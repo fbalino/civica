@@ -56,15 +56,17 @@ export default async function CountryPage({
   return (
     <div className="wide-container py-[var(--spacing-section)]">
       {/* Breadcrumb */}
-      <nav className="text-sm text-[var(--color-text-tertiary)] mb-6">
+      <nav className="text-sm text-[var(--color-text-tertiary)] mb-8 flex items-center gap-2">
         <a
           href="/countries"
           className="hover:text-[var(--color-text-secondary)] transition-colors"
         >
           Countries
         </a>
-        <span className="mx-2">/</span>
-        <span className="text-[var(--color-text-primary)]">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="opacity-40">
+          <path d="M4.5 2.5l3 3.5-3 3.5" />
+        </svg>
+        <span className="text-[var(--color-text-primary)] font-medium">
           {jurisdiction.name}
         </span>
       </nav>
@@ -90,32 +92,46 @@ export default async function CountryPage({
 
           {/* Government leaders */}
           {(headOfState || headOfGov) && (
-            <div className="mt-6 space-y-3">
-              <h3 className="font-heading text-lg font-medium">Leadership</h3>
-              {headOfState && (
-                <div className="flex items-center gap-3 p-3 rounded-[var(--radius-md)] bg-[var(--color-surface-alt)]">
-                  <div>
-                    <div className="text-xs text-[var(--color-text-tertiary)] uppercase tracking-wide">
-                      Head of State
+            <div className="mt-6">
+              <h3 className="font-heading text-lg font-medium mb-3">Leadership</h3>
+              <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] overflow-hidden divide-y divide-[var(--color-border-muted)]">
+                {headOfState && (
+                  <div className="flex items-center gap-4 px-5 py-4 bg-[var(--color-surface-elevated)]">
+                    <div className="w-9 h-9 rounded-full bg-[var(--color-branch-executive)]/10 flex items-center justify-center flex-shrink-0">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--color-branch-executive)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="8" cy="5" r="3" />
+                        <path d="M2.5 14c0-3 2.5-5 5.5-5s5.5 2 5.5 5" />
+                      </svg>
                     </div>
-                    <div className="text-sm font-medium text-[var(--color-text-primary)]">
-                      {headOfState.person.name}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {headOfGov && (
-                <div className="flex items-center gap-3 p-3 rounded-[var(--radius-md)] bg-[var(--color-surface-alt)]">
-                  <div>
-                    <div className="text-xs text-[var(--color-text-tertiary)] uppercase tracking-wide">
-                      Head of Government
-                    </div>
-                    <div className="text-sm font-medium text-[var(--color-text-primary)]">
-                      {headOfGov.person.name}
+                    <div>
+                      <div className="text-xs text-[var(--color-text-tertiary)] uppercase tracking-wide">
+                        Head of State
+                      </div>
+                      <div className="text-sm font-medium text-[var(--color-text-primary)] mt-0.5">
+                        {headOfState.person.name}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+                {headOfGov && (
+                  <div className="flex items-center gap-4 px-5 py-4 bg-[var(--color-surface-elevated)]">
+                    <div className="w-9 h-9 rounded-full bg-[var(--color-branch-legislative)]/10 flex items-center justify-center flex-shrink-0">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--color-branch-legislative)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="2" width="10" height="12" rx="1.5" />
+                        <path d="M6 5.5h4M6 8h4M6 10.5h2" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-xs text-[var(--color-text-tertiary)] uppercase tracking-wide">
+                        Head of Government
+                      </div>
+                      <div className="text-sm font-medium text-[var(--color-text-primary)] mt-0.5">
+                        {headOfGov.person.name}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

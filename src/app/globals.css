@@ -130,6 +130,13 @@ body {
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
+  transition: background-color 0.3s ease, color 0.2s ease;
+}
+
+*, *::before, *::after {
+  transition-property: background-color, border-color, box-shadow;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
 }
 
 /* --- Editorial heading styles --- */
@@ -270,4 +277,75 @@ a:hover {
   :root, .dark {
     --spacing-page-x: 3rem;
   }
+}
+
+/* ============================================================
+   Editorial card hover effects
+   ============================================================ */
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dark .card-hover:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   Decorative rule — thin horizontal accent
+   ============================================================ */
+
+.editorial-rule {
+  width: 3rem;
+  height: 1px;
+  background: var(--color-border);
+  border: none;
+  margin: 0;
+}
+
+.editorial-rule--accent {
+  background: var(--color-accent);
+  height: 2px;
+  width: 2.5rem;
+}
+
+/* ============================================================
+   Scrollbar hide for horizontal tab navs
+   ============================================================ */
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================
+   Flag emoji display — consistent sizing
+   ============================================================ */
+
+.flag-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   Hero gradient overlay (subtle depth)
+   ============================================================ */
+
+.hero-gradient {
+  background:
+    linear-gradient(
+      180deg,
+      var(--color-surface-alt) 0%,
+      var(--color-surface) 100%
+    );
 }

@@ -1,4 +1,5 @@
 import { getAllJurisdictions } from "@/lib/db/queries";
+import { CountrySearch } from "./search";
 
 export const metadata = {
   title: "Countries — Civica",
@@ -23,10 +24,21 @@ export default async function CountriesPage({
     typeof resolvedParams?.continent === "string"
       ? resolvedParams.continent
       : null;
+  const searchQuery =
+    typeof resolvedParams?.q === "string" ? resolvedParams.q.toLowerCase() : null;
 
-  const filtered = continentFilter
+  let filtered = continentFilter
     ? countries.filter((c) => c.continent === continentFilter)
     : countries;
+
+  if (searchQuery) {
+    filtered = filtered.filter(
+      (c) =>
+        c.name.toLowerCase().includes(searchQuery) ||
+        c.capital?.toLowerCase().includes(searchQuery) ||
+        c.continent?.toLowerCase().includes(searchQuery)
+    );
+  }
 
   const continents = [...new Set(countries.map((c) => c.continent).filter(Boolean))].sort();
 
@@ -35,11 +47,13 @@ export default async function CountriesPage({
       <h1 className="font-heading text-4xl font-normal tracking-tight mb-2">
         Countries
       </h1>
-      <p className="text-[var(--color-text-secondary)] mb-8">
+      <p className="text-[var(--color-text-secondary)] mb-6">
         {countries.length > 0
           ? `${countries.length} sovereign states and territories`
           : "Data not yet loaded. Run the seed scripts to populate."}
       </p>
+
+      <CountrySearch defaultValue={searchQuery ?? ""} continent={continentFilter} />
 
       {continents.length > 0 && (
         <nav className="flex gap-2 flex-wrap mb-8">
@@ -74,7 +88,7 @@ export default async function CountriesPage({
           <a
             key={country.slug}
             href={`/countries/${country.slug}`}
-            className="group flex flex-col gap-2 p-5 rounded-[var(--radius-lg)] border border-[var(--color-border-muted)] hover:border-[var(--color-border)] hover:bg-[var(--color-surface-alt)] transition-all no-underline"
+            className="card-hover group flex flex-col gap-2 p-5 rounded-[var(--radius-lg)] border border-[var(--color-border-muted)] hover:border-[var(--color-border)] hover:bg-[var(--color-surface-alt)] transition-all no-underline"
           >
             <div className="flex items-center gap-3">
               {country.flagUrl && (
@@ -90,7 +104,7 @@ export default async function CountriesPage({
             </div>
             <div className="flex gap-4 text-xs text-[var(--color-text-tertiary)]">
               {country.continent && <span>{country.continent}</span>}
-              {country.population && (
+              {country.population && country.population > 0 && (
                 <span>Pop: {(country.population / 1e6).toFixed(1)}M</span>
               )}
             </div>
@@ -105,7 +119,9 @@ export default async function CountriesPage({
 
       {filtered.length === 0 && countries.length > 0 && (
         <p className="text-center text-[var(--color-text-tertiary)] py-12">
-          No countries match the selected filter.
+          {searchQuery
+            ? `No countries match "${resolvedParams?.q}".`
+            : "No countries match the selected filter."}
         </p>
       )}
     </div>

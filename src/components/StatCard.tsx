@@ -20,7 +20,7 @@ export function StatCard({
   trend,
 }: StatCardProps) {
   return (
-    <div className="flex flex-col gap-1.5 p-4 rounded-[var(--radius-lg)] bg-[var(--color-surface-alt)] border border-[var(--color-border-muted)]">
+    <div className="flex flex-col gap-1.5 p-4 rounded-[var(--radius-lg)] bg-[var(--color-surface-alt)] border border-[var(--color-border-muted)] card-hover">
       <span className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-tertiary)]">
         {label}
       </span>
