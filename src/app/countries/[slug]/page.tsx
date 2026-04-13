@@ -8,7 +8,7 @@ import {
 import { CountryProfileCard } from "@/components/CountryProfileCard";
 import { StatCard } from "@/components/StatCard";
 import { FactbookSection } from "@/components/FactbookSection";
-import { FactbookSectionNavUncontrolled } from "@/components/FactbookSectionNav";
+import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
 
 export default async function CountryPage({
@@ -202,24 +202,25 @@ export default async function CountryPage({
           <h2 className="font-heading text-2xl font-medium tracking-tight mb-6">
             CIA World Factbook Archive
           </h2>
-          <FactbookSectionNavUncontrolled
+          <FactbookSectionTabs
             sections={sectionNames}
             defaultSection={sectionNames.includes("government") ? "government" : sectionNames[0]}
           >
-            {(activeSection: string) => {
-              const data = sectionDataMap.get(activeSection);
-              if (!data) return null;
+            {sectionNames.map((sectionName) => {
+              const data = sectionDataMap.get(sectionName);
+              if (!data) return <div key={sectionName} />;
               const fields = jsonbToFields(data);
               return (
                 <FactbookSection
-                  sectionName={activeSection}
+                  key={sectionName}
+                  sectionName={sectionName}
                   fields={fields}
                   source="cia_factbook"
                   retrievedAt="2026-01-23"
                 />
               );
-            }}
-          </FactbookSectionNavUncontrolled>
+            })}
+          </FactbookSectionTabs>
         </section>
       )}
     </div>

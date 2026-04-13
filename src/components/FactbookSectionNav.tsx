@@ -62,16 +62,17 @@ export function FactbookSectionNav({
   );
 }
 
-export function FactbookSectionNavUncontrolled({
+export function FactbookSectionTabs({
   sections,
   defaultSection,
   children,
 }: {
   sections: string[];
   defaultSection?: string;
-  children: (activeSection: string) => React.ReactNode;
+  children: React.ReactNode[];
 }) {
   const [active, setActive] = useState(defaultSection ?? sections[0] ?? "");
+  const activeIndex = sections.indexOf(active);
 
   return (
     <div>
@@ -81,7 +82,7 @@ export function FactbookSectionNavUncontrolled({
         onSectionChange={setActive}
       />
       <div className="mt-6" role="tabpanel">
-        {children(active)}
+        {children[activeIndex >= 0 ? activeIndex : 0]}
       </div>
     </div>
   );
