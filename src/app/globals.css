@@ -1,26 +1,273 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================================
+   Civica Editorial Design System — Tailwind v4 @theme tokens
+   ============================================================ */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* --- Typography --- */
+  --font-heading: var(--font-newsreader), "Georgia", "Times New Roman", serif;
+  --font-body: var(--font-dm-sans), "Helvetica Neue", "Arial", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 3.75rem;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.35;
+  --leading-normal: 1.65;
+  --leading-relaxed: 1.8;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+
+  /* --- Colors: restrained grayscale base --- */
+  --color-ink-950: #0a0a0a;
+  --color-ink-900: #171717;
+  --color-ink-800: #262626;
+  --color-ink-700: #3f3f3f;
+  --color-ink-600: #525252;
+  --color-ink-500: #6b6b6b;
+  --color-ink-400: #8a8a8a;
+  --color-ink-300: #b0b0b0;
+  --color-ink-200: #d4d4d4;
+  --color-ink-150: #e5e5e5;
+  --color-ink-100: #f0f0f0;
+  --color-ink-50: #f7f7f7;
+
+  /* --- Accent --- */
+  --color-accent: #1a56db;
+  --color-accent-hover: #1648b8;
+  --color-accent-muted: #dbeafe;
+  --color-accent-text: #1e40af;
+
+  /* --- Source provenance dots --- */
+  --color-source-live: #1d9e75;
+  --color-source-frozen: #d4a04a;
+
+  /* --- Government branch colors --- */
+  --color-branch-executive: #b45309;
+  --color-branch-legislative: #1d4ed8;
+  --color-branch-judicial: #6b7280;
+
+  /* --- Semantic surfaces (light mode defaults) --- */
+  --color-surface: #ffffff;
+  --color-surface-alt: #f7f7f7;
+  --color-surface-elevated: #ffffff;
+  --color-border: #e5e5e5;
+  --color-border-muted: #f0f0f0;
+
+  /* --- Semantic text --- */
+  --color-text-primary: #0a0a0a;
+  --color-text-secondary: #525252;
+  --color-text-tertiary: #8a8a8a;
+  --color-text-inverse: #ffffff;
+
+  /* --- Layout --- */
+  --max-w-content: 720px;
+  --max-w-wide: 960px;
+  --max-w-full-bleed: 1200px;
+
+  /* --- Spacing scale (generous whitespace) --- */
+  --spacing-page-x: 1.5rem;
+  --spacing-section: 4rem;
+  --spacing-block: 2rem;
+
+  /* --- Radii --- */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================
+   Dark mode overrides
+   ============================================================ */
+
+.dark {
+  --color-surface: #0a0a0a;
+  --color-surface-alt: #141414;
+  --color-surface-elevated: #1a1a1a;
+  --color-border: #262626;
+  --color-border-muted: #1a1a1a;
+
+  --color-text-primary: #f0f0f0;
+  --color-text-secondary: #b0b0b0;
+  --color-text-tertiary: #6b6b6b;
+  --color-text-inverse: #0a0a0a;
+
+  --color-accent: #60a5fa;
+  --color-accent-hover: #93bbfd;
+  --color-accent-muted: #1e3a5f;
+  --color-accent-text: #93c5fd;
+
+  --color-branch-executive: #f59e0b;
+  --color-branch-legislative: #60a5fa;
+  --color-branch-judicial: #9ca3af;
+}
+
+/* ============================================================
+   Base styles
+   ============================================================ */
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+/* --- Editorial heading styles --- */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+h1 { font-size: var(--text-5xl); font-weight: 400; }
+h2 { font-size: var(--text-3xl); }
+h3 { font-size: var(--text-2xl); }
+h4 { font-size: var(--text-xl); }
+
+/* --- Link styles --- */
+
+a {
+  color: var(--color-accent-text);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+/* --- Focus styles for accessibility --- */
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- Selection --- */
+
+::selection {
+  background: var(--color-accent-muted);
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+   SourceDot — CSS-only provenance indicator
+   ============================================================ */
+
+.source-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-left: 4px;
+  vertical-align: middle;
+  position: relative;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.source-dot--live {
+  background-color: var(--color-source-live);
+}
+
+.source-dot--frozen {
+  background-color: var(--color-source-frozen);
+}
+
+.source-dot::after {
+  content: attr(data-source) "\A" attr(data-date);
+  white-space: pre-line;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-ink-900);
+  color: var(--color-ink-50);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 50;
+  min-width: max-content;
+}
+
+.source-dot:hover::after {
+  opacity: 1;
+}
+
+.dark .source-dot::after {
+  background: var(--color-ink-100);
+  color: var(--color-ink-900);
+}
+
+/* ============================================================
+   Utility classes
+   ============================================================ */
+
+.editorial-container {
+  width: 100%;
+  max-width: var(--max-w-content);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-page-x);
+  padding-right: var(--spacing-page-x);
+}
+
+.wide-container {
+  width: 100%;
+  max-width: var(--max-w-wide);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-page-x);
+  padding-right: var(--spacing-page-x);
+}
+
+.full-bleed-container {
+  width: 100%;
+  max-width: var(--max-w-full-bleed);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-page-x);
+  padding-right: var(--spacing-page-x);
+}
+
+@media (min-width: 768px) {
+  :root, .dark {
+    --spacing-page-x: 2.5rem;
+    --spacing-section: 6rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root, .dark {
+    --spacing-page-x: 3rem;
+  }
 }
