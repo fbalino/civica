@@ -3,7 +3,7 @@ config({ path: ".env.local" });
 
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, ilike } from "drizzle-orm";
 import {
   jurisdictions,
   governmentBodies,
@@ -40,7 +40,14 @@ WHERE {
 }
 `;
 
-async function findJurisdiction(iso2: string | null, qid: string) {
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+async function findJurisdiction(iso2: string | null, qid: string, name: string) {
   if (iso2) {
     const byIso = await db
       .select({ id: jurisdictions.id })
@@ -56,6 +63,25 @@ async function findJurisdiction(iso2: string | null, qid: string) {
     .where(eq(jurisdictions.wikidataQid, qid))
     .limit(1);
   if (byQid.length > 0) return byQid[0].id;
+
+  const slug = slugify(name);
+  if (slug) {
+    const bySlug = await db
+      .select({ id: jurisdictions.id })
+      .from(jurisdictions)
+      .where(eq(jurisdictions.slug, slug))
+      .limit(1);
+    if (bySlug.length > 0) return bySlug[0].id;
+  }
+
+  if (name) {
+    const byName = await db
+      .select({ id: jurisdictions.id })
+      .from(jurisdictions)
+      .where(ilike(jurisdictions.name, name))
+      .limit(1);
+    if (byName.length > 0) return byName[0].id;
+  }
 
   return null;
 }
@@ -175,7 +201,7 @@ async function main() {
     const stateName = binding.stateLabel?.value ?? stateQid;
     const iso2 = binding.iso2?.value ?? null;
 
-    const jurisdictionId = await findJurisdiction(iso2, stateQid);
+    const jurisdictionId = await findJurisdiction(iso2, stateQid, stateName);
     if (!jurisdictionId) {
       skipped++;
       continue;
