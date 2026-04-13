@@ -1,0 +1,136 @@
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useCallback, useRef, useEffect } from "react";
+
+interface Country {
+  slug: string;
+  name: string;
+  iso2: string | null;
+}
+
+function countryFlag(iso2: string | null): string {
+  if (!iso2) return "";
+  return [...iso2.toUpperCase()]
+    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
+    .join("");
+}
+
+function CountryPicker({
+  countries,
+  selected,
+  onSelect,
+  onRemove,
+  placeholder,
+}: {
+  countries: Country[];
+  selected: string | null;
+  onSelect: (slug: string) => void;
+  onRemove: () => void;
+  placeholder: string;
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const filtered = query
+    ? countries.filter((c) => c.name.toLowerCase().includes(query.toLowerCase())).slice(0, 12)
+    : countries.slice(0, 12);
+
+  const selectedCountry = selected ? countries.find((c) => c.slug === selected) : null;
+
+  if (selectedCountry) {
+    return (
+      <div className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)]">
+        <span className="text-lg">{countryFlag(selectedCountry.iso2)}</span>
+        <span className="font-mono text-sm text-[var(--color-text-primary)] flex-1">
+          {selectedCountry.name}
+        </span>
+        <button
+          onClick={onRemove}
+          className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
+          aria-label="Remove"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M4 4l6 6M10 4l-6 6" />
+          </svg>
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <input
+        type="text"
+        placeholder={placeholder}
+        value={query}
+        onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        className="w-full px-3 py-2 text-sm rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
+      />
+      {open && filtered.length > 0 && (
+        <div className="absolute top-full mt-1 left-0 right-0 z-20 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-lg max-h-60 overflow-y-auto">
+          {filtered.map((c) => (
+            <button
+              key={c.slug}
+              onClick={() => { onSelect(c.slug); setQuery(""); setOpen(false); }}
+              className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-[var(--color-surface-alt)] transition-colors"
+            >
+              <span className="text-base">{countryFlag(c.iso2)}</span>
+              <span className="font-mono text-sm text-[var(--color-text-primary)]">{c.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function CompareSelector({ countries }: { countries: Country[] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const current = searchParams.getAll("c");
+
+  const updateUrl = useCallback(
+    (slugs: string[]) => {
+      const params = new URLSearchParams();
+      slugs.forEach((s) => params.append("c", s));
+      router.push(`/compare?${params.toString()}`);
+    },
+    [router]
+  );
+
+  const slots = [current[0] ?? null, current[1] ?? null, current[2] ?? null];
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
+      {slots.map((slug, i) => (
+        <CountryPicker
+          key={i}
+          countries={countries.filter((c) => !current.includes(c.slug) || c.slug === slug)}
+          selected={slug}
+          placeholder={i === 0 ? "Select first country..." : i === 1 ? "Select second country..." : "Add third (optional)..."}
+          onSelect={(s) => {
+            const next = [...current];
+            if (next.length <= i) next.push(s);
+            else next[i] = s;
+            updateUrl(next);
+          }}
+          onRemove={() => {
+            const next = current.filter((_, j) => j !== i);
+            updateUrl(next);
+          }}
+        />
+      ))}
+    </div>
+  );
+}

@@ -88,12 +88,15 @@ async function findJurisdiction(iso2: string | null, qid: string, name: string) 
 
 async function upsertPerson(name: string, qid: string): Promise<string> {
   const existing = await db
-    .select({ id: persons.id })
+    .select({ id: persons.id, name: persons.name })
     .from(persons)
     .where(eq(persons.wikidataQid, qid))
     .limit(1);
 
   if (existing.length > 0) {
+    if (existing[0].name !== name && !name.match(/^Q\d+$/)) {
+      await db.update(persons).set({ name }).where(eq(persons.id, existing[0].id));
+    }
     return existing[0].id;
   }
 

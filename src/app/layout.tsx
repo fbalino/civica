@@ -90,8 +90,18 @@ export default function RootLayout({
                   </div>
                 </div>
                 <div className="font-mono text-[11px] text-[var(--color-text-tertiary)] md:text-right">
-                  <div>Countries &middot; Constitutions &middot; Rankings</div>
-                  <div className="mt-1.5">About &middot; Methodology &middot; Sources</div>
+                  <div className="flex gap-3 md:justify-end">
+                    <a href="/countries" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">Countries</a>
+                    <span>&middot;</span>
+                    <a href="/compare" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">Compare</a>
+                    <span>&middot;</span>
+                    <a href="/rankings" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">Rankings</a>
+                  </div>
+                  <div className="mt-1.5 flex gap-3 md:justify-end">
+                    <a href="/about" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">About</a>
+                    <span>&middot;</span>
+                    <a href="/about" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">Sources</a>
+                  </div>
                 </div>
               </div>
             </div>

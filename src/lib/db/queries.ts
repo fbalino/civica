@@ -121,6 +121,14 @@ export async function getGovernmentStructure(jurisdictionId: string) {
   return { bodies, offices: allOffices, currentTerms };
 }
 
+export async function getJurisdictionsBySlugs(slugs: string[]) {
+  if (slugs.length === 0) return [];
+  return db
+    .select()
+    .from(jurisdictions)
+    .where(sql`${jurisdictions.slug} IN ${slugs}`);
+}
+
 export async function getSource(sourceId: string) {
   const results = await db
     .select()
