@@ -40,7 +40,7 @@ All sources tracked in `sources` table. Every fact has statement-level provenanc
 
 ## Design System
 Editorial reference work aesthetic (not a dashboard). See `globals.css` for tokens.
-- Serif headings (Newsreader), sans body (DM Sans)
+- IBM Plex family: Serif headings (IBM Plex Serif), sans body (IBM Plex Sans), mono (IBM Plex Mono)
 - SourceDot component on every data point (green=live, amber=frozen)
 - Dark/light mode via ThemeProvider
 - Layout containers: `.editorial-container` (720px), `.wide-container` (960px), `.full-bleed-container` (1200px)
