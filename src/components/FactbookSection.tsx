@@ -22,15 +22,12 @@ function FieldRow({ field, source, retrievedAt, depth = 0 }: {
   return (
     <>
       <div
-        className={`
-          py-3 border-b border-[var(--color-border-muted)] last:border-b-0
-          ${depth > 0 ? "pl-6" : ""}
-        `}
+        className={`py-2.5 border-b border-[var(--color-border-muted)] last:border-b-0 ${depth > 0 ? "pl-4" : ""}`}
       >
-        <dt className="text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+        <dt className="font-mono text-xs text-[var(--color-text-tertiary)] tracking-wide uppercase mb-1">
           {field.label}
         </dt>
-        <dd className="text-[var(--text-base)] leading-relaxed text-[var(--color-text-primary)]">
+        <dd className="font-mono text-[13px] leading-relaxed text-[var(--color-text-secondary)]">
           {field.value}
           {source && retrievedAt && (
             <SourceDot source={source} retrievedAt={retrievedAt} />
@@ -58,7 +55,7 @@ export function FactbookSection({
 }: FactbookSectionProps) {
   if (fields.length === 0) {
     return (
-      <div className="py-8 text-center text-[var(--color-text-tertiary)] text-sm">
+      <div className="py-8 text-center font-mono text-sm text-[var(--color-text-tertiary)]">
         No data available for this section.
       </div>
     );

@@ -20,22 +20,22 @@ export function StatCard({
   trend,
 }: StatCardProps) {
   return (
-    <div className="flex flex-col gap-1.5 p-4 rounded-[var(--radius-lg)] bg-[var(--color-surface-alt)] border border-[var(--color-border-muted)] card-hover">
-      <span className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-tertiary)]">
+    <div className="flex flex-col gap-1 p-4 rounded-[var(--radius-sm)] bg-[var(--color-surface-alt)] border border-[var(--color-border-muted)]">
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
         {label}
       </span>
       <div className="flex items-baseline gap-1.5">
-        <span className="font-heading text-2xl font-medium tracking-tight text-[var(--color-text-primary)]">
+        <span className="font-heading text-2xl tracking-tight text-[var(--color-text-primary)]">
           {value}
         </span>
         {unit && (
-          <span className="text-sm text-[var(--color-text-tertiary)]">
+          <span className="font-mono text-xs text-[var(--color-text-tertiary)]">
             {unit}
           </span>
         )}
         {trend && (
           <span
-            className={`text-xs ${
+            className={`font-mono text-xs ${
               trend === "up"
                 ? "text-[var(--color-source-live)]"
                 : trend === "down"
@@ -51,7 +51,7 @@ export function StatCard({
         )}
       </div>
       {year && (
-        <span className="text-xs text-[var(--color-text-tertiary)]">
+        <span className="font-mono text-[10px] text-[var(--color-text-tertiary)]">
           {year} est.
         </span>
       )}

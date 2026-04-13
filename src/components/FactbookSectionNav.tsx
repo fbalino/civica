@@ -33,7 +33,7 @@ export function FactbookSectionNav({
 }: FactbookSectionNavProps) {
   return (
     <nav
-      className="flex gap-1 overflow-x-auto border-b border-[var(--color-border)] pb-px -mb-px scrollbar-none"
+      className="flex gap-0.5 overflow-x-auto border-b border-[var(--color-border)] pb-px -mb-px scrollbar-none"
       role="tablist"
       aria-label="Factbook sections"
     >
@@ -45,14 +45,7 @@ export function FactbookSectionNav({
             role="tab"
             aria-selected={isActive}
             onClick={() => onSectionChange(section)}
-            className={`
-              px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors rounded-t-[var(--radius-md)]
-              ${
-                isActive
-                  ? "text-[var(--color-text-primary)] border-b-2 border-[var(--color-accent)] bg-[var(--color-surface)]"
-                  : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)]"
-              }
-            `}
+            className={`tab-nav ${isActive ? "tab-nav--active" : ""}`}
           >
             {sectionLabel(section)}
           </button>

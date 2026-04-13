@@ -1,35 +1,28 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Serif, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NavLinks } from "@/components/NavLinks";
 import { MobileNav } from "@/components/MobileNav";
 import "./globals.css";
 
-const ibmPlexSerif = IBM_Plex_Serif({
-  variable: "--font-ibm-plex-serif",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600"],
+  weight: "400",
   style: ["normal", "italic"],
 });
 
-const ibmPlexSans = IBM_Plex_Sans({
-  variable: "--font-ibm-plex-sans",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex-mono",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500"],
+  weight: ["300", "400", "500"],
 });
 
 export const metadata: Metadata = {
-  title: "Civica — World Government Atlas",
+  title: "Civica — Atlas of Governance",
   description:
     "An interactive platform visualizing government structures for every country in the world. A modern successor to the CIA World Factbook.",
 };
@@ -42,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${ibmPlexSerif.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable}`}
+      className={`${instrumentSerif.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -54,14 +47,21 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col antialiased">
         <ThemeProvider>
-          <header className="w-full border-b border-[var(--color-border)] sticky top-0 z-40 bg-[var(--color-surface)]/95 backdrop-blur-sm">
-            <div className="full-bleed-container flex items-center justify-between h-14">
-              <a href="/" className="font-heading text-xl font-medium tracking-tight text-[var(--color-text-primary)] no-underline hover:text-[var(--color-text-primary)]">
-                Civica
+          <header className="w-full border-b border-[var(--color-border)] sticky top-0 z-40 bg-[var(--color-surface)]/92 backdrop-blur-sm">
+            <div className="wide-container flex items-center justify-between py-4">
+              <a href="/" className="no-underline flex items-baseline gap-2">
+                <span className="font-heading text-[26px] font-normal tracking-tight text-[var(--color-text-primary)]">
+                  Civica
+                </span>
+                <span className="hidden sm:inline font-mono text-[9px] text-[var(--color-text-tertiary)] tracking-[0.15em] uppercase">
+                  Atlas of governance
+                </span>
               </a>
-              <div className="hidden md:flex items-center gap-6">
+              <div className="hidden md:flex items-center gap-1">
                 <NavLinks />
-                <ThemeToggle />
+                <div className="ml-4">
+                  <ThemeToggle />
+                </div>
               </div>
               <div className="flex md:hidden items-center gap-2">
                 <ThemeToggle />
@@ -70,43 +70,30 @@ export default function RootLayout({
             </div>
           </header>
           <main className="flex-1">{children}</main>
-          <footer className="border-t border-[var(--color-border)] mt-[var(--spacing-section)]">
-            <div className="full-bleed-container py-10">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <footer className="border-t border-[var(--color-border)] mt-16">
+            <div className="wide-container py-10">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-8">
                 <div>
-                  <span className="font-heading text-lg font-medium text-[var(--color-text-primary)]">
-                    Civica
-                  </span>
-                  <p className="mt-2 text-sm text-[var(--color-text-tertiary)] leading-relaxed max-w-xs">
-                    An open reference to the world&rsquo;s governments, political systems, and country data.
+                  <span className="font-heading text-xl text-[var(--color-text-primary)]">Civica</span>
+                  <p className="font-mono text-[11px] text-[var(--color-text-tertiary)] mt-2 leading-relaxed">
+                    Data from Wikidata (CC0), IPU Parline, Constitute Project, CIA World Factbook (archived)
                   </p>
+                  <div className="flex gap-3 mt-3">
+                    <span className="flex items-center gap-1.5 font-mono text-[10px] text-[var(--color-text-tertiary)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-source-live)]" />
+                      Live source
+                    </span>
+                    <span className="flex items-center gap-1.5 font-mono text-[10px] text-[var(--color-text-tertiary)]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-source-frozen)]" />
+                      Archived (Jan 2026)
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-tertiary)]">
-                    Explore
-                  </span>
-                  <nav className="mt-3 flex flex-col gap-2">
-                    <a href="/countries" className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors no-underline">Countries</a>
-                    <a href="/rankings" className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors no-underline">Rankings</a>
-                    <a href="/about" className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors no-underline">About</a>
-                  </nav>
-                </div>
-                <div>
-                  <span className="text-xs font-medium uppercase tracking-wide text-[var(--color-text-tertiary)]">
-                    Sources
-                  </span>
-                  <nav className="mt-3 flex flex-col gap-2">
-                    <span className="text-sm text-[var(--color-text-secondary)]">Wikidata (CC0)</span>
-                    <span className="text-sm text-[var(--color-text-secondary)]">CIA World Factbook (PD)</span>
-                    <span className="text-sm text-[var(--color-text-secondary)]">IPU Parline</span>
-                    <span className="text-sm text-[var(--color-text-secondary)]">Constitute Project</span>
-                  </nav>
+                <div className="font-mono text-[11px] text-[var(--color-text-tertiary)] md:text-right">
+                  <div>Countries &middot; Constitutions &middot; Rankings</div>
+                  <div className="mt-1.5">About &middot; Methodology &middot; Sources</div>
                 </div>
               </div>
-              <hr className="border-[var(--color-border-muted)] my-8" />
-              <p className="text-xs text-[var(--color-text-tertiary)] text-center">
-                Civica &mdash; Open data for open governments
-              </p>
             </div>
           </footer>
         </ThemeProvider>

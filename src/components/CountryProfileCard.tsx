@@ -52,42 +52,40 @@ export function CountryProfileCard({
   if (currency) rows.push({ label: "Currency", value: currency });
 
   return (
-    <div className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] overflow-hidden">
-      {/* Header with flag and name */}
-      <div className="flex items-center gap-4 px-6 py-5 border-b border-[var(--color-border-muted)]">
+    <div className="rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-alt)] overflow-hidden">
+      <div className="flex items-center gap-4 px-5 py-4 border-b border-[var(--color-border-muted)]">
         {flagUrl && (
           <img
             src={flagUrl}
             alt={`${name} flag`}
-            className="w-10 h-7 object-cover rounded-[var(--radius-sm)] shadow-sm"
+            className="w-10 h-7 object-cover rounded-sm shadow-sm"
           />
         )}
         <div className="flex flex-col">
           <a
             href={`/countries/${slug}`}
-            className="font-heading text-2xl font-medium tracking-tight text-[var(--color-text-primary)] hover:text-[var(--color-accent-text)] transition-colors no-underline"
+            className="font-heading text-2xl tracking-tight text-[var(--color-text-primary)] hover:text-[var(--color-accent-text)] transition-colors no-underline"
           >
             {name}
           </a>
           {continent && (
-            <span className="text-xs uppercase tracking-wide text-[var(--color-text-tertiary)] mt-0.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--color-text-tertiary)] mt-0.5">
               {continent}
             </span>
           )}
         </div>
       </div>
 
-      {/* Fact rows */}
       <dl className="divide-y divide-[var(--color-border-muted)]">
         {rows.map((row) => (
           <div
             key={row.label}
-            className="flex justify-between items-baseline px-6 py-3"
+            className="flex justify-between items-baseline px-5 py-2.5"
           >
-            <dt className="text-sm text-[var(--color-text-secondary)]">
+            <dt className="font-mono text-xs text-[var(--color-text-tertiary)] tracking-wide">
               {row.label}
             </dt>
-            <dd className="text-sm font-medium text-[var(--color-text-primary)] flex items-center gap-0">
+            <dd className="font-mono text-[13px] text-[var(--color-text-primary)] flex items-center gap-0">
               {row.value}
               {source && retrievedAt && (
                 <SourceDot source={source} retrievedAt={retrievedAt} />
