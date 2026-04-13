@@ -6,9 +6,9 @@
 
 @theme inline {
   /* --- Typography --- */
-  --font-heading: var(--font-newsreader), "Georgia", "Times New Roman", serif;
-  --font-body: var(--font-dm-sans), "Helvetica Neue", "Arial", sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code", monospace;
+  --font-heading: var(--font-ibm-plex-serif), "Georgia", "Times New Roman", serif;
+  --font-body: var(--font-ibm-plex-sans), "Helvetica Neue", "Arial", sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, "Cascadia Code", monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
