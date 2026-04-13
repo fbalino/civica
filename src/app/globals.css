@@ -283,12 +283,17 @@ a:hover {
    ============================================================ */
 
 .card-hover {
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .card-hover:hover {
   background: var(--color-surface-alt);
   border-color: var(--color-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.dark .card-hover:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 /* ============================================================
@@ -354,11 +359,15 @@ a:hover {
   background: var(--color-surface);
   padding: 24px 28px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
 .country-grid-cell:hover {
   background: var(--color-surface-alt);
+}
+
+.country-grid-cell:active {
+  transform: scale(0.99);
 }
 
 @media (max-width: 767px) {
@@ -398,6 +407,10 @@ a:hover {
 .tab-nav--active {
   color: var(--color-text-primary);
   border-bottom-color: var(--color-accent);
+}
+
+.tab-nav:focus-visible {
+  outline-offset: -2px;
 }
 
 /* ============================================================

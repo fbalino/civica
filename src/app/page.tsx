@@ -57,6 +57,7 @@ export default async function Home() {
         <h1 className="font-heading text-5xl md:text-[64px] font-normal leading-[1.05] tracking-tight text-[var(--color-text-primary)] mb-6 max-w-2xl">
           How the world<br />is <em>governed</em>
         </h1>
+        <hr className="editorial-rule--accent mb-8" />
         <p className="font-mono text-sm text-[var(--color-text-tertiary)] leading-relaxed max-w-lg mb-12">
           Interactive government structure diagrams, legislature visualizations,
           constitutional texts, and country intelligence. The successor to the CIA World Factbook.
@@ -64,41 +65,53 @@ export default async function Home() {
 
         {/* Country grid */}
         {featured.length > 0 && (
-          <div className="country-grid">
-            {featured.map((co) => {
-              const color = govColor(co.governmentTypeDetail ?? co.governmentType);
-              return (
+          <>
+            <div className="country-grid">
+              {featured.map((co) => {
+                const color = govColor(co.governmentTypeDetail ?? co.governmentType);
+                return (
+                  <a
+                    key={co.slug}
+                    href={`/countries/${co.slug}`}
+                    className="country-grid-cell no-underline group"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <span className="text-[32px] leading-none">
+                        {countryFlag(co.iso2)}
+                      </span>
+                      <span
+                        className="gov-badge"
+                        style={{
+                          color,
+                          border: `1px solid ${color}33`,
+                        }}
+                      >
+                        {govLabel(co.governmentTypeDetail ?? co.governmentType)}
+                      </span>
+                    </div>
+                    <h3 className="font-heading text-[22px] font-normal tracking-tight text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-text)] transition-colors mb-1 leading-tight">
+                      {co.name}
+                    </h3>
+                    <p className="font-mono text-[11px] text-[var(--color-text-tertiary)] m-0">
+                      {co.capital}
+                      {co.capital && co.population ? " · " : ""}
+                      {co.population ? formatPopulation(co.population) : ""}
+                    </p>
+                  </a>
+                );
+              })}
+            </div>
+            {countries.length > featured.length && (
+              <div className="mt-8 text-center">
                 <a
-                  key={co.slug}
-                  href={`/countries/${co.slug}`}
-                  className="country-grid-cell no-underline group"
+                  href="/countries"
+                  className="inline-flex items-center gap-2 font-mono text-xs text-[var(--color-accent-text)] hover:text-[var(--color-accent-hover)] transition-colors no-underline"
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="text-[32px] leading-none">
-                      {countryFlag(co.iso2)}
-                    </span>
-                    <span
-                      className="gov-badge"
-                      style={{
-                        color,
-                        border: `1px solid ${color}33`,
-                      }}
-                    >
-                      {govLabel(co.governmentTypeDetail ?? co.governmentType)}
-                    </span>
-                  </div>
-                  <h3 className="font-heading text-[22px] font-normal tracking-tight text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-text)] transition-colors mb-1 leading-tight">
-                    {co.name}
-                  </h3>
-                  <p className="font-mono text-[11px] text-[var(--color-text-tertiary)] m-0">
-                    {co.capital}
-                    {co.capital && co.population ? " · " : ""}
-                    {co.population ? formatPopulation(co.population) : ""}
-                  </p>
+                  Browse all {countries.length} countries &rarr;
                 </a>
-              );
-            })}
-          </div>
+              </div>
+            )}
+          </>
         )}
 
         {featured.length === 0 && (

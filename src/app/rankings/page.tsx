@@ -77,7 +77,7 @@ export default async function RankingsPage({
       <h1 className="font-heading text-4xl font-normal tracking-tight mb-2">
         Rankings
       </h1>
-      <p className="text-[var(--color-text-secondary)] mb-8">
+      <p className="font-mono text-xs text-[var(--color-text-tertiary)] mb-10">
         Countries ranked by key indicators.
       </p>
 
@@ -86,7 +86,7 @@ export default async function RankingsPage({
           <a
             key={m.key}
             href={`/rankings?metric=${m.key}`}
-            className={`px-3 py-1.5 text-sm rounded-[var(--radius-md)] transition-colors no-underline ${
+            className={`font-mono text-xs px-3 py-1.5 rounded-[var(--radius-sm)] transition-colors no-underline ${
               m.key === metric.key
                 ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]"
                 : "bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"

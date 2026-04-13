@@ -42,7 +42,7 @@ export function RankingTable({
   return (
     <div className="w-full">
       <div className="flex items-baseline justify-between mb-4">
-        <h3 className="font-heading text-xl font-medium tracking-tight">
+        <h3 className="font-heading text-xl font-normal tracking-tight">
           {title}
         </h3>
         {unit && (

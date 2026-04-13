@@ -253,13 +253,14 @@ export default async function CountryPage({
 
   return (
     <div className="wide-container py-8 md:py-10">
-      {/* Back link */}
-      <a href="/countries" className="font-mono text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors no-underline mb-6 inline-block">
-        &larr; Back
+      {/* Breadcrumb */}
+      <a href="/countries" className="font-mono text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors no-underline mb-8 inline-flex items-center gap-1.5">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+        All countries
       </a>
 
       {/* Country header */}
-      <div className="flex items-end gap-5 mb-2">
+      <div className="flex items-end gap-5 mb-6">
         <span className="text-[56px] leading-none">
           {countryFlag(jurisdiction.iso2)}
         </span>
@@ -267,7 +268,7 @@ export default async function CountryPage({
           <h1 className="font-heading text-[52px] font-normal tracking-tight leading-none m-0">
             {jurisdiction.name}
           </h1>
-          <p className="font-mono text-xs mt-1.5" style={{ color }}>
+          <p className="font-mono text-xs mt-2" style={{ color }}>
             {jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType}
           </p>
         </div>

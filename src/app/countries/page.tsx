@@ -115,9 +115,20 @@ export default async function CountriesPage({
         </nav>
       )}
 
-      {/* Table-style list matching prototype */}
+      {/* Table-style list */}
       <div className="rounded-[var(--radius-sm)] overflow-hidden" style={{ background: "var(--color-border)" }}>
         <div className="flex flex-col gap-px">
+          {/* Column header */}
+          <div
+            className="bg-[var(--color-surface-alt)] hidden md:grid items-center gap-4 px-6 py-2.5"
+            style={{ gridTemplateColumns: "48px 1fr 180px 120px 80px" }}
+          >
+            <span />
+            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)]">Country</span>
+            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)]">Government</span>
+            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)] text-right">Population</span>
+            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)] text-right">Democracy</span>
+          </div>
           {filtered.map((country) => (
             <a
               key={country.slug}

@@ -49,17 +49,17 @@ export default function AboutPage() {
       </div>
 
       <section className="mt-[var(--spacing-section)]">
-        <h2 className="font-heading text-2xl font-medium tracking-tight mb-6">
+        <h2 className="font-heading text-2xl font-normal tracking-tight mb-6">
           Data Sources
         </h2>
         <div className="space-y-4">
           {DATA_SOURCES.map((source) => (
             <div
               key={source.id}
-              className="p-5 rounded-[var(--radius-lg)] border border-[var(--color-border-muted)] bg-[var(--color-surface-elevated)]"
+              className="p-5 rounded-[var(--radius-sm)] border border-[var(--color-border-muted)] bg-[var(--color-surface-elevated)]"
             >
               <div className="flex items-center gap-2 mb-2">
-                <h3 className="font-heading text-lg font-medium">
+                <h3 className="font-heading text-lg font-normal">
                   {source.name}
                 </h3>
                 <SourceDot source={source.id} retrievedAt={source.retrievedAt} />
@@ -76,7 +76,7 @@ export default function AboutPage() {
       </section>
 
       <section className="mt-[var(--spacing-section)]">
-        <h2 className="font-heading text-2xl font-medium tracking-tight mb-4">
+        <h2 className="font-heading text-2xl font-normal tracking-tight mb-4">
           Data Provenance
         </h2>
         <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">
@@ -108,7 +108,7 @@ export default function AboutPage() {
       </section>
 
       <section className="mt-[var(--spacing-section)]">
-        <h2 className="font-heading text-2xl font-medium tracking-tight mb-4">
+        <h2 className="font-heading text-2xl font-normal tracking-tight mb-4">
           Open Source
         </h2>
         <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
