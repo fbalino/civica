@@ -206,7 +206,7 @@ export default async function Home() {
       {/* Key stats */}
       {countries.length > 0 && (() => {
         const totalPop = countries.reduce((sum, c) => sum + (c.population ?? 0), 0);
-        const withGov = countries.filter((c) => c.governmentType).length;
+        const withGov = countries.filter((c) => c.governmentType || c.governmentTypeDetail).length;
         const continentCount = new Set(countries.map((c) => c.continent).filter(Boolean)).size;
         const stats = [
           { label: "Countries", value: countries.length.toString() },
