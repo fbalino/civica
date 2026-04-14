@@ -219,6 +219,75 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {/* Browse by continent */}
+      {countries.length > 0 && (() => {
+        const continentCounts = new Map<string, number>();
+        countries.forEach((c) => {
+          if (c.continent) continentCounts.set(c.continent, (continentCounts.get(c.continent) ?? 0) + 1);
+        });
+        const continents = [...continentCounts.entries()].sort((a, b) => b[1] - a[1]);
+        if (continents.length === 0) return null;
+        return (
+          <section
+            style={{
+              maxWidth: "var(--max-w-content)",
+              margin: "0 auto",
+              padding: "0 var(--spacing-page-x) 80px",
+            }}
+          >
+            <h2
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-13)",
+                letterSpacing: "var(--tracking-caps)",
+                textTransform: "uppercase",
+                color: "var(--color-text-30)",
+                marginBottom: 24,
+              }}
+            >
+              Browse by continent
+            </h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 1, background: "var(--color-grid-bg)", borderRadius: "var(--radius-sm)", overflow: "hidden" }}>
+              {continents.map(([name, count]) => (
+                <a
+                  key={name}
+                  href={`/countries?continent=${encodeURIComponent(name)}`}
+                  style={{
+                    textDecoration: "none",
+                    color: "inherit",
+                    background: "var(--color-grid-cell)",
+                    padding: "20px 24px",
+                    transition: "background-color 0.15s ease",
+                  }}
+                  className="country-grid-cell"
+                >
+                  <span
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "var(--text-18)",
+                      color: "var(--color-text-primary)",
+                      display: "block",
+                      marginBottom: 4,
+                    }}
+                  >
+                    {name}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-11)",
+                      color: "var(--color-text-30)",
+                    }}
+                  >
+                    {count} {count === 1 ? "country" : "countries"}
+                  </span>
+                </a>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { NavLinks } from "@/components/NavLinks";
 import { MobileNav } from "@/components/MobileNav";
+import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -90,7 +91,10 @@ export default function RootLayout({
             </a>
             <div className="hidden md:flex" style={{ alignItems: "center", gap: 4 }}>
               <NavLinks />
-              <div style={{ marginLeft: 16 }}>
+              <div style={{ marginLeft: 12 }}>
+                <GlobalSearchWrapper />
+              </div>
+              <div style={{ marginLeft: 8 }}>
                 <ThemeToggle />
               </div>
             </div>
