@@ -10,6 +10,8 @@ import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
 import { FactbookSection } from "@/components/FactbookSection";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
 import { CountryTabs } from "./tabs";
+import { CountryFlag } from "@/components/CountryFlag";
+import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 
 function govColor(type: string | null): string {
   if (!type) return "var(--color-gov-other)";
@@ -248,9 +250,20 @@ export default async function CountryPage({
     </div>
   );
 
-  /* ---- Government tab: branch structure with colored border lines ---- */
+  /* ---- Government tab: SVG diagram + branch text listing ---- */
   const governmentTab = (
-    <div className="cv-card">
+    <div>
+      {govStructure.bodies.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <GovStructureDiagram
+            bodies={govStructure.bodies}
+            offices={govStructure.offices}
+            currentTerms={govStructure.currentTerms}
+            countryName={jurisdiction.name}
+          />
+        </div>
+      )}
+      <div className="cv-card">
       <p
         style={{
           fontFamily: "var(--font-mono)",
@@ -304,6 +317,7 @@ export default async function CountryPage({
           </div>
         );
       })}
+    </div>
     </div>
   );
 
@@ -367,9 +381,7 @@ export default async function CountryPage({
 
       {/* Country header — prototype: flag 56px + name 52px + gov type */}
       <div style={{ display: "flex", alignItems: "flex-end", gap: 20, marginBottom: 24 }}>
-        <span style={{ fontSize: "var(--text-56)", lineHeight: 1 }}>
-          {countryFlag(jurisdiction.iso2)}
-        </span>
+        <CountryFlag iso2={jurisdiction.iso2} size={56} />
         <div>
           <h1
             style={{

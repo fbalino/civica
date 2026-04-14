@@ -5,6 +5,7 @@ import {
   getGovernmentStructure,
 } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
+import { CountryFlag } from "@/components/CountryFlag";
 import { CompareSelector } from "./selector";
 
 export const metadata = {
@@ -145,23 +146,25 @@ export default async function ComparePage({
       </Suspense>
 
       {selected.length >= 2 && (
+        <div style={{ overflowX: "auto" }}>
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: `160px repeat(${colCount}, 1fr)`,
+            gridTemplateColumns: `140px repeat(${colCount}, minmax(160px, 1fr))`,
             gap: 1,
             background: "var(--color-grid-bg)",
             borderRadius: "var(--radius-sm)",
             overflow: "hidden",
+            minWidth: 140 + colCount * 160,
           }}
         >
           {/* Country headers */}
           <div style={{ background: "var(--color-card-bg)", padding: 16 }} />
           {selected.map((country) => (
             <div key={country.slug} style={{ background: "var(--color-card-bg)", padding: 16, textAlign: "center" }}>
-              <span style={{ fontSize: "var(--text-32)", display: "block", marginBottom: 8 }}>
-                {countryFlag(country.iso2)}
-              </span>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+                <CountryFlag iso2={country.iso2} size={32} />
+              </div>
               <a
                 href={`/countries/${country.slug}`}
                 style={{
@@ -240,6 +243,7 @@ export default async function ComparePage({
               )),
             ];
           })}
+        </div>
         </div>
       )}
 

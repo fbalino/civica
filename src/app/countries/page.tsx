@@ -1,5 +1,6 @@
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { CountrySearch } from "./search";
+import { CountryFlag } from "@/components/CountryFlag";
 
 export const metadata = {
   title: "Index — Civica",
@@ -187,9 +188,7 @@ export default async function CountriesPage({
             className="index-row"
             style={{ textDecoration: "none", color: "inherit" }}
           >
-            <span style={{ fontSize: "var(--text-32)", lineHeight: 1 }}>
-              {countryFlag(country.iso2)}
-            </span>
+            <CountryFlag iso2={country.iso2} size={28} />
             <div style={{ display: "flex", alignItems: "baseline", gap: 12, minWidth: 0 }}>
               <span
                 style={{

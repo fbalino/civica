@@ -534,6 +534,41 @@ a {
    Select (compare page)
    ============================================================ */
 
+/* ============================================================
+   Compare selector grid (responsive)
+   ============================================================ */
+
+.compare-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 640px) {
+  .compare-selector-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Compare table (responsive)
+   ============================================================ */
+
+.compare-table {
+  display: grid;
+  gap: 1px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-grid-bg);
+}
+
+@media (max-width: 640px) {
+  .compare-table {
+    overflow-x: auto;
+  }
+}
+
 .cv-select {
   font-family: var(--font-mono);
   font-size: var(--text-13);

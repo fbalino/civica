@@ -158,7 +158,7 @@ export function CompareSelector({ countries }: { countries: Country[] }) {
   const slots = [current[0] ?? null, current[1] ?? null, current[2] ?? null];
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 40 }}>
+    <div className="compare-selector-grid">
       {slots.map((slug, i) => (
         <CountryPicker
           key={i}

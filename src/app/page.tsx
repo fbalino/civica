@@ -1,4 +1,5 @@
 import { getAllJurisdictions } from "@/lib/db/queries";
+import { CountryFlag } from "@/components/CountryFlag";
 
 const GOV_TYPE_COLORS: Record<string, string> = {
   Presidential: "var(--color-gov-presidential)",
@@ -118,7 +119,7 @@ export default async function Home() {
                     style={{ textDecoration: "none", color: "inherit" }}
                   >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                      <span style={{ fontSize: "var(--text-32)" }}>{countryFlag(co.iso2)}</span>
+                      <CountryFlag iso2={co.iso2} size={32} />
                       <span
                         className="gov-badge"
                         style={{ color, border: `1px solid color-mix(in srgb, ${color} 20%, transparent)` }}
