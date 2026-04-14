@@ -131,22 +131,25 @@ export async function getJurisdictionsBySlugs(slugs: string[]) {
 
 export async function getCountryRankings(jurisdictionId: string) {
   const keys = ["population", "gdp_ppp", "total_area", "life_expectancy", "gdp_per_capita_ppp"];
-  const results: { key: string; rank: number; total: number }[] = [];
-
-  for (const key of keys) {
-    const all = await db
-      .select({ id: countryFacts.jurisdictionId, val: countryFacts.factValueNumeric })
-      .from(countryFacts)
-      .where(sql`${countryFacts.factKey} = ${key} AND ${countryFacts.factValueNumeric} IS NOT NULL`)
-      .orderBy(desc(countryFacts.factValueNumeric));
-
-    const idx = all.findIndex((r) => r.id === jurisdictionId);
-    if (idx >= 0) {
-      results.push({ key, rank: idx + 1, total: all.length });
-    }
-  }
-
-  return results;
+  const result = await db.execute(sql`
+    SELECT fact_key, rank, total
+    FROM (
+      SELECT
+        fact_key,
+        jurisdiction_id,
+        RANK() OVER (PARTITION BY fact_key ORDER BY fact_value_numeric DESC) AS rank,
+        COUNT(*) OVER (PARTITION BY fact_key) AS total
+      FROM country_facts
+      WHERE fact_key IN ${keys} AND fact_value_numeric IS NOT NULL
+    ) ranked
+    WHERE jurisdiction_id = ${jurisdictionId}
+  `);
+  const rows = Array.isArray(result) ? result : (result as { rows: unknown[] }).rows ?? [];
+  return (rows as { fact_key: string; rank: string | number; total: string | number }[]).map((r) => ({
+    key: r.fact_key,
+    rank: Number(r.rank),
+    total: Number(r.total),
+  }));
 }
 
 export async function getSource(sourceId: string) {
