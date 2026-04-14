@@ -362,13 +362,19 @@ export default async function CountryPage({
           <h3 className="section-header">Global Rankings</h3>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
             {rankings.map((r) => (
-              <div
+              <a
                 key={r.key}
+                href={`/rankings?metric=${r.key}`}
                 style={{
                   flex: "1 1 120px",
                   textAlign: "center",
                   padding: "8px 0",
+                  textDecoration: "none",
+                  color: "inherit",
+                  borderRadius: "var(--radius-sm)",
+                  transition: "background-color 0.15s ease",
                 }}
+                className="ranking-chip"
               >
                 <span
                   style={{
@@ -402,7 +408,7 @@ export default async function CountryPage({
                 >
                   of {r.total}
                 </span>
-              </div>
+              </a>
             ))}
           </div>
         </div>
@@ -521,20 +527,7 @@ export default async function CountryPage({
       }}
     >
       {/* Breadcrumb */}
-      <a
-        href="/countries"
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          textDecoration: "none",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-12)",
-          letterSpacing: "var(--tracking-wide)",
-          color: "var(--color-text-30)",
-          marginBottom: 32,
-        }}
-      >
+      <a href="/countries" className="breadcrumb">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4"/></svg>
         All countries
       </a>

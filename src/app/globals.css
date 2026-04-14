@@ -584,6 +584,50 @@ a {
 }
 
 /* ============================================================
+   Breadcrumb
+   ============================================================ */
+
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-30);
+  margin-bottom: 32px;
+  transition: color 0.15s ease;
+}
+
+.breadcrumb:hover {
+  color: var(--color-text-50);
+}
+
+/* ============================================================
+   Loading skeleton pulse
+   ============================================================ */
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.15; }
+}
+
+.skeleton {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-sm);
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+/* ============================================================
+   Ranking chip (country detail → links to /rankings)
+   ============================================================ */
+
+.ranking-chip:hover {
+  background: var(--color-card-hover-bg);
+}
+
+/* ============================================================
    Compare button
    ============================================================ */
 
