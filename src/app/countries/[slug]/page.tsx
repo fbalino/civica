@@ -2,8 +2,10 @@ import { notFound } from "next/navigation";
 import {
   getJurisdictionBySlug,
   getFactbookSections,
+  getFactbookSection,
   getCountryFacts,
   getGovernmentStructure,
+  getCountryRankings,
 } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
 import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
@@ -65,10 +67,12 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
+    getFactbookSection(jurisdiction.id, "introduction"),
+    getCountryRankings(jurisdiction.id),
   ]);
 
   const factMap = new Map(facts.map((f) => [f.factKey, f]));
@@ -108,9 +112,52 @@ export default async function CountryPage({
     judicial: "var(--color-branch-judicial)",
   };
 
-  /* ---- Overview tab: 2-column with Profile + Leadership + Chamber preview ---- */
+  // Extract introduction text
+  let introText: string | null = null;
+  if (introSection?.sectionData) {
+    const data = introSection.sectionData as Record<string, unknown>;
+    const bg = data["Background"] as { text?: string } | undefined;
+    if (bg?.text) {
+      const sentences = bg.text.split(/(?<=\.)\s+/);
+      introText = sentences.slice(0, 3).join(" ");
+    }
+  }
+
+  const RANK_LABELS: Record<string, string> = {
+    population: "Population",
+    gdp_ppp: "GDP (PPP)",
+    total_area: "Area",
+    life_expectancy: "Life Expectancy",
+    gdp_per_capita_ppp: "GDP per Capita",
+  };
+
+  function ordinal(n: number): string {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  }
+
+  /* ---- Overview tab: intro + 2-column with Profile + Leadership + Rankings ---- */
   const overviewTab = (
-    <div className="overview-grid">
+    <div>
+      {introText && (
+        <div className="cv-card" style={{ marginBottom: 16 }}>
+          <p
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-14)",
+              color: "var(--color-text-60)",
+              lineHeight: "var(--leading-relaxed)",
+              margin: 0,
+            }}
+          >
+            {introText}
+            <SourceDot source="cia_factbook" retrievedAt="2026-01-23" />
+          </p>
+        </div>
+      )}
+
+      <div className="overview-grid">
       {/* Profile card */}
       <div className="cv-card">
         <h3 className="section-header">Profile</h3>
@@ -240,6 +287,58 @@ export default async function CountryPage({
           </div>
         </div>
       </div>
+      </div>
+
+      {rankings.length > 0 && (
+        <div className="cv-card" style={{ marginTop: 16 }}>
+          <h3 className="section-header">Global Rankings</h3>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+            {rankings.map((r) => (
+              <div
+                key={r.key}
+                style={{
+                  flex: "1 1 120px",
+                  textAlign: "center",
+                  padding: "8px 0",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "var(--text-24)",
+                    color: "var(--color-accent)",
+                    display: "block",
+                  }}
+                >
+                  {ordinal(r.rank)}
+                </span>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-10)",
+                    color: "var(--color-text-30)",
+                    letterSpacing: "var(--tracking-wide)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {RANK_LABELS[r.key] ?? r.key}
+                </span>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-10)",
+                    color: "var(--color-text-20)",
+                    display: "block",
+                    marginTop: 2,
+                  }}
+                >
+                  of {r.total}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 

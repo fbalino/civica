@@ -129,6 +129,26 @@ export async function getJurisdictionsBySlugs(slugs: string[]) {
     .where(sql`${jurisdictions.slug} IN ${slugs}`);
 }
 
+export async function getCountryRankings(jurisdictionId: string) {
+  const keys = ["population", "gdp_ppp", "total_area", "life_expectancy", "gdp_per_capita_ppp"];
+  const results: { key: string; rank: number; total: number }[] = [];
+
+  for (const key of keys) {
+    const all = await db
+      .select({ id: countryFacts.jurisdictionId, val: countryFacts.factValueNumeric })
+      .from(countryFacts)
+      .where(sql`${countryFacts.factKey} = ${key} AND ${countryFacts.factValueNumeric} IS NOT NULL`)
+      .orderBy(desc(countryFacts.factValueNumeric));
+
+    const idx = all.findIndex((r) => r.id === jurisdictionId);
+    if (idx >= 0) {
+      results.push({ key, rank: idx + 1, total: all.length });
+    }
+  }
+
+  return results;
+}
+
 export async function getSource(sourceId: string) {
   const results = await db
     .select()
