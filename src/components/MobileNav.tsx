@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
@@ -11,7 +11,7 @@ const LINKS = [
   { href: "/about", label: "About" },
 ];
 
-export function MobileNav() {
+export function MobileNav({ searchSlot }: { searchSlot?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -66,6 +66,11 @@ export function MobileNav() {
             padding: 24,
           }}
         >
+          {searchSlot && (
+            <div style={{ marginBottom: 20 }}>
+              {searchSlot}
+            </div>
+          )}
           <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {LINKS.map(({ href, label }) => {
               const isActive = pathname === href || pathname.startsWith(href + "/");

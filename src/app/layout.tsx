@@ -100,7 +100,7 @@ export default function RootLayout({
             </div>
             <div className="flex md:hidden" style={{ alignItems: "center", gap: 8 }}>
               <ThemeToggle />
-              <MobileNav />
+              <MobileNav searchSlot={<GlobalSearchWrapper />} />
             </div>
           </nav>
 

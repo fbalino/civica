@@ -23,13 +23,6 @@ function govColor(type: string | null): string {
   return entry?.[1] ?? "var(--color-gov-other)";
 }
 
-function countryFlag(iso2: string | null): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
-    .join("");
-}
-
 function formatPopulation(pop: number | null): string {
   if (!pop) return "";
   if (pop >= 1_000_000_000) return `${(pop / 1_000_000_000).toFixed(2)}B`;
@@ -82,16 +75,7 @@ export default async function CountriesPage({
         padding: "48px var(--spacing-page-x)",
       }}
     >
-      <h1
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-44)",
-          fontWeight: 400,
-          letterSpacing: "var(--tracking-tight)",
-          marginBottom: 8,
-          color: "var(--color-text-primary)",
-        }}
-      >
+      <h1 className="page-heading">
         Index
       </h1>
       <p

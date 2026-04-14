@@ -80,16 +80,7 @@ export default async function RankingsPage({
         padding: "60px var(--spacing-page-x)",
       }}
     >
-      <h1
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-44)",
-          fontWeight: 400,
-          letterSpacing: "var(--tracking-tight)",
-          marginBottom: 8,
-          color: "var(--color-text-primary)",
-        }}
-      >
+      <h1 className="page-heading">
         Rankings
       </h1>
       <p

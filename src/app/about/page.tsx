@@ -34,16 +34,7 @@ export default function AboutPage() {
         padding: "60px var(--spacing-page-x)",
       }}
     >
-      <h1
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-44)",
-          fontWeight: 400,
-          letterSpacing: "var(--tracking-tight)",
-          marginBottom: 24,
-          color: "var(--color-text-primary)",
-        }}
-      >
+      <h1 className="page-heading" style={{ marginBottom: 24 }}>
         About Civica
       </h1>
 

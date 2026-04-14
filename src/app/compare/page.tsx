@@ -13,13 +13,6 @@ export const metadata = {
   description: "Compare countries side by side across key indicators.",
 };
 
-function countryFlag(iso2: string | null): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
-    .join("");
-}
-
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -118,16 +111,7 @@ export default async function ComparePage({
         padding: "60px var(--spacing-page-x)",
       }}
     >
-      <h1
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-44)",
-          fontWeight: 400,
-          letterSpacing: "var(--tracking-tight)",
-          marginBottom: 8,
-          color: "var(--color-text-primary)",
-        }}
-      >
+      <h1 className="page-heading">
         Compare
       </h1>
       <p
