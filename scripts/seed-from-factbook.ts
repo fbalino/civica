@@ -74,6 +74,7 @@ function slugify(name: string): string {
 
 function normalizeKey(key: string): string {
   return key
+    .trim()
     .toLowerCase()
     .replace(/\s+/g, "_")
     .replace(/[^a-z0-9_]/g, "");
@@ -208,8 +209,16 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
       if (entries.length > 0) addFact("economy", "unemployment_rate", entries[0][1], "%");
     }
 
-    addFact("economy", "exports_total", getNestedValue(economy, "Exports", "Exports") ?? getNestedValue(economy, "Exports"), "$");
-    addFact("economy", "imports_total", getNestedValue(economy, "Imports", "Imports") ?? getNestedValue(economy, "Imports"), "$");
+    const exportsObj = getNestedValue(economy, "Exports");
+    if (exportsObj && typeof exportsObj === "object") {
+      const entries = Object.entries(exportsObj as Record<string, unknown>).filter(([k]) => k !== "note");
+      if (entries.length > 0) addFact("economy", "exports_total", entries[0][1], "$");
+    }
+    const importsObj = getNestedValue(economy, "Imports");
+    if (importsObj && typeof importsObj === "object") {
+      const entries = Object.entries(importsObj as Record<string, unknown>).filter(([k]) => k !== "note");
+      if (entries.length > 0) addFact("economy", "imports_total", entries[0][1], "$");
+    }
 
     const publicDebt = getNestedValue(economy, "Public debt");
     if (publicDebt && typeof publicDebt === "object") {
@@ -217,14 +226,14 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
       if (entries.length > 0) addFact("economy", "public_debt_pct_gdp", entries[0][1], "% of GDP");
     }
 
-    addFact("economy", "industries", getNestedValue(economy, "Industries", "Industries"));
-    addFact("economy", "agriculture_products", getNestedValue(economy, "Agricultural products", "Agricultural products"));
+    addFact("economy", "industries", getNestedValue(economy, "Industries"));
+    addFact("economy", "agriculture_products", getNestedValue(economy, "Agricultural products"));
 
-    const exportPartners = getNestedValue(economy, "Exports - partners", "Exports - partners");
+    const exportPartners = getNestedValue(economy, "Exports - partners");
     addFact("economy", "export_partners", exportPartners);
-    const importPartners = getNestedValue(economy, "Imports - partners", "Imports - partners");
+    const importPartners = getNestedValue(economy, "Imports - partners");
     addFact("economy", "import_partners", importPartners);
-    const exportCommodities = getNestedValue(economy, "Exports - commodities", "Exports - commodities");
+    const exportCommodities = getNestedValue(economy, "Exports - commodities");
     addFact("economy", "export_commodities", exportCommodities);
 
     const budget = getNestedValue(economy, "Budget");
@@ -241,13 +250,13 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
     const pop = getNestedValue(people, "Population", "total");
     addFact("demographics", "population", pop, "persons");
 
-    const popGrowth = getNestedValue(people, "Population growth rate", "Population growth rate");
+    const popGrowth = getNestedValue(people, "Population growth rate");
     addFact("demographics", "population_growth_rate", popGrowth, "%");
 
-    const birthRate = getNestedValue(people, "Birth rate", "Birth rate");
+    const birthRate = getNestedValue(people, "Birth rate");
     addFact("demographics", "birth_rate", birthRate, "per 1000");
 
-    const deathRate = getNestedValue(people, "Death rate", "Death rate");
+    const deathRate = getNestedValue(people, "Death rate");
     addFact("demographics", "death_rate", deathRate, "per 1000");
 
     const medianAge = getNestedValue(people, "Median age", "total");
@@ -262,9 +271,9 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
     const urbanization = getNestedValue(people, "Urbanization", "urban population");
     addFact("demographics", "urbanization_rate", urbanization, "%");
 
-    addFact("demographics", "ethnic_groups", getNestedValue(people, "Ethnic groups", "Ethnic groups"));
-    addFact("demographics", "religions", getNestedValue(people, "Religions", "Religions"));
-    addFact("demographics", "languages", getNestedValue(people, "Languages", "Languages"));
+    addFact("demographics", "ethnic_groups", getNestedValue(people, "Ethnic groups"));
+    addFact("demographics", "religions", getNestedValue(people, "Religions"));
+    addFact("demographics", "languages", getNestedValue(people, "Languages"));
   }
 
   // Geography
@@ -276,11 +285,11 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
     addFact("geography", "land_area", land, "sq km");
     const water = getNestedValue(geo, "Area", "water");
     addFact("geography", "water_area", water, "sq km");
-    const coastline = getNestedValue(geo, "Coastline", "Coastline");
+    const coastline = getNestedValue(geo, "Coastline");
     addFact("geography", "coastline", coastline, "km");
-    addFact("geography", "natural_resources", getNestedValue(geo, "Natural resources", "Natural resources"));
-    addFact("geography", "climate", getNestedValue(geo, "Climate", "Climate"));
-    addFact("geography", "terrain", getNestedValue(geo, "Terrain", "Terrain"));
+    addFact("geography", "natural_resources", getNestedValue(geo, "Natural resources"));
+    addFact("geography", "climate", getNestedValue(geo, "Climate"));
+    addFact("geography", "terrain", getNestedValue(geo, "Terrain"));
   }
 
   // Military
@@ -291,8 +300,8 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
       const entries = Object.entries(milExp as Record<string, unknown>);
       if (entries.length > 0) addFact("military", "military_expenditure_pct_gdp", entries[0][1], "% of GDP");
     }
-    addFact("military", "military_branches", getNestedValue(military, "Military and security forces", "Military and security forces"));
-    addFact("military", "military_service_age", getNestedValue(military, "Military service age and obligation", "Military service age and obligation"));
+    addFact("military", "military_branches", getNestedValue(military, "Military and security forces"));
+    addFact("military", "military_service_age", getNestedValue(military, "Military service age and obligation"));
   }
 
   // Energy
