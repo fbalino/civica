@@ -596,10 +596,10 @@ export default async function CountryPage({
               <a
                 key={rc.slug}
                 href={`/countries/${rc.slug}`}
+                className="country-grid-cell"
                 style={{
                   textDecoration: "none",
                   color: "inherit",
-                  background: "var(--color-card-bg)",
                   padding: "16px 20px",
                   display: "flex",
                   alignItems: "center",
