@@ -320,7 +320,7 @@ function extractProfileFields(data: Record<string, unknown>) {
     getNestedValue(gov ?? {}, "Country name", "conventional short form")
   );
 
-  const govType = extractText(getNestedValue(gov ?? {}, "Government type", "Government type"));
+  const govType = extractText(getNestedValue(gov ?? {}, "Government type"));
   const capital = extractText(getNestedValue(gov ?? {}, "Capital", "name"));
 
   const popText = extractText(getNestedValue(people ?? {}, "Population", "total"));
