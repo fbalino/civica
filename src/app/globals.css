@@ -491,6 +491,36 @@ a {
 }
 
 /* ============================================================
+   Country header (responsive title sizing)
+   ============================================================ */
+
+.country-header {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.country-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-52);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tighter);
+  margin: 0;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 640px) {
+  .country-header {
+    gap: 12px;
+  }
+  .country-title {
+    font-size: var(--text-32);
+  }
+}
+
+/* ============================================================
    Scrollbar utility
    ============================================================ */
 

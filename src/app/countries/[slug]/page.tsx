@@ -27,13 +27,6 @@ function govColor(type: string | null): string {
   return entry?.[1] ?? "var(--color-gov-other)";
 }
 
-function countryFlag(iso2: string | null): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
-    .join("");
-}
-
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
@@ -379,21 +372,11 @@ export default async function CountryPage({
         All countries
       </a>
 
-      {/* Country header — prototype: flag 56px + name 52px + gov type */}
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 20, marginBottom: 24 }}>
+      {/* Country header */}
+      <div className="country-header">
         <CountryFlag iso2={jurisdiction.iso2} size={56} />
         <div>
-          <h1
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "var(--text-52)",
-              fontWeight: 400,
-              letterSpacing: "var(--tracking-tighter)",
-              margin: 0,
-              lineHeight: 1,
-              color: "var(--color-text-primary)",
-            }}
-          >
+          <h1 className="country-title">
             {jurisdiction.name}
           </h1>
           <p

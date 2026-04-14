@@ -47,6 +47,16 @@ export default function AboutPage() {
         About Civica
       </h1>
 
+      <div
+        style={{
+          width: 40,
+          height: 2,
+          background: "var(--color-accent)",
+          borderRadius: 1,
+          marginBottom: 32,
+        }}
+      />
+
       <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
         <p
           style={{
@@ -132,6 +142,8 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <div style={{ height: 1, background: "var(--color-divider)", margin: "60px 0 0" }} />
+
       <section style={{ marginTop: 60 }}>
         <h2
           style={{
@@ -171,6 +183,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      <div style={{ height: 1, background: "var(--color-divider)", margin: "60px 0 0" }} />
 
       <section style={{ marginTop: 60 }}>
         <h2
