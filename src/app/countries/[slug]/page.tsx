@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   getJurisdictionBySlug,
@@ -50,6 +51,21 @@ function StatRow({ label, val, source, date }: { label: string; val: string; sou
       </span>
     </div>
   );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const jurisdiction = await getJurisdictionBySlug(slug);
+  if (!jurisdiction) return { title: "Country — Civica" };
+  const govLabel = jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType ?? "sovereign state";
+  return {
+    title: `${jurisdiction.name} — Civica`,
+    description: `${jurisdiction.name} is a ${govLabel.toLowerCase()}. Government structure, leadership, rankings, and factbook data.`,
+  };
 }
 
 export default async function CountryPage({
@@ -196,6 +212,32 @@ export default async function CountryPage({
                   {headOfState.person.name}
                   <SourceDot source="wikidata" retrievedAt="2026-04-13" />
                 </p>
+                {(headOfState.term.partyName || headOfState.term.startDate) && (
+                  <p
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-11)",
+                      color: "var(--color-text-30)",
+                      margin: "4px 0 0",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    {headOfState.term.partyName && (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                        {headOfState.term.partyColor && (
+                          <span style={{ width: 6, height: 6, borderRadius: "50%", background: headOfState.term.partyColor, flexShrink: 0 }} />
+                        )}
+                        {headOfState.term.partyName}
+                      </span>
+                    )}
+                    {headOfState.term.partyName && headOfState.term.startDate && <span style={{ color: "var(--color-text-20)" }}>&middot;</span>}
+                    {headOfState.term.startDate && (
+                      <span>Since {new Date(headOfState.term.startDate).getFullYear()}</span>
+                    )}
+                  </p>
+                )}
               </div>
             )}
             {headOfGov && headOfGov.person.name !== headOfState?.person.name && (
@@ -223,6 +265,32 @@ export default async function CountryPage({
                   {headOfGov.person.name}
                   <SourceDot source="wikidata" retrievedAt="2026-04-13" />
                 </p>
+                {(headOfGov.term.partyName || headOfGov.term.startDate) && (
+                  <p
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-11)",
+                      color: "var(--color-text-30)",
+                      margin: "4px 0 0",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    {headOfGov.term.partyName && (
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                        {headOfGov.term.partyColor && (
+                          <span style={{ width: 6, height: 6, borderRadius: "50%", background: headOfGov.term.partyColor, flexShrink: 0 }} />
+                        )}
+                        {headOfGov.term.partyName}
+                      </span>
+                    )}
+                    {headOfGov.term.partyName && headOfGov.term.startDate && <span style={{ color: "var(--color-text-20)" }}>&middot;</span>}
+                    {headOfGov.term.startDate && (
+                      <span>Since {new Date(headOfGov.term.startDate).getFullYear()}</span>
+                    )}
+                  </p>
+                )}
               </div>
             )}
           </div>
