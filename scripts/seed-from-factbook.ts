@@ -121,13 +121,25 @@ function parseNumeric(text: string): { value: number | null; unit: string; year:
   return { value, unit, year, note };
 }
 
+function decodeHtmlEntities(str: string): string {
+  return str.replace(/&([a-z]+);/gi, (_, entity: string) => {
+    const map: Record<string, string> = {
+      amp: "&", lt: "<", gt: ">", quot: '"', apos: "'",
+      ocirc: "ô", eacute: "é", egrave: "è", agrave: "à", uuml: "ü",
+      ouml: "ö", auml: "ä", ntilde: "ñ", ccedil: "ç", iacute: "í",
+      aacute: "á", oacute: "ó", uacute: "ú", nbsp: " ",
+    };
+    return map[entity.toLowerCase()] ?? `&${entity};`;
+  });
+}
+
 function extractText(obj: unknown): string {
   if (!obj) return "";
-  if (typeof obj === "string") return obj;
+  if (typeof obj === "string") return decodeHtmlEntities(obj);
   if (typeof obj === "object" && "text" in (obj as Record<string, unknown>)) {
-    return String((obj as Record<string, unknown>).text);
+    return decodeHtmlEntities(String((obj as Record<string, unknown>).text));
   }
-  return String(obj);
+  return decodeHtmlEntities(String(obj));
 }
 
 function getNestedValue(data: Record<string, unknown>, ...keys: string[]): unknown {
