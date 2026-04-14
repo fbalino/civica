@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SourceDot } from "./SourceDot";
+import { CountryFlag } from "./CountryFlag";
 
 interface RankingRow {
   rank: number;
@@ -9,7 +10,7 @@ interface RankingRow {
   slug: string;
   value: string;
   numericValue?: number;
-  flagUrl?: string;
+  iso2?: string;
   source?: string;
   retrievedAt?: string;
 }
@@ -107,13 +108,7 @@ export function RankingTable({
                       textDecoration: "none",
                     }}
                   >
-                    {row.flagUrl && (
-                      <img
-                        src={row.flagUrl}
-                        alt=""
-                        style={{ width: 24, height: 16, objectFit: "cover", borderRadius: 2 }}
-                      />
-                    )}
+                    <CountryFlag iso2={row.iso2 ?? null} size={20} />
                     {row.name}
                   </a>
                 </td>

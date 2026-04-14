@@ -203,6 +203,73 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Key stats */}
+      {countries.length > 0 && (() => {
+        const totalPop = countries.reduce((sum, c) => sum + (c.population ?? 0), 0);
+        const withGov = countries.filter((c) => c.governmentType).length;
+        const continentCount = new Set(countries.map((c) => c.continent).filter(Boolean)).size;
+        const stats = [
+          { label: "Countries", value: countries.length.toString() },
+          { label: "Population Covered", value: totalPop >= 1e9 ? `${(totalPop / 1e9).toFixed(1)}B` : `${(totalPop / 1e6).toFixed(0)}M` },
+          { label: "Government Profiles", value: withGov.toString() },
+          { label: "Continents", value: continentCount.toString() },
+        ];
+        return (
+          <section
+            style={{
+              maxWidth: "var(--max-w-content)",
+              margin: "0 auto",
+              padding: "0 var(--spacing-page-x) 80px",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                gap: 1,
+                background: "var(--color-grid-bg)",
+                borderRadius: "var(--radius-sm)",
+                overflow: "hidden",
+              }}
+            >
+              {stats.map((s) => (
+                <div
+                  key={s.label}
+                  style={{
+                    background: "var(--color-card-bg)",
+                    padding: "24px 20px",
+                    textAlign: "center",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "var(--text-28)",
+                      color: "var(--color-accent)",
+                      display: "block",
+                      marginBottom: 4,
+                    }}
+                  >
+                    {s.value}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-10)",
+                      color: "var(--color-text-30)",
+                      letterSpacing: "var(--tracking-caps)",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {s.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
+
       {/* Browse by continent */}
       {countries.length > 0 && (() => {
         const continentCounts = new Map<string, number>();

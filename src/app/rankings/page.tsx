@@ -67,7 +67,7 @@ export default async function RankingsPage({
       ? metric.format(r.fact.factValueNumeric)
       : r.fact.factValue ?? "",
     numericValue: r.fact.factValueNumeric ?? undefined,
-    flagUrl: r.jurisdiction.flagUrl ?? undefined,
+    iso2: r.jurisdiction.iso2 ?? undefined,
     source: "cia_factbook",
     retrievedAt: "2026-01-23",
   }));
