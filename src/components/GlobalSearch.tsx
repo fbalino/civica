@@ -121,6 +121,11 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
+          role="combobox"
+          aria-expanded={open && filtered.length > 0}
+          aria-controls="search-results"
+          aria-autocomplete="list"
+          aria-label="Search countries"
           style={{
             background: "transparent",
             border: "none",
@@ -148,6 +153,9 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
 
       {open && filtered.length > 0 && (
         <div
+          id="search-results"
+          role="listbox"
+          aria-label="Search results"
           style={{
             position: "absolute",
             top: "calc(100% + 6px)",
@@ -165,6 +173,8 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
           {filtered.map((c, i) => (
             <button
               key={c.slug}
+              role="option"
+              aria-selected={i === selectedIdx}
               onClick={() => navigate(c.slug)}
               onMouseEnter={() => setSelectedIdx(i)}
               style={{

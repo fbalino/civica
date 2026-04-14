@@ -491,6 +491,26 @@ a {
 }
 
 /* ============================================================
+   Hero heading (responsive)
+   ============================================================ */
+
+.hero-heading {
+  font-family: var(--font-heading);
+  font-size: var(--text-64);
+  font-weight: 400;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tighter);
+  margin: 0 0 24px;
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 640px) {
+  .hero-heading {
+    font-size: var(--text-44);
+  }
+}
+
+/* ============================================================
    Country header (responsive title sizing)
    ============================================================ */
 

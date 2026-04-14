@@ -31,13 +31,6 @@ function govLabel(type: string | null): string {
   return type.split(" ")[0];
 }
 
-function countryFlag(iso2: string | null): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
-    .join("");
-}
-
 function formatPopulation(pop: number | null): string {
   if (!pop) return "";
   if (pop >= 1_000_000_000) return `${(pop / 1_000_000_000).toFixed(2)}B`;
@@ -78,17 +71,7 @@ export default async function Home() {
         >
           {countries.length > 0 ? `${countries.length}+ countries` : "260+ countries"} &middot; Live data &middot; Open source
         </p>
-        <h1
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-64)",
-            fontWeight: 400,
-            lineHeight: "var(--leading-tight)",
-            letterSpacing: "var(--tracking-tighter)",
-            margin: "0 0 24px",
-            color: "var(--color-text-primary)",
-          }}
-        >
+        <h1 className="hero-heading">
           How the world<br />is <em>governed</em>
         </h1>
         <p
