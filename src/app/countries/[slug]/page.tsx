@@ -67,15 +67,17 @@ export default async function CountryPage({
 
   const factMap = new Map(facts.map((f) => [f.factKey, f]));
 
+  const isQid = (name: string) => /^Q\d+$/.test(name);
+
   const headOfState = govStructure.currentTerms.find(
     (t) =>
       govStructure.offices.find((o) => o.id === t.term.officeId)
-        ?.officeType === "head_of_state"
+        ?.officeType === "head_of_state" && !isQid(t.person.name)
   );
   const headOfGov = govStructure.currentTerms.find(
     (t) =>
       govStructure.offices.find((o) => o.id === t.term.officeId)
-        ?.officeType === "head_of_government"
+        ?.officeType === "head_of_government" && !isQid(t.person.name)
   );
 
   const sectionNames = sections.map((s) => s.sectionName);
