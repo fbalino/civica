@@ -88,7 +88,7 @@ export default function RootLayout({
                 Atlas of governance
               </span>
             </a>
-            <div className="hidden md:flex" style={{ display: undefined, alignItems: "center", gap: 2 }}>
+            <div className="hidden md:flex" style={{ alignItems: "center", gap: 4 }}>
               <NavLinks />
               <div style={{ marginLeft: 16 }}>
                 <ThemeToggle />
@@ -193,8 +193,18 @@ export default function RootLayout({
                   textAlign: "right",
                 }}
               >
-                <div>Countries &middot; Constitutions &middot; Rankings &middot; API</div>
-                <div style={{ marginTop: 6 }}>About &middot; Methodology &middot; Sources &middot; Contact</div>
+                <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <a href="/countries" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>Countries</a>
+                  <span>&middot;</span>
+                  <a href="/compare" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>Compare</a>
+                  <span>&middot;</span>
+                  <a href="/rankings" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>Rankings</a>
+                </div>
+                <div style={{ marginTop: 6, display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                  <a href="/about" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>About</a>
+                  <span>&middot;</span>
+                  <a href="/about" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>Sources</a>
+                </div>
               </div>
             </div>
           </footer>

@@ -115,7 +115,7 @@ export default async function CountryPage({
 
   /* ---- Overview tab: 2-column with Profile + Leadership + Chamber preview ---- */
   const overviewTab = (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+    <div className="overview-grid">
       {/* Profile card */}
       <div className="cv-card">
         <h3 className="section-header">Profile</h3>
@@ -346,28 +346,27 @@ export default async function CountryPage({
         padding: "32px var(--spacing-page-x)",
       }}
     >
-      {/* Back button — prototype style */}
-      <button
-        onClick={undefined}
-        className="tab-nav"
-        style={{ color: "var(--color-text-30)", padding: "8px 0", marginBottom: 24, cursor: "pointer" }}
+      {/* Breadcrumb */}
+      <a
+        href="/countries"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          textDecoration: "none",
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-12)",
+          letterSpacing: "var(--tracking-wide)",
+          color: "var(--color-text-30)",
+          marginBottom: 32,
+        }}
       >
-        <a
-          href="/countries"
-          style={{
-            textDecoration: "none",
-            color: "inherit",
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-12)",
-            letterSpacing: "var(--tracking-wide)",
-          }}
-        >
-          &larr; Back
-        </a>
-      </button>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+        All countries
+      </a>
 
       {/* Country header — prototype: flag 56px + name 52px + gov type */}
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 20, marginBottom: 8 }}>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 20, marginBottom: 24 }}>
         <span style={{ fontSize: "var(--text-56)", lineHeight: 1 }}>
           {countryFlag(jurisdiction.iso2)}
         </span>

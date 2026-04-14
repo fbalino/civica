@@ -157,6 +157,29 @@ export default async function CountriesPage({
           overflow: "hidden",
         }}
       >
+        {/* Column header */}
+        <div
+          className="hidden md:grid index-row"
+          style={{
+            background: "var(--color-card-bg)",
+            padding: "10px 24px",
+            cursor: "default",
+          }}
+        >
+          <span />
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)" }}>
+            Country
+          </span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)" }}>
+            Government
+          </span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)", textAlign: "right" }}>
+            Population
+          </span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)", textAlign: "right" }}>
+            Democracy
+          </span>
+        </div>
         {filtered.map((country) => (
           <a
             key={country.slug}

@@ -475,6 +475,22 @@ a {
 }
 
 /* ============================================================
+   Overview 2-col grid (stacks on mobile)
+   ============================================================ */
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
    Scrollbar utility
    ============================================================ */
 

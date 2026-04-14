@@ -201,9 +201,9 @@ export default async function Home() {
         >
           Government types
         </h2>
-        <div style={{ display: "flex", gap: 24 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
           {GOV_TYPE_LEGEND.map(([type, color]) => (
-            <div key={type} style={{ flex: 1 }}>
+            <div key={type} style={{ flex: "1 1 100px" }}>
               <div className="gov-color-bar" style={{ background: color }} />
               <span
                 style={{
