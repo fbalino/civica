@@ -152,6 +152,28 @@ export async function getCountryRankings(jurisdictionId: string) {
   }));
 }
 
+export async function getRelatedCountries(
+  jurisdictionId: string,
+  continent: string | null,
+  limit = 6
+) {
+  if (!continent) return [];
+  return db
+    .select({
+      slug: jurisdictions.slug,
+      name: jurisdictions.name,
+      iso2: jurisdictions.iso2,
+      capital: jurisdictions.capital,
+      population: jurisdictions.population,
+    })
+    .from(jurisdictions)
+    .where(
+      sql`${jurisdictions.continent} = ${continent} AND ${jurisdictions.id} != ${jurisdictionId} AND ${jurisdictions.type} = 'sovereign_state'`
+    )
+    .orderBy(desc(jurisdictions.population))
+    .limit(limit);
+}
+
 export async function getSource(sourceId: string) {
   const results = await db
     .select()

@@ -7,6 +7,7 @@ import {
   getCountryFacts,
   getGovernmentStructure,
   getCountryRankings,
+  getRelatedCountries,
 } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
 import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
@@ -83,12 +84,13 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure, introSection, rankings] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings, relatedCountries] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
     getFactbookSection(jurisdiction.id, "introduction"),
     getCountryRankings(jurisdiction.id),
+    getRelatedCountries(jurisdiction.id, jurisdiction.continent),
   ]);
 
   const factMap = new Map(facts.map((f) => [f.factKey, f]));
@@ -475,7 +477,18 @@ export default async function CountryPage({
                 >
                   {office.name}
                   {currentHolder && !isQid(currentHolder.person.name) && (
-                    <span style={{ color: "var(--color-text-40)" }}> — {currentHolder.person.name}</span>
+                    <span style={{ color: "var(--color-text-40)" }}>
+                      {" — "}{currentHolder.person.name}
+                      {currentHolder.term.partyName && (
+                        <span style={{ color: "var(--color-text-25)", fontSize: "var(--text-11)" }}>
+                          {" ("}
+                          {currentHolder.term.partyColor && (
+                            <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: "50%", background: currentHolder.term.partyColor, marginRight: 3, verticalAlign: "middle" }} />
+                          )}
+                          {currentHolder.term.partyName}{")"}
+                        </span>
+                      )}
+                    </span>
                   )}
                 </div>
               );
@@ -554,6 +567,75 @@ export default async function CountryPage({
 
       {/* Tabs — prototype: gap 2, border-bottom, 28px top margin, 32px bottom margin */}
       <CountryTabs tabs={tabs} />
+
+      {relatedCountries.length > 0 && (
+        <section style={{ marginTop: 48 }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-11)",
+              letterSpacing: "var(--tracking-caps)",
+              textTransform: "uppercase",
+              color: "var(--color-text-30)",
+              marginBottom: 16,
+            }}
+          >
+            More in {jurisdiction.continent}
+          </h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
+              gap: 1,
+              background: "var(--color-grid-bg)",
+              borderRadius: "var(--radius-sm)",
+              overflow: "hidden",
+            }}
+          >
+            {relatedCountries.map((rc) => (
+              <a
+                key={rc.slug}
+                href={`/countries/${rc.slug}`}
+                style={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  background: "var(--color-card-bg)",
+                  padding: "16px 20px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
+                <CountryFlag iso2={rc.iso2} size={24} />
+                <div style={{ minWidth: 0 }}>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "var(--text-16)",
+                      color: "var(--color-text-primary)",
+                      display: "block",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {rc.name}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-10)",
+                      color: "var(--color-text-25)",
+                    }}
+                  >
+                    {rc.capital}
+                  </span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
