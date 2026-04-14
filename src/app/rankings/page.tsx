@@ -33,7 +33,7 @@ function formatGdpPerCapita(n: number): string {
 }
 
 function formatArea(n: number): string {
-  return `${n.toLocaleString()} km²`;
+  return `${n.toLocaleString()} km\u00B2`;
 }
 
 function formatDefault(n: number): string {
@@ -73,24 +73,51 @@ export default async function RankingsPage({
   }));
 
   return (
-    <div className="wide-container py-[var(--spacing-section)]">
-      <h1 className="font-heading text-4xl font-normal tracking-tight mb-2">
+    <div
+      style={{
+        maxWidth: "var(--max-w-content)",
+        margin: "0 auto",
+        padding: "60px var(--spacing-page-x)",
+      }}
+    >
+      <h1
+        style={{
+          fontFamily: "var(--font-heading)",
+          fontSize: "var(--text-44)",
+          fontWeight: 400,
+          letterSpacing: "var(--tracking-tight)",
+          marginBottom: 8,
+          color: "var(--color-text-primary)",
+        }}
+      >
         Rankings
       </h1>
-      <p className="font-mono text-xs text-[var(--color-text-tertiary)] mb-10">
+      <p
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-12)",
+          color: "var(--color-text-30)",
+          marginBottom: 40,
+        }}
+      >
         Countries ranked by key indicators.
       </p>
 
-      <nav className="flex gap-2 flex-wrap mb-8">
+      <nav style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 32 }}>
         {RANKING_METRICS.map((m) => (
           <a
             key={m.key}
             href={`/rankings?metric=${m.key}`}
-            className={`font-mono text-xs px-3 py-1.5 rounded-[var(--radius-sm)] transition-colors no-underline ${
-              m.key === metric.key
-                ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]"
-                : "bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
-            }`}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-12)",
+              padding: "6px 12px",
+              borderRadius: "var(--radius-sm)",
+              textDecoration: "none",
+              background: m.key === metric.key ? "var(--color-accent)" : "var(--color-card-bg)",
+              color: m.key === metric.key ? "var(--color-bg)" : "var(--color-text-40)",
+              border: m.key !== metric.key ? "1px solid var(--color-card-border)" : "none",
+            }}
           >
             {m.title}
           </a>
@@ -100,7 +127,15 @@ export default async function RankingsPage({
       {tableRows.length > 0 ? (
         <RankingTable title={metric.title} unit={metric.unit} rows={tableRows} pageSize={25} />
       ) : (
-        <p className="text-center text-[var(--color-text-tertiary)] py-12">
+        <p
+          style={{
+            textAlign: "center",
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-14)",
+            color: "var(--color-text-40)",
+            padding: "48px 0",
+          }}
+        >
           No ranking data available. Run the seed scripts to populate.
         </p>
       )}

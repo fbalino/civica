@@ -40,35 +40,49 @@ export function RankingTable({
   const visible = sorted.slice(page * pageSize, (page + 1) * pageSize);
 
   return (
-    <div className="w-full">
-      <div className="flex items-baseline justify-between mb-4">
-        <h3 className="font-heading text-xl font-normal tracking-tight">
+    <div style={{ width: "100%" }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
+        <h3
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "var(--text-20)",
+            fontWeight: 400,
+            letterSpacing: "var(--tracking-tight)",
+            color: "var(--color-text-primary)",
+          }}
+        >
           {title}
         </h3>
         {unit && (
-          <span className="text-xs text-[var(--color-text-tertiary)] uppercase tracking-wide">
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "var(--tracking-wide)" }}>
             {unit}
           </span>
         )}
       </div>
 
-      <div className="border border-[var(--color-border)] rounded-[var(--radius-lg)] overflow-hidden">
-        <table className="w-full text-sm">
+      <div
+        style={{
+          border: "1px solid var(--color-card-border)",
+          borderRadius: "var(--radius-sm)",
+          overflow: "hidden",
+        }}
+      >
+        <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "var(--font-mono)", fontSize: "var(--text-13)" }}>
           <thead>
-            <tr className="bg-[var(--color-surface-alt)] border-b border-[var(--color-border)]">
-              <th className="text-left py-3 px-4 font-medium text-[var(--color-text-tertiary)] w-12">
+            <tr style={{ background: "var(--color-card-bg)", borderBottom: "1px solid var(--color-divider)" }}>
+              <th style={{ textAlign: "left", padding: "12px 16px", fontWeight: 500, color: "var(--color-text-30)", width: 48 }}>
                 #
               </th>
-              <th className="text-left py-3 px-4 font-medium text-[var(--color-text-tertiary)]">
+              <th style={{ textAlign: "left", padding: "12px 16px", fontWeight: 500, color: "var(--color-text-30)" }}>
                 Country
               </th>
-              <th className="text-right py-3 px-4 font-medium text-[var(--color-text-tertiary)]">
+              <th style={{ textAlign: "right", padding: "12px 16px", fontWeight: 500, color: "var(--color-text-30)" }}>
                 <button
                   onClick={() => setSortAsc(!sortAsc)}
-                  className="inline-flex items-center gap-1 hover:text-[var(--color-text-primary)] transition-colors"
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-30)", fontFamily: "var(--font-mono)", fontSize: "var(--text-13)", display: "inline-flex", alignItems: "center", gap: 4 }}
                 >
                   Value
-                  <span className="text-xs">{sortAsc ? "\u2191" : "\u2193"}</span>
+                  <span style={{ fontSize: "var(--text-11)" }}>{sortAsc ? "\u2191" : "\u2193"}</span>
                 </button>
               </th>
             </tr>
@@ -77,33 +91,36 @@ export function RankingTable({
             {visible.map((row, i) => (
               <tr
                 key={row.slug}
-                className="border-b border-[var(--color-border-muted)] last:border-b-0 hover:bg-[var(--color-surface-alt)] transition-colors"
+                style={{ borderBottom: "1px solid var(--color-stat-border)" }}
               >
-                <td className="py-3 px-4 text-[var(--color-text-tertiary)] tabular-nums">
+                <td style={{ padding: "12px 16px", color: "var(--color-text-30)", fontVariantNumeric: "tabular-nums" }}>
                   {page * pageSize + i + 1}
                 </td>
-                <td className="py-3 px-4">
+                <td style={{ padding: "12px 16px" }}>
                   <a
                     href={`/countries/${row.slug}`}
-                    className="flex items-center gap-3 text-[var(--color-text-primary)] hover:text-[var(--color-accent-text)] no-underline transition-colors"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      color: "var(--color-text-primary)",
+                      textDecoration: "none",
+                    }}
                   >
                     {row.flagUrl && (
                       <img
                         src={row.flagUrl}
                         alt=""
-                        className="w-6 h-4 object-cover rounded-sm"
+                        style={{ width: 24, height: 16, objectFit: "cover", borderRadius: 2 }}
                       />
                     )}
                     {row.name}
                   </a>
                 </td>
-                <td className="py-3 px-4 text-right tabular-nums font-medium text-[var(--color-text-primary)]">
+                <td style={{ padding: "12px 16px", textAlign: "right", fontVariantNumeric: "tabular-nums", fontWeight: 500, color: "var(--color-text-primary)" }}>
                   {row.value}
                   {row.source && row.retrievedAt && (
-                    <SourceDot
-                      source={row.source}
-                      retrievedAt={row.retrievedAt}
-                    />
+                    <SourceDot source={row.source} retrievedAt={row.retrievedAt} />
                   )}
                 </td>
               </tr>
@@ -113,21 +130,41 @@ export function RankingTable({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-4">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 16 }}>
           <button
             onClick={() => setPage(Math.max(0, page - 1))}
             disabled={page === 0}
-            className="px-3 py-1.5 text-sm rounded-[var(--radius-md)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            style={{
+              padding: "6px 12px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-12)",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--color-card-border)",
+              color: "var(--color-text-40)",
+              background: "none",
+              cursor: page === 0 ? "not-allowed" : "pointer",
+              opacity: page === 0 ? 0.4 : 1,
+            }}
           >
             Previous
           </button>
-          <span className="text-sm text-[var(--color-text-tertiary)] tabular-nums">
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)", fontVariantNumeric: "tabular-nums" }}>
             {page + 1} / {totalPages}
           </span>
           <button
             onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
             disabled={page === totalPages - 1}
-            className="px-3 py-1.5 text-sm rounded-[var(--radius-md)] border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-alt)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            style={{
+              padding: "6px 12px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-12)",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--color-card-border)",
+              color: "var(--color-text-40)",
+              background: "none",
+              cursor: page === totalPages - 1 ? "not-allowed" : "pointer",
+              opacity: page === totalPages - 1 ? 0.4 : 1,
+            }}
           >
             Next
           </button>

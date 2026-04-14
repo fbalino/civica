@@ -1,20 +1,28 @@
 import { getAllJurisdictions } from "@/lib/db/queries";
 
 const GOV_TYPE_COLORS: Record<string, string> = {
-  Presidential: "#D4764E",
-  Parliamentary: "#4E8BD4",
-  "Semi-presidential": "#9B6DC6",
-  Theocratic: "#5CAA6E",
-  Absolute: "#C4A44E",
-  Federal: "#4E8BD4",
+  Presidential: "var(--color-gov-presidential)",
+  Parliamentary: "var(--color-gov-parliamentary)",
+  "Semi-presidential": "var(--color-gov-semi-presidential)",
+  Theocratic: "var(--color-gov-theocratic)",
+  Absolute: "var(--color-gov-absolute)",
+  Federal: "var(--color-gov-parliamentary)",
   Communist: "#E44040",
-  Constitutional: "#4E8BD4",
+  Constitutional: "var(--color-gov-parliamentary)",
 };
 
+const GOV_TYPE_LEGEND: [string, string][] = [
+  ["Presidential", "var(--color-gov-presidential)"],
+  ["Parliamentary", "var(--color-gov-parliamentary)"],
+  ["Semi-presidential", "var(--color-gov-semi-presidential)"],
+  ["Theocratic", "var(--color-gov-theocratic)"],
+  ["Absolute", "var(--color-gov-absolute)"],
+];
+
 function govColor(type: string | null): string {
-  if (!type) return "#8899AA";
+  if (!type) return "var(--color-gov-other)";
   const entry = Object.entries(GOV_TYPE_COLORS).find(([k]) => type.includes(k));
-  return entry?.[1] ?? "#8899AA";
+  return entry?.[1] ?? "var(--color-gov-other)";
 }
 
 function govLabel(type: string | null): string {
@@ -49,21 +57,54 @@ export default async function Home() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="wide-container pt-24 pb-14 md:pt-28 md:pb-16">
-        <p className="font-mono text-[11px] tracking-[0.2em] uppercase text-[var(--color-accent)] mb-6">
-          {countries.length > 0 ? `${countries.length}+ countries` : "260+ countries"} · Live data · Open source
+      {/* Hero — prototype: 100px top, 40px sides, 60px bottom */}
+      <section
+        style={{
+          maxWidth: "var(--max-w-content)",
+          margin: "0 auto",
+          padding: "100px var(--spacing-page-x) 60px",
+        }}
+      >
+        <p
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-11)",
+            letterSpacing: "var(--tracking-widest)",
+            textTransform: "uppercase",
+            color: "var(--color-accent)",
+            marginBottom: 24,
+          }}
+        >
+          {countries.length > 0 ? `${countries.length}+ countries` : "260+ countries"} &middot; Live data &middot; Open source
         </p>
-        <h1 className="font-heading text-5xl md:text-[64px] font-normal leading-[1.05] tracking-tight text-[var(--color-text-primary)] mb-6 max-w-2xl">
+        <h1
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "var(--text-64)",
+            fontWeight: 400,
+            lineHeight: "var(--leading-tight)",
+            letterSpacing: "var(--tracking-tighter)",
+            margin: "0 0 24px",
+            color: "var(--color-text-primary)",
+          }}
+        >
           How the world<br />is <em>governed</em>
         </h1>
-        <hr className="editorial-rule--accent mb-8" />
-        <p className="font-mono text-sm text-[var(--color-text-tertiary)] leading-relaxed max-w-lg mb-12">
+        <p
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-14)",
+            color: "var(--color-text-40)",
+            lineHeight: "var(--leading-loose)",
+            maxWidth: 520,
+            marginBottom: 48,
+          }}
+        >
           Interactive government structure diagrams, legislature visualizations,
           constitutional texts, and country intelligence. The successor to the CIA World Factbook.
         </p>
 
-        {/* Country grid */}
+        {/* Country grid — prototype: 3-col, 1px gap, rounded */}
         {featured.length > 0 && (
           <>
             <div className="country-grid">
@@ -73,28 +114,40 @@ export default async function Home() {
                   <a
                     key={co.slug}
                     href={`/countries/${co.slug}`}
-                    className="country-grid-cell no-underline group"
+                    className="country-grid-cell"
+                    style={{ textDecoration: "none", color: "inherit" }}
                   >
-                    <div className="flex justify-between items-start mb-3">
-                      <span className="text-[32px] leading-none">
-                        {countryFlag(co.iso2)}
-                      </span>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+                      <span style={{ fontSize: "var(--text-32)" }}>{countryFlag(co.iso2)}</span>
                       <span
                         className="gov-badge"
-                        style={{
-                          color,
-                          border: `1px solid ${color}33`,
-                        }}
+                        style={{ color, border: `1px solid color-mix(in srgb, ${color} 20%, transparent)` }}
                       >
                         {govLabel(co.governmentTypeDetail ?? co.governmentType)}
                       </span>
                     </div>
-                    <h3 className="font-heading text-[22px] font-normal tracking-tight text-[var(--color-text-primary)] group-hover:text-[var(--color-accent-text)] transition-colors mb-1 leading-tight">
+                    <h3
+                      style={{
+                        fontFamily: "var(--font-heading)",
+                        fontSize: "var(--text-22)",
+                        fontWeight: 400,
+                        letterSpacing: "var(--tracking-snug)",
+                        margin: "0 0 4px",
+                        color: "var(--color-text-primary)",
+                      }}
+                    >
                       {co.name}
                     </h3>
-                    <p className="font-mono text-[11px] text-[var(--color-text-tertiary)] m-0">
+                    <p
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "var(--text-11)",
+                        color: "var(--color-text-30)",
+                        margin: 0,
+                      }}
+                    >
                       {co.capital}
-                      {co.capital && co.population ? " · " : ""}
+                      {co.capital && co.population ? " \u00B7 " : ""}
                       {co.population ? formatPopulation(co.population) : ""}
                     </p>
                   </a>
@@ -102,10 +155,15 @@ export default async function Home() {
               })}
             </div>
             {countries.length > featured.length && (
-              <div className="mt-8 text-center">
+              <div style={{ marginTop: 32, textAlign: "center" }}>
                 <a
                   href="/countries"
-                  className="inline-flex items-center gap-2 font-mono text-xs text-[var(--color-accent-text)] hover:text-[var(--color-accent-hover)] transition-colors no-underline"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-12)",
+                    color: "var(--color-accent)",
+                    textDecoration: "none",
+                  }}
                 >
                   Browse all {countries.length} countries &rarr;
                 </a>
@@ -115,67 +173,49 @@ export default async function Home() {
         )}
 
         {featured.length === 0 && (
-          <div className="py-16 text-center">
-            <p className="font-mono text-sm text-[var(--color-text-tertiary)]">
+          <div style={{ padding: "64px 0", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)" }}>
               Run the seed scripts to populate country data.
             </p>
-            <a
-              href="/countries"
-              className="inline-flex items-center gap-2 mt-6 px-5 py-2.5 text-sm font-mono rounded-[var(--radius-md)] bg-[var(--color-accent)] text-[var(--color-text-inverse)] hover:bg-[var(--color-accent-hover)] transition-colors no-underline"
-            >
-              Explore countries &rarr;
-            </a>
           </div>
         )}
       </section>
 
-      {/* Government types legend */}
-      <section className="wide-container pt-14 pb-20">
-        <h2 className="font-mono text-[13px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)] mb-8">
+      {/* Government types legend — prototype: flex row with color bars */}
+      <section
+        style={{
+          maxWidth: "var(--max-w-content)",
+          margin: "0 auto",
+          padding: "60px var(--spacing-page-x) 80px",
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-13)",
+            letterSpacing: "var(--tracking-caps)",
+            textTransform: "uppercase",
+            color: "var(--color-text-30)",
+            marginBottom: 32,
+          }}
+        >
           Government types
         </h2>
-        <div className="flex flex-wrap gap-6">
-          {Object.entries(GOV_TYPE_COLORS).slice(0, 5).map(([type, color]) => (
-            <div key={type} className="flex-1 min-w-[100px]">
-              <div
-                className="w-8 h-[3px] rounded-sm mb-3"
-                style={{ background: color }}
-              />
-              <span className="font-mono text-xs text-[var(--color-text-secondary)]">
+        <div style={{ display: "flex", gap: 24 }}>
+          {GOV_TYPE_LEGEND.map(([type, color]) => (
+            <div key={type} style={{ flex: 1 }}>
+              <div className="gov-color-bar" style={{ background: color }} />
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-12)",
+                  color: "var(--color-text-50)",
+                }}
+              >
                 {type}
               </span>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Data provenance */}
-      <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-alt)]">
-        <div className="wide-container py-10">
-          <div className="flex flex-col sm:flex-row gap-8 sm:gap-12">
-            <div className="flex-1">
-              <h3 className="font-heading text-lg tracking-tight mb-3">
-                Data Provenance
-              </h3>
-              <p className="font-mono text-xs text-[var(--color-text-secondary)] leading-relaxed">
-                Every data point carries a provenance indicator. Hover any dot to see source and freshness.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 sm:pt-1">
-              <div className="flex items-center gap-3">
-                <span className="source-dot source-dot--live" data-source="" data-date="" />
-                <span className="font-mono text-xs text-[var(--color-text-secondary)]">
-                  Live or regularly updated
-                </span>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="source-dot source-dot--frozen" data-source="" data-date="" />
-                <span className="font-mono text-xs text-[var(--color-text-secondary)]">
-                  Frozen archive (Jan 2026)
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
     </div>

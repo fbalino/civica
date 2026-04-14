@@ -49,14 +49,24 @@ function CountryPicker({
 
   if (selectedCountry) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)]">
-        <span className="text-lg">{countryFlag(selectedCountry.iso2)}</span>
-        <span className="font-mono text-sm text-[var(--color-text-primary)] flex-1">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "8px 12px",
+          borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--color-card-border)",
+          background: "var(--color-card-bg)",
+        }}
+      >
+        <span style={{ fontSize: "var(--text-18)" }}>{countryFlag(selectedCountry.iso2)}</span>
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-13)", color: "var(--color-text-primary)", flex: 1 }}>
           {selectedCountry.name}
         </span>
         <button
           onClick={onRemove}
-          className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
+          style={{ color: "var(--color-text-30)", background: "none", border: "none", cursor: "pointer", padding: 4 }}
           aria-label="Remove"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -68,25 +78,61 @@ function CountryPicker({
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} style={{ position: "relative" }}>
       <input
         type="text"
         placeholder={placeholder}
         value={query}
         onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
         onFocus={() => setOpen(true)}
-        className="w-full px-3 py-2 text-sm rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:border-transparent"
+        style={{
+          width: "100%",
+          padding: "8px 12px",
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-13)",
+          borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--color-card-border)",
+          background: "var(--color-select-bg)",
+          color: "var(--color-text-primary)",
+        }}
       />
       {open && filtered.length > 0 && (
-        <div className="absolute top-full mt-1 left-0 right-0 z-20 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-elevated)] shadow-lg max-h-60 overflow-y-auto">
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            marginTop: 4,
+            left: 0,
+            right: 0,
+            zIndex: 20,
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid var(--color-card-border)",
+            background: "var(--color-surface-elevated)",
+            maxHeight: 240,
+            overflowY: "auto",
+          }}
+        >
           {filtered.map((c) => (
             <button
               key={c.slug}
               onClick={() => { onSelect(c.slug); setQuery(""); setOpen(false); }}
-              className="w-full text-left px-3 py-2 flex items-center gap-2 hover:bg-[var(--color-surface-alt)] transition-colors"
+              style={{
+                width: "100%",
+                textAlign: "left",
+                padding: "8px 12px",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "var(--color-text-primary)",
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-13)",
+              }}
             >
-              <span className="text-base">{countryFlag(c.iso2)}</span>
-              <span className="font-mono text-sm text-[var(--color-text-primary)]">{c.name}</span>
+              <span style={{ fontSize: "var(--text-18)" }}>{countryFlag(c.iso2)}</span>
+              {c.name}
             </button>
           ))}
         </div>
@@ -112,7 +158,7 @@ export function CompareSelector({ countries }: { countries: Country[] }) {
   const slots = [current[0] ?? null, current[1] ?? null, current[2] ?? null];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 40 }}>
       {slots.map((slug, i) => (
         <CountryPicker
           key={i}

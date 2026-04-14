@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import {
   getAllJurisdictions,
   getJurisdictionsBySlugs,
-  getCountryFacts,
   getGovernmentStructure,
 } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
@@ -111,11 +110,33 @@ export default async function ComparePage({
   const colCount = selected.length || 1;
 
   return (
-    <div className="wide-container py-[var(--spacing-section)]">
-      <h1 className="font-heading text-4xl font-normal tracking-tight mb-2">
+    <div
+      style={{
+        maxWidth: "var(--max-w-content)",
+        margin: "0 auto",
+        padding: "60px var(--spacing-page-x)",
+      }}
+    >
+      <h1
+        style={{
+          fontFamily: "var(--font-heading)",
+          fontSize: "var(--text-44)",
+          fontWeight: 400,
+          letterSpacing: "var(--tracking-tight)",
+          marginBottom: 8,
+          color: "var(--color-text-primary)",
+        }}
+      >
         Compare
       </h1>
-      <p className="font-mono text-xs text-[var(--color-text-tertiary)] mb-8">
+      <p
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-12)",
+          color: "var(--color-text-30)",
+          marginBottom: 32,
+        }}
+      >
         Select up to three countries to compare side by side.
       </p>
 
@@ -124,120 +145,112 @@ export default async function ComparePage({
       </Suspense>
 
       {selected.length >= 2 && (
-        <>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `160px repeat(${colCount}, 1fr)`,
+            gap: 1,
+            background: "var(--color-grid-bg)",
+            borderRadius: "var(--radius-sm)",
+            overflow: "hidden",
+          }}
+        >
           {/* Country headers */}
-          <div
-            className="grid gap-px mb-px rounded-t-[var(--radius-sm)] overflow-hidden"
-            style={{
-              gridTemplateColumns: `160px repeat(${colCount}, 1fr)`,
-              background: "var(--color-border)",
-            }}
-          >
-            <div className="bg-[var(--color-surface-alt)] p-4" />
-            {selected.map((country) => (
-              <div key={country.slug} className="bg-[var(--color-surface-alt)] p-4 text-center">
-                <span className="text-[32px] block mb-2">
-                  {countryFlag(country.iso2)}
-                </span>
-                <a
-                  href={`/countries/${country.slug}`}
-                  className="font-heading text-xl font-normal text-[var(--color-text-primary)] hover:text-[var(--color-accent-text)] transition-colors no-underline"
-                >
-                  {country.name}
-                </a>
-              </div>
-            ))}
-          </div>
+          <div style={{ background: "var(--color-card-bg)", padding: 16 }} />
+          {selected.map((country) => (
+            <div key={country.slug} style={{ background: "var(--color-card-bg)", padding: 16, textAlign: "center" }}>
+              <span style={{ fontSize: "var(--text-32)", display: "block", marginBottom: 8 }}>
+                {countryFlag(country.iso2)}
+              </span>
+              <a
+                href={`/countries/${country.slug}`}
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "var(--text-20)",
+                  fontWeight: 400,
+                  color: "var(--color-text-primary)",
+                  textDecoration: "none",
+                }}
+              >
+                {country.name}
+              </a>
+            </div>
+          ))}
 
           {/* Data rows */}
-          <div
-            className="grid gap-px rounded-b-[var(--radius-sm)] overflow-hidden"
-            style={{
-              gridTemplateColumns: `160px repeat(${colCount}, 1fr)`,
-              background: "var(--color-border)",
-            }}
-          >
-            {/* Profile rows */}
-            {rows.map((row) => {
-              const hasAny = row.values.some((v) => v != null);
-              if (!hasAny) return null;
+          {[...rows, ...leaderRows].map((row) => {
+            const hasAny = row.values.some((v) => v != null);
+            if (!hasAny) return null;
 
-              let maxIdx = -1;
-              if (row.numericValues) {
-                let maxVal = -Infinity;
-                row.numericValues.forEach((val, idx) => {
-                  if (val != null && val > maxVal) { maxVal = val; maxIdx = idx; }
-                });
-              }
+            let maxIdx = -1;
+            if (row.numericValues) {
+              let maxVal = -Infinity;
+              row.numericValues.forEach((val, idx) => {
+                if (val != null && val > maxVal) { maxVal = val; maxIdx = idx; }
+              });
+            }
 
-              return [
-                <div
-                  key={`${row.label}-label`}
-                  className="bg-[var(--color-surface)] p-4 flex items-center"
+            return [
+              <div
+                key={`${row.label}-label`}
+                style={{
+                  background: "var(--color-bg)",
+                  padding: 16,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-11)",
+                    color: "var(--color-text-30)",
+                    textTransform: "uppercase",
+                    letterSpacing: "var(--tracking-wide)",
+                  }}
                 >
-                  <span className="font-mono text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wide">
-                    {row.label}
-                  </span>
-                </div>,
-                ...row.values.map((val, i) => (
-                  <div
-                    key={`${row.label}-${i}`}
-                    className="bg-[var(--color-surface)] p-4 flex items-center justify-center"
-                  >
-                    <span
-                      className={`font-mono text-[13px] ${
-                        maxIdx === i && row.numericValues
-                          ? "text-[var(--color-accent-text)] font-medium"
-                          : "text-[var(--color-text-primary)]"
-                      }`}
-                    >
-                      {val ?? "\u2014"}
-                    </span>
-                  </div>
-                )),
-              ];
-            })}
-
-            {/* Leadership rows */}
-            {leaderRows.map((row) => {
-              const hasAny = row.values.some((v) => v != null);
-              if (!hasAny) return null;
-              return [
+                  {row.label}
+                </span>
+              </div>,
+              ...row.values.map((val, i) => (
                 <div
-                  key={`${row.label}-label`}
-                  className="bg-[var(--color-surface)] p-4 flex items-center"
+                  key={`${row.label}-${i}`}
+                  style={{
+                    background: "var(--color-bg)",
+                    padding: 16,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
-                  <span className="font-mono text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-wide">
-                    {row.label}
-                  </span>
-                </div>,
-                ...row.values.map((val, i) => (
-                  <div
-                    key={`${row.label}-${i}`}
-                    className="bg-[var(--color-surface)] p-4 flex items-center justify-center"
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-13)",
+                      color: maxIdx === i && row.numericValues ? "var(--color-accent)" : "var(--color-text-primary)",
+                      fontWeight: maxIdx === i && row.numericValues ? 500 : 400,
+                    }}
                   >
-                    <span className="font-mono text-[13px] text-[var(--color-text-primary)]">
-                      {val ?? "\u2014"}
-                      {val && row.source && (
-                        <SourceDot source={row.source} retrievedAt="2026-04-13" />
-                      )}
-                    </span>
-                  </div>
-                )),
-              ];
-            })}
-          </div>
-        </>
+                    {val ?? "\u2014"}
+                    {val && row.source && (
+                      <SourceDot source={row.source} retrievedAt="2026-04-13" />
+                    )}
+                  </span>
+                </div>
+              )),
+            ];
+          })}
+        </div>
       )}
 
       {selected.length === 1 && (
-        <p className="text-center font-mono text-sm text-[var(--color-text-tertiary)] py-12">
+        <p style={{ textAlign: "center", fontFamily: "var(--font-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)", padding: "48px 0" }}>
           Select at least one more country to compare.
         </p>
       )}
 
       {selected.length === 0 && validSlugs.length === 0 && (
-        <p className="text-center font-mono text-sm text-[var(--color-text-tertiary)] py-12">
+        <p style={{ textAlign: "center", fontFamily: "var(--font-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)", padding: "48px 0" }}>
           Choose countries above to begin comparing.
         </p>
       )}

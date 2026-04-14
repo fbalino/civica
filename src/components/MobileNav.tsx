@@ -30,7 +30,18 @@ export function MobileNav() {
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="inline-flex items-center justify-center w-8 h-8 rounded-[var(--radius-md)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 32,
+          height: 32,
+          borderRadius: "var(--radius-md)",
+          color: "var(--color-text-40)",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+        }}
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
       >
@@ -45,19 +56,32 @@ export function MobileNav() {
         )}
       </button>
       {open && (
-        <div className="fixed inset-0 top-14 z-30 bg-[var(--color-surface)] p-6">
-          <nav className="flex flex-col gap-1">
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            top: 56,
+            zIndex: 30,
+            background: "var(--color-bg)",
+            padding: 24,
+          }}
+        >
+          <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {LINKS.map(({ href, label }) => {
               const isActive = pathname === href || pathname.startsWith(href + "/");
               return (
                 <a
                   key={href}
                   href={href}
-                  className={`py-3 px-4 rounded-[var(--radius-md)] text-base transition-colors no-underline ${
-                    isActive
-                      ? "text-[var(--color-text-primary)] font-medium bg-[var(--color-surface-alt)]"
-                      : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)]"
-                  }`}
+                  style={{
+                    padding: "12px 16px",
+                    borderRadius: "var(--radius-md)",
+                    textDecoration: "none",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-14)",
+                    color: isActive ? "var(--color-text-primary)" : "var(--color-text-40)",
+                    background: isActive ? "var(--color-card-bg)" : "transparent",
+                  }}
                 >
                   {label}
                 </a>

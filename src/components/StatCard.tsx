@@ -20,28 +20,33 @@ export function StatCard({
   trend,
 }: StatCardProps) {
   return (
-    <div className="flex flex-col gap-1 p-4 rounded-[var(--radius-sm)] bg-[var(--color-surface-alt)] border border-[var(--color-border-muted)]">
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[var(--color-text-tertiary)]">
+    <div className="cv-card" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <span className="section-header" style={{ marginBottom: 0 }}>
         {label}
       </span>
-      <div className="flex items-baseline gap-1.5">
-        <span className="font-heading text-2xl tracking-tight text-[var(--color-text-primary)]">
+      <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+        <span
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "var(--text-24)",
+            letterSpacing: "var(--tracking-tight)",
+            color: "var(--color-text-primary)",
+          }}
+        >
           {value}
         </span>
         {unit && (
-          <span className="font-mono text-xs text-[var(--color-text-tertiary)]">
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)" }}>
             {unit}
           </span>
         )}
         {trend && (
           <span
-            className={`font-mono text-xs ${
-              trend === "up"
-                ? "text-[var(--color-source-live)]"
-                : trend === "down"
-                  ? "text-red-500"
-                  : "text-[var(--color-text-tertiary)]"
-            }`}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-12)",
+              color: trend === "up" ? "var(--color-source-live)" : trend === "down" ? "#E44040" : "var(--color-text-30)",
+            }}
           >
             {trend === "up" ? "\u2191" : trend === "down" ? "\u2193" : "\u2192"}
           </span>
@@ -51,7 +56,7 @@ export function StatCard({
         )}
       </div>
       {year && (
-        <span className="font-mono text-[10px] text-[var(--color-text-tertiary)]">
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", color: "var(--color-text-30)" }}>
           {year} est.
         </span>
       )}

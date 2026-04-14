@@ -14,7 +14,15 @@ export function CountryTabs({ tabs }: { tabs: Tab[] }) {
 
   return (
     <div>
-      <div className="flex gap-0.5 border-b border-[var(--color-border)] mt-7 mb-8" role="tablist">
+      <div
+        role="tablist"
+        style={{
+          display: "flex",
+          gap: 2,
+          borderBottom: "1px solid var(--color-divider)",
+          margin: "28px 0 32px",
+        }}
+      >
         {tabs.map((tab) => (
           <button
             key={tab.id}

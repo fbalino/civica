@@ -14,7 +14,7 @@ export function NavLinks() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-0.5">
+    <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>
       {LINKS.map(({ href, label }) => {
         const isActive =
           href === "/"
@@ -24,7 +24,8 @@ export function NavLinks() {
           <a
             key={href}
             href={href}
-            className={`tab-nav no-underline ${isActive ? "tab-nav--active" : ""}`}
+            className={`tab-nav ${isActive ? "tab-nav--active" : ""}`}
+            style={{ textDecoration: "none" }}
           >
             {label}
           </a>

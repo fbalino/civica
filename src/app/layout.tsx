@@ -41,68 +41,160 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches)){d.classList.add('dark')}else{d.classList.remove('dark')}}catch(e){}})()`,
+            __html: `(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='light'||(!t&&!window.matchMedia('(prefers-color-scheme:dark)').matches)){d.classList.add('light')}else{d.classList.remove('light')}}catch(e){}})()`,
           }}
         />
       </head>
-      <body className="min-h-screen flex flex-col antialiased">
+      <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <ThemeProvider>
-          <header className="w-full border-b border-[var(--color-border)] sticky top-0 z-40 bg-[var(--color-surface)]/92 backdrop-blur-sm">
-            <div className="wide-container flex items-center justify-between py-4">
-              <a href="/" className="no-underline flex items-baseline gap-2">
-                <span className="font-heading text-[26px] font-normal tracking-tight text-[var(--color-text-primary)]">
-                  Civica
-                </span>
-                <span className="hidden sm:inline font-mono text-[9px] text-[var(--color-text-tertiary)] tracking-[0.15em] uppercase">
-                  Atlas of governance
-                </span>
-              </a>
-              <div className="hidden md:flex items-center gap-1">
-                <NavLinks />
-                <div className="ml-4">
-                  <ThemeToggle />
-                </div>
-              </div>
-              <div className="flex md:hidden items-center gap-2">
+          {/* Nav — prototype: sticky, blur, 16px 40px padding */}
+          <nav
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "var(--spacing-nav-y) var(--spacing-page-x)",
+              borderBottom: "1px solid var(--color-divider)",
+              position: "sticky",
+              top: 0,
+              zIndex: 100,
+              background: "var(--color-bg-nav)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            }}
+          >
+            <a href="/" style={{ cursor: "pointer", textDecoration: "none", display: "flex", alignItems: "baseline", gap: 8 }}>
+              <span
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "var(--text-26)",
+                  fontWeight: 400,
+                  letterSpacing: "var(--tracking-tighter)",
+                  color: "var(--color-text-primary)",
+                }}
+              >
+                Civica
+              </span>
+              <span
+                className="hidden sm:inline"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-9)",
+                  color: "var(--color-text-30)",
+                  letterSpacing: "var(--tracking-caps)",
+                  textTransform: "uppercase",
+                }}
+              >
+                Atlas of governance
+              </span>
+            </a>
+            <div className="hidden md:flex" style={{ display: undefined, alignItems: "center", gap: 2 }}>
+              <NavLinks />
+              <div style={{ marginLeft: 16 }}>
                 <ThemeToggle />
-                <MobileNav />
               </div>
             </div>
-          </header>
-          <main className="flex-1">{children}</main>
-          <footer className="border-t border-[var(--color-border)] mt-16">
-            <div className="wide-container py-10">
-              <div className="flex flex-col md:flex-row justify-between items-start gap-8">
-                <div>
-                  <span className="font-heading text-xl text-[var(--color-text-primary)]">Civica</span>
-                  <p className="font-mono text-[11px] text-[var(--color-text-tertiary)] mt-2 leading-relaxed">
-                    Data from Wikidata (CC0), IPU Parline, Constitute Project, CIA World Factbook (archived)
-                  </p>
-                  <div className="flex gap-3 mt-3">
-                    <span className="flex items-center gap-1.5 font-mono text-[10px] text-[var(--color-text-tertiary)]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-source-live)]" />
-                      Live source
-                    </span>
-                    <span className="flex items-center gap-1.5 font-mono text-[10px] text-[var(--color-text-tertiary)]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-source-frozen)]" />
-                      Archived (Jan 2026)
-                    </span>
-                  </div>
+            <div className="flex md:hidden" style={{ alignItems: "center", gap: 8 }}>
+              <ThemeToggle />
+              <MobileNav />
+            </div>
+          </nav>
+
+          <main style={{ flex: 1 }}>{children}</main>
+
+          {/* Footer — prototype: border-top, 40px padding, 60px margin-top */}
+          <footer
+            style={{
+              borderTop: "1px solid var(--color-divider)",
+              padding: "var(--spacing-page-x)",
+              marginTop: 60,
+            }}
+          >
+            <div
+              style={{
+                maxWidth: "var(--max-w-content)",
+                margin: "0 auto",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                flexWrap: "wrap",
+                gap: 24,
+              }}
+            >
+              <div>
+                <span
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "var(--text-20)",
+                    fontWeight: 400,
+                    color: "var(--color-text-primary)",
+                  }}
+                >
+                  Civica
+                </span>
+                <p
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-11)",
+                    color: "var(--color-text-20)",
+                    marginTop: 8,
+                  }}
+                >
+                  Data from Wikidata (CC0), IPU Parline, Constitute Project, CIA World Factbook (archived)
+                </p>
+                <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-10)",
+                      color: "var(--color-text-30)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: "var(--color-source-live)",
+                      }}
+                    />
+                    Live source
+                  </span>
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 4,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-10)",
+                      color: "var(--color-text-30)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: "50%",
+                        background: "var(--color-source-frozen)",
+                      }}
+                    />
+                    Archived (Jan 2026)
+                  </span>
                 </div>
-                <div className="font-mono text-[11px] text-[var(--color-text-tertiary)] md:text-right">
-                  <div className="flex gap-3 md:justify-end">
-                    <a href="/countries" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">Countries</a>
-                    <span>&middot;</span>
-                    <a href="/compare" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">Compare</a>
-                    <span>&middot;</span>
-                    <a href="/rankings" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">Rankings</a>
-                  </div>
-                  <div className="mt-1.5 flex gap-3 md:justify-end">
-                    <a href="/about" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">About</a>
-                    <span>&middot;</span>
-                    <a href="/about" className="hover:text-[var(--color-text-secondary)] transition-colors no-underline text-[var(--color-text-tertiary)]">Sources</a>
-                  </div>
-                </div>
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-11)",
+                  color: "var(--color-text-20)",
+                  textAlign: "right",
+                }}
+              >
+                <div>Countries &middot; Constitutions &middot; Rankings &middot; API</div>
+                <div style={{ marginTop: 6 }}>About &middot; Methodology &middot; Sources &middot; Contact</div>
               </div>
             </div>
           </footer>

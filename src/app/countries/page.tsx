@@ -6,21 +6,20 @@ export const metadata = {
   description: "Browse all countries and territories in the Civica atlas.",
 };
 
-const GOV_TYPE_COLORS: Record<string, string> = {
-  Presidential: "#D4764E",
-  Parliamentary: "#4E8BD4",
-  "Semi-presidential": "#9B6DC6",
-  Theocratic: "#5CAA6E",
-  Absolute: "#C4A44E",
-  Federal: "#4E8BD4",
-  Communist: "#E44040",
-  Constitutional: "#4E8BD4",
-};
-
 function govColor(type: string | null): string {
-  if (!type) return "#8899AA";
-  const entry = Object.entries(GOV_TYPE_COLORS).find(([k]) => type.includes(k));
-  return entry?.[1] ?? "#8899AA";
+  if (!type) return "var(--color-gov-other)";
+  const map: Record<string, string> = {
+    Presidential: "var(--color-gov-presidential)",
+    Parliamentary: "var(--color-gov-parliamentary)",
+    "Semi-presidential": "var(--color-gov-semi-presidential)",
+    Theocratic: "var(--color-gov-theocratic)",
+    Absolute: "var(--color-gov-absolute)",
+    Federal: "var(--color-gov-parliamentary)",
+    Communist: "#E44040",
+    Constitutional: "var(--color-gov-parliamentary)",
+  };
+  const entry = Object.entries(map).find(([k]) => type.includes(k));
+  return entry?.[1] ?? "var(--color-gov-other)";
 }
 
 function countryFlag(iso2: string | null): string {
@@ -75,27 +74,54 @@ export default async function CountriesPage({
   const continents = [...new Set(countries.map((c) => c.continent).filter(Boolean))].sort();
 
   return (
-    <div className="wide-container py-12 md:py-16">
-      <h1 className="font-heading text-[44px] font-normal tracking-tight mb-2">
+    <div
+      style={{
+        maxWidth: "var(--max-w-content)",
+        margin: "0 auto",
+        padding: "48px var(--spacing-page-x)",
+      }}
+    >
+      <h1
+        style={{
+          fontFamily: "var(--font-heading)",
+          fontSize: "var(--text-44)",
+          fontWeight: 400,
+          letterSpacing: "var(--tracking-tight)",
+          marginBottom: 8,
+          color: "var(--color-text-primary)",
+        }}
+      >
         Index
       </h1>
-      <p className="font-mono text-xs text-[var(--color-text-tertiary)] mb-10">
+      <p
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-12)",
+          color: "var(--color-text-30)",
+          marginBottom: 40,
+        }}
+      >
         {countries.length > 0
-          ? `${countries.length} countries loaded · Full coverage coming soon`
+          ? `${countries.length} countries loaded \u00B7 Full coverage coming soon`
           : "Data not yet loaded. Run the seed scripts to populate."}
       </p>
 
       <CountrySearch defaultValue={searchQuery ?? ""} continent={continentFilter} />
 
       {continents.length > 0 && (
-        <nav className="flex gap-2 flex-wrap mb-8">
+        <nav style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 32 }}>
           <a
             href="/countries"
-            className={`font-mono text-xs px-3 py-1.5 rounded-[var(--radius-sm)] transition-colors no-underline ${
-              !continentFilter
-                ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]"
-                : "bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
-            }`}
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-12)",
+              padding: "6px 12px",
+              borderRadius: "var(--radius-sm)",
+              textDecoration: "none",
+              background: !continentFilter ? "var(--color-accent)" : "var(--color-card-bg)",
+              color: !continentFilter ? "var(--color-bg)" : "var(--color-text-40)",
+              border: continentFilter ? "1px solid var(--color-card-border)" : "none",
+            }}
           >
             All
           </a>
@@ -103,11 +129,16 @@ export default async function CountriesPage({
             <a
               key={c}
               href={`/countries?continent=${encodeURIComponent(c!)}`}
-              className={`font-mono text-xs px-3 py-1.5 rounded-[var(--radius-sm)] transition-colors no-underline ${
-                continentFilter === c
-                  ? "bg-[var(--color-accent)] text-[var(--color-text-inverse)]"
-                  : "bg-[var(--color-surface-alt)] text-[var(--color-text-secondary)] hover:bg-[var(--color-border)]"
-              }`}
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-12)",
+                padding: "6px 12px",
+                borderRadius: "var(--radius-sm)",
+                textDecoration: "none",
+                background: continentFilter === c ? "var(--color-accent)" : "var(--color-card-bg)",
+                color: continentFilter === c ? "var(--color-bg)" : "var(--color-text-40)",
+                border: continentFilter !== c ? "1px solid var(--color-card-border)" : "none",
+              }}
             >
               {c}
             </a>
@@ -115,59 +146,98 @@ export default async function CountriesPage({
         </nav>
       )}
 
-      {/* Table-style list */}
-      <div className="rounded-[var(--radius-sm)] overflow-hidden" style={{ background: "var(--color-border)" }}>
-        <div className="flex flex-col gap-px">
-          {/* Column header */}
-          <div
-            className="bg-[var(--color-surface-alt)] hidden md:grid items-center gap-4 px-6 py-2.5"
-            style={{ gridTemplateColumns: "48px 1fr 180px 120px 80px" }}
+      {/* Table-style list — prototype: 1px gap grid, 5-column layout */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          gap: 1,
+          background: "var(--color-grid-bg)",
+          borderRadius: "var(--radius-sm)",
+          overflow: "hidden",
+        }}
+      >
+        {filtered.map((country) => (
+          <a
+            key={country.slug}
+            href={`/countries/${country.slug}`}
+            className="index-row"
+            style={{ textDecoration: "none", color: "inherit" }}
           >
-            <span />
-            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)]">Country</span>
-            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)]">Government</span>
-            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)] text-right">Population</span>
-            <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)] text-right">Democracy</span>
-          </div>
-          {filtered.map((country) => (
-            <a
-              key={country.slug}
-              href={`/countries/${country.slug}`}
-              className="bg-[var(--color-surface)] hover:bg-[var(--color-surface-alt)] transition-colors no-underline grid items-center gap-4 px-6 py-4"
+            <span style={{ fontSize: "var(--text-32)", lineHeight: 1 }}>
+              {countryFlag(country.iso2)}
+            </span>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 12, minWidth: 0 }}>
+              <span
+                style={{
+                  fontFamily: "var(--font-heading)",
+                  fontSize: "var(--text-18)",
+                  fontWeight: 400,
+                  color: "var(--color-text-primary)",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {country.name}
+              </span>
+              <span
+                className="hidden sm:inline"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-11)",
+                  color: "var(--color-text-25)",
+                }}
+              >
+                {country.capital}
+              </span>
+            </div>
+            <span
+              className="hidden md:inline"
               style={{
-                gridTemplateColumns: "48px 1fr 180px 120px 80px",
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-11)",
+                color: govColor(country.governmentTypeDetail ?? country.governmentType),
               }}
             >
-              <span className="text-[28px] leading-none">
-                {countryFlag(country.iso2)}
-              </span>
-              <div className="flex items-baseline gap-3 min-w-0">
-                <span className="font-heading text-lg font-normal text-[var(--color-text-primary)] truncate">
-                  {country.name}
-                </span>
-                <span className="font-mono text-[11px] text-[var(--color-text-tertiary)] hidden sm:inline">
-                  {country.capital}
-                </span>
-              </div>
-              <span
-                className="font-mono text-[11px] hidden md:inline"
-                style={{ color: govColor(country.governmentTypeDetail ?? country.governmentType) }}
-              >
-                {country.governmentTypeDetail ?? country.governmentType ?? ""}
-              </span>
-              <span className="font-mono text-[11px] text-[var(--color-text-secondary)] text-right hidden sm:inline">
-                {country.population ? formatPopulation(country.population) : ""}
-              </span>
-              <span className="font-mono text-[11px] text-[var(--color-text-tertiary)] text-right hidden md:inline">
-                {country.democracyIndex?.toFixed(2) ?? ""}
-              </span>
-            </a>
-          ))}
-        </div>
+              {country.governmentTypeDetail ?? country.governmentType ?? ""}
+            </span>
+            <span
+              className="hidden sm:inline"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-11)",
+                color: "var(--color-text-40)",
+                textAlign: "right",
+              }}
+            >
+              {country.population ? formatPopulation(country.population) : ""}
+            </span>
+            <span
+              className="hidden md:inline"
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-11)",
+                color: "var(--color-text-25)",
+                textAlign: "right",
+              }}
+            >
+              {country.democracyIndex?.toFixed(2) ?? ""}
+            </span>
+          </a>
+        ))}
       </div>
 
       {filtered.length === 0 && countries.length > 0 && (
-        <p className="text-center font-mono text-sm text-[var(--color-text-tertiary)] py-12">
+        <p
+          style={{
+            textAlign: "center",
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-14)",
+            color: "var(--color-text-40)",
+            padding: "48px 0",
+          }}
+        >
           {searchQuery
             ? `No countries match "${resolvedParams?.q}".`
             : "No countries match the selected filter."}

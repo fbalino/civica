@@ -10,7 +10,7 @@ const ThemeContext = createContext<{
   setTheme: (t: Theme) => void;
 }>({
   theme: "system",
-  resolved: "light",
+  resolved: "dark",
   setTheme: () => {},
 });
 
@@ -20,7 +20,7 @@ export function useTheme() {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("system");
-  const [resolved, setResolved] = useState<"light" | "dark">("light");
+  const [resolved, setResolved] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
     const saved = localStorage.getItem("theme") as Theme | null;
@@ -30,10 +30,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const resolve = () => {
-      const dark =
-        theme === "dark" || (theme === "system" && mq.matches);
-      document.documentElement.classList.toggle("dark", dark);
-      setResolved(dark ? "dark" : "light");
+      const light =
+        theme === "light" || (theme === "system" && !mq.matches);
+      document.documentElement.classList.toggle("light", light);
+      setResolved(light ? "light" : "dark");
     };
     resolve();
     mq.addEventListener("change", resolve);

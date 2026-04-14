@@ -27,47 +27,104 @@ const DATA_SOURCES = [
 
 export default function AboutPage() {
   return (
-    <div className="editorial-container py-[var(--spacing-section)]">
-      <h1 className="font-heading text-4xl font-normal tracking-tight mb-6">
+    <div
+      style={{
+        maxWidth: "var(--max-w-content)",
+        margin: "0 auto",
+        padding: "60px var(--spacing-page-x)",
+      }}
+    >
+      <h1
+        style={{
+          fontFamily: "var(--font-heading)",
+          fontSize: "var(--text-44)",
+          fontWeight: 400,
+          letterSpacing: "var(--tracking-tight)",
+          marginBottom: 24,
+          color: "var(--color-text-primary)",
+        }}
+      >
         About Civica
       </h1>
 
-      <div className="space-y-6 text-[var(--color-text-secondary)] leading-relaxed">
-        <p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <p
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-13)",
+            color: "var(--color-text-50)",
+            lineHeight: "var(--leading-loose)",
+          }}
+        >
           Civica is an open reference platform that visualizes government
           structures for every country in the world. It combines data from
           multiple authoritative sources into a single, browsable atlas of
           political systems, constitutions, and country statistics.
         </p>
 
-        <p>
-          The CIA World Factbook — for decades the definitive public reference on
-          the world&rsquo;s nations — was sunset on February 4, 2026. Civica
+        <p
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-13)",
+            color: "var(--color-text-50)",
+            lineHeight: "var(--leading-loose)",
+          }}
+        >
+          The CIA World Factbook &mdash; for decades the definitive public reference on
+          the world&rsquo;s nations &mdash; was sunset on February 4, 2026. Civica
           preserves its final archive and enriches it with live data from
           Wikidata and other open sources.
         </p>
       </div>
 
-      <section className="mt-[var(--spacing-section)]">
-        <h2 className="font-heading text-2xl font-normal tracking-tight mb-6">
+      <section style={{ marginTop: 60 }}>
+        <h2
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "var(--text-24)",
+            fontWeight: 400,
+            letterSpacing: "var(--tracking-tight)",
+            marginBottom: 24,
+            color: "var(--color-text-primary)",
+          }}
+        >
           Data Sources
         </h2>
-        <div className="space-y-4">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {DATA_SOURCES.map((source) => (
-            <div
-              key={source.id}
-              className="p-5 rounded-[var(--radius-sm)] border border-[var(--color-border-muted)] bg-[var(--color-surface-elevated)]"
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="font-heading text-lg font-normal">
+            <div key={source.id} className="cv-card">
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <h3
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "var(--text-18)",
+                    fontWeight: 400,
+                    margin: 0,
+                    color: "var(--color-text-primary)",
+                  }}
+                >
                   {source.name}
                 </h3>
                 <SourceDot source={source.id} retrievedAt={source.retrievedAt} />
               </div>
-              <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-2">
+              <p
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-12)",
+                  color: "var(--color-text-50)",
+                  lineHeight: "var(--leading-relaxed)",
+                  marginBottom: 8,
+                }}
+              >
                 {source.description}
               </p>
-              <span className="text-xs text-[var(--color-text-tertiary)]">
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-11)",
+                  color: "var(--color-text-30)",
+                }}
+              >
                 License: {source.license}
               </span>
             </div>
@@ -75,46 +132,70 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="mt-[var(--spacing-section)]">
-        <h2 className="font-heading text-2xl font-normal tracking-tight mb-4">
+      <section style={{ marginTop: 60 }}>
+        <h2
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "var(--text-24)",
+            fontWeight: 400,
+            letterSpacing: "var(--tracking-tight)",
+            marginBottom: 16,
+            color: "var(--color-text-primary)",
+          }}
+        >
           Data Provenance
         </h2>
-        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-4">
-          Every data point on Civica carries a provenance indicator showing its
-          source and freshness.
+        <p
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-12)",
+            color: "var(--color-text-50)",
+            lineHeight: "var(--leading-relaxed)",
+            marginBottom: 16,
+          }}
+        >
+          Every data point on Civica carries a provenance indicator showing its source and freshness.
         </p>
-        <div className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <span
-              className="source-dot source-dot--live"
-              data-source=""
-              data-date=""
-            />
-            <span className="text-sm text-[var(--color-text-secondary)]">
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span className="source-dot source-dot--live" data-source="" data-date="" />
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-50)" }}>
               Green dot &mdash; live or regularly updated source
             </span>
           </div>
-          <div className="flex items-center gap-3">
-            <span
-              className="source-dot source-dot--frozen"
-              data-source=""
-              data-date=""
-            />
-            <span className="text-sm text-[var(--color-text-secondary)]">
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span className="source-dot source-dot--frozen" data-source="" data-date="" />
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-50)" }}>
               Amber dot &mdash; frozen archive (CIA World Factbook, January 2026)
             </span>
           </div>
         </div>
       </section>
 
-      <section className="mt-[var(--spacing-section)]">
-        <h2 className="font-heading text-2xl font-normal tracking-tight mb-4">
+      <section style={{ marginTop: 60 }}>
+        <h2
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "var(--text-24)",
+            fontWeight: 400,
+            letterSpacing: "var(--tracking-tight)",
+            marginBottom: 16,
+            color: "var(--color-text-primary)",
+          }}
+        >
           Open Source
         </h2>
-        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+        <p
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-12)",
+            color: "var(--color-text-50)",
+            lineHeight: "var(--leading-relaxed)",
+          }}
+        >
           Civica is built with Next.js, Neon (serverless Postgres), Drizzle ORM,
           and Tailwind CSS. The platform is designed to be a free, open reference
-          — all public-domain and CC0-licensed data is freely available.
+          &mdash; all public-domain and CC0-licensed data is freely available.
         </p>
       </section>
     </div>

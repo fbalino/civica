@@ -33,9 +33,17 @@ export function FactbookSectionNav({
 }: FactbookSectionNavProps) {
   return (
     <nav
-      className="flex gap-0.5 overflow-x-auto border-b border-[var(--color-border)] pb-px -mb-px scrollbar-none"
+      className="scrollbar-none"
       role="tablist"
       aria-label="Factbook sections"
+      style={{
+        display: "flex",
+        gap: 2,
+        overflowX: "auto",
+        borderBottom: "1px solid var(--color-divider)",
+        paddingBottom: 1,
+        marginBottom: -1,
+      }}
     >
       {sections.map((section) => {
         const isActive = section === activeSection;
@@ -74,7 +82,7 @@ export function FactbookSectionTabs({
         activeSection={active}
         onSectionChange={setActive}
       />
-      <div className="mt-6" role="tabpanel">
+      <div style={{ marginTop: 24 }} role="tabpanel">
         {children[activeIndex >= 0 ? activeIndex : 0]}
       </div>
     </div>

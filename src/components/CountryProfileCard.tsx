@@ -52,45 +52,67 @@ export function CountryProfileCard({
   if (currency) rows.push({ label: "Currency", value: currency });
 
   return (
-    <div className="rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-alt)] overflow-hidden">
-      <div className="flex items-center gap-4 px-5 py-4 border-b border-[var(--color-border-muted)]">
+    <div className="cv-card" style={{ overflow: "hidden", padding: 0 }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 16,
+          padding: "16px 20px",
+          borderBottom: "1px solid var(--color-stat-border)",
+        }}
+      >
         {flagUrl && (
           <img
             src={flagUrl}
             alt={`${name} flag`}
-            className="w-10 h-7 object-cover rounded-sm shadow-sm"
+            style={{ width: 40, height: 28, objectFit: "cover", borderRadius: 2 }}
           />
         )}
-        <div className="flex flex-col">
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <a
             href={`/countries/${slug}`}
-            className="font-heading text-2xl tracking-tight text-[var(--color-text-primary)] hover:text-[var(--color-accent-text)] transition-colors no-underline"
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "var(--text-24)",
+              letterSpacing: "var(--tracking-tight)",
+              color: "var(--color-text-primary)",
+              textDecoration: "none",
+            }}
           >
             {name}
           </a>
           {continent && (
-            <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--color-text-tertiary)] mt-0.5">
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-10)",
+                textTransform: "uppercase",
+                letterSpacing: "var(--tracking-wider)",
+                color: "var(--color-text-30)",
+                marginTop: 2,
+              }}
+            >
               {continent}
             </span>
           )}
         </div>
       </div>
 
-      <dl className="divide-y divide-[var(--color-border-muted)]">
+      <dl style={{ margin: 0 }}>
         {rows.map((row) => (
           <div
             key={row.label}
-            className="flex justify-between items-baseline px-5 py-2.5"
+            className="stat-row"
+            style={{ paddingLeft: 20, paddingRight: 20 }}
           >
-            <dt className="font-mono text-xs text-[var(--color-text-tertiary)] tracking-wide">
-              {row.label}
-            </dt>
-            <dd className="font-mono text-[13px] text-[var(--color-text-primary)] flex items-center gap-0">
+            <span className="stat-row__label">{row.label}</span>
+            <span className="stat-row__value">
               {row.value}
               {source && retrievedAt && (
                 <SourceDot source={source} retrievedAt={retrievedAt} />
               )}
-            </dd>
+            </span>
           </div>
         ))}
       </dl>

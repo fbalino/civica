@@ -8,7 +8,18 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(resolved === "dark" ? "light" : "dark")}
-      className="inline-flex items-center justify-center w-8 h-8 rounded-[var(--radius-md)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-alt)] transition-colors"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 32,
+        height: 32,
+        borderRadius: "var(--radius-md)",
+        color: "var(--color-text-40)",
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+      }}
       aria-label={`Switch to ${resolved === "dark" ? "light" : "dark"} mode`}
     >
       {resolved === "dark" ? (

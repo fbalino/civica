@@ -22,12 +22,33 @@ function FieldRow({ field, source, retrievedAt, depth = 0 }: {
   return (
     <>
       <div
-        className={`py-2.5 border-b border-[var(--color-border-muted)] last:border-b-0 ${depth > 0 ? "pl-4" : ""}`}
+        style={{
+          padding: "10px 0",
+          paddingLeft: depth > 0 ? 16 : 0,
+          borderBottom: "1px solid var(--color-stat-border)",
+        }}
       >
-        <dt className="font-mono text-xs text-[var(--color-text-tertiary)] tracking-wide uppercase mb-1">
+        <dt
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-10)",
+            color: "var(--color-text-30)",
+            letterSpacing: "var(--tracking-wider)",
+            textTransform: "uppercase",
+            marginBottom: 4,
+          }}
+        >
           {field.label}
         </dt>
-        <dd className="font-mono text-[13px] leading-relaxed text-[var(--color-text-secondary)]">
+        <dd
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-12)",
+            lineHeight: "var(--leading-relaxed)",
+            color: "var(--color-text-50)",
+            margin: 0,
+          }}
+        >
           {field.value}
           {source && retrievedAt && (
             <SourceDot source={source} retrievedAt={retrievedAt} />
@@ -55,7 +76,15 @@ export function FactbookSection({
 }: FactbookSectionProps) {
   if (fields.length === 0) {
     return (
-      <div className="py-8 text-center font-mono text-sm text-[var(--color-text-tertiary)]">
+      <div
+        style={{
+          padding: "32px 0",
+          textAlign: "center",
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-14)",
+          color: "var(--color-text-40)",
+        }}
+      >
         No data available for this section.
       </div>
     );
@@ -63,7 +92,7 @@ export function FactbookSection({
 
   return (
     <section aria-label={sectionName}>
-      <dl className="divide-y-0">
+      <dl style={{ margin: 0 }}>
         {fields.map((field) => (
           <FieldRow
             key={field.label}

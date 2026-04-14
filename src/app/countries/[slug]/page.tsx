@@ -11,19 +11,18 @@ import { FactbookSection } from "@/components/FactbookSection";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
 import { CountryTabs } from "./tabs";
 
-const GOV_TYPE_COLORS: Record<string, string> = {
-  Presidential: "#D4764E",
-  Parliamentary: "#4E8BD4",
-  "Semi-presidential": "#9B6DC6",
-  Theocratic: "#5CAA6E",
-  Absolute: "#C4A44E",
-  Federal: "#4E8BD4",
-};
-
 function govColor(type: string | null): string {
-  if (!type) return "#8899AA";
-  const entry = Object.entries(GOV_TYPE_COLORS).find(([k]) => type.includes(k));
-  return entry?.[1] ?? "#8899AA";
+  if (!type) return "var(--color-gov-other)";
+  const map: Record<string, string> = {
+    Presidential: "var(--color-gov-presidential)",
+    Parliamentary: "var(--color-gov-parliamentary)",
+    "Semi-presidential": "var(--color-gov-semi-presidential)",
+    Theocratic: "var(--color-gov-theocratic)",
+    Absolute: "var(--color-gov-absolute)",
+    Federal: "var(--color-gov-parliamentary)",
+  };
+  const entry = Object.entries(map).find(([k]) => type.includes(k));
+  return entry?.[1] ?? "var(--color-gov-other)";
 }
 
 function countryFlag(iso2: string | null): string {
@@ -42,6 +41,18 @@ function formatNumber(n: number): string {
 
 function formatArea(n: number): string {
   return `${n.toLocaleString()} km\u00B2`;
+}
+
+function StatRow({ label, val, source, date }: { label: string; val: string; source?: string; date?: string }) {
+  return (
+    <div className="stat-row">
+      <span className="stat-row__label">{label}</span>
+      <span className="stat-row__value">
+        {val}
+        <SourceDot source={source ?? "cia_factbook"} retrievedAt={date ?? "2026-01-23"} />
+      </span>
+    </div>
+  );
 }
 
 export default async function CountryPage({
@@ -96,39 +107,50 @@ export default async function CountryPage({
 
   const color = govColor(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType);
 
+  const branchColorMap: Record<string, string> = {
+    executive: "var(--color-branch-executive)",
+    legislative: "var(--color-branch-legislative)",
+    judicial: "var(--color-branch-judicial)",
+  };
+
+  /* ---- Overview tab: 2-column with Profile + Leadership + Chamber preview ---- */
   const overviewTab = (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
       {/* Profile card */}
-      <div className="rounded-[var(--radius-sm)] border border-[var(--color-border-muted)] bg-[var(--color-surface-alt)] p-5">
-        <h3 className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)] mb-4">
-          Profile
-        </h3>
+      <div className="cv-card">
+        <h3 className="section-header">Profile</h3>
         {profileRows.map((row) => (
-          <div key={row.label} className="flex justify-between items-baseline py-2 border-b border-[var(--color-border-muted)] last:border-b-0">
-            <span className="font-mono text-xs text-[var(--color-text-tertiary)] tracking-wide">
-              {row.label}
-            </span>
-            <span className="font-mono text-[13px] text-[var(--color-text-primary)] flex items-center gap-0">
-              {row.value}
-              <SourceDot source={row.source ?? "cia_factbook"} retrievedAt={row.date ?? "2026-01-23"} />
-            </span>
-          </div>
+          <StatRow key={row.label} label={row.label} val={row.value} source={row.source} date={row.date} />
         ))}
       </div>
 
-      {/* Leadership + Legislature preview */}
-      <div className="flex flex-col gap-3">
+      {/* Right column: Leadership + At a Glance */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {(headOfState || headOfGov) && (
-          <div className="rounded-[var(--radius-sm)] border border-[var(--color-border-muted)] bg-[var(--color-surface-alt)] p-5">
-            <h3 className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)] mb-4">
-              Leadership
-            </h3>
+          <div className="cv-card">
+            <h3 className="section-header">Leadership</h3>
             {headOfState && (
-              <div className={headOfGov && headOfGov.person.name !== headOfState.person.name ? "mb-4" : ""}>
-                <span className="font-mono text-[10px] text-[var(--color-text-tertiary)] tracking-wide uppercase">
+              <div style={{ marginBottom: headOfGov && headOfGov.person.name !== headOfState.person.name ? 16 : 0 }}>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-10)",
+                    color: "var(--color-text-30)",
+                    letterSpacing: "var(--tracking-wider)",
+                    textTransform: "uppercase",
+                  }}
+                >
                   Head of State
                 </span>
-                <p className="font-heading text-[22px] font-normal mt-1 text-[var(--color-text-primary)] leading-tight">
+                <p
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "var(--text-22)",
+                    fontWeight: 400,
+                    margin: "4px 0 0",
+                    color: "var(--color-text-primary)",
+                  }}
+                >
                   {headOfState.person.name}
                   <SourceDot source="wikidata" retrievedAt="2026-04-13" />
                 </p>
@@ -136,10 +158,26 @@ export default async function CountryPage({
             )}
             {headOfGov && headOfGov.person.name !== headOfState?.person.name && (
               <div>
-                <span className="font-mono text-[10px] text-[var(--color-text-tertiary)] tracking-wide uppercase">
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-10)",
+                    color: "var(--color-text-30)",
+                    letterSpacing: "var(--tracking-wider)",
+                    textTransform: "uppercase",
+                  }}
+                >
                   Head of Government
                 </span>
-                <p className="font-heading text-[22px] font-normal mt-1 text-[var(--color-text-primary)] leading-tight">
+                <p
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "var(--text-22)",
+                    fontWeight: 400,
+                    margin: "4px 0 0",
+                    color: "var(--color-text-primary)",
+                  }}
+                >
                   {headOfGov.person.name}
                   <SourceDot source="wikidata" retrievedAt="2026-04-13" />
                 </p>
@@ -148,16 +186,30 @@ export default async function CountryPage({
           </div>
         )}
 
-        {/* Quick stats */}
-        <div className="rounded-[var(--radius-sm)] border border-[var(--color-border-muted)] bg-[var(--color-surface-alt)] p-5">
-          <h3 className="font-mono text-[10px] tracking-[0.15em] uppercase text-[var(--color-text-tertiary)] mb-4">
-            At a Glance
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
+        {/* At a Glance stats */}
+        <div className="cv-card">
+          <h3 className="section-header">At a Glance</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             {factMap.get("population") && (
               <div>
-                <span className="font-mono text-[10px] text-[var(--color-text-tertiary)] uppercase">Population</span>
-                <p className="font-heading text-xl mt-1 text-[var(--color-text-primary)]">
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-10)",
+                    color: "var(--color-text-30)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Population
+                </span>
+                <p
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "var(--text-20)",
+                    marginTop: 4,
+                    color: "var(--color-text-primary)",
+                  }}
+                >
                   {factMap.get("population")!.factValueNumeric
                     ? formatNumber(factMap.get("population")!.factValueNumeric!)
                     : factMap.get("population")!.factValue}
@@ -166,8 +218,24 @@ export default async function CountryPage({
             )}
             {factMap.get("gdp_ppp") && (
               <div>
-                <span className="font-mono text-[10px] text-[var(--color-text-tertiary)] uppercase">GDP (PPP)</span>
-                <p className="font-heading text-xl mt-1 text-[var(--color-text-primary)]">
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-10)",
+                    color: "var(--color-text-30)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  GDP (PPP)
+                </span>
+                <p
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "var(--text-20)",
+                    marginTop: 4,
+                    color: "var(--color-text-primary)",
+                  }}
+                >
                   {factMap.get("gdp_ppp")!.factValueNumeric
                     ? `$${(factMap.get("gdp_ppp")!.factValueNumeric! / 1e9).toFixed(0)}B`
                     : factMap.get("gdp_ppp")!.factValue}
@@ -180,9 +248,19 @@ export default async function CountryPage({
     </div>
   );
 
+  /* ---- Government tab: branch structure with colored border lines ---- */
   const governmentTab = (
-    <div className="rounded-[var(--radius-sm)] border border-[var(--color-border-muted)] bg-[var(--color-surface-alt)] p-5">
-      <p className="font-mono text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-7">
+    <div className="cv-card">
+      <p
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "var(--text-13)",
+          color: "var(--color-text-50)",
+          lineHeight: "var(--leading-relaxed)",
+          marginTop: 0,
+          marginBottom: 28,
+        }}
+      >
         {jurisdiction.name} is a {(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType ?? "sovereign state").toLowerCase()}.
         {headOfState && headOfGov && headOfGov.person.name === headOfState.person.name
           ? ` The ${govStructure.offices.find((o) => o.id === headOfState.term.officeId)?.name?.toLowerCase() ?? "head of state"} serves as both head of state and head of government.`
@@ -191,15 +269,21 @@ export default async function CountryPage({
             : ""}
       </p>
       {govStructure.bodies.map((body) => {
-        const branchColor =
-          body.branch === "executive" ? "#D4764E" :
-          body.branch === "legislative" ? "#4E8BD4" :
-          body.branch === "judicial" ? "#5CAA6E" : "#8899AA";
+        const bColor = branchColorMap[body.branch ?? ""] ?? "var(--color-gov-other)";
         const bodyOffices = govStructure.offices.filter((o) => o.bodyId === body.id);
         if (bodyOffices.length === 0) return null;
         return (
-          <div key={body.id} className="mb-7 last:mb-0">
-            <h3 className="font-mono text-[10px] tracking-[0.15em] uppercase mb-2.5" style={{ color: branchColor }}>
+          <div key={body.id} style={{ marginBottom: 28 }}>
+            <h3
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "var(--text-10)",
+                letterSpacing: "var(--tracking-caps)",
+                textTransform: "uppercase",
+                color: bColor,
+                margin: "0 0 10px",
+              }}
+            >
               {body.branch ?? body.name}
             </h3>
             {bodyOffices.map((office) => {
@@ -207,12 +291,12 @@ export default async function CountryPage({
               return (
                 <div
                   key={office.id}
-                  className="py-1.5 pl-3.5 my-1 font-mono text-xs text-[var(--color-text-secondary)]"
-                  style={{ borderLeft: `2px solid ${branchColor}44` }}
+                  className="branch-line"
+                  style={{ borderLeftColor: `color-mix(in srgb, ${bColor} 27%, transparent)` }}
                 >
                   {office.name}
-                  {currentHolder && (
-                    <span className="text-[var(--color-text-tertiary)]"> — {currentHolder.person.name}</span>
+                  {currentHolder && !isQid(currentHolder.person.name) && (
+                    <span style={{ color: "var(--color-text-40)" }}> — {currentHolder.person.name}</span>
                   )}
                 </div>
               );
@@ -223,6 +307,7 @@ export default async function CountryPage({
     </div>
   );
 
+  /* ---- Factbook tab ---- */
   const factbookTab = sections.length > 0 ? (
     <div>
       <FactbookSectionTabs
@@ -254,29 +339,66 @@ export default async function CountryPage({
   ];
 
   return (
-    <div className="wide-container py-8 md:py-10">
-      {/* Breadcrumb */}
-      <a href="/countries" className="font-mono text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors no-underline mb-8 inline-flex items-center gap-1.5">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4"/></svg>
-        All countries
-      </a>
+    <div
+      style={{
+        maxWidth: "var(--max-w-content)",
+        margin: "0 auto",
+        padding: "32px var(--spacing-page-x)",
+      }}
+    >
+      {/* Back button — prototype style */}
+      <button
+        onClick={undefined}
+        className="tab-nav"
+        style={{ color: "var(--color-text-30)", padding: "8px 0", marginBottom: 24, cursor: "pointer" }}
+      >
+        <a
+          href="/countries"
+          style={{
+            textDecoration: "none",
+            color: "inherit",
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-12)",
+            letterSpacing: "var(--tracking-wide)",
+          }}
+        >
+          &larr; Back
+        </a>
+      </button>
 
-      {/* Country header */}
-      <div className="flex items-end gap-5 mb-6">
-        <span className="text-[56px] leading-none">
+      {/* Country header — prototype: flag 56px + name 52px + gov type */}
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 20, marginBottom: 8 }}>
+        <span style={{ fontSize: "var(--text-56)", lineHeight: 1 }}>
           {countryFlag(jurisdiction.iso2)}
         </span>
         <div>
-          <h1 className="font-heading text-[52px] font-normal tracking-tight leading-none m-0">
+          <h1
+            style={{
+              fontFamily: "var(--font-heading)",
+              fontSize: "var(--text-52)",
+              fontWeight: 400,
+              letterSpacing: "var(--tracking-tighter)",
+              margin: 0,
+              lineHeight: 1,
+              color: "var(--color-text-primary)",
+            }}
+          >
             {jurisdiction.name}
           </h1>
-          <p className="font-mono text-xs mt-2" style={{ color }}>
+          <p
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-12)",
+              color,
+              margin: "6px 0 0",
+            }}
+          >
             {jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType}
           </p>
         </div>
       </div>
 
-      {/* Tabs */}
+      {/* Tabs — prototype: gap 2, border-bottom, 28px top margin, 32px bottom margin */}
       <CountryTabs tabs={tabs} />
     </div>
   );
