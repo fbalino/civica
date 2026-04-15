@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { getAllPosts } from "@/lib/blog";
+import { GOVERNMENT_TYPES } from "@/lib/data/government-types";
 
 const SITE_URL = "https://civica-kappa.vercel.app";
 
@@ -66,5 +67,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...countryPages, ...blogPages];
+  const govTypePages: MetadataRoute.Sitemap = [
+    {
+      url: `${SITE_URL}/government-types`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...GOVERNMENT_TYPES.map((gt) => ({
+      url: `${SITE_URL}/government-types/${gt.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+  ];
+
+  return [...staticPages, ...govTypePages, ...countryPages, ...blogPages];
 }

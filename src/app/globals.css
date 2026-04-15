@@ -699,6 +699,21 @@ a {
   }
 }
 
+/* ============================================================
+   Government type row (hub page country list)
+   ============================================================ */
+
+.gov-type-row:hover {
+  background: var(--color-grid-row-hover) !important;
+}
+
+@media (max-width: 767px) {
+  .gov-type-row {
+    grid-template-columns: 48px 1fr !important;
+    padding: 14px 20px !important;
+  }
+}
+
 .cv-select {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);

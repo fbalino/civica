@@ -207,3 +207,37 @@ export async function getSource(sourceId: string) {
     .limit(1);
   return results[0] ?? null;
 }
+
+export async function getDistinctGovernmentTypes() {
+  const results = await db
+    .select({
+      governmentType: jurisdictions.governmentType,
+    })
+    .from(jurisdictions)
+    .where(
+      sql`${jurisdictions.type} = 'sovereign_state' AND ${jurisdictions.governmentType} IS NOT NULL`
+    )
+    .groupBy(jurisdictions.governmentType)
+    .orderBy(asc(jurisdictions.governmentType));
+  return results.map((r) => r.governmentType!);
+}
+
+export async function getJurisdictionsByGovernmentTypePattern(
+  patterns: string[]
+) {
+  if (patterns.length === 0) return [];
+  const conditions = patterns.map(
+    (p) => sql`LOWER(${jurisdictions.governmentType}) LIKE ${`%${p.toLowerCase()}%`}`
+  );
+  const combined =
+    conditions.length === 1
+      ? conditions[0]
+      : sql.join(conditions, sql` OR `);
+  return db
+    .select()
+    .from(jurisdictions)
+    .where(
+      sql`${jurisdictions.type} = 'sovereign_state' AND (${combined})`
+    )
+    .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
+}
