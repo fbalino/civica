@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { getAllPosts } from "@/lib/blog";
 import { GOVERNMENT_TYPES } from "@/lib/data/government-types";
+import { PRIORITY_COMPARISONS } from "./compare/[slug]/page";
 
 const SITE_URL = "https://civica-kappa.vercel.app";
 
@@ -82,5 +83,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
-  return [...staticPages, ...govTypePages, ...countryPages, ...blogPages];
+  const comparisonPages: MetadataRoute.Sitemap = PRIORITY_COMPARISONS.map(
+    (slug) => ({
+      url: `${SITE_URL}/compare/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })
+  );
+
+  return [
+    ...staticPages,
+    ...govTypePages,
+    ...comparisonPages,
+    ...countryPages,
+    ...blogPages,
+  ];
 }
