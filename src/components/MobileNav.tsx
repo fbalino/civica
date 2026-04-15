@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/countries", label: "Index" },
   { href: "/compare", label: "Compare" },
   { href: "/rankings", label: "Rankings" },
+  { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
 ];
 
@@ -83,6 +84,7 @@ export function MobileNav({ searchSlot }: { searchSlot?: ReactNode }) {
                     borderRadius: "var(--radius-md)",
                     textDecoration: "none",
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-14)",
                     color: isActive ? "var(--color-text-primary)" : "var(--color-text-40)",
                     background: isActive ? "var(--color-card-bg)" : "transparent",
