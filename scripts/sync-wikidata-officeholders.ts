@@ -18,12 +18,13 @@ const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
 
 const QUERY = `
-SELECT ?state ?stateLabel ?iso2
+SELECT ?state ?stateLabel ?iso2 ?shortName
        ?headOfState ?headOfStateLabel ?hosStart
        ?headOfGov ?headOfGovLabel ?hogStart
 WHERE {
   ?state wdt:P31 wd:Q3624078 .
   OPTIONAL { ?state wdt:P297 ?iso2 . }
+  OPTIONAL { ?state wdt:P1813 ?shortName . FILTER(LANG(?shortName) = "en") }
   OPTIONAL {
     ?state p:P35 ?hosStatement .
     ?hosStatement ps:P35 ?headOfState .
@@ -40,6 +41,30 @@ WHERE {
 }
 `;
 
+const WIKIDATA_TO_SLUG: Record<string, string> = {
+  "People's Republic of China": "china",
+  "Democratic Republic of the Congo": "drc",
+  "Republic of the Congo": "congo-brazzaville",
+  "Myanmar": "burma",
+  "Kingdom of the Netherlands": "netherlands",
+  "Dominican Republic": "the-dominican",
+  "State of Israel": "israel",
+  "Kingdom of Denmark": "denmark",
+  "Republic of Cabo Verde": "cabo-verde",
+  "Czech Republic": "czechia",
+  "Republic of Côte d'Ivoire": "c-te-d-ivoire",
+  "Ivory Coast": "c-te-d-ivoire",
+  "Côte d'Ivoire": "c-te-d-ivoire",
+  "Türkiye": "turkiye",
+  "Republic of Türkiye": "turkiye",
+  "Eswatini": "eswatini",
+  "Kingdom of Eswatini": "eswatini",
+  "São Tomé and Príncipe": "sao-tome-and-principe",
+  "Timor-Leste": "timor-leste",
+  "Cape Verde": "cabo-verde",
+  "Vatican City": "holy-see-vatican-city",
+};
+
 function slugify(name: string): string {
   return name
     .toLowerCase()
@@ -47,7 +72,7 @@ function slugify(name: string): string {
     .replace(/^-|-$/g, "");
 }
 
-async function findJurisdiction(iso2: string | null, qid: string, name: string) {
+async function findJurisdiction(iso2: string | null, qid: string, name: string, shortName: string | null) {
   if (iso2) {
     const byIso = await db
       .select({ id: jurisdictions.id })
@@ -64,6 +89,16 @@ async function findJurisdiction(iso2: string | null, qid: string, name: string) 
     .limit(1);
   if (byQid.length > 0) return byQid[0].id;
 
+  const aliasSlug = WIKIDATA_TO_SLUG[name];
+  if (aliasSlug) {
+    const byAlias = await db
+      .select({ id: jurisdictions.id })
+      .from(jurisdictions)
+      .where(eq(jurisdictions.slug, aliasSlug))
+      .limit(1);
+    if (byAlias.length > 0) return byAlias[0].id;
+  }
+
   const slug = slugify(name);
   if (slug) {
     const bySlug = await db
@@ -74,6 +109,25 @@ async function findJurisdiction(iso2: string | null, qid: string, name: string) 
     if (bySlug.length > 0) return bySlug[0].id;
   }
 
+  if (shortName) {
+    const shortSlug = slugify(shortName);
+    if (shortSlug && shortSlug !== slug) {
+      const byShortSlug = await db
+        .select({ id: jurisdictions.id })
+        .from(jurisdictions)
+        .where(eq(jurisdictions.slug, shortSlug))
+        .limit(1);
+      if (byShortSlug.length > 0) return byShortSlug[0].id;
+    }
+
+    const byShortName = await db
+      .select({ id: jurisdictions.id })
+      .from(jurisdictions)
+      .where(ilike(jurisdictions.name, shortName))
+      .limit(1);
+    if (byShortName.length > 0) return byShortName[0].id;
+  }
+
   if (name) {
     const byName = await db
       .select({ id: jurisdictions.id })
@@ -81,6 +135,18 @@ async function findJurisdiction(iso2: string | null, qid: string, name: string) 
       .where(ilike(jurisdictions.name, name))
       .limit(1);
     if (byName.length > 0) return byName[0].id;
+  }
+
+  // Substring match: check if DB name is contained in the Wikidata name
+  if (name) {
+    const byContains = await db
+      .select({ id: jurisdictions.id, name: jurisdictions.name })
+      .from(jurisdictions)
+      .where(
+        sql`${jurisdictions.type} = 'sovereign_state' AND LOWER(${name}) LIKE '%' || LOWER(${jurisdictions.name}) || '%'`
+      )
+      .limit(1);
+    if (byContains.length > 0) return byContains[0].id;
   }
 
   return null;
@@ -203,10 +269,14 @@ async function main() {
 
     const stateName = binding.stateLabel?.value ?? stateQid;
     const iso2 = binding.iso2?.value ?? null;
+    const shortName = binding.shortName?.value ?? null;
 
-    const jurisdictionId = await findJurisdiction(iso2, stateQid, stateName);
+    const jurisdictionId = await findJurisdiction(iso2, stateQid, stateName, shortName);
     if (!jurisdictionId) {
       skipped++;
+      if (binding.headOfState?.value || binding.headOfGov?.value) {
+        console.log(`  ⚠ Skipped ${stateName} (${stateQid}) — no DB match, has leadership data`);
+      }
       continue;
     }
 
