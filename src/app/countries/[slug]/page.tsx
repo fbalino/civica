@@ -8,6 +8,7 @@ import {
   getGovernmentStructure,
   getCountryRankings,
   getRelatedCountries,
+  getLegislatureComposition,
 } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
 import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
@@ -16,6 +17,7 @@ import { jsonbToFields } from "@/lib/data/factbook-fields";
 import { CountryTabs } from "./tabs";
 import { CountryFlag } from "@/components/CountryFlag";
 import { GovStructureDiagram } from "@/components/GovStructureDiagram";
+import { HemicycleChart } from "@/components/HemicycleChart";
 
 function govColor(type: string | null): string {
   if (!type) return "var(--color-gov-other)";
@@ -84,13 +86,14 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure, introSection, rankings, relatedCountries] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
     getFactbookSection(jurisdiction.id, "introduction"),
     getCountryRankings(jurisdiction.id),
     getRelatedCountries(jurisdiction.id, jurisdiction.continent),
+    getLegislatureComposition(jurisdiction.id),
   ]);
 
   const factMap = new Map(facts.map((f) => [f.factKey, f]));
@@ -525,9 +528,28 @@ export default async function CountryPage({
     </div>
   ) : null;
 
+  /* ---- Legislature tab: hemicycle charts per chamber ---- */
+  const legislatureTab = legislatureData.length > 0 ? (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {legislatureData.map(({ body, parties }) => (
+        <HemicycleChart
+          key={body.id}
+          chamberName={body.name}
+          totalSeats={body.totalSeats ?? parties.reduce((s, p) => s + p.seatCount, 0)}
+          parties={parties.map((p) => ({
+            name: p.partyName,
+            seats: p.seatCount,
+            color: p.partyColor ?? "var(--color-text-20)",
+          }))}
+        />
+      ))}
+    </div>
+  ) : null;
+
   const tabs = [
     { id: "overview", label: "Overview", content: overviewTab },
     { id: "government", label: "Government", content: governmentTab },
+    ...(legislatureTab ? [{ id: "legislature", label: "Legislature", content: legislatureTab }] : []),
     ...(factbookTab ? [{ id: "factbook", label: "Factbook", content: factbookTab }] : []),
   ];
 

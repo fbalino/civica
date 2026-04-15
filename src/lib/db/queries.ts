@@ -9,6 +9,7 @@ import {
   terms,
   persons,
   sources,
+  legislatureParties,
 } from "./schema";
 
 export async function getJurisdictionBySlug(slug: string) {
@@ -25,7 +26,7 @@ export async function getAllJurisdictions() {
     .select()
     .from(jurisdictions)
     .where(eq(jurisdictions.type, "sovereign_state"))
-    .orderBy(asc(jurisdictions.name));
+    .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
 }
 
 export async function getFactbookSections(jurisdictionId: string) {
@@ -172,6 +173,30 @@ export async function getRelatedCountries(
     )
     .orderBy(desc(jurisdictions.population))
     .limit(limit);
+}
+
+export async function getLegislatureComposition(jurisdictionId: string) {
+  const bodies = await db
+    .select()
+    .from(governmentBodies)
+    .where(
+      sql`${governmentBodies.jurisdictionId} = ${jurisdictionId} AND ${governmentBodies.branch} = 'legislative'`
+    )
+    .orderBy(asc(governmentBodies.hierarchyLevel));
+
+  if (bodies.length === 0) return [];
+
+  const bodyIds = bodies.map((b) => b.id);
+  const parties = await db
+    .select()
+    .from(legislatureParties)
+    .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+    .orderBy(desc(legislatureParties.seatCount));
+
+  return bodies.map((body) => ({
+    body,
+    parties: parties.filter((p) => p.bodyId === body.id),
+  }));
 }
 
 export async function getSource(sourceId: string) {
