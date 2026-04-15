@@ -227,7 +227,7 @@ export async function getJurisdictionsByGovernmentTypePattern(
 ) {
   if (patterns.length === 0) return [];
   const conditions = patterns.map(
-    (p) => sql`LOWER(${jurisdictions.governmentType}) LIKE ${`%${p.toLowerCase()}%`}`
+    (p) => sql`(LOWER(${jurisdictions.governmentTypeDetail}) LIKE ${`%${p.toLowerCase()}%`} OR LOWER(${jurisdictions.governmentType}) LIKE ${`%${p.toLowerCase()}%`})`
   );
   const combined =
     conditions.length === 1
