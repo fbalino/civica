@@ -56,6 +56,14 @@ function StatRow({ label, val, source, date }: { label: string; val: string; sou
   );
 }
 
+function formatPop(n: number | null): string {
+  if (!n) return "";
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return n.toLocaleString();
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -63,11 +71,28 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const jurisdiction = await getJurisdictionBySlug(slug);
-  if (!jurisdiction) return { title: "Country — Civica" };
+  if (!jurisdiction) return { title: "Country Not Found" };
   const govLabel = jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType ?? "sovereign state";
+  const title = `${jurisdiction.name} Government Structure — Executive, Legislative & Judicial`;
+  const popStr = jurisdiction.population ? ` Population: ${formatPop(jurisdiction.population)}.` : "";
+  const capStr = jurisdiction.capital ? ` Capital: ${jurisdiction.capital}.` : "";
+  const description = `Explore ${jurisdiction.name}'s ${govLabel.toLowerCase()} government structure. Interactive visualization of executive, legislative, and judicial branches.${popStr}${capStr}`;
+  const url = `https://civica-kappa.vercel.app/countries/${slug}`;
   return {
-    title: `${jurisdiction.name} — Civica`,
-    description: `${jurisdiction.name} is a ${govLabel.toLowerCase()}. Government structure, leadership, rankings, and factbook data.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${title} | Civica`,
+      description,
+      url,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | Civica`,
+      description,
+    },
   };
 }
 
@@ -197,6 +222,7 @@ export default async function CountryPage({
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-10)",
                     color: "var(--color-text-30)",
                     letterSpacing: "var(--tracking-wider)",
@@ -221,6 +247,7 @@ export default async function CountryPage({
                   <p
                     style={{
                       fontFamily: "var(--font-mono)",
+                      fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-11)",
                       color: "var(--color-text-30)",
                       margin: "4px 0 0",
@@ -250,6 +277,7 @@ export default async function CountryPage({
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-10)",
                     color: "var(--color-text-30)",
                     letterSpacing: "var(--tracking-wider)",
@@ -274,6 +302,7 @@ export default async function CountryPage({
                   <p
                     style={{
                       fontFamily: "var(--font-mono)",
+                      fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-11)",
                       color: "var(--color-text-30)",
                       margin: "4px 0 0",
@@ -310,6 +339,7 @@ export default async function CountryPage({
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-10)",
                     color: "var(--color-text-30)",
                     textTransform: "uppercase",
@@ -336,6 +366,7 @@ export default async function CountryPage({
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-10)",
                     color: "var(--color-text-30)",
                     textTransform: "uppercase",
@@ -394,6 +425,7 @@ export default async function CountryPage({
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-10)",
                     color: "var(--color-text-30)",
                     letterSpacing: "var(--tracking-wide)",
@@ -405,8 +437,9 @@ export default async function CountryPage({
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-10)",
-                    color: "var(--color-text-20)",
+                    color: "var(--color-text-25)",
                     display: "block",
                     marginTop: 2,
                   }}
@@ -438,6 +471,7 @@ export default async function CountryPage({
       <p
         style={{
           fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)",
           fontSize: "var(--text-13)",
           color: "var(--color-text-50)",
           lineHeight: "var(--leading-relaxed)",
@@ -461,6 +495,7 @@ export default async function CountryPage({
             <h3
               style={{
                 fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-10)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
@@ -553,14 +588,49 @@ export default async function CountryPage({
     ...(factbookTab ? [{ id: "factbook", label: "Factbook", content: factbookTab }] : []),
   ];
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: `${jurisdiction.name} Government Structure`,
+    description: `Explore ${jurisdiction.name}'s ${(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType ?? "sovereign state").toLowerCase()} government structure.`,
+    url: `https://civica-kappa.vercel.app/countries/${slug}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Civica",
+      url: "https://civica-kappa.vercel.app",
+    },
+    about: {
+      "@type": "Country",
+      name: jurisdiction.name,
+      ...(jurisdiction.iso2 ? { identifier: jurisdiction.iso2 } : {}),
+    },
+    mainEntity: {
+      "@type": "GovernmentOrganization",
+      name: `Government of ${jurisdiction.name}`,
+      areaServed: { "@type": "Country", name: jurisdiction.name },
+    },
+    breadcrumb: {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://civica-kappa.vercel.app" },
+        { "@type": "ListItem", position: 2, name: "Countries", item: "https://civica-kappa.vercel.app/countries" },
+        { "@type": "ListItem", position: 3, name: jurisdiction.name, item: `https://civica-kappa.vercel.app/countries/${slug}` },
+      ],
+    },
+  };
+
   return (
     <div
       style={{
         maxWidth: "var(--max-w-content)",
         margin: "0 auto",
-        padding: "32px var(--spacing-page-x)",
+        padding: "var(--spacing-content-top) var(--spacing-page-x)",
       }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Breadcrumb */}
       <a href="/countries" className="breadcrumb">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4"/></svg>
@@ -577,6 +647,7 @@ export default async function CountryPage({
           <p
             style={{
               fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-12)",
               color,
               margin: "6px 0 0",
@@ -595,6 +666,7 @@ export default async function CountryPage({
           <h2
             style={{
               fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-11)",
               letterSpacing: "var(--tracking-caps)",
               textTransform: "uppercase",
@@ -646,6 +718,7 @@ export default async function CountryPage({
                   <span
                     style={{
                       fontFamily: "var(--font-mono)",
+                      fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-10)",
                       color: "var(--color-text-25)",
                     }}

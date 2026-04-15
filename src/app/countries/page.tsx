@@ -1,10 +1,19 @@
+import type { Metadata } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { CountrySearch } from "./search";
 import { CountryFlag } from "@/components/CountryFlag";
 
-export const metadata = {
-  title: "Index — Civica",
-  description: "Browse all countries and territories in the Civica atlas.",
+export const metadata: Metadata = {
+  title: "All Countries & Territories — Government Structure Index",
+  description:
+    "Browse all 250+ countries and territories. Filter by continent, government type, and political system. Complete index of world governance data.",
+  alternates: { canonical: "https://civica-kappa.vercel.app/countries" },
+  openGraph: {
+    title: "All Countries & Territories — Government Structure Index | Civica",
+    description:
+      "Browse all 250+ countries and territories. Filter by continent, government type, and political system. Complete index of world governance data.",
+    url: "https://civica-kappa.vercel.app/countries",
+  },
 };
 
 function govColor(type: string | null): string {
@@ -81,6 +90,7 @@ export default async function CountriesPage({
       <p
         style={{
           fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)",
           fontSize: "var(--text-12)",
           color: "var(--color-text-30)",
           marginBottom: 40,
@@ -99,6 +109,7 @@ export default async function CountriesPage({
             href="/countries"
             style={{
               fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-12)",
               padding: "6px 12px",
               borderRadius: "var(--radius-sm)",
@@ -116,6 +127,7 @@ export default async function CountriesPage({
               href={`/countries?continent=${encodeURIComponent(c!)}`}
               style={{
                 fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-12)",
                 padding: "6px 12px",
                 borderRadius: "var(--radius-sm)",
@@ -152,16 +164,16 @@ export default async function CountriesPage({
           }}
         >
           <span />
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)" }}>
             Country
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)" }}>
             Government
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)", textAlign: "right" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)", textAlign: "right" }}>
             Population
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)", textAlign: "right" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-25)", textAlign: "right" }}>
             Democracy
           </span>
         </div>
@@ -191,6 +203,7 @@ export default async function CountriesPage({
                 className="hidden sm:inline"
                 style={{
                   fontFamily: "var(--font-mono)",
+                  fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-11)",
                   color: "var(--color-text-25)",
                 }}
@@ -202,6 +215,7 @@ export default async function CountriesPage({
               className="hidden md:inline"
               style={{
                 fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-11)",
                 color: govColor(country.governmentTypeDetail ?? country.governmentType),
               }}
@@ -212,6 +226,7 @@ export default async function CountriesPage({
               className="hidden sm:inline"
               style={{
                 fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-11)",
                 color: "var(--color-text-40)",
                 textAlign: "right",
@@ -223,6 +238,7 @@ export default async function CountriesPage({
               className="hidden md:inline"
               style={{
                 fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-11)",
                 color: "var(--color-text-25)",
                 textAlign: "right",
@@ -239,6 +255,7 @@ export default async function CountriesPage({
           style={{
             textAlign: "center",
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-14)",
             color: "var(--color-text-40)",
             padding: "48px 0",

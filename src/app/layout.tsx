@@ -22,10 +22,28 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["300", "400", "500"],
 });
 
+const SITE_URL = "https://civica-kappa.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Civica — Atlas of Governance",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Civica — Interactive Atlas of World Government Structures | 250+ Countries",
+    template: "%s | Civica",
+  },
   description:
-    "An interactive platform visualizing government structures for every country in the world. A modern successor to the CIA World Factbook.",
+    "Explore how every country in the world is governed. Interactive visualizations of government structures, branches of power, and political systems for 250+ nations. The modern successor to the CIA World Factbook.",
+  openGraph: {
+    type: "website",
+    siteName: "Civica",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -80,6 +98,7 @@ export default function RootLayout({
                 className="hidden sm:inline"
                 style={{
                   fontFamily: "var(--font-mono)",
+                  fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-9)",
                   color: "var(--color-text-30)",
                   letterSpacing: "var(--tracking-caps)",
@@ -139,8 +158,9 @@ export default function RootLayout({
                 <p
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-11)",
-                    color: "var(--color-text-20)",
+                    color: "var(--color-text-25)",
                     marginTop: 8,
                   }}
                 >
@@ -153,6 +173,7 @@ export default function RootLayout({
                       alignItems: "center",
                       gap: 4,
                       fontFamily: "var(--font-mono)",
+                      fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-10)",
                       color: "var(--color-text-30)",
                     }}
@@ -173,6 +194,7 @@ export default function RootLayout({
                       alignItems: "center",
                       gap: 4,
                       fontFamily: "var(--font-mono)",
+                      fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-10)",
                       color: "var(--color-text-30)",
                     }}
@@ -192,22 +214,23 @@ export default function RootLayout({
               <div
                 style={{
                   fontFamily: "var(--font-mono)",
+                  fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-11)",
-                  color: "var(--color-text-20)",
+                  color: "var(--color-text-25)",
                   textAlign: "right",
                 }}
               >
                 <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                  <a href="/countries" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>Countries</a>
+                  <a href="/countries" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Countries</a>
                   <span>&middot;</span>
-                  <a href="/compare" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>Compare</a>
+                  <a href="/compare" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Compare</a>
                   <span>&middot;</span>
-                  <a href="/rankings" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>Rankings</a>
+                  <a href="/rankings" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Rankings</a>
                 </div>
                 <div style={{ marginTop: 6, display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                  <a href="/about" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>About</a>
+                  <a href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>About</a>
                   <span>&middot;</span>
-                  <a href="/about" style={{ color: "var(--color-text-20)", textDecoration: "none" }}>Sources</a>
+                  <a href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</a>
                 </div>
               </div>
             </div>

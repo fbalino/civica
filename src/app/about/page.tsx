@@ -1,9 +1,17 @@
+import type { Metadata } from "next";
 import { SourceDot } from "@/components/SourceDot";
 
-export const metadata = {
-  title: "About — Civica",
+export const metadata: Metadata = {
+  title: "About Civica — Open-Source Government Structure Database",
   description:
-    "Civica is an open reference to the world's governments, built as a modern successor to the CIA World Factbook.",
+    "Civica is an open-source, interactive platform visualizing government structures for every country. Built on Wikidata, IPU Parline, and Constitute Project data.",
+  alternates: { canonical: "https://civica-kappa.vercel.app/about" },
+  openGraph: {
+    title: "About Civica — Open-Source Government Structure Database | Civica",
+    description:
+      "Civica is an open-source, interactive platform visualizing government structures for every country. Built on Wikidata, IPU Parline, and Constitute Project data.",
+    url: "https://civica-kappa.vercel.app/about",
+  },
 };
 
 const DATA_SOURCES = [
@@ -31,7 +39,7 @@ export default function AboutPage() {
       style={{
         maxWidth: "var(--max-w-content)",
         margin: "0 auto",
-        padding: "60px var(--spacing-page-x)",
+        padding: "var(--spacing-section-y) var(--spacing-page-x)",
       }}
     >
       <h1 className="page-heading" style={{ marginBottom: 24 }}>
@@ -52,6 +60,7 @@ export default function AboutPage() {
         <p
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-13)",
             color: "var(--color-text-50)",
             lineHeight: "var(--leading-loose)",
@@ -66,6 +75,7 @@ export default function AboutPage() {
         <p
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-13)",
             color: "var(--color-text-50)",
             lineHeight: "var(--leading-loose)",
@@ -111,6 +121,7 @@ export default function AboutPage() {
               <p
                 style={{
                   fontFamily: "var(--font-mono)",
+                  fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-12)",
                   color: "var(--color-text-50)",
                   lineHeight: "var(--leading-relaxed)",
@@ -122,6 +133,7 @@ export default function AboutPage() {
               <span
                 style={{
                   fontFamily: "var(--font-mono)",
+                  fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-11)",
                   color: "var(--color-text-30)",
                 }}
@@ -151,6 +163,7 @@ export default function AboutPage() {
         <p
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-12)",
             color: "var(--color-text-50)",
             lineHeight: "var(--leading-relaxed)",
@@ -162,13 +175,13 @@ export default function AboutPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span className="source-dot source-dot--live" data-source="" data-date="" />
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-50)" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-50)" }}>
               Green dot &mdash; live or regularly updated source
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span className="source-dot source-dot--frozen" data-source="" data-date="" />
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-50)" }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-50)" }}>
               Amber dot &mdash; frozen archive (CIA World Factbook, January 2026)
             </span>
           </div>
@@ -193,6 +206,7 @@ export default function AboutPage() {
         <p
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-12)",
             color: "var(--color-text-50)",
             lineHeight: "var(--leading-relaxed)",

@@ -1,9 +1,18 @@
+import type { Metadata } from "next";
 import { rankCountriesByFact } from "@/lib/db/queries";
 import { RankingTable } from "@/components/RankingTable";
 
-export const metadata = {
-  title: "Rankings — Civica",
-  description: "Compare countries by population, GDP, area, and more.",
+export const metadata: Metadata = {
+  title: "World Government Rankings — GDP, Population, Democracy Index",
+  description:
+    "Explore global rankings for 250+ countries by GDP, population, area, life expectancy, and more. Data from Wikidata, World Bank, and archived CIA World Factbook.",
+  alternates: { canonical: "https://civica-kappa.vercel.app/rankings" },
+  openGraph: {
+    title: "World Government Rankings — GDP, Population, Democracy Index | Civica",
+    description:
+      "Explore global rankings for 250+ countries by GDP, population, area, life expectancy, and more.",
+    url: "https://civica-kappa.vercel.app/rankings",
+  },
 };
 
 const RANKING_METRICS = [
@@ -77,7 +86,7 @@ export default async function RankingsPage({
       style={{
         maxWidth: "var(--max-w-content)",
         margin: "0 auto",
-        padding: "60px var(--spacing-page-x)",
+        padding: "var(--spacing-section-y) var(--spacing-page-x)",
       }}
     >
       <h1 className="page-heading">
@@ -86,6 +95,7 @@ export default async function RankingsPage({
       <p
         style={{
           fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)",
           fontSize: "var(--text-12)",
           color: "var(--color-text-30)",
           marginBottom: 40,
@@ -101,6 +111,7 @@ export default async function RankingsPage({
             href={`/rankings?metric=${m.key}`}
             style={{
               fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-12)",
               padding: "6px 12px",
               borderRadius: "var(--radius-sm)",
@@ -122,6 +133,7 @@ export default async function RankingsPage({
           style={{
             textAlign: "center",
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-14)",
             color: "var(--color-text-40)",
             padding: "48px 0",

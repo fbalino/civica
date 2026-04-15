@@ -1,5 +1,20 @@
+import type { Metadata } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { CountryFlag } from "@/components/CountryFlag";
+
+export const metadata: Metadata = {
+  title: "Civica — Interactive Atlas of World Government Structures | 250+ Countries",
+  description:
+    "Explore how every country in the world is governed. Interactive visualizations of government structures, branches of power, and political systems for 250+ nations. The modern successor to the CIA World Factbook.",
+  alternates: { canonical: "https://civica-kappa.vercel.app" },
+  openGraph: {
+    title: "Civica — Interactive Atlas of World Government Structures | 250+ Countries",
+    description:
+      "Explore how every country in the world is governed. Interactive visualizations of government structures, branches of power, and political systems for 250+ nations.",
+    url: "https://civica-kappa.vercel.app",
+    type: "website",
+  },
+};
 
 const GOV_TYPE_COLORS: Record<string, string> = {
   Presidential: "var(--color-gov-presidential)",
@@ -49,19 +64,38 @@ export default async function Home() {
 
   const featured = countries.slice(0, 21);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Civica",
+    alternateName: "Civica Atlas of Governance",
+    url: "https://civica-kappa.vercel.app",
+    description: "Interactive atlas of world government structures",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://civica-kappa.vercel.app/?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero — prototype: 100px top, 40px sides, 60px bottom */}
       <section
         style={{
           maxWidth: "var(--max-w-content)",
           margin: "0 auto",
-          padding: "100px var(--spacing-page-x) 60px",
+          padding: "var(--spacing-hero-top) var(--spacing-page-x) var(--spacing-section-y)",
         }}
       >
         <p
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-11)",
             letterSpacing: "var(--tracking-widest)",
             textTransform: "uppercase",
@@ -77,6 +111,7 @@ export default async function Home() {
         <p
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-14)",
             color: "var(--color-text-40)",
             lineHeight: "var(--leading-loose)",
@@ -125,6 +160,7 @@ export default async function Home() {
                     <p
                       style={{
                         fontFamily: "var(--font-mono)",
+                        fontWeight: "var(--font-weight-mono)",
                         fontSize: "var(--text-11)",
                         color: "var(--color-text-30)",
                         margin: 0,
@@ -144,6 +180,7 @@ export default async function Home() {
                   href="/countries"
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-12)",
                     color: "var(--color-accent)",
                     textDecoration: "none",
@@ -158,7 +195,7 @@ export default async function Home() {
 
         {featured.length === 0 && (
           <div style={{ padding: "64px 0", textAlign: "center" }}>
-            <p style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)" }}>
+            <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)" }}>
               Run the seed scripts to populate country data.
             </p>
           </div>
@@ -170,12 +207,13 @@ export default async function Home() {
         style={{
           maxWidth: "var(--max-w-content)",
           margin: "0 auto",
-          padding: "60px var(--spacing-page-x) 80px",
+          padding: "var(--spacing-section-y) var(--spacing-page-x) 80px",
         }}
       >
         <h2
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-13)",
             letterSpacing: "var(--tracking-caps)",
             textTransform: "uppercase",
@@ -192,6 +230,7 @@ export default async function Home() {
               <span
                 style={{
                   fontFamily: "var(--font-mono)",
+                  fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-12)",
                   color: "var(--color-text-50)",
                 }}
@@ -255,6 +294,7 @@ export default async function Home() {
                   <span
                     style={{
                       fontFamily: "var(--font-mono)",
+                      fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-10)",
                       color: "var(--color-text-30)",
                       letterSpacing: "var(--tracking-caps)",
@@ -289,6 +329,7 @@ export default async function Home() {
             <h2
               style={{
                 fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-13)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
@@ -326,6 +367,7 @@ export default async function Home() {
                   <span
                     style={{
                       fontFamily: "var(--font-mono)",
+                      fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-11)",
                       color: "var(--color-text-30)",
                     }}

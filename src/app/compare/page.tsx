@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import {
   getAllJurisdictions,
@@ -8,9 +9,17 @@ import { SourceDot } from "@/components/SourceDot";
 import { CountryFlag } from "@/components/CountryFlag";
 import { CompareSelector } from "./selector";
 
-export const metadata = {
-  title: "Compare — Civica",
-  description: "Compare countries side by side across key indicators.",
+export const metadata: Metadata = {
+  title: "Compare Government Structures — Side-by-Side Country Comparison",
+  description:
+    "Compare government structures between any two countries. See differences in executive, legislative, and judicial branches, political systems, and governance models side by side.",
+  alternates: { canonical: "https://civica-kappa.vercel.app/compare" },
+  openGraph: {
+    title: "Compare Government Structures — Side-by-Side Country Comparison | Civica",
+    description:
+      "Compare government structures between any two countries. See differences in executive, legislative, and judicial branches, political systems, and governance models side by side.",
+    url: "https://civica-kappa.vercel.app/compare",
+  },
 };
 
 function formatNumber(n: number): string {
@@ -108,7 +117,7 @@ export default async function ComparePage({
       style={{
         maxWidth: "var(--max-w-content)",
         margin: "0 auto",
-        padding: "60px var(--spacing-page-x)",
+        padding: "var(--spacing-section-y) var(--spacing-page-x)",
       }}
     >
       <h1 className="page-heading">
@@ -117,6 +126,7 @@ export default async function ComparePage({
       <p
         style={{
           fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)",
           fontSize: "var(--text-12)",
           color: "var(--color-text-30)",
           marginBottom: 32,
@@ -190,6 +200,7 @@ export default async function ComparePage({
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
                     fontSize: "var(--text-11)",
                     color: "var(--color-text-30)",
                     textTransform: "uppercase",
@@ -232,13 +243,13 @@ export default async function ComparePage({
       )}
 
       {selected.length === 1 && (
-        <p style={{ textAlign: "center", fontFamily: "var(--font-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)", padding: "48px 0" }}>
+        <p style={{ textAlign: "center", fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)", padding: "48px 0" }}>
           Select at least one more country to compare.
         </p>
       )}
 
       {selected.length === 0 && validSlugs.length === 0 && (
-        <p style={{ textAlign: "center", fontFamily: "var(--font-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)", padding: "48px 0" }}>
+        <p style={{ textAlign: "center", fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-14)", color: "var(--color-text-40)", padding: "48px 0" }}>
           Choose countries above to begin comparing.
         </p>
       )}
