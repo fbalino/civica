@@ -55,7 +55,7 @@ export function RankingTable({
           {title}
         </h3>
         {unit && (
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "var(--tracking-wide)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "var(--tracking-wide)" }}>
             {unit}
           </span>
         )}
@@ -68,7 +68,7 @@ export function RankingTable({
           overflow: "hidden",
         }}
       >
-        <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "var(--font-mono)", fontSize: "var(--text-13)" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-13)" }}>
           <thead>
             <tr style={{ background: "var(--color-card-bg)", borderBottom: "1px solid var(--color-divider)" }}>
               <th style={{ textAlign: "left", padding: "12px 16px", fontWeight: 500, color: "var(--color-text-30)", width: 48 }}>
@@ -80,7 +80,7 @@ export function RankingTable({
               <th style={{ textAlign: "right", padding: "12px 16px", fontWeight: 500, color: "var(--color-text-30)" }}>
                 <button
                   onClick={() => setSortAsc(!sortAsc)}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-30)", fontFamily: "var(--font-mono)", fontSize: "var(--text-13)", display: "inline-flex", alignItems: "center", gap: 4 }}
+                  style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-30)", fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-13)", display: "inline-flex", alignItems: "center", gap: 4 }}
                 >
                   Value
                   <span style={{ fontSize: "var(--text-11)" }}>{sortAsc ? "\u2191" : "\u2193"}</span>
@@ -132,6 +132,7 @@ export function RankingTable({
             style={{
               padding: "6px 12px",
               fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-12)",
               borderRadius: "var(--radius-sm)",
               border: "1px solid var(--color-card-border)",
@@ -143,7 +144,7 @@ export function RankingTable({
           >
             Previous
           </button>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)", fontVariantNumeric: "tabular-nums" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)", fontVariantNumeric: "tabular-nums" }}>
             {page + 1} / {totalPages}
           </span>
           <button
@@ -152,6 +153,7 @@ export function RankingTable({
             style={{
               padding: "6px 12px",
               fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-12)",
               borderRadius: "var(--radius-sm)",
               border: "1px solid var(--color-card-border)",

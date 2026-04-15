@@ -31,6 +31,7 @@ function FieldRow({ field, source, retrievedAt, depth = 0 }: {
         <dt
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-10)",
             color: "var(--color-text-30)",
             letterSpacing: "var(--tracking-wider)",
@@ -43,6 +44,7 @@ function FieldRow({ field, source, retrievedAt, depth = 0 }: {
         <dd
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-12)",
             lineHeight: "var(--leading-relaxed)",
             color: "var(--color-text-50)",
@@ -78,9 +80,10 @@ export function FactbookSection({
     return (
       <div
         style={{
-          padding: "32px 0",
+          padding: "var(--spacing-content-top) 0",
           textAlign: "center",
           fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)",
           fontSize: "var(--text-14)",
           color: "var(--color-text-40)",
         }}

@@ -36,7 +36,7 @@ export function StatCard({
           {value}
         </span>
         {unit && (
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)" }}>
             {unit}
           </span>
         )}
@@ -44,6 +44,7 @@ export function StatCard({
           <span
             style={{
               fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-12)",
               color: trend === "up" ? "var(--color-source-live)" : trend === "down" ? "#E44040" : "var(--color-text-30)",
             }}
@@ -56,7 +57,7 @@ export function StatCard({
         )}
       </div>
       {year && (
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-10)", color: "var(--color-text-30)" }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-30)" }}>
           {year} est.
         </span>
       )}

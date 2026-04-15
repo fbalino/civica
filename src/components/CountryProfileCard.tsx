@@ -86,6 +86,7 @@ export function CountryProfileCard({
             <span
               style={{
                 fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-10)",
                 textTransform: "uppercase",
                 letterSpacing: "var(--tracking-wider)",

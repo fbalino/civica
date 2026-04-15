@@ -4,7 +4,7 @@ export default function Loading() {
       style={{
         maxWidth: "var(--max-w-content)",
         margin: "0 auto",
-        padding: "60px var(--spacing-page-x)",
+        padding: "var(--spacing-section-y) var(--spacing-page-x)",
       }}
     >
       <div className="skeleton" style={{ width: 180, height: 36, marginBottom: 8 }} />

@@ -61,7 +61,7 @@ function CountryPicker({
         }}
       >
         <span style={{ fontSize: "var(--text-18)" }}>{countryFlag(selectedCountry.iso2)}</span>
-        <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-13)", color: "var(--color-text-primary)", flex: 1 }}>
+        <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-13)", color: "var(--color-text-primary)", flex: 1 }}>
           {selectedCountry.name}
         </span>
         <button
@@ -89,6 +89,7 @@ function CountryPicker({
           width: "100%",
           padding: "8px 12px",
           fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)",
           fontSize: "var(--text-13)",
           borderRadius: "var(--radius-sm)",
           border: "1px solid var(--color-card-border)",
@@ -128,6 +129,7 @@ function CountryPicker({
                 cursor: "pointer",
                 color: "var(--color-text-primary)",
                 fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-13)",
               }}
             >

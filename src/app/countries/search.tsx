@@ -39,6 +39,7 @@ export function CountrySearch({
           maxWidth: 400,
           padding: "10px 16px",
           fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)",
           fontSize: "var(--text-13)",
           borderRadius: "var(--radius-sm)",
           border: "1px solid var(--color-card-border)",

@@ -168,6 +168,7 @@ export function GovStructureDiagram({
                       y={nodeY + 20}
                       style={{
                         fontFamily: "var(--font-mono)",
+                        fontWeight: "var(--font-weight-mono)",
                         fontSize: 11,
                         fill: "var(--color-text-60)",
                       }}

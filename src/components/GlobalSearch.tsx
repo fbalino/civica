@@ -131,6 +131,7 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
             border: "none",
             outline: "none",
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-12)",
             color: "var(--color-text-primary)",
             width: 120,
@@ -139,6 +140,7 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
         <kbd
           style={{
             fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
             fontSize: "var(--text-10)",
             color: "var(--color-text-20)",
             border: "1px solid var(--color-card-border)",
@@ -208,6 +210,7 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
                   <div
                     style={{
                       fontFamily: "var(--font-mono)",
+                      fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-11)",
                       color: "var(--color-text-30)",
                       marginTop: 1,
