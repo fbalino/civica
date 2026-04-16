@@ -362,7 +362,13 @@ function extractProfileFields(data: Record<string, unknown>) {
   const gdpBillions = gdpParsed.value ? gdpParsed.value / 1e9 : null;
 
   const languages = extractText(getNestedValue(people ?? {}, "Languages", "Languages"));
-  const currency = extractText(getNestedValue(econ ?? {}, "Exchange rates", "Currency"));
+  let currency = extractText(getNestedValue(econ ?? {}, "Exchange rates", "Currency"));
+  if (!currency) {
+    const erText = extractText(getNestedValue(econ ?? {}, "Exchange rates"));
+    if (erText && /per US dollar/i.test(erText)) {
+      currency = "US dollars (USD)";
+    }
+  }
 
   return {
     name: countryName,
