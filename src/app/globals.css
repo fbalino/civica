@@ -9,6 +9,7 @@
   /* --- Typography families --- */
   --font-heading: var(--font-instrument-serif), "Georgia", "Times New Roman", serif;
   --font-body: var(--font-instrument-serif), "Georgia", "Times New Roman", serif;
+  --font-body-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, "Cascadia Code", monospace;
 
   /* --- Typography scale (readability-first — 12 px floor) --- */
@@ -69,7 +70,7 @@
   --color-branch-judicial: #5CAA6E;
 
   /* --- Layout --- */
-  --max-w-content: 900px;
+  --max-w-content: 1200px;
 
   /* --- Spacing --- */
   --spacing-page-x: 40px;
@@ -353,8 +354,10 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 7px 0;
+  padding: 8px 0;
+  gap: 24px;
   border-bottom: 1px solid var(--color-stat-border);
+  flex-wrap: wrap;
 }
 
 .stat-row:last-child {
@@ -367,6 +370,7 @@ a {
   font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: var(--tracking-wide);
+  flex: 0 0 auto;
 }
 
 .stat-row__value {
@@ -376,6 +380,11 @@ a {
   color: var(--color-text-85);
   display: flex;
   align-items: center;
+  gap: 8px;
+  text-align: right;
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: flex-end;
 }
 
 /* ============================================================
@@ -412,7 +421,7 @@ a {
 
 .country-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1px;
   background: var(--color-grid-bg);
   border-radius: var(--radius-sm);
@@ -432,7 +441,7 @@ a {
 
 @media (max-width: 767px) {
   .country-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
@@ -451,10 +460,11 @@ a {
   padding: 16px 24px;
   cursor: pointer;
   display: grid;
-  grid-template-columns: 48px 1fr 180px 120px 100px;
+  grid-template-columns: 48px minmax(0, 2fr) minmax(0, 1.2fr) 120px 100px;
   align-items: center;
   gap: 16px;
   transition: background-color 0.15s ease;
+  min-width: 0;
 }
 
 .index-row:hover {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { CountrySearch } from "./search";
 import { CountryFlag } from "@/components/CountryFlag";
+import { classifyGovernment } from "@/lib/data/government-category";
 
 export const metadata: Metadata = {
   title: "All Countries & Territories — Government Structure Index",
@@ -15,22 +16,6 @@ export const metadata: Metadata = {
     url: "https://civica-kappa.vercel.app/countries",
   },
 };
-
-function govColor(type: string | null): string {
-  if (!type) return "var(--color-gov-other)";
-  const map: Record<string, string> = {
-    Presidential: "var(--color-gov-presidential)",
-    Parliamentary: "var(--color-gov-parliamentary)",
-    "Semi-presidential": "var(--color-gov-semi-presidential)",
-    Theocratic: "var(--color-gov-theocratic)",
-    Absolute: "var(--color-gov-absolute)",
-    Federal: "var(--color-gov-parliamentary)",
-    Communist: "#E44040",
-    Constitutional: "var(--color-gov-parliamentary)",
-  };
-  const entry = Object.entries(map).find(([k]) => type.includes(k));
-  return entry?.[1] ?? "var(--color-gov-other)";
-}
 
 function formatPopulation(pop: number | null): string {
   if (!pop) return "";
@@ -177,7 +162,9 @@ export default async function CountriesPage({
             Democracy
           </span>
         </div>
-        {filtered.map((country) => (
+        {filtered.map((country) => {
+          const govCat = classifyGovernment(country.governmentTypeDetail ?? country.governmentType);
+          return (
           <a
             key={country.slug}
             href={`/countries/${country.slug}`}
@@ -195,6 +182,7 @@ export default async function CountriesPage({
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
+                  minWidth: 0,
                 }}
               >
                 {country.name}
@@ -206,6 +194,10 @@ export default async function CountriesPage({
                   fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-11)",
                   color: "var(--color-text-25)",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  minWidth: 0,
                 }}
               >
                 {country.capital}
@@ -217,10 +209,13 @@ export default async function CountriesPage({
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-11)",
-                color: govColor(country.governmentTypeDetail ?? country.governmentType),
+                color: govCat.color,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
               }}
             >
-              {country.governmentTypeDetail ?? country.governmentType ?? ""}
+              {govCat.label}
             </span>
             <span
               className="hidden sm:inline"
@@ -247,7 +242,8 @@ export default async function CountriesPage({
               {country.democracyIndex?.toFixed(2) ?? ""}
             </span>
           </a>
-        ))}
+          );
+        })}
       </div>
 
       {filtered.length === 0 && countries.length > 0 && (

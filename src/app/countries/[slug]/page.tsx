@@ -18,20 +18,8 @@ import { CountryTabs } from "./tabs";
 import { CountryFlag } from "@/components/CountryFlag";
 import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 import { HemicycleChart } from "@/components/HemicycleChart";
-
-function govColor(type: string | null): string {
-  if (!type) return "var(--color-gov-other)";
-  const map: Record<string, string> = {
-    Presidential: "var(--color-gov-presidential)",
-    Parliamentary: "var(--color-gov-parliamentary)",
-    "Semi-presidential": "var(--color-gov-semi-presidential)",
-    Theocratic: "var(--color-gov-theocratic)",
-    Absolute: "var(--color-gov-absolute)",
-    Federal: "var(--color-gov-parliamentary)",
-  };
-  const entry = Object.entries(map).find(([k]) => type.includes(k));
-  return entry?.[1] ?? "var(--color-gov-other)";
-}
+import { classifyGovernment } from "@/lib/data/government-category";
+import { stripHtml, firstSentences } from "@/lib/text/clean";
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
@@ -150,7 +138,9 @@ export default async function CountryPage({
   if (jurisdiction.currency) profileRows.push({ label: "Currency", value: jurisdiction.currency });
   if (jurisdiction.democracyIndex) profileRows.push({ label: "Democracy", value: jurisdiction.democracyIndex.toFixed(2), source: "V-Dem Institute", date: "2025" });
 
-  const color = govColor(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType);
+  const govCat = classifyGovernment(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType);
+  const color = govCat.color;
+  const govHeaderLabel = stripHtml(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType) || govCat.label;
 
   const branchColorMap: Record<string, string> = {
     executive: "var(--color-branch-executive)",
@@ -158,14 +148,14 @@ export default async function CountryPage({
     judicial: "var(--color-branch-judicial)",
   };
 
-  // Extract introduction text
+  // Extract introduction text (strip raw HTML before slicing)
   let introText: string | null = null;
   if (introSection?.sectionData) {
     const data = introSection.sectionData as Record<string, unknown>;
     const bg = data["Background"] as { text?: string } | undefined;
     if (bg?.text) {
-      const sentences = bg.text.split(/(?<=\.)\s+/);
-      introText = sentences.slice(0, 3).join(" ");
+      const clean = firstSentences(bg.text, 3);
+      introText = clean || null;
     }
   }
 
@@ -190,9 +180,9 @@ export default async function CountryPage({
         <div className="cv-card" style={{ marginBottom: 16 }}>
           <p
             style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "var(--text-14)",
-              color: "var(--color-text-60)",
+              fontFamily: "var(--font-body-sans)",
+              fontSize: "var(--text-16)",
+              color: "var(--color-text-85)",
               lineHeight: "var(--leading-relaxed)",
               margin: 0,
             }}
@@ -479,7 +469,7 @@ export default async function CountryPage({
           marginBottom: 28,
         }}
       >
-        {jurisdiction.name} is a {(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType ?? "sovereign state").toLowerCase()}.
+        {jurisdiction.name} is a {govHeaderLabel.toLowerCase() || "sovereign state"}.
         {headOfState && headOfGov && headOfGov.person.name === headOfState.person.name
           ? ` The ${govStructure.offices.find((o) => o.id === headOfState.term.officeId)?.name?.toLowerCase() ?? "head of state"} serves as both head of state and head of government.`
           : headOfState && headOfGov
@@ -653,7 +643,7 @@ export default async function CountryPage({
               margin: "6px 0 0",
             }}
           >
-            {jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType}
+            {govHeaderLabel}
           </p>
         </div>
       </div>

@@ -25,8 +25,30 @@ export async function getAllJurisdictions() {
   return db
     .select()
     .from(jurisdictions)
-    .where(eq(jurisdictions.type, "sovereign_state"))
-    .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
+    .where(
+      sql`${jurisdictions.type} = 'sovereign_state' AND LOWER(${jurisdictions.name}) <> 'none'`
+    )
+    .orderBy(
+      sql`${jurisdictions.population} DESC NULLS LAST`,
+      asc(jurisdictions.name)
+    );
+}
+
+// Non-territory sovereign states with population data. Used for the homepage
+// featured grid so we never surface Akrotiri / Antarctica / Bouvet Island first.
+export async function getFeaturedCountries(limit = 24) {
+  return db
+    .select()
+    .from(jurisdictions)
+    .where(
+      sql`${jurisdictions.type} = 'sovereign_state'
+        AND ${jurisdictions.population} IS NOT NULL
+        AND ${jurisdictions.population} > 0
+        AND ${jurisdictions.iso2} IS NOT NULL
+        AND LOWER(${jurisdictions.name}) <> 'none'`
+    )
+    .orderBy(desc(jurisdictions.population), asc(jurisdictions.name))
+    .limit(limit);
 }
 
 export async function getFactbookSections(jurisdictionId: string) {

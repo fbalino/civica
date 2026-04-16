@@ -198,9 +198,9 @@ export default async function GovernmentTypePage({
           <p
             key={i}
             style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "var(--text-14)",
-              color: "var(--color-text-60)",
+              fontFamily: "var(--font-body-sans)",
+              fontSize: "var(--text-16)",
+              color: "var(--color-text-85)",
               lineHeight: "var(--leading-relaxed)",
               margin: i === 0 ? 0 : "16px 0 0",
             }}
@@ -277,7 +277,7 @@ export default async function GovernmentTypePage({
                 padding: "10px 24px",
                 cursor: "default",
                 display: "grid",
-                gridTemplateColumns: "48px 1fr 180px 120px",
+                gridTemplateColumns: "48px minmax(0, 2fr) minmax(0, 1fr) 120px",
                 alignItems: "center",
                 gap: 16,
               }}
@@ -332,7 +332,7 @@ export default async function GovernmentTypePage({
                   padding: "16px 24px",
                   cursor: "pointer",
                   display: "grid",
-                  gridTemplateColumns: "48px 1fr 180px 120px",
+                  gridTemplateColumns: "48px minmax(0, 2fr) minmax(0, 1fr) 120px",
                   alignItems: "center",
                   gap: 16,
                   transition: "background-color 0.15s ease",
@@ -357,6 +357,7 @@ export default async function GovernmentTypePage({
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
+                      minWidth: 0,
                     }}
                   >
                     {country.name}
@@ -368,6 +369,10 @@ export default async function GovernmentTypePage({
                       fontWeight: "var(--font-weight-mono)",
                       fontSize: "var(--text-11)",
                       color: "var(--color-text-25)",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      minWidth: 0,
                     }}
                   >
                     {country.capital}

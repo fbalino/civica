@@ -1,5 +1,16 @@
 "use client";
 
+// flagcdn.com only serves these widths. Asking for any other (e.g. w56)
+// returns a 404 and the flag fails to load.
+const FLAGCDN_WIDTHS = [20, 40, 80, 160, 320, 640, 1280, 2560] as const;
+
+function pickFlagWidth(desired: number): number {
+  for (const w of FLAGCDN_WIDTHS) {
+    if (w >= desired) return w;
+  }
+  return FLAGCDN_WIDTHS[FLAGCDN_WIDTHS.length - 1];
+}
+
 function emojiFlag(iso2: string): string {
   return [...iso2.toUpperCase()]
     .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
@@ -18,6 +29,8 @@ export function CountryFlag({
   if (!iso2) return <span style={{ fontSize: size, lineHeight: 1 }} className={className} />;
 
   const code = iso2.toLowerCase();
+  const w1x = pickFlagWidth(size * 2);
+  const w2x = pickFlagWidth(size * 3);
 
   return (
     <span
@@ -34,8 +47,8 @@ export function CountryFlag({
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`https://flagcdn.com/w${Math.min(size * 2, 160)}/${code}.png`}
-        srcSet={`https://flagcdn.com/w${Math.min(size * 2, 160)}/${code}.png 1x, https://flagcdn.com/w${Math.min(size * 3, 320)}/${code}.png 2x`}
+        src={`https://flagcdn.com/w${w1x}/${code}.png`}
+        srcSet={`https://flagcdn.com/w${w1x}/${code}.png 1x, https://flagcdn.com/w${w2x}/${code}.png 2x`}
         alt={`Flag of ${iso2.toUpperCase()}`}
         width={size}
         height={Math.round(size * 0.75)}

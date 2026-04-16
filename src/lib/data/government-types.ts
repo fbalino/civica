@@ -7,7 +7,50 @@ export interface GovernmentTypeInfo {
   color: string;
 }
 
+// NOTE: Order matters. `matchGovernmentType` returns the FIRST pattern match,
+// so more-specific entries (e.g. "Semi-presidential") must come before less-specific
+// ones (e.g. "Presidential"). Otherwise "Semi-presidential republic" misclassifies.
 export const GOVERNMENT_TYPES: GovernmentTypeInfo[] = [
+  {
+    slug: "semi-presidential-republic",
+    name: "Semi-Presidential Republic",
+    description: [
+      "A semi-presidential republic is a system of government in which both a president and a prime minister share executive authority. The president is typically elected directly by the people and holds significant powers, while the prime minister is appointed and accountable to the legislature.",
+      "This hybrid system combines elements of both presidential and parliamentary government. The president usually handles foreign affairs and defense, while the prime minister manages domestic policy and the day-to-day running of government. When the president and prime minister are from different parties, a situation known as cohabitation may arise.",
+      "France under the Fifth Republic is the most prominent example of a semi-presidential system. Other examples include Russia, Ukraine, Romania, and several post-colonial African states. The system's effectiveness depends heavily on how well the dual executive manages to coordinate and on the constitutional division of powers.",
+    ],
+    characteristics: [
+      "Dual executive: both president and prime minister hold power",
+      "President is directly elected by the people",
+      "Prime minister is appointed and accountable to parliament",
+      "President typically controls foreign and defense policy",
+      "Prime minister manages domestic affairs and legislation",
+      "Cohabitation possible when president and PM are from different parties",
+      "Combines elements of presidential and parliamentary systems",
+    ],
+    dbPatterns: ["Semi-presidential republic", "Semi-presidential", "Semipresidential"],
+    color: "var(--color-gov-semi-presidential)",
+  },
+  {
+    slug: "federal-republic",
+    name: "Federal Republic",
+    description: [
+      "A federal republic is a form of government combining republican principles with a federal structure in which sovereignty is constitutionally divided between a central governing authority and constituent political units such as states or provinces. Each level of government has defined areas of authority.",
+      "Federal republics distribute power across multiple levels of government, with both the national government and sub-national units having their own legislative, executive, and often judicial branches. This division of power is protected by a constitution that neither level can unilaterally alter.",
+      "Federal republics are found across diverse regions and include some of the world's largest and most diverse nations. Notable examples include the United States, Germany, Brazil, and Nigeria. Federalism is often adopted in countries with significant regional diversity in language, culture, or ethnicity.",
+    ],
+    characteristics: [
+      "Power constitutionally divided between national and sub-national governments",
+      "Both levels of government have autonomous authority in defined areas",
+      "Written constitution allocating powers between federal and state levels",
+      "Typically bicameral legislature with representation of sub-national units",
+      "Constitutional court resolves jurisdictional disputes",
+      "Sub-national units have their own constitutions or basic laws",
+      "Citizens subject to both federal and state/provincial laws",
+    ],
+    dbPatterns: ["Federal parliamentary republic", "Federal republic", "Federation"],
+    color: "var(--color-gov-parliamentary)",
+  },
   {
     slug: "presidential-republic",
     name: "Presidential Republic",
@@ -69,26 +112,6 @@ export const GOVERNMENT_TYPES: GovernmentTypeInfo[] = [
       "Parliamentary republic",
       "Parliamentary democracy",
     ],
-    color: "var(--color-gov-parliamentary)",
-  },
-  {
-    slug: "federal-republic",
-    name: "Federal Republic",
-    description: [
-      "A federal republic is a form of government combining republican principles with a federal structure in which sovereignty is constitutionally divided between a central governing authority and constituent political units such as states or provinces. Each level of government has defined areas of authority.",
-      "Federal republics distribute power across multiple levels of government, with both the national government and sub-national units having their own legislative, executive, and often judicial branches. This division of power is protected by a constitution that neither level can unilaterally alter.",
-      "Federal republics are found across diverse regions and include some of the world's largest and most diverse nations. Notable examples include the United States, Germany, Brazil, and Nigeria. Federalism is often adopted in countries with significant regional diversity in language, culture, or ethnicity.",
-    ],
-    characteristics: [
-      "Power constitutionally divided between national and sub-national governments",
-      "Both levels of government have autonomous authority in defined areas",
-      "Written constitution allocating powers between federal and state levels",
-      "Typically bicameral legislature with representation of sub-national units",
-      "Constitutional court resolves jurisdictional disputes",
-      "Sub-national units have their own constitutions or basic laws",
-      "Citizens subject to both federal and state/provincial laws",
-    ],
-    dbPatterns: ["Federal republic", "Federal parliamentary republic"],
     color: "var(--color-gov-parliamentary)",
   },
   {
@@ -200,26 +223,6 @@ export const GOVERNMENT_TYPES: GovernmentTypeInfo[] = [
     dbPatterns: ["Constitutional republic", "Republic"],
     color: "var(--color-gov-parliamentary)",
   },
-  {
-    slug: "semi-presidential-republic",
-    name: "Semi-Presidential Republic",
-    description: [
-      "A semi-presidential republic is a system of government in which both a president and a prime minister share executive authority. The president is typically elected directly by the people and holds significant powers, while the prime minister is appointed and accountable to the legislature.",
-      "This hybrid system combines elements of both presidential and parliamentary government. The president usually handles foreign affairs and defense, while the prime minister manages domestic policy and the day-to-day running of government. When the president and prime minister are from different parties, a situation known as cohabitation may arise.",
-      "France under the Fifth Republic is the most prominent example of a semi-presidential system. Other examples include Russia, Ukraine, Romania, and several post-colonial African states. The system's effectiveness depends heavily on how well the dual executive manages to coordinate and on the constitutional division of powers.",
-    ],
-    characteristics: [
-      "Dual executive: both president and prime minister hold power",
-      "President is directly elected by the people",
-      "Prime minister is appointed and accountable to parliament",
-      "President typically controls foreign and defense policy",
-      "Prime minister manages domestic affairs and legislation",
-      "Cohabitation possible when president and PM are from different parties",
-      "Combines elements of presidential and parliamentary systems",
-    ],
-    dbPatterns: ["Semi-presidential republic", "Semi-presidential"],
-    color: "var(--color-gov-semi-presidential)",
-  },
 ];
 
 export function getGovernmentTypeBySlug(
@@ -232,8 +235,14 @@ export function matchGovernmentType(
   dbValue: string | null
 ): GovernmentTypeInfo | undefined {
   if (!dbValue) return undefined;
-  const lower = dbValue.toLowerCase();
+  const normalized = dbValue
+    .toLowerCase()
+    .replace(/<[^>]+>/g, " ")
+    .replace(/_/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!normalized) return undefined;
   return GOVERNMENT_TYPES.find((gt) =>
-    gt.dbPatterns.some((p) => lower.includes(p.toLowerCase()))
+    gt.dbPatterns.some((p) => normalized.includes(p.toLowerCase()))
   );
 }

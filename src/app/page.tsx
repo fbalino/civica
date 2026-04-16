@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { getAllJurisdictions } from "@/lib/db/queries";
+import { getAllJurisdictions, getFeaturedCountries } from "@/lib/db/queries";
 import { CountryFlag } from "@/components/CountryFlag";
+import { govColor, govLabel } from "@/lib/data/government-category";
 
 export const metadata: Metadata = {
   title: "Civica — Interactive Atlas of World Government Structures | 250+ Countries",
@@ -16,17 +17,6 @@ export const metadata: Metadata = {
   },
 };
 
-const GOV_TYPE_COLORS: Record<string, string> = {
-  Presidential: "var(--color-gov-presidential)",
-  Parliamentary: "var(--color-gov-parliamentary)",
-  "Semi-presidential": "var(--color-gov-semi-presidential)",
-  Theocratic: "var(--color-gov-theocratic)",
-  Absolute: "var(--color-gov-absolute)",
-  Federal: "var(--color-gov-parliamentary)",
-  Communist: "#E44040",
-  Constitutional: "var(--color-gov-parliamentary)",
-};
-
 const GOV_TYPE_LEGEND: [string, string][] = [
   ["Presidential", "var(--color-gov-presidential)"],
   ["Parliamentary", "var(--color-gov-parliamentary)"],
@@ -34,17 +24,6 @@ const GOV_TYPE_LEGEND: [string, string][] = [
   ["Theocratic", "var(--color-gov-theocratic)"],
   ["Absolute", "var(--color-gov-absolute)"],
 ];
-
-function govColor(type: string | null): string {
-  if (!type) return "var(--color-gov-other)";
-  const entry = Object.entries(GOV_TYPE_COLORS).find(([k]) => type.includes(k));
-  return entry?.[1] ?? "var(--color-gov-other)";
-}
-
-function govLabel(type: string | null): string {
-  if (!type) return "Other";
-  return type.split(" ")[0];
-}
 
 function formatPopulation(pop: number | null): string {
   if (!pop) return "";
@@ -56,13 +35,17 @@ function formatPopulation(pop: number | null): string {
 
 export default async function Home() {
   let countries: Awaited<ReturnType<typeof getAllJurisdictions>> = [];
+  let featured: Awaited<ReturnType<typeof getFeaturedCountries>> = [];
   try {
-    countries = await getAllJurisdictions();
+    const [allCountries, featuredCountries] = await Promise.all([
+      getAllJurisdictions(),
+      getFeaturedCountries(24),
+    ]);
+    countries = allCountries;
+    featured = featuredCountries;
   } catch {
     // DB not yet seeded
   }
-
-  const featured = countries.slice(0, 21);
 
   const jsonLd = {
     "@context": "https://schema.org",
