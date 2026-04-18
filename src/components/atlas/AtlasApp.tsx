@@ -864,7 +864,6 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   <h1>{country.name}</h1>
                   <div className="dek">
                     {govDescription(country)} of {country.pop} people, led from {country.capital}.
-                    Below: the living composition of its chambers and the laws it&apos;s working on right now.
                   </div>
                 </div>
                 <div className="quick-facts">
