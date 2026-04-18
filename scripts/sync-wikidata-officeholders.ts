@@ -18,12 +18,13 @@ const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
 
 const QUERY = `
-SELECT ?state ?stateLabel ?iso2 ?shortName
+SELECT ?state ?stateLabel ?iso2 ?iso3 ?shortName
        ?headOfState ?headOfStateLabel ?hosStart
        ?headOfGov ?headOfGovLabel ?hogStart
 WHERE {
   ?state wdt:P31 wd:Q3624078 .
   OPTIONAL { ?state wdt:P297 ?iso2 . }
+  OPTIONAL { ?state wdt:P298 ?iso3 . }
   OPTIONAL { ?state wdt:P1813 ?shortName . FILTER(LANG(?shortName) = "en") }
   OPTIONAL {
     ?state p:P35 ?hosStatement .
@@ -269,6 +270,7 @@ async function main() {
 
     const stateName = binding.stateLabel?.value ?? stateQid;
     const iso2 = binding.iso2?.value ?? null;
+    const iso3 = binding.iso3?.value ?? null;
     const shortName = binding.shortName?.value ?? null;
 
     const jurisdictionId = await findJurisdiction(iso2, stateQid, stateName, shortName);
@@ -280,10 +282,14 @@ async function main() {
       continue;
     }
 
-    // Update wikidata QID on jurisdiction
+    // Update wikidata QID and ISO codes on jurisdiction
     await db
       .update(jurisdictions)
-      .set({ wikidataQid: stateQid, iso2: iso2?.toUpperCase() ?? undefined })
+      .set({
+        wikidataQid: stateQid,
+        iso2: iso2?.toUpperCase() ?? undefined,
+        iso3: iso3?.toUpperCase() ?? undefined,
+      })
       .where(eq(jurisdictions.id, jurisdictionId));
 
     const execBody = await upsertBody(

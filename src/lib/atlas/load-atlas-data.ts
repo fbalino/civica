@@ -160,6 +160,7 @@ export async function loadAtlasData(): Promise<{
 
   const leaderByJurisdiction = new Map<string, string>();
   for (const h of currentHeads) {
+    if (/^Q\d+$/.test(h.person.name)) continue;
     const bId = officeToBody.get(h.officeId);
     if (!bId) continue;
     const jId = bodyToJurisdiction.get(bId);
