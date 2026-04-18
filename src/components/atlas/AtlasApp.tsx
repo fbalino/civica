@@ -42,6 +42,10 @@ export default function AtlasApp() {
   const dragRef = useRef<{ dragging: boolean; startX: number; startY: number; originX: number; originY: number }>({ dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 });
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapPaths, setMapPaths] = useState<Array<{ d: string; id: string | null; country: Country | null; neId: string }>>([]);
+  const [leftW, setLeftW] = useState(300);
+  const [rightW, setRightW] = useState(380);
+  const resizerRef = useRef<{ side: "left" | "right"; startX: number; startW: number } | null>(null);
+  const atlasRootRef = useRef<HTMLDivElement>(null);
 
   const W = 2000, H = 1000;
   const LAT_MIN = -58, LAT_MAX = 85;
@@ -193,18 +197,63 @@ export default function AtlasApp() {
     return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
   }, [applyTransform]);
 
+  // Wheel event must be added via addEventListener with {passive:false} for preventDefault
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const handler = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      const svgX = ((e.clientX - rect.left) / rect.width) * W;
+      const svgY = ((e.clientY - rect.top) / rect.height) * H;
+      zoomAround(svgX, svgY, e.deltaY < 0 ? 1.15 : 1 / 1.15);
+    };
+    svg.addEventListener("wheel", handler, { passive: false });
+    return () => svg.removeEventListener("wheel", handler);
+  }, [zoomAround, mapLoaded]);
+
+  // Resizable panes
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("atlas_panels") || "{}");
+      if (saved.leftW) setLeftW(saved.leftW);
+      if (saved.rightW) setRightW(saved.rightW);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      const r = resizerRef.current;
+      if (!r) return;
+      if (r.side === "left") {
+        setLeftW(Math.max(220, Math.min(500, r.startW + (e.clientX - r.startX))));
+      } else {
+        setRightW(Math.max(280, Math.min(560, r.startW - (e.clientX - r.startX))));
+      }
+    };
+    const onUp = () => {
+      if (resizerRef.current) {
+        resizerRef.current = null;
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
+        localStorage.setItem("atlas_panels", JSON.stringify({ leftW, rightW }));
+      }
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+  }, [leftW, rightW]);
+
+  function startResize(side: "left" | "right", e: React.MouseEvent) {
+    e.preventDefault();
+    resizerRef.current = { side, startX: e.clientX, startW: side === "left" ? leftW : rightW };
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }
+
   function handleSvgMouseDown(e: React.MouseEvent) {
     if ((e.target as Element).tagName === "path" && (e.target as Element).getAttribute("data-id")) return;
     dragRef.current = { dragging: true, startX: e.clientX, startY: e.clientY, originX: transformRef.current.x, originY: transformRef.current.y };
-  }
-
-  function handleSvgWheel(e: React.WheelEvent) {
-    e.preventDefault();
-    const rect = svgRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const svgX = ((e.clientX - rect.left) / rect.width) * W;
-    const svgY = ((e.clientY - rect.top) / rect.height) * H;
-    zoomAround(svgX, svgY, e.deltaY < 0 ? 1.15 : 1 / 1.15);
   }
 
   function enterChamber(id: string) {
@@ -378,7 +427,6 @@ export default function AtlasApp() {
             viewBox={`0 0 ${W} ${H}`}
             preserveAspectRatio="xMidYMid meet"
             onMouseDown={handleSvgMouseDown}
-            onWheel={handleSvgWheel}
           >
             <defs>
               <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -492,7 +540,7 @@ export default function AtlasApp() {
 
         {/* ===== CHAMBER VIEW ===== */}
         {mode === "chamber" && country && cd && currentHouse && (
-          <div className="chamber-grid" style={{ position: "absolute", inset: 0 }}>
+          <div className="chamber-grid" style={{ position: "absolute", inset: 0, gridTemplateColumns: `${leftW}px 6px 1fr 6px ${rightW}px` }}>
             {/* Left rail */}
             <div className="chamber-left">
               <div className="left-side-head">
@@ -540,7 +588,7 @@ export default function AtlasApp() {
             </div>
 
             {/* Left resizer */}
-            <div className="atlas-resizer" />
+            <div className="atlas-resizer" onMouseDown={(e) => startResize("left", e)} />
 
             {/* Center pane */}
             <div className="chamber-center">
@@ -651,7 +699,7 @@ export default function AtlasApp() {
             </div>
 
             {/* Right resizer */}
-            <div className="atlas-resizer" />
+            <div className="atlas-resizer" onMouseDown={(e) => startResize("right", e)} />
 
             {/* Chat rail */}
             <div className="chamber-right">
