@@ -1327,3 +1327,42 @@ a {
   font-weight: 400;
   color: var(--color-text-primary);
 }
+
+/* ============================================================
+   Blog — Featured card
+   ============================================================ */
+
+.blog-featured-card:hover {
+  border-color: var(--color-card-hover-border);
+  background: var(--color-card-hover-bg);
+}
+
+@media (max-width: 768px) {
+  .blog-featured-card {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================================
+   Blog — Masonry grid
+   ============================================================ */
+
+.blog-masonry {
+  columns: 2;
+  column-gap: 28px;
+}
+
+.blog-masonry-card {
+  break-inside: avoid;
+  margin-bottom: 32px;
+}
+
+.blog-masonry-card:hover h2 {
+  color: var(--color-accent);
+}
+
+@media (max-width: 640px) {
+  .blog-masonry {
+    columns: 1;
+  }
+}

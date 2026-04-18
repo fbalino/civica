@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllSlugs, getPostBySlug } from "@/lib/blog";
+import { GenerativeBlogImage } from "@/components/GenerativeBlogImage";
 
 const SITE_URL = "https://civicaatlas.org";
 
@@ -218,6 +219,16 @@ export default async function BlogPostPage({
       </a>
 
       <article>
+        <div style={{
+          borderRadius: "var(--radius-md)",
+          overflow: "hidden",
+          border: "1px solid var(--color-card-border)",
+          background: "var(--color-card-bg)",
+          marginBottom: 32,
+        }}>
+          <GenerativeBlogImage slug={post.slug} width={720} height={280} />
+        </div>
+
         <header style={{ marginBottom: 40 }}>
           <h1
             style={{
