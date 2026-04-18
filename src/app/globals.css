@@ -735,3 +735,266 @@ a {
   color: var(--color-text-primary);
   min-width: 200px;
 }
+
+/* ============================================================
+   Country Index — Atlas-style redesign
+   ============================================================ */
+
+.index-hero {
+  padding-top: var(--spacing-hero-top);
+  padding-bottom: 8px;
+}
+
+.index-stats-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.index-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.index-stat__value {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.index-stat__label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-25);
+}
+
+.index-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--color-divider);
+}
+
+.index-controls {
+  padding: 32px 0 24px;
+  border-top: 1px solid var(--color-divider);
+}
+
+.index-continent-nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.index-continent-chip {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  background: var(--color-card-bg);
+  color: var(--color-text-40);
+  border: 1px solid var(--color-card-border);
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.index-continent-chip:hover {
+  background: var(--color-card-hover-bg);
+  color: var(--color-text-60);
+  border-color: var(--color-card-hover-border);
+}
+
+.index-continent-chip--active {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.index-continent-chip--active:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.index-sections {
+  padding-bottom: 48px;
+}
+
+.index-continent-section {
+  margin-bottom: 48px;
+}
+
+.index-continent-section:last-child {
+  margin-bottom: 0;
+}
+
+.index-continent-header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-divider);
+  margin-bottom: 20px;
+}
+
+.index-continent-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tight);
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.index-continent-meta {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-25);
+  display: flex;
+  gap: 6px;
+}
+
+.index-continent-meta-dot {
+  color: var(--color-text-20);
+}
+
+.index-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--color-grid-bg);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.index-country-card {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--color-bg);
+}
+
+.index-country-card:hover {
+  background: var(--color-grid-cell-hover);
+}
+
+.index-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.index-card-name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.index-card-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: 400;
+  color: var(--color-text-primary);
+  line-height: var(--leading-snug);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.index-card-capital {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-30);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.index-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.index-card-data {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.index-card-datum {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+}
+
+.index-card-datum--dim {
+  color: var(--color-text-25);
+}
+
+.index-empty {
+  text-align: center;
+  padding: 80px 0;
+}
+
+.index-empty p {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-14);
+  color: var(--color-text-40);
+}
+
+/* Responsive: index page */
+
+@media (max-width: 640px) {
+  .index-hero {
+    padding-top: 48px;
+  }
+
+  .index-stats-row {
+    gap: 16px;
+  }
+
+  .index-stat__value {
+    font-size: var(--text-22);
+  }
+
+  .index-stat-divider {
+    height: 28px;
+  }
+
+  .index-continent-header {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .index-continent-title {
+    font-size: var(--text-24);
+  }
+
+  .index-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .index-country-card {
+    padding: 16px 20px;
+  }
+}
