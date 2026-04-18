@@ -7,10 +7,10 @@
 
 @theme inline {
   /* --- Typography families --- */
-  --font-heading: var(--font-instrument-serif), "Georgia", "Times New Roman", serif;
-  --font-body: var(--font-instrument-serif), "Georgia", "Times New Roman", serif;
-  --font-body-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, "Cascadia Code", monospace;
+  --font-heading: var(--font-fraunces), "Georgia", "Times New Roman", serif;
+  --font-body: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-body-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* --- Typography scale (readability-first — 12 px floor) --- */
   --text-9:  12px;
