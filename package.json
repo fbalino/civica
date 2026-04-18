@@ -12,7 +12,9 @@
     "db:studio": "drizzle-kit studio",
     "seed:sources": "tsx scripts/seed-sources.ts",
     "seed:factbook": "tsx scripts/seed-from-factbook.ts",
-    "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts"
+    "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
+    "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
+    "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
