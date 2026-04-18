@@ -524,3 +524,238 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   letter-spacing: 0.14em; text-transform: uppercase;
   display: flex; justify-content: space-between; align-items: center;
 }
+
+/* ===== MOBILE PANEL TOGGLES ===== */
+.mobile-panel-bar {
+  display: none;
+}
+
+/* ===== MOBILE OVERLAY PANELS ===== */
+.mobile-overlay {
+  display: none;
+}
+
+/* ===== RESPONSIVE — MOBILE (<= 768px) ===== */
+@media (max-width: 768px) {
+  /* Top bar: compact */
+  .atlas-root > div:first-child {
+    padding: 6px 10px;
+    gap: 6px;
+  }
+  .atlas-root > div:first-child .atlas-serif { font-size: 18px; }
+  .atlas-root > div:first-child .atlas-mono[style*="letterSpacing"] { display: none; }
+
+  /* Filter bar: scrollable, hidden by default */
+  .atlas-filter-bar {
+    display: none !important;
+  }
+  .atlas-filter-bar.mobile-open {
+    display: flex !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding: 0 10px;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+  }
+
+  /* Search: full width on mobile */
+  .atlas-root > div:first-child > div[style*="minWidth"] {
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: 1;
+  }
+
+  /* Mode bar: compact */
+  .atlas-mode-bar button { padding: 5px 8px; font-size: 9px; }
+
+  /* Nav links: hide on mobile */
+  .atlas-root > div:first-child > a { display: none; }
+
+  /* Separator line: hide */
+  .atlas-root > div:first-child > div[style*="width: 1px"] { display: none; }
+
+  /* HUD bottom: mobile-friendly */
+  .atlas-hud-bottom {
+    left: 10px; right: 10px; bottom: 10px;
+    flex-direction: column; align-items: stretch;
+  }
+  .atlas-intro {
+    max-width: none; padding: 12px 14px;
+    box-shadow: 3px 3px 0 var(--atlas-ink);
+  }
+  .atlas-intro h2 { font-size: 22px; }
+  .atlas-intro p { font-size: 12px; }
+  .atlas-intro .cta { font-size: 9px; }
+
+  .atlas-zoombar {
+    position: fixed; right: 10px; bottom: 10px; z-index: 10;
+  }
+  .atlas-zoombar button { width: 48px; height: 48px; font-size: 20px; }
+
+  /* Hover card: hide on mobile (no hover state) */
+  .atlas-hover-card { display: none !important; }
+
+  /* Compare banner: reposition */
+  .atlas-compare-banner {
+    top: auto; bottom: 70px; right: 10px; left: 10px;
+    font-size: 9px;
+  }
+
+  /* Chamber grid: single column */
+  .chamber-grid {
+    display: flex !important;
+    flex-direction: column;
+    grid-template-columns: unset !important;
+  }
+
+  /* Hide resizers on mobile */
+  .atlas-resizer { display: none; }
+
+  /* Left rail: overlay panel */
+  .chamber-left {
+    display: none;
+    border-right: none;
+  }
+  .chamber-left.mobile-visible {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: var(--atlas-paper);
+    overflow-y: auto;
+  }
+
+  /* Center pane: full width */
+  .chamber-center {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  /* Right rail (chat): overlay panel */
+  .chamber-right {
+    display: none;
+    border-left: none;
+  }
+  .chamber-right.mobile-visible {
+    display: flex;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: var(--atlas-paper);
+  }
+
+  /* Mobile panel toggle bar */
+  .mobile-panel-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--atlas-rule);
+    background: var(--atlas-paper-2);
+    flex-shrink: 0;
+  }
+  .mobile-panel-bar button {
+    flex: 1;
+    padding: 10px 8px;
+    background: var(--atlas-paper-2);
+    color: var(--atlas-ink-2);
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-family: ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .mobile-panel-bar button.on {
+    color: var(--atlas-ink);
+    border-bottom-color: var(--atlas-ink);
+    background: var(--atlas-paper);
+  }
+
+  /* Masthead: compact */
+  .atlas-masthead {
+    padding: 16px 16px 14px;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .atlas-masthead h1 { font-size: 36px; }
+  .atlas-masthead .dek { font-size: 14px; }
+  .atlas-masthead .quick-facts {
+    text-align: left;
+    min-width: 0;
+    font-size: 10px;
+  }
+
+  /* Tabs: scrollable */
+  .atlas-tabs {
+    padding: 0 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+  .atlas-tabs button {
+    white-space: nowrap;
+    font-size: 10px;
+    padding: 10px 0;
+    margin-right: 16px;
+  }
+
+  /* Panes: reduced padding */
+  .atlas-pane { padding: 16px 16px 40px; }
+
+  /* Chamber stage */
+  .atlas-chamber-stage { padding: 16px; }
+  .atlas-chamber-title .nm { font-size: 18px; }
+
+  /* Chamber meta: 2-col on mobile */
+  .atlas-chamber-meta {
+    grid-template-columns: 1fr 1fr;
+  }
+  .atlas-chamber-meta .cell { padding: 10px 12px; }
+  .atlas-chamber-meta .v { font-size: 18px; }
+
+  /* Party legend: smaller */
+  .atlas-party-legend .p { min-width: 120px; padding: 6px 8px; }
+  .atlas-party-legend .p .nm { font-size: 12px; }
+
+  /* Bill cards: single column */
+  .atlas-bill {
+    grid-template-columns: 30px 1fr;
+    gap: 10px;
+  }
+  .atlas-bill .actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+  .atlas-bill .idx { font-size: 22px; }
+  .atlas-bill .t { font-size: 18px; }
+
+  /* Chat: full-screen when visible */
+  .atlas-chat-input textarea { min-height: 40px; }
+
+  /* Compare mode: stack vertically */
+  .chamber-grid.compare-mode {
+    display: flex !important;
+    flex-direction: column;
+  }
+  .atlas-compare-divider { border-right: none; border-bottom: 2px solid var(--atlas-ink); }
+  .atlas-compare-heading { padding: 10px 16px; }
+
+  /* House toggle: full width */
+  .atlas-house-toggle { display: flex; width: 100%; }
+  .atlas-house-toggle button { flex: 1; }
+
+  /* SVG map: touch-action none for proper touch handling */
+  .atlas-view svg.world-map {
+    touch-action: none;
+  }
+
+  /* Left rail mini-map: smaller on mobile overlay */
+  .left-mini-map svg { height: 120px; }
+  .left-side-head { padding: 12px 14px; }
+  .left-country-list { padding: 6px 14px 20px; }
+}

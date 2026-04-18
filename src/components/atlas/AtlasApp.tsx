@@ -124,6 +124,18 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const resizerRef = useRef<{ side: "left" | "right"; startX: number; startW: number } | null>(null);
   const atlasRootRef = useRef<HTMLDivElement>(null);
   const labelsRef = useRef<SVGGElement>(null);
+  const touchRef = useRef<{ lastDist: number; lastX: number; lastY: number; touches: number }>({ lastDist: 0, lastX: 0, lastY: 0, touches: 0 });
+  const [mobilePanel, setMobilePanel] = useState<"center" | "countries" | "chat">("center");
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileFilters, setMobileFilters] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 768px)");
+    setIsMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   const W = 2000, H = 1000;
   const LAT_MIN = -58, LAT_MAX = 85;
@@ -317,6 +329,62 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     return () => svg.removeEventListener("wheel", handler);
   }, [zoomAround, mapLoaded]);
 
+  // Touch pan & pinch-zoom
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        touchRef.current = { lastDist: 0, lastX: e.touches[0].clientX, lastY: e.touches[0].clientY, touches: 1 };
+      } else if (e.touches.length === 2) {
+        e.preventDefault();
+        const dx = e.touches[1].clientX - e.touches[0].clientX;
+        const dy = e.touches[1].clientY - e.touches[0].clientY;
+        touchRef.current = { lastDist: Math.hypot(dx, dy), lastX: (e.touches[0].clientX + e.touches[1].clientX) / 2, lastY: (e.touches[0].clientY + e.touches[1].clientY) / 2, touches: 2 };
+      }
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      const t = touchRef.current;
+      if (e.touches.length === 1 && t.touches === 1) {
+        const dx = e.touches[0].clientX - t.lastX;
+        const dy = e.touches[0].clientY - t.lastY;
+        transformRef.current.x += dx;
+        transformRef.current.y += dy;
+        applyTransform();
+        t.lastX = e.touches[0].clientX;
+        t.lastY = e.touches[0].clientY;
+      } else if (e.touches.length === 2) {
+        const dx = e.touches[1].clientX - e.touches[0].clientX;
+        const dy = e.touches[1].clientY - e.touches[0].clientY;
+        const dist = Math.hypot(dx, dy);
+        const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        if (t.lastDist > 0) {
+          const rect = svg.getBoundingClientRect();
+          const svgX = ((midX - rect.left) / rect.width) * W;
+          const svgY = ((midY - rect.top) / rect.height) * H;
+          zoomAround(svgX, svgY, dist / t.lastDist);
+        }
+        t.lastDist = dist;
+        t.lastX = midX;
+        t.lastY = midY;
+        t.touches = 2;
+      }
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) touchRef.current.touches = e.touches.length;
+    };
+    svg.addEventListener("touchstart", onTouchStart, { passive: false });
+    svg.addEventListener("touchmove", onTouchMove, { passive: false });
+    svg.addEventListener("touchend", onTouchEnd);
+    return () => {
+      svg.removeEventListener("touchstart", onTouchStart);
+      svg.removeEventListener("touchmove", onTouchMove);
+      svg.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [applyTransform, zoomAround, mapLoaded]);
+
   // Resizable panes
   useEffect(() => {
     try {
@@ -449,7 +517,16 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
         {mode === "atlas" && (
           <>
             <div style={{ width: 1, height: 20, background: "var(--atlas-rule)", margin: "0 4px" }} />
-            <div className="atlas-filter-bar" style={{ border: "none", padding: 0, margin: 0, background: "none", height: "auto", backdropFilter: "none" }}>
+            {isMobile && (
+              <button
+                className="atlas-mono"
+                onClick={() => setMobileFilters(!mobileFilters)}
+                style={{ fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", border: "1px solid var(--atlas-rule)", background: mobileFilters ? "var(--atlas-ink)" : "var(--atlas-paper)", color: mobileFilters ? "var(--atlas-paper)" : "var(--atlas-ink-2)", padding: "5px 10px", cursor: "pointer" }}
+              >
+                Filters
+              </button>
+            )}
+            <div className={`atlas-filter-bar${mobileFilters ? " mobile-open" : ""}`} style={{ border: "none", padding: 0, margin: 0, background: "none", height: "auto", backdropFilter: "none" }}>
               <div className="group">
                 <span className="lbl">Region</span>
                 {["all", "Americas", "Europe", "Africa", "Asia", "Oceania"].map((r) => (
@@ -662,9 +739,15 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
         {/* ===== CHAMBER VIEW ===== */}
         {mode === "chamber" && country && cd && currentHouse && (
-          <div className="chamber-grid" style={{ position: "absolute", inset: 0, gridTemplateColumns: `${leftW}px 6px 1fr 6px ${rightW}px` }}>
+          <div className="chamber-grid" style={{ position: "absolute", inset: 0, gridTemplateColumns: isMobile ? undefined : `${leftW}px 6px 1fr 6px ${rightW}px` }}>
+            {/* Mobile panel toggle bar */}
+            <div className="mobile-panel-bar">
+              <button className={mobilePanel === "countries" ? "on" : ""} onClick={() => setMobilePanel(mobilePanel === "countries" ? "center" : "countries")}>Countries</button>
+              <button className={mobilePanel === "center" ? "on" : ""} onClick={() => setMobilePanel("center")}>Chamber</button>
+              <button className={mobilePanel === "chat" ? "on" : ""} onClick={() => setMobilePanel(mobilePanel === "chat" ? "center" : "chat")}>Ask AI</button>
+            </div>
             {/* Left rail */}
-            <div className="chamber-left">
+            <div className={`chamber-left${isMobile && mobilePanel === "countries" ? " mobile-visible" : ""}`}>
               <div className="left-side-head">
                 <button className="back-btn" onClick={() => setMode("atlas")}>&larr; Back to full atlas</button>
                 <div className="kicker">Atlas</div>
@@ -680,7 +763,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                       className={id === country.id ? "sel" : ""}
                       onClick={() => {
                         const c = COUNTRIES.find((c) => c.id === id);
-                        if (c) { setCountry(c); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); }
+                        if (c) { setCountry(c); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); if (isMobile) setMobilePanel("center"); }
                       }}
                     />
                   ))}
@@ -697,7 +780,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                         <div
                           key={c.id}
                           className={`country-row${c.id === country.id ? " on" : ""}`}
-                          onClick={() => { setCountry(c); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); }}
+                          onClick={() => { setCountry(c); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); if (isMobile) setMobilePanel("center"); }}
                         >
                           <span>{c.name}{c.featured ? " \u2605" : ""}</span>
                           <span className="code">{c.id.toUpperCase()}</span>
@@ -824,7 +907,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
             <div className="atlas-resizer" onMouseDown={(e) => startResize("right", e)} />
 
             {/* Chat rail */}
-            <div className="chamber-right">
+            <div className={`chamber-right${isMobile && mobilePanel === "chat" ? " mobile-visible" : ""}`}>
               <div className="atlas-chat-head">
                 <span className="dot" />
                 <span className="t">Ask Civica</span>
