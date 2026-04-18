@@ -7,8 +7,6 @@ const LINKS = [
   { href: "/countries", label: "Index" },
   { href: "/government-types", label: "Gov Types" },
   { href: "/compare", label: "Compare" },
-  { href: "/rankings", label: "Rankings" },
-  { href: "/blog", label: "Blog" },
   { href: "/about", label: "About" },
 ];
 

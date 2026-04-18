@@ -557,8 +557,8 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
         <div style={{ flex: 1 }} />
 
-        {/* Search bar — on mobile in chamber/compare mode, show magnifying glass icon instead */}
-        {isMobile && mode !== "atlas" ? (
+        {/* Search bar — on mobile, show magnifying glass icon instead of full search bar */}
+        {isMobile ? (
           mobileSearchOpen ? (
             <div style={{
               display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--atlas-rule)",

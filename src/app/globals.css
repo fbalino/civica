@@ -85,7 +85,7 @@
 
   /* --- Dark mode (default / prototype palette) --- */
   --color-bg: #0C0C0B;
-  --color-bg-nav: rgba(12, 12, 11, 0.92);
+  --color-bg-nav: rgba(42, 34, 24, 0.92);
   --color-surface-elevated: #1E1E1C;
   --color-select-bg: #141413;
 
