@@ -971,6 +971,7 @@ a {
 
   .index-stats-row {
     gap: 16px;
+    flex-wrap: wrap;
   }
 
   .index-stat__value {
@@ -997,4 +998,332 @@ a {
   .index-country-card {
     padding: 16px 20px;
   }
+}
+
+/* ============================================================
+   Government Types Index — distribution bar + legend
+   ============================================================ */
+
+.govtypes-distribution {
+  padding: 32px 0 40px;
+  border-top: 1px solid var(--color-divider);
+}
+
+.govtypes-distribution__bar {
+  display: flex;
+  height: 6px;
+  border-radius: 3px;
+  overflow: hidden;
+  gap: 2px;
+  margin-bottom: 20px;
+}
+
+.govtypes-distribution__segment {
+  min-width: 4px;
+  border-radius: 1px;
+  transition: opacity 0.15s ease;
+}
+
+.govtypes-distribution__segment:hover {
+  opacity: 0.75;
+}
+
+.govtypes-distribution__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.govtypes-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.govtypes-legend-item:hover {
+  opacity: 0.7;
+}
+
+.govtypes-legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.govtypes-legend-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-40);
+}
+
+.govtypes-legend-count {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-25);
+}
+
+/* ============================================================
+   Government Types Index — card grid
+   ============================================================ */
+
+.govtypes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1px;
+  background: var(--color-grid-bg);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 48px;
+}
+
+.govtype-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 28px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--color-bg);
+}
+
+.govtype-card:hover {
+  background: var(--color-grid-cell-hover);
+}
+
+.govtype-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.govtype-card__name {
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+.govtype-card__excerpt {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-30);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.govtype-card__footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.govtype-card__bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.govtype-card__bar-track {
+  flex: 1;
+  height: 3px;
+  background: var(--color-divider);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.govtype-card__bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.govtype-card__count {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: 400;
+  line-height: 1;
+  min-width: 28px;
+  text-align: right;
+}
+
+.govtype-card__pop {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-25);
+}
+
+.govtype-card__examples {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.govtype-card__more {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-25);
+  margin-left: 4px;
+}
+
+@media (max-width: 767px) {
+  .govtypes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Government Type Detail — two-column layout
+   ============================================================ */
+
+.govtype-detail-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+@media (max-width: 767px) {
+  .govtype-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Characteristic list */
+
+.govtype-char-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.govtype-char-item {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+  padding: 7px 0;
+  border-bottom: 1px solid var(--color-stat-border);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: var(--leading-relaxed);
+}
+
+.govtype-char-item:last-child {
+  border-bottom: none;
+}
+
+.govtype-char-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 7px;
+}
+
+/* Regional distribution bar chart */
+
+.govtype-region-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.govtype-region-name {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.govtype-region-bar-track {
+  flex: 1;
+  height: 4px;
+  background: var(--color-divider);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.govtype-region-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  min-width: 3px;
+}
+
+.govtype-region-count {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-25);
+  min-width: 24px;
+  text-align: right;
+}
+
+/* Prev/Next navigation */
+
+.govtype-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+  padding: 32px 0;
+  border-top: 1px solid var(--color-divider);
+}
+
+.govtype-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.govtype-nav__link:hover {
+  opacity: 0.7;
+}
+
+.govtype-nav__link--next {
+  text-align: right;
+  align-items: flex-end;
+}
+
+.govtype-nav__dir {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-25);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.govtype-nav__name {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: 400;
+  color: var(--color-text-primary);
 }

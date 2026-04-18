@@ -17,6 +17,12 @@ function formatPopulation(pop: number | null): string {
   return pop.toLocaleString();
 }
 
+function formatLargeNumber(n: number): string {
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  return n.toLocaleString();
+}
+
 export async function generateStaticParams() {
   return GOVERNMENT_TYPES.map((gt) => ({ type: gt.slug }));
 }
@@ -82,6 +88,27 @@ export default async function GovernmentTypePage({
     // DB unavailable
   }
 
+  const totalPop = countries.reduce((s, c) => s + (c.population ?? 0), 0);
+  const largest = countries[0];
+  const continentCounts = new Map<string, number>();
+  for (const c of countries) {
+    const cont = c.continent ?? "Other";
+    continentCounts.set(cont, (continentCounts.get(cont) ?? 0) + 1);
+  }
+  const sortedContinents = [...continentCounts.entries()].sort(
+    (a, b) => b[1] - a[1]
+  );
+
+  const currentIndex = GOVERNMENT_TYPES.findIndex(
+    (g) => g.slug === gt.slug
+  );
+  const prevType =
+    currentIndex > 0 ? GOVERNMENT_TYPES[currentIndex - 1] : null;
+  const nextType =
+    currentIndex < GOVERNMENT_TYPES.length - 1
+      ? GOVERNMENT_TYPES[currentIndex + 1]
+      : null;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -134,7 +161,7 @@ export default async function GovernmentTypePage({
       style={{
         maxWidth: "var(--max-w-content)",
         margin: "0 auto",
-        padding: "var(--spacing-content-top) var(--spacing-page-x)",
+        padding: "0 var(--spacing-page-x)",
       }}
     >
       <script
@@ -142,271 +169,218 @@ export default async function GovernmentTypePage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <a href="/government-types" className="breadcrumb">
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M10 12L6 8l4-4" />
-        </svg>
-        All government types
-      </a>
+      {/* Hero */}
+      <header className="index-hero">
+        <a href="/government-types" className="breadcrumb">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M10 12L6 8l4-4" />
+          </svg>
+          All government types
+        </a>
 
-      {/* Header */}
-      <div style={{ marginBottom: 32 }}>
         <div
           className="gov-color-bar"
-          style={{ background: gt.color, marginBottom: 16 }}
-        />
-        <h1
           style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-52)",
-            fontWeight: 400,
-            letterSpacing: "var(--tracking-tighter)",
-            margin: 0,
-            lineHeight: 1,
-            color: "var(--color-text-primary)",
+            background: gt.color,
+            width: 48,
+            height: 4,
+            marginBottom: 16,
           }}
-          className="page-heading"
-        >
+        />
+        <h1 className="hero-heading" style={{ marginBottom: 12 }}>
           {gt.name}
         </h1>
         <p
           style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-12)",
-            color: gt.color,
-            marginTop: 8,
+            fontFamily: "var(--font-body)",
+            fontSize: "var(--text-18)",
+            lineHeight: "var(--leading-relaxed)",
+            color: "var(--color-text-40)",
+            maxWidth: 640,
+            margin: "0 0 32px",
           }}
         >
-          {countries.length}{" "}
-          {countries.length === 1 ? "country" : "countries"} worldwide
+          {gt.description[0].split(". ").slice(0, 2).join(". ")}.
         </p>
-      </div>
 
-      {/* Definition */}
-      <div className="cv-card" style={{ marginBottom: 24 }}>
-        {gt.description.map((para, i) => (
-          <p
-            key={i}
-            style={{
-              fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-16)",
-              color: "var(--color-text-85)",
-              lineHeight: "var(--leading-relaxed)",
-              margin: i === 0 ? 0 : "16px 0 0",
-            }}
-          >
-            {para}
-          </p>
-        ))}
-      </div>
+        {countries.length > 0 && (
+          <div className="index-stats-row">
+            <div className="index-stat">
+              <span
+                className="index-stat__value"
+                style={{ color: gt.color }}
+              >
+                {countries.length}
+              </span>
+              <span className="index-stat__label">Countries</span>
+            </div>
+            <div className="index-stat-divider" />
+            <div className="index-stat">
+              <span className="index-stat__value">
+                {formatLargeNumber(totalPop)}
+              </span>
+              <span className="index-stat__label">Total population</span>
+            </div>
+            {largest && (
+              <>
+                <div className="index-stat-divider" />
+                <div className="index-stat">
+                  <span className="index-stat__value">{largest.name}</span>
+                  <span className="index-stat__label">
+                    Largest by population
+                  </span>
+                </div>
+              </>
+            )}
+            <div className="index-stat-divider" />
+            <div className="index-stat">
+              <span className="index-stat__value">
+                {sortedContinents.length}
+              </span>
+              <span className="index-stat__label">Continents</span>
+            </div>
+          </div>
+        )}
+      </header>
 
-      {/* Key Characteristics */}
-      <div className="cv-card" style={{ marginBottom: 24 }}>
-        <h2 className="section-header">Key Characteristics</h2>
-        <ul
-          style={{
-            margin: 0,
-            padding: 0,
-            listStyle: "none",
-          }}
-        >
-          {gt.characteristics.map((char, i) => (
-            <li
+      {/* About + Characteristics side-by-side */}
+      <div className="govtype-detail-grid">
+        <div className="cv-card">
+          <h2 className="section-header">Definition</h2>
+          {gt.description.map((para, i) => (
+            <p
               key={i}
               style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-12)",
-                color: "var(--color-text-50)",
-                padding: "7px 0",
-                borderBottom:
-                  i < gt.characteristics.length - 1
-                    ? "1px solid var(--color-stat-border)"
-                    : "none",
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
+                fontFamily: "var(--font-body)",
+                fontSize: "var(--text-16)",
+                color: "var(--color-text-60)",
+                lineHeight: "var(--leading-relaxed)",
+                margin: i === 0 ? 0 : "16px 0 0",
               }}
             >
-              <span
-                style={{
-                  width: 4,
-                  height: 4,
-                  borderRadius: "50%",
-                  background: gt.color,
-                  flexShrink: 0,
-                }}
-              />
-              {char}
-            </li>
+              {para}
+            </p>
           ))}
-        </ul>
+        </div>
+
+        <div>
+          <div className="cv-card" style={{ marginBottom: 16 }}>
+            <h2 className="section-header">Key Characteristics</h2>
+            <ul className="govtype-char-list">
+              {gt.characteristics.map((char, i) => (
+                <li key={i} className="govtype-char-item">
+                  <span
+                    className="govtype-char-dot"
+                    style={{ background: gt.color }}
+                  />
+                  {char}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Regional distribution */}
+          {sortedContinents.length > 0 && (
+            <div className="cv-card">
+              <h2 className="section-header">Regional Distribution</h2>
+              {sortedContinents.map(([continent, count]) => {
+                const pct = Math.round(
+                  (count / countries.length) * 100
+                );
+                return (
+                  <div key={continent} className="govtype-region-row">
+                    <span className="govtype-region-name">
+                      {continent}
+                    </span>
+                    <div className="govtype-region-bar-track">
+                      <div
+                        className="govtype-region-bar-fill"
+                        style={{
+                          width: `${pct}%`,
+                          background: gt.color,
+                        }}
+                      />
+                    </div>
+                    <span className="govtype-region-count">
+                      {count}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Countries List */}
+      {/* Countries — card grid matching the countries index */}
       {countries.length > 0 && (
-        <div>
-          <h2 className="section-header" style={{ marginBottom: 16 }}>
-            Countries with {gt.name} Government
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr",
-              gap: 1,
-              background: "var(--color-grid-bg)",
-              borderRadius: "var(--radius-sm)",
-              overflow: "hidden",
-            }}
-          >
-            {/* Column header */}
-            <div
-              className="hidden md:grid"
-              style={{
-                background: "var(--color-card-bg)",
-                padding: "10px 24px",
-                cursor: "default",
-                display: "grid",
-                gridTemplateColumns: "48px minmax(0, 2fr) minmax(0, 1fr) 120px",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
-              <span />
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-10)",
-                  letterSpacing: "var(--tracking-caps)",
-                  textTransform: "uppercase",
-                  color: "var(--color-text-25)",
-                }}
-              >
-                Country
+        <section style={{ marginTop: 48 }}>
+          <div className="index-continent-header">
+            <h2 className="index-continent-title">
+              Countries with {gt.name} Government
+            </h2>
+            <div className="index-continent-meta">
+              <span>
+                {countries.length}{" "}
+                {countries.length === 1 ? "country" : "countries"}
               </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-10)",
-                  letterSpacing: "var(--tracking-caps)",
-                  textTransform: "uppercase",
-                  color: "var(--color-text-25)",
-                }}
-              >
-                Continent
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-10)",
-                  letterSpacing: "var(--tracking-caps)",
-                  textTransform: "uppercase",
-                  color: "var(--color-text-25)",
-                  textAlign: "right",
-                }}
-              >
-                Population
-              </span>
+              {totalPop > 0 && (
+                <>
+                  <span className="index-continent-meta-dot">
+                    &middot;
+                  </span>
+                  <span>{formatLargeNumber(totalPop)} people</span>
+                </>
+              )}
             </div>
+          </div>
+
+          <div className="index-card-grid">
             {countries.map((country) => (
               <a
                 key={country.slug}
                 href={`/countries/${country.slug}`}
-                style={{
-                  textDecoration: "none",
-                  color: "inherit",
-                  background: "var(--color-bg)",
-                  padding: "16px 24px",
-                  cursor: "pointer",
-                  display: "grid",
-                  gridTemplateColumns: "48px minmax(0, 2fr) minmax(0, 1fr) 120px",
-                  alignItems: "center",
-                  gap: 16,
-                  transition: "background-color 0.15s ease",
-                }}
-                className="gov-type-row"
+                className="index-country-card cv-card cv-card--interactive"
               >
-                <CountryFlag iso2={country.iso2} size={28} />
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: 12,
-                    minWidth: 0,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "var(--font-heading)",
-                      fontSize: "var(--text-18)",
-                      fontWeight: 400,
-                      color: "var(--color-text-primary)",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      minWidth: 0,
-                    }}
-                  >
-                    {country.name}
-                  </span>
-                  <span
-                    className="hidden sm:inline"
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontWeight: "var(--font-weight-mono)",
-                      fontSize: "var(--text-11)",
-                      color: "var(--color-text-25)",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                      minWidth: 0,
-                    }}
-                  >
-                    {country.capital}
-                  </span>
+                <div className="index-card-top">
+                  <CountryFlag iso2={country.iso2} size={36} />
+                  <div className="index-card-name-block">
+                    <span className="index-card-name">
+                      {country.name}
+                    </span>
+                    {country.capital && (
+                      <span className="index-card-capital">
+                        {country.capital}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <span
-                  className="hidden md:inline"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-11)",
-                    color: "var(--color-text-30)",
-                  }}
-                >
-                  {country.continent ?? ""}
-                </span>
-                <span
-                  className="hidden sm:inline"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-11)",
-                    color: "var(--color-text-40)",
-                    textAlign: "right",
-                  }}
-                >
-                  {country.population
-                    ? formatPopulation(country.population)
-                    : ""}
-                </span>
+
+                <div className="index-card-bottom">
+                  <span className="index-card-datum">
+                    {country.continent ?? ""}
+                  </span>
+                  <div className="index-card-data">
+                    {country.population ? (
+                      <span className="index-card-datum">
+                        {formatPopulation(country.population)}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
               </a>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Compare CTA */}
@@ -414,20 +388,20 @@ export default async function GovernmentTypePage({
         <div
           className="cv-card"
           style={{
-            marginTop: 32,
+            marginTop: 48,
             textAlign: "center",
-            padding: "32px 24px",
+            padding: "40px 24px",
           }}
         >
           <p
             style={{
               fontFamily: "var(--font-heading)",
-              fontSize: "var(--text-22)",
+              fontSize: "var(--text-24)",
               color: "var(--color-text-primary)",
               margin: "0 0 8px",
             }}
           >
-            Compare two {gt.name.toLowerCase()} countries
+            Compare {gt.name.toLowerCase()} countries
           </p>
           <p
             style={{
@@ -435,11 +409,11 @@ export default async function GovernmentTypePage({
               fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
-              margin: "0 0 20px",
+              margin: "0 0 24px",
             }}
           >
-            See how {gt.name.toLowerCase()} governments differ across
-            countries
+            See how governance differs across {countries.length} countries
+            sharing the same system
           </p>
           <a
             href={
@@ -453,6 +427,62 @@ export default async function GovernmentTypePage({
             Compare Countries
           </a>
         </div>
+      )}
+
+      {/* Prev/Next nav */}
+      {(prevType || nextType) && (
+        <nav className="govtype-nav">
+          {prevType ? (
+            <a
+              href={`/government-types/${prevType.slug}`}
+              className="govtype-nav__link"
+            >
+              <span className="govtype-nav__dir">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M10 12L6 8l4-4" />
+                </svg>
+                Previous
+              </span>
+              <span className="govtype-nav__name">{prevType.name}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {nextType ? (
+            <a
+              href={`/government-types/${nextType.slug}`}
+              className="govtype-nav__link govtype-nav__link--next"
+            >
+              <span className="govtype-nav__dir">
+                Next
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 4l4 4-4 4" />
+                </svg>
+              </span>
+              <span className="govtype-nav__name">{nextType.name}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
       )}
     </div>
   );
