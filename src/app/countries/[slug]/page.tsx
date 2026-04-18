@@ -21,6 +21,7 @@ import { HemicycleChart } from "@/components/HemicycleChart";
 import { classifyGovernment } from "@/lib/data/government-category";
 import { resolvePartyColor } from "@/lib/data/party-colors";
 import { stripHtml, firstSentences, formatGovernmentType } from "@/lib/text/clean";
+import { fetchParliamentBills, getParliamentSource, type Bill } from "@/lib/data/parliament-feeds";
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
@@ -100,7 +101,7 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -108,6 +109,7 @@ export default async function CountryPage({
     getCountryRankings(jurisdiction.id),
     getRelatedCountries(jurisdiction.id, jurisdiction.continent),
     getLegislatureComposition(jurisdiction.id),
+    fetchParliamentBills(jurisdiction.iso2),
   ]);
 
   const factMap = new Map(facts.map((f) => [f.factKey, f]));
@@ -173,6 +175,167 @@ export default async function CountryPage({
     const v = n % 100;
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
   }
+
+  function formatBillDate(iso: string): string {
+    if (!iso) return "";
+    try {
+      return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    } catch {
+      return iso;
+    }
+  }
+
+  function BillRow({ bill }: { bill: Bill }) {
+    return (
+      <a
+        href={bill.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: "block",
+          padding: "14px 0",
+          borderBottom: "1px solid var(--color-stat-border)",
+          textDecoration: "none",
+          color: "inherit",
+        }}
+      >
+        {bill.identifier && (
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-10)",
+              color: "var(--color-text-30)",
+              letterSpacing: "var(--tracking-wider)",
+              textTransform: "uppercase",
+              display: "block",
+              marginBottom: 4,
+            }}
+          >
+            {bill.identifier}
+          </span>
+        )}
+        <span
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "var(--text-16)",
+            color: "var(--color-text-primary)",
+            display: "block",
+            lineHeight: "var(--leading-snug)",
+            marginBottom: 6,
+          }}
+        >
+          {bill.title}
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
+            fontSize: "var(--text-11)",
+            color: "var(--color-text-40)",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            flexWrap: "wrap",
+          }}
+        >
+          <span>{bill.status}</span>
+          {bill.date && (
+            <>
+              <span style={{ color: "var(--color-text-20)" }}>&middot;</span>
+              <span>{formatBillDate(bill.date)}</span>
+            </>
+          )}
+          <SourceDot source={bill.source} retrievedAt={new Date().toISOString().slice(0, 10)} />
+        </span>
+      </a>
+    );
+  }
+
+  const parliamentSource = getParliamentSource(jurisdiction.iso2);
+  const legislativeBodies = govStructure.bodies.filter((b) => b.branch === "legislative");
+
+  /* ---- Laws in Motion tab ---- */
+  const lawsTab = (
+    <div>
+      {parliamentBills.length > 0 ? (
+        <>
+          <div className="cv-card" style={{ marginBottom: 16 }}>
+            <h3 className="section-header">Recent Legislative Activity</h3>
+            {parliamentBills.map((bill, i) => (
+              <BillRow key={i} bill={bill} />
+            ))}
+          </div>
+          <p
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-11)",
+              color: "var(--color-text-25)",
+              margin: 0,
+            }}
+          >
+            Showing recent bills. Data refreshes hourly.
+          </p>
+        </>
+      ) : parliamentSource ? (
+        <div className="cv-card">
+          <h3 className="section-header">Legislative Feed</h3>
+          <p
+            style={{
+              fontFamily: "var(--font-body-sans)",
+              fontSize: "var(--text-14)",
+              color: "var(--color-text-50)",
+              margin: 0,
+              lineHeight: "var(--leading-relaxed)",
+            }}
+          >
+            Legislative feed temporarily unavailable. Data is sourced from{" "}
+            <SourceDot source={parliamentSource} retrievedAt={new Date().toISOString().slice(0, 10)} />
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="cv-card" style={{ marginBottom: 16 }}>
+            <h3 className="section-header">No live legislative feed</h3>
+            <p
+              style={{
+                fontFamily: "var(--font-body-sans)",
+                fontSize: "var(--text-14)",
+                color: "var(--color-text-50)",
+                margin: 0,
+                lineHeight: "var(--leading-relaxed)",
+              }}
+            >
+              No real-time legislative data is currently available for {jurisdiction.name}.
+              Live feeds are available for the US Congress, UK Parliament, and European Parliament.
+            </p>
+          </div>
+          {legislativeBodies.length > 0 && (
+            <div className="cv-card">
+              <h3 className="section-header">Legislative Structure</h3>
+              {legislativeBodies.map((body) => (
+                <div
+                  key={body.id}
+                  className="branch-line"
+                  style={{
+                    borderLeftColor: "color-mix(in srgb, var(--color-branch-legislative) 27%, transparent)",
+                  }}
+                >
+                  {body.name}
+                  {body.totalSeats != null && (
+                    <span style={{ color: "var(--color-text-40)" }}>
+                      {" — "}{body.totalSeats.toLocaleString()} seats
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
 
   /* ---- Overview tab: intro + 2-column with Profile + Leadership + Rankings ---- */
   const overviewTab = (
@@ -576,6 +739,7 @@ export default async function CountryPage({
     { id: "overview", label: "Overview", content: overviewTab },
     { id: "government", label: "Government", content: governmentTab },
     ...(legislatureTab ? [{ id: "legislature", label: "Legislature", content: legislatureTab }] : []),
+    { id: "laws", label: "Laws in Motion", content: lawsTab },
     ...(factbookTab ? [{ id: "factbook", label: "Factbook", content: factbookTab }] : []),
   ];
 
