@@ -125,6 +125,11 @@ html.light .atlas-root {
 .atlas-view svg.world-map { width: 100%; height: 100%; display: block; cursor: grab; }
 .atlas-view svg.world-map:active { cursor: grabbing; }
 
+/* Country label zoom tiers — tier 1 always visible, tier 2/3 appear as you zoom in */
+.map-labels[data-zoom-tier="1"] [data-tier="2"],
+.map-labels[data-zoom-tier="1"] [data-tier="3"] { display: none; }
+.map-labels[data-zoom-tier="2"] [data-tier="3"] { display: none; }
+
 .atlas-hud-bottom {
   position: absolute; left: 20px; bottom: 20px; z-index: 3;
   display: flex; gap: 10px; align-items: flex-end;

@@ -118,11 +118,12 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const transformRef = useRef({ k: 1, x: 0, y: 0 });
   const dragRef = useRef<{ dragging: boolean; startX: number; startY: number; originX: number; originY: number }>({ dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 });
   const [mapLoaded, setMapLoaded] = useState(false);
-  const [mapPaths, setMapPaths] = useState<Array<{ d: string; id: string | null; country: Country | null; neId: string }>>([]);
+  const [mapPaths, setMapPaths] = useState<Array<{ d: string; id: string | null; country: Country | null; neId: string; centroid: [number, number]; area: number }>>([]);
   const [leftW, setLeftW] = useState(300);
   const [rightW, setRightW] = useState(380);
   const resizerRef = useRef<{ side: "left" | "right"; startX: number; startW: number } | null>(null);
   const atlasRootRef = useRef<HTMLDivElement>(null);
+  const labelsRef = useRef<SVGGElement>(null);
 
   const W = 2000, H = 1000;
   const LAT_MIN = -58, LAT_MAX = 85;
@@ -172,6 +173,20 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     return proj(sx / best.length, sy / best.length);
   }
 
+  function geomBBoxArea(geom: { type: string; coordinates: number[][][][] | number[][][] }): number {
+    const rings = geom.type === "Polygon" ? [geom.coordinates as number[][][]] : (geom.coordinates as number[][][][]);
+    let totalArea = 0;
+    for (const poly of rings) {
+      const ring = poly[0] as number[][];
+      const lons = ring.map((p) => p[0]);
+      const lats = ring.map((p) => p[1]);
+      const w = Math.max(...lons) - Math.min(...lons);
+      const h = Math.max(...lats) - Math.min(...lats);
+      totalArea += w * h;
+    }
+    return totalArea;
+  }
+
   // Load TopoJSON world data
   useEffect(() => {
     let cancelled = false;
@@ -194,7 +209,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
           const neId = String(f.id).padStart(3, "0");
           const ourId = NE_ID_TO_OURS[neId] || null;
           const c = ourId ? COUNTRIES.find((c) => c.id === ourId) || null : null;
-          return { d: geomToPath(f.geometry), id: ourId, country: c, neId };
+          return { d: geomToPath(f.geometry), id: ourId, country: c, neId, centroid: geomCentroid(f.geometry), area: geomBBoxArea(f.geometry) };
         });
         setMapPaths(paths);
         setMapLoaded(true);
@@ -202,7 +217,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
         // Fallback to stylized paths
         const paths = Object.entries(WORLD_PATHS).map(([id, data]) => {
           const c = COUNTRIES.find((c) => c.id === id) || null;
-          return { d: data.d, id, country: c, neId: "" };
+          return { d: data.d, id, country: c, neId: "", centroid: data.label as [number, number], area: 1000 };
         });
         if (!cancelled) { setMapPaths(paths); setMapLoaded(true); }
       }
@@ -213,9 +228,14 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
   // Pan & zoom
   const applyTransform = useCallback(() => {
+    const t = transformRef.current;
     if (contentRef.current) {
-      const t = transformRef.current;
       contentRef.current.setAttribute("transform", `translate(${t.x},${t.y}) scale(${t.k})`);
+    }
+    if (labelsRef.current) {
+      const tier = t.k >= 4.5 ? 3 : t.k >= 2.5 ? 2 : 1;
+      labelsRef.current.setAttribute("data-zoom-tier", String(tier));
+      labelsRef.current.style.fontSize = `${11 / t.k}px`;
     }
   }, []);
 
@@ -574,19 +594,29 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   }}
                 />
               ))}
-              {/* Labels for featured countries */}
-              {mapPaths.filter((p) => p.country?.featured).map((p) => {
-                const wp = WORLD_PATHS[p.id!];
-                if (!wp) return null;
-                return (
-                  <g key={`lbl-${p.id}`} style={{ pointerEvents: "none" }}>
-                    <circle cx={wp.label[0]} cy={wp.label[1]} r={2.5} fill="var(--atlas-accent)" />
-                    <text x={wp.label[0]} y={wp.label[1] - 6} textAnchor="middle" fontFamily="ui-monospace,monospace" fontSize="13" letterSpacing="2" fill="var(--atlas-ink)" opacity="0.7">
+              {/* Country labels — visibility controlled by zoom tier via CSS */}
+              <g ref={labelsRef} className="map-labels" data-zoom-tier="1">
+                {mapPaths.filter((p) => p.country && p.id).map((p) => {
+                  const tier = p.area > 300 ? 1 : p.area > 30 ? 2 : 3;
+                  return (
+                    <text
+                      key={`lbl-${p.id}`}
+                      x={p.centroid[0]}
+                      y={p.centroid[1]}
+                      data-tier={tier}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fontFamily="ui-monospace,monospace"
+                      letterSpacing="1.5"
+                      fill="var(--atlas-ink)"
+                      opacity={tier === 1 ? 0.8 : 0.6}
+                      style={{ pointerEvents: "none" }}
+                    >
                       {p.id!.toUpperCase()}
                     </text>
-                  </g>
-                );
-              })}
+                  );
+                })}
+              </g>
             </g>
           </svg>
 
