@@ -3,6 +3,11 @@
 import { useRef, useCallback } from "react";
 import { type Chamber, type Party, PARTY_COLORS, getMember } from "./data";
 
+function resolveColor(color: string): string {
+  if (color.startsWith("#") || color.startsWith("oklch") || color.startsWith("rgb")) return color;
+  return PARTY_COLORS[color] || color;
+}
+
 interface SeatPos {
   x: number;
   y: number;
@@ -90,7 +95,7 @@ export function Hemicycle({ chamber, dimmed, onSeatHover, onSeatLeave }: Hemicyc
             cx={s.x}
             cy={s.y}
             r={2.1}
-            fill={PARTY_COLORS[p.color] || "gray"}
+            fill={resolveColor(p.color)}
             stroke="color-mix(in oklab, currentColor, black 20%)"
             strokeWidth="0.2"
             className={`seat${dimmed.has(p.id) ? " dim" : ""}`}
@@ -117,7 +122,7 @@ export function PartyLegend({ chamber, dimmed, onToggle }: PartyLegendProps) {
         const pct = ((p.seats / chamber.total) * 100).toFixed(1);
         return (
           <div key={p.id} className={`p${dimmed.has(p.id) ? " dim" : ""}`} onClick={() => onToggle(p.id)}>
-            <span className="sw" style={{ background: PARTY_COLORS[p.color] }} />
+            <span className="sw" style={{ background: resolveColor(p.color) }} />
             <div className="col">
               <span className="nm">{p.name}</span>
               <span className="seats">
