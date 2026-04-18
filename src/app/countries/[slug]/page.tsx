@@ -19,7 +19,8 @@ import { CountryFlag } from "@/components/CountryFlag";
 import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 import { HemicycleChart } from "@/components/HemicycleChart";
 import { classifyGovernment } from "@/lib/data/government-category";
-import { stripHtml, firstSentences } from "@/lib/text/clean";
+import { resolvePartyColor } from "@/lib/data/party-colors";
+import { stripHtml, firstSentences, formatGovernmentType } from "@/lib/text/clean";
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
@@ -60,7 +61,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) return { title: "Country Not Found" };
-  const govLabel = jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType ?? "sovereign state";
+  const govLabel = formatGovernmentType(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType) || "sovereign state";
   const title = `${jurisdiction.name} Government Structure — Executive, Legislative & Judicial`;
   const popStr = jurisdiction.population ? ` Population: ${formatPop(jurisdiction.population)}.` : "";
   const capStr = jurisdiction.capital ? ` Capital: ${jurisdiction.capital}.` : "";
@@ -140,7 +141,7 @@ export default async function CountryPage({
 
   const govCat = classifyGovernment(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType);
   const color = govCat.color;
-  const govHeaderLabel = stripHtml(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType) || govCat.label;
+  const govHeaderLabel = formatGovernmentType(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType) || govCat.label;
 
   const branchColorMap: Record<string, string> = {
     executive: "var(--color-branch-executive)",
@@ -561,10 +562,10 @@ export default async function CountryPage({
           key={body.id}
           chamberName={body.name}
           totalSeats={body.totalSeats ?? parties.reduce((s, p) => s + p.seatCount, 0)}
-          parties={parties.map((p) => ({
+          parties={parties.map((p, i) => ({
             name: p.partyName,
             seats: p.seatCount,
-            color: p.partyColor ?? "var(--color-text-20)",
+            color: resolvePartyColor(p.partyColor, p.partyName, i),
           }))}
         />
       ))}

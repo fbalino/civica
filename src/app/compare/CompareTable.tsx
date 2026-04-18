@@ -1,5 +1,6 @@
 import { SourceDot } from "@/components/SourceDot";
 import { CountryFlag } from "@/components/CountryFlag";
+import { formatGovernmentType } from "@/lib/text/clean";
 import type { getGovernmentStructure } from "@/lib/db/queries";
 
 function formatNumber(n: number): string {
@@ -59,7 +60,7 @@ const COMPARE_FIELDS: {
   { label: "Currency", getValue: (j) => j.currency },
   {
     label: "Government",
-    getValue: (j) => j.governmentTypeDetail ?? j.governmentType,
+    getValue: (j) => formatGovernmentType(j.governmentTypeDetail ?? j.governmentType),
   },
   {
     label: "Democracy Index",
@@ -85,11 +86,12 @@ export function CompareTable({
 
   const leaderRows: CompareRow[] = [];
   if (selected.length > 0) {
+    const isQid = (name: string) => /^Q\d+$/.test(name);
     const hosNames = govStructures.map((gs) => {
       const hos = gs.currentTerms.find(
         (t) =>
           gs.offices.find((o) => o.id === t.term.officeId)?.officeType ===
-          "head_of_state"
+          "head_of_state" && !isQid(t.person.name)
       );
       return hos?.person.name ?? null;
     });
@@ -97,7 +99,7 @@ export function CompareTable({
       const hog = gs.currentTerms.find(
         (t) =>
           gs.offices.find((o) => o.id === t.term.officeId)?.officeType ===
-          "head_of_government"
+          "head_of_government" && !isQid(t.person.name)
       );
       return hog?.person.name ?? null;
     });

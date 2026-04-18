@@ -8,6 +8,8 @@ import {
   persons,
   legislatureParties,
 } from "@/lib/db/schema";
+import { formatGovernmentType } from "@/lib/text/clean";
+import { resolvePartyColor } from "@/lib/data/party-colors";
 
 export interface AtlasCountry {
   id: string;
@@ -71,25 +73,6 @@ function formatGdp(b: number | null): string {
   return `$${b.toFixed(0)}B`;
 }
 
-const PARTY_COLOR_MAP: Record<string, string> = {
-  red: "oklch(55% 0.16 25)",
-  blue: "oklch(52% 0.13 245)",
-  green: "oklch(56% 0.13 145)",
-  yellow: "oklch(72% 0.14 85)",
-  purple: "oklch(50% 0.13 310)",
-  teal: "oklch(58% 0.10 195)",
-  gray: "oklch(55% 0.01 90)",
-  orange: "oklch(64% 0.15 55)",
-  black: "oklch(28% 0.02 90)",
-};
-
-function resolveColor(dbColor: string | null, index: number): string {
-  if (dbColor && dbColor.startsWith("#")) return dbColor;
-  if (dbColor && dbColor.startsWith("oklch")) return dbColor;
-  if (dbColor && PARTY_COLOR_MAP[dbColor.toLowerCase()]) return PARTY_COLOR_MAP[dbColor.toLowerCase()];
-  const fallbacks = ["blue", "red", "green", "yellow", "purple", "teal", "orange", "gray"];
-  return PARTY_COLOR_MAP[fallbacks[index % fallbacks.length]];
-}
 
 export async function loadAtlasData(): Promise<{
   countries: AtlasCountry[];
@@ -167,9 +150,8 @@ export async function loadAtlasData(): Promise<{
     if (!jId) continue;
     const existing = leaderByJurisdiction.get(jId);
     const title = officeName.get(h.officeId) || "";
-    const label = title ? `${title} ${h.person.name}` : h.person.name;
     if (!existing || title.toLowerCase().includes("president") || title.toLowerCase().includes("prime minister")) {
-      leaderByJurisdiction.set(jId, label);
+      leaderByJurisdiction.set(jId, h.person.name);
     }
   }
 
@@ -178,7 +160,7 @@ export async function loadAtlasData(): Promise<{
     id: j.iso3!.toLowerCase(),
     name: j.name,
     leader: leaderByJurisdiction.get(j.id) || "—",
-    gov: j.governmentType || j.governmentTypeDetail || "—",
+    gov: formatGovernmentType(j.governmentType || j.governmentTypeDetail) || "—",
     region: CONTINENT_TO_REGION[j.continent || ""] || j.continent || "—",
     pop: formatPop(j.population),
     gdp: formatGdp(j.gdpBillions),
@@ -214,7 +196,7 @@ export async function loadAtlasData(): Promise<{
           id: p.partyName.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 6),
           name: p.partyName,
           seats: p.seatCount,
-          color: resolveColor(p.partyColor, i),
+          color: resolvePartyColor(p.partyColor, p.partyName, i),
         })),
       };
     }

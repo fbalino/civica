@@ -884,6 +884,8 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
               {/* Tab I: Chamber */}
               <div className={`atlas-pane${tab === "chamber" ? " on" : ""}`}>
+                {currentHouse && currentHouse.total > 0 && currentHouse.parties.length > 0 ? (
+                  <>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", marginBottom: 14 }}>
                   <div>
                     <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: "0.14em", textTransform: "uppercase" }}>
@@ -927,6 +929,20 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   <div className="cell"><div className="k">Ruling coalition</div><div className="v" style={{ fontSize: 14 }}>{cd.coalition || "\u2014"}</div></div>
                   <div className="cell"><div className="k">Next election</div><div className="v">{cd.next || "\u2014"}</div></div>
                 </div>
+                  </>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", textAlign: "center" }}>
+                    <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 12 }}>
+                      {country.name.toUpperCase()} &middot; LEGISLATURE
+                    </div>
+                    <div className="atlas-serif" style={{ fontSize: 24, color: "var(--atlas-ink-2)", marginBottom: 8 }}>
+                      Composition data not yet available
+                    </div>
+                    <div className="atlas-sans" style={{ fontSize: 13, color: "var(--atlas-muted)" }}>
+                      Legislative seat data for {country.name} has not been ingested yet.
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Tab II: Bills */}

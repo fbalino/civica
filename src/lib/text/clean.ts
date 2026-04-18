@@ -23,6 +23,14 @@ export function stripHtml(input: string | null | undefined): string {
     .trim();
 }
 
+export function formatGovernmentType(raw: string | null | undefined): string {
+  if (!raw) return "";
+  return stripHtml(raw)
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .trim();
+}
+
 export function firstSentences(input: string | null | undefined, count = 3): string {
   const clean = stripHtml(input).replace(/\n+/g, " ");
   if (!clean) return "";
