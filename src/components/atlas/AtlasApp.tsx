@@ -755,18 +755,33 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
               </div>
               <div className="left-mini-map">
                 <svg viewBox="0 100 2000 800" preserveAspectRatio="xMidYMid meet">
-                  {Object.entries(WORLD_PATHS).map(([id, data]) => (
-                    <path
-                      key={id}
-                      d={data.d}
-                      data-id={id}
-                      className={id === country.id ? "sel" : ""}
-                      onClick={() => {
-                        const c = COUNTRIES.find((c) => c.id === id);
-                        if (c) { setCountry(c); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); if (isMobile) setMobilePanel("center"); }
-                      }}
-                    />
-                  ))}
+                  {mapLoaded ? (
+                    mapPaths.map((p, i) => (
+                      <path
+                        key={i}
+                        d={p.d}
+                        data-id={p.id || undefined}
+                        className={p.id === country.id ? "sel" : ""}
+                        onClick={() => {
+                          if (p.country) { setCountry(p.country); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); if (isMobile) setMobilePanel("center"); }
+                        }}
+                        style={{ cursor: p.country ? "pointer" : "default" }}
+                      />
+                    ))
+                  ) : (
+                    Object.entries(WORLD_PATHS).map(([id, data]) => (
+                      <path
+                        key={id}
+                        d={data.d}
+                        data-id={id}
+                        className={id === country.id ? "sel" : ""}
+                        onClick={() => {
+                          const c = COUNTRIES.find((c) => c.id === id);
+                          if (c) { setCountry(c); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); if (isMobile) setMobilePanel("center"); }
+                        }}
+                      />
+                    ))
+                  )}
                 </svg>
               </div>
               <div className="left-country-list">
