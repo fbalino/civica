@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import AtlasApp from "@/components/atlas/AtlasApp";
+import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 
 export const metadata: Metadata = {
   title: "Civica — Interactive Atlas of World Government Structures | 250+ Countries",
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
-  return <AtlasApp />;
+export default async function Home() {
+  const { countries, chambers } = await loadAtlasData();
+  return <AtlasApp dbCountries={countries} dbChambers={chambers} />;
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
-import { type Country, type ChamberData, type Bill, COUNTRIES, CHAMBERS, WORLD_PATHS, NE_ID_TO_OURS, PARTY_COLORS, getDefaultChamberData, govDescription, getMember } from "./data";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { type Country, type ChamberData, type Bill, COUNTRIES as FALLBACK_COUNTRIES, CHAMBERS as FALLBACK_CHAMBERS, WORLD_PATHS, NE_ID_TO_OURS as FALLBACK_NE_MAP, PARTY_COLORS, getDefaultChamberData as getFallbackChamberData, govDescription, getMember } from "./data";
 import { Hemicycle, PartyLegend } from "./Hemicycle";
+import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data";
 
 type Mode = "atlas" | "chamber" | "compare";
 type Tab = "chamber" | "bills" | "structure";
@@ -15,7 +16,83 @@ interface ChatMessage {
   cite?: string;
 }
 
-export default function AtlasApp() {
+// ISO 3166-1 numeric to alpha-3 mapping for linking TopoJSON to DB data
+const ISO_NUMERIC_TO_ALPHA3: Record<string, string> = {
+  "004":"afg","008":"alb","012":"dza","020":"and","024":"ago","028":"atg","032":"arg",
+  "036":"aus","040":"aut","044":"bhs","048":"bhr","050":"bgd","051":"arm","052":"brb",
+  "056":"bel","064":"btn","068":"bol","070":"bih","072":"bwa","076":"bra","084":"blz",
+  "090":"slb","096":"brn","100":"bgr","104":"mmr","108":"bdi","116":"khm","120":"cmr",
+  "124":"can","140":"caf","144":"lka","148":"tcd","152":"chl","156":"chn","170":"col",
+  "174":"com","178":"cog","180":"cod","188":"cri","191":"hrv","192":"cub","196":"cyp",
+  "203":"cze","204":"ben","208":"dnk","214":"dom","218":"ecu","222":"slv","226":"gnq",
+  "231":"eth","232":"eri","233":"est","242":"fji","246":"fin","250":"fra","258":"pfu",
+  "262":"dji","266":"gab","268":"geo","270":"gmb","275":"pse","276":"deu","288":"gha",
+  "296":"kir","300":"grc","308":"grd","320":"gtm","324":"gin","328":"guy","332":"hti",
+  "340":"hnd","348":"hun","352":"isl","356":"ind","360":"idn","364":"irn","368":"irq",
+  "372":"irl","376":"isr","380":"ita","384":"civ","388":"jam","392":"jpn","398":"kaz",
+  "400":"jor","404":"ken","408":"prk","410":"kor","414":"kwt","417":"kgz","418":"lao",
+  "422":"lbn","426":"lso","428":"lva","430":"lbr","434":"lby","440":"ltu","442":"lux",
+  "450":"mdg","454":"mwi","458":"mys","462":"mdv","466":"mli","470":"mlt","478":"mrt",
+  "480":"mus","484":"mex","496":"mng","498":"mda","499":"mne","504":"mar","508":"moz",
+  "512":"omn","516":"nam","520":"nru","524":"npl","528":"nld","540":"ncl","554":"nzl",
+  "558":"nic","562":"ner","566":"nga","578":"nor","586":"pak","591":"pan","598":"png",
+  "600":"pry","604":"per","608":"phl","616":"pol","620":"prt","626":"tls","634":"qat",
+  "642":"rou","643":"rus","646":"rwa","682":"sau","686":"sen","688":"srb","694":"sle",
+  "702":"sgp","703":"svk","704":"vnm","705":"svn","706":"som","710":"zaf","716":"zwe",
+  "724":"esp","728":"ssd","729":"sdn","740":"sur","748":"swz","752":"swe","756":"che",
+  "760":"syr","762":"tjk","764":"tha","768":"tgo","776":"ton","780":"tto","784":"are",
+  "788":"tun","792":"tur","795":"tkm","800":"uga","804":"ukr","807":"mkd","818":"egy",
+  "826":"gbr","834":"tza","840":"usa","854":"bfa","858":"ury","860":"uzb","862":"ven",
+  "887":"yem","894":"zmb",
+};
+
+interface AtlasAppProps {
+  dbCountries?: AtlasCountry[];
+  dbChambers?: Record<string, AtlasChamberData>;
+}
+
+export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
+  const COUNTRIES: Country[] = useMemo(() => {
+    if (!dbCountries || dbCountries.length === 0) return FALLBACK_COUNTRIES;
+    return dbCountries.map((c) => ({
+      id: c.id,
+      name: c.name,
+      leader: c.leader,
+      gov: c.gov,
+      region: c.region,
+      pop: c.pop,
+      gdp: c.gdp,
+      capital: c.capital,
+      featured: c.featured,
+    }));
+  }, [dbCountries]);
+
+  const NE_ID_TO_OURS: Record<string, string> = useMemo(() => {
+    if (!dbCountries || dbCountries.length === 0) return FALLBACK_NE_MAP;
+    const countryIds = new Set(COUNTRIES.map((c) => c.id));
+    const map: Record<string, string> = {};
+    for (const [numericId, alpha3] of Object.entries(ISO_NUMERIC_TO_ALPHA3)) {
+      if (countryIds.has(alpha3)) {
+        map[numericId] = alpha3;
+      }
+    }
+    return map;
+  }, [dbCountries, COUNTRIES]);
+
+  function getDefaultChamberData(id: string): ChamberData {
+    if (dbChambers && dbChambers[id]) {
+      const dc = dbChambers[id];
+      return {
+        lower: { ...dc.lower, parties: dc.lower.parties.length > 0 ? dc.lower.parties : [{ id: "unk", name: "Unknown", seats: dc.lower.total || 1, color: "gray" }] },
+        upper: dc.upper ? { ...dc.upper, parties: dc.upper.parties.length > 0 ? dc.upper.parties : [{ id: "unk", name: "Unknown", seats: dc.upper.total || 1, color: "gray" }] } : null,
+        branches: dc.branches,
+        coalition: undefined,
+        next: undefined,
+        bills: [],
+      };
+    }
+    return getFallbackChamberData(id);
+  }
   const [mode, setMode] = useState<Mode>("atlas");
   const [country, setCountry] = useState<Country | null>(null);
   const [house, setHouse] = useState<House>("lower");
@@ -61,11 +138,19 @@ export default function AtlasApp() {
     let d = "";
     for (const poly of rings) {
       for (const ring of poly) {
-        (ring as number[][]).forEach((pt, i) => {
-          const [x, y] = proj(pt[0], pt[1]);
-          d += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1);
+        const pts = ring as number[][];
+        let prevLon: number | null = null;
+        pts.forEach((pt, i) => {
+          const lon = pt[0], lat = pt[1];
+          const [x, y] = proj(lon, lat);
+          const crossesAntimeridian = prevLon !== null && Math.abs(lon - prevLon) > 180;
+          if (i === 0 || crossesAntimeridian) {
+            d += "M" + x.toFixed(1) + "," + y.toFixed(1);
+          } else {
+            d += "L" + x.toFixed(1) + "," + y.toFixed(1);
+          }
+          prevLon = lon;
         });
-        d += "Z";
       }
     }
     return d;
@@ -326,24 +411,57 @@ export default function AtlasApp() {
   const currentHouse = house === "upper" && cd?.upper ? cd.upper : cd?.lower;
 
   return (
-    <div className="atlas-root" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 30 }}>
-      {/* ===== TOP BAR ===== */}
+    <div className="atlas-root" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 30, display: "flex", flexDirection: "column" }}>
+      {/* ===== UNIFIED TOP BAR ===== */}
       <div style={{
-        position: "relative", height: 56, display: "flex", alignItems: "center", gap: 14,
-        padding: "0 18px", background: "color-mix(in oklab, var(--atlas-paper) 92%, transparent)",
+        position: "relative", display: "flex", alignItems: "center", gap: 10,
+        padding: "8px 18px", background: "color-mix(in oklab, var(--atlas-paper) 92%, transparent)",
         backdropFilter: "blur(10px)", borderBottom: "1px solid var(--atlas-rule)", zIndex: 40,
+        flexWrap: "wrap",
       }}>
-        <div className="atlas-serif" style={{ fontSize: 22, letterSpacing: "-0.02em" }}>
+        <div className="atlas-serif" style={{ fontSize: 22, letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
           Civica<span style={{ color: "var(--atlas-accent)" }}>.</span>
         </div>
+        <span className="atlas-mono" style={{ fontSize: 9, color: "var(--atlas-muted)", letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+          Atlas of governance
+        </span>
+
+        {mode === "atlas" && (
+          <>
+            <div style={{ width: 1, height: 20, background: "var(--atlas-rule)", margin: "0 4px" }} />
+            <div className="atlas-filter-bar" style={{ border: "none", padding: 0, margin: 0, background: "none", height: "auto", backdropFilter: "none" }}>
+              <div className="group">
+                <span className="lbl">Region</span>
+                {["all", "Americas", "Europe", "Africa", "Asia", "Oceania"].map((r) => (
+                  <button key={r} className={`chip${regionFilter === r ? " on" : ""}`} onClick={() => setRegionFilter(r)}>
+                    {r === "all" ? "All" : r}
+                  </button>
+                ))}
+              </div>
+              <div className="sep" />
+              <div className="group">
+                <span className="lbl">System</span>
+                {["all", "Federal", "Parliamentary", "Presidential", "Monarchy"].map((g) => (
+                  <button key={g} className={`chip${govFilter === g ? " on" : ""}`} onClick={() => setGovFilter(g)}>
+                    {g === "all" ? "All" : g}
+                  </button>
+                ))}
+              </div>
+              <button className="clear-btn" onClick={() => { setRegionFilter("all"); setGovFilter("all"); }}>
+                Reset &times;
+              </button>
+            </div>
+          </>
+        )}
+
         <div style={{ flex: 1 }} />
+
         <div style={{
           display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--atlas-rule)",
-          background: "var(--atlas-paper)", padding: "7px 12px", minWidth: 320, borderRadius: 2,
+          background: "var(--atlas-paper)", padding: "5px 10px", minWidth: 220, maxWidth: 320, borderRadius: 2,
         }}>
-          <span className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)" }}>&darr;</span>
           <input
-            placeholder="Search country, leader, bill\u2026"
+            placeholder="Search country, leader\u2026"
             autoComplete="off"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -356,7 +474,7 @@ export default function AtlasApp() {
             }}
             className="atlas-sans"
             style={{
-              border: 0, background: "transparent", outline: "none", fontSize: 13,
+              border: 0, background: "transparent", outline: "none", fontSize: 12,
               color: "var(--atlas-ink)", width: "100%",
             }}
           />
@@ -391,34 +509,8 @@ export default function AtlasApp() {
         </a>
       </div>
 
-      {/* ===== FILTER BAR (atlas only) ===== */}
-      {mode === "atlas" && (
-        <div className="atlas-filter-bar">
-          <div className="group">
-            <span className="lbl">Region</span>
-            {["all", "Americas", "Europe", "Africa", "Asia", "Oceania"].map((r) => (
-              <button key={r} className={`chip${regionFilter === r ? " on" : ""}`} onClick={() => setRegionFilter(r)}>
-                {r === "all" ? "All" : r}
-              </button>
-            ))}
-          </div>
-          <div className="sep" />
-          <div className="group">
-            <span className="lbl">System</span>
-            {["all", "Federal", "Parliamentary", "Presidential", "Monarchy"].map((g) => (
-              <button key={g} className={`chip${govFilter === g ? " on" : ""}`} onClick={() => setGovFilter(g)}>
-                {g === "all" ? "All" : g}
-              </button>
-            ))}
-          </div>
-          <button className="clear-btn" onClick={() => { setRegionFilter("all"); setGovFilter("all"); }}>
-            Reset &times;
-          </button>
-        </div>
-      )}
-
       {/* ===== STAGE ===== */}
-      <div style={{ position: "absolute", top: mode === "atlas" ? 100 : 56, left: 0, right: 0, bottom: 0, overflow: "hidden" }}>
+      <div style={{ position: "relative", flex: 1, overflow: "hidden" }}>
         {/* ===== ATLAS VIEW ===== */}
         <div className="atlas-view" style={{ display: mode === "atlas" ? "block" : "none", position: "absolute", inset: 0 }}>
           <svg
@@ -759,6 +851,8 @@ export default function AtlasApp() {
               dimmed={dimmed}
               onSeatHover={(info, e) => setSeatTip({ ...info, x: e.clientX + 14, y: e.clientY + 14 })}
               onSeatLeave={() => setSeatTip(null)}
+              countries={COUNTRIES}
+              getChamberData={getDefaultChamberData}
             />
             <div className="atlas-resizer decorative" />
             <ComparePane
@@ -770,6 +864,8 @@ export default function AtlasApp() {
               dimmed={dimmed}
               onSeatHover={(info, e) => setSeatTip({ ...info, x: e.clientX + 14, y: e.clientY + 14 })}
               onSeatLeave={() => setSeatTip(null)}
+              countries={COUNTRIES}
+              getChamberData={getDefaultChamberData}
             />
             <div className="atlas-resizer" />
             <div className="chamber-right">
@@ -891,7 +987,7 @@ function BillCard({ bill, index, onAsk }: { bill: Bill; index: number; onAsk: (t
 }
 
 /* ===== COMPARE PANE ===== */
-function ComparePane({ countryId, side, house, onChangeCountry, onChangeHouse, dimmed, onSeatHover, onSeatLeave }: {
+function ComparePane({ countryId, side, house, onChangeCountry, onChangeHouse, dimmed, onSeatHover, onSeatLeave, countries, getChamberData }: {
   countryId: string;
   side: string;
   house: House;
@@ -900,9 +996,11 @@ function ComparePane({ countryId, side, house, onChangeCountry, onChangeHouse, d
   dimmed: Set<string>;
   onSeatHover?: (info: { member: { name: string; district: string }; party: { name: string; id: string }; index: number }, e: React.MouseEvent) => void;
   onSeatLeave?: () => void;
+  countries: Country[];
+  getChamberData: (id: string) => ChamberData;
 }) {
-  const c = COUNTRIES.find((x) => x.id === countryId)!;
-  const cd = getDefaultChamberData(countryId);
+  const c = countries.find((x) => x.id === countryId)!;
+  const cd = getChamberData(countryId);
   const chamber = house === "upper" && cd.upper ? cd.upper : cd.lower;
   const hasUpper = !!cd.upper;
 
@@ -916,7 +1014,7 @@ function ComparePane({ countryId, side, house, onChangeCountry, onChangeHouse, d
           className="atlas-mono"
           style={{ fontSize: 11, padding: "4px 6px", border: "1px solid var(--atlas-ink)", background: "var(--atlas-paper)", color: "var(--atlas-ink)" }}
         >
-          {COUNTRIES.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+          {countries.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
         </select>
       </div>
       <div style={{ padding: "28px 32px 18px" }}>

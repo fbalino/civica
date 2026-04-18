@@ -1,0 +1,228 @@
+import { db } from "@/lib/db";
+import { sql, desc, asc } from "drizzle-orm";
+import {
+  jurisdictions,
+  governmentBodies,
+  offices,
+  terms,
+  persons,
+  legislatureParties,
+} from "@/lib/db/schema";
+
+export interface AtlasCountry {
+  id: string;
+  name: string;
+  leader: string;
+  gov: string;
+  region: string;
+  pop: string;
+  gdp: string;
+  capital: string;
+  iso3: string;
+  featured?: boolean;
+}
+
+export interface AtlasParty {
+  id: string;
+  name: string;
+  seats: number;
+  color: string;
+}
+
+export interface AtlasChamber {
+  name: string;
+  total: number;
+  sub: string;
+  parties: AtlasParty[];
+}
+
+export interface AtlasChamberData {
+  lower: AtlasChamber;
+  upper: AtlasChamber | null;
+  branches?: { exec: string; legis: string; jud: string };
+}
+
+const CONTINENT_TO_REGION: Record<string, string> = {
+  "North America": "Americas",
+  "South America": "Americas",
+  "Central America": "Americas",
+  Europe: "Europe",
+  Africa: "Africa",
+  Asia: "Asia",
+  Oceania: "Oceania",
+  Antarctica: "Oceania",
+};
+
+const TOP_COUNTRIES = new Set([
+  "USA", "CHN", "IND", "BRA", "GBR", "FRA", "DEU", "JPN", "RUS", "SAU",
+]);
+
+function formatPop(n: number | null): string {
+  if (!n) return "—";
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(0)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return n.toLocaleString();
+}
+
+function formatGdp(b: number | null): string {
+  if (!b) return "—";
+  if (b >= 1000) return `$${(b / 1000).toFixed(1)}T`;
+  return `$${b.toFixed(0)}B`;
+}
+
+const PARTY_COLOR_MAP: Record<string, string> = {
+  red: "oklch(55% 0.16 25)",
+  blue: "oklch(52% 0.13 245)",
+  green: "oklch(56% 0.13 145)",
+  yellow: "oklch(72% 0.14 85)",
+  purple: "oklch(50% 0.13 310)",
+  teal: "oklch(58% 0.10 195)",
+  gray: "oklch(55% 0.01 90)",
+  orange: "oklch(64% 0.15 55)",
+  black: "oklch(28% 0.02 90)",
+};
+
+function resolveColor(dbColor: string | null, index: number): string {
+  if (dbColor && dbColor.startsWith("#")) return dbColor;
+  if (dbColor && dbColor.startsWith("oklch")) return dbColor;
+  if (dbColor && PARTY_COLOR_MAP[dbColor.toLowerCase()]) return PARTY_COLOR_MAP[dbColor.toLowerCase()];
+  const fallbacks = ["blue", "red", "green", "yellow", "purple", "teal", "orange", "gray"];
+  return PARTY_COLOR_MAP[fallbacks[index % fallbacks.length]];
+}
+
+export async function loadAtlasData(): Promise<{
+  countries: AtlasCountry[];
+  chambers: Record<string, AtlasChamberData>;
+}> {
+  const allJurisdictions = await db
+    .select()
+    .from(jurisdictions)
+    .where(
+      sql`${jurisdictions.type} = 'sovereign_state'
+        AND ${jurisdictions.population} IS NOT NULL
+        AND ${jurisdictions.population} > 0
+        AND ${jurisdictions.iso3} IS NOT NULL
+        AND LOWER(${jurisdictions.name}) <> 'none'`
+    )
+    .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
+
+  const jurisdictionIds = allJurisdictions.map((j) => j.id);
+
+  // Batch: all legislative bodies
+  const allBodies = jurisdictionIds.length > 0
+    ? await db
+        .select()
+        .from(governmentBodies)
+        .where(sql`${governmentBodies.jurisdictionId} IN ${jurisdictionIds} AND ${governmentBodies.branch} = 'legislative'`)
+        .orderBy(asc(governmentBodies.hierarchyLevel))
+    : [];
+
+  // Batch: all legislature parties
+  const bodyIds = allBodies.map((b) => b.id);
+  const allParties = bodyIds.length > 0
+    ? await db
+        .select()
+        .from(legislatureParties)
+        .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+        .orderBy(desc(legislatureParties.seatCount))
+    : [];
+
+  // Batch: current heads of state/government
+  const execBodies = jurisdictionIds.length > 0
+    ? await db
+        .select()
+        .from(governmentBodies)
+        .where(sql`${governmentBodies.jurisdictionId} IN ${jurisdictionIds} AND ${governmentBodies.branch} = 'executive'`)
+    : [];
+  const execBodyIds = execBodies.map((b) => b.id);
+
+  const headOffices = execBodyIds.length > 0
+    ? await db
+        .select()
+        .from(offices)
+        .where(sql`${offices.bodyId} IN ${execBodyIds}`)
+    : [];
+  const headOfficeIds = headOffices.map((o) => o.id);
+
+  const currentHeads = headOfficeIds.length > 0
+    ? await db
+        .select({ term: terms, person: persons, officeId: terms.officeId })
+        .from(terms)
+        .innerJoin(persons, sql`${terms.personId} = ${persons.id}`)
+        .where(sql`${terms.officeId} IN ${headOfficeIds} AND ${terms.isCurrent} = true`)
+    : [];
+
+  // Build leader lookup: jurisdictionId -> leader name
+  const officeToBody = new Map(headOffices.map((o) => [o.id, o.bodyId]));
+  const bodyToJurisdiction = new Map([...allBodies, ...execBodies].map((b) => [b.id, b.jurisdictionId]));
+  const officeName = new Map(headOffices.map((o) => [o.id, o.name]));
+
+  const leaderByJurisdiction = new Map<string, string>();
+  for (const h of currentHeads) {
+    const bId = officeToBody.get(h.officeId);
+    if (!bId) continue;
+    const jId = bodyToJurisdiction.get(bId);
+    if (!jId) continue;
+    const existing = leaderByJurisdiction.get(jId);
+    const title = officeName.get(h.officeId) || "";
+    const label = title ? `${title} ${h.person.name}` : h.person.name;
+    if (!existing || title.toLowerCase().includes("president") || title.toLowerCase().includes("prime minister")) {
+      leaderByJurisdiction.set(jId, label);
+    }
+  }
+
+  // Build countries
+  const countries: AtlasCountry[] = allJurisdictions.map((j) => ({
+    id: j.iso3!.toLowerCase(),
+    name: j.name,
+    leader: leaderByJurisdiction.get(j.id) || "—",
+    gov: j.governmentType || j.governmentTypeDetail || "—",
+    region: CONTINENT_TO_REGION[j.continent || ""] || j.continent || "—",
+    pop: formatPop(j.population),
+    gdp: formatGdp(j.gdpBillions),
+    capital: j.capital || "—",
+    iso3: j.iso3!,
+    featured: TOP_COUNTRIES.has(j.iso3!.toUpperCase()),
+  }));
+
+  // Build chambers: keyed by iso3 lowercase
+  const chambers: Record<string, AtlasChamberData> = {};
+  const bodiesByJurisdiction = new Map<string, typeof allBodies>();
+  for (const b of allBodies) {
+    const existing = bodiesByJurisdiction.get(b.jurisdictionId) || [];
+    existing.push(b);
+    bodiesByJurisdiction.set(b.jurisdictionId, existing);
+  }
+
+  for (const j of allJurisdictions) {
+    const jBodies = bodiesByJurisdiction.get(j.id);
+    if (!jBodies || jBodies.length === 0) continue;
+
+    const iso3 = j.iso3!.toLowerCase();
+    const lowerBody = jBodies.find((b) => b.chamberType === "lower") || jBodies[0];
+    const upperBody = jBodies.find((b) => b.chamberType === "upper");
+
+    function buildChamber(body: typeof lowerBody): AtlasChamber {
+      const bp = allParties.filter((p) => p.bodyId === body.id);
+      return {
+        name: body.name,
+        total: body.totalSeats || bp.reduce((sum, p) => sum + p.seatCount, 0),
+        sub: `${body.totalSeats || "?"} seats`,
+        parties: bp.map((p, i) => ({
+          id: p.partyName.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 6),
+          name: p.partyName,
+          seats: p.seatCount,
+          color: resolveColor(p.partyColor, i),
+        })),
+      };
+    }
+
+    chambers[iso3] = {
+      lower: buildChamber(lowerBody),
+      upper: upperBody ? buildChamber(upperBody) : null,
+    };
+  }
+
+  return { countries, chambers };
+}
