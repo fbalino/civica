@@ -188,16 +188,22 @@ export async function loadAtlasData(): Promise<{
 
     function buildChamber(body: typeof lowerBody): AtlasChamber {
       const bp = allParties.filter((p) => p.bodyId === body.id);
+      const seen = new Set<string>();
       return {
         name: body.name,
         total: body.totalSeats || bp.reduce((sum, p) => sum + p.seatCount, 0),
         sub: `${body.totalSeats || "?"} seats`,
-        parties: bp.map((p, i) => ({
-          id: p.partyName.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 6),
-          name: p.partyName,
-          seats: p.seatCount,
-          color: resolvePartyColor(p.partyColor, p.partyName, i),
-        })),
+        parties: bp.map((p, i) => {
+          let slug = p.partyName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+          if (!slug || seen.has(slug)) slug = `${slug || "party"}-${i}`;
+          seen.add(slug);
+          return {
+            id: slug,
+            name: p.partyName,
+            seats: p.seatCount,
+            color: resolvePartyColor(p.partyColor, p.partyName, i),
+          };
+        }),
       };
     }
 
