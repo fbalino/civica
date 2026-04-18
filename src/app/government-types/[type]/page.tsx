@@ -7,7 +7,7 @@ import {
 } from "@/lib/data/government-types";
 import { CountryFlag } from "@/components/CountryFlag";
 
-const SITE_URL = "https://civica-kappa.vercel.app";
+const SITE_URL = "https://civicaatlas.org";
 
 function formatPopulation(pop: number | null): string {
   if (!pop) return "";

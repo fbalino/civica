@@ -4,7 +4,7 @@ import { getAllPosts } from "@/lib/blog";
 import { GOVERNMENT_TYPES } from "@/lib/data/government-types";
 import { PRIORITY_COMPARISONS } from "./compare/[slug]/page";
 
-const SITE_URL = "https://civica-kappa.vercel.app";
+const SITE_URL = "https://civicaatlas.org";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let countries: { slug: string }[] = [];

@@ -12,12 +12,12 @@ export const metadata: Metadata = {
   title: "Compare Government Structures — Side-by-Side Country Comparison",
   description:
     "Compare government structures between any two countries. See differences in executive, legislative, and judicial branches, political systems, and governance models side by side.",
-  alternates: { canonical: "https://civica-kappa.vercel.app/compare" },
+  alternates: { canonical: "https://civicaatlas.org/compare" },
   openGraph: {
     title: "Compare Government Structures — Side-by-Side Country Comparison | Civica",
     description:
       "Compare government structures between any two countries. See differences in executive, legislative, and judicial branches, political systems, and governance models side by side.",
-    url: "https://civica-kappa.vercel.app/compare",
+    url: "https://civicaatlas.org/compare",
   },
 };
 

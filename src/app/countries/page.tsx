@@ -8,12 +8,12 @@ export const metadata: Metadata = {
   title: "All Countries & Territories — Government Structure Index",
   description:
     "Browse all 250+ countries and territories. Filter by continent, government type, and political system. Complete index of world governance data.",
-  alternates: { canonical: "https://civica-kappa.vercel.app/countries" },
+  alternates: { canonical: "https://civicaatlas.org/countries" },
   openGraph: {
     title: "All Countries & Territories — Government Structure Index | Civica",
     description:
       "Browse all 250+ countries and territories. Filter by continent, government type, and political system. Complete index of world governance data.",
-    url: "https://civica-kappa.vercel.app/countries",
+    url: "https://civicaatlas.org/countries",
   },
 };
 

@@ -6,12 +6,12 @@ export const metadata: Metadata = {
   title: "World Government Rankings — GDP, Population, Democracy Index",
   description:
     "Explore global rankings for 250+ countries by GDP, population, area, life expectancy, and more. Data from Wikidata, World Bank, and archived CIA World Factbook.",
-  alternates: { canonical: "https://civica-kappa.vercel.app/rankings" },
+  alternates: { canonical: "https://civicaatlas.org/rankings" },
   openGraph: {
     title: "World Government Rankings — GDP, Population, Democracy Index | Civica",
     description:
       "Explore global rankings for 250+ countries by GDP, population, area, life expectancy, and more.",
-    url: "https://civica-kappa.vercel.app/rankings",
+    url: "https://civicaatlas.org/rankings",
   },
 };
 

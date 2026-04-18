@@ -5,12 +5,12 @@ export const metadata: Metadata = {
   title: "About Civica — Open-Source Government Structure Database",
   description:
     "Civica is an open-source, interactive platform visualizing government structures for every country. Built on Wikidata, IPU Parline, and Constitute Project data.",
-  alternates: { canonical: "https://civica-kappa.vercel.app/about" },
+  alternates: { canonical: "https://civicaatlas.org/about" },
   openGraph: {
     title: "About Civica — Open-Source Government Structure Database | Civica",
     description:
       "Civica is an open-source, interactive platform visualizing government structures for every country. Built on Wikidata, IPU Parline, and Constitute Project data.",
-    url: "https://civica-kappa.vercel.app/about",
+    url: "https://civicaatlas.org/about",
   },
 };
 

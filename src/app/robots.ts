@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://civica-kappa.vercel.app/sitemap.xml",
+    sitemap: "https://civicaatlas.org/sitemap.xml",
   };
 }

@@ -6,7 +6,7 @@ import {
 } from "@/lib/db/queries";
 import { CompareTable } from "../CompareTable";
 
-const SITE_URL = "https://civica-kappa.vercel.app";
+const SITE_URL = "https://civicaatlas.org";
 
 export const PRIORITY_COMPARISONS = [
   "united-states-vs-united-kingdom",

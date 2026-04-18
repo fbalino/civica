@@ -22,7 +22,7 @@ const inter = Inter({
   weight: ["400", "500", "600"],
 });
 
-const SITE_URL = "https://civica-kappa.vercel.app";
+const SITE_URL = "https://civicaatlas.org";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

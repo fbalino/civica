@@ -5,7 +5,7 @@ import {
   matchGovernmentType,
 } from "@/lib/data/government-types";
 
-const SITE_URL = "https://civica-kappa.vercel.app";
+const SITE_URL = "https://civicaatlas.org";
 
 export const metadata: Metadata = {
   title: "Government Types — Systems of Government Worldwide",

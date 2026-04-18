@@ -65,7 +65,7 @@ export async function generateMetadata({
   const popStr = jurisdiction.population ? ` Population: ${formatPop(jurisdiction.population)}.` : "";
   const capStr = jurisdiction.capital ? ` Capital: ${jurisdiction.capital}.` : "";
   const description = `Explore ${jurisdiction.name}'s ${govLabel.toLowerCase()} government structure. Interactive visualization of executive, legislative, and judicial branches.${popStr}${capStr}`;
-  const url = `https://civica-kappa.vercel.app/countries/${slug}`;
+  const url = `https://civicaatlas.org/countries/${slug}`;
   return {
     title,
     description,
@@ -583,11 +583,11 @@ export default async function CountryPage({
     "@type": "WebPage",
     name: `${jurisdiction.name} Government Structure`,
     description: `Explore ${jurisdiction.name}'s ${(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType ?? "sovereign state").toLowerCase()} government structure.`,
-    url: `https://civica-kappa.vercel.app/countries/${slug}`,
+    url: `https://civicaatlas.org/countries/${slug}`,
     isPartOf: {
       "@type": "WebSite",
       name: "Civica",
-      url: "https://civica-kappa.vercel.app",
+      url: "https://civicaatlas.org",
     },
     about: {
       "@type": "Country",
@@ -602,9 +602,9 @@ export default async function CountryPage({
     breadcrumb: {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: "https://civica-kappa.vercel.app" },
-        { "@type": "ListItem", position: 2, name: "Countries", item: "https://civica-kappa.vercel.app/countries" },
-        { "@type": "ListItem", position: 3, name: jurisdiction.name, item: `https://civica-kappa.vercel.app/countries/${slug}` },
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://civicaatlas.org" },
+        { "@type": "ListItem", position: 2, name: "Countries", item: "https://civicaatlas.org/countries" },
+        { "@type": "ListItem", position: 3, name: jurisdiction.name, item: `https://civicaatlas.org/countries/${slug}` },
       ],
     },
   };
