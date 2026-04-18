@@ -234,6 +234,8 @@ export default function RootLayout({
                 <div style={{ marginTop: 6, display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <a href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>About</a>
                   <span>&middot;</span>
+                  <a href="/api-docs" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>API</a>
+                  <span>&middot;</span>
                   <a href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</a>
                 </div>
               </div>
