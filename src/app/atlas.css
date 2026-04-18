@@ -564,8 +564,9 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     flex: 1;
   }
 
-  /* Mode bar: compact */
-  .atlas-mode-bar button { padding: 5px 8px; font-size: 9px; }
+  /* Mode bar: compact pill style on mobile */
+  .atlas-mode-bar { border-color: var(--atlas-rule); }
+  .atlas-mode-bar button { padding: 4px 7px; font-size: 8px; letter-spacing: 0.08em; }
 
   /* Nav links: hide on mobile */
   .atlas-root > div:first-child > a { display: none; }
@@ -610,7 +611,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   /* Hide resizers on mobile */
   .atlas-resizer { display: none; }
 
-  /* Left rail: overlay panel */
+  /* Left rail: overlay panel — top accounts for mobile-panel-bar height */
   .chamber-left {
     display: none;
     border-right: none;
@@ -618,7 +619,10 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .chamber-left.mobile-visible {
     display: block;
     position: absolute;
-    inset: 0;
+    top: 42px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 20;
     background: var(--atlas-paper);
     overflow-y: auto;
@@ -631,7 +635,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     min-height: 0;
   }
 
-  /* Right rail (chat): overlay panel */
+  /* Right rail (chat): overlay panel — top accounts for mobile-panel-bar height */
   .chamber-right {
     display: none;
     border-left: none;
@@ -639,18 +643,23 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .chamber-right.mobile-visible {
     display: flex;
     position: absolute;
-    inset: 0;
+    top: 42px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 20;
     background: var(--atlas-paper);
   }
 
-  /* Mobile panel toggle bar */
+  /* Mobile panel toggle bar — stays above overlay panels */
   .mobile-panel-bar {
     display: flex;
     gap: 0;
     border-bottom: 1px solid var(--atlas-rule);
     background: var(--atlas-paper-2);
     flex-shrink: 0;
+    position: relative;
+    z-index: 30;
   }
   .mobile-panel-bar button {
     flex: 1;
@@ -755,5 +764,6 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   /* Left rail mini-map: smaller on mobile overlay */
   .left-mini-map svg { height: 120px; }
   .left-side-head { padding: 12px 14px; }
+  .left-side-head .back-btn { display: none; }
   .left-country-list { padding: 6px 14px 20px; }
 }

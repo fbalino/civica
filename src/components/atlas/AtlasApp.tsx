@@ -128,6 +128,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const [mobilePanel, setMobilePanel] = useState<"center" | "countries" | "chat">("center");
   const [isMobile, setIsMobile] = useState(false);
   const [mobileFilters, setMobileFilters] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [navHeight, setNavHeight] = useState(0);
 
   useEffect(() => {
@@ -556,33 +557,75 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
         <div style={{ flex: 1 }} />
 
-        <div style={{
-          display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--atlas-rule)",
-          background: "var(--atlas-paper)", padding: "5px 10px", minWidth: 220, maxWidth: 320, borderRadius: 2,
-        }}>
-          <input
-            placeholder="Search country, leader\u2026"
-            autoComplete="off"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const q = searchQuery.toLowerCase();
-                const hit = COUNTRIES.find((c) => c.name.toLowerCase().includes(q));
-                if (hit) enterChamber(hit.id);
-              }
-            }}
-            className="atlas-sans"
-            style={{
-              border: 0, background: "transparent", outline: "none", fontSize: 12,
-              color: "var(--atlas-ink)", width: "100%",
-            }}
-          />
-          <span className="atlas-mono" style={{
-            border: "1px solid var(--atlas-rule)", padding: "1px 5px",
-            borderRadius: 2, color: "var(--atlas-muted)", fontSize: 10,
-          }}>\u2318K</span>
-        </div>
+        {/* Search bar — on mobile in chamber/compare mode, show magnifying glass icon instead */}
+        {isMobile && mode !== "atlas" ? (
+          mobileSearchOpen ? (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--atlas-rule)",
+              background: "var(--atlas-paper)", padding: "5px 10px", flex: 1, borderRadius: 2,
+            }}>
+              <input
+                autoFocus
+                placeholder="Search country, leader\u2026"
+                autoComplete="off"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const q = searchQuery.toLowerCase();
+                    const hit = COUNTRIES.find((c) => c.name.toLowerCase().includes(q));
+                    if (hit) enterChamber(hit.id);
+                    setMobileSearchOpen(false);
+                  } else if (e.key === "Escape") {
+                    setMobileSearchOpen(false);
+                    setSearchQuery("");
+                  }
+                }}
+                onBlur={() => { if (!searchQuery) setMobileSearchOpen(false); }}
+                className="atlas-sans"
+                style={{ border: 0, background: "transparent", outline: "none", fontSize: 12, color: "var(--atlas-ink)", width: "100%" }}
+              />
+              <button onClick={() => { setMobileSearchOpen(false); setSearchQuery(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--atlas-muted)", fontSize: 14, padding: 0 }}>&times;</button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setMobileSearchOpen(true)}
+              className="mobile-search-icon"
+              style={{ background: "none", border: "1px solid var(--atlas-rule)", borderRadius: 2, padding: "5px 8px", cursor: "pointer", color: "var(--atlas-ink-2)", display: "flex", alignItems: "center" }}
+              aria-label="Search"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </button>
+          )
+        ) : (
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--atlas-rule)",
+            background: "var(--atlas-paper)", padding: "5px 10px", minWidth: 220, maxWidth: 320, borderRadius: 2,
+          }}>
+            <input
+              placeholder="Search country, leader\u2026"
+              autoComplete="off"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const q = searchQuery.toLowerCase();
+                  const hit = COUNTRIES.find((c) => c.name.toLowerCase().includes(q));
+                  if (hit) enterChamber(hit.id);
+                }
+              }}
+              className="atlas-sans"
+              style={{
+                border: 0, background: "transparent", outline: "none", fontSize: 12,
+                color: "var(--atlas-ink)", width: "100%",
+              }}
+            />
+            <span className="atlas-mono" style={{
+              border: "1px solid var(--atlas-rule)", padding: "1px 5px",
+              borderRadius: 2, color: "var(--atlas-muted)", fontSize: 10,
+            }}>\u2318K</span>
+          </div>
+        )}
         <div className="atlas-mode-bar">
           {(["atlas", "chamber", "compare"] as Mode[]).map((m) => (
             <button
