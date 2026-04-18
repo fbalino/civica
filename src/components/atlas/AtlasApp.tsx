@@ -128,6 +128,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const [mobilePanel, setMobilePanel] = useState<"center" | "countries" | "chat">("center");
   const [isMobile, setIsMobile] = useState(false);
   const [mobileFilters, setMobileFilters] = useState(false);
+  const [navHeight, setNavHeight] = useState(0);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
@@ -135,6 +136,16 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    const measure = () => {
+      const nav = document.querySelector("body > nav");
+      if (nav) setNavHeight(nav.getBoundingClientRect().height);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, []);
 
   const W = 2000, H = 1000;
@@ -499,7 +510,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const currentHouse = house === "upper" && cd?.upper ? cd.upper : cd?.lower;
 
   return (
-    <div className="atlas-root" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 30, display: "flex", flexDirection: "column" }}>
+    <div className="atlas-root" style={{ position: "fixed", top: navHeight, left: 0, right: 0, bottom: 0, zIndex: 30, display: "flex", flexDirection: "column" }}>
       {/* ===== UNIFIED TOP BAR ===== */}
       <div style={{
         position: "relative", display: "flex", alignItems: "center", gap: 10,
@@ -507,16 +518,8 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
         backdropFilter: "blur(10px)", borderBottom: "1px solid var(--atlas-rule)", zIndex: 40,
         flexWrap: "wrap",
       }}>
-        <div className="atlas-serif" style={{ fontSize: 22, letterSpacing: "-0.02em", whiteSpace: "nowrap" }}>
-          Civica<span style={{ color: "var(--atlas-accent)" }}>.</span>
-        </div>
-        <span className="atlas-mono" style={{ fontSize: 9, color: "var(--atlas-muted)", letterSpacing: "0.1em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
-          Atlas of governance
-        </span>
-
         {mode === "atlas" && (
           <>
-            <div style={{ width: 1, height: 20, background: "var(--atlas-rule)", margin: "0 4px" }} />
             {isMobile && (
               <button
                 className="atlas-mono"

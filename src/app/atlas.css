@@ -542,8 +542,6 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     padding: 6px 10px;
     gap: 6px;
   }
-  .atlas-root > div:first-child .atlas-serif { font-size: 18px; }
-  .atlas-root > div:first-child .atlas-mono[style*="letterSpacing"] { display: none; }
 
   /* Filter bar: scrollable, hidden by default */
   .atlas-filter-bar {
