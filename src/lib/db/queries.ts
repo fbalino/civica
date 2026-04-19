@@ -10,6 +10,7 @@ import {
   persons,
   sources,
   legislatureParties,
+  constitutions,
 } from "./schema";
 
 export async function getJurisdictionBySlug(slug: string) {
@@ -262,4 +263,98 @@ export async function getJurisdictionsByGovernmentTypePattern(
       sql`${jurisdictions.type} = 'sovereign_state' AND (${combined})`
     )
     .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
+}
+
+export async function getDemocracyScores(jurisdictionId: string) {
+  const jurisdiction = await db
+    .select({
+      democracyIndex: jurisdictions.democracyIndex,
+      continent: jurisdictions.continent,
+    })
+    .from(jurisdictions)
+    .where(eq(jurisdictions.id, jurisdictionId))
+    .limit(1);
+
+  const freedomHouseFacts = await db
+    .select()
+    .from(countryFacts)
+    .where(
+      sql`${countryFacts.jurisdictionId} = ${jurisdictionId} AND ${countryFacts.factKey} LIKE 'freedom_house%'`
+    );
+
+  return {
+    democracyIndex: jurisdiction[0]?.democracyIndex ?? null,
+    continent: jurisdiction[0]?.continent ?? null,
+    freedomHouseFacts,
+  };
+}
+
+export async function getRegionalDemocracyComparison(
+  jurisdictionId: string,
+  continent: string | null
+) {
+  if (!continent) return [];
+  return db
+    .select({
+      id: jurisdictions.id,
+      name: jurisdictions.name,
+      slug: jurisdictions.slug,
+      iso2: jurisdictions.iso2,
+      democracyIndex: jurisdictions.democracyIndex,
+    })
+    .from(jurisdictions)
+    .where(
+      sql`${jurisdictions.continent} = ${continent} AND ${jurisdictions.type} = 'sovereign_state' AND ${jurisdictions.democracyIndex} IS NOT NULL`
+    )
+    .orderBy(desc(jurisdictions.democracyIndex))
+    .limit(20);
+}
+
+export async function getConstitution(jurisdictionId: string) {
+  const results = await db
+    .select()
+    .from(constitutions)
+    .where(eq(constitutions.jurisdictionId, jurisdictionId))
+    .limit(1);
+  return results[0] ?? null;
+}
+
+export async function getLeaderTimeline(jurisdictionId: string) {
+  const bodies = await db
+    .select()
+    .from(governmentBodies)
+    .where(eq(governmentBodies.jurisdictionId, jurisdictionId));
+
+  const bodyIds = bodies.map((b) => b.id);
+  if (bodyIds.length === 0) return [];
+
+  const allOffices = await db
+    .select()
+    .from(offices)
+    .where(sql`${offices.bodyId} IN ${bodyIds}`);
+
+  const officeIds = allOffices.map((o) => o.id);
+  if (officeIds.length === 0) return [];
+
+  const allTerms = await db
+    .select({ term: terms, person: persons })
+    .from(terms)
+    .innerJoin(persons, eq(terms.personId, persons.id))
+    .where(sql`${terms.officeId} IN ${officeIds}`)
+    .orderBy(desc(terms.startDate));
+
+  return allTerms.map((t) => {
+    const office = allOffices.find((o) => o.id === t.term.officeId);
+    return {
+      personName: t.person.name,
+      photoUrl: t.person.photoUrl,
+      officeName: office?.name ?? "Unknown",
+      officeType: office?.officeType ?? "unknown",
+      partyName: t.term.partyName,
+      partyColor: t.term.partyColor,
+      startDate: t.term.startDate,
+      endDate: t.term.endDate,
+      isCurrent: t.term.isCurrent,
+    };
+  });
 }

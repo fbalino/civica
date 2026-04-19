@@ -9,6 +9,10 @@ import {
   getCountryRankings,
   getRelatedCountries,
   getLegislatureComposition,
+  getDemocracyScores,
+  getRegionalDemocracyComparison,
+  getConstitution,
+  getLeaderTimeline,
 } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
 import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
@@ -101,7 +105,7 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -110,7 +114,12 @@ export default async function CountryPage({
     getRelatedCountries(jurisdiction.id, jurisdiction.continent),
     getLegislatureComposition(jurisdiction.id),
     fetchParliamentBills(jurisdiction.iso2),
+    getDemocracyScores(jurisdiction.id),
+    getConstitution(jurisdiction.id),
+    getLeaderTimeline(jurisdiction.id),
   ]);
+
+  const regionalComparison = await getRegionalDemocracyComparison(jurisdiction.id, democracyData.continent);
 
   const factMap = new Map(facts.map((f) => [f.factKey, f]));
 
@@ -735,11 +744,261 @@ export default async function CountryPage({
     </div>
   ) : null;
 
+  /* ---- Democracy tab ---- */
+  const democracyTab = (
+    <div>
+      <div className="cv-card" style={{ marginBottom: 16 }}>
+        <h3 className="section-header">Democracy Index</h3>
+        {democracyData.democracyIndex != null ? (
+          <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 16 }}>
+            <span
+              style={{
+                fontFamily: "var(--font-heading)",
+                fontSize: "var(--text-36)",
+                color: "var(--color-text-primary)",
+              }}
+            >
+              {democracyData.democracyIndex.toFixed(2)}
+            </span>
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)",
+                fontSize: "var(--text-11)",
+                color: "var(--color-text-30)",
+              }}
+            >
+              / 1.00
+              <SourceDot source="V-Dem Institute" retrievedAt="2025" />
+            </span>
+          </div>
+        ) : (
+          <p style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)", color: "var(--color-text-50)", margin: 0 }}>
+            No democracy index data available.
+          </p>
+        )}
+      </div>
+
+      {democracyData.freedomHouseFacts.length > 0 && (
+        <div className="cv-card" style={{ marginBottom: 16 }}>
+          <h3 className="section-header">Freedom House</h3>
+          {democracyData.freedomHouseFacts.map((f) => (
+            <StatRow
+              key={f.factKey}
+              label={f.factKey.replace("freedom_house_", "").replace(/_/g, " ")}
+              val={f.factValue ?? "—"}
+              source="Freedom House"
+              date={f.factYear != null ? String(f.factYear) : undefined}
+            />
+          ))}
+        </div>
+      )}
+
+      {regionalComparison.length > 0 && (
+        <div className="cv-card">
+          <h3 className="section-header">Regional Comparison ({jurisdiction.continent})</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {regionalComparison.map((rc, i) => (
+              <a
+                key={rc.id}
+                href={`/countries/${rc.slug}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "10px 0",
+                  borderBottom: i < regionalComparison.length - 1 ? "1px solid var(--color-stat-border)" : "none",
+                  textDecoration: "none",
+                  color: "inherit",
+                  fontWeight: rc.id === jurisdiction.id ? 600 : 400,
+                  background: rc.id === jurisdiction.id ? "var(--color-surface-hover)" : "transparent",
+                  borderRadius: rc.id === jurisdiction.id ? "var(--radius-sm)" : 0,
+                  paddingLeft: rc.id === jurisdiction.id ? 8 : 0,
+                  paddingRight: rc.id === jurisdiction.id ? 8 : 0,
+                }}
+              >
+                <span style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-25)", marginRight: 8, minWidth: 20, display: "inline-block" }}>
+                    {i + 1}.
+                  </span>
+                  {rc.name}
+                </span>
+                <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-40)" }}>
+                  {rc.democracyIndex?.toFixed(2) ?? "—"}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  /* ---- Leaders tab ---- */
+  const currentLeaders = leaderTimeline.filter((l) => l.isCurrent);
+  const pastLeaders = leaderTimeline.filter((l) => !l.isCurrent);
+
+  const leadersTab = leaderTimeline.length > 0 ? (
+    <div>
+      {currentLeaders.length > 0 && (
+        <div className="cv-card" style={{ marginBottom: 16 }}>
+          <h3 className="section-header">Current Leaders</h3>
+          {currentLeaders.map((leader, i) => (
+            <div
+              key={`current-${i}`}
+              style={{
+                padding: "14px 0",
+                borderBottom: i < currentLeaders.length - 1 ? "1px solid var(--color-stat-border)" : "none",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+              }}
+            >
+              {leader.photoUrl && (
+                <img
+                  src={leader.photoUrl}
+                  alt={leader.personName}
+                  style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+                />
+              )}
+              <div>
+                <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-18)", color: "var(--color-text-primary)", display: "block" }}>
+                  {leader.personName}
+                </span>
+                <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-40)", display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                  {leader.officeName}
+                  {leader.partyName && (
+                    <>
+                      <span style={{ color: "var(--color-text-20)" }}>&middot;</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                        {leader.partyColor && <span style={{ width: 5, height: 5, borderRadius: "50%", background: leader.partyColor }} />}
+                        {leader.partyName}
+                      </span>
+                    </>
+                  )}
+                  {leader.startDate && (
+                    <>
+                      <span style={{ color: "var(--color-text-20)" }}>&middot;</span>
+                      <span>Since {new Date(leader.startDate).getFullYear()}</span>
+                    </>
+                  )}
+                  <SourceDot source="wikidata" retrievedAt="2026-04-13" />
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {pastLeaders.length > 0 && (
+        <div className="cv-card">
+          <h3 className="section-header">Past Leaders</h3>
+          {pastLeaders.slice(0, 20).map((leader, i) => (
+            <div
+              key={`past-${i}`}
+              style={{
+                padding: "10px 0",
+                borderBottom: i < Math.min(pastLeaders.length, 20) - 1 ? "1px solid var(--color-stat-border)" : "none",
+              }}
+            >
+              <span style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)", color: "var(--color-text-primary)" }}>
+                {leader.personName}
+              </span>
+              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-30)", display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                {leader.officeName}
+                {leader.startDate && (
+                  <>
+                    <span style={{ color: "var(--color-text-20)" }}>&middot;</span>
+                    <span>
+                      {new Date(leader.startDate).getFullYear()}
+                      {leader.endDate ? `–${new Date(leader.endDate).getFullYear()}` : ""}
+                    </span>
+                  </>
+                )}
+                {leader.partyName && (
+                  <>
+                    <span style={{ color: "var(--color-text-20)" }}>&middot;</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                      {leader.partyColor && <span style={{ width: 5, height: 5, borderRadius: "50%", background: leader.partyColor }} />}
+                      {leader.partyName}
+                    </span>
+                  </>
+                )}
+              </span>
+            </div>
+          ))}
+          {pastLeaders.length > 20 && (
+            <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-25)", marginTop: 12 }}>
+              Showing 20 of {pastLeaders.length} past leaders.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  ) : null;
+
+  /* ---- Constitution tab ---- */
+  const constitutionTab = constitution ? (
+    <div>
+      <div className="cv-card" style={{ marginBottom: 16 }}>
+        <h3 className="section-header">Constitution</h3>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap", marginBottom: 16 }}>
+          {constitution.year && (
+            <div>
+              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-30)", textTransform: "uppercase", display: "block" }}>
+                Enacted
+              </span>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-22)", color: "var(--color-text-primary)" }}>
+                {constitution.year}
+              </span>
+            </div>
+          )}
+          {constitution.yearUpdated && (
+            <div>
+              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-30)", textTransform: "uppercase", display: "block" }}>
+                Last Amended
+              </span>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-22)", color: "var(--color-text-primary)" }}>
+                {constitution.yearUpdated}
+              </span>
+            </div>
+          )}
+        </div>
+        {constitution.constituteProjectId && (
+          <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-30)", margin: 0 }}>
+            Source: Constitute Project
+            <SourceDot source="Constitute Project" retrievedAt="2026-04-13" />
+          </p>
+        )}
+      </div>
+
+      {constitution.fullTextHtml && (
+        <div className="cv-card">
+          <h3 className="section-header">Full Text</h3>
+          <div
+            style={{
+              fontFamily: "var(--font-body-sans)",
+              fontSize: "var(--text-14)",
+              lineHeight: "var(--leading-relaxed)",
+              color: "var(--color-text-85)",
+              maxHeight: 600,
+              overflow: "auto",
+            }}
+            dangerouslySetInnerHTML={{ __html: constitution.fullTextHtml }}
+          />
+        </div>
+      )}
+    </div>
+  ) : null;
+
   const tabs = [
     { id: "overview", label: "Overview", content: overviewTab },
     { id: "government", label: "Government", content: governmentTab },
     ...(legislatureTab ? [{ id: "legislature", label: "Legislature", content: legislatureTab }] : []),
     { id: "laws", label: "Laws in Motion", content: lawsTab },
+    { id: "democracy", label: "Democracy", content: democracyTab },
+    ...(leadersTab ? [{ id: "leaders", label: "Leaders", content: leadersTab }] : []),
+    ...(constitutionTab ? [{ id: "constitution", label: "Constitution", content: constitutionTab }] : []),
     ...(factbookTab ? [{ id: "factbook", label: "Factbook", content: factbookTab }] : []),
   ];
 
@@ -810,6 +1069,44 @@ export default async function CountryPage({
           >
             {govHeaderLabel}
           </p>
+        </div>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
+          <a
+            href={`/api/countries/${slug}/export?format=json`}
+            download
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-10)",
+              color: "var(--color-text-30)",
+              textDecoration: "none",
+              padding: "6px 10px",
+              border: "1px solid var(--color-stat-border)",
+              borderRadius: "var(--radius-sm)",
+              letterSpacing: "var(--tracking-wide)",
+              textTransform: "uppercase",
+            }}
+          >
+            JSON
+          </a>
+          <a
+            href={`/api/countries/${slug}/export?format=csv`}
+            download
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-10)",
+              color: "var(--color-text-30)",
+              textDecoration: "none",
+              padding: "6px 10px",
+              border: "1px solid var(--color-stat-border)",
+              borderRadius: "var(--radius-sm)",
+              letterSpacing: "var(--tracking-wide)",
+              textTransform: "uppercase",
+            }}
+          >
+            CSV
+          </a>
         </div>
       </div>
 
