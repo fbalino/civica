@@ -682,23 +682,70 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   }).map((c) => c.id);
 
   // Chat
-  function sendChat(prefill?: string) {
+  async function sendChat(prefill?: string) {
     const text = prefill || chatInputRef.current?.value?.trim() || "";
     if (!text) return;
     if (chatInputRef.current) chatInputRef.current.value = "";
     const c = country;
     const cd = c ? getDefaultChamberData(c.id) : null;
-    const maj = cd?.lower?.parties?.[0];
+    const currentHouseData = house === "upper" && cd?.upper ? cd.upper : cd?.lower;
+    const tabLabel = { chamber: "Chamber", bills: "Bills in motion", structure: "Government structure", elections: "Elections", democracy: "Democracy index", leaders: "Leadership", constitution: "Constitution" }[tab] ?? tab;
+    const lead = c ? `About ${c.name} \u00b7 ${house === "upper" ? "upper" : "lower"} house \u00b7 ${tabLabel}` : undefined;
+
+    // Append user message + empty AI placeholder
     setChatHistory((prev) => [
       ...prev,
       { role: "user", text },
-      {
-        role: "ai",
-        lead: c ? `About ${c.name} \u00b7 ${house === "upper" ? "upper" : "lower"} house` : undefined,
-        text: `${maj ? `The largest party is **${maj.name}** with ${maj.seats} seats.` : "Here's what I found."} ${cd?.coalition ? `The governing coalition is **${cd.coalition}**, with next elections in ${cd.next}.` : ""}\n\nThis is a stub response \u2014 wire me to a language model and I'll answer for real, grounded in the data on this page.`,
-        cite: c ? `Sources \u00b7 ${c.name} chamber record \u00b7 coalition brief` : undefined,
-      },
+      { role: "ai", lead, text: "" },
     ]);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: text,
+          context: {
+            country: c?.name ?? "unknown",
+            house,
+            tab,
+            parties: currentHouseData?.parties?.map((p) => ({ name: p.name, seats: p.seats })),
+            coalition: cd?.coalition,
+            nextElection: cd?.next,
+          },
+        }),
+      });
+
+      if (!res.ok || !res.body) {
+        setChatHistory((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = { role: "ai", lead, text: "Sorry, something went wrong. Please try again." };
+          return next;
+        });
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        accumulated += decoder.decode(value, { stream: true });
+        setChatHistory((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = { role: "ai", lead, text: accumulated };
+          return next;
+        });
+      }
+    } catch {
+      setChatHistory((prev) => {
+        const next = [...prev];
+        next[next.length - 1] = { role: "ai", lead, text: "Network error \u2014 please check your connection and try again." };
+        return next;
+      });
+    }
   }
 
   // Toggle party dimming
@@ -1323,6 +1370,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                 Context:
                 <span className="pill">{country.name}</span>
                 <span className="pill">{house === "upper" ? "Upper house" : "Lower house"}</span>
+                <span className="pill">{{ chamber: "Chamber", bills: "Bills", structure: "Structure", elections: "Elections", democracy: "Democracy", leaders: "Leaders", constitution: "Constitution" }[tab] ?? tab}</span>
               </div>
               <div className="atlas-chat-scroll">
                 {chatHistory.map((m, i) => (
@@ -1330,9 +1378,13 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                     <div className={`av${m.role === "ai" ? " ai" : ""}`}>{m.role === "ai" ? "C" : "U"}</div>
                     <div className="bub">
                       {m.lead && <div className="lead">{m.lead}</div>}
-                      {m.text.split("\n\n").map((p, j) => (
-                        <p key={j} dangerouslySetInnerHTML={{ __html: p.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }} />
-                      ))}
+                      {m.role === "ai" && m.text === "" ? (
+                        <p style={{ color: "var(--atlas-muted)", fontStyle: "italic" }}>Thinking…</p>
+                      ) : (
+                        m.text.split("\n\n").map((p, j) => (
+                          <p key={j} dangerouslySetInnerHTML={{ __html: p.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }} />
+                        ))
+                      )}
                       {m.cite && <div className="cite">{m.cite}</div>}
                     </div>
                   </div>
@@ -1496,7 +1548,7 @@ function BillCard({ bill, index, onAsk }: { bill: Bill; index: number; onAsk: (t
         })()}
       </div>
       <div className="actions">
-        <span className="status-badge">{bill.status}</span>
+        {bill.status && <span className="status-badge">{bill.status}</span>}
         <button className="ask-btn" onClick={() => onAsk(`Explain "${bill.title}" to me \u2014 what does it actually do, who wins, who loses, and where is it in the process?`)}>
           Ask AI
         </button>

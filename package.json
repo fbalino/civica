@@ -14,9 +14,11 @@
     "seed:factbook": "tsx scripts/seed-from-factbook.ts",
     "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
-    "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts"
+    "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
+    "db:deduplicate-terms": "tsx scripts/deduplicate-terms.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
     "@neondatabase/serverless": "^1.0.2",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
