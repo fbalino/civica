@@ -31,84 +31,119 @@ const DATA_SOURCES = [
     license: "CC0 (Public Domain)",
     retrievedAt: "2026-04-13",
   },
+  {
+    id: "ipu_parline",
+    name: "IPU Parline",
+    description:
+      "Inter-Parliamentary Union database on national parliaments. Provides chamber composition, electoral systems, and parliamentary structure data for legislatures worldwide.",
+    license: "CC-BY-NC-SA-4.0",
+    retrievedAt: null,
+  },
+  {
+    id: "constitute_project",
+    name: "Constitute Project",
+    description:
+      "Full-text constitution database covering 200+ countries. Provides searchable constitutional texts, amendment histories, and comparative constitutional data.",
+    license: "Non-commercial",
+    retrievedAt: null,
+  },
+  {
+    id: "parlgov",
+    name: "ParlGov",
+    description:
+      "Political party and election data for established democracies. Covers party positions, election results, and cabinet composition across parliamentary systems.",
+    license: "Open",
+    retrievedAt: null,
+  },
+  {
+    id: "congress_gov",
+    name: "Congress.gov",
+    description:
+      "Official legislative information for the United States Congress. Provides bill texts, voting records, and member data via the Library of Congress API.",
+    license: "Public Domain",
+    retrievedAt: null,
+  },
+  {
+    id: "uk_parliament",
+    name: "UK Parliament",
+    description:
+      "Members API for the Parliament of the United Kingdom. Provides current and historical data on MPs, Lords, constituencies, and parliamentary activity.",
+    license: "Open Parliament Licence",
+    retrievedAt: null,
+  },
+  {
+    id: "eu_parliament",
+    name: "European Parliament",
+    description:
+      "Open data portal for the European Parliament. Provides MEP profiles, committee membership, plenary votes, and legislative procedure data.",
+    license: "CC-BY-4.0",
+    retrievedAt: null,
+  },
 ];
 
 export default function AboutPage() {
   return (
-    <div
-      style={{
-        maxWidth: "var(--max-w-content)",
-        margin: "0 auto",
-        padding: "var(--spacing-section-y) var(--spacing-page-x)",
-      }}
-    >
-      <h1 className="page-heading" style={{ marginBottom: 24 }}>
+    <div className="cv-container" style={{ paddingTop: "var(--spacing-hero-top)", paddingBottom: "var(--spacing-section-y)" }}>
+      <h1 className="hero-heading">
         About Civica
       </h1>
 
-      <div
+      <p
         style={{
-          width: 40,
-          height: 2,
-          background: "var(--color-accent)",
-          borderRadius: 1,
-          marginBottom: 32,
+          fontFamily: "var(--font-body)",
+          fontSize: "var(--text-16)",
+          color: "var(--color-text-60)",
+          lineHeight: "var(--leading-normal)",
+          maxWidth: 720,
+          marginBottom: 12,
         }}
-      />
+      >
+        Civica is an open reference platform that visualizes government
+        structures for every country in the world. It combines data from
+        multiple authoritative sources into a single, browsable atlas of
+        political systems, constitutions, and country statistics.
+      </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-        <p
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-13)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-loose)",
-          }}
-        >
-          Civica is an open reference platform that visualizes government
-          structures for every country in the world. It combines data from
-          multiple authoritative sources into a single, browsable atlas of
-          political systems, constitutions, and country statistics.
-        </p>
+      <p
+        style={{
+          fontFamily: "var(--font-body)",
+          fontSize: "var(--text-16)",
+          color: "var(--color-text-60)",
+          lineHeight: "var(--leading-normal)",
+          maxWidth: 720,
+        }}
+      >
+        The CIA World Factbook &mdash; for decades the definitive public reference on
+        the world&rsquo;s nations &mdash; was sunset on February 4, 2026. Civica
+        preserves its final archive and enriches it with live data from
+        Wikidata and other open sources.
+      </p>
 
-        <p
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-13)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-loose)",
-          }}
-        >
-          The CIA World Factbook &mdash; for decades the definitive public reference on
-          the world&rsquo;s nations &mdash; was sunset on February 4, 2026. Civica
-          preserves its final archive and enriches it with live data from
-          Wikidata and other open sources.
-        </p>
-      </div>
+      <div style={{ height: 1, background: "var(--color-divider)", margin: "var(--spacing-section-y) 0" }} />
 
-      <section style={{ marginTop: 60 }}>
-        <h2
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-24)",
-            fontWeight: 400,
-            letterSpacing: "var(--tracking-tight)",
-            marginBottom: 24,
-            color: "var(--color-text-primary)",
-          }}
-        >
+      <section>
+        <h2 className="page-heading" style={{ marginBottom: 8 }}>
           Data Sources
         </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <p
+          style={{
+            fontFamily: "var(--font-body)",
+            fontSize: "var(--text-14)",
+            color: "var(--color-text-40)",
+            lineHeight: "var(--leading-normal)",
+            marginBottom: 24,
+          }}
+        >
+          Civica draws from {DATA_SOURCES.length} authoritative sources. Every data point carries statement-level provenance.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 1, background: "var(--color-grid-bg)", borderRadius: "var(--radius-sm)", overflow: "hidden" }}>
           {DATA_SOURCES.map((source) => (
-            <div key={source.id} className="cv-card">
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+            <div key={source.id} style={{ background: "var(--color-bg)", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <h3
                   style={{
                     fontFamily: "var(--font-heading)",
-                    fontSize: "var(--text-18)",
+                    fontSize: "var(--text-20)",
                     fontWeight: 400,
                     margin: 0,
                     color: "var(--color-text-primary)",
@@ -116,16 +151,15 @@ export default function AboutPage() {
                 >
                   {source.name}
                 </h3>
-                <SourceDot source={source.id} retrievedAt={source.retrievedAt} />
+                <SourceDot source={source.id} retrievedAt={source.retrievedAt ?? "pending"} />
               </div>
               <p
                 style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-12)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-14)",
                   color: "var(--color-text-50)",
-                  lineHeight: "var(--leading-relaxed)",
-                  marginBottom: 8,
+                  lineHeight: "var(--leading-normal)",
+                  margin: 0,
                 }}
               >
                 {source.description}
@@ -135,39 +169,30 @@ export default function AboutPage() {
                   fontFamily: "var(--font-mono)",
                   fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-11)",
-                  color: "var(--color-text-30)",
+                  color: "var(--color-text-25)",
+                  letterSpacing: "var(--tracking-wide)",
                 }}
               >
-                License: {source.license}
+                {source.license}
               </span>
             </div>
           ))}
         </div>
       </section>
 
-      <div style={{ height: 1, background: "var(--color-divider)", margin: "60px 0 0" }} />
+      <div style={{ height: 1, background: "var(--color-divider)", margin: "var(--spacing-section-y) 0" }} />
 
-      <section style={{ marginTop: 60 }}>
-        <h2
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-24)",
-            fontWeight: 400,
-            letterSpacing: "var(--tracking-tight)",
-            marginBottom: 16,
-            color: "var(--color-text-primary)",
-          }}
-        >
+      <section>
+        <h2 className="page-heading" style={{ marginBottom: 8 }}>
           Data Provenance
         </h2>
         <p
           style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-12)",
+            fontFamily: "var(--font-body)",
+            fontSize: "var(--text-14)",
             color: "var(--color-text-50)",
-            lineHeight: "var(--leading-relaxed)",
-            marginBottom: 16,
+            lineHeight: "var(--leading-normal)",
+            marginBottom: 20,
           }}
         >
           Every data point on Civica carries a provenance indicator showing its source and freshness.
@@ -175,41 +200,31 @@ export default function AboutPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span className="source-dot source-dot--live" data-source="" data-date="" />
-            <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-50)" }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", color: "var(--color-text-50)" }}>
               Green dot &mdash; live or regularly updated source
             </span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span className="source-dot source-dot--frozen" data-source="" data-date="" />
-            <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-50)" }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", color: "var(--color-text-50)" }}>
               Amber dot &mdash; frozen archive (CIA World Factbook, January 2026)
             </span>
           </div>
         </div>
       </section>
 
-      <div style={{ height: 1, background: "var(--color-divider)", margin: "60px 0 0" }} />
+      <div style={{ height: 1, background: "var(--color-divider)", margin: "var(--spacing-section-y) 0" }} />
 
-      <section style={{ marginTop: 60 }}>
-        <h2
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-24)",
-            fontWeight: 400,
-            letterSpacing: "var(--tracking-tight)",
-            marginBottom: 16,
-            color: "var(--color-text-primary)",
-          }}
-        >
+      <section>
+        <h2 className="page-heading" style={{ marginBottom: 8 }}>
           Open Source
         </h2>
         <p
           style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-12)",
+            fontFamily: "var(--font-body)",
+            fontSize: "var(--text-14)",
             color: "var(--color-text-50)",
-            lineHeight: "var(--leading-relaxed)",
+            lineHeight: "var(--leading-normal)",
           }}
         >
           Civica is built with Next.js, Neon (serverless Postgres), Drizzle ORM,

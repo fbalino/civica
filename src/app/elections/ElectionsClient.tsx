@@ -100,45 +100,38 @@ export default function ElectionsClient({
   }, [filteredRecent]);
 
   return (
-    <div style={{ maxWidth: "var(--max-w-content)", margin: "0 auto", padding: "40px var(--spacing-page-x)" }}>
-      <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-52)", fontWeight: 400, letterSpacing: "var(--tracking-tighter)", marginBottom: 8, lineHeight: "var(--leading-tight)" }}>
-        Elections
-      </h1>
-      <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-25)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginBottom: 32 }}>
+    <div className="cv-container" style={{ paddingTop: "var(--spacing-hero-top)", paddingBottom: "var(--spacing-section-y)" }}>
+      {/* Hero */}
+      <h1 className="hero-heading">Elections</h1>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-16)", color: "var(--color-text-40)", marginBottom: 32 }}>
         Track upcoming and past elections worldwide. Turnout data from IDEA. Results from Wikidata and official sources.
       </p>
 
-      {/* Stats strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "var(--color-divider)", borderRadius: "var(--radius-md)", overflow: "hidden", marginBottom: 32 }}>
+      {/* Stats — matching Index page pattern */}
+      <div className="index-stats-row" style={{ marginBottom: 32 }}>
         {[
           { value: stats.electionsThisYear || "—", label: `Elections in ${new Date().getFullYear()}` },
           { value: stats.upcomingCount || "—", label: "Upcoming" },
-          { value: stats.avgTurnout ? `${stats.avgTurnout}%` : "—", label: "Avg Global Turnout" },
-          { value: stats.totalElections.toLocaleString() || "—", label: "Total Elections Tracked" },
-        ].map((s) => (
-          <div key={s.label} style={{ background: "var(--color-surface-elevated)", padding: 20, textAlign: "center" }}>
-            <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-32)", fontWeight: 400, color: "var(--color-accent)", display: "block" }}>
-              {s.value}
-            </span>
-            <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-25)", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase", marginTop: 4, display: "block" }}>
-              {s.label}
-            </span>
+          { value: stats.avgTurnout ? `${stats.avgTurnout}%` : "—", label: "Avg Turnout" },
+          { value: stats.totalElections.toLocaleString() || "—", label: "Total Tracked" },
+        ].map((s, i, arr) => (
+          <div key={s.label} style={{ display: "contents" }}>
+            <div className="index-stat">
+              <span className="index-stat__value">{s.value}</span>
+              <span className="index-stat__label">{s.label}</span>
+            </div>
+            {i < arr.length - 1 && <div className="index-stat-divider" />}
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 32, flexWrap: "wrap", alignItems: "center", paddingTop: 24, borderTop: "1px solid var(--color-divider)" }}>
         <select
           value={regionFilter}
           onChange={(e) => setRegionFilter(e.target.value)}
-          style={{
-            background: "var(--color-surface-elevated)", border: "1px solid var(--color-card-border)",
-            borderRadius: "var(--radius-sm)", padding: "8px 32px 8px 14px",
-            fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)",
-            color: "var(--color-text-primary)", outline: "none", cursor: "pointer",
-            appearance: "none", WebkitAppearance: "none",
-          }}
+          className="cv-select"
+          style={{ minWidth: 140, padding: "8px 32px 8px 14px", fontSize: "var(--text-11)" }}
         >
           {REGIONS.map((r) => <option key={r}>{r}</option>)}
         </select>
@@ -146,13 +139,13 @@ export default function ElectionsClient({
           <button
             key={t}
             onClick={() => setTypeFilter(t)}
+            className="index-continent-chip"
             style={{
-              fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)",
-              padding: "5px 12px", borderRadius: 999,
-              border: `1px solid ${typeFilter === t ? "var(--color-accent)" : "var(--color-card-border)"}`,
-              background: typeFilter === t ? "var(--color-selection)" : "var(--color-surface-elevated)",
-              color: typeFilter === t ? "var(--color-accent)" : "var(--color-text-40)",
-              cursor: "pointer", transition: "all 0.15s", letterSpacing: "var(--tracking-wide)",
+              ...(typeFilter === t ? {
+                background: "var(--color-accent)",
+                color: "var(--color-bg)",
+                borderColor: "var(--color-accent)",
+              } : {}),
             }}
           >
             {t}
@@ -162,70 +155,81 @@ export default function ElectionsClient({
 
       {/* Upcoming Elections */}
       {filteredUpcoming.length > 0 && (
-        <>
-          <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-20)", marginBottom: 16 }}>
-            Upcoming Elections
+        <section style={{ marginBottom: 48 }}>
+          <div className="index-continent-header">
+            <h2 className="index-continent-title">Upcoming Elections</h2>
+            <div className="index-continent-meta">
+              <span>{filteredUpcoming.length} elections</span>
+            </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 1, background: "var(--color-divider)", borderRadius: "var(--radius-md)", overflow: "hidden", marginBottom: 40 }}>
+          <div className="index-card-grid">
             {filteredUpcoming.map((e) => {
               const days = e.election.electionDate ? daysUntil(e.election.electionDate) : null;
               return (
                 <a
                   key={e.election.id}
                   href={`/countries/${e.jurisdiction.slug}`}
-                  style={{ background: "var(--color-surface-elevated)", padding: 20, display: "flex", flexDirection: "column", gap: 8, textDecoration: "none", color: "inherit", transition: "background 0.15s" }}
-                  onMouseEnter={(ev) => (ev.currentTarget.style.background = "var(--color-selection)")}
-                  onMouseLeave={(ev) => (ev.currentTarget.style.background = "var(--color-surface-elevated)")}
+                  className="index-country-card"
+                  style={{ textDecoration: "none", color: "inherit" }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <CountryFlag iso2={e.jurisdiction.iso2} size={24} />
-                    <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-18)", fontWeight: 400 }}>
-                      {e.jurisdiction.name}
-                    </span>
+                  <div className="index-card-top">
+                    <CountryFlag iso2={e.jurisdiction.iso2} size={28} />
+                    <div className="index-card-name-block">
+                      <span className="index-card-name">{e.jurisdiction.name}</span>
+                      <span className="index-card-capital" style={{ textTransform: "capitalize" }}>
+                        {e.election.electionType} election
+                      </span>
+                    </div>
                   </div>
-                  <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-25)", textTransform: "uppercase", letterSpacing: "var(--tracking-wide)" }}>
-                    {e.election.electionType} election
-                  </span>
-                  <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-accent)" }}>
-                    {formatDate(e.election.electionDate)}
-                  </span>
-                  {days !== null && days > 0 && (
-                    <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-branch-executive)" }}>
-                      {days} {days === 1 ? "day" : "days"} away
-                    </span>
-                  )}
+                  <div className="index-card-bottom">
+                    <div className="index-card-data">
+                      <span className="index-card-datum" style={{ color: "var(--color-accent)" }}>
+                        {formatDate(e.election.electionDate)}
+                      </span>
+                    </div>
+                    {days !== null && days > 0 && (
+                      <span className="index-card-datum index-card-datum--dim">
+                        {days}d away
+                      </span>
+                    )}
+                  </div>
                 </a>
               );
             })}
           </div>
-        </>
+        </section>
       )}
 
       {/* Recent Election Results Timeline */}
-      <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-text-20)", marginBottom: 16 }}>
-        Recent Election Results
-      </div>
-      <div style={{ position: "relative", marginBottom: 40 }}>
-        {/* Timeline line */}
-        <div style={{ position: "absolute", left: 20, top: 0, bottom: 0, width: 2, background: "var(--color-divider)" }} />
+      <section>
+        <div className="index-continent-header">
+          <h2 className="index-continent-title">Recent Results</h2>
+          <div className="index-continent-meta">
+            <span>{filteredRecent.length} elections</span>
+          </div>
+        </div>
 
-        {recentByYear.map(({ year, items }) => (
-          <div key={year}>
-            <div style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-28)", fontWeight: 400, color: "var(--color-text-20)", paddingLeft: 52, marginBottom: 16, marginTop: 8 }}>
-              {year}
+        <div style={{ position: "relative", marginTop: 8 }}>
+          <div style={{ position: "absolute", left: 20, top: 0, bottom: 0, width: 2, background: "var(--color-divider)" }} />
+
+          {recentByYear.map(({ year, items }) => (
+            <div key={year}>
+              <div style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-28)", fontWeight: 400, color: "var(--color-text-20)", paddingLeft: 52, marginBottom: 16, marginTop: 8 }}>
+                {year}
+              </div>
+              {items.map((e) => (
+                <TimelineCard key={e.election.id} election={e} />
+              ))}
             </div>
-            {items.map((e) => (
-              <TimelineCard key={e.election.id} election={e} />
-            ))}
-          </div>
-        ))}
+          ))}
 
-        {recentByYear.length === 0 && (
-          <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-25)", padding: "40px 0", textAlign: "center", letterSpacing: "var(--tracking-wider)", textTransform: "uppercase" }}>
-            No election results match the current filters.
-          </div>
-        )}
-      </div>
+          {recentByYear.length === 0 && (
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", color: "var(--color-text-25)", padding: "40px 0", textAlign: "center" }}>
+              No election results match the current filters.
+            </p>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
@@ -237,7 +241,6 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
 
   return (
     <div style={{ position: "relative", paddingLeft: 52, paddingBottom: 32 }}>
-      {/* Dot */}
       <div style={{
         position: "absolute", left: 14, top: 6, width: 14, height: 14,
         borderRadius: "50%", border: `2px solid ${dotColor}`, background: "var(--color-bg)", zIndex: 1,
@@ -245,13 +248,7 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
 
       <div
         onClick={() => setExpanded(!expanded)}
-        style={{
-          background: "var(--color-surface-elevated)", border: "1px solid var(--color-card-border)",
-          borderRadius: "var(--radius-md)", padding: 20, cursor: "pointer",
-          transition: "border-color 0.15s",
-        }}
-        onMouseEnter={(ev) => (ev.currentTarget.style.borderColor = "var(--color-accent)")}
-        onMouseLeave={(ev) => (ev.currentTarget.style.borderColor = "var(--color-card-border)")}
+        className="cv-card cv-card--interactive"
       >
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
@@ -261,10 +258,9 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
               {e.jurisdiction.name}
             </span>
           </div>
-          <span style={{
-            fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)",
-            letterSpacing: "var(--tracking-wide)", textTransform: "uppercase", padding: "3px 10px",
+          <span className="gov-badge" style={{
             borderRadius: 999,
+            padding: "3px 10px",
             background: isLegislative ? "var(--color-branch-legislative-bg)" : "var(--color-branch-executive-bg)",
             color: dotColor,
           }}>
@@ -273,11 +269,11 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
         </div>
 
         {/* Meta */}
-        <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-25)", display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", color: "var(--color-text-40)", display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
           <span>{formatDate(e.election.electionDate)}</span>
           {e.election.electoralSystem && (
             <span style={{
-              display: "inline-flex", alignItems: "center", gap: 4,
+              fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-10)", color: "var(--color-text-25)",
               padding: "3px 8px", border: "1px solid var(--color-card-border)",
               borderRadius: "var(--radius-sm)",
@@ -304,7 +300,7 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
           </div>
         )}
 
-        {/* Results (fetched inline from recent data) */}
+        {/* Results */}
         {expanded && (e as RecentElectionRow).results && (e as RecentElectionRow).results!.length > 0 && (
           <ResultsBar results={(e as RecentElectionRow).results!} />
         )}
@@ -330,7 +326,7 @@ function ResultsBar({ results }: {
       {results.map((r, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <span style={{
-            fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)",
+            fontFamily: "var(--font-body)", fontSize: "var(--text-13)",
             color: "var(--color-text-85)", width: 140, overflow: "hidden", textOverflow: "ellipsis",
             whiteSpace: "nowrap", flexShrink: 0,
           }}>
