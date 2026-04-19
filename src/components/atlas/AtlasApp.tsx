@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
+import ReactMarkdown from "react-markdown";
 import { type Country, type ChamberData, type Bill, COUNTRIES as FALLBACK_COUNTRIES, CHAMBERS as FALLBACK_CHAMBERS, WORLD_PATHS, NE_ID_TO_OURS as FALLBACK_NE_MAP, PARTY_COLORS, getDefaultChamberData as getFallbackChamberData, govDescription, getMember } from "./data";
 import { Hemicycle, PartyLegend } from "./Hemicycle";
 import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data";
@@ -166,6 +167,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     { role: "ai", text: "I'm **Civica**. I can explain bills in plain language, compare countries, or walk you through any chamber. What do you want to know?" },
   ]);
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
   const [electionData, setElectionData] = useState<ElectionData[]>([]);
   const [electionsLoading, setElectionsLoading] = useState(false);
   const electionFetchRef = useRef<AbortController | null>(null);
@@ -210,6 +212,12 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, []);
+
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [chatHistory]);
 
   useEffect(() => {
     const measure = () => {
@@ -1372,7 +1380,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                 <span className="pill">{house === "upper" ? "Upper house" : "Lower house"}</span>
                 <span className="pill">{{ chamber: "Chamber", bills: "Bills", structure: "Structure", elections: "Elections", democracy: "Democracy", leaders: "Leaders", constitution: "Constitution" }[tab] ?? tab}</span>
               </div>
-              <div className="atlas-chat-scroll">
+              <div className="atlas-chat-scroll" ref={chatScrollRef}>
                 {chatHistory.map((m, i) => (
                   <div key={i} className="atlas-msg">
                     <div className={`av${m.role === "ai" ? " ai" : ""}`}>{m.role === "ai" ? "C" : "U"}</div>
@@ -1381,9 +1389,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                       {m.role === "ai" && m.text === "" ? (
                         <p style={{ color: "var(--atlas-muted)", fontStyle: "italic" }}>Thinking…</p>
                       ) : (
-                        m.text.split("\n\n").map((p, j) => (
-                          <p key={j} dangerouslySetInnerHTML={{ __html: p.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>") }} />
-                        ))
+                        <ReactMarkdown>{m.text}</ReactMarkdown>
                       )}
                       {m.cite && <div className="cite">{m.cite}</div>}
                     </div>
