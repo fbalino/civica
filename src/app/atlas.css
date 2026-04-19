@@ -538,7 +538,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   text-transform: uppercase; letter-spacing: 0.08em;
 }
 
-.atlas-chat-scroll { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.atlas-chat-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
 
 .atlas-msg { display: flex; gap: 10px; align-items: flex-start; }
 .atlas-msg .av {
