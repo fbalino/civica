@@ -33,7 +33,7 @@ function CodeBlock({ children }: { children: string }) {
       style={{
         ...mono,
         fontSize: "var(--text-11)",
-        background: "var(--color-bg-card)",
+        background: "var(--color-card-bg)",
         border: "1px solid var(--color-divider)",
         borderRadius: 6,
         padding: "16px 20px",

@@ -219,3 +219,13 @@ export const sources = pgTable("sources", {
   isCommercialUseAllowed: boolean("is_commercial_use_allowed").notNull(),
   lastSyncAt: timestamp("last_sync_at"),
 });
+
+export const contactSubmissions = pgTable("contact_submissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  subject: text("subject").notNull(),
+  message: text("message").notNull(),
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

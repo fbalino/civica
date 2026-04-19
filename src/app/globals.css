@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Civica Design System — mapped from civica-prototype-v2.jsx
-   Fonts: Instrument Serif (heading/body) + JetBrains Mono (data/labels)
+   Civica Design System — warm newsprint palette
+   Fonts: Fraunces (headings) + Inter (body) + ui-monospace (data)
    ============================================================ */
 
 @theme inline {
@@ -83,60 +83,62 @@
   --radius-sm: 4px;
   --radius-md: 4px;
 
-  /* --- Dark mode (default / prototype palette) --- */
-  --color-bg: #0C0C0B;
-  --color-bg-nav: rgba(42, 34, 24, 0.92);
-  --color-surface-elevated: #1E1E1C;
-  --color-select-bg: #141413;
+  /* --- Dark mode (default) — design system: starless sky --- */
+  --color-bg: #16140f;
+  --color-bg-nav: color-mix(in oklab, #16140f 92%, transparent);
+  --color-surface-elevated: #221e16;
+  --color-select-bg: #2b2619;
 
-  --color-text-primary: #E8E6DF;
-  --color-text-85: rgba(255, 255, 255, 0.88);
-  --color-text-60: rgba(255, 255, 255, 0.72);
-  --color-text-50: rgba(255, 255, 255, 0.64);
-  --color-text-40: rgba(255, 255, 255, 0.56);
-  --color-text-30: rgba(255, 255, 255, 0.50);
-  --color-text-25: rgba(255, 255, 255, 0.48);
-  --color-text-20: rgba(255, 255, 255, 0.40);
+  --color-text-primary: #ebe6d6;
+  --color-text-85: rgba(235, 230, 214, 0.88);
+  --color-text-60: #c4bdae;
+  --color-text-50: rgba(235, 230, 214, 0.64);
+  --color-text-40: #8a8370;
+  --color-text-30: rgba(235, 230, 214, 0.50);
+  --color-text-25: rgba(235, 230, 214, 0.48);
+  --color-text-20: rgba(235, 230, 214, 0.40);
 
-  --color-accent: #D4A04A;
+  --color-accent: oklch(68% 0.15 35);
 
-  --color-card-bg: rgba(255, 255, 255, 0.03);
-  --color-card-border: rgba(255, 255, 255, 0.07);
-  --color-card-hover-bg: rgba(255, 255, 255, 0.06);
-  --color-card-hover-border: rgba(255, 255, 255, 0.14);
-  --color-divider: rgba(255, 255, 255, 0.06);
+  --color-card-bg: #221e16;
+  --color-card-border: #3d382d;
+  --color-card-hover-bg: #2b2619;
+  --color-card-hover-border: #8a8370;
+  --color-divider: #3d382d;
   --color-branch-border-alpha: 44;
-  --color-stat-border: rgba(255, 255, 255, 0.06);
-  --color-selection: rgba(212, 160, 74, 0.3);
+  --color-stat-border: #3d382d;
+  --color-selection: oklch(30% 0.06 35);
 
-  --color-grid-bg: rgba(255, 255, 255, 0.06);
-  --color-grid-cell: rgba(12, 12, 11, 0.9);
-  --color-grid-cell-hover: rgba(255, 255, 255, 0.06);
-  --color-grid-row-hover: rgba(255, 255, 255, 0.03);
+  --color-grid-bg: #221e16;
+  --color-grid-cell: #16140f;
+  --color-grid-cell-hover: #2b2619;
+  --color-grid-row-hover: #221e16;
 
-  --color-tooltip-bg: #1E1E1C;
-  --color-tooltip-text: #ccc;
-  --color-tooltip-border: rgba(255, 255, 255, 0.1);
+  --color-tooltip-bg: #221e16;
+  --color-tooltip-text: #c4bdae;
+  --color-tooltip-border: #3d382d;
 
-  --color-hemi-seat-text: rgba(255, 255, 255, 0.3);
+  --color-hemi-seat-text: rgba(235, 230, 214, 0.3);
 
-  /* --- Signal colors (from design system reference) --- */
-  --color-success: #3b8a5a;
-  --color-warn: #c9963a;
-  --color-danger: #b5454a;
-  --color-info: #4E8BD4;
+  /* --- Signal colors — design system reference --- */
+  --color-success: oklch(68% 0.14 145);
+  --color-warn: oklch(75% 0.14 75);
+  --color-danger: oklch(65% 0.18 25);
+  --color-info: oklch(68% 0.10 240);
 
   /* --- Branch backgrounds (alpha) --- */
   --color-branch-executive-bg: rgba(212, 118, 78, 0.15);
   --color-branch-legislative-bg: rgba(78, 139, 212, 0.15);
 
   /* --- Badge colors --- */
-  --color-badge-get: #22863a;
-  --color-badge-post: #0366d6;
-  --color-badge-text: #ffffff;
+  --color-badge-get: oklch(55% 0.12 145);
+  --color-badge-post: oklch(52% 0.10 240);
+  --color-badge-text: #ebe6d6;
 
   /* --- Shadows --- */
-  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.25);
+  --shadow-dropdown: 4px 4px 0 #000;
+  --shadow-hard: 4px 4px 0 #000;
+  --shadow-hard-lg: 6px 6px 0 #000;
 }
 
 /* ============================================================
@@ -144,49 +146,52 @@
    ============================================================ */
 
 .light {
-  --color-bg: #FAFAF7;
-  --color-bg-nav: rgba(250, 250, 247, 0.92);
-  --color-surface-elevated: #FFFFFF;
-  --color-select-bg: #F2F1EC;
+  /* --- Light mode — design system: warm newsprint --- */
+  --color-bg: #f4f1ea;
+  --color-bg-nav: color-mix(in oklab, #f4f1ea 92%, transparent);
+  --color-surface-elevated: #ebe6d6;
+  --color-select-bg: #e2dcc8;
 
-  --color-text-primary: #1A1A18;
-  --color-text-85: rgba(0, 0, 0, 0.82);
-  --color-text-60: rgba(0, 0, 0, 0.70);
-  --color-text-50: rgba(0, 0, 0, 0.62);
-  --color-text-40: rgba(0, 0, 0, 0.56);
-  --color-text-30: rgba(0, 0, 0, 0.53);
-  --color-text-25: rgba(0, 0, 0, 0.48);
-  --color-text-20: rgba(0, 0, 0, 0.38);
+  --color-text-primary: #1a1a1a;
+  --color-text-85: rgba(26, 26, 26, 0.82);
+  --color-text-60: #3d382d;
+  --color-text-50: rgba(26, 26, 26, 0.62);
+  --color-text-40: #8a8370;
+  --color-text-30: rgba(26, 26, 26, 0.53);
+  --color-text-25: rgba(26, 26, 26, 0.48);
+  --color-text-20: rgba(26, 26, 26, 0.38);
 
-  --color-accent: #B8860B;
+  --color-accent: oklch(58% 0.14 35);
 
-  --color-card-bg: rgba(0, 0, 0, 0.02);
-  --color-card-border: rgba(0, 0, 0, 0.08);
-  --color-card-hover-bg: rgba(0, 0, 0, 0.04);
-  --color-card-hover-border: rgba(0, 0, 0, 0.14);
-  --color-divider: rgba(0, 0, 0, 0.07);
-  --color-stat-border: rgba(0, 0, 0, 0.07);
-  --color-selection: rgba(184, 134, 11, 0.2);
+  --color-card-bg: #ebe6d6;
+  --color-card-border: #c4bdae;
+  --color-card-hover-bg: #e2dcc8;
+  --color-card-hover-border: #8a8370;
+  --color-divider: #c4bdae;
+  --color-stat-border: #c4bdae;
+  --color-selection: oklch(92% 0.04 35);
 
-  --color-grid-bg: rgba(0, 0, 0, 0.06);
-  --color-grid-cell: rgba(250, 250, 247, 0.95);
-  --color-grid-cell-hover: rgba(0, 0, 0, 0.03);
-  --color-grid-row-hover: rgba(0, 0, 0, 0.02);
+  --color-grid-bg: #ebe6d6;
+  --color-grid-cell: #f4f1ea;
+  --color-grid-cell-hover: #e2dcc8;
+  --color-grid-row-hover: #ebe6d6;
 
-  --color-tooltip-bg: #FFFFFF;
-  --color-tooltip-text: #4A4A42;
-  --color-tooltip-border: rgba(0, 0, 0, 0.1);
+  --color-tooltip-bg: #f4f1ea;
+  --color-tooltip-text: #3d382d;
+  --color-tooltip-border: #c4bdae;
 
-  --color-hemi-seat-text: rgba(0, 0, 0, 0.25);
+  --color-hemi-seat-text: rgba(26, 26, 26, 0.25);
 
-  --color-success: #2d7a4a;
-  --color-warn: #b8860b;
-  --color-danger: #a83838;
+  --color-success: oklch(55% 0.12 145);
+  --color-warn: oklch(65% 0.14 75);
+  --color-danger: oklch(52% 0.18 25);
 
   --color-branch-executive-bg: rgba(212, 118, 78, 0.12);
   --color-branch-legislative-bg: rgba(78, 139, 212, 0.12);
 
-  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-dropdown: 4px 4px 0 var(--color-text-primary);
+  --shadow-hard: 4px 4px 0 var(--color-text-primary);
+  --shadow-hard-lg: 6px 6px 0 var(--color-text-primary);
 }
 
 /* ============================================================
