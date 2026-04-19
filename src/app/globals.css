@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-/* Civica Design System v0.1 — canonical semantic tokens (CIV-87).
-   Imported first so legacy tokens defined below still win on
-   collision. CIV-88 will progressively migrate pages onto the
-   new --color-surface-*, --color-text-*, --shadow-hard, etc. */
-@import "./design-tokens.css";
 
 /* ============================================================
    Civica Design System — warm newsprint palette
@@ -145,6 +140,10 @@
   --shadow-dropdown: 4px 4px 0 #000;
   --shadow-hard: 4px 4px 0 #000;
   --shadow-hard-lg: 6px 6px 0 #000;
+
+  /* --- Logo tokens (dark mode defaults) --- */
+  --logo-fg: var(--color-text-primary);  /* cream on dark */
+  --logo-bg: var(--color-bg);            /* dark field */
 }
 
 /* ============================================================
@@ -198,6 +197,10 @@
   --shadow-dropdown: 4px 4px 0 var(--color-text-primary);
   --shadow-hard: 4px 4px 0 var(--color-text-primary);
   --shadow-hard-lg: 6px 6px 0 var(--color-text-primary);
+
+  /* --- Logo tokens (light mode overrides) --- */
+  --logo-fg: var(--color-text-primary);  /* dark ink on paper */
+  --logo-bg: var(--color-bg);            /* cream field */
 }
 
 /* ============================================================
