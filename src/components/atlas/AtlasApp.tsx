@@ -100,6 +100,8 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     if (!dbCountries || dbCountries.length === 0) return FALLBACK_COUNTRIES;
     return dbCountries.map((c) => ({
       id: c.id,
+      slug: c.slug,
+      iso2: c.iso2,
       name: c.name,
       leader: c.leader,
       gov: c.gov,
@@ -144,6 +146,8 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const [democracyData, setDemocracyData] = useState<DemocracyData | null>(null);
   const [leadersData, setLeadersData] = useState<LeaderEntry[] | null>(null);
   const [constitutionData, setConstitutionData] = useState<ConstitutionData | null>(null);
+  const [billsData, setBillsData] = useState<Bill[] | null>(null);
+  const [billsLoading, setBillsLoading] = useState(false);
   const [tabDataLoading, setTabDataLoading] = useState(false);
   const [dimmed, setDimmed] = useState<Set<string>>(new Set());
   const [pinned, setPinned] = useState<string[]>([]);
@@ -548,13 +552,27 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     setMode("compare");
   }
 
-  // Fetch extended tab data (democracy / leaders / constitution) when country or tab changes
+  // Fetch extended tab data (bills / democracy / leaders / constitution) when country or tab changes
   useEffect(() => {
-    if (!country || !["democracy", "leaders", "constitution"].includes(tab)) return;
-    const slug = country.id;
+    if (!country || !["bills", "democracy", "leaders", "constitution"].includes(tab)) return;
+    const slug = country.slug ?? country.id;
     let cancelled = false;
 
     async function load() {
+      if (tab === "bills") {
+        if (billsData !== null) return;
+        setBillsLoading(true);
+        try {
+          const res = await fetch(`/api/countries/${slug}/bills`);
+          if (!cancelled && res.ok) {
+            const json = await res.json();
+            setBillsData(json.bills ?? []);
+          }
+        } finally {
+          if (!cancelled) setBillsLoading(false);
+        }
+        return;
+      }
       setTabDataLoading(true);
       try {
         if (tab === "democracy" && !democracyData) {
@@ -583,6 +601,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     setDemocracyData(null);
     setLeadersData(null);
     setConstitutionData(null);
+    setBillsData(null);
   }, [country?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filter logic
@@ -987,7 +1006,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   </div>
                   <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
                     <a
-                      href={`/api/countries/${country.id}/export?format=json`}
+                      href={`/api/countries/${country.slug ?? country.id}/export?format=json`}
                       download
                       className="atlas-export-btn"
                     >
@@ -1090,15 +1109,17 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
               {/* Tab II: Bills */}
               <div className={`atlas-pane${tab === "bills" ? " on" : ""}`}>
-                {(!cd.bills || cd.bills.length === 0) ? (
-                  <div className="atlas-mono" style={{ color: "var(--atlas-muted)", fontSize: 12, padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>
-                    No bill data loaded for {country.name}
-                  </div>
-                ) : (
-                  cd.bills.map((b, i) => <BillCard key={i} bill={b} index={i} onAsk={(text) => {
+                {billsLoading ? (
+                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading…</div>
+                ) : billsData && billsData.length > 0 ? (
+                  billsData.map((b, i) => <BillCard key={i} bill={b} index={i} onAsk={(text) => {
                     if (chatInputRef.current) chatInputRef.current.value = text;
                     sendChat(text);
                   }} />)
+                ) : (
+                  <div className="atlas-mono" style={{ color: "var(--atlas-muted)", fontSize: 12, padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>
+                    No bill data available for {country.name}
+                  </div>
                 )}
               </div>
 

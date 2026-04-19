@@ -45,6 +45,8 @@ export interface Bill {
 
 export interface Country {
   id: string;
+  slug?: string;
+  iso2?: string;
   name: string;
   leader: string;
   gov: string;
