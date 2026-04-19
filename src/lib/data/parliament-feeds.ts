@@ -1,5 +1,6 @@
 export interface Bill {
   title: string;
+  longTitle?: string;
   summary?: string;
   status: string;
   date: string;
@@ -36,14 +37,26 @@ async function fetchUSBills(): Promise<Bill[]> {
       number?: number;
     }>;
   };
-  return (json.bills ?? []).map((b) => ({
-    title: b.title ?? "Untitled",
-    status: b.latestAction?.text ?? "In Congress",
-    date: b.latestAction?.actionDate ?? b.updateDate ?? "",
-    url: b.url ?? `https://www.congress.gov/bill/${b.congress}th-congress/${(b.type ?? "").toLowerCase()}-bill/${b.number}`,
-    source: "congress_gov",
-    identifier: b.type && b.number != null ? `${b.type} ${b.number}` : undefined,
-  }));
+  return (json.bills ?? []).map((b) => {
+    const typeMap: Record<string, string> = {
+      HR: "H.R.", HJRES: "H.J.Res.", HRES: "H.Res.", HCONRES: "H.Con.Res.",
+      S: "S.", SJRES: "S.J.Res.", SRES: "S.Res.", SCONRES: "S.Con.Res.",
+    };
+    const typeLabel = b.type ? (typeMap[b.type] ?? b.type) : "";
+    const identifier = typeLabel && b.number != null ? `${typeLabel} ${b.number}` : undefined;
+    // Use identifier as title for Congress bills; the long formal title becomes longTitle for AI context
+    const formalTitle = b.title ?? "Untitled";
+    const displayTitle = identifier ?? formalTitle;
+    return {
+      title: displayTitle,
+      longTitle: formalTitle !== displayTitle ? formalTitle : undefined,
+      status: b.latestAction?.text ?? "In Congress",
+      date: b.latestAction?.actionDate ?? b.updateDate ?? "",
+      url: b.url ?? `https://www.congress.gov/bill/${b.congress}th-congress/${(b.type ?? "").toLowerCase()}-bill/${b.number}`,
+      source: "congress_gov",
+      identifier,
+    };
+  });
 }
 
 async function fetchUKBills(): Promise<Bill[]> {
