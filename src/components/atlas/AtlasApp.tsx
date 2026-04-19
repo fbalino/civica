@@ -277,7 +277,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
       </div>
     );
     return () => setAtlasControls(null);
-  });
+  }, [mode, regionFilter, govFilter, country, pinned, setAtlasControls]);
 
   const W = 2000, H = 1000;
   const LAT_MIN = -58, LAT_MAX = 85;
