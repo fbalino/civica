@@ -36,8 +36,6 @@ function generateSeats(
   rand: () => number,
   rows: number,
   perRow: number,
-  cx: number,
-  cy: number,
   startRadius: number,
   spacing: number,
   seatRadius: number
@@ -55,8 +53,8 @@ function generateSeats(
       seats.push(
         <circle
           key={`s${r}-${i}`}
-          cx={cx + x}
-          cy={cy + y}
+          cx={x}
+          cy={y}
           r={seatRadius}
           fill={parties[Math.floor((i / perRow) * parties.length)]}
         />
@@ -66,6 +64,112 @@ function generateSeats(
   return seats;
 }
 
+function generateCardHemicycle(rand: () => number): React.ReactElement[] {
+  const seats: React.ReactElement[] = [];
+  const numParties = 3 + Math.floor(rand() * 2);
+  const parties = PARTY_COLORS.slice(0, numParties);
+  const rows = 3;
+  const perRow = 12 + Math.floor(rand() * 8);
+
+  for (let r = 0; r < rows; r++) {
+    const rad = 50 + r * 25;
+    for (let i = 0; i < perRow; i++) {
+      const t = Math.PI - (i / (perRow - 1)) * Math.PI;
+      const x = Math.cos(t) * rad;
+      const y = -Math.sin(t) * rad;
+      seats.push(
+        <circle
+          key={`cs${r}-${i}`}
+          cx={x}
+          cy={y}
+          r={3}
+          fill={parties[Math.floor((i / perRow) * parties.length)]}
+          opacity={0.7 + rand() * 0.3}
+        />
+      );
+    }
+  }
+  return seats;
+}
+
+function generateCardBenches(rand: () => number): React.ReactElement[] {
+  const elements: React.ReactElement[] = [];
+  const leftRows = 3 + Math.floor(rand() * 2);
+  const rightRows = 3 + Math.floor(rand() * 2);
+
+  for (let i = 0; i < leftRows; i++) {
+    elements.push(
+      <rect key={`lb${i}`} x={-90} y={-80 + i * 34} width={70} height={20}
+        fill="none" stroke="currentColor" strokeWidth="1" />
+    );
+  }
+  for (let i = 0; i < rightRows; i++) {
+    elements.push(
+      <rect key={`rb${i}`} x={20} y={-80 + i * 34} width={70} height={20}
+        fill="none" stroke="currentColor" strokeWidth="1" />
+    );
+  }
+  elements.push(
+    <line key="aisle" x1={-95} y1={0} x2={95} y2={0}
+      stroke="var(--color-accent)" strokeWidth="1.5" strokeDasharray="4 4" />
+  );
+  return elements;
+}
+
+function generateCardRound(rand: () => number): React.ReactElement[] {
+  const elements: React.ReactElement[] = [];
+  const rings = 2 + Math.floor(rand() * 2);
+
+  for (let r = 0; r < rings; r++) {
+    const radius = 30 + r * 30;
+    elements.push(
+      <circle key={`ring${r}`} cx={0} cy={0} r={radius}
+        fill="none" stroke="currentColor" strokeWidth="1" />
+    );
+  }
+
+  const dotCount = 4 + Math.floor(rand() * 4);
+  for (let i = 0; i < dotCount; i++) {
+    const angle = (i / dotCount) * Math.PI * 2;
+    const radius = 30 + rand() * 60;
+    elements.push(
+      <circle key={`dot${i}`}
+        cx={Math.cos(angle) * radius}
+        cy={Math.sin(angle) * radius}
+        r={4} fill="var(--color-accent)" />
+    );
+  }
+  return elements;
+}
+
+function generateCardHorseshoe(rand: () => number): React.ReactElement[] {
+  const elements: React.ReactElement[] = [];
+  const outerR = 80 + Math.floor(rand() * 20);
+  const legLen = 20 + Math.floor(rand() * 20);
+
+  elements.push(
+    <path key="h1" d={`M -${outerR} 0 A ${outerR} ${outerR} 0 0 1 ${outerR} 0`}
+      fill="none" stroke="currentColor" strokeWidth="1" />
+  );
+  elements.push(
+    <path key="h2" d={`M -${outerR - 25} 0 A ${outerR - 25} ${outerR - 25} 0 0 1 ${outerR - 25} 0`}
+      fill="none" stroke="currentColor" strokeWidth="1" />
+  );
+  elements.push(
+    <line key="ll" x1={-outerR} y1={0} x2={-outerR} y2={legLen}
+      stroke="currentColor" strokeWidth="1" />
+  );
+  elements.push(
+    <line key="rl" x1={outerR} y1={0} x2={outerR} y2={legLen}
+      stroke="currentColor" strokeWidth="1" />
+  );
+  elements.push(
+    <circle key="spk" cx={0} cy={0} r={4} fill="var(--color-accent)" />
+  );
+
+  return elements;
+}
+
 export function HemicycleCover({ slug, variant = "card" }: HemicycleCoverProps) {
   const hash = hashString(slug);
   const rand = seededRandom(hash);
@@ -73,7 +177,7 @@ export function HemicycleCover({ slug, variant = "card" }: HemicycleCoverProps) 
   if (variant === "lead") {
     const vw = 600;
     const vh = 480;
-    const seats = generateSeats(rand, 6, 34, 300, 360, 90, 22, 3);
+    const seats = generateSeats(rand, 6, 34, 90, 22, 3);
     return (
       <svg
         viewBox={`0 0 ${vw} ${vh}`}
@@ -107,7 +211,7 @@ export function HemicycleCover({ slug, variant = "card" }: HemicycleCoverProps) 
   if (variant === "hero") {
     const vw = 1200;
     const vh = 515;
-    const seats = generateSeats(rand, 7, 52, 600, 430, 110, 50, 3.2);
+    const seats = generateSeats(rand, 7, 52, 110, 50, 3.2);
     return (
       <svg
         viewBox={`0 0 ${vw} ${vh}`}
@@ -139,10 +243,11 @@ export function HemicycleCover({ slug, variant = "card" }: HemicycleCoverProps) 
     );
   }
 
-  // Card variant — smaller, simpler
+  // Card variant — 4 unique shapes based on slug hash
   const vw = 400;
   const vh = 300;
-  const shapeType = hash % 3;
+  const shapeType = hash % 4;
+
   return (
     <svg
       viewBox={`0 0 ${vw} ${vh}`}
@@ -151,49 +256,13 @@ export function HemicycleCover({ slug, variant = "card" }: HemicycleCoverProps) 
       aria-hidden="true"
     >
       <rect width={vw} height={vh} fill="var(--color-surface-elevated)" />
-      {shapeType === 0 && (
-        // Hemicycle
-        <g transform="translate(200 220)" style={{ color: "var(--color-text-primary)" }}>
-          <g fill="none" stroke="currentColor" strokeWidth="1">
-            <path d="M -140 0 A 140 140 0 0 1 140 0" />
-            <path d="M -110 0 A 110 110 0 0 1 110 0" />
-            <path d="M -80 0 A 80 80 0 0 1 80 0" />
-          </g>
-          <g fill="var(--color-accent)">
-            <circle cx={-70} cy={-50} r={4} />
-            <circle cx={-20} cy={-80} r={4} />
-            <circle cx={30} cy={-80} r={4} />
-            <circle cx={80} cy={-50} r={4} />
-            <circle cx={110} cy={-10} r={4} />
-          </g>
-        </g>
-      )}
-      {shapeType === 1 && (
-        // Opposing benches
-        <g style={{ color: "var(--color-text-primary)" }} fill="none" stroke="currentColor" strokeWidth="1">
-          <rect x="40" y="100" width="140" height="24" />
-          <rect x="40" y="134" width="140" height="24" />
-          <rect x="40" y="168" width="140" height="24" />
-          <rect x="220" y="100" width="140" height="24" />
-          <rect x="220" y="134" width="140" height="24" />
-          <rect x="220" y="168" width="140" height="24" />
-          <line x1="200" y1="80" x2="200" y2="220" stroke="var(--color-accent)" strokeWidth="2" strokeDasharray="4 4" />
-        </g>
-      )}
-      {shapeType === 2 && (
-        // Round chamber
-        <g transform="translate(200 170)" style={{ color: "var(--color-text-primary)" }}>
-          <circle cx="0" cy="0" r="90" fill="none" stroke="currentColor" />
-          <circle cx="0" cy="0" r="60" fill="none" stroke="currentColor" />
-          <circle cx="0" cy="0" r="30" fill="none" stroke="currentColor" />
-          <g fill="var(--color-accent)">
-            <circle cx="0" cy="-90" r={4} />
-            <circle cx="90" cy="0" r={4} />
-            <circle cx="0" cy="90" r={4} />
-            <circle cx="-90" cy="0" r={4} />
-          </g>
-        </g>
-      )}
+      <g transform={`translate(200 ${shapeType === 1 ? 170 : shapeType === 2 ? 170 : 220})`}
+         style={{ color: "var(--color-text-primary)" }}>
+        {shapeType === 0 && generateCardHemicycle(rand)}
+        {shapeType === 1 && generateCardBenches(rand)}
+        {shapeType === 2 && generateCardRound(rand)}
+        {shapeType === 3 && generateCardHorseshoe(rand)}
+      </g>
     </svg>
   );
 }

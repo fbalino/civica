@@ -5,6 +5,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllSlugs, getAllPosts, getPostBySlug } from "@/lib/blog";
 import { HemicycleCover } from "@/components/blog/HemicycleCover";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
+import { ShareButtons } from "@/components/blog/ShareButtons";
 
 const SITE_URL = "https://civicaatlas.org";
 
@@ -167,8 +168,8 @@ export default async function BlogPostPage({
             <HemicycleCover slug={post.slug} variant="hero" />
           </div>
           <div className="post-hero-cap">
-            <span>Illustration &middot; Civica Desk</span>
-            <span>{post.tags.join(" &middot; ")}</span>
+            <span>Illustration · Civica Desk</span>
+            <span>{post.tags.join(" · ")}</span>
           </div>
         </figure>
 
@@ -187,11 +188,10 @@ export default async function BlogPostPage({
               </div>
               <div className="post-rail-block">
                 <b>Share</b>
-                <div className="post-share">
-                  <a href="#">
-                    Copy link <span>&nearr;</span>
-                  </a>
-                </div>
+                <ShareButtons
+                  url={`${SITE_URL}/blog/${post.slug}`}
+                  title={post.title}
+                />
               </div>
             </div>
           </aside>
