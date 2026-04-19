@@ -768,7 +768,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
             <span className="atlas-mono" style={{
               border: "1px solid var(--atlas-rule)", padding: "1px 5px",
               borderRadius: 2, color: "var(--atlas-muted)", fontSize: 10,
-            }}>\u2318K</span>
+            }}>{"⌘K"}</span>
           </div>
         )}
         <div className="atlas-mode-bar">
@@ -786,15 +786,6 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
             </button>
           ))}
         </div>
-        <Link href="/countries" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
-          Index
-        </Link>
-        <Link href="/rankings" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
-          Rankings
-        </Link>
-        <Link href="/blog" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
-          Blog
-        </Link>
       </div>
 
       {/* ===== STAGE ===== */}
