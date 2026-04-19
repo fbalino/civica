@@ -992,6 +992,15 @@ export default async function CountryPage({
     </div>
   ) : null;
 
+  const constitutionTabContent = constitutionTab ?? (
+    <div className="cv-card">
+      <h3 className="section-header">Constitution</h3>
+      <p style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)", color: "var(--color-text-50)", margin: 0, lineHeight: "var(--leading-relaxed)" }}>
+        Constitution data for {jurisdiction.name} has not yet been added to Civica.
+      </p>
+    </div>
+  );
+
   const tabs = [
     { id: "overview", label: "Overview", content: overviewTab },
     { id: "government", label: "Government", content: governmentTab },
@@ -999,7 +1008,7 @@ export default async function CountryPage({
     { id: "laws", label: "Laws in Motion", content: lawsTab },
     { id: "democracy", label: "Democracy", content: democracyTab },
     ...(leadersTab ? [{ id: "leaders", label: "Leaders", content: leadersTab }] : []),
-    ...(constitutionTab ? [{ id: "constitution", label: "Constitution", content: constitutionTab }] : []),
+    { id: "constitution", label: "Constitution", content: constitutionTabContent },
     ...(factbookTab ? [{ id: "factbook", label: "Factbook", content: factbookTab }] : []),
   ];
 

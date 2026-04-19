@@ -346,6 +346,16 @@ html.light .atlas-root {
   letter-spacing: 0.08em; font-size: 10px;
 }
 
+/* ===== EXPORT BUTTONS ===== */
+.atlas-export-btn {
+  font-family: ui-monospace, monospace; font-size: 10px; font-weight: 500;
+  color: var(--atlas-muted); text-decoration: none;
+  padding: 4px 9px; border: 1px solid var(--atlas-rule);
+  border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase;
+  transition: color 0.15s, border-color 0.15s;
+}
+.atlas-export-btn:hover { color: var(--atlas-ink); border-color: var(--atlas-ink); }
+
 /* ===== TABS ===== */
 .atlas-tabs {
   display: flex; padding: 0 48px; border-bottom: 1px solid var(--atlas-rule); gap: 0;
