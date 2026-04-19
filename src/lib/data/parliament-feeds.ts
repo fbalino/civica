@@ -52,7 +52,17 @@ async function fetchUSBills(): Promise<Bill[]> {
       longTitle: formalTitle !== displayTitle ? formalTitle : undefined,
       status: b.latestAction?.text ?? "In Congress",
       date: b.latestAction?.actionDate ?? b.updateDate ?? "",
-      url: b.url ?? `https://www.congress.gov/bill/${b.congress}th-congress/${(b.type ?? "").toLowerCase()}-bill/${b.number}`,
+      // Always use the human-readable Congress.gov page, not the API endpoint URL
+      url: (() => {
+        const slugMap: Record<string, string> = {
+          HR: "house-bill", S: "senate-bill",
+          HJRES: "house-joint-resolution", SJRES: "senate-joint-resolution",
+          HRES: "house-resolution", SRES: "senate-resolution",
+          HCONRES: "house-concurrent-resolution", SCONRES: "senate-concurrent-resolution",
+        };
+        const typeSlug = b.type ? (slugMap[b.type] ?? b.type.toLowerCase()) : "bill";
+        return `https://www.congress.gov/bill/${b.congress}th-congress/${typeSlug}/${b.number}`;
+      })(),
       source: "congress_gov",
       identifier,
     };

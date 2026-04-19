@@ -229,3 +229,17 @@ export const contactSubmissions = pgTable("contact_submissions", {
   ipAddress: text("ip_address"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Cache AI-generated one-sentence bill summaries to avoid re-calling Claude on every page load
+export const billSummaryCache = pgTable(
+  "bill_summary_cache",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    // Stable key: ISO2 country code + bill title hash
+    cacheKey: text("cache_key").notNull(),
+    summary: text("summary").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [uniqueIndex("bill_summary_cache_key_idx").on(t.cacheKey)]
+);

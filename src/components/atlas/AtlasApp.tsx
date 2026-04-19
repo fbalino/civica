@@ -1517,12 +1517,10 @@ function BillCard({ bill, index, onAsk }: { bill: Bill; index: number; onAsk: (t
         {bill.summary && <div className="sum">{bill.summary}</div>}
         <div className="tags">{bill.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>
         <div className="timeline">
-          {stages.map((s, j) => (
-            <span key={s}>
-              <span className={`dot${j < bill.stage ? " done" : j === bill.stage ? " now" : ""}`} />
-              {j < stages.length - 1 && <span className="line" />}
-            </span>
-          ))}
+          {stages.flatMap((s, j) => [
+            <span key={`dot-${j}`} className={`dot${j < bill.stage ? " done" : j === bill.stage ? " now" : ""}`} />,
+            ...(j < stages.length - 1 ? [<span key={`line-${j}`} className="line" />] : []),
+          ])}
         </div>
         <div className="tlabs">{stages.map((s) => <span key={s}>{s}</span>)}</div>
         {bill.votes && (() => {
