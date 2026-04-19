@@ -113,13 +113,15 @@ export async function loadAtlasData(): Promise<{
         .orderBy(desc(legislatureParties.seatCount))
     : [];
 
-  // Batch: current heads of state/government
-  const execBodies = jurisdictionIds.length > 0
+  // Batch: all government bodies (for branch labels and executive leader lookup)
+  const allGovBodies = jurisdictionIds.length > 0
     ? await db
         .select()
         .from(governmentBodies)
-        .where(sql`${governmentBodies.jurisdictionId} IN ${jurisdictionIds} AND ${governmentBodies.branch} = 'executive'`)
+        .where(sql`${governmentBodies.jurisdictionId} IN ${jurisdictionIds}`)
+        .orderBy(asc(governmentBodies.hierarchyLevel))
     : [];
+  const execBodies = allGovBodies.filter((b) => b.branch === "executive");
   const execBodyIds = execBodies.map((b) => b.id);
 
   const headOffices = execBodyIds.length > 0
@@ -211,9 +213,19 @@ export async function loadAtlasData(): Promise<{
       };
     }
 
+    const jGovBodies = allGovBodies.filter((b) => b.jurisdictionId === j.id);
+    const execBody = jGovBodies.find((b) => b.branch === "executive");
+    const legisBody = jGovBodies.find((b) => b.branch === "legislative");
+    const judBody = jGovBodies.find((b) => b.branch === "judicial");
+
     chambers[iso3] = {
       lower: buildChamber(lowerBody),
       upper: upperBody ? buildChamber(upperBody) : null,
+      branches: {
+        exec: execBody?.name ?? "—",
+        legis: legisBody?.name ?? "—",
+        jud: judBody?.name ?? "—",
+      },
     };
   }
 

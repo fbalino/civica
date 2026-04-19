@@ -26,7 +26,23 @@ export default async function LeadersPage({ params }: { params: Promise<{ slug: 
   }
   if (!jurisdiction) notFound();
 
-  const leaderTimeline = await getLeaderTimeline(jurisdiction.id);
+  const rawTimeline = await getLeaderTimeline(jurisdiction.id);
+
+  // Deduplicate: group by person+office, keep the term with the earliest start date
+  const seen = new Map<string, typeof rawTimeline[number]>();
+  for (const l of rawTimeline) {
+    const key = `${l.personName}::${l.officeName}`;
+    const existing = seen.get(key);
+    if (!existing) {
+      seen.set(key, l);
+    } else if (l.isCurrent && !existing.isCurrent) {
+      seen.set(key, l);
+    } else if (l.isCurrent === existing.isCurrent && l.startDate && existing.startDate && l.startDate < existing.startDate) {
+      seen.set(key, { ...l, endDate: existing.endDate });
+    }
+  }
+  const leaderTimeline = Array.from(seen.values());
+
   const currentLeaders = leaderTimeline.filter((l) => l.isCurrent);
   const pastLeaders = leaderTimeline.filter((l) => !l.isCurrent);
 

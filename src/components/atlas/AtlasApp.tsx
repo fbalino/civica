@@ -564,10 +564,16 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
         setBillsLoading(true);
         try {
           const res = await fetch(`/api/countries/${slug}/bills`);
-          if (!cancelled && res.ok) {
-            const json = await res.json();
-            setBillsData(json.bills ?? []);
+          if (!cancelled) {
+            if (res.ok) {
+              const json = await res.json();
+              setBillsData(json.bills ?? []);
+            } else {
+              setBillsData([]);
+            }
           }
+        } catch {
+          if (!cancelled) setBillsData([]);
         } finally {
           if (!cancelled) setBillsLoading(false);
         }
@@ -1164,9 +1170,26 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading…</div>
                 ) : democracyData ? (
                   <>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid var(--atlas-rule)" }}>
-                      <span className="atlas-serif" style={{ fontSize: 48 }}>{democracyData.democracyIndex != null ? democracyData.democracyIndex.toFixed(2) : "—"}</span>
-                      <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".1em" }}>/ 1.00 V-DEM</span>
+                    <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid var(--atlas-rule)" }}>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10 }}>
+                        <span className="atlas-serif" style={{ fontSize: 48 }}>{democracyData.democracyIndex != null ? democracyData.democracyIndex.toFixed(2) : "—"}</span>
+                        <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".1em" }}>/ 1.00 V-DEM</span>
+                      </div>
+                      {democracyData.democracyIndex != null && (
+                        <>
+                          <div style={{ background: "var(--atlas-rule-2)", borderRadius: 3, height: 8, overflow: "hidden", marginBottom: 8 }}>
+                            <div style={{
+                              width: `${(democracyData.democracyIndex * 100).toFixed(1)}%`,
+                              height: "100%",
+                              borderRadius: 3,
+                              background: democracyData.democracyIndex >= 0.7 ? "#3b8a5a" : democracyData.democracyIndex >= 0.4 ? "#c9963a" : "#b5454a",
+                            }} />
+                          </div>
+                          <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-ink-2)", letterSpacing: ".08em" }}>
+                            {democracyData.democracyIndex >= 0.7 ? "LIBERAL DEMOCRACY" : democracyData.democracyIndex >= 0.4 ? "ELECTORAL DEMOCRACY / HYBRID" : "AUTOCRACY / CLOSED"}
+                          </span>
+                        </>
+                      )}
                     </div>
                     {democracyData.freedomHouseFacts.length > 0 && (
                       <div style={{ marginBottom: 20 }}>
@@ -1259,6 +1282,19 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                           </div>
                         )}
                       </div>
+                      {constitutionData.constituteProjectId && (
+                        <div style={{ marginBottom: 16 }}>
+                          <a
+                            href={`https://www.constituteproject.org/constitution/${constitutionData.constituteProjectId}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="atlas-mono"
+                            style={{ fontSize: 11, color: "var(--atlas-accent, #3b8a5a)", textDecoration: "underline", letterSpacing: ".06em" }}
+                          >
+                            Read full text on Constitute Project &nearr;
+                          </a>
+                        </div>
+                      )}
                       {constitutionData.fullTextHtml && (
                         <div
                           className="atlas-sans"
