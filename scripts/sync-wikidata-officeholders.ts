@@ -153,6 +153,25 @@ async function findJurisdiction(iso2: string | null, qid: string, name: string, 
   return null;
 }
 
+const LABEL_LANG_PRIORITY = ["en", "mul", "la", "fr", "es", "de", "pt"];
+
+async function resolveQidLabel(qid: string): Promise<string | null> {
+  try {
+    const langs = LABEL_LANG_PRIORITY.join("|");
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${qid}&props=labels&languages=${langs}&format=json`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "Civica/1.0 (https://civicaatlas.org)" },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const labels = data.entities?.[qid]?.labels ?? {};
+    for (const lang of LABEL_LANG_PRIORITY) {
+      if (labels[lang]?.value) return labels[lang].value;
+    }
+  } catch {}
+  return null;
+}
+
 async function upsertPerson(name: string, qid: string): Promise<string> {
   const existing = await db
     .select({ id: persons.id, name: persons.name })
@@ -357,6 +376,25 @@ async function main() {
   console.log(`\n=== Sync Complete ===`);
   console.log(`Synced:  ${synced}`);
   console.log(`Skipped: ${skipped}`);
+
+  // Resolve any remaining QID-as-name persons via Wikidata entity API
+  const allPersons = await db
+    .select({ id: persons.id, name: persons.name, wikidataQid: persons.wikidataQid })
+    .from(persons);
+  const qidPersons = allPersons.filter((p) => /^Q\d+$/.test(p.name));
+  if (qidPersons.length > 0) {
+    console.log(`\nResolving ${qidPersons.length} unresolved QID names...`);
+    for (const person of qidPersons) {
+      const qid = person.wikidataQid ?? person.name;
+      const realName = await resolveQidLabel(qid);
+      if (realName) {
+        await db.update(persons).set({ name: realName }).where(eq(persons.id, person.id));
+        console.log(`  ✓ ${qid} → ${realName}`);
+      } else {
+        console.log(`  ✗ ${qid} — could not resolve`);
+      }
+    }
+  }
 }
 
 main().catch((err) => {
