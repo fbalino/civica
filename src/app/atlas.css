@@ -17,6 +17,8 @@
   --atlas-land-dim: #d0c7ad;
   --atlas-land-hover: #1a1a1a;
   --atlas-land-selected: oklch(58% 0.14 35);
+  --atlas-success: oklch(55% 0.12 145);
+  --atlas-danger: oklch(58% 0.15 25);
   --atlas-leftW: 300px;
   --atlas-rightW: 380px;
 }
@@ -34,6 +36,8 @@ html:not(.light) .atlas-root {
   --atlas-ocean: #1b1812;
   --atlas-land: #312c1f;
   --atlas-land-dim: #221e16;
+  --atlas-success: oklch(68% 0.14 145);
+  --atlas-danger: oklch(65% 0.18 25);
 }
 
 html.light .atlas-root {
@@ -467,14 +471,14 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .atlas-bill .tlabs { display: flex; justify-content: space-between; max-width: 640px; margin-top: 6px; font-family: ui-monospace, monospace; font-size: 9px; color: var(--atlas-muted); letter-spacing: 0.08em; text-transform: uppercase; }
 
 .atlas-vote-bar { display: flex; height: 6px; margin-top: 14px; max-width: 640px; }
-.atlas-vote-bar .y { background: oklch(55% 0.12 145); }
-.atlas-vote-bar .n { background: oklch(58% 0.15 25); }
+.atlas-vote-bar .y { background: var(--atlas-success); }
+.atlas-vote-bar .n { background: var(--atlas-danger); }
 .atlas-vote-bar .a { background: var(--atlas-rule); }
 .atlas-vote-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 6px; font-family: ui-monospace, monospace; font-size: 10px; color: var(--atlas-muted); letter-spacing: 0.08em; text-transform: uppercase; max-width: 640px; }
 
 /* ===== CHAT RAIL ===== */
 .atlas-chat-head { padding: 14px 18px; border-bottom: 1px solid var(--atlas-rule); display: flex; gap: 10px; align-items: center; }
-.atlas-chat-head .dot { width: 8px; height: 8px; background: oklch(58% 0.12 145); border-radius: 50%; }
+.atlas-chat-head .dot { width: 8px; height: 8px; background: var(--atlas-success); border-radius: 50%; }
 .atlas-chat-head .t { font-family: "Fraunces", serif; font-size: 18px; letter-spacing: -0.01em; }
 .atlas-chat-head .s { font-family: ui-monospace, monospace; font-size: 10px; color: var(--atlas-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-left: auto; }
 

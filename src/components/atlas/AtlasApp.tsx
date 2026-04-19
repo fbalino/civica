@@ -1182,7 +1182,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                               width: `${(democracyData.democracyIndex * 100).toFixed(1)}%`,
                               height: "100%",
                               borderRadius: 3,
-                              background: democracyData.democracyIndex >= 0.7 ? "#3b8a5a" : democracyData.democracyIndex >= 0.4 ? "#c9963a" : "#b5454a",
+                              background: democracyData.democracyIndex >= 0.7 ? "var(--color-success)" : democracyData.democracyIndex >= 0.4 ? "var(--color-warn)" : "var(--color-danger)",
                             }} />
                           </div>
                           <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-ink-2)", letterSpacing: ".08em" }}>
@@ -1289,7 +1289,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="atlas-mono"
-                            style={{ fontSize: 11, color: "var(--atlas-accent, #3b8a5a)", textDecoration: "underline", letterSpacing: ".06em" }}
+                            style={{ fontSize: 11, color: "var(--atlas-accent)", textDecoration: "underline", letterSpacing: ".06em" }}
                           >
                             Read full text on Constitute Project &nearr;
                           </a>

@@ -17,9 +17,9 @@ interface GovTerm {
 }
 
 const BRANCH_COLORS: Record<string, string> = {
-  executive: "#D4764E",
-  legislative: "#4E8BD4",
-  judicial: "#5CAA6E",
+  executive: "var(--color-branch-executive)",
+  legislative: "var(--color-branch-legislative)",
+  judicial: "var(--color-branch-judicial)",
 };
 
 const BRANCH_ORDER = ["executive", "legislative", "judicial"];
@@ -51,7 +51,7 @@ export function GovStructureDiagram({
           })
       );
       if (branchOffices.length === 0) return null;
-      return { branch, color: BRANCH_COLORS[branch] ?? "#8899AA", offices: branchOffices };
+      return { branch, color: BRANCH_COLORS[branch] ?? "var(--color-gov-other)", offices: branchOffices };
     })
     .filter(Boolean) as { branch: string; color: string; offices: (GovOffice & { holder: string | null })[] }[];
 

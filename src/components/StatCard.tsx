@@ -46,7 +46,7 @@ export function StatCard({
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
               fontSize: "var(--text-12)",
-              color: trend === "up" ? "var(--color-source-live)" : trend === "down" ? "#E44040" : "var(--color-text-30)",
+              color: trend === "up" ? "var(--color-source-live)" : trend === "down" ? "var(--color-danger)" : "var(--color-text-30)",
             }}
           >
             {trend === "up" ? "\u2191" : trend === "down" ? "\u2193" : "\u2192"}
