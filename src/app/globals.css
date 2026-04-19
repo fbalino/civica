@@ -1366,3 +1366,13 @@ a {
     columns: 1;
   }
 }
+
+/* Mobile menu animations */
+@keyframes civ-fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes civ-slide-right { from { transform: translateX(100%) } to { transform: translateX(0) } }
+@keyframes civ-slide-up { from { transform: translateY(16px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+@keyframes civ-pulse {
+  0% { transform: scale(0.6); opacity: 0.6; }
+  70% { transform: scale(1.9); opacity: 0; }
+  100% { transform: scale(0.6); opacity: 0; }
+}
