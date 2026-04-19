@@ -7,25 +7,11 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 function statusToStage(status: string): number {
   const s = status.toLowerCase();
-  if (s.includes("enacted") || s.includes("became law") || s.includes("royal assent")) return 4;
-  if (s.includes("passed") || s.includes("agreed")) return 3;
-  if (s.includes("floor") || s.includes("reading") || s.includes("referred to")) return 2;
-  if (s.includes("committee")) return 1;
+  if (s.includes("enacted") || s.includes("became law") || s.includes("royal assent") || s.includes("became public law")) return 4;
+  if (s.includes("presented to the president") || s.includes("signed by the president") || s.includes("passed senate") || s.includes("passed the senate") || s.includes("passed house") || s.includes("passed the house") || s.includes("agreed to in senate") || s.includes("agreed to in house")) return 3;
+  if (s.includes("floor") || s.includes("engrossed") || s.includes("ordered to be reported") || s.includes("placed on") || s.includes("reading") || s.includes("report stage") || s.includes("3rd reading") || s.includes("third reading")) return 2;
+  if (s.includes("committee") || s.includes("referred to") || s.includes("1st reading") || s.includes("first reading") || s.includes("2nd reading") || s.includes("second reading")) return 1;
   return 0;
-}
-
-function shortenStatus(status: string): string {
-  const s = status.toLowerCase();
-  if (s.includes("became public law") || s.includes("became law")) return "Enacted";
-  if (s.includes("royal assent")) return "Royal Assent";
-  if (s.includes("presented to the president")) return "Sent to President";
-  if (s.includes("passed senate") || s.includes("passed the senate")) return "Passed Senate";
-  if (s.includes("passed house") || s.includes("passed the house")) return "Passed House";
-  if (s.includes("placed on")) return "On Calendar";
-  if (s.includes("committee")) return "In Committee";
-  if (s.includes("introduced")) return "Introduced";
-  // Truncate anything else to 30 chars
-  return status.length > 30 ? status.slice(0, 27) + "…" : status;
 }
 
 async function generateSummaries(bills: RawBill[]): Promise<string[]> {
@@ -46,10 +32,7 @@ async function generateSummaries(bills: RawBill[]): Promise<string[]> {
       messages: [
         {
           role: "user",
-          content: `For each bill below, write exactly ONE plain-English sentence (15–30 words) explaining what the bill would do if passed, written for a general audience. Focus on real-world impact, not procedural steps. Return only a JSON array of strings, one per bill, in order. No markdown, no extra text.
-
-Bills:
-${billList}`,
+          content: `For each bill below, write exactly ONE plain-English sentence (15–30 words) explaining what the bill would do if passed or what it aims to achieve, written for a general audience. Focus on real-world impact, not procedure. Return only a JSON array of strings, one per bill, in order. No markdown, no extra text.\n\nBills:\n${billList}`,
         },
       ],
     });
@@ -77,10 +60,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   const summaries = await generateSummaries(rawBills);
 
   const bills = rawBills.map((b, i) => ({
-    title: b.title,
+    // Full combined title: "H.R. 8322 - To amend the FISA Amendments Act..."
+    title: b.longTitle ? `${b.title} - ${b.longTitle}` : b.title,
+    // AI one-sentence description of real-world impact
     summary: summaries[i] || (b.summary && b.summary !== b.status ? b.summary : ""),
-    status: shortenStatus(b.status),
-    sponsor: b.identifier ?? b.source.replace(/_/g, " "),
     tags: [b.source === "congress_gov" ? "U.S. Congress" : b.source === "uk_parliament" ? "UK Parliament" : b.source],
     stage: statusToStage(b.status),
     votes: null,

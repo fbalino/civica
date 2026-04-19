@@ -1514,8 +1514,7 @@ function BillCard({ bill, index, onAsk }: { bill: Bill; index: number; onAsk: (t
       <div className="idx">{String(index + 1).padStart(2, "0")}</div>
       <div>
         <div className="t">{bill.title}</div>
-        <div className="sum">{bill.summary}</div>
-        <div className="sponsor">Sponsor &middot; {bill.sponsor}</div>
+        {bill.summary && <div className="sum">{bill.summary}</div>}
         <div className="tags">{bill.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>
         <div className="timeline">
           {stages.map((s, j) => (
@@ -1548,7 +1547,11 @@ function BillCard({ bill, index, onAsk }: { bill: Bill; index: number; onAsk: (t
         })()}
       </div>
       <div className="actions">
-        {bill.status && <span className="status-badge">{bill.status}</span>}
+        {bill.url && (
+          <a href={bill.url} target="_blank" rel="noopener noreferrer" className="ask-btn" style={{ textDecoration: "none", textAlign: "center" }}>
+            Official Text &rarr;
+          </a>
+        )}
         <button className="ask-btn" onClick={() => onAsk(`Explain "${bill.title}" to me \u2014 what does it actually do, who wins, who loses, and where is it in the process?`)}>
           Ask AI
         </button>

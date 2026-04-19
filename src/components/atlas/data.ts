@@ -35,12 +35,13 @@ export interface ChamberData {
 
 export interface Bill {
   title: string;
-  status: string;
   stage: number;
   summary: string;
   tags: string[];
   votes: { yes: number; no: number; abs: number } | null;
-  sponsor: string;
+  url?: string;
+  status?: string;
+  sponsor?: string;
 }
 
 export interface Country {
