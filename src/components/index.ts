@@ -6,5 +6,4 @@ export { FactbookSectionNav, FactbookSectionTabs } from "./FactbookSectionNav";
 export { RankingTable } from "./RankingTable";
 export { ThemeProvider } from "./ThemeProvider";
 export { ThemeToggle } from "./ThemeToggle";
-export { NavLinks } from "./NavLinks";
 export { MobileNav } from "./MobileNav";

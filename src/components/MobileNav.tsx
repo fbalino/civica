@@ -124,22 +124,42 @@ function MenuOverlay({
 
   return (
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Main menu"
       style={{
         position: "fixed",
         inset: 0,
         zIndex: 100,
-        background: "var(--color-bg)",
-        animation: "civ-slide-right 280ms cubic-bezier(0.22, 1, 0.36, 1)",
         display: "flex",
-        flexDirection: "column",
-        overflow: "auto",
-        overscrollBehavior: "contain",
-        WebkitOverflowScrolling: "touch",
+        justifyContent: "flex-end",
       }}
     >
+      <div
+        onClick={onClose}
+        className="menu-backdrop"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "rgba(0, 0, 0, 0.3)",
+          animation: "civ-fade-in 200ms ease-out",
+        }}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Main menu"
+        style={{
+          position: "relative",
+          width: "100%",
+          maxWidth: 420,
+          background: "var(--color-bg)",
+          animation: "civ-slide-right 280ms cubic-bezier(0.22, 1, 0.36, 1)",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "auto",
+          overscrollBehavior: "contain",
+          WebkitOverflowScrolling: "touch",
+          boxShadow: "-8px 0 32px rgba(0, 0, 0, 0.15)",
+        }}
+      >
       <OverlayHeader onClose={onClose} logoSlot={logoSlot} />
 
       <div style={{ padding: "4px 20px 18px", borderBottom: "1px solid var(--color-divider)" }}>
@@ -179,6 +199,7 @@ function MenuOverlay({
       </div>
 
       <OverlayFooter />
+      </div>
     </div>
   );
 }

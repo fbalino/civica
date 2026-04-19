@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Fraunces, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { NavLinks } from "@/components/NavLinks";
 import { MobileNav } from "@/components/MobileNav";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo } from "@/components/CivicaLogo";
@@ -117,16 +116,7 @@ export default function RootLayout({
                 </span>
               </span>
             </Link>
-            <div className="hidden md:flex" style={{ alignItems: "center", gap: 4 }}>
-              <NavLinks />
-              <div style={{ marginLeft: 12 }}>
-                <GlobalSearchWrapper />
-              </div>
-              <div style={{ marginLeft: 8 }}>
-                <ThemeToggle />
-              </div>
-            </div>
-            <div className="flex md:hidden" style={{ alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <ThemeToggle />
               <MobileNav searchSlot={<GlobalSearchWrapper />} logoSlot={<CivicaLogo size={26} />} />
             </div>
