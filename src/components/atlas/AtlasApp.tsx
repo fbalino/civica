@@ -6,7 +6,7 @@ import { Hemicycle, PartyLegend } from "./Hemicycle";
 import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data";
 
 type Mode = "atlas" | "chamber" | "compare";
-type Tab = "chamber" | "bills" | "structure";
+type Tab = "chamber" | "bills" | "structure" | "elections";
 type House = "lower" | "upper";
 
 interface ChatMessage {
@@ -14,6 +14,25 @@ interface ChatMessage {
   text: string;
   lead?: string;
   cite?: string;
+}
+
+interface ElectionData {
+  election: {
+    id: string;
+    electionDate: string | null;
+    electionType: string | null;
+    electionName: string | null;
+    electoralSystem: string | null;
+    turnoutPercent: number | null;
+  };
+  results: Array<{
+    partyName: string | null;
+    partyColor: string | null;
+    candidateName: string | null;
+    votesPercent: number | null;
+    seatsWon: number | null;
+    isWinner: boolean | null;
+  }>;
 }
 
 // ISO 3166-1 numeric to alpha-3 mapping for linking TopoJSON to DB data
@@ -113,6 +132,9 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     { role: "ai", text: "I'm **Civica**. I can explain bills in plain language, compare countries, or walk you through any chamber. What do you want to know?" },
   ]);
   const chatInputRef = useRef<HTMLTextAreaElement>(null);
+  const [electionData, setElectionData] = useState<ElectionData[]>([]);
+  const [electionsLoading, setElectionsLoading] = useState(false);
+  const electionFetchRef = useRef<AbortController | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const contentRef = useRef<SVGGElement>(null);
   const transformRef = useRef({ k: 1, x: 0, y: 0 });
@@ -428,6 +450,31 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     window.addEventListener("mouseup", onUp);
     return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
   }, [leftW, rightW]);
+
+  useEffect(() => {
+    electionFetchRef.current?.abort();
+    if (!country) return;
+    const slug = dbCountries?.find((c) => c.id === country.id)?.slug;
+    if (!slug) return;
+    setElectionsLoading(true);
+    const controller = new AbortController();
+    electionFetchRef.current = controller;
+    fetch(`/api/countries/${slug}/elections`, { signal: controller.signal })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!controller.signal.aborted) {
+          setElectionData(data.elections ?? []);
+          setElectionsLoading(false);
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setElectionData([]);
+          setElectionsLoading(false);
+        }
+      });
+    return () => controller.abort();
+  }, [country, dbCountries]);
 
   function startResize(side: "left" | "right", e: React.MouseEvent) {
     e.preventDefault();
@@ -876,7 +923,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
               </div>
 
               <div className="atlas-tabs">
-                {([["chamber", "I \u00b7 The Chamber"], ["bills", "II \u00b7 Laws in Motion"], ["structure", "III \u00b7 Full Structure"]] as [Tab, string][]).map(([t, label]) => (
+                {([["chamber", "I \u00b7 The Chamber"], ["bills", "II \u00b7 Laws in Motion"], ["structure", "III \u00b7 Full Structure"], ["elections", "IV \u00b7 Elections"]] as [Tab, string][]).map(([t, label]) => (
                   <button key={t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>{label}</button>
                 ))}
               </div>
@@ -976,6 +1023,21 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   A full interactive appointment map &mdash; who nominates whom, who confirms, which terms overlap &mdash; lives here in v2.
                   For now, this is a schematic summary.
                 </div>
+              </div>
+
+              {/* Tab IV: Elections */}
+              <div className={`atlas-pane${tab === "elections" ? " on" : ""}`}>
+                {electionsLoading ? (
+                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: 40, textAlign: "center" }}>
+                    Loading elections&hellip;
+                  </div>
+                ) : electionData.length === 0 ? (
+                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: 40, textAlign: "center" }}>
+                    No election data available yet.
+                  </div>
+                ) : (
+                  <ElectionsPanel elections={electionData} countryName={country.name} />
+                )}
               </div>
             </div>
 
@@ -1252,6 +1314,99 @@ function ComparePane({ countryId, side, house, onChangeCountry, onChangeHouse, d
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ElectionsPanel({ elections, countryName }: { elections: ElectionData[]; countryName: string }) {
+  const now = new Date();
+  const upcoming = elections.filter((e) => e.election.electionDate && new Date(e.election.electionDate + "T00:00:00Z") >= now);
+  const past = elections.filter((e) => e.election.electionDate && new Date(e.election.electionDate + "T00:00:00Z") < now);
+
+  function formatDate(d: string | null) {
+    if (!d) return "TBD";
+    return new Date(d + "T00:00:00Z").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+  }
+
+  function daysUntil(d: string) {
+    return Math.ceil((new Date(d + "T00:00:00Z").getTime() - now.getTime()) / 86400000);
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      {upcoming.length > 0 && (
+        <div>
+          <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 10 }}>
+            Upcoming Elections
+          </div>
+          {upcoming.map((e) => (
+            <div key={e.election.id} style={{ border: "1px solid var(--atlas-rule)", padding: "14px 16px", marginBottom: 8, background: "var(--atlas-paper-2)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div className="atlas-serif" style={{ fontSize: 17, lineHeight: 1.25 }}>
+                    {e.election.electionName || `${e.election.electionType || "Election"}`}
+                  </div>
+                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", marginTop: 4 }}>
+                    {formatDate(e.election.electionDate)}
+                  </div>
+                </div>
+                {e.election.electionDate && (
+                  <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-accent)", letterSpacing: ".1em", textTransform: "uppercase", border: "1px solid var(--atlas-accent)", padding: "2px 8px", whiteSpace: "nowrap" }}>
+                    {daysUntil(e.election.electionDate)}d
+                  </span>
+                )}
+              </div>
+              {e.election.electoralSystem && (
+                <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", marginTop: 6 }}>
+                  {e.election.electoralSystem}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {past.length > 0 && (
+        <div>
+          <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 10 }}>
+            Past Elections
+          </div>
+          {past.map((e) => (
+            <div key={e.election.id} style={{ border: "1px solid var(--atlas-rule)", padding: "14px 16px", marginBottom: 8 }}>
+              <div className="atlas-serif" style={{ fontSize: 17, lineHeight: 1.25 }}>
+                {e.election.electionName || `${e.election.electionType || "Election"}`}
+              </div>
+              <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", marginTop: 4 }}>
+                {formatDate(e.election.electionDate)}
+                {e.election.turnoutPercent != null && ` · ${e.election.turnoutPercent.toFixed(1)}% turnout`}
+              </div>
+              {e.results && e.results.length > 0 && (
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden", gap: 1 }}>
+                    {e.results.filter((r) => r.votesPercent != null).map((r, i) => (
+                      <div key={i} style={{ flex: r.votesPercent!, background: r.partyColor || "var(--atlas-muted)", minWidth: 2 }} title={`${r.partyName}: ${r.votesPercent?.toFixed(1)}%`} />
+                    ))}
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", marginTop: 8 }}>
+                    {e.results.slice(0, 5).map((r, i) => (
+                      <div key={i} className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-ink-2)", display: "flex", alignItems: "center", gap: 4 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: r.partyColor || "var(--atlas-muted)" }} />
+                        {r.partyName || r.candidateName || "Unknown"}
+                        {r.votesPercent != null && <span style={{ color: "var(--atlas-muted)" }}>{r.votesPercent.toFixed(1)}%</span>}
+                        {r.isWinner && <span style={{ color: "var(--atlas-accent)" }}>✓</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <a href="/elections" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-accent)", letterSpacing: ".08em", textTransform: "uppercase", textDecoration: "none" }}>
+        View all elections &rarr;
+      </a>
     </div>
   );
 }

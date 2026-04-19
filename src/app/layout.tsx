@@ -223,6 +223,8 @@ export default function RootLayout({
                 <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <a href="/countries" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Countries</a>
                   <span>&middot;</span>
+                  <a href="/elections" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Elections</a>
+                  <span>&middot;</span>
                   <a href="/government-types" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Gov Types</a>
                   <span>&middot;</span>
                   <a href="/compare" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Compare</a>

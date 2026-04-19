@@ -104,9 +104,29 @@ export const elections = pgTable("elections", {
     .notNull(),
   electionDate: date("election_date"),
   electionType: text("election_type"),
+  electionName: text("election_name"),
+  electoralSystem: text("electoral_system"),
   bodyId: uuid("body_id").references(() => governmentBodies.id),
   turnoutPercent: real("turnout_percent"),
+  registeredVoters: integer("registered_voters"),
+  totalValidVotes: integer("total_valid_votes"),
   wikidataQid: text("wikidata_qid"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const electionResults = pgTable("election_results", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  electionId: uuid("election_id")
+    .references(() => elections.id)
+    .notNull(),
+  partyName: text("party_name"),
+  partyColor: text("party_color"),
+  partyWikidataQid: text("party_wikidata_qid"),
+  candidateName: text("candidate_name"),
+  votesCount: integer("votes_count"),
+  votesPercent: real("votes_percent"),
+  seatsWon: integer("seats_won"),
+  isWinner: boolean("is_winner").default(false),
 });
 
 export const constitutions = pgTable("constitutions", {

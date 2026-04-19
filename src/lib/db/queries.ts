@@ -11,6 +11,8 @@ import {
   sources,
   legislatureParties,
   constitutions,
+  elections,
+  electionResults,
 } from "./schema";
 
 export async function getJurisdictionBySlug(slug: string) {
@@ -357,4 +359,94 @@ export async function getLeaderTimeline(jurisdictionId: string) {
       isCurrent: t.term.isCurrent,
     };
   });
+}
+
+export async function getElectionsByJurisdiction(jurisdictionId: string) {
+  const rows = await db
+    .select()
+    .from(elections)
+    .where(eq(elections.jurisdictionId, jurisdictionId))
+    .orderBy(desc(elections.electionDate));
+
+  const electionIds = rows.map((e) => e.id);
+  if (electionIds.length === 0) return rows.map((e) => ({ election: e, results: [] as typeof allResults }));
+
+  const allResults = await db
+    .select()
+    .from(electionResults)
+    .where(sql`${electionResults.electionId} IN ${electionIds}`)
+    .orderBy(desc(electionResults.votesPercent));
+
+  return rows.map((election) => ({
+    election,
+    results: allResults.filter((r) => r.electionId === election.id),
+  }));
+}
+
+export async function getUpcomingElections(limit = 20) {
+  return db
+    .select({
+      election: elections,
+      jurisdiction: {
+        slug: jurisdictions.slug,
+        name: jurisdictions.name,
+        iso2: jurisdictions.iso2,
+        continent: jurisdictions.continent,
+      },
+    })
+    .from(elections)
+    .innerJoin(jurisdictions, eq(elections.jurisdictionId, jurisdictions.id))
+    .where(sql`${elections.electionDate} >= CURRENT_DATE`)
+    .orderBy(asc(elections.electionDate))
+    .limit(limit);
+}
+
+export async function getRecentElections(limit = 20) {
+  return db
+    .select({
+      election: elections,
+      jurisdiction: {
+        slug: jurisdictions.slug,
+        name: jurisdictions.name,
+        iso2: jurisdictions.iso2,
+        continent: jurisdictions.continent,
+      },
+    })
+    .from(elections)
+    .innerJoin(jurisdictions, eq(elections.jurisdictionId, jurisdictions.id))
+    .where(sql`${elections.electionDate} < CURRENT_DATE`)
+    .orderBy(desc(elections.electionDate))
+    .limit(limit);
+}
+
+export async function getRecentElectionsWithResults(limit = 40) {
+  const rows = await db
+    .select({
+      election: elections,
+      jurisdiction: {
+        slug: jurisdictions.slug,
+        name: jurisdictions.name,
+        iso2: jurisdictions.iso2,
+        continent: jurisdictions.continent,
+      },
+    })
+    .from(elections)
+    .innerJoin(jurisdictions, eq(elections.jurisdictionId, jurisdictions.id))
+    .where(sql`${elections.electionDate} < CURRENT_DATE`)
+    .orderBy(desc(elections.electionDate))
+    .limit(limit);
+
+  const electionIds = rows.map((r) => r.election.id);
+  if (electionIds.length === 0) return rows.map((r) => ({ ...r, results: [] as typeof allResults }));
+
+  const allResults = await db
+    .select()
+    .from(electionResults)
+    .where(sql`${electionResults.electionId} IN ${electionIds}`)
+    .orderBy(desc(electionResults.votesPercent));
+
+  return rows.map((r) => ({
+    ...r,
+    results: allResults.filter((res) => res.electionId === r.election.id),
+  }));
 }

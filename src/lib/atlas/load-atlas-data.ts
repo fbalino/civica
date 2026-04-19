@@ -13,6 +13,7 @@ import { resolvePartyColor } from "@/lib/data/party-colors";
 
 export interface AtlasCountry {
   id: string;
+  slug: string;
   name: string;
   leader: string;
   gov: string;
@@ -158,6 +159,7 @@ export async function loadAtlasData(): Promise<{
   // Build countries
   const countries: AtlasCountry[] = allJurisdictions.map((j) => ({
     id: j.iso3!.toLowerCase(),
+    slug: j.slug,
     name: j.name,
     leader: leaderByJurisdiction.get(j.id) || "—",
     gov: formatGovernmentType(j.governmentType || j.governmentTypeDetail) || "—",
