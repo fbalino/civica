@@ -67,8 +67,8 @@ function EndpointSection({
           style={{
             ...mono,
             fontSize: "var(--text-10)",
-            color: "#fff",
-            background: method === "GET" ? "#22863a" : "#0366d6",
+            color: "var(--color-badge-text)",
+            background: method === "GET" ? "var(--color-badge-get)" : "var(--color-badge-post)",
             padding: "2px 8px",
             borderRadius: 4,
             letterSpacing: "var(--tracking-caps)",

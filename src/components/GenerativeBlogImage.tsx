@@ -1,11 +1,11 @@
 "use client";
 
 const PALETTES = [
-  ["#D4764E", "#D4A04A", "#C4A44E"],
-  ["#4E8BD4", "#9B6DC6", "#5CAA6E"],
-  ["#9B6DC6", "#D4764E", "#4E8BD4"],
-  ["#5CAA6E", "#C4A44E", "#D4764E"],
-  ["#D4A04A", "#4E8BD4", "#9B6DC6"],
+  ["var(--color-gov-presidential)", "var(--color-accent)", "var(--color-gov-absolute)"],
+  ["var(--color-gov-parliamentary)", "var(--color-gov-semi-presidential)", "var(--color-branch-judicial)"],
+  ["var(--color-gov-semi-presidential)", "var(--color-gov-presidential)", "var(--color-gov-parliamentary)"],
+  ["var(--color-branch-judicial)", "var(--color-gov-absolute)", "var(--color-gov-presidential)"],
+  ["var(--color-accent)", "var(--color-gov-parliamentary)", "var(--color-gov-semi-presidential)"],
 ];
 
 function seededRandom(seed: number) {

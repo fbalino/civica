@@ -106,7 +106,7 @@ export function HemicycleChart({
           gap: 8,
         }}>
           {chamberName}
-          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#5CAA6E", flexShrink: 0 }} />
+          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-source-live)", flexShrink: 0 }} />
         </h3>
         <span style={{
           fontFamily: "var(--font-mono)",
