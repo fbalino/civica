@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Fraunces, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { MobileNav } from "@/components/MobileNav";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo } from "@/components/CivicaLogo";
+import { AtlasHeaderProvider } from "@/context/AtlasHeaderContext";
+import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 import "./atlas.css";
 
@@ -68,59 +68,12 @@ export default function RootLayout({
       </head>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <ThemeProvider>
-          {/* Nav — prototype: sticky, blur, 16px 40px padding */}
-          <nav
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "var(--spacing-nav-y) var(--spacing-page-x)",
-              borderBottom: "1px solid var(--color-divider)",
-              position: "sticky",
-              top: 0,
-              zIndex: 100,
-              background: "var(--color-bg-nav)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
-            }}
-          >
-            <Link href="/" style={{ cursor: "pointer", textDecoration: "none", display: "flex", alignItems: "center", gap: 12 }}>
-              <CivicaLogo size={56} />
-              <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                <span
-                  style={{
-                    fontFamily: "var(--font-heading)",
-                    fontSize: "var(--text-32)",
-                    fontWeight: 300,
-                    letterSpacing: "var(--tracking-tighter)",
-                    color: "var(--color-text-primary)",
-                    lineHeight: 1,
-                  }}
-                >
-                  Civica
-                </span>
-                <span
-                  className="hidden sm:inline"
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
-                    color: "var(--color-text-30)",
-                    letterSpacing: "var(--tracking-caps)",
-                    textTransform: "uppercase",
-                    lineHeight: 1,
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  Atlas of governance
-                </span>
-              </span>
-            </Link>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <ThemeToggle />
-              <MobileNav searchSlot={<GlobalSearchWrapper />} logoSlot={<CivicaLogo size={26} />} />
-            </div>
-          </nav>
+          <AtlasHeaderProvider>
+          <SiteHeader
+            searchSlot={<GlobalSearchWrapper />}
+            logoSlot={<CivicaLogo size={40} />}
+            logoSlotSmall={<CivicaLogo size={26} />}
+          />
 
           <main style={{ flex: 1 }}>{children}</main>
 
@@ -247,6 +200,7 @@ export default function RootLayout({
               </div>
             </div>
           </footer>
+          </AtlasHeaderProvider>
         </ThemeProvider>
       </body>
     </html>

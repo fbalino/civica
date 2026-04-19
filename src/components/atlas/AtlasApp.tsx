@@ -5,6 +5,7 @@ import Link from "next/link";
 import { type Country, type ChamberData, type Bill, COUNTRIES as FALLBACK_COUNTRIES, CHAMBERS as FALLBACK_CHAMBERS, WORLD_PATHS, NE_ID_TO_OURS as FALLBACK_NE_MAP, PARTY_COLORS, getDefaultChamberData as getFallbackChamberData, govDescription, getMember } from "./data";
 import { Hemicycle, PartyLegend } from "./Hemicycle";
 import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data";
+import { useAtlasHeader } from "@/context/AtlasHeaderContext";
 
 type Mode = "atlas" | "explore" | "compare";
 type Tab = "chamber" | "bills" | "structure" | "elections" | "democracy" | "leaders" | "constitution";
@@ -200,7 +201,8 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   );
   const [mobileFilters, setMobileFilters] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-  const [navHeight, setNavHeight] = useState(0);
+  const [navHeight, setNavHeight] = useState(56);
+  const { setAtlasControls } = useAtlasHeader();
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
@@ -211,13 +213,71 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
   useEffect(() => {
     const measure = () => {
-      const nav = document.querySelector("body > nav");
+      const nav = document.getElementById("site-header");
       if (nav) setNavHeight(nav.getBoundingClientRect().height);
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
+
+  useEffect(() => {
+    const handleMode = (m: Mode) => {
+      if (m === "atlas") setMode("atlas");
+      else if (m === "explore") { if (!country) enterExplore("fra"); else setMode("explore"); }
+      else { if (pinned.length >= 2) { setCompareA(pinned[0]); setCompareB(pinned[1]); } enterCompare(); }
+    };
+
+    setAtlasControls(
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div className="atlas-mode-bar">
+          {(["atlas", "explore", "compare"] as Mode[]).map((m) => (
+            <button
+              key={m}
+              className={mode === m ? "on" : ""}
+              onClick={() => handleMode(m)}
+            >
+              {m.charAt(0).toUpperCase() + m.slice(1)}
+            </button>
+          ))}
+        </div>
+
+        {mode === "atlas" && (
+          <>
+            <select
+              className="atlas-header-select"
+              value={regionFilter}
+              onChange={(e) => setRegionFilter(e.target.value)}
+            >
+              <option value="all">All Regions</option>
+              {["Americas", "Europe", "Africa", "Asia", "Oceania"].map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+            <select
+              className="atlas-header-select"
+              value={govFilter}
+              onChange={(e) => setGovFilter(e.target.value)}
+            >
+              <option value="all">All Systems</option>
+              {["Federal", "Parliamentary", "Presidential", "Monarchy"].map((g) => (
+                <option key={g} value={g}>{g}</option>
+              ))}
+            </select>
+            {(regionFilter !== "all" || govFilter !== "all") && (
+              <button
+                className="atlas-header-clear"
+                onClick={() => { setRegionFilter("all"); setGovFilter("all"); }}
+              >
+                &times;
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    );
+    return () => setAtlasControls(null);
+  });
 
   const W = 2000, H = 1000;
   const LAT_MIN = -58, LAT_MAX = 85;
@@ -657,136 +717,82 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
   return (
     <div className="atlas-root" style={{ position: "fixed", top: navHeight, left: 0, right: 0, bottom: 0, zIndex: 30, display: "flex", flexDirection: "column" }}>
-      {/* ===== UNIFIED TOP BAR ===== */}
-      <div style={{
-        position: "relative", display: "flex", alignItems: "center", gap: 10,
-        padding: "8px 18px", background: "color-mix(in oklab, var(--atlas-paper) 92%, transparent)",
-        backdropFilter: "blur(10px)", borderBottom: "1px solid var(--atlas-rule)", zIndex: 40,
-        flexWrap: "wrap",
-      }}>
-        {mode === "atlas" && (
-          <>
-            {isMobile && (
+      {/* Mobile filter chips row */}
+      {isMobile && mode === "atlas" && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 6, padding: "6px 12px",
+          background: "color-mix(in oklab, var(--atlas-paper) 92%, transparent)",
+          backdropFilter: "blur(10px)", borderBottom: "1px solid var(--atlas-rule)",
+          flexWrap: "wrap", zIndex: 40,
+        }}>
+          <div className="atlas-mode-bar">
+            {(["atlas", "explore", "compare"] as Mode[]).map((m) => (
               <button
-                className="atlas-mono"
-                onClick={() => setMobileFilters(!mobileFilters)}
-                style={{ fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", border: "1px solid var(--atlas-rule)", background: mobileFilters ? "var(--atlas-ink)" : "var(--atlas-paper)", color: mobileFilters ? "var(--atlas-paper)" : "var(--atlas-ink-2)", padding: "5px 10px", cursor: "pointer" }}
-              >
-                Filters
-              </button>
-            )}
-            <div className={`atlas-filter-bar${mobileFilters ? " mobile-open" : ""}`} style={{ border: "none", padding: 0, margin: 0, background: "none", height: "auto", backdropFilter: "none" }}>
-              <div className="group">
-                <span className="lbl">Region</span>
-                {["all", "Americas", "Europe", "Africa", "Asia", "Oceania"].map((r) => (
-                  <button key={r} className={`chip${regionFilter === r ? " on" : ""}`} onClick={() => setRegionFilter(r)}>
-                    {r === "all" ? "All" : r}
-                  </button>
-                ))}
-              </div>
-              <div className="sep" />
-              <div className="group">
-                <span className="lbl">System</span>
-                {["all", "Federal", "Parliamentary", "Presidential", "Monarchy"].map((g) => (
-                  <button key={g} className={`chip${govFilter === g ? " on" : ""}`} onClick={() => setGovFilter(g)}>
-                    {g === "all" ? "All" : g}
-                  </button>
-                ))}
-              </div>
-              <button className="clear-btn" onClick={() => { setRegionFilter("all"); setGovFilter("all"); }}>
-                Reset &times;
-              </button>
-            </div>
-          </>
-        )}
-
-        <div style={{ flex: 1 }} />
-
-        {/* Search bar — on mobile, show magnifying glass icon instead of full search bar */}
-        {isMobile ? (
-          mobileSearchOpen ? (
-            <div style={{
-              display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--atlas-rule)",
-              background: "var(--atlas-paper)", padding: "5px 10px", flex: 1, borderRadius: 2,
-            }}>
-              <input
-                autoFocus
-                placeholder="Search country, leader…"
-                autoComplete="off"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const q = searchQuery.toLowerCase();
-                    const hit = COUNTRIES.find((c) => c.name.toLowerCase().includes(q));
-                    if (hit) enterExplore(hit.id);
-                    setMobileSearchOpen(false);
-                  } else if (e.key === "Escape") {
-                    setMobileSearchOpen(false);
-                    setSearchQuery("");
-                  }
+                key={m}
+                className={mode === m ? "on" : ""}
+                onClick={() => {
+                  if (m === "atlas") setMode("atlas");
+                  else if (m === "explore") { if (!country) enterExplore("fra"); else setMode("explore"); }
+                  else { if (pinned.length >= 2) { setCompareA(pinned[0]); setCompareB(pinned[1]); } enterCompare(); }
                 }}
-                onBlur={() => { if (!searchQuery) setMobileSearchOpen(false); }}
-                className="atlas-sans"
-                style={{ border: 0, background: "transparent", outline: "none", fontSize: 12, color: "var(--atlas-ink)", width: "100%" }}
-              />
-              <button onClick={() => { setMobileSearchOpen(false); setSearchQuery(""); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--atlas-muted)", fontSize: 14, padding: 0 }}>&times;</button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setMobileSearchOpen(true)}
-              className="mobile-search-icon"
-              style={{ background: "none", border: "1px solid var(--atlas-rule)", borderRadius: 2, padding: "5px 8px", cursor: "pointer", color: "var(--atlas-ink-2)", display: "flex", alignItems: "center" }}
-              aria-label="Search"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            </button>
-          )
-        ) : (
-          <div style={{
-            display: "flex", alignItems: "center", gap: 8, border: "1px solid var(--atlas-rule)",
-            background: "var(--atlas-paper)", padding: "5px 10px", minWidth: 220, maxWidth: 320, borderRadius: 2,
-          }}>
-            <input
-              placeholder="Search country, leader…"
-              autoComplete="off"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const q = searchQuery.toLowerCase();
-                  const hit = COUNTRIES.find((c) => c.name.toLowerCase().includes(q));
-                  if (hit) enterExplore(hit.id);
-                }
-              }}
-              className="atlas-sans"
-              style={{
-                border: 0, background: "transparent", outline: "none", fontSize: 12,
-                color: "var(--atlas-ink)", width: "100%",
-              }}
-            />
-            <span className="atlas-mono" style={{
-              border: "1px solid var(--atlas-rule)", padding: "1px 5px",
-              borderRadius: 2, color: "var(--atlas-muted)", fontSize: 10,
-            }}>{"⌘K"}</span>
+              >
+                {m.charAt(0).toUpperCase() + m.slice(1)}
+              </button>
+            ))}
           </div>
-        )}
-        <div className="atlas-mode-bar">
-          {(["atlas", "explore", "compare"] as Mode[]).map((m) => (
+          <select
+            className="atlas-header-select"
+            value={regionFilter}
+            onChange={(e) => setRegionFilter(e.target.value)}
+          >
+            <option value="all">Region</option>
+            {["Americas", "Europe", "Africa", "Asia", "Oceania"].map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
+          <select
+            className="atlas-header-select"
+            value={govFilter}
+            onChange={(e) => setGovFilter(e.target.value)}
+          >
+            <option value="all">System</option>
+            {["Federal", "Parliamentary", "Presidential", "Monarchy"].map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+          {(regionFilter !== "all" || govFilter !== "all") && (
             <button
-              key={m}
-              className={mode === m ? "on" : ""}
-              onClick={() => {
-                if (m === "atlas") setMode("atlas");
-                else if (m === "explore") { if (!country) enterExplore("fra"); else setMode("explore"); }
-                else { if (pinned.length >= 2) { setCompareA(pinned[0]); setCompareB(pinned[1]); } enterCompare(); }
-              }}
+              className="atlas-header-clear"
+              onClick={() => { setRegionFilter("all"); setGovFilter("all"); }}
             >
-              {m.charAt(0).toUpperCase() + m.slice(1)}
+              &times;
             </button>
-          ))}
+          )}
         </div>
-      </div>
+      )}
+      {isMobile && mode !== "atlas" && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 6, padding: "6px 12px",
+          background: "color-mix(in oklab, var(--atlas-paper) 92%, transparent)",
+          backdropFilter: "blur(10px)", borderBottom: "1px solid var(--atlas-rule)", zIndex: 40,
+        }}>
+          <div className="atlas-mode-bar">
+            {(["atlas", "explore", "compare"] as Mode[]).map((m) => (
+              <button
+                key={m}
+                className={mode === m ? "on" : ""}
+                onClick={() => {
+                  if (m === "atlas") setMode("atlas");
+                  else if (m === "explore") { if (!country) enterExplore("fra"); else setMode("explore"); }
+                  else { if (pinned.length >= 2) { setCompareA(pinned[0]); setCompareB(pinned[1]); } enterCompare(); }
+                }}
+              >
+                {m.charAt(0).toUpperCase() + m.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ===== STAGE ===== */}
       <div style={{ position: "relative", flex: 1, overflow: "hidden" }}>
