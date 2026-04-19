@@ -119,6 +119,24 @@
   --color-tooltip-border: rgba(255, 255, 255, 0.1);
 
   --color-hemi-seat-text: rgba(255, 255, 255, 0.3);
+
+  /* --- Signal colors (from design system reference) --- */
+  --color-success: #3b8a5a;
+  --color-warn: #c9963a;
+  --color-danger: #b5454a;
+  --color-info: #4E8BD4;
+
+  /* --- Branch backgrounds (alpha) --- */
+  --color-branch-executive-bg: rgba(212, 118, 78, 0.15);
+  --color-branch-legislative-bg: rgba(78, 139, 212, 0.15);
+
+  /* --- Badge colors --- */
+  --color-badge-get: #22863a;
+  --color-badge-post: #0366d6;
+  --color-badge-text: #ffffff;
+
+  /* --- Shadows --- */
+  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
 /* ============================================================
@@ -160,6 +178,15 @@
   --color-tooltip-border: rgba(0, 0, 0, 0.1);
 
   --color-hemi-seat-text: rgba(0, 0, 0, 0.25);
+
+  --color-success: #2d7a4a;
+  --color-warn: #b8860b;
+  --color-danger: #a83838;
+
+  --color-branch-executive-bg: rgba(212, 118, 78, 0.12);
+  --color-branch-legislative-bg: rgba(78, 139, 212, 0.12);
+
+  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 /* ============================================================

@@ -562,7 +562,7 @@ export default async function CountryPage({
           <h3 className="section-header">Global Rankings</h3>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
             {rankings.map((r) => (
-              <a
+              <Link
                 key={r.key}
                 href={`/rankings?metric=${r.key}`}
                 style={{
@@ -610,7 +610,7 @@ export default async function CountryPage({
                 >
                   of {r.total}
                 </span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -800,7 +800,7 @@ export default async function CountryPage({
           <h3 className="section-header">Regional Comparison ({jurisdiction.continent})</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {regionalComparison.map((rc, i) => (
-              <a
+              <Link
                 key={rc.id}
                 href={`/countries/${rc.slug}`}
                 style={{
@@ -827,7 +827,7 @@ export default async function CountryPage({
                 <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-40)" }}>
                   {rc.democracyIndex?.toFixed(2) ?? "—"}
                 </span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -1149,7 +1149,7 @@ export default async function CountryPage({
             }}
           >
             {relatedCountries.map((rc) => (
-              <a
+              <Link
                 key={rc.slug}
                 href={`/countries/${rc.slug}`}
                 className="country-grid-cell"
@@ -1188,7 +1188,7 @@ export default async function CountryPage({
                     {rc.capital}
                   </span>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </section>

@@ -265,7 +265,7 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
             fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)",
             letterSpacing: "var(--tracking-wide)", textTransform: "uppercase", padding: "3px 10px",
             borderRadius: 999,
-            background: isLegislative ? "rgba(78, 139, 212, 0.15)" : "rgba(212, 118, 78, 0.15)",
+            background: isLegislative ? "var(--color-branch-legislative-bg)" : "var(--color-branch-executive-bg)",
             color: dotColor,
           }}>
             {e.election.electionType}

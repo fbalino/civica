@@ -171,7 +171,7 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
             border: "1px solid var(--color-card-border)",
             background: "var(--color-surface-elevated)",
             overflow: "hidden",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+            boxShadow: "var(--shadow-dropdown)",
           }}
         >
           {filtered.map((c, i) => (
