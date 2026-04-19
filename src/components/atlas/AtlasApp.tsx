@@ -5,7 +5,7 @@ import { type Country, type ChamberData, type Bill, COUNTRIES as FALLBACK_COUNTR
 import { Hemicycle, PartyLegend } from "./Hemicycle";
 import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data";
 
-type Mode = "atlas" | "chamber" | "compare";
+type Mode = "atlas" | "explore" | "compare";
 type Tab = "chamber" | "bills" | "structure" | "elections";
 type House = "lower" | "upper";
 
@@ -488,7 +488,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     dragRef.current = { dragging: true, startX: e.clientX, startY: e.clientY, originX: transformRef.current.x, originY: transformRef.current.y };
   }
 
-  function enterChamber(id: string) {
+  function enterExplore(id: string) {
     const c = COUNTRIES.find((c) => c.id === id);
     if (!c) return;
     setCountry(c);
@@ -496,7 +496,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     setTab("chamber");
     setDimmed(new Set());
     flyTo(id);
-    setTimeout(() => setMode("chamber"), 500);
+    setTimeout(() => setMode("explore"), 500);
   }
 
   function handleCountryClick(c: Country) {
@@ -505,7 +505,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
       setPinned(newPinned);
       return;
     }
-    enterChamber(c.id);
+    enterExplore(c.id);
   }
 
   function enterCompare() {
@@ -621,7 +621,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   if (e.key === "Enter") {
                     const q = searchQuery.toLowerCase();
                     const hit = COUNTRIES.find((c) => c.name.toLowerCase().includes(q));
-                    if (hit) enterChamber(hit.id);
+                    if (hit) enterExplore(hit.id);
                     setMobileSearchOpen(false);
                   } else if (e.key === "Escape") {
                     setMobileSearchOpen(false);
@@ -658,7 +658,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                 if (e.key === "Enter") {
                   const q = searchQuery.toLowerCase();
                   const hit = COUNTRIES.find((c) => c.name.toLowerCase().includes(q));
-                  if (hit) enterChamber(hit.id);
+                  if (hit) enterExplore(hit.id);
                 }
               }}
               className="atlas-sans"
@@ -674,13 +674,13 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
           </div>
         )}
         <div className="atlas-mode-bar">
-          {(["atlas", "chamber", "compare"] as Mode[]).map((m) => (
+          {(["atlas", "explore", "compare"] as Mode[]).map((m) => (
             <button
               key={m}
               className={mode === m ? "on" : ""}
               onClick={() => {
                 if (m === "atlas") setMode("atlas");
-                else if (m === "chamber") { if (!country) enterChamber("fra"); else setMode("chamber"); }
+                else if (m === "explore") { if (!country) enterExplore("fra"); else setMode("explore"); }
                 else { if (pinned.length >= 2) { setCompareA(pinned[0]); setCompareB(pinned[1]); } enterCompare(); }
               }}
             >
@@ -831,12 +831,12 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
         </div>
 
         {/* ===== CHAMBER VIEW ===== */}
-        {mode === "chamber" && country && cd && currentHouse && (
+        {mode === "explore" && country && cd && currentHouse && (
           <div className="chamber-grid" style={{ position: "absolute", inset: 0, gridTemplateColumns: isMobile ? undefined : `${leftW}px 6px 1fr 6px ${rightW}px` }}>
             {/* Mobile panel toggle bar */}
             <div className="mobile-panel-bar">
               <button className={mobilePanel === "countries" ? "on" : ""} onClick={() => setMobilePanel(mobilePanel === "countries" ? "center" : "countries")}>Countries</button>
-              <button className={mobilePanel === "center" ? "on" : ""} onClick={() => setMobilePanel("center")}>Chamber</button>
+              <button className={mobilePanel === "center" ? "on" : ""} onClick={() => setMobilePanel("center")}>Explore</button>
               <button className={mobilePanel === "chat" ? "on" : ""} onClick={() => setMobilePanel(mobilePanel === "chat" ? "center" : "chat")}>Ask AI</button>
             </div>
             {/* Left rail */}
