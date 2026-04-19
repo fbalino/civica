@@ -261,6 +261,40 @@ export default function ApiDocsPage() {
             <code style={mono}>Access-Control-Allow-Origin: *</code>.
           </p>
         </div>
+
+        <div style={{ marginTop: 16 }}>
+          <h3
+            style={{
+              ...mono,
+              fontSize: "var(--text-10)",
+              color: "var(--color-text-30)",
+              letterSpacing: "var(--tracking-caps)",
+              textTransform: "uppercase",
+              marginBottom: 8,
+            }}
+          >
+            API Status
+          </h3>
+          <a
+            href="https://statuspage.incident.io/civica-atlas"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              ...mono,
+              fontSize: "var(--text-11)",
+              color: "var(--color-text-50)",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+            Check current API status on our status page ↗
+          </a>
+        </div>
       </div>
 
       <div

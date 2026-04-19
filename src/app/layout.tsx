@@ -198,6 +198,18 @@ export default function RootLayout({
                   <Link href="/contact" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Contact</Link>
                   <span>&middot;</span>
                   <Link href="/design-system" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Design System</Link>
+                  <span>&middot;</span>
+                  <a
+                    href="https://statuspage.incident.io/civica-atlas"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: "var(--color-text-25)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                    Status
+                  </a>
                 </div>
               </div>
             </div>
