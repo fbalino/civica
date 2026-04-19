@@ -711,7 +711,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
             }}>
               <input
                 autoFocus
-                placeholder="Search country, leader\u2026"
+                placeholder="Search country, leader…"
                 autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -748,7 +748,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
             background: "var(--atlas-paper)", padding: "5px 10px", minWidth: 220, maxWidth: 320, borderRadius: 2,
           }}>
             <input
-              placeholder="Search country, leader\u2026"
+              placeholder="Search country, leader…"
               autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -1409,7 +1409,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                 <span className="s">How do their courts differ?</span>
               </div>
               <div className="atlas-chat-input">
-                <textarea placeholder="Ask about the comparison\u2026" rows={2} />
+                <textarea placeholder="Ask about the comparison…" rows={2} />
                 <button>Send</button>
               </div>
             </div>
