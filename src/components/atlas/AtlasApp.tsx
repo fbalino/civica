@@ -1086,7 +1086,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   />
                 </div>
 
-                <PartyLegend chamber={currentHouse} dimmed={dimmed} onToggle={toggleDim} />
+                <PartyLegend key={`${country.id}-${house}`} chamber={currentHouse} dimmed={dimmed} onToggle={toggleDim} />
 
                 <div className="atlas-chamber-meta" style={{ marginTop: 18, borderTop: "1px solid var(--atlas-rule)" }}>
                   <div className="cell"><div className="k">Total seats</div><div className="v">{currentHouse.total}</div></div>

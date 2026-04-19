@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { type Chamber, type Party, PARTY_COLORS, getMember } from "./data";
 
 function resolveColor(color: string): string {
@@ -115,10 +115,18 @@ interface PartyLegendProps {
   onToggle: (partyId: string) => void;
 }
 
+const PARTY_LEGEND_DEFAULT_VISIBLE = 6;
+
 export function PartyLegend({ chamber, dimmed, onToggle }: PartyLegendProps) {
+  const [expanded, setExpanded] = useState(false);
+  const total = chamber.parties.length;
+  const showToggle = total > PARTY_LEGEND_DEFAULT_VISIBLE;
+  const visible = expanded || !showToggle ? chamber.parties : chamber.parties.slice(0, PARTY_LEGEND_DEFAULT_VISIBLE);
+  const hiddenCount = total - PARTY_LEGEND_DEFAULT_VISIBLE;
+
   return (
     <div className="atlas-party-legend">
-      {chamber.parties.map((p) => {
+      {visible.map((p) => {
         const pct = ((p.seats / chamber.total) * 100).toFixed(1);
         return (
           <div key={p.id} className={`p${dimmed.has(p.id) ? " dim" : ""}`} onClick={() => onToggle(p.id)}>
@@ -135,6 +143,14 @@ export function PartyLegend({ chamber, dimmed, onToggle }: PartyLegendProps) {
           </div>
         );
       })}
+      {showToggle && (
+        <button
+          className="atlas-party-legend-toggle"
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? "Show fewer" : `See all ${total} parties (${hiddenCount} more)`}
+        </button>
+      )}
     </div>
   );
 }

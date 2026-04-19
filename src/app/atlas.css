@@ -470,6 +470,8 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .atlas-party-legend .p .seats { font-family: ui-monospace, monospace; font-size: 10px; color: var(--atlas-muted); letter-spacing: 0.08em; }
 .atlas-party-legend .p .bar { flex: 1; height: 4px; background: var(--atlas-paper-2); position: relative; margin-left: 6px; align-self: center; }
 .atlas-party-legend .p .bar .fill { position: absolute; inset: 0 auto 0 0; }
+.atlas-party-legend-toggle { width: 100%; margin-top: 4px; padding: 7px 12px; font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--atlas-muted); background: transparent; border: 1px solid var(--atlas-rule); border-radius: 4px; cursor: pointer; text-align: center; transition: color 0.15s, border-color 0.15s; }
+.atlas-party-legend-toggle:hover { color: var(--atlas-ink); border-color: var(--atlas-ink); }
 
 /* ===== SEAT TOOLTIP ===== */
 .atlas-seat-tip {
