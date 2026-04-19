@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { NavLinks } from "@/components/NavLinks";
 import { MobileNav } from "@/components/MobileNav";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
+import { CivicaLogo } from "@/components/CivicaLogo";
 import "./globals.css";
 import "./atlas.css";
 
@@ -14,6 +15,7 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
   axes: ["opsz"],
+  weight: "variable",
 });
 
 const inter = Inter({
@@ -83,30 +85,36 @@ export default function RootLayout({
               WebkitBackdropFilter: "blur(12px)",
             }}
           >
-            <Link href="/" style={{ cursor: "pointer", textDecoration: "none", display: "flex", alignItems: "baseline", gap: 8 }}>
-              <span
-                style={{
-                  fontFamily: "var(--font-heading)",
-                  fontSize: "var(--text-26)",
-                  fontWeight: 400,
-                  letterSpacing: "var(--tracking-tighter)",
-                  color: "var(--color-text-primary)",
-                }}
-              >
-                Civica
-              </span>
-              <span
-                className="hidden sm:inline"
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-9)",
-                  color: "var(--color-text-30)",
-                  letterSpacing: "var(--tracking-caps)",
-                  textTransform: "uppercase",
-                }}
-              >
-                Atlas of governance
+            <Link href="/" style={{ cursor: "pointer", textDecoration: "none", display: "flex", alignItems: "center", gap: 12 }}>
+              <CivicaLogo size={56} />
+              <span style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                <span
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "var(--text-32)",
+                    fontWeight: 300,
+                    letterSpacing: "var(--tracking-tighter)",
+                    color: "var(--color-text-primary)",
+                    lineHeight: 1,
+                  }}
+                >
+                  Civica
+                </span>
+                <span
+                  className="hidden sm:inline"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
+                    fontSize: "var(--text-10)",
+                    color: "var(--color-text-30)",
+                    letterSpacing: "var(--tracking-caps)",
+                    textTransform: "uppercase",
+                    lineHeight: 1,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Atlas of governance
+                </span>
               </span>
             </Link>
             <div className="hidden md:flex" style={{ alignItems: "center", gap: 4 }}>
@@ -120,7 +128,7 @@ export default function RootLayout({
             </div>
             <div className="flex md:hidden" style={{ alignItems: "center", gap: 8 }}>
               <ThemeToggle />
-              <MobileNav searchSlot={<GlobalSearchWrapper />} />
+              <MobileNav searchSlot={<GlobalSearchWrapper />} logoSlot={<CivicaLogo size={26} />} />
             </div>
           </nav>
 
@@ -146,16 +154,19 @@ export default function RootLayout({
               }}
             >
               <div>
-                <span
-                  style={{
-                    fontFamily: "var(--font-heading)",
-                    fontSize: "var(--text-20)",
-                    fontWeight: 400,
-                    color: "var(--color-text-primary)",
-                  }}
-                >
-                  Civica
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <CivicaLogo size={28} />
+                  <span
+                    style={{
+                      fontFamily: "var(--font-heading)",
+                      fontSize: "var(--text-20)",
+                      fontWeight: 400,
+                      color: "var(--color-text-primary)",
+                    }}
+                  >
+                    Civica
+                  </span>
+                </div>
                 <p
                   style={{
                     fontFamily: "var(--font-mono)",

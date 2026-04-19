@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Civica Design System v0.1 — canonical semantic tokens (CIV-87).
+   Imported first so legacy tokens defined below still win on
+   collision. CIV-88 will progressively migrate pages onto the
+   new --color-surface-*, --color-text-*, --shadow-hard, etc. */
+@import "./design-tokens.css";
+
 /* ============================================================
    Civica Design System — warm newsprint palette
    Fonts: Fraunces (headings) + Inter (body) + ui-monospace (data)

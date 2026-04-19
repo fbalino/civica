@@ -42,7 +42,7 @@ function useIsActive(pathname: string) {
   };
 }
 
-export function MobileNav({ searchSlot }: { searchSlot?: ReactNode }) {
+export function MobileNav({ searchSlot, logoSlot }: { searchSlot?: ReactNode; logoSlot?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -102,7 +102,7 @@ export function MobileNav({ searchSlot }: { searchSlot?: ReactNode }) {
       </button>
 
       {mounted && open && createPortal(
-        <MenuOverlay onClose={() => setOpen(false)} pathname={pathname} searchSlot={searchSlot} />,
+        <MenuOverlay onClose={() => setOpen(false)} pathname={pathname} searchSlot={searchSlot} logoSlot={logoSlot} />,
         document.body
       )}
     </>
@@ -113,10 +113,12 @@ function MenuOverlay({
   onClose,
   pathname,
   searchSlot,
+  logoSlot,
 }: {
   onClose: () => void;
   pathname: string;
   searchSlot?: ReactNode;
+  logoSlot?: ReactNode;
 }) {
   const isActive = useIsActive(pathname);
 
@@ -138,7 +140,7 @@ function MenuOverlay({
         WebkitOverflowScrolling: "touch",
       }}
     >
-      <OverlayHeader onClose={onClose} />
+      <OverlayHeader onClose={onClose} logoSlot={logoSlot} />
 
       <div style={{ padding: "4px 20px 18px", borderBottom: "1px solid var(--color-divider)" }}>
         {searchSlot}
@@ -247,7 +249,7 @@ function PanelRow({ item, active, delay = 0 }: { item: NavItem; active: boolean;
   );
 }
 
-function OverlayHeader({ onClose }: { onClose: () => void }) {
+function OverlayHeader({ onClose, logoSlot }: { onClose: () => void; logoSlot?: ReactNode }) {
   return (
     <div
       style={{
@@ -263,7 +265,8 @@ function OverlayHeader({ onClose }: { onClose: () => void }) {
         zIndex: 2,
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {logoSlot}
         <span
           style={{
             fontFamily: "var(--font-heading)",

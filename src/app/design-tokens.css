@@ -1,0 +1,211 @@
+/* ============================================================
+   CIVICA DESIGN TOKENS — canonical CSS custom properties
+   Source of truth: Civica Design System v0.1 (April 2026)
+   Reference HTML: Civica Design System.zip → Design System.html
+
+   Naming convention
+   -----------------
+   Tokens are named semantically by ROLE, not by raw color
+   (e.g. --color-surface-primary, not --paper). The role-based
+   names are the canonical interface — page-level CSS should
+   only reference these.
+
+   Theme mode
+   ----------
+   Light mode is the default (:root). Dark mode is opted into
+   via either of:
+     • <html data-theme="dark">      (explicit toggle)
+     • prefers-color-scheme: dark    (system preference, only
+                                      when no data-theme is set)
+
+   To force light:    <html data-theme="light">
+   ============================================================ */
+
+:root,
+html[data-theme="light"] {
+  /* --- Surface (paper field) --- */
+  --color-surface-primary:        #f4f1ea;  /* paper  — base field */
+  --color-surface-secondary:      #ebe6d6;  /* paper-2 — quiet hover, zebra rows */
+  --color-surface-tertiary:       #e2dcc8;  /* paper-3 — wells, mini-map ground */
+
+  /* --- Ink / text --- */
+  --color-text-primary:           #1a1a1a;  /* ink     — body type, rules, heavy UI */
+  --color-text-secondary:         #3d382d;  /* ink-2   — secondary type, soft buttons */
+  --color-text-muted:             #8a8370;  /* muted   — captions, eyebrows, meta */
+
+  /* --- Borders / rules --- */
+  --color-border-strong:          #1a1a1a;  /* heavy borders use --color-text-primary */
+  --color-border-default:         #c4bdae;  /* rule    — hairlines */
+  --color-border-subtle:          #d9d2c1;  /* rule-2  — graticules, dashed rules */
+
+  /* --- Signal (one accent + functional status) --- */
+  --color-accent:                 oklch(58% 0.14 35);   /* cinnabar — selection, CTAs, eyebrows */
+  --color-accent-soft:            oklch(92% 0.04 35);   /* pinned banners, accent wash */
+  --color-accent-on:              #ffffff;              /* text/icon color when sitting on --color-accent */
+
+  --color-status-success:         oklch(55% 0.12 145);  /* olive — passed, yes votes, stable */
+  --color-status-success-on:      var(--color-surface-primary);
+  --color-status-warning:         oklch(65% 0.14 75);   /* amber — in committee, deadline near */
+  --color-status-warning-on:      var(--color-text-primary);
+  --color-status-danger:          oklch(52% 0.18 25);   /* brick — failed, nay votes, contested */
+  --color-status-danger-on:       var(--color-surface-primary);
+  --color-status-info:            oklch(52% 0.10 240);  /* slate — procedural, abstentions */
+  --color-status-info-on:         var(--color-surface-primary);
+
+  /* --- Brand / Logo --- */
+  --logo-fg:                      var(--color-text-primary);
+  --logo-bg:                      var(--color-surface-primary);
+
+  /* --- Map --- */
+  --color-map-ocean:              #ece7d6;  /* water + atlas ground */
+  --color-map-land:               #ddd5be;  /* featured countries */
+  --color-map-land-dim:           #d0c7ad;  /* non-featured countries */
+  --color-map-land-hover:         #1a1a1a;  /* hover (uses ink) */
+  --color-map-land-selected:      var(--color-accent); /* current country */
+
+  /* --- Selection (text highlight) --- */
+  --color-selection-bg:           color-mix(in oklab, var(--color-accent) 30%, transparent);
+
+  /* --- Type families --- */
+  --font-serif:                   "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans:                    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-mono:                    ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* --- Type roles (font-family aliases used by globals.css) --- */
+  --font-heading:                 var(--font-serif);
+  --font-body:                    var(--font-sans);
+  --font-label:                   var(--font-mono);
+
+  /* --- Type scale --- */
+  --font-size-display:            72px;  /* H1 / hero — Fraunces 400 / lh 0.95 / -3% track */
+  --font-size-h2:                 40px;  /* Section header — Fraunces 400 / -2% track */
+  --font-size-h3:                 22px;  /* Subhead — Fraunces 400 / -1% track */
+  --font-size-dek:                17px;  /* Lede / dek — Fraunces italic */
+  --font-size-body:               14px;  /* Body — Inter 400 / lh 1.55 */
+  --font-size-caption:            12px;  /* Caption — Inter 400 */
+  --font-size-eyebrow:            10px;  /* Eyebrow — Mono / 16% track / uppercase */
+  --font-size-meta:               11px;  /* Meta / code — Mono */
+
+  /* --- Line-heights --- */
+  --line-height-display:          0.95;
+  --line-height-tight:            1.05;
+  --line-height-snug:             1.1;
+  --line-height-body:             1.55;
+  --line-height-relaxed:          1.6;
+
+  /* --- Letter-spacing --- */
+  --letter-spacing-display:       -0.03em;  /* H1 */
+  --letter-spacing-h2:            -0.02em;  /* H2 */
+  --letter-spacing-h3:            -0.01em;  /* H3 */
+  --letter-spacing-eyebrow:       0.16em;   /* Mono eyebrow */
+  --letter-spacing-label:         0.12em;   /* Mono label / button */
+  --letter-spacing-caps:          0.14em;   /* Mono uppercase */
+
+  /* --- Spacing scale (4-pt) --- */
+  --space-1:                      2px;
+  --space-2:                      4px;
+  --space-3:                      8px;
+  --space-4:                      12px;
+  --space-5:                      16px;
+  --space-6:                      24px;
+  --space-7:                      32px;
+  --space-8:                      48px;
+  --space-9:                      64px;
+
+  /* --- Radii (near-zero, hard edges) --- */
+  --radius-none:                  0;
+  --radius-sm:                    2px;   /* default for buttons, chips, inputs */
+  --radius-md:                    6px;   /* occasional softer card */
+
+  /* --- Elevation (blocky offset, no soft shadow) --- */
+  --shadow-hard:                  4px 4px 0 var(--color-text-primary);
+  --shadow-hard-lg:               6px 6px 0 var(--color-text-primary);
+
+  /* --- Layout --- */
+  --layout-max-width:             1160px;
+  --layout-page-x:                32px;
+
+  /* --- Motion --- */
+  --motion-fast:                  120ms;
+  --motion-base:                  150ms;
+  --motion-slow:                  300ms;
+}
+
+/* ============================================================
+   Dark mode — explicit toggle
+   ============================================================ */
+html[data-theme="dark"] {
+  --color-surface-primary:        #16140f;
+  --color-surface-secondary:      #221e16;
+  --color-surface-tertiary:       #2b2619;
+
+  --color-text-primary:           #ebe6d6;
+  --color-text-secondary:         #c4bdae;
+  --color-text-muted:             #8a8370;
+
+  --color-border-strong:          #ebe6d6;
+  --color-border-default:         #3d382d;
+  --color-border-subtle:          #2d2a22;
+
+  --color-accent:                 oklch(68% 0.15 35);
+  --color-accent-soft:            oklch(30% 0.06 35);
+  --color-accent-on:              #16140f;
+
+  --color-status-success:         oklch(68% 0.14 145);
+  --color-status-success-on:      var(--color-surface-primary);
+  --color-status-warning:         oklch(75% 0.14 75);
+  --color-status-warning-on:      var(--color-surface-primary);
+  --color-status-danger:          oklch(65% 0.18 25);
+  --color-status-danger-on:       var(--color-surface-primary);
+  --color-status-info:            oklch(68% 0.10 240);
+  --color-status-info-on:         var(--color-surface-primary);
+
+  --color-map-ocean:              #1b1812;
+  --color-map-land:               #312c1f;
+  --color-map-land-dim:           #221e16;
+  --color-map-land-hover:         #ebe6d6;
+
+  --shadow-hard:                  4px 4px 0 #000;
+  --shadow-hard-lg:               6px 6px 0 #000;
+}
+
+/* ============================================================
+   Dark mode — system preference fallback
+   Applies only when the user has NOT set data-theme explicitly.
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    --color-surface-primary:      #16140f;
+    --color-surface-secondary:    #221e16;
+    --color-surface-tertiary:     #2b2619;
+
+    --color-text-primary:         #ebe6d6;
+    --color-text-secondary:       #c4bdae;
+    --color-text-muted:           #8a8370;
+
+    --color-border-strong:        #ebe6d6;
+    --color-border-default:       #3d382d;
+    --color-border-subtle:        #2d2a22;
+
+    --color-accent:               oklch(68% 0.15 35);
+    --color-accent-soft:          oklch(30% 0.06 35);
+    --color-accent-on:            #16140f;
+
+    --color-status-success:       oklch(68% 0.14 145);
+    --color-status-success-on:    var(--color-surface-primary);
+    --color-status-warning:       oklch(75% 0.14 75);
+    --color-status-warning-on:    var(--color-surface-primary);
+    --color-status-danger:        oklch(65% 0.18 25);
+    --color-status-danger-on:     var(--color-surface-primary);
+    --color-status-info:          oklch(68% 0.10 240);
+    --color-status-info-on:       var(--color-surface-primary);
+
+    --color-map-ocean:            #1b1812;
+    --color-map-land:             #312c1f;
+    --color-map-land-dim:         #221e16;
+    --color-map-land-hover:       #ebe6d6;
+
+    --shadow-hard:                4px 4px 0 #000;
+    --shadow-hard-lg:             6px 6px 0 #000;
+  }
+}
