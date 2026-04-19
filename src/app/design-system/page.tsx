@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { Metadata } from "next";
+
 import "./design-system.css";
 
 const SURFACE_TOKENS = [
@@ -127,7 +127,7 @@ export default function DesignSystemPage() {
             and a hairline rule. Dark mode inverts the field, keeps the ink, and warms the signal.
           </p>
           <p style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: 14, color: "var(--muted)", maxWidth: 640 }}>
-            No drop shadows (except the occasional blocky offset). Color is reserved for meaning,
+            No gradients. No drop shadows (except the occasional blocky offset). Color is reserved for meaning,
             not decoration.
           </p>
         </section>

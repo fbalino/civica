@@ -196,6 +196,8 @@ export default function RootLayout({
                   <Link href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</Link>
                   <span>&middot;</span>
                   <Link href="/contact" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Contact</Link>
+                  <span>&middot;</span>
+                  <Link href="/design-system" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Design System</Link>
                 </div>
               </div>
             </div>
