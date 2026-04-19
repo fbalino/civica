@@ -232,11 +232,25 @@ export default async function CountryPage({
             color: "var(--color-text-primary)",
             display: "block",
             lineHeight: "var(--leading-snug)",
-            marginBottom: 6,
+            marginBottom: bill.summary ? 4 : 6,
           }}
         >
           {bill.title}
         </span>
+        {bill.summary && (
+          <span
+            style={{
+              fontFamily: "var(--font-body-sans)",
+              fontSize: "var(--text-13)",
+              color: "var(--color-text-60)",
+              display: "block",
+              lineHeight: "var(--leading-relaxed)",
+              marginBottom: 6,
+            }}
+          >
+            {bill.summary}
+          </span>
+        )}
         <span
           style={{
             fontFamily: "var(--font-mono)",

@@ -1,5 +1,6 @@
 export interface Bill {
   title: string;
+  summary?: string;
   status: string;
   date: string;
   url: string;
@@ -62,6 +63,7 @@ async function fetchUKBills(): Promise<Bill[]> {
   };
   return (json.items ?? []).map((b) => ({
     title: b.shortTitle ?? b.longTitle ?? "Untitled",
+    summary: b.longTitle && b.shortTitle && b.longTitle !== b.shortTitle ? b.longTitle : undefined,
     status: b.currentStage?.description ?? "In Parliament",
     date: b.lastUpdate ?? "",
     url: `https://bills.parliament.uk/bills/${b.billId}`,

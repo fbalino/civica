@@ -23,7 +23,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
   const rawBills = await fetchParliamentBills(jurisdiction.iso2);
   const bills = rawBills.map((b) => ({
     title: b.title,
-    summary: b.status,
+    summary: b.summary ?? b.status,
+    status: b.status,
     sponsor: b.identifier ?? b.source.replace(/_/g, " "),
     tags: [b.source === "congress_gov" ? "U.S. Congress" : b.source === "uk_parliament" ? "UK Parliament" : b.source],
     stage: statusToStage(b.status),
