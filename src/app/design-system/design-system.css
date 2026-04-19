@@ -59,6 +59,7 @@
 }
 
 .ds-page * { box-sizing: border-box; }
+.ds-page h1, .ds-page h2, .ds-page h3, .ds-page h4 { color: var(--ink); }
 
 .ds-page *::-webkit-scrollbar { width: 6px; height: 6px; }
 .ds-page *::-webkit-scrollbar-track { background: transparent; }
