@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo, Fragment } from "react";
 import Link from "next/link";
 import { type Country, type ChamberData, type Bill, COUNTRIES as FALLBACK_COUNTRIES, CHAMBERS as FALLBACK_CHAMBERS, WORLD_PATHS, NE_ID_TO_OURS as FALLBACK_NE_MAP, PARTY_COLORS, getDefaultChamberData as getFallbackChamberData, govDescription, getMember } from "./data";
 import { Hemicycle, PartyLegend } from "./Hemicycle";
