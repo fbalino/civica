@@ -78,11 +78,10 @@ const mdxComponents = {
     <p
       {...props}
       style={{
-        fontFamily: "var(--font-mono)",
-        fontWeight: "var(--font-weight-mono)",
-        fontSize: "var(--text-13)",
-        color: "var(--color-text-50)",
-        lineHeight: "var(--leading-loose)",
+        fontFamily: "var(--font-body)",
+        fontSize: "var(--text-16)",
+        color: "var(--color-text-85)",
+        lineHeight: "var(--leading-relaxed)",
         margin: "0 0 20px",
       }}
     />
@@ -91,11 +90,10 @@ const mdxComponents = {
     <ul
       {...props}
       style={{
-        fontFamily: "var(--font-mono)",
-        fontWeight: "var(--font-weight-mono)",
-        fontSize: "var(--text-13)",
-        color: "var(--color-text-50)",
-        lineHeight: "var(--leading-loose)",
+        fontFamily: "var(--font-body)",
+        fontSize: "var(--text-16)",
+        color: "var(--color-text-85)",
+        lineHeight: "var(--leading-relaxed)",
         paddingLeft: 24,
         margin: "0 0 20px",
       }}
@@ -105,11 +103,10 @@ const mdxComponents = {
     <ol
       {...props}
       style={{
-        fontFamily: "var(--font-mono)",
-        fontWeight: "var(--font-weight-mono)",
-        fontSize: "var(--text-13)",
-        color: "var(--color-text-50)",
-        lineHeight: "var(--leading-loose)",
+        fontFamily: "var(--font-body)",
+        fontSize: "var(--text-16)",
+        color: "var(--color-text-85)",
+        lineHeight: "var(--leading-relaxed)",
         paddingLeft: 24,
         margin: "0 0 20px",
       }}
