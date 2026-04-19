@@ -21,6 +21,7 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState(0);
+  const [lastQuery, setLastQuery] = useState(query);
   const ref = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -35,9 +36,10 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
         .slice(0, 8)
     : [];
 
-  useEffect(() => {
+  if (lastQuery !== query) {
+    setLastQuery(query);
     setSelectedIdx(0);
-  }, [query]);
+  }
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {

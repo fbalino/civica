@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
@@ -22,14 +23,14 @@ export function NavLinks() {
             ? pathname === "/"
             : pathname === href || pathname.startsWith(href + "/");
         return (
-          <a
+          <Link
             key={href}
             href={href}
             className={`tab-nav ${isActive ? "tab-nav--active" : ""}`}
             style={{ textDecoration: "none" }}
           >
             {label}
-          </a>
+          </Link>
         );
       })}
     </nav>

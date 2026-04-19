@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllSlugs, getPostBySlug } from "@/lib/blog";
@@ -202,7 +203,7 @@ export default async function BlogPostPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <a href="/blog" className="breadcrumb">
+      <Link href="/blog" className="breadcrumb">
         <svg
           width="14"
           height="14"
@@ -216,7 +217,7 @@ export default async function BlogPostPage({
           <path d="M10 12L6 8l4-4" />
         </svg>
         Blog
-      </a>
+      </Link>
 
       <article>
         <div style={{

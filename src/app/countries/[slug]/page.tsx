@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getJurisdictionBySlug,
@@ -1046,10 +1047,10 @@ export default async function CountryPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {/* Breadcrumb */}
-      <a href="/countries" className="breadcrumb">
+      <Link href="/countries" className="breadcrumb">
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 12L6 8l4-4"/></svg>
         All countries
-      </a>
+      </Link>
 
       {/* Country header */}
       <div className="country-header">

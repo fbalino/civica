@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { type Country, type ChamberData, type Bill, COUNTRIES as FALLBACK_COUNTRIES, CHAMBERS as FALLBACK_CHAMBERS, WORLD_PATHS, NE_ID_TO_OURS as FALLBACK_NE_MAP, PARTY_COLORS, getDefaultChamberData as getFallbackChamberData, govDescription, getMember } from "./data";
 import { Hemicycle, PartyLegend } from "./Hemicycle";
 import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data";
@@ -141,21 +142,36 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const dragRef = useRef<{ dragging: boolean; startX: number; startY: number; originX: number; originY: number }>({ dragging: false, startX: 0, startY: 0, originX: 0, originY: 0 });
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapPaths, setMapPaths] = useState<Array<{ d: string; id: string | null; country: Country | null; neId: string; centroid: [number, number]; area: number }>>([]);
-  const [leftW, setLeftW] = useState(300);
-  const [rightW, setRightW] = useState(380);
+  const [leftW, setLeftW] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("atlas_panels") || "{}");
+      return saved.leftW || 300;
+    } catch {
+      return 300;
+    }
+  });
+  const [rightW, setRightW] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("atlas_panels") || "{}");
+      return saved.rightW || 380;
+    } catch {
+      return 380;
+    }
+  });
   const resizerRef = useRef<{ side: "left" | "right"; startX: number; startW: number } | null>(null);
   const atlasRootRef = useRef<HTMLDivElement>(null);
   const labelsRef = useRef<SVGGElement>(null);
   const touchRef = useRef<{ lastDist: number; lastX: number; lastY: number; touches: number }>({ lastDist: 0, lastX: 0, lastY: 0, touches: 0 });
   const [mobilePanel, setMobilePanel] = useState<"center" | "countries" | "chat">("center");
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches
+  );
   const [mobileFilters, setMobileFilters] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [navHeight, setNavHeight] = useState(0);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
-    setIsMobile(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
@@ -421,14 +437,6 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
   // Resizable panes
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("atlas_panels") || "{}");
-      if (saved.leftW) setLeftW(saved.leftW);
-      if (saved.rightW) setRightW(saved.rightW);
-    } catch {}
-  }, []);
-
-  useEffect(() => {
     const onMove = (e: MouseEvent) => {
       const r = resizerRef.current;
       if (!r) return;
@@ -688,15 +696,15 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
             </button>
           ))}
         </div>
-        <a href="/countries" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
+        <Link href="/countries" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
           Index
-        </a>
-        <a href="/rankings" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
+        </Link>
+        <Link href="/rankings" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
           Rankings
-        </a>
-        <a href="/blog" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
+        </Link>
+        <Link href="/blog" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-ink-2)", textDecoration: "none", letterSpacing: "0.06em" }}>
           Blog
-        </a>
+        </Link>
       </div>
 
       {/* ===== STAGE ===== */}

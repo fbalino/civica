@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Fraunces, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -82,7 +83,7 @@ export default function RootLayout({
               WebkitBackdropFilter: "blur(12px)",
             }}
           >
-            <a href="/" style={{ cursor: "pointer", textDecoration: "none", display: "flex", alignItems: "baseline", gap: 8 }}>
+            <Link href="/" style={{ cursor: "pointer", textDecoration: "none", display: "flex", alignItems: "baseline", gap: 8 }}>
               <span
                 style={{
                   fontFamily: "var(--font-heading)",
@@ -107,7 +108,7 @@ export default function RootLayout({
               >
                 Atlas of governance
               </span>
-            </a>
+            </Link>
             <div className="hidden md:flex" style={{ alignItems: "center", gap: 4 }}>
               <NavLinks />
               <div style={{ marginLeft: 12 }}>
@@ -221,24 +222,24 @@ export default function RootLayout({
                 }}
               >
                 <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                  <a href="/countries" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Countries</a>
+                  <Link href="/countries" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Countries</Link>
                   <span>&middot;</span>
-                  <a href="/elections" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Elections</a>
+                  <Link href="/elections" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Elections</Link>
                   <span>&middot;</span>
-                  <a href="/government-types" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Gov Types</a>
+                  <Link href="/government-types" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Gov Types</Link>
                   <span>&middot;</span>
-                  <a href="/compare" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Compare</a>
+                  <Link href="/compare" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Compare</Link>
                   <span>&middot;</span>
-                  <a href="/rankings" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Rankings</a>
+                  <Link href="/rankings" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Rankings</Link>
                   <span>&middot;</span>
-                  <a href="/blog" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Blog</a>
+                  <Link href="/blog" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Blog</Link>
                 </div>
                 <div style={{ marginTop: 6, display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                  <a href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>About</a>
+                  <Link href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>About</Link>
                   <span>&middot;</span>
-                  <a href="/api-docs" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>API</a>
+                  <Link href="/api-docs" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>API</Link>
                   <span>&middot;</span>
-                  <a href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</a>
+                  <Link href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</Link>
                 </div>
               </div>
             </div>

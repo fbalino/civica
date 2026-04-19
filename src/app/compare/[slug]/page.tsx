@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getJurisdictionsBySlugs,
@@ -176,7 +177,7 @@ export default async function CompareSlugPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <a href="/compare" className="breadcrumb">
+      <Link href="/compare" className="breadcrumb">
         <svg
           width="14"
           height="14"
@@ -190,7 +191,7 @@ export default async function CompareSlugPage({
           <path d="M10 12L6 8l4-4" />
         </svg>
         Compare countries
-      </a>
+      </Link>
 
       <h1 className="page-heading">
         {nameA} vs {nameB}

@@ -44,7 +44,7 @@ export function apiError(message: string, status: number) {
 
 export function withRateLimit(request: Request): NextResponse | null {
   const key = getRateLimitKey(request);
-  const { allowed, remaining } = checkRateLimit(key);
+  const { allowed } = checkRateLimit(key);
 
   if (!allowed) {
     return NextResponse.json(

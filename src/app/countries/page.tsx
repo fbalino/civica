@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { CountrySearch } from "./search";
 import { CountryFlag } from "@/components/CountryFlag";
@@ -151,12 +152,12 @@ export default async function CountriesPage({
 
         {continents.length > 0 && (
           <nav className="index-continent-nav">
-            <a
+            <Link
               href="/countries"
               className={`index-continent-chip ${!continentFilter ? "index-continent-chip--active" : ""}`}
             >
               All
-            </a>
+            </Link>
             {continents.map((c) => (
               <a
                 key={c}

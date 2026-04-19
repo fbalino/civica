@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useCallback } from "react";
 import { type Chamber, type Party, PARTY_COLORS, getMember } from "./data";
 
 function resolveColor(color: string): string {

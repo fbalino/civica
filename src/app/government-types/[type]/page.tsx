@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getJurisdictionsByGovernmentTypePattern } from "@/lib/db/queries";
 import {
@@ -171,7 +172,7 @@ export default async function GovernmentTypePage({
 
       {/* Hero */}
       <header className="index-hero">
-        <a href="/government-types" className="breadcrumb">
+        <Link href="/government-types" className="breadcrumb">
           <svg
             width="14"
             height="14"
@@ -185,7 +186,7 @@ export default async function GovernmentTypePage({
             <path d="M10 12L6 8l4-4" />
           </svg>
           All government types
-        </a>
+        </Link>
 
         <div
           className="gov-color-bar"
