@@ -240,6 +240,8 @@ export default function RootLayout({
                   <Link href="/api-docs" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>API</Link>
                   <span>&middot;</span>
                   <Link href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</Link>
+                  <span>&middot;</span>
+                  <Link href="/contact" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Contact</Link>
                 </div>
               </div>
             </div>
