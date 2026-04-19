@@ -19,7 +19,7 @@ const PRIMARY: NavItem[] = [
   { href: "/government-types", label: "Gov Types", descriptor: "Systems compared", glyph: "▣" },
   { href: "/compare", label: "Compare", descriptor: "Side-by-side analysis", glyph: "⇆" },
   { href: "/rankings", label: "Rankings", descriptor: "Data-backed leaderboards", glyph: "☰" },
-  { href: "/blog", label: "Blog", descriptor: "Essays & visualizations", glyph: "✎" },
+  { href: "/blog", label: "The Record", descriptor: "Essays & dispatches", glyph: "✎" },
 ];
 
 const REFERENCE: NavItem[] = [

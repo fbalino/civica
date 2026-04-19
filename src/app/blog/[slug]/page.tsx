@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { getAllSlugs, getPostBySlug } from "@/lib/blog";
-import { GenerativeBlogImage } from "@/components/GenerativeBlogImage";
+import { getAllSlugs, getAllPosts, getPostBySlug } from "@/lib/blog";
+import { HemicycleCover } from "@/components/blog/HemicycleCover";
+import { ReadingProgress } from "@/components/blog/ReadingProgress";
 
 const SITE_URL = "https://civicaatlas.org";
 
@@ -25,7 +26,7 @@ export async function generateMetadata({
     alternates: { canonical: `${SITE_URL}/blog/${post.slug}` },
     openGraph: {
       type: "article",
-      title: `${post.title} | Civica Blog`,
+      title: `${post.title} | The Record`,
       description: post.description,
       url: `${SITE_URL}/blog/${post.slug}`,
       publishedTime: post.date,
@@ -35,130 +36,56 @@ export async function generateMetadata({
   };
 }
 
+function estimateReadTime(content: string): number {
+  const words = content.split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 250));
+}
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 const mdxComponents = {
   h1: (props: React.ComponentProps<"h1">) => (
-    <h1
-      {...props}
-      style={{
-        fontFamily: "var(--font-heading)",
-        fontSize: "var(--text-32)",
-        fontWeight: 400,
-        letterSpacing: "var(--tracking-tight)",
-        margin: "48px 0 16px",
-        color: "var(--color-text-primary)",
-      }}
-    />
+    <h2 {...props} />
   ),
   h2: (props: React.ComponentProps<"h2">) => (
-    <h2
-      {...props}
-      style={{
-        fontFamily: "var(--font-heading)",
-        fontSize: "var(--text-24)",
-        fontWeight: 400,
-        letterSpacing: "var(--tracking-tight)",
-        margin: "40px 0 12px",
-        color: "var(--color-text-primary)",
-      }}
-    />
+    <h2 {...props} />
   ),
   h3: (props: React.ComponentProps<"h3">) => (
-    <h3
-      {...props}
-      style={{
-        fontFamily: "var(--font-heading)",
-        fontSize: "var(--text-20)",
-        fontWeight: 400,
-        margin: "32px 0 8px",
-        color: "var(--color-text-primary)",
-      }}
-    />
+    <h3 {...props} />
   ),
-  p: (props: React.ComponentProps<"p">) => (
-    <p
-      {...props}
-      style={{
-        fontFamily: "var(--font-body)",
-        fontSize: "var(--text-16)",
-        color: "var(--color-text-85)",
-        lineHeight: "var(--leading-relaxed)",
-        margin: "0 0 20px",
-      }}
-    />
-  ),
+  p: (props: React.ComponentProps<"p">) => <p {...props} />,
   ul: (props: React.ComponentProps<"ul">) => (
-    <ul
-      {...props}
-      style={{
-        fontFamily: "var(--font-body)",
-        fontSize: "var(--text-16)",
-        color: "var(--color-text-85)",
-        lineHeight: "var(--leading-relaxed)",
-        paddingLeft: 24,
-        margin: "0 0 20px",
-      }}
-    />
+    <ul {...props} style={{ paddingLeft: 24, margin: "0 0 1.2em" }} />
   ),
   ol: (props: React.ComponentProps<"ol">) => (
-    <ol
-      {...props}
-      style={{
-        fontFamily: "var(--font-body)",
-        fontSize: "var(--text-16)",
-        color: "var(--color-text-85)",
-        lineHeight: "var(--leading-relaxed)",
-        paddingLeft: 24,
-        margin: "0 0 20px",
-      }}
-    />
+    <ol {...props} style={{ paddingLeft: 24, margin: "0 0 1.2em" }} />
   ),
   li: (props: React.ComponentProps<"li">) => (
     <li {...props} style={{ marginBottom: 6 }} />
   ),
-  a: (props: React.ComponentProps<"a">) => (
-    <a
-      {...props}
-      style={{
-        color: "var(--color-accent)",
-        textDecoration: "underline",
-        textUnderlineOffset: 3,
-      }}
-    />
+  a: (props: React.ComponentProps<"a">) => <a {...props} />,
+  strong: (props: React.ComponentProps<"strong">) => <strong {...props} />,
+  em: (props: React.ComponentProps<"em">) => <em {...props} />,
+  blockquote: ({ children }: React.ComponentProps<"blockquote">) => (
+    <div className="post-callout">
+      <div>{children}</div>
+    </div>
   ),
-  strong: (props: React.ComponentProps<"strong">) => (
-    <strong {...props} style={{ color: "var(--color-text-85)" }} />
-  ),
-  blockquote: (props: React.ComponentProps<"blockquote">) => (
-    <blockquote
-      {...props}
-      style={{
-        borderLeft: "2px solid var(--color-accent)",
-        paddingLeft: 20,
-        margin: "24px 0",
-        fontStyle: "italic",
-        color: "var(--color-text-40)",
-      }}
-    />
-  ),
-  hr: (props: React.ComponentProps<"hr">) => (
-    <hr
-      {...props}
-      style={{
-        border: "none",
-        height: 1,
-        background: "var(--color-divider)",
-        margin: "40px 0",
-      }}
-    />
-  ),
+  hr: () => <hr />,
   code: (props: React.ComponentProps<"code">) => (
     <code
       {...props}
       style={{
         fontFamily: "var(--font-mono)",
         fontSize: "var(--text-12)",
-        background: "var(--color-card-bg)",
-        border: "1px solid var(--color-card-border)",
+        background: "var(--color-surface-elevated)",
+        border: "1px solid var(--color-divider)",
         padding: "2px 6px",
         borderRadius: "var(--radius-sm)",
       }}
@@ -175,6 +102,11 @@ export default async function BlogPostPage({
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
+  const allPosts = getAllPosts();
+  const otherPosts = allPosts.filter((p) => p.slug !== post.slug).slice(0, 3);
+
+  const readTime = estimateReadTime(post.content);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -187,149 +119,134 @@ export default async function BlogPostPage({
     keywords: post.tags,
   };
 
+  const authorInitials = post.author
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
-    <div
-      style={{
-        maxWidth: "var(--max-w-content)",
-        margin: "0 auto",
-        padding: "var(--spacing-section-y) var(--spacing-page-x)",
-      }}
-    >
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+    <>
+      <ReadingProgress />
 
-      <Link href="/blog" className="breadcrumb">
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M10 12L6 8l4-4" />
-        </svg>
-        Blog
-      </Link>
+      <article className="post-article">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
 
-      <article>
-        <div style={{
-          borderRadius: "var(--radius-md)",
-          overflow: "hidden",
-          border: "1px solid var(--color-card-border)",
-          background: "var(--color-card-bg)",
-          marginBottom: 32,
-        }}>
-          <GenerativeBlogImage slug={post.slug} width={720} height={280} />
-        </div>
-
-        <header style={{ marginBottom: 40 }}>
-          <h1
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "var(--text-44)",
-              fontWeight: 400,
-              letterSpacing: "var(--tracking-tighter)",
-              lineHeight: "var(--leading-snug)",
-              margin: "0 0 16px",
-              color: "var(--color-text-primary)",
-            }}
-          >
-            {post.title}
-          </h1>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              flexWrap: "wrap",
-            }}
-          >
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-12)",
-                color: "var(--color-text-40)",
-                letterSpacing: "var(--tracking-wide)",
-              }}
-            >
-              {post.author}
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-11)",
-                color: "var(--color-text-25)",
-              }}
-            >
-              &middot;
-            </span>
-            <time
-              dateTime={post.date}
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-12)",
-                color: "var(--color-text-40)",
-                letterSpacing: "var(--tracking-wide)",
-              }}
-            >
-              {new Date(post.date + "T00:00:00").toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </time>
+        {/* Header */}
+        <header className="post-head">
+          <div className="post-crumbs">
+            <Link href="/blog" style={{ color: "inherit", textDecoration: "none" }}>
+              The Record
+            </Link>
+            <span className="post-crumbs-dot" />
+            {post.tags[0] && <span>{post.tags[0]}</span>}
           </div>
-          {post.tags.length > 0 && (
-            <div
-              style={{
-                display: "flex",
-                gap: 8,
-                flexWrap: "wrap",
-                marginTop: 16,
-              }}
-            >
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
-                    color: "var(--color-text-30)",
-                    letterSpacing: "var(--tracking-caps)",
-                    textTransform: "uppercase",
-                    background: "var(--color-card-bg)",
-                    border: "1px solid var(--color-card-border)",
-                    padding: "2px 8px",
-                    borderRadius: "var(--radius-sm)",
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-          <div
-            style={{
-              width: 40,
-              height: 2,
-              background: "var(--color-accent)",
-              borderRadius: 1,
-              marginTop: 32,
-            }}
-          />
+          <h1 className="post-title">{post.title}</h1>
+          <p className="post-dek">{post.description}</p>
+          <div className="post-byline">
+            <span>
+              By <strong>{post.author}</strong>
+            </span>
+            <span className="post-byline-dot" />
+            <span>{formatDate(post.date)}</span>
+            <span className="post-byline-dot" />
+            <span>
+              {post.content.split(/\s+/).length.toLocaleString()} words &middot;{" "}
+              {readTime} min read
+            </span>
+          </div>
         </header>
 
-        <MDXRemote source={post.content} components={mdxComponents} />
+        {/* Hero figure */}
+        <figure className="post-hero-fig">
+          <div className="post-hero-img">
+            <HemicycleCover slug={post.slug} variant="hero" />
+          </div>
+          <div className="post-hero-cap">
+            <span>Illustration &middot; Civica Desk</span>
+            <span>{post.tags.join(" &middot; ")}</span>
+          </div>
+        </figure>
+
+        {/* Body grid */}
+        <div className="post-body-grid">
+          {/* Left rail */}
+          <aside className="post-rail">
+            <div className="post-rail-stuck">
+              <div className="post-rail-block">
+                <b>Filed under</b>
+                <span>{post.tags.join(", ")}</span>
+              </div>
+              <div className="post-rail-block">
+                <b>Author</b>
+                <span>{post.author}</span>
+              </div>
+              <div className="post-rail-block">
+                <b>Share</b>
+                <div className="post-share">
+                  <a href="#">
+                    Copy link <span>&nearr;</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Prose */}
+          <main className="post-prose">
+            <MDXRemote source={post.content} components={mdxComponents} />
+          </main>
+
+          {/* Right rail (empty — breathing room) */}
+          <aside className="post-rail" />
+        </div>
+
+        {/* Author card */}
+        <div className="post-author">
+          <div className="post-author-avatar">{authorInitials}</div>
+          <div>
+            <h4>{post.author}</h4>
+            <p>
+              Contributing to The Record at Civica — covering governance,
+              political systems, and the architecture of public life.
+            </p>
+          </div>
+        </div>
+
+        {/* More stories */}
+        {otherPosts.length > 0 && (
+          <section className="post-more">
+            <div className="post-more-head">
+              <span className="post-more-ey">Keep reading</span>
+              <h2>More from The Record</h2>
+            </div>
+            <div className="post-more-grid">
+              {otherPosts.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/blog/${p.slug}`}
+                  className="post-more-card"
+                >
+                  <div className="post-more-card-cover">
+                    <HemicycleCover slug={p.slug} variant="card" />
+                  </div>
+                  <div className="post-more-card-kicker">
+                    {p.tags[0] ?? "Essay"}
+                  </div>
+                  <h4>{p.title}</h4>
+                  <div className="post-more-card-by">
+                    {p.author} &middot; {estimateReadTime(p.content)} min
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
       </article>
-    </div>
+    </>
   );
 }

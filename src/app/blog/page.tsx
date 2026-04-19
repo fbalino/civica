@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
-import { GenerativeBlogImage } from "@/components/GenerativeBlogImage";
+import { HemicycleCover } from "@/components/blog/HemicycleCover";
 
 const SITE_URL = "https://civicaatlas.org";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "The Record",
   description:
-    "Articles on governance, political systems, and open data from the Civica team.",
+    "Notes from the chambers — articles on governance, political systems, and the architecture of public life from the Civica desk.",
   alternates: { canonical: `${SITE_URL}/blog` },
   openGraph: {
-    title: "Blog | Civica",
+    title: "The Record | Civica",
     description:
-      "Articles on governance, political systems, and open data from the Civica team.",
+      "Notes from the chambers — articles on governance, political systems, and the architecture of public life from the Civica desk.",
     url: `${SITE_URL}/blog`,
   },
 };
@@ -25,22 +26,35 @@ function formatDate(dateStr: string) {
   });
 }
 
+function formatShortDate(dateStr: string) {
+  return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function estimateReadTime(content: string): number {
+  const words = content.split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 250));
+}
+
 export default function BlogIndex() {
   const posts = getAllPosts();
 
   if (posts.length === 0) {
     return (
-      <div className="cv-container" style={{ padding: "var(--spacing-section-y) var(--spacing-page-x)" }}>
-        <h1 className="page-heading" style={{ marginBottom: 24 }}>Blog</h1>
-        <div style={{ width: 40, height: 2, background: "var(--color-accent)", borderRadius: 1, marginBottom: 40 }} />
-        <p style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-13)",
-          color: "var(--color-text-40)",
-        }}>
-          No posts yet. Check back soon.
-        </p>
+      <div className="record-page">
+        <header className="record-masthead">
+          <h1 className="record-nameplate">
+            The Record<span className="record-dot">.</span>
+          </h1>
+          <p className="record-tag">
+            Notes from the chambers — a letter from the Civica desk.
+          </p>
+        </header>
+        <div className="record-main">
+          <p className="record-empty">No dispatches yet. Check back soon.</p>
+        </div>
       </div>
     );
   }
@@ -49,213 +63,185 @@ export default function BlogIndex() {
   const rest = posts.slice(1);
 
   return (
-    <div className="cv-container" style={{ padding: "var(--spacing-section-y) var(--spacing-page-x)" }}>
-      <header style={{ marginBottom: 48 }}>
-        <p style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-11)",
-          color: "var(--color-text-30)",
-          letterSpacing: "var(--tracking-caps)",
-          textTransform: "uppercase",
-          margin: "0 0 12px",
-        }}>
-          From the Atlas
+    <div className="record-page">
+      {/* Masthead */}
+      <header className="record-masthead">
+        <div className="record-masthead-grid">
+          <div className="record-masthead-date">
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </div>
+          <h1 className="record-nameplate">
+            The Record<span className="record-dot">.</span>
+          </h1>
+          <div className="record-masthead-vol">
+            {posts.length} {posts.length === 1 ? "Article" : "Articles"}
+          </div>
+        </div>
+        <p className="record-tag">
+          Notes from the chambers — a letter from the Civica desk.
         </p>
-        <h1 style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-44)",
-          fontWeight: 400,
-          letterSpacing: "var(--tracking-tighter)",
-          lineHeight: "var(--leading-snug)",
-          margin: "0 0 16px",
-          color: "var(--color-text-primary)",
-        }}>
-          Blog
-        </h1>
-        <div style={{ width: 40, height: 2, background: "var(--color-accent)", borderRadius: 1 }} />
       </header>
 
-      {/* Featured post */}
-      <a
-        href={`/blog/${featured.slug}`}
-        className="blog-featured-card"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 0,
-          textDecoration: "none",
-          borderRadius: "var(--radius-md)",
-          overflow: "hidden",
-          border: "1px solid var(--color-card-border)",
-          background: "var(--color-card-bg)",
-          marginBottom: 40,
-          transition: "border-color 0.2s ease, background 0.2s ease",
-        }}
-      >
-        <div style={{
-          background: "var(--color-card-bg)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 24,
-          minHeight: 240,
-        }}>
-          <GenerativeBlogImage slug={featured.slug} width={600} height={320} />
-        </div>
-        <div style={{ padding: "32px 36px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          <div style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-10)",
-            color: "var(--color-accent)",
-            letterSpacing: "var(--tracking-caps)",
-            textTransform: "uppercase",
-            marginBottom: 12,
-          }}>
-            Latest
-          </div>
-          <h2 style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-28)",
-            fontWeight: 400,
-            letterSpacing: "var(--tracking-tight)",
-            lineHeight: "var(--leading-snug)",
-            margin: "0 0 12px",
-            color: "var(--color-text-primary)",
-          }}>
-            {featured.title}
-          </h2>
-          <p style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-12)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-relaxed)",
-            margin: "0 0 16px",
-          }}>
-            {featured.description}
-          </p>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <time
-              dateTime={featured.date}
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-11)",
-                color: "var(--color-text-30)",
-                letterSpacing: "var(--tracking-wide)",
-              }}
-            >
-              {formatDate(featured.date)}
-            </time>
-            {featured.tags.length > 0 && (
-              <>
-                <span style={{ color: "var(--color-text-20)" }}>&middot;</span>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {featured.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontWeight: "var(--font-weight-mono)",
-                        fontSize: "var(--text-10)",
-                        color: "var(--color-text-25)",
-                        letterSpacing: "var(--tracking-caps)",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </a>
+      {/* Sub-nav */}
+      <nav className="record-subnav">
+        <Link href="/" className="record-subnav-link">
+          &larr; Atlas
+        </Link>
+        <span className="record-subnav-link record-subnav-active">
+          The Record
+        </span>
+        <span className="record-subnav-grow" />
+      </nav>
 
-      {/* Masonry grid */}
-      {rest.length > 0 && (
-        <div className="blog-masonry">
-          {rest.map((post) => (
-            <a
-              key={post.slug}
-              href={`/blog/${post.slug}`}
-              className="blog-masonry-card"
-              style={{ textDecoration: "none", display: "block" }}
+      <main className="record-main">
+        {/* Lead story */}
+        <article className="record-lead">
+          <Link
+            href={`/blog/${featured.slug}`}
+            className="record-lead-cover"
+            aria-label="Open article"
+          >
+            <HemicycleCover slug={featured.slug} variant="lead" />
+          </Link>
+          <div className="record-lead-copy">
+            <span className="record-kicker">
+              Latest &middot; {featured.tags[0] ?? "Essay"}
+            </span>
+            <h2 className="record-lead-title">{featured.title}</h2>
+            <p className="record-lead-dek">{featured.description}</p>
+            <Link
+              href={`/blog/${featured.slug}`}
+              className="record-read-link"
             >
-              <div style={{
-                borderRadius: "var(--radius-md)",
-                overflow: "hidden",
-                marginBottom: 14,
-                border: "1px solid var(--color-card-border)",
-                background: "var(--color-card-bg)",
-              }}>
-                <GenerativeBlogImage slug={post.slug} width={400} height={220} />
+              Read the essay &rarr;
+            </Link>
+            <div className="record-byline">
+              <span>
+                By <strong>{featured.author}</strong>
+              </span>
+              <span className="record-byline-dot" />
+              <span>{estimateReadTime(featured.content)} min read</span>
+              <span className="record-byline-dot" />
+              <span>{formatDate(featured.date)}</span>
+            </div>
+          </div>
+        </article>
+
+        {/* Stories grid */}
+        {rest.length > 0 && (
+          <>
+            <div className="record-sec-head">
+              <span className="record-sec-ey">&sect; 01</span>
+              <h2 className="record-sec-title">More from the desk</h2>
+            </div>
+            <div className="record-stories">
+              {rest.map((post) => (
+                <article key={post.slug} className="record-story">
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="record-story-cover"
+                    aria-label="Open"
+                  >
+                    <HemicycleCover slug={post.slug} variant="card" />
+                  </Link>
+                  <div className="record-story-kicker">
+                    {post.tags[0] ?? "Essay"}
+                  </div>
+                  <h3 className="record-story-title">
+                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                  </h3>
+                  <p className="record-story-dek">{post.description}</p>
+                  <div className="record-story-meta">
+                    <strong>{post.author}</strong>
+                    <span>&middot;</span>
+                    <span>{estimateReadTime(post.content)} min</span>
+                    <span>&middot;</span>
+                    <span>{formatShortDate(post.date)}</span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Numbered list — "In the margins" style */}
+        {rest.length >= 3 && (
+          <div className="record-two-col">
+            <div>
+              <div className="record-sec-head" style={{ marginTop: 0 }}>
+                <span className="record-sec-ey">&sect; 02</span>
+                <h2 className="record-sec-title">In the margins</h2>
               </div>
-              <time
-                dateTime={post.date}
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-10)",
-                  color: "var(--color-text-25)",
-                  letterSpacing: "var(--tracking-wide)",
-                  display: "block",
-                  marginBottom: 6,
-                }}
-              >
-                {formatDate(post.date)}
-              </time>
-              <h2 style={{
-                fontFamily: "var(--font-heading)",
-                fontSize: "var(--text-20)",
-                fontWeight: 400,
-                letterSpacing: "var(--tracking-tight)",
-                lineHeight: "var(--leading-snug)",
-                margin: "0 0 8px",
-                color: "var(--color-text-primary)",
-              }}>
-                {post.title}
-              </h2>
-              <p style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-11)",
-                color: "var(--color-text-40)",
-                lineHeight: "var(--leading-relaxed)",
-                margin: "0 0 10px",
-              }}>
-                {post.description}
-              </p>
-              {post.tags.length > 0 && (
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                  {post.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontWeight: "var(--font-weight-mono)",
-                        fontSize: "var(--text-9)",
-                        color: "var(--color-text-20)",
-                        letterSpacing: "var(--tracking-caps)",
-                        textTransform: "uppercase",
-                        background: "var(--color-card-bg)",
-                        border: "1px solid var(--color-card-border)",
-                        padding: "1px 6px",
-                        borderRadius: "var(--radius-sm)",
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
+              <div className="record-list">
+                {rest.map((post, i) => (
+                  <Link
+                    key={post.slug}
+                    href={`/blog/${post.slug}`}
+                    className="record-list-row"
+                  >
+                    <div className="record-list-n">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div>
+                      <div className="record-list-kicker">
+                        {post.tags[0] ?? "Essay"}
+                      </div>
+                      <h4 className="record-list-title">{post.title}</h4>
+                      <div className="record-list-by">
+                        <strong>{post.author}</strong> &middot;{" "}
+                        {estimateReadTime(post.content)} min &middot;{" "}
+                        {formatShortDate(post.date)}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <aside className="record-sidebar">
+              <div className="record-sidebar-block">
+                <h5 className="record-sidebar-heading">Editor&apos;s note</h5>
+                <blockquote className="record-sidebar-quote">
+                  &ldquo;The chamber is not a container for politics. It{" "}
+                  <em>is</em> the politics. Walk in, sit down, look around: the
+                  argument has already begun.&rdquo;
+                </blockquote>
+              </div>
+
+              {posts.length > 0 && (
+                <div className="record-sidebar-block">
+                  <h5 className="record-sidebar-heading">Topics</h5>
+                  <div className="record-tag-cloud">
+                    {Array.from(
+                      new Set(posts.flatMap((p) => p.tags))
+                    )
+                      .slice(0, 10)
+                      .map((tag) => (
+                        <span key={tag} className="record-tag-chip">
+                          {tag}
+                        </span>
+                      ))}
+                  </div>
                 </div>
               )}
-            </a>
-          ))}
-        </div>
-      )}
+
+              <div className="record-sidebar-block">
+                <h5 className="record-sidebar-heading">Colophon</h5>
+                <p className="record-sidebar-colophon">
+                  Set in <strong>Fraunces</strong> and <strong>Inter</strong>.
+                  Published in warm paper and starless dark.
+                  Letterpress-inspired, web-native.
+                </p>
+              </div>
+            </aside>
+          </div>
+        )}
+      </main>
     </div>
   );
 }

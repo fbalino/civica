@@ -186,7 +186,7 @@ export default function RootLayout({
                   <span>&middot;</span>
                   <Link href="/rankings" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Rankings</Link>
                   <span>&middot;</span>
-                  <Link href="/blog" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Blog</Link>
+                  <Link href="/blog" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>The Record</Link>
                 </div>
                 <div style={{ marginTop: 6, display: "flex", gap: 12, justifyContent: "flex-end" }}>
                   <Link href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>About</Link>
