@@ -19,8 +19,8 @@
   --atlas-land-selected: oklch(58% 0.14 35);
   --atlas-success: oklch(55% 0.12 145);
   --atlas-danger: oklch(58% 0.15 25);
-  --atlas-leftW: 300px;
-  --atlas-rightW: 380px;
+  --atlas-leftW: 290px;
+  --atlas-rightW: 325px;
 }
 
 html.dark .atlas-root,
@@ -676,6 +676,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     display: flex !important;
     flex-direction: column;
     grid-template-columns: unset !important;
+    overflow: hidden;
   }
 
   /* Hide resizers on mobile */
@@ -743,6 +744,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     letter-spacing: 0.1em;
     text-transform: uppercase;
     cursor: pointer;
+    white-space: nowrap;
   }
   .mobile-panel-bar button.on {
     color: var(--atlas-ink);

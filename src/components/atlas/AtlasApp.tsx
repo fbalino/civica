@@ -180,17 +180,17 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const [leftW, setLeftW] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("atlas_panels") || "{}");
-      return saved.leftW || 300;
+      return saved.leftW || 290;
     } catch {
-      return 300;
+      return 290;
     }
   });
   const [rightW, setRightW] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem("atlas_panels") || "{}");
-      return saved.rightW || 380;
+      return saved.rightW || 325;
     } catch {
-      return 380;
+      return 325;
     }
   });
   const resizerRef = useRef<{ side: "left" | "right"; startX: number; startW: number } | null>(null);
