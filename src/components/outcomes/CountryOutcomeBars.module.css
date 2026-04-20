@@ -1,0 +1,395 @@
+/*
+ * CountryOutcomeBars component styles — ported from CIV-133 mockup.
+ *
+ * Per-row positional data is injected as CSS custom properties on .cob__chart
+ * via React inline styles:
+ *   --peer-lo, --peer-hi   : percent positions of peer band edges
+ *   --peer-median          : percent position of peer median tick
+ *   --pos                  : percent position of country marker
+ *
+ * Token mapping (design-spec → project globals.css):
+ *   --color-surface-primary   → var(--color-bg)
+ *   --color-surface-secondary → var(--color-surface-elevated)
+ *   --color-surface-tertiary  → var(--color-select-bg)
+ *   --color-text-secondary    → var(--color-text-60)
+ *   --color-text-muted        → var(--color-text-40)
+ *   --color-border-strong     → var(--color-text-primary)
+ *   --color-border-default    → var(--color-card-border)
+ *   --color-border-subtle     → var(--color-stat-border)
+ *   --color-status-warning    → var(--color-warn)
+ */
+
+/* ---- Block ---------------------------------------------------------------- */
+.cob {
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+}
+
+/* ---- Header -------------------------------------------------------------- */
+.cob__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-text-primary);
+  margin-bottom: 16px;
+}
+
+.cob__title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.cob__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+.cob__eyebrow b {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+/* ---- Row ----------------------------------------------------------------- */
+.cob__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-stat-border);
+}
+
+.cob__row:last-of-type {
+  border-bottom: none;
+}
+
+/* ---- Meta line (name + unit + direction | value + rank) ------------------ */
+.cob__meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 16px;
+  align-items: baseline;
+}
+
+.cob__name {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.cob__unit {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-40);
+  margin-left: 8px;
+  letter-spacing: 0.02em;
+}
+
+.cob__direction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin-left: 12px;
+  white-space: nowrap;
+}
+
+.cob__direction svg {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+/* ---- Value + rank block (right side) ------------------------------------- */
+.cob__value {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  justify-content: flex-end;
+  text-align: right;
+  flex-wrap: nowrap;
+}
+
+.cob__number {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cob__rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-60);
+  background: var(--color-surface-elevated);
+  white-space: nowrap;
+}
+
+.cob__rank b {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* ---- Stale badge --------------------------------------------------------- */
+.cob__stale {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-warn);
+  border: 1px solid color-mix(in oklab, var(--color-warn) 50%, transparent);
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+/* ---- Chart rail ---------------------------------------------------------- */
+.cob__chart {
+  position: relative;
+  height: 44px;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.cob__rail {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  height: 12px;
+  border-top: 1px dashed var(--color-stat-border);
+  border-bottom: 1px dashed var(--color-stat-border);
+}
+
+/* Peer band: peer-min → peer-max */
+.cob__band {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 12px;
+  left: var(--peer-lo);
+  width: calc(var(--peer-hi) - var(--peer-lo));
+  background: var(--color-select-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 2px;
+}
+
+/* Median tick */
+.cob__median {
+  position: absolute;
+  top: calc(50% - 10px);
+  height: 20px;
+  width: 2px;
+  left: var(--peer-median);
+  transform: translateX(-50%);
+  background: var(--color-text-40);
+}
+
+.cob__median-label {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: var(--peer-median);
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-40);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Country marker — full-height needle + circle at top */
+.cob__marker {
+  position: absolute;
+  left: var(--pos);
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  transform: translateX(-50%);
+  background: var(--color-accent);
+  z-index: 2;
+}
+
+.cob__marker::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--color-accent);
+  border: 2px solid var(--color-bg);
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+/* Out-of-range arrow variants */
+.cob__marker--outside-low,
+.cob__marker--outside-high {
+  background: transparent;
+  width: 0;
+}
+
+.cob__marker--outside-low::before,
+.cob__marker--outside-high::before {
+  top: 50%;
+  width: 0;
+  height: 0;
+  border: 7px solid transparent;
+  background: transparent;
+  border-radius: 0;
+  transform: translate(-50%, -50%);
+}
+
+.cob__marker--outside-low::before {
+  border-right: 10px solid var(--color-accent);
+}
+
+.cob__marker--outside-high::before {
+  border-left: 10px solid var(--color-accent);
+}
+
+/* Axis endpoint labels (Peer low / Peer high) */
+.cob__axis {
+  position: absolute;
+  inset: auto 0 -18px 0;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-40);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  text-transform: none;
+}
+
+.cob__axis span:first-child {
+  padding-left: 2px;
+}
+
+.cob__axis span:last-child {
+  padding-right: 2px;
+}
+
+/* ---- Dek sentence -------------------------------------------------------- */
+.cob__dek {
+  margin: 32px 0 0 0;
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--color-text-60);
+  max-width: 62ch;
+}
+
+/* ---- No-data modifier ---------------------------------------------------- */
+.cob__row--no-data .cob__number,
+.cob__row--no-data .cob__rank {
+  color: var(--color-text-40);
+}
+
+.cob__row--no-data .cob__band {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-surface-elevated) 0 6px,
+    transparent 6px 12px
+  );
+  border-style: dashed;
+}
+
+.cob__row--no-data .cob__marker,
+.cob__row--no-data .cob__median,
+.cob__row--no-data .cob__median-label {
+  display: none;
+}
+
+/* ---- Footer CTA ---------------------------------------------------------- */
+.cob__footer {
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-text-primary);
+}
+
+.cob__footer a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+}
+
+.cob__footer a:hover {
+  opacity: 0.8;
+}
+
+/* ---- Hover / focus -------------------------------------------------------- */
+.cob__row:focus-within .cob__marker::before,
+.cob__row:hover .cob__marker::before {
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-accent) 20%, transparent);
+}
+
+/* ---- Responsive ---------------------------------------------------------- */
+@media (max-width: 640px) {
+  .cob__meta {
+    grid-template-columns: 1fr;
+    row-gap: 4px;
+  }
+
+  .cob__value {
+    justify-content: flex-start;
+  }
+
+  .cob__number {
+    font-size: 20px;
+  }
+
+  .cob__direction {
+    margin-left: 0;
+  }
+}
+
+/* ---- Forced colors (Windows High Contrast) ------------------------------- */
+@media (forced-colors: active) {
+  .cob__marker,
+  .cob__marker::before {
+    background: CanvasText;
+    border-color: Canvas;
+  }
+
+  .cob__band {
+    border-color: CanvasText;
+  }
+}
