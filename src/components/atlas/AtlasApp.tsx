@@ -29,6 +29,33 @@ interface LeaderEntry {
   photoUrl: string | null;
 }
 
+interface GovStructureBody {
+  id: string;
+  name: string;
+  branch: string | null;
+  bodyType: string;
+  hierarchyLevel: number | null;
+}
+
+interface GovStructureOffice {
+  id: string;
+  bodyId: string;
+  name: string;
+  officeType: string;
+}
+
+interface GovStructureTerm {
+  term: { officeId: string };
+  person: { name: string; photoUrl: string | null };
+}
+
+interface StructureData {
+  country: string;
+  bodies: GovStructureBody[];
+  offices: GovStructureOffice[];
+  currentTerms: GovStructureTerm[];
+}
+
 interface ConstitutionData {
   year: number | null;
   yearUpdated: number | null;
@@ -148,6 +175,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const [democracyData, setDemocracyData] = useState<DemocracyData | null>(null);
   const [leadersData, setLeadersData] = useState<LeaderEntry[] | null>(null);
   const [constitutionData, setConstitutionData] = useState<ConstitutionData | null>(null);
+  const [structureData, setStructureData] = useState<StructureData | null>(null);
   const [billsData, setBillsData] = useState<Bill[] | null>(null);
   const [billsLoading, setBillsLoading] = useState(false);
   const [tabDataLoading, setTabDataLoading] = useState(false);
@@ -620,9 +648,9 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     setMode("compare");
   }
 
-  // Fetch extended tab data (bills / democracy / leaders / constitution) when country or tab changes
+  // Fetch extended tab data (bills / democracy / leaders / constitution / structure) when country or tab changes
   useEffect(() => {
-    if (!country || !["bills", "democracy", "leaders", "constitution"].includes(tab)) return;
+    if (!country || !["bills", "democracy", "leaders", "constitution", "structure"].includes(tab)) return;
     const slug = country.slug ?? country.id;
     let cancelled = false;
 
@@ -661,6 +689,9 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
         } else if (tab === "constitution" && !constitutionData) {
           const res = await fetch(`/api/countries/${slug}/constitution`);
           if (!cancelled && res.ok) setConstitutionData(await res.json());
+        } else if (tab === "structure" && !structureData) {
+          const res = await fetch(`/api/countries/${slug}/structure`);
+          if (!cancelled && res.ok) setStructureData(await res.json());
         }
       } finally {
         if (!cancelled) setTabDataLoading(false);
@@ -675,6 +706,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     setDemocracyData(null);
     setLeadersData(null);
     setConstitutionData(null);
+    setStructureData(null);
     setBillsData(null);
   }, [country?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -1183,22 +1215,24 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
               {/* Tab III: Structure */}
               <div className={`atlas-pane${tab === "structure" ? " on" : ""}`}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, border: "1px dashed var(--atlas-rule)", padding: 24, minHeight: 320, background: "var(--atlas-paper-2)" }}>
-                  {(["exec", "legis", "jud"] as const).map((branch) => (
-                    <div key={branch}>
-                      <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase" }}>
-                        {branch === "exec" ? "Executive" : branch === "legis" ? "Legislative" : "Judicial"}
+                {tabDataLoading && tab === "structure" ? (
+                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading&hellip;</div>
+                ) : structureData && structureData.bodies.length > 0 ? (
+                  <StructurePanel data={structureData} countryName={country.name} />
+                ) : (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, border: "1px dashed var(--atlas-rule)", padding: 24, minHeight: 320, background: "var(--atlas-paper-2)" }}>
+                    {(["exec", "legis", "jud"] as const).map((branch) => (
+                      <div key={branch}>
+                        <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase" }}>
+                          {branch === "exec" ? "Executive" : branch === "legis" ? "Legislative" : "Judicial"}
+                        </div>
+                        <div className="atlas-serif" style={{ fontSize: 20, marginTop: 6 }}>
+                          {cd.branches?.[branch] || "\u2014"}
+                        </div>
                       </div>
-                      <div className="atlas-serif" style={{ fontSize: 20, marginTop: 6 }}>
-                        {cd.branches?.[branch] || "\u2014"}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="atlas-sans" style={{ fontSize: 13, color: "var(--atlas-muted)", marginTop: 18, lineHeight: 1.55 }}>
-                  A full interactive appointment map &mdash; who nominates whom, who confirms, which terms overlap &mdash; lives here in v2.
-                  For now, this is a schematic summary.
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Tab IV: Elections */}
@@ -1734,6 +1768,157 @@ function ElectionsPanel({ elections, countryName }: { elections: ElectionData[];
       <a href="/elections" className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-accent)", letterSpacing: ".08em", textTransform: "uppercase", textDecoration: "none" }}>
         View all elections &rarr;
       </a>
+    </div>
+  );
+}
+
+const BRANCH_META: Record<string, { label: string; color: string }> = {
+  executive: { label: "Executive", color: "var(--color-branch-executive)" },
+  legislative: { label: "Legislative", color: "var(--color-branch-legislative)" },
+  judicial: { label: "Judicial", color: "var(--color-branch-judicial)" },
+};
+const BRANCH_ORDER = ["executive", "legislative", "judicial"];
+
+function StructurePanel({ data, countryName }: { data: StructureData; countryName: string }) {
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [hoveredOffice, setHoveredOffice] = useState<string | null>(null);
+
+  const isQid = (name: string) => /^Q\d+$/.test(name);
+
+  const branches = BRANCH_ORDER.map((branchKey) => {
+    const meta = BRANCH_META[branchKey] ?? { label: branchKey, color: "var(--atlas-muted)" };
+    const branchBodies = data.bodies
+      .filter((b) => b.branch === branchKey)
+      .sort((a, b) => (a.hierarchyLevel ?? 99) - (b.hierarchyLevel ?? 99));
+    if (branchBodies.length === 0) return null;
+
+    const bodyNodes = branchBodies.map((body) => {
+      const bodyOffices = data.offices
+        .filter((o) => o.bodyId === body.id)
+        .map((o) => {
+          const holder = data.currentTerms.find(
+            (t) => t.term.officeId === o.id && !isQid(t.person.name)
+          );
+          return { ...o, holder: holder?.person ?? null };
+        });
+      return { body, offices: bodyOffices };
+    });
+
+    return { branchKey, meta, bodyNodes };
+  }).filter(Boolean) as Array<{
+    branchKey: string;
+    meta: { label: string; color: string };
+    bodyNodes: Array<{
+      body: GovStructureBody;
+      offices: Array<GovStructureOffice & { holder: { name: string; photoUrl: string | null } | null }>;
+    }>;
+  }>;
+
+  if (branches.length === 0) return null;
+
+  function toggleBody(bodyId: string) {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(bodyId)) next.delete(bodyId);
+      else next.add(bodyId);
+      return next;
+    });
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      {branches.map(({ branchKey, meta, bodyNodes }) => (
+        <div key={branchKey}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+            <div style={{ width: 3, height: 16, borderRadius: 1.5, background: meta.color }} />
+            <span className="atlas-mono" style={{ fontSize: 10, color: meta.color, letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 600 }}>
+              {meta.label}
+            </span>
+          </div>
+
+          {bodyNodes.map(({ body, offices }) => {
+            const isCollapsed = collapsed.has(body.id);
+            const hasOffices = offices.length > 0;
+            const indent = (body.hierarchyLevel ?? 0) * 12;
+
+            return (
+              <div key={body.id} style={{ marginLeft: indent, marginBottom: 6 }}>
+                <div
+                  onClick={() => hasOffices && toggleBody(body.id)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    cursor: hasOffices ? "pointer" : "default",
+                    padding: "6px 10px",
+                    background: "var(--atlas-paper-2)",
+                    border: "1px solid var(--atlas-rule)",
+                    borderLeft: `3px solid ${meta.color}33`,
+                    userSelect: "none",
+                  }}
+                >
+                  {hasOffices && (
+                    <span className="atlas-mono" style={{ fontSize: 9, color: "var(--atlas-muted)", width: 10, textAlign: "center", transition: "transform 0.15s" }}>
+                      {isCollapsed ? "\u25B6" : "\u25BC"}
+                    </span>
+                  )}
+                  <span className="atlas-serif" style={{ fontSize: 15, flex: 1 }}>
+                    {body.name}
+                  </span>
+                  {body.bodyType && (
+                    <span className="atlas-mono" style={{ fontSize: 9, color: "var(--atlas-muted)", letterSpacing: ".06em", textTransform: "uppercase" }}>
+                      {body.bodyType}
+                    </span>
+                  )}
+                </div>
+
+                {hasOffices && !isCollapsed && (
+                  <div style={{ borderLeft: `1px solid ${meta.color}22`, marginLeft: 16, paddingLeft: 12, marginTop: 2 }}>
+                    {offices.map((office) => (
+                      <div
+                        key={office.id}
+                        onMouseEnter={() => setHoveredOffice(office.id)}
+                        onMouseLeave={() => setHoveredOffice(null)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          padding: "5px 8px",
+                          marginBottom: 1,
+                          background: hoveredOffice === office.id ? `${meta.color}08` : "transparent",
+                          borderRadius: 2,
+                          transition: "background 0.1s",
+                        }}
+                      >
+                        {office.holder?.photoUrl && (
+                          <img
+                            src={office.holder.photoUrl}
+                            alt=""
+                            style={{ width: 22, height: 22, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: `1px solid ${meta.color}33` }}
+                          />
+                        )}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".04em" }}>
+                            {office.name}
+                          </div>
+                          {office.holder && (
+                            <div className="atlas-serif" style={{ fontSize: 14, marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                              {office.holder.name}
+                            </div>
+                          )}
+                        </div>
+                        <span className="atlas-mono" style={{ fontSize: 8, color: "var(--atlas-muted)", letterSpacing: ".06em", textTransform: "uppercase", flexShrink: 0 }}>
+                          {office.officeType}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }
