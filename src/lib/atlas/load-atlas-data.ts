@@ -128,7 +128,7 @@ export async function loadAtlasData(): Promise<{
     ? await db
         .select()
         .from(offices)
-        .where(sql`${offices.bodyId} IN ${execBodyIds}`)
+        .where(sql`${offices.bodyId} IN ${execBodyIds} AND ${offices.officeType} IN ('head_of_state', 'head_of_government')`)
     : [];
   const headOfficeIds = headOffices.map((o) => o.id);
 
@@ -140,12 +140,12 @@ export async function loadAtlasData(): Promise<{
         .where(sql`${terms.officeId} IN ${headOfficeIds} AND ${terms.isCurrent} = true`)
     : [];
 
-  // Build leader lookup: jurisdictionId -> leader name
+  // Build leader lookup: jurisdictionId -> leader name (head_of_state takes priority)
   const officeToBody = new Map(headOffices.map((o) => [o.id, o.bodyId]));
   const bodyToJurisdiction = new Map([...allBodies, ...execBodies].map((b) => [b.id, b.jurisdictionId]));
-  const officeName = new Map(headOffices.map((o) => [o.id, o.name]));
+  const officeTypeMap = new Map(headOffices.map((o) => [o.id, o.officeType]));
 
-  const leaderByJurisdiction = new Map<string, string>();
+  const leaderByJurisdiction = new Map<string, { name: string; isHeadOfState: boolean }>();
   for (const h of currentHeads) {
     if (/^Q\d+$/.test(h.person.name)) continue;
     const bId = officeToBody.get(h.officeId);
@@ -153,9 +153,9 @@ export async function loadAtlasData(): Promise<{
     const jId = bodyToJurisdiction.get(bId);
     if (!jId) continue;
     const existing = leaderByJurisdiction.get(jId);
-    const title = officeName.get(h.officeId) || "";
-    if (!existing || title.toLowerCase().includes("president") || title.toLowerCase().includes("prime minister")) {
-      leaderByJurisdiction.set(jId, h.person.name);
+    const isHeadOfState = officeTypeMap.get(h.officeId) === "head_of_state";
+    if (!existing || (isHeadOfState && !existing.isHeadOfState)) {
+      leaderByJurisdiction.set(jId, { name: h.person.name, isHeadOfState });
     }
   }
 
@@ -165,7 +165,7 @@ export async function loadAtlasData(): Promise<{
     slug: j.slug,
     iso2: j.iso2 ?? undefined,
     name: j.name,
-    leader: leaderByJurisdiction.get(j.id) || "—",
+    leader: leaderByJurisdiction.get(j.id)?.name || "—",
     gov: formatGovernmentType(j.governmentType || j.governmentTypeDetail) || "—",
     region: CONTINENT_TO_REGION[j.continent || ""] || j.continent || "—",
     pop: formatPop(j.population),
