@@ -48,6 +48,7 @@ export const governmentBodies = pgTable("government_bodies", {
   wikidataQid: text("wikidata_qid"),
   ipuParlineId: text("ipu_parline_id"),
   hierarchyLevel: integer("hierarchy_level"),
+  parentBodyId: uuid("parent_body_id"),
 });
 
 export const offices = pgTable("offices", {
@@ -59,6 +60,7 @@ export const offices = pgTable("offices", {
   officeType: text("office_type").notNull(),
   isElected: boolean("is_elected"),
   wikidataQid: text("wikidata_qid"),
+  reportsToOfficeId: uuid("reports_to_office_id"),
 });
 
 export const persons = pgTable("persons", {

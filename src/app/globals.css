@@ -69,6 +69,7 @@
   --color-branch-executive: #D4764E;
   --color-branch-legislative: #4E8BD4;
   --color-branch-judicial: #5CAA6E;
+  --color-branch-monarchy: #b48bff;
 
   /* --- Layout --- */
   --max-w-content: 1200px;
@@ -130,6 +131,7 @@
   /* --- Branch backgrounds (alpha) --- */
   --color-branch-executive-bg: rgba(212, 118, 78, 0.15);
   --color-branch-legislative-bg: rgba(78, 139, 212, 0.15);
+  --color-branch-monarchy-bg: rgba(180, 139, 255, 0.15);
 
   /* --- Badge colors --- */
   --color-badge-get: oklch(55% 0.12 145);
@@ -193,6 +195,7 @@
 
   --color-branch-executive-bg: rgba(212, 118, 78, 0.12);
   --color-branch-legislative-bg: rgba(78, 139, 212, 0.12);
+  --color-branch-monarchy-bg: rgba(180, 139, 255, 0.12);
 
   --shadow-dropdown: 4px 4px 0 var(--color-text-primary);
   --shadow-hard: 4px 4px 0 var(--color-text-primary);
@@ -2464,4 +2467,159 @@ a {
   0% { transform: scale(0.6); opacity: 0.6; }
   70% { transform: scale(1.9); opacity: 0; }
   100% { transform: scale(0.6); opacity: 0; }
+}
+
+/* ============================================================
+   Government Hierarchy Chart
+   ============================================================ */
+
+.gov-hierarchy-chart {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  overflow-x: auto;
+}
+
+.gov-branch-column {
+  min-width: 260px;
+}
+
+.gov-branch-header {
+  border-top: 3px solid;
+  margin-bottom: 12px;
+}
+
+.gov-branch-eyebrow {
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.gov-tree-root {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gov-tree-children {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 16px;
+  border-left: 1px solid color-mix(in srgb, var(--branch-color, var(--color-text-20)) 35%, transparent);
+}
+
+.gov-tree-body {
+  margin-bottom: 4px;
+  --branch-color: var(--color-text-40);
+}
+
+.gov-tree-body-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-left: 3px solid color-mix(in srgb, var(--branch-color) 40%, transparent);
+  user-select: none;
+  transition: background 0.1s;
+}
+
+.gov-tree-body-header:hover {
+  background: var(--color-card-hover-bg);
+}
+
+.gov-tree-body-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-14);
+  color: var(--color-text-primary);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gov-tree-seat-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-30);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.gov-tree-toggle {
+  font-size: 10px;
+  color: var(--color-text-30);
+  width: 12px;
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.gov-tree-node {
+  margin-bottom: 1px;
+  position: relative;
+}
+
+.gov-tree-node-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 2px;
+  transition: background 0.1s;
+  outline: none;
+}
+
+.gov-tree-node-content:hover,
+.gov-tree-node-content:focus-visible {
+  background: color-mix(in srgb, var(--branch-color, var(--color-text-20)) 8%, transparent);
+}
+
+.gov-tree-node-content:focus-visible {
+  outline: 2px solid var(--branch-color, var(--color-text-20));
+  outline-offset: -2px;
+}
+
+.gov-tree-office-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+  letter-spacing: 0.04em;
+}
+
+.gov-tree-holder-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-14);
+  color: var(--color-text-85);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 1px;
+}
+
+.gov-tree-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid;
+  flex-shrink: 0;
+}
+
+.gov-tree-party-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .gov-hierarchy-chart {
+    grid-template-columns: 1fr;
+  }
 }

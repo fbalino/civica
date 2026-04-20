@@ -642,6 +642,15 @@ export default async function CountryPage({
             offices={govStructure.offices}
             currentTerms={govStructure.currentTerms}
             countryName={jurisdiction.name}
+            parties={legislatureData.flatMap(({ body, parties }) =>
+              parties.map((p) => ({
+                bodyId: body.id,
+                partyName: p.partyName,
+                partyColor: p.partyColor,
+                seatCount: p.seatCount,
+                isRulingCoalition: p.isRulingCoalition,
+              }))
+            )}
           />
         </div>
       )}

@@ -149,6 +149,40 @@ export async function getGovernmentStructure(jurisdictionId: string) {
   return { bodies, offices: allOffices, currentTerms };
 }
 
+export async function getGovernmentHierarchy(jurisdictionId: string) {
+  const bodies = await db
+    .select()
+    .from(governmentBodies)
+    .where(eq(governmentBodies.jurisdictionId, jurisdictionId))
+    .orderBy(asc(governmentBodies.hierarchyLevel));
+
+  const bodyIds = bodies.map((b) => b.id);
+  if (bodyIds.length === 0) return { bodies: [], offices: [], currentTerms: [], parties: [] };
+
+  const allOffices = await db
+    .select()
+    .from(offices)
+    .where(sql`${offices.bodyId} IN ${bodyIds}`);
+
+  const officeIds = allOffices.map((o) => o.id);
+
+  const currentTerms = officeIds.length > 0
+    ? await db
+        .select({ term: terms, person: persons })
+        .from(terms)
+        .innerJoin(persons, eq(terms.personId, persons.id))
+        .where(sql`${terms.officeId} IN ${officeIds} AND ${terms.isCurrent} = true`)
+    : [];
+
+  const parties = await db
+    .select()
+    .from(legislatureParties)
+    .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
+    .orderBy(desc(legislatureParties.seatCount));
+
+  return { bodies, offices: allOffices, currentTerms, parties };
+}
+
 export async function getJurisdictionsBySlugs(slugs: string[]) {
   if (slugs.length === 0) return [];
   return db
