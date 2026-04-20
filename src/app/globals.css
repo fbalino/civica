@@ -2470,156 +2470,450 @@ a {
 }
 
 /* ============================================================
-   Government Hierarchy Chart
+   Government Hierarchy Chart (ghc-)
    ============================================================ */
 
-.gov-hierarchy-chart {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-  overflow-x: auto;
+.ghc-root {
+  font-family: var(--font-body);
 }
 
-.gov-branch-column {
-  min-width: 260px;
-}
-
-.gov-branch-header {
-  border-top: 3px solid;
-  margin-bottom: 12px;
-}
-
-.gov-branch-eyebrow {
-  padding: 8px 12px;
+.ghc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
   font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+.ghc-toolbar-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.ghc-ctrl {
+  background: none;
+  border: 1px solid var(--color-card-border);
+  color: var(--color-text-60);
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.ghc-ctrl:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-card-hover-border);
+}
+
+.ghc-canvas {
+  background:
+    linear-gradient(var(--color-card-bg) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-card-bg) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 12px;
+  padding: 28px 20px;
+  overflow-x: auto;
+  position: relative;
+}
+
+.ghc-canvas::-webkit-scrollbar { height: 10px; }
+.ghc-canvas::-webkit-scrollbar-thumb { background: var(--color-card-hover-border); border-radius: 4px; }
+
+.ghc-branches {
+  display: grid;
+  grid-template-columns: repeat(var(--ghc-cols, 3), minmax(280px, 1fr));
+  gap: 20px;
+  min-width: fit-content;
+  align-items: start;
+}
+
+.ghc-branch {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.ghc-branch-head {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--color-card-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.ghc-branch-head::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.ghc-branch[data-branch="executive"] .ghc-branch-head::before { background: var(--color-branch-executive); }
+.ghc-branch[data-branch="legislative"] .ghc-branch-head::before { background: var(--color-branch-legislative); }
+.ghc-branch[data-branch="judicial"] .ghc-branch-head::before { background: var(--color-branch-judicial); }
+.ghc-branch[data-branch="monarchy"] .ghc-branch-head::before { background: var(--color-branch-monarchy); }
+
+.ghc-branch-title {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
   font-size: var(--text-10);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 600;
 }
 
-.gov-tree-root {
+.ghc-branch[data-branch="executive"] .ghc-branch-title { color: var(--color-branch-executive); }
+.ghc-branch[data-branch="legislative"] .ghc-branch-title { color: var(--color-branch-legislative); }
+.ghc-branch[data-branch="judicial"] .ghc-branch-title { color: var(--color-branch-judicial); }
+.ghc-branch[data-branch="monarchy"] .ghc-branch-title { color: var(--color-branch-monarchy); }
+
+.ghc-branch-count {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+  letter-spacing: 0.12em;
+}
+
+.ghc-branch-body {
+  padding: 20px 16px 22px;
+}
+
+/* ---------- Tree connectors ---------- */
+
+.ghc-tree ul {
   list-style: none;
+  padding-left: 22px;
+  position: relative;
   margin: 0;
-  padding: 0;
 }
 
-.gov-tree-children {
-  list-style: none;
-  margin: 0;
-  padding: 0 0 0 16px;
-  border-left: 1px solid color-mix(in srgb, var(--branch-color, var(--color-text-20)) 35%, transparent);
+.ghc-tree > ul {
+  padding-left: 0;
 }
 
-.gov-tree-body {
-  margin-bottom: 4px;
-  --branch-color: var(--color-text-40);
+.ghc-tree li {
+  position: relative;
+  padding: 6px 0;
 }
 
-.gov-tree-body-header {
-  display: flex;
+.ghc-tree li::before,
+.ghc-tree li::after {
+  content: "";
+  position: absolute;
+  left: -22px;
+}
+
+.ghc-tree > ul > li::before,
+.ghc-tree > ul > li::after {
+  display: none;
+}
+
+.ghc-tree li::before {
+  top: 0;
+  height: 100%;
+  width: 1px;
+  background: var(--color-card-hover-border);
+}
+
+.ghc-tree li::after {
+  top: 28px;
+  width: 18px;
+  height: 1px;
+  background: var(--color-card-hover-border);
+}
+
+.ghc-tree li:last-child::before {
+  height: 28px;
+}
+
+.ghc-branch[data-branch="executive"] .ghc-tree li::before,
+.ghc-branch[data-branch="executive"] .ghc-tree li::after {
+  background: color-mix(in srgb, var(--color-branch-executive) 35%, transparent);
+}
+.ghc-branch[data-branch="legislative"] .ghc-tree li::before,
+.ghc-branch[data-branch="legislative"] .ghc-tree li::after {
+  background: color-mix(in srgb, var(--color-branch-legislative) 35%, transparent);
+}
+.ghc-branch[data-branch="judicial"] .ghc-tree li::before,
+.ghc-branch[data-branch="judicial"] .ghc-tree li::after {
+  background: color-mix(in srgb, var(--color-branch-judicial) 35%, transparent);
+}
+.ghc-branch[data-branch="monarchy"] .ghc-tree li::before,
+.ghc-branch[data-branch="monarchy"] .ghc-tree li::after {
+  background: color-mix(in srgb, var(--color-branch-monarchy) 35%, transparent);
+}
+
+/* ---------- Node card ---------- */
+
+.ghc-node {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
   align-items: center;
-  gap: 6px;
-  padding: 8px 10px;
-  background: var(--color-card-bg);
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--color-surface-elevated);
   border: 1px solid var(--color-card-border);
-  border-left: 3px solid color-mix(in srgb, var(--branch-color) 40%, transparent);
-  user-select: none;
-  transition: background 0.1s;
+  border-radius: 8px;
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.gov-tree-body-header:hover {
+.ghc-node:hover {
+  border-color: var(--color-card-hover-border);
   background: var(--color-card-hover-bg);
 }
 
-.gov-tree-body-name {
-  font-family: var(--font-heading);
-  font-size: var(--text-14);
-  color: var(--color-text-primary);
-  flex: 1;
+.ghc-node.has-holder {
+  min-height: 56px;
+}
+
+.ghc-node-accent {
+  width: 3px;
+  height: 28px;
+  border-radius: 2px;
+}
+
+.ghc-node-main {
   min-width: 0;
+}
+
+.ghc-node-office {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: 0.04em;
+  color: var(--color-text-60);
+  text-transform: uppercase;
+  margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.gov-tree-seat-badge {
+.ghc-node-holder {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ghc-node-party {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
   font-size: var(--text-10);
-  color: var(--color-text-30);
-  letter-spacing: 0.04em;
-  flex-shrink: 0;
+  color: var(--color-text-40);
+  margin-left: 6px;
 }
 
-.gov-tree-toggle {
-  font-size: 10px;
-  color: var(--color-text-30);
-  width: 12px;
-  text-align: center;
-  flex-shrink: 0;
-  line-height: 1;
+.ghc-party-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
 }
 
-.gov-tree-node {
-  margin-bottom: 1px;
-  position: relative;
-}
-
-.gov-tree-node-content {
+.ghc-node-toggle {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: none;
+  border: 1px solid var(--color-card-border);
   display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  padding: 5px 8px;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-40);
+  font-size: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+
+.ghc-node-toggle:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-card-hover-border);
+}
+
+.ghc-node-toggle.is-empty {
+  visibility: hidden;
+}
+
+/* Collapsed state */
+.collapsed > ul { display: none; }
+.collapsed .ghc-node-toggle { transform: rotate(-90deg); }
+
+/* ---------- Chamber variant ---------- */
+
+.ghc-node.chamber {
+  padding: 12px;
+}
+
+.ghc-party-bar {
+  margin-top: 8px;
+  height: 4px;
   border-radius: 2px;
-  transition: background 0.1s;
-  outline: none;
+  overflow: hidden;
+  display: flex;
+  background: var(--color-card-hover-bg);
 }
 
-.gov-tree-node-content:hover,
-.gov-tree-node-content:focus-visible {
-  background: color-mix(in srgb, var(--branch-color, var(--color-text-20)) 8%, transparent);
+.ghc-party-bar span {
+  height: 100%;
 }
 
-.gov-tree-node-content:focus-visible {
-  outline: 2px solid var(--branch-color, var(--color-text-20));
-  outline-offset: -2px;
-}
-
-.gov-tree-office-label {
+.ghc-chamber-meta {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 4px 10px;
+  margin-top: 6px;
   font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
   font-size: var(--text-10);
   color: var(--color-text-40);
   letter-spacing: 0.04em;
 }
 
-.gov-tree-holder-name {
+.ghc-chamber-meta strong {
+  color: var(--color-text-60);
+  font-weight: 500;
+}
+
+/* ---------- Hover card (fixed position) ---------- */
+
+.ghc-hover-card {
+  position: fixed;
+  z-index: 100;
+  width: 280px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-hover-border);
+  border-radius: 10px;
+  border-top: 3px solid;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  padding: 14px 16px;
+  pointer-events: none;
+  transition: opacity 0.1s;
+}
+
+.ghc-hover-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ghc-hover-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-heading);
-  font-size: var(--text-14);
-  color: var(--color-text-85);
+  font-size: 15px;
+  color: var(--color-text-60);
+  flex-shrink: 0;
+}
+
+.ghc-hover-name {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.ghc-hover-role {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin-top: 2px;
+}
+
+.ghc-hover-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  margin: 0;
+}
+
+.ghc-hover-facts dt {
+  color: var(--color-text-40);
+  letter-spacing: 0.05em;
+}
+
+.ghc-hover-facts dd {
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+/* ---------- Legend ---------- */
+
+.ghc-legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  flex-wrap: wrap;
+}
+
+.ghc-legend-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 1px;
 }
 
-.gov-tree-avatar {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid;
-  flex-shrink: 0;
+.ghc-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
 }
 
-.gov-tree-party-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+/* ---------- Responsive ---------- */
 
 @media (max-width: 768px) {
-  .gov-hierarchy-chart {
-    grid-template-columns: 1fr;
+  .ghc-branches {
+    grid-template-columns: 1fr !important;
   }
 }

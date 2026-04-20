@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 
 interface GovBody {
   id: string;
@@ -140,139 +140,72 @@ function HoverCard({
     const rect = anchorRef.getBoundingClientRect();
     const card = cardRef.current.getBoundingClientRect();
     let top = rect.bottom + 6;
-    let left = rect.left + rect.width / 2 - card.width / 2;
-    if (left < 8) left = 8;
+    let left = rect.left;
     if (left + card.width > window.innerWidth - 8) left = window.innerWidth - card.width - 8;
+    if (left < 8) left = 8;
     if (top + card.height > window.innerHeight - 8) top = rect.top - card.height - 6;
     setPos({ top, left });
   }, [anchorRef]);
 
   const holder = office.holder;
+  const initials = holder
+    ? holder.person.name
+        .split(" ")
+        .map((w) => w[0])
+        .slice(0, 2)
+        .join("")
+    : "";
 
   return (
     <div
       ref={cardRef}
+      className="ghc-hover-card"
       role="tooltip"
       style={{
-        position: "fixed",
         top: pos?.top ?? -9999,
         left: pos?.left ?? -9999,
-        zIndex: 1000,
-        background: "var(--color-card-bg)",
-        border: `1px solid var(--color-card-border)`,
-        borderTop: `2px solid ${branchColor}`,
-        padding: "14px 16px",
-        minWidth: 220,
-        maxWidth: 320,
-        boxShadow: "var(--shadow-dropdown)",
         opacity: pos ? 1 : 0,
-        transition: "opacity 0.12s",
+        borderTopColor: branchColor,
       }}
     >
-      <div
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-10)",
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-          color: branchColor,
-          marginBottom: 6,
-        }}
-      >
-        {office.officeType.replace(/_/g, " ")}
-      </div>
-      <div
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-16)",
-          color: "var(--color-text-primary)",
-          marginBottom: holder ? 8 : 0,
-        }}
-      >
-        {office.name}
-      </div>
       {holder && (
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {holder.person.photoUrl && (
-            <img
-              src={holder.person.photoUrl}
-              alt=""
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: `2px solid ${branchColor}33`,
-                flexShrink: 0,
-              }}
-            />
-          )}
+        <div className="ghc-hover-head">
+          <div className="ghc-hover-avatar">{initials}</div>
           <div>
-            <div
-              style={{
-                fontFamily: "var(--font-heading)",
-                fontSize: "var(--text-14)",
-                color: "var(--color-text-85)",
-              }}
-            >
-              {holder.person.name}
-            </div>
-            {holder.term.partyName && (
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-11)",
-                  color: "var(--color-text-40)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  marginTop: 2,
-                }}
-              >
-                {holder.term.partyColor && (
-                  <span
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: "50%",
-                      background: holder.term.partyColor,
-                      flexShrink: 0,
-                    }}
-                  />
-                )}
-                {holder.term.partyName}
-              </div>
-            )}
-            {holder.term.startDate && (
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-10)",
-                  color: "var(--color-text-25)",
-                  marginTop: 2,
-                }}
-              >
-                {holder.term.startDate}
-                {holder.term.endDate ? ` – ${holder.term.endDate}` : " – present"}
-              </div>
-            )}
+            <div className="ghc-hover-name">{holder.person.name}</div>
+            <div className="ghc-hover-role">{office.name}</div>
           </div>
         </div>
       )}
-      {holder?.person.wikidataQid && (
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-10)",
-            color: "var(--color-text-20)",
-            marginTop: 8,
-            borderTop: "1px solid var(--color-card-border)",
-            paddingTop: 6,
-          }}
-        >
-          Source: Wikidata {holder.person.wikidataQid}
-        </div>
-      )}
+      {!holder && <div className="ghc-hover-name" style={{ marginBottom: 8 }}>{office.name}</div>}
+      <dl className="ghc-hover-facts">
+        {holder?.term.partyName && (
+          <>
+            <dt>Party</dt>
+            <dd>
+              {holder.term.partyColor && (
+                <span className="ghc-party-dot" style={{ background: holder.term.partyColor }} />
+              )}
+              {holder.term.partyName}
+            </dd>
+          </>
+        )}
+        {holder?.term.startDate && (
+          <>
+            <dt>Term</dt>
+            <dd>
+              {holder.term.startDate}
+              {holder.term.endDate ? ` — ${holder.term.endDate}` : " — present"}
+            </dd>
+          </>
+        )}
+        {holder?.person.wikidataQid && (
+          <>
+            <dt>Source</dt>
+            <dd>Wikidata · {holder.person.wikidataQid}</dd>
+          </>
+        )}
+      </dl>
     </div>
   );
 }
@@ -280,50 +213,45 @@ function HoverCard({
 function PartyBar({ parties, totalSeats }: { parties: PartyData[]; totalSeats: number }) {
   if (parties.length === 0 || totalSeats === 0) return null;
   const total = totalSeats || parties.reduce((s, p) => s + p.seatCount, 0);
+  const ruling = parties.filter((p) => p.isRulingCoalition);
+  const opposition = parties.filter((p) => !p.isRulingCoalition);
+  const rulingSeats = ruling.reduce((s, p) => s + p.seatCount, 0);
+  const oppositionSeats = opposition.reduce((s, p) => s + p.seatCount, 0);
   const majority = Math.floor(total / 2) + 1;
-  const rulingSeats = parties.filter((p) => p.isRulingCoalition).reduce((s, p) => s + p.seatCount, 0);
 
   return (
-    <div style={{ marginTop: 6 }}>
-      <div
-        style={{
-          display: "flex",
-          height: 6,
-          borderRadius: 3,
-          overflow: "hidden",
-          background: "var(--color-text-20)",
-        }}
-      >
+    <>
+      <div className="ghc-party-bar">
         {parties.map((p, i) => (
-          <div
+          <span
             key={i}
             title={`${p.partyName}: ${p.seatCount} seats`}
             style={{
               width: `${(p.seatCount / total) * 100}%`,
               background: p.partyColor ?? "var(--color-text-30)",
-              minWidth: 1,
             }}
           />
         ))}
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-10)",
-          color: "var(--color-text-30)",
-          marginTop: 3,
-        }}
-      >
-        <span>{total} seats</span>
+      <div className="ghc-chamber-meta">
         {rulingSeats > 0 && (
-          <span>
-            {rulingSeats >= majority ? "majority" : "minority"} · {rulingSeats}/{total}
-          </span>
+          <>
+            <strong>{rulingSeats >= majority ? "Majority" : "Largest"}</strong>
+            <span>
+              {ruling[0]?.partyName} ({rulingSeats})
+            </span>
+          </>
+        )}
+        {oppositionSeats > 0 && (
+          <>
+            <strong>{rulingSeats > 0 ? "Minority" : "Opposition"}</strong>
+            <span>
+              {opposition[0]?.partyName} ({oppositionSeats})
+            </span>
+          </>
         )}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -331,67 +259,56 @@ function OfficeNodeItem({
   office,
   branchColor,
   depth,
-  isLast,
 }: {
   office: OfficeNode;
   branchColor: string;
   depth: number;
-  isLast: boolean;
 }) {
   const [hoverAnchor, setHoverAnchor] = useState<HTMLElement | null>(null);
-  const nodeRef = useRef<HTMLLIElement>(null);
   const hasChildren = office.children.length > 0;
   const [expanded, setExpanded] = useState(depth < 2);
+  const hasHolder = !!office.holder;
 
   return (
     <li
-      ref={nodeRef}
       role="treeitem"
       aria-expanded={hasChildren ? expanded : undefined}
-      className="gov-tree-node"
-      style={{ "--branch-color": branchColor } as React.CSSProperties}
+      className={!expanded && hasChildren ? "collapsed" : undefined}
     >
       <div
-        className="gov-tree-node-content"
+        className={`ghc-node${hasHolder ? " has-holder" : ""}`}
         tabIndex={0}
         onMouseEnter={(e) => setHoverAnchor(e.currentTarget as HTMLElement)}
         onMouseLeave={() => setHoverAnchor(null)}
         onFocus={(e) => setHoverAnchor(e.currentTarget as HTMLElement)}
         onBlur={() => setHoverAnchor(null)}
-        onClick={() => hasChildren && setExpanded(!expanded)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            if (hasChildren) setExpanded(!expanded);
-          }
-        }}
-        style={{ cursor: hasChildren ? "pointer" : "default" }}
       >
-        {hasChildren && (
-          <span className="gov-tree-toggle">{expanded ? "▾" : "▸"}</span>
-        )}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="gov-tree-office-label">{office.name}</div>
+        <div className="ghc-node-accent" style={{ background: branchColor }} />
+        <div className="ghc-node-main">
+          <div className="ghc-node-office">{office.name}</div>
           {office.holder && (
-            <div className="gov-tree-holder-name">
-              {office.holder.person.photoUrl && (
-                <img
-                  src={office.holder.person.photoUrl}
-                  alt=""
-                  className="gov-tree-avatar"
-                  style={{ borderColor: `${branchColor}33` }}
-                />
-              )}
+            <div className="ghc-node-holder">
               {office.holder.person.name}
-              {office.holder.term.partyColor && (
-                <span
-                  className="gov-tree-party-dot"
-                  style={{ background: office.holder.term.partyColor }}
-                />
+              {office.holder.term.partyName && (
+                <span className="ghc-node-party" style={{ color: office.holder.term.partyColor ?? "var(--color-text-30)" }}>
+                  <span className="ghc-party-dot" />
+                  {office.holder.term.partyName}
+                </span>
               )}
             </div>
           )}
         </div>
+        <button
+          className={`ghc-node-toggle${!hasChildren ? " is-empty" : ""}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (hasChildren) setExpanded(!expanded);
+          }}
+          aria-label={expanded ? "Collapse" : "Expand"}
+          tabIndex={-1}
+        >
+          ▾
+        </button>
       </div>
 
       {hoverAnchor && (
@@ -399,14 +316,13 @@ function OfficeNodeItem({
       )}
 
       {hasChildren && expanded && (
-        <ul role="group" className="gov-tree-children">
-          {office.children.map((child, i) => (
+        <ul role="group">
+          {office.children.map((child) => (
             <OfficeNodeItem
               key={child.id}
               office={child}
               branchColor={branchColor}
               depth={depth + 1}
-              isLast={i === office.children.length - 1}
             />
           ))}
         </ul>
@@ -432,43 +348,48 @@ function BodyNodeItem({
     <li
       role="treeitem"
       aria-expanded={hasContent ? expanded : undefined}
-      className="gov-tree-body"
-      style={{ "--branch-color": branchColor } as React.CSSProperties}
+      className={!expanded && hasContent ? "collapsed" : undefined}
     >
-      <div
-        className="gov-tree-body-header"
-        onClick={() => hasContent && setExpanded(!expanded)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
+      <div className={`ghc-node${isChamber ? " chamber" : ""}`}>
+        <div className="ghc-node-accent" style={{ background: branchColor }} />
+        <div className="ghc-node-main">
+          <div className="ghc-node-office">{node.body.name}</div>
+          {isChamber ? (
+            <>
+              <div className="ghc-node-holder">
+                {node.body.chamberType === "upper" ? "Upper" : node.body.chamberType === "lower" ? "Lower" : ""} chamber · {node.body.totalSeats} seats
+              </div>
+              {expanded && node.parties.length > 0 && (
+                <PartyBar parties={node.parties} totalSeats={node.body.totalSeats ?? 0} />
+              )}
+            </>
+          ) : (
+            <div className="ghc-node-holder" style={{ fontSize: 13, color: "var(--color-text-40)" }}>
+              {node.body.bodyType}
+            </div>
+          )}
+        </div>
+        <button
+          className={`ghc-node-toggle${!hasContent ? " is-empty" : ""}`}
+          onClick={(e) => {
+            e.stopPropagation();
             if (hasContent) setExpanded(!expanded);
-          }
-        }}
-        tabIndex={0}
-        style={{ cursor: hasContent ? "pointer" : "default" }}
-      >
-        {hasContent && (
-          <span className="gov-tree-toggle">{expanded ? "▾" : "▸"}</span>
-        )}
-        <span className="gov-tree-body-name">{node.body.name}</span>
-        {node.body.totalSeats && node.body.totalSeats > 0 && (
-          <span className="gov-tree-seat-badge">{node.body.totalSeats} seats</span>
-        )}
+          }}
+          aria-label={expanded ? "Collapse" : "Expand"}
+          tabIndex={-1}
+        >
+          ▾
+        </button>
       </div>
 
-      {isChamber && expanded && node.parties.length > 0 && (
-        <PartyBar parties={node.parties} totalSeats={node.body.totalSeats ?? 0} />
-      )}
-
       {expanded && hasContent && (
-        <ul role="group" className="gov-tree-children">
-          {node.offices.map((office, i) => (
+        <ul role="group">
+          {node.offices.map((office) => (
             <OfficeNodeItem
               key={office.id}
               office={office}
               branchColor={branchColor}
               depth={depth + 1}
-              isLast={i === node.offices.length - 1 && node.children.length === 0}
             />
           ))}
           {node.children.map((child) => (
@@ -483,6 +404,22 @@ function BodyNodeItem({
       )}
     </li>
   );
+}
+
+function countOffices(tree: BodyNode[]): number {
+  let count = 0;
+  for (const node of tree) {
+    count += node.offices.length;
+    for (const o of node.offices) count += countOfficeChildren(o);
+    count += countOffices(node.children);
+  }
+  return count;
+}
+
+function countOfficeChildren(office: OfficeNode): number {
+  let count = office.children.length;
+  for (const c of office.children) count += countOfficeChildren(c);
+  return count;
 }
 
 export function GovStructureDiagram({
@@ -511,17 +448,27 @@ export function GovStructureDiagram({
   const branchTrees = allBranches
     .map((branch) => {
       const branchBodies = bodies.filter(
-        (b) => branch === "other"
-          ? b.branch && !BRANCH_ORDER.includes(b.branch)
-          : b.branch === branch
+        (b) =>
+          branch === "other"
+            ? b.branch && !BRANCH_ORDER.includes(b.branch)
+            : b.branch === branch
       );
       const tree = buildBodyTree(branchBodies, offices, currentTerms, parties, isQid);
       if (tree.length === 0) return null;
+
+      const officeCount = countOffices(tree);
+      const totalSeats = branchBodies.reduce((s, b) => s + (b.totalSeats ?? 0), 0);
+      let subtitle = `${officeCount} office${officeCount !== 1 ? "s" : ""}`;
+      if (branch === "legislative" && totalSeats > 0) {
+        const chambers = branchBodies.filter((b) => b.chamberType);
+        subtitle = `${chambers.length > 1 ? "Bicameral" : "Unicameral"} · ${totalSeats} seats`;
+      }
 
       return {
         branch,
         color: BRANCH_COLORS[branch] ?? "var(--color-text-40)",
         label: BRANCH_LABELS[branch] ?? branch,
+        subtitle,
         tree,
       };
     })
@@ -529,40 +476,84 @@ export function GovStructureDiagram({
     branch: string;
     color: string;
     label: string;
+    subtitle: string;
     tree: BodyNode[];
   }>;
 
   if (branchTrees.length === 0) return null;
 
-  return (
-    <div
-      className="gov-hierarchy-chart"
-      role="tree"
-      aria-label={`Government structure of ${countryName}`}
-    >
-      {branchTrees.map(({ branch, color, label, tree }) => (
-        <div key={branch} className="gov-branch-column">
-          <div className="gov-branch-header" style={{ borderTopColor: color }}>
-            <div
-              className="gov-branch-eyebrow"
-              style={{ background: `color-mix(in srgb, ${color} 12%, transparent)` }}
-            >
-              <span style={{ color }}>{label}</span>
-            </div>
-          </div>
+  const expandAllRef = useRef<(() => void) | null>(null);
+  const [expandKey, setExpandKey] = useState(0);
+  const [collapseKey, setCollapseKey] = useState(0);
 
-          <ul role="group" className="gov-tree-root">
-            {tree.map((node) => (
-              <BodyNodeItem
-                key={node.body.id}
-                node={node}
-                branchColor={color}
-                depth={0}
-              />
-            ))}
-          </ul>
+  return (
+    <div className="ghc-root" role="tree" aria-label={`Government structure of ${countryName}`}>
+      <div className="ghc-toolbar">
+        <span>Full government structure</span>
+        <div className="ghc-toolbar-controls">
+          <button className="ghc-ctrl" onClick={() => setExpandKey((k) => k + 1)}>Expand all</button>
+          <button className="ghc-ctrl" onClick={() => setCollapseKey((k) => k + 1)}>Collapse all</button>
         </div>
-      ))}
+      </div>
+
+      <div className="ghc-canvas">
+        <div
+          className="ghc-branches"
+          style={{ "--ghc-cols": branchTrees.length } as React.CSSProperties}
+        >
+          {branchTrees.map(({ branch, color, label, subtitle, tree }) => (
+            <div key={branch} className="ghc-branch" data-branch={branch}>
+              <div className="ghc-branch-head">
+                <div className="ghc-branch-title">{label}</div>
+                <div className="ghc-branch-count">{subtitle}</div>
+              </div>
+              <div className="ghc-branch-body ghc-tree">
+                <ul role="group">
+                  {tree.length === 1 && tree[0].offices.length > 0 ? (
+                    <>
+                      {tree[0].offices.map((office) => (
+                        <OfficeNodeItem
+                          key={office.id}
+                          office={office}
+                          branchColor={color}
+                          depth={0}
+                        />
+                      ))}
+                      {tree[0].children.map((child) => (
+                        <BodyNodeItem
+                          key={child.body.id}
+                          node={child}
+                          branchColor={color}
+                          depth={0}
+                        />
+                      ))}
+                    </>
+                  ) : (
+                    tree.map((node) => (
+                      <BodyNodeItem
+                        key={node.body.id}
+                        node={node}
+                        branchColor={color}
+                        depth={0}
+                      />
+                    ))
+                  )}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="ghc-legend">
+        {branchTrees.map(({ branch, color, label }) => (
+          <div key={branch} className="ghc-legend-item">
+            <span className="ghc-legend-swatch" style={{ background: color }} />
+            {label}
+          </div>
+        ))}
+        <div className="ghc-legend-item">· Hover a node for details · Click ▾ to collapse</div>
+      </div>
     </div>
   );
 }

@@ -18,7 +18,8 @@
     "db:deduplicate-terms": "tsx scripts/deduplicate-terms.ts",
     "sync:world-bank": "tsx scripts/sync-world-bank-metrics.ts",
     "sync:hdi": "tsx scripts/sync-undp-hdi.ts",
-    "sync:cpi": "tsx scripts/sync-transparency-cpi.ts"
+    "sync:cpi": "tsx scripts/sync-transparency-cpi.ts",
+    "enrich:hierarchy": "tsx scripts/enrich-hierarchy.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
