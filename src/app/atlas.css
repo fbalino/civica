@@ -770,6 +770,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .atlas-tabs {
     padding: 0 16px;
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap;
   }
