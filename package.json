@@ -15,7 +15,10 @@
     "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
     "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
-    "db:deduplicate-terms": "tsx scripts/deduplicate-terms.ts"
+    "db:deduplicate-terms": "tsx scripts/deduplicate-terms.ts",
+    "sync:world-bank": "tsx scripts/sync-world-bank-metrics.ts",
+    "sync:hdi": "tsx scripts/sync-undp-hdi.ts",
+    "sync:cpi": "tsx scripts/sync-transparency-cpi.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

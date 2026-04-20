@@ -243,3 +243,47 @@ export const billSummaryCache = pgTable(
   },
   (t) => [uniqueIndex("bill_summary_cache_key_idx").on(t.cacheKey)]
 );
+
+export const metricDefinitions = pgTable("metric_definitions", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category").notNull(),
+  unit: text("unit"),
+  higherIsBetter: boolean("higher_is_better").notNull(),
+  valueMin: real("value_min"),
+  valueMax: real("value_max"),
+  defaultSourceId: text("default_source_id").references(() => sources.id),
+});
+
+export const countryMetrics = pgTable(
+  "country_metrics",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    metricId: text("metric_id")
+      .references(() => metricDefinitions.id)
+      .notNull(),
+    year: integer("year").notNull(),
+    value: real("value").notNull(),
+    rank: integer("rank"),
+    totalRanked: integer("total_ranked"),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    sourceUrl: text("source_url"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_country_metrics_unique").on(
+      table.jurisdictionId,
+      table.metricId,
+      table.year
+    ),
+    index("idx_country_metrics_type_year").on(table.metricId, table.year),
+    index("idx_country_metrics_jurisdiction").on(table.jurisdictionId),
+  ]
+);

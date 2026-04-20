@@ -13,6 +13,8 @@ import {
   constitutions,
   elections,
   electionResults,
+  countryMetrics,
+  metricDefinitions,
 } from "./schema";
 
 export async function getJurisdictionBySlug(slug: string) {
@@ -449,4 +451,94 @@ export async function getRecentElectionsWithResults(limit = 40) {
     ...r,
     results: allResults.filter((res) => res.electionId === r.election.id),
   }));
+}
+
+export async function getCountryMetrics(
+  jurisdictionId: string,
+  metricId?: string
+) {
+  return db
+    .select({
+      metric: countryMetrics,
+      definition: metricDefinitions,
+    })
+    .from(countryMetrics)
+    .innerJoin(
+      metricDefinitions,
+      eq(countryMetrics.metricId, metricDefinitions.id)
+    )
+    .where(
+      metricId
+        ? sql`${countryMetrics.jurisdictionId} = ${jurisdictionId} AND ${countryMetrics.metricId} = ${metricId}`
+        : eq(countryMetrics.jurisdictionId, jurisdictionId)
+    )
+    .orderBy(asc(countryMetrics.metricId), desc(countryMetrics.year));
+}
+
+export async function getLatestMetricsForCountry(jurisdictionId: string) {
+  return db.execute(sql`
+    SELECT DISTINCT ON (cm.metric_id)
+      cm.metric_id, cm.year, cm.value, cm.rank, cm.total_ranked,
+      cm.source_id, cm.source_url,
+      md.name, md.description, md.category, md.unit,
+      md.higher_is_better, md.value_min, md.value_max
+    FROM country_metrics cm
+    JOIN metric_definitions md ON cm.metric_id = md.id
+    WHERE cm.jurisdiction_id = ${jurisdictionId}
+    ORDER BY cm.metric_id, cm.year DESC
+  `);
+}
+
+export async function getMetricRankings(
+  metricId: string,
+  year?: number,
+  limit = 20
+) {
+  const yearFilter = year
+    ? sql`AND cm.year = ${year}`
+    : sql`AND cm.year = (SELECT MAX(year) FROM country_metrics WHERE metric_id = ${metricId})`;
+
+  return db.execute(sql`
+    SELECT
+      cm.value, cm.year, cm.rank, cm.total_ranked,
+      j.id AS jurisdiction_id, j.slug, j.name, j.iso2, j.iso3,
+      j.government_type, j.continent,
+      RANK() OVER (ORDER BY cm.value DESC) AS computed_rank
+    FROM country_metrics cm
+    JOIN jurisdictions j ON cm.jurisdiction_id = j.id
+    WHERE cm.metric_id = ${metricId} ${yearFilter}
+    ORDER BY cm.value DESC
+    LIMIT ${limit}
+  `);
+}
+
+export async function getMetricsByGovernmentType(
+  metricId: string,
+  year?: number
+) {
+  const yearFilter = year
+    ? sql`AND cm.year = ${year}`
+    : sql`AND cm.year = (SELECT MAX(year) FROM country_metrics WHERE metric_id = ${metricId})`;
+
+  return db.execute(sql`
+    SELECT
+      j.government_type,
+      COUNT(*) AS country_count,
+      AVG(cm.value) AS avg_value,
+      MIN(cm.value) AS min_value,
+      MAX(cm.value) AS max_value,
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY cm.value) AS median_value
+    FROM country_metrics cm
+    JOIN jurisdictions j ON cm.jurisdiction_id = j.id
+    WHERE cm.metric_id = ${metricId}
+      AND j.government_type IS NOT NULL
+      ${yearFilter}
+    GROUP BY j.government_type
+    HAVING COUNT(*) >= 3
+    ORDER BY avg_value DESC
+  `);
+}
+
+export async function getAllMetricDefinitions() {
+  return db.select().from(metricDefinitions).orderBy(asc(metricDefinitions.category), asc(metricDefinitions.name));
 }
