@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/elections", label: "Elections" },
   { href: "/government-types", label: "Gov Types" },
   { href: "/compare", label: "Compare" },
+  { href: "/outcomes", label: "Outcomes" },
   { href: "/about", label: "About" },
 ];
 

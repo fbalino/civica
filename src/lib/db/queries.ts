@@ -576,3 +576,182 @@ export async function getMetricsByGovernmentType(
 export async function getAllMetricDefinitions() {
   return db.select().from(metricDefinitions).orderBy(asc(metricDefinitions.category), asc(metricDefinitions.name));
 }
+
+export async function getAllMetricDefinitionsWithCoverage(year?: number) {
+  const asOfYear = year ?? new Date().getFullYear();
+  return db.execute(sql`
+    SELECT
+      md.id,
+      md.name,
+      md.description,
+      md.category,
+      md.unit,
+      md.higher_is_better      AS "higherIsBetter",
+      md.value_min              AS "valueMin",
+      md.value_max              AS "valueMax",
+      md.default_source_id      AS "defaultSourceId",
+      s.name                    AS "defaultSourceName",
+      COUNT(DISTINCT cm.jurisdiction_id)
+        FILTER (WHERE cm.year <= ${asOfYear}) AS "coverageCount",
+      (SELECT COUNT(*) FROM jurisdictions WHERE type = 'sovereign_state')::int AS "totalCountries"
+    FROM metric_definitions md
+    LEFT JOIN sources s ON md.default_source_id = s.id
+    LEFT JOIN country_metrics cm ON md.id = cm.metric_id
+    GROUP BY md.id, md.name, md.description, md.category, md.unit,
+             md.higher_is_better, md.value_min, md.value_max, md.default_source_id, s.name
+    ORDER BY md.category, md.name
+  `);
+}
+
+export async function getMetricStripData(
+  metricId: string,
+  year: number,
+  govTypes?: string[]
+) {
+  const govTypeFilter =
+    govTypes && govTypes.length > 0
+      ? sql`AND j.government_type = ANY(${govTypes})`
+      : sql``;
+
+  return db.execute(sql`
+    SELECT DISTINCT ON (cm.jurisdiction_id)
+      cm.jurisdiction_id        AS "countryId",
+      j.name                    AS "countryName",
+      j.government_type         AS "govType",
+      cm.value,
+      cm.rank,
+      cm.total_ranked           AS "totalRanked",
+      cm.year                   AS "asOfYear",
+      (cm.year < ${year - 5})   AS "isStale"
+    FROM country_metrics cm
+    JOIN jurisdictions j ON cm.jurisdiction_id = j.id
+    WHERE cm.metric_id = ${metricId}
+      AND cm.year <= ${year}
+      AND j.type = 'sovereign_state'
+      AND j.government_type IS NOT NULL
+      ${govTypeFilter}
+    ORDER BY cm.jurisdiction_id, cm.year DESC
+  `);
+}
+
+export async function getGovTypeStripBands(
+  metricId: string,
+  year: number,
+  govTypes?: string[]
+) {
+  const govTypeFilter =
+    govTypes && govTypes.length > 0
+      ? sql`AND j.government_type = ANY(${govTypes})`
+      : sql``;
+
+  return db.execute(sql`
+    WITH latest_per_country AS (
+      SELECT DISTINCT ON (cm.jurisdiction_id)
+        cm.value,
+        j.government_type
+      FROM country_metrics cm
+      JOIN jurisdictions j ON cm.jurisdiction_id = j.id
+      WHERE cm.metric_id = ${metricId}
+        AND cm.year <= ${year}
+        AND j.type = 'sovereign_state'
+        AND j.government_type IS NOT NULL
+        ${govTypeFilter}
+      ORDER BY cm.jurisdiction_id, cm.year DESC
+    )
+    SELECT
+      government_type                                                      AS "govType",
+      COUNT(*)::int                                                        AS "count",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY value)                  AS "median",
+      PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY value)                 AS "q1",
+      PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY value)                 AS "q3",
+      PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY value)
+        - PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY value)             AS "iqr",
+      MIN(value)                                                           AS "min",
+      MAX(value)                                                           AS "max"
+    FROM latest_per_country
+    GROUP BY government_type
+    ORDER BY government_type
+  `);
+}
+
+export async function getCountryOutcomes(jurisdictionId: string, year: number) {
+  const countryData = await db.execute(sql`
+    SELECT DISTINCT ON (cm.metric_id)
+      cm.metric_id              AS "metricId",
+      md.name,
+      md.category,
+      md.unit,
+      md.higher_is_better       AS "higherIsBetter",
+      cm.value,
+      cm.year                   AS "asOfYear",
+      cm.rank,
+      cm.total_ranked           AS "totalRanked",
+      (cm.year < ${year - 5})   AS "isStale"
+    FROM country_metrics cm
+    JOIN metric_definitions md ON cm.metric_id = md.id
+    WHERE cm.jurisdiction_id = ${jurisdictionId}
+      AND cm.year <= ${year}
+    ORDER BY cm.metric_id, cm.year DESC
+  `);
+
+  const jurisdictionRow = await db
+    .select({ governmentType: jurisdictions.governmentType })
+    .from(jurisdictions)
+    .where(eq(jurisdictions.id, jurisdictionId))
+    .limit(1);
+
+  const govType = jurisdictionRow[0]?.governmentType ?? null;
+
+  if (!govType) {
+    return { metrics: countryData, peerBands: [], govType: null };
+  }
+
+  const peerBands = await db.execute(sql`
+    WITH latest_per_country AS (
+      SELECT DISTINCT ON (cm.jurisdiction_id, cm.metric_id)
+        cm.metric_id,
+        cm.value
+      FROM country_metrics cm
+      JOIN jurisdictions j ON cm.jurisdiction_id = j.id
+      WHERE j.government_type = ${govType}
+        AND j.type = 'sovereign_state'
+        AND cm.year <= ${year}
+      ORDER BY cm.jurisdiction_id, cm.metric_id, cm.year DESC
+    )
+    SELECT
+      metric_id                                                           AS "metricId",
+      COUNT(*)::int                                                       AS "peerCount",
+      MIN(value)                                                          AS "peerMin",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY value)                 AS "peerMedian",
+      MAX(value)                                                          AS "peerMax"
+    FROM latest_per_country
+    GROUP BY metric_id
+  `);
+
+  return { metrics: countryData, peerBands, govType };
+}
+
+export async function getMetricCoverage(metricId: string, year: number) {
+  return db.execute(sql`
+    WITH sovereign AS (
+      SELECT id FROM jurisdictions WHERE type = 'sovereign_state'
+    ),
+    latest_data AS (
+      SELECT DISTINCT ON (cm.jurisdiction_id)
+        cm.jurisdiction_id,
+        cm.year AS data_year
+      FROM country_metrics cm
+      WHERE cm.metric_id = ${metricId}
+        AND cm.year <= ${year}
+      ORDER BY cm.jurisdiction_id, cm.year DESC
+    )
+    SELECT
+      (SELECT COUNT(*) FROM sovereign)::int                                            AS "totalCountries",
+      COUNT(ld.jurisdiction_id)::int                                                   AS "countriesWithData",
+      ((SELECT COUNT(*) FROM sovereign) - COUNT(ld.jurisdiction_id))::int              AS "countriesWithoutData",
+      COUNT(CASE WHEN ld.data_year >= ${year - 5} THEN 1 END)::int                    AS "countriesWithFreshData",
+      COUNT(CASE WHEN ld.data_year IS NOT NULL AND ld.data_year < ${year - 5} THEN 1 END)::int AS "countriesWithStaleData"
+    FROM sovereign s
+    LEFT JOIN latest_data ld ON s.id = ld.jurisdiction_id
+  `);
+}

@@ -27,6 +27,7 @@ import { classifyGovernment } from "@/lib/data/government-category";
 import { resolvePartyColor } from "@/lib/data/party-colors";
 import { stripHtml, firstSentences, formatGovernmentType } from "@/lib/text/clean";
 import { fetchParliamentBills, getParliamentSource, type Bill } from "@/lib/data/parliament-feeds";
+import { CountryOutcomeBars } from "@/components/outcomes/CountryOutcomeBars";
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
@@ -725,6 +726,17 @@ export default async function CountryPage({
     </div>
   );
 
+  /* ---- Outcomes tab ---- */
+  const outcomesTab = (
+    <div>
+      <CountryOutcomeBars
+        slug={slug}
+        countryName={jurisdiction.name}
+        year={new Date().getFullYear()}
+      />
+    </div>
+  );
+
   /* ---- Factbook tab ---- */
   const factbookTab = sections.length > 0 ? (
     <div>
@@ -1027,6 +1039,7 @@ export default async function CountryPage({
   const tabs = [
     { id: "overview", label: "Overview", content: overviewTab },
     { id: "government", label: "Government", content: governmentTab },
+    { id: "outcomes", label: "Outcomes", content: outcomesTab },
     ...(legislatureTab ? [{ id: "legislature", label: "Legislature", content: legislatureTab }] : []),
     { id: "laws", label: "Laws in Motion", content: lawsTab },
     { id: "democracy", label: "Democracy", content: democracyTab },
