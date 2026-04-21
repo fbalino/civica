@@ -58,7 +58,6 @@ export async function GET(
   const ciDisplay = ciInt !== null ? String(ciInt) : "—";
   const ciMeta = ciScore !== null ? ciScore.toFixed(1) : "—";
   const cpScore = ciScore !== null ? ciScore.toFixed(1) : "—";
-  const cpInt = ciInt !== null ? String(ciInt) : "—";
 
   const tier =
     ciInt !== null ? getTier(ciInt) : { label: "N/A", cssVar: "--t-mixed" };
@@ -83,7 +82,6 @@ export async function GET(
     jurisdiction,
     ciDisplay,
     ciMeta,
-    cpInt,
     cpScore,
     tier,
     rank,
@@ -154,12 +152,12 @@ function buildDimScores(facts: FactRow[], ciScore: number | null) {
     milRaw != null ? Math.min(100, Math.max(0, 100 - milRaw * 5)) : null;
 
   return [
-    { label: "Dem", score: dem !== null ? Math.round(dem) : null },
-    { label: "Live", score: live !== null ? Math.round(live) : null },
-    { label: "Rule", score: rule !== null ? Math.round(rule) : null },
-    { label: "Econ", score: econ !== null ? Math.round(econ) : null },
-    { label: "Ecol", score: ecol !== null ? Math.round(ecol) : null },
-    { label: "Stab", score: stab !== null ? Math.round(stab) : null },
+    { label: "Dem", title: "Democratic", score: dem !== null ? Math.round(dem) : null },
+    { label: "Livh", title: "Livelihoods", score: live !== null ? Math.round(live) : null },
+    { label: "Rule", title: "Rule of law", score: rule !== null ? Math.round(rule) : null },
+    { label: "Econ", title: "Economic", score: econ !== null ? Math.round(econ) : null },
+    { label: "Ecol", title: "Ecological", score: ecol !== null ? Math.round(ecol) : null },
+    { label: "Stab", title: "Stability", score: stab !== null ? Math.round(stab) : null },
   ];
 }
 
@@ -180,14 +178,13 @@ interface BuildHtmlArgs {
   jurisdiction: { name: string; slug: string; governmentType: string | null };
   ciDisplay: string;
   ciMeta: string;
-  cpInt: string;
   cpScore: string;
   tier: { label: string; cssVar: string };
   rank: number | null;
   totalRanked: number | null;
   quarterLabel: string;
   updatedDate: string;
-  dimScores: { label: string; score: number | null }[];
+  dimScores: { label: string; title?: string; score: number | null }[];
   width: number;
   height: number;
 }
@@ -195,7 +192,7 @@ interface BuildHtmlArgs {
 function buildHtml(args: BuildHtmlArgs): string {
   const {
     size, themeParam, dims, jurisdiction,
-    ciDisplay, ciMeta, cpInt, cpScore,
+    ciDisplay, ciMeta, cpScore,
     tier, rank, totalRanked, quarterLabel, updatedDate,
     dimScores, width, height,
   } = args;
@@ -214,7 +211,8 @@ function buildHtml(args: BuildHtmlArgs): string {
     .map((d) => {
       const pct = d.score ?? 0;
       const fillH = Math.round((pct / 100) * 28);
-      return `<div class="dim-col"><div class="dim-bar-wrap"><div class="dim-fill" style="height:${fillH}px"></div></div><span class="dim-lbl">${esc(d.label)}</span></div>`;
+      const titleAttr = d.title ? ` title="${esc(d.title)}"` : "";
+      return `<div class="dim-col"><div class="dim-bar-wrap"><div class="dim-fill" style="height:${fillH}px"></div></div><span class="dim-lbl"${titleAttr}>${esc(d.label)}</span></div>`;
     })
     .join("");
 
@@ -242,7 +240,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="tier-bar"><span style="width:${tierPct}%"></span></div>
   <div class="foot mono">
     <span>civica.io/countries/${esc(jurisdiction.slug)}</span>
-    <span>CP ${esc(cpInt)} &middot; LIVE</span>
+    <span>LIVE</span>
   </div>
 </a>`;
 
