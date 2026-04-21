@@ -1,6 +1,6 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
-import { jurisdictions, ciCompositeScores } from "@/lib/db/schema";
+import { jurisdictions, ciCompositeScores, pulseDailyScores } from "@/lib/db/schema";
 import { eq, sql, desc, asc } from "drizzle-orm";
 
 export async function GET(request: Request) {
@@ -48,25 +48,54 @@ export async function GET(request: Request) {
 
     const where = sql.join(conditions, sql` AND `);
 
-    const orderCol = sort === "cp"
-      ? desc(ciCompositeScores.score) // placeholder — cp sort uses same score until pulse integrated
+    const isCpSort = sort === "cp";
+
+    const baseSelect = {
+      rank: ciCompositeScores.rank,
+      score: ciCompositeScores.score,
+      isPartial: ciCompositeScores.isPartial,
+      missingDimensions: ciCompositeScores.missingDimensions,
+      methodologyVersion: ciCompositeScores.methodologyVersion,
+      slug: jurisdictions.slug,
+      name: jurisdictions.name,
+      continent: jurisdictions.continent,
+      governmentType: jurisdictions.governmentType,
+    };
+
+    const cpSelect = isCpSort
+      ? {
+          ...baseSelect,
+          pulseScore: pulseDailyScores.pulseScore,
+          eventImpact: pulseDailyScores.eventImpact,
+          activeEvents: pulseDailyScores.activeEvents,
+          isLowConfidence: pulseDailyScores.isLowConfidence,
+          pulseDate: pulseDailyScores.scoreDate,
+        }
+      : baseSelect;
+
+    let rowsQuery = db
+      .select(cpSelect)
+      .from(ciCompositeScores)
+      .innerJoin(jurisdictions, eq(ciCompositeScores.jurisdictionId, jurisdictions.id))
+      .$dynamic();
+
+    if (isCpSort) {
+      rowsQuery = rowsQuery.leftJoin(
+        pulseDailyScores,
+        sql`${pulseDailyScores.jurisdictionId} = ${ciCompositeScores.jurisdictionId}
+          AND ${pulseDailyScores.scoreDate} = (
+            SELECT MAX(score_date) FROM pulse_daily_scores
+            WHERE jurisdiction_id = ${ciCompositeScores.jurisdictionId}
+          )`
+      );
+    }
+
+    const orderCol = isCpSort
+      ? sql`${pulseDailyScores.pulseScore} DESC NULLS LAST`
       : asc(ciCompositeScores.rank);
 
     const [rows, countResult] = await Promise.all([
-      db
-        .select({
-          rank: ciCompositeScores.rank,
-          score: ciCompositeScores.score,
-          isPartial: ciCompositeScores.isPartial,
-          missingDimensions: ciCompositeScores.missingDimensions,
-          methodologyVersion: ciCompositeScores.methodologyVersion,
-          slug: jurisdictions.slug,
-          name: jurisdictions.name,
-          continent: jurisdictions.continent,
-          governmentType: jurisdictions.governmentType,
-        })
-        .from(ciCompositeScores)
-        .innerJoin(jurisdictions, eq(ciCompositeScores.jurisdictionId, jurisdictions.id))
+      rowsQuery
         .where(where)
         .orderBy(orderCol)
         .limit(limit)
