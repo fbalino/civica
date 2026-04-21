@@ -66,8 +66,10 @@ async function ingestArticle(
     return;
   }
 
-  const eventDate = parseArticleDate(article.seendate);
-  const expiresAt = new Date(eventDate.getTime() + EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  const eventDateObj = parseArticleDate(article.seendate);
+  const expiresAtObj = new Date(eventDateObj.getTime() + EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+  const eventDate = eventDateObj.toISOString().slice(0, 10);
+  const expiresAt = expiresAtObj.toISOString().slice(0, 10);
 
   await db.insert(pulseEvents).values({
     jurisdictionId,

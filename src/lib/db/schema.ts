@@ -222,38 +222,6 @@ export const sources = pgTable("sources", {
   lastSyncAt: timestamp("last_sync_at"),
 });
 
-export const pulseEvents = pgTable(
-  "pulse_events",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    jurisdictionId: uuid("jurisdiction_id")
-      .references(() => jurisdictions.id)
-      .notNull(),
-    eventDate: timestamp("event_date").notNull(),
-    category: text("category").notNull().default("unclassified"),
-    severity: real("severity").notNull().default(0),
-    confidence: real("confidence").notNull().default(0),
-    justification: text("justification").notNull().default(""),
-    headline: text("headline").notNull(),
-    sourceUrl: text("source_url").notNull(),
-    sourceName: text("source_name").notNull(),
-    llmModel: text("llm_model").notNull().default(""),
-    rawEventData: jsonb("raw_event_data").notNull(),
-    isActive: boolean("is_active").notNull().default(true),
-    expiresAt: timestamp("expires_at"),
-    createdAt: timestamp("created_at").defaultNow(),
-  },
-  (table) => [
-    uniqueIndex("idx_pulse_events_url_jurisdiction").on(
-      table.sourceUrl,
-      table.jurisdictionId
-    ),
-    index("idx_pulse_events_jurisdiction").on(table.jurisdictionId),
-    index("idx_pulse_events_event_date").on(table.eventDate),
-    index("idx_pulse_events_category").on(table.category),
-  ]
-);
-
 export const contactSubmissions = pgTable("contact_submissions", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
