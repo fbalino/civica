@@ -10,7 +10,74 @@ import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data
 import { useAtlasHeader } from "@/context/AtlasHeaderContext";
 
 type Mode = "atlas" | "explore" | "compare";
-type Tab = "chamber" | "bills" | "structure" | "elections" | "democracy" | "leaders" | "constitution";
+type Tab = "chamber" | "bills" | "structure" | "elections" | "democracy" | "leaders" | "constitution" | "international";
+type LeftMode = "countries" | "organizations";
+
+interface InternationalMembership {
+  orgId: string;
+  orgSlug: string;
+  orgName: string;
+  orgFullName: string;
+  type: "security" | "regional" | "trade" | "un" | "cultural";
+  joinYear: number | null;
+  role: string | null;
+}
+
+interface InternationalCoMember {
+  id: string;
+  name: string;
+  slug: string;
+  sharedCount: number;
+}
+
+interface InternationalData {
+  country: string;
+  countryId: string;
+  memberships: InternationalMembership[];
+  coMembers: InternationalCoMember[];
+}
+
+interface OrgGroupEntry {
+  id: string;
+  slug: string;
+  name: string;
+  fullName: string;
+  type: "security" | "regional" | "trade" | "un" | "cultural";
+  foundedYear: number | null;
+  hqCountry: string | null;
+  memberCount: number;
+}
+
+interface OrgGroup {
+  type: "security" | "regional" | "trade" | "un" | "cultural";
+  label: string;
+  color: string;
+  organizations: OrgGroupEntry[];
+}
+
+interface OrgMember {
+  id: string;
+  name: string;
+  slug: string;
+  region: string;
+  joinYear: number | null;
+  role: string | null;
+}
+
+interface OrgDetail {
+  organization: {
+    id: string;
+    slug: string;
+    name: string;
+    fullName: string;
+    type: "security" | "regional" | "trade" | "un" | "cultural";
+    foundedYear: number | null;
+    hqCountry: string | null;
+    description: string | null;
+    extra: Record<string, unknown> | null;
+  };
+  members: OrgMember[];
+}
 type House = "lower" | "upper";
 
 interface DemocracyData {
@@ -223,6 +290,13 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const [electionData, setElectionData] = useState<ElectionData[]>([]);
   const [electionsLoading, setElectionsLoading] = useState(false);
   const electionFetchRef = useRef<AbortController | null>(null);
+  const [leftMode, setLeftMode] = useState<LeftMode>("countries");
+  const [internationalData, setInternationalData] = useState<InternationalData | null>(null);
+  const [orgGroups, setOrgGroups] = useState<OrgGroup[] | null>(null);
+  const [orgGroupsLoading, setOrgGroupsLoading] = useState(false);
+  const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(null);
+  const [orgDetail, setOrgDetail] = useState<OrgDetail | null>(null);
+  const [orgDetailLoading, setOrgDetailLoading] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   const contentRef = useRef<SVGGElement>(null);
   const transformRef = useRef({ k: 1, x: 0, y: 0 });
@@ -672,13 +746,26 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     setMode("compare");
   }
 
-  // Fetch extended tab data (bills / democracy / leaders / constitution / structure) when country or tab changes
+  // Fetch extended tab data (bills / democracy / leaders / constitution / structure / international) when country or tab changes
   useEffect(() => {
-    if (!country || !["bills", "democracy", "leaders", "constitution", "structure"].includes(tab)) return;
+    if (!country || !["bills", "democracy", "leaders", "constitution", "structure", "international"].includes(tab)) return;
     const slug = country.slug ?? country.id;
     let cancelled = false;
 
     async function load() {
+      if (tab === "international") {
+        if (internationalData !== null) return;
+        setTabDataLoading(true);
+        try {
+          const res = await fetch(`/api/countries/${slug}/international`);
+          if (!cancelled && res.ok) {
+            setInternationalData(await res.json());
+          }
+        } finally {
+          if (!cancelled) setTabDataLoading(false);
+        }
+        return;
+      }
       if (tab === "bills") {
         if (billsData !== null) return;
         setBillsLoading(true);
@@ -732,7 +819,41 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     setConstitutionData(null);
     setStructureData(null);
     setBillsData(null);
+    setInternationalData(null);
   }, [country?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Fetch org groups when Organizations mode is entered
+  useEffect(() => {
+    if (leftMode !== "organizations" || orgGroups !== null) return;
+    let cancelled = false;
+    setOrgGroupsLoading(true);
+    fetch(`/api/organizations`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (!cancelled && j) setOrgGroups(j.groups);
+      })
+      .finally(() => {
+        if (!cancelled) setOrgGroupsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [leftMode, orgGroups]);
+
+  // Fetch org detail when selected
+  useEffect(() => {
+    if (!selectedOrgSlug) { setOrgDetail(null); return; }
+    let cancelled = false;
+    setOrgDetailLoading(true);
+    setOrgDetail(null);
+    fetch(`/api/organizations/${selectedOrgSlug}/members`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (!cancelled && j) setOrgDetail(j);
+      })
+      .finally(() => {
+        if (!cancelled) setOrgDetailLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [selectedOrgSlug]);
 
   // Filter logic
   const filteredCountryIds = COUNTRIES.filter((c) => {
@@ -753,7 +874,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     const c = country;
     const cd = c ? getDefaultChamberData(c.id) : null;
     const currentHouseData = house === "upper" && cd?.upper ? cd.upper : cd?.lower;
-    const tabLabel = { chamber: "Chamber", bills: "Bills in motion", structure: "Government structure", elections: "Elections", democracy: "Democracy index", leaders: "Leadership", constitution: "Constitution" }[tab] ?? tab;
+    const tabLabel = { chamber: "Chamber", bills: "Bills in motion", structure: "Government structure", elections: "Elections", democracy: "Democracy index", leaders: "Leadership", constitution: "Constitution", international: "International relations" }[tab] ?? tab;
     const lead = c ? `About ${c.name} \u00b7 ${house === "upper" ? "upper" : "lower"} house \u00b7 ${tabLabel}` : undefined;
 
     // Append user message + empty AI placeholder
@@ -1050,8 +1171,14 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
               <div className="left-side-head">
                 <button className="back-btn" onClick={() => setMode("atlas")}>&larr; Back to full atlas</button>
                 <div className="kicker">Atlas</div>
-                <div className="title">Pick a country</div>
+                <div className="title">{leftMode === "countries" ? "Pick a country" : "Pick an organization"}</div>
+                <div className="left-mode-toggle" style={{ marginTop: 10 }}>
+                  <button className={leftMode === "countries" ? "on" : ""} onClick={() => { setLeftMode("countries"); setSelectedOrgSlug(null); }}>Countries</button>
+                  <button className={leftMode === "organizations" ? "on" : ""} onClick={() => setLeftMode("organizations")}>Organizations</button>
+                </div>
               </div>
+              {leftMode === "countries" && (
+              <>
               <div className="left-mini-map">
                 <svg viewBox="0 100 2000 800" preserveAspectRatio="xMidYMid meet">
                   {mapLoaded ? (
@@ -1104,6 +1231,37 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   );
                 })}
               </div>
+              </>
+              )}
+              {leftMode === "organizations" && (
+                <div className="left-org-list">
+                  {orgGroupsLoading && !orgGroups ? (
+                    <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "30px 10px", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading&hellip;</div>
+                  ) : orgGroups && orgGroups.length > 0 ? (
+                    orgGroups.map((g) => (
+                      <div key={g.type} className="type-group">
+                        <div className="type-label" style={{ color: g.color }}>{g.label}</div>
+                        {g.organizations.map((o) => {
+                          const initials = o.name.length <= 4 ? o.name : o.name.slice(0, 3);
+                          return (
+                            <div
+                              key={o.id}
+                              className={`org-row${selectedOrgSlug === o.slug ? " on" : ""}`}
+                              onClick={() => { setSelectedOrgSlug(o.slug); if (isMobile) setMobilePanel("center"); }}
+                            >
+                              <span className="initials" style={{ background: g.color }}>{initials}</span>
+                              <span className="nm">{o.name}</span>
+                              <span className="count">{o.memberCount}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "30px 10px", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>No data</div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Left resizer */}
@@ -1111,6 +1269,30 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
             {/* Center pane */}
             <div className="chamber-center">
+              {leftMode === "organizations" && selectedOrgSlug ? (
+                <OrgDetailPanel
+                  detail={orgDetail}
+                  loading={orgDetailLoading}
+                  onClose={() => setSelectedOrgSlug(null)}
+                  onPickCountry={(slug) => {
+                    const c = COUNTRIES.find((x) => (x.slug ?? x.id) === slug || x.id === slug);
+                    if (c) {
+                      setLeftMode("countries");
+                      setSelectedOrgSlug(null);
+                      setCountry(c);
+                      setTab("international");
+                      setHouse("lower");
+                      setDimmed(new Set());
+                    }
+                  }}
+                />
+              ) : leftMode === "organizations" ? (
+                <div className="intl-empty" style={{ margin: 40 }}>
+                  <div className="atlas-serif" style={{ fontSize: 24, marginBottom: 8 }}>Pick an organization</div>
+                  <div className="atlas-sans" style={{ fontSize: 13, color: "var(--atlas-muted)" }}>Select an international body from the left rail to see its full membership roster, founding year, and role distribution.</div>
+                </div>
+              ) : (
+              <>
               <div className="atlas-masthead">
                 <div>
                   <div className="eyebrow">{country.region.toUpperCase()} &middot; {country.id.toUpperCase()}</div>
@@ -1153,6 +1335,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   ["democracy", "V \u00b7 Democracy"],
                   ["leaders", "VI \u00b7 Leaders"],
                   ["constitution", "VII \u00b7 Constitution"],
+                  ["international", "VIII \u00b7 International"],
                 ] as [Tab, string][]).map(([t, label]) => (
                   <button key={t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>{label}</button>
                 ))}
@@ -1420,6 +1603,30 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Constitution data not yet available</div>
                 )}
               </div>
+
+              {/* Tab VIII: International */}
+              <div className={`atlas-pane${tab === "international" ? " on" : ""}`}>
+                {tabDataLoading && tab === "international" ? (
+                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading&hellip;</div>
+                ) : internationalData && internationalData.memberships.length > 0 ? (
+                  <InternationalPanel
+                    data={internationalData}
+                    country={country}
+                    onPickOrg={(slug) => { setLeftMode("organizations"); setSelectedOrgSlug(slug); }}
+                    onPickCountry={(slug) => {
+                      const c = COUNTRIES.find((x) => (x.slug ?? x.id) === slug || x.id === slug);
+                      if (c) { setCountry(c); setTab("international"); setDimmed(new Set()); }
+                    }}
+                  />
+                ) : (
+                  <div className="intl-empty">
+                    <div className="atlas-serif" style={{ fontSize: 22, marginBottom: 6 }}>No international memberships recorded</div>
+                    <div className="atlas-sans" style={{ fontSize: 13, color: "var(--atlas-muted)" }}>This country does not appear in the curated international organisations dataset yet.</div>
+                  </div>
+                )}
+              </div>
+              </>
+              )}
             </div>
 
             {/* Right resizer */}
@@ -1436,7 +1643,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                 Context:
                 <span className="pill">{country.name}</span>
                 <span className="pill">{house === "upper" ? "Upper house" : "Lower house"}</span>
-                <span className="pill">{{ chamber: "Chamber", bills: "Bills", structure: "Structure", elections: "Elections", democracy: "Democracy", leaders: "Leaders", constitution: "Constitution" }[tab] ?? tab}</span>
+                <span className="pill">{{ chamber: "Chamber", bills: "Bills", structure: "Structure", elections: "Elections", democracy: "Democracy", leaders: "Leaders", constitution: "Constitution", international: "International" }[tab] ?? tab}</span>
               </div>
               <div className="atlas-chat-scroll" ref={chatScrollRef}>
                 {chatHistory.map((m, i) => (
@@ -1805,5 +2012,226 @@ function StructurePanel({ data, countryName }: { data: StructureData; countryNam
       countryName={countryName}
       parties={data.parties ?? []}
     />
+  );
+}
+
+const TYPE_LABEL: Record<InternationalMembership["type"], string> = {
+  un: "United Nations & Agencies",
+  security: "Security Alliances",
+  regional: "Regional Blocs",
+  trade: "Trade & Economic",
+  cultural: "Cultural & Linguistic",
+};
+const TYPE_VAR: Record<InternationalMembership["type"], string> = {
+  un: "var(--cat-un)",
+  security: "var(--cat-security)",
+  regional: "var(--cat-regional)",
+  trade: "var(--cat-trade)",
+  cultural: "var(--cat-cultural)",
+};
+
+function InternationalPanel({
+  data,
+  country,
+  onPickOrg,
+  onPickCountry,
+}: {
+  data: InternationalData;
+  country: Country;
+  onPickOrg: (slug: string) => void;
+  onPickCountry: (slug: string) => void;
+}) {
+  const grouped = new Map<InternationalMembership["type"], InternationalMembership[]>();
+  for (const m of data.memberships) {
+    const list = grouped.get(m.type) ?? [];
+    list.push(m);
+    grouped.set(m.type, list);
+  }
+  const order: InternationalMembership["type"][] = ["un", "security", "regional", "trade", "cultural"];
+  const oldestYear = data.memberships.reduce<number | null>(
+    (acc, m) => (m.joinYear != null && (acc == null || m.joinYear < acc) ? m.joinYear : acc),
+    null
+  );
+  const foundingCount = data.memberships.filter((m) => (m.role ?? "").toLowerCase() === "founding").length;
+
+  return (
+    <>
+      <div style={{ marginBottom: 18 }}>
+        <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase" }}>
+          {country.name.toUpperCase()} &middot; INTERNATIONAL FOOTPRINT
+        </div>
+        <div className="atlas-serif" style={{ fontSize: 36, letterSpacing: "-0.02em", lineHeight: 1, marginTop: 4 }}>
+          Where {country.name} sits in the world
+        </div>
+        <div className="atlas-sans" style={{ fontSize: 13, color: "var(--atlas-ink-2)", marginTop: 6 }}>
+          Memberships in intergovernmental organizations, alliances, and cultural blocs.
+        </div>
+      </div>
+
+      <div className="intl-stats">
+        <div className="cell">
+          <div className="k">Memberships</div>
+          <div className="v">{data.memberships.length}</div>
+        </div>
+        <div className="cell">
+          <div className="k">Founding member of</div>
+          <div className="v">{foundingCount}</div>
+        </div>
+        <div className="cell">
+          <div className="k">Earliest accession</div>
+          <div className="v">{oldestYear ?? "\u2014"}</div>
+        </div>
+      </div>
+
+      {data.coMembers.length > 0 && (
+        <>
+          <div className="intl-section-head">Closest partners <span>by shared memberships</span></div>
+          <div className="intl-panel" style={{ padding: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 8 }}>
+              {data.coMembers.map((cm) => (
+                <div
+                  key={cm.id}
+                  onClick={() => onPickCountry(cm.slug)}
+                  style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", border: "1px solid var(--atlas-rule-2)", background: "var(--atlas-paper-2)", cursor: "pointer" }}
+                  className="atlas-sans"
+                >
+                  <span style={{ fontSize: 13, color: "var(--atlas-ink)" }}>{cm.name}</span>
+                  <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)" }}>{cm.sharedCount}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className="intl-section-head">Memberships <span>grouped by type, oldest first</span></div>
+      <div className="intl-mem-list">
+        {order.map((t) => {
+          const items = grouped.get(t);
+          if (!items || items.length === 0) return null;
+          return (
+            <div key={t} className="intl-mem-group">
+              <div className="type-head" style={{ color: TYPE_VAR[t] }}>
+                <span className="sw" style={{ background: TYPE_VAR[t] }} />
+                {TYPE_LABEL[t]}
+                <span className="ct">{items.length}</span>
+              </div>
+              {items.map((m) => {
+                const role = (m.role ?? "").toLowerCase();
+                const badgeClass =
+                  role === "founding" ? "role-badge founding" :
+                  role === "p5" ? "role-badge p5" :
+                  role === "observer" ? "role-badge observer" :
+                  role ? "role-badge" : "";
+                return (
+                  <div key={m.orgId} className="intl-mem-row" onClick={() => onPickOrg(m.orgSlug)}>
+                    <span className="nm" title={m.orgFullName}>{m.orgName}</span>
+                    <span className="full">{m.orgFullName}</span>
+                    <span className="yr">{m.joinYear ?? "\u2014"}</span>
+                    {m.role && <span className={badgeClass}>{m.role}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function OrgDetailPanel({
+  detail,
+  loading,
+  onClose,
+  onPickCountry,
+}: {
+  detail: OrgDetail | null;
+  loading: boolean;
+  onClose: () => void;
+  onPickCountry: (slug: string) => void;
+}) {
+  if (loading && !detail) {
+    return <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: 60, textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading organization&hellip;</div>;
+  }
+  if (!detail) {
+    return <div className="org-empty">No organization data available.</div>;
+  }
+  const o = detail.organization;
+  const typeVar = TYPE_VAR[o.type];
+  const typeLabel = TYPE_LABEL[o.type];
+  const initials = o.name.length <= 4 ? o.name : o.name.slice(0, 3);
+
+  const founding = detail.members.filter((m) => (m.role ?? "").toLowerCase() === "founding").length;
+  const observers = detail.members.filter((m) => (m.role ?? "").toLowerCase() === "observer").length;
+
+  const byRegion = new Map<string, OrgMember[]>();
+  for (const m of detail.members) {
+    const list = byRegion.get(m.region) ?? [];
+    list.push(m);
+    byRegion.set(m.region, list);
+  }
+  const regionOrder = ["Americas", "Europe", "Africa", "Asia", "Oceania"];
+
+  return (
+    <>
+      <div style={{ marginBottom: 12 }}>
+        <button className="back-btn" onClick={onClose}>&larr; Back to country view</button>
+      </div>
+      <div className="org-masthead">
+        <div className="badge" style={{ background: typeVar }}>{initials}</div>
+        <div>
+          <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase" }}>
+            INTERNATIONAL ORGANIZATION &middot; {typeLabel.toUpperCase()}
+          </div>
+          <h1>{o.name}</h1>
+          <div className="atlas-sans" style={{ fontSize: 14, color: "var(--atlas-ink-2)", marginTop: 4 }}>{o.fullName}</div>
+          {o.description && (
+            <div className="atlas-sans" style={{ fontSize: 13, color: "var(--atlas-ink-2)", marginTop: 10, lineHeight: 1.55 }}>{o.description}</div>
+          )}
+          <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10, flexWrap: "wrap" }}>
+            <span className="type-chip" style={{ borderColor: typeVar, color: typeVar }}>{typeLabel}</span>
+            {o.foundedYear && (
+              <span className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", letterSpacing: ".08em" }}>FOUNDED {o.foundedYear}</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="org-stats">
+        <div className="cell"><div className="k">Members</div><div className="v">{detail.members.length}</div></div>
+        <div className="cell"><div className="k">Founding members</div><div className="v">{founding}</div></div>
+        <div className="cell"><div className="k">Observers</div><div className="v">{observers}</div></div>
+        <div className="cell"><div className="k">HQ</div><div className="v" style={{ fontSize: 14 }}>{o.hqCountry ? o.hqCountry.toUpperCase() : "\u2014"}</div></div>
+      </div>
+
+      <div className="intl-section-head">Members <span>by region, join year ascending</span></div>
+      <div className="org-members">
+        {regionOrder.map((reg) => {
+          const items = byRegion.get(reg);
+          if (!items || items.length === 0) return null;
+          return (
+            <div key={reg}>
+              <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase", padding: "10px 12px 6px" }}>{reg}</div>
+              {items.map((m) => {
+                const role = (m.role ?? "").toLowerCase();
+                const badgeClass =
+                  role === "founding" ? "role-badge founding" :
+                  role === "p5" ? "role-badge p5" :
+                  role === "observer" ? "role-badge observer" :
+                  role ? "role-badge" : "";
+                return (
+                  <div key={m.id} className="org-member-row" onClick={() => onPickCountry(m.slug)}>
+                    <span className="nm">{m.name}</span>
+                    <span className="yr">{m.joinYear ?? "\u2014"}</span>
+                    {m.role && <span className={badgeClass}>{m.role}</span>}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }
