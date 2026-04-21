@@ -20,6 +20,7 @@ export type Db = ReturnType<typeof createDb>;
 const HALF_LIFE_DAYS = 30;
 const DECAY_LAMBDA = Math.LN2 / HALF_LIFE_DAYS;
 const WINDOW_DAYS = 120;
+const MIN_EVENTS_FOR_CONFIDENCE = 3;
 
 function decayedImpact(
   severity: number,
@@ -144,7 +145,6 @@ export async function calculatePulseScores(
 
     const todayMs = new Date(today).getTime();
     let totalImpact = 0;
-    let totalConfidence = 0;
     const changelogEntries: {
       eventId: string;
       decayed: number;
@@ -160,7 +160,6 @@ export async function calculatePulseScores(
       const decayed = decayedImpact(event.severity, event.confidence, daysSince);
 
       totalImpact += decayed;
-      totalConfidence += event.confidence;
       changelogEntries.push({
         eventId: event.id,
         decayed,
@@ -169,8 +168,7 @@ export async function calculatePulseScores(
     }
 
     const eventImpact = clamp(totalImpact, -30, 30);
-    const avgConfidence = totalConfidence / events.length;
-    const isLowConfidence = avgConfidence < 0.5;
+    const isLowConfidence = events.length < MIN_EVENTS_FOR_CONFIDENCE;
 
     const ciBaseline = (await getCiBaseline(db, jurisdiction.id)) ?? 50;
     const pulseScore = clamp(ciBaseline + eventImpact, 0, 100);
