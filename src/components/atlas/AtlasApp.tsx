@@ -754,8 +754,8 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
 
     async function load() {
       if (tab === "international") {
-        if (internationalData !== null) return;
         setTabDataLoading(true);
+        setInternationalData(null);
         try {
           // International data is keyed by 3-letter country id, not the
           // DB jurisdiction slug.
@@ -814,14 +814,16 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     return () => { cancelled = true; };
   }, [country, tab]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Reset extended data when country changes
+  // Reset extended data when country changes. International is handled
+  // inline in the fetch effect below to avoid a race where the reset
+  // nulls new data after a same-tab country swap (e.g. clicking a
+  // closest partner from the International pane itself).
   useEffect(() => {
     setDemocracyData(null);
     setLeadersData(null);
     setConstitutionData(null);
     setStructureData(null);
     setBillsData(null);
-    setInternationalData(null);
   }, [country?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch org groups when Organizations mode is entered
@@ -2114,24 +2116,28 @@ function InternationalPanel({
           if (!items || items.length === 0) return null;
           return (
             <div key={t} className="intl-mem-group">
-              <div className="type-head" style={{ color: TYPE_VAR[t] }}>
-                <span className="sw" style={{ background: TYPE_VAR[t] }} />
+              <div className="group-head" style={{ color: TYPE_VAR[t] }}>
+                <span className="dot" style={{ background: TYPE_VAR[t] }} />
                 {TYPE_LABEL[t]}
-                <span className="ct">{items.length}</span>
+                <span className="count">{items.length}</span>
               </div>
               {items.map((m) => {
                 const role = (m.role ?? "").toLowerCase();
+                const isP5 = m.type === "un" && role === "permanent";
                 const badgeClass =
                   role === "founding" ? "role-badge founding" :
-                  role === "p5" ? "role-badge p5" :
+                  isP5 ? "role-badge p5" :
                   role === "observer" ? "role-badge observer" :
                   role ? "role-badge" : "";
                 return (
                   <div key={m.orgId} className="intl-mem-row" onClick={() => onPickOrg(m.orgSlug)}>
-                    <span className="nm" title={m.orgFullName}>{m.orgName}</span>
-                    <span className="full">{m.orgFullName}</span>
-                    <span className="yr">{m.joinYear ?? "\u2014"}</span>
-                    {m.role && <span className={badgeClass}>{m.role}</span>}
+                    <span className="dot" style={{ background: TYPE_VAR[t] }} />
+                    <span className="name" title={m.orgFullName}>
+                      {m.orgName}
+                      <span className="full">{m.orgFullName}</span>
+                    </span>
+                    <span className="year">{m.joinYear ?? "\u2014"}</span>
+                    {m.role && <span className={badgeClass}>{isP5 ? "P5" : m.role}</span>}
                   </div>
                 );
               })}

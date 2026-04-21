@@ -934,14 +934,13 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 }
 
 .intl-section-head {
-  display: flex; align-items: baseline; justify-content: space-between;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
   margin: 26px 0 10px; border-bottom: 1px solid var(--atlas-rule);
   padding-bottom: 6px;
-}
-.intl-section-head .title {
   font-family: "Fraunces", serif; font-size: 18px; letter-spacing: -0.01em;
+  color: var(--atlas-ink);
 }
-.intl-section-head .meta {
+.intl-section-head > span {
   font-family: ui-monospace, monospace; font-size: 10px;
   color: var(--atlas-muted); letter-spacing: 0.1em; text-transform: uppercase;
 }
