@@ -477,3 +477,44 @@ export const pulseChangelog = pgTable(
     index("idx_pulse_changelog_event").on(table.eventId),
   ]
 );
+
+// --- International organizations (CIV-163) ---
+
+export const organizations = pgTable("organizations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").unique().notNull(),
+  name: text("name").notNull(),
+  fullName: text("full_name").notNull(),
+  type: text("type").notNull(),
+  foundedYear: integer("founded_year"),
+  hqCountry: text("hq_country"),
+  memberCount: integer("member_count"),
+  wikidataQid: text("wikidata_qid"),
+  extra: jsonb("extra"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const organizationMemberships = pgTable(
+  "organization_memberships",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .references(() => organizations.id)
+      .notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    joinDate: date("join_date"),
+    role: text("role"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_org_memberships_unique").on(
+      table.orgId,
+      table.jurisdictionId
+    ),
+    index("idx_org_memberships_jurisdiction").on(table.jurisdictionId),
+    index("idx_org_memberships_org").on(table.orgId),
+  ]
+);
