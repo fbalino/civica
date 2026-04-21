@@ -127,7 +127,6 @@ export default async function CountryPage({
     getLeaderTimeline(jurisdiction.id),
     getCICountryDetail(slug).catch(() => null),
   ]);
-
   const ciScore: CIScoreData | null = ciDetail?.composite
     ? {
         score: Number(ciDetail.composite.score ?? 0),
@@ -137,15 +136,12 @@ export default async function CountryPage({
         isPartial: Boolean(ciDetail.composite.isPartial),
       }
     : null;
-
   const pulseScoreData: PulseScoreData | null = ciDetail?.pulse
     ? {
         pulseScore: Number(ciDetail.pulse.pulseScore ?? 0),
         eventImpact: Number(ciDetail.pulse.eventImpact ?? 0),
         activeEvents: Number(ciDetail.pulse.activeEvents ?? 0),
-        scoreDate: ciDetail.pulse.scoreDate
-          ? String(ciDetail.pulse.scoreDate)
-          : "",
+        scoreDate: ciDetail.pulse.scoreDate ? String(ciDetail.pulse.scoreDate) : "",
         isLowConfidence: Boolean(ciDetail.pulse.isLowConfidence),
       }
     : null;
@@ -1185,12 +1181,13 @@ export default async function CountryPage({
         </div>
       </div>
 
+      {/* Tabs — prototype: gap 2, border-bottom, 28px top margin, 32px bottom margin */}
       {(ciScore || pulseScoreData) && (
         <div style={{ marginTop: 32 }}>
           <CIPulseScoreDisplay ciScore={ciScore} pulseScore={pulseScoreData} />
           <div
             style={{
-              marginTop: -32,
+              marginTop: -8,
               marginBottom: 32,
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
@@ -1224,7 +1221,6 @@ export default async function CountryPage({
         </div>
       )}
 
-      {/* Tabs — prototype: gap 2, border-bottom, 28px top margin, 32px bottom margin */}
       <CountryTabs tabs={tabs} />
 
       {relatedCountries.length > 0 && (

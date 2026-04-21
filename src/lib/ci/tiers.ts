@@ -16,11 +16,11 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     info: {
       key: "exceptional",
       label: "Exceptional",
-      range: "90–100",
+      range: "90-100",
       className: "tier-90",
       bgClassName: "tier-90-bg",
       cssVar: "var(--tier-exceptional)",
-      description: "Exceptional",
+      description: "Exceptional governance",
     },
   },
   {
@@ -28,7 +28,7 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     info: {
       key: "strong",
       label: "Strong",
-      range: "75–89",
+      range: "75-89",
       className: "tier-75",
       bgClassName: "tier-75-bg",
       cssVar: "var(--tier-strong)",
@@ -40,7 +40,7 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     info: {
       key: "mixed",
       label: "Mixed",
-      range: "50–74",
+      range: "50-74",
       className: "tier-50",
       bgClassName: "tier-50-bg",
       cssVar: "var(--tier-mixed)",
@@ -52,7 +52,7 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     info: {
       key: "weak",
       label: "Weak",
-      range: "25–49",
+      range: "25-49",
       className: "tier-25",
       bgClassName: "tier-25-bg",
       cssVar: "var(--tier-weak)",
@@ -64,22 +64,23 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     info: {
       key: "failed",
       label: "Failed",
-      range: "0–24",
+      range: "0-24",
       className: "tier-0",
       bgClassName: "tier-0-bg",
       cssVar: "var(--tier-failed)",
-      description: "Failed / authoritarian",
+      description: "Failed governance",
     },
   },
 ];
 
 export function ciTier(score: number): TierInfo {
-  for (const t of TIERS) {
-    if (score >= t.min) return t.info;
+  for (const tier of TIERS) {
+    if (score >= tier.min) return tier.info;
   }
+
   return TIERS[TIERS.length - 1].info;
 }
 
 export const CI_TIER_LEGEND: ReadonlyArray<TierInfo> = [...TIERS]
   .reverse()
-  .map((t) => t.info);
+  .map((tier) => tier.info);

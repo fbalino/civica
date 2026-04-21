@@ -1,3 +1,5 @@
+import { ciTier } from "@/lib/ci/tiers";
+
 export interface CIScoreData {
   score: number;
   rank: number | null;
@@ -14,288 +16,328 @@ export interface PulseScoreData {
   isLowConfidence: boolean;
 }
 
-export function ciTierInfo(score: number): { label: string; cssVar: string } {
-  if (score >= 90) return { label: "Exceptional governance", cssVar: "--tier-exceptional" };
-  if (score >= 75) return { label: "Strong governance",      cssVar: "--tier-strong" };
-  if (score >= 50) return { label: "Mixed governance",       cssVar: "--tier-mixed" };
-  if (score >= 25) return { label: "Weak governance",        cssVar: "--tier-weak" };
-  return               { label: "Failed governance",      cssVar: "--tier-failed" };
-}
-
-function formatQuarter(q: string): string {
-  const m = q.match(/^(\d{4})-Q(\d)$/);
-  if (!m) return q;
-  return `${m[1]} Q${m[2]}`;
-}
-
 interface CIPulseScoreDisplayProps {
   ciScore: CIScoreData | null;
   pulseScore: PulseScoreData | null;
+  ciChangeText?: string | null;
 }
 
-export function CIPulseScoreDisplay({ ciScore, pulseScore }: CIPulseScoreDisplayProps) {
-  const ciTier = ciScore ? ciTierInfo(ciScore.score) : null;
-  const cpTier = pulseScore ? ciTierInfo(pulseScore.pulseScore) : null;
-  const ciRounded = ciScore ? Math.round(ciScore.score * 10) / 10 : null;
-  const cpRounded = pulseScore ? Math.round(pulseScore.pulseScore * 10) / 10 : null;
+function formatQuarter(quarter: string): string {
+  const match = quarter.match(/^(\d{4})-Q(\d)$/);
+  if (!match) return quarter;
+  return `Q${match[2]} ${match[1]}`;
+}
 
-  const pulseDelta = pulseScore ? pulseScore.eventImpact : 0;
-  const deltaSign = pulseDelta > 0 ? "▲" : pulseDelta < 0 ? "▼" : "—";
-  const deltaClass = pulseDelta > 0.1 ? "pulse-up" : pulseDelta < -0.1 ? "pulse-down" : "pulse-flat";
-  const deltaLabel = `${deltaSign} ${Math.abs(pulseDelta).toFixed(1)} today`;
+function formatDateLabel(dateString: string): string {
+  if (!dateString) return "Date unavailable";
 
+  const parsed = new Date(dateString);
+  if (Number.isNaN(parsed.getTime())) return dateString;
+
+  return parsed.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatPulseDelta(delta: number): string {
+  if (Math.abs(delta) < 0.05) return "Flat today";
+  return `${delta >= 0 ? "+" : ""}${delta.toFixed(1)} today`;
+}
+
+function ProvenanceDot({ kind }: { kind: "frozen" | "live" }) {
+  const isLive = kind === "live";
+
+  return (
+    <span
+      style={{
+        position: "relative",
+        display: "inline-flex",
+        width: 12,
+        height: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+      aria-hidden="true"
+    >
+      {isLive ? (
+        <span
+          style={{
+            position: "absolute",
+            inset: 0,
+            borderRadius: "999px",
+            background: "var(--color-source-live)",
+            opacity: 0.2,
+            animation: "civ-pulse 2s ease-out infinite",
+          }}
+        />
+      ) : null}
+      <span
+        style={{
+          position: "relative",
+          width: 8,
+          height: 8,
+          borderRadius: "999px",
+          background: isLive ? "var(--color-source-live)" : "var(--color-source-frozen)",
+          boxShadow: `0 0 0 1px ${isLive ? "rgba(92, 170, 110, 0.22)" : "rgba(212, 160, 74, 0.28)"}`,
+        }}
+      />
+    </span>
+  );
+}
+
+function ScorePane({
+  title,
+  chip,
+  provenance,
+  scoreLabel,
+  tierLabel,
+  tierColor,
+  scoreValue,
+  barValue,
+  secondaryLine,
+  footer,
+}: {
+  title: string;
+  chip: string;
+  provenance: "frozen" | "live";
+  scoreLabel: string;
+  tierLabel: string;
+  tierColor: string;
+  scoreValue: string;
+  barValue: number;
+  secondaryLine: string;
+  footer: string;
+}) {
   return (
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: 1,
-        background: "var(--color-card-border)",
-        border: "1px solid var(--color-card-border)",
-        borderRadius: "var(--radius-sm, 2px)",
-        overflow: "hidden",
-        marginBottom: 48,
-        boxShadow: "var(--shadow-hard-lg)",
+        background: "var(--color-card-bg)",
+        padding: "28px 28px 24px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
+        minWidth: 0,
       }}
     >
-      {/* CI half — frozen / structural */}
       <div
         style={{
-          background: "var(--color-card-bg)",
-          padding: "32px 36px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap",
         }}
       >
         <div
           style={{
-            display: "flex",
+            display: "inline-flex",
             alignItems: "center",
             gap: 8,
-            fontFamily: "var(--font-mono)",
-            fontWeight: 500,
-            fontSize: 11,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            color: "var(--color-text-30)",
-            marginBottom: 8,
+            minWidth: 0,
           }}
         >
-          <span>Civica Index · structural</span>
+          <ProvenanceDot kind={provenance} />
           <span
-            className="source-dot source-dot--frozen"
-            role="img"
-            aria-label="Updates quarterly"
-            title="Updates quarterly"
-          />
-        </div>
-
-        {ciRounded !== null && ciTier ? (
-          <>
-            <div style={{ display: "flex", alignItems: "baseline" }}>
-              <span
-                style={{
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 400,
-                  fontSize: 88,
-                  letterSpacing: "-0.05em",
-                  lineHeight: 0.9,
-                  color: `var(${ciTier.cssVar})`,
-                }}
-              >
-                {ciRounded}
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: 500,
-                  fontSize: 14,
-                  color: "var(--color-text-25)",
-                  marginLeft: 4,
-                }}
-              >
-                /100
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                fontFamily: "var(--font-mono)",
-                fontWeight: 500,
-                fontSize: 11,
-                letterSpacing: "0.10em",
-                textTransform: "uppercase",
-                marginTop: 16,
-                padding: "4px 10px",
-                borderRadius: "var(--radius-sm, 2px)",
-                background: "rgba(128,128,128,0.06)",
-                color: `var(${ciTier.cssVar})`,
-              }}
-            >
-              ● {ciTier.label}
-            </div>
-
-            <div
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: 500,
-                fontSize: 13,
-                color: "var(--color-text-40)",
-                marginTop: 10,
-              }}
-            >
-              Last recalculated {ciScore!.isPartial ? "(partial) " : ""}{formatQuarter(ciScore!.quarter)} · weighted composite of 6 dimensions
-            </div>
-          </>
-        ) : (
-          <div
             style={{
               fontFamily: "var(--font-mono)",
-              fontWeight: 500,
-              fontSize: 14,
-              color: "var(--color-text-40)",
-              paddingTop: 16,
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-11)",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--color-text-35)",
             }}
           >
-            No CI score yet
-          </div>
-        )}
+            {title}
+          </span>
+        </div>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
+            fontSize: "var(--text-10)",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "var(--color-text-35)",
+            padding: "4px 8px",
+            borderRadius: "999px",
+            border: "1px solid var(--color-card-border)",
+            background: "var(--color-page-bg)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {chip}
+        </span>
       </div>
 
-      {/* CP half — live / real-time */}
-      <div
-        style={{
-          background: "var(--color-card-bg)",
-          padding: "32px 36px",
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+        <span
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontWeight: 400,
+            fontSize: "clamp(64px, 11vw, 88px)",
+            letterSpacing: "-0.03em",
+            lineHeight: 0.88,
+            color: tierColor,
+          }}
+        >
+          {scoreValue}
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
+            fontSize: "var(--text-12)",
+            color: "var(--color-text-40)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}
+        >
+          {scoreLabel}
+        </span>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 8,
-            fontFamily: "var(--font-mono)",
-            fontWeight: 500,
-            fontSize: 11,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            color: "var(--color-text-30)",
-            marginBottom: 8,
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
           }}
         >
-          <span>Civica Pulse · real-time</span>
           <span
-            className="source-dot source-dot--live"
-            role="img"
-            aria-label="Updates daily"
-            title="Updates daily"
-          />
-        </div>
-
-        {cpRounded !== null && cpTier ? (
-          <>
-            <div style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: 6 }}>
-              <span
-                style={{
-                  fontFamily: "var(--font-heading)",
-                  fontWeight: 400,
-                  fontSize: 88,
-                  letterSpacing: "-0.05em",
-                  lineHeight: 0.9,
-                  color: `var(${cpTier.cssVar})`,
-                }}
-              >
-                {cpRounded}
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: 500,
-                  fontSize: 14,
-                  color: "var(--color-text-25)",
-                  marginLeft: 4,
-                }}
-              >
-                /100
-              </span>
-              {pulseDelta !== 0 && (
-                <span
-                  className={`score-pulse-delta ${deltaClass}`}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 4,
-                    padding: "2px 8px",
-                    borderRadius: "var(--radius-sm, 2px)",
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: 500,
-                    fontSize: 12,
-                    background:
-                      pulseDelta > 0.1
-                        ? "rgba(92,170,110,0.15)"
-                        : pulseDelta < -0.1
-                          ? "rgba(212,118,78,0.15)"
-                          : "rgba(196,189,174,0.10)",
-                    color:
-                      pulseDelta > 0.1
-                        ? "var(--color-source-live)"
-                        : pulseDelta < -0.1
-                          ? "var(--color-danger, oklch(65% 0.18 25))"
-                          : "var(--color-text-40)",
-                  }}
-                >
-                  {deltaLabel}
-                </span>
-              )}
-            </div>
-
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                fontFamily: "var(--font-mono)",
-                fontWeight: 500,
-                fontSize: 11,
-                letterSpacing: "0.10em",
-                textTransform: "uppercase",
-                marginTop: 16,
-                padding: "4px 10px",
-                borderRadius: "var(--radius-sm, 2px)",
-                background: "rgba(128,128,128,0.06)",
-                color: `var(${cpTier.cssVar})`,
-              }}
-            >
-              ● {cpTier.label}
-            </div>
-
-            <div
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: 500,
-                fontSize: 13,
-                color: "var(--color-text-40)",
-                marginTop: 10,
-              }}
-            >
-              CI {ciRounded ?? "—"} + event impact {pulseDelta >= 0 ? "+" : ""}{pulseDelta.toFixed(1)} · {pulseScore!.activeEvents} events in trailing 120d
-            </div>
-          </>
-        ) : (
-          <div
             style={{
               fontFamily: "var(--font-mono)",
-              fontWeight: 500,
-              fontSize: 14,
-              color: "var(--color-text-40)",
-              paddingTop: 16,
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-11)",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: tierColor,
             }}
           >
-            No Pulse score yet
-          </div>
-        )}
+            {tierLabel}
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-11)",
+              color: "var(--color-text-40)",
+            }}
+          >
+            {secondaryLine}
+          </span>
+        </div>
+
+        <div
+          style={{
+            height: 8,
+            borderRadius: "999px",
+            background: "var(--color-card-border)",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: `${Math.max(0, Math.min(barValue, 100))}%`,
+              height: "100%",
+              background: tierColor,
+            }}
+          />
+        </div>
       </div>
+
+      <p
+        style={{
+          margin: 0,
+          fontFamily: "var(--font-body-sans, var(--font-body))",
+          fontSize: "var(--text-13)",
+          lineHeight: "var(--leading-relaxed)",
+          color: "var(--color-text-55)",
+        }}
+      >
+        {footer}
+      </p>
     </div>
+  );
+}
+
+export function CIPulseScoreDisplay({
+  ciScore,
+  pulseScore,
+  ciChangeText,
+}: CIPulseScoreDisplayProps) {
+  const ciTierInfo = ciScore ? ciTier(ciScore.score) : null;
+  const pulseTierInfo = pulseScore ? ciTier(pulseScore.pulseScore) : null;
+
+  const ciFooter =
+    ciScore && ciTierInfo
+      ? [
+          ciScore.rank && ciScore.totalRanked
+            ? `Rank ${ciScore.rank} of ${ciScore.totalRanked}.`
+            : null,
+          "Structural index across six weighted dimensions.",
+          ciScore.isPartial ? "Current quarter is partial." : "Updated quarterly.",
+        ]
+          .filter(Boolean)
+          .join(" ")
+      : "Composite score not available yet.";
+
+  const pulseFooter =
+    pulseScore && pulseTierInfo
+      ? [
+          `${pulseScore.activeEvents} active event${pulseScore.activeEvents === 1 ? "" : "s"} in the trailing 120 days.`,
+          `Last refresh ${formatDateLabel(pulseScore.scoreDate)}.`,
+          pulseScore.isLowConfidence ? "Low confidence." : null,
+        ]
+          .filter(Boolean)
+          .join(" ")
+      : "Pulse score not available yet.";
+
+  return (
+    <section
+      aria-label="Civica Index and Civica Pulse scores"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+        gap: 1,
+        border: "1px solid var(--color-card-border)",
+        borderRadius: "var(--radius-sm)",
+        overflow: "hidden",
+        background: "var(--color-card-border)",
+        boxShadow: "var(--shadow-hard-lg)",
+        marginBottom: 24,
+      }}
+    >
+      <ScorePane
+        title="Civica Index"
+        chip={ciScore ? `CI · ${formatQuarter(ciScore.quarter)}` : "CI · Pending"}
+        provenance="frozen"
+        scoreLabel="/ 100"
+        tierLabel={ciTierInfo ? ciTierInfo.label : "Unscored"}
+        tierColor={ciTierInfo ? ciTierInfo.cssVar : "var(--color-text-40)"}
+        scoreValue={ciScore ? ciScore.score.toFixed(1) : "—"}
+        barValue={ciScore?.score ?? 0}
+        secondaryLine={ciChangeText ?? (ciScore?.isPartial ? "Partial quarter" : "Quarterly cadence")}
+        footer={ciFooter}
+      />
+
+      <ScorePane
+        title="Civica Pulse"
+        chip="CP · Live"
+        provenance="live"
+        scoreLabel="/ 100"
+        tierLabel={pulseTierInfo ? pulseTierInfo.label : "Awaiting events"}
+        tierColor={pulseTierInfo ? pulseTierInfo.cssVar : "var(--color-text-40)"}
+        scoreValue={pulseScore ? pulseScore.pulseScore.toFixed(1) : "—"}
+        barValue={pulseScore?.pulseScore ?? 0}
+        secondaryLine={pulseScore ? formatPulseDelta(pulseScore.eventImpact) : "Daily cadence"}
+        footer={pulseFooter}
+      />
+    </section>
   );
 }

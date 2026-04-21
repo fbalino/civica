@@ -6,6 +6,11 @@ import {
   getCICountryHistory,
   getPulseChangelog,
 } from "@/lib/db/queries";
+import {
+  CIPulseScoreDisplay,
+  type CIScoreData,
+  type PulseScoreData,
+} from "@/components/ci/CIPulseScoreDisplay";
 import { CountryFlag } from "@/components/CountryFlag";
 import { SourceDot } from "@/components/SourceDot";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
@@ -47,12 +52,6 @@ function pulseImpactColor(impact: number): string {
   if (impact < -2) return "oklch(52% 0.18 145)";
   if (impact < 0) return "oklch(65% 0.17 85)";
   return "var(--color-text-30)";
-}
-
-function ordinal(n: number): string {
-  const s = ["th", "st", "nd", "rd"];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
 function formatQuarter(q: string): string {
@@ -429,7 +428,6 @@ export default async function CICountryDetailPage({
 
   const { jurisdiction, composite, dimensions, pulse } = detail;
   const score = composite ? Math.round(composite.score) : null;
-  const tier = score !== null ? ciTier(score) : null;
 
   const historyArr = Array.isArray(history)
     ? history
@@ -440,6 +438,34 @@ export default async function CICountryDetailPage({
     rank: number | null;
     totalRanked: number | null;
   }[];
+  const ciScoreData: CIScoreData | null = composite
+    ? {
+        score: Number(composite.score ?? 0),
+        rank: composite.rank ?? null,
+        totalRanked: composite.totalRanked ?? null,
+        quarter: composite.quarter,
+        isPartial: Boolean(composite.isPartial),
+      }
+    : null;
+  const pulseScoreData: PulseScoreData | null = pulse
+    ? {
+        pulseScore: Number(pulse.pulseScore ?? 0),
+        eventImpact: Number(pulse.eventImpact ?? 0),
+        activeEvents: Number(pulse.activeEvents ?? 0),
+        scoreDate: pulse.scoreDate ? String(pulse.scoreDate) : "",
+        isLowConfidence: Boolean(pulse.isLowConfidence),
+      }
+    : null;
+  const previousHistoryPoint =
+    typedHistory.length >= 2 ? typedHistory[typedHistory.length - 2] : null;
+  const latestHistoryPoint =
+    typedHistory.length >= 1 ? typedHistory[typedHistory.length - 1] : null;
+  const ciChangeText =
+    previousHistoryPoint && latestHistoryPoint
+      ? `${latestHistoryPoint.score - previousHistoryPoint.score >= 0 ? "+" : ""}${(
+          latestHistoryPoint.score - previousHistoryPoint.score
+        ).toFixed(1)} vs ${formatQuarter(previousHistoryPoint.quarter)}`
+      : null;
 
   return (
     <div
@@ -507,108 +533,12 @@ export default async function CICountryDetailPage({
         </div>
       </div>
 
-      {/* CI Score hero */}
-      {score !== null && tier ? (
-        <div
-          className="cv-card"
-          style={{
-            marginBottom: 24,
-            display: "flex",
-            alignItems: "center",
-            gap: 24,
-            flexWrap: "wrap",
-          }}
-        >
-          {/* Big score */}
-          <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-            <span
-              style={{
-                fontFamily: "var(--font-heading)",
-                fontSize: "var(--text-56, 56px)",
-                lineHeight: 1,
-                color: "var(--color-text-primary)",
-                letterSpacing: "var(--tracking-tight)",
-              }}
-            >
-              {score}
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-14)",
-                color: "var(--color-text-30)",
-              }}
-            >
-              / 100
-            </span>
-          </div>
-
-          {/* Tier badge */}
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: tier.bg,
-              color: tier.color,
-              borderRadius: "var(--radius-sm)",
-              padding: "4px 14px",
-              fontFamily: "var(--font-mono)",
-              fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-13)",
-            }}
-          >
-            {tier.label}
-          </span>
-
-          {/* Rank */}
-          {composite?.rank && composite.totalRanked && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <span
-                style={{
-                  fontFamily: "var(--font-heading)",
-                  fontSize: "var(--text-24)",
-                  color: "var(--color-accent, oklch(55% 0.18 245))",
-                  lineHeight: 1,
-                }}
-              >
-                {ordinal(composite.rank)}
-              </span>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-10)",
-                  color: "var(--color-text-25)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                of {composite.totalRanked} countries
-              </span>
-            </div>
-          )}
-
-          {/* Quarter label */}
-          {composite?.quarter && (
-            <div style={{ marginLeft: "auto" }}>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-10)",
-                  color: "var(--color-text-25)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                {composite.quarter}
-                <SourceDot source="civica" retrievedAt={new Date().toISOString().slice(0, 10)} />
-              </span>
-            </div>
-          )}
-        </div>
+      {(ciScoreData || pulseScoreData) ? (
+        <CIPulseScoreDisplay
+          ciScore={ciScoreData}
+          pulseScore={pulseScoreData}
+          ciChangeText={ciChangeText}
+        />
       ) : (
         <div className="cv-card" style={{ marginBottom: 24 }}>
           <p
@@ -642,98 +572,6 @@ export default async function CICountryDetailPage({
             Dimension Scores
           </h2>
           <DimensionBars dimensions={dimensions} />
-        </div>
-      )}
-
-      {/* Pulse score */}
-      {pulse && (
-        <div className="cv-card" style={{ marginBottom: 24 }}>
-          <h2
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
-              color: "var(--color-text-30)",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              margin: "0 0 12px",
-            }}
-          >
-            Civica Pulse
-          </h2>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-            <span
-              style={{
-                fontFamily: "var(--font-heading)",
-                fontSize: "var(--text-36)",
-                color: "var(--color-text-primary)",
-                lineHeight: 1,
-              }}
-            >
-              {pulse.pulseScore.toFixed(1)}
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-12)",
-                color: "var(--color-text-30)",
-              }}
-            >
-              / 100
-              <SourceDot
-                source="civica"
-                retrievedAt={
-                  typeof pulse.scoreDate === "string"
-                    ? pulse.scoreDate
-                    : new Date().toISOString().slice(0, 10)
-                }
-              />
-            </span>
-
-            {pulse.eventImpact !== 0 && (
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-12)",
-                  color: pulseImpactColor(pulse.eventImpact),
-                }}
-              >
-                {pulse.eventImpact > 0 ? "+" : ""}
-                {pulse.eventImpact.toFixed(1)} event impact
-              </span>
-            )}
-
-            {pulse.activeEvents > 0 && (
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-11)",
-                  color: "var(--color-text-30)",
-                }}
-              >
-                {pulse.activeEvents} active event{pulse.activeEvents !== 1 ? "s" : ""}
-              </span>
-            )}
-
-            {pulse.isLowConfidence && (
-              <span
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-10)",
-                  color: "var(--color-text-25)",
-                  padding: "2px 6px",
-                  border: "1px solid var(--color-card-border)",
-                  borderRadius: "var(--radius-sm)",
-                }}
-              >
-                low confidence
-              </span>
-            )}
-          </div>
         </div>
       )}
 
