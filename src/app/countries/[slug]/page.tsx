@@ -1200,19 +1200,19 @@ export default async function CountryPage({
             }}
           >
             <Link
-              href={`/index/${slug}`}
+              href={`/civica-index/${slug}`}
               style={{ color: "var(--color-accent)", textDecoration: "none" }}
             >
               See full Civica Index breakdown →
             </Link>
             <Link
-              href={`/index/changelog?country=${slug}`}
+              href={`/civica-index/changelog?country=${slug}`}
               style={{ color: "var(--color-accent)", textDecoration: "none" }}
             >
               Pulse events
             </Link>
             <Link
-              href="/index/methodology"
+              href="/civica-index/methodology"
               style={{ color: "var(--color-accent)", textDecoration: "none" }}
             >
               Methodology

@@ -65,7 +65,7 @@
   --color-gov-absolute: #C4A44E;
   --color-gov-other: #8899AA;
 
-  /* Short aliases used by /index/government-types */
+  /* Short aliases used by /civica-index/government-types */
   --gov-parl: #4E8BD4;
   --gov-pres: #D4764E;
   --gov-semi: #9B6DC6;
@@ -146,7 +146,7 @@
   --tier-weak:        oklch(62% 0.15 45);
   --tier-failed:      oklch(55% 0.18 25);
 
-  /* --- Comparison series colors (used on /index/compare) --- */
+  /* --- Comparison series colors (used on /civica-index/compare) --- */
   --series-a: oklch(72% 0.15 35);
   --series-b: oklch(68% 0.13 220);
   --series-c: oklch(72% 0.14 150);

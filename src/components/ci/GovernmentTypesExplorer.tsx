@@ -318,7 +318,7 @@ function StatsTable({ rows }: { rows: GovTypeRow[] }) {
                       }}
                     />
                     <Link
-                      href={`/index?governmentType=${encodeURIComponent(row.governmentType)}`}
+                      href={`/civica-index?governmentType=${encodeURIComponent(row.governmentType)}`}
                       style={{ color: "inherit", textDecoration: "none" }}
                       className="gt-table-link"
                     >
@@ -530,13 +530,13 @@ export function GovernmentTypesExplorer({ data }: { data: GovTypeRow[] }) {
           color: "var(--color-text-25)",
         }}
       >
-        <Link href="/index" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
+        <Link href="/civica-index" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
           ← All Countries
         </Link>
-        <Link href="/index/compare" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
+        <Link href="/civica-index/compare" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
           Compare Countries
         </Link>
-        <Link href="/index/methodology" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
+        <Link href="/civica-index/methodology" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
           Methodology
         </Link>
       </div>

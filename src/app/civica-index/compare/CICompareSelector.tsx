@@ -185,8 +185,8 @@ export function CICompareSelector({
       const params = new URLSearchParams();
       slugs.forEach((s) => params.append("c", s));
       const nextUrl = params.toString()
-        ? `/index/compare?${params.toString()}`
-        : "/index/compare";
+        ? `/civica-index/compare?${params.toString()}`
+        : "/civica-index/compare";
       router.replace(nextUrl, { scroll: false });
     },
     [router]

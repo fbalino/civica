@@ -216,7 +216,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     })
     .join("");
 
-  const smBody = `<a class="civica-widget small" href="https://civicaatlas.org/index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const smBody = `<a class="civica-widget small" href="https://civicaatlas.org/civica-index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="mark serif">C</div>
   <div class="body">
     <div class="country">${esc(jurisdiction.name)}</div>
@@ -225,7 +225,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="score serif">${esc(ciDisplay)}</div>
 </a>`;
 
-  const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/civica-index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
     <div class="gov mono">${esc(govType)}</div>
@@ -244,7 +244,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   </div>
 </a>`;
 
-  const lgBody = `<a class="civica-widget large" href="https://civicaatlas.org/index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const lgBody = `<a class="civica-widget large" href="https://civicaatlas.org/civica-index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
     <div class="gov mono">${esc(govType)}</div>
