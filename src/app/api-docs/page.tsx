@@ -545,6 +545,97 @@ for country in resp.json()["data"]:
           non-commercial licenses.
         </p>
       </section>
+
+      <div style={{ height: 1, background: "var(--color-divider)", margin: "40px 0" }} />
+
+      <section>
+        <h2
+          style={{
+            fontFamily: "var(--font-heading)",
+            fontSize: "var(--text-24)",
+            fontWeight: 400,
+            letterSpacing: "var(--tracking-tight)",
+            marginBottom: 16,
+            color: "var(--color-text-primary)",
+          }}
+        >
+          Widget Embed
+        </h2>
+        <p style={{ ...bodyText, fontSize: "var(--text-13)", marginBottom: 24 }}>
+          Embed a live Civica Index widget on any website using a standard{" "}
+          <code style={mono}>&lt;iframe&gt;</code>. Widgets update every 5 minutes and
+          respect the visitor&rsquo;s system color scheme by default. Override with{" "}
+          <code style={mono}>?theme=light</code> or <code style={mono}>?theme=dark</code>.
+          Add <code style={mono}>?dims=1</code> to the large widget to show dimension mini-bars.
+        </p>
+
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ ...mono, fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+            Small — 300 × 80
+          </p>
+          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=sm"
+        width="300" height="80" loading="lazy"
+        title="Civica Index — Brazil"></iframe>`}</CodeBlock>
+        </div>
+
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ ...mono, fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+            Medium — 320 × 180
+          </p>
+          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/denmark?size=md"
+        width="320" height="180" loading="lazy"
+        title="Civica Index — Denmark"></iframe>`}</CodeBlock>
+        </div>
+
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ ...mono, fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
+            Large — 400 × 260 (with dimensions)
+          </p>
+          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=lg&dims=1"
+        width="400" height="260" loading="lazy"
+        title="Civica Index — Brazil"></iframe>`}</CodeBlock>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid var(--color-divider)",
+            borderRadius: 6,
+            overflow: "hidden",
+          }}
+        >
+          <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--color-divider)", background: "var(--color-card-bg)" }}>
+            <span style={{ ...mono, fontSize: "var(--text-10)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+              Query Parameters
+            </span>
+          </div>
+          {[
+            { name: "size", type: "sm | md | lg", description: "Widget dimensions. Default: md" },
+            { name: "theme", type: "light | dark", description: "Override color scheme. Default: system prefers-color-scheme" },
+            { name: "dims", type: "0 | 1", description: "Show 6 dimension mini-bars in large widget. Default: 0" },
+          ].map((param, i) => (
+            <div
+              key={param.name}
+              style={{
+                display: "flex",
+                gap: 16,
+                padding: "10px 16px",
+                borderTop: i > 0 ? "1px solid var(--color-divider)" : undefined,
+                alignItems: "baseline",
+              }}
+            >
+              <code style={{ ...mono, fontSize: "var(--text-11)", color: "var(--color-text-primary)", minWidth: 80 }}>
+                {param.name}
+              </code>
+              <span style={{ ...mono, fontSize: "var(--text-10)", color: "var(--color-text-30)", minWidth: 110 }}>
+                {param.type}
+              </span>
+              <span style={{ ...bodyText, fontSize: "var(--text-11)" }}>
+                {param.description}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
