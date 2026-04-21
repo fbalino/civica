@@ -35,6 +35,9 @@ All sources tracked in `sources` table. Every fact has statement-level provenanc
 - `npm run seed:sources` — seed the sources table
 - `npm run seed:factbook` — import CIA World Factbook (clones repo, imports 260+ countries)
 - `npm run sync:wikidata` — sync heads of state/government from Wikidata SPARQL
+- `npm run seed:ci-methodology` — seed CI methodology v1.0 and data sources
+- `npm run ingest:ci` — ingest all CI dimension data from source adapters
+- `npm run calculate:ci` — calculate CI composite scores and rankings (optional: `-- <quarter> <version>`)
 - `npm run db:generate` — generate Drizzle migrations
 - `npm run db:push` — push schema to database
 
