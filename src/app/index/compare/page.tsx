@@ -6,9 +6,7 @@ import {
   compareCICountries,
   getCICountryHistory,
 } from "@/lib/db/queries";
-import { CountryFlag } from "@/components/CountryFlag";
 import { CICompareSelector } from "./CICompareSelector";
-import { ciTier } from "@/lib/ci/tiers";
 
 export const metadata: Metadata = {
   title: "Compare Countries — Civica Index",
@@ -259,6 +257,29 @@ export default async function CIComparePage({
     .map((slug) => compareData.find((c) => c.jurisdiction.slug === slug))
     .filter(Boolean) as CompareCIResult;
 
+  const selectedCards = [0, 1, 2].map((index) => {
+    const country = ordered[index];
+    if (!country) return null;
+    return {
+      slug: country.jurisdiction.slug,
+      name: country.jurisdiction.name,
+      iso2: country.jurisdiction.iso2 ?? null,
+      score:
+        country.composite && country.composite.score !== null
+          ? Number(country.composite.score)
+          : null,
+      rank: country.composite?.rank ?? null,
+      governmentType: country.jurisdiction.governmentType
+        ? govShort(country.jurisdiction.governmentType)
+        : null,
+      continent: country.jurisdiction.continent ?? null,
+      populationLabel:
+        country.jurisdiction.population && country.jurisdiction.population > 0
+          ? fmtPop(country.jurisdiction.population)
+          : null,
+    };
+  });
+
   const timelineSeries = ordered.map((country, i) => {
     const hist = historyArrays[validSlugs.indexOf(country.jurisdiction.slug)] ?? [];
     const arr = (Array.isArray(hist) ? hist : (hist as { rows: unknown[] }).rows ?? []) as {
@@ -335,7 +356,10 @@ export default async function CIComparePage({
 
       <section className="picker-row" aria-label="Country slots">
         <Suspense fallback={null}>
-          <CICompareSelector countries={countryList} />
+          <CICompareSelector
+            countries={countryList}
+            selectedCards={selectedCards}
+          />
         </Suspense>
       </section>
 
@@ -357,65 +381,6 @@ export default async function CIComparePage({
 
       {hasData && (
         <>
-          <section className="score-row" aria-label="Picked countries">
-            {ordered.map((country, i) => {
-              const score =
-                country.composite && country.composite.score !== null
-                  ? Math.round(Number(country.composite.score))
-                  : null;
-              const tier = score !== null ? ciTier(score) : null;
-              const colorVar = SERIES_VARS[i] ?? SERIES_VARS[0];
-              return (
-                <article
-                  key={country.jurisdiction.slug}
-                  className="score-card"
-                  style={{ borderTopColor: colorVar }}
-                >
-                  <div className="score-card-slot">
-                    Country {SERIES_LETTERS[i]}
-                  </div>
-                  <div className="score-card-name">
-                    <CountryFlag iso2={country.jurisdiction.iso2} size={22} />
-                    <Link href={`/index/${country.jurisdiction.slug}`}>
-                      {country.jurisdiction.name}
-                    </Link>
-                  </div>
-                  <div className="score-card-score">
-                    {score !== null ? (
-                      <>
-                        <span className="score-val" style={{ color: colorVar }}>
-                          {score}
-                        </span>
-                        <span className="score-label">
-                          CI
-                          {country.composite?.rank
-                            ? ` · rank ${country.composite.rank}`
-                            : ""}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="score-none">No score</span>
-                    )}
-                  </div>
-                  {tier && (
-                    <div className="score-tier" style={{ color: tier.cssVar }}>
-                      ● {tier.label}
-                    </div>
-                  )}
-                  <div className="score-meta">
-                    {[
-                      govShort(country.jurisdiction.governmentType ?? null),
-                      country.jurisdiction.continent ?? null,
-                      fmtPop(country.jurisdiction.population ?? null),
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </div>
-                </article>
-              );
-            })}
-          </section>
-
           {hasTimeline && (
             <section className="chart-block" aria-label="Timeline overlay">
               <div className="chart-header">
@@ -610,6 +575,142 @@ export default async function CIComparePage({
         }
 
         .picker-row { margin: 40px 0 24px; }
+        .compare-selector-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+        }
+        .ci-compare-picker-card {
+          background: var(--color-grid-cell);
+          border: 1px solid var(--color-card-border);
+          border-top: 3px solid var(--series-a);
+          border-radius: 4px;
+          padding: 20px 22px;
+          min-height: 196px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .ci-compare-picker-slot {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: var(--color-text-30);
+        }
+        .ci-compare-picker-name {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          min-height: 28px;
+          font-family: var(--font-heading, var(--font-serif));
+          font-size: 28px;
+          font-weight: 400;
+          letter-spacing: -0.02em;
+          line-height: 1;
+          color: var(--color-text-primary);
+        }
+        .ci-compare-picker-score {
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+          min-height: 38px;
+          font-family: var(--font-heading, var(--font-serif));
+        }
+        .ci-compare-picker-score-val {
+          font-size: 32px;
+          font-weight: 500;
+          letter-spacing: -0.02em;
+          line-height: 1;
+        }
+        .ci-compare-picker-score-label {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--color-text-30);
+        }
+        .ci-compare-picker-meta {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 11px;
+          color: var(--color-text-30);
+          min-height: 32px;
+        }
+        .ci-compare-picker-remove {
+          margin-top: auto;
+          width: fit-content;
+          background: transparent;
+          border: 1px solid var(--color-card-border);
+          border-radius: 2px;
+          padding: 6px 10px;
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 10px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--color-text-40);
+          cursor: pointer;
+          transition: border-color 120ms ease, color 120ms ease, background 120ms ease;
+        }
+        .ci-compare-picker-remove:hover {
+          color: var(--color-text-primary);
+          border-color: var(--color-card-hover-border);
+          background: color-mix(in oklch, var(--color-card-hover-bg) 55%, transparent);
+        }
+        .ci-compare-picker-search {
+          width: 100%;
+          margin-top: 2px;
+          background: var(--color-bg);
+          color: var(--color-text-primary);
+          border: 1px solid var(--color-card-border);
+          border-radius: 4px;
+          padding: 10px 12px;
+          font-family: var(--font-mono);
+          font-size: 13px;
+          outline: none;
+        }
+        .ci-compare-picker-search::placeholder {
+          color: var(--color-text-30);
+        }
+        .ci-compare-picker-search:focus {
+          border-color: var(--color-card-hover-border);
+          box-shadow: 0 0 0 1px color-mix(in oklch, var(--color-card-hover-border) 60%, transparent);
+        }
+        .ci-compare-picker-empty {
+          margin-top: auto;
+          padding-top: 12px;
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 12px;
+          letter-spacing: 0.04em;
+          color: var(--color-text-30);
+        }
+        .ci-compare-picker-menu {
+          border-radius: 4px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+        }
+        .ci-compare-picker-option {
+          width: 100%;
+          text-align: left;
+          padding: 10px 12px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          color: var(--color-text-primary);
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 13px;
+          transition: background 120ms ease, color 120ms ease;
+        }
+        .ci-compare-picker-option:hover {
+          background: var(--color-card-hover-bg);
+        }
 
         .ci-empty {
           padding: 80px 0;
@@ -625,77 +726,6 @@ export default async function CIComparePage({
           font-family: var(--font-mono);
           font-size: 12px;
           color: var(--color-text-25);
-        }
-
-        .score-row {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          margin-bottom: 32px;
-        }
-        .score-card {
-          background: var(--color-grid-cell);
-          border: 1px solid var(--color-card-border);
-          border-top: 3px solid var(--series-a);
-          border-radius: 4px;
-          padding: 20px 22px;
-          display: flex; flex-direction: column; gap: 10px;
-        }
-        .score-card-slot {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 10px;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          color: var(--color-text-30);
-        }
-        .score-card-name {
-          display: flex; align-items: center; gap: 10px;
-        }
-        .score-card-name a {
-          font-family: var(--font-heading, var(--font-serif));
-          font-size: 28px;
-          font-weight: 400;
-          letter-spacing: -0.02em;
-          color: var(--color-text-primary);
-          text-decoration: none;
-          line-height: 1;
-        }
-        .score-card-name a:hover { color: var(--color-accent); }
-        .score-card-score {
-          display: flex; align-items: baseline; gap: 8px;
-          font-family: var(--font-heading, var(--font-serif));
-        }
-        .score-val {
-          font-size: 32px;
-          font-weight: 500;
-          letter-spacing: -0.02em;
-        }
-        .score-label {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 11px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          color: var(--color-text-30);
-        }
-        .score-none {
-          font-family: var(--font-mono);
-          font-size: 13px;
-          color: var(--color-text-40);
-        }
-        .score-tier {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 11px;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-        .score-meta {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 11px;
-          color: var(--color-text-30);
         }
 
         .chart-block {
@@ -860,7 +890,7 @@ export default async function CIComparePage({
 
         @media (max-width: 900px) {
           .page-title { font-size: 40px; }
-          .score-row { grid-template-columns: 1fr; }
+          .compare-selector-grid { grid-template-columns: 1fr; }
           .dim-compare-header,
           .dim-compare-row {
             grid-template-columns: 1fr;
