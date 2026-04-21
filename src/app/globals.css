@@ -65,6 +65,17 @@
   --color-gov-absolute: #C4A44E;
   --color-gov-other: #8899AA;
 
+  /* Short aliases used by /index/government-types */
+  --gov-parl: #4E8BD4;
+  --gov-pres: #D4764E;
+  --gov-semi: #9B6DC6;
+  --gov-mon:  #C4A44E;
+  --gov-abs:  #C4A44E;
+  --gov-theo: #5CAA6E;
+  --gov-one:  #D4764E;
+  --gov-mil:  #C65A37;
+  --gov-other:#8899AA;
+
   /* --- Government branch colors --- */
   --color-branch-executive: #D4764E;
   --color-branch-legislative: #4E8BD4;
@@ -134,6 +145,11 @@
   --tier-mixed:       oklch(75% 0.14 75);
   --tier-weak:        oklch(62% 0.15 45);
   --tier-failed:      oklch(55% 0.18 25);
+
+  /* --- Comparison series colors (used on /index/compare) --- */
+  --series-a: oklch(72% 0.15 35);
+  --series-b: oklch(68% 0.13 220);
+  --series-c: oklch(72% 0.14 150);
 
   /* --- Branch backgrounds (alpha) --- */
   --color-branch-executive-bg: rgba(212, 118, 78, 0.15);
@@ -206,6 +222,11 @@
   --tier-mixed:       oklch(65% 0.14 75);
   --tier-weak:        oklch(55% 0.15 45);
   --tier-failed:      oklch(52% 0.18 25);
+
+  /* --- Comparison series colors (light) --- */
+  --series-a: oklch(55% 0.16 35);
+  --series-b: oklch(48% 0.13 220);
+  --series-c: oklch(55% 0.14 150);
 
   --color-branch-executive-bg: rgba(212, 118, 78, 0.12);
   --color-branch-legislative-bg: rgba(78, 139, 212, 0.12);

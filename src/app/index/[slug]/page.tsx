@@ -8,6 +8,7 @@ import {
 } from "@/lib/db/queries";
 import { CountryFlag } from "@/components/CountryFlag";
 import { SourceDot } from "@/components/SourceDot";
+import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
 
 const DIMENSION_LABELS: Record<string, string> = {
   democratic_quality: "Democratic Quality",
@@ -28,18 +29,16 @@ const DIMENSION_ORDER = [
 ];
 
 function ciTier(score: number): { label: string; color: string; bg: string } {
-  if (score >= 90) return { label: "Elite", color: "#fff", bg: "oklch(55% 0.18 245)" };
-  if (score >= 75) return { label: "Strong", color: "#fff", bg: "oklch(52% 0.18 145)" };
-  if (score >= 50) return { label: "Moderate", color: "#1a1208", bg: "oklch(82% 0.17 85)" };
-  if (score >= 25) return { label: "Weak", color: "#fff", bg: "oklch(60% 0.17 45)" };
-  return { label: "Critical", color: "#fff", bg: "oklch(52% 0.20 25)" };
+  const info = ciTierCanonical(score);
+  return {
+    label: info.label,
+    color: score >= 50 && score < 75 ? "#1a1208" : "#fff",
+    bg: info.cssVar,
+  };
 }
 
 function dimensionColor(score: number): string {
-  if (score >= 75) return "oklch(52% 0.18 145)";
-  if (score >= 50) return "oklch(65% 0.17 85)";
-  if (score >= 25) return "oklch(60% 0.17 45)";
-  return "oklch(52% 0.20 25)";
+  return ciTierCanonical(score).cssVar;
 }
 
 function pulseImpactColor(impact: number): string {

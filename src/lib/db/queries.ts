@@ -930,6 +930,42 @@ export async function getCIByGovernmentType(quarter?: string) {
   `);
 }
 
+export async function getCIByGovernmentTypeDots(quarter?: string) {
+  const q = quarter ?? await getLatestAvailableQuarter();
+
+  return db.execute(sql`
+    SELECT
+      j.government_type  AS "governmentType",
+      j.slug,
+      j.name,
+      j.iso2,
+      cs.score
+    FROM ci_composite_scores cs
+    JOIN jurisdictions j ON cs.jurisdiction_id = j.id
+    WHERE cs.quarter = ${q}
+      AND j.government_type IS NOT NULL
+      AND j.type = 'sovereign_state'
+    ORDER BY j.government_type, cs.score DESC
+  `);
+}
+
+export async function getGovTypeTrajectory() {
+  return db.execute(sql`
+    SELECT
+      cs.quarter,
+      j.government_type  AS "governmentType",
+      AVG(cs.score)       AS "avgScore",
+      COUNT(*)::int       AS "countryCount"
+    FROM ci_composite_scores cs
+    JOIN jurisdictions j ON cs.jurisdiction_id = j.id
+    WHERE j.government_type IS NOT NULL
+      AND j.type = 'sovereign_state'
+    GROUP BY cs.quarter, j.government_type
+    HAVING COUNT(*) >= 3
+    ORDER BY cs.quarter ASC, j.government_type ASC
+  `);
+}
+
 export async function getCIMethodology(versionId?: string) {
   if (versionId) {
     const [row] = await db
@@ -978,7 +1014,16 @@ export async function getPulseChangelog(
       j.slug,
       j.name                    AS "countryName",
       j.iso2,
-      j.flag_url                AS "flagUrl"
+      j.flag_url                AS "flagUrl",
+      j.continent,
+      j.capital,
+      (
+        SELECT pds.pulse_score
+        FROM pulse_daily_scores pds
+        WHERE pds.jurisdiction_id = j.id
+        ORDER BY pds.score_date DESC
+        LIMIT 1
+      )                         AS "pulseLatest"
     FROM pulse_events pe
     JOIN jurisdictions j ON pe.jurisdiction_id = j.id
     WHERE j.type = 'sovereign_state'
@@ -986,6 +1031,57 @@ export async function getPulseChangelog(
     ORDER BY pe.event_date DESC, pe.created_at DESC
     LIMIT ${limit}
     OFFSET ${offset}
+  `);
+}
+
+export async function getPulseChangelogSummary(days = 30) {
+  return db.execute(sql`
+    WITH scoped AS (
+      SELECT pe.*, j.name AS country_name, j.continent
+      FROM pulse_events pe
+      JOIN jurisdictions j ON pe.jurisdiction_id = j.id
+      WHERE j.type = 'sovereign_state'
+        AND pe.event_date >= CURRENT_DATE - ${days}
+    ),
+    biggest_drop AS (
+      SELECT country_name, SUM(severity * confidence / 10.0) AS total
+      FROM scoped
+      GROUP BY country_name
+      ORDER BY total ASC
+      LIMIT 1
+    ),
+    biggest_gain AS (
+      SELECT country_name, SUM(severity * confidence / 10.0) AS total
+      FROM scoped
+      GROUP BY country_name
+      ORDER BY total DESC
+      LIMIT 1
+    )
+    SELECT
+      (SELECT COUNT(*)::int FROM scoped)                                 AS "totalEvents",
+      (SELECT COUNT(DISTINCT country_name)::int FROM scoped)             AS "countriesMoved",
+      (SELECT COUNT(*)::int FROM jurisdictions WHERE type = 'sovereign_state') AS "totalCountries",
+      (SELECT country_name FROM biggest_drop)                            AS "biggestDropCountry",
+      (SELECT total        FROM biggest_drop)                            AS "biggestDropValue",
+      (SELECT country_name FROM biggest_gain)                            AS "biggestGainCountry",
+      (SELECT total        FROM biggest_gain)                            AS "biggestGainValue"
+  `);
+}
+
+export async function getPulseChangelogDailyGlobal(days = 30) {
+  return db.execute(sql`
+    SELECT
+      pe.event_date                                                           AS "eventDate",
+      SUM(CASE WHEN pe.severity > 0 THEN pe.severity * pe.confidence ELSE 0 END)::float AS "positiveImpact",
+      SUM(CASE WHEN pe.severity < 0 THEN pe.severity * pe.confidence ELSE 0 END)::float AS "negativeImpact",
+      SUM(pe.severity * pe.confidence)::float                                 AS "netImpact",
+      COUNT(*)::int                                                           AS "eventCount"
+    FROM pulse_events pe
+    JOIN jurisdictions j ON pe.jurisdiction_id = j.id
+    WHERE j.type = 'sovereign_state'
+      AND pe.event_date >= CURRENT_DATE - ${days}
+    GROUP BY pe.event_date
+    ORDER BY pe.event_date ASC
   `);
 }
 

@@ -1,30 +1,35 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { getAllJurisdictions, compareCICountries, getCICountryHistory } from "@/lib/db/queries";
+import {
+  getAllJurisdictions,
+  compareCICountries,
+  getCICountryHistory,
+} from "@/lib/db/queries";
 import { CountryFlag } from "@/components/CountryFlag";
 import { CICompareSelector } from "./CICompareSelector";
+import { ciTier } from "@/lib/ci/tiers";
 
 export const metadata: Metadata = {
   title: "Compare Countries — Civica Index",
   description:
-    "Compare governance scores across 2–3 countries. Side-by-side CI dimension breakdowns and historical trajectories.",
+    "Compare two or three countries side by side. CI overlay on a shared timeline, dimension-by-dimension breakdown, and auto-generated head-to-head insights.",
   alternates: { canonical: "https://civicaatlas.org/index/compare" },
   openGraph: {
     title: "Compare Countries — Civica Index | Civica",
     description:
-      "Compare governance scores across 2–3 countries. Side-by-side CI dimension breakdowns and historical trajectories.",
+      "Overlay CI on a shared timeline, then drill into the six weighted dimensions to see where countries actually diverge.",
     url: "https://civicaatlas.org/index/compare",
   },
 };
 
 const DIMENSION_LABELS: Record<string, string> = {
-  democratic_quality: "Democratic Quality",
-  rule_of_law: "Rule of Law",
-  human_development: "Human Development",
-  freedom_rights: "Freedom & Rights",
-  corruption_control: "Corruption Control",
-  stability_security: "Stability & Security",
+  democratic_quality: "Democratic quality",
+  rule_of_law: "Rule of law & institutions",
+  human_development: "Human development",
+  freedom_rights: "Freedom & rights",
+  corruption_control: "Corruption control",
+  stability_security: "Stability & security",
 };
 
 const DIMENSION_ORDER = [
@@ -36,666 +41,835 @@ const DIMENSION_ORDER = [
   "stability_security",
 ];
 
-// Per-country palette — distinct in both dark and light mode
-const COUNTRY_COLORS = [
-  "oklch(55% 0.18 245)",  // blue
-  "oklch(62% 0.20 30)",   // orange-red
-  "oklch(52% 0.18 145)",  // green
+const DIMENSION_WEIGHTS: Record<string, number> = {
+  democratic_quality: 30,
+  rule_of_law: 20,
+  human_development: 15,
+  freedom_rights: 15,
+  corruption_control: 10,
+  stability_security: 10,
+};
+
+const SERIES_VARS = [
+  "var(--series-a, oklch(72% 0.15 35))",
+  "var(--series-b, oklch(68% 0.13 220))",
+  "var(--series-c, oklch(72% 0.14 150))",
 ];
 
-function ciTier(score: number): { label: string; color: string; bg: string } {
-  if (score >= 90) return { label: "Elite",    color: "#fff",     bg: "oklch(55% 0.18 245)" };
-  if (score >= 75) return { label: "Strong",   color: "#fff",     bg: "oklch(52% 0.18 145)" };
-  if (score >= 50) return { label: "Moderate", color: "#1a1208",  bg: "oklch(82% 0.17 85)"  };
-  if (score >= 25) return { label: "Weak",     color: "#fff",     bg: "oklch(60% 0.17 45)"  };
-  return               { label: "Critical",  color: "#fff",     bg: "oklch(52% 0.20 25)"  };
-}
+const SERIES_LETTERS = ["A", "B", "C"];
 
 function formatQuarter(q: string): string {
   const m = q.match(/^(\d{4})-Q(\d)$/);
   if (!m) return q;
-  return `Q${m[2]} '${m[1].slice(2)}`;
+  return `Q${m[2]} ${m[1]}`;
+}
+
+function fmtPop(pop: number | null): string {
+  if (!pop || pop <= 0) return "—";
+  if (pop >= 1_000_000_000) return `${(pop / 1_000_000_000).toFixed(1)}B`;
+  if (pop >= 1_000_000) return `${Math.round(pop / 1_000_000)}M`;
+  if (pop >= 1_000) return `${Math.round(pop / 1_000)}K`;
+  return `${pop}`;
+}
+
+function govShort(g: string | null): string {
+  if (!g) return "—";
+  return g
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
 }
 
 type HistoryPoint = { quarter: string; score: number };
 
-function MultiLineHistoryChart({
+type CompareCIResult = Awaited<ReturnType<typeof compareCICountries>>;
+type CIHistoryResult = Awaited<ReturnType<typeof getCICountryHistory>>;
+
+function TimelineOverlay({
   series,
 }: {
-  series: { name: string; color: string; data: HistoryPoint[] }[];
+  series: { name: string; colorVar: string; data: HistoryPoint[] }[];
 }) {
   const allPoints = series.flatMap((s) => s.data);
   if (allPoints.length === 0) return null;
 
-  // Build a unified quarter axis
   const quartersSet = new Set(allPoints.map((p) => p.quarter));
   const quarters = [...quartersSet].sort();
   if (quarters.length < 2) return null;
 
-  const W = 800;
-  const H = 200;
-  const PAD = { top: 16, right: 32, bottom: 36, left: 40 };
+  const W = 1120;
+  const H = 340;
+  const PAD = { top: 0, right: 0, bottom: 24, left: 36 };
   const chartW = W - PAD.left - PAD.right;
   const chartH = H - PAD.top - PAD.bottom;
 
-  const allScores = allPoints.map((p) => p.score);
-  const minScore = Math.max(0, Math.floor(Math.min(...allScores) / 10) * 10 - 10);
-  const maxScore = Math.min(100, Math.ceil(Math.max(...allScores) / 10) * 10 + 10);
-  const scoreRange = maxScore - minScore || 1;
-
+  const minScore = 0;
+  const maxScore = 100;
   const xStep = chartW / (quarters.length - 1);
 
-  function xAt(i: number) { return PAD.left + i * xStep; }
-  function yAt(score: number) { return PAD.top + chartH - ((score - minScore) / scoreRange) * chartH; }
+  function xAt(i: number) {
+    return PAD.left + i * xStep;
+  }
+  function yAt(score: number) {
+    return PAD.top + chartH - ((score - minScore) / (maxScore - minScore)) * chartH;
+  }
 
-  const yTicks = [minScore, minScore + Math.round(scoreRange / 2), maxScore];
+  // Tier band vertical extents (top→bottom: 100→90, 90→75, 75→50, 50→25, 25→0)
+  const bandTops = [
+    { from: 100, to: 90, color: "var(--tier-exceptional)" },
+    { from: 90, to: 75, color: "var(--tier-strong)" },
+    { from: 75, to: 50, color: "var(--tier-mixed)" },
+    { from: 50, to: 25, color: "var(--tier-weak)" },
+    { from: 25, to: 0, color: "var(--tier-failed)" },
+  ];
 
-  const xLabelIndices = new Set<number>([0, quarters.length - 1]);
+  const xLabelIdx = new Set<number>([0, quarters.length - 1]);
   if (quarters.length > 6) {
-    xLabelIndices.add(Math.round(quarters.length / 3));
-    xLabelIndices.add(Math.round((2 * quarters.length) / 3));
+    xLabelIdx.add(Math.round(quarters.length / 3));
+    xLabelIdx.add(Math.round((2 * quarters.length) / 3));
   }
 
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
-      width="100%"
-      style={{ display: "block", overflow: "visible" }}
-      aria-label="Historical CI score comparison chart"
+      preserveAspectRatio="none"
+      style={{ width: "100%", height: 340 }}
+      aria-label="CI timeline overlay"
     >
-      {/* Y-axis grid lines */}
-      {yTicks.map((tick) => (
-        <g key={tick}>
-          <line
-            x1={PAD.left} y1={yAt(tick)}
-            x2={PAD.left + chartW} y2={yAt(tick)}
-            stroke="currentColor" strokeOpacity="0.07" strokeWidth="1"
-          />
-          <text
-            x={PAD.left - 6} y={yAt(tick)}
-            textAnchor="end" dominantBaseline="middle"
-            fontSize="10" fontFamily="var(--font-mono)"
-            fill="currentColor" fillOpacity="0.35"
-          >
-            {tick}
-          </text>
-        </g>
+      {bandTops.map((b) => (
+        <rect
+          key={b.from}
+          x={PAD.left}
+          y={yAt(b.from)}
+          width={chartW}
+          height={yAt(b.to) - yAt(b.from)}
+          fill={b.color}
+          opacity="0.06"
+        />
       ))}
-
-      {/* X-axis labels */}
-      {quarters.map((q, i) =>
-        xLabelIndices.has(i) ? (
-          <text
-            key={`xl-${q}`}
-            x={xAt(i)} y={PAD.top + chartH + 16}
-            textAnchor="middle" fontSize="9"
-            fontFamily="var(--font-mono)" fill="currentColor" fillOpacity="0.35"
-          >
-            {formatQuarter(q)}
-          </text>
-        ) : null
-      )}
-
-      {/* Lines per country */}
+      <g stroke="var(--color-divider)" strokeWidth="1" opacity="0.6">
+        {[90, 75, 50, 25].map((v) => (
+          <line
+            key={v}
+            x1={PAD.left}
+            y1={yAt(v)}
+            x2={PAD.left + chartW}
+            y2={yAt(v)}
+          />
+        ))}
+      </g>
+      {[100, 90, 75, 50, 25].map((v) => (
+        <text
+          key={v}
+          x={4}
+          y={yAt(v) + 3}
+          fontFamily="ui-monospace, 'SF Mono', Menlo, monospace"
+          fontSize="10"
+          fill="var(--color-text-30)"
+          fontWeight="500"
+        >
+          {v}
+        </text>
+      ))}
       {series.map((s) => {
-        const points = quarters
+        const pts = quarters
           .map((q, i) => {
             const pt = s.data.find((d) => d.quarter === q);
             return pt ? { x: xAt(i), y: yAt(pt.score) } : null;
           })
           .filter(Boolean) as { x: number; y: number }[];
-
-        if (points.length < 2) return null;
-
-        // Split into segments (skip gaps)
-        const segments: { x: number; y: number }[][] = [];
-        let seg: { x: number; y: number }[] = [];
-        quarters.forEach((q, i) => {
-          const pt = s.data.find((d) => d.quarter === q);
-          if (pt) {
-            seg.push({ x: xAt(i), y: yAt(pt.score) });
-          } else {
-            if (seg.length >= 2) segments.push(seg);
-            seg = [];
-          }
-        });
-        if (seg.length >= 2) segments.push(seg);
-
+        if (pts.length < 2) return null;
+        const d = pts
+          .map((p, pi) => `${pi === 0 ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`)
+          .join(" ");
         return (
           <g key={s.name}>
-            {segments.map((sg, si) => {
-              const d = sg.map((p, pi) => `${pi === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
-              return (
-                <path key={si} d={d} fill="none" stroke={s.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              );
-            })}
-            {points.map((p, pi) => (
-              <circle key={pi} cx={p.x} cy={p.y} r="3.5" fill={s.color} />
+            <path d={d} fill="none" stroke={s.colorVar} strokeWidth="2" />
+            {pts.map((p, pi) => (
+              <circle
+                key={pi}
+                cx={p.x}
+                cy={p.y}
+                r={3}
+                fill={s.colorVar}
+              />
             ))}
           </g>
         );
       })}
-    </svg>
-  );
-}
-
-function DimensionCompareChart({
-  series,
-}: {
-  series: { name: string; color: string; dimensions: { dimension: string; score: number }[] }[];
-}) {
-  if (series.length === 0) return null;
-
-  const dims = DIMENSION_ORDER.filter((dim) =>
-    series.some((s) => s.dimensions.find((d) => d.dimension === dim))
-  );
-
-  if (dims.length === 0) return null;
-
-  const BAR_H = 10;
-  const GAP = 3;
-  const GROUP_GAP = 18;
-  const groupH = series.length * BAR_H + (series.length - 1) * GAP;
-  const rowH = groupH + GROUP_GAP;
-  const totalH = dims.length * rowH - GROUP_GAP + 2;
-  const LABEL_W = 130;
-  const SCORE_W = 36;
-  const W = 760;
-  const barW = W - LABEL_W - SCORE_W - 16;
-
-  return (
-    <svg
-      viewBox={`0 0 ${W} ${totalH}`}
-      width="100%"
-      style={{ display: "block", overflow: "visible" }}
-      aria-label="Dimension score comparison"
-    >
-      {dims.map((dim, di) => {
-        const y0 = di * rowH;
-        return (
-          <g key={dim}>
-            {/* Dimension label */}
+      <g
+        fontFamily="ui-monospace, 'SF Mono', Menlo, monospace"
+        fontSize="10"
+        fill="var(--color-text-30)"
+        fontWeight="500"
+      >
+        {quarters.map((q, i) =>
+          xLabelIdx.has(i) ? (
             <text
-              x={0} y={y0 + groupH / 2}
-              dominantBaseline="middle"
-              fontSize="10" fontFamily="var(--font-mono)"
-              fill="currentColor" fillOpacity="0.5"
-              style={{ textTransform: "uppercase" }}
+              key={q}
+              x={xAt(i)}
+              y={H - 6}
+              textAnchor={i === 0 ? "start" : i === quarters.length - 1 ? "end" : "middle"}
             >
-              {DIMENSION_LABELS[dim] ?? dim}
+              {formatQuarter(q)}
             </text>
-
-            {/* Bars per country */}
-            {series.map((s, si) => {
-              const d = s.dimensions.find((x) => x.dimension === dim);
-              const score = d ? Math.round(d.score) : 0;
-              const barFill = LABEL_W + (score / 100) * barW;
-              const y = y0 + si * (BAR_H + GAP);
-
-              return (
-                <g key={s.name}>
-                  {/* Background track */}
-                  <rect x={LABEL_W} y={y} width={barW} height={BAR_H} rx={3} fill="currentColor" fillOpacity="0.06" />
-                  {/* Filled bar */}
-                  {score > 0 && (
-                    <rect x={LABEL_W} y={y} width={(score / 100) * barW} height={BAR_H} rx={3} fill={s.color} />
-                  )}
-                  {/* Score label */}
-                  <text
-                    x={LABEL_W + barW + 8} y={y + BAR_H / 2}
-                    dominantBaseline="middle"
-                    fontSize="10" fontFamily="var(--font-mono)"
-                    fill={s.color} fillOpacity="0.9"
-                  >
-                    {score}
-                  </text>
-                </g>
-              );
-            })}
-          </g>
-        );
-      })}
+          ) : null
+        )}
+      </g>
     </svg>
   );
 }
-
-function countryFlag(iso2: string | null): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
-    .join("");
-}
-
-type CompareCIResult = Awaited<ReturnType<typeof compareCICountries>>;
-type CIHistoryResult = Awaited<ReturnType<typeof getCICountryHistory>>;
 
 export default async function CIComparePage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const resolvedParams = await searchParams;
-  const rawC = resolvedParams?.c;
+  const sp = await searchParams;
+  const rawC = sp?.c;
   const slugs: string[] = Array.isArray(rawC) ? rawC : rawC ? [rawC] : [];
-  const validSlugs = slugs.filter((s) => typeof s === "string" && s.length > 0).slice(0, 3);
+  const validSlugs = slugs
+    .filter((s) => typeof s === "string" && s.length > 0)
+    .slice(0, 3);
 
   let allCountries: Awaited<ReturnType<typeof getAllJurisdictions>> = [];
   try {
     allCountries = await getAllJurisdictions();
   } catch {}
-
-  const countryList = allCountries.map((c) => ({ slug: c.slug, name: c.name, iso2: c.iso2 }));
+  const countryList = allCountries.map((c) => ({
+    slug: c.slug,
+    name: c.name,
+    iso2: c.iso2,
+  }));
 
   let compareData: CompareCIResult = [];
-  let historyData: CIHistoryResult[] = [];
-
-  if (validSlugs.length >= 2) {
+  let historyArrays: CIHistoryResult[] = [];
+  if (validSlugs.length >= 1) {
     try {
-      [compareData, ...historyData] = await Promise.all([
+      const results = await Promise.all([
         compareCICountries(validSlugs),
         ...validSlugs.map((s) => getCICountryHistory(s)),
       ]);
+      compareData = results[0] as CompareCIResult;
+      historyArrays = results.slice(1) as CIHistoryResult[];
     } catch {}
   }
 
-  // Sort compareData to match validSlugs order
   const ordered = validSlugs
     .map((slug) => compareData.find((c) => c.jurisdiction.slug === slug))
     .filter(Boolean) as CompareCIResult;
 
-  // Build per-country history series
-  const historySeries = ordered.map((country, i) => {
-    const hist = historyData[validSlugs.indexOf(country.jurisdiction.slug)] ?? [];
-    const histArr = Array.isArray(hist) ? hist : (hist as { rows: unknown[] }).rows ?? [];
+  const timelineSeries = ordered.map((country, i) => {
+    const hist = historyArrays[validSlugs.indexOf(country.jurisdiction.slug)] ?? [];
+    const arr = (Array.isArray(hist) ? hist : (hist as { rows: unknown[] }).rows ?? []) as {
+      quarter: string;
+      score: number;
+    }[];
     return {
       name: country.jurisdiction.name,
-      color: COUNTRY_COLORS[i] ?? COUNTRY_COLORS[0],
-      data: (histArr as { quarter: string; score: number }[]).map((h) => ({
-        quarter: h.quarter,
-        score: h.score,
-      })),
+      colorVar: SERIES_VARS[i] ?? SERIES_VARS[0],
+      data: arr.map((h) => ({ quarter: h.quarter, score: Number(h.score) })),
     };
   });
 
-  // Build dimension series
-  const dimensionSeries = ordered.map((country, i) => ({
-    name: country.jurisdiction.name,
-    color: COUNTRY_COLORS[i] ?? COUNTRY_COLORS[0],
-    dimensions: country.dimensions.map((d) => ({
-      dimension: d.dimension,
-      score: Math.round(d.normalizedScore ?? 0),
-    })),
-  }));
-
+  const hasTimeline = timelineSeries.some((s) => s.data.length >= 2);
   const hasData = ordered.length >= 2;
 
+  // Head-to-head insight generation (only if exactly 2 countries and both have dims)
+  type DimRow = { dim: string; values: (number | null)[] };
+  const dimRows: DimRow[] = DIMENSION_ORDER.map((dim) => {
+    const values = ordered.map((country) => {
+      const d = country.dimensions.find((x) => x.dimension === dim);
+      return d && d.normalizedScore !== null && d.normalizedScore !== undefined
+        ? Number(d.normalizedScore)
+        : null;
+    });
+    return { dim, values };
+  });
+
+  let insightA: { country: string; dim: string; delta: number } | null = null;
+  let insightB: { country: string; dim: string; delta: number } | null = null;
+
+  if (ordered.length === 2) {
+    const diffs = dimRows
+      .map((r) => {
+        const a = r.values[0];
+        const b = r.values[1];
+        if (a === null || b === null) return null;
+        return { dim: r.dim, a, b, delta: a - b };
+      })
+      .filter(Boolean) as { dim: string; a: number; b: number; delta: number }[];
+    const aLead = diffs.filter((d) => d.delta > 0).sort((x, y) => y.delta - x.delta);
+    const bLead = diffs.filter((d) => d.delta < 0).sort((x, y) => x.delta - y.delta);
+    if (aLead[0]) {
+      insightA = {
+        country: ordered[0].jurisdiction.name,
+        dim: aLead[0].dim,
+        delta: aLead[0].delta,
+      };
+    }
+    if (bLead[0]) {
+      insightB = {
+        country: ordered[1].jurisdiction.name,
+        dim: bLead[0].dim,
+        delta: Math.abs(bLead[0].delta),
+      };
+    }
+  }
+
   return (
-    <div
-      style={{
-        maxWidth: 960,
-        margin: "0 auto",
-        padding: "var(--spacing-section-y) var(--spacing-page-x)",
-      }}
-    >
-      {/* Breadcrumb */}
-      <Link href="/index" className="breadcrumb" style={{ marginBottom: 24, display: "inline-flex" }}>
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M10 12L6 8l4-4" />
-        </svg>
-        Civica Index
-      </Link>
-
-      <h1 className="page-heading" style={{ marginBottom: 8 }}>Compare CI</h1>
-      <p
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-12)",
-          color: "var(--color-text-30)",
-          marginBottom: 36,
-        }}
-      >
-        Select 2–3 countries to compare governance scores side by side.
-      </p>
-
-      {/* Country selector */}
-      <Suspense fallback={null}>
-        <CICompareSelector countries={countryList} />
-      </Suspense>
-
-      {/* Prompt when fewer than 2 countries */}
-      {validSlugs.length === 0 && (
-        <p
-          style={{
-            textAlign: "center",
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-40)",
-            padding: "48px 0",
-          }}
-        >
-          Choose countries above to begin comparing.
+    <main className="civica-compare-page">
+      <section className="page-hero">
+        <nav className="breadcrumb">
+          <Link href="/index">← Civica Index</Link>
+          <span>/</span>
+          Compare
+        </nav>
+        <h1 className="page-title">Compare two or three countries, side by side.</h1>
+        <p className="page-lede">
+          Overlay CI on a shared timeline, then drill into each of the six
+          weighted dimensions to see where countries actually differ — not just
+          what their headline score says.
         </p>
+      </section>
+
+      <section className="picker-row" aria-label="Country slots">
+        <Suspense fallback={null}>
+          <CICompareSelector countries={countryList} />
+        </Suspense>
+      </section>
+
+      {validSlugs.length === 0 && (
+        <div className="ci-empty">
+          <p className="ci-empty-title">Choose countries above to begin comparing.</p>
+          <p className="ci-empty-sub">
+            Pick two countries to see an overlay; pick three to compare across
+            the full dimension grid.
+          </p>
+        </div>
       )}
 
       {validSlugs.length === 1 && (
-        <p
-          style={{
-            textAlign: "center",
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-40)",
-            padding: "48px 0",
-          }}
-        >
-          Select at least one more country to compare.
-        </p>
+        <div className="ci-empty">
+          <p className="ci-empty-title">Pick one more country to start the overlay.</p>
+        </div>
       )}
 
-      {/* Main comparison content */}
       {hasData && (
         <>
-          {/* Color legend */}
-          <div style={{ display: "flex", gap: 20, flexWrap: "wrap", marginBottom: 32 }}>
-            {ordered.map((country, i) => (
-              <span
-                key={country.jurisdiction.slug}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-12)",
-                  color: "var(--color-text-60)",
-                }}
-              >
-                <span
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: 3,
-                    background: COUNTRY_COLORS[i],
-                    flexShrink: 0,
-                    display: "inline-block",
-                  }}
-                />
-                {countryFlag(country.jurisdiction.iso2)} {country.jurisdiction.name}
-              </span>
-            ))}
-          </div>
-
-          {/* Score cards side-by-side */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${ordered.length}, 1fr)`,
-              gap: 16,
-              marginBottom: 32,
-            }}
-          >
+          <section className="score-row" aria-label="Picked countries">
             {ordered.map((country, i) => {
-              const score = country.composite ? Math.round(country.composite.score) : null;
+              const score =
+                country.composite && country.composite.score !== null
+                  ? Math.round(Number(country.composite.score))
+                  : null;
               const tier = score !== null ? ciTier(score) : null;
-              const color = COUNTRY_COLORS[i];
-
+              const colorVar = SERIES_VARS[i] ?? SERIES_VARS[0];
               return (
-                <div
+                <article
                   key={country.jurisdiction.slug}
-                  className="cv-card"
-                  style={{ borderTop: `3px solid ${color}` }}
+                  className="score-card"
+                  style={{ borderTopColor: colorVar }}
                 >
-                  {/* Country name */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-                    <CountryFlag iso2={country.jurisdiction.iso2} size={24} />
-                    <Link
-                      href={`/index/${country.jurisdiction.slug}`}
-                      style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "var(--text-15)",
-                        fontWeight: 600,
-                        color: "var(--color-text-primary)",
-                        textDecoration: "none",
-                      }}
-                    >
+                  <div className="score-card-slot">
+                    Country {SERIES_LETTERS[i]}
+                  </div>
+                  <div className="score-card-name">
+                    <CountryFlag iso2={country.jurisdiction.iso2} size={22} />
+                    <Link href={`/index/${country.jurisdiction.slug}`}>
                       {country.jurisdiction.name}
                     </Link>
                   </div>
-
-                  {score !== null && tier ? (
-                    <>
-                      <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 10 }}>
-                        <span
-                          style={{
-                            fontFamily: "var(--font-heading)",
-                            fontSize: "var(--text-48, 48px)",
-                            lineHeight: 1,
-                            color: "var(--color-text-primary)",
-                          }}
-                        >
+                  <div className="score-card-score">
+                    {score !== null ? (
+                      <>
+                        <span className="score-val" style={{ color: colorVar }}>
                           {score}
                         </span>
-                        <span
-                          style={{
-                            fontFamily: "var(--font-mono)",
-                            fontWeight: "var(--font-weight-mono)",
-                            fontSize: "var(--text-13)",
-                            color: "var(--color-text-30)",
-                          }}
-                        >
-                          / 100
+                        <span className="score-label">
+                          CI
+                          {country.composite?.rank
+                            ? ` · rank ${country.composite.rank}`
+                            : ""}
                         </span>
-                      </div>
-
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          background: tier.bg,
-                          color: tier.color,
-                          borderRadius: "var(--radius-sm)",
-                          padding: "3px 12px",
-                          fontFamily: "var(--font-mono)",
-                          fontWeight: "var(--font-weight-mono)",
-                          fontSize: "var(--text-11)",
-                          marginBottom: 8,
-                        }}
-                      >
-                        {tier.label}
-                      </span>
-
-                      {country.composite?.rank && country.composite.totalRanked && (
-                        <p
-                          style={{
-                            fontFamily: "var(--font-mono)",
-                            fontWeight: "var(--font-weight-mono)",
-                            fontSize: "var(--text-10)",
-                            color: "var(--color-text-30)",
-                            margin: "8px 0 0",
-                          }}
-                        >
-                          Rank #{country.composite.rank} of {country.composite.totalRanked}
-                        </p>
-                      )}
-
-                      {country.composite?.quarter && (
-                        <p
-                          style={{
-                            fontFamily: "var(--font-mono)",
-                            fontWeight: "var(--font-weight-mono)",
-                            fontSize: "var(--text-10)",
-                            color: "var(--color-text-25)",
-                            margin: "4px 0 0",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.05em",
-                          }}
-                        >
-                          {country.composite.quarter}
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <p
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontWeight: "var(--font-weight-mono)",
-                        fontSize: "var(--text-13)",
-                        color: "var(--color-text-40)",
-                        margin: 0,
-                      }}
-                    >
-                      No score available
-                    </p>
+                      </>
+                    ) : (
+                      <span className="score-none">No score</span>
+                    )}
+                  </div>
+                  {tier && (
+                    <div className="score-tier" style={{ color: tier.cssVar }}>
+                      ● {tier.label}
+                    </div>
                   )}
-                </div>
+                  <div className="score-meta">
+                    {[
+                      govShort(country.jurisdiction.governmentType ?? null),
+                      country.jurisdiction.continent ?? null,
+                      fmtPop(country.jurisdiction.population ?? null),
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </div>
+                </article>
               );
             })}
-          </div>
+          </section>
 
-          {/* Dimension comparison chart */}
-          {dimensionSeries.some((s) => s.dimensions.length > 0) && (
-            <div className="cv-card" style={{ marginBottom: 32 }}>
-              <h2
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-11)",
-                  color: "var(--color-text-30)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  margin: "0 0 20px",
-                }}
-              >
-                Dimension Breakdown
-              </h2>
-
-              {/* Legend */}
-              <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
-                {dimensionSeries.map((s) => (
-                  <span
-                    key={s.name}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      fontFamily: "var(--font-mono)",
-                      fontWeight: "var(--font-weight-mono)",
-                      fontSize: "var(--text-10)",
-                      color: "var(--color-text-40)",
-                    }}
-                  >
+          {hasTimeline && (
+            <section className="chart-block" aria-label="Timeline overlay">
+              <div className="chart-header">
+                <div>
+                  <div className="chart-sub">CI TIMELINE · OVERLAY</div>
+                  <div className="chart-title">
+                    {ordered.map((o) => o.jurisdiction.name).join(" vs. ")}
+                  </div>
+                </div>
+              </div>
+              <div className="chart-plot">
+                <TimelineOverlay series={timelineSeries} />
+              </div>
+              <div className="chart-legend">
+                {timelineSeries.map((s) => (
+                  <span key={s.name}>
                     <span
-                      style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: 2,
-                        background: s.color,
-                        display: "inline-block",
-                        flexShrink: 0,
-                      }}
+                      className="legend-swatch"
+                      style={{ background: s.colorVar }}
                     />
                     {s.name}
                   </span>
                 ))}
+                <span style={{ color: "var(--color-text-20)" }}>
+                  Tier bands shown in background
+                </span>
               </div>
-
-              <DimensionCompareChart series={dimensionSeries} />
-            </div>
+            </section>
           )}
 
-          {/* Multi-line history chart */}
-          {historySeries.some((s) => s.data.length >= 2) && (
-            <div className="cv-card" style={{ marginBottom: 32 }}>
-              <h2
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-11)",
-                  color: "var(--color-text-30)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  margin: "0 0 8px",
-                }}
-              >
-                CI Score History
-              </h2>
-
-              {/* Legend */}
-              <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
-                {historySeries.map((s) => (
-                  <span
-                    key={s.name}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      fontFamily: "var(--font-mono)",
-                      fontWeight: "var(--font-weight-mono)",
-                      fontSize: "var(--text-10)",
-                      color: "var(--color-text-40)",
-                    }}
-                  >
+          <section aria-labelledby="dim-compare-title">
+            <div className="chart-sub" style={{ marginBottom: 12 }}>
+              DIMENSION-BY-DIMENSION · LATEST CI COMPONENTS
+            </div>
+            <h2 id="dim-compare-title" className="chart-title">
+              Where they diverge.
+            </h2>
+            <div className="dim-compare">
+              <div className="dim-compare-header">
+                <div>Dimension</div>
+                {ordered.map((o, i) => (
+                  <div key={o.jurisdiction.slug}>
+                    {o.jurisdiction.name}
                     <span
-                      style={{
-                        width: 20,
-                        height: 2.5,
-                        background: s.color,
-                        display: "inline-block",
-                        flexShrink: 0,
-                        borderRadius: 2,
-                      }}
+                      className="hdr-dot"
+                      style={{ background: SERIES_VARS[i] }}
                     />
-                    {s.name}
-                  </span>
+                  </div>
                 ))}
+                {ordered.length < 3 &&
+                  Array.from({ length: 3 - ordered.length }).map((_, i) => (
+                    <div key={`empty-${i}`} style={{ color: "var(--color-text-20)" }}>
+                      Country {SERIES_LETTERS[ordered.length + i]} —
+                    </div>
+                  ))}
+                <div style={{ textAlign: "right" }}>Weight</div>
               </div>
-
-              <MultiLineHistoryChart series={historySeries} />
+              {DIMENSION_ORDER.map((dim) => {
+                const weight = DIMENSION_WEIGHTS[dim];
+                return (
+                  <div key={dim} className="dim-compare-row">
+                    <div className="dim-name">
+                      {DIMENSION_LABELS[dim] ?? dim}
+                    </div>
+                    {ordered.map((country, i) => {
+                      const d = country.dimensions.find((x) => x.dimension === dim);
+                      const val =
+                        d && d.normalizedScore !== null && d.normalizedScore !== undefined
+                          ? Number(d.normalizedScore)
+                          : null;
+                      const color = SERIES_VARS[i] ?? SERIES_VARS[0];
+                      return (
+                        <div
+                          key={country.jurisdiction.slug}
+                          className="dim-compare-cell"
+                        >
+                          {val !== null ? (
+                            <>
+                              <div className="val" style={{ color }}>
+                                {val.toFixed(1)}
+                              </div>
+                              <div className="bar">
+                                <span
+                                  style={{
+                                    width: `${Math.max(0, Math.min(100, val))}%`,
+                                    background: color,
+                                  }}
+                                />
+                              </div>
+                            </>
+                          ) : (
+                            <div className="val" style={{ color: "var(--color-text-20)" }}>
+                              —
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {ordered.length < 3 &&
+                      Array.from({ length: 3 - ordered.length }).map((_, i) => (
+                        <div key={`empty-${i}`} className="dim-compare-cell">
+                          <div className="val" style={{ color: "var(--color-text-20)" }}>
+                            —
+                          </div>
+                        </div>
+                      ))}
+                    <div className="dim-wt">{weight}%</div>
+                  </div>
+                );
+              })}
             </div>
+          </section>
+
+          {(insightA || insightB) && (
+            <section className="h2h" aria-label="Head-to-head insights">
+              {insightA && (
+                <article className="h2h-card">
+                  <div className="h2h-eyebrow">▲ {insightA.country.toUpperCase()} LEADS</div>
+                  <div className="h2h-body">
+                    {insightA.country} scores{" "}
+                    <strong>{insightA.delta.toFixed(1)} points</strong> higher
+                    on <em>{DIMENSION_LABELS[insightA.dim]}</em>, its largest
+                    advantage in this matchup.
+                  </div>
+                </article>
+              )}
+              {insightB && (
+                <article className="h2h-card">
+                  <div className="h2h-eyebrow">▲ {insightB.country.toUpperCase()} LEADS</div>
+                  <div className="h2h-body">
+                    {insightB.country} leads on{" "}
+                    <em>{DIMENSION_LABELS[insightB.dim]}</em> by{" "}
+                    <strong>{insightB.delta.toFixed(1)} points</strong> — its
+                    biggest win across the six dimensions.
+                  </div>
+                </article>
+              )}
+            </section>
           )}
 
-          {/* Footer links */}
-          <div
-            style={{
-              display: "flex",
-              gap: 16,
-              flexWrap: "wrap",
-              borderTop: "1px solid var(--color-card-border)",
-              paddingTop: 24,
-            }}
-          >
+          <footer className="ci-page-footer">
             {ordered.map((country) => (
               <Link
                 key={country.jurisdiction.slug}
                 href={`/index/${country.jurisdiction.slug}`}
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-12)",
-                  color: "var(--color-text-40)",
-                  textDecoration: "none",
-                }}
               >
                 {country.jurisdiction.name} detail →
               </Link>
             ))}
-            <Link
-              href="/index/methodology"
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-12)",
-                color: "var(--color-text-40)",
-                textDecoration: "none",
-              }}
-            >
-              Methodology →
-            </Link>
-          </div>
+            <Link href="/index/methodology">Methodology →</Link>
+            <span className="footer-meta">
+              Civica Index v1.0 · weighted composite of 6 dimensions
+            </span>
+          </footer>
         </>
       )}
-    </div>
+
+      <style>{`
+        .civica-compare-page {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 32px var(--spacing-page-x, 40px) 64px;
+          color: var(--color-text-primary);
+        }
+        .page-hero { padding: 32px 0 32px; }
+        .breadcrumb {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 12px;
+          letter-spacing: 0.03em;
+          color: var(--color-text-30);
+          margin-bottom: 20px;
+          display: flex; gap: 8px; align-items: center;
+        }
+        .breadcrumb a { color: var(--color-text-30); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--color-text-primary); }
+
+        .page-title {
+          font-family: var(--font-heading, var(--font-serif));
+          font-size: 56px;
+          font-weight: 400;
+          letter-spacing: -0.04em;
+          line-height: 1.02;
+          margin-bottom: 12px;
+        }
+        .page-lede {
+          font-size: 17px;
+          color: var(--color-text-60);
+          max-width: 700px;
+          line-height: 1.55;
+          margin: 0;
+        }
+
+        .picker-row { margin: 40px 0 24px; }
+
+        .ci-empty {
+          padding: 80px 0;
+          text-align: center;
+        }
+        .ci-empty-title {
+          font-family: var(--font-heading, var(--font-serif));
+          font-size: 20px;
+          color: var(--color-text-40);
+          margin-bottom: 8px;
+        }
+        .ci-empty-sub {
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: var(--color-text-25);
+        }
+
+        .score-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 32px;
+        }
+        .score-card {
+          background: var(--color-grid-cell);
+          border: 1px solid var(--color-card-border);
+          border-top: 3px solid var(--series-a);
+          border-radius: 4px;
+          padding: 20px 22px;
+          display: flex; flex-direction: column; gap: 10px;
+        }
+        .score-card-slot {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: var(--color-text-30);
+        }
+        .score-card-name {
+          display: flex; align-items: center; gap: 10px;
+        }
+        .score-card-name a {
+          font-family: var(--font-heading, var(--font-serif));
+          font-size: 28px;
+          font-weight: 400;
+          letter-spacing: -0.02em;
+          color: var(--color-text-primary);
+          text-decoration: none;
+          line-height: 1;
+        }
+        .score-card-name a:hover { color: var(--color-accent); }
+        .score-card-score {
+          display: flex; align-items: baseline; gap: 8px;
+          font-family: var(--font-heading, var(--font-serif));
+        }
+        .score-val {
+          font-size: 32px;
+          font-weight: 500;
+          letter-spacing: -0.02em;
+        }
+        .score-label {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--color-text-30);
+        }
+        .score-none {
+          font-family: var(--font-mono);
+          font-size: 13px;
+          color: var(--color-text-40);
+        }
+        .score-tier {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        .score-meta {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 11px;
+          color: var(--color-text-30);
+        }
+
+        .chart-block {
+          border: 1px solid var(--color-card-border);
+          border-radius: 4px;
+          background: var(--color-grid-cell);
+          padding: 32px 36px;
+          margin-bottom: 40px;
+        }
+        .chart-header {
+          display: flex; justify-content: space-between; align-items: flex-start;
+          gap: 24px; flex-wrap: wrap; margin-bottom: 20px;
+        }
+        .chart-sub {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 11px;
+          color: var(--color-text-30);
+          letter-spacing: 0.08em;
+          margin-bottom: 6px;
+        }
+        .chart-title {
+          font-family: var(--font-heading, var(--font-serif));
+          font-size: 26px;
+          font-weight: 400;
+          letter-spacing: -0.02em;
+          margin: 0 0 24px;
+        }
+        .chart-plot { position: relative; height: 340px; }
+        .chart-legend {
+          display: flex; gap: 24px; flex-wrap: wrap;
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 11px;
+          color: var(--color-text-40);
+          margin-top: 18px;
+        }
+        .legend-swatch {
+          display: inline-block;
+          width: 14px; height: 3px;
+          margin-right: 6px; vertical-align: middle;
+        }
+
+        .dim-compare {
+          border: 1px solid var(--color-card-border);
+          border-radius: 4px;
+          background: var(--color-grid-bg);
+          overflow: hidden;
+          display: grid; gap: 1px;
+          margin-bottom: 40px;
+        }
+        .dim-compare-header,
+        .dim-compare-row {
+          background: var(--color-grid-cell);
+          padding: 18px 28px;
+          display: grid;
+          grid-template-columns: minmax(200px, 1.3fr) repeat(3, 1fr) 80px;
+          gap: 18px;
+          align-items: center;
+        }
+        .dim-compare-header {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: var(--color-text-30);
+        }
+        .dim-compare-header .hdr-dot {
+          display: inline-block;
+          width: 8px; height: 8px;
+          border-radius: 50%;
+          margin-left: 8px;
+          vertical-align: middle;
+        }
+        .dim-compare-row .dim-name {
+          font-family: var(--font-heading, var(--font-serif));
+          font-size: 17px;
+          color: var(--color-text-primary);
+        }
+        .dim-compare-row .dim-wt {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 12px;
+          color: var(--color-text-30);
+          text-align: right;
+        }
+        .dim-compare-cell {
+          display: flex; flex-direction: column; gap: 6px;
+        }
+        .dim-compare-cell .val {
+          font-family: var(--font-heading, var(--font-serif));
+          font-size: 20px;
+          font-weight: 500;
+          letter-spacing: -0.01em;
+          line-height: 1;
+        }
+        .dim-compare-cell .bar {
+          height: 3px;
+          background: var(--color-divider);
+          border-radius: 1px;
+          overflow: hidden;
+        }
+        .dim-compare-cell .bar > span {
+          display: block;
+          height: 100%;
+        }
+
+        .h2h {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+          margin-bottom: 40px;
+        }
+        .h2h-card {
+          background: var(--color-grid-cell);
+          border: 1px solid var(--color-card-border);
+          border-radius: 4px;
+          padding: 28px 32px;
+        }
+        .h2h-eyebrow {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono, 500);
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: var(--color-text-30);
+          margin-bottom: 8px;
+        }
+        .h2h-body {
+          font-family: var(--font-heading, var(--font-serif));
+          font-size: 22px;
+          font-weight: 400;
+          line-height: 1.35;
+          letter-spacing: -0.01em;
+          color: var(--color-text-primary);
+        }
+        .h2h-body strong { font-weight: 500; }
+        .h2h-body em { font-style: italic; color: var(--color-text-60); }
+
+        .ci-page-footer {
+          margin-top: 20px;
+          padding-top: 24px;
+          border-top: 1px solid var(--color-divider);
+          display: flex;
+          gap: 24px;
+          flex-wrap: wrap;
+          align-items: center;
+          font-family: var(--font-mono);
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          color: var(--color-text-30);
+        }
+        .ci-page-footer a {
+          color: var(--color-accent);
+          text-decoration: none;
+        }
+        .ci-page-footer .footer-meta {
+          margin-left: auto;
+          color: var(--color-text-30);
+        }
+
+        @media (max-width: 900px) {
+          .page-title { font-size: 40px; }
+          .score-row { grid-template-columns: 1fr; }
+          .dim-compare-header,
+          .dim-compare-row {
+            grid-template-columns: 1fr;
+            padding: 14px 20px;
+          }
+          .dim-compare-header > :not(:first-child) { display: none; }
+          .h2h { grid-template-columns: 1fr; }
+        }
+      `}</style>
+    </main>
   );
 }
