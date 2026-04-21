@@ -2995,3 +2995,36 @@ a {
   100% { box-shadow: 0 0 0 0   rgba(92, 170, 110, 0); }
 }
 
+/* ============================================================
+   CI Compare page — responsive overrides
+   ============================================================ */
+
+@media (max-width: 900px) {
+  .ci-compare-picker {
+    grid-template-columns: 1fr !important;
+  }
+  .ci-compare-dim-row {
+    grid-template-columns: 1fr !important;
+    padding: 14px 20px !important;
+  }
+  .ci-compare-dim-header {
+    grid-template-columns: 1fr !important;
+    padding: 14px 20px !important;
+  }
+  .ci-compare-dim-header > *:not(:first-child) {
+    display: none;
+  }
+  .ci-compare-h2h {
+    grid-template-columns: 1fr !important;
+  }
+  .ci-compare-hero-title {
+    font-size: 40px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .ci-compare-page {
+    padding: 0 20px !important;
+  }
+}
+
