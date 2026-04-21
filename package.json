@@ -22,7 +22,8 @@
     "enrich:hierarchy": "tsx scripts/enrich-hierarchy.ts",
     "seed:ci-methodology": "tsx scripts/seed-ci-methodology.ts",
     "ingest:ci": "tsx scripts/ingest-ci-all.ts",
-    "calculate:ci": "tsx scripts/calculate-ci-composite.ts"
+    "calculate:ci": "tsx scripts/calculate-ci-composite.ts",
+    "classify:pulse": "tsx scripts/classify-pulse-events.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
