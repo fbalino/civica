@@ -12,7 +12,7 @@ const INDICATOR = "hdi";
 
 // UNDP Human Development Index: scale 0-1, higher = more developed, NOT inverted
 // In production, fetch from https://hdr.undp.org/api/data/hdi or download CSV from UNDP Data Center
-// Reference values are HDR 2023/24 report (2022 data)
+// Reference values are HDR 2023/24 report (2022 data, assigned to 2023-Q4 CI period)
 const HDI_2022: Record<string, number> = {
   CHE: 0.967, NOR: 0.966, ISL: 0.959, HKG: 0.956, DNK: 0.952,
   SWE: 0.952, DEU: 0.950, IRL: 0.950, SGP: 0.949, NLD: 0.946,
@@ -33,7 +33,7 @@ async function main() {
   const records: SourceDataRecord[] = Object.entries(HDI_2022).map(
     ([iso3, rawValue]) => ({
       iso3,
-      year: 2022,
+      year: 2023,
       dimension: DIMENSION,
       indicator: INDICATOR,
       rawValue,
@@ -47,7 +47,7 @@ async function main() {
   const result: IngestionResult = {
     sourceId: SOURCE_ID,
     dimension: DIMENSION,
-    datasetYear: 2022,
+    datasetYear: 2023,
     records,
     globalMinObserved: Math.min(...values),
     globalMaxObserved: Math.max(...values),

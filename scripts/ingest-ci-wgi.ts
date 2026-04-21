@@ -12,7 +12,7 @@ const INDICATOR = "rl.est";
 
 // World Bank WGI Rule of Law: scale -2.5 to +2.5, higher = stronger rule of law, NOT inverted
 // In production, download from https://info.worldbank.org/governance/wgi/ (CSV/XLS)
-// Reference values are 2022 WGI estimates (latest public release)
+// Reference values are 2022 WGI estimates (published 2023, assigned to 2023-Q4 CI period)
 const WGI_2022: Record<string, number> = {
   FIN: 2.00, NOR: 1.98, DNK: 1.96, SWE: 1.97, SGP: 1.93,
   NZL: 1.87, IRL: 1.83, NLD: 1.85, CHE: 1.84, DEU: 1.79,
@@ -32,7 +32,7 @@ async function main() {
   const records: SourceDataRecord[] = Object.entries(WGI_2022).map(
     ([iso3, rawValue]) => ({
       iso3,
-      year: 2022,
+      year: 2023,
       dimension: DIMENSION,
       indicator: INDICATOR,
       rawValue,
@@ -46,7 +46,7 @@ async function main() {
   const result: IngestionResult = {
     sourceId: SOURCE_ID,
     dimension: DIMENSION,
-    datasetYear: 2022,
+    datasetYear: 2023,
     records,
     globalMinObserved: Math.min(...values),
     globalMaxObserved: Math.max(...values),
