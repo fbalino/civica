@@ -129,6 +129,13 @@ html[data-theme="light"] {
   --motion-fast:                  120ms;
   --motion-base:                  150ms;
   --motion-slow:                  300ms;
+
+  /* --- CI tier palette (light) --- */
+  --tier-exceptional:             oklch(55% 0.12 145);
+  --tier-strong:                  oklch(48% 0.10 155);
+  --tier-mixed:                   oklch(65% 0.14 75);
+  --tier-weak:                    oklch(55% 0.15 45);
+  --tier-failed:                  oklch(52% 0.18 25);
 }
 
 /* ============================================================
@@ -167,6 +174,13 @@ html[data-theme="dark"] {
 
   --shadow-hard:                  4px 4px 0 #000;
   --shadow-hard-lg:               6px 6px 0 #000;
+
+  /* --- CI tier palette (dark) --- */
+  --tier-exceptional:             oklch(68% 0.14 145);
+  --tier-strong:                  oklch(60% 0.11 155);
+  --tier-mixed:                   oklch(75% 0.14 75);
+  --tier-weak:                    oklch(62% 0.15 45);
+  --tier-failed:                  oklch(55% 0.18 25);
 }
 
 /* ============================================================
@@ -207,5 +221,12 @@ html[data-theme="dark"] {
 
     --shadow-hard:                4px 4px 0 #000;
     --shadow-hard-lg:             6px 6px 0 #000;
+
+    /* --- CI tier palette (dark) --- */
+    --tier-exceptional:           oklch(68% 0.14 145);
+    --tier-strong:                oklch(60% 0.11 155);
+    --tier-mixed:                 oklch(75% 0.14 75);
+    --tier-weak:                  oklch(62% 0.15 45);
+    --tier-failed:                oklch(55% 0.18 25);
   }
 }
