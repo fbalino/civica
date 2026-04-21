@@ -767,7 +767,7 @@ export async function getCIRankings(
   quarter?: string,
   filters?: { continent?: string; governmentType?: string }
 ) {
-  const q = quarter ?? getCurrentQuarter();
+  const q = quarter ?? await getLatestAvailableQuarter();
   const continentFilter = filters?.continent
     ? sql`AND j.continent = ${filters.continent}`
     : sql``;
@@ -804,7 +804,7 @@ export async function getCIRankings(
 }
 
 export async function getCICountryDetail(slug: string, quarter?: string) {
-  const q = quarter ?? getCurrentQuarter();
+  const q = quarter ?? await getLatestAvailableQuarter();
 
   const jurisdiction = await db
     .select()
@@ -875,7 +875,7 @@ export async function getCICountryHistory(slug: string) {
 
 export async function compareCICountries(slugs: string[], quarter?: string) {
   if (slugs.length === 0) return [];
-  const q = quarter ?? getCurrentQuarter();
+  const q = quarter ?? await getLatestAvailableQuarter();
 
   const countries = await db
     .select()
@@ -907,7 +907,7 @@ export async function compareCICountries(slugs: string[], quarter?: string) {
 }
 
 export async function getCIByGovernmentType(quarter?: string) {
-  const q = quarter ?? getCurrentQuarter();
+  const q = quarter ?? await getLatestAvailableQuarter();
 
   return db.execute(sql`
     SELECT
@@ -1006,7 +1006,13 @@ export async function getPulseHistory(slug: string, days = 90) {
   `);
 }
 
-function getCurrentQuarter(): string {
+async function getLatestAvailableQuarter(): Promise<string> {
+  const [row] = await db
+    .select({ quarter: ciCompositeScores.quarter })
+    .from(ciCompositeScores)
+    .orderBy(desc(ciCompositeScores.quarter))
+    .limit(1);
+  if (row) return row.quarter;
   const now = new Date();
   const q = Math.ceil((now.getMonth() + 1) / 3);
   return `${now.getFullYear()}-Q${q}`;
