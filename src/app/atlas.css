@@ -964,6 +964,9 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   margin-bottom: 6px;
 }
 .intl-panel svg { width: 100%; display: block; }
+.org-mini-map { width: 100%; max-height: 420px; display: block; }
+.org-mini-map path { transition: opacity 120ms; }
+.org-mini-map path.member:hover { opacity: 1 !important; }
 
 /* Grouped memberships */
 .intl-mem-list { display: grid; gap: 22px; margin-top: 12px; }
