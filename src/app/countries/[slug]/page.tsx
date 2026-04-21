@@ -14,7 +14,13 @@ import {
   getRegionalDemocracyComparison,
   getConstitution,
   getLeaderTimeline,
+  getCICountryDetail,
 } from "@/lib/db/queries";
+import {
+  CIPulseScoreDisplay,
+  type CIScoreData,
+  type PulseScoreData,
+} from "@/components/ci/CIPulseScoreDisplay";
 import { SourceDot } from "@/components/SourceDot";
 import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
 import { FactbookSection } from "@/components/FactbookSection";
@@ -107,7 +113,7 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline, ciDetail] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -119,7 +125,30 @@ export default async function CountryPage({
     getDemocracyScores(jurisdiction.id),
     getConstitution(jurisdiction.id),
     getLeaderTimeline(jurisdiction.id),
+    getCICountryDetail(slug).catch(() => null),
   ]);
+
+  const ciScore: CIScoreData | null = ciDetail?.composite
+    ? {
+        score: Number(ciDetail.composite.score ?? 0),
+        rank: ciDetail.composite.rank ?? null,
+        totalRanked: ciDetail.composite.totalRanked ?? null,
+        quarter: ciDetail.composite.quarter,
+        isPartial: Boolean(ciDetail.composite.isPartial),
+      }
+    : null;
+
+  const pulseScoreData: PulseScoreData | null = ciDetail?.pulse
+    ? {
+        pulseScore: Number(ciDetail.pulse.pulseScore ?? 0),
+        eventImpact: Number(ciDetail.pulse.eventImpact ?? 0),
+        activeEvents: Number(ciDetail.pulse.activeEvents ?? 0),
+        scoreDate: ciDetail.pulse.scoreDate
+          ? String(ciDetail.pulse.scoreDate)
+          : "",
+        isLowConfidence: Boolean(ciDetail.pulse.isLowConfidence),
+      }
+    : null;
 
   const regionalComparison = await getRegionalDemocracyComparison(jurisdiction.id, democracyData.continent);
 
@@ -1155,6 +1184,45 @@ export default async function CountryPage({
           </a>
         </div>
       </div>
+
+      {(ciScore || pulseScoreData) && (
+        <div style={{ marginTop: 32 }}>
+          <CIPulseScoreDisplay ciScore={ciScore} pulseScore={pulseScoreData} />
+          <div
+            style={{
+              marginTop: -32,
+              marginBottom: 32,
+              fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-11)",
+              letterSpacing: "var(--tracking-wider)",
+              color: "var(--color-text-30)",
+              display: "flex",
+              gap: 12,
+              flexWrap: "wrap",
+            }}
+          >
+            <Link
+              href={`/index/${slug}`}
+              style={{ color: "var(--color-accent)", textDecoration: "none" }}
+            >
+              See full Civica Index breakdown →
+            </Link>
+            <Link
+              href={`/index/changelog?country=${slug}`}
+              style={{ color: "var(--color-accent)", textDecoration: "none" }}
+            >
+              Pulse events
+            </Link>
+            <Link
+              href="/index/methodology"
+              style={{ color: "var(--color-accent)", textDecoration: "none" }}
+            >
+              Methodology
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Tabs — prototype: gap 2, border-bottom, 28px top margin, 32px bottom margin */}
       <CountryTabs tabs={tabs} />
