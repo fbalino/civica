@@ -2917,3 +2917,8 @@ a {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Civica Index ranking rows */
+.ci-ranking-row:hover > div {
+  background: var(--color-card-bg);
+}

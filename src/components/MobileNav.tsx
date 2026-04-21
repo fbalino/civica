@@ -15,6 +15,7 @@ type NavItem = {
 const PRIMARY: NavItem[] = [
   { href: "/", label: "Home", descriptor: "Today in governance", glyph: "◐" },
   { href: "/countries", label: "Countries", descriptor: "Index of 250+ nations", glyph: "◯" },
+  { href: "/index", label: "Civica Index", descriptor: "Governance quality scores", glyph: "◈" },
   { href: "/elections", label: "Elections", descriptor: "Upcoming & historical", glyph: "▲" },
   { href: "/government-types", label: "Gov Types", descriptor: "Systems compared", glyph: "▣" },
   { href: "/compare", label: "Compare", descriptor: "Side-by-side analysis", glyph: "⇆" },
