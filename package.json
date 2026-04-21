@@ -19,7 +19,9 @@
     "sync:world-bank": "tsx scripts/sync-world-bank-metrics.ts",
     "sync:hdi": "tsx scripts/sync-undp-hdi.ts",
     "sync:cpi": "tsx scripts/sync-transparency-cpi.ts",
-    "enrich:hierarchy": "tsx scripts/enrich-hierarchy.ts"
+    "enrich:hierarchy": "tsx scripts/enrich-hierarchy.ts",
+    "seed:ci-methodology": "tsx scripts/seed-ci-methodology.ts",
+    "ingest:ci": "tsx scripts/ingest-ci-all.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

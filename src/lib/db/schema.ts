@@ -289,3 +289,191 @@ export const countryMetrics = pgTable(
     index("idx_country_metrics_jurisdiction").on(table.jurisdictionId),
   ]
 );
+
+// --- Civica Index & Pulse tables ---
+
+export const ciMethodologyVersions = pgTable("ci_methodology_versions", {
+  id: text("id").primaryKey(),
+  publishedAt: timestamp("published_at").notNull(),
+  weights: jsonb("weights").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const ciSourceIngestions = pgTable(
+  "ci_source_ingestions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    datasetYear: integer("dataset_year").notNull(),
+    nativeScaleMin: real("native_scale_min").notNull(),
+    nativeScaleMax: real("native_scale_max").notNull(),
+    isInverted: boolean("is_inverted").notNull().default(false),
+    globalMinObserved: real("global_min_observed"),
+    globalMaxObserved: real("global_max_observed"),
+    countriesCovered: integer("countries_covered"),
+    ingestedAt: timestamp("ingested_at").defaultNow().notNull(),
+    status: text("status").notNull().default("completed"),
+    errorMessage: text("error_message"),
+  },
+  (table) => [
+    uniqueIndex("idx_ci_source_ingestions_unique").on(
+      table.sourceId,
+      table.dimension,
+      table.datasetYear
+    ),
+  ]
+);
+
+export const ciDimensionScores = pgTable(
+  "ci_dimension_scores",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    dimension: text("dimension").notNull(),
+    quarter: text("quarter").notNull(),
+    normalizedScore: real("normalized_score").notNull(),
+    rawValue: real("raw_value"),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    ingestionId: uuid("ingestion_id").references(() => ciSourceIngestions.id),
+    methodologyVersion: text("methodology_version")
+      .references(() => ciMethodologyVersions.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_ci_dimension_scores_unique").on(
+      table.jurisdictionId,
+      table.dimension,
+      table.quarter,
+      table.methodologyVersion
+    ),
+    index("idx_ci_dimension_scores_quarter").on(table.quarter),
+    index("idx_ci_dimension_scores_jurisdiction").on(table.jurisdictionId),
+  ]
+);
+
+export const ciCompositeScores = pgTable(
+  "ci_composite_scores",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    quarter: text("quarter").notNull(),
+    score: real("score").notNull(),
+    rank: integer("rank"),
+    totalRanked: integer("total_ranked"),
+    isPartial: boolean("is_partial").notNull().default(false),
+    dimensionsAvailable: integer("dimensions_available").notNull().default(6),
+    missingDimensions: text("missing_dimensions").array(),
+    methodologyVersion: text("methodology_version")
+      .references(() => ciMethodologyVersions.id)
+      .notNull(),
+    calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_ci_composite_unique").on(
+      table.jurisdictionId,
+      table.quarter,
+      table.methodologyVersion
+    ),
+    index("idx_ci_composite_quarter_rank").on(table.quarter, table.rank),
+    index("idx_ci_composite_jurisdiction").on(table.jurisdictionId),
+  ]
+);
+
+export const pulseEvents = pgTable(
+  "pulse_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    eventDate: date("event_date").notNull(),
+    category: text("category").notNull(),
+    severity: real("severity").notNull(),
+    confidence: real("confidence").notNull(),
+    justification: text("justification").notNull(),
+    headline: text("headline").notNull(),
+    sourceUrl: text("source_url"),
+    sourceName: text("source_name"),
+    llmModel: text("llm_model").notNull(),
+    llmRequestId: text("llm_request_id"),
+    rawEventData: jsonb("raw_event_data"),
+    isActive: boolean("is_active").notNull().default(true),
+    expiresAt: date("expires_at"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_pulse_events_jurisdiction_date").on(
+      table.jurisdictionId,
+      table.eventDate
+    ),
+    index("idx_pulse_events_active").on(
+      table.jurisdictionId,
+      table.isActive,
+      table.eventDate
+    ),
+    index("idx_pulse_events_category").on(table.category),
+  ]
+);
+
+export const pulseDailyScores = pgTable(
+  "pulse_daily_scores",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    scoreDate: date("score_date").notNull(),
+    ciBaseline: real("ci_baseline").notNull(),
+    eventImpact: real("event_impact").notNull(),
+    pulseScore: real("pulse_score").notNull(),
+    activeEvents: integer("active_events").notNull(),
+    isLowConfidence: boolean("is_low_confidence").notNull().default(false),
+    methodologyVersion: text("methodology_version")
+      .references(() => ciMethodologyVersions.id)
+      .notNull(),
+    calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_daily_unique").on(
+      table.jurisdictionId,
+      table.scoreDate
+    ),
+    index("idx_pulse_daily_date").on(table.scoreDate),
+    index("idx_pulse_daily_jurisdiction").on(table.jurisdictionId),
+  ]
+);
+
+export const pulseChangelog = pgTable(
+  "pulse_changelog",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    scoreDate: date("score_date").notNull(),
+    eventId: uuid("event_id")
+      .references(() => pulseEvents.id)
+      .notNull(),
+    decayedImpact: real("decayed_impact").notNull(),
+    daysSinceEvent: integer("days_since_event").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_pulse_changelog_jurisdiction_date").on(
+      table.jurisdictionId,
+      table.scoreDate
+    ),
+    index("idx_pulse_changelog_event").on(table.eventId),
+  ]
+);
