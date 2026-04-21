@@ -1,14 +1,4 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
-import { eq, and, sql as dsql } from "drizzle-orm";
-import { jurisdictions, pulseEvents } from "../db/schema";
-
-export function createDb() {
-  const sqlClient = neon(process.env.DATABASE_URL!);
-  return drizzle({ client: sqlClient });
-}
-
-export type Db = ReturnType<typeof createDb>;
+const GDELT_DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc";
 
 const GOVERNANCE_TERMS = [
   "government",
@@ -20,147 +10,63 @@ const GOVERNANCE_TERMS = [
   "constitutional",
   "military",
   "sanctions",
-  "rights",
   "corruption",
-  "democracy",
-  "authoritarian",
-  "referendum",
-  "judiciary",
-];
+].join(" OR ");
 
-interface GdeltArticle {
+export interface GdeltArticle {
   url: string;
   title: string;
   seendate: string;
   domain: string;
-  language: string;
   sourcecountry: string;
+  language: string;
+  socialimage?: string;
 }
 
-interface GdeltResponse {
-  articles?: GdeltArticle[];
+export interface GdeltResponse {
+  articles: GdeltArticle[];
 }
 
-export interface IngestionSummary {
-  fetched: number;
-  ingested: number;
-  skippedNoMatch: number;
-  skippedDuplicate: number;
+function formatGdeltDate(d: Date): string {
+  return d.toISOString().replace(/[-:]/g, "").replace("T", "").slice(0, 14);
 }
 
-async function buildIso2Map(db: Db): Promise<Map<string, string>> {
-  const rows = await db
-    .select({ id: jurisdictions.id, iso2: jurisdictions.iso2 })
-    .from(jurisdictions)
-    .where(dsql`${jurisdictions.iso2} IS NOT NULL`);
-  const map = new Map<string, string>();
-  for (const r of rows) {
-    if (r.iso2) map.set(r.iso2.toUpperCase(), r.id);
-  }
-  return map;
-}
+export async function fetchGdeltEvents(hoursBack = 24): Promise<GdeltArticle[]> {
+  const now = new Date();
+  const start = new Date(now.getTime() - hoursBack * 60 * 60 * 1000);
 
-async function existingSourceUrls(
-  db: Db,
-  urls: string[]
-): Promise<Set<string>> {
-  if (urls.length === 0) return new Set();
-  const rows = await db
-    .select({ sourceUrl: pulseEvents.sourceUrl })
-    .from(pulseEvents)
-    .where(
-      dsql`${pulseEvents.sourceUrl} IN (${dsql.join(
-        urls.map((u) => dsql`${u}`),
-        dsql`, `
-      )})`
-    );
-  return new Set(rows.map((r) => r.sourceUrl).filter(Boolean) as string[]);
-}
+  const params = new URLSearchParams({
+    query: `(${GOVERNANCE_TERMS})`,
+    mode: "artlist",
+    format: "json",
+    maxrecords: "250",
+    startdatetime: formatGdeltDate(start),
+    enddatetime: formatGdeltDate(now),
+  });
 
-function parseGdeltDate(seendate: string): string {
-  const cleaned = seendate.replace(/T.*/, "").replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
-  const d = new Date(cleaned);
-  if (isNaN(d.getTime())) return new Date().toISOString().split("T")[0];
-  return d.toISOString().split("T")[0];
-}
-
-function expiresAt(eventDate: string): string {
-  const d = new Date(eventDate);
-  d.setDate(d.getDate() + 120);
-  return d.toISOString().split("T")[0];
-}
-
-export async function fetchGdeltArticles(
-  timespan = "24h",
-  maxRecords = 250
-): Promise<GdeltArticle[]> {
-  const query = GOVERNANCE_TERMS.join(" OR ");
-  const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&maxrecords=${maxRecords}&timespan=${timespan}&format=json&sort=datedesc`;
-
-  console.log(`[gdelt] Fetching up to ${maxRecords} articles (${timespan} window)...`);
+  const url = `${GDELT_DOC_API}?${params.toString()}`;
   const res = await fetch(url);
+
   if (!res.ok) {
-    throw new Error(`GDELT API returned ${res.status}: ${await res.text()}`);
+    throw new Error(`GDELT API error: ${res.status} ${res.statusText}`);
   }
 
-  const data: GdeltResponse = await res.json();
-  const articles = data.articles ?? [];
-  console.log(`[gdelt] Received ${articles.length} articles from GDELT.`);
-  return articles;
+  const data = (await res.json()) as GdeltResponse;
+  return data.articles ?? [];
 }
 
-export async function ingestPulseEvents(
-  db: Db,
-  articles: GdeltArticle[]
-): Promise<IngestionSummary> {
-  const iso2Map = await buildIso2Map(db);
+export function parseArticleDate(seendate: string): Date {
+  // GDELT seendate format: "20240101T123456Z" or "20240101000000"
+  const cleaned = seendate.replace(/[TZ]/g, "").padEnd(14, "0");
+  const year = parseInt(cleaned.slice(0, 4));
+  const month = parseInt(cleaned.slice(4, 6)) - 1;
+  const day = parseInt(cleaned.slice(6, 8));
+  const hour = parseInt(cleaned.slice(8, 10));
+  const min = parseInt(cleaned.slice(10, 12));
+  const sec = parseInt(cleaned.slice(12, 14));
+  return new Date(Date.UTC(year, month, day, hour, min, sec));
+}
 
-  const urls = articles.map((a) => a.url).filter(Boolean);
-  const existing = await existingSourceUrls(db, urls);
-
-  let ingested = 0;
-  let skippedNoMatch = 0;
-  let skippedDuplicate = 0;
-
-  for (const article of articles) {
-    if (existing.has(article.url)) {
-      skippedDuplicate++;
-      continue;
-    }
-
-    const countryCode = (article.sourcecountry ?? "").toUpperCase().slice(0, 2);
-    const jurisdictionId = iso2Map.get(countryCode);
-    if (!jurisdictionId) {
-      skippedNoMatch++;
-      continue;
-    }
-
-    const eventDate = parseGdeltDate(article.seendate);
-
-    await db.insert(pulseEvents).values({
-      jurisdictionId,
-      eventDate,
-      category: "unclassified",
-      severity: 0,
-      confidence: 0,
-      justification: "",
-      headline: article.title.slice(0, 500),
-      sourceUrl: article.url,
-      sourceName: article.domain,
-      llmModel: "",
-      rawEventData: article,
-      isActive: true,
-      expiresAt: expiresAt(eventDate),
-    });
-
-    existing.add(article.url);
-    ingested++;
-  }
-
-  return {
-    fetched: articles.length,
-    ingested,
-    skippedNoMatch,
-    skippedDuplicate,
-  };
+export function extractSourceName(domain: string): string {
+  return domain.replace(/^www\./, "");
 }

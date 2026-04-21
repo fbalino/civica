@@ -15,20 +15,9 @@
     "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
     "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
-    "db:deduplicate-terms": "tsx scripts/deduplicate-terms.ts",
-    "sync:world-bank": "tsx scripts/sync-world-bank-metrics.ts",
-    "sync:hdi": "tsx scripts/sync-undp-hdi.ts",
-    "sync:cpi": "tsx scripts/sync-transparency-cpi.ts",
-    "enrich:hierarchy": "tsx scripts/enrich-hierarchy.ts",
-    "seed:ci-methodology": "tsx scripts/seed-ci-methodology.ts",
-    "ingest:ci": "tsx scripts/ingest-ci-all.ts",
-    "calculate:ci": "tsx scripts/calculate-ci-composite.ts",
-    "ingest:pulse:events": "tsx scripts/ingest-pulse-events.ts",
-    "classify:pulse": "tsx scripts/classify-pulse-events.ts",
-    "calculate:pulse": "tsx scripts/calculate-pulse-scores.ts"
+    "ingest:pulse:events": "tsx scripts/ingest-pulse-events.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.90.0",
     "@neondatabase/serverless": "^1.0.2",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
@@ -36,8 +25,7 @@
     "next": "16.2.3",
     "next-mdx-remote": "^6.0.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-markdown": "^10.1.0"
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
