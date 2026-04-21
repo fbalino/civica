@@ -23,6 +23,7 @@
     "seed:ci-methodology": "tsx scripts/seed-ci-methodology.ts",
     "ingest:ci": "tsx scripts/ingest-ci-all.ts",
     "calculate:ci": "tsx scripts/calculate-ci-composite.ts",
+    "ingest:pulse:events": "tsx scripts/ingest-pulse-events.ts",
     "classify:pulse": "tsx scripts/classify-pulse-events.ts"
   },
   "dependencies": {
