@@ -395,6 +395,20 @@ export function OutcomesExplorer({
     [metrics, metricId]
   );
 
+  const resolvedMetricDef = useMemo<MetricDef | null>(() => {
+    if (stripData?.metricDef) return stripData.metricDef;
+    if (!currentMetric) return null;
+    return {
+      id: currentMetric.id,
+      name: currentMetric.name,
+      description: currentMetric.description,
+      category: currentMetric.category,
+      unit: currentMetric.unit,
+      higherIsBetter: currentMetric.higherIsBetter,
+      sourceName: currentMetric.name,
+    };
+  }, [currentMetric, stripData]);
+
   // ── Year options for selected metric ──
   const yearOptions = useMemo(
     () => buildYearOptions(currentMetric?.latestYear),
@@ -1043,20 +1057,22 @@ export function OutcomesExplorer({
             )
           ) : loading || !stripData ? (
             <StripSkeleton />
-          ) : (
+          ) : stripData && resolvedMetricDef ? (
             <MetricStripPlot
               data={stripData.data}
               govTypeBands={stripData.govTypeBands}
-              metricDef={stripData.metricDef}
+              metricDef={resolvedMetricDef}
               year={year}
               onCountryClick={handleCountryClick}
               coverage={stripData.coverage}
             />
+          ) : (
+            <StripSkeleton />
           )}
         </div>
 
         {/* ── Caption + source ── */}
-        {!smallMultiples && stripData && (
+        {!smallMultiples && stripData && resolvedMetricDef && (
           <div
             style={{
               marginTop: 20,
@@ -1078,8 +1094,8 @@ export function OutcomesExplorer({
                 margin: 0,
               }}
             >
-              {stripData.metricDef.description ??
-                `${stripData.metricDef.name} scores by government type, ${year}.`}
+              {resolvedMetricDef.description ??
+                `${resolvedMetricDef.name} scores by government type, ${year}.`}
             </p>
             <p
               style={{
@@ -1093,7 +1109,7 @@ export function OutcomesExplorer({
                 alignSelf: "flex-end",
               }}
             >
-              Source: {stripData.metricDef.sourceName ?? stripData.metricDef.name} · Civica
+              Source: {resolvedMetricDef.sourceName ?? resolvedMetricDef.name} · Civica
             </p>
           </div>
         )}

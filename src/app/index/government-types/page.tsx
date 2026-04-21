@@ -693,9 +693,7 @@ function BeeSwarm({
                     cy={p.cy}
                     r={DOT_R}
                   >
-                    <title>
-                      {d.name}: {d.score.toFixed(1)}
-                    </title>
+                    <title>{`${d.name}: ${d.score.toFixed(1)}`}</title>
                   </circle>
                 );
               })}
