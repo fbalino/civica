@@ -24,7 +24,8 @@
     "ingest:ci": "tsx scripts/ingest-ci-all.ts",
     "calculate:ci": "tsx scripts/calculate-ci-composite.ts",
     "ingest:pulse:events": "tsx scripts/ingest-pulse-events.ts",
-    "classify:pulse": "tsx scripts/classify-pulse-events.ts"
+    "classify:pulse": "tsx scripts/classify-pulse-events.ts",
+    "calculate:pulse": "tsx scripts/calculate-pulse-scores.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
