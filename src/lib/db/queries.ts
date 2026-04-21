@@ -15,6 +15,11 @@ import {
   electionResults,
   countryMetrics,
   metricDefinitions,
+  ciCompositeScores,
+  ciDimensionScores,
+  ciMethodologyVersions,
+  pulseEvents,
+  pulseDailyScores,
 } from "./schema";
 
 export async function getJurisdictionBySlug(slug: string) {
@@ -754,4 +759,255 @@ export async function getMetricCoverage(metricId: string, year: number) {
     FROM sovereign s
     LEFT JOIN latest_data ld ON s.id = ld.jurisdiction_id
   `);
+}
+
+// --- Civica Index queries ---
+
+export async function getCIRankings(
+  quarter?: string,
+  filters?: { continent?: string; governmentType?: string }
+) {
+  const q = quarter ?? getCurrentQuarter();
+  const continentFilter = filters?.continent
+    ? sql`AND j.continent = ${filters.continent}`
+    : sql``;
+  const govTypeFilter = filters?.governmentType
+    ? sql`AND j.government_type = ${filters.governmentType}`
+    : sql``;
+
+  return db.execute(sql`
+    SELECT
+      cs.score,
+      cs.rank,
+      cs.total_ranked         AS "totalRanked",
+      cs.is_partial           AS "isPartial",
+      cs.dimensions_available AS "dimensionsAvailable",
+      cs.missing_dimensions   AS "missingDimensions",
+      cs.methodology_version  AS "methodologyVersion",
+      j.id                    AS "jurisdictionId",
+      j.slug,
+      j.name,
+      j.iso2,
+      j.iso3,
+      j.continent,
+      j.government_type       AS "governmentType",
+      j.population,
+      j.flag_url              AS "flagUrl"
+    FROM ci_composite_scores cs
+    JOIN jurisdictions j ON cs.jurisdiction_id = j.id
+    WHERE cs.quarter = ${q}
+      AND j.type = 'sovereign_state'
+      ${continentFilter}
+      ${govTypeFilter}
+    ORDER BY cs.rank ASC
+  `);
+}
+
+export async function getCICountryDetail(slug: string, quarter?: string) {
+  const q = quarter ?? getCurrentQuarter();
+
+  const jurisdiction = await db
+    .select()
+    .from(jurisdictions)
+    .where(eq(jurisdictions.slug, slug))
+    .limit(1);
+
+  if (!jurisdiction[0]) return null;
+
+  const jId = jurisdiction[0].id;
+
+  const [composite] = await db
+    .select()
+    .from(ciCompositeScores)
+    .where(
+      sql`${ciCompositeScores.jurisdictionId} = ${jId} AND ${ciCompositeScores.quarter} = ${q}`
+    )
+    .limit(1);
+
+  const dimensions = await db
+    .select({
+      dimension: ciDimensionScores.dimension,
+      normalizedScore: ciDimensionScores.normalizedScore,
+      rawValue: ciDimensionScores.rawValue,
+      sourceId: ciDimensionScores.sourceId,
+    })
+    .from(ciDimensionScores)
+    .where(
+      sql`${ciDimensionScores.jurisdictionId} = ${jId} AND ${ciDimensionScores.quarter} = ${q}`
+    );
+
+  const pulseLatest = await db
+    .select()
+    .from(pulseDailyScores)
+    .where(eq(pulseDailyScores.jurisdictionId, jId))
+    .orderBy(desc(pulseDailyScores.scoreDate))
+    .limit(1);
+
+  return {
+    jurisdiction: jurisdiction[0],
+    composite: composite ?? null,
+    dimensions,
+    pulse: pulseLatest[0] ?? null,
+  };
+}
+
+export async function getCICountryHistory(slug: string) {
+  const jurisdiction = await db
+    .select({ id: jurisdictions.id })
+    .from(jurisdictions)
+    .where(eq(jurisdictions.slug, slug))
+    .limit(1);
+
+  if (!jurisdiction[0]) return [];
+
+  return db
+    .select({
+      quarter: ciCompositeScores.quarter,
+      score: ciCompositeScores.score,
+      rank: ciCompositeScores.rank,
+      totalRanked: ciCompositeScores.totalRanked,
+      isPartial: ciCompositeScores.isPartial,
+    })
+    .from(ciCompositeScores)
+    .where(eq(ciCompositeScores.jurisdictionId, jurisdiction[0].id))
+    .orderBy(asc(ciCompositeScores.quarter));
+}
+
+export async function compareCICountries(slugs: string[], quarter?: string) {
+  if (slugs.length === 0) return [];
+  const q = quarter ?? getCurrentQuarter();
+
+  const countries = await db
+    .select()
+    .from(jurisdictions)
+    .where(sql`${jurisdictions.slug} IN ${slugs}`);
+
+  const jIds = countries.map((c) => c.id);
+  if (jIds.length === 0) return [];
+
+  const composites = await db
+    .select()
+    .from(ciCompositeScores)
+    .where(
+      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q}`
+    );
+
+  const dimensions = await db
+    .select()
+    .from(ciDimensionScores)
+    .where(
+      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q}`
+    );
+
+  return countries.map((country) => ({
+    jurisdiction: country,
+    composite: composites.find((c) => c.jurisdictionId === country.id) ?? null,
+    dimensions: dimensions.filter((d) => d.jurisdictionId === country.id),
+  }));
+}
+
+export async function getCIByGovernmentType(quarter?: string) {
+  const q = quarter ?? getCurrentQuarter();
+
+  return db.execute(sql`
+    SELECT
+      j.government_type                                                     AS "governmentType",
+      COUNT(*)::int                                                         AS "countryCount",
+      AVG(cs.score)                                                         AS "avgScore",
+      MIN(cs.score)                                                         AS "minScore",
+      MAX(cs.score)                                                         AS "maxScore",
+      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY cs.score)                AS "medianScore",
+      PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY cs.score)               AS "q1",
+      PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY cs.score)               AS "q3"
+    FROM ci_composite_scores cs
+    JOIN jurisdictions j ON cs.jurisdiction_id = j.id
+    WHERE cs.quarter = ${q}
+      AND j.government_type IS NOT NULL
+      AND j.type = 'sovereign_state'
+    GROUP BY j.government_type
+    HAVING COUNT(*) >= 3
+    ORDER BY AVG(cs.score) DESC
+  `);
+}
+
+export async function getCIMethodology(versionId?: string) {
+  if (versionId) {
+    const [row] = await db
+      .select()
+      .from(ciMethodologyVersions)
+      .where(eq(ciMethodologyVersions.id, versionId))
+      .limit(1);
+    return row ?? null;
+  }
+  const [row] = await db
+    .select()
+    .from(ciMethodologyVersions)
+    .orderBy(desc(ciMethodologyVersions.publishedAt))
+    .limit(1);
+  return row ?? null;
+}
+
+export async function getCIMethodologyHistory() {
+  return db
+    .select()
+    .from(ciMethodologyVersions)
+    .orderBy(desc(ciMethodologyVersions.publishedAt));
+}
+
+export async function getPulseChangelog(
+  slug?: string,
+  limit = 50,
+  offset = 0
+) {
+  const slugFilter = slug
+    ? sql`AND j.slug = ${slug}`
+    : sql``;
+
+  return db.execute(sql`
+    SELECT
+      pe.id,
+      pe.event_date             AS "eventDate",
+      pe.category,
+      pe.severity,
+      pe.confidence,
+      pe.headline,
+      pe.justification,
+      pe.source_url             AS "sourceUrl",
+      pe.source_name            AS "sourceName",
+      pe.is_active              AS "isActive",
+      j.slug,
+      j.name                    AS "countryName",
+      j.iso2,
+      j.flag_url                AS "flagUrl"
+    FROM pulse_events pe
+    JOIN jurisdictions j ON pe.jurisdiction_id = j.id
+    WHERE j.type = 'sovereign_state'
+      ${slugFilter}
+    ORDER BY pe.event_date DESC, pe.created_at DESC
+    LIMIT ${limit}
+    OFFSET ${offset}
+  `);
+}
+
+export async function getPulseHistory(slug: string, days = 90) {
+  return db.execute(sql`
+    SELECT
+      pds.score_date            AS "scoreDate",
+      pds.ci_baseline           AS "ciBaseline",
+      pds.event_impact          AS "eventImpact",
+      pds.pulse_score           AS "pulseScore",
+      pds.active_events         AS "activeEvents",
+      pds.is_low_confidence     AS "isLowConfidence"
+    FROM pulse_daily_scores pds
+    JOIN jurisdictions j ON pds.jurisdiction_id = j.id
+    WHERE j.slug = ${slug}
+      AND pds.score_date >= CURRENT_DATE - ${days}
+    ORDER BY pds.score_date ASC
+  `);
+}
+
+function getCurrentQuarter(): string {
+  const now = new Date();
+  const q = Math.ceil((now.getMonth() + 1) / 3);
+  return `${now.getFullYear()}-Q${q}`;
 }
