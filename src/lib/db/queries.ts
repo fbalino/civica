@@ -305,6 +305,10 @@ export async function getSource(sourceId: string) {
   return results[0] ?? null;
 }
 
+export async function getAllSources() {
+  return db.select().from(sources).orderBy(sources.name);
+}
+
 export async function getDistinctGovernmentTypes() {
   const results = await db
     .select({

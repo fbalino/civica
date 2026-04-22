@@ -11,6 +11,7 @@ import {
   persons,
   terms,
   statements,
+  sources,
 } from "../src/lib/db/schema";
 import { sparqlQuery, extractQid } from "../src/lib/data/wikidata";
 
@@ -372,6 +373,11 @@ async function main() {
     synced++;
     console.log(`  ✓ ${stateName}`);
   }
+
+  await db
+    .update(sources)
+    .set({ lastSyncAt: new Date() })
+    .where(eq(sources.id, "wikidata"));
 
   console.log(`\n=== Sync Complete ===`);
   console.log(`Synced:  ${synced}`);
