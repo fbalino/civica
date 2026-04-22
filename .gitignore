@@ -20,6 +20,10 @@
 # production
 /build
 
+# local artifacts from diagnostic runs / playwright
+/output/
+/test-results/
+
 # misc
 .DS_Store
 *.pem
