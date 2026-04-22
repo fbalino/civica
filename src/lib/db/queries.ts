@@ -323,6 +323,38 @@ export async function getDistinctGovernmentTypes() {
   return results.map((r) => r.governmentType!);
 }
 
+/**
+ * Returns clean structural family options (from the Bjornskov-Rode / CGV
+ * taxonomy layer) for use as Civica Index filter chips. Each option includes
+ * both the total number of sovereign states in that family and the number of
+ * those that have a CI composite score for the given quarter, so the UI can
+ * warn users when a filter combination would empty out.
+ */
+export async function getStructuralFamilyDistribution(quarter?: string) {
+  const q = quarter ?? (await getLatestAvailableQuarter());
+  const result = await db.execute(sql`
+    SELECT
+      gt.structural_family AS key,
+      COUNT(DISTINCT gt.jurisdiction_id)::int AS "totalCount",
+      COUNT(DISTINCT cs.jurisdiction_id) FILTER (
+        WHERE cs.quarter = ${q} AND cs.score IS NOT NULL
+      )::int AS "scoredCount"
+    FROM government_taxonomies gt
+    JOIN jurisdictions j ON j.id = gt.jurisdiction_id AND j.type = 'sovereign_state'
+    LEFT JOIN ci_composite_scores cs ON cs.jurisdiction_id = gt.jurisdiction_id
+    WHERE gt.taxonomy_version = '2026_v1'
+      AND gt.structural_family IS NOT NULL
+    GROUP BY gt.structural_family
+    ORDER BY "totalCount" DESC
+  `);
+  const rows = Array.isArray(result) ? result : (result as { rows?: unknown[] }).rows ?? [];
+  return (rows as Array<{ key: string; totalCount: number; scoredCount: number }>).map((row) => ({
+    key: row.key,
+    totalCount: Number(row.totalCount ?? 0),
+    scoredCount: Number(row.scoredCount ?? 0),
+  }));
+}
+
 export async function getJurisdictionsByGovernmentTypePattern(
   patterns: string[]
 ) {
@@ -866,7 +898,11 @@ export async function getMetricCoverage(metricId: string, year: number) {
 
 export async function getCIRankings(
   quarter?: string,
-  filters?: { continent?: string; governmentType?: string }
+  filters?: {
+    continent?: string;
+    governmentType?: string;
+    structuralFamily?: string;
+  }
 ) {
   const q = quarter ?? await getLatestAvailableQuarter();
   const continentFilter = filters?.continent
@@ -874,6 +910,14 @@ export async function getCIRankings(
     : sql``;
   const govTypeFilter = filters?.governmentType
     ? sql`AND j.government_type = ${filters.governmentType}`
+    : sql``;
+  const familyFilter = filters?.structuralFamily
+    ? sql`AND EXISTS (
+        SELECT 1 FROM government_taxonomies gt
+        WHERE gt.jurisdiction_id = j.id
+          AND gt.taxonomy_version = '2026_v1'
+          AND gt.structural_family = ${filters.structuralFamily}
+      )`
     : sql``;
 
   const result = await db.execute(sql`
@@ -901,6 +945,7 @@ export async function getCIRankings(
       AND j.type = 'sovereign_state'
       ${continentFilter}
       ${govTypeFilter}
+      ${familyFilter}
     ORDER BY cs.rank ASC
   `);
   const rows = Array.isArray(result)

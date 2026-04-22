@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getCIRankings, getDistinctGovernmentTypes } from "@/lib/db/queries";
+import { getCIRankings, getStructuralFamilyDistribution } from "@/lib/db/queries";
 import { CountryFlag } from "@/components/CountryFlag";
 import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
+import {
+  STRUCTURAL_FAMILY_META,
+  type StructuralFamilyKey,
+} from "@/lib/government-taxonomy";
 
 export const metadata: Metadata = {
   title: "Civica Index — Global Governance Rankings",
@@ -93,23 +97,31 @@ export default async function CivicaIndexPage({
   const sp = await searchParams;
   const continent =
     typeof sp?.continent === "string" ? sp.continent : undefined;
-  const governmentType =
-    typeof sp?.governmentType === "string" ? sp.governmentType : undefined;
+  const structuralFamily =
+    typeof sp?.family === "string" ? sp.family : undefined;
 
   let rawRows: CIRankingRow[] = [];
-  let govTypes: string[] = [];
+  let familyOptions: Array<{ key: string; totalCount: number; scoredCount: number }> = [];
   try {
-    const [result, gt] = await Promise.all([
-      getCIRankings(undefined, { continent, governmentType }),
-      getDistinctGovernmentTypes(),
+    const [result, families] = await Promise.all([
+      getCIRankings(undefined, { continent, structuralFamily }),
+      getStructuralFamilyDistribution(),
     ]);
     rawRows = Array.isArray(result)
       ? (result as unknown as CIRankingRow[])
       : ((result as { rows?: CIRankingRow[] }).rows ?? []);
-    govTypes = gt;
+    familyOptions = families;
   } catch {
     // DB not yet seeded
   }
+
+  // Sort family options by our canonical display order, then by count.
+  const familyOptionsSorted = [...familyOptions].sort((a, b) => {
+    const orderA = STRUCTURAL_FAMILY_META[a.key as StructuralFamilyKey]?.order ?? 999;
+    const orderB = STRUCTURAL_FAMILY_META[b.key as StructuralFamilyKey]?.order ?? 999;
+    if (orderA !== orderB) return orderA - orderB;
+    return b.totalCount - a.totalCount;
+  });
 
   const totalCountries = rawRows[0]?.totalRanked ?? rawRows.length;
   const avgCI =
@@ -120,17 +132,24 @@ export default async function CivicaIndexPage({
   const continentHref = (c: string | null) => {
     const qs = new URLSearchParams();
     if (c) qs.set("continent", c);
-    if (governmentType) qs.set("governmentType", governmentType);
+    if (structuralFamily) qs.set("family", structuralFamily);
     const q = qs.toString();
     return q ? `/civica-index?${q}` : "/civica-index";
   };
-  const govHref = (g: string | null) => {
+  const familyHref = (f: string | null) => {
     const qs = new URLSearchParams();
     if (continent) qs.set("continent", continent);
-    if (g) qs.set("governmentType", g);
+    if (f) qs.set("family", f);
     const q = qs.toString();
     return q ? `/civica-index?${q}` : "/civica-index";
   };
+
+  const activeFamilyMeta = structuralFamily
+    ? STRUCTURAL_FAMILY_META[structuralFamily as StructuralFamilyKey]
+    : null;
+  const activeFamilyOption = structuralFamily
+    ? familyOptionsSorted.find((f) => f.key === structuralFamily)
+    : null;
 
   return (
     <main className="civica-index-page">
@@ -161,7 +180,7 @@ export default async function CivicaIndexPage({
                 {avgCI > 0 ? avgCI.toFixed(1) : "—"}
               </div>
               <div className="ci-stat-label">
-                {continent || governmentType ? "Filtered average CI" : "Global average CI"}
+                {continent || structuralFamily ? "Filtered average CI" : "Global average CI"}
               </div>
             </div>
             <div className="ci-stat">
@@ -199,7 +218,7 @@ export default async function CivicaIndexPage({
         <section className="ci-controls" aria-label="Filters">
           <div className="ci-control-group" role="group" aria-label="Filter by region">
             <Link
-              href={govHref(null)}
+              href={familyHref(structuralFamily ?? null)}
               className={`ci-chip ${!continent ? "ci-chip--active" : ""}`}
               scroll={false}
             >
@@ -229,25 +248,34 @@ export default async function CivicaIndexPage({
             })}
           </div>
 
-          {govTypes.length > 0 && (
-            <div className="ci-control-group" role="group" aria-label="Filter by government type">
+          {familyOptionsSorted.length > 0 && (
+            <div className="ci-control-group" role="group" aria-label="Filter by government family">
               <Link
                 href={continent ? `/civica-index?continent=${encodeURIComponent(continent)}` : "/civica-index"}
-                className={`ci-chip ${!governmentType ? "ci-chip--active" : ""}`}
+                className={`ci-chip ${!structuralFamily ? "ci-chip--active" : ""}`}
                 scroll={false}
               >
                 All government types
               </Link>
-              {govTypes.slice(0, 5).map((g) => (
-                <Link
-                  key={g}
-                  href={govHref(g)}
-                  className={`ci-chip ${governmentType === g ? "ci-chip--active" : ""}`}
-                  scroll={false}
-                >
-                  {shortGovLabel(g)}
-                </Link>
-              ))}
+              {familyOptionsSorted.map((f) => {
+                const meta = STRUCTURAL_FAMILY_META[f.key as StructuralFamilyKey];
+                const label = meta?.label ?? f.key;
+                return (
+                  <Link
+                    key={f.key}
+                    href={familyHref(f.key)}
+                    className={`ci-chip ${structuralFamily === f.key ? "ci-chip--active" : ""}`}
+                    scroll={false}
+                    title={`${f.totalCount} countries · ${f.scoredCount} with a Civica Index score`}
+                  >
+                    {label}
+                    <span className="ci-chip-count">
+                      {" "}
+                      {f.scoredCount}/{f.totalCount}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </section>
@@ -257,7 +285,7 @@ export default async function CivicaIndexPage({
           <>
             <div className="ci-section-eyebrow" style={{ marginTop: 8 }}>
               {rawRows.length} {rawRows.length === 1 ? "country" : "countries"}
-              {continent || governmentType ? " · filtered" : " · ranked by CI"}
+              {continent || structuralFamily ? " · filtered" : " · ranked by CI"}
             </div>
 
             <section aria-label="Civica Index leaderboard">
@@ -345,11 +373,27 @@ export default async function CivicaIndexPage({
           </>
         ) : (
           <section className="ci-empty">
-            <p className="ci-empty-title">No Civica Index data available yet.</p>
-            <p className="ci-empty-sub">
-              Run <code>npm run ingest:ci</code> and{" "}
-              <code>npm run calculate:ci</code> to populate scores.
-            </p>
+            {activeFamilyMeta && activeFamilyOption && activeFamilyOption.totalCount > 0 ? (
+              <>
+                <p className="ci-empty-title">
+                  No Civica Index scores yet for {activeFamilyMeta.label.toLowerCase()}
+                  {continent ? ` in ${continent}` : ""}.
+                </p>
+                <p className="ci-empty-sub">
+                  {activeFamilyOption.totalCount} countr{activeFamilyOption.totalCount === 1 ? "y is" : "ies are"} classified in this group,
+                  but none of them have complete Civica Index coverage for this filter combination yet.
+                  Try a different region or government family above.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="ci-empty-title">No Civica Index data available for this filter.</p>
+                <p className="ci-empty-sub">
+                  Try a different region or government family above, or{" "}
+                  <Link href="/civica-index">see all scored countries</Link>.
+                </p>
+              </>
+            )}
           </section>
         )}
       </div>
