@@ -33,7 +33,7 @@ export default async function ElectionsPage() {
       .select({
         total: sql<number>`COUNT(*)`,
         upcoming: sql<number>`COUNT(*) FILTER (WHERE ${elections.electionDate} >= CURRENT_DATE)`,
-        avgTurnout: sql<number>`ROUND(AVG(${elections.turnoutPercent}) FILTER (WHERE ${elections.turnoutPercent} IS NOT NULL), 1)`,
+        avgTurnout: sql<number>`ROUND((AVG(${elections.turnoutPercent}) FILTER (WHERE ${elections.turnoutPercent} IS NOT NULL))::numeric, 1)`,
         thisYear: sql<number>`COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM ${elections.electionDate}::date) = EXTRACT(YEAR FROM CURRENT_DATE))`,
       })
       .from(elections)
@@ -46,8 +46,8 @@ export default async function ElectionsPage() {
       avgTurnout: Number(statsRow?.avgTurnout ?? 0),
       electionsThisYear: Number(statsRow?.thisYear ?? 0),
     };
-  } catch {
-    // DB not yet seeded
+  } catch (err) {
+    console.error("[elections] stats query failed:", err);
   }
 
   return <ElectionsClient upcoming={upcoming} recent={recent} stats={stats} />;

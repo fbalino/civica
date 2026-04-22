@@ -110,10 +110,10 @@ export default function ElectionsClient({
       {/* Stats — matching Index page pattern */}
       <div className="index-stats-row" style={{ marginBottom: 32 }}>
         {[
-          { value: stats.electionsThisYear || "—", label: `Elections in ${new Date().getFullYear()}` },
-          { value: stats.upcomingCount || "—", label: "Upcoming" },
-          { value: stats.avgTurnout ? `${stats.avgTurnout}%` : "—", label: "Avg Turnout" },
-          { value: stats.totalElections.toLocaleString() || "—", label: "Total Tracked" },
+          { value: stats.electionsThisYear ?? "—", label: `Elections in ${new Date().getFullYear()}` },
+          { value: stats.upcomingCount ?? "—", label: "Upcoming" },
+          { value: stats.avgTurnout != null ? `${stats.avgTurnout}%` : "—", label: "Avg Turnout" },
+          { value: stats.totalElections != null ? stats.totalElections.toLocaleString() : "—", label: "Total Tracked" },
         ].map((s, i, arr) => (
           <div key={s.label} style={{ display: "contents" }}>
             <div className="index-stat">
