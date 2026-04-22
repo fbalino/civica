@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import {
-  GOVERNMENT_TYPES,
-  matchGovernmentType,
-} from "@/lib/data/government-types";
+  STRUCTURAL_GOVERNMENT_TYPES,
+} from "@/lib/data/structural-government-types";
 import { CountryFlag } from "@/components/CountryFlag";
 
 const SITE_URL = "https://civicaatlas.org";
@@ -41,9 +40,8 @@ export default async function GovernmentTypesPage() {
   const typePopulations = new Map<string, number>();
   const typeExamples = new Map<string, typeof countries>();
   for (const c of countries) {
-    const gt = matchGovernmentType(
-      c.governmentTypeDetail ?? c.governmentType
-    );
+    const familyKey = c.governmentClassification?.structuralFamily ?? null;
+    const gt = STRUCTURAL_GOVERNMENT_TYPES.find((item) => item.familyKey === familyKey);
     if (gt) {
       typeCounts.set(gt.slug, (typeCounts.get(gt.slug) ?? 0) + 1);
       typePopulations.set(
@@ -61,14 +59,14 @@ export default async function GovernmentTypesPage() {
     0
   );
 
-  const sortedTypes = [...GOVERNMENT_TYPES].sort((a, b) => {
+  const sortedTypes = [...STRUCTURAL_GOVERNMENT_TYPES].sort((a, b) => {
     const ca = typeCounts.get(a.slug) ?? 0;
     const cb = typeCounts.get(b.slug) ?? 0;
     return cb - ca;
   });
 
   const maxCount = Math.max(
-    ...GOVERNMENT_TYPES.map((gt) => typeCounts.get(gt.slug) ?? 0),
+    ...STRUCTURAL_GOVERNMENT_TYPES.map((gt) => typeCounts.get(gt.slug) ?? 0),
     1
   );
 
@@ -86,7 +84,7 @@ export default async function GovernmentTypesPage() {
     },
     mainEntity: {
       "@type": "ItemList",
-      itemListElement: GOVERNMENT_TYPES.map((gt, i) => ({
+      itemListElement: STRUCTURAL_GOVERNMENT_TYPES.map((gt, i) => ({
         "@type": "ListItem",
         position: i + 1,
         name: gt.name,
@@ -131,7 +129,7 @@ export default async function GovernmentTypesPage() {
           <div className="index-stats-row">
             <div className="index-stat">
               <span className="index-stat__value">
-                {GOVERNMENT_TYPES.length}
+                {STRUCTURAL_GOVERNMENT_TYPES.length}
               </span>
               <span className="index-stat__label">Systems</span>
             </div>

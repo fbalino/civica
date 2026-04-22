@@ -22,6 +22,13 @@
       "when": 1745194800000,
       "tag": "0002_pulse_events",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1776819518187,
+      "tag": "0003_soft_shinko_yamashiro",
+      "breakpoints": true
     }
   ]
 }

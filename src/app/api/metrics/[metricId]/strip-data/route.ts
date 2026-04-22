@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { eq, sql } from "drizzle-orm";
-import { getMetricStripData, getGovTypeStripBands } from "@/lib/db/queries";
+import {
+  buildGovTypeStripBands,
+  getMetricStripData,
+} from "@/lib/db/queries";
 import { db } from "@/lib/db";
 import { jurisdictions, metricDefinitions, sources } from "@/lib/db/schema";
+import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 
 export async function GET(
   req: Request,
@@ -24,14 +28,28 @@ export async function GET(
   const govTypes = govTypesParam
     ? govTypesParam.split(",").map((t) => t.trim()).filter(Boolean)
     : undefined;
+  const regionsParam = searchParams.get("regions");
+  const regions = regionsParam
+    ? regionsParam.split(",").map((t) => t.trim()).filter(Boolean)
+    : undefined;
+  const taxonomyParam = searchParams.get("taxonomy");
+  const taxonomy: GovernmentTaxonomyLens =
+    taxonomyParam === "structural" || taxonomyParam === "regime"
+      ? taxonomyParam
+      : "raw";
 
-  const [rawRows, rawBands] = await Promise.all([
-    getMetricStripData(metricId, year, govTypes),
-    getGovTypeStripBands(metricId, year, govTypes),
-  ]);
+  const rawRows = await getMetricStripData(
+    metricId,
+    year,
+    govTypes,
+    taxonomy,
+    regions,
+  );
 
   const rows = Array.isArray(rawRows) ? rawRows : (rawRows as { rows: unknown[] }).rows ?? [];
-  const bands = Array.isArray(rawBands) ? rawBands : (rawBands as { rows: unknown[] }).rows ?? [];
+  const bands = buildGovTypeStripBands(
+    rows as Array<{ govType: string; value: number }>,
+  );
   const [metricDefRows, coverageRows] = await Promise.all([
     db
       .select({
@@ -69,6 +87,7 @@ export async function GET(
   return NextResponse.json({
     metricId,
     year,
+    taxonomy,
     data: rows,
     govTypeBands: bandByGovType,
     metricDef,

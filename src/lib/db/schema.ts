@@ -222,6 +222,45 @@ export const sources = pgTable("sources", {
   lastSyncAt: timestamp("last_sync_at"),
 });
 
+export const governmentTaxonomies = pgTable(
+  "government_taxonomies",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    taxonomyVersion: text("taxonomy_version").notNull(),
+    regimeTypeCgv: text("regime_type_cgv"),
+    regimeDatasetVersion: text("regime_dataset_version"),
+    regimeYear: integer("regime_year"),
+    structuralFamily: text("structural_family"),
+    structuralSubtype: text("structural_subtype"),
+    isFederal: boolean("is_federal"),
+    isMonarchy: boolean("is_monarchy"),
+    executiveStructure: text("executive_structure"),
+    governmentDependency: text("government_dependency"),
+    overrideNote: text("override_note"),
+    provenance: jsonb("provenance"),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_government_taxonomies_unique").on(
+      table.jurisdictionId,
+      table.taxonomyVersion
+    ),
+    index("idx_government_taxonomies_version").on(table.taxonomyVersion),
+    index("idx_government_taxonomies_regime").on(
+      table.taxonomyVersion,
+      table.regimeTypeCgv
+    ),
+    index("idx_government_taxonomies_structural").on(
+      table.taxonomyVersion,
+      table.structuralFamily
+    ),
+  ]
+);
+
 export const contactSubmissions = pgTable("contact_submissions", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),

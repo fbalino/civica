@@ -106,6 +106,14 @@ const SOURCES = [
     lastSyncAt: null,
   },
   {
+    id: "bjornskov_rode",
+    name: "Bjornskov-Rode / CGV Regime Data",
+    baseUrl: "https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset",
+    license: "academic_noncommercial",
+    isCommercialUseAllowed: false,
+    lastSyncAt: null,
+  },
+  {
     id: "rsf_press_freedom",
     name: "Reporters Without Borders Press Freedom Index",
     baseUrl: "https://rsf.org/en/index",

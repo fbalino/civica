@@ -27,6 +27,7 @@ import { FactbookSection } from "@/components/FactbookSection";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
 import { CountryTabs } from "./tabs";
 import { CountryFlag } from "@/components/CountryFlag";
+import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 import { HemicycleChart } from "@/components/HemicycleChart";
 import { classifyGovernment } from "@/lib/data/government-category";
@@ -180,6 +181,7 @@ export default async function CountryPage({
   const govCat = classifyGovernment(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType);
   const color = govCat.color;
   const govHeaderLabel = formatGovernmentType(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType) || govCat.label;
+  const taxonomy = jurisdiction.governmentClassification ?? null;
 
   const branchColorMap: Record<string, string> = {
     executive: "var(--color-branch-executive)",
@@ -1179,6 +1181,10 @@ export default async function CountryPage({
             CSV
           </a>
         </div>
+      </div>
+
+      <div style={{ marginBottom: 24 }}>
+        <GovernmentTaxonomyBlock classification={taxonomy} />
       </div>
 
       {/* Tabs — prototype: gap 2, border-bottom, 28px top margin, 32px bottom margin */}

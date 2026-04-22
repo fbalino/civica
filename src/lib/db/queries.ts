@@ -1,6 +1,14 @@
 import { eq, desc, asc, sql } from "drizzle-orm";
 import { db } from "./index";
 import {
+  buildGovernmentClassificationMap,
+  type JurisdictionTaxonomyInput,
+} from "./government-taxonomy";
+import {
+  getGovernmentTaxonomyGroupingLabel,
+  type GovernmentTaxonomyLens,
+} from "@/lib/government-taxonomy";
+import {
   jurisdictions,
   countryFactbookSections,
   countryFacts,
@@ -28,11 +36,19 @@ export async function getJurisdictionBySlug(slug: string) {
     .from(jurisdictions)
     .where(eq(jurisdictions.slug, slug))
     .limit(1);
-  return results[0] ?? null;
+  const jurisdiction = results[0] ?? null;
+  if (!jurisdiction) return null;
+  const classificationMap = await buildGovernmentClassificationMap([
+    jurisdiction satisfies JurisdictionTaxonomyInput,
+  ]);
+  return {
+    ...jurisdiction,
+    governmentClassification: classificationMap.get(jurisdiction.id) ?? null,
+  };
 }
 
 export async function getAllJurisdictions() {
-  return db
+  const rows = await db
     .select()
     .from(jurisdictions)
     .where(
@@ -42,12 +58,17 @@ export async function getAllJurisdictions() {
       sql`${jurisdictions.population} DESC NULLS LAST`,
       asc(jurisdictions.name)
     );
+  const classificationMap = await buildGovernmentClassificationMap(rows);
+  return rows.map((row) => ({
+    ...row,
+    governmentClassification: classificationMap.get(row.id) ?? null,
+  }));
 }
 
 // Non-territory sovereign states with population data. Used for the homepage
 // featured grid so we never surface Akrotiri / Antarctica / Bouvet Island first.
 export async function getFeaturedCountries(limit = 24) {
-  return db
+  const rows = await db
     .select()
     .from(jurisdictions)
     .where(
@@ -59,6 +80,11 @@ export async function getFeaturedCountries(limit = 24) {
     )
     .orderBy(desc(jurisdictions.population), asc(jurisdictions.name))
     .limit(limit);
+  const classificationMap = await buildGovernmentClassificationMap(rows);
+  return rows.map((row) => ({
+    ...row,
+    governmentClassification: classificationMap.get(row.id) ?? null,
+  }));
 }
 
 export async function getFactbookSections(jurisdictionId: string) {
@@ -190,10 +216,15 @@ export async function getGovernmentHierarchy(jurisdictionId: string) {
 
 export async function getJurisdictionsBySlugs(slugs: string[]) {
   if (slugs.length === 0) return [];
-  return db
+  const rows = await db
     .select()
     .from(jurisdictions)
     .where(sql`${jurisdictions.slug} IN ${slugs}`);
+  const classificationMap = await buildGovernmentClassificationMap(rows);
+  return rows.map((row) => ({
+    ...row,
+    governmentClassification: classificationMap.get(row.id) ?? null,
+  }));
 }
 
 export async function getCountryRankings(jurisdictionId: string) {
@@ -299,13 +330,18 @@ export async function getJurisdictionsByGovernmentTypePattern(
     conditions.length === 1
       ? conditions[0]
       : sql.join(conditions, sql` OR `);
-  return db
+  const rows = await db
     .select()
     .from(jurisdictions)
     .where(
       sql`${jurisdictions.type} = 'sovereign_state' AND (${combined})`
     )
     .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
+  const classificationMap = await buildGovernmentClassificationMap(rows);
+  return rows.map((row) => ({
+    ...row,
+    governmentClassification: classificationMap.get(row.id) ?? null,
+  }));
 }
 
 export async function getDemocracyScores(jurisdictionId: string) {
@@ -611,18 +647,20 @@ export async function getAllMetricDefinitionsWithCoverage(year?: number) {
 export async function getMetricStripData(
   metricId: string,
   year: number,
-  govTypes?: string[]
+  govTypes?: string[],
+  taxonomy: GovernmentTaxonomyLens = "raw",
+  regions?: string[],
 ) {
-  const govTypeFilter =
-    govTypes && govTypes.length > 0
-      ? sql`AND j.government_type = ANY(${govTypes})`
-      : sql``;
-
-  return db.execute(sql`
+  const result = await db.execute(sql`
     SELECT DISTINCT ON (cm.jurisdiction_id)
       cm.jurisdiction_id        AS "countryId",
       j.name                    AS "countryName",
+      j.continent               AS "continent",
       j.government_type         AS "govType",
+      j.government_type_detail  AS "governmentTypeDetail",
+      j.slug                    AS "slug",
+      j.iso2                    AS "iso2",
+      j.iso3                    AS "iso3",
       cm.value,
       cm.rank,
       cm.total_ranked           AS "totalRanked",
@@ -634,49 +672,108 @@ export async function getMetricStripData(
       AND cm.year <= ${year}
       AND j.type = 'sovereign_state'
       AND j.government_type IS NOT NULL
-      ${govTypeFilter}
     ORDER BY cm.jurisdiction_id, cm.year DESC
   `);
+
+  const rows = Array.isArray(result)
+    ? result
+    : ((result as { rows?: unknown[] }).rows ?? []);
+  const typedRows = rows as Array<{
+    countryId: string;
+    countryName: string;
+    continent?: string | null;
+    govType: string;
+    governmentTypeDetail?: string | null;
+    slug?: string | null;
+    iso2?: string | null;
+    iso3?: string | null;
+    value: number;
+    rank: number | null;
+    totalRanked: number | null;
+    asOfYear: number;
+    isStale: boolean;
+  }>;
+
+  const classificationMap = await buildGovernmentClassificationMap(
+    typedRows.map((row) => ({
+      id: row.countryId,
+      slug: row.slug ?? null,
+      iso3: row.iso3 ?? null,
+      governmentType: row.govType ?? null,
+      governmentTypeDetail: row.governmentTypeDetail ?? null,
+    })),
+  );
+
+  const filtered = typedRows
+    .map((row) => {
+      const classification =
+        classificationMap.get(row.countryId) ?? null;
+      const groupedGovType = classification
+        ? getGovernmentTaxonomyGroupingLabel(classification, taxonomy)
+        : row.govType;
+      return {
+        ...row,
+        govType: groupedGovType,
+        governmentClassification: classification,
+      };
+    })
+    .filter((row) =>
+      govTypes && govTypes.length > 0 ? govTypes.includes(row.govType) : true,
+    )
+    .filter((row) =>
+      regions && regions.length > 0
+        ? row.continent != null && regions.includes(row.continent)
+        : true,
+    )
+    .sort(
+      (a, b) =>
+        a.govType.localeCompare(b.govType) || Number(a.value) - Number(b.value),
+    );
+
+  return filtered;
 }
 
-export async function getGovTypeStripBands(
-  metricId: string,
-  year: number,
-  govTypes?: string[]
-) {
-  const govTypeFilter =
-    govTypes && govTypes.length > 0
-      ? sql`AND j.government_type = ANY(${govTypes})`
-      : sql``;
+function quantile(sortedValues: number[], percentile: number): number {
+  if (sortedValues.length === 0) return 0;
+  if (sortedValues.length === 1) return sortedValues[0];
+  const index = (sortedValues.length - 1) * percentile;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) return sortedValues[lower];
+  const weight = index - lower;
+  return sortedValues[lower] * (1 - weight) + sortedValues[upper] * weight;
+}
 
-  return db.execute(sql`
-    WITH latest_per_country AS (
-      SELECT DISTINCT ON (cm.jurisdiction_id)
-        cm.value,
-        j.government_type
-      FROM country_metrics cm
-      JOIN jurisdictions j ON cm.jurisdiction_id = j.id
-      WHERE cm.metric_id = ${metricId}
-        AND cm.year <= ${year}
-        AND j.type = 'sovereign_state'
-        AND j.government_type IS NOT NULL
-        ${govTypeFilter}
-      ORDER BY cm.jurisdiction_id, cm.year DESC
-    )
-    SELECT
-      government_type                                                      AS "govType",
-      COUNT(*)::int                                                        AS "count",
-      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY value)                  AS "median",
-      PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY value)                 AS "q1",
-      PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY value)                 AS "q3",
-      PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY value)
-        - PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY value)             AS "iqr",
-      MIN(value)                                                           AS "min",
-      MAX(value)                                                           AS "max"
-    FROM latest_per_country
-    GROUP BY government_type
-    ORDER BY government_type
-  `);
+export function buildGovTypeStripBands(
+  rows: Array<{ govType: string; value: number }>,
+) {
+  const grouped = new Map<string, number[]>();
+
+  for (const row of rows) {
+    if (!Number.isFinite(row.value)) continue;
+    const values = grouped.get(row.govType) ?? [];
+    values.push(Number(row.value));
+    grouped.set(row.govType, values);
+  }
+
+  return [...grouped.entries()]
+    .map(([govType, values]) => {
+      const sorted = [...values].sort((a, b) => a - b);
+      const q1 = quantile(sorted, 0.25);
+      const median = quantile(sorted, 0.5);
+      const q3 = quantile(sorted, 0.75);
+      return {
+        govType,
+        count: sorted.length,
+        median,
+        q1,
+        q3,
+        iqr: q3 - q1,
+        min: sorted[0] ?? 0,
+        max: sorted[sorted.length - 1] ?? 0,
+      };
+    })
+    .sort((a, b) => a.govType.localeCompare(b.govType));
 }
 
 export async function getCountryOutcomes(jurisdictionId: string, year: number) {
@@ -775,7 +872,7 @@ export async function getCIRankings(
     ? sql`AND j.government_type = ${filters.governmentType}`
     : sql``;
 
-  return db.execute(sql`
+  const result = await db.execute(sql`
     SELECT
       cs.score,
       cs.rank,
@@ -791,6 +888,7 @@ export async function getCIRankings(
       j.iso3,
       j.continent,
       j.government_type       AS "governmentType",
+      j.government_type_detail AS "governmentTypeDetail",
       j.population,
       j.flag_url              AS "flagUrl"
     FROM ci_composite_scores cs
@@ -801,6 +899,31 @@ export async function getCIRankings(
       ${govTypeFilter}
     ORDER BY cs.rank ASC
   `);
+  const rows = Array.isArray(result)
+    ? result
+    : ((result as { rows?: unknown[] }).rows ?? []);
+  const typedRows = rows as Array<{
+    jurisdictionId: string;
+    slug: string;
+    iso3?: string | null;
+    governmentType?: string | null;
+    governmentTypeDetail?: string | null;
+  } & Record<string, unknown>>;
+  const classificationMap = await buildGovernmentClassificationMap(
+    typedRows.map((row) => ({
+      id: row.jurisdictionId,
+      slug: row.slug,
+      iso3: (row.iso3 as string | null | undefined) ?? null,
+      governmentType: (row.governmentType as string | null | undefined) ?? null,
+      governmentTypeDetail:
+        (row.governmentTypeDetail as string | null | undefined) ?? null,
+    })),
+  );
+  return typedRows.map((row) => ({
+    ...row,
+    governmentClassification:
+      classificationMap.get(row.jurisdictionId) ?? null,
+  }));
 }
 
 export async function getCICountryDetail(slug: string, quarter?: string) {
@@ -843,8 +966,16 @@ export async function getCICountryDetail(slug: string, quarter?: string) {
     .orderBy(desc(pulseDailyScores.scoreDate))
     .limit(1);
 
+  const classificationMap = await buildGovernmentClassificationMap([
+    jurisdiction[0],
+  ]);
+
   return {
-    jurisdiction: jurisdiction[0],
+    jurisdiction: {
+      ...jurisdiction[0],
+      governmentClassification:
+        classificationMap.get(jurisdiction[0].id) ?? null,
+    },
     composite: composite ?? null,
     dimensions,
     pulse: pulseLatest[0] ?? null,
@@ -899,8 +1030,13 @@ export async function compareCICountries(slugs: string[], quarter?: string) {
       sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q}`
     );
 
+  const classificationMap = await buildGovernmentClassificationMap(countries);
+
   return countries.map((country) => ({
-    jurisdiction: country,
+    jurisdiction: {
+      ...country,
+      governmentClassification: classificationMap.get(country.id) ?? null,
+    },
     composite: composites.find((c) => c.jurisdictionId === country.id) ?? null,
     dimensions: dimensions.filter((d) => d.jurisdictionId === country.id),
   }));
@@ -932,13 +1068,15 @@ export async function getCIByGovernmentType(quarter?: string) {
 
 export async function getCIByGovernmentTypeDots(quarter?: string) {
   const q = quarter ?? await getLatestAvailableQuarter();
-
-  return db.execute(sql`
+  const result = await db.execute(sql`
     SELECT
+      j.id               AS "jurisdictionId",
       j.government_type  AS "governmentType",
+      j.government_type_detail AS "governmentTypeDetail",
       j.slug,
       j.name,
       j.iso2,
+      j.iso3,
       cs.score
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
@@ -947,23 +1085,77 @@ export async function getCIByGovernmentTypeDots(quarter?: string) {
       AND j.type = 'sovereign_state'
     ORDER BY j.government_type, cs.score DESC
   `);
+  const rows = Array.isArray(result)
+    ? result
+    : ((result as { rows?: unknown[] }).rows ?? []);
+  const typedRows = rows as Array<{
+    jurisdictionId: string;
+    governmentType: string;
+    governmentTypeDetail?: string | null;
+    slug: string;
+    name: string;
+    iso2?: string | null;
+    iso3?: string | null;
+    score: number;
+  }>;
+  const classificationMap = await buildGovernmentClassificationMap(
+    typedRows.map((row) => ({
+      id: row.jurisdictionId,
+      slug: row.slug,
+      iso3: row.iso3 ?? null,
+      governmentType: row.governmentType ?? null,
+      governmentTypeDetail: row.governmentTypeDetail ?? null,
+    })),
+  );
+  return typedRows.map((row) => ({
+    ...row,
+    governmentClassification:
+      classificationMap.get(row.jurisdictionId) ?? null,
+  }));
 }
 
 export async function getGovTypeTrajectory() {
-  return db.execute(sql`
+  const result = await db.execute(sql`
     SELECT
       cs.quarter,
+      j.id               AS "jurisdictionId",
       j.government_type  AS "governmentType",
-      AVG(cs.score)       AS "avgScore",
-      COUNT(*)::int       AS "countryCount"
+      j.government_type_detail AS "governmentTypeDetail",
+      j.slug,
+      j.iso3,
+      cs.score
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
     WHERE j.government_type IS NOT NULL
       AND j.type = 'sovereign_state'
-    GROUP BY cs.quarter, j.government_type
-    HAVING COUNT(*) >= 3
-    ORDER BY cs.quarter ASC, j.government_type ASC
+    ORDER BY cs.quarter ASC, j.government_type ASC, cs.score DESC
   `);
+  const rows = Array.isArray(result)
+    ? result
+    : ((result as { rows?: unknown[] }).rows ?? []);
+  const typedRows = rows as Array<{
+    quarter: string;
+    jurisdictionId: string;
+    governmentType: string;
+    governmentTypeDetail?: string | null;
+    slug: string;
+    iso3?: string | null;
+    score: number;
+  }>;
+  const classificationMap = await buildGovernmentClassificationMap(
+    typedRows.map((row) => ({
+      id: row.jurisdictionId,
+      slug: row.slug,
+      iso3: row.iso3 ?? null,
+      governmentType: row.governmentType ?? null,
+      governmentTypeDetail: row.governmentTypeDetail ?? null,
+    })),
+  );
+  return typedRows.map((row) => ({
+    ...row,
+    governmentClassification:
+      classificationMap.get(row.jurisdictionId) ?? null,
+  }));
 }
 
 export async function getCIMethodology(versionId?: string) {

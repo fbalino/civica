@@ -9,6 +9,7 @@ import { formatGovernmentType } from "@/lib/text/clean";
 export interface StripDot {
   countryId: string;
   countryName: string;
+  continent?: string | null;
   govType: string;
   value: number;
   rank: number | null;
@@ -658,40 +659,47 @@ export function MetricStripPlot({
             );
           })()}
 
-          {/* Source line */}
-          <text
-            x={MARGIN.left}
-            y={SVG_H - 12}
+        </svg>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+            marginTop: 10,
+          }}
+        >
+          <div
             style={{
               fill: "var(--color-text-25)",
               fontSize: "var(--text-10)",
               fontFamily: "var(--font-body-sans)",
               letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--color-text-25)",
             }}
           >
-            SOURCE:{" "}
-            {(metricDef.sourceName ?? metricDef.name).toUpperCase()} ·
-            CIVICA CLASSIFICATION · METHODOLOGY ↗
-          </text>
+            Source: {(metricDef.sourceName ?? metricDef.name).toUpperCase()} ·
+            Civica classification · Methodology ↗
+          </div>
 
-          {/* Coverage badge */}
-          {coverage && coveragePct != null && (
-            <text
-              x={SVG_W - MARGIN.right}
-              y={SVG_H - 12}
-              textAnchor="end"
+          {coverage && coveragePct != null ? (
+            <div
               style={{
-                fill: "var(--color-text-25)",
                 fontSize: "var(--text-10)",
                 fontFamily: "var(--font-body-sans)",
                 letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                color: "var(--color-text-25)",
+                textAlign: "right",
               }}
             >
-              COVERAGE: {coverage.withData} OF {coverage.total} COUNTRIES (
+              Coverage: {coverage.withData} of {coverage.total} countries (
               {coveragePct}%)
-            </text>
-          )}
-        </svg>
+            </div>
+          ) : null}
+        </div>
 
         {/* Tooltip (positioned as absolute div over container) */}
         {tooltip && tooltip.dot && (() => {

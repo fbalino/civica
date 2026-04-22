@@ -225,6 +225,7 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
       name: c.name,
       leader: c.leader,
       gov: c.gov,
+      govDetail: c.govDetail,
       region: c.region,
       pop: c.pop,
       gdp: c.gdp,
@@ -1758,7 +1759,13 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
             <h3>{hoverCard.country.name}</h3>
             <span className="hc-code">{hoverCard.country.id.toUpperCase()}</span>
           </div>
-          <div className="hc-row"><b>Government</b><span>{hoverCard.country.gov}</span></div>
+          <div className="hc-row hc-row--government">
+            <b>Government</b>
+            <span className="hc-row-value">{hoverCard.country.gov}</span>
+            {hoverCard.country.govDetail && (
+              <span className="hc-row-detail">{hoverCard.country.govDetail}</span>
+            )}
+          </div>
           <div className="hc-row"><b>Capital</b><span>{hoverCard.country.capital}</span></div>
           <div className="hc-row"><b>Pop.</b><span>{hoverCard.country.pop}</span></div>
           <div className="hc-row"><b>GDP</b><span>{hoverCard.country.gdp}</span></div>

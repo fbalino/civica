@@ -12,10 +12,16 @@
     "db:studio": "drizzle-kit studio",
     "seed:sources": "tsx scripts/seed-sources.ts",
     "seed:factbook": "tsx scripts/seed-from-factbook.ts",
+    "seed:ci-methodology": "tsx scripts/seed-ci-methodology.ts",
     "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
     "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
-    "ingest:pulse:events": "tsx scripts/ingest-pulse-events.ts"
+    "ingest:ci": "tsx scripts/ingest-ci-all.ts",
+    "calculate:ci": "tsx scripts/calculate-ci-composite.ts",
+    "ingest:pulse:events": "tsx scripts/ingest-pulse-events.ts",
+    "ingest:government-taxonomy:br": "tsx scripts/ingest-government-taxonomy-br.ts",
+    "derive:government-taxonomy": "tsx scripts/derive-government-taxonomy.ts",
+    "sync:government-taxonomy": "tsx scripts/ingest-government-taxonomy-br.ts && tsx scripts/derive-government-taxonomy.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getJurisdictionsByGovernmentTypePattern } from "@/lib/db/queries";
+import { getAllJurisdictions } from "@/lib/db/queries";
 import {
-  GOVERNMENT_TYPES,
-  getGovernmentTypeBySlug,
-} from "@/lib/data/government-types";
+  STRUCTURAL_GOVERNMENT_TYPES,
+  getStructuralGovernmentTypeBySlug,
+} from "@/lib/data/structural-government-types";
 import { CountryFlag } from "@/components/CountryFlag";
 
 const SITE_URL = "https://civicaatlas.org";
@@ -25,7 +25,7 @@ function formatLargeNumber(n: number): string {
 }
 
 export async function generateStaticParams() {
-  return GOVERNMENT_TYPES.map((gt) => ({ type: gt.slug }));
+  return STRUCTURAL_GOVERNMENT_TYPES.map((gt) => ({ type: gt.slug }));
 }
 
 export async function generateMetadata({
@@ -34,15 +34,16 @@ export async function generateMetadata({
   params: Promise<{ type: string }>;
 }): Promise<Metadata> {
   const { type } = await params;
-  const gt = getGovernmentTypeBySlug(type);
+  const gt = getStructuralGovernmentTypeBySlug(type);
   if (!gt) return { title: "Government Type Not Found" };
 
   let count = 0;
   try {
-    const countries = await getJurisdictionsByGovernmentTypePattern(
-      gt.dbPatterns
-    );
-    count = countries.length;
+    const countries = await getAllJurisdictions();
+    count = countries.filter(
+      (country) =>
+        country.governmentClassification?.structuralFamily === gt.familyKey,
+    ).length;
   } catch {
     // DB unavailable
   }
@@ -75,19 +76,22 @@ export default async function GovernmentTypePage({
   params: Promise<{ type: string }>;
 }) {
   const { type } = await params;
-  const gt = getGovernmentTypeBySlug(type);
+  const gt = getStructuralGovernmentTypeBySlug(type);
   if (!gt) notFound();
 
-  let countries: Awaited<
-    ReturnType<typeof getJurisdictionsByGovernmentTypePattern>
-  > = [];
+  let countries: Awaited<ReturnType<typeof getAllJurisdictions>> = [];
   try {
-    countries = await getJurisdictionsByGovernmentTypePattern(
-      gt.dbPatterns
+    countries = (await getAllJurisdictions()).filter(
+      (country) =>
+        country.governmentClassification?.structuralFamily === gt.familyKey,
     );
   } catch {
     // DB unavailable
   }
+
+  countries = [...countries].sort(
+    (a, b) => (b.population ?? 0) - (a.population ?? 0) || a.name.localeCompare(b.name),
+  );
 
   const totalPop = countries.reduce((s, c) => s + (c.population ?? 0), 0);
   const largest = countries[0];
@@ -100,14 +104,14 @@ export default async function GovernmentTypePage({
     (a, b) => b[1] - a[1]
   );
 
-  const currentIndex = GOVERNMENT_TYPES.findIndex(
+  const currentIndex = STRUCTURAL_GOVERNMENT_TYPES.findIndex(
     (g) => g.slug === gt.slug
   );
   const prevType =
-    currentIndex > 0 ? GOVERNMENT_TYPES[currentIndex - 1] : null;
+    currentIndex > 0 ? STRUCTURAL_GOVERNMENT_TYPES[currentIndex - 1] : null;
   const nextType =
-    currentIndex < GOVERNMENT_TYPES.length - 1
-      ? GOVERNMENT_TYPES[currentIndex + 1]
+    currentIndex < STRUCTURAL_GOVERNMENT_TYPES.length - 1
+      ? STRUCTURAL_GOVERNMENT_TYPES[currentIndex + 1]
       : null;
 
   const jsonLd = {

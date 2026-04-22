@@ -1,6 +1,6 @@
 {
-  "id": "9c9975e6-80e8-4bd9-806f-0a5cc4faa4ee",
-  "prevId": "f928c762-2fe2-47d8-a085-8a125c9a7721",
+  "id": "0fa71b1a-147a-4d53-90be-9d7694c1723f",
+  "prevId": "9c9975e6-80e8-4bd9-806f-0a5cc4faa4ee",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -1469,6 +1469,211 @@
         "government_bodies_jurisdiction_id_jurisdictions_id_fk": {
           "name": "government_bodies_jurisdiction_id_jurisdictions_id_fk",
           "tableFrom": "government_bodies",
+          "tableTo": "jurisdictions",
+          "columnsFrom": [
+            "jurisdiction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.government_taxonomies": {
+      "name": "government_taxonomies",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "jurisdiction_id": {
+          "name": "jurisdiction_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taxonomy_version": {
+          "name": "taxonomy_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "regime_type_cgv": {
+          "name": "regime_type_cgv",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "regime_dataset_version": {
+          "name": "regime_dataset_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "regime_year": {
+          "name": "regime_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "structural_family": {
+          "name": "structural_family",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "structural_subtype": {
+          "name": "structural_subtype",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_federal": {
+          "name": "is_federal",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_monarchy": {
+          "name": "is_monarchy",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "executive_structure": {
+          "name": "executive_structure",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "government_dependency": {
+          "name": "government_dependency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "override_note": {
+          "name": "override_note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "provenance": {
+          "name": "provenance",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_government_taxonomies_unique": {
+          "name": "idx_government_taxonomies_unique",
+          "columns": [
+            {
+              "expression": "jurisdiction_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "taxonomy_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_government_taxonomies_version": {
+          "name": "idx_government_taxonomies_version",
+          "columns": [
+            {
+              "expression": "taxonomy_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_government_taxonomies_regime": {
+          "name": "idx_government_taxonomies_regime",
+          "columns": [
+            {
+              "expression": "taxonomy_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "regime_type_cgv",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_government_taxonomies_structural": {
+          "name": "idx_government_taxonomies_structural",
+          "columns": [
+            {
+              "expression": "taxonomy_version",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "structural_family",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "government_taxonomies_jurisdiction_id_jurisdictions_id_fk": {
+          "name": "government_taxonomies_jurisdiction_id_jurisdictions_id_fk",
+          "tableFrom": "government_taxonomies",
           "tableTo": "jurisdictions",
           "columnsFrom": [
             "jurisdiction_id"

@@ -1,7 +1,7 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
+import { getJurisdictionBySlug } from "@/lib/db/queries";
 import {
-  jurisdictions,
   ciCompositeScores,
   ciDimensionScores,
 } from "@/lib/db/schema";
@@ -17,14 +17,7 @@ export async function GET(
   try {
     const { country_slug } = await params;
     const slug = country_slug.toLowerCase();
-
-    const jurisdictionRows = await db
-      .select({ id: jurisdictions.id, slug: jurisdictions.slug, name: jurisdictions.name })
-      .from(jurisdictions)
-      .where(sql`LOWER(${jurisdictions.slug}) = ${slug}`)
-      .limit(1);
-
-    const jurisdiction = jurisdictionRows[0];
+    const jurisdiction = await getJurisdictionBySlug(slug);
     if (!jurisdiction) {
       return apiError("Country not found", 404);
     }
@@ -59,6 +52,7 @@ export async function GET(
       data: {
         slug: jurisdiction.slug,
         name: jurisdiction.name,
+        governmentClassification: jurisdiction.governmentClassification ?? null,
         quarter: composite.quarter,
         score: composite.score,
         rank: composite.rank,

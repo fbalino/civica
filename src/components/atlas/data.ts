@@ -51,6 +51,7 @@ export interface Country {
   name: string;
   leader: string;
   gov: string;
+  govDetail?: string;
   region: string;
   pop: string;
   gdp: string;

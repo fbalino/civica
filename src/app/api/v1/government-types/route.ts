@@ -1,34 +1,31 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
-import { db } from "@/lib/db";
-import { jurisdictions } from "@/lib/db/schema";
-import { sql, asc } from "drizzle-orm";
+import { getAllJurisdictions } from "@/lib/db/queries";
+import { STRUCTURAL_GOVERNMENT_TYPES } from "@/lib/data/structural-government-types";
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
   if (rateLimited) return rateLimited;
 
   try {
-    const results = await db
-      .select({
-        governmentType: jurisdictions.governmentType,
-        count: sql<number>`count(*)::int`,
-        examples: sql<string>`string_agg(${jurisdictions.name}, ', ' ORDER BY ${jurisdictions.population} DESC NULLS LAST) FILTER (WHERE ${jurisdictions.population} IS NOT NULL)`,
-      })
-      .from(jurisdictions)
-      .where(
-        sql`${jurisdictions.type} = 'sovereign_state' AND ${jurisdictions.governmentType} IS NOT NULL AND LOWER(${jurisdictions.name}) <> 'none'`
-      )
-      .groupBy(jurisdictions.governmentType)
-      .orderBy(asc(jurisdictions.governmentType));
+    const countries = await getAllJurisdictions();
 
-    const data = results.map((r) => {
-      const allExamples = r.examples?.split(", ") ?? [];
+    const data = STRUCTURAL_GOVERNMENT_TYPES.map((type) => {
+      const matches = countries.filter(
+        (country) =>
+          country.governmentClassification?.structuralFamily === type.familyKey,
+      );
+
       return {
-        governmentType: r.governmentType,
-        count: r.count,
-        topExamples: allExamples.slice(0, 5),
+        governmentType: type.name,
+        structuralFamily: type.familyKey,
+        count: matches.length,
+        topExamples: matches
+          .slice()
+          .sort((a, b) => (b.population ?? 0) - (a.population ?? 0))
+          .slice(0, 5)
+          .map((country) => country.name),
       };
-    });
+    }).filter((row) => row.count > 0);
 
     return apiResponse({
       data,

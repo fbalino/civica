@@ -241,6 +241,26 @@ html.light .atlas-root {
   color: var(--atlas-ink-2); margin-top: 3px;
 }
 .atlas-hover-card .hc-row b { color: var(--atlas-muted); font-weight: 500; }
+.atlas-hover-card .hc-row--government {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  align-items: start;
+  row-gap: 2px;
+}
+.atlas-hover-card .hc-row--government b {
+  grid-row: 1 / span 2;
+}
+.atlas-hover-card .hc-row-value {
+  color: var(--atlas-ink);
+}
+.atlas-hover-card .hc-row-detail {
+  color: var(--atlas-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
 .atlas-hover-card .hc-leader {
   margin-top: 8px; font-family: "Fraunces", serif; font-size: 14px;
   line-height: 1.1; border-top: 1px dashed var(--atlas-rule); padding-top: 6px;

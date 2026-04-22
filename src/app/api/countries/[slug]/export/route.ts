@@ -23,6 +23,7 @@ export async function GET(
     population: jurisdiction.population,
     governmentType: jurisdiction.governmentType,
     governmentTypeDetail: jurisdiction.governmentTypeDetail,
+    governmentClassification: jurisdiction.governmentClassification ?? null,
     democracyIndex: jurisdiction.democracyIndex,
     facts: facts.map((f) => ({
       category: f.category,

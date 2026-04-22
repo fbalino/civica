@@ -357,6 +357,20 @@ export default function ApiDocsPage() {
       "population": 339996563,
       "governmentType": "presidential republic",
       "governmentTypeDetail": "constitutional federal republic",
+      "governmentClassification": {
+        "rawLabel": "constitutional federal republic",
+        "regimeType": "presidential_democracy",
+        "regimeSource": "Bjornskov-Rode / CGV (QoG Standard)",
+        "regimeYear": 2025,
+        "structuralFamily": "presidential_republic",
+        "structuralSubtype": "federal_presidential_republic",
+        "primitives": {
+          "isFederal": true,
+          "isMonarchy": false,
+          "executiveStructure": "single_executive",
+          "governmentDependency": "fixed_term"
+        }
+      },
       "gdpBillions": 25.46,
       "areaSqKm": 9833520,
       "flagUrl": "..."
@@ -394,6 +408,20 @@ export default function ApiDocsPage() {
     "population": 68170228,
     "governmentType": "semi-presidential republic",
     "governmentTypeDetail": "...",
+    "governmentClassification": {
+      "rawLabel": "semi-presidential republic",
+      "regimeType": "semi_presidential_democracy",
+      "regimeSource": "Bjornskov-Rode / CGV (QoG Standard)",
+      "regimeYear": 2025,
+      "structuralFamily": "semi_presidential",
+      "structuralSubtype": "semi_presidential_republic",
+      "primitives": {
+        "isFederal": false,
+        "isMonarchy": false,
+        "executiveStructure": "dual_executive",
+        "governmentDependency": "mixed_dependency"
+      }
+    },
     "gdpBillions": 2.78,
     "areaSqKm": 643801,
     "languages": "French",

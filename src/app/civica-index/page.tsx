@@ -103,8 +103,9 @@ export default async function CivicaIndexPage({
       getCIRankings(undefined, { continent, governmentType }),
       getDistinctGovernmentTypes(),
     ]);
-    const res = result as unknown as { rows: CIRankingRow[] };
-    rawRows = res.rows ?? [];
+    rawRows = Array.isArray(result)
+      ? (result as unknown as CIRankingRow[])
+      : ((result as { rows?: CIRankingRow[] }).rows ?? []);
     govTypes = gt;
   } catch {
     // DB not yet seeded

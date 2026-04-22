@@ -8,7 +8,7 @@ import {
   persons,
   legislatureParties,
 } from "@/lib/db/schema";
-import { formatGovernmentType } from "@/lib/text/clean";
+import { formatGovernmentDisplay } from "@/lib/text/clean";
 import { resolvePartyColor } from "@/lib/data/party-colors";
 
 export interface AtlasCountry {
@@ -18,6 +18,7 @@ export interface AtlasCountry {
   name: string;
   leader: string;
   gov: string;
+  govDetail?: string;
   region: string;
   pop: string;
   gdp: string;
@@ -160,20 +161,28 @@ export async function loadAtlasData(): Promise<{
   }
 
   // Build countries
-  const countries: AtlasCountry[] = allJurisdictions.map((j) => ({
-    id: j.iso3!.toLowerCase(),
-    slug: j.slug,
-    iso2: j.iso2 ?? undefined,
-    name: j.name,
-    leader: leaderByJurisdiction.get(j.id)?.name || "—",
-    gov: formatGovernmentType(j.governmentType || j.governmentTypeDetail) || "—",
-    region: CONTINENT_TO_REGION[j.continent || ""] || j.continent || "—",
-    pop: formatPop(j.population),
-    gdp: formatGdp(j.gdpBillions),
-    capital: j.capital || "—",
-    iso3: j.iso3!,
-    featured: TOP_COUNTRIES.has(j.iso3!.toUpperCase()),
-  }));
+  const countries: AtlasCountry[] = allJurisdictions.map((j) => {
+    const government = formatGovernmentDisplay(
+      j.governmentTypeDetail || j.governmentType,
+      j.name
+    );
+
+    return {
+      id: j.iso3!.toLowerCase(),
+      slug: j.slug,
+      iso2: j.iso2 ?? undefined,
+      name: j.name,
+      leader: leaderByJurisdiction.get(j.id)?.name || "—",
+      gov: government.label,
+      govDetail: government.detail ?? undefined,
+      region: CONTINENT_TO_REGION[j.continent || ""] || j.continent || "—",
+      pop: formatPop(j.population),
+      gdp: formatGdp(j.gdpBillions),
+      capital: j.capital || "—",
+      iso3: j.iso3!,
+      featured: TOP_COUNTRIES.has(j.iso3!.toUpperCase()),
+    };
+  });
 
   // Build chambers: keyed by iso3 lowercase
   const chambers: Record<string, AtlasChamberData> = {};

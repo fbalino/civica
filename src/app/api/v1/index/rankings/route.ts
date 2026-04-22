@@ -1,7 +1,9 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
+import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { jurisdictions, ciCompositeScores, pulseDailyScores } from "@/lib/db/schema";
 import { eq, sql, desc, asc } from "drizzle-orm";
+import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
@@ -13,8 +15,13 @@ export async function GET(request: Request) {
     const sort = url.searchParams.get("sort") ?? "ci";
     const continent = url.searchParams.get("continent");
     const governmentType = url.searchParams.get("government_type");
+    const taxonomyParam = url.searchParams.get("taxonomy");
     const limitParam = url.searchParams.get("limit");
     const offsetParam = url.searchParams.get("offset");
+    const taxonomy: GovernmentTaxonomyLens =
+      taxonomyParam === "structural" || taxonomyParam === "regime"
+        ? taxonomyParam
+        : "raw";
 
     const limit = Math.min(Math.max(parseInt(limitParam ?? "50", 10) || 50, 1), 250);
     const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
@@ -39,7 +46,7 @@ export async function GET(request: Request) {
     if (continent) {
       conditions.push(sql`LOWER(${jurisdictions.continent}) = ${continent.toLowerCase()}`);
     }
-    if (governmentType) {
+    if (governmentType && taxonomy === "raw") {
       conditions.push(
         sql`(LOWER(${jurisdictions.governmentType}) LIKE ${`%${governmentType.toLowerCase()}%`}
           OR LOWER(${jurisdictions.governmentTypeDetail}) LIKE ${`%${governmentType.toLowerCase()}%`})`
@@ -51,6 +58,7 @@ export async function GET(request: Request) {
     const isCpSort = sort === "cp";
 
     const baseSelect = {
+      jurisdictionId: jurisdictions.id,
       rank: ciCompositeScores.rank,
       score: ciCompositeScores.score,
       isPartial: ciCompositeScores.isPartial,
@@ -58,8 +66,10 @@ export async function GET(request: Request) {
       methodologyVersion: ciCompositeScores.methodologyVersion,
       slug: jurisdictions.slug,
       name: jurisdictions.name,
+      iso3: jurisdictions.iso3,
       continent: jurisdictions.continent,
       governmentType: jurisdictions.governmentType,
+      governmentTypeDetail: jurisdictions.governmentTypeDetail,
     };
 
     const cpSelect = isCpSort
@@ -94,6 +104,49 @@ export async function GET(request: Request) {
       ? sql`${pulseDailyScores.pulseScore} DESC NULLS LAST`
       : asc(ciCompositeScores.rank);
 
+    if (taxonomy !== "raw" && governmentType) {
+      const rows = await rowsQuery
+        .where(where)
+        .orderBy(orderCol);
+
+      const classificationMap = await buildGovernmentClassificationMap(
+        rows.map((row) => ({
+          id: row.jurisdictionId,
+          slug: row.slug,
+          iso3: row.iso3,
+          governmentType: row.governmentType,
+          governmentTypeDetail: row.governmentTypeDetail,
+        })),
+      );
+
+      const filtered = rows
+        .map(({ jurisdictionId, ...row }) => ({
+          ...row,
+          governmentClassification: classificationMap.get(jurisdictionId) ?? null,
+        }))
+        .filter((row) => {
+          const label =
+            taxonomy === "regime"
+              ? row.governmentClassification?.regimeTypeLabel
+              : row.governmentClassification?.structuralFamilyLabel;
+          return label
+            ? label.toLowerCase().includes(governmentType.toLowerCase())
+            : false;
+        });
+
+      return apiResponse({
+        data: filtered.slice(offset, offset + limit),
+        meta: {
+          total: filtered.length,
+          limit,
+          offset,
+          hasMore: offset + limit < filtered.length,
+          quarter,
+          taxonomy,
+        },
+      });
+    }
+
     const [rows, countResult] = await Promise.all([
       rowsQuery
         .where(where)
@@ -108,10 +161,22 @@ export async function GET(request: Request) {
     ]);
 
     const total = countResult[0]?.count ?? 0;
+    const classificationMap = await buildGovernmentClassificationMap(
+      rows.map((row) => ({
+        id: row.jurisdictionId,
+        slug: row.slug,
+        iso3: row.iso3,
+        governmentType: row.governmentType,
+        governmentTypeDetail: row.governmentTypeDetail,
+      })),
+    );
 
     return apiResponse({
-      data: rows,
-      meta: { total, limit, offset, hasMore: offset + limit < total, quarter },
+      data: rows.map(({ jurisdictionId, ...row }) => ({
+        ...row,
+        governmentClassification: classificationMap.get(jurisdictionId) ?? null,
+      })),
+      meta: { total, limit, offset, hasMore: offset + limit < total, quarter, taxonomy },
     });
   } catch (e) {
     console.error("API /v1/index/rankings error:", e);

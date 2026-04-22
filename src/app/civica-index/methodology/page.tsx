@@ -15,10 +15,11 @@ const SECTIONS = [
   { id: "ci", num: 3, label: "Civica Index (CI)" },
   { id: "cp", num: 4, label: "Civica Pulse (CP)" },
   { id: "gov-modifier", num: 5, label: "Government modifier" },
-  { id: "limitations", num: 6, label: "Limitations" },
-  { id: "citation", num: 7, label: "Publication & citation" },
-  { id: "site", num: 8, label: "Site integration" },
-  { id: "versioning", num: 9, label: "Versioning" },
+  { id: "government-taxonomy", num: 6, label: "Government taxonomy" },
+  { id: "limitations", num: 7, label: "Limitations" },
+  { id: "citation", num: 8, label: "Publication & citation" },
+  { id: "site", num: 9, label: "Site integration" },
+  { id: "versioning", num: 10, label: "Versioning" },
 ];
 
 interface DimensionRow {
@@ -451,9 +452,51 @@ CP          = clamp(CI + clamp(EventImpact, −30, +30), 0, 100)`}</pre>
           </p>
         </section>
 
+        <section id="government-taxonomy">
+          <h2>
+            <span className="num">Section 6</span>Government taxonomy layers
+          </h2>
+          <p>
+            Civica now keeps <strong>three separate government labels</strong>
+            for each country so the site can stay academically honest without
+            flattening unlike systems into one bucket.
+          </p>
+          <ul className="bullets">
+            <li>
+              <strong>Raw source label.</strong> The CIA World Factbook wording
+              is preserved exactly for provenance.
+            </li>
+            <li>
+              <strong>Normalized regime type.</strong> Bjornskov-Rode / CGV
+              coding tracks executive-legislative accountability in the
+              parliamentary / semi-presidential / presidential democracy and
+              civilian / military / royal dictatorship families.
+            </li>
+            <li>
+              <strong>Derived structural form.</strong> Civica derives the
+              system&apos;s constitutional form from explicit primitives such as
+              federalism, monarchy, executive structure, and government
+              dependency, with documented overrides for edge cases.
+            </li>
+          </ul>
+          <p>
+            These layers are <strong>classification metadata only</strong>.
+            They do not change CI weights, dimension scores, or the composite
+            formula. Their purpose is interpretive: to help readers compare
+            systems without mistaking structural form for a scoring bonus.
+          </p>
+          <p>
+            Switzerland is a useful example of why the layers stay separate:
+            BR/CGV codes it as a <em>presidential democracy</em> in the
+            accountability sense, while Civica&apos;s structural layer exposes its
+            <em>federal directorial republic</em> form. Both statements are
+            true, and the disagreement is informative rather than an error.
+          </p>
+        </section>
+
         <section id="limitations">
           <h2>
-            <span className="num">Section 6</span>Data quality &amp; limitations
+            <span className="num">Section 7</span>Data quality &amp; limitations
           </h2>
           <p>
             <strong>Known limitations.</strong> The CI is only as current as its
@@ -475,7 +518,7 @@ CP          = clamp(CI + clamp(EventImpact, −30, +30), 0, 100)`}</pre>
 
         <section id="citation">
           <h2>
-            <span className="num">Section 7</span>Publication &amp; citation
+            <span className="num">Section 8</span>Publication &amp; citation
           </h2>
           <pre className="formula">{`Civica Index ${new Date().getFullYear()}. Civica Atlas. https://civicaatlas.org/civica-index
 Civica Pulse for [Country], [Date]. Civica Atlas. https://civicaatlas.org/civica-index/[slug]`}</pre>
@@ -494,7 +537,7 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
 
         <section id="site">
           <h2>
-            <span className="num">Section 8</span>Site integration
+            <span className="num">Section 9</span>Site integration
           </h2>
           <table>
             <thead>
@@ -534,7 +577,7 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
 
         <section id="versioning">
           <h2>
-            <span className="num">Section 9</span>Versioning
+            <span className="num">Section 10</span>Versioning
           </h2>
           <div className="version-strip">
             <div className="version-cell">

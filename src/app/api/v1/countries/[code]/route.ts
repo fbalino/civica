@@ -1,5 +1,6 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
+import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import {
   jurisdictions,
   governmentBodies,
@@ -34,6 +35,7 @@ export async function GET(
     if (!country) {
       return apiError(`Country not found: ${code}`, 404);
     }
+    const classificationMap = await buildGovernmentClassificationMap([country]);
 
     const bodies = await db
       .select()
@@ -141,6 +143,7 @@ export async function GET(
         population: country.population,
         governmentType: country.governmentType,
         governmentTypeDetail: country.governmentTypeDetail,
+        governmentClassification: classificationMap.get(country.id) ?? null,
         gdpBillions: country.gdpBillions,
         areaSqKm: country.areaSqKm,
         languages: country.languages,

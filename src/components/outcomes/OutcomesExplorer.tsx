@@ -11,6 +11,7 @@ import React, {
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MetricStripPlot } from "@/components/outcomes/MetricStripPlot";
+import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import type {
   StripDot,
   GovTypeBand,
@@ -43,6 +44,7 @@ interface StripDataResponse {
   govTypeBands: Record<string, GovTypeBand>;
   metricDef: MetricDef;
   coverage: { total: number; withData: number };
+  taxonomy?: GovernmentTaxonomyLens;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -89,40 +91,215 @@ function StripSkeleton() {
   );
 }
 
-// ─── Chip ─────────────────────────────────────────────────────────────────────
+// ─── Filter menu ──────────────────────────────────────────────────────────────
 
-interface ChipProps {
+interface FilterMenuProps {
   label: string;
-  active: boolean;
-  onClick: () => void;
+  summary: string;
+  open: boolean;
+  onToggle: () => void;
+  onClear: () => void;
+  items: Array<{
+    id: string;
+    label: string;
+    checked: boolean;
+    onToggle: () => void;
+  }>;
 }
 
-function Chip({ label, active, onClick }: ChipProps) {
+function FilterMenu({
+  label,
+  summary,
+  open,
+  onToggle,
+  onClear,
+  items,
+}: FilterMenuProps) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <div style={{ position: "relative", minWidth: 210 }}>
+      <div
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+          fontSize: "var(--text-10)",
+          letterSpacing: "var(--tracking-caps)",
+          textTransform: "uppercase",
+          color: "var(--color-text-30)",
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          padding: "10px 12px",
+          borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--color-card-border)",
+          background: "var(--color-select-bg, var(--color-surface-elevated))",
+          color: "var(--color-text-primary)",
+          fontFamily: "var(--font-body-sans)",
+          fontSize: "var(--text-13)",
+          cursor: "pointer",
+          textAlign: "left",
+        }}
+      >
+        <span
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {summary}
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            color: "var(--color-text-40)",
+            transition: "transform 140ms ease",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+          }}
+        >
+          ▾
+        </span>
+      </button>
+      {open ? (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 6px)",
+            left: 0,
+            zIndex: 50,
+            minWidth: "100%",
+            maxWidth: 320,
+            background: "var(--color-card-bg)",
+            border: "1px solid var(--color-card-border)",
+            borderRadius: "var(--radius-sm)",
+            boxShadow: "var(--shadow-dropdown)",
+            padding: "12px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 10,
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontSize: "var(--text-10)",
+                letterSpacing: "var(--tracking-caps)",
+                textTransform: "uppercase",
+                color: "var(--color-text-30)",
+              }}
+            >
+              {label}
+            </div>
+            <button
+              type="button"
+              onClick={onClear}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontSize: "var(--text-10)",
+                letterSpacing: "var(--tracking-caps)",
+                textTransform: "uppercase",
+                color: "var(--color-accent)",
+              }}
+            >
+              Show all
+            </button>
+          </div>
+          <div style={{ display: "grid", gap: 6, maxHeight: 240, overflowY: "auto" }}>
+            {items.map((item) => (
+              <label
+                key={item.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  cursor: "pointer",
+                  padding: "4px 0",
+                  fontFamily: "var(--font-body-sans)",
+                  fontSize: "var(--text-13)",
+                  color: "var(--color-text-60)",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={item.checked}
+                  onChange={item.onToggle}
+                  style={{ accentColor: "var(--color-accent)" }}
+                />
+                <span>{item.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function TaxonomyGlossaryCard({
+  label,
+  title,
+  description,
+}: {
+  label: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div
+      title={title}
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 4,
-        padding: "4px 10px",
-        borderRadius: "var(--radius-sm)",
-        border: active
-          ? "1px solid var(--color-accent)"
-          : "1px solid var(--color-card-border)",
-        background: active ? "var(--color-accent-soft, color-mix(in oklab, var(--color-accent) 18%, transparent))" : "transparent",
-        color: active ? "var(--color-accent)" : "var(--color-text-50)",
-        fontFamily: "var(--font-body-sans)",
-        fontSize: "var(--text-12)",
-        fontWeight: active ? 600 : 400,
-        cursor: "pointer",
-        whiteSpace: "nowrap",
-        transition: "border-color 120ms, background 120ms, color 120ms",
+        borderLeft: "1px solid var(--color-card-border)",
+        paddingLeft: 14,
       }}
     >
-      {label}
-    </button>
+      <div
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+          fontSize: "var(--text-10)",
+          letterSpacing: "var(--tracking-caps)",
+          textTransform: "uppercase",
+          color: "var(--color-accent)",
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: "var(--font-body-sans)",
+          fontSize: "var(--text-13)",
+          color: "var(--color-text-50)",
+          lineHeight: 1.55,
+        }}
+      >
+        {description}
+      </p>
+    </div>
   );
 }
 
@@ -359,12 +536,21 @@ export function OutcomesExplorer({
     const raw = searchParams.get("govTypes");
     return raw ? raw.split(",").filter(Boolean) : [];
   });
-  const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+  const [taxonomy, setTaxonomy] = useState<GovernmentTaxonomyLens>(() => {
+    const raw = searchParams.get("taxonomy");
+    return raw === "raw" || raw === "regime" ? raw : "structural";
+  });
+  const [selectedRegions, setSelectedRegions] = useState<string[]>(() => {
+    const raw = searchParams.get("regions");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  });
   const [smallMultiples, setSmallMultiples] = useState(false);
-  const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
   const [methodologyOpen, setMethodologyOpen] = useState(false);
-  const [overflowOpen, setOverflowOpen] = useState(false);
-  const overflowRef = useRef<HTMLDivElement>(null);
+  const [openMenu, setOpenMenu] = useState<null | "government" | "region">(
+    null,
+  );
+  const govMenuRef = useRef<HTMLDivElement>(null);
+  const regionMenuRef = useRef<HTMLDivElement>(null);
 
   // ── Fetched data ──
   const [stripData, setStripData] = useState<StripDataResponse | null>(null);
@@ -425,21 +611,42 @@ export function OutcomesExplorer({
     return Array.from(seen).sort();
   }, [stripData]);
 
-  const visibleChips = availableGovTypes.slice(0, 8);
-  const overflowChips = availableGovTypes.slice(8);
+  const selectedGovTypeSummary = useMemo(() => {
+    if (selectedGovTypes.length === 0) {
+      return taxonomy === "raw" ? "All source labels" : "All categories";
+    }
+    if (selectedGovTypes.length === 1) {
+      return selectedGovTypes[0];
+    }
+    return `${selectedGovTypes.length} selected`;
+  }, [selectedGovTypes, taxonomy]);
+
+  const selectedRegionSummary = useMemo(() => {
+    if (selectedRegions.length === 0) return "All regions";
+    if (selectedRegions.length === 1) return selectedRegions[0];
+    return `${selectedRegions.length} selected`;
+  }, [selectedRegions]);
 
   // ── URL sync ──
   const syncUrl = useCallback(
     (
       newMetric: string,
       newYear: number,
-      newGovTypes: string[]
+      newGovTypes: string[],
+      newTaxonomy: GovernmentTaxonomyLens,
+      newRegions: string[],
     ) => {
       const params = new URLSearchParams();
       params.set("metric", newMetric);
       params.set("year", String(newYear));
+      if (newTaxonomy !== "structural") {
+        params.set("taxonomy", newTaxonomy);
+      }
       if (newGovTypes.length > 0) {
         params.set("govTypes", newGovTypes.join(","));
+      }
+      if (newRegions.length > 0) {
+        params.set("regions", newRegions.join(","));
       }
       startTransition(() => {
         router.replace(`/outcomes?${params.toString()}`, { scroll: false });
@@ -453,7 +660,9 @@ export function OutcomesExplorer({
     async (
       mId: string,
       yr: number,
-      govTypes: string[]
+      govTypes: string[],
+      nextTaxonomy: GovernmentTaxonomyLens,
+      regions: string[],
     ) => {
       setLoading(true);
       try {
@@ -461,8 +670,14 @@ export function OutcomesExplorer({
           govTypes.length > 0
             ? `&govTypes=${encodeURIComponent(govTypes.join(","))}`
             : "";
+        const taxonomyParam =
+          nextTaxonomy !== "raw" ? `&taxonomy=${encodeURIComponent(nextTaxonomy)}` : "";
+        const regionsParam =
+          regions.length > 0
+            ? `&regions=${encodeURIComponent(regions.join(","))}`
+            : "";
         const res = await fetch(
-          `/api/metrics/${mId}/strip-data?year=${yr}${govTypesParam}`
+          `/api/metrics/${mId}/strip-data?year=${yr}${govTypesParam}${taxonomyParam}${regionsParam}`
         );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json: StripDataResponse = await res.json();
@@ -478,17 +693,28 @@ export function OutcomesExplorer({
 
   // ── Fetch all metrics strip data (small multiples) ──
   const fetchAllStripData = useCallback(
-    async (yr: number, govTypes: string[]) => {
+    async (
+      yr: number,
+      govTypes: string[],
+      nextTaxonomy: GovernmentTaxonomyLens,
+      regions: string[],
+    ) => {
       setLoadingAll(true);
       try {
         const govTypesParam =
           govTypes.length > 0
             ? `&govTypes=${encodeURIComponent(govTypes.join(","))}`
             : "";
+        const taxonomyParam =
+          nextTaxonomy !== "raw" ? `&taxonomy=${encodeURIComponent(nextTaxonomy)}` : "";
+        const regionsParam =
+          regions.length > 0
+            ? `&regions=${encodeURIComponent(regions.join(","))}`
+            : "";
         const results = await Promise.allSettled(
           metrics.map((m) =>
             fetch(
-              `/api/metrics/${m.id}/strip-data?year=${yr}${govTypesParam}`
+              `/api/metrics/${m.id}/strip-data?year=${yr}${govTypesParam}${taxonomyParam}${regionsParam}`
             ).then((r) => r.json() as Promise<StripDataResponse>)
           )
         );
@@ -512,30 +738,39 @@ export function OutcomesExplorer({
 
   // Fetch on metric/year/govTypes change
   useEffect(() => {
-    fetchStripData(metricId, year, selectedGovTypes);
-  }, [metricId, year, selectedGovTypes, fetchStripData]);
+    fetchStripData(metricId, year, selectedGovTypes, taxonomy, selectedRegions);
+  }, [metricId, year, selectedGovTypes, taxonomy, selectedRegions, fetchStripData]);
 
   // Fetch all when small multiples enabled
   useEffect(() => {
     if (smallMultiples) {
-      fetchAllStripData(year, selectedGovTypes);
+      fetchAllStripData(year, selectedGovTypes, taxonomy, selectedRegions);
     }
-  }, [smallMultiples, year, selectedGovTypes, fetchAllStripData]);
+  }, [
+    smallMultiples,
+    year,
+    selectedGovTypes,
+    taxonomy,
+    selectedRegions,
+    fetchAllStripData,
+  ]);
 
-  // Close overflow dropdown on outside click
+  // Close filter menus on outside click
   useEffect(() => {
-    if (!overflowOpen) return;
+    if (!openMenu) return;
     const handler = (e: MouseEvent) => {
+      const target = e.target as Node;
       if (
-        overflowRef.current &&
-        !overflowRef.current.contains(e.target as Node)
+        govMenuRef.current?.contains(target) ||
+        regionMenuRef.current?.contains(target)
       ) {
-        setOverflowOpen(false);
+        return;
       }
+      setOpenMenu(null);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [overflowOpen]);
+  }, [openMenu]);
 
   // ── Handlers ──
 
@@ -546,13 +781,13 @@ export function OutcomesExplorer({
     setYear(newYear);
     setSelectedGovTypes([]);
     setSelectedCountry(null);
-    syncUrl(id, newYear, []);
+    syncUrl(id, newYear, [], taxonomy, selectedRegions);
   };
 
   const handleYearChange = (yr: number) => {
     setYear(yr);
     setSelectedCountry(null);
-    syncUrl(metricId, yr, selectedGovTypes);
+    syncUrl(metricId, yr, selectedGovTypes, taxonomy, selectedRegions);
   };
 
   const handleGovTypeToggle = (govType: string) => {
@@ -568,13 +803,34 @@ export function OutcomesExplorer({
       }
     }
     setSelectedGovTypes(next);
-    syncUrl(metricId, year, next);
+    syncUrl(metricId, year, next, taxonomy, selectedRegions);
+  };
+
+  const handleTaxonomyChange = (nextTaxonomy: GovernmentTaxonomyLens) => {
+    setTaxonomy(nextTaxonomy);
+    setSelectedGovTypes([]);
+    setSelectedCountry(null);
+    syncUrl(metricId, year, [], nextTaxonomy, selectedRegions);
   };
 
   const handleRegionToggle = (region: string) => {
-    setSelectedRegions((prev) =>
-      prev.includes(region) ? prev.filter((r) => r !== region) : [...prev, region]
-    );
+    setSelectedRegions((prev) => {
+      const next = prev.includes(region)
+        ? prev.filter((r) => r !== region)
+        : [...prev, region];
+      syncUrl(metricId, year, selectedGovTypes, taxonomy, next);
+      return next;
+    });
+  };
+
+  const clearGovTypes = () => {
+    setSelectedGovTypes([]);
+    syncUrl(metricId, year, [], taxonomy, selectedRegions);
+  };
+
+  const clearRegions = () => {
+    setSelectedRegions([]);
+    syncUrl(metricId, year, selectedGovTypes, taxonomy, []);
   };
 
   const handleCountryClick = (slug: string) => {
@@ -708,6 +964,66 @@ export function OutcomesExplorer({
           to investigate, not conclusions.
         </p>
 
+        <div
+          style={{
+            maxWidth: 760,
+            border: "1px solid var(--color-card-border)",
+            borderRadius: "var(--radius-sm)",
+            background: "var(--color-surface-elevated)",
+            padding: "14px 16px",
+            marginBottom: 24,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+              fontSize: "var(--text-10)",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--color-text-30)",
+              marginBottom: 10,
+            }}
+          >
+            Two taxonomy lenses
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 1fr))",
+              gap: 14,
+            }}
+          >
+            <TaxonomyGlossaryCard
+              label="Structural form"
+              title="Structural form: constitutional design, such as parliamentary republic, constitutional monarchy, or directorial republic."
+              description="What the system is in constitutional terms."
+            />
+            <TaxonomyGlossaryCard
+              label="Regime type"
+              title="Regime type: executive-legislative accountability in the Bjornskov-Rode / CGV tradition."
+              description="How executive accountability works."
+            />
+            <TaxonomyGlossaryCard
+              label="Raw source"
+              title="Raw source: the original CIA Factbook government-type wording kept for provenance."
+              description="The original source label, preserved verbatim."
+            />
+          </div>
+          <p
+            style={{
+              margin: "12px 0 0",
+              fontFamily: "var(--font-body-sans)",
+              fontSize: "var(--text-13)",
+              color: "var(--color-text-50)",
+              lineHeight: 1.55,
+            }}
+          >
+            These labels are metadata only. They do not change CI weights or
+            outcome values.
+          </p>
+        </div>
+
         {/* ── Controls ── */}
         <div
           style={{
@@ -718,8 +1034,20 @@ export function OutcomesExplorer({
             marginBottom: 28,
           }}
         >
-          {/* Metric selector */}
           <div>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontSize: "var(--text-10)",
+                letterSpacing: "var(--tracking-caps)",
+                textTransform: "uppercase",
+                color: "var(--color-text-30)",
+                marginBottom: 6,
+              }}
+            >
+              Metric
+            </div>
             {useSegmented ? (
               <div
                 role="group"
@@ -789,8 +1117,20 @@ export function OutcomesExplorer({
             )}
           </div>
 
-          {/* Year dropdown */}
           <div>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontSize: "var(--text-10)",
+                letterSpacing: "var(--tracking-caps)",
+                textTransform: "uppercase",
+                color: "var(--color-text-30)",
+                marginBottom: 6,
+              }}
+            >
+              Year
+            </div>
             <select
               aria-label="Select year"
               value={year}
@@ -815,88 +1155,90 @@ export function OutcomesExplorer({
             </select>
           </div>
 
-          {/* Gov type chips */}
-          {availableGovTypes.length > 0 && (
+          <div
+            style={{
+              minWidth: 200,
+            }}
+          >
             <div
               style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 6,
-                alignItems: "center",
+                fontFamily: "var(--font-mono)",
+                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontSize: "var(--text-10)",
+                letterSpacing: "var(--tracking-caps)",
+                textTransform: "uppercase",
+                color: "var(--color-text-30)",
+                marginBottom: 6,
               }}
             >
-              <Chip
-                label="All"
-                active={selectedGovTypes.length === 0}
-                onClick={() => handleGovTypeToggle("__all__")}
+              Lens
+            </div>
+            <select
+              aria-label="Select taxonomy lens"
+              value={taxonomy}
+              onChange={(e) =>
+                handleTaxonomyChange(e.target.value as GovernmentTaxonomyLens)
+              }
+              style={{
+                padding: "10px 12px",
+                background: "var(--color-select-bg, var(--color-surface-elevated))",
+                color: "var(--color-text-primary)",
+                border: "1px solid var(--color-card-border)",
+                borderRadius: "var(--radius-sm)",
+                fontFamily: "var(--font-body-sans)",
+                fontSize: "var(--text-13)",
+                cursor: "pointer",
+                width: "100%",
+              }}
+            >
+              <option value="structural">Structural form</option>
+              <option value="regime">Regime type</option>
+              <option value="raw">Raw source</option>
+            </select>
+          </div>
+
+          {availableGovTypes.length > 0 && (
+            <div ref={govMenuRef}>
+              <FilterMenu
+                label="Government type"
+                summary={selectedGovTypeSummary}
+                open={openMenu === "government"}
+                onToggle={() =>
+                  setOpenMenu((current) =>
+                    current === "government" ? null : "government",
+                  )
+                }
+                onClear={clearGovTypes}
+                items={availableGovTypes.map((govType) => ({
+                  id: govType,
+                  label: govType,
+                  checked: selectedGovTypes.includes(govType),
+                  onToggle: () => handleGovTypeToggle(govType),
+                }))}
               />
-              {visibleChips.map((g) => (
-                <Chip
-                  key={g}
-                  label={g}
-                  active={selectedGovTypes.includes(g)}
-                  onClick={() => handleGovTypeToggle(g)}
-                />
-              ))}
-              {overflowChips.length > 0 && (
-                <div ref={overflowRef} style={{ position: "relative" }}>
-                  <button
-                    type="button"
-                    onClick={() => setOverflowOpen((o) => !o)}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 4,
-                      padding: "4px 10px",
-                      borderRadius: "var(--radius-sm)",
-                      border: "1px solid var(--color-card-border)",
-                      background: overflowOpen
-                        ? "var(--color-surface-elevated)"
-                        : "transparent",
-                      color: "var(--color-text-50)",
-                      fontFamily: "var(--font-body-sans)",
-                      fontSize: "var(--text-12)",
-                      cursor: "pointer",
-                    }}
-                  >
-                    More ({overflowChips.length}) ▾
-                  </button>
-                  {overflowOpen && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "calc(100% + 4px)",
-                        left: 0,
-                        zIndex: 50,
-                        background: "var(--color-card-bg)",
-                        border: "1px solid var(--color-card-border)",
-                        borderRadius: "var(--radius-sm)",
-                        boxShadow: "var(--shadow-dropdown)",
-                        padding: "8px",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 4,
-                        minWidth: 180,
-                      }}
-                    >
-                      {overflowChips.map((g) => (
-                        <Chip
-                          key={g}
-                          label={g}
-                          active={selectedGovTypes.includes(g)}
-                          onClick={() => {
-                            handleGovTypeToggle(g);
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           )}
 
-          {/* Small multiples toggle */}
+          <div ref={regionMenuRef}>
+            <FilterMenu
+              label="Region"
+              summary={selectedRegionSummary}
+              open={openMenu === "region"}
+              onToggle={() =>
+                setOpenMenu((current) =>
+                  current === "region" ? null : "region",
+                )
+              }
+              onClear={clearRegions}
+              items={CONTINENTS.map((region) => ({
+                id: region,
+                label: region,
+                checked: selectedRegions.includes(region),
+                onToggle: () => handleRegionToggle(region),
+              }))}
+            />
+          </div>
+
           <label
             style={{
               display: "inline-flex",
@@ -917,57 +1259,6 @@ export function OutcomesExplorer({
             />
             All metrics
           </label>
-        </div>
-
-        {/* More filters (region) */}
-        <div style={{ marginBottom: 24 }}>
-          <button
-            type="button"
-            onClick={() => setMoreFiltersOpen((o) => !o)}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-12)",
-              color: "var(--color-text-40)",
-              padding: 0,
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            <span
-              style={{
-                display: "inline-block",
-                transition: "transform 150ms",
-                transform: moreFiltersOpen ? "rotate(90deg)" : "rotate(0deg)",
-              }}
-            >
-              ▸
-            </span>
-            {moreFiltersOpen ? "Fewer filters" : "More filters (region)"}
-          </button>
-
-          {moreFiltersOpen && (
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 6,
-                marginTop: 10,
-              }}
-            >
-              {CONTINENTS.map((c) => (
-                <Chip
-                  key={c}
-                  label={c}
-                  active={selectedRegions.includes(c)}
-                  onClick={() => handleRegionToggle(c)}
-                />
-              ))}
-            </div>
-          )}
         </div>
 
         {/* ── Chart area ── */}
