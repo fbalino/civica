@@ -9,7 +9,14 @@ import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data";
 import { useAtlasHeader } from "@/context/AtlasHeaderContext";
 import { AtlasWorldMap, type AtlasWorldMapHandle } from "./AtlasWorldMap";
+import { AtlasCountryLeft } from "./AtlasCountryLeft";
 import { geomToPath, geomCentroid, geomBBoxArea, type MapPath } from "./map-geom";
+import type {
+  OrgGroup,
+  OrgGroupEntry,
+  OrgMember,
+  OrgDetail,
+} from "./organizations";
 
 type Mode = "atlas" | "explore" | "compare";
 type Tab = "chamber" | "bills" | "structure" | "elections" | "democracy" | "leaders" | "constitution" | "international";
@@ -39,47 +46,6 @@ interface InternationalData {
   coMembers: InternationalCoMember[];
 }
 
-interface OrgGroupEntry {
-  id: string;
-  slug: string;
-  name: string;
-  fullName: string;
-  type: "security" | "regional" | "trade" | "un" | "cultural";
-  foundedYear: number | null;
-  hqCountry: string | null;
-  memberCount: number;
-}
-
-interface OrgGroup {
-  type: "security" | "regional" | "trade" | "un" | "cultural";
-  label: string;
-  color: string;
-  organizations: OrgGroupEntry[];
-}
-
-interface OrgMember {
-  id: string;
-  name: string;
-  slug: string;
-  region: string;
-  joinYear: number | null;
-  role: string | null;
-}
-
-interface OrgDetail {
-  organization: {
-    id: string;
-    slug: string;
-    name: string;
-    fullName: string;
-    type: "security" | "regional" | "trade" | "un" | "cultural";
-    foundedYear: number | null;
-    hqCountry: string | null;
-    description: string | null;
-    extra: Record<string, unknown> | null;
-  };
-  members: OrgMember[];
-}
 type House = "lower" | "upper";
 
 interface DemocracyData {
@@ -844,103 +810,33 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
               <button className={mobilePanel === "center" ? "on" : ""} onClick={() => setMobilePanel("center")}>Explore</button>
               <button className={mobilePanel === "chat" ? "on" : ""} onClick={() => setMobilePanel(mobilePanel === "chat" ? "center" : "chat")}>Ask AI</button>
             </div>
-            {/* Left rail */}
-            <div className={`chamber-left${isMobile && mobilePanel === "countries" ? " mobile-visible" : ""}`}>
-              <div className="left-side-head">
-                <button className="back-btn" onClick={() => setMode("atlas")}>&larr; Back to full atlas</button>
-                <div className="kicker">Atlas</div>
-                <div className="title">{leftMode === "countries" ? "Pick a country" : "Pick an organization"}</div>
-                <div className="left-mode-toggle" style={{ marginTop: 10 }}>
-                  <button className={leftMode === "countries" ? "on" : ""} onClick={() => { setLeftMode("countries"); setSelectedOrgSlug(null); }}>Countries</button>
-                  <button className={leftMode === "organizations" ? "on" : ""} onClick={() => setLeftMode("organizations")}>Organizations</button>
-                </div>
-              </div>
-              {leftMode === "countries" && (
-              <>
-              <div className="left-mini-map">
-                <svg viewBox="0 100 2000 800" preserveAspectRatio="xMidYMid meet">
-                  {mapLoaded ? (
-                    mapPaths.map((p, i) => (
-                      <path
-                        key={i}
-                        d={p.d}
-                        data-id={p.id || undefined}
-                        className={p.id === country.id ? "sel" : ""}
-                        onClick={() => {
-                          if (p.country) { setCountry(p.country); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); if (isMobile) setMobilePanel("center"); }
-                        }}
-                        style={{ cursor: p.country ? "pointer" : "default" }}
-                      />
-                    ))
-                  ) : (
-                    Object.entries(WORLD_PATHS).map(([id, data]) => (
-                      <path
-                        key={id}
-                        d={data.d}
-                        data-id={id}
-                        className={id === country.id ? "sel" : ""}
-                        onClick={() => {
-                          const c = COUNTRIES.find((c) => c.id === id);
-                          if (c) { setCountry(c); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); if (isMobile) setMobilePanel("center"); }
-                        }}
-                      />
-                    ))
-                  )}
-                </svg>
-              </div>
-              <div className="left-country-list">
-                {["Americas", "Europe", "Africa", "Asia", "Oceania"].map((region) => {
-                  const items = COUNTRIES.filter((c) => c.region === region);
-                  if (!items.length) return null;
-                  return (
-                    <div key={region} className="region-group">
-                      <div className="region-label">{region}</div>
-                      {items.map((c) => (
-                        <div
-                          key={c.id}
-                          className={`country-row${c.id === country.id ? " on" : ""}`}
-                          onClick={() => { setCountry(c); setDimmed(new Set()); setHouse("lower"); setTab("chamber"); if (isMobile) setMobilePanel("center"); }}
-                        >
-                          <span>{c.name}{c.featured ? " \u2605" : ""}</span>
-                          <span className="code">{c.id.toUpperCase()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-              </>
-              )}
-              {leftMode === "organizations" && (
-                <div className="left-org-list">
-                  {orgGroupsLoading && !orgGroups ? (
-                    <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "30px 10px", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading&hellip;</div>
-                  ) : orgGroups && orgGroups.length > 0 ? (
-                    orgGroups.map((g) => (
-                      <div key={g.type} className="type-group">
-                        <div className="type-label" style={{ color: g.color }}>{g.label}</div>
-                        {g.organizations.map((o) => {
-                          const initials = o.name.length <= 4 ? o.name : o.name.slice(0, 3);
-                          return (
-                            <div
-                              key={o.id}
-                              className={`org-row${selectedOrgSlug === o.slug ? " on" : ""}`}
-                              onClick={() => { setSelectedOrgSlug(o.slug); if (isMobile) setMobilePanel("center"); }}
-                            >
-                              <span className="initials" style={{ background: g.color }}>{initials}</span>
-                              <span className="nm">{o.name}</span>
-                              <span className="count">{o.memberCount}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "30px 10px", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>No data</div>
-                  )}
-                </div>
-              )}
-            </div>
+            <AtlasCountryLeft
+              countries={COUNTRIES}
+              mapPaths={mapPaths}
+              mapLoaded={mapLoaded}
+              selectedCountry={country}
+              leftMode={leftMode}
+              orgGroups={orgGroups}
+              orgGroupsLoading={orgGroupsLoading}
+              selectedOrgSlug={selectedOrgSlug}
+              mobilePanelVisible={isMobile && mobilePanel === "countries"}
+              onBackToAtlas={() => setMode("atlas")}
+              onLeftModeChange={(m) => {
+                setLeftMode(m);
+                if (m === "countries") setSelectedOrgSlug(null);
+              }}
+              onPickCountry={(c) => {
+                setCountry(c);
+                setDimmed(new Set());
+                setHouse("lower");
+                setTab("chamber");
+                if (isMobile) setMobilePanel("center");
+              }}
+              onPickOrg={(slug) => {
+                setSelectedOrgSlug(slug);
+                if (isMobile) setMobilePanel("center");
+              }}
+            />
 
             {/* Left resizer */}
             <div className="atlas-resizer" onMouseDown={(e) => startResize("left", e)} />
