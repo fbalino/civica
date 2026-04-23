@@ -18,13 +18,17 @@
 The `contextChips` shown in the right-pane chat AND the `apiContext` sent to `/api/chat`
 must only include state variables that are semantically relevant to the active tab.
 
-House (upper/lower) is only meaningful on the `chamber` and `bills` tabs. It must be
-stripped from both chips and apiContext when tab ∈ {structure, elections, democracy,
-leaders, constitution, international}.
+House (upper/lower) is only meaningful on the `chamber` tab (amended 2026-04-24,
+narrower than the original chamber+bills rule). It must be stripped from chips and
+apiContext on ALL other tabs, including bills.
 
-Why: the current Atlas sends noisy state to the model — e.g. on `/atlas/usa/democracy`
-the chat was sending `{house: "lower"}` even though Democracy is a country-level view.
-The model then has to ignore irrelevant context, which degrades answer quality.
+Why: the chamber tab is the only view with a visible upper/lower toggle driving what
+the user is looking at. Bills, structure, democracy, etc. all display country-level
+data regardless of which house was last selected. Showing the house chip on them reads
+like the chamber selection is bleeding through. Example user report: on
+`/atlas/usa/chamber` with lower selected → navigating to structure (which already
+strips house) → then to bills, the chip still said "Lower" and felt like leaked state
+rather than an intentional scope.
 
 How to apply:
 ```ts

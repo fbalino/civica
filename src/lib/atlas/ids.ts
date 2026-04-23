@@ -85,10 +85,13 @@ export function buildAtlasUrl(
 }
 
 // The chat context scoping rule: house is only semantically relevant on the
-// chamber and bills tabs. Strip it from apiContext/contextChips elsewhere so
-// /api/chat isn't getting noisy state (e.g. house=lower on the Democracy tab).
+// chamber tab, because that's the only tab with a visible upper/lower toggle
+// driving what the user is looking at. Bills, structure, democracy, etc. all
+// display country-level data regardless of house — plumbing house into their
+// chat context adds noise (e.g. "United States | Lower | Bills" reads like the
+// chamber selection is bleeding through into Bills).
 export function tabNeedsHouse(tab: AtlasTab): boolean {
-  return tab === "chamber" || tab === "bills";
+  return tab === "chamber";
 }
 
 export const ATLAS_TAB_LABELS: Record<AtlasTab, string> = {
