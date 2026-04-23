@@ -24,13 +24,36 @@ Active plan: `~/.claude/plans/excellent-findings-thank-you-bubbly-kay.md` (roadm
 - Atlas in-app "See full comparison" link REMOVED (user correctly flagged that it would be obsolete in the shell).
 - Polish pass after visual QA: fixed card top borders (self-referential CSS var bug), sticky nav (nested <main> → <div>), hemicycle seats label wrap, SourceDot tooltip overflow, South America chip, CI filter All Regions click-back, structural taxonomy label instead of raw government_type in selector cards, NZ empty-elections alignment.
 
-### Phase 2 — Three-pane shell refactor (in progress)
+### Phase 2.1 — Three-pane shell refactor (shipped)
 - Architect-designed plan at `~/.claude/plans/phase-2-shell-refactor.md`.
 - Save-point tag: `pre-shell-refactor`.
-- Step 1 done (`8620b10`): shell CSS extracted from `atlas.css` into `src/app/shell.css`. Class names kept as `.chamber-*` to avoid rename churn.
-- Step 2 done (`16b2a2d`): shell components built (`ShellContext`, `ThreePaneShell`, `AskCivicaPanel` extracted from AtlasApp), `(shell)` route group scaffolded with default slots, landing page at `/preview` (CANNOT be at `/` because of `src/app/page.tsx` collision — will move in Phase 2.4).
-- Per-route prompt catalogs in `src/lib/shell/suggested-prompts.ts`.
-- Remaining for Phase 2.1: decompose `AtlasApp.tsx` (2,353 lines) into `<AtlasWorldMap>` + `<AtlasCountryLeft>` + `<AtlasCountryCenter>` + `useAtlasUrlState`, then create `(shell)/atlas/*` routes.
+- 14 commits total (`ce60f9a` … `01ded34`).
 
-### Decisions and gotchas captured in `~/.claude/plans/NEXT-SESSION-HANDOFF.md`
-Full session handoff prompt for next Claude. Includes: files to read, architectural decisions, gotchas (CSS var circularity, Postgres ROUND cast, nested `<main>`, two-page-at-same-URL collision, GDELT name-matching), recommended team workflow, and testing URLs.
+Commits in order:
+1. `ce60f9a` — `src/lib/atlas/ids.ts` (atlasIdToSlug, slugToCountry, buildAtlasUrl, tabNeedsHouse, ATLAS_TAB_LABELS).
+2. `a9c40d7` — `src/lib/shell/events.ts` civica:ask CustomEvent bridge. `listenForExternalAsk` prop on AskCivicaPanel.
+3. `20cdcca` — `<AtlasWorldMap>` extracted.
+4. `eeea0ba` — `<AtlasCountryLeft>` + `organizations.ts` shared types.
+5. `c07c770` — `<ChamberTab>`.
+6. `b19f780` — `<BillsTab>` with BillCard + `onAskBill` prop (legacy path uses chatInputRef+sendChat; shell path uses dispatchCivicaAsk).
+7. `e1a2dae` — `<ElectionsTab>`.
+8. `43e6fec` — `<ConstitutionTab>`.
+9. `4468121` — `<InternationalTab>` + ORG_TYPE_LABEL/ORG_TYPE_COLOR shared.
+10. `45abba7` — `<AtlasCountryCenter>` (masthead + tab bar + all 8 panes). AtlasApp 2,352 → 1,222 lines.
+11. `357c7d6` — `useAtlasUrlState` hook.
+12. `b6400bb` — `/atlas` map-root route + AtlasMapShellClient + shared `useMapPaths` hook.
+13. `01ded34` — `/atlas/[slug]/[tab]` country view + **house-chip context fix** in `@right/atlas/[slug]/[tab]/page.tsx`.
+14. Handoff doc at `~/.claude/plans/NEXT-SESSION-HANDOFF.md` + this memory update.
+
+### House-chip context fix (2026-04-24)
+Rule captured in `memory-decisions.md`. `contextChips` + `apiContext` only include house when tab ∈ {chamber, bills}. Verified in browser:
+- `/atlas/united-states/chamber` → `[United States] [Lower] [Chamber]`
+- `/atlas/france/democracy` → `[France] [Democracy]` (no house)
+
+### Phase 2.1 gotchas discovered
+- **Parallel-route slot file placement is INSIDE the slot dir.** Correct: `(shell)/@left/atlas/page.tsx`. WRONG: `(shell)/atlas/@left/page.tsx` — silently shadowed by root default.tsx, no error.
+- **Turbopack parser chokes on `useCallback(async function name() {...})`.** `next build` + `tsc` pass; `next dev` errors. Use arrow function instead.
+- **`.chamber-center` has no `position: relative`.** Children using `position: absolute; inset: 0` don't work. Use `position: relative; height: 100%` on the child.
+
+### Next: Phase 2.2 — move /civica-index into the shell
+Goals: CI filter chips move from the global header into the left pane; `setAtlasControls` / `AtlasHeaderContext` deleted entirely. 5-8 commits expected. Full plan in `~/.claude/plans/NEXT-SESSION-HANDOFF.md`.
