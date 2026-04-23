@@ -45,3 +45,19 @@ export interface OrgDetail {
   };
   members: OrgMember[];
 }
+
+export const ORG_TYPE_LABEL: Record<OrgType, string> = {
+  un: "United Nations & Agencies",
+  security: "Security Alliances",
+  regional: "Regional Blocs",
+  trade: "Trade & Economic",
+  cultural: "Cultural & Linguistic",
+};
+
+export const ORG_TYPE_COLOR: Record<OrgType, string> = {
+  un: "var(--cat-un)",
+  security: "var(--cat-security)",
+  regional: "var(--cat-regional)",
+  trade: "var(--cat-trade)",
+  cultural: "var(--cat-cultural)",
+};
