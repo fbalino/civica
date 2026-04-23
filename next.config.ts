@@ -14,6 +14,24 @@ const nextConfig: NextConfig = {
         destination: "/civica-index/:path*",
         permanent: true,
       },
+      {
+        source: "/civica-index/compare",
+        destination: "/compare",
+        permanent: true,
+      },
+      {
+        source: "/civica-index/compare/:path*",
+        destination: "/compare/:path*",
+        permanent: true,
+      },
+      // Legacy SEO-friendly pretty URLs: /compare/united-states-vs-france →
+      // /compare?c=united-states&c=france. Preserves canonical authority
+      // transfer to the new query-param-driven page.
+      {
+        source: "/compare/:a-vs-:b",
+        destination: "/compare?c=:a&c=:b",
+        permanent: true,
+      },
     ];
   },
 };

@@ -2,9 +2,23 @@ import type { MetadataRoute } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { getAllPosts } from "@/lib/blog";
 import { GOVERNMENT_TYPES } from "@/lib/data/government-types";
-import { PRIORITY_COMPARISONS } from "./compare/[slug]/page";
 
 const SITE_URL = "https://civicaatlas.org";
+
+// High-value country comparisons for sitemap coverage. Canonical URLs use
+// query params; legacy /compare/<a>-vs-<b> URLs 308-redirect to these.
+const PRIORITY_COMPARISONS: Array<[string, string]> = [
+  ["united-states", "united-kingdom"],
+  ["united-states", "china"],
+  ["china", "india"],
+  ["france", "germany"],
+  ["united-states", "russia"],
+  ["japan", "south-korea"],
+  ["united-kingdom", "canada"],
+  ["brazil", "argentina"],
+  ["australia", "new-zealand"],
+  ["india", "pakistan"],
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let countries: { slug: string }[] = [];
@@ -90,8 +104,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const comparisonPages: MetadataRoute.Sitemap = PRIORITY_COMPARISONS.map(
-    (slug) => ({
-      url: `${SITE_URL}/compare/${slug}`,
+    ([a, b]) => ({
+      url: `${SITE_URL}/compare?c=${encodeURIComponent(a)}&c=${encodeURIComponent(b)}`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.6,
