@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { onCivicaAsk } from "@/lib/shell/events";
 
 export interface AskCivicaContextChip {
   label: string;
@@ -30,6 +31,14 @@ export interface AskCivicaPanelProps {
   greeting?: string;
   /** Arbitrary extra context passed to /api/chat — e.g. tab, house, parties. */
   apiContext?: Record<string, unknown>;
+  /**
+   * Listen for `civica:ask` CustomEvents on window and pre-fill / auto-send.
+   * Triggers (like a bill card's "Ask AI" button) dispatch via
+   * `dispatchCivicaAsk()` from `@/lib/shell/events`. Enable only on the
+   * active route slot — the idle default slot should leave this off so it
+   * doesn't intercept events meant for a specific route's panel.
+   */
+  listenForExternalAsk?: boolean;
 }
 
 type ChatMessage = {
@@ -57,6 +66,7 @@ export function AskCivicaPanel({
   messageLead,
   greeting = DEFAULT_GREETING,
   apiContext,
+  listenForExternalAsk = false,
 }: AskCivicaPanelProps) {
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     { role: "ai", text: greeting },
@@ -71,7 +81,7 @@ export function AskCivicaPanel({
     }
   }, [chatHistory]);
 
-  async function send(prefill?: string) {
+  const send = useCallback(async function send(prefill?: string) {
     const text = prefill || inputRef.current?.value?.trim() || "";
     if (!text) return;
     if (inputRef.current) inputRef.current.value = "";
@@ -134,7 +144,17 @@ export function AskCivicaPanel({
         return next;
       });
     }
-  }
+  }, [apiContext, messageLead]);
+
+  // Cross-pane trigger bus (bill cards etc.). Enabled per route so only the
+  // active panel responds — see listenForExternalAsk prop docs.
+  useEffect(() => {
+    if (!listenForExternalAsk) return;
+    return onCivicaAsk(({ question, autoSend }) => {
+      if (inputRef.current) inputRef.current.value = question;
+      if (autoSend !== false) send(question);
+    });
+  }, [listenForExternalAsk, send]);
 
   return (
     <>
