@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { db } from "@/lib/db";
 import { sql, desc, asc } from "drizzle-orm";
 import {
@@ -77,7 +78,12 @@ function formatGdp(b: number | null): string {
 }
 
 
-export async function loadAtlasData(): Promise<{
+// React `cache()` dedupes calls within a single render. Shell routes for
+// /atlas/[slug]/[tab] call this from the page AND from each parallel slot;
+// without cache() each tab click triggers 3 identical DB round-trips.
+export const loadAtlasData = cache(_loadAtlasData);
+
+async function _loadAtlasData(): Promise<{
   countries: AtlasCountry[];
   chambers: Record<string, AtlasChamberData>;
 }> {
