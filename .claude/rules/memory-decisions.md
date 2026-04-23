@@ -41,10 +41,14 @@ const apiContext = {
 };
 ```
 
-The URL's `?house=` query param is NOT stripped for non-chamber tabs — it is preserved
-so navigating back to Chamber restores the user's previous choice. Only the chat
-context is filtered. This same principle applies to any future per-tab context
-(e.g. a future `currentBillId` should only appear on the bills tab).
+The URL's `?house=` query param is ALSO stripped when navigating to non-chamber/
+non-bills tabs (updated 2026-04-24, supersedes earlier decision to preserve it).
+Reason: a shared URL like `/atlas/usa/democracy?house=upper` looks broken to a
+reader because house has no meaning on Democracy. If we want to preserve the
+user's house choice across navigations, use `localStorage` (pattern: same as the
+pane-width persistence in `ShellContext` under key `atlas_panels`), not URL state.
+This same principle applies to any future per-tab context (e.g. a future
+`currentBillId` should only appear on the bills tab).
 
 ## 2026-04-24 — Phase 2.1 extraction plan locked
 

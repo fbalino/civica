@@ -8,6 +8,7 @@ import {
   buildAtlasUrl,
   isAtlasHouse,
   isAtlasTab,
+  tabNeedsHouse,
 } from "@/lib/atlas/ids";
 
 export interface AtlasUrlState {
@@ -42,11 +43,17 @@ export function useAtlasUrlState(): AtlasUrlState {
   const setTab = useCallback(
     (next: AtlasTab) => {
       if (!slug) return;
-      // Preserve the ?house= query param when navigating between tabs so
-      // returning to `chamber` restores the user's previous house choice.
+      // ?house= only belongs on tabs that care about upper/lower. For
+      // democracy/leaders/etc the param would just look broken in a
+      // shared URL, and chat context already strips it server-side.
+      // Preserving the user's house choice across tab switches is a
+      // nice-to-have — re-introduce via localStorage if we want it back.
       const currentHouse = searchParams?.get("house");
       const base = buildAtlasUrl(slug, next);
-      const url = currentHouse ? `${base}?house=${currentHouse}` : base;
+      const url =
+        currentHouse && tabNeedsHouse(next)
+          ? `${base}?house=${currentHouse}`
+          : base;
       router.replace(url, { scroll: false });
     },
     [router, slug, searchParams],
