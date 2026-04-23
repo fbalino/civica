@@ -294,38 +294,12 @@ html.light .atlas-root {
   letter-spacing: 0.1em; text-transform: uppercase; font-size: 10px;
 }
 
-/* ===== CHAMBER VIEW (three-pane grid) ===== */
-.chamber-grid {
-  display: grid;
-  grid-template-columns: var(--atlas-leftW) 6px 1fr 6px var(--atlas-rightW);
-  height: 100%;
-}
-.chamber-grid.compare-mode {
-  grid-template-columns: 1fr 6px 1fr 6px var(--atlas-rightW);
-}
-
-.chamber-left {
-  background: var(--atlas-paper); border-right: 1px solid var(--atlas-rule);
-  overflow-y: auto;
-}
-.chamber-center { overflow-y: auto; background: var(--atlas-paper); }
-.chamber-right {
-  background: var(--atlas-paper); border-left: 1px solid var(--atlas-rule);
-  display: flex; flex-direction: column;
-  min-height: 0; overflow: hidden;
-}
-
-/* Resizer */
-.atlas-resizer {
-  background: transparent; cursor: col-resize; position: relative; z-index: 5;
-}
-.atlas-resizer::after {
-  content: ""; position: absolute; inset: 0 2px;
-  background: var(--atlas-rule); opacity: 0; transition: opacity 120ms;
-}
-.atlas-resizer:hover::after { opacity: 1; background: var(--atlas-accent); }
-.atlas-resizer.decorative { pointer-events: none; }
-.atlas-resizer.decorative::after { opacity: 0.4; background: var(--atlas-rule); }
+/* ===== CHAMBER VIEW (three-pane grid) =====
+ * Moved to src/app/shell.css during Phase 2 of the shell refactor.
+ * .chamber-grid, .chamber-left, .chamber-center, .chamber-right and
+ * .atlas-resizer live there so the pane chrome can be used by the whole
+ * site, not only AtlasApp. The class names did not change.
+ */
 
 /* ===== LEFT RAIL ===== */
 .left-side-head { padding: 16px 18px; border-bottom: 1px solid var(--atlas-rule); }
@@ -624,15 +598,11 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   display: flex; justify-content: space-between; align-items: center;
 }
 
-/* ===== MOBILE PANEL TOGGLES ===== */
-.mobile-panel-bar {
-  display: none;
-}
-
-/* ===== MOBILE OVERLAY PANELS ===== */
-.mobile-overlay {
-  display: none;
-}
+/* ===== MOBILE PANEL TOGGLES / OVERLAY PANELS =====
+ * Moved to src/app/shell.css (.mobile-panel-bar, .mobile-overlay, plus the
+ * <=768px responsive overrides for .chamber-*). The pattern is part of the
+ * shell contract, not atlas-specific.
+ */
 
 /* ===== RESPONSIVE — MOBILE (<= 768px) ===== */
 @media (max-width: 768px) {
@@ -700,86 +670,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     font-size: 9px;
   }
 
-  /* Chamber grid: single column */
-  .chamber-grid {
-    display: flex !important;
-    flex-direction: column;
-    grid-template-columns: unset !important;
-    overflow: hidden;
-  }
-
-  /* Hide resizers on mobile */
-  .atlas-resizer { display: none; }
-
-  /* Left rail: overlay panel — top accounts for mobile-panel-bar height */
-  .chamber-left {
-    display: none;
-    border-right: none;
-  }
-  .chamber-left.mobile-visible {
-    display: block;
-    position: absolute;
-    top: 42px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 20;
-    background: var(--atlas-paper);
-    overflow-y: auto;
-  }
-
-  /* Center pane: full width */
-  .chamber-center {
-    flex: 1;
-    overflow-y: auto;
-    min-height: 0;
-  }
-
-  /* Right rail (chat): overlay panel — top accounts for mobile-panel-bar height */
-  .chamber-right {
-    display: none;
-    border-left: none;
-  }
-  .chamber-right.mobile-visible {
-    display: flex;
-    position: absolute;
-    top: 42px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 20;
-    background: var(--atlas-paper);
-  }
-
-  /* Mobile panel toggle bar — stays above overlay panels */
-  .mobile-panel-bar {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--atlas-rule);
-    background: var(--atlas-paper-2);
-    flex-shrink: 0;
-    position: relative;
-    z-index: 30;
-  }
-  .mobile-panel-bar button {
-    flex: 1;
-    padding: 10px 8px;
-    background: var(--atlas-paper-2);
-    color: var(--atlas-ink-2);
-    border: none;
-    border-bottom: 2px solid transparent;
-    font-family: ui-monospace, monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .mobile-panel-bar button.on {
-    color: var(--atlas-ink);
-    border-bottom-color: var(--atlas-ink);
-    background: var(--atlas-paper);
-  }
+  /* Shell-grid mobile overrides moved to shell.css — see comment at top. */
 
   /* Masthead: compact */
   .atlas-masthead {

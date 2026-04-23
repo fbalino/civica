@@ -9,6 +9,7 @@ import { AtlasHeaderProvider } from "@/context/AtlasHeaderContext";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 import "./atlas.css";
+import "./shell.css";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
