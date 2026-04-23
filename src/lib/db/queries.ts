@@ -28,6 +28,8 @@ import {
   ciMethodologyVersions,
   pulseEvents,
   pulseDailyScores,
+  organizations,
+  organizationMemberships,
 } from "./schema";
 
 export async function getJurisdictionBySlug(slug: string) {
@@ -1341,6 +1343,43 @@ export async function getPulseHistory(slug: string, days = 90) {
       AND pds.score_date >= CURRENT_DATE - ${days}
     ORDER BY pds.score_date ASC
   `);
+}
+
+/**
+ * Organization memberships for a set of jurisdictions, grouped server-side
+ * for the unified /compare page's International section. Returns one row
+ * per (jurisdictionId, orgId) pair, sorted by type then name so the UI can
+ * render a single row per org with a column per jurisdiction.
+ */
+export async function getInternationalMembershipsBySlugs(
+  jurisdictionIds: string[]
+) {
+  if (jurisdictionIds.length === 0) return [];
+  const rows = await db
+    .select({
+      jurisdictionId: organizationMemberships.jurisdictionId,
+      orgId: organizations.id,
+      orgSlug: organizations.slug,
+      orgName: organizations.name,
+      orgFullName: organizations.fullName,
+      orgType: organizations.type,
+      foundedYear: organizations.foundedYear,
+      joinDate: organizationMemberships.joinDate,
+      role: organizationMemberships.role,
+    })
+    .from(organizationMemberships)
+    .innerJoin(
+      organizations,
+      eq(organizationMemberships.orgId, organizations.id)
+    )
+    .where(
+      sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`
+    )
+    .orderBy(
+      asc(organizations.type),
+      asc(organizations.name)
+    );
+  return rows;
 }
 
 async function getLatestAvailableQuarter(): Promise<string> {
