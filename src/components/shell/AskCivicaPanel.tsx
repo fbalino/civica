@@ -133,6 +133,22 @@ export function AskCivicaPanel({
           return next;
         });
       }
+
+      // Defense against a 200 OK with zero bytes — leaves the user stuck
+      // on "Thinking…" otherwise. Usually means /api/chat caught a
+      // server-side error and closed the stream without enqueuing.
+      if (accumulated.trim() === "") {
+        setChatHistory((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = {
+            role: "ai",
+            lead: messageLead,
+            text:
+              "The assistant returned no response. If this keeps happening, check that ANTHROPIC_API_KEY is set and /api/chat isn't throwing.",
+          };
+          return next;
+        });
+      }
     } catch {
       setChatHistory((prev) => {
         const next = [...prev];

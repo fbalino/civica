@@ -53,17 +53,16 @@ Current user context:
 
 Answer questions grounded in this context. If the user asks about something on the current tab (${tabLabel}), focus your answer there. Be concise — 2-4 short paragraphs max. Use plain language. If you cite a source, say so briefly at the end.`;
 
-  const stream = await client.messages.stream({
-    model: "claude-sonnet-4-6",
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages: [{ role: "user", content: message }],
-  });
-
   const encoder = new TextEncoder();
   const readable = new ReadableStream({
     async start(controller) {
       try {
+        const stream = await client.messages.stream({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1024,
+          system: systemPrompt,
+          messages: [{ role: "user", content: message }],
+        });
         for await (const chunk of stream) {
           if (
             chunk.type === "content_block_delta" &&
@@ -72,6 +71,13 @@ Answer questions grounded in this context. If the user asks about something on t
             controller.enqueue(encoder.encode(chunk.delta.text));
           }
         }
+      } catch (err) {
+        console.error("[/api/chat] stream error:", err);
+        controller.enqueue(
+          encoder.encode(
+            `\n\n_(Chat is unavailable — ${err instanceof Error ? err.message : "unknown error"}. Check ANTHROPIC_API_KEY.)_`,
+          ),
+        );
       } finally {
         controller.close();
       }
