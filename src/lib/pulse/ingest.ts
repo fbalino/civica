@@ -22,16 +22,52 @@ export interface IngestSummary {
   inserted: number;
   skippedDuplicate: number;
   unmatchedCountry: number;
+  /** Top 5 `sourcecountry` values that failed to match, with hit counts.
+   *  Surfaced in the cron-route response so GDELT/jurisdiction drift is
+   *  visible without digging into logs. */
+  unmatchedSample: Array<{ country: string; count: number }>;
 }
 
 async function buildJurisdictionMap(db: Db): Promise<Map<string, string>> {
   const rows = await db
-    .select({ id: jurisdictions.id, iso2: jurisdictions.iso2, iso3: jurisdictions.iso3 })
+    .select({
+      id: jurisdictions.id,
+      name: jurisdictions.name,
+      iso2: jurisdictions.iso2,
+      iso3: jurisdictions.iso3,
+    })
     .from(jurisdictions);
   const map = new Map<string, string>();
   for (const row of rows) {
     if (row.iso2) map.set(row.iso2.toUpperCase(), row.id);
     if (row.iso3) map.set(row.iso3.toUpperCase(), row.id);
+    // GDELT DOC 2.0 returns full country names in `sourcecountry`
+    // (e.g. "United States", "United Kingdom"), not ISO codes — map those too.
+    if (row.name) map.set(row.name.toUpperCase(), row.id);
+  }
+  // A few common GDELT country-name variants that don't match our canonical name.
+  const aliases: Record<string, string | null> = {
+    "UNITED STATES OF AMERICA": "UNITED STATES",
+    "USA": "UNITED STATES",
+    "US": "UNITED STATES",
+    "UK": "UNITED KINGDOM",
+    "BRITAIN": "UNITED KINGDOM",
+    "GREAT BRITAIN": "UNITED KINGDOM",
+    "RUSSIAN FEDERATION": "RUSSIA",
+    "SOUTH KOREA": "KOREA, SOUTH",
+    "NORTH KOREA": "KOREA, NORTH",
+    "CZECH REPUBLIC": "CZECHIA",
+    "MYANMAR (BURMA)": "BURMA",
+    "CONGO (KINSHASA)": "DEMOCRATIC REPUBLIC OF THE CONGO",
+    "CONGO (BRAZZAVILLE)": "REPUBLIC OF THE CONGO",
+    "IVORY COAST": "COTE D'IVOIRE",
+    "CAPE VERDE": "CABO VERDE",
+    "BURMA": "MYANMAR",
+  };
+  for (const [alias, canonical] of Object.entries(aliases)) {
+    if (!canonical) continue;
+    const id = map.get(canonical.toUpperCase());
+    if (id && !map.has(alias)) map.set(alias, id);
   }
   return map;
 }
@@ -58,16 +94,19 @@ async function ingestArticle(
   db: Db,
   article: GdeltArticle,
   jurisdictionMap: Map<string, string>,
-  summary: IngestSummary
+  summary: IngestSummary,
+  unmatchedCounts: Map<string, number>
 ) {
-  const countryCode = article.sourcecountry?.toUpperCase();
-  if (!countryCode) {
+  const rawCountry = article.sourcecountry?.trim();
+  if (!rawCountry) {
     summary.unmatchedCountry += 1;
+    unmatchedCounts.set("(empty)", (unmatchedCounts.get("(empty)") ?? 0) + 1);
     return;
   }
-  const jurisdictionId = jurisdictionMap.get(countryCode);
+  const jurisdictionId = jurisdictionMap.get(rawCountry.toUpperCase());
   if (!jurisdictionId) {
     summary.unmatchedCountry += 1;
+    unmatchedCounts.set(rawCountry, (unmatchedCounts.get(rawCountry) ?? 0) + 1);
     return;
   }
   if (await isDuplicate(db, jurisdictionId, article.url)) {
@@ -111,9 +150,15 @@ export async function ingestPulseEvents(
     inserted: 0,
     skippedDuplicate: 0,
     unmatchedCountry: 0,
+    unmatchedSample: [],
   };
+  const unmatchedCounts = new Map<string, number>();
   for (const article of articles) {
-    await ingestArticle(db, article, jurisdictionMap, summary);
+    await ingestArticle(db, article, jurisdictionMap, summary, unmatchedCounts);
   }
+  summary.unmatchedSample = [...unmatchedCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([country, count]) => ({ country, count }));
   return summary;
 }
