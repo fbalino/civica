@@ -81,7 +81,7 @@ export function AskCivicaPanel({
     }
   }, [chatHistory]);
 
-  const send = useCallback(async function send(prefill?: string) {
+  const send = useCallback(async (prefill?: string) => {
     const text = prefill || inputRef.current?.value?.trim() || "";
     if (!text) return;
     if (inputRef.current) inputRef.current.value = "";
