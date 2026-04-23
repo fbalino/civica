@@ -10,14 +10,15 @@ import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data
 import { useAtlasHeader } from "@/context/AtlasHeaderContext";
 import { AtlasWorldMap, type AtlasWorldMapHandle } from "./AtlasWorldMap";
 import { AtlasCountryLeft } from "./AtlasCountryLeft";
-import { ChamberTab } from "./tabs/ChamberTab";
-import { BillsTab } from "./tabs/BillsTab";
-import { ElectionsTab, type ElectionData } from "./tabs/ElectionsTab";
-import { ConstitutionTab, type ConstitutionData } from "./tabs/ConstitutionTab";
 import {
-  InternationalTab,
-  type InternationalData,
-} from "./tabs/InternationalTab";
+  AtlasCountryCenter,
+  type DemocracyData,
+  type LeaderEntry,
+  type StructureData,
+} from "./AtlasCountryCenter";
+import type { ElectionData } from "./tabs/ElectionsTab";
+import type { ConstitutionData } from "./tabs/ConstitutionTab";
+import type { InternationalData } from "./tabs/InternationalTab";
 import { ORG_TYPE_COLOR, ORG_TYPE_LABEL } from "./organizations";
 import { geomToPath, geomCentroid, geomBBoxArea, type MapPath } from "./map-geom";
 import type {
@@ -32,73 +33,6 @@ type Tab = "chamber" | "bills" | "structure" | "elections" | "democracy" | "lead
 type LeftMode = "countries" | "organizations";
 
 type House = "lower" | "upper";
-
-interface DemocracyData {
-  democracyIndex: number | null;
-  freedomHouseFacts: { factKey: string; factValue: string | null; factYear: number | null }[];
-  regionalComparison: { id: string; name: string; slug: string; democracyIndex: number | null }[];
-}
-
-interface LeaderEntry {
-  personName: string;
-  officeName: string;
-  startDate: string | null;
-  endDate: string | null;
-  isCurrent: boolean;
-  partyName: string | null;
-  partyColor: string | null;
-  photoUrl: string | null;
-}
-
-interface GovStructureBody {
-  id: string;
-  name: string;
-  branch: string | null;
-  bodyType: string;
-  chamberType?: string | null;
-  totalSeats?: number | null;
-  hierarchyLevel: number | null;
-  parentBodyId?: string | null;
-}
-
-interface GovStructureOffice {
-  id: string;
-  bodyId: string;
-  name: string;
-  officeType: string;
-  reportsToOfficeId?: string | null;
-}
-
-interface GovStructureTerm {
-  term: {
-    officeId: string;
-    partyName?: string | null;
-    partyColor?: string | null;
-    startDate?: string | null;
-    endDate?: string | null;
-  };
-  person: {
-    name: string;
-    photoUrl: string | null;
-    wikidataQid?: string | null;
-  };
-}
-
-interface GovStructureParty {
-  bodyId: string;
-  partyName: string;
-  partyColor: string | null;
-  seatCount: number;
-  isRulingCoalition: boolean | null;
-}
-
-interface StructureData {
-  country: string;
-  bodies: GovStructureBody[];
-  offices: GovStructureOffice[];
-  currentTerms: GovStructureTerm[];
-  parties?: GovStructureParty[];
-}
 
 interface ChatMessage {
   role: "ai" | "user";
@@ -826,245 +760,55 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                   <div className="atlas-sans" style={{ fontSize: 13, color: "var(--atlas-muted)" }}>Select an international body from the left rail to see its full membership roster, founding year, and role distribution.</div>
                 </div>
               ) : (
-              <>
-              <div className="atlas-masthead">
-                <div>
-                  <div className="eyebrow">{country.region.toUpperCase()} &middot; {country.id.toUpperCase()}</div>
-                  <h1>{country.name}</h1>
-                  <div className="dek">
-                    {govDescription(country)} of {country.pop} people, led from {country.capital}.
-                  </div>
-                  <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-                    <a
-                      href={`/api/countries/${country.slug ?? country.id}/export?format=json`}
-                      download
-                      className="atlas-export-btn"
-                    >
-                      JSON
-                    </a>
-                    <a
-                      href={`/api/countries/${country.id}/export?format=csv`}
-                      download
-                      className="atlas-export-btn"
-                    >
-                      CSV
-                    </a>
-                  </div>
-                </div>
-                <div className="quick-facts">
-                  <div className="r"><b>Leader</b><span>{country.leader}</span></div>
-                  <div className="r"><b>Gov</b><span>{country.gov}</span></div>
-                  <div className="r"><b>Capital</b><span>{country.capital}</span></div>
-                  <div className="r"><b>Population</b><span>{country.pop}</span></div>
-                  <div className="r"><b>GDP</b><span>{country.gdp}</span></div>
-                </div>
-              </div>
-
-              <div className="atlas-tabs">
-                {([
-                  ["chamber", "I \u00b7 The Chamber"],
-                  ["bills", "II \u00b7 Laws in Motion"],
-                  ["structure", "III \u00b7 Full Structure"],
-                  ["elections", "IV \u00b7 Elections"],
-                  ["democracy", "V \u00b7 Democracy"],
-                  ["leaders", "VI \u00b7 Leaders"],
-                  ["constitution", "VII \u00b7 Constitution"],
-                  ["international", "VIII \u00b7 International"],
-                ] as [Tab, string][]).map(([t, label]) => (
-                  <button key={t} className={tab === t ? "on" : ""} onClick={() => setTab(t)}>{label}</button>
-                ))}
-              </div>
-
-              {/* Tab I: Chamber */}
-              <ChamberTab
-                active={tab === "chamber"}
-                country={country}
-                house={house}
-                cd={cd}
-                dimmed={dimmed}
-                onHouseChange={(h) => {
-                  setHouse(h);
-                  setDimmed(new Set());
-                }}
-                onDimToggle={toggleDim}
-                onSeatHover={(info, e) =>
-                  setSeatTip({
-                    ...info,
-                    x: e.clientX + 14,
-                    y: e.clientY + 14,
-                  })
-                }
-                onSeatLeave={() => setSeatTip(null)}
-              />
-
-              {/* Tab II: Bills */}
-              <BillsTab
-                active={tab === "bills"}
-                countryName={country.name}
-                billsData={billsData}
-                billsLoading={billsLoading}
-                onAskBill={(text) => {
-                  if (chatInputRef.current) chatInputRef.current.value = text;
-                  sendChat(text);
-                }}
-              />
-
-              {/* Tab III: Structure */}
-              <div className={`atlas-pane${tab === "structure" ? " on" : ""}`}>
-                {tabDataLoading && tab === "structure" ? (
-                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading&hellip;</div>
-                ) : structureData && structureData.bodies.length > 0 ? (
-                  <StructurePanel data={structureData} countryName={country.name} />
-                ) : (
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14, border: "1px dashed var(--atlas-rule)", padding: 24, minHeight: 320, background: "var(--atlas-paper-2)" }}>
-                    {(["exec", "legis", "jud"] as const).map((branch) => (
-                      <div key={branch}>
-                        <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase" }}>
-                          {branch === "exec" ? "Executive" : branch === "legis" ? "Legislative" : "Judicial"}
-                        </div>
-                        <div className="atlas-serif" style={{ fontSize: 20, marginTop: 6 }}>
-                          {cd.branches?.[branch] || "\u2014"}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Tab IV: Elections */}
-              <ElectionsTab
-                active={tab === "elections"}
-                countryName={country.name}
-                electionData={electionData}
-                electionsLoading={electionsLoading}
-              />
-
-              {/* Tab V: Democracy */}
-              <div className={`atlas-pane${tab === "democracy" ? " on" : ""}`}>
-                {tabDataLoading && tab === "democracy" ? (
-                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading…</div>
-                ) : democracyData ? (
-                  <>
-                    <div style={{ marginBottom: 20, paddingBottom: 16, borderBottom: "1px solid var(--atlas-rule)" }}>
-                      <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 10 }}>
-                        <span className="atlas-serif" style={{ fontSize: 48 }}>{democracyData.democracyIndex != null ? democracyData.democracyIndex.toFixed(2) : "—"}</span>
-                        <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".1em" }}>/ 1.00 V-DEM</span>
-                      </div>
-                      {democracyData.democracyIndex != null && (
-                        <>
-                          <div style={{ background: "var(--atlas-rule-2)", borderRadius: 3, height: 8, overflow: "hidden", marginBottom: 8 }}>
-                            <div style={{
-                              width: `${(democracyData.democracyIndex * 100).toFixed(1)}%`,
-                              height: "100%",
-                              borderRadius: 3,
-                              background: democracyData.democracyIndex >= 0.7 ? "var(--color-success)" : democracyData.democracyIndex >= 0.4 ? "var(--color-warn)" : "var(--color-danger)",
-                            }} />
-                          </div>
-                          <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-ink-2)", letterSpacing: ".08em" }}>
-                            {democracyData.democracyIndex >= 0.7 ? "LIBERAL DEMOCRACY" : democracyData.democracyIndex >= 0.4 ? "ELECTORAL DEMOCRACY / HYBRID" : "AUTOCRACY / CLOSED"}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    {democracyData.freedomHouseFacts.length > 0 && (
-                      <div style={{ marginBottom: 20 }}>
-                        <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 10 }}>Freedom House</div>
-                        {democracyData.freedomHouseFacts.map((f) => (
-                          <div key={f.factKey} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid var(--atlas-rule-2)" }}>
-                            <span className="atlas-sans" style={{ fontSize: 13, color: "var(--atlas-ink-2)", textTransform: "capitalize" }}>{f.factKey.replace("freedom_house_", "").replace(/_/g, " ")}</span>
-                            <span className="atlas-mono" style={{ fontSize: 12, color: "var(--atlas-ink)" }}>{f.factValue ?? "—"}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {democracyData.regionalComparison.length > 0 && (
-                      <div>
-                        <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 10 }}>Regional Comparison</div>
-                        {democracyData.regionalComparison.slice(0, 8).map((rc, i) => (
-                          <div key={rc.id} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: "1px solid var(--atlas-rule-2)", fontWeight: rc.id === country.id ? 700 : 400 }}>
-                            <span className="atlas-sans" style={{ fontSize: 13 }}><span style={{ color: "var(--atlas-muted)", marginRight: 6, fontSize: 10 }}>{i + 1}.</span>{rc.name}</span>
-                            <span className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)" }}>{rc.democracyIndex?.toFixed(2) ?? "—"}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>No democracy data available</div>
-                )}
-              </div>
-
-              {/* Tab VI: Leaders */}
-              <div className={`atlas-pane${tab === "leaders" ? " on" : ""}`}>
-                {tabDataLoading && tab === "leaders" ? (
-                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>Loading…</div>
-                ) : leadersData && leadersData.length > 0 ? (
-                  <>
-                    {leadersData.filter((l) => l.isCurrent).length > 0 && (
-                      <div style={{ marginBottom: 20 }}>
-                        <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 10 }}>Current Leaders</div>
-                        {leadersData.filter((l) => l.isCurrent).map((l, i) => (
-                          <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0", borderBottom: "1px solid var(--atlas-rule-2)" }}>
-                            {l.photoUrl && <img src={l.photoUrl} alt={l.personName} style={{ width: 32, height: 32, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />}
-                            <div>
-                              <div className="atlas-serif" style={{ fontSize: 17 }}>{l.personName}</div>
-                              <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", marginTop: 2 }}>
-                                {l.officeName}{l.partyName ? ` · ${l.partyName}` : ""}{l.startDate ? ` · Since ${new Date(l.startDate).getFullYear()}` : ""}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {leadersData.filter((l) => !l.isCurrent).length > 0 && (
-                      <div>
-                        <div className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 10 }}>Past Leaders</div>
-                        {leadersData.filter((l) => !l.isCurrent).slice(0, 12).map((l, i) => (
-                          <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid var(--atlas-rule-2)" }}>
-                            <span className="atlas-sans" style={{ fontSize: 13 }}>{l.personName}</span>
-                            <span className="atlas-mono" style={{ fontSize: 10, color: "var(--atlas-muted)" }}>
-                              {l.startDate ? new Date(l.startDate).getFullYear() : ""}
-                              {l.endDate ? `–${new Date(l.endDate).getFullYear()}` : ""}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="atlas-mono" style={{ fontSize: 11, color: "var(--atlas-muted)", padding: "40px 0", textAlign: "center", letterSpacing: ".08em", textTransform: "uppercase" }}>No leader data available</div>
-                )}
-              </div>
-
-              {/* Tab VII: Constitution */}
-              <ConstitutionTab
-                active={tab === "constitution"}
-                loading={tabDataLoading}
-                data={constitutionData}
-              />
-
-              {/* Tab VIII: International */}
-              <InternationalTab
-                active={tab === "international"}
-                loading={tabDataLoading}
-                country={country}
-                data={internationalData}
-                onPickOrg={(slug) => {
-                  setLeftMode("organizations");
-                  setSelectedOrgSlug(slug);
-                }}
-                onPickCountry={(slug) => {
-                  const c = COUNTRIES.find(
-                    (x) => (x.slug ?? x.id) === slug || x.id === slug,
-                  );
-                  if (c) {
-                    setCountry(c);
-                    setTab("international");
+                <AtlasCountryCenter
+                  country={country}
+                  cd={cd}
+                  tab={tab}
+                  house={house}
+                  dimmed={dimmed}
+                  billsData={billsData}
+                  billsLoading={billsLoading}
+                  structureData={structureData}
+                  electionData={electionData}
+                  electionsLoading={electionsLoading}
+                  democracyData={democracyData}
+                  leadersData={leadersData}
+                  constitutionData={constitutionData}
+                  internationalData={internationalData}
+                  tabDataLoading={tabDataLoading}
+                  onTabChange={(t) => setTab(t)}
+                  onHouseChange={(h) => {
+                    setHouse(h);
                     setDimmed(new Set());
+                  }}
+                  onDimToggle={toggleDim}
+                  onSeatHover={(info, e) =>
+                    setSeatTip({
+                      ...info,
+                      x: e.clientX + 14,
+                      y: e.clientY + 14,
+                    })
                   }
-                }}
-              />
-              </>
+                  onSeatLeave={() => setSeatTip(null)}
+                  onAskBill={(text) => {
+                    if (chatInputRef.current) chatInputRef.current.value = text;
+                    sendChat(text);
+                  }}
+                  onPickOrg={(slug) => {
+                    setLeftMode("organizations");
+                    setSelectedOrgSlug(slug);
+                  }}
+                  onPickCountry={(slug) => {
+                    const c = COUNTRIES.find(
+                      (x) => (x.slug ?? x.id) === slug || x.id === slug,
+                    );
+                    if (c) {
+                      setCountry(c);
+                      setTab("international");
+                      setDimmed(new Set());
+                    }
+                  }}
+                />
               )}
             </div>
 
@@ -1280,17 +1024,6 @@ function ComparePane({ countryId, side, house, onChangeCountry, onChangeHouse, d
   );
 }
 
-function StructurePanel({ data, countryName }: { data: StructureData; countryName: string }) {
-  return (
-    <GovStructureDiagram
-      bodies={data.bodies}
-      offices={data.offices}
-      currentTerms={data.currentTerms}
-      countryName={countryName}
-      parties={data.parties ?? []}
-    />
-  );
-}
 
 
 function OrgDetailPanel({
