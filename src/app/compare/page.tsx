@@ -162,13 +162,20 @@ export default async function ComparePage({
   const selectedCards: Array<SelectedCountryCard | null> = [0, 1, 2].map((i) => {
     const ciRow = orderedCI[i];
     if (!ciRow) return null;
+    // Prefer the pretty-printed structural family from the taxonomy layer
+    // (e.g. "Federal Republic", "Parliamentary Democracy") over the raw DB
+    // `government_type` which is often a long snake_case factbook string.
+    const classification = ciRow.jurisdiction.governmentClassification;
+    const prettyGov =
+      classification?.structuralFamilyLabel ??
+      govShort(ciRow.jurisdiction.governmentType);
     return {
       slug: ciRow.jurisdiction.slug,
       name: ciRow.jurisdiction.name,
       iso2: ciRow.jurisdiction.iso2 ?? null,
       score: ciRow.composite?.score != null ? Number(ciRow.composite.score) : null,
       rank: ciRow.composite?.rank ?? null,
-      governmentType: govShort(ciRow.jurisdiction.governmentType),
+      governmentType: prettyGov,
       continent: ciRow.jurisdiction.continent ?? null,
       populationLabel: fmtPop(ciRow.jurisdiction.population),
     };
@@ -218,7 +225,7 @@ export default async function ComparePage({
   const hasEnough = validSlugs.length >= 2;
 
   return (
-    <main className="civica-compare-page">
+    <div className="civica-compare-page">
       <section className="page-hero">
         <h1 className="page-title">
           {countryLabels.length === 0
@@ -762,10 +769,19 @@ export default async function ComparePage({
         }
 
         /* Elections column layout */
+        .compare-elections-grid {
+          align-items: stretch;
+        }
         .compare-elections-col {
           display: flex;
           flex-direction: column;
           gap: 16px;
+        }
+        .compare-elections-col > .compare-elections-placeholder {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .compare-elections-block { display: flex; flex-direction: column; gap: 8px; }
         .compare-elections-eyebrow {
@@ -929,11 +945,14 @@ export default async function ComparePage({
           letter-spacing: 0.04em;
         }
 
-        /* Series color CSS vars fallback */
-        :root {
-          --series-a: ${SERIES_VARS[0]};
-          --series-b: ${SERIES_VARS[1]};
-          --series-c: ${SERIES_VARS[2]};
+        /* Series color CSS vars fallback — scoped to this page so we don't
+           pollute globals, and using the plain oklch values so the selector
+           cards' border-top renders even without the (optional) design-system
+           override. */
+        .civica-compare-page {
+          --series-a: oklch(72% 0.15 35);
+          --series-b: oklch(68% 0.13 220);
+          --series-c: oklch(72% 0.14 150);
         }
 
         @media (max-width: 900px) {
@@ -955,6 +974,6 @@ export default async function ComparePage({
           }
         }
       `}</style>
-    </main>
+    </div>
   );
 }

@@ -23,7 +23,8 @@ export const metadata: Metadata = {
 
 const CONTINENTS = [
   "Africa",
-  "Americas",
+  "North America",
+  "South America",
   "Asia",
   "Europe",
   "Oceania",
@@ -218,34 +219,26 @@ export default async function CivicaIndexPage({
         <section className="ci-controls" aria-label="Filters">
           <div className="ci-control-group" role="group" aria-label="Filter by region">
             <Link
-              href={familyHref(structuralFamily ?? null)}
+              href={
+                structuralFamily
+                  ? `/civica-index?family=${encodeURIComponent(structuralFamily)}`
+                  : "/civica-index"
+              }
               className={`ci-chip ${!continent ? "ci-chip--active" : ""}`}
               scroll={false}
             >
               All regions
             </Link>
-            {CONTINENTS.map((c) => {
-              const dbValue = c === "Americas" ? null : c;
-              const hrefTarget =
-                c === "Americas"
-                  ? "/civica-index?continent=North%20America"
-                  : continentHref(c);
-              const active =
-                c === "Americas"
-                  ? continent === "North America" || continent === "South America"
-                  : continent === c;
-              void dbValue;
-              return (
-                <Link
-                  key={c}
-                  href={hrefTarget}
-                  className={`ci-chip ${active ? "ci-chip--active" : ""}`}
-                  scroll={false}
-                >
-                  {c}
-                </Link>
-              );
-            })}
+            {CONTINENTS.map((c) => (
+              <Link
+                key={c}
+                href={continentHref(c)}
+                className={`ci-chip ${continent === c ? "ci-chip--active" : ""}`}
+                scroll={false}
+              >
+                {c}
+              </Link>
+            ))}
           </div>
 
           {familyOptionsSorted.length > 0 && (

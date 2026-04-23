@@ -94,24 +94,43 @@ export function HemicycleChart({
 
   return (
     <div className="cv-card" style={{ padding: "24px 20px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        gap: 12,
+        marginBottom: 16,
+      }}>
         <h3 style={{
           fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-24)",
+          fontSize: "var(--text-20)",
           fontWeight: 400,
           margin: 0,
           color: "var(--color-text-primary)",
           display: "flex",
-          alignItems: "center",
+          alignItems: "baseline",
           gap: 8,
+          lineHeight: 1.15,
+          minWidth: 0,
         }}>
-          {chamberName}
-          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-source-live)", flexShrink: 0 }} />
+          <span>{chamberName}</span>
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: "var(--color-source-live)",
+              flexShrink: 0,
+              alignSelf: "center",
+            }}
+          />
         </h3>
         <span style={{
           fontFamily: "var(--font-mono)",
           fontSize: "var(--text-13)",
           color: "var(--color-text-40)",
+          whiteSpace: "nowrap",
+          flexShrink: 0,
         }}>
           {displayTotal} seats
         </span>

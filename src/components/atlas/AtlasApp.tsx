@@ -1747,23 +1747,6 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
                 <textarea placeholder="Ask about the comparison…" rows={2} />
                 <button>Send</button>
               </div>
-              {(() => {
-                const a = COUNTRIES.find((c) => c.id === compareA);
-                const b = COUNTRIES.find((c) => c.id === compareB);
-                const slugA = a?.slug ?? a?.id;
-                const slugB = b?.slug ?? b?.id;
-                if (!slugA || !slugB) return null;
-                return (
-                  <a
-                    href={`/compare?c=${encodeURIComponent(slugA)}&c=${encodeURIComponent(slugB)}`}
-                    target="_blank"
-                    rel="noopener"
-                    className="atlas-compare-deeplink"
-                  >
-                    See full comparison &middot; CI, chambers, elections &rarr;
-                  </a>
-                );
-              })()}
             </div>
           </div>
         )}
