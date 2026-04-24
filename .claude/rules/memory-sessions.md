@@ -75,5 +75,55 @@ Commits: `a00a41e` (move) + `4a00510` (delete AtlasHeaderContext).
 - `SiteHeader.tsx` dropped its `"use client"` tag since it no longer uses the
   context hook.
 
-### Next: Phase 2.3 (Reader route group) or Phase 3 (IA consolidation)
-Per the roadmap. Choose by user priority at session start.
+### CI/CP beta hedge (2026-04-24, shipped)
+Commit `b11aaf6` — `feat(ci): add BETA pill + methodology-rework disclosure`.
+
+- Amber `.ci-beta-pill` class added to `src/app/civica-index.css` (uses
+  `--color-warn` per the frozen-data convention).
+- Pill appears next to the `/civica-index` hero eyebrow, alongside a
+  one-line "Methodology under active revision — v2 in development"
+  disclosure linking to `/civica-index/methodology`.
+- Same pill overlaid on both score titles in
+  `src/components/ci/CIPulseScoreDisplay.tsx`, so every country CI/CP
+  detail page carries the hedge.
+
+### Phase 2.3 — (reader) route group (shipped, scope limited)
+Commits `a602e40` → `63b0e7f` (pages moved) + `7f94b73` (rollback of the
+extra header).
+
+- `/civica-index/methodology`, `/civica-index/government-types`,
+  `/civica-index/changelog` now live under `src/app/(reader)/civica-index/…`.
+  URLs unchanged; route groups don't affect paths.
+- First attempt added a minimal `ReaderHeader` (wordmark + ThemeToggle)
+  in `(reader)/layout.tsx`. User saw it live and said the resulting
+  double-header (SiteHeader above + ReaderHeader below, both with a
+  theme toggle) looked bad. Rolled back in `7f94b73`: deleted both
+  `src/components/ReaderHeader.tsx` and `src/app/(reader)/layout.tsx`.
+  (reader) is now purely an organizational marker; pages inherit the
+  root layout unchanged.
+- Phase 2.3b (migrating `/countries` and `/countries/[slug]` into
+  (reader)) is still deferred to its own session — bigger, hero-heavy
+  surface that deserves its own commit sequence.
+- `/design-system`, `/blog`, `/outcomes`, `/rankings` explicitly stay
+  where they are for now.
+
+### Next session starts here
+Roadmap options remaining:
+- Phase 2.3b — /countries + /countries/[slug] into (reader)
+- Phase 2.4 — flip feature flag so `/` becomes the shell (needs 2.3b
+  first so shell-driven navigation doesn't land on a still-classic
+  /countries/[slug])
+- Phase 3 — IA consolidation (elections/outcomes/by-government-type
+  moves). **User flagged this is being reassessed**; don't start
+  without confirming scope first.
+- Phase 4 — widget gallery
+- Phase 5 — CI/CP v2 methodology rebuild (the rescoped Phase 5; was
+  "academic legitimacy polish")
+
+Polish backlog still open per user (phrased as "nitpicking"):
+- `/civica-index` hero sizing in narrower shell center pane
+- Mini-map aspect ratio in the left rail on shell routes
+- `.country-row.on` selected-country styling — user may want a softer
+  variant (accent underline) instead of full dark-bg inversion
+- Chat persistence across `(shell)` route navigations — lifting
+  `chatHistory` into `ShellContext` with per-route channel keys
