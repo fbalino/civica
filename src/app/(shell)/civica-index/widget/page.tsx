@@ -22,6 +22,7 @@ const WIDGET_SIZES = [
 ] as const;
 
 type WidgetSize = (typeof WIDGET_SIZES)[number];
+type ThemeChoice = "auto" | "light" | "dark";
 
 interface LandingRow {
   slug: string;
@@ -40,16 +41,41 @@ async function resolveDefaultSlug(): Promise<string> {
   return DEFAULT_SLUG;
 }
 
-function buildEmbedSrc(slug: string, size: WidgetSize["key"]): string {
-  return `/embed/${slug}?size=${size}`;
+function buildEmbedSrc(
+  slug: string,
+  size: WidgetSize,
+  theme: ThemeChoice,
+  dims: boolean
+): string {
+  const params = new URLSearchParams({ size: size.key });
+  if (theme !== "auto") params.set("theme", theme);
+  // Dimension bars only render on the large layout.
+  if (dims && size.key === "lg") params.set("dims", "1");
+  return `/embed/${slug}?${params.toString()}`;
 }
 
 function buildEmbedSnippet(
   slug: string,
-  size: WidgetSize
+  size: WidgetSize,
+  theme: ThemeChoice,
+  dims: boolean
 ): string {
-  const src = `${PUBLIC_ORIGIN}${buildEmbedSrc(slug, size.key)}`;
+  const src = `${PUBLIC_ORIGIN}${buildEmbedSrc(slug, size, theme, dims)}`;
   return `<iframe src="${src}" width="${size.width}" height="${size.height}" frameborder="0" loading="lazy" title="Civica Index score"></iframe>`;
+}
+
+function buildGalleryHref(params: {
+  slug: string;
+  theme: ThemeChoice;
+  dims: boolean;
+  override?: Partial<{ theme: ThemeChoice; dims: boolean }>;
+}): string {
+  const theme = params.override?.theme ?? params.theme;
+  const dims = params.override?.dims ?? params.dims;
+  const qs = new URLSearchParams({ c: params.slug });
+  if (theme !== "auto") qs.set("theme", theme);
+  if (dims) qs.set("dims", "1");
+  return `/civica-index/widget?${qs.toString()}`;
 }
 
 export default async function CivicaIndexWidgetPage({
@@ -59,11 +85,22 @@ export default async function CivicaIndexWidgetPage({
 }) {
   const sp = await searchParams;
   const rawSlug = typeof sp?.c === "string" ? sp.c : null;
+  const rawTheme = typeof sp?.theme === "string" ? sp.theme : null;
+  const theme: ThemeChoice =
+    rawTheme === "light" || rawTheme === "dark" ? rawTheme : "auto";
+  const dims = sp?.dims === "1";
+
   const { countries } = await loadAtlasData();
   const match = rawSlug ? slugToCountry(rawSlug, countries) : null;
   const slug = match?.slug ?? (await resolveDefaultSlug());
   const country = slugToCountry(slug, countries);
   const countryName = country?.name ?? slug;
+
+  const themeOptions: { key: ThemeChoice; label: string }[] = [
+    { key: "auto", label: "Auto" },
+    { key: "light", label: "Light" },
+    { key: "dark", label: "Dark" },
+  ];
 
   return (
     <div className="widget-gallery">
@@ -85,12 +122,65 @@ export default async function CivicaIndexWidgetPage({
           </p>
         </section>
 
+        <section className="widget-toolbar" aria-label="Widget appearance">
+          <div className="widget-toolbar-group" role="group" aria-label="Theme">
+            <span className="widget-toolbar-label">Theme</span>
+            {themeOptions.map((opt) => {
+              const href = buildGalleryHref({
+                slug,
+                theme,
+                dims,
+                override: { theme: opt.key },
+              });
+              const isActive = opt.key === theme;
+              return (
+                <Link
+                  key={opt.key}
+                  href={href}
+                  className={`widget-toolbar-chip${isActive ? " on" : ""}`}
+                  aria-pressed={isActive}
+                >
+                  {opt.label}
+                </Link>
+              );
+            })}
+          </div>
+
+          <div className="widget-toolbar-group" role="group" aria-label="Dimension bars">
+            <span className="widget-toolbar-label">
+              Dimension bars <em>(Large only)</em>
+            </span>
+            {[
+              { key: false, label: "Off" },
+              { key: true, label: "On" },
+            ].map((opt) => {
+              const href = buildGalleryHref({
+                slug,
+                theme,
+                dims,
+                override: { dims: opt.key },
+              });
+              const isActive = opt.key === dims;
+              return (
+                <Link
+                  key={String(opt.key)}
+                  href={href}
+                  className={`widget-toolbar-chip${isActive ? " on" : ""}`}
+                  aria-pressed={isActive}
+                >
+                  {opt.label}
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
         <section
           className="widget-sizes"
           aria-label="Widget size previews"
         >
           {WIDGET_SIZES.map((size) => {
-            const snippet = buildEmbedSnippet(slug, size);
+            const snippet = buildEmbedSnippet(slug, size, theme, dims);
             return (
               <article
                 key={size.key}
@@ -111,7 +201,7 @@ export default async function CivicaIndexWidgetPage({
 
                 <div className="widget-size-frame">
                   <iframe
-                    src={buildEmbedSrc(slug, size.key)}
+                    src={buildEmbedSrc(slug, size, theme, dims)}
                     title={`${countryName} Civica Index widget — ${size.label}`}
                     width={size.width}
                     height={size.height}
@@ -172,6 +262,59 @@ export default async function CivicaIndexWidgetPage({
           text-decoration: none;
         }
         .widget-hero-lede a:hover { text-decoration: underline; }
+
+        .widget-toolbar {
+          padding: 20px 0 0;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 20px 28px;
+          align-items: flex-start;
+        }
+        .widget-toolbar-group {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 6px;
+        }
+        .widget-toolbar-label {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono);
+          font-size: var(--text-11);
+          letter-spacing: var(--tracking-caps);
+          text-transform: uppercase;
+          color: var(--color-text-30);
+          margin-right: 6px;
+        }
+        .widget-toolbar-label em {
+          font-style: normal;
+          color: var(--color-text-25);
+          text-transform: none;
+          letter-spacing: 0;
+        }
+        .widget-toolbar-chip {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono);
+          font-size: var(--text-11);
+          letter-spacing: var(--tracking-caps);
+          text-transform: uppercase;
+          padding: 6px 12px;
+          border: 1px solid var(--color-card-border);
+          border-radius: var(--radius-sm);
+          background: var(--color-card-bg);
+          color: var(--color-text-40);
+          text-decoration: none;
+          transition: background-color .15s, color .15s, border-color .15s;
+        }
+        .widget-toolbar-chip:hover {
+          background: var(--color-card-hover-bg);
+          color: var(--color-text-primary);
+          border-color: var(--color-card-hover-border);
+        }
+        .widget-toolbar-chip.on {
+          background: var(--color-accent);
+          color: var(--color-bg);
+          border-color: var(--color-accent);
+        }
 
         .widget-sizes {
           padding-top: 28px;
