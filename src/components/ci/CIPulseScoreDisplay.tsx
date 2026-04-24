@@ -152,6 +152,13 @@ function ScorePane({
           >
             {title}
           </span>
+          <span
+            className="ci-beta-pill"
+            aria-label="Beta release — methodology under revision"
+            title="Methodology under active revision — v2 in development"
+          >
+            Beta
+          </span>
         </div>
         <span
           style={{

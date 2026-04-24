@@ -114,10 +114,17 @@ export default async function CivicaIndexShellPage({
           <div className="ci-hero-eyebrow">
             <span className="dot live" aria-hidden="true" />
             Civica Index · Version 1.0 · Updated daily
+            <span className="ci-beta-pill" aria-label="Beta release">
+              Beta
+            </span>
           </div>
           <h1 className="ci-hero-title">
             The governance health of every country, updated in real time.
           </h1>
+          <p className="ci-hero-rework-note">
+            Methodology under active revision —{" "}
+            <Link href="/civica-index/methodology">v2 in development</Link>.
+          </p>
           <p className="ci-hero-lede">
             The Civica Index is a composite governance score for every
             sovereign state and territory, blending a quarterly structural

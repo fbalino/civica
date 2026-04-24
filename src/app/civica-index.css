@@ -22,6 +22,36 @@
   color: var(--color-text-30);
   margin-bottom: 16px;
   display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.ci-beta-pill {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-warn);
+  padding: 2px 7px;
+  border: 1px solid var(--color-warn);
+  border-radius: 2px;
+  line-height: 1.2;
+  background: transparent;
+  white-space: nowrap;
+}
+.ci-hero-rework-note {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-warn);
+  margin: 0 0 20px;
+  max-width: 720px;
+  display: flex; align-items: center; gap: 8px;
+}
+.ci-hero-rework-note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .ci-hero-title {
   font-family: var(--font-heading);
