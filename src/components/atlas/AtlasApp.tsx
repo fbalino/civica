@@ -7,7 +7,6 @@ import { type Country, type ChamberData, type Bill, COUNTRIES as FALLBACK_COUNTR
 import { Hemicycle, PartyLegend } from "./Hemicycle";
 import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 import type { AtlasCountry, AtlasChamberData } from "@/lib/atlas/load-atlas-data";
-import { useAtlasHeader } from "@/context/AtlasHeaderContext";
 import { AtlasWorldMap, type AtlasWorldMapHandle } from "./AtlasWorldMap";
 import { AtlasCountryLeft } from "./AtlasCountryLeft";
 import {
@@ -148,7 +147,6 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
   const [mobileFilters, setMobileFilters] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [navHeight, setNavHeight] = useState(56);
-  const { setAtlasControls } = useAtlasHeader();
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 768px)");
@@ -172,64 +170,6 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
-
-  useEffect(() => {
-    const handleMode = (m: Mode) => {
-      if (m === "atlas") setMode("atlas");
-      else if (m === "explore") { if (!country) enterExplore("fra"); else setMode("explore"); }
-      else { if (pinned.length >= 2) { setCompareA(pinned[0]); setCompareB(pinned[1]); } enterCompare(); }
-    };
-
-    setAtlasControls(
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div className="atlas-mode-bar">
-          {(["atlas", "explore", "compare"] as Mode[]).map((m) => (
-            <button
-              key={m}
-              className={mode === m ? "on" : ""}
-              onClick={() => handleMode(m)}
-            >
-              {m.charAt(0).toUpperCase() + m.slice(1)}
-            </button>
-          ))}
-        </div>
-
-        {mode === "atlas" && (
-          <>
-            <select
-              className="atlas-header-select"
-              value={regionFilter}
-              onChange={(e) => setRegionFilter(e.target.value)}
-            >
-              <option value="all">All Regions</option>
-              {["Americas", "Europe", "Africa", "Asia", "Oceania"].map((r) => (
-                <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
-            <select
-              className="atlas-header-select"
-              value={govFilter}
-              onChange={(e) => setGovFilter(e.target.value)}
-            >
-              <option value="all">All Systems</option>
-              {["Federal", "Parliamentary", "Presidential", "Monarchy"].map((g) => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
-            {(regionFilter !== "all" || govFilter !== "all") && (
-              <button
-                className="atlas-header-clear"
-                onClick={() => { setRegionFilter("all"); setGovFilter("all"); }}
-              >
-                &times;
-              </button>
-            )}
-          </>
-        )}
-      </div>
-    );
-    return () => setAtlasControls(null);
-  }, [mode, regionFilter, govFilter, country, pinned, setAtlasControls]);
 
 
   // Resizable panes

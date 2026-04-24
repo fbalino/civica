@@ -1,8 +1,5 @@
-"use client";
-
 import Link from "next/link";
 import { type ReactNode } from "react";
-import { useAtlasHeader } from "@/context/AtlasHeaderContext";
 import { NavLinks } from "@/components/NavLinks";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileNav } from "@/components/MobileNav";
@@ -16,8 +13,6 @@ export function SiteHeader({
   logoSlot?: ReactNode;
   logoSlotSmall?: ReactNode;
 }) {
-  const { atlasControls } = useAtlasHeader();
-
   return (
     <nav
       id="site-header"
@@ -91,7 +86,7 @@ export function SiteHeader({
           padding: "0 16px",
         }}
       >
-        {atlasControls ?? <NavLinks />}
+        <NavLinks />
       </div>
 
       {/* Right: ThemeToggle + Hamburger */}

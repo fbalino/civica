@@ -5,7 +5,6 @@ import Script from "next/script";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo } from "@/components/CivicaLogo";
-import { AtlasHeaderProvider } from "@/context/AtlasHeaderContext";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 import "./atlas.css";
@@ -69,7 +68,6 @@ export default function RootLayout({
           {`(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='light'||(!t&& !window.matchMedia('(prefers-color-scheme:dark)').matches)){d.classList.add('light')}else{d.classList.remove('light')}}catch(e){}})()`}
         </Script>
         <ThemeProvider>
-          <AtlasHeaderProvider>
           <SiteHeader
             searchSlot={<GlobalSearchWrapper />}
             logoSlot={<CivicaLogo size={40} />}
@@ -215,7 +213,6 @@ export default function RootLayout({
               </div>
             </div>
           </footer>
-          </AtlasHeaderProvider>
         </ThemeProvider>
       </body>
     </html>
