@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/preview",
+        destination: "/",
+        permanent: true,
+      },
+      {
         source: "/index",
         destination: "/civica-index",
         permanent: true,
