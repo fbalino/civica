@@ -1,5 +1,31 @@
 # Project Memory Decisions
 
+## 2026-04-24 — Civica Index/Pulse methodology is beta and under rework
+
+User disclosed (end of Phase 2.2 session) that the CI v1 composite + CP daily
+scoring both have known flaws and will be recalculated with a new methodology.
+The rework ships in beta form first. Implications:
+
+- Do NOT optimize code paths around the current dimension weights or adapter
+  outputs as if they were stable. The shape of `ci_scores` / `pulse_scores`
+  rows may change, as will the composite formula and the dimension list.
+- `/civica-index` hero copy currently reads more authoritatively than the
+  product's maturity warrants. Add a visible `BETA` marker (hero eyebrow or
+  pill) and a one-line "methodology under revision" disclosure in the lede
+  before the rework ships — credibility hedge.
+- Phase 5 in the roadmap (originally "CI/CP academic legitimacy — polish for
+  citation") now scoped differently: it's the v2 methodology rebuild +
+  beta→stable transition, not a polish pass. Treat the old Phase 5 framing as
+  superseded.
+- Routing / shell work (Phase 2.3+) is orthogonal. The reader-group migration
+  of `/civica-index/methodology` doesn't care what the page says, only where
+  the file lives and what layout wraps it. Safe to proceed.
+
+How to apply: if you're writing CI-adjacent code, ask the user whether it
+should assume the current methodology or a new one before committing to an
+approach. Content changes on `/civica-index` pages should lean toward honest
+hedging while the rework is in flight.
+
 ## 2026-04-21
 
 - Government classification now uses three layers:
