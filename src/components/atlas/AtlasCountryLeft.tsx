@@ -17,7 +17,6 @@ export interface AtlasCountryLeftProps {
   orgGroupsLoading: boolean;
   selectedOrgSlug: string | null;
   mobilePanelVisible: boolean;
-  onBackToAtlas: () => void;
   onLeftModeChange: (m: LeftMode) => void;
   onPickCountry: (c: Country) => void;
   onPickOrg: (slug: string) => void;
@@ -35,7 +34,6 @@ export function AtlasCountryLeft({
   orgGroupsLoading,
   selectedOrgSlug,
   mobilePanelVisible,
-  onBackToAtlas,
   onLeftModeChange,
   onPickCountry,
   onPickOrg,
@@ -45,9 +43,6 @@ export function AtlasCountryLeft({
   return (
     <div className={`chamber-left${mobilePanelVisible ? " mobile-visible" : ""}`}>
       <div className="left-side-head">
-        <button className="back-btn" onClick={onBackToAtlas}>
-          &larr; Back to full atlas
-        </button>
         <div className="kicker">Atlas</div>
         <div className="title">
           {leftMode === "countries" ? "Pick a country" : "Pick an organization"}

@@ -576,7 +576,6 @@ export default function AtlasApp({ dbCountries, dbChambers }: AtlasAppProps) {
               orgGroupsLoading={orgGroupsLoading}
               selectedOrgSlug={selectedOrgSlug}
               mobilePanelVisible={isMobile && mobilePanel === "countries"}
-              onBackToAtlas={() => setMode("atlas")}
               onLeftModeChange={(m) => {
                 setLeftMode(m);
                 if (m === "countries") setSelectedOrgSlug(null);

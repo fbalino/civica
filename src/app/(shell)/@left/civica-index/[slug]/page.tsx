@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { slugToCountry } from "@/lib/atlas/ids";
 import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
@@ -22,13 +21,6 @@ export default async function CivicaIndexCountryLeftSlot({
       hrefMode={{ type: "civica-index" }}
       header={
         <>
-          <Link
-            href="/civica-index"
-            className="back-btn"
-            style={{ textDecoration: "none" }}
-          >
-            ← Civica Index
-          </Link>
           <div className="kicker">Civica Index</div>
           <div className="title">Pick a country</div>
         </>

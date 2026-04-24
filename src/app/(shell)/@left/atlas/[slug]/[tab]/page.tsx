@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { slugToCountry } from "@/lib/atlas/ids";
 import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
@@ -19,13 +18,6 @@ export default async function AtlasCountryLeftSlot({
       hrefMode={{ type: "atlas", tab }}
       header={
         <>
-          <Link
-            href="/atlas"
-            className="back-btn"
-            style={{ textDecoration: "none" }}
-          >
-            ← Atlas map
-          </Link>
           <div className="kicker">Atlas</div>
           <div className="title">Pick a country</div>
         </>
