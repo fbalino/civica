@@ -141,54 +141,6 @@
   border-color: var(--color-accent);
 }
 
-/* Left-pane variant: chips stack vertically in the narrow rail. */
-.ci-left-pane {
-  padding: 18px 16px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-.ci-left-group { display: flex; flex-direction: column; gap: 8px; }
-.ci-left-group-label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--color-text-30);
-  margin-bottom: 2px;
-}
-.ci-left-chip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 7px 12px;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  background: var(--color-card-bg);
-  color: var(--color-text-40);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  transition: background-color .15s, color .15s, border-color .15s;
-}
-.ci-left-chip:hover {
-  background: var(--color-card-hover-bg);
-  color: var(--color-text-primary);
-  border-color: var(--color-card-hover-border);
-}
-.ci-left-chip--active {
-  background: var(--color-accent);
-  color: var(--color-bg);
-  border-color: var(--color-accent);
-}
-.ci-left-chip-count {
-  font-size: var(--text-10);
-  opacity: 0.6;
-  letter-spacing: 0;
-}
-
 .ci-leaderboard {
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-sm);

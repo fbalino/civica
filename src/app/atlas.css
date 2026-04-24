@@ -333,14 +333,43 @@ html.light .atlas-root {
   text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px;
 }
 .left-filter-block .chips-wrap { display: flex; gap: 4px; flex-wrap: wrap; }
+.left-filter-block {
+  padding: 10px 16px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.left-filter-block .left-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.left-filter-block .left-filter-label {
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  color: var(--atlas-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.left-filter-block .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 .left-filter-block .chip {
   font-family: ui-monospace, monospace; font-size: 10px;
   letter-spacing: 0.08em; text-transform: uppercase;
   border: 1px solid var(--atlas-rule); background: var(--atlas-paper);
   padding: 3px 8px; border-radius: 10px; cursor: pointer; color: var(--atlas-ink-2);
+  text-decoration: none;
 }
 .left-filter-block .chip:hover { background: var(--atlas-paper-2); }
 .left-filter-block .chip.active { background: var(--atlas-ink); color: var(--atlas-paper); border-color: var(--atlas-ink); }
+.left-filter-block .chip-count {
+  opacity: 0.6;
+  margin-left: 2px;
+  font-size: 9px;
+}
 
 .left-country-list { padding: 6px 16px 20px; font-family: "Inter", sans-serif; font-size: 13px; }
 .left-country-list .region-group { margin-top: 10px; }

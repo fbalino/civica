@@ -1,7 +1,29 @@
+import Link from "next/link";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
-import { AtlasMapLeft } from "@/components/atlas/AtlasMapLeft";
+import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
 
+// Shell @left for the /atlas map root. Unlike /atlas/[slug]/[tab], there's no
+// selected country; clicking a row navigates to /atlas/<slug>/chamber.
 export default async function AtlasMapLeftSlot() {
   const { countries } = await loadAtlasData();
-  return <AtlasMapLeft countries={countries} />;
+  return (
+    <ShellCountryRail
+      countries={countries}
+      selectedId={null}
+      hrefMode={{ type: "atlas", tab: "chamber" }}
+      header={
+        <>
+          <Link
+            href="/preview"
+            className="back-btn"
+            style={{ textDecoration: "none" }}
+          >
+            ← Back to landing
+          </Link>
+          <div className="kicker">Atlas</div>
+          <div className="title">Pick a country</div>
+        </>
+      }
+    />
+  );
 }

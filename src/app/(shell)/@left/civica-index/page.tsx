@@ -1,9 +1,13 @@
 import Link from "next/link";
-import { getStructuralFamilyDistribution } from "@/lib/db/queries";
+import {
+  getStructuralFamilyDistribution,
+} from "@/lib/db/queries";
+import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import {
   STRUCTURAL_FAMILY_META,
   type StructuralFamilyKey,
 } from "@/lib/government-taxonomy";
+import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
 
 const CONTINENTS = [
   "Africa",
@@ -44,6 +48,8 @@ export default async function CivicaIndexLeftSlot({
     return b.totalCount - a.totalCount;
   });
 
+  const { countries } = await loadAtlasData();
+
   const continentHref = (c: string | null) => {
     const qs = new URLSearchParams();
     if (c) qs.set("continent", c);
@@ -60,66 +66,85 @@ export default async function CivicaIndexLeftSlot({
   };
 
   return (
-    <div className="ci-left-pane">
-      <div className="ci-left-group">
-        <div className="ci-left-group-label">Region</div>
-        <Link
-          href={
-            structuralFamily
-              ? `/civica-index?family=${encodeURIComponent(structuralFamily)}`
-              : "/civica-index"
-          }
-          className={`ci-left-chip ${!continent ? "ci-left-chip--active" : ""}`}
-          scroll={false}
-        >
-          <span>All regions</span>
-        </Link>
-        {CONTINENTS.map((c) => (
-          <Link
-            key={c}
-            href={continentHref(c)}
-            className={`ci-left-chip ${continent === c ? "ci-left-chip--active" : ""}`}
-            scroll={false}
-          >
-            <span>{c}</span>
-          </Link>
-        ))}
-      </div>
-
-      {familyOptionsSorted.length > 0 && (
-        <div className="ci-left-group">
-          <div className="ci-left-group-label">Government type</div>
-          <Link
-            href={
-              continent
-                ? `/civica-index?continent=${encodeURIComponent(continent)}`
-                : "/civica-index"
-            }
-            className={`ci-left-chip ${!structuralFamily ? "ci-left-chip--active" : ""}`}
-            scroll={false}
-          >
-            <span>All types</span>
-          </Link>
-          {familyOptionsSorted.map((f) => {
-            const meta = STRUCTURAL_FAMILY_META[f.key as StructuralFamilyKey];
-            const label = meta?.label ?? f.key;
-            return (
+    <ShellCountryRail
+      countries={countries}
+      selectedId={null}
+      hrefMode={{ type: "civica-index" }}
+      header={
+        <>
+          <div className="kicker">Civica Index</div>
+          <div className="title">Pick a country</div>
+        </>
+      }
+      filters={
+        <div className="left-filter-block">
+          <div className="left-filter-group">
+            <div className="left-filter-label">Region</div>
+            <div className="chips">
               <Link
-                key={f.key}
-                href={familyHref(f.key)}
-                className={`ci-left-chip ${structuralFamily === f.key ? "ci-left-chip--active" : ""}`}
+                href={
+                  structuralFamily
+                    ? `/civica-index?family=${encodeURIComponent(structuralFamily)}`
+                    : "/civica-index"
+                }
+                className={`chip ${!continent ? "active" : ""}`}
                 scroll={false}
-                title={`${f.totalCount} countries · ${f.scoredCount} with a Civica Index score`}
               >
-                <span>{label}</span>
-                <span className="ci-left-chip-count">
-                  {f.scoredCount}/{f.totalCount}
-                </span>
+                All
               </Link>
-            );
-          })}
+              {CONTINENTS.map((c) => (
+                <Link
+                  key={c}
+                  href={continentHref(c)}
+                  className={`chip ${continent === c ? "active" : ""}`}
+                  scroll={false}
+                >
+                  {c}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {familyOptionsSorted.length > 0 && (
+            <div className="left-filter-group">
+              <div className="left-filter-label">Government type</div>
+              <div className="chips">
+                <Link
+                  href={
+                    continent
+                      ? `/civica-index?continent=${encodeURIComponent(continent)}`
+                      : "/civica-index"
+                  }
+                  className={`chip ${!structuralFamily ? "active" : ""}`}
+                  scroll={false}
+                >
+                  All
+                </Link>
+                {familyOptionsSorted.map((f) => {
+                  const meta =
+                    STRUCTURAL_FAMILY_META[f.key as StructuralFamilyKey];
+                  const label = meta?.label ?? f.key;
+                  return (
+                    <Link
+                      key={f.key}
+                      href={familyHref(f.key)}
+                      className={`chip ${structuralFamily === f.key ? "active" : ""}`}
+                      scroll={false}
+                      title={`${f.totalCount} countries · ${f.scoredCount} scored`}
+                    >
+                      {label}
+                      <span className="chip-count">
+                        {" "}
+                        {f.scoredCount}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      }
+    />
   );
 }
