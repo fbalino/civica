@@ -641,6 +641,7 @@ export default async function CICountryDetailPage({
           <a href="#history">History</a>
           {pulseEvents.length > 0 ? <a href="#pulse">Pulse changelog</a> : null}
           <Link href="/civica-index/methodology">Methodology</Link>
+          <Link href={`/civica-index/widget?c=${slug}`}>Embed</Link>
           <a href="#cite">Cite</a>
         </nav>
 
