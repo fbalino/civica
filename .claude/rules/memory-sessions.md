@@ -158,16 +158,46 @@ After these commits:
 left rail + right chat live as their own components under
 `src/components/atlas/` and `src/components/shell/`.
 
+### Phase 4 — widget gallery (shipped)
+Commits `2a16ce2` (scaffold), `2764401` (3 sizes + copy buttons),
+`a6b0586` (theme + dims toggles), `396395c` (Embed subnav link).
+
+- `/civica-index/widget` is a shell route. Left rail = country picker
+  (routes to `/civica-index/widget?c=[slug]`). Center = hero + toolbar
+  + three size cards (sm/md/lg) each with iframe preview, snippet,
+  and copy button. Right = Ask Civica · Widgets with WIDGET_PROMPTS
+  and `civica-index:widget` thread key.
+- `ShellCountryRail.HrefMode` gained a `"widget"` variant.
+- Theme (Auto/Light/Dark) and Dimension Bars (Off/On) are
+  server-rendered <Link> toggles that rebuild the gallery URL, so
+  selections are shareable and the iframes + snippets stay in sync
+  with `?theme` + `?dims`. `?dims=1` is only applied to the large
+  iframe.
+- New client-only `WidgetCopyButton` handles `navigator.clipboard`
+  writes so the page itself stays a server component.
+- Deep link from `/civica-index/[slug]` subnav — "Embed" sits between
+  Methodology and Cite, goes to `/civica-index/widget?c=[slug]`.
+
+### Phase 4 not done
+- Embed button on the rankings leaderboard rows (small hover icon) —
+  handoff suggested it but didn't ship in this phase. Cheap
+  follow-up.
+- Embed button on `/countries/[slug]` reader page — same.
+- The embed's med/large footer still reads `civica.io/countries/X`
+  instead of `civicaatlas.org/countries/X`. Flagged in the original
+  roadmap as "replace the placeholder civica.io URL text in the
+  embed's medium/large footer with the real civicaatlas.org domain".
+  Fix lives in `src/app/embed/[slug]/route.ts`.
+
 ### Open polish not yet addressed
 - `.country-row.on` selected-country styling in the left rail — user
-  has not reviewed options yet. Handoff suggested an accent underline
-  instead of the current full dark-bg inversion; awaiting user call.
+  chose to leave as-is (2026-04-24). Not a live item.
 
 ### Next session starts here
 - Phase 3 — IA consolidation (elections/outcomes/by-government-type
   moves). **User flagged this is being reassessed**; don't start
   without confirming scope first.
-- Phase 4 — widget gallery at `/civica-index/widget`.
 - Phase 5 — CI/CP v2 methodology rebuild (rescoped from the original
   "academic legitimacy polish" framing).
-- Any `.country-row.on` styling change the user lands on.
+- Phase 4 follow-ups above (rankings embed button, countries embed
+  button, fix `civica.io` → `civicaatlas.org` in the embed footer).
