@@ -33,3 +33,10 @@ export const CI_INDEX_PROMPTS: AskCivicaSuggestion[] = [
   { q: "Explain the Pulse dimension — how does it work?", label: "What is Pulse?" },
   { q: "Which country has improved most in the last year?", label: "Most-improved" },
 ];
+
+export const WIDGET_PROMPTS: AskCivicaSuggestion[] = [
+  { q: "What's the best place to embed one of these widgets?", label: "Where to embed" },
+  { q: "What does the Civica Pulse dot show on the widget?", label: "Pulse dot meaning" },
+  { q: "Can I change the theme to match my site?", label: "Theme options" },
+  { q: "How often do widget scores refresh?", label: "Refresh cadence" },
+];

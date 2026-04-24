@@ -10,7 +10,8 @@ import { useMapPaths } from "@/components/atlas/useMapPaths";
 
 type HrefMode =
   | { type: "atlas"; tab: string }
-  | { type: "civica-index" };
+  | { type: "civica-index" }
+  | { type: "widget" };
 
 export interface ShellCountryRailProps {
   countries: AtlasCountry[];
@@ -29,6 +30,7 @@ const REGION_ORDER = ["Americas", "Europe", "Africa", "Asia", "Oceania"];
 
 function buildHref(c: AtlasCountry, mode: HrefMode): string {
   if (mode.type === "atlas") return `/atlas/${c.slug}/${mode.tab}`;
+  if (mode.type === "widget") return `/civica-index/widget?c=${c.slug}`;
   return `/civica-index/${c.slug}`;
 }
 
