@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 import "./atlas.css";
 import "./shell.css";
+import "./civica-index.css";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
