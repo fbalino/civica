@@ -3,6 +3,7 @@ import Link from "next/link";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { slugToCountry } from "@/lib/atlas/ids";
 import { getCIRankings } from "@/lib/db/queries";
+import { WidgetCopyButton } from "@/components/widget/WidgetCopyButton";
 
 export const metadata: Metadata = {
   title: "Civica Widget Gallery — Embed a governance score anywhere",
@@ -12,6 +13,15 @@ export const metadata: Metadata = {
 };
 
 const DEFAULT_SLUG = "denmark";
+const PUBLIC_ORIGIN = "https://civicaatlas.org";
+
+const WIDGET_SIZES = [
+  { key: "sm", label: "Small", width: 300, height: 80, note: "Sidebar / inline" },
+  { key: "md", label: "Medium", width: 320, height: 180, note: "Card, default" },
+  { key: "lg", label: "Large", width: 400, height: 260, note: "Feature block" },
+] as const;
+
+type WidgetSize = (typeof WIDGET_SIZES)[number];
 
 interface LandingRow {
   slug: string;
@@ -30,6 +40,18 @@ async function resolveDefaultSlug(): Promise<string> {
   return DEFAULT_SLUG;
 }
 
+function buildEmbedSrc(slug: string, size: WidgetSize["key"]): string {
+  return `/embed/${slug}?size=${size}`;
+}
+
+function buildEmbedSnippet(
+  slug: string,
+  size: WidgetSize
+): string {
+  const src = `${PUBLIC_ORIGIN}${buildEmbedSrc(slug, size.key)}`;
+  return `<iframe src="${src}" width="${size.width}" height="${size.height}" frameborder="0" loading="lazy" title="Civica Index score"></iframe>`;
+}
+
 export default async function CivicaIndexWidgetPage({
   searchParams,
 }: {
@@ -42,8 +64,6 @@ export default async function CivicaIndexWidgetPage({
   const slug = match?.slug ?? (await resolveDefaultSlug());
   const country = slugToCountry(slug, countries);
   const countryName = country?.name ?? slug;
-
-  const embedSrc = `/embed/${slug}?size=md`;
 
   return (
     <div className="widget-gallery">
@@ -65,22 +85,48 @@ export default async function CivicaIndexWidgetPage({
           </p>
         </section>
 
-        <section className="widget-preview-section" aria-label="Live widget preview">
-          <div className="widget-preview-eyebrow">Preview · Medium (320×180)</div>
-          <div className="widget-preview-frame">
-            <iframe
-              src={embedSrc}
-              title={`${countryName} Civica Index widget`}
-              width={320}
-              height={180}
-              style={{ border: "1px solid var(--color-card-border)" }}
-              loading="lazy"
-            />
-          </div>
-          <p className="widget-preview-note">
-            Three sizes and theme/dimension toggles land in the next
-            commits. This scaffold just proves the pane wiring.
-          </p>
+        <section
+          className="widget-sizes"
+          aria-label="Widget size previews"
+        >
+          {WIDGET_SIZES.map((size) => {
+            const snippet = buildEmbedSnippet(slug, size);
+            return (
+              <article
+                key={size.key}
+                className="widget-size-card"
+                aria-labelledby={`widget-size-${size.key}`}
+              >
+                <header className="widget-size-head">
+                  <div className="widget-size-eyebrow">
+                    Preview · {size.label}
+                  </div>
+                  <div
+                    className="widget-size-dims"
+                    id={`widget-size-${size.key}`}
+                  >
+                    {size.width} × {size.height} · {size.note}
+                  </div>
+                </header>
+
+                <div className="widget-size-frame">
+                  <iframe
+                    src={buildEmbedSrc(slug, size.key)}
+                    title={`${countryName} Civica Index widget — ${size.label}`}
+                    width={size.width}
+                    height={size.height}
+                    loading="lazy"
+                  />
+                </div>
+
+                <div className="widget-size-snippet">
+                  <code>{snippet}</code>
+                </div>
+
+                <WidgetCopyButton snippet={snippet} />
+              </article>
+            );
+          })}
         </section>
       </div>
 
@@ -127,29 +173,81 @@ export default async function CivicaIndexWidgetPage({
         }
         .widget-hero-lede a:hover { text-decoration: underline; }
 
-        .widget-preview-section { padding-top: 28px; }
-        .widget-preview-eyebrow {
+        .widget-sizes {
+          padding-top: 28px;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+        }
+        .widget-size-card {
+          border: 1px solid var(--color-card-border);
+          border-radius: var(--radius-sm);
+          padding: 20px;
+          background: var(--color-card-bg);
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+        }
+        .widget-size-head { display: flex; flex-direction: column; gap: 4px; }
+        .widget-size-eyebrow {
           font-family: var(--font-mono);
           font-weight: var(--font-weight-mono);
           font-size: var(--text-11);
           letter-spacing: var(--tracking-caps);
           text-transform: uppercase;
           color: var(--color-text-30);
-          margin-bottom: 12px;
         }
-        .widget-preview-frame {
-          display: inline-block;
-          background: var(--color-card-bg);
-          padding: 16px;
+        .widget-size-dims {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono);
+          font-size: var(--text-12);
+          color: var(--color-text-55);
+        }
+        .widget-size-frame {
+          display: flex;
+          justify-content: center;
+          padding: 20px 0;
+          background: var(--color-bg);
+          border: 1px dashed var(--color-card-border);
           border-radius: var(--radius-sm);
         }
-        .widget-preview-note {
-          margin-top: 14px;
+        .widget-size-frame iframe {
+          border: 0;
+          box-shadow: var(--shadow-hard-sm, 2px 2px 0 var(--color-card-border));
+        }
+        .widget-size-snippet {
+          background: var(--color-page-bg);
+          border: 1px solid var(--color-card-border);
+          border-radius: var(--radius-sm);
+          padding: 10px 12px;
+          overflow-x: auto;
+        }
+        .widget-size-snippet code {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono);
+          font-size: var(--text-12);
+          color: var(--color-text-60);
+          white-space: nowrap;
+        }
+        .widget-copy-btn {
+          align-self: flex-start;
           font-family: var(--font-mono);
           font-weight: var(--font-weight-mono);
           font-size: var(--text-11);
-          color: var(--color-text-25);
-          max-width: 520px;
+          letter-spacing: var(--tracking-caps);
+          text-transform: uppercase;
+          padding: 9px 14px;
+          border: 1px solid var(--color-card-border);
+          border-radius: var(--radius-sm);
+          background: var(--color-bg);
+          color: var(--color-text-primary);
+          cursor: pointer;
+          transition: background-color .15s, border-color .15s;
+        }
+        .widget-copy-btn:hover {
+          background: var(--color-accent);
+          color: var(--color-bg);
+          border-color: var(--color-accent);
         }
       `}</style>
     </div>
