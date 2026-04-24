@@ -16,6 +16,7 @@ export default function CivicaIndexRight() {
       messageLead="About the Civica Index"
       apiContext={{ mode: "civica-index" }}
       listenForExternalAsk
+      threadKey="civica-index:home"
     />
   );
 }

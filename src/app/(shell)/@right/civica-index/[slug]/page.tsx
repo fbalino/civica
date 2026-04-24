@@ -26,6 +26,7 @@ export default async function CivicaIndexCountryRight({
         countrySlug: slug,
       }}
       listenForExternalAsk
+      threadKey={`civica-index:country:${slug}`}
     />
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import { onCivicaAsk } from "@/lib/shell/events";
+import { useShell } from "@/components/shell/ShellContext";
 
 export interface AskCivicaContextChip {
   label: string;
@@ -39,6 +40,14 @@ export interface AskCivicaPanelProps {
    * doesn't intercept events meant for a specific route's panel.
    */
   listenForExternalAsk?: boolean;
+  /**
+   * Stable key for persisting chat history across route transitions within
+   * the shell. Each @right/page.tsx provides its own (e.g. "atlas:country:
+   * united-states") so hopping between countries preserves each
+   * conversation. When omitted, the panel falls back to a shared "default"
+   * thread.
+   */
+  threadKey?: string;
 }
 
 type ChatMessage = {
@@ -67,12 +76,21 @@ export function AskCivicaPanel({
   greeting = DEFAULT_GREETING,
   apiContext,
   listenForExternalAsk = false,
+  threadKey = "default",
 }: AskCivicaPanelProps) {
-  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
-    { role: "ai", text: greeting },
-  ]);
+  const { getThread, setThread } = useShell();
+  const chatHistory = getThread(threadKey, greeting) as ChatMessage[];
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Seed the persistent thread with the greeting on first mount for this
+  // key. Without this, the greeting would live only in getThread's
+  // fallback and disappear on the first setThread call.
+  useEffect(() => {
+    setThread(threadKey, (prev) =>
+      prev.length === 0 ? [{ role: "ai", text: greeting }] : prev
+    );
+  }, [threadKey, greeting, setThread]);
 
   // Auto-scroll on new messages.
   useEffect(() => {
@@ -86,7 +104,7 @@ export function AskCivicaPanel({
     if (!text) return;
     if (inputRef.current) inputRef.current.value = "";
 
-    setChatHistory((prev) => [
+    setThread(threadKey, (prev) => [
       ...prev,
       { role: "user", text },
       { role: "ai", lead: messageLead, text: "" },
@@ -103,7 +121,7 @@ export function AskCivicaPanel({
       });
 
       if (!res.ok || !res.body) {
-        setChatHistory((prev) => {
+        setThread(threadKey, (prev) => {
           const next = [...prev];
           next[next.length - 1] = {
             role: "ai",
@@ -123,7 +141,7 @@ export function AskCivicaPanel({
         const { done, value } = await reader.read();
         if (done) break;
         accumulated += decoder.decode(value, { stream: true });
-        setChatHistory((prev) => {
+        setThread(threadKey, (prev) => {
           const next = [...prev];
           next[next.length - 1] = {
             role: "ai",
@@ -138,7 +156,7 @@ export function AskCivicaPanel({
       // on "Thinking…" otherwise. Usually means /api/chat caught a
       // server-side error and closed the stream without enqueuing.
       if (accumulated.trim() === "") {
-        setChatHistory((prev) => {
+        setThread(threadKey, (prev) => {
           const next = [...prev];
           next[next.length - 1] = {
             role: "ai",
@@ -150,7 +168,7 @@ export function AskCivicaPanel({
         });
       }
     } catch {
-      setChatHistory((prev) => {
+      setThread(threadKey, (prev) => {
         const next = [...prev];
         next[next.length - 1] = {
           role: "ai",
@@ -160,7 +178,7 @@ export function AskCivicaPanel({
         return next;
       });
     }
-  }, [apiContext, messageLead]);
+  }, [apiContext, messageLead, setThread, threadKey]);
 
   // Cross-pane trigger bus (bill cards etc.). Enabled per route so only the
   // active panel responds — see listenForExternalAsk prop docs.

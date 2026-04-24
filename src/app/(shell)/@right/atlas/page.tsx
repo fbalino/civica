@@ -12,6 +12,7 @@ export default function AtlasMapRight() {
       suggestions={ATLAS_MAP_PROMPTS}
       inputPlaceholder="Ask about any country on the map…"
       apiContext={{ mode: "atlas-map" }}
+      threadKey="atlas:map"
     />
   );
 }

@@ -63,6 +63,7 @@ export default async function AtlasCountryRight({
       messageLead={`About ${countryName} · ${tabLabel}`}
       apiContext={apiContext}
       listenForExternalAsk
+      threadKey={`atlas:country:${slug}`}
     />
   );
 }

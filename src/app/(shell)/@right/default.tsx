@@ -10,6 +10,7 @@ export default function RightDefault() {
     <AskCivicaPanel
       suggestions={LANDING_PROMPTS}
       inputPlaceholder="Ask anything about world governance…"
+      threadKey="landing"
     />
   );
 }

@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -16,6 +17,15 @@ import {
  * existing CSS overlay rules keep working unchanged during the migration.
  */
 export type MobilePanel = "center" | "countries" | "chat";
+
+export type ChatRole = "user" | "ai";
+
+export interface ChatMessage {
+  role: ChatRole;
+  text: string;
+  lead?: string;
+  cite?: string;
+}
 
 interface ShellContextValue {
   /** Viewport is currently <=768px. */
@@ -32,6 +42,16 @@ interface ShellContextValue {
   /** Is the right pane collapsed on desktop (user preference). */
   rightCollapsed: boolean;
   setRightCollapsed: (c: boolean) => void;
+  /**
+   * Per-route chat history. Keyed so /atlas/usa's conversation is
+   * preserved when the user hops to /atlas/france and back. The panel
+   * initializes a thread with its greeting on first read.
+   */
+  getThread: (key: string, greeting: string) => ChatMessage[];
+  setThread: (
+    key: string,
+    updater: (prev: ChatMessage[]) => ChatMessage[]
+  ) => void;
 }
 
 const ShellContext = createContext<ShellContextValue | null>(null);
@@ -61,6 +81,15 @@ export function ShellProvider({ children }: { children: ReactNode }) {
   const [rightCollapsed, setRightCollapsedState] = useState<boolean>(false);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>("center");
   const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  // Chat threads are stored keyed by route so /atlas/usa's conversation
+  // survives a hop to /atlas/france. Storing in state (not a ref) means
+  // updates trigger a re-render of the panel subscribed through useShell.
+  const [threads, setThreads] = useState<Record<string, ChatMessage[]>>({});
+  // Stable fallback arrays for threads that haven't been seeded yet.
+  // Without this, getThread would return a fresh array on every render
+  // and the panel's auto-scroll effect would fire in a loop.
+  const fallbacksRef = useRef<Record<string, ChatMessage[]>>({});
 
   // Hydrate persisted values after mount (avoid SSR mismatch).
   useEffect(() => {
@@ -127,6 +156,25 @@ export function ShellProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const getThread = (key: string, greeting: string): ChatMessage[] => {
+    if (threads[key]) return threads[key];
+    const cached = fallbacksRef.current[key];
+    if (cached && cached[0]?.text === greeting) return cached;
+    const seeded: ChatMessage[] = [{ role: "ai", text: greeting }];
+    fallbacksRef.current[key] = seeded;
+    return seeded;
+  };
+
+  const setThread = useCallback(
+    (key: string, updater: (prev: ChatMessage[]) => ChatMessage[]) => {
+      setThreads((prev) => {
+        const cur = prev[key] ?? [];
+        return { ...prev, [key]: updater(cur) };
+      });
+    },
+    []
+  );
+
   const value = useMemo<ShellContextValue>(
     () => ({
       isMobile,
@@ -138,7 +186,10 @@ export function ShellProvider({ children }: { children: ReactNode }) {
       setRightW,
       rightCollapsed,
       setRightCollapsed,
+      getThread,
+      setThread,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       isMobile,
       mobilePanel,
@@ -148,6 +199,8 @@ export function ShellProvider({ children }: { children: ReactNode }) {
       setRightW,
       rightCollapsed,
       setRightCollapsed,
+      threads,
+      setThread,
     ]
   );
 
