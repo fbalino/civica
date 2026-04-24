@@ -107,23 +107,67 @@ extra header).
 - `/design-system`, `/blog`, `/outcomes`, `/rankings` explicitly stay
   where they are for now.
 
+### Polish pass (2026-04-24, shipped)
+Commit `53bbe56` — `fix(ci): tune /civica-index hero for narrower shell center pane`.
+- `.ci-container` is now a `container-type: inline-size` container.
+- Hero title is 32px by default, bumps to 44px only at container
+  width ≥ 960px. Tier legend stacks vertically under 800px. Stats
+  strip is a CSS grid (min 92px) so all five stats fit one row.
+- Rework-note link got `white-space: nowrap` so "v2 in development"
+  stays together.
+- Fixed undefined text tokens (`--text-36/38/40/15` don't exist)
+  that were silently falling back to 16px body size.
+
+### Chat persistence in the shell (2026-04-24, shipped)
+Commit `31db65f` — `feat(shell): persist Ask Civica chat across route navigations`.
+- `ShellContext` now exposes `getThread(key, greeting)` +
+  `setThread(key, updater)`. Threads held in React state so the
+  subscribed panel re-renders on its slice change.
+- `AskCivicaPanel` takes a `threadKey` prop; a mount-time effect
+  seeds the thread with the greeting the first time a key is used.
+- Keys:
+  - `/atlas` → `atlas:map`
+  - `/atlas/[slug]/[tab]` → `atlas:country:[slug]` (country-level —
+    tab hops within a country share one conversation)
+  - `/civica-index` → `civica-index:home`
+  - `/civica-index/[slug]` → `civica-index:country:[slug]`
+  - default → `landing`
+- In-memory only. No localStorage yet.
+
+### Phase 2.3b — /countries + /countries/[slug] into (reader) (shipped)
+Commit `105841b`. Pure file move. URLs unchanged.
+
+### Phase 2.4 — flip / to the shell (shipped)
+Commits `21f2fe6` (move preview/page.tsx → `(shell)/page.tsx`, delete
+legacy `src/app/page.tsx`), `3d47fbc` (add `/preview` → `/` 308
+redirect), `df32da9` (delete unreferenced `AtlasApp.tsx`,
+−1,084 lines).
+
+After these commits:
+- `/` is the shell landing (three panes: Start Exploring left rail
+  + landing hero + CI Top 10 + how-to center + Ask Civica right).
+- `/atlas`, `/atlas/[slug]/[tab]`, `/civica-index`, `/civica-index/[slug]`,
+  `/compare` — all in `(shell)`.
+- `/countries`, `/countries/[slug]/(democracy|leaders|constitution)`,
+  `/civica-index/(methodology|government-types|changelog)` — all in
+  `(reader)` (classic single-pane reader, no shell chrome).
+- `/design-system`, `/blog`, `/elections`, `/outcomes`, `/rankings`,
+  `/about`, `/government-types` — untouched top-level routes.
+
+`AtlasApp.tsx` is gone. All 8 atlas tabs plus the map/country-list
+left rail + right chat live as their own components under
+`src/components/atlas/` and `src/components/shell/`.
+
+### Open polish not yet addressed
+- `.country-row.on` selected-country styling in the left rail — user
+  has not reviewed options yet. Handoff suggested an accent underline
+  instead of the current full dark-bg inversion; awaiting user call.
+
 ### Next session starts here
-Roadmap options remaining:
-- Phase 2.3b — /countries + /countries/[slug] into (reader)
-- Phase 2.4 — flip feature flag so `/` becomes the shell (needs 2.3b
-  first so shell-driven navigation doesn't land on a still-classic
-  /countries/[slug])
 - Phase 3 — IA consolidation (elections/outcomes/by-government-type
   moves). **User flagged this is being reassessed**; don't start
   without confirming scope first.
-- Phase 4 — widget gallery
-- Phase 5 — CI/CP v2 methodology rebuild (the rescoped Phase 5; was
-  "academic legitimacy polish")
-
-Polish backlog still open per user (phrased as "nitpicking"):
-- `/civica-index` hero sizing in narrower shell center pane
-- Mini-map aspect ratio in the left rail on shell routes
-- `.country-row.on` selected-country styling — user may want a softer
-  variant (accent underline) instead of full dark-bg inversion
-- Chat persistence across `(shell)` route navigations — lifting
-  `chatHistory` into `ShellContext` with per-route channel keys
+- Phase 4 — widget gallery at `/civica-index/widget`.
+- Phase 5 — CI/CP v2 methodology rebuild (rescoped from the original
+  "academic legitimacy polish" framing).
+- Any `.country-row.on` styling change the user lands on.
