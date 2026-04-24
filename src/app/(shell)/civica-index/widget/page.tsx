@@ -4,6 +4,7 @@ import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { slugToCountry } from "@/lib/atlas/ids";
 import { getCIRankings } from "@/lib/db/queries";
 import { WidgetCopyButton } from "@/components/widget/WidgetCopyButton";
+import { WidgetCountrySearch } from "@/components/widget/WidgetCountrySearch";
 
 export const metadata: Metadata = {
   title: "Civica Widget Gallery — Embed a governance score anywhere",
@@ -112,14 +113,12 @@ export default async function CivicaIndexWidgetPage({
           <h1 className="widget-hero-title">
             A Civica Index score, ready for your site.
           </h1>
-          <p className="widget-hero-lede">
-            Drop a one-line iframe into any page and show the live
-            governance score for{" "}
-            <strong>{countryName}</strong> — or{" "}
-            <Link href="/civica-index/widget">any country</Link>. Three
-            sizes, light or dark, updated quarterly with the rest of
-            the Civica Index.
-          </p>
+          <WidgetCountrySearch
+            countries={countries}
+            currentSlug={country?.slug ?? slug}
+            currentTheme={theme}
+            currentDims={dims}
+          />
         </section>
 
         <section className="widget-toolbar" aria-label="Widget appearance">
@@ -250,18 +249,78 @@ export default async function CivicaIndexWidgetPage({
           margin: 0 0 14px;
           text-wrap: balance;
         }
-        .widget-hero-lede {
-          font-size: var(--text-14);
-          color: var(--color-text-60);
-          line-height: 1.55;
-          margin: 0;
-          max-width: 640px;
+        .widget-search {
+          position: relative;
+          max-width: 480px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
         }
-        .widget-hero-lede a {
-          color: var(--color-accent);
-          text-decoration: none;
+        .widget-search-label {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono);
+          font-size: var(--text-11);
+          letter-spacing: var(--tracking-caps);
+          text-transform: uppercase;
+          color: var(--color-text-30);
         }
-        .widget-hero-lede a:hover { text-decoration: underline; }
+        .widget-search-row { position: relative; }
+        .widget-search input {
+          width: 100%;
+          padding: 12px 16px;
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono);
+          font-size: var(--text-13);
+          color: var(--color-text-primary);
+          background: var(--color-card-bg);
+          border: 1px solid var(--color-card-border);
+          border-radius: var(--radius-sm);
+        }
+        .widget-search input:focus {
+          outline: none;
+          border-color: var(--color-accent);
+        }
+        .widget-search-results {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          margin: 6px 0 0;
+          padding: 4px;
+          list-style: none;
+          background: var(--color-card-bg);
+          border: 1px solid var(--color-card-border);
+          border-radius: var(--radius-sm);
+          z-index: 10;
+          box-shadow: var(--shadow-hard-sm, 2px 2px 0 var(--color-card-border));
+        }
+        .widget-search-results li {
+          padding: 9px 12px;
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          color: var(--color-text-primary);
+        }
+        .widget-search-results li.on,
+        .widget-search-results li:hover {
+          background: var(--color-accent);
+          color: var(--color-bg);
+        }
+        .widget-search-name {
+          font-family: var(--font-heading);
+          font-size: var(--text-16);
+        }
+        .widget-search-iso {
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-mono);
+          font-size: var(--text-11);
+          letter-spacing: var(--tracking-wider);
+          color: inherit;
+          opacity: 0.7;
+        }
 
         .widget-toolbar {
           padding: 20px 0 0;
