@@ -55,5 +55,25 @@ Rule captured in `memory-decisions.md`. `contextChips` + `apiContext` only inclu
 - **Turbopack parser chokes on `useCallback(async function name() {...})`.** `next build` + `tsc` pass; `next dev` errors. Use arrow function instead.
 - **`.chamber-center` has no `position: relative`.** Children using `position: absolute; inset: 0` don't work. Use `position: relative; height: 100%` on the child.
 
-### Next: Phase 2.2 — move /civica-index into the shell
-Goals: CI filter chips move from the global header into the left pane; `setAtlasControls` / `AtlasHeaderContext` deleted entirely. 5-8 commits expected. Full plan in `~/.claude/plans/NEXT-SESSION-HANDOFF.md`.
+### Phase 2.2 — /civica-index in the shell (shipped)
+Commits: `a00a41e` (move) + `4a00510` (delete AtlasHeaderContext).
+
+- `/civica-index` now lives under `(shell)/civica-index/` with filter chips in
+  the left pane (`(shell)/@left/civica-index/page.tsx`), hero + tier legend +
+  leaderboard in the center, and CI_INDEX_PROMPTS Ask Civica in the right.
+- Inline `<style>` block from the legacy page (~320 lines) extracted to
+  `src/app/civica-index.css`, imported from root layout. New `.ci-left-pane` +
+  `.ci-left-chip` styles for the narrow-rail variant.
+- Legacy non-shell page at `src/app/civica-index/page.tsx` deleted. Sub-routes
+  (`/[slug]`, `/methodology`, `/government-types`, `/changelog`) stay outside
+  the shell as reader-style detail pages.
+- `AtlasHeaderContext` deleted entirely. With /civica-index no longer injecting
+  into the header, AtlasApp was the last user. The mode bar / filter selects
+  are gone from the desktop legacy / site header. Mobile / chips bar is
+  unchanged because it renders inside AtlasApp directly. The Shift+click
+  compare-pin flow still works via the on-map banner.
+- `SiteHeader.tsx` dropped its `"use client"` tag since it no longer uses the
+  context hook.
+
+### Next: Phase 2.3 (Reader route group) or Phase 3 (IA consolidation)
+Per the roadmap. Choose by user priority at session start.
