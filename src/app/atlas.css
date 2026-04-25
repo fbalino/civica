@@ -1190,9 +1190,37 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   line-height: 1;
 }
 
-/* 5-column fact grid — drops to 3 then 2 cols on narrow shells via
-   container queries (the parent .cm is the inline-size container). */
+/* Wrapper for the [+] expand button + the fact grid. */
+.cm-grid-wrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.cm-expand-btn {
+  flex-shrink: 0;
+  width: 24px; height: 24px;
+  margin-top: 2px;
+  border: 1px solid var(--atlas-rule);
+  border-radius: 50%;
+  background: var(--atlas-paper);
+  color: var(--atlas-muted);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background-color .12s, color .12s, border-color .12s;
+  padding: 0;
+}
+.cm-expand-btn:hover {
+  background: var(--atlas-paper-2);
+  border-color: var(--atlas-accent);
+  color: var(--atlas-accent);
+}
+
+/* Default 3-column fact grid (cols 1, 2, 5). When expanded, a class
+   bumps it to 4 columns (cols 1, 2, 3, 4 — col 5 wraps to a second
+   row alongside the other two when needed, or sits at the right end
+   when the container is wide). */
 .cm-fact-grid {
+  flex: 1; min-width: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px 24px;
@@ -1200,8 +1228,8 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 @container (min-width: 560px) {
   .cm-fact-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@container (min-width: 800px) {
-  .cm-fact-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; }
+@container (min-width: 900px) {
+  .cm-fact-grid--expanded { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; }
 }
 .cm-fact-col {
   display: flex; flex-direction: column; gap: 5px;
@@ -1222,19 +1250,26 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   width: 16px;
   padding-top: 2px;
 }
-.cm-fact-value {
+.cm-fact-text {
   font-family: var(--font-heading);
   font-size: var(--text-13);
-  color: var(--atlas-ink);
-  line-height: 1.25;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  /* Wrap at spaces only — never split mid-word. Long single words
-     overflow visually rather than break to "Constit...ution". */
   word-break: normal;
   overflow-wrap: normal;
+}
+.cm-fact-label {
+  color: var(--atlas-muted);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: 0.02em;
+}
+.cm-fact-value {
+  color: var(--atlas-ink);
 }
 /* CSS tooltip — appears below the row on hover. Uses data-tooltip
    so it's always visible (the native title attribute has a delay
@@ -1278,21 +1313,56 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   border-radius: 2px;
   background: var(--atlas-paper-2);
   color: var(--atlas-ink);
+  text-decoration: none;
+  transition: background-color .12s, border-color .12s, color .12s;
+  cursor: pointer;
 }
-.cm-qc-list { display: flex; flex-direction: column; gap: 1px; }
-.cm-qc-btn {
-  display: inline-flex; align-items: center;
-  padding: 2px 6px; margin-left: -6px;
+.cm-org-chip:hover {
+  background: var(--atlas-accent);
+  border-color: var(--atlas-accent);
+  color: var(--atlas-paper);
+}
+
+/* Quick compare typeahead */
+.cm-qc-search { position: relative; }
+.cm-qc-search input {
+  width: 100%;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  color: var(--atlas-ink);
+  background: var(--atlas-paper);
+  border: 1px solid var(--atlas-rule);
+  border-radius: 2px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.cm-qc-search input:focus { border-color: var(--atlas-accent); }
+.cm-qc-results {
+  position: absolute;
+  top: calc(100% + 4px); left: 0; right: 0;
+  margin: 0; padding: 4px;
+  list-style: none;
+  background: var(--atlas-paper);
+  border: 1px solid var(--atlas-rule);
+  border-radius: 2px;
+  z-index: 20;
+  box-shadow: var(--shadow-hard-sm, 2px 2px 0 var(--atlas-rule));
+}
+.cm-qc-results li {
+  padding: 5px 8px;
+  border-radius: 2px;
+  cursor: pointer;
   font-family: var(--font-heading);
   font-size: var(--text-13);
   color: var(--atlas-ink);
-  text-decoration: none;
-  border-radius: 2px;
-  transition: background-color .12s, color .12s;
 }
-.cm-qc-btn:hover {
-  background: var(--atlas-paper-2);
-  color: var(--atlas-accent);
+.cm-qc-results li.on,
+.cm-qc-results li:hover {
+  background: var(--atlas-accent);
+  color: var(--atlas-paper);
 }
 
 /* Hero scales down on narrow containers */

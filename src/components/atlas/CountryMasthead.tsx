@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
   Award,
@@ -17,10 +18,12 @@ import {
   Landmark,
   Languages,
   MapPin,
+  Minus,
   Music,
   Network,
   Package,
   Phone,
+  Plus,
   ScrollText,
   Square,
   TrendingUp,
@@ -33,21 +36,28 @@ import {
 } from "lucide-react";
 import { type Country } from "./data";
 import { ciTier } from "@/lib/ci/tiers";
+import { QuickCompareSearch } from "@/components/widget/QuickCompareSearch";
 
 /**
  * Phase A masthead — country page header.
  *
- * Structure (top → bottom):
- * 1. Hero row: eyebrow + country name on the left, CI + CP big scores on
- *    the right.
- * 2. Five-column fact grid: same-topic facts stack vertically inside each
- *    column. Blank rows visually separate sub-groups inside a column. The
- *    icon labels each fact; hover any row for a tooltip.
- * 3. Chip strip at the bottom for the remaining dimension scores
- *    (HDI / DQ / ROL / FNR / CC / SS).
+ * Default layout (3 columns):
+ * 1. Government & people (gov, gov detail, head of state, head of govt,
+ *    capital, language, currency)
+ * 2. Geography & economy (region, area, population, GDP, exports,
+ *    imports, trade balance)
+ * 3. Memberships (clickable chips → International tab) + Quick compare
+ *    typeahead search
  *
- * Real fields (capital, pop, gdp, gov, leader, region, id) come from the
- * existing `Country` shape. Everything else is demo data tagged
+ * A "+" toggle to the left of the grid expands to a 5-column layout
+ * adding two extra columns:
+ * 4. History & culture (founded, constitution, last election,
+ *    religion, literacy, olympics)
+ * 5. Identifiers (calling code, TLD, time zone, ISO, drives-on,
+ *    anthem, national day)
+ *
+ * Real fields (capital, pop, gdp, gov, leader, region, id) come from
+ * the existing `Country` shape. Everything else is demo data tagged
  * data-demo="true" — Phase A is a layout pass, not a data pass.
  */
 
@@ -194,7 +204,7 @@ function mockData(country: Country): MockData {
       ? "99%"
       : pick(seed + 23, ["96%", "92%", "78%", "99%", "85%"]),
     olympicMedals: usa
-      ? "2,977 (career)"
+      ? "2,977"
       : pick(seed + 25, ["402", "856", "1,140", "237", "94"]),
     callingCode: usa ? "+1" : pick(seed + 27, ["+33", "+44", "+49", "+55", "+81", "+86", "+91"]),
     tld: usa ? ".us" : pick(seed + 29, [".fr", ".uk", ".de", ".br", ".jp", ".cn", ".in"]),
@@ -211,34 +221,6 @@ function mockData(country: Country): MockData {
         ]),
     nationalDay: usa ? "Jul 4" : pick(seed + 37, ["Jul 14", "May 5", "Sep 7", "Aug 15", "Oct 1"]),
   };
-}
-
-// Hardcoded peer set per the user's mockup. For non-USA countries we
-// fall back to a default G7-ish list filtered to remove the active
-// country itself.
-const USA_PEERS = [
-  { name: "France", slug: "france" },
-  { name: "Mexico", slug: "mexico" },
-  { name: "Canada", slug: "canada" },
-  { name: "Russia", slug: "russia" },
-  { name: "China", slug: "china" },
-  { name: "Japan", slug: "japan" },
-];
-
-const DEFAULT_PEERS = [
-  { name: "United States", slug: "united-states" },
-  { name: "Germany", slug: "germany" },
-  { name: "France", slug: "france" },
-  { name: "Japan", slug: "japan" },
-  { name: "Brazil", slug: "brazil" },
-  { name: "Canada", slug: "canada" },
-  { name: "United Kingdom", slug: "united-kingdom" },
-];
-
-function getPeers(country: Country): { name: string; slug: string }[] {
-  if (country.id === "usa") return USA_PEERS;
-  const selfSlug = country.slug ?? country.id;
-  return DEFAULT_PEERS.filter((p) => p.slug !== selfSlug).slice(0, 6);
 }
 
 function BigScore({
@@ -309,26 +291,28 @@ function ChipStrip({ d }: { d: MockData }) {
 
 function Fact({
   icon,
+  label,
   value,
   demo,
-  tooltip,
 }: {
   icon: React.ReactNode;
+  label: string;
   value: string;
   demo?: boolean;
-  tooltip: string;
 }) {
   return (
     <div
       className="cm-fact"
       data-demo={demo ? "true" : undefined}
-      data-tooltip={tooltip}
-      title={tooltip}
+      title={`${label}: ${value}`}
     >
       <span className="cm-fact-icon" aria-hidden="true">
         {icon}
       </span>
-      <span className="cm-fact-value">{value}</span>
+      <span className="cm-fact-text">
+        <span className="cm-fact-label">{label}:</span>{" "}
+        <span className="cm-fact-value">{value}</span>
+      </span>
     </div>
   );
 }
@@ -337,7 +321,13 @@ function Spacer() {
   return <div className="cm-fact-spacer" aria-hidden="true" />;
 }
 
-function Memberships({ orgs }: { orgs: string[] }) {
+function Memberships({
+  countrySlug,
+  orgs,
+}: {
+  countrySlug: string;
+  orgs: string[];
+}) {
   return (
     <div className="cm-orgs" data-demo="true">
       <div className="cm-mini-title">
@@ -346,37 +336,13 @@ function Memberships({ orgs }: { orgs: string[] }) {
       </div>
       <div className="cm-orgs-list">
         {orgs.map((o) => (
-          <span key={o} className="cm-org-chip">
-            {o}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function QuickCompare({
-  currentSlug,
-  peers,
-}: {
-  currentSlug: string;
-  peers: { name: string; slug: string }[];
-}) {
-  return (
-    <div className="cm-qc">
-      <div className="cm-mini-title">
-        <Compass size={13} aria-hidden="true" />
-        <span>Quick compare</span>
-      </div>
-      <div className="cm-qc-list">
-        {peers.map((p) => (
           <Link
-            key={p.slug}
-            href={`/compare?c=${currentSlug}&c=${p.slug}`}
-            className="cm-qc-btn"
-            title={`Compare ${currentSlug} vs ${p.slug}`}
+            key={o}
+            href={`/atlas/${countrySlug}/international`}
+            className="cm-org-chip"
+            title={`View ${countrySlug.toUpperCase()}'s membership in ${o}`}
           >
-            {p.name}
+            {o}
           </Link>
         ))}
       </div>
@@ -384,10 +350,22 @@ function QuickCompare({
   );
 }
 
+function QuickCompareBlock({ currentSlug }: { currentSlug: string }) {
+  return (
+    <div className="cm-qc">
+      <div className="cm-mini-title">
+        <Compass size={13} aria-hidden="true" />
+        <span>Quick compare</span>
+      </div>
+      <QuickCompareSearch currentSlug={currentSlug} />
+    </div>
+  );
+}
+
 export function CountryMasthead({ country }: { country: Country }) {
+  const [expanded, setExpanded] = useState(false);
   const d = mockData(country);
   const slug = country.slug ?? country.id;
-  const peers = getPeers(country);
 
   return (
     <section className="cm">
@@ -404,191 +382,213 @@ export function CountryMasthead({ country }: { country: Country }) {
         </div>
       </header>
 
-      <div className="cm-fact-grid">
-        {/* Column 1: Government, leadership, national identity */}
-        <div className="cm-fact-col">
-          <Fact
-            icon={<Building2 size={15} />}
-            tooltip="Government type"
-            value={country.gov}
-          />
-          <Fact
-            icon={<ScrollText size={15} />}
-            tooltip="Government detail"
-            value={d.govDetail}
-            demo
-          />
-          <Spacer />
-          <Fact
-            icon={<User size={15} />}
-            tooltip="Head of state"
-            value={country.leader}
-          />
-          <Fact
-            icon={<UserPlus size={15} />}
-            tooltip="Head of government"
-            value={d.headOfGovernment}
-            demo
-          />
-          <Spacer />
-          <Fact
-            icon={<MapPin size={15} />}
-            tooltip="Capital"
-            value={country.capital}
-          />
-          <Fact
-            icon={<Languages size={15} />}
-            tooltip="Official language"
-            value={d.language}
-            demo
-          />
-          <Fact
-            icon={<Coins size={15} />}
-            tooltip="Currency"
-            value={d.currency}
-            demo
-          />
-        </div>
+      <div className="cm-grid-wrap">
+        <button
+          type="button"
+          className="cm-expand-btn"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-label={expanded ? "Hide extra details" : "Show more details"}
+          title={expanded ? "Hide extra details" : "Show more details"}
+        >
+          {expanded ? <Minus size={14} /> : <Plus size={14} />}
+        </button>
 
-        {/* Column 2: Geography & economy */}
-        <div className="cm-fact-col">
-          <Fact
-            icon={<Compass size={15} />}
-            tooltip="Region"
-            value={country.region}
-          />
-          <Fact
-            icon={<Square size={15} />}
-            tooltip="Land area"
-            value={d.area}
-            demo
-          />
-          <Spacer />
-          <Fact
-            icon={<Users size={15} />}
-            tooltip="Population"
-            value={country.pop}
-          />
-          <Fact
-            icon={<TrendingUp size={15} />}
-            tooltip="GDP (nominal)"
-            value={country.gdp}
-          />
-          <Spacer />
-          <Fact
-            icon={<Truck size={15} />}
-            tooltip="Main export"
-            value={d.mainExport}
-            demo
-          />
-          <Fact
-            icon={<Package size={15} />}
-            tooltip="Main import"
-            value={d.mainImport}
-            demo
-          />
-          <Fact
-            icon={<Wallet size={15} />}
-            tooltip="Trade balance (est.)"
-            value={d.tradeBalance}
-            demo
-          />
-        </div>
+        <div
+          className={`cm-fact-grid${expanded ? " cm-fact-grid--expanded" : ""}`}
+        >
+          {/* Column 1: Government, leadership, capital/lang/currency */}
+          <div className="cm-fact-col">
+            <Fact
+              icon={<Building2 size={15} />}
+              label="Gov"
+              value={country.gov}
+            />
+            <Fact
+              icon={<ScrollText size={15} />}
+              label="Detail"
+              value={d.govDetail}
+              demo
+            />
+            <Spacer />
+            <Fact
+              icon={<User size={15} />}
+              label="Head of state"
+              value={country.leader}
+            />
+            <Fact
+              icon={<UserPlus size={15} />}
+              label="Head of govt"
+              value={d.headOfGovernment}
+              demo
+            />
+            <Spacer />
+            <Fact
+              icon={<MapPin size={15} />}
+              label="Capital"
+              value={country.capital}
+            />
+            <Fact
+              icon={<Languages size={15} />}
+              label="Language"
+              value={d.language}
+              demo
+            />
+            <Fact
+              icon={<Coins size={15} />}
+              label="Currency"
+              value={d.currency}
+              demo
+            />
+          </div>
 
-        {/* Column 3: History & culture */}
-        <div className="cm-fact-col">
-          <Fact
-            icon={<Calendar size={15} />}
-            tooltip="Founded"
-            value={d.foundingYear}
-            demo
-          />
-          <Spacer />
-          <Fact
-            icon={<Landmark size={15} />}
-            tooltip="Constitution adopted"
-            value={d.constitutionYear}
-            demo
-          />
-          <Fact
-            icon={<Vote size={15} />}
-            tooltip="Last national election"
-            value={d.lastElection}
-            demo
-          />
-          <Spacer />
-          <Fact
-            icon={<Church size={15} />}
-            tooltip="Dominant religion"
-            value={d.dominantReligion}
-            demo
-          />
-          <Fact
-            icon={<BookOpen size={15} />}
-            tooltip="Literacy rate"
-            value={d.literacyRate}
-            demo
-          />
-          <Fact
-            icon={<Award size={15} />}
-            tooltip="Olympic medals (career)"
-            value={d.olympicMedals}
-            demo
-          />
-        </div>
+          {/* Column 2: Geography & economy */}
+          <div className="cm-fact-col">
+            <Fact
+              icon={<Compass size={15} />}
+              label="Region"
+              value={country.region}
+            />
+            <Fact
+              icon={<Square size={15} />}
+              label="Area"
+              value={d.area}
+              demo
+            />
+            <Spacer />
+            <Fact
+              icon={<Users size={15} />}
+              label="Population"
+              value={country.pop}
+            />
+            <Fact
+              icon={<TrendingUp size={15} />}
+              label="GDP"
+              value={country.gdp}
+            />
+            <Spacer />
+            <Fact
+              icon={<Truck size={15} />}
+              label="Main export"
+              value={d.mainExport}
+              demo
+            />
+            <Fact
+              icon={<Package size={15} />}
+              label="Main import"
+              value={d.mainImport}
+              demo
+            />
+            <Fact
+              icon={<Wallet size={15} />}
+              label="Trade bal."
+              value={d.tradeBalance}
+              demo
+            />
+          </div>
 
-        {/* Column 4: Identifiers & misc (no scores per user) */}
-        <div className="cm-fact-col">
-          <Fact
-            icon={<Phone size={15} />}
-            tooltip="Calling code"
-            value={d.callingCode}
-            demo
-          />
-          <Fact
-            icon={<Globe size={15} />}
-            tooltip="Internet TLD"
-            value={d.tld}
-            demo
-          />
-          <Fact
-            icon={<Clock size={15} />}
-            tooltip="Time zone (capital)"
-            value={d.timeZone}
-            demo
-          />
-          <Spacer />
-          <Fact
-            icon={<Hash size={15} />}
-            tooltip="ISO 3166-1 alpha-3"
-            value={country.id.toUpperCase()}
-          />
-          <Fact
-            icon={<CarFront size={15} />}
-            tooltip="Drives on"
-            value={d.drivesOn}
-            demo
-          />
-          <Spacer />
-          <Fact
-            icon={<Music size={15} />}
-            tooltip="National anthem"
-            value={d.anthem}
-            demo
-          />
-          <Fact
-            icon={<Flag size={15} />}
-            tooltip="National day"
-            value={d.nationalDay}
-            demo
-          />
-        </div>
+          {/* Column 3 — History & culture (only when expanded) */}
+          {expanded && (
+            <div className="cm-fact-col">
+              <Fact
+                icon={<Calendar size={15} />}
+                label="Founded"
+                value={d.foundingYear}
+                demo
+              />
+              <Spacer />
+              <Fact
+                icon={<Landmark size={15} />}
+                label="Constitution"
+                value={d.constitutionYear}
+                demo
+              />
+              <Fact
+                icon={<Vote size={15} />}
+                label="Last election"
+                value={d.lastElection}
+                demo
+              />
+              <Spacer />
+              <Fact
+                icon={<Church size={15} />}
+                label="Religion"
+                value={d.dominantReligion}
+                demo
+              />
+              <Fact
+                icon={<BookOpen size={15} />}
+                label="Literacy"
+                value={d.literacyRate}
+                demo
+              />
+              <Fact
+                icon={<Award size={15} />}
+                label="Olympic medals"
+                value={d.olympicMedals}
+                demo
+              />
+            </div>
+          )}
 
-        {/* Column 5: Memberships + Quick compare */}
-        <div className="cm-fact-col cm-col-membership">
-          <Memberships orgs={["NATO", "WHO", "WTO"]} />
-          <Spacer />
-          <QuickCompare currentSlug={slug} peers={peers} />
+          {/* Column 4 — Identifiers (only when expanded) */}
+          {expanded && (
+            <div className="cm-fact-col">
+              <Fact
+                icon={<Phone size={15} />}
+                label="Calling"
+                value={d.callingCode}
+                demo
+              />
+              <Fact
+                icon={<Globe size={15} />}
+                label="TLD"
+                value={d.tld}
+                demo
+              />
+              <Fact
+                icon={<Clock size={15} />}
+                label="Time zone"
+                value={d.timeZone}
+                demo
+              />
+              <Spacer />
+              <Fact
+                icon={<Hash size={15} />}
+                label="ISO"
+                value={country.id.toUpperCase()}
+              />
+              <Fact
+                icon={<CarFront size={15} />}
+                label="Drives on"
+                value={d.drivesOn}
+                demo
+              />
+              <Spacer />
+              <Fact
+                icon={<Music size={15} />}
+                label="Anthem"
+                value={d.anthem}
+                demo
+              />
+              <Fact
+                icon={<Flag size={15} />}
+                label="National day"
+                value={d.nationalDay}
+                demo
+              />
+            </div>
+          )}
+
+          {/* Column 5 — Memberships + Quick compare (always visible, last) */}
+          <div className="cm-fact-col cm-col-membership">
+            <Memberships
+              countrySlug={slug}
+              orgs={["NATO", "WHO", "WTO"]}
+            />
+            <Spacer />
+            <QuickCompareBlock currentSlug={slug} />
+          </div>
         </div>
       </div>
 
