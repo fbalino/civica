@@ -1,41 +1,37 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import {
-  Banknote,
   Building2,
   Calendar,
-  Globe2,
+  Coins,
   Languages,
   MapPin,
+  Package,
+  ScrollText,
   Square,
   TrendingUp,
   Truck,
+  User,
+  UserPlus,
   Users,
 } from "lucide-react";
 import { type Country } from "./data";
 import { ciTier } from "@/lib/ci/tiers";
 
 /**
- * Three-variant Phase A mockup of the country masthead. The variant is
- * chosen via the `?layout=A1|A2|A3` query param; default is A1.
+ * Phase A masthead — variant A1 (right-rail dashboard).
  *
- * All score values are demo (data-demo="true") — Phase A is a visual
- * pass, not a data-wiring pass. Real CI/Pulse/dimension data is wired
- * in a follow-up phase once the user picks a variant.
+ * Layout: country name + eyebrow + tight icon-fact grid on the left;
+ * CI/CP big stacked + dimension chip strip on the right. The icon
+ * column omits group titles and per-fact captions — the icon itself
+ * communicates the data type — so we can pack ~13 facts into the
+ * space that previously held 9.
  *
- * Static country fields (capital, population, GDP, government type)
- * come from the existing `Country` shape. Currency, language, area,
- * main export, founding year are demo for now.
+ * Real fields from the existing `Country` shape: gov, leader, capital,
+ * pop, gdp. Everything else (head of government, currency, language,
+ * area, founded, main export/import, score chips) is demo data tagged
+ * data-demo="true" so a future grep finds the wiring points.
  */
-
-type LayoutVariant = "A1" | "A2" | "A3";
-
-interface ScoreValue {
-  label: string;
-  abbr: string;
-  value: number;
-}
 
 interface MockData {
   ci: number;
@@ -46,15 +42,16 @@ interface MockData {
   fnr: number;
   cc: number;
   ss: number;
+  govDetail: string;
+  headOfGovernment: string;
   area: string;
   currency: string;
   language: string;
   mainExport: string;
+  mainImport: string;
   foundingYear: string;
 }
 
-// Deterministic pseudo-random scores per country slug so the demo values
-// are stable across reloads and consistent across variants.
 function hashSlug(slug: string): number {
   let h = 0;
   for (let i = 0; i < slug.length; i++) {
@@ -69,8 +66,14 @@ function mockScore(seed: number, base: number, spread: number): number {
   return Math.max(0, Math.min(100, Math.round(base + (r - 0.5) * spread)));
 }
 
+function pick<T>(seed: number, arr: readonly T[]): T {
+  return arr[seed % arr.length]!;
+}
+
 function mockData(country: Country): MockData {
   const seed = hashSlug(country.slug ?? country.id);
+  const usa = country.id === "usa";
+
   return {
     ci: mockScore(seed + 1, 70, 50),
     cp: mockScore(seed + 2, 70, 40),
@@ -80,21 +83,66 @@ function mockData(country: Country): MockData {
     fnr: mockScore(seed + 6, 70, 50),
     cc: mockScore(seed + 7, 65, 60),
     ss: mockScore(seed + 8, 75, 40),
-    area: ["9.8M km²", "8.5M km²", "1.7M km²", "643k km²", "377k km²"][
-      seed % 5
-    ]!,
-    currency: country.id === "usa"
+
+    govDetail: usa
+      ? "Presidential Democracy"
+      : pick(seed, [
+          "Parliamentary Democracy",
+          "Constitutional Monarchy",
+          "Federal Republic",
+          "Semi-Presidential",
+          "Directorial Republic",
+        ]),
+    headOfGovernment: usa
+      ? "JD Vance"
+      : pick(seed, [
+          "Cabinet Chief",
+          "Prime Minister",
+          "Vice President",
+          "Deputy Head",
+        ]),
+    area: usa
+      ? "9.8M km²"
+      : pick(seed, ["8.5M km²", "1.7M km²", "643k km²", "377k km²", "551k km²"]),
+    currency: usa
       ? "US Dollar"
-      : ["Euro", "Pound Sterling", "Yen", "Yuan", "Real", "Peso"][seed % 6]!,
-    language: country.id === "usa"
+      : pick(seed, [
+          "Euro",
+          "Pound Sterling",
+          "Yen",
+          "Yuan",
+          "Real",
+          "Peso",
+          "Rupee",
+        ]),
+    language: usa
       ? "English"
-      : ["French", "Spanish", "German", "Mandarin", "Portuguese", "Arabic"][
-          seed % 6
-        ]!,
-    mainExport: ["Machinery", "Vehicles", "Electronics", "Pharmaceuticals", "Energy"][
-      seed % 5
-    ]!,
-    foundingYear: ["1776", "1789", "1804", "1867", "1949"][seed % 5]!,
+      : pick(seed, [
+          "French",
+          "Spanish",
+          "German",
+          "Mandarin",
+          "Portuguese",
+          "Arabic",
+          "Hindi",
+        ]),
+    mainExport: pick(seed, [
+      "Machinery",
+      "Vehicles",
+      "Electronics",
+      "Pharmaceuticals",
+      "Energy",
+    ]),
+    mainImport: pick(seed + 11, [
+      "Pharmaceuticals",
+      "Vehicles",
+      "Machinery",
+      "Refined oil",
+      "Electronics",
+    ]),
+    foundingYear: usa
+      ? "1776"
+      : pick(seed, ["1789", "1804", "1867", "1949", "1922", "1945"]),
   };
 }
 
@@ -127,7 +175,13 @@ function BigScore({
   );
 }
 
-function ScoreChip({ abbr, label, value }: ScoreValue) {
+interface ChipScore {
+  abbr: string;
+  label: string;
+  value: number;
+}
+
+function ScoreChip({ abbr, label, value }: ChipScore) {
   const tier = ciTier(value);
   return (
     <div
@@ -143,58 +197,8 @@ function ScoreChip({ abbr, label, value }: ScoreValue) {
   );
 }
 
-function IconFact({
-  icon,
-  label,
-  value,
-  demo,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  demo?: boolean;
-}) {
-  return (
-    <div className="cm-icon-fact" data-demo={demo ? "true" : undefined}>
-      <span className="cm-icon" aria-hidden="true">
-        {icon}
-      </span>
-      <span className="cm-fact-body">
-        <span className="cm-fact-label">{label}</span>
-        <span className="cm-fact-value">{value}</span>
-      </span>
-    </div>
-  );
-}
-
-function IconFactGroup({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="cm-icon-group">
-      <div className="cm-icon-group-title">{title}</div>
-      <div className="cm-icon-group-body">{children}</div>
-    </div>
-  );
-}
-
-function CountryName({ country }: { country: Country }) {
-  return (
-    <>
-      <div className="cm-eyebrow">
-        {country.region.toUpperCase()} &middot; {country.id.toUpperCase()}
-      </div>
-      <h1 className="cm-name">{country.name}</h1>
-    </>
-  );
-}
-
-function buildChipScores(d: MockData): ScoreValue[] {
-  return [
+function ChipStrip({ d }: { d: MockData }) {
+  const chips: ChipScore[] = [
     { abbr: "HDI", label: "Human Development", value: d.hdi },
     { abbr: "DQ", label: "Democratic Quality", value: d.dq },
     { abbr: "ROL", label: "Rule of Law", value: d.rol },
@@ -202,10 +206,6 @@ function buildChipScores(d: MockData): ScoreValue[] {
     { abbr: "CC", label: "Corruption Control", value: d.cc },
     { abbr: "SS", label: "Stability & Security", value: d.ss },
   ];
-}
-
-function ChipStrip({ d }: { d: MockData }) {
-  const chips = buildChipScores(d);
   return (
     <div className="cm-chip-strip" role="list">
       {chips.map((c) => (
@@ -215,86 +215,122 @@ function ChipStrip({ d }: { d: MockData }) {
   );
 }
 
-function IconRow({ country, d }: { country: Country; d: MockData }) {
+function Fact({
+  icon,
+  value,
+  demo,
+  title,
+}: {
+  icon: React.ReactNode;
+  value: string;
+  demo?: boolean;
+  title: string;
+}) {
   return (
-    <div className="cm-icon-row">
-      <IconFactGroup title="Geography & people">
-        <IconFact
-          icon={<MapPin size={16} />}
-          label="Capital"
-          value={country.capital}
-        />
-        <IconFact
-          icon={<Users size={16} />}
-          label="Population"
-          value={country.pop}
-        />
-        <IconFact
-          icon={<Square size={16} />}
-          label="Area"
-          value={d.area}
-          demo
-        />
-      </IconFactGroup>
-
-      <IconFactGroup title="Economy">
-        <IconFact
-          icon={<Banknote size={16} />}
-          label="Currency"
-          value={d.currency}
-          demo
-        />
-        <IconFact
-          icon={<TrendingUp size={16} />}
-          label="GDP"
-          value={country.gdp}
-        />
-        <IconFact
-          icon={<Truck size={16} />}
-          label="Main export"
-          value={d.mainExport}
-          demo
-        />
-      </IconFactGroup>
-
-      <IconFactGroup title="Identity">
-        <IconFact
-          icon={<Building2 size={16} />}
-          label="Government"
-          value={country.gov}
-        />
-        <IconFact
-          icon={<Languages size={16} />}
-          label="Language"
-          value={d.language}
-          demo
-        />
-        <IconFact
-          icon={<Calendar size={16} />}
-          label="Founded"
-          value={d.foundingYear}
-          demo
-        />
-      </IconFactGroup>
+    <div
+      className="cm-fact"
+      data-demo={demo ? "true" : undefined}
+      title={title}
+    >
+      <span className="cm-fact-icon" aria-hidden="true">
+        {icon}
+      </span>
+      <span className="cm-fact-value">{value}</span>
     </div>
   );
 }
 
-function VariantBadge({ variant }: { variant: LayoutVariant }) {
+function FactGrid({ country, d }: { country: Country; d: MockData }) {
   return (
-    <div className="cm-variant-badge" aria-label={`Layout variant ${variant}`}>
-      Mockup · Layout {variant}
+    <div className="cm-fact-grid">
+      <Fact
+        icon={<Building2 size={15} />}
+        title="Government type"
+        value={country.gov}
+      />
+      <Fact
+        icon={<ScrollText size={15} />}
+        title="Government detail"
+        value={d.govDetail}
+        demo
+      />
+      <Fact
+        icon={<User size={15} />}
+        title="Head of state"
+        value={country.leader}
+      />
+      <Fact
+        icon={<UserPlus size={15} />}
+        title="Head of government"
+        value={d.headOfGovernment}
+        demo
+      />
+      <Fact
+        icon={<MapPin size={15} />}
+        title="Capital"
+        value={country.capital}
+      />
+      <Fact
+        icon={<Languages size={15} />}
+        title="Official language"
+        value={d.language}
+        demo
+      />
+      <Fact
+        icon={<Coins size={15} />}
+        title="Currency"
+        value={d.currency}
+        demo
+      />
+      <Fact
+        icon={<Users size={15} />}
+        title="Population"
+        value={country.pop}
+      />
+      <Fact
+        icon={<TrendingUp size={15} />}
+        title="GDP"
+        value={country.gdp}
+      />
+      <Fact
+        icon={<Square size={15} />}
+        title="Area"
+        value={d.area}
+        demo
+      />
+      <Fact
+        icon={<Calendar size={15} />}
+        title="Founded"
+        value={d.foundingYear}
+        demo
+      />
+      <Fact
+        icon={<Truck size={15} />}
+        title="Main export"
+        value={d.mainExport}
+        demo
+      />
+      <Fact
+        icon={<Package size={15} />}
+        title="Main import"
+        value={d.mainImport}
+        demo
+      />
     </div>
   );
 }
 
-function LayoutA1({ country, d }: { country: Country; d: MockData }) {
+export function CountryMasthead({ country }: { country: Country }) {
+  const d = mockData(country);
   return (
     <section className="cm cm--a1">
       <header className="cm-a1-head">
         <div className="cm-a1-left">
-          <CountryName country={country} />
-          <IconRow country={country} d={d} />
+          <div className="cm-eyebrow">
+            {country.region.toUpperCase()} &middot; {country.id.toUpperCase()}
+          </div>
+          <h1 className="cm-name">{country.name}</h1>
+          <FactGrid country={country} d={d} />
         </div>
         <div className="cm-a1-right">
           <div className="cm-a1-bigscores">
@@ -305,64 +341,5 @@ function LayoutA1({ country, d }: { country: Country; d: MockData }) {
         </div>
       </header>
     </section>
-  );
-}
-
-function LayoutA2({ country, d }: { country: Country; d: MockData }) {
-  return (
-    <section className="cm cm--a2">
-      <header className="cm-a2-head">
-        <CountryName country={country} />
-        <div className="cm-a2-bigrow">
-          <BigScore abbr="CI" label="Civica Index" value={d.ci} />
-          <BigScore abbr="CP" label="Civica Pulse" value={d.cp} />
-        </div>
-        <ChipStrip d={d} />
-        <IconRow country={country} d={d} />
-      </header>
-    </section>
-  );
-}
-
-function LayoutA3({ country, d }: { country: Country; d: MockData }) {
-  return (
-    <section className="cm cm--a3">
-      <header className="cm-a3-head">
-        <div className="cm-a3-left">
-          <CountryName country={country} />
-          <IconRow country={country} d={d} />
-        </div>
-        <div className="cm-a3-right">
-          <BigScore abbr="CI" label="Civica Index" value={d.ci} />
-          <BigScore abbr="CP" label="Civica Pulse" value={d.cp} />
-        </div>
-      </header>
-      <div className="cm-a3-statbar">
-        <Globe2 size={14} aria-hidden="true" />
-        <ChipStrip d={d} />
-      </div>
-    </section>
-  );
-}
-
-export function CountryMasthead({ country }: { country: Country }) {
-  const sp = useSearchParams();
-  const raw = sp?.get("layout") ?? "A1";
-  const variant: LayoutVariant =
-    raw === "A2" ? "A2" : raw === "A3" ? "A3" : "A1";
-
-  const d = mockData(country);
-
-  return (
-    <>
-      <VariantBadge variant={variant} />
-      {variant === "A1" ? (
-        <LayoutA1 country={country} d={d} />
-      ) : variant === "A2" ? (
-        <LayoutA2 country={country} d={d} />
-      ) : (
-        <LayoutA3 country={country} d={d} />
-      )}
-    </>
   );
 }
