@@ -4,8 +4,8 @@ import {
   type Bill,
   type ChamberData,
   type Country,
-  govDescription,
 } from "./data";
+import { CountryMasthead } from "./CountryMasthead";
 import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 import { ChamberTab } from "./tabs/ChamberTab";
 import { BillsTab } from "./tabs/BillsTab";
@@ -185,56 +185,7 @@ export function AtlasCountryCenter({
 }: AtlasCountryCenterProps) {
   return (
     <>
-      <div className="atlas-masthead">
-        <div>
-          <div className="eyebrow">
-            {country.region.toUpperCase()} &middot; {country.id.toUpperCase()}
-          </div>
-          <h1>{country.name}</h1>
-          <div className="dek">
-            {govDescription(country)} of {country.pop} people, led from{" "}
-            {country.capital}.
-          </div>
-          <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
-            <a
-              href={`/api/countries/${country.slug ?? country.id}/export?format=json`}
-              download
-              className="atlas-export-btn"
-            >
-              JSON
-            </a>
-            <a
-              href={`/api/countries/${country.id}/export?format=csv`}
-              download
-              className="atlas-export-btn"
-            >
-              CSV
-            </a>
-          </div>
-        </div>
-        <div className="quick-facts">
-          <div className="r">
-            <b>Leader</b>
-            <span>{country.leader}</span>
-          </div>
-          <div className="r">
-            <b>Gov</b>
-            <span>{country.gov}</span>
-          </div>
-          <div className="r">
-            <b>Capital</b>
-            <span>{country.capital}</span>
-          </div>
-          <div className="r">
-            <b>Population</b>
-            <span>{country.pop}</span>
-          </div>
-          <div className="r">
-            <b>GDP</b>
-            <span>{country.gdp}</span>
-          </div>
-        </div>
-      </div>
+      <CountryMasthead country={country} />
 
       <div className="atlas-tabs">
         {TAB_LABELS.map(([t, label]) => (
@@ -481,7 +432,11 @@ export function AtlasCountryCenter({
         )}
       </div>
 
-      {/* Tab VI: Leaders (inline) */}
+      {/* Tab VI: Leaders (inline)
+          TODO Phase I: Redesign as an org-chart hierarchy. Current ordering
+          puts cabinet members above heads of state because the SQL sorts by
+          desc(startDate). See
+          ~/.claude/plans/great-questions-1-build-tender-falcon.md Phase I. */}
       <div className={`atlas-pane${tab === "leaders" ? " on" : ""}`}>
         {tabDataLoading && tab === "leaders" ? (
           <LoadingPane />

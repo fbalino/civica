@@ -1108,3 +1108,218 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .org-stats .cell:nth-last-child(-n+2) { border-bottom: 0; }
   .org-members { padding: 16px 16px 40px; }
 }
+
+/* =============================================================
+   Phase A — Country Masthead (mockup variants A1 / A2 / A3)
+   ============================================================= */
+
+.cm-variant-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  padding: 4px 8px;
+  margin-bottom: 12px;
+  color: var(--color-warn);
+  border: 1px solid var(--color-warn);
+  border-radius: 2px;
+  background: transparent;
+}
+
+.cm { padding: 0 0 24px; border-bottom: 1px solid var(--atlas-rule); margin-bottom: 24px; }
+.cm-eyebrow {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+  margin-bottom: 6px;
+}
+.cm-name {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 56px;
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--atlas-ink);
+  margin: 0 0 16px;
+}
+
+/* BigScore — used by all variants for CI / CP */
+.cm-bigscore {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: end;
+  padding: 8px 0;
+}
+.cm-bigscore-label {
+  grid-column: 1; grid-row: 1 / span 2;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+  align-self: start;
+  padding-top: 12px;
+}
+.cm-bigscore-value {
+  grid-column: 2; grid-row: 1;
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.cm-bigscore-meta {
+  grid-column: 2; grid-row: 2;
+  display: flex; gap: 8px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+.cm-bigscore-tier { font-weight: 600; }
+.cm-bigscore-name { color: var(--atlas-muted); }
+
+/* ScoreChip — small chip used in chip strips */
+.cm-chip-strip {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.cm-chip {
+  display: flex; align-items: baseline; gap: 6px;
+  padding: 6px 10px;
+  background: var(--atlas-paper-2);
+  border: 1px solid var(--atlas-rule);
+  border-radius: 2px;
+}
+.cm-chip-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+.cm-chip-value {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: var(--text-16);
+  line-height: 1;
+}
+
+/* Icon row — three groups (Geography / Economy / Identity) */
+.cm-icon-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px 28px;
+  margin-top: 16px;
+}
+.cm-icon-group {
+  display: flex; flex-direction: column; gap: 8px;
+  border-left: 2px solid var(--atlas-rule);
+  padding-left: 12px;
+}
+.cm-icon-group-title {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+.cm-icon-group-body { display: flex; flex-direction: column; gap: 6px; }
+.cm-icon-fact {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--atlas-ink);
+}
+.cm-icon { color: var(--atlas-muted); display: inline-flex; }
+.cm-fact-body { display: flex; flex-direction: column; }
+.cm-fact-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+.cm-fact-value {
+  font-family: var(--font-heading);
+  font-size: var(--text-14);
+  color: var(--atlas-ink);
+}
+
+/* --- Variant A1: Right-rail dashboard --- */
+.cm--a1 .cm-a1-head {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  align-items: start;
+}
+.cm--a1 .cm-a1-right {
+  display: flex; flex-direction: column; gap: 14px;
+  border-left: 1px solid var(--atlas-rule);
+  padding-left: 24px;
+}
+.cm--a1 .cm-a1-bigscores {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.cm--a1 .cm-bigscore-value { font-size: 72px; }
+@media (max-width: 900px) {
+  .cm--a1 .cm-a1-head { grid-template-columns: 1fr; }
+  .cm--a1 .cm-a1-right { border-left: 0; padding-left: 0; border-top: 1px solid var(--atlas-rule); padding-top: 16px; }
+}
+
+/* --- Variant A2: Stacked --- */
+.cm--a2 .cm-a2-head {
+  display: flex; flex-direction: column; gap: 18px;
+  text-align: center;
+}
+.cm--a2 .cm-name { text-align: center; margin-bottom: 0; }
+.cm--a2 .cm-eyebrow { text-align: center; }
+.cm--a2 .cm-a2-bigrow {
+  display: flex; justify-content: center; gap: 48px;
+  padding: 18px 0;
+  border-top: 1px solid var(--atlas-rule);
+  border-bottom: 1px solid var(--atlas-rule);
+}
+.cm--a2 .cm-a2-bigrow .cm-bigscore-value { font-size: 88px; }
+.cm--a2 .cm-chip-strip { justify-content: center; }
+.cm--a2 .cm-icon-row { text-align: left; }
+
+/* --- Variant A3: Split header + thin statbar --- */
+.cm--a3 .cm-a3-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: start;
+}
+.cm--a3 .cm-a3-right {
+  display: flex; gap: 24px; padding-top: 4px;
+}
+.cm--a3 .cm-a3-right .cm-bigscore-value { font-size: 80px; }
+.cm--a3 .cm-a3-statbar {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 18px;
+  padding: 10px 12px;
+  background: var(--atlas-paper-2);
+  border: 1px solid var(--atlas-rule);
+  border-radius: 2px;
+}
+.cm--a3 .cm-a3-statbar .cm-chip-strip { flex: 1; }
+.cm--a3 .cm-a3-statbar .cm-chip {
+  background: transparent; border: 0; padding: 0 8px 0 0;
+  border-right: 1px solid var(--atlas-rule);
+}
+.cm--a3 .cm-a3-statbar .cm-chip:last-child { border-right: 0; }
+@media (max-width: 900px) {
+  .cm--a3 .cm-a3-head { grid-template-columns: 1fr; }
+}

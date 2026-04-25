@@ -453,6 +453,11 @@ export async function getLeaderTimeline(jurisdictionId: string) {
   const officeIds = allOffices.map((o) => o.id);
   if (officeIds.length === 0) return [];
 
+  // TODO Phase I: Layer office-rank ordering (Head of State → Head of
+  // Government → cabinet → other) on top of the start-date sort. Today the
+  // pure desc(startDate) sort can put a recently confirmed cabinet member
+  // above the head of state. See
+  // ~/.claude/plans/great-questions-1-build-tender-falcon.md Phase I.
   const allTerms = await db
     .select({ term: terms, person: persons })
     .from(terms)
