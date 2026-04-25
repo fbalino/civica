@@ -1076,10 +1076,32 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 }
 
 /* =============================================================
-   Phase A — Country Masthead (variant A1: right-rail dashboard)
+   Phase A — Country Masthead
+   Layout: hero row (eyebrow + name + CI/CP big scores)
+           5-column fact grid (full width)
+           chip strip (HDI / DQ / ROL / FNR / CC / SS)
    ============================================================= */
 
-.cm { padding: 0 0 24px; border-bottom: 1px solid var(--atlas-rule); margin-bottom: 24px; }
+.cm {
+  padding: 4px 0 24px;
+  border-bottom: 1px solid var(--atlas-rule);
+  margin-bottom: 24px;
+  container-type: inline-size;
+}
+
+/* Hero row */
+.cm-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--atlas-rule);
+}
+.cm-hero-left { flex: 1 1 320px; min-width: 0; }
+.cm-hero-scores { display: flex; gap: 28px; flex-shrink: 0; }
 .cm-eyebrow {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
@@ -1096,17 +1118,16 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   line-height: 1.0;
   letter-spacing: -0.025em;
   color: var(--atlas-ink);
-  margin: 0 0 16px;
+  margin: 0;
 }
 
-/* BigScore — used by all variants for CI / CP */
+/* BigScore — CI / CP next to the country name */
 .cm-bigscore {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto auto;
   grid-template-rows: auto auto;
-  column-gap: 12px;
+  column-gap: 10px;
   align-items: end;
-  padding: 8px 0;
 }
 .cm-bigscore-label {
   grid-column: 1; grid-row: 1 / span 2;
@@ -1117,31 +1138,35 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   text-transform: uppercase;
   color: var(--atlas-muted);
   align-self: start;
-  padding-top: 12px;
+  padding-top: 14px;
 }
 .cm-bigscore-value {
   grid-column: 2; grid-row: 1;
   font-family: var(--font-heading);
   font-weight: 400;
-  font-size: 64px;
+  font-size: 60px;
   line-height: 1;
   letter-spacing: -0.03em;
 }
 .cm-bigscore-meta {
   grid-column: 2; grid-row: 2;
-  display: flex; gap: 8px;
+  display: flex; flex-direction: column;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-10);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
+  margin-top: 2px;
 }
 .cm-bigscore-tier { font-weight: 600; }
 .cm-bigscore-name { color: var(--atlas-muted); }
 
-/* ScoreChip — small chip used in chip strips */
+/* Score-chip strip (bottom of masthead) */
 .cm-chip-strip {
   display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--atlas-rule);
 }
 .cm-chip {
   display: flex; align-items: baseline; gap: 6px;
@@ -1165,58 +1190,116 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   line-height: 1;
 }
 
-/* Tight fact grid — icon + value, no labels, no group titles.
-   Icon does the labeling; hover the row for a tooltip describing
-   the field (`title` attribute on each .cm-fact). Values can wrap
-   to two lines so longer government-type strings don't truncate
-   into half-words. */
+/* 5-column fact grid — drops to 3 then 2 cols on narrow shells via
+   container queries (the parent .cm is the inline-size container). */
 .cm-fact-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 10px 24px;
-  margin-top: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 24px;
 }
-.cm-fact {
-  display: flex; align-items: flex-start; gap: 10px;
+@container (min-width: 560px) {
+  .cm-fact-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container (min-width: 800px) {
+  .cm-fact-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; }
+}
+.cm-fact-col {
+  display: flex; flex-direction: column; gap: 5px;
   min-width: 0;
+}
+.cm-fact-spacer { height: 12px; }
+.cm-fact {
+  display: flex; align-items: flex-start; gap: 8px;
+  position: relative;
+  min-width: 0;
+  cursor: default;
+  padding: 1px 0;
 }
 .cm-fact-icon {
   color: var(--atlas-muted);
   display: inline-flex;
   flex-shrink: 0;
-  width: 18px;
+  width: 16px;
   padding-top: 2px;
 }
 .cm-fact-value {
   font-family: var(--font-heading);
-  font-size: var(--text-14);
+  font-size: var(--text-13);
   color: var(--atlas-ink);
   line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  word-break: break-word;
+  /* Wrap at spaces only — never split mid-word. Long single words
+     overflow visually rather than break to "Constit...ution". */
+  word-break: normal;
+  overflow-wrap: normal;
+}
+/* CSS tooltip — appears below the row on hover. Uses data-tooltip
+   so it's always visible (the native title attribute has a delay
+   that made earlier hover feedback feel broken). */
+.cm-fact[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 22px;
+  z-index: 10;
+  background: var(--atlas-ink);
+  color: var(--atlas-paper);
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
-/* --- Variant A1: Right-rail dashboard --- */
-.cm--a1 .cm-a1-head {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 32px;
-  align-items: start;
+/* Column 5 — memberships + quick compare */
+.cm-mini-title {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+  margin-bottom: 4px;
 }
-.cm--a1 .cm-a1-right {
-  display: flex; flex-direction: column; gap: 14px;
-  border-left: 1px solid var(--atlas-rule);
-  padding-left: 24px;
+.cm-orgs-list { display: flex; flex-wrap: wrap; gap: 4px; }
+.cm-org-chip {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border: 1px solid var(--atlas-rule);
+  border-radius: 2px;
+  background: var(--atlas-paper-2);
+  color: var(--atlas-ink);
 }
-.cm--a1 .cm-a1-bigscores {
-  display: flex; flex-direction: column; gap: 8px;
+.cm-qc-list { display: flex; flex-direction: column; gap: 1px; }
+.cm-qc-btn {
+  display: inline-flex; align-items: center;
+  padding: 2px 6px; margin-left: -6px;
+  font-family: var(--font-heading);
+  font-size: var(--text-13);
+  color: var(--atlas-ink);
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background-color .12s, color .12s;
 }
-.cm--a1 .cm-bigscore-value { font-size: 72px; }
-@media (max-width: 900px) {
-  .cm--a1 .cm-a1-head { grid-template-columns: 1fr; }
-  .cm--a1 .cm-a1-right { border-left: 0; padding-left: 0; border-top: 1px solid var(--atlas-rule); padding-top: 16px; }
+.cm-qc-btn:hover {
+  background: var(--atlas-paper-2);
+  color: var(--atlas-accent);
+}
+
+/* Hero scales down on narrow containers */
+@container (max-width: 560px) {
+  .cm-name { font-size: 40px; }
+  .cm-bigscore-value { font-size: 44px; }
+  .cm-hero { gap: 16px; }
+  .cm-hero-scores { gap: 18px; }
 }
 
