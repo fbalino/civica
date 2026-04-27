@@ -321,13 +321,7 @@ function Spacer() {
   return <div className="cm-fact-spacer" aria-hidden="true" />;
 }
 
-function Memberships({
-  countrySlug,
-  orgs,
-}: {
-  countrySlug: string;
-  orgs: string[];
-}) {
+function Memberships({ orgs }: { orgs: string[] }) {
   return (
     <div className="cm-orgs" data-demo="true">
       <div className="cm-mini-title">
@@ -335,16 +329,19 @@ function Memberships({
         <span>Memberships</span>
       </div>
       <div className="cm-orgs-list">
-        {orgs.map((o) => (
-          <Link
-            key={o}
-            href={`/atlas/${countrySlug}/international`}
-            className="cm-org-chip"
-            title={`View ${countrySlug.toUpperCase()}'s membership in ${o}`}
-          >
-            {o}
-          </Link>
-        ))}
+        {orgs.map((o) => {
+          const slug = o.toLowerCase();
+          return (
+            <Link
+              key={o}
+              href={`/atlas/organizations/${slug}`}
+              className="cm-org-chip"
+              title={`Open ${o} in the Atlas`}
+            >
+              {o}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
@@ -582,10 +579,7 @@ export function CountryMasthead({ country }: { country: Country }) {
 
           {/* Column 5 — Memberships + Quick compare (always visible, last) */}
           <div className="cm-fact-col cm-col-membership">
-            <Memberships
-              countrySlug={slug}
-              orgs={["NATO", "WHO", "WTO"]}
-            />
+            <Memberships orgs={["NATO", "WHO", "WTO"]} />
             <Spacer />
             <QuickCompareBlock currentSlug={slug} />
           </div>

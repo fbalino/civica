@@ -34,6 +34,13 @@ export const CI_INDEX_PROMPTS: AskCivicaSuggestion[] = [
   { q: "Which country has improved most in the last year?", label: "Most-improved" },
 ];
 
+export const ATLAS_ORG_PROMPTS: AskCivicaSuggestion[] = [
+  { q: "What does this organization actually do?", label: "What does it do?" },
+  { q: "Who has the most influence inside this organization?", label: "Most influential members" },
+  { q: "Which countries are notable absences from this organization?", label: "Notable absences" },
+  { q: "How has membership changed over the last 20 years?", label: "Membership over time" },
+];
+
 export const WIDGET_PROMPTS: AskCivicaSuggestion[] = [
   { q: "What's the best place to embed one of these widgets?", label: "Where to embed" },
   { q: "What does the Civica Pulse dot show on the widget?", label: "Pulse dot meaning" },

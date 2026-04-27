@@ -774,18 +774,25 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   display: flex; border: 1px solid var(--atlas-rule);
   margin: 12px 16px 0;
 }
-.left-mode-toggle button {
+.left-mode-toggle button,
+.left-mode-toggle a {
   flex: 1; background: var(--atlas-paper); color: var(--atlas-ink-2);
   border: 0; padding: 8px 10px;
   font-family: ui-monospace, monospace; font-size: 10px;
   letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer;
   transition: background 120ms, color 120ms;
+  text-align: center; text-decoration: none; display: block;
 }
-.left-mode-toggle button:hover { background: var(--atlas-paper-2); }
-.left-mode-toggle button.on {
+.left-mode-toggle button:hover,
+.left-mode-toggle a:hover { background: var(--atlas-paper-2); }
+.left-mode-toggle button.on,
+.left-mode-toggle a.on {
   background: var(--atlas-ink); color: var(--atlas-paper);
 }
-.left-mode-toggle button + button { border-left: 1px solid var(--atlas-rule); }
+.left-mode-toggle button + button,
+.left-mode-toggle a + a,
+.left-mode-toggle a + button,
+.left-mode-toggle button + a { border-left: 1px solid var(--atlas-rule); }
 
 /* Organization list in left rail */
 .left-org-list {
@@ -806,6 +813,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   display: grid; grid-template-columns: 28px 1fr auto;
   gap: 10px; align-items: center; padding: 5px 6px; border-radius: 2px;
   cursor: pointer; color: var(--atlas-ink-2);
+  text-decoration: none;
 }
 .left-org-list .org-row:hover { background: var(--atlas-paper-2); }
 .left-org-list .org-row.on { background: var(--atlas-ink); color: var(--atlas-paper); }
