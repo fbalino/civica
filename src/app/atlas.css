@@ -596,6 +596,35 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .atlas-compare-deeplink:hover { color: var(--atlas-ink); }
 
 /* ===== COMPARE ===== */
+/* Phase A.6 — in-atlas compare. Two ComparePanes side-by-side inside the
+ * shell's center pane. The center pane already provides the outer scroll
+ * container, so each pane scrolls independently of the other. */
+.atlas-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  min-height: 100%;
+  background: var(--atlas-paper);
+}
+.atlas-compare-grid .atlas-resizer.decorative {
+  background: var(--atlas-ink);
+  pointer-events: none;
+}
+.atlas-compare-pane {
+  background: var(--atlas-paper);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+@media (max-width: 768px) {
+  .atlas-compare-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .atlas-compare-grid .atlas-resizer.decorative {
+    height: 1px;
+    width: 100%;
+  }
+}
 .atlas-compare-divider { border-right: 1px solid var(--atlas-ink); }
 .atlas-compare-heading {
   padding: 16px 32px; background: var(--atlas-paper-2);
