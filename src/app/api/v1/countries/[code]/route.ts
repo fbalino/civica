@@ -1,6 +1,7 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
+import { getCICountryDetail } from "@/lib/db/queries";
 import {
   jurisdictions,
   governmentBodies,
@@ -81,6 +82,17 @@ export async function GET(
       .where(eq(constitutions.jurisdictionId, country.id))
       .limit(1);
 
+    // Phase E — include Civica Index composite + dimensions + Pulse
+    // latest in the JSON download so a researcher pulling
+    // /api/v1/countries/<slug> gets a comprehensive snapshot.
+    let ciDetail: Awaited<ReturnType<typeof getCICountryDetail>> = null;
+    try {
+      ciDetail = await getCICountryDetail(country.slug);
+    } catch {
+      /* CI tables may be missing in fresh dev DBs — keep the response
+       * useful even when the score subsystem isn't available. */
+    }
+
     const branches = bodies.reduce(
       (acc, body) => {
         const branch = body.branch ?? "other";
@@ -152,6 +164,34 @@ export async function GET(
         flagUrl: country.flagUrl,
         constitution: constitutionResults[0] ?? null,
         government: branches,
+        civicaIndex: ciDetail
+          ? {
+              quarter: ciDetail.composite?.quarter ?? null,
+              composite: ciDetail.composite
+                ? {
+                    score: ciDetail.composite.score,
+                    rank: ciDetail.composite.rank,
+                    totalRanked: ciDetail.composite.totalRanked,
+                    isPartial: ciDetail.composite.isPartial,
+                  }
+                : null,
+              dimensions: ciDetail.dimensions.map((d) => ({
+                dimension: d.dimension,
+                normalizedScore: d.normalizedScore,
+                rawValue: d.rawValue,
+              })),
+            }
+          : null,
+        civicaPulse: ciDetail?.pulse
+          ? {
+              scoreDate: ciDetail.pulse.scoreDate,
+              pulseScore: ciDetail.pulse.pulseScore,
+              ciBaseline: ciDetail.pulse.ciBaseline,
+              eventImpact: ciDetail.pulse.eventImpact,
+              activeEvents: ciDetail.pulse.activeEvents,
+              isLowConfidence: ciDetail.pulse.isLowConfidence,
+            }
+          : null,
       },
     });
   } catch (e) {

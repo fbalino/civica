@@ -23,6 +23,7 @@ import {
   ATLAS_TAB_LABELS,
   ATLAS_TAB_ORDER,
 } from "@/lib/atlas/ids";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 
 type Tab = AtlasTab;
 type House = "upper" | "lower";
@@ -414,9 +415,35 @@ export function AtlasCountryCenter({
         country={country}
         democracyData={democracyData}
       />
+
+      {/* Phase E — auto-citation. Sits inside .atlas-pane padding so it
+          aligns with the tab content above it. Renders on every tab so
+          the citation always references whatever the user is currently
+          looking at. */}
+      <div className="atlas-pane on" style={{ paddingTop: 0 }}>
+        <CiteAccordion
+          subject={country.name}
+          pageTitle={ATLAS_TAB_LABELS[tab]}
+          downloadSlug={country.slug ?? country.id}
+          sourceNames={CIVICA_DATA_SOURCES}
+        />
+      </div>
     </>
   );
 }
+
+const CIVICA_DATA_SOURCES = [
+  "Wikidata",
+  "IPU Parline",
+  "Constitute Project",
+  "Bjornskov-Rode / CGV regime taxonomy (QoG)",
+  "V-Dem",
+  "Freedom House",
+  "World Bank WGI",
+  "UNDP HDI",
+  "Transparency International CPI",
+  "Civica Pulse (GDELT-derived)",
+];
 
 function LoadingPane() {
   return (

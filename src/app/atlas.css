@@ -531,6 +531,126 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .atlas-party-legend-toggle { width: 100%; margin-top: 4px; padding: 7px 12px; font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--atlas-muted); background: transparent; border: 1px solid var(--atlas-rule); border-radius: 4px; cursor: pointer; text-align: center; transition: color 0.15s, border-color 0.15s; }
 .atlas-party-legend-toggle:hover { color: var(--atlas-ink); border-color: var(--atlas-ink); }
 
+/* ===== CITE & EMBED ACCORDION — Phase E ===== */
+.cite-accordion {
+  margin: 28px 0 12px;
+  border: 1px solid var(--atlas-rule);
+  background: var(--atlas-paper);
+}
+.cite-accordion-summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  user-select: none;
+}
+.cite-accordion-summary::-webkit-details-marker { display: none; }
+.cite-accordion-summary:hover { background: var(--atlas-paper-2); }
+.cite-accordion-title {
+  font-family: "Fraunces", serif;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  color: var(--atlas-ink);
+}
+.cite-accordion-meta {
+  flex: 1;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+.cite-accordion-chev {
+  font-size: 14px;
+  color: var(--atlas-muted);
+  transition: transform 160ms;
+}
+.cite-accordion[open] .cite-accordion-chev { transform: rotate(180deg); }
+
+.cite-accordion-body {
+  border-top: 1px solid var(--atlas-rule);
+  padding: 14px 16px 16px;
+}
+.cite-format-tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--atlas-rule);
+  width: fit-content;
+  margin-bottom: 12px;
+}
+.cite-format-tab {
+  background: var(--atlas-paper);
+  border: 0;
+  padding: 6px 14px;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+  cursor: pointer;
+  transition: background 120ms, color 120ms;
+}
+.cite-format-tab + .cite-format-tab { border-left: 1px solid var(--atlas-rule); }
+.cite-format-tab:hover { background: var(--atlas-paper-2); color: var(--atlas-ink); }
+.cite-format-tab.on {
+  background: var(--atlas-ink);
+  color: var(--atlas-paper);
+}
+.cite-text {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--atlas-ink);
+  background: var(--atlas-paper-2);
+  border: 1px solid var(--atlas-rule);
+  padding: 12px 14px;
+  margin: 0 0 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+.cite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cite-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--atlas-rule);
+  background: var(--atlas-paper);
+  color: var(--atlas-ink-2);
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 120ms, color 120ms, border-color 120ms;
+}
+.cite-action:hover {
+  background: var(--atlas-paper-2);
+  color: var(--atlas-ink);
+  border-color: var(--atlas-ink);
+}
+.cite-sources {
+  margin-top: 12px;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  color: var(--atlas-muted);
+  line-height: 1.5;
+}
+.cite-sources-label {
+  font-family: ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 /* ===== ALL POLITICAL PARTIES — Phase B accordion ===== */
 .atlas-parties-accordion {
   margin-top: 18px;
