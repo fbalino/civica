@@ -421,6 +421,26 @@ html.light .atlas-root {
 .atlas-house-toggle button.on { background: var(--atlas-ink); color: var(--atlas-paper); }
 .atlas-house-toggle button:disabled { opacity: 0.3; cursor: not-allowed; }
 
+/* Phase B — toggle promoted to its own row above the chamber title. */
+.atlas-house-toggle--above {
+  margin-bottom: 14px;
+  align-self: flex-start;
+}
+
+/* Phase B — chamber heading block; previously inline alongside the
+ * toggle. Now stacks beneath the toggle as a normal heading group. */
+.atlas-chamber-head { margin-bottom: 14px; }
+
+/* Phase B — replaces the duplicate `.atlas-chamber-title` heading that
+ * used to render *inside* the hemicycle. We only keep the helpful seat
+ * count + hover hint. */
+.atlas-chamber-hint {
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  color: var(--atlas-muted);
+  margin-bottom: 12px;
+}
+
 /* ===== CHAMBER STAGE (hemicycle container) ===== */
 .atlas-chamber-stage {
   background: linear-gradient(180deg, var(--atlas-paper-2) 0%, var(--atlas-paper) 90%);
@@ -466,6 +486,99 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .atlas-party-legend .p .bar .fill { position: absolute; inset: 0 auto 0 0; }
 .atlas-party-legend-toggle { width: 100%; margin-top: 4px; padding: 7px 12px; font-family: ui-monospace, monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--atlas-muted); background: transparent; border: 1px solid var(--atlas-rule); border-radius: 4px; cursor: pointer; text-align: center; transition: color 0.15s, border-color 0.15s; }
 .atlas-party-legend-toggle:hover { color: var(--atlas-ink); border-color: var(--atlas-ink); }
+
+/* ===== ALL POLITICAL PARTIES — Phase B accordion ===== */
+.atlas-parties-accordion {
+  margin-top: 18px;
+  border: 1px solid var(--atlas-rule);
+  background: var(--atlas-paper);
+}
+.atlas-parties-accordion > summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  user-select: none;
+}
+.atlas-parties-accordion > summary::-webkit-details-marker { display: none; }
+.atlas-parties-accordion > summary:hover { background: var(--atlas-paper-2); }
+.atlas-parties-accordion-title {
+  font-family: "Fraunces", serif;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--atlas-ink);
+}
+.atlas-parties-accordion-meta {
+  flex: 1;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+.atlas-parties-accordion-chev {
+  font-size: 14px;
+  color: var(--atlas-muted);
+  transition: transform 160ms;
+}
+.atlas-parties-accordion[open] .atlas-parties-accordion-chev {
+  transform: rotate(180deg);
+}
+.atlas-parties-list {
+  border-top: 1px solid var(--atlas-rule);
+  padding: 8px 0;
+}
+.atlas-parties-row {
+  display: grid;
+  grid-template-columns: 14px 1fr minmax(80px, 200px) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 16px;
+}
+.atlas-parties-row + .atlas-parties-row {
+  border-top: 1px solid var(--atlas-rule-2);
+}
+.atlas-parties-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.atlas-parties-name {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  color: var(--atlas-ink);
+  line-height: 1.2;
+}
+.atlas-parties-bar {
+  height: 4px;
+  background: var(--atlas-paper-2);
+  position: relative;
+  border: 1px solid var(--atlas-rule-2);
+}
+.atlas-parties-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+.atlas-parties-seats {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--atlas-ink-2);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.atlas-parties-pct {
+  color: var(--atlas-muted);
+}
+@media (max-width: 600px) {
+  .atlas-parties-row {
+    grid-template-columns: 12px 1fr auto;
+    gap: 8px;
+  }
+  .atlas-parties-bar { display: none; }
+}
 
 /* ===== SEAT TOOLTIP ===== */
 .atlas-seat-tip {
