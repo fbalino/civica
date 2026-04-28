@@ -8,15 +8,18 @@
 // `COUNTRIES.find((c) => (c.slug ?? c.id) === x || c.id === x)` patterns that
 // were scattered across AtlasApp.tsx.
 
+// Phase C — tab consolidation 8 → 6.
+//   Chamber folded into Structure (the upper/lower toggle now lives inside
+//   the Structure tab), and Democracy folded into a new Scores & Rankings
+//   tab. Roman-numeral prefixes dropped. `next.config.ts` carries 301
+//   redirects from the retired URLs.
 export type AtlasTab =
-  | "chamber"
-  | "bills"
   | "structure"
-  | "elections"
-  | "democracy"
+  | "bills"
   | "leaders"
   | "constitution"
-  | "international";
+  | "international"
+  | "scores";
 
 export type AtlasHouse = "upper" | "lower";
 
@@ -57,14 +60,12 @@ export function slugToCountry<T extends HasIdAndSlug>(
 }
 
 const VALID_TABS: ReadonlySet<AtlasTab> = new Set([
-  "chamber",
-  "bills",
   "structure",
-  "elections",
-  "democracy",
+  "bills",
   "leaders",
   "constitution",
   "international",
+  "scores",
 ]);
 
 export function isAtlasTab(value: string): value is AtlasTab {
@@ -75,9 +76,11 @@ export function isAtlasHouse(value: string): value is AtlasHouse {
   return value === "upper" || value === "lower";
 }
 
+export const DEFAULT_ATLAS_TAB: AtlasTab = "structure";
+
 export function buildAtlasUrl(
   slug: string,
-  tab: AtlasTab = "chamber",
+  tab: AtlasTab = DEFAULT_ATLAS_TAB,
   house?: AtlasHouse,
 ): string {
   const base = `/atlas/${slug}/${tab}`;
@@ -85,22 +88,28 @@ export function buildAtlasUrl(
 }
 
 // The chat context scoping rule: house is only semantically relevant on the
-// chamber tab, because that's the only tab with a visible upper/lower toggle
-// driving what the user is looking at. Bills, structure, democracy, etc. all
-// display country-level data regardless of house — plumbing house into their
-// chat context adds noise (e.g. "United States | Lower | Bills" reads like the
-// chamber selection is bleeding through into Bills).
+// Structure tab now (because Chamber folded into Structure and the upper/
+// lower toggle lives there). Other tabs render country-level data and
+// piping `house` into their chat context just adds noise.
 export function tabNeedsHouse(tab: AtlasTab): boolean {
-  return tab === "chamber";
+  return tab === "structure";
 }
 
 export const ATLAS_TAB_LABELS: Record<AtlasTab, string> = {
-  chamber: "Chamber",
-  bills: "Bills",
   structure: "Structure",
-  elections: "Elections",
-  democracy: "Democracy",
+  bills: "Bills",
   leaders: "Leaders",
   constitution: "Constitution",
   international: "International",
+  scores: "Scores & Rankings",
 };
+
+// Display order for the tab bar.
+export const ATLAS_TAB_ORDER: AtlasTab[] = [
+  "structure",
+  "bills",
+  "leaders",
+  "constitution",
+  "international",
+  "scores",
+];

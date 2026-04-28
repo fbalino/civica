@@ -9,10 +9,7 @@ import { CountryMasthead } from "./CountryMasthead";
 import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 import { ChamberTab } from "./tabs/ChamberTab";
 import { BillsTab } from "./tabs/BillsTab";
-import {
-  ElectionsTab,
-  type ElectionData,
-} from "./tabs/ElectionsTab";
+import { ScoresTab } from "./tabs/ScoresTab";
 import {
   ConstitutionTab,
   type ConstitutionData,
@@ -21,17 +18,13 @@ import {
   InternationalTab,
   type InternationalData,
 } from "./tabs/InternationalTab";
+import {
+  type AtlasTab,
+  ATLAS_TAB_LABELS,
+  ATLAS_TAB_ORDER,
+} from "@/lib/atlas/ids";
 
-type Tab =
-  | "chamber"
-  | "bills"
-  | "structure"
-  | "elections"
-  | "democracy"
-  | "leaders"
-  | "constitution"
-  | "international";
-
+type Tab = AtlasTab;
 type House = "upper" | "lower";
 
 export interface DemocracyData {
@@ -121,8 +114,6 @@ export interface AtlasCountryCenterProps {
   billsData: Bill[] | null;
   billsLoading: boolean;
   structureData: StructureData | null;
-  electionData: ElectionData[];
-  electionsLoading: boolean;
   democracyData: DemocracyData | null;
   leadersData: LeaderEntry[] | null;
   constitutionData: ConstitutionData | null;
@@ -147,17 +138,27 @@ export interface AtlasCountryCenterProps {
   onPickCountry: (slug: string) => void;
 }
 
-const TAB_LABELS: [Tab, string][] = [
-  ["chamber", "I · The Chamber"],
-  ["bills", "II · Laws in Motion"],
-  ["structure", "III · Full Structure"],
-  ["elections", "IV · Elections"],
-  ["democracy", "V · Democracy"],
-  ["leaders", "VI · Leaders"],
-  ["constitution", "VII · Constitution"],
-  ["international", "VIII · International"],
-];
-
+/**
+ * Phase C — 6-tab consolidation.
+ *
+ * Old 8-tab Roman-numeral list (Chamber / Bills / Structure / Elections /
+ * Democracy / Leaders / Constitution / International) is replaced by:
+ *   1. Structure   (folds in Chamber — government diagram on top, then
+ *                   the chamber composition with its upper/lower toggle)
+ *   2. Bills
+ *   3. Leaders
+ *   4. Constitution
+ *   5. International
+ *   6. Scores & Rankings   (folds in Democracy)
+ *
+ * Elections at the country level is retired in this phase; the global
+ * /elections page still exists and the legacy `/atlas/[slug]/elections`
+ * URL redirects to /elections via next.config.ts. Old URLs for chamber
+ * and democracy redirect to their new homes too.
+ *
+ * Tab labels are read from ATLAS_TAB_LABELS (single source of truth in
+ * src/lib/atlas/ids.ts) — the local TAB_LABELS const is gone.
+ */
 export function AtlasCountryCenter({
   country,
   cd,
@@ -167,8 +168,6 @@ export function AtlasCountryCenter({
   billsData,
   billsLoading,
   structureData,
-  electionData,
-  electionsLoading,
   democracyData,
   leadersData,
   constitutionData,
@@ -188,28 +187,100 @@ export function AtlasCountryCenter({
       <CountryMasthead country={country} />
 
       <div className="atlas-tabs">
-        {TAB_LABELS.map(([t, label]) => (
+        {ATLAS_TAB_ORDER.map((t) => (
           <button
             key={t}
             className={tab === t ? "on" : ""}
             onClick={() => onTabChange(t)}
           >
-            {label}
+            {ATLAS_TAB_LABELS[t]}
           </button>
         ))}
       </div>
 
-      <ChamberTab
-        active={tab === "chamber"}
-        country={country}
-        house={house}
-        cd={cd}
-        dimmed={dimmed}
-        onHouseChange={onHouseChange}
-        onDimToggle={onDimToggle}
-        onSeatHover={onSeatHover}
-        onSeatLeave={onSeatLeave}
-      />
+      {/* Tab 1: Structure — folds in Chamber.
+          Top: GovStructureDiagram (branches + bodies + offices + terms).
+          Bottom: ChamberTab (hemicycle + party legend + house toggle +
+          all-parties accordion). The upper/lower toggle that used to live
+          on the retired Chamber tab is now part of this pane. */}
+      <div className={`atlas-pane${tab === "structure" ? " on" : ""}`}>
+        {tabDataLoading && tab === "structure" ? (
+          <LoadingPane />
+        ) : (
+          <>
+            {structureData && structureData.bodies.length > 0 ? (
+              <GovStructureDiagram
+                bodies={structureData.bodies}
+                offices={structureData.offices}
+                currentTerms={structureData.currentTerms}
+                countryName={country.name}
+                parties={structureData.parties ?? []}
+              />
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr 1fr",
+                  gap: 14,
+                  border: "1px dashed var(--atlas-rule)",
+                  padding: 24,
+                  minHeight: 200,
+                  background: "var(--atlas-paper-2)",
+                }}
+              >
+                {(["exec", "legis", "jud"] as const).map((branch) => (
+                  <div key={branch}>
+                    <div
+                      className="atlas-mono"
+                      style={{
+                        fontSize: 10,
+                        color: "var(--atlas-muted)",
+                        letterSpacing: ".14em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {branch === "exec"
+                        ? "Executive"
+                        : branch === "legis"
+                          ? "Legislative"
+                          : "Judicial"}
+                    </div>
+                    <div
+                      className="atlas-serif"
+                      style={{ fontSize: 20, marginTop: 6 }}
+                    >
+                      {cd.branches?.[branch] || "—"}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Section divider between branches diagram and chamber graphic. */}
+            <div
+              className="atlas-section-divider"
+              role="separator"
+              aria-label="Chamber composition"
+            >
+              <span className="atlas-section-divider-label">
+                Chamber composition
+              </span>
+            </div>
+
+            <ChamberTab
+              active
+              country={country}
+              house={house}
+              cd={cd}
+              dimmed={dimmed}
+              onHouseChange={onHouseChange}
+              onDimToggle={onDimToggle}
+              onSeatHover={onSeatHover}
+              onSeatLeave={onSeatLeave}
+            />
+          </>
+        )}
+      </div>
 
       <BillsTab
         active={tab === "bills"}
@@ -219,220 +290,7 @@ export function AtlasCountryCenter({
         onAskBill={onAskBill}
       />
 
-      {/* Tab III: Structure (inline — small, stable, delegates to GovStructureDiagram) */}
-      <div className={`atlas-pane${tab === "structure" ? " on" : ""}`}>
-        {tabDataLoading && tab === "structure" ? (
-          <LoadingPane />
-        ) : structureData && structureData.bodies.length > 0 ? (
-          <GovStructureDiagram
-            bodies={structureData.bodies}
-            offices={structureData.offices}
-            currentTerms={structureData.currentTerms}
-            countryName={country.name}
-            parties={structureData.parties ?? []}
-          />
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: 14,
-              border: "1px dashed var(--atlas-rule)",
-              padding: 24,
-              minHeight: 320,
-              background: "var(--atlas-paper-2)",
-            }}
-          >
-            {(["exec", "legis", "jud"] as const).map((branch) => (
-              <div key={branch}>
-                <div
-                  className="atlas-mono"
-                  style={{
-                    fontSize: 10,
-                    color: "var(--atlas-muted)",
-                    letterSpacing: ".14em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {branch === "exec"
-                    ? "Executive"
-                    : branch === "legis"
-                      ? "Legislative"
-                      : "Judicial"}
-                </div>
-                <div className="atlas-serif" style={{ fontSize: 20, marginTop: 6 }}>
-                  {cd.branches?.[branch] || "—"}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <ElectionsTab
-        active={tab === "elections"}
-        countryName={country.name}
-        electionData={electionData}
-        electionsLoading={electionsLoading}
-      />
-
-      {/* Tab V: Democracy (inline — compact, no sub-components) */}
-      <div className={`atlas-pane${tab === "democracy" ? " on" : ""}`}>
-        {tabDataLoading && tab === "democracy" ? (
-          <LoadingPane />
-        ) : democracyData ? (
-          <>
-            <div
-              style={{
-                marginBottom: 20,
-                paddingBottom: 16,
-                borderBottom: "1px solid var(--atlas-rule)",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: 10,
-                  marginBottom: 10,
-                }}
-              >
-                <span className="atlas-serif" style={{ fontSize: 48 }}>
-                  {democracyData.democracyIndex != null
-                    ? democracyData.democracyIndex.toFixed(2)
-                    : "—"}
-                </span>
-                <span
-                  className="atlas-mono"
-                  style={{
-                    fontSize: 10,
-                    color: "var(--atlas-muted)",
-                    letterSpacing: ".1em",
-                  }}
-                >
-                  / 1.00 V-DEM
-                </span>
-              </div>
-              {democracyData.democracyIndex != null && (
-                <>
-                  <div
-                    style={{
-                      background: "var(--atlas-rule-2)",
-                      borderRadius: 3,
-                      height: 8,
-                      overflow: "hidden",
-                      marginBottom: 8,
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${(democracyData.democracyIndex * 100).toFixed(1)}%`,
-                        height: "100%",
-                        borderRadius: 3,
-                        background:
-                          democracyData.democracyIndex >= 0.7
-                            ? "var(--color-success)"
-                            : democracyData.democracyIndex >= 0.4
-                              ? "var(--color-warn)"
-                              : "var(--color-danger)",
-                      }}
-                    />
-                  </div>
-                  <span
-                    className="atlas-mono"
-                    style={{
-                      fontSize: 10,
-                      color: "var(--atlas-ink-2)",
-                      letterSpacing: ".08em",
-                    }}
-                  >
-                    {democracyData.democracyIndex >= 0.7
-                      ? "LIBERAL DEMOCRACY"
-                      : democracyData.democracyIndex >= 0.4
-                        ? "ELECTORAL DEMOCRACY / HYBRID"
-                        : "AUTOCRACY / CLOSED"}
-                  </span>
-                </>
-              )}
-            </div>
-            {democracyData.freedomHouseFacts.length > 0 && (
-              <div style={{ marginBottom: 20 }}>
-                <SectionHead>Freedom House</SectionHead>
-                {democracyData.freedomHouseFacts.map((f) => (
-                  <div
-                    key={f.factKey}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "6px 0",
-                      borderBottom: "1px solid var(--atlas-rule-2)",
-                    }}
-                  >
-                    <span
-                      className="atlas-sans"
-                      style={{
-                        fontSize: 13,
-                        color: "var(--atlas-ink-2)",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {f.factKey
-                        .replace("freedom_house_", "")
-                        .replace(/_/g, " ")}
-                    </span>
-                    <span
-                      className="atlas-mono"
-                      style={{ fontSize: 12, color: "var(--atlas-ink)" }}
-                    >
-                      {f.factValue ?? "—"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {democracyData.regionalComparison.length > 0 && (
-              <div>
-                <SectionHead>Regional Comparison</SectionHead>
-                {democracyData.regionalComparison.slice(0, 8).map((rc, i) => (
-                  <div
-                    key={rc.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      padding: "5px 0",
-                      borderBottom: "1px solid var(--atlas-rule-2)",
-                      fontWeight: rc.id === country.id ? 700 : 400,
-                    }}
-                  >
-                    <span className="atlas-sans" style={{ fontSize: 13 }}>
-                      <span
-                        style={{
-                          color: "var(--atlas-muted)",
-                          marginRight: 6,
-                          fontSize: 10,
-                        }}
-                      >
-                        {i + 1}.
-                      </span>
-                      {rc.name}
-                    </span>
-                    <span
-                      className="atlas-mono"
-                      style={{ fontSize: 11, color: "var(--atlas-muted)" }}
-                    >
-                      {rc.democracyIndex?.toFixed(2) ?? "—"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <EmptyPane label="No democracy data available" />
-        )}
-      </div>
-
-      {/* Tab VI: Leaders (inline)
+      {/* Tab 3: Leaders (inline)
           TODO Phase I: Redesign as an org-chart hierarchy. Current ordering
           puts cabinet members above heads of state because the SQL sorts by
           desc(startDate). See
@@ -549,6 +407,13 @@ export function AtlasCountryCenter({
         onPickOrg={onPickOrg}
         onPickCountry={onPickCountry}
       />
+
+      <ScoresTab
+        active={tab === "scores"}
+        loading={tabDataLoading}
+        country={country}
+        democracyData={democracyData}
+      />
     </>
   );
 }
@@ -598,7 +463,8 @@ function SectionHead({ children }: { children: React.ReactNode }) {
         color: "var(--atlas-muted)",
         letterSpacing: ".14em",
         textTransform: "uppercase",
-        marginBottom: 10,
+        marginBottom: 8,
+        marginTop: 4,
       }}
     >
       {children}

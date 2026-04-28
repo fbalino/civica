@@ -43,7 +43,7 @@ export function AtlasMapShellClient({ countries }: AtlasMapShellClientProps) {
             return;
           }
           const slug = atlasIdToSlug(c.id, countries);
-          router.push(`/atlas/${slug}/chamber`);
+          router.push(`/atlas/${slug}/structure`);
         }}
         onUnpinAt={(i) =>
           setPinned((prev) => prev.filter((_, j) => j !== i))

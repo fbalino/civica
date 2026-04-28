@@ -10,7 +10,7 @@ export default async function AtlasMapLeftSlot() {
     <ShellCountryRail
       countries={countries}
       selectedId={null}
-      hrefMode={{ type: "atlas", tab: "chamber" }}
+      hrefMode={{ type: "atlas", tab: "structure" }}
       header={
         <>
           <div className="kicker">Atlas</div>

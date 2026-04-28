@@ -448,6 +448,27 @@ html.light .atlas-root {
  * toggle. Now stacks beneath the toggle as a normal heading group. */
 .atlas-chamber-head { margin-bottom: 14px; }
 
+/* Phase C — divider between the GovStructureDiagram (top of Structure tab)
+ * and the chamber composition (bottom of Structure tab). The label is the
+ * scan anchor that tells the user "the diagram ends here, the seats begin." */
+.atlas-section-divider {
+  position: relative;
+  margin: 36px 0 22px;
+  border-top: 1px solid var(--atlas-rule);
+}
+.atlas-section-divider-label {
+  position: absolute;
+  top: -10px;
+  left: 0;
+  padding-right: 14px;
+  background: var(--atlas-paper);
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+
 /* Phase B — replaces the duplicate `.atlas-chamber-title` heading that
  * used to render *inside* the hemicycle. We only keep the helpful seat
  * count + hover hint. */

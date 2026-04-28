@@ -3,6 +3,7 @@ import { ATLAS_COUNTRY_PROMPTS } from "@/lib/shell/suggested-prompts";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import {
   ATLAS_TAB_LABELS,
+  DEFAULT_ATLAS_TAB,
   isAtlasHouse,
   isAtlasTab,
   slugToCountry,
@@ -26,7 +27,7 @@ export default async function AtlasCountryRight({
   const match = slugToCountry(slug, countries);
   const countryName = match?.name ?? slug;
 
-  const validTab = isAtlasTab(tab) ? tab : "chamber";
+  const validTab = isAtlasTab(tab) ? tab : DEFAULT_ATLAS_TAB;
   const tabLabel = ATLAS_TAB_LABELS[validTab];
 
   // THE HOUSE-CHIP CONTEXT FIX: only include house in the chat's context

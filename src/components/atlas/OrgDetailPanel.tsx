@@ -61,7 +61,7 @@ export function OrgDetailPanel({
 
   const goToCountry = (slug: string) => {
     if (memberBySlug.has(slug)) {
-      router.push(`/atlas/${slug}/chamber`);
+      router.push(`/atlas/${slug}/structure`);
     }
   };
 

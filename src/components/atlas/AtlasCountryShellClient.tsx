@@ -15,7 +15,6 @@ import {
   type LeaderEntry,
   type StructureData,
 } from "./AtlasCountryCenter";
-import type { ElectionData } from "./tabs/ElectionsTab";
 import type { ConstitutionData } from "./tabs/ConstitutionTab";
 import type { InternationalData } from "./tabs/InternationalTab";
 import { useAtlasUrlState } from "@/hooks/useAtlasUrlState";
@@ -106,8 +105,6 @@ export function AtlasCountryShellClient({
     useState<InternationalData | null>(null);
   const [tabDataLoading, setTabDataLoading] = useState(false);
 
-  const [electionData, setElectionData] = useState<ElectionData[]>([]);
-  const [electionsLoading, setElectionsLoading] = useState(false);
 
   // Clear per-tab data when the country changes (mirrors AtlasApp's reset effect).
   useEffect(() => {
@@ -120,34 +117,16 @@ export function AtlasCountryShellClient({
     setDimmed(new Set());
   }, [country.id]);
 
-  // Elections fetch — its own effect because it fires on country change
-  // regardless of tab (just like AtlasApp).
-  useEffect(() => {
-    const slug = dbCountries.find((c) => c.id === country.id)?.slug;
-    if (!slug) return;
-    const controller = new AbortController();
-    setElectionsLoading(true);
-    fetch(`/api/countries/${slug}/elections`, { signal: controller.signal })
-      .then((r) => r.json())
-      .then((data) => {
-        if (!controller.signal.aborted) {
-          setElectionData(data.elections ?? []);
-          setElectionsLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setElectionData([]);
-          setElectionsLoading(false);
-        }
-      });
-    return () => controller.abort();
-  }, [country.id, dbCountries]);
+  // Phase C — Elections retired at the country level (route redirects to
+  // global /elections). The unconditional /api/countries/<slug>/elections
+  // fetch that used to live here is gone with it.
 
-  // Shared fetch effect for bills / democracy / leaders / constitution /
+  // Shared fetch effect for bills / scores / leaders / constitution /
   // structure / international. Mirrors AtlasApp.tsx's consolidated loader.
   useEffect(() => {
-    if (!["bills", "democracy", "leaders", "constitution", "structure", "international"].includes(tab))
+    // Phase C — fetch list updated for the consolidated 6-tab set.
+    // "scores" picks up democracy data (Democracy folded into Scores).
+    if (!["bills", "scores", "leaders", "constitution", "structure", "international"].includes(tab))
       return;
     const slug = country.slug ?? country.id;
     let cancelled = false;
@@ -182,7 +161,7 @@ export function AtlasCountryShellClient({
       }
       setTabDataLoading(true);
       try {
-        if (tab === "democracy" && !democracyData) {
+        if (tab === "scores" && !democracyData) {
           const res = await fetch(`/api/countries/${slug}/democracy`);
           if (!cancelled && res.ok) setDemocracyData(await res.json());
         } else if (tab === "leaders" && !leadersData) {
@@ -228,8 +207,6 @@ export function AtlasCountryShellClient({
         billsData={billsData}
         billsLoading={billsLoading}
         structureData={structureData}
-        electionData={electionData}
-        electionsLoading={electionsLoading}
         democracyData={democracyData}
         leadersData={leadersData}
         constitutionData={constitutionData}

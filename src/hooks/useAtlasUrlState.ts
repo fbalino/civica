@@ -6,6 +6,7 @@ import {
   type AtlasHouse,
   type AtlasTab,
   buildAtlasUrl,
+  DEFAULT_ATLAS_TAB,
   isAtlasHouse,
   isAtlasTab,
   tabNeedsHouse,
@@ -35,7 +36,7 @@ export function useAtlasUrlState(): AtlasUrlState {
 
   const slug = params?.slug ?? null;
   const rawTab = params?.tab;
-  const tab: AtlasTab = rawTab && isAtlasTab(rawTab) ? rawTab : "chamber";
+  const tab: AtlasTab = rawTab && isAtlasTab(rawTab) ? rawTab : DEFAULT_ATLAS_TAB;
   const rawHouse = searchParams?.get("house");
   const house: AtlasHouse =
     rawHouse && isAtlasHouse(rawHouse) ? rawHouse : "lower";
