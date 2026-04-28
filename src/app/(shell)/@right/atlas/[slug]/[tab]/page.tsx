@@ -54,10 +54,13 @@ export default async function AtlasCountryRight({
     ...(needsHouse ? { house } : {}),
   };
 
+  // Title and subtitle are kept minimal — the duplicated "United States ·
+  // AI · LEADERS" used to read as redundant noise alongside the context
+  // chips below. The chips own the scope label now.
   return (
     <AskCivicaPanel
-      title={`Ask Civica · ${countryName}`}
-      subtitle={`AI · ${tabLabel}`}
+      title="Ask Civica"
+      subtitle="AI"
       contextChips={contextChips}
       suggestions={ATLAS_COUNTRY_PROMPTS}
       inputPlaceholder={`Ask about ${countryName}…`}

@@ -406,22 +406,28 @@ html.light .atlas-root {
   flex-wrap: nowrap;
   padding: 0;
   gap: 0;
+  /* Top + bottom rules both go edge-to-edge. Top serves as the divider
+   * between masthead and tabs (masthead's own bottom rule was dropped). */
+  border-top: 1px solid var(--atlas-rule);
   border-bottom: 1px solid var(--atlas-rule);
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  /* Tabs centred when content fits; flex naturally aligns to start
+   * once content overflows so scroll still works. */
+  justify-content: center;
 }
 .atlas-tabs button {
   flex-shrink: 0;
-  background: transparent; border: 0; padding: 14px 0; margin-right: 24px;
+  background: transparent; border: 0;
+  padding: 9px 0;
+  margin: 0 14px;
   white-space: nowrap;
   font-family: ui-monospace, monospace; font-size: 11px;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--atlas-muted);
   cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
 }
-.atlas-tabs button:first-child { margin-left: 48px; }
-.atlas-tabs button:last-child { margin-right: 48px; }
 .atlas-tabs button.on { color: var(--atlas-ink); border-bottom-color: var(--atlas-ink); }
 .atlas-tabs button:hover { color: var(--atlas-ink); }
 
@@ -857,8 +863,8 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
    * nowrap, x-scroll only (defined in the base rule above). */
   .atlas-tabs button {
     font-size: 10px;
-    padding: 10px 0;
-    margin-right: 16px;
+    padding: 8px 0;
+    margin: 0 9px;
   }
   .atlas-tabs button:first-child { margin-left: 16px; }
   .atlas-tabs button:last-child { margin-right: 16px; }
@@ -1258,9 +1264,10 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
    ============================================================= */
 
 .cm {
-  padding: 4px 0 24px;
-  border-bottom: 1px solid var(--atlas-rule);
-  margin-bottom: 24px;
+  padding: 4px 28px 18px;
+  /* Bottom rule + margin removed in Phase C — the tab bar's own
+   * top border now serves as the divider between masthead and tabs. */
+  margin-bottom: 0;
   container-type: inline-size;
 }
 

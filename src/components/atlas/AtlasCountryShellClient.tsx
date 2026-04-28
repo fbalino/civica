@@ -197,7 +197,7 @@ export function AtlasCountryShellClient({
   }
 
   return (
-    <div style={{ padding: "32px 28px" }}>
+    <div style={{ paddingTop: 32, paddingBottom: 32 }}>
       <AtlasCountryCenter
         country={country}
         cd={cd}

@@ -453,11 +453,14 @@ export async function getLeaderTimeline(jurisdictionId: string) {
   const officeIds = allOffices.map((o) => o.id);
   if (officeIds.length === 0) return [];
 
-  // TODO Phase I: Layer office-rank ordering (Head of State → Head of
-  // Government → cabinet → other) on top of the start-date sort. Today the
-  // pure desc(startDate) sort can put a recently confirmed cabinet member
-  // above the head of state. See
-  // ~/.claude/plans/great-questions-1-build-tender-falcon.md Phase I.
+  // Layered ordering: rank by office type first (Head of State → Head of
+  // Government → deputy → cabinet → legislative leader → other), then by
+  // start date desc within rank. The pure desc(startDate) order used to
+  // float a recently confirmed cabinet member above the head of state,
+  // which read as the AG running the country. The full org-chart redesign
+  // is still deferred to its own session
+  // (~/.claude/plans/great-questions-1-build-tender-falcon.md Phase I);
+  // this is the targeted fix for the leaders list ordering only.
   const allTerms = await db
     .select({ term: terms, person: persons })
     .from(terms)
@@ -465,7 +468,18 @@ export async function getLeaderTimeline(jurisdictionId: string) {
     .where(sql`${terms.officeId} IN ${officeIds}`)
     .orderBy(desc(terms.startDate));
 
-  return allTerms.map((t) => {
+  const OFFICE_RANK: Record<string, number> = {
+    head_of_state: 0,
+    head_of_government: 1,
+    deputy_head: 2,
+    cabinet: 3,
+    legislative_leader: 4,
+    judicial: 5,
+  };
+  const rankOf = (t: string | null | undefined) =>
+    OFFICE_RANK[t ?? "unknown"] ?? 99;
+
+  const enriched = allTerms.map((t) => {
     const office = allOffices.find((o) => o.id === t.term.officeId);
     return {
       personName: t.person.name,
@@ -479,6 +493,20 @@ export async function getLeaderTimeline(jurisdictionId: string) {
       isCurrent: t.term.isCurrent,
     };
   });
+
+  enriched.sort((a, b) => {
+    // Current leaders always before past leaders.
+    if (a.isCurrent !== b.isCurrent) return a.isCurrent ? -1 : 1;
+    const ra = rankOf(a.officeType);
+    const rb = rankOf(b.officeType);
+    if (ra !== rb) return ra - rb;
+    // Within the same office rank, newer first.
+    const aT = a.startDate ? new Date(a.startDate).getTime() : 0;
+    const bT = b.startDate ? new Date(b.startDate).getTime() : 0;
+    return bT - aT;
+  });
+
+  return enriched;
 }
 
 export async function getElectionsByJurisdiction(jurisdictionId: string) {
