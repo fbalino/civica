@@ -66,6 +66,14 @@ const SOURCES = [
     lastSyncAt: null,
   },
   {
+    id: "legisinfo_ca",
+    name: "Parliament of Canada (LEGISinfo)",
+    baseUrl: "https://www.parl.ca/legisinfo/en/bills/json",
+    license: "Open Government Licence – Canada",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
     id: "eu_parliament",
     name: "European Parliament",
     baseUrl: "https://data.europarl.europa.eu/api/v2",

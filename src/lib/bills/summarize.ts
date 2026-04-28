@@ -17,7 +17,19 @@ import type * as schema from "@/lib/db/schema";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+/**
+ * Lazy-initialised so dotenv (loaded synchronously at the top of each
+ * sync script) gets to populate `ANTHROPIC_API_KEY` *before* the SDK
+ * reads it. Module-level `new Anthropic()` evaluates when imports are
+ * hoisted, which is before the script body runs.
+ */
+let _anthropic: Anthropic | null = null;
+function getAnthropic(): Anthropic {
+  if (!_anthropic) {
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  }
+  return _anthropic;
+}
 
 export interface SummarizeInput {
   /** Stable cache key — typically `${iso2}::${title.slice(0, 120)}`. */
@@ -58,29 +70,29 @@ export async function readCachedSummaries(
 }
 
 /**
- * Generate one-sentence summaries via Claude Haiku. Returns parallel
- * array aligned with `inputs`; an entry is `""` if generation failed.
- * Pre-condition: `inputs.length >= 1`.
+ * Internal: send a single Anthropic call for up to `CHUNK_SIZE` bills
+ * and parse the JSON-array response. Returns `[]` on any failure so
+ * `generateSummariesBatch` can fill the slots with empty strings.
  */
-export async function generateSummariesBatch(
+async function generateChunk(
   inputs: Array<{ promptTitle: string }>,
 ): Promise<string[]> {
-  if (!process.env.ANTHROPIC_API_KEY || inputs.length === 0) {
-    return inputs.map(() => "");
-  }
+  if (inputs.length === 0) return [];
 
   const billList = inputs
     .map((b, i) => `${i + 1}. "${b.promptTitle}"`)
     .join("\n");
 
   try {
-    const msg = await anthropic.messages.create({
+    const msg = await getAnthropic().messages.create({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 600,
+      // Budget ~60 output tokens per bill (≈25-word sentence + JSON
+      // overhead). At CHUNK_SIZE=20 → 1500 tokens.
+      max_tokens: Math.max(600, inputs.length * 75),
       messages: [
         {
           role: "user",
-          content: `For each bill below, write exactly ONE plain-English sentence (15–30 words) explaining what the bill aims to do or what it would change if passed, written for a general audience. Focus on real-world impact. Return ONLY a raw JSON array of strings — no markdown, no code fences, no explanation.\n\nBills:\n${billList}`,
+          content: `For each bill below, write exactly ONE plain-English sentence (15–30 words) explaining what the bill aims to do or what it would change if passed, written for a general audience. Some titles may be in a non-English language — write the summary in English regardless. Focus on real-world impact. Return ONLY a raw JSON array of strings — no markdown, no code fences, no explanation.\n\nBills:\n${billList}`,
         },
       ],
     });
@@ -98,6 +110,32 @@ export async function generateSummariesBatch(
     /* fall through */
   }
   return inputs.map(() => "");
+}
+
+/** Bills per Anthropic call — keeps responses well under the model's
+ * output cap and survives the occasional verbose summary. */
+const CHUNK_SIZE = 20;
+
+/**
+ * Generate one-sentence summaries via Claude Haiku. Splits inputs into
+ * chunks of `CHUNK_SIZE` so a single oversized response can't lose the
+ * whole batch. Returns a parallel array aligned with `inputs`; an
+ * entry is `""` if generation failed.
+ */
+export async function generateSummariesBatch(
+  inputs: Array<{ promptTitle: string }>,
+): Promise<string[]> {
+  if (!process.env.ANTHROPIC_API_KEY || inputs.length === 0) {
+    return inputs.map(() => "");
+  }
+
+  const out: string[] = [];
+  for (let i = 0; i < inputs.length; i += CHUNK_SIZE) {
+    const chunk = inputs.slice(i, i + CHUNK_SIZE);
+    const summaries = await generateChunk(chunk);
+    out.push(...summaries);
+  }
+  return out;
 }
 
 /**
