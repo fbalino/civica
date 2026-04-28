@@ -22,13 +22,27 @@ export async function GET(
   const { slug } = await params;
   const { searchParams } = new URL(request.url);
 
-  const size = (["sm", "md", "lg"].includes(searchParams.get("size") ?? "")
+  const size = (["sm", "md", "lg", "custom"].includes(searchParams.get("size") ?? "")
     ? searchParams.get("size")
-    : "md") as "sm" | "md" | "lg";
+    : "md") as "sm" | "md" | "lg" | "custom";
   const themeParam = (["light", "dark"].includes(searchParams.get("theme") ?? "")
     ? searchParams.get("theme")
     : null) as "light" | "dark" | null;
   const dims = searchParams.get("dims") === "1";
+
+  // Phase G — custom builder. ?include=ci,cp,hos,hog,capital,gov,pop,gdp,area
+  // controls which datapoints render inside the size=custom widget.
+  // ?w= and ?h= are user-tunable dimensions. Defaults give a tall card
+  // sized for a sidebar.
+  const includeRaw = searchParams.get("include") ?? "";
+  const include = new Set(
+    includeRaw
+      .split(",")
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean),
+  );
+  const customW = clampInt(searchParams.get("w"), 280, 600, 360);
+  const customH = clampInt(searchParams.get("h"), 120, 800, 320);
 
   let detail: Awaited<ReturnType<typeof getCICountryDetail>> = null;
   let facts: Awaited<ReturnType<typeof getCountryFacts>> = [];
@@ -73,7 +87,10 @@ export async function GET(
     .toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
     .toUpperCase();
 
-  const { width, height } = SIZE_MAP[size];
+  const { width, height } =
+    size === "custom"
+      ? { width: customW, height: customH }
+      : SIZE_MAP[size];
 
   const html = buildHtml({
     size,
@@ -91,6 +108,7 @@ export async function GET(
     dimScores,
     width,
     height,
+    include,
   });
 
   return new Response(html, {
@@ -169,13 +187,44 @@ function esc(str: string): string {
     .replace(/"/g, "&quot;");
 }
 
+function clampInt(
+  raw: string | null,
+  min: number,
+  max: number,
+  fallback: number,
+): number {
+  if (!raw) return fallback;
+  const n = parseInt(raw, 10);
+  if (Number.isNaN(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
+}
+
+function formatPopulation(n: number): string {
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return String(n);
+}
+
+function formatNumber(n: number): string {
+  return n.toLocaleString("en-US");
+}
+
 // ─── HTML builder ────────────────────────────────────────────────────────────
 
 interface BuildHtmlArgs {
-  size: "sm" | "md" | "lg";
+  size: "sm" | "md" | "lg" | "custom";
   themeParam: "light" | "dark" | null;
   dims: boolean;
-  jurisdiction: { name: string; slug: string; governmentType: string | null };
+  jurisdiction: {
+    name: string;
+    slug: string;
+    governmentType: string | null;
+    capital?: string | null;
+    population?: number | null;
+    gdpBillions?: number | null;
+    areaSqKm?: number | null;
+  };
   ciDisplay: string;
   ciMeta: string;
   cpScore: string;
@@ -187,6 +236,7 @@ interface BuildHtmlArgs {
   dimScores: { label: string; title?: string; score: number | null }[];
   width: number;
   height: number;
+  include: Set<string>;
 }
 
 function buildHtml(args: BuildHtmlArgs): string {
@@ -194,7 +244,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     size, themeParam, dims, jurisdiction,
     ciDisplay, ciMeta, cpScore,
     tier, rank, totalRanked, quarterLabel, updatedDate,
-    dimScores, width, height,
+    dimScores, width, height, include,
   } = args;
 
   const themeAttr = themeParam ? ` data-theme="${themeParam}"` : "";
@@ -267,7 +317,70 @@ function buildHtml(args: BuildHtmlArgs): string {
   </div>
 </a>`;
 
-  const body = size === "sm" ? smBody : size === "md" ? mdBody : lgBody;
+  // Phase G — custom widget. Stacks rows for whichever datapoints the
+  // builder selected. CI/CP show as score chips; everything else shows
+  // as a label/value row. If `include` is empty, fall back to a sensible
+  // default (CI + capital + government type).
+  const includeSet =
+    include.size > 0 ? include : new Set(["ci", "cp", "capital", "gov"]);
+  const factRow = (label: string, value: string | null | undefined) =>
+    value
+      ? `<div class="cf-row"><span class="cf-k mono">${esc(label)}</span><span class="cf-v">${esc(value)}</span></div>`
+      : "";
+  const popValue =
+    typeof jurisdiction.population === "number"
+      ? formatPopulation(jurisdiction.population)
+      : null;
+  const gdpValue =
+    typeof jurisdiction.gdpBillions === "number"
+      ? `$${jurisdiction.gdpBillions.toFixed(1)}B`
+      : null;
+  const areaValue =
+    typeof jurisdiction.areaSqKm === "number"
+      ? `${formatNumber(jurisdiction.areaSqKm)} km²`
+      : null;
+  const customRowsHtml = [
+    includeSet.has("ci")
+      ? `<div class="cf-score-row"><span class="cf-score-label mono">CI</span><span class="cf-score-val serif" style="color:var(${tier.cssVar})">${esc(ciDisplay)}</span><span class="cf-score-meta mono">${esc(tier.label)}</span></div>`
+      : "",
+    includeSet.has("cp")
+      ? `<div class="cf-score-row"><span class="cf-score-label mono">CP</span><span class="cf-score-val serif">${esc(cpScore)}</span><span class="cf-score-meta mono">PULSE</span></div>`
+      : "",
+    includeSet.has("hos")
+      ? factRow("Head of state", "—")
+      : "",
+    includeSet.has("hog")
+      ? factRow("Head of govt.", "—")
+      : "",
+    includeSet.has("capital") ? factRow("Capital", jurisdiction.capital) : "",
+    includeSet.has("gov") ? factRow("Government", govType || null) : "",
+    includeSet.has("pop") ? factRow("Population", popValue) : "",
+    includeSet.has("gdp") ? factRow("GDP", gdpValue) : "",
+    includeSet.has("area") ? factRow("Area", areaValue) : "",
+  ]
+    .filter(Boolean)
+    .join("");
+
+  const customBody = `<a class="civica-widget custom" href="https://civicaatlas.org/atlas/${esc(jurisdiction.slug)}/structure" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  <div class="cf-top">
+    <div class="cf-brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
+  </div>
+  <div class="cf-name serif">${esc(jurisdiction.name)}</div>
+  <div class="cf-rows">${customRowsHtml}</div>
+  <div class="cf-foot mono">
+    <span>civicaatlas.org/atlas/${esc(jurisdiction.slug)}</span>
+    <span>UPDATED &middot; ${esc(updatedDate)}</span>
+  </div>
+</a>`;
+
+  const body =
+    size === "sm"
+      ? smBody
+      : size === "md"
+        ? mdBody
+        : size === "lg"
+          ? lgBody
+          : customBody;
 
   return `<!DOCTYPE html>
 <html lang="en"${themeAttr}>
@@ -409,6 +522,26 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
 .civica-widget.large .dim-fill{width:100%;background:var(--tier,var(--ink-2))}
 .civica-widget.large .dim-lbl{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;text-align:center}
 .civica-widget.large .foot{display:flex;justify-content:space-between;align-items:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:var(--ink-3);padding-top:8px;border-top:1px dashed var(--rule)}
+
+/* ── Custom (builder mode) ── */
+.civica-widget.custom{
+  width:${width}px;padding:18px 20px 14px;
+  display:flex;flex-direction:column;gap:10px;
+  height:${height}px;
+}
+.civica-widget.custom .cf-top{display:flex;justify-content:space-between;align-items:center}
+.civica-widget.custom .cf-brand{font-family:'Fraunces',serif;font-weight:600;font-size:13px;letter-spacing:-0.005em}
+.civica-widget.custom .dotlabel{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:400;font-size:10px;color:var(--ink-3);margin-left:6px;text-transform:uppercase;letter-spacing:0.1em}
+.civica-widget.custom .cf-name{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-0.015em;line-height:1.05}
+.civica-widget.custom .cf-rows{display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;overflow:hidden}
+.civica-widget.custom .cf-score-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--rule-soft)}
+.civica-widget.custom .cf-score-label{font-size:10px;color:var(--ink-3);letter-spacing:0.12em;text-transform:uppercase}
+.civica-widget.custom .cf-score-val{font-size:22px;font-weight:500;letter-spacing:-0.015em;line-height:1}
+.civica-widget.custom .cf-score-meta{font-size:10px;color:var(--ink-3);letter-spacing:0.1em;text-transform:uppercase}
+.civica-widget.custom .cf-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline;padding:3px 0}
+.civica-widget.custom .cf-k{font-size:10px;color:var(--ink-3);letter-spacing:0.1em;text-transform:uppercase}
+.civica-widget.custom .cf-v{font-size:13px;color:var(--ink);text-align:right}
+.civica-widget.custom .cf-foot{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--ink-3);padding-top:6px;border-top:1px dashed var(--rule)}
 </style>
 </head>
 <body>
