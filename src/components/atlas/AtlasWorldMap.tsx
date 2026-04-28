@@ -436,18 +436,17 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
 
         {/* HUD bottom */}
         <div className="atlas-hud-bottom">
-          <div className="atlas-intro">
-            <div className="ey">Welcome &middot; Atlas</div>
-            <h2>Every chamber, every bill, one map.</h2>
-            <p>
-              Pan and zoom the world. Hover a country to preview its government;
-              click to walk into the chamber. Hold <b>&uArr; Shift</b> and click
-              two countries to compare them side-by-side.
-            </p>
-            <div className="cta">
+          <div className="atlas-hints">
+            <div className="cta cta--desktop">
               <span className="k">Drag</span> to pan &middot;{" "}
               <span className="k">Scroll</span> to zoom &middot;{" "}
-              <span className="k">Click</span> a country
+              <span className="k">Click</span> a country &middot;{" "}
+              <span className="k">Shift-click</span> to compare
+            </div>
+            <div className="cta cta--mobile">
+              <span className="k">Pinch</span> to zoom &middot;{" "}
+              <span className="k">Tap</span> a country &middot;{" "}
+              <span className="k">Tap two</span> to compare
             </div>
           </div>
           <div className="atlas-zoombar">

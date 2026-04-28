@@ -180,32 +180,24 @@ html.light .atlas-root {
   display: flex; gap: 10px; align-items: flex-end;
 }
 
-.atlas-intro {
+/* Slim hint bar at the bottom of the Atlas map. Replaced the larger
+ * "Every chamber, every bill, one map" welcome card. Desktop and mobile
+ * variants are both rendered; CSS toggles which is visible. */
+.atlas-hints {
   background: var(--atlas-paper); border: 1px solid var(--atlas-ink);
-  padding: 18px 22px; max-width: 420px;
-  box-shadow: 6px 6px 0 var(--atlas-ink);
+  padding: 10px 14px; max-width: 100%;
+  box-shadow: 4px 4px 0 var(--atlas-ink);
 }
-.atlas-intro .ey {
-  font-family: ui-monospace, monospace; font-size: 10px;
-  letter-spacing: 0.16em; text-transform: uppercase; color: var(--atlas-accent);
-}
-.atlas-intro h2 {
-  font-family: "Fraunces", serif; font-weight: 400; font-size: 36px;
-  line-height: 1.02; letter-spacing: -0.02em; margin: 6px 0 10px;
-}
-.atlas-intro p {
-  font-family: "Inter", sans-serif; font-size: 13px;
-  color: var(--atlas-ink-2); line-height: 1.55; margin: 0;
-}
-.atlas-intro .cta {
+.atlas-hints .cta {
   font-family: ui-monospace, monospace; font-size: 10px;
   letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--atlas-muted); margin-top: 12px;
+  color: var(--atlas-muted); white-space: nowrap;
 }
-.atlas-intro .cta .k {
+.atlas-hints .cta .k {
   border: 1px solid var(--atlas-rule); padding: 1px 5px;
   border-radius: 2px; color: var(--atlas-ink-2); margin: 0 2px;
 }
+.atlas-hints .cta--mobile { display: none; }
 
 .atlas-zoombar {
   display: inline-flex; flex-direction: column;
@@ -684,13 +676,13 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     left: 10px; right: 10px; bottom: 10px;
     flex-direction: column; align-items: stretch;
   }
-  .atlas-intro {
-    max-width: none; padding: 12px 14px;
+  .atlas-hints {
+    max-width: none; padding: 10px 12px;
     box-shadow: 3px 3px 0 var(--atlas-ink);
   }
-  .atlas-intro h2 { font-size: 22px; }
-  .atlas-intro p { font-size: 12px; }
-  .atlas-intro .cta { font-size: 9px; }
+  .atlas-hints .cta { font-size: 9px; white-space: normal; }
+  .atlas-hints .cta--desktop { display: none; }
+  .atlas-hints .cta--mobile { display: block; }
 
   .atlas-zoombar {
     position: fixed; right: 10px; bottom: 10px; z-index: 10;
