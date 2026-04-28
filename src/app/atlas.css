@@ -1689,3 +1689,293 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .cm-hero-scores { gap: 18px; }
 }
 
+
+
+/* ===== HOME — Phase F variants (?home=clean | ?home=wiki) ===== */
+
+/* Variant: CLEAN — single circle mark + tagline. The shell still
+ * renders left/right slots; this just owns the center pane. */
+.home-clean {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 80px 32px;
+}
+.home-clean-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+  max-width: 540px;
+}
+.home-clean-mark {
+  color: var(--atlas-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.home-clean-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 56px;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  color: var(--atlas-ink);
+  margin: 4px 0 0;
+}
+.home-clean-tagline {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--atlas-ink-2);
+  margin: 0;
+  max-width: 420px;
+}
+.home-clean-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.home-clean-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--atlas-ink);
+  background: var(--atlas-paper);
+  border: 1px solid var(--atlas-ink);
+  text-decoration: none;
+  transition: background 120ms, color 120ms;
+}
+.home-clean-btn:hover { background: var(--atlas-paper-2); }
+.home-clean-btn--primary {
+  background: var(--atlas-ink);
+  color: var(--atlas-paper);
+}
+.home-clean-btn--primary:hover {
+  background: var(--atlas-ink-2);
+  color: var(--atlas-paper);
+}
+
+/* Variant: WIKI — editorial directory. Hero on top, then a 6-card
+ * grid of rankings + recent-feed lists. Demo cards tagged
+ * data-demo='true' so we can grep them when wiring real data. */
+.home-wiki {
+  padding: 32px 32px 60px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.home-wiki-hero {
+  border-bottom: 1px solid var(--atlas-rule);
+  padding-bottom: 28px;
+  margin-bottom: 28px;
+}
+.home-wiki-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--atlas-accent);
+  margin-bottom: 12px;
+}
+.home-wiki-eyebrow .dot.live {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--color-success, #6e8b3d);
+}
+.home-wiki-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--atlas-ink);
+  margin: 0 0 12px;
+  max-width: 760px;
+}
+.home-wiki-lede {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--atlas-ink-2);
+  margin: 0 0 18px;
+  max-width: 640px;
+}
+.home-wiki-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.home-wiki-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 16px;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--atlas-ink);
+  background: var(--atlas-paper);
+  border: 1px solid var(--atlas-ink);
+  text-decoration: none;
+  transition: background 120ms, color 120ms;
+}
+.home-wiki-btn:hover { background: var(--atlas-paper-2); }
+.home-wiki-btn--primary {
+  background: var(--atlas-ink);
+  color: var(--atlas-paper);
+}
+.home-wiki-btn--primary:hover {
+  background: var(--atlas-ink-2);
+  color: var(--atlas-paper);
+}
+
+.home-wiki-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+@media (max-width: 760px) {
+  .home-wiki-grid { grid-template-columns: minmax(0, 1fr); }
+  .home-wiki-title { font-size: 30px; }
+  .home-wiki { padding: 22px 16px 40px; }
+}
+
+.home-wiki-card {
+  border: 1px solid var(--atlas-rule);
+  background: var(--atlas-paper);
+  padding: 16px 18px;
+}
+.home-wiki-card--featured {
+  background: var(--atlas-paper-2);
+}
+.home-wiki-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.home-wiki-card-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+  color: var(--atlas-ink);
+  margin: 0;
+}
+.home-wiki-card-more {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+  text-decoration: none;
+}
+.home-wiki-card-more:hover { color: var(--atlas-ink); }
+.home-wiki-card-empty {
+  margin: 0;
+  padding: 18px 0;
+  text-align: center;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+
+.home-wiki-rank-list {
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.home-wiki-rank-row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 7px 0;
+  border-top: 1px solid var(--atlas-rule-2);
+  text-decoration: none;
+  color: inherit;
+}
+.home-wiki-rank-list li:first-child .home-wiki-rank-row {
+  border-top: 0;
+}
+.home-wiki-rank-row:hover { background: var(--atlas-paper-2); }
+.home-wiki-rank-num {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--atlas-muted);
+}
+.home-wiki-rank-name {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--atlas-ink);
+}
+.home-wiki-rank-score {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.home-wiki-feed {
+  list-style: none;
+  margin: 0; padding: 0;
+}
+.home-wiki-feed-row {
+  padding: 8px 0;
+  border-top: 1px solid var(--atlas-rule-2);
+}
+.home-wiki-feed-row:first-child { border-top: 0; }
+.home-wiki-feed-meta {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--atlas-muted);
+  margin-bottom: 2px;
+}
+.home-wiki-feed-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--atlas-ink);
+}
+
+.home-wiki-feature {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.home-wiki-feature-name {
+  font-family: 'Fraunces', serif;
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.home-wiki-feature-blurb {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--atlas-ink-2);
+}
+.home-wiki-feature-link {
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--atlas-ink);
+  text-decoration: none;
+  margin-top: 4px;
+}
+.home-wiki-feature-link:hover { color: var(--atlas-accent); }
+

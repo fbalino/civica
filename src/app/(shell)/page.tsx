@@ -3,6 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCIRankings } from "@/lib/db/queries";
 import { ciTier } from "@/lib/ci/tiers";
+import { HomeClean } from "@/components/home/HomeClean";
+import { HomeWiki } from "@/components/home/HomeWiki";
 
 export const metadata: Metadata = {
   title: "Civica — Atlas of Governance",
@@ -26,10 +28,20 @@ interface LandingRankingRow {
   score: number | null;
 }
 
-export default async function LandingPage() {
-  // TEMP — user wants the Atlas as the landing surface while testing the
-  // redesign. Skip the landing-page render and route straight to /atlas.
-  // To restore the landing, remove the redirect line below.
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ home?: string }>;
+}) {
+  // Phase F — A/B mockup of two homepage variants behind ?home=.
+  // ?home=clean → minimalist circle-mark + tagline + CTAs
+  // ?home=wiki  → 6-card directory with rankings + recent feeds
+  // No param → keep redirecting to /atlas (the user's preferred default
+  // while testing the redesign). After they pick a variant, the
+  // follow-up commit will drop both the loser and the redirect.
+  const sp = await searchParams;
+  if (sp.home === "clean") return <HomeClean />;
+  if (sp.home === "wiki") return <HomeWiki />;
   redirect("/atlas");
 
   // Best-effort data; if queries fail (e.g. local dev without DB) we still
