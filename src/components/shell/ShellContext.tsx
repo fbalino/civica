@@ -39,6 +39,9 @@ interface ShellContextValue {
   /** Right pane width (desktop only). */
   rightW: number;
   setRightW: (w: number) => void;
+  /** Is the left pane collapsed on desktop (user preference). */
+  leftCollapsed: boolean;
+  setLeftCollapsed: (c: boolean) => void;
   /** Is the right pane collapsed on desktop (user preference). */
   rightCollapsed: boolean;
   setRightCollapsed: (c: boolean) => void;
@@ -67,6 +70,7 @@ const RIGHT_DEFAULT = 325;
 // legacy Atlas stay in sync on width preferences during the migration.
 const STORAGE_KEY = "atlas_panels";
 const COLLAPSED_KEY = "shell_right_collapsed";
+const LEFT_COLLAPSED_KEY = "shell_left_collapsed";
 
 function clampLeft(w: number) {
   return Math.max(LEFT_MIN, Math.min(LEFT_MAX, w));
@@ -79,6 +83,7 @@ export function ShellProvider({ children }: { children: ReactNode }) {
   const [leftW, setLeftWState] = useState<number>(LEFT_DEFAULT);
   const [rightW, setRightWState] = useState<number>(RIGHT_DEFAULT);
   const [rightCollapsed, setRightCollapsedState] = useState<boolean>(false);
+  const [leftCollapsed, setLeftCollapsedState] = useState<boolean>(false);
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>("center");
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
@@ -102,6 +107,8 @@ export function ShellProvider({ children }: { children: ReactNode }) {
       }
       const c = localStorage.getItem(COLLAPSED_KEY);
       if (c === "1") setRightCollapsedState(true);
+      const lc = localStorage.getItem(LEFT_COLLAPSED_KEY);
+      if (lc === "1") setLeftCollapsedState(true);
     } catch {
       /* ignore */
     }
@@ -156,6 +163,15 @@ export function ShellProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const setLeftCollapsed = useCallback((c: boolean) => {
+    setLeftCollapsedState(c);
+    try {
+      localStorage.setItem(LEFT_COLLAPSED_KEY, c ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   const getThread = (key: string, greeting: string): ChatMessage[] => {
     if (threads[key]) return threads[key];
     const cached = fallbacksRef.current[key];
@@ -184,6 +200,8 @@ export function ShellProvider({ children }: { children: ReactNode }) {
       setLeftW,
       rightW,
       setRightW,
+      leftCollapsed,
+      setLeftCollapsed,
       rightCollapsed,
       setRightCollapsed,
       getThread,
@@ -197,6 +215,8 @@ export function ShellProvider({ children }: { children: ReactNode }) {
       setLeftW,
       rightW,
       setRightW,
+      leftCollapsed,
+      setLeftCollapsed,
       rightCollapsed,
       setRightCollapsed,
       threads,

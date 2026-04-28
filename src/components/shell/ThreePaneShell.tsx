@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { useShell } from "./ShellContext";
+import { PaneHandle } from "./PaneHandle";
 
 interface ThreePaneShellProps {
   leftSlot: ReactNode;
@@ -37,7 +38,10 @@ export function ThreePaneShell({
     isMobile,
     mobilePanel,
     setMobilePanel,
+    leftCollapsed,
+    setLeftCollapsed,
     rightCollapsed,
+    setRightCollapsed,
   } = useShell();
 
   const resizerRef = useRef<{
@@ -83,16 +87,27 @@ export function ThreePaneShell({
     document.body.style.userSelect = "none";
   }
 
-  // Effective right width — 0 when collapsed (desktop only).
-  const effectiveRightW = rightCollapsed || hideRight ? 0 : rightW;
-  const effectiveLeftW = hideLeft ? 0 : leftW;
+  // Collapse only applies on desktop. Mobile uses the panel-bar tabs;
+  // honouring leftCollapsed there would leave the user with no Nav tab
+  // content even after they tap "Nav".
+  const leftCollapsedDesktop = !isMobile && leftCollapsed;
+  const rightCollapsedDesktop = !isMobile && rightCollapsed;
+  // Effective widths — 0 when collapsed (desktop only) or hidden by route.
+  const effectiveRightW = rightCollapsedDesktop || hideRight ? 0 : rightW;
+  const effectiveLeftW = leftCollapsedDesktop || hideLeft ? 0 : leftW;
+  // Hide the resizer along with the pane itself so collapsed gives 0px.
+  const showLeftResizer = !hideLeft && !leftCollapsedDesktop;
+  const showRightResizer = !hideRight && !rightCollapsedDesktop;
 
-  // Grid template varies by mode + collapse state.
+  // Grid template varies by mode + collapse state. Resizer columns get 0px
+  // when their pane is collapsed/hidden so the seam disappears too.
+  const leftResizerCol = showLeftResizer ? "6px" : "0px";
+  const rightResizerCol = showRightResizer ? "6px" : "0px";
   const gridTemplate = compareMode
-    ? `1fr 6px 1fr 6px ${effectiveRightW}px`
+    ? `1fr ${rightResizerCol} 1fr ${rightResizerCol} ${effectiveRightW}px`
     : hideLeft
-      ? `1fr 6px ${effectiveRightW}px`
-      : `${effectiveLeftW}px 6px 1fr 6px ${effectiveRightW}px`;
+      ? `1fr ${rightResizerCol} ${effectiveRightW}px`
+      : `${effectiveLeftW}px ${leftResizerCol} 1fr ${rightResizerCol} ${effectiveRightW}px`;
 
   return (
     <div
@@ -152,15 +167,22 @@ export function ThreePaneShell({
           <aside
             className={`chamber-left${
               isMobile && mobilePanel === "countries" ? " mobile-visible" : ""
-            }`}
+            }${leftCollapsedDesktop ? " is-collapsed" : ""}`}
             role="navigation"
             aria-label="Context navigation"
           >
-            {leftSlot}
+            {!leftCollapsedDesktop && leftSlot}
+            {!leftCollapsedDesktop && !isMobile && (
+              <PaneHandle
+                side="left"
+                collapsed={false}
+                onToggle={() => setLeftCollapsed(true)}
+              />
+            )}
           </aside>
         )}
 
-        {!hideLeft && (
+        {showLeftResizer && (
           <div
             className="atlas-resizer"
             onMouseDown={(e) => startResize("left", e)}
@@ -179,7 +201,7 @@ export function ThreePaneShell({
           {children}
         </section>
 
-        {!hideRight && (
+        {showRightResizer && (
           <div
             className="atlas-resizer"
             onMouseDown={(e) => startResize("right", e)}
@@ -193,14 +215,40 @@ export function ThreePaneShell({
           <aside
             className={`chamber-right${
               isMobile && mobilePanel === "chat" ? " mobile-visible" : ""
-            }`}
+            }${rightCollapsedDesktop ? " is-collapsed" : ""}`}
             role="complementary"
             aria-label="Ask Civica AI assistant"
           >
-            {rightSlot}
+            {!rightCollapsedDesktop && rightSlot}
+            {!rightCollapsedDesktop && !isMobile && (
+              <PaneHandle
+                side="right"
+                collapsed={false}
+                onToggle={() => setRightCollapsed(true)}
+              />
+            )}
           </aside>
         )}
       </div>
+
+      {/* Edge handles to re-open a collapsed pane. Pinned to the
+          viewport edge via CSS so they stay reachable even though the
+          pane itself is width 0. Desktop only — mobile uses the panel-
+          bar tabs instead. */}
+      {!hideLeft && leftCollapsedDesktop && (
+        <PaneHandle
+          side="left"
+          collapsed
+          onToggle={() => setLeftCollapsed(false)}
+        />
+      )}
+      {!hideRight && rightCollapsedDesktop && (
+        <PaneHandle
+          side="right"
+          collapsed
+          onToggle={() => setRightCollapsed(false)}
+        />
+      )}
     </div>
   );
 }
