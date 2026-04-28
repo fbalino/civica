@@ -21,7 +21,15 @@
     "ingest:pulse:events": "tsx scripts/ingest-pulse-events.ts",
     "ingest:government-taxonomy:br": "tsx scripts/ingest-government-taxonomy-br.ts",
     "derive:government-taxonomy": "tsx scripts/derive-government-taxonomy.ts",
-    "sync:government-taxonomy": "tsx scripts/ingest-government-taxonomy-br.ts && tsx scripts/derive-government-taxonomy.ts"
+    "sync:government-taxonomy": "tsx scripts/ingest-government-taxonomy-br.ts && tsx scripts/derive-government-taxonomy.ts",
+    "sync:bills:us": "tsx scripts/sync-bills-us.ts",
+    "sync:bills:uk": "tsx scripts/sync-bills-uk.ts",
+    "sync:bills:ca": "tsx scripts/sync-bills-ca.ts",
+    "sync:bills:br": "tsx scripts/sync-bills-br.ts",
+    "sync:bills:de": "tsx scripts/sync-bills-de.ts",
+    "sync:bills:fr": "tsx scripts/sync-bills-fr.ts",
+    "sync:bills": "npm run sync:bills:us && npm run sync:bills:uk",
+    "sync:bills:all": "npm run sync:bills:us && npm run sync:bills:uk && npm run sync:bills:ca && npm run sync:bills:br && npm run sync:bills:de && npm run sync:bills:fr"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

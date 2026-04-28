@@ -28,6 +28,7 @@ import {
   ciMethodologyVersions,
   pulseEvents,
   pulseDailyScores,
+  bills,
   organizations,
   organizationMemberships,
 } from "./schema";
@@ -1451,4 +1452,28 @@ async function getLatestAvailableQuarter(): Promise<string> {
   const now = new Date();
   const q = Math.ceil((now.getMonth() + 1) / 3);
   return `${now.getFullYear()}-Q${q}`;
+}
+
+/**
+ * Phase H.1 — read the most recent bills for a country, ordered by
+ * last-action date desc. The route at
+ * `src/app/api/countries/[slug]/bills/route.ts` calls this and shapes
+ * the result for the UI.
+ */
+export async function getBillsForJurisdiction(slug: string, limit = 10) {
+  const j = await db
+    .select({ id: jurisdictions.id, name: jurisdictions.name, iso2: jurisdictions.iso2 })
+    .from(jurisdictions)
+    .where(eq(jurisdictions.slug, slug))
+    .limit(1);
+  if (!j[0]) return null;
+
+  const rows = await db
+    .select()
+    .from(bills)
+    .where(eq(bills.jurisdictionId, j[0].id))
+    .orderBy(desc(bills.lastActionDate))
+    .limit(limit);
+
+  return { jurisdiction: j[0], rows };
 }

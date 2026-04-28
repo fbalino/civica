@@ -1,82 +1,59 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
-import { getJurisdictionBySlug } from "@/lib/db/queries";
-import { fetchParliamentBills } from "@/lib/data/parliament-feeds";
-import { statusToStage } from "@/lib/bills/stage";
-import {
-  makeCacheKey,
-  readCachedSummaries,
-  generateSummariesBatch,
-  writeCachedSummary,
-} from "@/lib/bills/summarize";
+import { getBillsForJurisdiction } from "@/lib/db/queries";
+
+const SOURCE_TAG: Record<string, string> = {
+  congress_gov: "U.S. Congress",
+  uk_parliament: "UK Parliament",
+  legisinfo_ca: "Parliament of Canada",
+  camara_br: "Câmara dos Deputados",
+  senado_br: "Senado Federal",
+  bundestag_dip: "Bundestag",
+  data_assemblee_fr: "Assemblée Nationale",
+  senat_fr: "Sénat",
+};
 
 /**
- * Phase H.1 commit 1 — refactored route. Uses the shared
- * `src/lib/bills/{stage,summarize}.ts` modules but is otherwise
- * unchanged: still live-fetches from US/UK on request, still
- * memoises summaries in `bill_summary_cache`. Commit 2 swaps this
- * to a DB read against the new `bills` table.
+ * Phase H.1 — DB-backed bills feed. Reads from the `bills` table
+ * populated by the per-source sync scripts under `scripts/sync-bills-*`
+ * and the matching cron routes under `/api/cron/bills/*`. The legacy
+ * live-fetch path is gone; for jurisdictions whose sync hasn't run
+ * yet the response is `{ country, bills: [] }` and the UI shows the
+ * existing empty state.
+ *
+ * Output shape preserved so `BillsTab` keeps rendering unchanged.
  */
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   const { slug } = await params;
-  let jurisdiction;
+  let result;
   try {
-    jurisdiction = await getJurisdictionBySlug(slug);
+    result = await getBillsForJurisdiction(slug, 10);
   } catch {
     return NextResponse.json({ error: "DB unavailable" }, { status: 503 });
   }
-  if (!jurisdiction)
+  if (!result)
     return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-  const rawBills = await fetchParliamentBills(jurisdiction.iso2);
-  const iso2 = jurisdiction.iso2 ?? "XX";
-  const db = getDb();
-
-  const cacheKeys = rawBills.map((b) =>
-    makeCacheKey(iso2, b.longTitle ?? b.title),
-  );
-  const cachedSummaries = await readCachedSummaries(db, cacheKeys);
-
-  const needsGeneration = rawBills
-    .map((_b, i) => (cachedSummaries[i] === null ? i : -1))
-    .filter((i) => i >= 0);
-
-  if (needsGeneration.length > 0) {
-    const toGenerate = needsGeneration.map((i) => ({
-      promptTitle: rawBills[i].longTitle ?? rawBills[i].title,
-    }));
-    const newSummaries = await generateSummariesBatch(toGenerate);
-    await Promise.all(
-      needsGeneration.map(async (billIdx, genIdx) => {
-        const summary = newSummaries[genIdx];
-        if (summary) {
-          cachedSummaries[billIdx] = summary;
-          await writeCachedSummary(db, cacheKeys[billIdx], summary);
-        }
-      }),
-    );
-  }
-
-  const bills = rawBills.map((b, i) => ({
+  const bills = result.rows.map((b) => ({
     title: b.longTitle ? `${b.title} - ${b.longTitle}` : b.title,
-    summary:
-      cachedSummaries[i] ??
-      (b.summary && b.summary !== b.status ? b.summary : ""),
-    tags: [
-      b.source === "congress_gov"
-        ? "U.S. Congress"
-        : b.source === "uk_parliament"
-          ? "UK Parliament"
-          : b.source,
-    ],
-    stage: statusToStage(b.status),
-    votes: null,
+    summary: b.summary ?? "",
+    tags: [SOURCE_TAG[b.sourceId] ?? b.sourceId],
+    stage: b.stage,
+    votes:
+      b.voteYes != null && b.voteNo != null
+        ? {
+            yes: b.voteYes,
+            no: b.voteNo,
+            abs: b.voteAbstain ?? 0,
+          }
+        : null,
     url: b.url,
-    date: b.date,
+    status: b.rawStatus ?? undefined,
+    sponsor: b.sponsorName ?? undefined,
+    date: b.lastActionDate,
   }));
 
-  return NextResponse.json({ country: jurisdiction.name, bills });
+  return NextResponse.json({ country: result.jurisdiction.name, bills });
 }
