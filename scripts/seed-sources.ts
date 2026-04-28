@@ -90,6 +90,14 @@ const SOURCES = [
     lastSyncAt: null,
   },
   {
+    id: "bundestag_dip",
+    name: "Bundestag DIP",
+    baseUrl: "https://search.dip.bundestag.de/api/v1",
+    license: "Bundestag Open Data (CC-BY-equivalent)",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
     id: "eu_parliament",
     name: "European Parliament",
     baseUrl: "https://data.europarl.europa.eu/api/v2",

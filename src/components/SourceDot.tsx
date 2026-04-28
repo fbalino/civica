@@ -10,6 +10,7 @@ const SOURCE_NAMES: Record<string, string> = {
   legisinfo_ca: "Parliament of Canada",
   camara_br: "Câmara dos Deputados",
   senado_br: "Senado Federal",
+  bundestag_dip: "Bundestag DIP",
   bjornskov_rode: "Bjornskov-Rode / CGV",
   vdem: "V-Dem",
   worldbank_wgi: "World Bank WGI",

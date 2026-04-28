@@ -53,5 +53,26 @@ export function statusToStage(status: string | null | undefined): number {
   ) {
     return 1;
   }
+  // German (Bundestag DIP) — "beratungsstand" free text
+  if (
+    s.includes("verkündet") ||
+    s.includes("ausgefertigt") ||
+    s.includes("in kraft")
+  ) {
+    return 4;
+  }
+  if (s.includes("verabschiedet") || s.includes("angenommen")) {
+    return 3;
+  }
+  if (
+    s.includes("ausschuss") ||
+    s.includes("beschlussempfehlung") ||
+    s.includes("beraten")
+  ) {
+    return 2;
+  }
+  if (s.includes("zugeleitet") || s.includes("eingebracht")) {
+    return 1;
+  }
   return 0;
 }
