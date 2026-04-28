@@ -74,6 +74,22 @@ const SOURCES = [
     lastSyncAt: null,
   },
   {
+    id: "camara_br",
+    name: "Câmara dos Deputados",
+    baseUrl: "https://dadosabertos.camara.leg.br/api/v2",
+    license: "LAI 12.527/2011 (Brazil)",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "senado_br",
+    name: "Senado Federal",
+    baseUrl: "https://legis.senado.leg.br/dadosabertos",
+    license: "LAI 12.527/2011 (Brazil)",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
     id: "eu_parliament",
     name: "European Parliament",
     baseUrl: "https://data.europarl.europa.eu/api/v2",

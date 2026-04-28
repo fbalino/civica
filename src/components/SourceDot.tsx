@@ -8,6 +8,8 @@ const SOURCE_NAMES: Record<string, string> = {
   uk_parliament: "UK Parliament",
   eu_parliament: "European Parliament",
   legisinfo_ca: "Parliament of Canada",
+  camara_br: "Câmara dos Deputados",
+  senado_br: "Senado Federal",
   bjornskov_rode: "Bjornskov-Rode / CGV",
   vdem: "V-Dem",
   worldbank_wgi: "World Bank WGI",

@@ -6,6 +6,7 @@
     { "path": "/api/cron/pulse/calculate", "schedule": "0 6 * * *" },
     { "path": "/api/cron/bills/us", "schedule": "0 3 * * *" },
     { "path": "/api/cron/bills/uk", "schedule": "30 3 * * *" },
-    { "path": "/api/cron/bills/ca", "schedule": "0 4 * * *" }
+    { "path": "/api/cron/bills/ca", "schedule": "0 4 * * *" },
+    { "path": "/api/cron/bills/br", "schedule": "30 4 * * *" }
   ]
 }
