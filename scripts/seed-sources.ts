@@ -98,6 +98,22 @@ const SOURCES = [
     lastSyncAt: null,
   },
   {
+    id: "data_assemblee_fr",
+    name: "Assemblée Nationale",
+    baseUrl: "https://data.assemblee-nationale.fr",
+    license: "Etalab Open Licence v2.0",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "senat_fr",
+    name: "Sénat (France)",
+    baseUrl: "https://data.senat.fr",
+    license: "Etalab Open Licence v2.0",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
     id: "eu_parliament",
     name: "European Parliament",
     baseUrl: "https://data.europarl.europa.eu/api/v2",

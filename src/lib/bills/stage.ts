@@ -74,5 +74,36 @@ export function statusToStage(status: string | null | undefined): number {
   if (s.includes("zugeleitet") || s.includes("eingebracht")) {
     return 1;
   }
+  // French (Assemblée Nationale + Sénat) — libelleActe + état du dossier
+  if (
+    s.includes("promulgué") ||
+    s.includes("promulgation") ||
+    s.includes("loi du")
+  ) {
+    return 4;
+  }
+  if (
+    s.includes("adoption définitive") ||
+    s.includes("adopté définitivement") ||
+    s.includes("adoptée définitivement")
+  ) {
+    return 3;
+  }
+  if (
+    s.includes("commission") ||
+    s.includes("rapport") ||
+    s.includes("examen")
+  ) {
+    return 2;
+  }
+  if (
+    s.includes("première lecture") ||
+    s.includes("deuxième lecture") ||
+    s.includes("dépôt") ||
+    s.includes("déposé") ||
+    s.includes("déposée")
+  ) {
+    return 1;
+  }
   return 0;
 }

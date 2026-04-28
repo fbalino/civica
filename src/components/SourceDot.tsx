@@ -11,6 +11,8 @@ const SOURCE_NAMES: Record<string, string> = {
   camara_br: "Câmara dos Deputados",
   senado_br: "Senado Federal",
   bundestag_dip: "Bundestag DIP",
+  data_assemblee_fr: "Assemblée Nationale",
+  senat_fr: "Sénat",
   bjornskov_rode: "Bjornskov-Rode / CGV",
   vdem: "V-Dem",
   worldbank_wgi: "World Bank WGI",
