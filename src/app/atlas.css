@@ -395,16 +395,33 @@ html.light .atlas-root {
 }
 .atlas-export-btn:hover { color: var(--atlas-ink); border-color: var(--atlas-ink); }
 
-/* ===== TABS ===== */
+/* ===== TABS =====
+ * Edge-to-edge bar: the container has no horizontal padding (so its
+ * bottom border spans the full width of the center pane) and instead
+ * the first/last buttons take the indent. Always horizontally
+ * scrollable; never wraps; vertical scroll is suppressed.
+ */
 .atlas-tabs {
-  display: flex; padding: 0 48px; border-bottom: 1px solid var(--atlas-rule); gap: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 0;
+  gap: 0;
+  border-bottom: 1px solid var(--atlas-rule);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 .atlas-tabs button {
+  flex-shrink: 0;
   background: transparent; border: 0; padding: 14px 0; margin-right: 24px;
+  white-space: nowrap;
   font-family: ui-monospace, monospace; font-size: 11px;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--atlas-muted);
   cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
 }
+.atlas-tabs button:first-child { margin-left: 48px; }
+.atlas-tabs button:last-child { margin-right: 48px; }
 .atlas-tabs button.on { color: var(--atlas-ink); border-bottom-color: var(--atlas-ink); }
 .atlas-tabs button:hover { color: var(--atlas-ink); }
 
@@ -815,20 +832,15 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 
   /* Mobile masthead overrides handled by .cm--a1 @media (max-width: 900px) below. */
 
-  /* Tabs: scrollable */
-  .atlas-tabs {
-    padding: 0 16px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    flex-wrap: nowrap;
-  }
+  /* Tabs: tighter on mobile. Edge indent shrinks, buttons stay
+   * nowrap, x-scroll only (defined in the base rule above). */
   .atlas-tabs button {
-    white-space: nowrap;
     font-size: 10px;
     padding: 10px 0;
     margin-right: 16px;
   }
+  .atlas-tabs button:first-child { margin-left: 16px; }
+  .atlas-tabs button:last-child { margin-right: 16px; }
 
   /* Panes: reduced padding */
   .atlas-pane { padding: 16px 16px 40px; }
