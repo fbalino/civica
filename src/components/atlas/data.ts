@@ -42,6 +42,11 @@ export interface Bill {
   url?: string;
   status?: string;
   sponsor?: string;
+  /** Phase H.1: provenance — source row id + last-sync timestamp. The
+   *  legacy CHAMBERS fixture leaves these undefined; the SourceDot in
+   *  BillsTab is then skipped. */
+  sourceId?: string;
+  sourceLastSyncAt?: string | null;
 }
 
 export interface Country {

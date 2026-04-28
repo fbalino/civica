@@ -1,5 +1,6 @@
 "use client";
 
+import { SourceDot } from "@/components/SourceDot";
 import type { Bill } from "../data";
 
 export interface BillsTabProps {
@@ -75,12 +76,21 @@ function BillCard({ bill, index, onAsk }: BillCardProps) {
       <div>
         <div className="t">{bill.title}</div>
         {bill.summary && <div className="sum">{bill.summary}</div>}
-        <div className="tags">
+        <div
+          className="tags"
+          style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}
+        >
           {bill.tags.map((t) => (
             <span key={t} className="tag">
               {t}
             </span>
           ))}
+          {bill.sourceId && (
+            <SourceDot
+              source={bill.sourceId}
+              retrievedAt={bill.sourceLastSyncAt ?? null}
+            />
+          )}
         </div>
         <div className="timeline">
           {stages.flatMap((s, j) => [
