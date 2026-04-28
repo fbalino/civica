@@ -163,6 +163,12 @@ export function ThreePaneShell({
           height: isMobile ? undefined : "calc(100vh - 56px)",
         }}
       >
+        {/* IMPORTANT: render the resizer slots unconditionally — even when
+            collapsed they hold the column. CSS display:none on a grid
+            item *removes* it from the layout, which would shift later
+            children and dump the center pane into a 0-px column.
+            pointer-events:none + visibility:hidden keeps the slot but
+            silences interaction. */}
         {!hideLeft && (
           <aside
             className={`chamber-left${
@@ -182,13 +188,20 @@ export function ThreePaneShell({
           </aside>
         )}
 
-        {showLeftResizer && (
+        {!hideLeft && (
           <div
             className="atlas-resizer"
-            onMouseDown={(e) => startResize("left", e)}
+            onMouseDown={
+              showLeftResizer ? (e) => startResize("left", e) : undefined
+            }
             role="separator"
             aria-orientation="vertical"
             aria-label="Resize left pane"
+            style={
+              showLeftResizer
+                ? undefined
+                : { pointerEvents: "none", visibility: "hidden" }
+            }
           />
         )}
 
@@ -201,13 +214,20 @@ export function ThreePaneShell({
           {children}
         </section>
 
-        {showRightResizer && (
+        {!hideRight && (
           <div
             className="atlas-resizer"
-            onMouseDown={(e) => startResize("right", e)}
+            onMouseDown={
+              showRightResizer ? (e) => startResize("right", e) : undefined
+            }
             role="separator"
             aria-orientation="vertical"
             aria-label="Resize right pane"
+            style={
+              showRightResizer
+                ? undefined
+                : { pointerEvents: "none", visibility: "hidden" }
+            }
           />
         )}
 
