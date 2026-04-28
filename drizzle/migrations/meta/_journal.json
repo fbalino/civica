@@ -29,6 +29,13 @@
       "when": 1776819518187,
       "tag": "0003_soft_shinko_yamashiro",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1777409819681,
+      "tag": "0004_gray_mojo",
+      "breakpoints": true
     }
   ]
 }

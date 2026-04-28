@@ -285,6 +285,64 @@ export const billSummaryCache = pgTable(
   (t) => [uniqueIndex("bill_summary_cache_key_idx").on(t.cacheKey)]
 );
 
+// Phase H — persisted bills, populated by per-jurisdiction sync scripts.
+// Replaces the request-time live-fetch path that used to live in
+// `src/app/api/countries/[slug]/bills/route.ts`. Stage column is the
+// 0–4 normalised value the BillsTab UI already consumes (see
+// `src/components/atlas/data.ts:36-45`); raw status text is preserved
+// for citation honesty.
+export const bills = pgTable(
+  "bills",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    bodyId: uuid("body_id").references(() => governmentBodies.id),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    /** Source-side identifier (e.g. "hr-1234-119" or "uk-3782"). Combined
+     *  with sourceId, uniquely identifies the bill across re-syncs. */
+    externalId: text("external_id").notNull(),
+    /** Display title — original language for non-English jurisdictions. */
+    title: text("title").notNull(),
+    longTitle: text("long_title"),
+    /** Plain-English summary, generated via Claude Haiku per `summarize.ts`. */
+    summary: text("summary"),
+    /** 0=draft, 1=committee, 2=floor, 3=passed, 4=enacted. */
+    stage: integer("stage").notNull().default(0),
+    /** The raw status string from the source — kept verbatim for citation. */
+    rawStatus: text("raw_status"),
+    introducedDate: date("introduced_date"),
+    lastActionDate: date("last_action_date").notNull(),
+    lastActionText: text("last_action_text"),
+    sponsorName: text("sponsor_name"),
+    sponsorParty: text("sponsor_party"),
+    /** Human-readable URL on the parliament's site. */
+    url: text("url").notNull(),
+    /** Direct link to the bill text PDF / HTML if the source exposes one. */
+    textUrl: text("text_url"),
+    voteYes: integer("vote_yes"),
+    voteNo: integer("vote_no"),
+    voteAbstain: integer("vote_abstain"),
+    /** Full source-side response, preserved for future field extraction
+     *  without re-syncing. */
+    raw: jsonb("raw"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => [
+    // Drives the 10-most-recent-bills query.
+    index("bills_jurisdiction_last_action_idx").on(
+      t.jurisdictionId,
+      t.lastActionDate
+    ),
+    // Idempotent upserts.
+    uniqueIndex("bills_source_external_idx").on(t.sourceId, t.externalId),
+  ]
+);
+
 export const metricDefinitions = pgTable("metric_definitions", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
