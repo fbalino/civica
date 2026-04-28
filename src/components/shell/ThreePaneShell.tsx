@@ -178,13 +178,6 @@ export function ThreePaneShell({
             aria-label="Context navigation"
           >
             {!leftCollapsedDesktop && leftSlot}
-            {!leftCollapsedDesktop && !isMobile && (
-              <PaneHandle
-                side="left"
-                collapsed={false}
-                onToggle={() => setLeftCollapsed(true)}
-              />
-            )}
           </aside>
         )}
 
@@ -240,33 +233,28 @@ export function ThreePaneShell({
             aria-label="Ask Civica AI assistant"
           >
             {!rightCollapsedDesktop && rightSlot}
-            {!rightCollapsedDesktop && !isMobile && (
-              <PaneHandle
-                side="right"
-                collapsed={false}
-                onToggle={() => setRightCollapsed(true)}
-              />
-            )}
           </aside>
         )}
       </div>
 
-      {/* Edge handles to re-open a collapsed pane. Pinned to the
-          viewport edge via CSS so they stay reachable even though the
-          pane itself is width 0. Desktop only — mobile uses the panel-
-          bar tabs instead. */}
-      {!hideLeft && leftCollapsedDesktop && (
+      {/* Single floating handle per side. Position is driven by the
+          --atlas-leftW / --atlas-rightW CSS vars on .atlas-root, so the
+          tab pokes out of the inner edge of the pane regardless of
+          whether it's expanded (sits at the seam with the center) or
+          collapsed (slides flush against the viewport edge). Desktop
+          only — mobile uses the panel-bar tabs. */}
+      {!hideLeft && !isMobile && (
         <PaneHandle
           side="left"
-          collapsed
-          onToggle={() => setLeftCollapsed(false)}
+          collapsed={leftCollapsedDesktop}
+          onToggle={() => setLeftCollapsed(!leftCollapsedDesktop)}
         />
       )}
-      {!hideRight && rightCollapsedDesktop && (
+      {!hideRight && !isMobile && (
         <PaneHandle
           side="right"
-          collapsed
-          onToggle={() => setRightCollapsed(false)}
+          collapsed={rightCollapsedDesktop}
+          onToggle={() => setRightCollapsed(!rightCollapsedDesktop)}
         />
       )}
     </div>
