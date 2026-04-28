@@ -207,11 +207,37 @@ export async function getGovernmentHierarchy(jurisdictionId: string) {
         .where(sql`${terms.officeId} IN ${officeIds} AND ${terms.isCurrent} = true`)
     : [];
 
-  const parties = await db
+  const rawParties = await db
     .select()
     .from(legislatureParties)
     .where(sql`${legislatureParties.bodyId} IN ${bodyIds}`)
     .orderBy(desc(legislatureParties.seatCount));
+
+  // Mirror the load-atlas-data normalisation: when the IPU/Wikidata
+  // sync aggregated multiple elections (Brazil's lower house reads as
+  // 3,084 party seats vs a 513-seat chamber) rescale each party's
+  // seatCount to the chamber's actual total, preserving the ordering.
+  const partiesByBody = new Map<string, typeof rawParties>();
+  for (const p of rawParties) {
+    const arr = partiesByBody.get(p.bodyId) ?? [];
+    arr.push(p);
+    partiesByBody.set(p.bodyId, arr);
+  }
+  const parties: typeof rawParties = [];
+  for (const body of bodies) {
+    const bp = partiesByBody.get(body.id) ?? [];
+    if (!bp.length) continue;
+    const totalSeats = body.totalSeats ?? bp.reduce((s, p) => s + p.seatCount, 0);
+    const sumSeats = bp.reduce((s, p) => s + p.seatCount, 0);
+    const isAggregated = sumSeats > 0 && sumSeats > totalSeats * 1.2;
+    for (const p of bp) {
+      const seatCount = isAggregated
+        ? Math.round((p.seatCount / sumSeats) * totalSeats)
+        : p.seatCount;
+      if (seatCount === 0 && isAggregated) continue;
+      parties.push({ ...p, seatCount });
+    }
+  }
 
   return { bodies, offices: allOffices, currentTerms, parties };
 }

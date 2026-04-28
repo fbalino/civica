@@ -373,10 +373,10 @@ export function CountryMasthead({ country }: { country: Country }) {
           </div>
           <h1 className="cm-name">{country.name}</h1>
         </div>
-        <div className="cm-hero-scores">
-          <BigScore abbr="CI" label="Civica Index" value={d.ci} />
-          <BigScore abbr="CP" label="Civica Pulse" value={d.cp} />
-        </div>
+        {/* CI / CP big scores are hidden until the v2 methodology lands.
+            The mock-data values were misleading (e.g. Congo reading like
+            paradise). Re-enable by restoring <BigScore> here and
+            <ChipStrip d={d} /> below the grid. */}
       </header>
 
       <div className="cm-grid-wrap">
@@ -586,7 +586,8 @@ export function CountryMasthead({ country }: { country: Country }) {
         </div>
       </div>
 
-      <ChipStrip d={d} />
+      {/* ChipStrip (HDI/DQ/ROL/FNR/CC/SS) hidden until v2 — see
+          comment above. */}
     </section>
   );
 }

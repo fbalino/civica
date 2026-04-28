@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChamberData, Country } from "../data";
-import { Hemicycle, PartyLegend } from "../Hemicycle";
+import { Hemicycle } from "../Hemicycle";
 
 export interface ChamberTabProps {
   active: boolean;
@@ -131,12 +131,10 @@ export function ChamberTab({
             />
           </div>
 
-          <PartyLegend
-            key={`${country.id}-${house}`}
-            chamber={currentHouse}
-            dimmed={dimmed}
-            onToggle={onDimToggle}
-          />
+          {/* Legend pill grid removed — the "All political parties"
+              accordion below is the canonical, accurate party listing.
+              The pill grid duplicated the data and the implicit two-tone
+              layout could be misleading on multi-party chambers. */}
 
           <div
             className="atlas-chamber-meta"

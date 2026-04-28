@@ -210,21 +210,51 @@ async function _loadAtlasData(): Promise<{
     function buildChamber(body: typeof lowerBody): AtlasChamber {
       const bp = allParties.filter((p) => p.bodyId === body.id);
       const seen = new Set<string>();
+      const totalSeats =
+        body.totalSeats || bp.reduce((sum, p) => sum + p.seatCount, 0);
+      const sumPartySeats = bp.reduce((sum, p) => sum + p.seatCount, 0);
+
+      // Data-quality guard. Some IPU/Wikidata syncs end up summing seat
+      // counts across multiple elections, so a country like Brazil
+      // (513-seat lower house) reports its largest party with 443 seats
+      // and other parties on top — total > 2,500. The hemicycle and
+      // percentage labels are nonsensical in that state.
+      //
+      // Heuristic: if the sum of party seats exceeds the chamber total
+      // by more than 20%, normalise each party's seat count to be the
+      // proportion of the SUM, scaled into the chamber total. The
+      // ranking order is preserved, the visualisation gets accurate
+      // proportions, and percentages add up to 100%.
+      const isAggregated =
+        sumPartySeats > 0 && sumPartySeats > totalSeats * 1.2;
+
+      let parties = bp.map((p, i) => {
+        let slug = p.partyName
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
+        if (!slug || seen.has(slug)) slug = `${slug || "party"}-${i}`;
+        seen.add(slug);
+        const normalisedSeats = isAggregated
+          ? Math.round((p.seatCount / sumPartySeats) * totalSeats)
+          : p.seatCount;
+        return {
+          id: slug,
+          name: p.partyName,
+          seats: normalisedSeats,
+          color: resolvePartyColor(p.partyColor, p.partyName, i),
+        };
+      });
+
+      // After normalising, drop parties that rounded to zero so the
+      // legend doesn't show a pile of "0 · 0.0%" rows.
+      if (isAggregated) parties = parties.filter((p) => p.seats > 0);
+
       return {
         name: body.name,
-        total: body.totalSeats || bp.reduce((sum, p) => sum + p.seatCount, 0),
-        sub: `${body.totalSeats || "?"} seats`,
-        parties: bp.map((p, i) => {
-          let slug = p.partyName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-          if (!slug || seen.has(slug)) slug = `${slug || "party"}-${i}`;
-          seen.add(slug);
-          return {
-            id: slug,
-            name: p.partyName,
-            seats: p.seatCount,
-            color: resolvePartyColor(p.partyColor, p.partyName, i),
-          };
-        }),
+        total: totalSeats,
+        sub: `${totalSeats} seats`,
+        parties,
       };
     }
 

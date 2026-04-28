@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, type ReactNode, useMemo } from "react";
+import { Fragment, type ReactNode, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { AtlasCountry } from "@/lib/atlas/load-atlas-data";
@@ -58,10 +58,31 @@ export function ShellCountryRail({
     neIdMap,
   );
 
+  // Country search — narrows the regional list. Empty query shows all
+  // regions; non-empty query flattens to a single match list.
+  const [query, setQuery] = useState("");
+  const q = query.trim().toLowerCase();
+  const filteredCountries = useMemo(() => {
+    if (!q) return null;
+    return countries
+      .filter((c) => c.name.toLowerCase().includes(q))
+      .slice(0, 30);
+  }, [q, countries]);
+
   return (
     <div className="chamber-left">
       {header && <div className="left-side-head">{header}</div>}
       {filters}
+      <div className="left-search">
+        <input
+          type="search"
+          autoComplete="off"
+          placeholder="Search countries…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search countries"
+        />
+      </div>
       <div className="left-mini-map">
         <svg viewBox="0 100 2000 800" preserveAspectRatio="xMidYMid meet">
           {mapLoaded
@@ -95,30 +116,67 @@ export function ShellCountryRail({
         </svg>
       </div>
       <div className="left-country-list">
-        {REGION_ORDER.map((region) => {
-          const items = countries.filter((c) => c.region === region);
-          if (!items.length) return null;
-          return (
-            <Fragment key={region}>
-              <div className="region-group">
-                <div className="region-label">{region}</div>
-                {items.map((c) => (
-                  <Link
-                    key={c.id}
-                    href={buildHref(c, hrefMode)}
-                    className={`country-row${c.id === selectedId ? " on" : ""}`}
-                  >
-                    <span>
-                      {c.name}
-                      {c.featured ? " ★" : ""}
-                    </span>
-                    <span className="code">{c.id.toUpperCase()}</span>
-                  </Link>
-                ))}
+        {filteredCountries ? (
+          <div className="region-group">
+            <div className="region-label">
+              {filteredCountries.length} match
+              {filteredCountries.length === 1 ? "" : "es"}
+            </div>
+            {filteredCountries.length === 0 ? (
+              <div
+                style={{
+                  padding: "10px 12px",
+                  fontFamily: "ui-monospace, monospace",
+                  fontSize: 10,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "var(--atlas-muted)",
+                }}
+              >
+                No country matches “{query}”
               </div>
-            </Fragment>
-          );
-        })}
+            ) : (
+              filteredCountries.map((c) => (
+                <Link
+                  key={c.id}
+                  href={buildHref(c, hrefMode)}
+                  className={`country-row${c.id === selectedId ? " on" : ""}`}
+                >
+                  <span>
+                    {c.name}
+                    {c.featured ? " ★" : ""}
+                  </span>
+                  <span className="code">{c.id.toUpperCase()}</span>
+                </Link>
+              ))
+            )}
+          </div>
+        ) : (
+          REGION_ORDER.map((region) => {
+            const items = countries.filter((c) => c.region === region);
+            if (!items.length) return null;
+            return (
+              <Fragment key={region}>
+                <div className="region-group">
+                  <div className="region-label">{region}</div>
+                  {items.map((c) => (
+                    <Link
+                      key={c.id}
+                      href={buildHref(c, hrefMode)}
+                      className={`country-row${c.id === selectedId ? " on" : ""}`}
+                    >
+                      <span>
+                        {c.name}
+                        {c.featured ? " ★" : ""}
+                      </span>
+                      <span className="code">{c.id.toUpperCase()}</span>
+                    </Link>
+                  ))}
+                </div>
+              </Fragment>
+            );
+          })
+        )}
       </div>
     </div>
   );
