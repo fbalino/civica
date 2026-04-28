@@ -140,7 +140,11 @@ export function ThreePaneShell({
       <div
         className={`chamber-grid${compareMode ? " compare-mode" : ""}`}
         style={{
-          gridTemplateColumns: gridTemplate,
+          // Skip grid-template-columns on mobile so the CSS flex
+          // override is the only thing controlling layout.
+          ...(isMobile ? {} : { gridTemplateColumns: gridTemplate }),
+          // Mobile height comes from the CSS @media block (calc(100dvh - 100px)).
+          // Desktop fills viewport minus the 56px sticky header.
           height: isMobile ? undefined : "calc(100vh - 56px)",
         }}
       >

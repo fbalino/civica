@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getCIRankings } from "@/lib/db/queries";
 import { ciTier } from "@/lib/ci/tiers";
 
@@ -26,6 +27,11 @@ interface LandingRankingRow {
 }
 
 export default async function LandingPage() {
+  // TEMP — user wants the Atlas as the landing surface while testing the
+  // redesign. Skip the landing-page render and route straight to /atlas.
+  // To restore the landing, remove the redirect line below.
+  redirect("/atlas");
+
   // Best-effort data; if queries fail (e.g. local dev without DB) we still
   // render the page with empty lists rather than a crash.
   let topScores: LandingRankingRow[] = [];

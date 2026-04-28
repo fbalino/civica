@@ -72,12 +72,17 @@
 
 /* ===== RESPONSIVE — MOBILE (<= 768px) ===== */
 @media (max-width: 768px) {
-  /* Shell grid: single column */
+  /* Shell grid: single column. Explicit height so .chamber-center's
+   * flex: 1 has something to expand into — without this the inner
+   * panes (e.g. the map SVG with height: 100%) collapse and you end
+   * up with a tiny strip at the top of the screen. 56px header +
+   * ~42px mobile-panel-bar = ~98px of chrome. */
   .chamber-grid {
     display: flex !important;
     flex-direction: column;
     grid-template-columns: unset !important;
     overflow: hidden;
+    height: calc(100dvh - 100px) !important;
   }
 
   /* Hide resizers on mobile */

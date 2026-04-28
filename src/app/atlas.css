@@ -1260,6 +1260,20 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 @container (min-width: 900px) {
   .cm-fact-grid--expanded { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; }
 }
+/* Narrow center pane (phone) — shrink the headline + scores so the
+ * masthead doesn't tower over the rest of the page. The hero already
+ * flex-wraps; this just keeps the wrap from looking explosive. */
+@container (max-width: 520px) {
+  .cm-name { font-size: 36px; letter-spacing: -0.02em; }
+  .cm-bigscore-value { font-size: 40px; }
+  .cm-bigscore-label { padding-top: 8px; font-size: var(--text-10); }
+  .cm-hero { gap: 16px; padding-bottom: 14px; margin-bottom: 14px; }
+  .cm-hero-scores { gap: 18px; flex-wrap: wrap; }
+  .cm-chip-strip { gap: 6px; margin-top: 14px; padding-top: 10px; }
+  .cm-chip { padding: 4px 8px; }
+  .cm-fact-grid { gap: 10px 18px; }
+  .cm-grid-wrap { gap: 6px; }
+}
 .cm-fact-col {
   display: flex; flex-direction: column; gap: 5px;
   min-width: 0;
