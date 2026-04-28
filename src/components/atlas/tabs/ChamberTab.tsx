@@ -160,25 +160,34 @@ export function ChamberTab({
             </div>
           </div>
 
-          <details className="atlas-parties-accordion">
-            <summary>
+          <div className="atlas-parties-table">
+            <div className="atlas-parties-table-head">
               <span className="atlas-parties-accordion-title">
                 All political parties
               </span>
               <span className="atlas-parties-accordion-meta">
                 {sortedParties.length}{" "}
                 {sortedParties.length === 1 ? "party" : "parties"} &middot;{" "}
-                {currentHouse.total} seats
+                {currentHouse.total} seats &middot; click to dim in hemicycle
               </span>
-              <span className="atlas-parties-accordion-chev" aria-hidden="true">
-                ▾
-              </span>
-            </summary>
+            </div>
             <div className="atlas-parties-list">
               {sortedParties.map((p) => {
                 const pct = (p.seats / currentHouse.total) * 100;
+                const isDimmed = dimmed.has(p.id);
                 return (
-                  <div key={p.id} className="atlas-parties-row">
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={`atlas-parties-row${isDimmed ? " dim" : ""}`}
+                    onClick={() => onDimToggle(p.id)}
+                    aria-pressed={isDimmed}
+                    title={
+                      isDimmed
+                        ? `Click to show ${p.name} in the hemicycle`
+                        : `Click to dim ${p.name} in the hemicycle`
+                    }
+                  >
                     <span
                       className="atlas-parties-swatch"
                       style={{ background: p.color }}
@@ -201,11 +210,11 @@ export function ChamberTab({
                         &middot; {pct.toFixed(1)}%
                       </span>
                     </span>
-                  </div>
+                  </button>
                 );
               })}
             </div>
-          </details>
+          </div>
         </>
       ) : (
         <div

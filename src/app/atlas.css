@@ -656,23 +656,19 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   text-transform: uppercase;
 }
 
-/* ===== ALL POLITICAL PARTIES — Phase B accordion ===== */
-.atlas-parties-accordion {
+/* ===== ALL POLITICAL PARTIES — always-visible interactive table ===== */
+.atlas-parties-table {
   margin-top: 18px;
   border: 1px solid var(--atlas-rule);
   background: var(--atlas-paper);
 }
-.atlas-parties-accordion > summary {
-  list-style: none;
-  cursor: pointer;
+.atlas-parties-table-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 14px;
   padding: 12px 16px;
-  user-select: none;
+  border-bottom: 1px solid var(--atlas-rule);
 }
-.atlas-parties-accordion > summary::-webkit-details-marker { display: none; }
-.atlas-parties-accordion > summary:hover { background: var(--atlas-paper-2); }
 .atlas-parties-accordion-title {
   font-family: "Fraunces", serif;
   font-size: 16px;
@@ -687,28 +683,33 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   text-transform: uppercase;
   color: var(--atlas-muted);
 }
-.atlas-parties-accordion-chev {
-  font-size: 14px;
-  color: var(--atlas-muted);
-  transition: transform 160ms;
-}
-.atlas-parties-accordion[open] .atlas-parties-accordion-chev {
-  transform: rotate(180deg);
-}
-.atlas-parties-list {
-  border-top: 1px solid var(--atlas-rule);
-  padding: 8px 0;
-}
+.atlas-parties-list { padding: 4px 0; }
+
+/* Each row is a <button> so it's keyboard- and screen-reader-accessible
+ * as a toggle. aria-pressed flips when dim. */
 .atlas-parties-row {
   display: grid;
   grid-template-columns: 14px 1fr minmax(80px, 200px) auto;
   gap: 12px;
   align-items: center;
   padding: 8px 16px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--atlas-ink);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background 120ms, opacity 120ms;
 }
+.atlas-parties-row:hover { background: var(--atlas-paper-2); }
 .atlas-parties-row + .atlas-parties-row {
   border-top: 1px solid var(--atlas-rule-2);
 }
+.atlas-parties-row.dim {
+  opacity: 0.42;
+}
+.atlas-parties-row.dim:hover { opacity: 0.6; }
 .atlas-parties-swatch {
   width: 12px;
   height: 12px;
@@ -1071,9 +1072,10 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .left-mode-toggle {
   display: inline-flex;
   border: 1px solid var(--atlas-rule);
-  margin: 12px 16px 0;
-  /* Sized to its content so the toggle hugs the left edge of the rail
-   * instead of stretching the full width. */
+  /* Lives inside .left-side-head which already has 16px 18px padding,
+   * so no own horizontal margin — its left edge then sits flush with
+   * the "Pick a country" title above it. */
+  margin: 12px 0 0;
   align-self: flex-start;
 }
 /* Country search — slim row right under the mode toggle. */

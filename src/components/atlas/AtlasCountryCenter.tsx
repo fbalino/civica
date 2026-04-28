@@ -200,15 +200,40 @@ export function AtlasCountryCenter({
       </div>
 
       {/* Tab 1: Structure — folds in Chamber.
-          Top: GovStructureDiagram (branches + bodies + offices + terms).
-          Bottom: ChamberTab (hemicycle + party legend + house toggle +
-          all-parties accordion). The upper/lower toggle that used to live
-          on the retired Chamber tab is now part of this pane. */}
+          Top: ChamberTab (hemicycle + house toggle + all-parties
+          accordion). Bottom: GovStructureDiagram (branches + bodies +
+          offices + terms). User-preferred order — the seat composition
+          is the most-asked question; the org-chart is the deeper
+          drill-down. */}
       <div className={`atlas-pane${tab === "structure" ? " on" : ""}`}>
         {tabDataLoading && tab === "structure" ? (
           <LoadingPane />
         ) : (
           <>
+            <ChamberTab
+              active
+              country={country}
+              house={house}
+              cd={cd}
+              dimmed={dimmed}
+              onHouseChange={onHouseChange}
+              onDimToggle={onDimToggle}
+              onSeatHover={onSeatHover}
+              onSeatLeave={onSeatLeave}
+            />
+
+            {/* Section divider between chamber composition (above) and
+                the full government structure diagram (below). */}
+            <div
+              className="atlas-section-divider"
+              role="separator"
+              aria-label="Full government structure"
+            >
+              <span className="atlas-section-divider-label">
+                Full government structure
+              </span>
+            </div>
+
             {structureData && structureData.bodies.length > 0 ? (
               <GovStructureDiagram
                 bodies={structureData.bodies}
@@ -256,29 +281,6 @@ export function AtlasCountryCenter({
                 ))}
               </div>
             )}
-
-            {/* Section divider between branches diagram and chamber graphic. */}
-            <div
-              className="atlas-section-divider"
-              role="separator"
-              aria-label="Chamber composition"
-            >
-              <span className="atlas-section-divider-label">
-                Chamber composition
-              </span>
-            </div>
-
-            <ChamberTab
-              active
-              country={country}
-              house={house}
-              cd={cd}
-              dimmed={dimmed}
-              onHouseChange={onHouseChange}
-              onDimToggle={onDimToggle}
-              onSeatHover={onSeatHover}
-              onSeatLeave={onSeatLeave}
-            />
           </>
         )}
       </div>
