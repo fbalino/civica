@@ -50,8 +50,9 @@ export function AtlasMapShellClient({ countries }: AtlasMapShellClientProps) {
         }
         onOpenCompare={() => {
           if (pinned.length < 2) return;
-          const slugs = pinned.map((id) => atlasIdToSlug(id, countries));
-          router.push(`/compare?c=${slugs[0]}&c=${slugs[1]}`);
+          // In-atlas compare (fast SPA-style with hemicycles). The
+          // long-form scrollable comparison still lives at /compare.
+          router.push(`/atlas/compare?a=${pinned[0]}&b=${pinned[1]}`);
         }}
       />
     </div>
