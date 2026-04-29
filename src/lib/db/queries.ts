@@ -31,6 +31,7 @@ import {
   bills,
   organizations,
   organizationMemberships,
+  civicaConditionsScores,
 } from "./schema";
 
 export async function getJurisdictionBySlug(slug: string) {
@@ -964,9 +965,12 @@ export async function getCIRankings(
     continent?: string;
     governmentType?: string;
     structuralFamily?: string;
+    /** Defaults to "beta" — Phase 5.4 cut-over. */
+    methodologyVersion?: string;
   }
 ) {
-  const q = quarter ?? await getLatestAvailableQuarter();
+  const methodologyVersion = filters?.methodologyVersion ?? "beta";
+  const q = quarter ?? (await getLatestAvailableQuarter(methodologyVersion));
   const continentFilter = filters?.continent
     ? sql`AND j.continent = ${filters.continent}`
     : sql``;
@@ -985,6 +989,11 @@ export async function getCIRankings(
   const result = await db.execute(sql`
     SELECT
       cs.score,
+      cs.score_lower          AS "scoreLower",
+      cs.score_upper          AS "scoreUpper",
+      cs.band,
+      cs.completeness_flag    AS "completenessFlag",
+      cs.vintage_label        AS "vintageLabel",
       cs.rank,
       cs.total_ranked         AS "totalRanked",
       cs.is_partial           AS "isPartial",
@@ -1004,6 +1013,7 @@ export async function getCIRankings(
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
     WHERE cs.quarter = ${q}
+      AND cs.methodology_version = ${methodologyVersion}
       AND j.type = 'sovereign_state'
       ${continentFilter}
       ${govTypeFilter}
@@ -1037,8 +1047,12 @@ export async function getCIRankings(
   }));
 }
 
-export async function getCICountryDetail(slug: string, quarter?: string) {
-  const q = quarter ?? await getLatestAvailableQuarter();
+export async function getCICountryDetail(
+  slug: string,
+  quarter?: string,
+  methodologyVersion: string = "beta",
+) {
+  const q = quarter ?? (await getLatestAvailableQuarter(methodologyVersion));
 
   const jurisdiction = await db
     .select()
@@ -1054,7 +1068,9 @@ export async function getCICountryDetail(slug: string, quarter?: string) {
     .select()
     .from(ciCompositeScores)
     .where(
-      sql`${ciCompositeScores.jurisdictionId} = ${jId} AND ${ciCompositeScores.quarter} = ${q}`
+      sql`${ciCompositeScores.jurisdictionId} = ${jId}
+        AND ${ciCompositeScores.quarter} = ${q}
+        AND ${ciCompositeScores.methodologyVersion} = ${methodologyVersion}`
     )
     .limit(1);
 
@@ -1442,10 +1458,13 @@ export async function getInternationalMembershipsBySlugs(
   return rows;
 }
 
-async function getLatestAvailableQuarter(): Promise<string> {
+async function getLatestAvailableQuarter(
+  methodologyVersion: string = "beta",
+): Promise<string> {
   const [row] = await db
     .select({ quarter: ciCompositeScores.quarter })
     .from(ciCompositeScores)
+    .where(eq(ciCompositeScores.methodologyVersion, methodologyVersion))
     .orderBy(desc(ciCompositeScores.quarter))
     .limit(1);
   if (row) return row.quarter;
@@ -1476,4 +1495,52 @@ export async function getBillsForJurisdiction(slug: string, limit = 10) {
     .limit(limit);
 
   return { jurisdiction: j[0], rows };
+}
+
+/**
+ * Phase 5.4 — Civica Conditions companion layer.
+ * Returns the latest score row for each of the 3 dimensions
+ * (human_development, peace_security, economic_stability) for a given
+ * jurisdictionId under the specified methodologyVersion.
+ *
+ * At most 3 rows are returned (one per dimension). If a dimension has
+ * no data, it is simply absent from the array — callers render a
+ * placeholder card for missing dimensions.
+ */
+export async function getCivicaConditionsForJurisdiction(
+  jurisdictionId: string,
+  methodologyVersion: string = "beta"
+) {
+  // For each dimension, pick the row with the latest quarter.
+  const rows = await db.execute(sql`
+    SELECT DISTINCT ON (ccs.dimension)
+      ccs.dimension,
+      ccs.quarter,
+      ccs.normalized_score  AS "normalizedScore",
+      ccs.raw_value         AS "rawValue",
+      ccs.source_id         AS "sourceId",
+      ccs.dataset_year      AS "datasetYear",
+      ccs.methodology_version AS "methodologyVersion",
+      s.name                AS "sourceName"
+    FROM civica_conditions_scores ccs
+    LEFT JOIN sources s ON ccs.source_id = s.id
+    WHERE ccs.jurisdiction_id = ${jurisdictionId}
+      AND ccs.methodology_version = ${methodologyVersion}
+    ORDER BY ccs.dimension, ccs.quarter DESC
+  `);
+
+  const raw = Array.isArray(rows)
+    ? rows
+    : ((rows as { rows?: unknown[] }).rows ?? []);
+
+  return raw as Array<{
+    dimension: string;
+    quarter: string;
+    normalizedScore: number;
+    rawValue: number | null;
+    sourceId: string;
+    datasetYear: number;
+    methodologyVersion: string;
+    sourceName: string | null;
+  }>;
 }
