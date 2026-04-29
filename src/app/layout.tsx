@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Fraunces, Inter } from "next/font/google";
-import Script from "next/script";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
+import "./editorial.css";
 import "./atlas.css";
 import "./shell.css";
 import "./civica-index.css";
@@ -59,14 +59,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${fraunces.variable} ${inter.variable}`}
+      data-theme="dark"
       suppressHydrationWarning
     >
       <head>
       </head>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');var dark=window.matchMedia('(prefers-color-scheme: dark)').matches;var r=t==='light'||(t!=='dark'&&!dark)?'light':'dark';d.setAttribute('data-theme',r)}catch(e){document.documentElement.setAttribute('data-theme','dark')}})()`}
-        </Script>
         <ThemeProvider>
           <SiteHeader
             searchSlot={<GlobalSearchWrapper />}

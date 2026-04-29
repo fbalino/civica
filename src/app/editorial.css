@@ -1,0 +1,483 @@
+/*
+ * Civica editorial layout system
+ * ──────────────────────────────
+ *
+ * Global classes that drive the layout + typography of every reader-
+ * style page (methodology, replication, corrections, changelog, etc.).
+ *
+ * DESIGN PRINCIPLE: a new editorial page should not need to ship inline
+ * <style> blocks. It composes these classes alongside the editorial
+ * primitives in src/components/editorial/ (EditorialPage, SectionHeader,
+ * Banner, Pill, DataTable, SourceDot).
+ *
+ * EVERY VALUE IS A ROLE TOKEN. No hex/rgb/oklch literals.
+ *
+ * Required reading: ./DESIGN.md.
+ */
+
+/* ── Page container ─────────────────────────────────────────────── */
+
+.editorial-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+  color: var(--color-text-primary);
+}
+.editorial-page--wide  { max-width: 960px;  }
+.editorial-page--full  { max-width: 1200px; }
+
+@media (max-width: 480px) {
+  .editorial-page { padding: 40px 18px 60px; }
+}
+
+/* ── Breadcrumb row ─────────────────────────────────────────────── */
+
+.editorial-breadcrumbs {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-12);
+  letter-spacing: 0.03em;
+  color: var(--color-text-30);
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.editorial-breadcrumbs a {
+  color: var(--color-text-30);
+  text-decoration: none;
+}
+.editorial-breadcrumbs a:hover {
+  color: var(--color-text-primary);
+}
+
+/* ── Page header (title + subtitle + meta) ──────────────────────── */
+
+.editorial-header,
+.editorial-page-header {
+  margin-bottom: 28px;
+}
+
+.editorial-page-title,
+.editorial-page h1 {
+  font-family: var(--font-heading);
+  font-size: var(--text-52);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+  margin: 0 0 12px;
+  color: var(--color-text-primary);
+}
+@media (max-width: 480px) {
+  .editorial-page-title,
+  .editorial-page h1 { font-size: var(--text-32); }
+}
+
+.editorial-page-subtitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--color-text-60);
+  margin: 0 0 28px;
+  line-height: 1.4;
+  max-width: 640px;
+}
+
+.editorial-meta,
+.editorial-page-meta {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-12);
+  letter-spacing: 0.03em;
+  color: var(--color-text-30);
+  margin: 0 0 28px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── Inline Beta tag for headlines ──────────────────────────────── */
+
+.editorial-beta-tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-mono, 500);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-warning, var(--color-status-warning));
+  background: color-mix(
+    in oklch,
+    var(--color-status-warning) 18%,
+    var(--color-page-bg) 82%
+  );
+  border: 1px solid var(--color-status-warning);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  white-space: nowrap;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+/* ── Warning callout (used for Beta disclosures, methodology
+ *    caveats, etc. — companion to <Banner variant="warn">) ──────── */
+
+.editorial-warning {
+  background: color-mix(
+    in oklch,
+    var(--color-status-warning) 10%,
+    var(--color-page-bg) 90%
+  );
+  border: 1px solid var(--color-status-warning);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 32px;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: 1.55;
+  color: var(--color-text-primary);
+}
+.editorial-warning a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.editorial-warning a:hover {
+  text-decoration: underline;
+}
+
+/* ── Content sections ───────────────────────────────────────────── */
+
+.editorial-section {
+  margin-top: 36px;
+}
+.editorial-section h2,
+.editorial-section .editorial-h2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-26);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0 0 16px;
+}
+.editorial-section h3,
+.editorial-section .editorial-h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 24px 0 8px;
+}
+.editorial-section p {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: 1.7;
+  color: var(--color-text-60);
+  margin: 0 0 12px;
+}
+.editorial-section ul,
+.editorial-section ol {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: 1.7;
+  color: var(--color-text-60);
+  padding-left: 22px;
+  margin: 0 0 12px;
+}
+.editorial-section li {
+  margin-bottom: 6px;
+}
+.editorial-section strong {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.editorial-section a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.editorial-section a:hover {
+  text-decoration: underline;
+}
+.editorial-section code {
+  font-family: var(--font-mono);
+  font-size: var(--text-13);
+  background: var(--color-card-bg);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+/* Lightweight table styling for in-section data */
+.editorial-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0 8px;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+}
+.editorial-section thead th {
+  text-align: left;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  border-bottom: 1px solid var(--color-card-border);
+}
+.editorial-section tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--color-card-border);
+  color: var(--color-text-primary);
+}
+.editorial-section td.editorial-td-num {
+  font-family: var(--font-mono);
+  color: var(--color-text-60);
+}
+
+/* ── Footer nav (link row at the bottom of an editorial page) ───── */
+
+.editorial-footer-nav {
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-card-border);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-12);
+  color: var(--color-text-60);
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.editorial-footer-nav a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.editorial-footer-nav a:hover {
+  text-decoration: underline;
+}
+
+/* ── Filter bar (changelog-style faceted filtering) ─────────────── */
+
+.editorial-filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding: 18px 20px;
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+}
+.editorial-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.editorial-filter-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  color: var(--color-text-40);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  min-width: 80px;
+}
+@media (max-width: 480px) {
+  .editorial-filter-label { min-width: 0; }
+}
+
+.editorial-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-page-bg);
+  color: var(--color-text-60);
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  font-weight: var(--font-weight-mono, 500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.editorial-chip:hover {
+  color: var(--color-text-primary);
+}
+.editorial-chip--active {
+  border-color: var(--color-accent);
+  background: color-mix(
+    in oklch,
+    var(--color-accent) 14%,
+    var(--color-page-bg) 86%
+  );
+  color: var(--color-text-primary);
+}
+
+/* Country/select submit form inside an editorial filter row */
+.editorial-filter-form {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.editorial-filter-form select {
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-page-bg);
+  color: var(--color-text-primary);
+}
+.editorial-filter-form button {
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  font-weight: var(--font-weight-mono, 500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-page-bg);
+  color: var(--color-accent);
+  cursor: pointer;
+}
+.editorial-filter-form button:hover {
+  border-color: var(--color-accent);
+}
+
+/* ── Editorial card (event row, news entry, list item) ──────────── */
+
+.editorial-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hard);
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+.editorial-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.editorial-card-head-left {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.editorial-card-pills {
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.editorial-card-headline {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 8px 0 12px;
+  color: var(--color-text-primary);
+}
+.editorial-card-desc {
+  margin: 0 0 12px;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: 1.55;
+  color: var(--color-text-60);
+}
+.editorial-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-card-border);
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-40);
+  letter-spacing: 0.04em;
+}
+.editorial-card-foot-row {
+  display: inline-flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── Pagination row ─────────────────────────────────────────────── */
+
+.editorial-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-card-border);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+}
+.editorial-pagination a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.editorial-pagination a:hover {
+  text-decoration: underline;
+}
+
+/* ── Section header (companion to <SectionHeader>) ──────────────── */
+
+.editorial-section-header,
+.editorial-results-header-block {
+  margin-bottom: 16px;
+}
+.editorial-eyebrow {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 8px;
+  display: block;
+}
+.editorial-section-header h2,
+.editorial-results-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  margin: 0 0 6px;
+}
+.editorial-section-header p,
+.editorial-results-dek {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+  margin: 0 0 20px;
+}
+
+/* ── Empty state ────────────────────────────────────────────────── */
+
+.editorial-empty {
+  margin: 16px 0 24px;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-60);
+  line-height: 1.5;
+}
+.editorial-empty a {
+  color: var(--color-accent);
+  text-decoration: none;
+}

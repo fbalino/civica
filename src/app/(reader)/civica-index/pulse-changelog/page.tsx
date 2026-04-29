@@ -3,8 +3,6 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { jurisdictions } from "@/lib/db/schema";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
-import { SectionHeader } from "@/components/editorial/SectionHeader";
-import { Banner } from "@/components/editorial/Banner";
 import { Pill } from "@/components/editorial/Pill";
 import { SourceDot } from "@/components/SourceDot";
 import {
@@ -98,24 +96,9 @@ function FilterChip({
   return (
     <Link
       href={href}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        padding: "4px 10px",
-        borderRadius: "var(--radius-sm)",
-        border: `1px solid ${active ? "var(--color-accent)" : "var(--color-card-border)"}`,
-        background: active
-          ? "color-mix(in oklch, var(--color-accent) 14%, var(--color-page-bg) 86%)"
-          : "var(--color-page-bg)",
-        color: active ? "var(--color-text-primary)" : "var(--color-text-55)",
-        fontFamily: "var(--font-mono)",
-        fontSize: "var(--text-11)",
-        fontWeight: "var(--font-weight-mono)",
-        letterSpacing: "0.06em",
-        textTransform: "uppercase",
-        textDecoration: "none",
-        whiteSpace: "nowrap",
-      }}
+      className={
+        active ? "editorial-chip editorial-chip--active" : "editorial-chip"
+      }
     >
       {children}
     </Link>
@@ -125,34 +108,9 @@ function FilterChip({
 function EventCard({ event }: { event: PulseV2ChangelogRow }) {
   const isPos = event.severityValue > 0;
   return (
-    <article
-      style={{
-        background: "var(--color-card-bg)",
-        border: "1px solid var(--color-card-border)",
-        borderRadius: "var(--radius-sm)",
-        boxShadow: "var(--shadow-hard)",
-        padding: "20px 24px",
-        marginBottom: 16,
-      }}
-    >
-      <header
-        style={{
-          display: "flex",
-          alignItems: "baseline",
-          justifyContent: "space-between",
-          gap: 12,
-          flexWrap: "wrap",
-          marginBottom: 8,
-        }}
-      >
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            flexWrap: "wrap",
-          }}
-        >
+    <article className="editorial-card">
+      <header className="editorial-card-head">
+        <div className="editorial-card-head-left">
           <Link
             href={`/countries/${event.country.slug}`}
             style={{
@@ -176,7 +134,7 @@ function EventCard({ event }: { event: PulseV2ChangelogRow }) {
             {formatEventDate(event.eventDate)}
           </span>
         </div>
-        <div style={{ display: "inline-flex", gap: 6, flexWrap: "wrap" }}>
+        <div className="editorial-card-pills">
           <Pill>{DIMENSION_LABELS[event.dimension] ?? event.dimension}</Pill>
           <Pill variant={SEVERITY_VARIANT[event.severityTier] ?? "default"}>
             {SEVERITY_LABELS[event.severityTier] ?? event.severityTier} ·{" "}
@@ -197,49 +155,16 @@ function EventCard({ event }: { event: PulseV2ChangelogRow }) {
         </div>
       </header>
 
-      <h3
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-18)",
-          fontWeight: 400,
-          lineHeight: 1.3,
-          margin: "8px 0 12px",
-          color: "var(--color-text-primary)",
-        }}
-      >
-        {event.headline}
-      </h3>
+      <h3 className="editorial-card-headline">{event.headline}</h3>
 
-      <p
-        style={{
-          margin: "0 0 12px",
-          fontFamily: "var(--font-body)",
-          fontSize: "var(--text-13)",
-          lineHeight: 1.55,
-          color: "var(--color-text-55)",
-        }}
-      >
+      <p className="editorial-card-desc">
         {event.description.length > 320
           ? `${event.description.slice(0, 320)}…`
           : event.description}
       </p>
 
-      <footer
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          flexWrap: "wrap",
-          paddingTop: 10,
-          borderTop: "1px solid var(--color-card-border)",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-11)",
-          color: "var(--color-text-40)",
-          letterSpacing: "0.04em",
-        }}
-      >
-        <div style={{ display: "inline-flex", gap: 12, flexWrap: "wrap" }}>
+      <footer className="editorial-card-foot">
+        <div className="editorial-card-foot-row">
           {event.sources.map((src) => (
             <SourceDot key={src} source={src} retrievedAt={null} />
           ))}
@@ -266,7 +191,6 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
   const limit = 25;
   const offset = (page - 1) * limit;
 
-  // Fetch the country list once for the filter dropdown
   const countries = await db
     .select({
       slug: jurisdictions.slug,
@@ -292,90 +216,37 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
   };
 
   return (
-    <EditorialPage
-      className="editorial-page repl-layout"
-      breadcrumbs={
-        <>
-          <Link href="/civica-index">← Civica Index</Link>
-          <span style={{ margin: "0 8px", color: "var(--color-text-40)" }}>
-            /
-          </span>
-          Pulse changelog
-        </>
-      }
-      title={
-        <>
-          Pulse changelog{" "}
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-12)",
-              color: "var(--color-status-warning)",
-              fontWeight: "var(--font-weight-mono)",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              verticalAlign: "middle",
-              padding: "2px 8px",
-              border: "1px solid var(--color-status-warning)",
-              borderRadius: "var(--radius-sm)",
-            }}
-          >
-            Beta
-          </span>
-        </>
-      }
-      meta="Every governance event classified by the Civica Pulse Beta pipeline. Updated daily."
-    >
-      <Banner variant="warn">
-        <div style={{ padding: "14px 18px", lineHeight: 1.5 }}>
-          The Civica Pulse Beta is a real-time governance shock monitor under
-          active validation. Events queued for human review (
-          <strong>severe and catastrophic severity tiers</strong>, plus events
-          where the classifier didn&apos;t reach consensus) do{" "}
-          <strong>not</strong> drive published Pulse scores until a reviewer
-          confirms them. See the{" "}
-          <Link
-            href="/civica-index/methodology/pulse"
-            style={{ color: "var(--color-accent)" }}
-          >
-            Pulse methodology
-          </Link>{" "}
-          for the full pipeline.
-        </div>
-      </Banner>
+    <EditorialPage width="wide">
+      <nav className="editorial-breadcrumbs">
+        <Link href="/civica-index">← Civica Index</Link>
+        <span>/</span>
+        Pulse changelog
+      </nav>
 
-      <SectionHeader eyebrow="Filters" title="Narrow the feed" />
+      <h1 className="editorial-page-title">
+        Pulse changelog
+        <span className="editorial-beta-tag">Beta</span>
+      </h1>
+      <p className="editorial-page-subtitle">
+        Every governance event classified by the Civica Pulse Beta pipeline.
+        Updated daily.
+      </p>
 
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 12,
-          marginBottom: 24,
-        }}
-      >
-        {/* Country filter — chips for active, native select for the long list */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            flexWrap: "wrap",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
-              fontWeight: "var(--font-weight-mono)",
-              color: "var(--color-text-40)",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              minWidth: 80,
-            }}
-          >
-            Country
-          </span>
+      <div className="editorial-warning">
+        The Civica Pulse Beta is a real-time governance shock monitor under
+        active validation. Events queued for human review (
+        <strong>severe and catastrophic severity tiers</strong>, plus events
+        where the classifier didn&apos;t reach consensus) do{" "}
+        <strong>not</strong> drive published Pulse scores until a reviewer
+        confirms them. See the{" "}
+        <Link href="/civica-index/methodology/pulse">Pulse methodology</Link>{" "}
+        for the full pipeline.
+      </div>
+
+      <div className="editorial-filter-bar">
+        {/* Country filter */}
+        <div className="editorial-filter-row">
+          <span className="editorial-filter-label">Country</span>
           <FilterChip
             href={buildHref(baseParams, { country: undefined, page: undefined })}
             active={!country}
@@ -390,8 +261,11 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
               {countries.find((c) => c.slug === country)?.name ?? country} ✕
             </FilterChip>
           ) : null}
-          <form action="/civica-index/pulse-changelog" method="get">
-            {/* Persist current filter state across the country swap */}
+          <form
+            action="/civica-index/pulse-changelog"
+            method="get"
+            className="editorial-filter-form"
+          >
             {dimension ? (
               <input type="hidden" name="dimension" value={dimension} />
             ) : null}
@@ -399,19 +273,7 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
               <input type="hidden" name="severity" value={severity} />
             ) : null}
             {showReview ? <input type="hidden" name="review" value="1" /> : null}
-            <select
-              name="country"
-              defaultValue={country ?? ""}
-              style={{
-                padding: "4px 8px",
-                fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-11)",
-                borderRadius: "var(--radius-sm)",
-                border: "1px solid var(--color-card-border)",
-                background: "var(--color-page-bg)",
-                color: "var(--color-text-primary)",
-              }}
-            >
+            <select name="country" defaultValue={country ?? ""}>
               <option value="">— pick country —</option>
               {countries.map((c) => (
                 <option key={c.slug} value={c.slug}>
@@ -419,47 +281,13 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
                 </option>
               ))}
             </select>
-            <button
-              type="submit"
-              style={{
-                marginLeft: 6,
-                padding: "4px 10px",
-                fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-11)",
-                borderRadius: "var(--radius-sm)",
-                border: "1px solid var(--color-card-border)",
-                background: "var(--color-page-bg)",
-                color: "var(--color-accent)",
-                cursor: "pointer",
-              }}
-            >
-              Apply
-            </button>
+            <button type="submit">Apply</button>
           </form>
         </div>
 
         {/* Dimension chips */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            flexWrap: "wrap",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
-              fontWeight: "var(--font-weight-mono)",
-              color: "var(--color-text-40)",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              minWidth: 80,
-            }}
-          >
-            Dimension
-          </span>
+        <div className="editorial-filter-row">
+          <span className="editorial-filter-label">Dimension</span>
           <FilterChip
             href={buildHref(baseParams, {
               dimension: undefined,
@@ -481,27 +309,8 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
         </div>
 
         {/* Severity chips */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            flexWrap: "wrap",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
-              fontWeight: "var(--font-weight-mono)",
-              color: "var(--color-text-40)",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              minWidth: 80,
-            }}
-          >
-            Severity
-          </span>
+        <div className="editorial-filter-row">
+          <span className="editorial-filter-label">Severity</span>
           <FilterChip
             href={buildHref(baseParams, {
               severity: undefined,
@@ -523,27 +332,8 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
         </div>
 
         {/* Review-queue toggle */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            flexWrap: "wrap",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
-              fontWeight: "var(--font-weight-mono)",
-              color: "var(--color-text-40)",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              minWidth: 80,
-            }}
-          >
-            Status
-          </span>
+        <div className="editorial-filter-row">
+          <span className="editorial-filter-label">Status</span>
           <FilterChip
             href={buildHref(baseParams, {
               review: undefined,
@@ -562,35 +352,24 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      <SectionHeader
-        eyebrow="Events"
-        title={
-          result.rows.length === 0 && page === 1
+      <div className="editorial-results-header-block">
+        <span className="editorial-eyebrow">Events</span>
+        <h2 className="editorial-results-title">
+          {result.rows.length === 0 && page === 1
             ? "No events match these filters"
-            : `${result.rows.length} event${result.rows.length === 1 ? "" : "s"} on this page`
-        }
-        dek={
-          showReview
+            : `${result.rows.length} event${result.rows.length === 1 ? "" : "s"} on this page`}
+        </h2>
+        <p className="editorial-results-dek">
+          {showReview
             ? "Including events queued for human review. These do not drive published scores yet."
-            : "Published events only. Toggle status above to include the review queue."
-        }
-      />
+            : "Published events only. Toggle status above to include the review queue."}
+        </p>
+      </div>
 
       {result.rows.length === 0 && page === 1 ? (
-        <p
-          style={{
-            margin: "16px 0 24px",
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-55)",
-            lineHeight: 1.5,
-          }}
-        >
+        <p className="editorial-empty">
           No events match. Try{" "}
-          <Link
-            href="/civica-index/pulse-changelog"
-            style={{ color: "var(--color-accent)" }}
-          >
+          <Link href="/civica-index/pulse-changelog">
             clearing all filters
           </Link>
           .
@@ -603,50 +382,21 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
         </div>
       )}
 
-      {/* Pagination */}
-      <nav
-        aria-label="Pagination"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          paddingTop: 16,
-          borderTop: "1px solid var(--color-card-border)",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-12)",
-        }}
-      >
+      <nav className="editorial-pagination" aria-label="Pagination">
         {page > 1 ? (
-          <Link
-            href={buildHref(baseParams, {
-              page: String(page - 1),
-            })}
-            style={{
-              color: "var(--color-accent)",
-              textDecoration: "none",
-            }}
-          >
+          <Link href={buildHref(baseParams, { page: String(page - 1) })}>
             ← Page {page - 1}
           </Link>
         ) : (
-          <span style={{ color: "var(--color-text-40)" }}>—</span>
+          <span>—</span>
         )}
-        <span style={{ color: "var(--color-text-40)" }}>Page {page}</span>
+        <span>Page {page}</span>
         {result.hasMore ? (
-          <Link
-            href={buildHref(baseParams, {
-              page: String(page + 1),
-            })}
-            style={{
-              color: "var(--color-accent)",
-              textDecoration: "none",
-            }}
-          >
+          <Link href={buildHref(baseParams, { page: String(page + 1) })}>
             Page {page + 1} →
           </Link>
         ) : (
-          <span style={{ color: "var(--color-text-40)" }}>—</span>
+          <span>—</span>
         )}
       </nav>
     </EditorialPage>

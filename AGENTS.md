@@ -10,6 +10,7 @@ Domain: `civicaatlas.org`.
 - No hardcoded hex / rgb / rgba / oklch in component code or page CSS — use `var(--color-*)`. Hex literals are only allowed inside `:root` token-definition blocks and inside `<DesignSystemSwatch>`.
 - No hardcoded `font-family`, `font-size` in px, or padding/margin magic numbers in new UI — use `--font-*`, `--text-*`, and `--space-*`.
 - New pages must build on shared primitives: `<EditorialPage>`, `<SectionHeader>`, `<Banner>`, `<Pill>`, `<DataTable>`, and `<SourceDot>`.
+- **Reader-style pages compose `editorial.css` classes — no per-page `<style>` blocks.** If you find yourself reaching for a `<style>` block to set max-width, padding, breadcrumb typography, section heading sizes, filter chips, or list-card layout, the class already exists in `src/app/editorial.css`. If the pattern truly is missing, add it there once and reuse it everywhere.
 - The `/design-system` page is the only source of canonical visuals. If your page does not look like a piece of `/design-system`, it is wrong.
 
 ## North stars
