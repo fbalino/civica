@@ -25,6 +25,17 @@ const SOURCE_NAMES: Record<string, string> = {
   rsf_press_freedom: "RSF Press Freedom",
   world_happiness: "World Happiness Report",
   unodc: "UNODC",
+  // Phase 5.5 — Pulse Beta sources
+  acled: "ACLED",
+  civicus_monitor: "CIVICUS Monitor",
+  rsf_alerts: "RSF Press Freedom Alerts",
+  vdem_pulse: "V-Dem Pulse",
+  hrw: "Human Rights Watch",
+  amnesty: "Amnesty International",
+  gdelt: "GDELT Project",
+  reuters_wire: "Reuters",
+  ap_wire: "Associated Press",
+  google_news: "Google News",
 };
 
 const FROZEN_SOURCES = new Set(["cia_factbook"]);

@@ -1,3 +1,4 @@
+import { sql as dsql } from "drizzle-orm";
 import {
   pgTable,
   uuid,
@@ -739,4 +740,211 @@ export const advisoryBoardMembers = pgTable("advisory_board_members", {
   displayOrder: integer("display_order").notNull().default(100),
   joinedAt: date("joined_at").notNull().defaultNow(),
   isActive: boolean("is_active").notNull().default(true),
+});
+
+// --- Phase 5.5 — Pulse Beta foundation (dimensional deltas) ---
+
+/**
+ * Staging table for raw events ingested from specialist + news feeds.
+ * One row per source-record. Drained by the clustering step which
+ * groups near-duplicate records into governance-event clusters.
+ *
+ * Rows are retained for 7 days post-clustering then garbage-collected.
+ */
+export const rawEvents = pgTable(
+  "raw_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** sources.id — e.g. "acled", "civicus_monitor", "gdelt" */
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    /** Source-native id where available, for upsert idempotency */
+    externalId: text("external_id"),
+    sourceUrl: text("source_url"),
+    /** 'specialist' | 'news' */
+    sourceType: text("source_type").notNull(),
+    /** Nullable — country resolution can fail */
+    jurisdictionId: uuid("jurisdiction_id").references(() => jurisdictions.id),
+    /** Pre-resolution country name from the source for diagnostics */
+    rawCountryName: text("raw_country_name"),
+    eventDate: date("event_date"),
+    retrievedAt: timestamp("retrieved_at").defaultNow().notNull(),
+    title: text("title").notNull(),
+    body: text("body"),
+    /** Full source payload for re-extraction without re-fetching */
+    raw: jsonb("raw").notNull(),
+    /** 384-dim sentence-transformer embedding for clustering */
+    embedding: real("embedding").array(),
+    /** Set when row joins a cluster; null until then */
+    clusterId: uuid("cluster_id"),
+    clusteredAt: timestamp("clustered_at"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_raw_events_jurisdiction_date").on(
+      table.jurisdictionId,
+      table.eventDate
+    ),
+    index("idx_raw_events_unclustered").on(table.clusteredAt),
+    index("idx_raw_events_cluster").on(table.clusterId),
+    uniqueIndex("idx_raw_events_external")
+      .on(table.sourceId, table.externalId)
+      .where(dsql`${table.externalId} IS NOT NULL`),
+  ]
+);
+
+/**
+ * Pulse Beta v2 events — one row per clustered governance event.
+ *
+ * Replaces v1's per-source-record `pulse_events` table. Each row
+ * represents a single real-world event (e.g. "Niger 2023 coup")
+ * regardless of how many source records describe it.
+ *
+ * Unpublished rows (`published=false`) are pending human review per
+ * spec §5.1. Reviewer UI lands in Phase 5.7.
+ */
+export const pulseEventsV2 = pgTable(
+  "pulse_events_v2",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    eventDate: date("event_date").notNull(),
+    /** Taxonomy category from spec §3.2 (e.g. "judicial_purge") */
+    category: text("category").notNull(),
+    /** dq | rol | fnr | cc | stability */
+    dimension: text("dimension").notNull(),
+    /**
+     * low_pos | moderate_pos | high_pos |
+     * low_neg | moderate_neg | severe_neg | catastrophic_neg
+     */
+    severityTier: text("severity_tier").notNull(),
+    /** Numeric severity within the tier's range, signed */
+    severityValue: real("severity_value").notNull(),
+    /** Computed by the corroboration step, range [0, 1] */
+    corroborationConfidence: real("corroboration_confidence").notNull(),
+    /** All 3 classifier runs preserved for audit. Shape:
+     *  [{run, temp, model, category, dimension, severity, confidence, raw}, ...] */
+    classifierRuns: jsonb("classifier_runs").notNull(),
+    /** 'all' | 'two_of_three' | 'none' — drives confidence boost/penalty */
+    classifierAgreement: text("classifier_agreement").notNull(),
+    humanReviewed: boolean("human_reviewed").notNull().default(false),
+    reviewerId: text("reviewer_id"),
+    reviewNotes: text("review_notes"),
+    /** pending | approved | rejected | edited */
+    reviewStatus: text("review_status").notNull().default("pending"),
+    /** True only when classifier agreement is sufficient AND review is
+     *  not required, OR human reviewer has approved it. Score-driving. */
+    published: boolean("published").notNull().default(false),
+    headline: text("headline").notNull(),
+    description: text("description").notNull(),
+    /** RSF press freedom score for the country at classification time —
+     *  pinned for reproducibility per spec §3.5 */
+    pressFreedomScoreAtClassification: real(
+      "press_freedom_score_at_classification"
+    ),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_v2_jurisdiction_date").on(
+      table.jurisdictionId,
+      table.eventDate
+    ),
+    index("idx_pulse_v2_published").on(table.published, table.reviewStatus),
+    index("idx_pulse_v2_dimension").on(table.dimension, table.eventDate),
+  ]
+);
+
+/**
+ * Per-event source attribution. Many rows per `pulse_events_v2.id` —
+ * one for each source that contributed to the cluster. Source diversity
+ * here drives corroboration confidence per spec §2.4.
+ */
+export const pulseSources = pgTable(
+  "pulse_sources",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "cascade" })
+      .notNull(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    /** 'specialist' | 'news' — denormalized for fast aggregation */
+    sourceType: text("source_type").notNull(),
+    sourceName: text("source_name").notNull(),
+    sourceUrl: text("source_url"),
+    /** Breadcrumb back to the staging row that contributed */
+    rawEventId: uuid("raw_event_id").references(() => rawEvents.id),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    index("idx_pulse_sources_event").on(table.eventId),
+    index("idx_pulse_sources_source").on(table.sourceId),
+  ]
+);
+
+/**
+ * Current dimensional delta state per (country, dimension).
+ *
+ * Recomputed daily from all `pulse_events_v2` rows where `published=true`
+ * within the trailing 365-day window, applying category-specific decay
+ * per spec §4.1, then clamped to [-15, +10] per §4.3.
+ *
+ * One row per (jurisdictionId, dimension). Daily score script upserts.
+ */
+export const pulseDimensionalDeltas = pgTable(
+  "pulse_dimensional_deltas",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    /** dq | rol | fnr | cc | stability */
+    dimension: text("dimension").notNull(),
+    /** Clamped [-15, +10] per spec §4.3 */
+    deltaValue: real("delta_value").notNull(),
+    /** Event ids contributing non-trivially (≥0.1 abs decayed impact) */
+    contributingEventIds: uuid("contributing_event_ids").array().notNull(),
+    lastComputedAt: timestamp("last_computed_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_pulse_dim_unique").on(
+      table.jurisdictionId,
+      table.dimension
+    ),
+    index("idx_pulse_dim_jurisdiction").on(table.jurisdictionId),
+  ]
+);
+
+/**
+ * Public corrections log specific to Pulse events. Sister of
+ * `correction_log`. Disputes track event misclassification, severity
+ * miscalibration, false positives, missing events, duplicates per
+ * spec §5.4.
+ */
+export const pulseCorrections = pgTable("pulse_corrections", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  submittedAt: timestamp("submitted_at").notNull().defaultNow(),
+  /** Event under dispute — nullable if the report is "missing event" */
+  eventId: uuid("event_id").references(() => pulseEventsV2.id),
+  countryId: uuid("country_id").references(() => jurisdictions.id),
+  /**
+   * misclassification | severity | false_positive |
+   * missing_event | duplicate | other
+   */
+  category: text("category").notNull(),
+  submitterName: text("submitter_name"),
+  submitterEmail: text("submitter_email"),
+  submitterAffiliation: text("submitter_affiliation"),
+  description: text("description").notNull(),
+  /** open | in_review | resolved_corrected | resolved_no_change | rejected */
+  status: text("status").notNull().default("open"),
+  disposition: text("disposition"),
+  resolvedAt: timestamp("resolved_at"),
+  isPublic: boolean("is_public").notNull().default(true),
+  internalNotes: text("internal_notes"),
 });
