@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { correctionLog, jurisdictions } from "@/lib/db/schema";
 import { eq, desc, and } from "drizzle-orm";
 import { CorrectionsForm } from "./CorrectionsForm";
+import { EditorialPage } from "@/components/editorial/EditorialPage";
 
 export const metadata: Metadata = {
   title: "Corrections — Civica Index",
@@ -121,7 +122,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
   const totalPages = Math.ceil(totalCount / perPage);
 
   return (
-    <div className="corr-layout">
+    <EditorialPage className="corr-layout">
       <style>{`
         .corr-layout {
           max-width: 760px;
@@ -491,6 +492,6 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           full disposition within <strong>30 days</strong> of submission.
         </p>
       </section>
-    </div>
+    </EditorialPage>
   );
 }

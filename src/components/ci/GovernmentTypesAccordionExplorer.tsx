@@ -286,7 +286,7 @@ function BeeSwarm({
                     toggleRow(row.familyId);
                   }
                 }}
-                style={{ cursor: "pointer", color: "var(--color-text-35)" }}
+                style={{ cursor: "pointer", color: "var(--color-text-30)" }}
               >
                 <rect
                   x={0}
@@ -1115,7 +1115,7 @@ const CSS = `
     border: none;
     padding: 0;
     background: transparent;
-    color: var(--color-text-35);
+    color: var(--color-text-30);
     cursor: pointer;
     flex-shrink: 0;
   }

@@ -27,15 +27,24 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       return "system";
     }
   });
-  const [resolved, setResolved] = useState<"light" | "dark">("dark");
+  const [resolved, setResolved] = useState<"light" | "dark">(() => {
+    try {
+      const attr = document.documentElement.getAttribute("data-theme");
+      return attr === "light" ? "light" : "dark";
+    } catch {
+      return "dark";
+    }
+  });
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     const resolve = () => {
-      const light =
-        theme === "light" || (theme === "system" && !mq.matches);
-      document.documentElement.classList.toggle("light", light);
-      setResolved(light ? "light" : "dark");
+      const next =
+        theme === "light" || (theme === "system" && !mq.matches)
+          ? "light"
+          : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      setResolved(next);
     };
     resolve();
     mq.addEventListener("change", resolve);

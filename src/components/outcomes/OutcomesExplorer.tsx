@@ -185,7 +185,7 @@ function FilterMenu({
             background: "var(--color-card-bg)",
             border: "1px solid var(--color-card-border)",
             borderRadius: "var(--radius-sm)",
-            boxShadow: "var(--shadow-dropdown)",
+            boxShadow: "var(--shadow-dark)",
             padding: "12px",
           }}
         >

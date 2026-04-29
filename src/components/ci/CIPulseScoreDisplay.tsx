@@ -1,7 +1,25 @@
-import { ciTier } from "@/lib/ci/tiers";
+/**
+ * Civica Index + Pulse score display.
+ *
+ * Phase 5.4 cut-over — this component now renders the Beta methodology:
+ *   - Integer score (no decimals)
+ *   - 90% confidence interval beside the headline number
+ *   - A–F rank band per spec §2.6 (replaces the old 5-tier system)
+ *   - Completeness flag (full / partial / insufficient)
+ *
+ * The Pulse panel is unchanged for now — Phase 5.5/5.6 reworks it from
+ * a merged scalar into dimensional deltas. Until then it keeps the
+ * Beta pill on it so readers know the methodology is in flux.
+ */
+
+import { BAND_RANGES, type CIBand } from "@/lib/ci/bands";
 
 export interface CIScoreData {
   score: number;
+  scoreLower: number | null;
+  scoreUpper: number | null;
+  band: CIBand | string | null;
+  completenessFlag: "full" | "partial" | "insufficient" | string | null;
   rank: number | null;
   totalRanked: number | null;
   quarter: string;
@@ -30,10 +48,8 @@ function formatQuarter(quarter: string): string {
 
 function formatDateLabel(dateString: string): string {
   if (!dateString) return "Date unavailable";
-
   const parsed = new Date(dateString);
   if (Number.isNaN(parsed.getTime())) return dateString;
-
   return parsed.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -46,9 +62,36 @@ function formatPulseDelta(delta: number): string {
   return `${delta >= 0 ? "+" : ""}${delta.toFixed(1)} today`;
 }
 
+/** Pick the band row for a given letter; falls back to the F row. */
+function bandRow(letter: string | null) {
+  return (
+    BAND_RANGES.find((b) => b.letter === letter) ??
+    BAND_RANGES[BAND_RANGES.length - 1]
+  );
+}
+
+/** Map a Beta CI band → a CSS color token from the existing tier palette. */
+function bandColor(letter: string | null): string {
+  switch (letter) {
+    case "A":
+      return "var(--tier-exceptional)";
+    case "B":
+      return "var(--tier-strong)";
+    case "C":
+      return "var(--tier-mixed)";
+    case "D":
+      return "var(--tier-weak)";
+    case "E":
+      return "var(--tier-failed)";
+    case "F":
+      return "var(--tier-failed)";
+    default:
+      return "var(--color-text-40)";
+  }
+}
+
 function ProvenanceDot({ kind }: { kind: "frozen" | "live" }) {
   const isLive = kind === "live";
-
   return (
     <span
       style={{
@@ -93,9 +136,11 @@ function ScorePane({
   chip,
   provenance,
   scoreLabel,
-  tierLabel,
-  tierColor,
+  bandLetter,
+  bandLabel,
+  bandColorVar,
   scoreValue,
+  intervalLine,
   barValue,
   secondaryLine,
   footer,
@@ -104,9 +149,11 @@ function ScorePane({
   chip: string;
   provenance: "frozen" | "live";
   scoreLabel: string;
-  tierLabel: string;
-  tierColor: string;
+  bandLetter: string | null;
+  bandLabel: string;
+  bandColorVar: string;
   scoreValue: string;
+  intervalLine: string | null;
   barValue: number;
   secondaryLine: string;
   footer: string;
@@ -147,7 +194,7 @@ function ScorePane({
               fontSize: "var(--text-11)",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
-              color: "var(--color-text-35)",
+              color: "var(--color-text-30)",
             }}
           >
             {title}
@@ -167,7 +214,7 @@ function ScorePane({
             fontSize: "var(--text-10)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            color: "var(--color-text-35)",
+            color: "var(--color-text-30)",
             padding: "4px 8px",
             borderRadius: "999px",
             border: "1px solid var(--color-card-border)",
@@ -187,7 +234,7 @@ function ScorePane({
             fontSize: "clamp(64px, 11vw, 88px)",
             letterSpacing: "-0.03em",
             lineHeight: 0.88,
-            color: tierColor,
+            color: bandColorVar,
           }}
         >
           {scoreValue}
@@ -206,6 +253,22 @@ function ScorePane({
         </span>
       </div>
 
+      {/* Confidence interval — directly below the headline number. */}
+      {intervalLine ? (
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontWeight: "var(--font-weight-mono)",
+            fontSize: "var(--text-12)",
+            color: "var(--color-text-50)",
+            letterSpacing: "0.05em",
+            marginTop: -4,
+          }}
+        >
+          {intervalLine}
+        </span>
+      ) : null}
+
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <div
           style={{
@@ -223,10 +286,10 @@ function ScorePane({
               fontSize: "var(--text-11)",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
-              color: tierColor,
+              color: bandColorVar,
             }}
           >
-            {tierLabel}
+            {bandLetter ? `${bandLetter} · ${bandLabel}` : bandLabel}
           </span>
           <span
             style={{
@@ -252,7 +315,7 @@ function ScorePane({
             style={{
               width: `${Math.max(0, Math.min(barValue, 100))}%`,
               height: "100%",
-              background: tierColor,
+              background: bandColorVar,
             }}
           />
         </div>
@@ -278,32 +341,52 @@ export function CIPulseScoreDisplay({
   pulseScore,
   ciChangeText,
 }: CIPulseScoreDisplayProps) {
-  const ciTierInfo = ciScore ? ciTier(ciScore.score) : null;
-  const pulseTierInfo = pulseScore ? ciTier(pulseScore.pulseScore) : null;
+  // CI panel — Beta methodology.
+  const ciBandLetter = ciScore?.band ?? null;
+  const ciBandRow = bandRow(ciBandLetter as string | null);
+  const ciColorVar = bandColor(ciBandLetter as string | null);
 
-  const ciFooter =
-    ciScore && ciTierInfo
-      ? [
-          ciScore.rank && ciScore.totalRanked
-            ? `Rank ${ciScore.rank} of ${ciScore.totalRanked}.`
-            : null,
-          "Structural index across six weighted dimensions.",
-          ciScore.isPartial ? "Current quarter is partial." : "Updated quarterly.",
-        ]
-          .filter(Boolean)
-          .join(" ")
-      : "Composite score not available yet.";
+  const ciIntervalLine =
+    ciScore && ciScore.scoreLower != null && ciScore.scoreUpper != null
+      ? `90% CI: ${ciScore.scoreLower}–${ciScore.scoreUpper}`
+      : null;
 
-  const pulseFooter =
-    pulseScore && pulseTierInfo
-      ? [
-          `${pulseScore.activeEvents} active event${pulseScore.activeEvents === 1 ? "" : "s"} in the trailing 120 days.`,
-          `Last refresh ${formatDateLabel(pulseScore.scoreDate)}.`,
-          pulseScore.isLowConfidence ? "Low confidence." : null,
-        ]
-          .filter(Boolean)
-          .join(" ")
-      : "Pulse score not available yet.";
+  const ciFooter = ciScore
+    ? [
+        ciScore.rank && ciScore.totalRanked
+          ? `Rank ${ciScore.rank} of ${ciScore.totalRanked}.`
+          : null,
+        "Composite of four governance dimensions.",
+        ciScore.completenessFlag === "partial"
+          ? "Partial — one optional dimension missing."
+          : "Updated quarterly.",
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : "Composite score not available yet.";
+
+  // Pulse panel — still v1 merged scalar; Phase 5.5/5.6 reworks this.
+  // Map the 0–100 Pulse score onto an A–F band the same way as CI for
+  // visual consistency until the Pulse rework lands.
+  let pulseBandLetter: string | null = null;
+  if (pulseScore) {
+    const ps = pulseScore.pulseScore;
+    const matched = BAND_RANGES.find((b) => ps >= b.min && ps <= b.max);
+    pulseBandLetter = matched?.letter ?? null;
+  }
+  const pulseBandRow = bandRow(pulseBandLetter);
+  const pulseColorVar = bandColor(pulseBandLetter);
+
+  const pulseFooter = pulseScore
+    ? [
+        `${pulseScore.activeEvents} active event${pulseScore.activeEvents === 1 ? "" : "s"} in the trailing 120 days.`,
+        `Last refresh ${formatDateLabel(pulseScore.scoreDate)}.`,
+        pulseScore.isLowConfidence ? "Low confidence." : null,
+        "Pulse rework coming.",
+      ]
+        .filter(Boolean)
+        .join(" ")
+    : "Pulse score not available yet.";
 
   return (
     <section
@@ -322,14 +405,16 @@ export function CIPulseScoreDisplay({
     >
       <ScorePane
         title="Civica Index"
-        chip={ciScore ? `CI · ${formatQuarter(ciScore.quarter)}` : "CI · Pending"}
+        chip={ciScore ? `CI · ${formatQuarter(ciScore.quarter)} (Beta)` : "CI · Pending"}
         provenance="frozen"
         scoreLabel="/ 100"
-        tierLabel={ciTierInfo ? ciTierInfo.label : "Unscored"}
-        tierColor={ciTierInfo ? ciTierInfo.cssVar : "var(--color-text-40)"}
-        scoreValue={ciScore ? ciScore.score.toFixed(1) : "—"}
+        bandLetter={(ciBandLetter as string | null) ?? null}
+        bandLabel={ciBandRow.label}
+        bandColorVar={ciColorVar}
+        scoreValue={ciScore ? Math.round(ciScore.score).toString() : "—"}
+        intervalLine={ciIntervalLine}
         barValue={ciScore?.score ?? 0}
-        secondaryLine={ciChangeText ?? (ciScore?.isPartial ? "Partial quarter" : "Quarterly cadence")}
+        secondaryLine={ciChangeText ?? (ciScore?.completenessFlag === "partial" ? "Partial" : "Quarterly cadence")}
         footer={ciFooter}
       />
 
@@ -338,9 +423,11 @@ export function CIPulseScoreDisplay({
         chip="CP · Live"
         provenance="live"
         scoreLabel="/ 100"
-        tierLabel={pulseTierInfo ? pulseTierInfo.label : "Awaiting events"}
-        tierColor={pulseTierInfo ? pulseTierInfo.cssVar : "var(--color-text-40)"}
+        bandLetter={pulseBandLetter}
+        bandLabel={pulseBandRow.label}
+        bandColorVar={pulseColorVar}
         scoreValue={pulseScore ? pulseScore.pulseScore.toFixed(1) : "—"}
+        intervalLine={null}
         barValue={pulseScore?.pulseScore ?? 0}
         secondaryLine={pulseScore ? formatPulseDelta(pulseScore.eventImpact) : "Daily cadence"}
         footer={pulseFooter}

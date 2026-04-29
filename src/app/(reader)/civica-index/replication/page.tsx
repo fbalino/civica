@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Banner } from "@/components/editorial/Banner";
+import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { Pill } from "@/components/editorial/Pill";
 
 export const metadata: Metadata = {
   title: "Replication package — Civica Index",
@@ -10,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function ReplicationPage() {
   return (
-    <div className="repl-layout">
+    <EditorialPage className="repl-layout">
       <style>{`
         .repl-layout {
           max-width: 760px;
@@ -46,7 +49,7 @@ export default function ReplicationPage() {
           font-weight: var(--font-weight-mono, 500);
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: #7a5c00;
+          color: var(--color-on-warning);
           background: color-mix(in oklch, var(--color-warn) 18%, var(--color-page-bg) 82%);
           border: 1px solid var(--color-warn);
           border-radius: 3px;
@@ -172,7 +175,7 @@ export default function ReplicationPage() {
       </nav>
 
       <div className="repl-eyebrow">
-        <span className="repl-beta-pill">Coming soon</span>
+        <Pill className="repl-beta-pill" variant="warn">Coming soon</Pill>
       </div>
 
       <h1 className="repl-title">Replication package.</h1>
@@ -190,10 +193,10 @@ export default function ReplicationPage() {
         below.
       </p>
 
-      <div className="repl-status-box">
+      <Banner className="repl-status-box" variant="warn">
         <span className="repl-status-dot" />
         Status: coming at Beta launch — target Q3 2026
-      </div>
+      </Banner>
 
       <div className="repl-section-label">What will be available</div>
       <h2 className="repl-h2">Package contents</h2>
@@ -246,6 +249,6 @@ export default function ReplicationPage() {
           </div>
         </div>
       </div>
-    </div>
+    </EditorialPage>
   );
 }

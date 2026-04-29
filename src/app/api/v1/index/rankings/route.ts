@@ -25,13 +25,16 @@ export async function GET(request: Request) {
 
     const limit = Math.min(Math.max(parseInt(limitParam ?? "50", 10) || 50, 1), 250);
     const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
+    const methodologyVersion = url.searchParams.get("methodology") ?? "beta";
 
-    // Resolve the target quarter: explicit param or latest available
+    // Resolve the target quarter: explicit param or latest available for
+    // the requested methodology version.
     let quarter = quarterParam;
     if (!quarter) {
       const latest = await db
         .select({ quarter: ciCompositeScores.quarter })
         .from(ciCompositeScores)
+        .where(eq(ciCompositeScores.methodologyVersion, methodologyVersion))
         .orderBy(desc(ciCompositeScores.quarter))
         .limit(1);
       quarter = latest[0]?.quarter ?? null;
@@ -51,7 +54,10 @@ export async function GET(request: Request) {
       });
     }
 
-    const conditions = [sql`${ciCompositeScores.quarter} = ${quarter}`];
+    const conditions = [
+      sql`${ciCompositeScores.quarter} = ${quarter}`,
+      sql`${ciCompositeScores.methodologyVersion} = ${methodologyVersion}`,
+    ];
 
     if (continent) {
       conditions.push(sql`LOWER(${jurisdictions.continent}) = ${continent.toLowerCase()}`);
@@ -71,6 +77,11 @@ export async function GET(request: Request) {
       jurisdictionId: jurisdictions.id,
       rank: ciCompositeScores.rank,
       score: ciCompositeScores.score,
+      scoreLower: ciCompositeScores.scoreLower,
+      scoreUpper: ciCompositeScores.scoreUpper,
+      band: ciCompositeScores.band,
+      completenessFlag: ciCompositeScores.completenessFlag,
+      vintageLabel: ciCompositeScores.vintageLabel,
       isPartial: ciCompositeScores.isPartial,
       missingDimensions: ciCompositeScores.missingDimensions,
       methodologyVersion: ciCompositeScores.methodologyVersion,

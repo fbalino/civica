@@ -570,7 +570,7 @@ export default async function ChangelogPage({
           max-width: 1200px;
           margin: 0 auto;
           padding: 32px var(--spacing-page-x, 40px) 64px;
-          font-family: var(--font-body, var(--font-sans));
+          font-family: var(--font-body);
           color: var(--color-text-primary);
         }
         .ci-breadcrumb {
@@ -612,7 +612,7 @@ export default async function ChangelogPage({
           margin: 0;
         }
         .ci-hero-lede {
-          font-family: var(--font-body, var(--font-sans));
+          font-family: var(--font-body);
           font-size: 16px;
           color: var(--color-text-60);
           line-height: 1.6;
@@ -827,12 +827,12 @@ export default async function ChangelogPage({
           border-radius: 2px;
           line-height: 1;
         }
-        .sev-cat { background: rgba(198,90,55,0.14); color: var(--tier-failed); }
-        .sev-sev { background: rgba(230,140,65,0.14); color: var(--tier-weak); }
-        .sev-sig { background: rgba(230,180,70,0.14); color: var(--tier-mixed); }
-        .sev-mod { background: rgba(196,189,174,0.10); color: var(--color-text-50); }
-        .sev-pos { background: rgba(92,170,110,0.14); color: var(--tier-exceptional); }
-        .sev-pos-big { background: rgba(92,170,110,0.22); color: var(--tier-exceptional); }
+        .sev-cat { background: color-mix(in oklch, var(--tier-failed) 15%, transparent); color: var(--tier-failed); }
+        .sev-sev { background: color-mix(in oklch, var(--tier-weak) 15%, transparent); color: var(--tier-weak); }
+        .sev-sig { background: color-mix(in oklch, var(--tier-mixed) 15%, transparent); color: var(--tier-mixed); }
+        .sev-mod { background: color-mix(in oklch, var(--color-text-40) 12%, transparent); color: var(--color-text-50); }
+        .sev-pos { background: color-mix(in oklch, var(--tier-exceptional) 15%, transparent); color: var(--tier-exceptional); }
+        .sev-pos-big { background: color-mix(in oklch, var(--tier-exceptional) 22%, transparent); color: var(--tier-exceptional); }
 
         .event-country { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
         .event-country-inline { display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -861,7 +861,7 @@ export default async function ChangelogPage({
           margin-bottom: 4px;
         }
         .event-head {
-          font-family: var(--font-body, var(--font-sans));
+          font-family: var(--font-body);
           font-size: 14px;
           font-weight: 500;
           color: var(--color-text-primary);

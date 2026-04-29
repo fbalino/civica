@@ -65,7 +65,7 @@ export default function RootLayout({
       </head>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         <Script id="theme-init" strategy="beforeInteractive">
-          {`(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');if(t==='light'||(!t&& !window.matchMedia('(prefers-color-scheme:dark)').matches)){d.classList.add('light')}else{d.classList.remove('light')}}catch(e){}})()`}
+          {`(function(){try{var d=document.documentElement;var t=localStorage.getItem('theme');var dark=window.matchMedia('(prefers-color-scheme: dark)').matches;var r=t==='light'||(t!=='dark'&&!dark)?'light':'dark';d.setAttribute('data-theme',r)}catch(e){document.documentElement.setAttribute('data-theme','dark')}})()`}
         </Script>
         <ThemeProvider>
           <SiteHeader

@@ -7,7 +7,7 @@ import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
 export const metadata: Metadata = {
   title: "Civica Index — Global Governance Rankings",
   description:
-    "Composite governance score for every sovereign state and territory. Quarterly structural score (CI) blended with a daily event-sensitive score (CP). Six dimensions, nine datasets, transparent weights.",
+    "Composite governance score for every sovereign state and territory. Four governance dimensions, empirically-derived weights, fixed-bound normalization, 90% confidence intervals. Beta methodology — see /civica-index/methodology.",
   alternates: { canonical: "https://civicaatlas.org/civica-index" },
   openGraph: {
     title: "Civica Index — Global Governance Rankings | Civica Atlas",
@@ -60,6 +60,11 @@ function formatToday(): string {
 
 interface CIRankingRow {
   score: number;
+  scoreLower: number | null;
+  scoreUpper: number | null;
+  band: string | null;
+  completenessFlag: string | null;
+  vintageLabel: string | null;
   rank: number;
   totalRanked: number;
   isPartial: boolean;
@@ -132,9 +137,10 @@ export default async function CivicaIndexShellPage({
           </p>
           <p className="ci-hero-lede">
             The Civica Index is a composite governance score for every
-            sovereign state and territory, blending a quarterly structural
-            score (CI) with a daily event-sensitive score (CP). Six
-            dimensions. Nine datasets. Transparent weights. Citable.
+            sovereign state and territory. Four governance dimensions,
+            empirically-derived weights, fixed-bound normalization, and
+            published 90% confidence intervals. The Civica Pulse layers
+            real-time event sensitivity on top.
           </p>
 
           <div className="ci-stats-strip" role="group" aria-label="Index coverage">
@@ -153,12 +159,12 @@ export default async function CivicaIndexShellPage({
               </div>
             </div>
             <div className="ci-stat">
-              <div className="ci-stat-value">6</div>
+              <div className="ci-stat-value">4</div>
               <div className="ci-stat-label">Dimensions</div>
             </div>
             <div className="ci-stat">
-              <div className="ci-stat-value">9</div>
-              <div className="ci-stat-label">Datasets</div>
+              <div className="ci-stat-value">A–F</div>
+              <div className="ci-stat-label">Rank bands</div>
             </div>
             <div className="ci-stat">
               <div className="ci-stat-value">{formatToday()}</div>
@@ -247,25 +253,33 @@ export default async function CivicaIndexShellPage({
                         <span
                           className={`ci-lb-score-value ${tier.className}`}
                         >
-                          {r.score.toFixed(1)}
+                          {Math.round(r.score)}
                         </span>
+                        {r.scoreLower != null && r.scoreUpper != null ? (
+                          <span
+                            className="ci-lb-score-interval"
+                            title="90% confidence interval"
+                          >
+                            ({r.scoreLower}–{r.scoreUpper})
+                          </span>
+                        ) : null}
                       </div>
 
                       <div className={`ci-lb-tier ${tier.className}`} role="cell">
-                        {tier.label}
+                        {r.band ? `${r.band} · ${tier.label}` : tier.label}
                       </div>
 
                       <div className="ci-lb-dims" role="cell">
-                        {r.isPartial ? (
+                        {r.completenessFlag === "partial" ? (
                           <span
-                            title={`${r.dimensionsAvailable}/6 dimensions available`}
+                            title={`${r.dimensionsAvailable}/4 dimensions available`}
                           >
-                            {r.dimensionsAvailable}/6
+                            {r.dimensionsAvailable}/4
                             <span className="ci-dim-warn" aria-hidden="true" />
                           </span>
                         ) : (
                           <span>
-                            6/6
+                            4/4
                             <span className="ci-dim-ok" aria-hidden="true" />
                           </span>
                         )}

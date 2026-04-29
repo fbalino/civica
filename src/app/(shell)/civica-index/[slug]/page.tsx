@@ -17,31 +17,33 @@ import { CountryFlag } from "@/components/CountryFlag";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
 
+/**
+ * Phase 5.4 cut-over — display the four governance dimensions of the
+ * Beta methodology. Human Development and Stability & Security have
+ * moved to the Civica Conditions companion layer (rendered separately).
+ *
+ * Weights here MUST mirror src/lib/ci/dimensions-v2.ts; expressed as
+ * integer percentages for display.
+ */
 const DIMENSION_LABELS: Record<string, string> = {
   democratic_quality: "Democratic Quality",
   rule_of_law: "Rule of Law",
-  human_development: "Human Development",
-  freedom_rights: "Freedom & Rights",
+  freedom_rights: "Freedoms & Rights",
   corruption_control: "Corruption Control",
-  stability_security: "Stability & Security",
 };
 
 const DIMENSION_ORDER = [
   "democratic_quality",
   "rule_of_law",
-  "human_development",
   "freedom_rights",
   "corruption_control",
-  "stability_security",
 ];
 
 const DIMENSION_WEIGHTS: Record<string, number> = {
-  democratic_quality: 30,
-  rule_of_law: 20,
-  human_development: 15,
-  freedom_rights: 15,
-  corruption_control: 10,
-  stability_security: 10,
+  democratic_quality: 27,
+  rule_of_law: 26,
+  freedom_rights: 23,
+  corruption_control: 24,
 };
 
 const DIMENSION_SOURCE_LABELS: Record<string, string> = {
@@ -288,10 +290,10 @@ function DimensionScoreTable({
               className="ci-country-dim-score"
               style={{ color }}
             >
-              {score.toFixed(1)}
+              {Math.round(score)}
             </div>
             <div className="ci-country-dim-contribution">
-              contributes <strong>{contribution.toFixed(1)}</strong> pts
+              contributes <strong>{Math.round(contribution)}</strong> pts
             </div>
           </div>
         );
@@ -463,6 +465,17 @@ export default async function CICountryDetailPage({
   const ciScoreData: CIScoreData | null = composite
     ? {
         score: Number(composite.score ?? 0),
+        scoreLower:
+          composite.scoreLower != null ? Number(composite.scoreLower) : null,
+        scoreUpper:
+          composite.scoreUpper != null ? Number(composite.scoreUpper) : null,
+        band: (composite.band as string | null) ?? null,
+        completenessFlag:
+          (composite.completenessFlag as
+            | "full"
+            | "partial"
+            | "insufficient"
+            | null) ?? null,
         rank: composite.rank ?? null,
         totalRanked: composite.totalRanked ?? null,
         quarter: composite.quarter,
@@ -648,11 +661,11 @@ export default async function CICountryDetailPage({
         {dimensions.length > 0 ? (
           <section id="dimensions">
             <div className="ci-country-section-eyebrow">
-              <span>Civica Index breakdown · 6 dimensions</span>
-              <small>weights fixed · source-specific inputs</small>
+              <span>Civica Index breakdown · 4 governance dimensions</span>
+              <small>weights empirically derived · source-specific inputs</small>
             </div>
             <h2 className="ci-country-section-title">
-              How the {ciScoreData ? ciScoreData.score.toFixed(1) : "score"} is calculated.
+              How the {ciScoreData ? Math.round(ciScoreData.score) : "score"} is calculated.
             </h2>
             <DimensionScoreTable dimensions={dimensions} />
           </section>

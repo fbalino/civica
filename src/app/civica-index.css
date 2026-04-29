@@ -276,6 +276,13 @@
   line-height: 1;
   letter-spacing: -0.01em;
 }
+.ci-lb-score-interval {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-40);
+  letter-spacing: 0.02em;
+}
 .ci-lb-tier {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);

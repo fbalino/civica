@@ -92,7 +92,7 @@ function DimensionCard({
             fontSize: "var(--text-10)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            color: "var(--color-text-35)",
+            color: "var(--color-text-30)",
           }}
         >
           {meta.label}
@@ -157,7 +157,7 @@ function DimensionCard({
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-10)",
-                color: "var(--color-text-35)",
+                color: "var(--color-text-30)",
                 padding: "2px 6px",
                 border: "1px solid var(--color-card-border)",
                 borderRadius: "999px",
@@ -246,7 +246,7 @@ export async function CivicaConditionsPanel({
             fontSize: "var(--text-11)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
-            color: "var(--color-text-35)",
+            color: "var(--color-text-30)",
             margin: 0,
           }}
         >

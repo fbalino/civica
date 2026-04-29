@@ -1,119 +1,72 @@
-"use client";
-
-import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
+import { DesignSystemSwatch } from "@/components/DesignSystemSwatch";
+import { HemicycleChart } from "@/components/HemicycleChart";
 
 import "./design-system.css";
 
 const SURFACE_TOKENS = [
-  { var: "--paper", use: "Base field. Everything sits on it." },
-  { var: "--paper-2", use: "Quiet hover & zebra." },
-  { var: "--paper-3", use: "Well / mini-map ground." },
-  { var: "--ink", use: "Body type, rules, heavy UI." },
-  { var: "--ink-2", use: "Secondary type, soft buttons." },
-  { var: "--muted", use: "Captions, eyebrows, meta." },
-  { var: "--rule", use: "Hairlines, borders." },
-  { var: "--rule-2", use: "Graticules, dashed rules." },
+  { var: "--color-surface-primary", use: "Base field. Everything sits on it." },
+  { var: "--color-surface-secondary", use: "Quiet hover & zebra." },
+  { var: "--color-surface-tertiary", use: "Well / mini-map ground." },
+  { var: "--color-text-primary", use: "Body type, rules, heavy UI." },
+  { var: "--color-text-secondary", use: "Secondary type, soft buttons." },
+  { var: "--color-text-muted", use: "Captions, eyebrows, meta." },
+  { var: "--color-border-default", use: "Hairlines, borders." },
+  { var: "--color-card-border", use: "Graticules, dashed rules." },
 ];
 
 const SIGNAL_TOKENS = [
-  { var: "--accent", hex: "oklch(58% 0.14 35) · cinnabar", use: "The one live color: selection, CTAs, eyebrows." },
-  { var: "--accent-soft", hex: "accent @ 92% L", use: "Pinned banners, accent wash." },
-  { var: "--success", hex: "olive · oklch(55% 0.12 145)", use: "Passed · yes votes · stable." },
-  { var: "--warn", hex: "amber · oklch(65% 0.14 75)", use: "In committee · deadline near." },
-  { var: "--danger", hex: "brick · oklch(52% 0.18 25)", use: "Failed · nay votes · contested." },
-  { var: "--info", hex: "slate · oklch(52% 0.10 240)", use: "Procedural · abstentions." },
+  { var: "--color-accent", hex: "cinnabar", use: "The one live color: selection, CTAs, eyebrows." },
+  { var: "--color-selection", hex: "accent wash", use: "Pinned banners, accent wash." },
+  { var: "--color-status-success", hex: "olive", use: "Passed · yes votes · stable." },
+  { var: "--color-status-warning", hex: "amber", use: "In committee · deadline near." },
+  { var: "--color-status-danger", hex: "brick", use: "Failed · nay votes · contested." },
+  { var: "--color-status-info", hex: "slate", use: "Procedural · abstentions." },
 ];
 
 const MAP_TOKENS = [
-  { var: "--ocean", use: "Water & atlas ground." },
-  { var: "--land", use: "Featured countries." },
-  { var: "--land-dim", use: "Non-featured countries." },
-  { var: "--land-selected", hex: "accent", use: "Current country." },
+  { var: "--atlas-ocean", use: "Water & atlas ground." },
+  { var: "--atlas-land", use: "Featured countries." },
+  { var: "--atlas-land-dim", use: "Non-featured countries." },
+  { var: "--atlas-land-selected", hex: "accent", use: "Current country." },
 ];
 
 const SPACING = [
-  { name: "--s-1", px: 2 },
-  { name: "--s-2", px: 4 },
-  { name: "--s-3", px: 8 },
-  { name: "--s-4", px: 12 },
-  { name: "--s-5", px: 16 },
-  { name: "--s-6", px: 24 },
-  { name: "--s-7", px: 32 },
-  { name: "--s-8", px: 48 },
-  { name: "--s-9", px: 64 },
+  { name: "--space-1", px: 2 },
+  { name: "--space-2", px: 4 },
+  { name: "--space-3", px: 8 },
+  { name: "--space-4", px: 12 },
+  { name: "--space-5", px: 16 },
+  { name: "--space-6", px: 24 },
+  { name: "--space-7", px: 32 },
+  { name: "--space-8", px: 48 },
+  { name: "--space-9", px: 64 },
 ];
 
-const PARTIES = [
-  "oklch(55% 0.15 25)",
-  "oklch(55% 0.18 15)",
-  "oklch(58% 0.13 145)",
-  "oklch(60% 0.14 270)",
-  "oklch(55% 0.15 25)",
+const SAMPLE_PARTIES = [
+  { name: "Civic Alliance", seats: 46, color: "var(--gov-parl)" },
+  { name: "National Union", seats: 38, color: "var(--gov-pres)" },
+  { name: "Green List", seats: 25, color: "var(--gov-theo)" },
+  { name: "Liberal Forum", seats: 22, color: "var(--gov-semi)" },
+  { name: "Independents", seats: 19, color: "var(--color-text-40)" },
 ];
-
-function MiniHemicycle() {
-  const svgRef = useRef<SVGGElement>(null);
-  useEffect(() => {
-    const g = svgRef.current;
-    if (!g) return;
-    g.innerHTML = "";
-    const cx = 150, cy = 150;
-    const rows = 5, seatsPerRow = 30;
-    for (let r = 0; r < rows; r++) {
-      const rad = 60 + r * 15;
-      for (let i = 0; i < seatsPerRow; i++) {
-        const t = Math.PI - (i / (seatsPerRow - 1)) * Math.PI;
-        const x = cx + Math.cos(t) * rad;
-        const y = cy - Math.sin(t) * rad;
-        const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        c.setAttribute("cx", String(x));
-        c.setAttribute("cy", String(y));
-        c.setAttribute("r", "2.8");
-        c.setAttribute("fill", PARTIES[Math.floor((i / seatsPerRow) * PARTIES.length)]);
-        g.appendChild(c);
-      }
-    }
-  }, []);
-  return (
-    <svg className="hemi-demo" viewBox="0 0 300 160" style={{ display: "block", maxWidth: 300 }}>
-      <g ref={svgRef} />
-      <line x1="150" y1="150" x2="150" y2="30" stroke="var(--danger)" strokeWidth="1" strokeDasharray="4 4" />
-    </svg>
-  );
-}
 
 export default function DesignSystemPage() {
-  const [dark, setDark] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const [hexValues, setHexValues] = useState<Record<string, string>>({});
-
-  const readHex = useCallback(() => {
-    if (!rootRef.current) return;
-    const css = getComputedStyle(rootRef.current);
-    const vals: Record<string, string> = {};
-    ["paper", "paper-2", "paper-3", "ink", "ink-2", "muted", "rule", "rule-2", "ocean", "land", "land-dim"].forEach((k) => {
-      vals[k] = css.getPropertyValue("--" + k).trim();
-    });
-    setHexValues(vals);
-  }, []);
-
-  useEffect(() => {
-    readHex();
-  }, [dark, readHex]);
-
   return (
-    <div ref={rootRef} className={`ds-page${dark ? " ds-dark" : ""}`}>
+    <div className="ds-page atlas-root">
       <header className="ds-top">
         <div className="ds-brand">Civica<span className="d">.</span></div>
         <div className="ds-eyebrow">Design System · v0.1 · April 2026</div>
         <div className="ds-grow" />
-        <div className="ds-theme-toggle">
-          <button className={dark ? "" : "on"} onClick={() => setDark(false)}>Light</button>
-          <button className={dark ? "on" : ""} onClick={() => setDark(true)}>Dark</button>
-        </div>
       </header>
 
       <main className="ds-main">
+        <div className="ds-directive-banner">
+          <strong>This is the canonical look.</strong>{" "}
+          Every page on civicaatlas.org should match these tokens. See{" "}
+          <Link href="https://github.com/fbalino/civica/blob/main/DESIGN.md">DESIGN.md</Link>. No hardcoded colors, fonts, or sizes elsewhere.
+        </div>
+
         {/* 00 Foundation */}
         <section className="ds-section">
           <div className="ds-section-header">
@@ -147,7 +100,7 @@ export default function DesignSystemPage() {
                 <div className="chip" style={{ background: `var(${t.var})` }} />
                 <div className="meta">
                   <div className="nm">{t.var}</div>
-                  <div className="hex">{hexValues[t.var.replace("--", "")] || ""}</div>
+                <div className="hex">{t.var}</div>
                   <div className="use">{t.use}</div>
                 </div>
               </div>
@@ -175,7 +128,7 @@ export default function DesignSystemPage() {
                 <div className="chip" style={{ background: `var(${t.var})` }} />
                 <div className="meta">
                   <div className="nm">{t.var}</div>
-                  <div className="hex">{t.hex || hexValues[t.var.replace("--", "")] || ""}</div>
+                  <div className="hex">{t.hex || t.var}</div>
                   <div className="use">{t.use}</div>
                 </div>
               </div>
@@ -187,21 +140,21 @@ export default function DesignSystemPage() {
             <div className="ds-pair-card">
               <div className="hd">Light — default</div>
               <div className="body" style={{ background: "#f4f1ea", color: "#1a1a1a" }}>
-                <div className="slot" style={{ background: "#f4f1ea" }}>paper</div>
-                <div className="slot" style={{ background: "#ebe6d6" }}>paper-2</div>
-                <div className="slot" style={{ background: "#e2dcc8" }}>paper-3</div>
-                <div className="slot" style={{ background: "#1a1a1a", color: "#f4f1ea" }}>ink</div>
-                <div className="slot" style={{ background: "oklch(58% 0.14 35)", color: "#fff" }}>accent</div>
+                <DesignSystemSwatch label="paper" bg="#f4f1ea" />
+                <DesignSystemSwatch label="paper-2" bg="#ebe6d6" />
+                <DesignSystemSwatch label="paper-3" bg="#e2dcc8" />
+                <DesignSystemSwatch label="ink" bg="#1a1a1a" fg="#f4f1ea" />
+                <DesignSystemSwatch label="accent" bg="oklch(58% 0.14 35)" fg="#ffffff" />
               </div>
             </div>
             <div className="ds-pair-card">
               <div className="hd">Dark</div>
               <div className="body" style={{ background: "#16140f", color: "#ebe6d6" }}>
-                <div className="slot" style={{ background: "#16140f" }}>paper</div>
-                <div className="slot" style={{ background: "#221e16" }}>paper-2</div>
-                <div className="slot" style={{ background: "#2b2619" }}>paper-3</div>
-                <div className="slot" style={{ background: "#ebe6d6", color: "#16140f" }}>ink</div>
-                <div className="slot" style={{ background: "oklch(68% 0.15 35)", color: "#16140f" }}>accent</div>
+                <DesignSystemSwatch label="paper" bg="#16140f" />
+                <DesignSystemSwatch label="paper-2" bg="#221e16" />
+                <DesignSystemSwatch label="paper-3" bg="#2b2619" />
+                <DesignSystemSwatch label="ink" bg="#ebe6d6" fg="#16140f" />
+                <DesignSystemSwatch label="accent" bg="oklch(68% 0.15 35)" fg="#16140f" />
               </div>
             </div>
           </div>
@@ -357,10 +310,10 @@ export default function DesignSystemPage() {
             <div className="ds-comp">
               <h4>Status badges</h4>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" as const }}>
-                <span style={{ background: "var(--success)", color: "var(--paper)", padding: "3px 8px" }}>Passed</span>
-                <span style={{ background: "var(--warn)", color: "var(--ink)", padding: "3px 8px" }}>In committee</span>
-                <span style={{ background: "var(--danger)", color: "var(--paper)", padding: "3px 8px" }}>Failed</span>
-                <span style={{ background: "var(--info)", color: "var(--paper)", padding: "3px 8px" }}>Procedural</span>
+                <span style={{ background: "var(--success)", color: "var(--color-on-accent)", padding: "3px 8px" }}>Passed</span>
+                <span style={{ background: "var(--warn)", color: "var(--color-on-warning)", padding: "3px 8px" }}>In committee</span>
+                <span style={{ background: "var(--danger)", color: "var(--color-on-accent)", padding: "3px 8px" }}>Failed</span>
+                <span style={{ background: "var(--info)", color: "var(--color-on-accent)", padding: "3px 8px" }}>Procedural</span>
                 <span style={{ border: "1px solid var(--rule)", color: "var(--ink-2)", padding: "3px 8px" }}>Draft</span>
               </div>
             </div>
@@ -377,8 +330,43 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="ds-comp">
-              <h4>Mini hemicycle</h4>
-              <MiniHemicycle />
+              <h4>Hemicycle</h4>
+              <HemicycleChart
+                totalSeats={150}
+                parties={SAMPLE_PARTIES}
+                chamberName="Sample Country · National Assembly"
+              />
+            </div>
+          </div>
+
+          <h3 className="ds-sub" style={{ marginTop: 48 }}>Editorial primitives</h3>
+          <div className="ds-comp-grid">
+            <div className="ds-comp">
+              <h4>SourceDot</h4>
+              <p style={{ fontFamily: "var(--sans)", fontSize: 14, color: "var(--ink-2)", margin: 0 }}>
+                Every data point carries live or frozen provenance.
+              </p>
+            </div>
+            <div className="ds-comp">
+              <h4>Pill / Badge</h4>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span className="ds-chip on">Exceptional</span>
+                <span className="ds-chip">Warning</span>
+                <span className="ds-chip">Live</span>
+              </div>
+            </div>
+            <div className="ds-comp">
+              <h4>Banner / Alert</h4>
+              <div className="ds-directive-banner" style={{ margin: 0, boxShadow: "none" }}>
+                Methodology in active development.
+              </div>
+            </div>
+            <div className="ds-comp">
+              <h4>Section header</h4>
+              <div className="ds-section-header" style={{ margin: 0 }}>
+                <span className="num">Evidence</span>
+                <h2 style={{ fontSize: "var(--text-28)" }}>Readable structure.</h2>
+              </div>
             </div>
           </div>
 

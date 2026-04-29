@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Banner } from "@/components/editorial/Banner";
+import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { getCIMethodology, getCIMethodologyHistory } from "@/lib/db/queries";
 
 export const metadata: Metadata = {
@@ -143,7 +145,7 @@ export default async function MethodologyPage() {
     : "Apr 2026";
 
   return (
-    <div className="civica-methodology-layout">
+    <EditorialPage className="civica-methodology-layout">
       <aside className="meth-toc" aria-label="On this page">
         <div className="meth-toc-label">On this page</div>
         <ol className="meth-toc-list">
@@ -172,7 +174,7 @@ export default async function MethodologyPage() {
           <span>Cut-over target Sept 30, 2026</span>
         </div>
 
-        <div className="meth-rebuild-banner" role="note">
+        <Banner className="meth-rebuild-banner" variant="warn">
           <strong>Beta.</strong> The methodology described on this page
           is in active development. Civica&rsquo;s published scores
           will be republished under these rules at cut-over (target
@@ -180,7 +182,7 @@ export default async function MethodologyPage() {
           analysis, source-substitution sensitivity testing, and the
           PCA appendix — are still being finalized; the dimension
           weights below are provisional.
-        </div>
+        </Banner>
 
         <p className="abstract">
           The Civica Index measures the quality of governing
@@ -1020,7 +1022,7 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           font-family: var(--font-mono);
           font-weight: var(--font-weight-mono, 500);
           font-size: 11px;
-          color: #16140f;
+          color: var(--color-text-primary);
           min-width: 80px;
           border-right: 1px solid rgba(0,0,0,0.2);
         }
@@ -1050,7 +1052,7 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
         }
         .band-cell {
           padding: 12px 18px;
-          color: #16140f;
+          color: var(--color-text-primary);
           display: flex;
           align-items: baseline;
           gap: 16px;
@@ -1134,6 +1136,6 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           }
         }
       `}</style>
-    </div>
+    </EditorialPage>
   );
 }

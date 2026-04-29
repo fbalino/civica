@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { EditorialPage } from "@/components/editorial/EditorialPage";
 
 export const metadata: Metadata = {
   title: "PCA appendix — Civica Index methodology",
@@ -127,7 +128,7 @@ const CORRELATIONS: CorrRow[] = [
 
 export default function PcaAppendixPage() {
   return (
-    <div className="pca-layout">
+    <EditorialPage className="pca-layout">
       <article className="pca-article">
         <nav className="breadcrumb">
           <Link href="/civica-index">← Civica Index</Link>
@@ -682,6 +683,6 @@ export default function PcaAppendixPage() {
           .pca-article h2 { font-size: 24px; }
         }
       `}</style>
-    </div>
+    </EditorialPage>
   );
 }

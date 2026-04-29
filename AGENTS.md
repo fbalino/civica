@@ -5,6 +5,13 @@ Civica is a modern, visual replacement for the CIA World Factbook — an interac
 
 Domain: `civicaatlas.org`.
 
+## Design system is non-negotiable
+- Read [DESIGN.md](DESIGN.md) before any UI work.
+- No hardcoded hex / rgb / rgba / oklch in component code or page CSS — use `var(--color-*)`. Hex literals are only allowed inside `:root` token-definition blocks and inside `<DesignSystemSwatch>`.
+- No hardcoded `font-family`, `font-size` in px, or padding/margin magic numbers in new UI — use `--font-*`, `--text-*`, and `--space-*`.
+- New pages must build on shared primitives: `<EditorialPage>`, `<SectionHeader>`, `<Banner>`, `<Pill>`, `<DataTable>`, and `<SourceDot>`.
+- The `/design-system` page is the only source of canonical visuals. If your page does not look like a piece of `/design-system`, it is wrong.
+
 ## North stars
 - **Design system is canonical.** Before creating any new page or component, consult [`/design-system`](https://www.civicaatlas.org/design-system). Any styling that drifts from those tokens is a bug.
 - **Civica Index and Civica Pulse are the product.** Everything else (countries, elections, compare, outcomes) is evidence for them. When in doubt, make features reinforce that identity.
