@@ -1,0 +1,469 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { Pill } from "@/components/editorial/Pill";
+import { SourceDot } from "@/components/SourceDot";
+import {
+  getPulseReviewEvent,
+  getPulseReviewAuditTrail,
+} from "@/lib/db/queries-pulse-review";
+import { EVENT_CATEGORIES } from "@/lib/pulse/v2/taxonomy";
+import { PULSE_DIMENSIONS } from "@/lib/pulse/v2/types";
+
+export const metadata: Metadata = {
+  title: "Review event — Civica admin",
+  robots: { index: false, follow: false },
+};
+
+const DIMENSION_LABELS: Record<string, string> = {
+  democratic_quality: "Democratic Quality",
+  rule_of_law: "Rule of Law",
+  freedom_rights: "Rights & Freedoms",
+  corruption_control: "Corruption Control",
+  stability: "Stability",
+};
+
+const SEVERITY_TIERS = [
+  "low_pos",
+  "moderate_pos",
+  "high_pos",
+  "low_neg",
+  "moderate_neg",
+  "severe_neg",
+  "catastrophic_neg",
+] as const;
+
+const SEVERITY_LABELS: Record<string, string> = {
+  low_pos: "Low + (1 to 2)",
+  moderate_pos: "Moderate + (3 to 4)",
+  high_pos: "High + (5 to 6)",
+  low_neg: "Low − (-1 to -2)",
+  moderate_neg: "Moderate − (-3 to -4)",
+  severe_neg: "Severe − (-5 to -7)",
+  catastrophic_neg: "Catastrophic − (-8 to -10)",
+};
+
+const ACTION_LABELS: Record<string, string> = {
+  approve: "Approved",
+  edit: "Edited + approved",
+  reject: "Rejected",
+};
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+function formatDate(d: string): string {
+  const dt = new Date(d);
+  if (Number.isNaN(dt.getTime())) return d;
+  return dt.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+export default async function PulseReviewDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  const event = await getPulseReviewEvent(id);
+  if (!event) notFound();
+
+  const auditTrail = await getPulseReviewAuditTrail(id);
+
+  return (
+    <EditorialPage width="wide">
+      <nav className="editorial-breadcrumbs">
+        <Link href="/admin/pulse-review">← Review queue</Link>
+      </nav>
+
+      <h1 className="editorial-page-title" style={{ fontSize: "var(--text-32)" }}>
+        {event.country.name} — {event.headline}
+      </h1>
+
+      <p className="editorial-page-meta" style={{ marginBottom: 16 }}>
+        <span>Event date {event.eventDate}</span>
+        <span>·</span>
+        <span>Country: {event.country.name}</span>
+        {event.country.iso3 ? (
+          <>
+            <span>·</span>
+            <span>{event.country.iso3}</span>
+          </>
+        ) : null}
+        <span>·</span>
+        <span>Status: {event.reviewStatus}</span>
+        <span>·</span>
+        <span>Published: {event.published ? "yes" : "no"}</span>
+      </p>
+
+      <div
+        style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 24 }}
+      >
+        <Pill>{DIMENSION_LABELS[event.dimension] ?? event.dimension}</Pill>
+        <Pill
+          variant={event.severityValue < 0 ? "danger" : "success"}
+        >
+          {event.severityTier} ·{" "}
+          {event.severityValue > 0
+            ? `+${event.severityValue}`
+            : event.severityValue}
+        </Pill>
+        {event.classifierAgreement === "all" ? (
+          <Pill variant="success">Classifier 3/3 agree</Pill>
+        ) : event.classifierAgreement === "two_of_three" ? (
+          <Pill>Classifier 2/3 agree</Pill>
+        ) : (
+          <Pill variant="warn">Classifier no consensus</Pill>
+        )}
+        <Pill>
+          Confidence {(event.corroborationConfidence ?? 0).toFixed(2)}
+        </Pill>
+        {event.pressFreedomScoreAtClassification != null ? (
+          <Pill>RSF {event.pressFreedomScoreAtClassification}</Pill>
+        ) : null}
+      </div>
+
+      <section className="editorial-section">
+        <h2>Description</h2>
+        <p style={{ whiteSpace: "pre-wrap" }}>{event.description}</p>
+      </section>
+
+      <section className="editorial-section">
+        <h2>Sources</h2>
+        <ul>
+          {event.sources.map((src, i) => (
+            <li key={i}>
+              <SourceDot source={src.sourceId} retrievedAt={null} /> ·{" "}
+              <strong>{src.sourceName}</strong> ({src.sourceType})
+              {src.sourceUrl ? (
+                <>
+                  {" — "}
+                  <a
+                    href={src.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    open ↗
+                  </a>
+                </>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="editorial-section">
+        <h2>Classifier runs</h2>
+        <p>
+          Three independent passes at temperatures 0.0, 0.4, and 0.8.
+          Per-run output is preserved verbatim for audit.
+        </p>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 12,
+            marginTop: 16,
+          }}
+        >
+          {event.classifierRuns.map((run) => (
+            <div
+              key={run.run}
+              style={{
+                background: "var(--color-card-bg)",
+                border: "1px solid var(--color-card-border)",
+                borderRadius: "var(--radius-md)",
+                padding: "12px 14px",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-11)",
+                  color: "var(--color-text-40)",
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  marginBottom: 6,
+                }}
+              >
+                Run {run.run} · temp {run.temp}
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-13)",
+                  color: "var(--color-text-primary)",
+                  marginBottom: 4,
+                }}
+              >
+                <strong>{run.category}</strong> · {run.dimension} ·{" "}
+                {run.severityTier} ({run.severityValue >= 0 ? "+" : ""}
+                {run.severityValue})
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-13)",
+                  color: "var(--color-text-60)",
+                  lineHeight: 1.5,
+                }}
+              >
+                {run.rationale}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="editorial-section">
+        <h2>Decision</h2>
+        <p>
+          Approve as-is, edit the classification before approving, or
+          reject the event. Rejection keeps the row in the audit trail
+          but excludes it from scoring.
+        </p>
+
+        <form
+          action={`/api/admin/pulse-review/${event.id}`}
+          method="post"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "auto 1fr",
+            gap: 12,
+            alignItems: "center",
+            background: "var(--color-card-bg)",
+            border: "1px solid var(--color-card-border)",
+            borderRadius: "var(--radius-md)",
+            padding: 20,
+            marginTop: 16,
+          }}
+        >
+          <input
+            type="hidden"
+            name="redirect"
+            value="/admin/pulse-review"
+          />
+
+          <label htmlFor="category" style={labelStyle}>
+            Category
+          </label>
+          <select
+            id="category"
+            name="category"
+            defaultValue={event.category}
+            style={inputStyle}
+          >
+            {EVENT_CATEGORIES.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.label} ({c.id})
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="dimension" style={labelStyle}>
+            Dimension
+          </label>
+          <select
+            id="dimension"
+            name="dimension"
+            defaultValue={event.dimension}
+            style={inputStyle}
+          >
+            {PULSE_DIMENSIONS.map((d) => (
+              <option key={d} value={d}>
+                {DIMENSION_LABELS[d]}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="severityTier" style={labelStyle}>
+            Severity tier
+          </label>
+          <select
+            id="severityTier"
+            name="severityTier"
+            defaultValue={event.severityTier}
+            style={inputStyle}
+          >
+            {SEVERITY_TIERS.map((t) => (
+              <option key={t} value={t}>
+                {SEVERITY_LABELS[t]}
+              </option>
+            ))}
+          </select>
+
+          <label htmlFor="severityValue" style={labelStyle}>
+            Severity value
+          </label>
+          <input
+            id="severityValue"
+            name="severityValue"
+            type="number"
+            min={-10}
+            max={10}
+            step={1}
+            defaultValue={event.severityValue}
+            style={inputStyle}
+          />
+
+          <label htmlFor="notes" style={labelStyle}>
+            Reviewer notes
+          </label>
+          <textarea
+            id="notes"
+            name="notes"
+            rows={3}
+            defaultValue={event.reviewNotes ?? ""}
+            placeholder="Optional rationale for the decision."
+            style={{
+              ...inputStyle,
+              resize: "vertical",
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-13)",
+            }}
+          />
+
+          <div
+            style={{
+              gridColumn: "1 / -1",
+              display: "flex",
+              gap: 10,
+              flexWrap: "wrap",
+              marginTop: 8,
+            }}
+          >
+            <button
+              type="submit"
+              name="action"
+              value="approve"
+              style={{
+                ...buttonBase,
+                borderColor: "var(--tier-strong)",
+                background:
+                  "color-mix(in oklch, var(--tier-strong) 16%, var(--color-page-bg) 84%)",
+              }}
+            >
+              ✓ Approve as-is
+            </button>
+            <button
+              type="submit"
+              name="action"
+              value="edit"
+              style={{
+                ...buttonBase,
+                borderColor: "var(--color-accent)",
+                background:
+                  "color-mix(in oklch, var(--color-accent) 14%, var(--color-page-bg) 86%)",
+              }}
+            >
+              ✎ Save edits + approve
+            </button>
+            <button
+              type="submit"
+              name="action"
+              value="reject"
+              style={{
+                ...buttonBase,
+                borderColor: "var(--tier-failed)",
+                background:
+                  "color-mix(in oklch, var(--tier-failed) 14%, var(--color-page-bg) 86%)",
+              }}
+            >
+              ✕ Reject
+            </button>
+          </div>
+        </form>
+      </section>
+
+      {auditTrail.length > 0 ? (
+        <section className="editorial-section">
+          <h2>Audit trail</h2>
+          <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+            {auditTrail.map((entry) => (
+              <li
+                key={entry.id}
+                style={{
+                  background: "var(--color-card-bg)",
+                  border: "1px solid var(--color-card-border)",
+                  borderRadius: "var(--radius-md)",
+                  padding: 12,
+                  marginBottom: 8,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 8,
+                    flexWrap: "wrap",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-11)",
+                    color: "var(--color-text-40)",
+                    letterSpacing: "0.05em",
+                    marginBottom: 4,
+                  }}
+                >
+                  <span>
+                    <strong style={{ color: "var(--color-text-primary)" }}>
+                      {entry.reviewerId}
+                    </strong>{" "}
+                    · {ACTION_LABELS[entry.action] ?? entry.action}
+                  </span>
+                  <span>{formatDate(entry.createdAt)}</span>
+                </div>
+                {entry.notes ? (
+                  <p
+                    style={{
+                      margin: "4px 0",
+                      fontFamily: "var(--font-body)",
+                      fontSize: "var(--text-13)",
+                      color: "var(--color-text-60)",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {entry.notes}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </EditorialPage>
+  );
+}
+
+const labelStyle: React.CSSProperties = {
+  fontFamily: "var(--font-mono)",
+  fontSize: "var(--text-11)",
+  fontWeight: 500,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+  color: "var(--color-text-40)",
+};
+
+const inputStyle: React.CSSProperties = {
+  padding: "6px 10px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "var(--text-12)",
+  border: "1px solid var(--color-card-border)",
+  borderRadius: "var(--radius-sm)",
+  background: "var(--color-page-bg)",
+  color: "var(--color-text-primary)",
+};
+
+const buttonBase: React.CSSProperties = {
+  padding: "8px 14px",
+  fontFamily: "var(--font-mono)",
+  fontSize: "var(--text-12)",
+  fontWeight: 500,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+  border: "1px solid",
+  borderRadius: "var(--radius-sm)",
+  color: "var(--color-text-primary)",
+  cursor: "pointer",
+};
