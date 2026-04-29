@@ -318,7 +318,7 @@ export default async function ComparePage({
             ))}
             <Link href="/civica-index/methodology">Methodology →</Link>
             <span className="compare-footer-meta">
-              Civica Index v1.0 · weighted composite of 6 dimensions
+              Civica Index (Beta) · weighted composite of governance dimensions
             </span>
           </footer>
         </>

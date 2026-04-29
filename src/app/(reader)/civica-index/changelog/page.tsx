@@ -561,7 +561,7 @@ export default async function ChangelogPage({
         <Link href="/civica-index/methodology">Methodology</Link>
         <Link href="/civica-index/government-types">By government type</Link>
         <span className="footer-meta">
-          Civica Pulse v1.0 · every event logged · every score auditable
+          Civica Pulse (Beta) · every event logged · every score auditable
         </span>
       </footer>
 

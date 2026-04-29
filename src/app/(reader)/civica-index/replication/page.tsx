@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Replication package — Civica Index",
   description:
-    "Reproduce every Civica Index score from primary sources. Full methodology, codebook, processing logic, and downloadable outputs — coming at v2.0 launch.",
+    "Reproduce every Civica Index score from primary sources. Full methodology, codebook, processing logic, and downloadable outputs — coming at Beta launch.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/replication" },
 };
 
@@ -184,7 +184,7 @@ export default function ReplicationPage() {
         The Civica Index is designed to be fully reproducible. That means
         publishing not just the scores, but every formula, normalization step,
         source dataset reference, and codebook entry needed to re-derive the
-        same numbers from scratch. The replication package ships at v2.0
+        same numbers from scratch. The replication package ships at Beta
         cut-over (target: Q3 2026), once the PCA / factor analysis and
         confidence-interval work are finalized. The contents are described
         below.
@@ -192,16 +192,16 @@ export default function ReplicationPage() {
 
       <div className="repl-status-box">
         <span className="repl-status-dot" />
-        Status: coming at v2.0 launch — target Q3 2026
+        Status: coming at Beta launch — target Q3 2026
       </div>
 
       <div className="repl-section-label">What will be available</div>
       <h2 className="repl-h2">Package contents</h2>
       <ul className="repl-list">
         <li>
-          <strong>Full methodology document.</strong> An expanded version of the
-          v2.0 methodology, including worked examples, edge-case decisions, and
-          deviation log from v1.0.
+          <strong>Full methodology document.</strong> An expanded version of
+          the published methodology, including worked examples and
+          edge-case decisions.
         </li>
         <li>
           <strong>Codebook.</strong> Every variable, every source, every formula

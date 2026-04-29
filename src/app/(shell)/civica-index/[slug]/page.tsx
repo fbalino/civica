@@ -735,7 +735,7 @@ export default async function CICountryDetailPage({
               </div>
               <div className="ci-country-meta-row">
                 <span>Methodology</span>
-                <strong>{composite?.methodologyVersion ?? "v1.0"}</strong>
+                <strong>Beta</strong>
               </div>
             </div>
 

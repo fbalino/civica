@@ -3,28 +3,27 @@ import Link from "next/link";
 import { getCIMethodology, getCIMethodologyHistory } from "@/lib/db/queries";
 
 export const metadata: Metadata = {
-  title: "Civica Index Methodology v2.0 — How Governance Is Scored",
+  title: "Civica Index Methodology — How Governance Is Scored",
   description:
-    "The Civica Index v2.0 methodology: four governance dimensions, fixed-bound normalization, Monte Carlo uncertainty intervals, rank bands, and a separate Civica Conditions companion layer for human development and security. Rebuild in progress; cut-over target Q3 2026.",
+    "The Civica Index methodology: four governance dimensions, fixed-bound normalization, Monte Carlo uncertainty intervals, A–F rank bands, and a separate Civica Conditions companion layer. Beta — methodology in active development.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/methodology" },
 };
 
 const SECTIONS = [
-  { id: "rebuild", num: 1, label: "The rebuild" },
-  { id: "scale", num: 2, label: "Scale" },
-  { id: "dimensions", num: 3, label: "Dimensions" },
-  { id: "normalization", num: 4, label: "Normalization" },
-  { id: "weights", num: 5, label: "Weights" },
-  { id: "uncertainty", num: 6, label: "Uncertainty" },
-  { id: "bands", num: 7, label: "Rank bands" },
-  { id: "missing", num: 8, label: "Missing data" },
-  { id: "conditions", num: 9, label: "Conditions" },
-  { id: "gov-type", num: 10, label: "Government type" },
-  { id: "pulse", num: 11, label: "Civica Pulse" },
-  { id: "vintages", num: 12, label: "Vintages" },
-  { id: "limitations", num: 13, label: "Limitations" },
-  { id: "citation", num: 14, label: "Citation" },
-  { id: "versioning", num: 15, label: "Versioning" },
+  { id: "scale", num: 1, label: "Scale" },
+  { id: "dimensions", num: 2, label: "Dimensions" },
+  { id: "normalization", num: 3, label: "Normalization" },
+  { id: "weights", num: 4, label: "Weights" },
+  { id: "uncertainty", num: 5, label: "Uncertainty" },
+  { id: "bands", num: 6, label: "Rank bands" },
+  { id: "missing", num: 7, label: "Missing data" },
+  { id: "conditions", num: 8, label: "Conditions" },
+  { id: "gov-type", num: 9, label: "Government type" },
+  { id: "pulse", num: 10, label: "Civica Pulse" },
+  { id: "vintages", num: 11, label: "Vintages" },
+  { id: "limitations", num: 12, label: "Limitations" },
+  { id: "citation", num: 13, label: "Citation" },
+  { id: "versioning", num: 14, label: "Versioning" },
 ];
 
 interface DimensionRow {
@@ -36,12 +35,12 @@ interface DimensionRow {
 }
 
 /**
- * v2.0 governance core — 4 dimensions. Weights are provisional until
- * PCA / factor analysis (Phase 5.3) confirms the empirical structure.
- * A 5th dimension (Administrative Capacity) is added back if and only
- * if PCA shows it's distinct from Rule of Law.
+ * Governance core — 4 dimensions. Weights are provisional until the
+ * empirical factor analysis described in the weights section confirms
+ * the structure. A 5th dimension (Administrative Capacity) is added if
+ * and only if PCA shows it's distinct from Rule of Law.
  */
-const DIMENSIONS_V2: DimensionRow[] = [
+const DIMENSIONS: DimensionRow[] = [
   {
     label: "Democratic quality",
     weight: 30,
@@ -72,9 +71,7 @@ const DIMENSIONS_V2: DimensionRow[] = [
   },
 ];
 
-/** Fixed normalization bounds, per spec §2.3. Replaces v1's observed
- * min-max approach (which created spurious movement in every score
- * whenever any country shifted in either direction). */
+/** Fixed normalization bounds — see normalization section. */
 const NORMALIZATION: Array<{
   source: string;
   native: string;
@@ -107,7 +104,7 @@ const NORMALIZATION: Array<{
   },
 ];
 
-/** Rank bands per spec §2.6. */
+/** Rank bands — see rank bands section. */
 const BANDS: Array<{
   letter: string;
   range: string;
@@ -120,39 +117,6 @@ const BANDS: Array<{
   { letter: "D", range: "40 – 54", label: "Weak", color: "var(--tier-weak)" },
   { letter: "E", range: "25 – 39", label: "Very weak", color: "var(--tier-failed)" },
   { letter: "F", range: "0 – 24", label: "Failed / authoritarian", color: "var(--tier-failed)" },
-];
-
-/** v1 → v2 fix table (spec §1.3 condensed). Drives the comparison
- * grid on this page so readers can see what changed at a glance. */
-const FIXES: Array<{ problem: string; fix: string }> = [
-  {
-    problem: "Min-max normalization against shifting global extremes — every score moved when any country moved",
-    fix: "Fixed theoretical bounds per source; scores are stable across time",
-  },
-  {
-    problem: "Six dimensions with asserted weights, high overlap between them",
-    fix: "Four-dimension governance core; weights determined empirically by factor analysis",
-  },
-  {
-    problem: "Human Development and Security baked into the governance score, mixing institutions with material outcomes",
-    fix: "Moved to a separate Civica Conditions companion layer, never merged into the headline",
-  },
-  {
-    problem: "Single-decimal point estimates implying a precision the data does not support",
-    fix: "Integer scores published with explicit 90% confidence intervals and rank bands",
-  },
-  {
-    problem: "Missing-data re-proportioning that biased fragile states upward",
-    fix: "Mandatory dimensions; partial scores flagged visually; some countries simply show no CI",
-  },
-  {
-    problem: "No provision for citation stability when the methodology improves",
-    fix: "Dual historical series — frozen as-published vintages plus a harmonized back-cast for researchers",
-  },
-  {
-    problem: "Government-type modifier whose role inside the formula was internally contradictory",
-    fix: "Removed from scoring entirely; published as descriptive analysis on a separate page",
-  },
 ];
 
 function formatDate(d: Date | string): string {
@@ -174,8 +138,7 @@ export default async function MethodologyPage() {
     // DB not seeded
   }
 
-  const liveVersion = methodology?.id ?? "1.0";
-  const livePublished = methodology?.publishedAt
+  const lastRevision = methodology?.publishedAt
     ? formatDate(methodology.publishedAt)
     : "Apr 2026";
 
@@ -202,24 +165,21 @@ export default async function MethodologyPage() {
         </nav>
         <h1 className="page-title">The Civica Index methodology.</h1>
         <div className="page-meta">
-          <span>v2.0 (in active development)</span>
+          <span>Beta — methodology in active development</span>
           <span className="dim">·</span>
-          <span>Apr 2026</span>
+          <span>{lastRevision}</span>
           <span className="dim">·</span>
           <span>Cut-over target Sept 30, 2026</span>
         </div>
 
         <div className="meth-rebuild-banner" role="note">
-          <strong>Read this first.</strong> This page describes v2.0,
-          the methodology Civica is building toward. Live scores still
-          use{" "}
-          <Link href="/civica-index/methodology/v1">
-            v1.0 (archived)
-          </Link>{" "}
-          until cut-over (target Sept 30, 2026). The v2.0 description
-          below is the public draft — substantive details (weights,
-          factor structure, source-substitution behaviour) remain
-          provisional pending the empirical work outlined in §5.
+          <strong>Beta.</strong> The methodology described on this page
+          is in active development. Civica&rsquo;s published scores
+          will be republished under these rules at cut-over (target
+          Sept 30, 2026). Substantive details — the empirical factor
+          analysis, source-substitution sensitivity testing, and the
+          PCA appendix — are still being finalized; the dimension
+          weights below are provisional.
         </div>
 
         <p className="abstract">
@@ -231,60 +191,9 @@ export default async function MethodologyPage() {
         </p>
 
         {/* ────────────────────────────────────────────────────── */}
-        <section id="rebuild">
-          <h2>
-            <span className="num">Section 1</span>The rebuild
-          </h2>
-          <p>
-            v1.0 of the Civica Index was a composite of existing
-            governance composites — V-Dem, Freedom House, World Bank
-            WGI, Transparency International, UNDP, the Global Peace
-            Index. Useful as a quick orientation, but on review it had
-            real problems: it conflated governance with material
-            conditions, used normalization that destabilized historical
-            comparisons, asserted weights without empirical grounding,
-            and presented single-decimal scores that implied more
-            precision than the underlying data supports.
-          </p>
-          <p>
-            v2.0 fixes these systematically. Most importantly, it
-            <strong>
-              {" "}
-              repositions the Index as scoring infrastructure for the
-              atlas
-            </strong>{" "}
-            rather than the headline product. The atlas itself — the
-            comprehensive, beautifully designed reference for how every
-            country is governed — is the headline. The Index is the
-            number that powers the rankings, the country-level
-            comparisons, and the baseline that the event-sensitive{" "}
-            <Link href="/civica-index/pulse-methodology">Civica Pulse</Link>{" "}
-            modulates.
-          </p>
-
-          <h3>1.1 · What changed</h3>
-          <table className="fix-table">
-            <thead>
-              <tr>
-                <th>v1.0 problem</th>
-                <th>v2.0 fix</th>
-              </tr>
-            </thead>
-            <tbody>
-              {FIXES.map((f, i) => (
-                <tr key={i}>
-                  <td>{f.problem}</td>
-                  <td>{f.fix}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-
-        {/* ────────────────────────────────────────────────────── */}
         <section id="scale">
           <h2>
-            <span className="num">Section 2</span>Scale
+            <span className="num">Section 1</span>Scale
           </h2>
           <p>
             Every Civica Index score is an integer between 0 and 100.
@@ -299,7 +208,7 @@ export default async function MethodologyPage() {
               uncertainty of the underlying data.
             </li>
             <li>
-              <strong>A rank band</strong> — A through F, see §7. The
+              <strong>A rank band</strong> — A through F, see §6. The
               band is the primary presentation; the integer is for
               researchers and API consumers who want it.
             </li>
@@ -310,20 +219,20 @@ export default async function MethodologyPage() {
             </li>
             <li>
               <strong>A completeness flag</strong> — Full, Partial, or
-              Insufficient. See §8.
+              Insufficient. See §7.
             </li>
           </ul>
           <p>
-            Single-decimal scores like &ldquo;72.4&rdquo; are gone. The
-            underlying data is not that precise; pretending it is misleads
-            readers.
+            Scores are integers, not decimals. The underlying data is
+            not precise enough to support fractional digits, and
+            pretending otherwise misleads readers.
           </p>
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
         <section id="dimensions">
           <h2>
-            <span className="num">Section 3</span>Dimensions
+            <span className="num">Section 2</span>Dimensions
           </h2>
           <p>
             The CI measures{" "}
@@ -337,9 +246,9 @@ export default async function MethodologyPage() {
           <div
             className="weights-bar"
             role="img"
-            aria-label="v2.0 dimension weight visualization (provisional)"
+            aria-label="Dimension weight visualization (provisional)"
           >
-            {DIMENSIONS_V2.map((d) => (
+            {DIMENSIONS.map((d) => (
               <div
                 key={d.label}
                 className="weight-slice"
@@ -361,7 +270,7 @@ export default async function MethodologyPage() {
               </tr>
             </thead>
             <tbody>
-              {DIMENSIONS_V2.map((d) => (
+              {DIMENSIONS.map((d) => (
                 <tr key={d.label}>
                   <td>{d.label}</td>
                   <td className="weight-cell">{d.weight}%</td>
@@ -375,7 +284,7 @@ export default async function MethodologyPage() {
           <p>
             <strong>The weights above are provisional.</strong> Final
             weights are determined by the empirical factor analysis
-            described in §5. A fifth dimension — <em>Administrative
+            described in §4. A fifth dimension — <em>Administrative
             Capacity</em>, drawn from World Bank WGI Government
             Effectiveness and Regulatory Quality — is added if and only
             if it emerges as empirically distinct from Rule of Law in
@@ -386,16 +295,15 @@ export default async function MethodologyPage() {
         {/* ────────────────────────────────────────────────────── */}
         <section id="normalization">
           <h2>
-            <span className="num">Section 4</span>Normalization
+            <span className="num">Section 3</span>Normalization
           </h2>
           <p>
-            Every source uses a different native scale. v1.0 normalized
-            them by stretching each year&rsquo;s observed minimum and
-            maximum across 0–100 — which meant every country&rsquo;s
-            score moved whenever{" "}
-            <em>any</em> country moved, breaking longitudinal
-            comparability. v2.0 uses{" "}
-            <strong>fixed theoretical bounds</strong>:
+            Every source uses a different native scale. Civica
+            normalizes them to 0–100 using{" "}
+            <strong>fixed theoretical bounds</strong> rather than
+            observed minimums and maximums, so scores remain comparable
+            across years and aren&rsquo;t shifted by changes elsewhere
+            in the dataset:
           </p>
 
           <table>
@@ -432,12 +340,11 @@ export default async function MethodologyPage() {
         {/* ────────────────────────────────────────────────────── */}
         <section id="weights">
           <h2>
-            <span className="num">Section 5</span>Weight determination
+            <span className="num">Section 4</span>Weight determination
           </h2>
           <p>
-            Asserting weights without empirical grounding is exactly
-            what v1.0 did wrong. v2.0 derives weights from the data
-            itself, using two standard statistical techniques:
+            Weights are derived from the data itself rather than
+            asserted, using two standard statistical techniques:
           </p>
           <ul className="bullets">
             <li>
@@ -463,15 +370,15 @@ export default async function MethodologyPage() {
           <p>
             The PCA / factor analysis appendix is published alongside
             this page when the work is complete. Until then, the weights
-            in §3 are provisional scaffolding for the rebuild and are
-            clearly labelled as such on every CI display.
+            in §2 are provisional scaffolding and are clearly labelled
+            as such on every CI display.
           </p>
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
         <section id="uncertainty">
           <h2>
-            <span className="num">Section 6</span>Uncertainty intervals
+            <span className="num">Section 5</span>Uncertainty intervals
           </h2>
           <p>
             Every score publishes a 90% confidence interval. The
@@ -498,7 +405,7 @@ export default async function MethodologyPage() {
         {/* ────────────────────────────────────────────────────── */}
         <section id="bands">
           <h2>
-            <span className="num">Section 7</span>Rank bands
+            <span className="num">Section 6</span>Rank bands
           </h2>
           <p>
             The difference between rank 42 and rank 44 is, in any honest
@@ -539,13 +446,12 @@ export default async function MethodologyPage() {
         {/* ────────────────────────────────────────────────────── */}
         <section id="missing">
           <h2>
-            <span className="num">Section 8</span>Missing data
+            <span className="num">Section 7</span>Missing data
           </h2>
           <p>
-            Different countries have different data coverage. v1.0 just
-            re-proportioned the missing weight onto whatever was left,
-            which had the perverse effect of biasing fragile states
-            upward. v2.0 enforces three rules:
+            Different countries have different data coverage. Civica
+            enforces three rules to handle missing data without
+            distorting the score:
           </p>
           <ul className="bullets">
             <li>
@@ -567,12 +473,19 @@ export default async function MethodologyPage() {
               dimensions present. No flag.
             </li>
           </ul>
+          <p>
+            Re-proportioning weights to fill in missing data is
+            explicitly avoided — that approach silently biases the
+            scores of fragile states upward, since the dimensions most
+            likely to be missing are the ones that would have scored
+            lowest.
+          </p>
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
         <section id="conditions">
           <h2>
-            <span className="num">Section 9</span>Civica Conditions
+            <span className="num">Section 8</span>Civica Conditions
           </h2>
           <p>
             Human development, security, and economic stability are{" "}
@@ -585,12 +498,12 @@ export default async function MethodologyPage() {
             external factors.
           </p>
           <p>
-            v2.0 publishes these as the{" "}
+            Civica publishes these as the{" "}
             <strong>Civica Conditions</strong> companion layer at{" "}
-            <Link href="/civica-conditions">/civica-conditions</Link>{" "}
-            (formerly /outcomes). Each Conditions dimension is shown
-            separately on country pages — never merged into a single
-            number, and never combined with the CI.
+            <Link href="/civica-conditions">/civica-conditions</Link>.
+            Each Conditions dimension is shown separately on country
+            pages — never merged into a single number, and never
+            combined with the CI.
           </p>
           <table>
             <thead>
@@ -629,13 +542,16 @@ export default async function MethodologyPage() {
         {/* ────────────────────────────────────────────────────── */}
         <section id="gov-type">
           <h2>
-            <span className="num">Section 10</span>Government type analysis
+            <span className="num">Section 9</span>Government type
           </h2>
           <p>
-            v1.0 included a &ldquo;government-type modifier&rdquo; whose
-            role inside the formula was internally contradictory. v2.0
-            removes it from the scoring formula entirely. Government
-            type is descriptive metadata, not a scoring signal.
+            Government type is descriptive metadata, not a scoring
+            signal. It does not enter the CI calculation in any form.
+            Constitutional monarchies are not awarded points for being
+            constitutional monarchies; presidential republics are not
+            penalized for being presidential republics. The score
+            measures governance quality directly, regardless of the
+            constitutional shell that produces it.
           </p>
           <p>
             Empirical observation about how governance scores vary by
@@ -645,28 +561,29 @@ export default async function MethodologyPage() {
             </Link>{" "}
             — average CI per type, distribution spread, twenty-year
             trajectories. The data is presented as observation, never
-            as ranking. No type is &ldquo;better&rdquo; than another in
-            the methodology; the data simply shows what the scores look
-            like in practice.
+            as ranking.
           </p>
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
         <section id="pulse">
           <h2>
-            <span className="num">Section 11</span>Civica Pulse (Beta)
+            <span className="num">Section 10</span>Civica Pulse (Beta)
           </h2>
           <p>
             The Civica Pulse is the real-time, event-sensitive layer
-            that sits on top of the structural CI. v2.0 reworks the
-            Pulse from a single merged scalar into{" "}
+            that sits on top of the structural CI. It publishes{" "}
             <strong>dimensional deltas</strong> — separate impact values
-            on each CI dimension, with category-specific decay
-            timelines, asymmetric scoring rules to resist gaming, and
-            press-freedom-aware corroboration.
+            on each CI dimension — driven by classified events from
+            specialist feeds (ACLED, CIVICUS, RSF alerts, V-Dem pulse,
+            HRW / Amnesty) corroborated by general news. Decay is
+            category-specific: a coup persists for a year; a journalist
+            arrest decays in two months. Positive events require
+            stronger corroboration than negative events to resist
+            gaming.
           </p>
           <p>
-            The Pulse launches as a clearly labelled <em>Beta</em> —
+            The Pulse is currently a clearly labelled <em>Beta</em> —
             experimental, not yet citable as authoritative. Its
             methodology is documented in detail at{" "}
             <Link href="/civica-index/pulse-methodology">
@@ -680,7 +597,7 @@ export default async function MethodologyPage() {
         {/* ────────────────────────────────────────────────────── */}
         <section id="vintages">
           <h2>
-            <span className="num">Section 12</span>Update frequency &amp; vintages
+            <span className="num">Section 11</span>Update frequency &amp; vintages
           </h2>
           <p>
             The Civica Index updates <strong>quarterly</strong> — March,
@@ -698,9 +615,9 @@ export default async function MethodologyPage() {
             <li>
               <strong>As-published vintages.</strong> Every quarterly
               snapshot is preserved permanently. Cited values like
-              &ldquo;Civica Index 2026 Q3 (v2.0)&rdquo; resolve to that
-              frozen value forever, no matter what happens to the
-              methodology afterward.
+              &ldquo;Civica Index 2026 Q3&rdquo; resolve to that frozen
+              value forever, regardless of how the methodology evolves
+              afterward.
             </li>
             <li>
               <strong>Harmonized back-cast.</strong> Every country&rsquo;s
@@ -711,7 +628,7 @@ export default async function MethodologyPage() {
             </li>
           </ul>
           <p>
-            Both series are accessible via the API. See §14 for citation
+            Both series are accessible via the API. See §13 for citation
             format.
           </p>
         </section>
@@ -719,7 +636,7 @@ export default async function MethodologyPage() {
         {/* ────────────────────────────────────────────────────── */}
         <section id="limitations">
           <h2>
-            <span className="num">Section 13</span>Limitations
+            <span className="num">Section 12</span>Limitations
           </h2>
           <p>
             <strong>Source lag.</strong> The CI is only as current as
@@ -744,36 +661,33 @@ export default async function MethodologyPage() {
             <Link href="/civica-conditions">Civica Conditions</Link>.
           </p>
           <p>
-            <strong>Provisional weights.</strong> Until the §5 PCA work
-            completes, the weights in §3 are scaffolding. Country pages
-            and API responses indicate this status.
+            <strong>Provisional weights.</strong> Until the empirical
+            factor analysis described in §4 completes, the dimension
+            weights are scaffolding. Country pages and API responses
+            indicate this status.
           </p>
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
         <section id="citation">
           <h2>
-            <span className="num">Section 14</span>Citation
+            <span className="num">Section 13</span>Citation
           </h2>
           <p>
-            For published vintages, cite by year, quarter, and
-            methodology version:
+            For published vintages, cite by year and quarter. While the
+            Index is in Beta, include the &ldquo;Beta&rdquo; suffix:
           </p>
-          <pre className="formula">{`Civica Index 2026 Q3 (v2.0). Civica Atlas. https://civicaatlas.org/civica-index
+          <pre className="formula">{`Civica Index 2026 Q3 (Beta). Civica Atlas. https://civicaatlas.org/civica-index
 For a specific country:
-  Civica Index for [Country], 2026 Q3 (v2.0). Civica Atlas.
+  Civica Index for [Country], 2026 Q3 (Beta). Civica Atlas.
     https://civicaatlas.org/civica-index/[country-slug]`}</pre>
           <p>
-            For citation pre-cut-over, the live methodology is v1.0 —
-            cite as &ldquo;Civica Index 2026 Q2 (v1.0).&rdquo; The full
-            v1.0 methodology is preserved at{" "}
-            <Link href="/civica-index/methodology/v1">
-              /civica-index/methodology/v1
-            </Link>
-            .
+            Once the Beta exits and the Index stabilizes, the
+            &ldquo;Beta&rdquo; suffix drops; the year-quarter remains
+            the canonical citation handle.
           </p>
 
-          <h3>14.1 · API access</h3>
+          <h3>13.1 · API access</h3>
           <pre className="formula">{`GET /api/v1/index/{country_slug}
 GET /api/v1/index/rankings
 GET /api/v1/index/methodology
@@ -781,13 +695,12 @@ GET /api/v1/pulse/{country_slug}              (Beta — see Pulse spec)
 GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           <p>
             Every CI API response includes a{" "}
-            <code>meta.methodology</code> block describing the live
-            methodology version, the next version status, and the
-            cut-over target date — so machine consumers can detect the
-            rebuild programmatically.
+            <code>meta.methodology</code> block describing the
+            methodology revision date and the Beta status — so machine
+            consumers can detect the development phase programmatically.
           </p>
 
-          <h3>14.2 · Disputes &amp; corrections</h3>
+          <h3>13.2 · Disputes &amp; corrections</h3>
           <p>
             Every score is open to dispute. Submit data-error
             corrections, methodology disagreements, or Pulse event
@@ -799,7 +712,7 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
             disposition. Every dispute and outcome is logged publicly.
           </p>
 
-          <h3>14.3 · Replication</h3>
+          <h3>13.3 · Replication</h3>
           <p>
             Full codebook, processing logic, source references, and
             downloadable derived outputs at{" "}
@@ -813,43 +726,44 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
         {/* ────────────────────────────────────────────────────── */}
         <section id="versioning">
           <h2>
-            <span className="num">Section 15</span>Versioning
+            <span className="num">Section 14</span>Versioning
           </h2>
           <div className="version-strip">
             <div className="version-cell">
-              <div className="version-label">Live version</div>
-              <div className="version-value">{liveVersion}</div>
+              <div className="version-label">Status</div>
+              <div className="version-value">Beta</div>
             </div>
             <div className="version-cell">
-              <div className="version-label">Live since</div>
-              <div className="version-value">{livePublished}</div>
-            </div>
-            <div className="version-cell">
-              <div className="version-label">Next version</div>
-              <div className="version-value">2.0 (Beta)</div>
+              <div className="version-label">Last revision</div>
+              <div className="version-value">{lastRevision}</div>
             </div>
             <div className="version-cell">
               <div className="version-label">Cut-over target</div>
               <div className="version-value">Sept 30, 2026</div>
             </div>
+            <div className="version-cell">
+              <div className="version-label">Quarterly update</div>
+              <div className="version-value">Mar / Jun / Sep / Dec</div>
+            </div>
           </div>
           <p>
-            Every weight change, source change, or formula change
-            requires a new methodology version, a public changelog
-            entry, and preservation of the prior vintage. Cited values
-            from any historical vintage continue to resolve to the
-            frozen score under that vintage&rsquo;s methodology, no
-            matter how the methodology evolves afterward.
+            The methodology is versioned: every change to weights,
+            sources, or formulas creates a new methodology snapshot.
+            Vintages — the actual published scores — are frozen against
+            the methodology that produced them. Cited values resolve to
+            the original score under its original methodology,
+            regardless of how the methodology evolves afterward.
           </p>
           {history.length > 0 && (
             <>
-              <h3>Changelog</h3>
+              <h3>Revision history</h3>
               <ul className="bullets">
                 {history.map((h) => (
                   <li key={h.id}>
-                    <strong>v{h.id}</strong>
-                    {h.publishedAt ? ` — ${formatDate(h.publishedAt)}` : ""}
-                    {h.notes ? ` · ${h.notes}` : ""}
+                    <strong>
+                      {h.publishedAt ? formatDate(h.publishedAt) : "Snapshot"}
+                    </strong>
+                    {h.notes ? ` — ${h.notes}` : ""}
                   </li>
                 ))}
               </ul>
@@ -1080,10 +994,6 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           font-weight: 500;
           color: var(--color-text-primary);
           letter-spacing: -0.01em;
-        }
-        .meth-article .fix-table tbody td {
-          font-family: var(--font-sans);
-          font-size: 14px;
         }
 
         .weights-bar {
