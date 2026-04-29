@@ -177,6 +177,22 @@ const SOURCES = [
     isCommercialUseAllowed: true,
     lastSyncAt: null,
   },
+  {
+    id: "worldbank_economic",
+    name: "World Bank — Economic Stability Indicators",
+    baseUrl: "https://api.worldbank.org/v2",
+    license: "CC-BY-4.0",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "global_peace_index",
+    name: "Institute for Economics & Peace — Global Peace Index",
+    baseUrl: "https://www.visionofhumanity.org/maps/",
+    license: "non-commercial",
+    isCommercialUseAllowed: false,
+    lastSyncAt: null,
+  },
 ];
 
 const METRIC_DEFINITIONS = [

@@ -466,6 +466,30 @@ export const ciCompositeScores = pgTable(
       .notNull(),
     quarter: text("quarter").notNull(),
     score: real("score").notNull(),
+    /**
+     * Phase 5.2 — Beta methodology additions.
+     *
+     * `score_lower` and `score_upper` are the 5th and 95th percentile
+     * of the Monte Carlo simulation (10,000 sims) per spec §2.5,
+     * giving a 90% confidence interval. NULL on legacy v1.0 rows.
+     *
+     * `band` is the A–F rank band per spec §2.6. Derived from `score`.
+     *
+     * `completeness_flag` is the explicit successor to `is_partial`.
+     * Possible values: 'full' | 'partial' | 'insufficient'. The Beta
+     * methodology will not insert 'insufficient' rows (those are
+     * skipped entirely); the column allows the value for forward
+     * compatibility.
+     *
+     * `vintage_label` is the human-readable cite handle, e.g.
+     * "Civica Index 2026 Q3 (Beta)". NULL until the row becomes a
+     * frozen vintage at quarterly publication.
+     */
+    scoreLower: real("score_lower"),
+    scoreUpper: real("score_upper"),
+    band: text("band"),
+    completenessFlag: text("completeness_flag"),
+    vintageLabel: text("vintage_label"),
     rank: integer("rank"),
     totalRanked: integer("total_ranked"),
     isPartial: boolean("is_partial").notNull().default(false),
@@ -613,6 +637,51 @@ export const organizationMemberships = pgTable(
     ),
     index("idx_org_memberships_jurisdiction").on(table.jurisdictionId),
     index("idx_org_memberships_org").on(table.orgId),
+  ]
+);
+
+// --- Phase 5.2 — Civica Conditions companion layer ---
+
+/**
+ * Civica Conditions scores — material conditions companion to the CI.
+ * Three dimensions, each surfaced separately on country pages; never merged
+ * into a headline number and never combined with the CI composite.
+ *
+ * Dimensions: human_development | peace_security | economic_stability
+ */
+export const civicaConditionsScores = pgTable(
+  "civica_conditions_scores",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    /** human_development | peace_security | economic_stability */
+    dimension: text("dimension").notNull(),
+    /** Quarter string matching ci_dimension_scores.quarter, e.g. "2026-Q3" */
+    quarter: text("quarter").notNull(),
+    /** Normalized 0–100 score (higher = better) */
+    normalizedScore: real("normalized_score").notNull(),
+    /** Original native-scale value, kept for transparency */
+    rawValue: real("raw_value"),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    /** Vintage of the upstream dataset (calendar year) */
+    datasetYear: integer("dataset_year").notNull(),
+    /** Methodology version tag — "beta" during the v2 rebuild */
+    methodologyVersion: text("methodology_version").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_conditions_unique").on(
+      table.jurisdictionId,
+      table.dimension,
+      table.quarter,
+      table.methodologyVersion
+    ),
+    index("idx_conditions_quarter").on(table.quarter),
+    index("idx_conditions_jurisdiction").on(table.jurisdictionId),
   ]
 );
 

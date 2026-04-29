@@ -13,6 +13,9 @@
     "seed:sources": "tsx scripts/seed-sources.ts",
     "seed:factbook": "tsx scripts/seed-from-factbook.ts",
     "seed:ci-methodology": "tsx scripts/seed-ci-methodology.ts",
+    "seed:ci-methodology:beta": "tsx scripts/seed-ci-methodology-beta.ts",
+    "calculate:ci:v2": "tsx scripts/calculate-ci-v2.ts",
+    "report:ci:divergence": "tsx scripts/divergence-report-ci-v2.ts",
     "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
     "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
@@ -29,7 +32,11 @@
     "sync:bills:de": "tsx scripts/sync-bills-de.ts",
     "sync:bills:fr": "tsx scripts/sync-bills-fr.ts",
     "sync:bills": "npm run sync:bills:us && npm run sync:bills:uk",
-    "sync:bills:all": "npm run sync:bills:us && npm run sync:bills:uk && npm run sync:bills:ca && npm run sync:bills:br && npm run sync:bills:de && npm run sync:bills:fr"
+    "sync:bills:all": "npm run sync:bills:us && npm run sync:bills:uk && npm run sync:bills:ca && npm run sync:bills:br && npm run sync:bills:de && npm run sync:bills:fr",
+    "ingest:conditions:hdi": "tsx scripts/ingest-conditions-hdi.ts",
+    "ingest:conditions:gpi": "tsx scripts/ingest-conditions-gpi.ts",
+    "ingest:conditions:economic": "tsx scripts/ingest-conditions-economic.ts",
+    "ingest:conditions:all": "npm run ingest:conditions:hdi && npm run ingest:conditions:gpi && npm run ingest:conditions:economic"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
