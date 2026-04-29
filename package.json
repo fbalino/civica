@@ -36,10 +36,12 @@
     "ingest:conditions:hdi": "tsx scripts/ingest-conditions-hdi.ts",
     "ingest:conditions:gpi": "tsx scripts/ingest-conditions-gpi.ts",
     "ingest:conditions:economic": "tsx scripts/ingest-conditions-economic.ts",
-    "ingest:conditions:all": "npm run ingest:conditions:hdi && npm run ingest:conditions:gpi && npm run ingest:conditions:economic"
+    "ingest:conditions:all": "npm run ingest:conditions:hdi && npm run ingest:conditions:gpi && npm run ingest:conditions:economic",
+    "pulse:v2:cluster": "tsx scripts/sync-pulse-v2-cluster.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
+    "@huggingface/transformers": "^4.2.0",
     "@neondatabase/serverless": "^1.0.2",
     "adm-zip": "^0.5.17",
     "dotenv": "^17.4.2",
