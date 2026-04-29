@@ -35,6 +35,7 @@ import { resolvePartyColor } from "@/lib/data/party-colors";
 import { stripHtml, firstSentences, formatGovernmentType } from "@/lib/text/clean";
 import { fetchParliamentBills, getParliamentSource, type Bill } from "@/lib/data/parliament-feeds";
 import { CountryOutcomeBars } from "@/components/outcomes/CountryOutcomeBars";
+import { CivicaConditionsPanel } from "@/components/conditions/CivicaConditionsPanel";
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
@@ -131,6 +132,21 @@ export default async function CountryPage({
   const ciScore: CIScoreData | null = ciDetail?.composite
     ? {
         score: Number(ciDetail.composite.score ?? 0),
+        scoreLower:
+          ciDetail.composite.scoreLower != null
+            ? Number(ciDetail.composite.scoreLower)
+            : null,
+        scoreUpper:
+          ciDetail.composite.scoreUpper != null
+            ? Number(ciDetail.composite.scoreUpper)
+            : null,
+        band: (ciDetail.composite.band as string | null) ?? null,
+        completenessFlag:
+          (ciDetail.composite.completenessFlag as
+            | "full"
+            | "partial"
+            | "insufficient"
+            | null) ?? null,
         rank: ciDetail.composite.rank ?? null,
         totalRanked: ciDetail.composite.totalRanked ?? null,
         quarter: ciDetail.composite.quarter,
@@ -1226,6 +1242,11 @@ export default async function CountryPage({
           </div>
         </div>
       )}
+
+      {/* Civica Conditions — material conditions companion layer (spec §2.8) */}
+      <div style={{ marginBottom: 32 }}>
+        <CivicaConditionsPanel jurisdictionId={jurisdiction.id} />
+      </div>
 
       <CountryTabs tabs={tabs} />
 
