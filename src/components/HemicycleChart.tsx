@@ -65,6 +65,10 @@ function generateHemicycleDots(
   return points;
 }
 
+function svgNumber(value: number): string {
+  return Number(value.toFixed(4)).toString();
+}
+
 export function HemicycleChart({
   totalSeats,
   parties,
@@ -148,9 +152,9 @@ export function HemicycleChart({
           return (
             <circle
               key={i}
-              cx={dot.x}
-              cy={dot.y}
-              r={dotR}
+              cx={svgNumber(dot.x)}
+              cy={svgNumber(dot.y)}
+              r={svgNumber(dotR)}
               fill={party?.color ?? "var(--color-text-20)"}
             />
           );

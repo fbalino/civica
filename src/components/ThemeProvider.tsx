@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 
 type Theme = "light" | "dark" | "system";
 
@@ -18,42 +24,52 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
+function normalizeTheme(value: string | null): Theme {
+  return value === "light" || value === "dark" || value === "system"
+    ? value
+    : "system";
+}
+
+function getThemeState(): `${Theme}:light` | `${Theme}:dark` {
+  const theme = normalizeTheme(localStorage.getItem("theme"));
+  const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const resolved =
+    theme === "light" || (theme === "system" && !systemDark) ? "light" : "dark";
+  return `${theme}:${resolved}`;
+}
+
+function getServerThemeState(): `${Theme}:dark` {
+  return "system:dark";
+}
+
+function subscribeTheme(listener: () => void) {
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const notify = () => listener();
+  mq.addEventListener("change", notify);
+  window.addEventListener("storage", notify);
+  window.addEventListener("civica-theme-change", notify);
+  return () => {
+    mq.removeEventListener("change", notify);
+    window.removeEventListener("storage", notify);
+    window.removeEventListener("civica-theme-change", notify);
+  };
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    try {
-      const saved = localStorage.getItem("theme") as Theme | null;
-      return saved || "system";
-    } catch {
-      return "system";
-    }
-  });
-  const [resolved, setResolved] = useState<"light" | "dark">(() => {
-    try {
-      const attr = document.documentElement.getAttribute("data-theme");
-      return attr === "light" ? "light" : "dark";
-    } catch {
-      return "dark";
-    }
-  });
+  const themeState = useSyncExternalStore(
+    subscribeTheme,
+    getThemeState,
+    getServerThemeState
+  );
+  const [theme, resolved] = themeState.split(":") as [Theme, "light" | "dark"];
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const resolve = () => {
-      const next =
-        theme === "light" || (theme === "system" && !mq.matches)
-          ? "light"
-          : "dark";
-      document.documentElement.setAttribute("data-theme", next);
-      setResolved(next);
-    };
-    resolve();
-    mq.addEventListener("change", resolve);
-    return () => mq.removeEventListener("change", resolve);
-  }, [theme]);
+    document.documentElement.setAttribute("data-theme", resolved);
+  }, [resolved]);
 
   const setTheme = (t: Theme) => {
-    setThemeState(t);
     localStorage.setItem("theme", t);
+    window.dispatchEvent(new Event("civica-theme-change"));
   };
 
   return (
