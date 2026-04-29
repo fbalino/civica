@@ -3,23 +3,28 @@ import Link from "next/link";
 import { getCIMethodology, getCIMethodologyHistory } from "@/lib/db/queries";
 
 export const metadata: Metadata = {
-  title: "Civica Index Methodology — How We Score Governance",
+  title: "Civica Index Methodology v2.0 — How Governance Is Scored",
   description:
-    "The Civica Index methodology: six weighted dimensions of governance quality, composite CI scoring, Civica Pulse event decay, data sources, and limitations.",
+    "The Civica Index v2.0 methodology: four governance dimensions, fixed-bound normalization, Monte Carlo uncertainty intervals, rank bands, and a separate Civica Conditions companion layer for human development and security. Rebuild in progress; cut-over target Q3 2026.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/methodology" },
 };
 
 const SECTIONS = [
-  { id: "purpose", num: 1, label: "Purpose" },
+  { id: "rebuild", num: 1, label: "The rebuild" },
   { id: "scale", num: 2, label: "Scale" },
-  { id: "ci", num: 3, label: "Civica Index (CI)" },
-  { id: "cp", num: 4, label: "Civica Pulse (CP)" },
-  { id: "gov-modifier", num: 5, label: "Government modifier" },
-  { id: "government-taxonomy", num: 6, label: "Government taxonomy" },
-  { id: "limitations", num: 7, label: "Limitations" },
-  { id: "citation", num: 8, label: "Publication & citation" },
-  { id: "site", num: 9, label: "Site integration" },
-  { id: "versioning", num: 10, label: "Versioning" },
+  { id: "dimensions", num: 3, label: "Dimensions" },
+  { id: "normalization", num: 4, label: "Normalization" },
+  { id: "weights", num: 5, label: "Weights" },
+  { id: "uncertainty", num: 6, label: "Uncertainty" },
+  { id: "bands", num: 7, label: "Rank bands" },
+  { id: "missing", num: 8, label: "Missing data" },
+  { id: "conditions", num: 9, label: "Conditions" },
+  { id: "gov-type", num: 10, label: "Government type" },
+  { id: "pulse", num: 11, label: "Civica Pulse" },
+  { id: "vintages", num: 12, label: "Vintages" },
+  { id: "limitations", num: 13, label: "Limitations" },
+  { id: "citation", num: 14, label: "Citation" },
+  { id: "versioning", num: 15, label: "Versioning" },
 ];
 
 interface DimensionRow {
@@ -30,106 +35,123 @@ interface DimensionRow {
   secondary: string;
 }
 
-const DIMENSIONS: DimensionRow[] = [
+/**
+ * v2.0 governance core — 4 dimensions. Weights are provisional until
+ * PCA / factor analysis (Phase 5.3) confirms the empirical structure.
+ * A 5th dimension (Administrative Capacity) is added back if and only
+ * if PCA shows it's distinct from Rule of Law.
+ */
+const DIMENSIONS_V2: DimensionRow[] = [
   {
     label: "Democratic quality",
     weight: 30,
     tierVar: "var(--tier-exceptional)",
-    primary: "V-Dem Liberal Democracy",
-    secondary: "V-Dem Polyarchy",
+    primary: "V-Dem Liberal Democracy Index",
+    secondary: "V-Dem Electoral Democracy Index",
   },
   {
-    label: "Rule of law & institutions",
-    weight: 20,
+    label: "Rule of law",
+    weight: 25,
     tierVar: "var(--tier-strong)",
-    primary: "World Bank WGI",
-    secondary: "V-Dem Rule of Law",
+    primary: "V-Dem Rule of Law",
+    secondary: "World Bank WGI Rule of Law",
   },
   {
-    label: "Human development",
-    weight: 15,
-    tierVar: "var(--tier-mixed)",
-    primary: "UNDP HDI",
-    secondary: "WB income/edu/health",
-  },
-  {
-    label: "Freedom & rights",
-    weight: 15,
+    label: "Freedoms & rights",
+    weight: 25,
     tierVar: "oklch(70% 0.13 35)",
-    primary: "Freedom in the World",
-    secondary: "RSF Press Freedom",
+    primary: "Freedom House (PR + CL combined)",
+    secondary: "RSF Press Freedom Index",
   },
   {
     label: "Corruption control",
-    weight: 10,
+    weight: 20,
     tierVar: "var(--tier-weak)",
-    primary: "Transparency Int'l CPI",
-    secondary: "WGI Control of Corruption",
-  },
-  {
-    label: "Stability & security",
-    weight: 10,
-    tierVar: "var(--tier-failed)",
-    primary: "Global Peace Index",
-    secondary: "Fragile States Index",
+    primary: "Transparency International CPI",
+    secondary: "World Bank WGI Control of Corruption",
   },
 ];
 
-interface SeverityRow {
-  score: string;
-  color: string;
-  meaning: string;
-  example: string;
-}
+/** Fixed normalization bounds, per spec §2.3. Replaces v1's observed
+ * min-max approach (which created spurious movement in every score
+ * whenever any country shifted in either direction). */
+const NORMALIZATION: Array<{
+  source: string;
+  native: string;
+  formula: string;
+}> = [
+  {
+    source: "V-Dem (libdem, polyarchy, rule)",
+    native: "0.0 – 1.0",
+    formula: "score × 100",
+  },
+  {
+    source: "World Bank WGI",
+    native: "−2.5 to +2.5",
+    formula: "((score + 2.5) / 5.0) × 100",
+  },
+  {
+    source: "Transparency International CPI",
+    native: "0 – 100",
+    formula: "score (already on target scale)",
+  },
+  {
+    source: "Freedom House (PR + CL)",
+    native: "2 – 14 (sum, inverted)",
+    formula: "((14 − score) / 12) × 100",
+  },
+  {
+    source: "RSF Press Freedom",
+    native: "0 – 100 (varies by year)",
+    formula: "see annual RSF methodology",
+  },
+];
 
-const SEVERITY_ROWS: SeverityRow[] = [
+/** Rank bands per spec §2.6. */
+const BANDS: Array<{
+  letter: string;
+  range: string;
+  label: string;
+  color: string;
+}> = [
+  { letter: "A", range: "85 – 100", label: "Exceptional", color: "var(--tier-exceptional)" },
+  { letter: "B", range: "70 – 84", label: "Strong", color: "var(--tier-strong)" },
+  { letter: "C", range: "55 – 69", label: "Mixed", color: "var(--tier-mixed)" },
+  { letter: "D", range: "40 – 54", label: "Weak", color: "var(--tier-weak)" },
+  { letter: "E", range: "25 – 39", label: "Very weak", color: "var(--tier-failed)" },
+  { letter: "F", range: "0 – 24", label: "Failed / authoritarian", color: "var(--tier-failed)" },
+];
+
+/** v1 → v2 fix table (spec §1.3 condensed). Drives the comparison
+ * grid on this page so readers can see what changed at a glance. */
+const FIXES: Array<{ problem: string; fix: string }> = [
   {
-    score: "−10",
-    color: "var(--tier-failed)",
-    meaning: "Catastrophic governance failure",
-    example: "Full-scale war, genocide, state collapse",
+    problem: "Min-max normalization against shifting global extremes — every score moved when any country moved",
+    fix: "Fixed theoretical bounds per source; scores are stable across time",
   },
   {
-    score: "−7 to −9",
-    color: "var(--tier-weak)",
-    meaning: "Severe",
-    example: "Military coup, mass civilian casualties, total media blackout",
+    problem: "Six dimensions with asserted weights, high overlap between them",
+    fix: "Four-dimension governance core; weights determined empirically by factor analysis",
   },
   {
-    score: "−4 to −6",
-    color: "var(--tier-mixed)",
-    meaning: "Significant",
-    example: "Major protest crackdown, opposition leader imprisoned",
+    problem: "Human Development and Security baked into the governance score, mixing institutions with material outcomes",
+    fix: "Moved to a separate Civica Conditions companion layer, never merged into the headline",
   },
   {
-    score: "−1 to −3",
-    color: "var(--color-text-40)",
-    meaning: "Moderate",
-    example: "Journalist arrested, minor corruption scandal",
+    problem: "Single-decimal point estimates implying a precision the data does not support",
+    fix: "Integer scores published with explicit 90% confidence intervals and rank bands",
   },
   {
-    score: "0",
-    color: "var(--color-text-40)",
-    meaning: "Neutral",
-    example: "Routine diplomatic event, sports, weather",
+    problem: "Missing-data re-proportioning that biased fragile states upward",
+    fix: "Mandatory dimensions; partial scores flagged visually; some countries simply show no CI",
   },
   {
-    score: "+1 to +3",
-    color: "var(--tier-strong)",
-    meaning: "Moderate positive",
-    example: "Minor reform, transparency improvement",
+    problem: "No provision for citation stability when the methodology improves",
+    fix: "Dual historical series — frozen as-published vintages plus a harmonized back-cast for researchers",
   },
   {
-    score: "+4 to +6",
-    color: "var(--tier-exceptional)",
-    meaning: "Significant positive",
-    example: "Anti-corruption conviction, rights expansion",
-  },
-  {
-    score: "+7 to +10",
-    color: "var(--tier-exceptional)",
-    meaning: "Transformative positive",
-    example: "Peaceful democratic transition, comprehensive peace agreement",
+    problem: "Government-type modifier whose role inside the formula was internally contradictory",
+    fix: "Removed from scoring entirely; published as descriptive analysis on a separate page",
   },
 ];
 
@@ -152,12 +174,10 @@ export default async function MethodologyPage() {
     // DB not seeded
   }
 
-  const version = methodology?.id ?? "1.0";
-  const published = methodology?.publishedAt
+  const liveVersion = methodology?.id ?? "1.0";
+  const livePublished = methodology?.publishedAt
     ? formatDate(methodology.publishedAt)
     : "Apr 2026";
-  const countriesCovered = 197;
-  const datasets = 9;
 
   return (
     <div className="civica-methodology-layout">
@@ -182,123 +202,144 @@ export default async function MethodologyPage() {
         </nav>
         <h1 className="page-title">The Civica Index methodology.</h1>
         <div className="page-meta">
-          <span>Version {version} (live)</span>
+          <span>v2.0 (in active development)</span>
           <span className="dim">·</span>
-          <span>{published}</span>
+          <span>Apr 2026</span>
           <span className="dim">·</span>
-          <span>v2.0 in active revision</span>
+          <span>Cut-over target Sept 30, 2026</span>
         </div>
 
         <div className="meth-rebuild-banner" role="note">
-          <strong>Methodology rebuild in progress.</strong> The text below
-          documents v1.0 — the live methodology. A complete revision (v2.0)
-          is being prepared, incorporating fixed-bound normalization,
-          confidence intervals, rank bands, separation of governance from
-          conditions, and a rebuilt event-sensitive Pulse layer. The
-          rebuild is in a dedicated planning document; this page will be
-          rewritten before cut-over (target Q3 2026). Until then, the v1.0
-          methodology below is the authoritative description of how every
-          published score is currently produced.
+          <strong>Read this first.</strong> This page describes v2.0,
+          the methodology Civica is building toward. Live scores still
+          use{" "}
+          <Link href="/civica-index/methodology/v1">
+            v1.0 (archived)
+          </Link>{" "}
+          until cut-over (target Sept 30, 2026). The v2.0 description
+          below is the public draft — substantive details (weights,
+          factor structure, source-substitution behaviour) remain
+          provisional pending the empirical work outlined in §5.
         </div>
 
         <p className="abstract">
-          The Civica Index is a composite governance score assigned to every
-          sovereign state — a structural score (CI) updated quarterly, and a
-          real-time Pulse (CP) updated daily from classified events.
-          Transparent sources. Fixed weights. Reproducible. Citable.
+          The Civica Index measures the quality of governing
+          institutions in every country on a 0–100 scale, with explicit
+          uncertainty, rank bands, and full transparency on sources. It
+          is the scoring layer of Civica Atlas — useful for orientation,
+          honestly presented, never oversold as definitive.
         </p>
 
-        <section id="purpose">
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="rebuild">
           <h2>
-            <span className="num">Section 1</span>Purpose
+            <span className="num">Section 1</span>The rebuild
           </h2>
           <p>
-            The Civica Index measures overall quality of governance —
-            democratic participation, institutional strength, rule of law,
-            human development, freedom, and security — through two
-            complementary scores:
+            v1.0 of the Civica Index was a composite of existing
+            governance composites — V-Dem, Freedom House, World Bank
+            WGI, Transparency International, UNDP, the Global Peace
+            Index. Useful as a quick orientation, but on review it had
+            real problems: it conflated governance with material
+            conditions, used normalization that destabilized historical
+            comparisons, asserted weights without empirical grounding,
+            and presented single-decimal scores that implied more
+            precision than the underlying data supports.
+          </p>
+          <p>
+            v2.0 fixes these systematically. Most importantly, it
+            <strong>
+              {" "}
+              repositions the Index as scoring infrastructure for the
+              atlas
+            </strong>{" "}
+            rather than the headline product. The atlas itself — the
+            comprehensive, beautifully designed reference for how every
+            country is governed — is the headline. The Index is the
+            number that powers the rankings, the country-level
+            comparisons, and the baseline that the event-sensitive{" "}
+            <Link href="/civica-index/pulse-methodology">Civica Pulse</Link>{" "}
+            modulates.
+          </p>
+
+          <h3>1.1 · What changed</h3>
+          <table className="fix-table">
+            <thead>
+              <tr>
+                <th>v1.0 problem</th>
+                <th>v2.0 fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              {FIXES.map((f, i) => (
+                <tr key={i}>
+                  <td>{f.problem}</td>
+                  <td>{f.fix}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="scale">
+          <h2>
+            <span className="num">Section 2</span>Scale
+          </h2>
+          <p>
+            Every Civica Index score is an integer between 0 and 100.
+            Higher means stronger governance institutions. Every
+            published score is accompanied by:
           </p>
           <ul className="bullets">
             <li>
-              <strong>Civica Index (CI)</strong> — structural, updated
-              quarterly; answers &ldquo;how well-governed over time?&rdquo;
+              <strong>A 90% confidence interval</strong> — e.g. &ldquo;CI
+              72 (90% CI: 68–76)&rdquo;. This is the range within which
+              the &ldquo;true&rdquo; score is likely to fall, given the
+              uncertainty of the underlying data.
             </li>
             <li>
-              <strong>Civica Pulse (CP)</strong> — event-sensitive, updated
-              daily; answers &ldquo;what&rsquo;s the state <em>right now</em>?&rdquo;
+              <strong>A rank band</strong> — A through F, see §7. The
+              band is the primary presentation; the integer is for
+              researchers and API consumers who want it.
+            </li>
+            <li>
+              <strong>A vintage / freshness timestamp</strong> per
+              underlying source. So you can see, for any score, exactly
+              how recent each upstream dataset is.
+            </li>
+            <li>
+              <strong>A completeness flag</strong> — Full, Partial, or
+              Insufficient. See §8.
             </li>
           </ul>
           <p>
-            The Index is transparent (every component traces to a public
-            source), reproducible (methodology fully documented), and citable
-            (structured for academic, journalistic, and institutional use).
+            Single-decimal scores like &ldquo;72.4&rdquo; are gone. The
+            underlying data is not that precise; pretending it is misleads
+            readers.
           </p>
         </section>
 
-        <section id="scale">
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="dimensions">
           <h2>
-            <span className="num">Section 2</span>The 0–100 scale
+            <span className="num">Section 3</span>Dimensions
           </h2>
           <p>
-            Both CI and CP are expressed on a 0–100 scale, where higher is
-            better. Five interpretive tiers:
-          </p>
-          <div
-            className="tier-scale-viz"
-            role="img"
-            aria-label="Five-tier interpretation scale"
-          >
-            <div
-              className="tier-scale-cell"
-              style={{ background: "var(--tier-failed)" }}
-            >
-              <strong>0–24</strong>Failed / authoritarian
-            </div>
-            <div
-              className="tier-scale-cell"
-              style={{ background: "var(--tier-weak)" }}
-            >
-              <strong>25–49</strong>Weak
-            </div>
-            <div
-              className="tier-scale-cell"
-              style={{ background: "var(--tier-mixed)" }}
-            >
-              <strong>50–74</strong>Mixed
-            </div>
-            <div
-              className="tier-scale-cell"
-              style={{ background: "var(--tier-strong)" }}
-            >
-              <strong>75–89</strong>Strong
-            </div>
-            <div
-              className="tier-scale-cell"
-              style={{ background: "var(--tier-exceptional)" }}
-            >
-              <strong>90–100</strong>Exceptional
-            </div>
-          </div>
-        </section>
-
-        <section id="ci">
-          <h2>
-            <span className="num">Section 3</span>Civica Index — structural
-          </h2>
-
-          <h3>3.1 · The six dimensions</h3>
-          <p>
-            The CI is a weighted composite of six dimensions, each sourced from
-            established, peer-reviewed or institutionally maintained open
-            datasets. Raw values are normalized to 0–100 before weighting:
+            The CI measures{" "}
+            <strong>governing institutions and practices</strong> — and
+            only those. Material conditions like human development,
+            security, and economic stability live on the separate{" "}
+            <a href="#conditions">Civica Conditions</a> layer. The four
+            governance dimensions:
           </p>
 
           <div
             className="weights-bar"
             role="img"
-            aria-label="Dimension weights visualization"
+            aria-label="v2.0 dimension weight visualization (provisional)"
           >
-            {DIMENSIONS.map((d) => (
+            {DIMENSIONS_V2.map((d) => (
               <div
                 key={d.label}
                 className="weight-slice"
@@ -316,11 +357,11 @@ export default async function MethodologyPage() {
                 <th>Dimension</th>
                 <th>Weight</th>
                 <th>Primary source</th>
-                <th>Secondary source</th>
+                <th>Secondary / cross-check</th>
               </tr>
             </thead>
             <tbody>
-              {DIMENSIONS.map((d) => (
+              {DIMENSIONS_V2.map((d) => (
                 <tr key={d.label}>
                   <td>{d.label}</td>
                   <td className="weight-cell">{d.weight}%</td>
@@ -331,290 +372,474 @@ export default async function MethodologyPage() {
             </tbody>
           </table>
 
-          <h3>3.2 · Normalization</h3>
           <p>
-            Each source uses a different native scale. All are normalized to
-            0–100 using min-max normalization across the full dataset of
-            countries:
-          </p>
-          <pre className="formula">{`normalized_score = ((raw_value − global_min) / (global_max − global_min)) × 100`}</pre>
-          <p>
-            For inverted scales (where lower = better, such as GPI and Freedom
-            House), the normalization is reversed.
-          </p>
-
-          <h3>3.3 · Composite</h3>
-          <pre className="formula">{`CI = (0.30 × democratic_quality)
-   + (0.20 × rule_of_law)
-   + (0.15 × human_development)
-   + (0.15 × freedom_rights)
-   + (0.10 × corruption_control)
-   + (0.10 × stability_security)`}</pre>
-
-          <h3>3.4 · Update frequency</h3>
-          <p>
-            The CI updates <strong>quarterly</strong>. Between publications, the
-            CI carries forward the most recent available value per source. The
-            CI never moves between quarterly recalculations — that&rsquo;s what
-            the Pulse is for.
-          </p>
-
-          <h3>3.5 · Missing data</h3>
-          <p>
-            If a country has no data for a dimension, that dimension is
-            excluded and remaining weights are re-proportioned to sum to 100%.
-            The CI is flagged <strong>&ldquo;partial&rdquo;</strong>. If fewer
-            than three of the six dimensions have data, no CI is calculated.
+            <strong>The weights above are provisional.</strong> Final
+            weights are determined by the empirical factor analysis
+            described in §5. A fifth dimension — <em>Administrative
+            Capacity</em>, drawn from World Bank WGI Government
+            Effectiveness and Regulatory Quality — is added if and only
+            if it emerges as empirically distinct from Rule of Law in
+            that analysis.
           </p>
         </section>
 
-        <section id="cp">
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="normalization">
           <h2>
-            <span className="num">Section 4</span>Civica Pulse — real-time
+            <span className="num">Section 4</span>Normalization
           </h2>
-
-          <h3>4.1 · Concept</h3>
           <p>
-            The Pulse starts at the country&rsquo;s current CI and is modified
-            by a real-time event impact layer:
-          </p>
-          <pre className="formula">{`CP = CI + EventImpact`}</pre>
-
-          <h3>4.2 · Event ingestion</h3>
-          <p>
-            An automated pipeline monitors global news sources daily (GDELT,
-            Google News, Reuters/AP, country gazettes). It filters for events
-            tagged to a specific country that fall within governance-relevant
-            categories.
+            Every source uses a different native scale. v1.0 normalized
+            them by stretching each year&rsquo;s observed minimum and
+            maximum across 0–100 — which meant every country&rsquo;s
+            score moved whenever{" "}
+            <em>any</em> country moved, breaking longitudinal
+            comparability. v2.0 uses{" "}
+            <strong>fixed theoretical bounds</strong>:
           </p>
 
-          <h3>4.3 · Event classification</h3>
-          <p>
-            Each qualifying event is classified by an LLM agent into one of
-            twelve directional categories — from <em>armed conflict</em>{" "}
-            (negative) to <em>democratic election</em> (positive). Every score
-            is logged with category, severity, confidence, and a one-sentence
-            justification. All are published in the{" "}
-            <Link href="/civica-index/changelog">Pulse changelog</Link> for audit.
-          </p>
-
-          <h3>4.4 · Severity scale (−10 to +10)</h3>
           <table>
             <thead>
               <tr>
-                <th>Score</th>
-                <th>Meaning</th>
-                <th>Example</th>
+                <th>Source</th>
+                <th>Native scale</th>
+                <th>Transform to 0–100</th>
               </tr>
             </thead>
             <tbody>
-              {SEVERITY_ROWS.map((r) => (
-                <tr key={r.score}>
-                  <td className="weight-cell" style={{ color: r.color }}>
-                    {r.score}
-                  </td>
-                  <td>{r.meaning}</td>
-                  <td>{r.example}</td>
+              {NORMALIZATION.map((n, i) => (
+                <tr key={i}>
+                  <td>{n.source}</td>
+                  <td>{n.native}</td>
+                  <td className="weight-cell">{n.formula}</td>
                 </tr>
               ))}
             </tbody>
           </table>
 
-          <h3>4.5 · Temporal decay</h3>
           <p>
-            Events lose influence over time. The decay is exponential with a{" "}
-            <strong>30-day half-life</strong>:
-          </p>
-          <pre className="formula">{`decayed_impact = severity × confidence × e^(−0.693 × days / 30)`}</pre>
-          <p>
-            An event from today counts 100%. From 30 days ago, 50%. From 60
-            days, 25%. From 90 days, 12.5%. From 120+ days, negligible
-            (&lt;6%).
-          </p>
-
-          <h3>4.6 · Aggregation and clamp</h3>
-          <pre className="formula">{`EventImpact = Σ (severity × confidence × e^(−0.693 × days / 30))
-CP          = clamp(CI + clamp(EventImpact, −30, +30), 0, 100)`}</pre>
-          <p>
-            The ±30-point cap on EventImpact prevents a single catastrophic
-            event from completely overriding years of structural data.
-          </p>
-
-          <h3>4.7 · Update frequency</h3>
-          <p>
-            The Pulse recomputes <strong>daily</strong>. Every Pulse movement
-            comes with a public changelog entry showing every contributing
-            event, its category, severity, confidence, and justification.
+            For sources without natural theoretical bounds, the
+            methodology uses an{" "}
+            <strong>anchored z-score transform</strong>: compute z-scores
+            against the global distribution of a fixed reference period
+            (2020–2024), then convert via the cumulative normal
+            distribution to 0–100. The reference period, mean, and
+            standard deviation are documented and frozen — never
+            re-anchored — so historical scores remain comparable.
           </p>
         </section>
 
-        <section id="gov-modifier">
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="weights">
           <h2>
-            <span className="num">Section 5</span>Government-type modifier
+            <span className="num">Section 5</span>Weight determination
           </h2>
           <p>
-            The CI does <strong>not</strong> apply a fixed bonus or penalty per
-            government type. Instead, the site publishes an empirical
-            observation layer —{" "}
-            <Link href="/civica-index/government-types">
-              Governance Outcomes by Government Type
-            </Link>{" "}
-            — showing average CI, distribution spread, and 20-year trajectories
-            for each category. The data speaks for itself.
-          </p>
-        </section>
-
-        <section id="government-taxonomy">
-          <h2>
-            <span className="num">Section 6</span>Government taxonomy layers
-          </h2>
-          <p>
-            Civica now keeps <strong>three separate government labels</strong>
-            for each country so the site can stay academically honest without
-            flattening unlike systems into one bucket.
+            Asserting weights without empirical grounding is exactly
+            what v1.0 did wrong. v2.0 derives weights from the data
+            itself, using two standard statistical techniques:
           </p>
           <ul className="bullets">
             <li>
-              <strong>Raw source label.</strong> The CIA World Factbook wording
-              is preserved exactly for provenance.
+              <strong>Principal component analysis (PCA)</strong> on the
+              full country-year panel of normalized indicators (V-Dem
+              components, WGI, CPI, Freedom House, RSF) for 2000–2024.
+              PCA tells us how many genuinely distinct dimensions exist
+              in the data.
             </li>
             <li>
-              <strong>Normalized regime type.</strong> Bjornskov-Rode / CGV
-              coding tracks executive-legislative accountability in the
-              parliamentary / semi-presidential / presidential democracy and
-              civilian / military / royal dictatorship families.
+              <strong>Factor analysis with varimax rotation</strong> to
+              map each source onto its primary latent factor. This is
+              what tells us whether Administrative Capacity is its own
+              dimension or just another face of Rule of Law.
             </li>
             <li>
-              <strong>Derived structural form.</strong> Civica derives the
-              system&apos;s constitutional form from explicit primitives such as
-              federalism, monarchy, executive structure, and government
-              dependency, with documented overrides for edge cases.
+              <strong>Source-substitution sensitivity testing</strong>:
+              swap each primary source for its secondary, recompute, and
+              confirm that scores stay stable within their published
+              uncertainty intervals.
             </li>
           </ul>
           <p>
-            These layers are <strong>classification metadata only</strong>.
-            They do not change CI weights, dimension scores, or the composite
-            formula. Their purpose is interpretive: to help readers compare
-            systems without mistaking structural form for a scoring bonus.
-          </p>
-          <p>
-            Switzerland is a useful example of why the layers stay separate:
-            BR/CGV codes it as a <em>presidential democracy</em> in the
-            accountability sense, while Civica&apos;s structural layer exposes its
-            <em>federal directorial republic</em> form. Both statements are
-            true, and the disagreement is informative rather than an error.
+            The PCA / factor analysis appendix is published alongside
+            this page when the work is complete. Until then, the weights
+            in §3 are provisional scaffolding for the rebuild and are
+            clearly labelled as such on every CI display.
           </p>
         </section>
 
-        <section id="limitations">
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="uncertainty">
           <h2>
-            <span className="num">Section 7</span>Data quality &amp; limitations
+            <span className="num">Section 6</span>Uncertainty intervals
           </h2>
           <p>
-            <strong>Known limitations.</strong> The CI is only as current as its
-            slowest-updating source (some indices publish 12–18 months behind).
-            Pulse event scoring relies on LLM judgment, which may exhibit
-            biases in event selection or severity. Countries with limited media
-            coverage will have fewer detected events, potentially making their
-            Pulse artificially stable. The ±30-point cap prevents extreme
-            scores but may understate truly catastrophic situations.
+            Every score publishes a 90% confidence interval. The
+            interval is computed via{" "}
+            <strong>Monte Carlo simulation</strong>:
           </p>
-          <p>
-            <strong>Mitigations.</strong> All LLM event scores are logged with
-            justifications for audit. A quarterly human review samples 5% of
-            scored events. The methodology is versioned; weight/source/formula
-            changes publish with a changelog. Countries with fewer than 3
-            events in 90 days are flagged <em>low-confidence</em>.
-          </p>
-        </section>
+          <pre className="formula">{`for each country:
+  for sim in 1 .. 10,000:
+    sample each indicator from its
+      published-uncertainty distribution
+    recompute the CI
 
-        <section id="citation">
-          <h2>
-            <span className="num">Section 8</span>Publication &amp; citation
-          </h2>
-          <pre className="formula">{`Civica Index ${new Date().getFullYear()}. Civica Atlas. https://civicaatlas.org/civica-index
-Civica Pulse for [Country], [Date]. Civica Atlas. https://civicaatlas.org/civica-index/[slug]`}</pre>
-
-          <h3>API access</h3>
-          <pre className="formula">{`GET https://civicaatlas.org/api/v1/index/{country_slug}
-GET https://civicaatlas.org/api/v1/pulse/{country_slug}
-GET https://civicaatlas.org/api/v1/index/rankings
-GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
+  90% CI  =  [5th percentile, 95th percentile]
+                of the 10,000 simulated CIs`}</pre>
           <p>
-            A small embeddable badge showing a country&rsquo;s CI and CP is
-            available for news organizations, blogs, and other platforms to
-            embed with attribution.
+            Most academic sources (V-Dem in particular) publish
+            uncertainty information directly. For sources that do not, a
+            conservative ±5% of the normalized range is used as the
+            indicator&rsquo;s spread. This is documented in the
+            replication package.
           </p>
         </section>
 
-        <section id="site">
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="bands">
           <h2>
-            <span className="num">Section 9</span>Site integration
+            <span className="num">Section 7</span>Rank bands
           </h2>
+          <p>
+            The difference between rank 42 and rank 44 is, in any honest
+            reading, nothing — it&rsquo;s well within the uncertainty
+            interval of either country. Civica publishes{" "}
+            <strong>rank bands</strong> instead of exact ranks as the
+            primary presentation:
+          </p>
+
+          <div
+            className="band-scale-viz"
+            role="img"
+            aria-label="Six-band interpretation scale (A–F)"
+          >
+            {BANDS.map((b) => (
+              <div
+                key={b.letter}
+                className="band-cell"
+                style={{ background: b.color }}
+              >
+                <strong>
+                  {b.letter} · {b.range}
+                </strong>
+                <small>{b.label}</small>
+              </div>
+            ))}
+          </div>
+
+          <p>
+            Country pages display the band prominently: e.g. &ldquo;CI
+            72 — Strong (B).&rdquo; Within a band, countries are sorted
+            alphabetically or by region rather than by exact integer
+            score. The exact integer remains available via the API for
+            researchers who want it.
+          </p>
+        </section>
+
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="missing">
+          <h2>
+            <span className="num">Section 8</span>Missing data
+          </h2>
+          <p>
+            Different countries have different data coverage. v1.0 just
+            re-proportioned the missing weight onto whatever was left,
+            which had the perverse effect of biasing fragile states
+            upward. v2.0 enforces three rules:
+          </p>
+          <ul className="bullets">
+            <li>
+              <strong>Mandatory dimensions.</strong> Democratic Quality
+              and Rule of Law are required. If either is missing, no CI
+              is published for that country — the page reads
+              &ldquo;Insufficient data for governance index&rdquo; with
+              an explanation of which dimensions are missing.
+            </li>
+            <li>
+              <strong>Partial CI.</strong> If the mandatory dimensions
+              are present but one of the others (Freedoms &amp; Rights
+              or Corruption Control) is missing, a partial CI is
+              published — flagged visually, with the confidence interval
+              widened by 20% to reflect the added uncertainty.
+            </li>
+            <li>
+              <strong>Complete CI.</strong> All four (or five)
+              dimensions present. No flag.
+            </li>
+          </ul>
+        </section>
+
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="conditions">
+          <h2>
+            <span className="num">Section 9</span>Civica Conditions
+          </h2>
+          <p>
+            Human development, security, and economic stability are{" "}
+            <strong>
+              not part of the Civica Index headline score
+            </strong>
+            . They are essential context for understanding a country,
+            but they measure something different — material conditions,
+            shaped by governance but also by geography, economy, and
+            external factors.
+          </p>
+          <p>
+            v2.0 publishes these as the{" "}
+            <strong>Civica Conditions</strong> companion layer at{" "}
+            <Link href="/civica-conditions">/civica-conditions</Link>{" "}
+            (formerly /outcomes). Each Conditions dimension is shown
+            separately on country pages — never merged into a single
+            number, and never combined with the CI.
+          </p>
           <table>
             <thead>
               <tr>
-                <th>Page</th>
-                <th>What it shows</th>
+                <th>Conditions dimension</th>
+                <th>Source</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>/civica-index</td>
-                <td>Global leaderboard · all countries ranked by CI or CP, filterable</td>
+                <td>Human Development</td>
+                <td>UNDP Human Development Index</td>
               </tr>
               <tr>
-                <td>/civica-index/[slug]</td>
-                <td>Country detail · dimension breakdown, Pulse changelog, history</td>
+                <td>Peace &amp; Security</td>
+                <td>Institute for Economics and Peace, Global Peace Index</td>
               </tr>
               <tr>
-                <td>/civica-index/compare</td>
-                <td>Overlay two or three countries on a timeline</td>
-              </tr>
-              <tr>
-                <td>/civica-index/methodology</td>
-                <td>This document</td>
-              </tr>
-              <tr>
-                <td>/civica-index/government-types</td>
-                <td>Governance outcomes by government type</td>
-              </tr>
-              <tr>
-                <td>/civica-index/changelog</td>
-                <td>Global feed of all Pulse movements across all countries</td>
+                <td>Economic Stability</td>
+                <td>
+                  World Bank composite (inflation, unemployment, GDP
+                  growth)
+                </td>
               </tr>
             </tbody>
           </table>
+          <p>
+            The contrast between CI and Conditions is itself
+            informative. A poor, well-governed democracy like Botswana
+            shows a strong CI alongside moderate Conditions. A wealthy
+            autocracy like the UAE shows the inverse. Reading the two
+            together tells a fuller story than either could alone.
+          </p>
         </section>
 
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="gov-type">
+          <h2>
+            <span className="num">Section 10</span>Government type analysis
+          </h2>
+          <p>
+            v1.0 included a &ldquo;government-type modifier&rdquo; whose
+            role inside the formula was internally contradictory. v2.0
+            removes it from the scoring formula entirely. Government
+            type is descriptive metadata, not a scoring signal.
+          </p>
+          <p>
+            Empirical observation about how governance scores vary by
+            government type is published as a separate analysis at{" "}
+            <Link href="/civica-index/government-types">
+              /civica-index/government-types
+            </Link>{" "}
+            — average CI per type, distribution spread, twenty-year
+            trajectories. The data is presented as observation, never
+            as ranking. No type is &ldquo;better&rdquo; than another in
+            the methodology; the data simply shows what the scores look
+            like in practice.
+          </p>
+        </section>
+
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="pulse">
+          <h2>
+            <span className="num">Section 11</span>Civica Pulse (Beta)
+          </h2>
+          <p>
+            The Civica Pulse is the real-time, event-sensitive layer
+            that sits on top of the structural CI. v2.0 reworks the
+            Pulse from a single merged scalar into{" "}
+            <strong>dimensional deltas</strong> — separate impact values
+            on each CI dimension, with category-specific decay
+            timelines, asymmetric scoring rules to resist gaming, and
+            press-freedom-aware corroboration.
+          </p>
+          <p>
+            The Pulse launches as a clearly labelled <em>Beta</em> —
+            experimental, not yet citable as authoritative. Its
+            methodology is documented in detail at{" "}
+            <Link href="/civica-index/pulse-methodology">
+              /civica-index/pulse-methodology
+            </Link>
+            . That page is the sister document to this one and should
+            be read alongside.
+          </p>
+        </section>
+
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="vintages">
+          <h2>
+            <span className="num">Section 12</span>Update frequency &amp; vintages
+          </h2>
+          <p>
+            The Civica Index updates <strong>quarterly</strong> — March,
+            June, September, December — to align with source publication
+            cycles and to avoid spurious between-quarter movement.
+            Mid-quarter source releases are staged for the next
+            quarterly publication. Only the Pulse moves daily.
+          </p>
+          <p>
+            To reconcile citation stability with longitudinal
+            comparability, every score is preserved in two parallel
+            historical series:
+          </p>
+          <ul className="bullets">
+            <li>
+              <strong>As-published vintages.</strong> Every quarterly
+              snapshot is preserved permanently. Cited values like
+              &ldquo;Civica Index 2026 Q3 (v2.0)&rdquo; resolve to that
+              frozen value forever, no matter what happens to the
+              methodology afterward.
+            </li>
+            <li>
+              <strong>Harmonized back-cast.</strong> Every country&rsquo;s
+              historical CI is recomputed annually under the current
+              methodology and published as a separate time series — for
+              researchers who want apples-to-apples comparisons across
+              years. Always clearly labelled as back-cast.
+            </li>
+          </ul>
+          <p>
+            Both series are accessible via the API. See §14 for citation
+            format.
+          </p>
+        </section>
+
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="limitations">
+          <h2>
+            <span className="num">Section 13</span>Limitations
+          </h2>
+          <p>
+            <strong>Source lag.</strong> The CI is only as current as
+            its slowest-updating source. Some upstream indices publish
+            12–18 months behind real-world developments. Quarterly
+            updates partially smooth this, but the Pulse exists
+            specifically to fill the gap between structural updates.
+          </p>
+          <p>
+            <strong>Coverage gaps.</strong> Some countries have
+            insufficient source coverage to compute even a partial CI.
+            Those pages display &ldquo;Insufficient data&rdquo; rather
+            than guess. The list is published in the replication
+            package.
+          </p>
+          <p>
+            <strong>Construct narrowing.</strong> By design, the CI
+            measures governing institutions only. If a reader wants to
+            ask &ldquo;is this country a good place to live?&rdquo; — a
+            different and broader question — the CI alone does not
+            answer that. Read it together with{" "}
+            <Link href="/civica-conditions">Civica Conditions</Link>.
+          </p>
+          <p>
+            <strong>Provisional weights.</strong> Until the §5 PCA work
+            completes, the weights in §3 are scaffolding. Country pages
+            and API responses indicate this status.
+          </p>
+        </section>
+
+        {/* ────────────────────────────────────────────────────── */}
+        <section id="citation">
+          <h2>
+            <span className="num">Section 14</span>Citation
+          </h2>
+          <p>
+            For published vintages, cite by year, quarter, and
+            methodology version:
+          </p>
+          <pre className="formula">{`Civica Index 2026 Q3 (v2.0). Civica Atlas. https://civicaatlas.org/civica-index
+For a specific country:
+  Civica Index for [Country], 2026 Q3 (v2.0). Civica Atlas.
+    https://civicaatlas.org/civica-index/[country-slug]`}</pre>
+          <p>
+            For citation pre-cut-over, the live methodology is v1.0 —
+            cite as &ldquo;Civica Index 2026 Q2 (v1.0).&rdquo; The full
+            v1.0 methodology is preserved at{" "}
+            <Link href="/civica-index/methodology/v1">
+              /civica-index/methodology/v1
+            </Link>
+            .
+          </p>
+
+          <h3>14.1 · API access</h3>
+          <pre className="formula">{`GET /api/v1/index/{country_slug}
+GET /api/v1/index/rankings
+GET /api/v1/index/methodology
+GET /api/v1/pulse/{country_slug}              (Beta — see Pulse spec)
+GET /api/v1/pulse/changelog                   (Beta)`}</pre>
+          <p>
+            Every CI API response includes a{" "}
+            <code>meta.methodology</code> block describing the live
+            methodology version, the next version status, and the
+            cut-over target date — so machine consumers can detect the
+            rebuild programmatically.
+          </p>
+
+          <h3>14.2 · Disputes &amp; corrections</h3>
+          <p>
+            Every score is open to dispute. Submit data-error
+            corrections, methodology disagreements, or Pulse event
+            misclassifications at{" "}
+            <Link href="/civica-index/corrections">
+              /civica-index/corrections
+            </Link>
+            . Resolution targets: 7 days initial response, 30 days full
+            disposition. Every dispute and outcome is logged publicly.
+          </p>
+
+          <h3>14.3 · Replication</h3>
+          <p>
+            Full codebook, processing logic, source references, and
+            downloadable derived outputs at{" "}
+            <Link href="/civica-index/replication">
+              /civica-index/replication
+            </Link>
+            .
+          </p>
+        </section>
+
+        {/* ────────────────────────────────────────────────────── */}
         <section id="versioning">
           <h2>
-            <span className="num">Section 10</span>Versioning
+            <span className="num">Section 15</span>Versioning
           </h2>
           <div className="version-strip">
             <div className="version-cell">
-              <div className="version-label">Version</div>
-              <div className="version-value">{version}</div>
+              <div className="version-label">Live version</div>
+              <div className="version-value">{liveVersion}</div>
             </div>
             <div className="version-cell">
-              <div className="version-label">Published</div>
-              <div className="version-value">{published}</div>
+              <div className="version-label">Live since</div>
+              <div className="version-value">{livePublished}</div>
             </div>
             <div className="version-cell">
-              <div className="version-label">Countries covered</div>
-              <div className="version-value">{countriesCovered}</div>
+              <div className="version-label">Next version</div>
+              <div className="version-value">2.0 (Beta)</div>
             </div>
             <div className="version-cell">
-              <div className="version-label">Open-source datasets</div>
-              <div className="version-value">{datasets}</div>
+              <div className="version-label">Cut-over target</div>
+              <div className="version-value">Sept 30, 2026</div>
             </div>
           </div>
           <p>
-            Changes to weights, sources, formulas, or the event-scoring
-            framework are documented in a public changelog and assigned a new
-            version number. Historical CI/CP values are never retroactively
-            recalculated; they&rsquo;re preserved as-is with their methodology
-            version recorded. This way, cited values remain stable forever.
+            Every weight change, source change, or formula change
+            requires a new methodology version, a public changelog
+            entry, and preservation of the prior vintage. Cited values
+            from any historical vintage continue to resolve to the
+            frozen score under that vintage&rsquo;s methodology, no
+            matter how the methodology evolves afterward.
           </p>
           {history.length > 0 && (
             <>
@@ -713,7 +938,7 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
           font-size: 12px;
           letter-spacing: 0.03em;
           color: var(--color-text-30);
-          margin-bottom: 48px;
+          margin-bottom: 32px;
           display: flex;
           gap: 12px;
           flex-wrap: wrap;
@@ -737,6 +962,10 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
           font-weight: 600;
           color: var(--color-text-primary);
         }
+        .meth-rebuild-banner a {
+          color: var(--color-accent);
+        }
+
         .meth-article .abstract {
           font-family: var(--font-heading, var(--font-serif));
           font-size: 22px;
@@ -782,6 +1011,7 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
           line-height: 1.7;
         }
         .meth-article p strong { color: var(--color-text-primary); font-weight: 500; }
+        .meth-article p em { color: var(--color-text-primary); }
         .meth-article a { color: var(--color-accent); }
         .meth-article ul.bullets {
           color: var(--color-text-60);
@@ -807,6 +1037,13 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
           margin: 20px 0 24px;
           white-space: pre;
           overflow-x: auto;
+        }
+        .meth-article code {
+          font-family: var(--font-mono);
+          font-size: 0.9em;
+          background: var(--color-grid-cell);
+          padding: 2px 6px;
+          border-radius: 3px;
         }
 
         .meth-article table {
@@ -844,6 +1081,10 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
           color: var(--color-text-primary);
           letter-spacing: -0.01em;
         }
+        .meth-article .fix-table tbody td {
+          font-family: var(--font-sans);
+          font-size: 14px;
+        }
 
         .weights-bar {
           display: flex;
@@ -880,30 +1121,36 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
           opacity: 0.8;
         }
 
-        .tier-scale-viz {
+        .band-scale-viz {
           display: flex;
-          height: 52px;
+          flex-direction: column;
+          gap: 1px;
           margin: 10px 0 32px;
-          border-radius: 2px;
+          border-radius: 4px;
           overflow: hidden;
           border: 1px solid var(--color-card-border);
         }
-        .tier-scale-cell {
-          flex: 1;
-          padding: 8px 12px;
+        .band-cell {
+          padding: 12px 18px;
+          color: #16140f;
           display: flex;
-          flex-direction: column;
-          justify-content: center;
+          align-items: baseline;
+          gap: 16px;
           font-family: var(--font-mono);
           font-weight: var(--font-weight-mono, 500);
-          font-size: 10px;
-          letter-spacing: 0.08em;
-          color: #16140f;
         }
-        .tier-scale-cell strong {
+        .band-cell strong {
           font-family: var(--font-heading, var(--font-serif));
-          font-size: 14px;
+          font-size: 16px;
           font-weight: 500;
+          letter-spacing: -0.01em;
+          flex: 0 0 140px;
+        }
+        .band-cell small {
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          opacity: 0.8;
         }
 
         .version-strip {
@@ -956,15 +1203,16 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
           .meth-article .page-title { font-size: 40px; }
           .meth-article h2 { font-size: 28px; }
           .version-strip { grid-template-columns: 1fr 1fr; }
-          .weights-bar,
-          .tier-scale-viz {
+          .weights-bar {
             flex-wrap: wrap;
             height: auto;
           }
-          .weight-slice,
-          .tier-scale-cell {
+          .weight-slice {
             flex: 1 1 50%;
             padding: 10px;
+          }
+          .band-cell strong {
+            flex: 0 0 110px;
           }
         }
       `}</style>
