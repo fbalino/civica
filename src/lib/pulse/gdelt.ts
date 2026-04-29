@@ -45,7 +45,9 @@ export async function fetchGdeltEvents(hoursBack = 24): Promise<GdeltArticle[]> 
   });
 
   const url = `${GDELT_DOC_API}?${params.toString()}`;
-  const res = await fetch(url);
+  // GDELT can be slow to respond from some networks; allow 60s.
+  // Retry once on transient connect failures.
+  const res = await fetchWithRetry(url, { signal: AbortSignal.timeout(60_000) });
 
   if (!res.ok) {
     throw new Error(`GDELT API error: ${res.status} ${res.statusText}`);
@@ -53,6 +55,25 @@ export async function fetchGdeltEvents(hoursBack = 24): Promise<GdeltArticle[]> 
 
   const data = (await res.json()) as GdeltResponse;
   return data.articles ?? [];
+}
+
+async function fetchWithRetry(
+  url: string,
+  init?: RequestInit,
+  attempts = 2
+): Promise<Response> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fetch(url, init);
+    } catch (err) {
+      lastErr = err;
+      if (i < attempts - 1) {
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+    }
+  }
+  throw lastErr;
 }
 
 export function parseArticleDate(seendate: string): Date {

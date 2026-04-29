@@ -37,6 +37,7 @@
     "ingest:conditions:gpi": "tsx scripts/ingest-conditions-gpi.ts",
     "ingest:conditions:economic": "tsx scripts/ingest-conditions-economic.ts",
     "ingest:conditions:all": "npm run ingest:conditions:hdi && npm run ingest:conditions:gpi && npm run ingest:conditions:economic",
+    "pulse:v2:ingest": "tsx scripts/sync-pulse-v2-ingest.ts",
     "pulse:v2:cluster": "tsx scripts/sync-pulse-v2-cluster.ts"
   },
   "dependencies": {
