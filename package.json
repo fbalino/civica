@@ -40,7 +40,8 @@
     "pulse:v2:ingest": "tsx scripts/sync-pulse-v2-ingest.ts",
     "pulse:v2:cluster": "tsx scripts/sync-pulse-v2-cluster.ts",
     "pulse:v2:classify": "tsx scripts/sync-pulse-v2-classify.ts",
-    "pulse:v2:score": "tsx scripts/sync-pulse-v2-score.ts"
+    "pulse:v2:score": "tsx scripts/sync-pulse-v2-score.ts",
+    "pulse:v2:all": "tsx scripts/run-pulse-v2.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

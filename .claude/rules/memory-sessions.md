@@ -287,3 +287,132 @@ UK 100, CA 100, BR 100 [Câmara 50 + Senado 50], DE 100, FR 100
 - Phase 4 follow-ups (rankings embed button, countries embed
   button, fix `civica.io` → `civicaatlas.org` in the embed
   footer).
+
+## 2026-04-29 — Design-system unification execution
+
+- Executed the design-system unification plan from
+  `/Users/fernandobalino/.claude/plans/i-want-the-design-system-lazy-hickey.md`.
+- Added `DESIGN.md`, strengthened the top-level AGENTS design-system
+  directive, migrated runtime theme handling to `data-theme`, and
+  kept `/design-system` tied to the live site theme.
+- `/design-system` now renders the shared `HemicycleChart` with
+  deterministic SVG coordinates to prevent React hydration drift.
+- Added editorial primitives under `src/components/editorial/` and
+  wrapped Civica Index reader pages through the shared shell where
+  the existing page structure allowed a low-risk swap.
+- Verification: `npx @google/design.md lint DESIGN.md`, targeted
+  ESLint on touched files, `npm run build`, and agent-browser passes
+  on `/design-system`, `/atlas/usa/chamber` (redirected to structure),
+  `/civica-index/methodology`, `/civica-index/changelog`, and
+  `/compare?c=usa&c=france`.
+
+## 2026-04-29 — Phase 5.5: Pulse Beta foundation shipped
+
+Plan: `~/civica/plan/phase-5-5-pulse-beta-foundation.md`. Eight
+commits (`4a7af06` → final commit) replace the v1 merged-scalar
+Pulse pipeline with the dimensional-delta architecture from spec
+v0.9. **Backend only — no public UI changes in this phase**, the
+legacy Pulse panel still renders unchanged on country pages until
+Phase 5.6 swaps the UI.
+
+What shipped:
+
+- **Five new tables.** `raw_events` (staging, drained by clustering),
+  `pulse_events_v2` (one row per clustered governance event,
+  classifier_runs JSON preserved for audit), `pulse_sources`
+  (per-event source attribution join), `pulse_dimensional_deltas`
+  (current state per (country, dimension)), `pulse_corrections`
+  (Pulse-specific dispute log). All in parallel to the legacy
+  pulse_events / pulse_daily_scores / pulse_changelog tables —
+  legacy stays running until 5.6 cut-over.
+
+- **Hard-coded taxonomy (29 categories).** spec §3.2 across 5
+  dimensions (democratic_quality, rule_of_law, freedom_rights,
+  corruption_control, stability) with allowed severity tiers and
+  decay half-lives in `src/lib/pulse/v2/taxonomy.ts`. Severity
+  ranges per §3.3 (low_pos +1/+2 through catastrophic_neg -8/-10).
+  HUMAN_REVIEW_TIERS (severe_neg, catastrophic_neg, high_pos)
+  drives auto-publish gating.
+
+- **Eight connectors with graceful no-op semantics.** CIVICUS Monitor
+  RSS (working — fixed URL is `/feed/`), HRW news RSS (working,
+  20 items/day), Amnesty RSS (working, 12 items/day, fixed URL
+  `/en/feed/`), RSF (gated on env override — no public RSS feed
+  exists at standard paths), IPU /elections (works but sparse —
+  IPU API doesn't expose daily parliamentary actions),
+  ACLED (gated on ACLED_API_KEY + ACLED_API_EMAIL), V-Dem pulse
+  (pure stub — V-Dem ships annually, not real-time),
+  GDELT v2 adapter (wraps existing fetcher),
+  Reuters/AP wire (URL paths have rotated; gated on env override).
+
+- **Country resolver.** `src/lib/pulse/v2/country-resolver.ts`
+  extracted from v1 ingest with extended aliases (DR Congo,
+  eSwatini/Swaziland, Türkiye, Vatican). `extractCountryFromText()`
+  with word-boundary regex prevents the "MALI inside FORMALIN"
+  class of false positives.
+
+- **Sentence-transformer clustering.** `Xenova/all-MiniLM-L6-v2`
+  (384-dim, ~25MB local model) via `@huggingface/transformers`.
+  Lazy-init pipeline. Per-country bucket → union-find with
+  greedy O(N²) pairwise cosine similarity ≥ 0.75 within ±48h
+  date window. Embedding stored back on each raw_events row.
+
+- **Multi-run classifier.** Three Anthropic claude-sonnet-4-6
+  calls per cluster at temps [0.0, 0.4, 0.8] in parallel.
+  Compares (category, severity_tier) tuples for agreement. All-3
+  agree → +0.2 confidence boost; 2-of-3 → neutral; none → -0.3
+  + flag for review. Lazy-init Anthropic client (project
+  convention; module-level `new Anthropic()` evaluates before
+  dotenv populates env vars). max_tokens=800 — the 400 cap from
+  the bills summariser truncates the longer JSON shape.
+
+- **Asymmetric corroboration + scoring.** spec §3.4 (positive
+  events require ≥1 specialist source; in restricted-press
+  countries require ≥2 non-state sources) + §3.5 (RSF press-
+  freedom tier modulates news-only signal weight; restricted-press
+  + news-only → severely discount). RSF scores hardcoded in
+  `press-freedom.ts` from 2024 World Press Freedom Index, refresh
+  annually.
+
+- **Decay + dimensional deltas.** Exponential decay
+  `severity × confidence × exp(-ln2 × days / half_life)`.
+  Half-life from taxonomy (coup 365d, journalist arrest 60d,
+  state collapse 730d). Sum decayed impacts per (country,
+  dimension) across published=true events in trailing 365 days,
+  clamp to [-15, +10] per spec §4.3, upsert
+  pulse_dimensional_deltas.
+
+- **Cron schedule.** Four new daily Vercel crons: 07:00 ingest,
+  07:30 cluster, 08:00 classify, 08:30 score. All gated by
+  requireCronAuth.
+
+- **End-to-end runner.** `npm run pulse:v2:all` does ingest →
+  cluster → classify → corroborate → score in one pass. Useful
+  for backfill + spot-checking. Individual stages also addressable
+  as `pulse:v2:{ingest,cluster,classify,score}`.
+
+End-to-end smoke verified on 42 raw_events: 23 country-resolved
+→ clustered into 23 distinct events (zero multi-source dedup at
+this scale because RSS volumes are tiny; multi-source clusters
+will surface once GDELT runs successfully) → 8 classified (1
+none, 7 written to pulse_events_v2). Bangladesh moderate_neg
+auto-published with delta -2.05 to freedom_rights; 7 severe_neg
+events queued for human review (review queue UI ships in 5.7).
+
+Known issues parked:
+- **GDELT timeout under Node 25 + undici.** Connect-timeout
+  failure on api.gdeltproject.org from Node fetch even though
+  curl works fine. Likely IPv6/IPv4 resolver behavior. Bumped
+  fetch timeout to 60s + retry-once wrapper. Followup: switch
+  to undici Agent with family:4.
+- **RSF / Reuters / AP feed URLs.** Public RSS endpoints have
+  rotated. Connectors gated on env-var URL overrides; gracefully
+  no-op until we identify the right paths (or — for RSF —
+  obtain API access).
+- **IPU /elections endpoint.** Returns 0 results for our
+  date_from filter; needs syntax investigation. Connector is
+  shape-correct.
+
+Up next: Phase 5.6 — Pulse scoring + dimensional delta UI on
+country pages + public Pulse changelog page. The whole pipeline
+stands up to 5.6's needs without further backend changes.
