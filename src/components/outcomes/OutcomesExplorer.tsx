@@ -35,6 +35,8 @@ interface OutcomesExplorerProps {
   metrics: MetricOption[];
   initialMetricId: string;
   initialYear: number;
+  /** "civica-conditions" = new Conditions framing; default = legacy Outcomes framing */
+  pageVariant?: "civica-conditions" | "outcomes";
 }
 
 // ─── Strip data response ──────────────────────────────────────────────────────
@@ -519,7 +521,9 @@ export function OutcomesExplorer({
   metrics,
   initialMetricId,
   initialYear,
+  pageVariant = "outcomes",
 }: OutcomesExplorerProps) {
+  const isConditionsPage = pageVariant === "civica-conditions";
   const router = useRouter();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
@@ -928,7 +932,9 @@ export function OutcomesExplorer({
             Compare
           </Link>
           <span>›</span>
-          <span style={{ color: "var(--color-text-50)" }}>Outcomes</span>
+          <span style={{ color: "var(--color-text-50)" }}>
+            {isConditionsPage ? "Civica Conditions" : "Outcomes"}
+          </span>
         </nav>
 
         {/* Page heading */}
@@ -943,7 +949,9 @@ export function OutcomesExplorer({
             marginBottom: 16,
           }}
         >
-          How government type relates to country outcomes
+          {isConditionsPage
+            ? "Civica Conditions: how do material conditions vary across countries?"
+            : "How government type relates to country outcomes"}
         </h1>
 
         {/* Dek */}
@@ -958,10 +966,9 @@ export function OutcomesExplorer({
             marginBottom: 36,
           }}
         >
-          These charts show how country outcomes vary across government types.
-          Differences here reflect history, geography, wealth, and dozens of
-          other factors — not just institutional design. Read these as patterns
-          to investigate, not conclusions.
+          {isConditionsPage
+            ? "Material conditions — human development, peace & security, and economic stability — are separate from governance. These charts show how conditions vary across countries and government types. Government type is one filter among many: history, geography, and external factors all matter."
+            : "These charts show how country outcomes vary across government types. Differences here reflect history, geography, wealth, and dozens of other factors — not just institutional design. Read these as patterns to investigate, not conclusions."}
         </p>
 
         <div

@@ -37,6 +37,13 @@ const nextConfig: NextConfig = {
         destination: "/compare?c=:a&c=:b",
         permanent: true,
       },
+      // Phase 5.4 — /outcomes renamed to /civica-conditions.
+      // 308 (permanent redirect) transfers SEO authority to the new URL.
+      {
+        source: "/outcomes",
+        destination: "/civica-conditions",
+        permanent: true,
+      },
       // Phase C — tab consolidation 8 → 6.
       // Chamber folded into Structure (the house toggle now lives there).
       {
