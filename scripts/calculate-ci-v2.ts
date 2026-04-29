@@ -18,9 +18,16 @@ config({ path: ".env.local", override: true });
 
 import { createDb } from "../src/lib/ci/ingest";
 import { calculateCompositeV2, latestQuarter } from "../src/lib/ci/calculate-v2";
+import { decoupleAbsorbedEvents } from "../src/lib/pulse/v2/decouple";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
+import type * as schema from "../src/lib/db/schema";
 
 async function main() {
   const db = createDb();
+
+  // --decouple-dry-run runs the absorption check without zeroing.
+  // Useful when validating the helper before next quarterly fires.
+  const decoupleDryRun = process.argv.includes("--decouple-dry-run");
 
   let quarter = process.argv[2];
   const sims = process.argv[3] ? parseInt(process.argv[3], 10) : undefined;
@@ -55,6 +62,38 @@ async function main() {
   console.log(`  Full:                                ${summary.scored - summary.partial}`);
   console.log(`  Partial:                             ${summary.partial}`);
   console.log(`Skipped (insufficient mandatory dims): ${summary.insufficient}`);
+
+  // ── Phase 5.6: CI/Pulse double-counting prevention ────────────────
+  console.log(`\n=== Decouple absorbed Pulse events ===`);
+  // The CI-pipeline db handle is created without the full schema
+  // generic; cast for the helper which needs schema-typed inference.
+  const decouple = await decoupleAbsorbedEvents(
+    db as unknown as NeonHttpDatabase<typeof schema>,
+    quarter,
+    {
+      methodologyVersion: "beta",
+      dryRun: decoupleDryRun,
+    }
+  );
+  if (decouple.noPreviousQuarter) {
+    console.log(
+      "  No previous beta quarter found — first run, nothing to decouple."
+    );
+  } else {
+    const verb = decoupleDryRun ? "would be zeroed" : "zeroed";
+    console.log(
+      `  (country, dim) pairs crossed threshold: ${decouple.pairsCrossed}`
+    );
+    console.log(`  pulse_events_v2 rows ${verb}:           ${decouple.eventsZeroed}`);
+    if (Object.keys(decouple.byDimension).length) {
+      for (const [dim, count] of Object.entries(decouple.byDimension)) {
+        console.log(`    ${dim.padEnd(22)} ${count} pair${count === 1 ? "" : "s"}`);
+      }
+    }
+    if (decoupleDryRun) {
+      console.log(`  --decouple-dry-run: no UPDATE issued.`);
+    }
+  }
 }
 
 main().catch((err) => {
