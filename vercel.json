@@ -6,6 +6,7 @@
     { "path": "/api/cron/pulse/calculate", "schedule": "0 6 * * *" },
     { "path": "/api/cron/pulse/v2/ingest", "schedule": "0 7 * * *" },
     { "path": "/api/cron/pulse/v2/cluster", "schedule": "30 7 * * *" },
+    { "path": "/api/cron/pulse/v2/classify", "schedule": "0 8 * * *" },
     { "path": "/api/cron/bills/us", "schedule": "0 3 * * *" },
     { "path": "/api/cron/bills/uk", "schedule": "30 3 * * *" },
     { "path": "/api/cron/bills/ca", "schedule": "0 4 * * *" },
