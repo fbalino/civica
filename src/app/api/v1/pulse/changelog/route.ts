@@ -1,5 +1,25 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { getPulseChangelog } from "@/lib/db/queries";
+import { NextResponse } from "next/server";
+
+/**
+ * Phase 5.6 deprecation notice. The v1 changelog returns merged-
+ * scalar event impacts. The Beta methodology publishes dimensional
+ * deltas at /api/v1/pulse/changelog/v2. Legacy callers continue to
+ * work until the 90-day sunset window closes.
+ */
+const DEPRECATION_HEADERS: Record<string, string> = {
+  Deprecation: "true",
+  Sunset: "Thu, 31 Dec 2026 00:00:00 GMT",
+  Link: '</api/v1/pulse/changelog/v2>; rel="successor-version"',
+};
+
+function withDeprecation(res: NextResponse): NextResponse {
+  for (const [k, v] of Object.entries(DEPRECATION_HEADERS)) {
+    res.headers.set(k, v);
+  }
+  return res;
+}
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
@@ -16,13 +36,15 @@ export async function GET(request: Request) {
     const result = await getPulseChangelog(undefined, limit, offset);
     const rows = Array.isArray(result) ? result : (result as { rows: unknown[] }).rows ?? [];
 
-    return apiResponse({
-      data: rows,
-      meta: { limit, offset, hasMore: rows.length === limit },
-    });
+    return withDeprecation(
+      apiResponse({
+        data: rows,
+        meta: { limit, offset, hasMore: rows.length === limit },
+      })
+    );
   } catch (e) {
     console.error("API /v1/pulse/changelog error:", e);
-    return apiError("Internal server error", 500);
+    return withDeprecation(apiError("Internal server error", 500));
   }
 }
 

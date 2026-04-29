@@ -2,6 +2,28 @@ import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/hel
 import { db } from "@/lib/db";
 import { jurisdictions, pulseDailyScores, pulseEvents } from "@/lib/db/schema";
 import { eq, sql, desc } from "drizzle-orm";
+import { NextResponse } from "next/server";
+
+/**
+ * Phase 5.6 deprecation notice. The merged-scalar Pulse shape this
+ * endpoint returns is the v1 methodology. The Beta methodology
+ * publishes dimensional deltas — see the v2 endpoints listed in the
+ * Sunset / Deprecation headers below. Legacy callers continue to
+ * work until the 90-day sunset window closes (2026-12-31, 90 days
+ * after the targeted CI v2 cut-over on 2026-09-30).
+ */
+const DEPRECATION_HEADERS: Record<string, string> = {
+  Deprecation: "true",
+  Sunset: "Thu, 31 Dec 2026 00:00:00 GMT",
+  Link: '</api/v1/pulse/{country_slug}/dimensions>; rel="successor-version"',
+};
+
+function withDeprecation(res: NextResponse): NextResponse {
+  for (const [k, v] of Object.entries(DEPRECATION_HEADERS)) {
+    res.headers.set(k, v);
+  }
+  return res;
+}
 
 export async function GET(
   request: Request,
@@ -22,7 +44,7 @@ export async function GET(
 
     const jurisdiction = jurisdictionRows[0];
     if (!jurisdiction) {
-      return apiError("Country not found", 404);
+      return withDeprecation(apiError("Country not found", 404));
     }
 
     const latestScore = await db
@@ -34,7 +56,9 @@ export async function GET(
 
     const pulse = latestScore[0];
     if (!pulse) {
-      return apiError("No Pulse data available for this country", 404);
+      return withDeprecation(
+        apiError("No Pulse data available for this country", 404)
+      );
     }
 
     const thirtyDaysAgo = new Date();
@@ -60,23 +84,25 @@ export async function GET(
       )
       .orderBy(desc(pulseEvents.eventDate));
 
-    return apiResponse({
-      data: {
-        slug: jurisdiction.slug,
-        name: jurisdiction.name,
-        scoreDate: pulse.scoreDate,
-        ciBaseline: pulse.ciBaseline,
-        eventImpact: pulse.eventImpact,
-        pulseScore: pulse.pulseScore,
-        activeEvents: pulse.activeEvents,
-        isLowConfidence: pulse.isLowConfidence,
-        methodologyVersion: pulse.methodologyVersion,
-        recentEvents,
-      },
-    });
+    return withDeprecation(
+      apiResponse({
+        data: {
+          slug: jurisdiction.slug,
+          name: jurisdiction.name,
+          scoreDate: pulse.scoreDate,
+          ciBaseline: pulse.ciBaseline,
+          eventImpact: pulse.eventImpact,
+          pulseScore: pulse.pulseScore,
+          activeEvents: pulse.activeEvents,
+          isLowConfidence: pulse.isLowConfidence,
+          methodologyVersion: pulse.methodologyVersion,
+          recentEvents,
+        },
+      })
+    );
   } catch (e) {
     console.error("API /v1/pulse/[country_slug] error:", e);
-    return apiError("Internal server error", 500);
+    return withDeprecation(apiError("Internal server error", 500));
   }
 }
 
