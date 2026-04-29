@@ -615,3 +615,59 @@ export const organizationMemberships = pgTable(
     index("idx_org_memberships_org").on(table.orgId),
   ]
 );
+
+// --- Phase 5.1 — CI v2 credibility infrastructure ---
+
+/**
+ * Public log of data-error disputes, methodology disagreements, and
+ * Pulse misclassification reports. Backs the /civica-index/corrections page.
+ * Rows where is_public=false are hidden from the public log (PII redaction).
+ */
+export const correctionLog = pgTable("correction_log", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  submittedAt: timestamp("submitted_at").notNull().defaultNow(),
+  /** FK to jurisdictions.id — nullable for methodology-wide disputes */
+  countryId: uuid("country_id").references(() => jurisdictions.id),
+  /**
+   * ci_data_error | ci_methodology | pulse_misclassification |
+   * pulse_severity | pulse_false_positive | pulse_missing_event |
+   * pulse_duplicate | other
+   */
+  category: text("category").notNull(),
+  /** Optional CI dimension the dispute pertains to */
+  dimension: text("dimension"),
+  submitterName: text("submitter_name"),
+  submitterEmail: text("submitter_email"),
+  submitterAffiliation: text("submitter_affiliation"),
+  description: text("description").notNull(),
+  /**
+   * open | in_review | resolved_corrected | resolved_no_change | rejected
+   */
+  status: text("status").notNull().default("open"),
+  /** Public-facing response from Civica, set when resolved */
+  disposition: text("disposition"),
+  resolvedAt: timestamp("resolved_at"),
+  /** false = row is hidden from the public log (PII redaction toggle) */
+  isPublic: boolean("is_public").notNull().default(true),
+  /** Internal team notes — never shown publicly */
+  internalNotes: text("internal_notes"),
+});
+
+/**
+ * Placeholder schema for the academic advisory board described in
+ * v2 methodology spec §3.1. Table ships empty; rows arrive via
+ * manual INSERT once recruitment happens.
+ */
+export const advisoryBoardMembers = pgTable("advisory_board_members", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  affiliation: text("affiliation").notNull(),
+  /** Comma-separated expertise tags or a short paragraph */
+  expertise: text("expertise").notNull(),
+  /** Optional markdown bio */
+  bioMd: text("bio_md"),
+  photoUrl: text("photo_url"),
+  displayOrder: integer("display_order").notNull().default(100),
+  joinedAt: date("joined_at").notNull().defaultNow(),
+  isActive: boolean("is_active").notNull().default(true),
+});
