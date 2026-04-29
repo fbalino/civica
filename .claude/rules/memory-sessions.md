@@ -193,11 +193,97 @@ Commits `2a16ce2` (scaffold), `2764401` (3 sizes + copy buttons),
 - `.country-row.on` selected-country styling in the left rail — user
   chose to leave as-is (2026-04-24). Not a live item.
 
-### Next session starts here
+### Phase H — Bills tab redesign: real DB-backed sync (shipped)
+
+Active plan: `~/.claude/plans/great-questions-1-build-tender-falcon.md`.
+
+Phase H.1 (3 commits, baseline scaffold):
+1. `2587ab9` — schema + foundation. New `bills` table (jurisdictionId,
+   bodyId, sourceId, externalId, title, longTitle, summary, stage,
+   rawStatus, dates, sponsor, votes, raw jsonb). Refactored
+   `parliament-feeds.ts` → `src/lib/bills/` with shared `types.ts`,
+   `stage.ts` (statusToStage), `summarize.ts` (Claude Haiku batch
+   summariser + `bill_summary_cache`), `upsert.ts` (idempotent +
+   stamps `sources.last_sync_at`), `sync.ts` (orchestrator).
+2. `79a5778` — US sync (`congress_gov`) + DB-backed
+   `/api/countries/[slug]/bills` route.
+3. `081378d` — UK sync (`uk_parliament`) + per-row `<SourceDot>`.
+
+Phase H.2 (4 commits, country expansion):
+4. `153414c` — Canada (`legisinfo_ca`) via the LEGISinfo bulk JSON.
+   First source where `bills.body_id` is populated (resolved from
+   `OriginatingChamberId` → governmentBodies.chamber_type). Also
+   fixed two summariser bugs surfaced when scaling past the legacy
+   5-bill live-fetch shape: lazy-init the Anthropic client (so
+   dotenv has a chance to populate `ANTHROPIC_API_KEY` before the
+   SDK reads it — static-import hoist would otherwise capture the
+   shell's empty placeholder), and chunk `generateSummariesBatch`
+   into groups of 20 (max_tokens=600 truncated at 100 bills).
+5. `4940ca6` — Brazil (`camara_br` + `senado_br`) merged adapter.
+   Câmara via dadosabertos.camara.leg.br; Senado via
+   legis.senado.leg.br. Resilient to single-chamber outages
+   (Câmara was 504-ing during local verification — Senado still
+   shipped). Sénat note: API caps `numdias=30` (returns 400 for
+   higher values) — pitfall not in the docs.
+6. `8999a46` — Germany (`bundestag_dip`) via DIP REST API. Uses the
+   public/anonymous key from the bundesAPI repo as fallback when
+   `BUNDESTAG_API_KEY` env var is unset. Extended `statusToStage`
+   with German keywords (verkündet/verabschiedet/ausschuss/
+   zugeleitet etc).
+7. `cd627bb` — France (`data_assemblee_fr` + `senat_fr`) merged
+   adapter. AN via 9MB zipped JSON dump (8905 dossiers, 2113 are
+   `DossierLegislatif_Type` real bills, sorted by latest dateActe).
+   Sénat via 3.5MB latin-1 CSV. Added `adm-zip` (+@types) for
+   in-memory zip extraction (dynamic import keeps it out of the
+   client bundle). Extended `statusToStage` with French keywords
+   (promulgué/adoption définitive/commission/première lecture etc).
+
+After all 7 commits: 606 bills in DB across 8 sources (US 106,
+UK 100, CA 100, BR 100 [Câmara 50 + Senado 50], DE 100, FR 100
+[AN 50 + Sénat 50]). All summarised. Daily Vercel cron runs at
+03:00, 03:30, 04:00, 04:30, 05:00, 05:30 UTC.
+
+### Phase H gotchas + decisions
+
+- **Shell-env interferes with dotenv defaults.** Claude Code (and
+  some macOS setups) export `ANTHROPIC_API_KEY=` as an empty
+  string at the system level. dotenv's default behaviour is to
+  *not* override existing env vars. Result: `process.env.ANTHROPIC_
+  API_KEY` stays empty even with a valid key in `.env.local`. Fix:
+  every sync script uses `config({ path: ".env.local",
+  override: true })`. Applied to all 6 H.1+H.2 scripts.
+- **Static-import hoist + module-level SDK client = race.**
+  TypeScript ESM hoists `import` statements above the script body,
+  so `dotenv.config()` runs *after* `summarize.ts` has executed
+  `const anthropic = new Anthropic({...})`. Lazy-init via a getter
+  fixes this and is now the pattern.
+- **EU is deferred.** Skipped in H.2 entirely. Future placement
+  question (member-state vs top-level EU page) remains open.
+- **Brazil vote tallies** — schema columns exist, left null. Same
+  for sponsor party. Future enhancement: per-bill detail call.
+- **Câmara API flakiness** is real. The merged adapter degrades
+  gracefully — empty-array on fetch failure, only stamps the
+  source for chambers that returned rows. Verified live: a 504
+  spell during local sync still shipped Senado.
+- **No new dimension columns** were added — the existing schema
+  carries all 6 sources without alteration. `bodyId` is the only
+  field touched after H.1 (CA is the first to populate it; BR/FR
+  also do).
+- **Summariser is multilingual now.** The prompt explicitly tells
+  Haiku that titles may be non-English and to write the summary
+  in English regardless. Verified across BR/DE/FR.
+
+### Phase H follow-up + open items
+
+- US/UK have a few bills with null summaries because the H.1
+  sync ran with the broken summariser; subsequent
+  `npm run sync:bills:{us,uk}` re-summarises them (verified
+  locally — 90/95 fresh on the first re-run).
 - Phase 3 — IA consolidation (elections/outcomes/by-government-type
   moves). **User flagged this is being reassessed**; don't start
   without confirming scope first.
-- Phase 5 — CI/CP v2 methodology rebuild (rescoped from the original
-  "academic legitimacy polish" framing).
-- Phase 4 follow-ups above (rankings embed button, countries embed
-  button, fix `civica.io` → `civicaatlas.org` in the embed footer).
+- Phase 5 — CI/CP v2 methodology rebuild (rescoped from the
+  original "academic legitimacy polish" framing).
+- Phase 4 follow-ups (rankings embed button, countries embed
+  button, fix `civica.io` → `civicaatlas.org` in the embed
+  footer).

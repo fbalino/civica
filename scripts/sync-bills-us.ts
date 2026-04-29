@@ -1,5 +1,7 @@
 import { config } from "dotenv";
-config({ path: ".env.local" });
+// override: true so values in .env.local win over a shell that may
+// have empty placeholders (e.g. `ANTHROPIC_API_KEY=` exported globally).
+config({ path: ".env.local", override: true });
 
 import { db } from "../src/lib/db";
 import { runBillsSync } from "../src/lib/bills/sync";
