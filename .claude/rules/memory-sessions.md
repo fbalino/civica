@@ -416,3 +416,102 @@ Known issues parked:
 Up next: Phase 5.6 — Pulse scoring + dimensional delta UI on
 country pages + public Pulse changelog page. The whole pipeline
 stands up to 5.6's needs without further backend changes.
+
+## 2026-04-29 — Phase 5.6: Dimensional delta UI + changelog shipped
+
+Plan: `~/civica/plan/phase-5-6-dimensional-delta-ui.md`. Seven
+commits replace the merged-scalar v1 Pulse pane with the
+dimensional-delta architecture wherever the Pulse appears, and
+expose the v2 pipeline through public API + changelog + methodology
+pages.
+
+What shipped:
+
+- **v2 API endpoints + legacy deprecation** (`03aa2c0`).
+  `GET /api/v1/pulse/[slug]/dimensions` returns 5-dimension
+  deltas + driving events. `GET /api/v1/pulse/[slug]/events`
+  returns the full event list joined with pulse_sources.
+  `GET /api/v1/pulse/changelog/v2` is the paginated global feed
+  with country / dimension / severity / since / published_only
+  filters. The legacy `/api/v1/pulse/[slug]` and
+  `/api/v1/pulse/changelog` now serve `Deprecation: true` +
+  `Sunset: Thu, 31 Dec 2026` + `Link: rel=successor-version`
+  headers pointing at the v2 paths.
+
+- **Query layer** (`03aa2c0`).
+  `src/lib/db/queries-pulse-v2.ts`:
+  `getPulseV2ForCountry(slug)`,
+  `getPulseV2EventsForCountry(slug)`,
+  `getPulseV2Changelog({country?, dimension?, severityTier?,
+  sinceDate?, publishedOnly?, limit?, offset?})`.
+  Driving events sort by ABS(severity_value); zero-fills missing
+  dimensions in the per-country response so callers don't need
+  null checks.
+
+- **`<PulseDimensionalDeltas>` component** (`d79e0c7`).
+  Server component. 5 rows in a grid (label · delta · drivers).
+  |δ| ≥ 0.5 threshold to show drivers; below threshold, "Flat —
+  no significant signal". Empty-state copy when totalEvents === 0.
+  All styling via role tokens per DESIGN.md — no inline hex/rgb.
+
+- **Country page surfaces wired** (`5bd0c79`).
+  Both `/countries/[slug]` (reader) and `/civica-index/[slug]`
+  (shell) now render `<PulseDimensionalDeltas>` below the CI
+  panel. CIPulseScoreDisplay slimmed to a single full-width CI
+  pane — the v1 merged-scalar Pulse code is gone. `pulseScore`
+  prop kept (deprecated, ignored at render) for backwards-
+  compat. Visual smoke on /countries/bangladesh: Rights &
+  Freedoms shows -2.1 with the HRW arrests headline as driver,
+  other 4 dimensions render flat.
+
+- **Public Pulse changelog** (`b2ab743`).
+  `/civica-index/pulse-changelog`. EditorialPage with link-driven
+  filters (no client JS). Country select with apply button +
+  active-state chip. Dimension chips (5). Severity chips (7).
+  Status toggle: published-only ↔ show review queue. Each event
+  card: country + date, dimension/severity/agreement/queued
+  pills, headline, description excerpt, source dots, confidence
+  + signed severity. Pagination at 25 per page.
+
+- **Pulse methodology page** (`260112f`).
+  `/civica-index/methodology/pulse`. Sister of the existing CI
+  methodology + pca-appendix. 11 sections covering source
+  taxonomy, pipeline stages, multi-run classifier, asymmetric
+  scoring, press-freedom rule, decay (with half-life table),
+  bounds + double-counting prevention, known limitations,
+  corrections. Beta warning banner first. Footer nav links back.
+  Fixed the broken /civica-index/pulse-methodology link in
+  Section 10 of the existing methodology page.
+
+- **CI/Pulse double-counting prevention** (`06da300`).
+  `decoupleAbsorbedEvents(db, newQuarter, opts)` compares CI v2
+  dimensional scores between two consecutive quarters. For each
+  (country, dimension) where the score moved by ≥ 3 points,
+  zeros corroboration_confidence on all published
+  pulse_events_v2 rows pre-dating the new quarter, with the
+  reason logged in review_notes. Wired into
+  `scripts/calculate-ci-v2.ts` as the final pass.
+  `--decouple-dry-run` flag computes everything without the
+  UPDATE. Helper no-ops on first beta quarter (no previous to
+  compare against). The hook is ready for the next CI v2
+  quarterly recompute (target: 2026-09-30 cut-over).
+
+Plan-level notes:
+- Phase 5.5's stability dimension is intentionally excluded from
+  the decouple shared-dimension list. No CI v2 dimension absorbs
+  it; it stays Pulse-only as a spillover signal per spec §3.2.
+- The Phase 5.5 Bangladesh event remains the only published v2
+  event in the DB. The 7 severe_neg events from various other
+  countries stay queued (`published=false`) until Phase 5.7
+  ships the reviewer surface.
+- Visual verification: `/countries/bangladesh`,
+  `/civica-index/pulse-changelog?review=1`,
+  `/civica-index/methodology/pulse` all render correctly via
+  the preview MCP.
+
+Up next: Phase 5.7 — internal review queue UI for the severe-tier
+events. The pulse_events_v2 rows with `published=false` AND
+`review_status='pending'` are the queue. Reviewer UI lives at
+admin-gated `/admin/pulse-review`. Backend already has reviewerId
++ reviewNotes + reviewStatus columns; Phase 5.7 just builds the
+operator surface.
