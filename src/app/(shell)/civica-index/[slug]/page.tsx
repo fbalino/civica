@@ -13,6 +13,8 @@ import {
   type CIScoreData,
   type PulseScoreData,
 } from "@/components/ci/CIPulseScoreDisplay";
+import { PulseDimensionalDeltas } from "@/components/pulse/PulseDimensionalDeltas";
+import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 import { CountryFlag } from "@/components/CountryFlag";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
@@ -426,6 +428,8 @@ export default async function CICountryDetailPage({
       getCICountryDetail(slug, quarter),
       getCICountryHistory(slug),
     ]);
+    // pulseV2 fetched here so it lands inside the same try-block as
+    // detail; failures still let the page render via the fallback.
     if (detail) {
       const changelog = await getPulseChangelog(slug, 20);
       const rows = Array.isArray(changelog)
@@ -448,6 +452,10 @@ export default async function CICountryDetailPage({
   } catch {}
 
   if (!detail) notFound();
+
+  // Pulse v2 dimensional deltas. Independent of legacy `pulse` —
+  // when 5.10 cuts over fully, the legacy `pulse` field disappears.
+  const pulseV2 = await getPulseV2ForCountry(slug).catch(() => null);
 
   const { jurisdiction, composite, dimensions, pulse } = detail;
   const taxonomy = jurisdiction.governmentClassification ?? null;
@@ -631,13 +639,13 @@ export default async function CICountryDetailPage({
             </div>
           ) : null}
 
-          {(ciScoreData || pulseScoreData) ? (
+          {(ciScoreData || pulseV2) ? (
             <div className="ci-country-score-shell">
               <CIPulseScoreDisplay
                 ciScore={ciScoreData}
-                pulseScore={pulseScoreData}
                 ciChangeText={ciChangeText}
               />
+              {pulseV2 ? <PulseDimensionalDeltas data={pulseV2} /> : null}
             </div>
           ) : (
             <div className="cv-card" style={{ marginBottom: 24 }}>

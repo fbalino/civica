@@ -1,15 +1,15 @@
 /**
- * Civica Index + Pulse score display.
+ * Civica Index score display — Beta methodology.
  *
- * Phase 5.4 cut-over — this component now renders the Beta methodology:
- *   - Integer score (no decimals)
- *   - 90% confidence interval beside the headline number
- *   - A–F rank band per spec §2.6 (replaces the old 5-tier system)
- *   - Completeness flag (full / partial / insufficient)
+ * Renders a single editorial pane showing the CI score, 90%
+ * confidence interval, A–F band, and completeness flag.
  *
- * The Pulse panel is unchanged for now — Phase 5.5/5.6 reworks it from
- * a merged scalar into dimensional deltas. Until then it keeps the
- * Beta pill on it so readers know the methodology is in flux.
+ * Phase 5.4 added Beta methodology display.
+ * Phase 5.6 dropped the merged-scalar Pulse pane entirely. The
+ * dimensional-delta replacement is `<PulseDimensionalDeltas>` —
+ * consumers render it below this CI pane. The legacy `pulseScore`
+ * prop remains accepted (and ignored) so callers can migrate at
+ * their own pace, but new code should not pass it.
  */
 
 import { BAND_RANGES, type CIBand } from "@/lib/ci/bands";
@@ -36,7 +36,13 @@ export interface PulseScoreData {
 
 interface CIPulseScoreDisplayProps {
   ciScore: CIScoreData | null;
-  pulseScore: PulseScoreData | null;
+  /**
+   * @deprecated Phase 5.6 removed the merged-scalar Pulse pane.
+   * The replacement is the `<PulseDimensionalDeltas>` component
+   * rendered alongside this one. This prop is accepted for
+   * backwards compatibility and ignored at render time.
+   */
+  pulseScore?: PulseScoreData | null;
   ciChangeText?: string | null;
 }
 
@@ -44,22 +50,6 @@ function formatQuarter(quarter: string): string {
   const match = quarter.match(/^(\d{4})-Q(\d)$/);
   if (!match) return quarter;
   return `Q${match[2]} ${match[1]}`;
-}
-
-function formatDateLabel(dateString: string): string {
-  if (!dateString) return "Date unavailable";
-  const parsed = new Date(dateString);
-  if (Number.isNaN(parsed.getTime())) return dateString;
-  return parsed.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function formatPulseDelta(delta: number): string {
-  if (Math.abs(delta) < 0.05) return "Flat today";
-  return `${delta >= 0 ? "+" : ""}${delta.toFixed(1)} today`;
 }
 
 /** Pick the band row for a given letter; falls back to the F row. */
@@ -90,8 +80,8 @@ function bandColor(letter: string | null): string {
   }
 }
 
-function ProvenanceDot({ kind }: { kind: "frozen" | "live" }) {
-  const isLive = kind === "live";
+function ProvenanceDot() {
+  // CI is sourced from quarterly upstream data; "frozen" until next refresh.
   return (
     <span
       style={{
@@ -105,26 +95,14 @@ function ProvenanceDot({ kind }: { kind: "frozen" | "live" }) {
       }}
       aria-hidden="true"
     >
-      {isLive ? (
-        <span
-          style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "999px",
-            background: "var(--color-source-live)",
-            opacity: 0.2,
-            animation: "civ-pulse 2s ease-out infinite",
-          }}
-        />
-      ) : null}
       <span
         style={{
           position: "relative",
           width: 8,
           height: 8,
           borderRadius: "999px",
-          background: isLive ? "var(--color-source-live)" : "var(--color-source-frozen)",
-          boxShadow: `0 0 0 1px ${isLive ? "rgba(92, 170, 110, 0.22)" : "rgba(212, 160, 74, 0.28)"}`,
+          background: "var(--color-source-frozen)",
+          boxShadow: "0 0 0 1px rgba(212, 160, 74, 0.28)",
         }}
       />
     </span>
@@ -134,7 +112,6 @@ function ProvenanceDot({ kind }: { kind: "frozen" | "live" }) {
 function ScorePane({
   title,
   chip,
-  provenance,
   scoreLabel,
   bandLetter,
   bandLabel,
@@ -147,7 +124,6 @@ function ScorePane({
 }: {
   title: string;
   chip: string;
-  provenance: "frozen" | "live";
   scoreLabel: string;
   bandLetter: string | null;
   bandLabel: string;
@@ -186,7 +162,7 @@ function ScorePane({
             minWidth: 0,
           }}
         >
-          <ProvenanceDot kind={provenance} />
+          <ProvenanceDot />
           <span
             style={{
               fontFamily: "var(--font-mono)",
@@ -338,10 +314,8 @@ function ScorePane({
 
 export function CIPulseScoreDisplay({
   ciScore,
-  pulseScore,
   ciChangeText,
 }: CIPulseScoreDisplayProps) {
-  // CI panel — Beta methodology.
   const ciBandLetter = ciScore?.band ?? null;
   const ciBandRow = bandRow(ciBandLetter as string | null);
   const ciColorVar = bandColor(ciBandLetter as string | null);
@@ -365,40 +339,13 @@ export function CIPulseScoreDisplay({
         .join(" ")
     : "Composite score not available yet.";
 
-  // Pulse panel — still v1 merged scalar; Phase 5.5/5.6 reworks this.
-  // Map the 0–100 Pulse score onto an A–F band the same way as CI for
-  // visual consistency until the Pulse rework lands.
-  let pulseBandLetter: string | null = null;
-  if (pulseScore) {
-    const ps = pulseScore.pulseScore;
-    const matched = BAND_RANGES.find((b) => ps >= b.min && ps <= b.max);
-    pulseBandLetter = matched?.letter ?? null;
-  }
-  const pulseBandRow = bandRow(pulseBandLetter);
-  const pulseColorVar = bandColor(pulseBandLetter);
-
-  const pulseFooter = pulseScore
-    ? [
-        `${pulseScore.activeEvents} active event${pulseScore.activeEvents === 1 ? "" : "s"} in the trailing 120 days.`,
-        `Last refresh ${formatDateLabel(pulseScore.scoreDate)}.`,
-        pulseScore.isLowConfidence ? "Low confidence." : null,
-        "Pulse rework coming.",
-      ]
-        .filter(Boolean)
-        .join(" ")
-    : "Pulse score not available yet.";
-
   return (
     <section
-      aria-label="Civica Index and Civica Pulse scores"
+      aria-label="Civica Index score"
       style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-        gap: 1,
         border: "1px solid var(--color-card-border)",
         borderRadius: "var(--radius-sm)",
         overflow: "hidden",
-        background: "var(--color-card-border)",
         boxShadow: "var(--shadow-hard-lg)",
         marginBottom: 24,
       }}
@@ -406,7 +353,6 @@ export function CIPulseScoreDisplay({
       <ScorePane
         title="Civica Index"
         chip={ciScore ? `CI · ${formatQuarter(ciScore.quarter)} (Beta)` : "CI · Pending"}
-        provenance="frozen"
         scoreLabel="/ 100"
         bandLetter={(ciBandLetter as string | null) ?? null}
         bandLabel={ciBandRow.label}
@@ -416,21 +362,6 @@ export function CIPulseScoreDisplay({
         barValue={ciScore?.score ?? 0}
         secondaryLine={ciChangeText ?? (ciScore?.completenessFlag === "partial" ? "Partial" : "Quarterly cadence")}
         footer={ciFooter}
-      />
-
-      <ScorePane
-        title="Civica Pulse"
-        chip="CP · Live"
-        provenance="live"
-        scoreLabel="/ 100"
-        bandLetter={pulseBandLetter}
-        bandLabel={pulseBandRow.label}
-        bandColorVar={pulseColorVar}
-        scoreValue={pulseScore ? pulseScore.pulseScore.toFixed(1) : "—"}
-        intervalLine={null}
-        barValue={pulseScore?.pulseScore ?? 0}
-        secondaryLine={pulseScore ? formatPulseDelta(pulseScore.eventImpact) : "Daily cadence"}
-        footer={pulseFooter}
       />
     </section>
   );

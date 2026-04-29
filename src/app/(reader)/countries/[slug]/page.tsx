@@ -21,6 +21,8 @@ import {
   type CIScoreData,
   type PulseScoreData,
 } from "@/components/ci/CIPulseScoreDisplay";
+import { PulseDimensionalDeltas } from "@/components/pulse/PulseDimensionalDeltas";
+import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 import { SourceDot } from "@/components/SourceDot";
 import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
 import { FactbookSection } from "@/components/FactbookSection";
@@ -115,7 +117,7 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline, ciDetail] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline, ciDetail, pulseV2] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -128,6 +130,7 @@ export default async function CountryPage({
     getConstitution(jurisdiction.id),
     getLeaderTimeline(jurisdiction.id),
     getCICountryDetail(slug).catch(() => null),
+    getPulseV2ForCountry(slug).catch(() => null),
   ]);
   const ciScore: CIScoreData | null = ciDetail?.composite
     ? {
@@ -1204,9 +1207,10 @@ export default async function CountryPage({
       </div>
 
       {/* Tabs — prototype: gap 2, border-bottom, 28px top margin, 32px bottom margin */}
-      {(ciScore || pulseScoreData) && (
+      {(ciScore || pulseV2) && (
         <div style={{ marginTop: 32 }}>
-          <CIPulseScoreDisplay ciScore={ciScore} pulseScore={pulseScoreData} />
+          <CIPulseScoreDisplay ciScore={ciScore} />
+          {pulseV2 ? <PulseDimensionalDeltas data={pulseV2} /> : null}
           <div
             style={{
               marginTop: -8,
