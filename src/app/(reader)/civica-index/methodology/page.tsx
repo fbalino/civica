@@ -596,11 +596,15 @@ export default async function MethodologyPage() {
             The Pulse is currently a clearly labelled <em>Beta</em> —
             experimental, not yet citable as authoritative. Its
             methodology is documented in detail at{" "}
-            <Link href="/civica-index/pulse-methodology">
-              /civica-index/pulse-methodology
+            <Link href="/civica-index/methodology/pulse">
+              /civica-index/methodology/pulse
             </Link>
             . That page is the sister document to this one and should
-            be read alongside.
+            be read alongside. The full event feed is at{" "}
+            <Link href="/civica-index/pulse-changelog">
+              /civica-index/pulse-changelog
+            </Link>
+            .
           </p>
         </section>
 
