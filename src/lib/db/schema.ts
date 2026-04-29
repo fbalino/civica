@@ -921,6 +921,43 @@ export const pulseDimensionalDeltas = pgTable(
 );
 
 /**
+ * Phase 5.7 — internal Pulse review audit log.
+ *
+ * Every reviewer decision (approve / edit / reject) writes a row
+ * here with the before/after event snapshot. Lets us reconstruct
+ * who decided what when, and surfaces the trail to disputes raised
+ * via the corrections form.
+ */
+export const pulseReviewAuditLog = pgTable(
+  "pulse_review_audit_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "cascade" })
+      .notNull(),
+    /** Operator name supplied at sign-in. Initially the user types
+     *  their own name; multi-operator support comes later. */
+    reviewerId: text("reviewer_id").notNull(),
+    /** 'approve' | 'edit' | 'reject' */
+    action: text("action").notNull(),
+    /** Pre-decision snapshot of the event row (relevant fields). */
+    before: jsonb("before").notNull(),
+    /** Post-decision snapshot. For 'reject', after === before with
+     *  review_status flipped. */
+    after: jsonb("after").notNull(),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_pulse_review_audit_event").on(table.eventId),
+    index("idx_pulse_review_audit_reviewer").on(
+      table.reviewerId,
+      table.createdAt
+    ),
+  ]
+);
+
+/**
  * Public corrections log specific to Pulse events. Sister of
  * `correction_log`. Disputes track event misclassification, severity
  * miscalibration, false positives, missing events, duplicates per
