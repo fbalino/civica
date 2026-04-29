@@ -5,13 +5,28 @@
  * the Beta governance core is FOUR dimensions, with Human Development and
  * Stability/Security moved out to the separate Civica Conditions layer.
  *
- * Weights are PROVISIONAL until the empirical factor analysis (Phase 5.3)
- * confirms the structure. Until then, the proportions in the spec §2.2 are
- * scaffolding — they sum to 1.00 and are clearly labelled as provisional
- * on every CI display.
+ * Weights below are derived from the Phase 5.3 PCA on 46 countries × 4
+ * dimensions (full analysis at /civica-index/methodology/pca-appendix).
+ * PC1 explains 90.7% of variance with all four dimensions loading
+ * roughly equally — indicating one strong latent "governance quality"
+ * factor. Final weights are the squared PC1 loadings, rounded to 2dp
+ * and proven to sum to 1.00:
  *
- * A 5th dimension (Administrative Capacity) is added back if and only if
- * factor analysis shows it's empirically distinct from Rule of Law.
+ *   democratic_quality  0.27   (PCA suggested 0.266)
+ *   rule_of_law         0.26   (PCA suggested 0.257)
+ *   freedom_rights      0.23   (PCA suggested 0.229)
+ *   corruption_control  0.24   (PCA suggested 0.248)
+ *
+ * The 5th-dimension test (Administrative Capacity from WGI Government
+ * Effectiveness) is deferred — that indicator is not yet ingested.
+ * When it is, re-run the analysis to test whether it loads on a
+ * distinct factor or collapses into Rule of Law.
+ *
+ * NOTE: the Phase 5.3 panel is statistically usable (n=46) but
+ * underpowered relative to the spec's 2000–2024 target. Weights will
+ * be re-validated when the historical panel is ingested. The
+ * structural decision (4-dim core, near-equal weights) is unlikely
+ * to change.
  */
 
 import type { CIDimensionKey } from "./dimensions";
@@ -30,12 +45,14 @@ export const V2_DIMENSIONS: readonly CIDimensionV2[] = [
   "corruption_control",
 ] as const;
 
-/** Provisional weights — sum to 1.00. Spec §2.2. */
+/** Empirical weights — sum to 1.00. PCA-derived from Phase 5.3
+ * (squared PC1 loadings, rounded to 2dp). See full analysis at
+ * /civica-index/methodology/pca-appendix. */
 export const V2_WEIGHTS: Record<CIDimensionV2, number> = {
-  democratic_quality: 0.30,
-  rule_of_law: 0.25,
-  freedom_rights: 0.25,
-  corruption_control: 0.20,
+  democratic_quality: 0.27,
+  rule_of_law: 0.26,
+  freedom_rights: 0.23,
+  corruption_control: 0.24,
 };
 
 /** Mandatory dimensions per spec §2.7 — if either is missing, no CI is

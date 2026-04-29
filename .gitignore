@@ -45,3 +45,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# python (Phase 5.3 PCA analysis lives in /analysis)
+**/.venv/
+**/__pycache__/
+**/*.pyc

@@ -1,0 +1,14 @@
+[project]
+name = "civica-pca"
+version = "0.1.0"
+description = "PCA / factor analysis for the Civica Index Beta methodology (Phase 5.3)"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=2.0",
+    "scikit-learn>=1.5",
+    "factor-analyzer>=0.5",
+    "matplotlib>=3.9",
+    "psycopg[binary]>=3.2",
+    "python-dotenv>=1.0",
+]

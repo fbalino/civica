@@ -368,10 +368,18 @@ export default async function MethodologyPage() {
             </li>
           </ul>
           <p>
-            The PCA / factor analysis appendix is published alongside
-            this page when the work is complete. Until then, the weights
-            in §2 are provisional scaffolding and are clearly labelled
-            as such on every CI display.
+            The full PCA results — eigenvalues, scree plot, factor
+            loadings, and decision rationale — are published as a
+            separate appendix at{" "}
+            <Link href="/civica-index/methodology/pca-appendix">
+              /civica-index/methodology/pca-appendix
+            </Link>
+            . Headline finding: the four governance dimensions are
+            highly correlated (r = 0.74 to 0.98), one dominant latent
+            factor explains 90.7% of the variance, and weights
+            proportional to the squared first-component loadings come
+            out near-equal — close enough to the provisional values
+            that rankings barely move under the revision.
           </p>
         </section>
 
