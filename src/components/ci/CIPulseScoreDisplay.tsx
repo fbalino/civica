@@ -154,8 +154,8 @@ function ScorePane({
           </span>
           <span
             className="ci-beta-pill"
-            aria-label="Beta release — methodology under revision"
-            title="Methodology under active revision — v2 in development"
+            aria-label="Beta — methodology under active revision"
+            title="Methodology under active revision. See /civica-index/methodology for details."
           >
             Beta
           </span>

@@ -182,11 +182,23 @@ export default async function MethodologyPage() {
         </nav>
         <h1 className="page-title">The Civica Index methodology.</h1>
         <div className="page-meta">
-          <span>Version {version}</span>
+          <span>Version {version} (live)</span>
           <span className="dim">·</span>
           <span>{published}</span>
           <span className="dim">·</span>
-          <span>DOI pending</span>
+          <span>v2.0 in active revision</span>
+        </div>
+
+        <div className="meth-rebuild-banner" role="note">
+          <strong>Methodology rebuild in progress.</strong> The text below
+          documents v1.0 — the live methodology. A complete revision (v2.0)
+          is being prepared, incorporating fixed-bound normalization,
+          confidence intervals, rank bands, separation of governance from
+          conditions, and a rebuilt event-sensitive Pulse layer. The
+          rebuild is in a dedicated planning document; this page will be
+          rewritten before cut-over (target Q3 2026). Until then, the v1.0
+          methodology below is the authoritative description of how every
+          published score is currently produced.
         </div>
 
         <p className="abstract">
@@ -709,6 +721,22 @@ GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}`}</pre>
         }
         .meth-article .page-meta .dim { color: var(--color-text-20); }
 
+        .meth-rebuild-banner {
+          font-family: var(--font-sans);
+          font-size: 14px;
+          line-height: 1.6;
+          color: var(--color-text-primary);
+          background: color-mix(in oklch, var(--color-warn) 10%, var(--color-page-bg) 90%);
+          border: 1px solid var(--color-warn);
+          border-left: 4px solid var(--color-warn);
+          border-radius: 4px;
+          padding: 18px 22px;
+          margin: 0 0 32px;
+        }
+        .meth-rebuild-banner strong {
+          font-weight: 600;
+          color: var(--color-text-primary);
+        }
         .meth-article .abstract {
           font-family: var(--font-heading, var(--font-serif));
           font-size: 22px;

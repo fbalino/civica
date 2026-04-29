@@ -1,4 +1,4 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { getJurisdictionBySlug } from "@/lib/db/queries";
 import {
@@ -62,6 +62,7 @@ export async function GET(
         methodologyVersion: composite.methodologyVersion,
         dimensions,
       },
+      meta: { methodology: CI_METHODOLOGY_META },
     });
   } catch (e) {
     console.error("API /v1/index/[country_slug] error:", e);

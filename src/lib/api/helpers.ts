@@ -7,6 +7,27 @@ const CORS_HEADERS = {
   "Access-Control-Max-Age": "86400",
 };
 
+/**
+ * Methodology status metadata for CI + Pulse API endpoints.
+ *
+ * Civica is in a methodology rebuild. v1.0 is the live methodology;
+ * v2.0 is in active development with a target cut-over of 2026 Q3.
+ * Public-facing labels follow the year-quarter convention; the
+ * `methodology_version` field stays as the engineering/citation marker.
+ *
+ * Endpoints that surface CI or Pulse data include this object as
+ * `meta.methodology` in their response envelope so machine consumers
+ * can detect the rebuild and the cut-over window.
+ */
+export const CI_METHODOLOGY_META = Object.freeze({
+  current_version: "1.0",
+  current_status: "live",
+  next_version: "2.0",
+  next_status: "in-development",
+  target_cutover: "2026-09-30",
+  reference: "https://civicaatlas.org/civica-index/methodology",
+});
+
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 60;

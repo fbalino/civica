@@ -1,4 +1,4 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { jurisdictions, ciCompositeScores, pulseDailyScores } from "@/lib/db/schema";
@@ -38,7 +38,17 @@ export async function GET(request: Request) {
     }
 
     if (!quarter) {
-      return apiResponse({ data: [], meta: { total: 0, limit, offset, hasMore: false, quarter: null } });
+      return apiResponse({
+        data: [],
+        meta: {
+          total: 0,
+          limit,
+          offset,
+          hasMore: false,
+          quarter: null,
+          methodology: CI_METHODOLOGY_META,
+        },
+      });
     }
 
     const conditions = [sql`${ciCompositeScores.quarter} = ${quarter}`];
@@ -143,6 +153,7 @@ export async function GET(request: Request) {
           hasMore: offset + limit < filtered.length,
           quarter,
           taxonomy,
+          methodology: CI_METHODOLOGY_META,
         },
       });
     }
@@ -176,7 +187,15 @@ export async function GET(request: Request) {
         ...row,
         governmentClassification: classificationMap.get(jurisdictionId) ?? null,
       })),
-      meta: { total, limit, offset, hasMore: offset + limit < total, quarter, taxonomy },
+      meta: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + limit < total,
+        quarter,
+        taxonomy,
+        methodology: CI_METHODOLOGY_META,
+      },
     });
   } catch (e) {
     console.error("API /v1/index/rankings error:", e);

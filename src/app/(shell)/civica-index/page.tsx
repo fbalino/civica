@@ -113,8 +113,12 @@ export default async function CivicaIndexShellPage({
         <section className="ci-hero">
           <div className="ci-hero-eyebrow">
             <span className="dot live" aria-hidden="true" />
-            Civica Index · Version 1.0 · Updated daily
-            <span className="ci-beta-pill" aria-label="Beta release">
+            Civica Index · Beta · Updated daily
+            <span
+              className="ci-beta-pill"
+              aria-label="Beta — methodology under active revision"
+              title="Methodology under active revision. See methodology page for details."
+            >
               Beta
             </span>
           </div>
@@ -123,7 +127,8 @@ export default async function CivicaIndexShellPage({
           </h1>
           <p className="ci-hero-rework-note">
             Methodology under active revision —{" "}
-            <Link href="/civica-index/methodology">v2 in development</Link>.
+            <Link href="/civica-index/methodology">see methodology</Link> for the
+            current state of the rebuild.
           </p>
           <p className="ci-hero-lede">
             The Civica Index is a composite governance score for every

@@ -1,4 +1,4 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { getCIMethodology, getCIMethodologyHistory } from "@/lib/db/queries";
 
 export async function GET(request: Request) {
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
     if (history) {
       const versions = await getCIMethodologyHistory();
-      return apiResponse({ data: versions });
+      return apiResponse({ data: versions, meta: { methodology: CI_METHODOLOGY_META } });
     }
 
     const methodology = await getCIMethodology(versionId);
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       return apiError("Methodology not found", 404);
     }
 
-    return apiResponse({ data: methodology });
+    return apiResponse({ data: methodology, meta: { methodology: CI_METHODOLOGY_META } });
   } catch (e) {
     console.error("API /v1/index/methodology error:", e);
     return apiError("Internal server error", 500);
