@@ -1,5 +1,97 @@
 # Project Memory Sessions
 
+## 2026-04-30 — Phase 5.10 cut-over verified live
+
+The Pulse v2 / taxonomy-v2.0 cut-over had effectively been deploying
+across the previous session's pushes (every push to `origin/main`
+triggers a Vercel auto-deploy). This session verified the production
+state and shipped one bug fix that was uncovered during smoke-testing.
+
+### Bug fix shipped — review-queue → delta refresh (`469e73d`)
+
+**Symptom (user-reported).** Russia country page showed all 5
+dimensions as "FLAT — NO SIGNIFICANT SIGNAL" even though the public
+changelog had a published Russia event (LGBT Network labelled
+"extremist", freedom_rights severe_neg -6, 3/3 classifier agreement).
+
+**Root cause.** The review-queue approve/edit/reject endpoint at
+`src/app/api/admin/pulse-review/[id]/route.ts` flipped
+`pulse_events_v2.published` and wrote the audit row but never
+recomputed `pulse_dimensional_deltas`. Country pages read the
+deltas table directly. So between an approval and the next 08:30 UTC
+score cron, the changelog and country page disagreed.
+
+DB inspection showed 6 published v2 events but only 5 delta rows
+(all from Bangladesh's Phase 5.5 smoke run). `last_computed_at` was
+2026-04-30 01:07 UTC — before any of the review-queue approvals.
+
+**Fix.** After the audit log insert in the review route, call
+`calculateDimensionalDeltas(db)`. ~1s for current event volume.
+Errors caught + logged so a scoring hiccup doesn't block the review
+action — daily cron remains the safety net. Comment notes the
+revisit point if `pulse_events_v2` grows past ~10k rows.
+
+**Backfill.** Ran `npm run pulse:v2:score` once to hydrate deltas
+for all 6 in-flight events:
+
+  Russia      freedom_rights      -4.15  (LGBT extremism)
+  Bolivia     freedom_rights      -3.33
+  Zimbabwe    freedom_rights      -3.28
+  Thailand    democratic_quality  -2.97
+  Malaysia    freedom_rights      -2.64
+  Bangladesh  freedom_rights      -2.04
+
+### Phase 5.10 verification (production smoke tests)
+
+All public-facing v2 surfaces verified live on civicaatlas.org:
+
+- `/civica-index/russia` — 200, dimensional panel renders Rights
+  & Freedoms -4.2 with "extremist" driver text
+- `/civica-index/bangladesh` — 200, dimensional panel renders
+- `/civica-index/pulse-changelog` — 200
+- `/civica-index/methodology/pulse` — 200
+- `/civica-index/methodology/pulse/backtest` — 200
+- `/admin/sign-in` — 200
+- `/api/v1/pulse/russia/dimensions` — returns the LGBT event
+  as freedom_rights driver with delta -4.15 (matches local)
+- `/api/v1/pulse/changelog/v2` — 200
+- Legacy `/api/v1/pulse/[slug]` and `/api/v1/pulse/changelog`
+  return `Deprecation: true` + `Sunset: Thu, 31 Dec 2026 00:00:00
+  GMT` + `Link: rel="successor-version"` headers
+
+`npm run build` clean locally.
+
+### State of system at end of session
+
+- `origin/main` at `469e73d` (the review-route fix)
+- `pulse-taxonomy-v2.0` tag on origin at `df7cd4e`
+- Production serving deployment `dpl_95X4XiaKMCZAXBacYKBSjGMDSME3`
+  (the post-fix build will replace this within a few minutes; not
+  a behavioral concern since all v2 surfaces shipped earlier)
+- 6 published v2 events visible publicly with correct deltas
+- 3 still pending in `/admin/pulse-review` queue (no SLA breach yet)
+- Daily v2 cron schedule (07:00 / 07:30 / 08:00 / 08:30 UTC)
+  remains active
+
+### Known gaps + parked
+
+- **Per-driving-event linking from country panel to changelog** —
+  per the deployment plan Q&A, the country panel's driving-event
+  headlines are not yet individually clickable. "See all events →"
+  link satisfies the transparency floor. Pre-cut-over plan flagged
+  this as a 15-min fast-follow; not done. Reviewer may pick up.
+- **`ADMIN_API_KEY` rotation in Vercel production env** — flagged
+  in the deployment plan as a sign-off item. Not verified this
+  session; reviewer should confirm the Vercel dashboard value
+  doesn't match the local dev token.
+- **Phase 5.9** (licensing audit, advisory board, SSRN preprint)
+  remains deferred per 2026-04-28 decision.
+- **Vercel deploy of `469e73d`** kicked off by the push during this
+  session. Verification was done against the previous deployment
+  (`dpl_95X4...`) which already had every visible v2 surface; the
+  only behavioral change in `469e73d` is in the admin review POST
+  handler, which doesn't affect public-facing surfaces.
+
 ## 2026-04-30 — Route audit and visual sitemap
 
 - Created route audit + Mermaid sitemap at `/Users/fernandobalino/civica/plan/site-route-audit-sitemap.md`.
