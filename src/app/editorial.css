@@ -107,7 +107,10 @@
   font-weight: var(--font-weight-mono, 500);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--color-on-warning, var(--color-status-warning));
+  /* Bg is mostly page-bg with a hint of warning colour, so text reads
+     against the page palette. --color-text-primary keeps the tag
+     legible in both light and dark themes. */
+  color: var(--color-text-primary);
   background: color-mix(
     in oklch,
     var(--color-status-warning) 18%,

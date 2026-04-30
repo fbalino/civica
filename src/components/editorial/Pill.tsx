@@ -33,7 +33,10 @@ export function Pill({
         alignItems: "center",
         border: `1px solid ${color}`,
         background: `color-mix(in oklch, ${color} 16%, var(--color-page-bg) 84%)`,
-        color: variant === "warn" ? "var(--color-on-warning)" : "var(--color-text-primary)",
+        // Pill bg is always 84% page-bg, so text reads against the
+        // page palette — not the saturated variant colour. Using
+        // --color-text-primary keeps Pills legible in both themes.
+        color: "var(--color-text-primary)",
         borderRadius: "var(--radius-sm)",
         padding: size === "sm" ? "2px 7px" : "4px 10px",
         fontFamily: "var(--font-mono)",
