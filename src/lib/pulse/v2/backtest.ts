@@ -56,25 +56,9 @@ function getAnthropic(): Anthropic {
   return _anthropic;
 }
 
-const SYSTEM_PROMPT = (() => {
-  const lines = EVENT_CATEGORIES.map(
-    (c) =>
-      `  ${c.id}: "${c.label}" → dimension=${c.dimension}, direction=${c.direction}, allowed_tiers=[${c.allowedTiers.join(", ")}]`
-  ).join("\n");
-  return `You are a governance-event classifier for Civica's Pulse Beta. Pick exactly ONE category from this list:
-
-${lines}
-
-Severity tier numeric ranges:
-  low_pos: +1..+2 | moderate_pos: +3..+4 | high_pos: +5..+6
-  low_neg: -2..-1 | moderate_neg: -4..-3 | severe_neg: -7..-5
-  catastrophic_neg: -10..-8
-
-If the event does NOT match any category (sports, weather, routine politics), respond with category="none".
-
-Respond with JSON ONLY:
-{"category":"<id or 'none'>","severity_tier":"<one allowed_tier>","severity_value":<integer>,"self_confidence":<0..1>,"rationale":"one sentence"}`;
-})();
+// Single source of truth — same prompt as production classify.ts.
+import { CLASSIFIER_SYSTEM_PROMPT } from "./classifier-prompt";
+const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
 interface ClassifierLite {
   category: string;

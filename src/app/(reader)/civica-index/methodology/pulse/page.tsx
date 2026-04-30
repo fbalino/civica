@@ -212,6 +212,347 @@ export default function PulseMethodologyPage() {
       </section>
 
       <section className="editorial-section">
+        <h2>Event categories — the v2 taxonomy</h2>
+        <p>
+          The Pulse classifies every event into exactly one category
+          drawn from a fixed taxonomy. v2.0 ships{" "}
+          <strong>61 categories</strong> across the five dimensions,
+          derived from a top-down completeness review against five
+          established political-science frameworks (V-Dem, ACLED, the
+          Comparative Constitutions Project, the Polity Project, and
+          Freedom House). Full derivation lives in{" "}
+          <Link href="https://github.com/civicaatlas/civica/blob/main/docs/taxonomy-v2-gap-analysis.md">
+            the gap-analysis document
+          </Link>
+          .
+        </p>
+
+        <h3>Democratic Quality (12 categories)</h3>
+        <ul>
+          <li>
+            <code>fair_election</code> — free and fair election (V-Dem
+            Electoral Democracy Index, FH A-1).
+          </li>
+          <li>
+            <code>flawed_election</code> — irregularity-laden election
+            (V-Dem v2elirreg).
+          </li>
+          <li>
+            <code>disputed_election</code> — close, contested,
+            challenged-in-court election (V-Dem v2elirreg, FH A-2).
+          </li>
+          <li>
+            <code>election_cancellation</code> — postponement or
+            cancellation of a scheduled election.
+          </li>
+          <li>
+            <code>gerrymandering</code> — pre-election boundary
+            manipulation (V-Dem v2elaccept, FH A-3).
+          </li>
+          <li>
+            <code>candidate_disqualification</code> — opposition
+            candidate barred from competing (V-Dem v2psbars, FH B-1).
+          </li>
+          <li>
+            <code>electoral_access_change</code> — voter ID,
+            registration, polling-station rules (bidirectional —
+            V-Dem v2xeg_eqaccess, FH A).
+          </li>
+          <li>
+            <code>mass_disenfranchisement</code> — annulment of
+            electoral mandate or large-scale disqualification of
+            voters.
+          </li>
+          <li>
+            <code>peaceful_transfer</code> — successful transfer of
+            power between governments through normal democratic
+            channels.
+          </li>
+          <li>
+            <code>negotiated_transition</code> — pacted democratic
+            transition out of authoritarianism (Polity transition
+            codings; Spain 1976, South Africa 1990-94).
+          </li>
+          <li>
+            <code>term_extension</code> — constitutional term
+            extension or self-coup that prolongs a leader&apos;s
+            mandate.
+          </li>
+          <li>
+            <code>constitutional_override_electoral</code> —
+            constitutional override of a specific electoral mandate.
+          </li>
+        </ul>
+
+        <h3>Rule of Law (13 categories)</h3>
+        <ul>
+          <li>
+            <code>judicial_purge</code> — mass dismissal or
+            replacement of judges (V-Dem v2juhcind).
+          </li>
+          <li>
+            <code>judicial_independence_rollback</code> —
+            institutional erosion of judicial independence.
+          </li>
+          <li>
+            <code>judicial_independence_expansion</code> —
+            institutional strengthening of judicial independence.
+          </li>
+          <li>
+            <code>prosecutorial_independence</code> — independent
+            prosecutors fired or strengthened (V-Dem v2juncind, FH F-1).
+          </li>
+          <li>
+            <code>executive_constitutional_override</code> — executive
+            overriding the constitution itself.
+          </li>
+          <li>
+            <code>executive_court_defiance</code> — executive refusing
+            to comply with binding court rulings (V-Dem v2jucomp, FH F-1).
+          </li>
+          <li>
+            <code>opposition_prosecution</code> — politically motivated
+            prosecution of named opposition figures (V-Dem
+            v2juhcind, politically motivated prosecutions).
+          </li>
+          <li>
+            <code>oversight_body_dismantling</code> — auditor-general,
+            ombudsman, or non-anti-corruption oversight body weakened.
+          </li>
+          <li>
+            <code>police_accountability</code> — civilian oversight of
+            police expanded or restricted (V-Dem v2clrspct, FH F-3).
+          </li>
+          <li>
+            <code>detention_conditions</code> — pretrial detention,
+            solitary, torture-allegation regime changes (V-Dem
+            v2cltort, FH F-3).
+          </li>
+          <li>
+            <code>martial_law</code> — military-jurisdiction
+            declaration over civilians.
+          </li>
+          <li>
+            <code>emergency_declaration</code> — civilian state of
+            emergency without military jurisdiction (FH F).
+          </li>
+          <li>
+            <code>anticorruption_conviction</code> — high-profile
+            anti-corruption conviction in independent court (also
+            scored on Corruption Control).
+          </li>
+        </ul>
+
+        <h3>Rights &amp; Freedoms (19 categories)</h3>
+        <ul>
+          <li>
+            <code>journalist_arrest</code>, <code>media_shutdown</code>{" "}
+            — press-freedom incidents (RSF, V-Dem v2mecenefm).
+          </li>
+          <li>
+            <code>protest_crackdown</code> — state response to a
+            specific protest event with casualties.
+          </li>
+          <li>
+            <code>assembly_rights_restriction</code> /
+            <code>{" "}assembly_rights_expansion</code> — de jure
+            assembly law (FH E-1).
+          </li>
+          <li>
+            <code>internet_shutdown</code> — full internet shutdown.
+          </li>
+          <li>
+            <code>internet_content_restriction</code> — content
+            blocking, throttling, content laws (V-Dem v2smgovsm).
+          </li>
+          <li>
+            <code>mass_detention</code> — mass political detentions
+            (cross-cutting freedom_rights signal).
+          </li>
+          <li>
+            <code>systematic_crackdown</code> — cross-cutting
+            repression pattern without a single named target.
+          </li>
+          <li>
+            <code>religious_freedom_change</code> — restrictions or
+            expansions of religious practice (V-Dem v2clrelig, FH D-2).
+          </li>
+          <li>
+            <code>minority_rights_change</code> — de jure changes
+            affecting ethnic / linguistic / religious minorities
+            (V-Dem v2clpolcl, FH G-4).
+          </li>
+          <li>
+            <code>lgbt_rights_change</code> — LGBT-specific rights
+            changes (V-Dem v2clrgunev).
+          </li>
+          <li>
+            <code>academic_freedom_change</code> — university,
+            scholar, curriculum freedom (V-Dem v2cafres).
+          </li>
+          <li>
+            <code>ngo_restriction</code> — NGO-specific legal regimes
+            (foreign-agent laws, etc. V-Dem v2cseeorgs).
+          </li>
+          <li>
+            <code>surveillance_regime_change</code> — bulk
+            surveillance authority expanded or restricted (V-Dem
+            v2cldiscm, FH D-4).
+          </li>
+          <li>
+            <code>movement_freedom_change</code> — travel bans, exit
+            visas, internal-passport requirements (FH G-1).
+          </li>
+          <li>
+            <code>property_rights_change</code> — expropriation,
+            asset seizures, property protections (V-Dem v2clprptyw,
+            FH G-2).
+          </li>
+          <li>
+            <code>political_assassination</code> — targeted killing of
+            journalists, activists, opposition figures (ACLED VAC
+            attack sub-event-type).
+          </li>
+          <li>
+            <code>press_freedom_expansion</code> — press-freedom law
+            expansion (positive).
+          </li>
+        </ul>
+
+        <h3>Corruption Control (6 categories)</h3>
+        <ul>
+          <li>
+            <code>corruption_conviction</code> — high-level corruption
+            conviction.
+          </li>
+          <li>
+            <code>corruption_scandal</code> — major documented
+            corruption scandal.
+          </li>
+          <li>
+            <code>anticorruption_law</code> — anti-corruption law
+            enactment.
+          </li>
+          <li>
+            <code>anticorruption_dismantling</code> —
+            anti-corruption institution weakened.
+          </li>
+          <li>
+            <code>whistleblower_protection_change</code> —
+            whistleblower-protection regime changes (V-Dem v2juacgr).
+          </li>
+          <li>
+            <code>financial_disclosure_change</code> — asset-disclosure
+            and beneficial-ownership requirement changes (FH C-3).
+          </li>
+        </ul>
+
+        <h3>Stability (11 categories)</h3>
+        <ul>
+          <li>
+            <code>armed_conflict</code>, <code>state_collapse</code> —
+            ACLED battles + Polity codings.
+          </li>
+          <li>
+            <code>coup</code> — military or unconstitutional seizure
+            of power.
+          </li>
+          <li>
+            <code>foreign_occupation</code> — foreign occupation /
+            imposition (Polity -66).
+          </li>
+          <li>
+            <code>constitutional_crisis</code> — institutional
+            deadlock or partial breakdown without coup or armed
+            conflict (Polity interregnum -88; Sri Lanka 2022 example).
+          </li>
+          <li>
+            <code>government_collapse</code> — coalition breakdown or
+            no-confidence collapse via parliamentary mechanism.
+          </li>
+          <li>
+            <code>secession_or_territorial_dispute</code> — independence
+            referendum, declaration, or non-violent territorial
+            transfer.
+          </li>
+          <li>
+            <code>electoral_violence</code> — partisan-group violence
+            below armed-conflict threshold (ACLED riots / VAC).
+          </li>
+          <li>
+            <code>peace_agreement_signed</code> /
+            <code>{" "}peace_agreement_implemented</code> — formal
+            peace agreements (positive).
+          </li>
+          <li>
+            <code>negotiated_transition_stability</code> —
+            stabilising side of pacted regime transitions (positive).
+          </li>
+        </ul>
+
+        <p>
+          Each category in the taxonomy ships with: an inline
+          theoretical citation, an allowed-severity-tier list, a decay
+          half-life, and a direction (positive / negative / mixed). The
+          classifier picks exactly one category per event; multiple
+          related events on different dimensions form what the
+          methodology calls a <em>cascade</em> — see below.
+        </p>
+      </section>
+
+      <section className="editorial-section">
+        <h2>Disambiguation — when an event could fit multiple categories</h2>
+        <p>
+          v2.0 expanded the taxonomy from 30 to 61 categories. Several
+          of the new fine-grained categories overlap at the prompt
+          level with v1 categories — an event could plausibly fit
+          either. The classifier prompt enforces a single rule for
+          these cases:
+        </p>
+        <p>
+          <strong>The more dimension-specific category wins over the
+          more generic procedural one.</strong>
+        </p>
+        <p>
+          Concrete precedence:
+        </p>
+        <ul>
+          <li>
+            <code>emergency_declaration</code> loses to{" "}
+            <code>term_extension</code>, <code>mass_disenfranchisement</code>,{" "}
+            <code>election_cancellation</code>,{" "}
+            <code>constitutional_override_electoral</code>,{" "}
+            <code>judicial_purge</code>, and <code>martial_law</code>{" "}
+            when the event has a named institutional target.
+          </li>
+          <li>
+            <code>systematic_crackdown</code> loses to any category
+            with a named institutional target (e.g.{" "}
+            <code>ngo_restriction</code>,{" "}
+            <code>media_shutdown</code>, <code>academic_freedom_change</code>).
+          </li>
+          <li>
+            <code>mass_detention</code> loses to{" "}
+            <code>opposition_prosecution</code> when the detained are
+            named figures with formal charges.
+          </li>
+          <li>
+            <code>coup</code> wins over{" "}
+            <code>government_collapse</code> and{" "}
+            <code>constitutional_crisis</code> when there is an
+            unconstitutional seizure of power.
+          </li>
+        </ul>
+        <p>
+          The disambiguation rules live in{" "}
+          <code>src/lib/pulse/v2/classifier-prompt.ts</code> as part
+          of the system prompt sent to Claude. The same prompt drives
+          both production classification and backtesting — they cannot
+          drift apart.
+        </p>
+      </section>
+
+      <section className="editorial-section">
         <h2>How coups are classified — the cascade model</h2>
         <p>
           Reviewers occasionally ask why a coup d&apos;état drives the

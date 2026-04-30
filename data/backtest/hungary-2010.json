@@ -43,11 +43,21 @@
       "eventDate": "2012-01-23",
       "sourceId": "civicus_monitor",
       "sourceType": "specialist",
-      "title": "Hungary: New electoral law concentrates redistricting power, halves opposition seats",
-      "body": "Parliament passed a new electoral law that redrew constituency boundaries to favour the governing party, reduced the number of parliamentary seats from 386 to 199, and converted a substantial fraction to single-member districts won under first-past-the-post. CIVICUS and OSCE election observers concluded that the changes substantially advantaged Fidesz and that opposition parties faced structurally adverse competitive conditions. Subsequent elections held under the new rules returned Fidesz supermajorities with reduced vote shares.",
+      "title": "Hungary: Parliament halved from 386 to 199 seats, electoral system restructured to favour governing party",
+      "body": "Parliament passed Act CCIII reducing the number of parliamentary seats from 386 to 199 and converting a substantial fraction to single-member districts won under first-past-the-post rules. The new structure systematically advantages the governing Fidesz party and disenfranchises the supporters of smaller opposition parties whose votes are now structurally non-competitive in the redrawn single-member contests. CIVICUS and OSCE election observers concluded the structural changes were the primary mechanism by which Fidesz secured supermajorities in subsequent elections with declining vote shares.",
       "hintCategory": "mass_disenfranchisement",
       "hintDimension": "democratic_quality",
       "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2012-01-23",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Hungary: Electoral constituency boundaries redrawn to favour governing party",
+      "body": "The same Act CCIII redrew constituency boundaries across the country to systematically advantage the governing party. Independent statistical analyses showed that the new boundaries concentrated Fidesz votes inefficiently while distributing opposition votes across many losing single-member districts. The boundary changes are a textbook example of partisan gerrymandering and produce structurally biased electoral results separate from the seat-count reduction.",
+      "hintCategory": "gerrymandering",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "moderate_neg"
     }
   ]
 }

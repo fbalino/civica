@@ -63,40 +63,11 @@ function getAnthropic(): Anthropic {
   return _anthropic;
 }
 
-const SYSTEM_PROMPT = buildSystemPrompt();
+// Single source of truth for the classifier prompt — shared with
+// backtest.ts so both paths classify identically.
+import { CLASSIFIER_SYSTEM_PROMPT } from "./classifier-prompt";
 
-function buildSystemPrompt(): string {
-  const taxonomyLines = EVENT_CATEGORIES.map((c) => {
-    const tiers = c.allowedTiers.join(", ");
-    return `  ${c.id}: "${c.label}" → dimension=${c.dimension}, direction=${c.direction}, allowed_tiers=[${tiers}]`;
-  }).join("\n");
-
-  return `You are a governance-event classifier for Civica's Pulse Beta. You receive a single news/specialist-feed event description and must classify it according to the v2 taxonomy.
-
-Pick exactly ONE category from this list:
-
-${taxonomyLines}
-
-Severity tier numeric ranges:
-  low_pos: +1 to +2
-  moderate_pos: +3 to +4
-  high_pos: +5 to +6
-  low_neg: -1 to -2
-  moderate_neg: -3 to -4
-  severe_neg: -5 to -7
-  catastrophic_neg: -8 to -10
-
-If the event does NOT clearly match any of the categories above (e.g. it's a sports story, weather event, or routine politics), respond with category="none".
-
-Respond with JSON ONLY, no preamble:
-{
-  "category": "<id from list or 'none'>",
-  "severity_tier": "<one of the allowed_tiers for that category>",
-  "severity_value": <integer in the tier's range, signed>,
-  "self_confidence": <float 0.0-1.0>,
-  "rationale": "<one sentence>"
-}`;
-}
+const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
 interface ClassifierResultLite {
   category: string;
