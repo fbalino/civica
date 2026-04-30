@@ -3,7 +3,7 @@
   "countryName": "Burma",
   "countryIso3": "MMR",
   "eventDate": "2021-02-01",
-  "description": "Myanmar military (Tatmadaw) seized power on February 1, 2021, detaining elected NLD officials including Aung San Suu Kyi and declaring a year-long state of emergency. The coup ended a decade of partial democratic transition. Subsequent months saw widespread protests, mass detentions, and a junta crackdown that killed thousands and effectively dismantled the elected legislature.",
+  "description": "Myanmar military (Tatmadaw) seized power on February 1, 2021, detaining elected NLD officials including Aung San Suu Kyi and declaring a year-long state of emergency. The coup ended a decade of partial democratic transition. Cascade events through the rest of 2021 — parliament dissolution, election annulment, party dismantling, show trials of the elected leadership, expansion of military tribunals to civilians — drove dimensional impact across democratic_quality, rule_of_law, and freedom_rights in addition to the headline stability rupture.",
   "expected": [
     { "dimension": "democratic_quality", "direction": "negative", "magnitude": "catastrophic" },
     { "dimension": "rule_of_law", "direction": "negative", "magnitude": "catastrophic" },
@@ -21,14 +21,24 @@
       "hintSeverityTier": "catastrophic_neg"
     },
     {
-      "eventDate": "2021-02-02",
+      "eventDate": "2021-02-01",
       "sourceId": "amnesty",
       "sourceType": "specialist",
-      "title": "Myanmar: Coup d'état and dissolution of elected parliament",
-      "body": "The Tatmadaw's seizure of power dissolved the elected Pyidaungsu Hluttaw and replaced civilian governance with a State Administration Council headed by Min Aung Hlaing. The action overrides constitutional electoral provisions.",
-      "hintCategory": "term_extension",
+      "title": "Myanmar: Junta declares Pyidaungsu Hluttaw dissolved, voids constitutional electoral mandate",
+      "body": "The Tatmadaw's State Administration Council dissolved the Pyidaungsu Hluttaw — Myanmar's elected bicameral legislature — and voided the constitutional mandate of representatives elected in November 2020. The action constitutes a sweeping override of the electoral process and removes all elected representation from national governance.",
+      "hintCategory": "constitutional_override_electoral",
       "hintDimension": "democratic_quality",
-      "hintSeverityTier": "catastrophic_neg"
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-02-26",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Myanmar: Election Commission annuls 2020 election results, voids 25 million ballots",
+      "body": "The Union Election Commission, reconstituted by the junta, formally annulled the results of the November 2020 general election in which more than 25 million Myanmar voters participated. The annulment is the clearest act of mass disenfranchisement in Myanmar's modern history; it strips electoral legitimacy from the entire elected body.",
+      "hintCategory": "mass_disenfranchisement",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
     },
     {
       "eventDate": "2021-02-15",
@@ -51,10 +61,30 @@
       "hintSeverityTier": "catastrophic_neg"
     },
     {
+      "eventDate": "2021-03-15",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Myanmar: Junta files first criminal charges against Aung San Suu Kyi",
+      "body": "State Counsellor Aung San Suu Kyi was charged under the Penal Code's import-export provisions in the first wave of politically motivated prosecutions of the elected leadership. Amnesty International documents the lack of due process protections, denial of access to defense counsel, and the use of legal proceedings to remove elected officials from political life. The charges erode the independence of the criminal justice system as an institution.",
+      "hintCategory": "judicial_independence_rollback",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-04-01",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Myanmar: Junta extends military tribunals to civilians, suspends habeas corpus",
+      "body": "The junta declared martial law in 11 townships across Yangon and Mandalay, transferring jurisdiction over civilian defendants to military tribunals. The tribunals operate without due-process protections — defendants have no right to appeal or to civilian counsel. Habeas corpus and other procedural rights are suspended in martial-law areas. Human Rights Watch documents the wholesale displacement of the civilian justice system.",
+      "hintCategory": "martial_law",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
       "eventDate": "2021-04-12",
       "sourceId": "amnesty",
       "sourceType": "specialist",
-      "title": "Myanmar: Junta dissolves NLD party in show trial",
+      "title": "Myanmar: Junta dissolves NLD party, bars elected officials from politics",
       "body": "The Union Election Commission, controlled by the junta, dissolved the National League for Democracy and barred elected officials from future participation. Amnesty International called this a comprehensive disenfranchisement of the 2020 election outcome.",
       "hintCategory": "constitutional_override_electoral",
       "hintDimension": "democratic_quality",
@@ -68,6 +98,26 @@
       "body": "Special tribunals convicted multiple journalists under the Penal Code's incitement provisions, with sentences of 3–7 years. The trials lacked due process protections including access to defense counsel.",
       "hintCategory": "journalist_arrest",
       "hintDimension": "freedom_rights",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-07-30",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Myanmar: Mass detentions of NLD officials and activists, special courts convene without due process",
+      "body": "More than 7,000 NLD officials, activists, lawyers, and journalists detained since the coup, Amnesty International estimates. Trials are held in special courts inside prisons; defendants have no right to public hearings, no access to independent counsel, and no right of appeal. The pattern represents a systematic dismantling of judicial independence and an ongoing erosion of the rule-of-law foundations of Myanmar's constitutional order.",
+      "hintCategory": "judicial_independence_rollback",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-12-06",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Myanmar: Aung San Suu Kyi convicted in show trial, sentenced to four years",
+      "body": "A junta-controlled court sentenced Aung San Suu Kyi to four years' imprisonment after a closed-door trial on incitement and COVID-19 protocol violations. The proceedings did not conform to international standards: access to her legal counsel was severely restricted, the prosecution presented no exculpatory evidence requirements, and verdicts were delivered without public hearings. The conviction further erodes judicial independence as an institution.",
+      "hintCategory": "judicial_independence_rollback",
+      "hintDimension": "rule_of_law",
       "hintSeverityTier": "severe_neg"
     }
   ]

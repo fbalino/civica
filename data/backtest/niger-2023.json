@@ -3,7 +3,7 @@
   "countryName": "Niger",
   "countryIso3": "NER",
   "eventDate": "2023-07-26",
-  "description": "Members of Niger's presidential guard detained President Mohamed Bazoum on July 26, 2023, declaring a coup d'état and installing General Abdourahamane Tchiani as head of a new junta (Conseil National de Sauvegarde de la Patrie). The takeover ended Niger's 2021 democratic transition and triggered ECOWAS sanctions plus a regional standoff.",
+  "description": "Members of Niger's presidential guard detained President Mohamed Bazoum on July 26, 2023, declaring a coup d'état and installing General Abdourahamane Tchiani as head of a new junta (Conseil National de Sauvegarde de la Patrie). Cascade events through late 2023 — constitution suspended, parliament dissolved, political party activities banned, treason charges filed against the deposed president, three-year transition timeline announced — drove dimensional impact across democratic_quality and rule_of_law in addition to the headline stability rupture.",
   "expected": [
     { "dimension": "democratic_quality", "direction": "negative", "magnitude": "catastrophic" },
     { "dimension": "rule_of_law", "direction": "negative", "magnitude": "severe" }
@@ -20,12 +20,32 @@
       "hintSeverityTier": "catastrophic_neg"
     },
     {
-      "eventDate": "2023-07-28",
+      "eventDate": "2023-07-26",
       "sourceId": "amnesty",
       "sourceType": "specialist",
-      "title": "Niger: Junta suspends constitution, dissolves elected institutions",
-      "body": "The new National Council for the Safeguard of the Homeland suspended the 2010 constitution, dissolved the National Assembly, and prohibited political party activity. The actions remove all institutional checks on military rule.",
+      "title": "Niger: Constitution of 2010 suspended, all branches of government overridden",
+      "body": "Following the seizure of power, Niger's 2010 constitution was suspended in its entirety. The constitutional framework — which structured executive accountability, defined judicial independence, and provided for periodic elections — has been set aside without amendment, referendum, or any other process specified by the constitution itself. The action removes the legal scaffolding for democratic governance.",
       "hintCategory": "constitutional_override_electoral",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2023-07-28",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Niger: National Assembly dissolved, elected representatives stripped of mandates",
+      "body": "The National Assembly elected in 2021 was dissolved by the new National Council for the Safeguard of the Homeland, stripping all elected representatives of their mandates. The dissolution removes legislative oversight and ends representative governance. The action constitutes a wholesale override of Niger's electoral mandate from the 2021 vote.",
+      "hintCategory": "constitutional_override_electoral",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2023-08-02",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Niger: All political party activities suspended, opposition disenfranchised",
+      "body": "The junta issued decrees suspending all political party activities — including meetings, public communications, and organisational work — across the country. The ban affects every political organisation that participated in the 2021 election, effectively disenfranchising the millions of Nigeriens whose political affiliations are now legally unactionable.",
+      "hintCategory": "mass_disenfranchisement",
       "hintDimension": "democratic_quality",
       "hintSeverityTier": "severe_neg"
     },
@@ -43,8 +63,8 @@
       "eventDate": "2023-09-15",
       "sourceId": "hrw",
       "sourceType": "specialist",
-      "title": "Niger: Junta announces three-year transition timeline",
-      "body": "The junta unveiled a three-year transition plan retaining military rule, rejecting ECOWAS demands for the immediate restoration of constitutional order. The announcement effectively extends military governance through 2026.",
+      "title": "Niger: Junta announces three-year transition timeline, extends military rule through 2026",
+      "body": "The junta unveiled a three-year transition plan retaining military rule, rejecting ECOWAS demands for the immediate restoration of constitutional order. The announcement effectively extends military governance through 2026 and removes any immediate prospect of returning to elected civilian rule.",
       "hintCategory": "term_extension",
       "hintDimension": "democratic_quality",
       "hintSeverityTier": "severe_neg"
@@ -54,7 +74,7 @@
       "sourceId": "amnesty",
       "sourceType": "specialist",
       "title": "Niger: Charges of high treason filed against deposed President Bazoum",
-      "body": "Junta authorities filed treason and conspiracy charges against the deposed Bazoum, who remains under house arrest. Amnesty International called the prosecution politically motivated and lacking in due process.",
+      "body": "Junta authorities filed treason and conspiracy charges against the deposed Bazoum, who remains under house arrest. Amnesty International called the prosecution politically motivated and lacking in due process; the special tribunal selected to hear the case operates outside of the ordinary judicial system, eroding judicial independence as an institution.",
       "hintCategory": "judicial_independence_rollback",
       "hintDimension": "rule_of_law",
       "hintSeverityTier": "severe_neg"
