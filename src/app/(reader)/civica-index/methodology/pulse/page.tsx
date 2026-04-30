@@ -212,6 +212,60 @@ export default function PulseMethodologyPage() {
       </section>
 
       <section className="editorial-section">
+        <h2>How coups are classified — the cascade model</h2>
+        <p>
+          Reviewers occasionally ask why a coup d&apos;état drives the
+          Stability dimension rather than Democratic Quality. The
+          answer is that it drives both — but indirectly, through the
+          cascade.
+        </p>
+        <p>
+          The Pulse models a coup as the <strong>stability rupture</strong>.
+          The democratic damage that follows is captured through the
+          cascade of post-coup events that the classifier handles
+          independently:
+        </p>
+        <ul>
+          <li>
+            Parliament dissolution → <code>constitutional_override_electoral</code>
+            {" "}→ Democratic Quality
+          </li>
+          <li>
+            Annulment of prior elections → <code>mass_disenfranchisement</code>
+            {" "}→ Democratic Quality
+          </li>
+          <li>
+            "Transition plans" or term extensions → <code>term_extension</code>
+            {" "}→ Democratic Quality
+          </li>
+          <li>
+            Show trials of opposition figures →{" "}
+            <code>judicial_independence_rollback</code> → Rule of Law
+          </li>
+          <li>
+            Martial law / military tribunals for civilians →{" "}
+            <code>martial_law</code> → Rule of Law
+          </li>
+          <li>
+            Press shutdowns and journalist arrests →{" "}
+            <code>media_shutdown</code> / <code>journalist_arrest</code> →
+            Rights &amp; Freedoms
+          </li>
+        </ul>
+        <p>
+          This mirrors how political scientists model regime breakdown:
+          the coup is the rupture event, the consolidation is what
+          kills democratic institutions over the following weeks and
+          months. Each cascade event is independently classifiable;
+          their dimensional impacts accumulate naturally on the right
+          rows. A reader looking at the country page sees Stability
+          plummet on day one and Democratic Quality, Rule of Law, and
+          Rights &amp; Freedoms degrade over the following months as
+          the new regime consolidates power.
+        </p>
+      </section>
+
+      <section className="editorial-section">
         <h2>Multi-run classifier — agreement is the confidence signal</h2>
         <p>
           LLM self-reported confidence is not calibrated. The Pulse
@@ -355,6 +409,32 @@ export default function PulseMethodologyPage() {
           new release), the corresponding Pulse delta is zeroed so the
           event isn&apos;t counted twice. The audit trail in the event row
           records when this happens.
+        </p>
+      </section>
+
+      <section className="editorial-section">
+        <h2>Coverage limitations — closed regimes</h2>
+        <p>
+          The Pulse depends on observable, reportable events. For
+          countries with severely restricted press freedom (RSF Press
+          Freedom score below 30) or where international monitoring
+          organisations have limited access — North Korea, Eritrea,
+          Turkmenistan, parts of contemporary Afghanistan — the Pulse
+          will systematically <strong>under-detect</strong> events and
+          may show artificially stable dimensional deltas.
+        </p>
+        <p>
+          This is a known limitation of any real-time governance
+          monitor that depends on documented evidence. For these
+          countries, the structural{" "}
+          <Link href="/civica-index">Civica Index</Link> remains the
+          primary signal — it draws on expert assessments aggregated
+          annually (V-Dem, Freedom House, etc.) and does not depend on
+          observable real-time events.
+        </p>
+        <p>
+          Country pages where the country&apos;s RSF score falls below
+          30 surface this caveat directly on the Pulse panel.
         </p>
       </section>
 

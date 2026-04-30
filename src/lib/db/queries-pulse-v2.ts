@@ -15,6 +15,7 @@ import {
   pulseSources,
 } from "@/lib/db/schema";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
+import { pressFreedomScore } from "@/lib/pulse/v2/press-freedom";
 
 /** A row in the per-country dimensional-delta panel. */
 export interface DimensionRow {
@@ -33,11 +34,14 @@ export interface DimensionRow {
 }
 
 export interface PulseV2ForCountry {
-  jurisdiction: { id: string; slug: string; name: string };
+  jurisdiction: { id: string; slug: string; name: string; iso3: string | null };
   dimensions: Record<PulseDimension, DimensionRow>;
   lastComputedAt: string | null;
   /** Total published events feeding the deltas. */
   totalEvents: number;
+  /** RSF Press Freedom score at the time of fetch — surfaces the
+   *  closed-regime caveat on the country panel when score < 30. */
+  pressFreedomScore: number;
 }
 
 /**
@@ -57,6 +61,7 @@ export async function getPulseV2ForCountry(
       id: jurisdictions.id,
       slug: jurisdictions.slug,
       name: jurisdictions.name,
+      iso3: jurisdictions.iso3,
     })
     .from(jurisdictions)
     .where(sql`LOWER(${jurisdictions.slug}) = ${lower}`)
@@ -64,6 +69,7 @@ export async function getPulseV2ForCountry(
 
   const jurisdiction = jurisdictionRows[0];
   if (!jurisdiction) return null;
+  const press = pressFreedomScore(jurisdiction.iso3);
 
   // Pull all 5 dimension rows (or however many exist). Missing
   // dimensions get a zero default below.
@@ -143,6 +149,7 @@ export async function getPulseV2ForCountry(
     dimensions,
     lastComputedAt,
     totalEvents: eventRows.length,
+    pressFreedomScore: press,
   };
 }
 

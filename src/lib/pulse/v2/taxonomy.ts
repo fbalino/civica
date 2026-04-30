@@ -6,6 +6,46 @@
  * decay half-lives). Keep this file as the single source of truth —
  * the classifier picks from `EVENT_CATEGORIES`, the corroboration step
  * reads `SEVERITY_TIER_RANGES`, and the scoring step reads `HALF_LIFE_DAYS`.
+ *
+ * ─────────────────────────────────────────────────────────────────
+ *  TAXONOMY DECISION — coups map to STABILITY, not democratic_quality
+ * ─────────────────────────────────────────────────────────────────
+ *
+ * The `coup` and `state_collapse` categories live on the `stability`
+ * dimension. This is deliberate, not an oversight. Reviewers occasionally
+ * raise the question "shouldn't a coup drive democratic_quality?" — the
+ * answer is yes, but indirectly, through the cascade.
+ *
+ * Civica Pulse models a coup as the *stability rupture*. The
+ * democratic_quality damage that follows is captured through the
+ * cascade of post-coup events that are independently classifiable:
+ *
+ *   - Parliament dissolution    → constitutional_override_electoral
+ *                                  → democratic_quality
+ *   - Election results annulled → mass_disenfranchisement
+ *                                  → democratic_quality
+ *   - Term extensions / "transition plans"
+ *                                → term_extension
+ *                                  → democratic_quality
+ *   - Show trials of opposition → judicial_independence_rollback
+ *                                  → rule_of_law
+ *   - Martial law / military tribunals
+ *                                → martial_law
+ *                                  → rule_of_law
+ *   - Press shutdowns           → media_shutdown / journalist_arrest
+ *                                  → freedom_rights
+ *
+ * This mirrors how political scientists model regime breakdown: the
+ * coup is the rupture event, the consolidation kills democratic
+ * institutions over the following weeks and months. Each cascade
+ * event is its own classifiable record; their dimensional impacts
+ * accumulate naturally on the right rows.
+ *
+ * Implication for ground-truth seed data (backtesting): a single
+ * "coup" headline is not enough to reach catastrophic-magnitude
+ * deltas on democratic_quality or rule_of_law. The cascade events
+ * must be present too. See `data/backtest/myanmar-2021.json` for
+ * the canonical example.
  */
 
 import type { PulseDimension, SeverityTier } from "./types";

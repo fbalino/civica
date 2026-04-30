@@ -268,6 +268,30 @@ export function PulseDimensionalDeltas({ data }: Props) {
         </Link>
       </header>
 
+      {data.pressFreedomScore < 30 ? (
+        <div
+          className="editorial-warning"
+          style={{ margin: "8px 0 16px" }}
+        >
+          <strong>Coverage caveat.</strong> {jurisdiction.name} has
+          severely restricted press freedom (RSF score{" "}
+          {data.pressFreedomScore}). The Pulse depends on observable
+          events; in restricted-press environments it systematically
+          under-detects and may show artificially stable deltas. The{" "}
+          <Link href="/civica-index" style={{ color: "var(--color-accent)" }}>
+            structural Civica Index
+          </Link>{" "}
+          remains the primary signal. See the{" "}
+          <Link
+            href="/civica-index/methodology/pulse#coverage-limitations"
+            style={{ color: "var(--color-accent)" }}
+          >
+            Pulse coverage limitations
+          </Link>{" "}
+          for details.
+        </div>
+      ) : null}
+
       {totalEvents === 0 ? (
         <p
           style={{
