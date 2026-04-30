@@ -408,7 +408,8 @@ export default function PulseMethodologyPage() {
 
       <nav className="editorial-footer-nav" aria-label="Methodology navigation">
         <Link href="/civica-index/methodology">← Civica Index methodology</Link>
-        <Link href="/civica-index/pulse-changelog">Pulse changelog →</Link>
+        <Link href="/civica-index/methodology/pulse/backtest">Backtest report →</Link>
+        <Link href="/civica-index/pulse-changelog">Pulse changelog</Link>
         <Link href="/civica-index/corrections">Corrections form</Link>
       </nav>
     </EditorialPage>
