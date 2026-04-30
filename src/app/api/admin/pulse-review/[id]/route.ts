@@ -32,6 +32,7 @@ import {
   getAdminSession,
   ADMIN_REVIEWER_COOKIE,
 } from "@/lib/admin/session";
+import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
 
 type Action = "approve" | "edit" | "reject";
 
@@ -208,6 +209,18 @@ export async function POST(
     after,
     notes: body.notes ?? null,
   });
+
+  // Refresh dimensional deltas so the country page reflects this
+  // decision immediately. Without this, country-page Pulse panels
+  // stay flat until the next daily score cron. ~1s for current
+  // event volume; revisit if pulse_events_v2 grows past ~10k rows.
+  try {
+    await calculateDimensionalDeltas(db);
+  } catch (err) {
+    // Don't fail the review action if scoring hiccups — the daily
+    // cron will catch up. Log so the issue is visible.
+    console.error("[pulse-review] delta recompute failed", err);
+  }
 
   if (isForm) {
     const redirect = body.redirect ?? "/admin/pulse-review";
