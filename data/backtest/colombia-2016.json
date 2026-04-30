@@ -1,0 +1,52 @@
+{
+  "id": "colombia-2016",
+  "countryName": "Colombia",
+  "countryIso3": "COL",
+  "eventDate": "2016-11-24",
+  "description": "After more than four years of negotiations in Havana, the Colombian government and the Revolutionary Armed Forces of Colombia (FARC-EP) signed a final peace agreement on November 24, 2016. The accord ended the longest-running armed conflict in the Western Hemisphere. The original agreement was rejected in an October 2 plebiscite by a narrow margin; a revised text was signed and ratified by Congress on November 30. This is a positive-direction case used to verify the pipeline correctly registers stabilisation.",
+  "expected": [
+    { "dimension": "stability", "direction": "positive", "magnitude": "moderate" }
+  ],
+  "events": [
+    {
+      "eventDate": "2016-08-24",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Colombia: Government and FARC announce final peace accord",
+      "body": "The Colombian government and FARC-EP announced that negotiating teams in Havana have finalised a comprehensive peace agreement, including provisions on rural reform, political participation, transitional justice, and disarmament. The text marks the culmination of four years of formal negotiations.",
+      "hintCategory": "peace_agreement_signed",
+      "hintDimension": "stability",
+      "hintSeverityTier": "moderate_pos"
+    },
+    {
+      "eventDate": "2016-11-24",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Colombia: Revised peace agreement signed in Bogotá",
+      "body": "President Juan Manuel Santos and FARC-EP commander Rodrigo Londoño signed a revised peace agreement at the Teatro Colón in Bogotá, incorporating amendments addressing concerns from the October plebiscite. The accord ends a 52-year armed conflict.",
+      "hintCategory": "peace_agreement_signed",
+      "hintDimension": "stability",
+      "hintSeverityTier": "moderate_pos"
+    },
+    {
+      "eventDate": "2016-11-30",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Colombia: Congress ratifies peace agreement",
+      "body": "The Colombian Senate and House of Representatives ratified the revised peace agreement, formalising its entry into force. Implementation phases including FARC disarmament begin immediately.",
+      "hintCategory": "peace_agreement_implemented",
+      "hintDimension": "stability",
+      "hintSeverityTier": "moderate_pos"
+    },
+    {
+      "eventDate": "2017-06-27",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Colombia: FARC completes weapons handover to UN observers",
+      "body": "FARC-EP completed the handover of approximately 7,000 individual weapons to United Nations observers, certifying compliance with the disarmament timeline of the November 2016 peace agreement.",
+      "hintCategory": "peace_agreement_implemented",
+      "hintDimension": "stability",
+      "hintSeverityTier": "high_pos"
+    }
+  ]
+}

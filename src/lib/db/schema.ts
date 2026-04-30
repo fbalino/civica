@@ -958,6 +958,79 @@ export const pulseReviewAuditLog = pgTable(
 );
 
 /**
+ * Phase 5.8 — backtest cases.
+ *
+ * One row per named historical governance shock from the spec §5.3
+ * test list (Myanmar 2021, Niger 2023, etc.). The `expected` column
+ * holds the spec's expected-direction definition as JSON:
+ *   [{dimension, direction, magnitude}, ...]
+ * where direction ∈ {'positive','negative','mixed'} and
+ * magnitude ∈ {'moderate','severe','catastrophic'}.
+ */
+export const backtestCases = pgTable("backtest_cases", {
+  id: text("id").primaryKey(),
+  countryName: text("country_name").notNull(),
+  countryIso3: text("country_iso3"),
+  eventDate: date("event_date").notNull(),
+  description: text("description").notNull(),
+  expected: jsonb("expected").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+/**
+ * Hand-curated representative events for each backtest case. Fed
+ * to the v2 classifier during a backtest run instead of pulling
+ * from raw_events. Hint columns let the curator preflight what the
+ * classifier should output without forcing the harness to use them.
+ */
+export const backtestEvents = pgTable(
+  "backtest_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    caseId: text("case_id")
+      .references(() => backtestCases.id, { onDelete: "cascade" })
+      .notNull(),
+    eventDate: date("event_date").notNull(),
+    sourceId: text("source_id").notNull(),
+    sourceType: text("source_type").notNull(),
+    title: text("title").notNull(),
+    body: text("body"),
+    hintCategory: text("hint_category"),
+    hintDimension: text("hint_dimension"),
+    hintSeverityTier: text("hint_severity_tier"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("idx_backtest_events_case").on(table.caseId)]
+);
+
+/**
+ * One row per backtest run per case. Stores the per-dimension
+ * trajectory the harness produced and the pass/fail verdict.
+ * Append-only — re-running creates new rows.
+ */
+export const backtestRuns = pgTable(
+  "backtest_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    caseId: text("case_id")
+      .references(() => backtestCases.id, { onDelete: "cascade" })
+      .notNull(),
+    ranAt: timestamp("ran_at").defaultNow().notNull(),
+    /** Snapshot of the v2 pipeline parameters at run time. */
+    paramSnapshot: jsonb("param_snapshot").notNull(),
+    /** Array of {dayOffset, dimension, delta} sample points. */
+    trajectory: jsonb("trajectory").notNull(),
+    /** 'pass' | 'fail' | 'partial' */
+    verdict: text("verdict").notNull(),
+    /** Per-expected-row verdicts + divergence notes. */
+    detail: jsonb("detail").notNull(),
+  },
+  (table) => [
+    index("idx_backtest_runs_case_ran").on(table.caseId, table.ranAt),
+  ]
+);
+
+/**
  * Public corrections log specific to Pulse events. Sister of
  * `correction_log`. Disputes track event misclassification, severity
  * miscalibration, false positives, missing events, duplicates per

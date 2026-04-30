@@ -1,0 +1,74 @@
+{
+  "id": "myanmar-2021",
+  "countryName": "Burma",
+  "countryIso3": "MMR",
+  "eventDate": "2021-02-01",
+  "description": "Myanmar military (Tatmadaw) seized power on February 1, 2021, detaining elected NLD officials including Aung San Suu Kyi and declaring a year-long state of emergency. The coup ended a decade of partial democratic transition. Subsequent months saw widespread protests, mass detentions, and a junta crackdown that killed thousands and effectively dismantled the elected legislature.",
+  "expected": [
+    { "dimension": "democratic_quality", "direction": "negative", "magnitude": "catastrophic" },
+    { "dimension": "rule_of_law", "direction": "negative", "magnitude": "catastrophic" },
+    { "dimension": "freedom_rights", "direction": "negative", "magnitude": "severe" }
+  ],
+  "events": [
+    {
+      "eventDate": "2021-02-01",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Myanmar: Military coup ends decade of democratic transition",
+      "body": "Myanmar's military seized power on February 1, 2021, detaining elected officials including State Counsellor Aung San Suu Kyi and President Win Myint, and declaring a one-year state of emergency. The coup followed a November 2020 election in which the NLD won decisively. Human Rights Watch called the takeover an unconstitutional seizure of power.",
+      "hintCategory": "coup",
+      "hintDimension": "stability",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2021-02-02",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Myanmar: Coup d'état and dissolution of elected parliament",
+      "body": "The Tatmadaw's seizure of power dissolved the elected Pyidaungsu Hluttaw and replaced civilian governance with a State Administration Council headed by Min Aung Hlaing. The action overrides constitutional electoral provisions.",
+      "hintCategory": "term_extension",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2021-02-15",
+      "sourceId": "rsf_alerts",
+      "sourceType": "specialist",
+      "title": "Myanmar: Multiple journalists arrested, internet shutdown imposed",
+      "body": "Reporters Without Borders documented arrests of more than a dozen journalists across Yangon and Mandalay; the junta has imposed multiple nationwide internet shutdowns to suppress reporting on protests.",
+      "hintCategory": "internet_shutdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-03-03",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Myanmar: Security forces kill protesters in deadliest day yet",
+      "body": "At least 38 protesters killed by security forces on March 3 alone in coordinated nationwide crackdowns, bringing the post-coup death toll to over 60. Human Rights Watch documents systematic use of live ammunition against civilians.",
+      "hintCategory": "protest_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2021-04-12",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Myanmar: Junta dissolves NLD party in show trial",
+      "body": "The Union Election Commission, controlled by the junta, dissolved the National League for Democracy and barred elected officials from future participation. Amnesty International called this a comprehensive disenfranchisement of the 2020 election outcome.",
+      "hintCategory": "constitutional_override_electoral",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-05-24",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Myanmar: Junta sentences journalists in show trials",
+      "body": "Special tribunals convicted multiple journalists under the Penal Code's incitement provisions, with sentences of 3–7 years. The trials lacked due process protections including access to defense counsel.",
+      "hintCategory": "journalist_arrest",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "severe_neg"
+    }
+  ]
+}

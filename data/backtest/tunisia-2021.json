@@ -1,0 +1,63 @@
+{
+  "id": "tunisia-2021",
+  "countryName": "Tunisia",
+  "countryIso3": "TUN",
+  "eventDate": "2021-07-25",
+  "description": "On July 25, 2021, Tunisian President Kais Saied invoked Article 80 of the constitution to dismiss the prime minister, freeze parliament, and assume executive powers. Critics labeled the move a self-coup. Subsequent decrees further consolidated presidential power, including a 2022 referendum that adopted a new constitution removing parliamentary checks on the executive.",
+  "expected": [
+    { "dimension": "democratic_quality", "direction": "negative", "magnitude": "severe" },
+    { "dimension": "rule_of_law", "direction": "negative", "magnitude": "severe" }
+  ],
+  "events": [
+    {
+      "eventDate": "2021-07-25",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Tunisia: President Saied freezes parliament, dismisses prime minister",
+      "body": "President Kais Saied invoked Article 80 of the constitution to dismiss Prime Minister Hichem Mechichi and freeze parliament for 30 days, citing national emergency. Human Rights Watch and international observers raised concern that the action exceeds Article 80's emergency powers.",
+      "hintCategory": "executive_constitutional_override",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-08-24",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Tunisia: President extends emergency powers indefinitely",
+      "body": "President Saied extended the parliamentary suspension indefinitely, effectively transitioning emergency powers into a sustained executive consolidation. Amnesty International expressed concern over the absence of constitutional review.",
+      "hintCategory": "term_extension",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2022-02-06",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Tunisia: Saied dissolves Supreme Judicial Council",
+      "body": "Presidential decree dissolved the Supreme Judicial Council, replacing it with a body whose members the president directly appoints. Human Rights Watch called this an erosion of judicial independence with broad implications for separation of powers.",
+      "hintCategory": "judicial_purge",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2022-07-25",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Tunisia: Constitutional referendum adopts presidential system, removes parliamentary checks",
+      "body": "A referendum adopted a new constitution drafted under President Saied's direction. The text concentrates executive power, weakens parliamentary oversight, and removes the previous constitution's checks on presidential authority. Turnout was approximately 30%.",
+      "hintCategory": "term_extension",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2022-12-17",
+      "sourceId": "rsf_alerts",
+      "sourceType": "specialist",
+      "title": "Tunisia: Press-freedom landscape deteriorates, journalists detained",
+      "body": "Reporters Without Borders documented multiple journalist detentions and a deterioration in press-freedom conditions throughout 2022. Decree 54 criminalises broad categories of online speech.",
+      "hintCategory": "journalist_arrest",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "moderate_neg"
+    }
+  ]
+}

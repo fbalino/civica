@@ -1,0 +1,63 @@
+{
+  "id": "niger-2023",
+  "countryName": "Niger",
+  "countryIso3": "NER",
+  "eventDate": "2023-07-26",
+  "description": "Members of Niger's presidential guard detained President Mohamed Bazoum on July 26, 2023, declaring a coup d'état and installing General Abdourahamane Tchiani as head of a new junta (Conseil National de Sauvegarde de la Patrie). The takeover ended Niger's 2021 democratic transition and triggered ECOWAS sanctions plus a regional standoff.",
+  "expected": [
+    { "dimension": "democratic_quality", "direction": "negative", "magnitude": "catastrophic" },
+    { "dimension": "rule_of_law", "direction": "negative", "magnitude": "severe" }
+  ],
+  "events": [
+    {
+      "eventDate": "2023-07-26",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Niger: Military coup ousts elected President Bazoum",
+      "body": "Members of the presidential guard detained President Mohamed Bazoum at the presidential palace in Niamey, declaring a coup d'état. General Abdourahamane Tchiani, head of the presidential guard, announced himself leader of a new junta. The action ends Niger's 2021 democratic transition.",
+      "hintCategory": "coup",
+      "hintDimension": "stability",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2023-07-28",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Niger: Junta suspends constitution, dissolves elected institutions",
+      "body": "The new National Council for the Safeguard of the Homeland suspended the 2010 constitution, dissolved the National Assembly, and prohibited political party activity. The actions remove all institutional checks on military rule.",
+      "hintCategory": "constitutional_override_electoral",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2023-08-04",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Niger: Civic-space restrictions intensify under junta rule",
+      "body": "CIVICUS Monitor downgraded Niger's civic-space rating after the junta banned demonstrations supporting deposed President Bazoum and arrested several civil-society figures. Press accreditations have been revoked for multiple international outlets.",
+      "hintCategory": "systematic_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2023-09-15",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Niger: Junta announces three-year transition timeline",
+      "body": "The junta unveiled a three-year transition plan retaining military rule, rejecting ECOWAS demands for the immediate restoration of constitutional order. The announcement effectively extends military governance through 2026.",
+      "hintCategory": "term_extension",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2023-10-12",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Niger: Charges of high treason filed against deposed President Bazoum",
+      "body": "Junta authorities filed treason and conspiracy charges against the deposed Bazoum, who remains under house arrest. Amnesty International called the prosecution politically motivated and lacking in due process.",
+      "hintCategory": "judicial_independence_rollback",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    }
+  ]
+}
