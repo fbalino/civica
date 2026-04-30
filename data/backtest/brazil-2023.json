@@ -1,0 +1,63 @@
+{
+  "id": "brazil-2023",
+  "countryName": "Brazil",
+  "countryIso3": "BRA",
+  "eventDate": "2023-01-08",
+  "description": "On January 8, 2023, supporters of former president Jair Bolsonaro stormed the National Congress building, the Supreme Federal Tribunal, and the Planalto Palace in Brasília, attempting to overturn the result of the October 2022 election that had brought Lula da Silva to power. The institutional response was swift: the military did not back the rioters, federal police and security forces secured the buildings within hours, more than 1,500 arrests followed, and the Supreme Court opened investigations into the organisers and into Bolsonaro himself. The case is a moderate-magnitude stability and rights stress test in which institutions held.",
+  "expected": [
+    { "dimension": "stability", "direction": "negative", "magnitude": "moderate" },
+    { "dimension": "freedom_rights", "direction": "negative", "magnitude": "moderate" }
+  ],
+  "events": [
+    {
+      "eventDate": "2023-01-08",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Brazil: Bolsonaro supporters storm Congress, Supreme Court, and Planalto Palace",
+      "body": "Thousands of Bolsonaro supporters breached security cordons in Brasília's Three Powers Plaza on January 8, attacking and vandalising the National Congress building, the Supreme Federal Tribunal, and the Planalto Palace. The rioters sought to overturn the result of the October 2022 election. The military did not back them; federal police and the security forces of the three institutions secured the buildings within five hours. Human Rights Watch documented the incident as an attempted assault on Brazilian democratic institutions that was rapidly contained.",
+      "hintCategory": "protest_crackdown",
+      "hintDimension": "stability",
+      "hintSeverityTier": "moderate_neg"
+    },
+    {
+      "eventDate": "2023-01-09",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Brazil: 1,500 arrested in Brasília insurrection response, federal investigations opened",
+      "body": "Federal authorities arrested more than 1,500 people involved in the January 8 attack on the federal capital. Lula da Silva, sworn in as president eight days earlier, declared the events an attempt at coup d'état. Federal Supreme Court Justice Alexandre de Moraes opened formal criminal investigations into organisers, financiers, and federal officials whose conduct may have facilitated the breach of security perimeters. The institutional response was swift but the volume of detentions raised due-process questions for some defendants.",
+      "hintCategory": "mass_detention",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "moderate_neg"
+    },
+    {
+      "eventDate": "2023-01-12",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Brazil: Federal police and Supreme Court coordinate accountability response",
+      "body": "Federal police, working with Supreme Court Justice Alexandre de Moraes, opened formal criminal investigations against former government officials, military officers, and civilian organisers. The Federal District's military police commander was dismissed; senior security officials were placed under investigation for facilitating the breach. The coordinated institutional response demonstrated functional accountability mechanisms even as the incident itself represented serious instability.",
+      "hintCategory": "anticorruption_conviction",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "moderate_pos"
+    },
+    {
+      "eventDate": "2023-04-19",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Brazil: Justice Moraes orders former president Bolsonaro to testify on January 8 events",
+      "body": "Federal Supreme Court Justice Alexandre de Moraes ordered former president Jair Bolsonaro to give testimony as part of the investigation into incitement of the January 8 attacks. The proceeding marked the first time a Brazilian former head of state was compelled to testify on alleged incitement of violence against state institutions. Amnesty International noted the proceeding as a significant test of accountability for high-level political figures.",
+      "hintCategory": "anticorruption_conviction",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "moderate_pos"
+    },
+    {
+      "eventDate": "2023-06-30",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Brazil: Electoral court bars Bolsonaro from office for eight years over election misinformation",
+      "body": "The Superior Electoral Court (TSE) ruled 5-2 to bar former president Jair Bolsonaro from holding public office until 2030 for abuse of political power and misuse of public media to spread misinformation about Brazil's electoral system. The ruling demonstrated functional electoral oversight institutions even after the January 8 attacks; Bolsonaro retained the right to appeal but the immediate effect was political ineligibility through the next presidential cycle.",
+      "hintCategory": "anticorruption_conviction",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "moderate_pos"
+    }
+  ]
+}

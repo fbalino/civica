@@ -1,0 +1,63 @@
+{
+  "id": "sri-lanka-2022",
+  "countryName": "Sri Lanka",
+  "countryIso3": "LKA",
+  "eventDate": "2022-07-09",
+  "description": "Sri Lanka's 2022 economic collapse — sovereign default, severe shortages of fuel, food, and medicine — triggered the largest peaceful protest movement in the country's modern history. Mass demonstrations across spring and summer 2022 culminated on July 9 when protesters stormed the presidential palace. President Gotabaya Rajapaksa fled the country and resigned days later. The case is a moderate-magnitude stability and rights stress test in which constitutional process largely held: Wickremesinghe was elected president by parliament, no military takeover occurred, civil-society institutions endured.",
+  "expected": [
+    { "dimension": "stability", "direction": "negative", "magnitude": "moderate" },
+    { "dimension": "freedom_rights", "direction": "negative", "magnitude": "moderate" }
+  ],
+  "events": [
+    {
+      "eventDate": "2022-04-01",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Sri Lanka: President declares state of emergency amid economic protests",
+      "body": "President Gotabaya Rajapaksa declared a nationwide state of emergency on April 1, 2022, in response to growing protests over fuel, food, and medicine shortages. The declaration grants security forces expanded powers of arrest and detention; civil-society organisations warned of overuse against peaceful demonstrators. CIVICUS Monitor downgraded Sri Lanka's civic-space rating in response.",
+      "hintCategory": "martial_law",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "moderate_neg"
+    },
+    {
+      "eventDate": "2022-04-19",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Sri Lanka: Police fire on protesters in Rambukkana, killing one",
+      "body": "Police opened fire on protesters in Rambukkana on April 19, killing one and injuring more than two dozen, in what Amnesty International called an excessive use of force against unarmed demonstrators. The incident triggered nationwide condemnation and was the first fatality in months of largely peaceful protest. Subsequent commissions of inquiry documented procedural failures in the police chain of command.",
+      "hintCategory": "protest_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "moderate_neg"
+    },
+    {
+      "eventDate": "2022-05-09",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Sri Lanka: Pro-government mob violence, multiple deaths, prime minister resigns",
+      "body": "Pro-government supporters attacked peaceful protesters at Galle Face Green and other sites in Colombo on May 9, triggering counter-violence that killed at least nine people including a member of parliament. Prime Minister Mahinda Rajapaksa resigned the same day. The violence marked a sharp escalation in the political crisis but did not result in regime breakdown — constitutional succession proceeded.",
+      "hintCategory": "protest_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "moderate_neg"
+    },
+    {
+      "eventDate": "2022-07-09",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Sri Lanka: Protesters storm presidential palace, Rajapaksa flees country",
+      "body": "Tens of thousands of demonstrators marched on Colombo on July 9 and entered the presidential palace, the prime minister's official residence, and other state buildings. President Gotabaya Rajapaksa fled to the Maldives the following day and submitted his formal resignation from Singapore on July 14. The events represented the largest peaceful protest in Sri Lanka's modern history. Constitutional succession produced an interim presidency under Wickremesinghe; no military intervention occurred.",
+      "hintCategory": "systematic_crackdown",
+      "hintDimension": "stability",
+      "hintSeverityTier": "moderate_neg"
+    },
+    {
+      "eventDate": "2022-07-22",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Sri Lanka: Wickremesinghe security forces clear Galle Face protest camp using batons and tear gas",
+      "body": "On the night of July 22, security forces under newly inaugurated President Ranil Wickremesinghe used batons, tear gas, and water cannons to clear the Galle Face Green protest camp that had stood for more than 100 days. Multiple protesters and journalists were injured. Amnesty International criticised the disproportionate force; subsequent legal challenges questioned the constitutionality of the action.",
+      "hintCategory": "protest_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "moderate_neg"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "ethiopia-2020",
+  "countryName": "Ethiopia",
+  "countryIso3": "ETH",
+  "eventDate": "2020-11-04",
+  "description": "On November 4, 2020, Prime Minister Abiy Ahmed launched a military operation in Ethiopia's Tigray region, beginning a civil war that lasted approximately two years and killed an estimated 600,000 people through combat, famine, and disease. The conflict involved federal forces, Eritrean troops, and Tigray Defense Forces; widespread atrocities including massacres of civilians, sexual violence as a weapon of war, and aid blockades that produced famine conditions. The November 2022 Pretoria peace agreement formally ended major combat operations.",
+  "expected": [
+    { "dimension": "stability", "direction": "negative", "magnitude": "catastrophic" },
+    { "dimension": "freedom_rights", "direction": "negative", "magnitude": "catastrophic" }
+  ],
+  "events": [
+    {
+      "eventDate": "2020-11-04",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Ethiopia: Federal military operation launched in Tigray, civil war begins",
+      "body": "Prime Minister Abiy Ahmed announced military operations against the Tigray People's Liberation Front (TPLF) in northern Ethiopia, accusing TPLF of attacking a federal army base. Federal forces, supported by Eritrean troops and Amhara regional forces, launched coordinated ground and air operations against Tigray. The war that began on November 4 was the largest armed conflict in Ethiopia in decades; communications were severed across Tigray within days. Human Rights Watch documented the rapid escalation as a major instability rupture.",
+      "hintCategory": "armed_conflict",
+      "hintDimension": "stability",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2020-11-28",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Ethiopia: Pattern of mass civilian killings documented in northern Tigray",
+      "body": "Amnesty International documented a systematic pattern of mass civilian killings, beginning with hundreds killed in Mai Kadra and extending through subsequent incidents across northern Tigray. Investigations attributed responsibility to multiple armed forces operating in the region. The pattern of attacks on unarmed civilians represents a sustained, systematic violation of basic rights protections and a catastrophic erosion of civilian safety as a fundamental right.",
+      "hintCategory": "systematic_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-03-19",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Ethiopia: Systematic atrocities, sexual violence, and extrajudicial executions documented",
+      "body": "Human Rights Watch and Amnesty International published joint findings documenting a systematic pattern of human rights abuses across Tigray, including extrajudicial executions, mass arrests, the use of sexual violence as a weapon, and forced displacement. The pattern of abuses was determined to constitute crimes against humanity. The findings document a comprehensive collapse of civilian rights protections — assembly, association, freedom from torture, freedom from arbitrary detention.",
+      "hintCategory": "systematic_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2021-08-04",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Ethiopia: Mass deprivation of food and medicine, aid access systematically denied",
+      "body": "UN agencies and Amnesty International documented systematic denial of humanitarian aid to 400,000 to 900,000 people in Tigray. Aid convoys were repeatedly turned back at checkpoints; food, medicine, and fuel were prevented from reaching civilian populations. The pattern of denying basic necessities to a civilian population represents a comprehensive violation of fundamental rights to life and health, and produced one of the largest hunger crises of the 2020s.",
+      "hintCategory": "systematic_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2021-11-02",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Ethiopia: State of emergency declared as Tigray forces advance toward Addis Ababa",
+      "body": "The Ethiopian government declared a six-month nationwide state of emergency on November 2, 2021, as Tigray Defense Forces advanced southward and approached the outskirts of Addis Ababa. The emergency declaration granted security forces broad powers of arrest and detention, and resulted in mass round-ups of ethnic Tigrayans in the capital. CIVICUS Monitor downgraded Ethiopia's civic-space rating in response.",
+      "hintCategory": "martial_law",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2022-11-02",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Ethiopia: Pretoria peace agreement signed, ending major combat operations in Tigray",
+      "body": "The federal government and TPLF signed a cessation-of-hostilities agreement in Pretoria, South Africa, formally ending major combat operations in Tigray. The agreement provided for TPLF disarmament, restoration of federal services in Tigray, and humanitarian access. Estimates of total dead from the two-year war ranged from 380,000 to 600,000 across combat, famine, and disease. Implementation challenges remained, but Human Rights Watch noted the agreement as a moderate stability stabiliser.",
+      "hintCategory": "peace_agreement_signed",
+      "hintDimension": "stability",
+      "hintSeverityTier": "moderate_pos"
+    }
+  ]
+}

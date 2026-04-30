@@ -1,0 +1,52 @@
+{
+  "id": "poland-2023",
+  "countryName": "Poland",
+  "countryIso3": "POL",
+  "eventDate": "2023-10-15",
+  "description": "On October 15, 2023, a coalition of opposition parties led by Donald Tusk's Civic Coalition won enough parliamentary seats to end eight years of governance by the Law and Justice (PiS) party. The new coalition government, sworn in December 13, immediately began reversing PiS-era restrictions on judicial independence, public media, and civil society. The case is the spec's archetypal positive-direction example — a peaceful democratic transfer of power following a period of backsliding, and a stress test of whether the Pulse correctly registers improvements as well as deteriorations.",
+  "expected": [
+    { "dimension": "democratic_quality", "direction": "positive", "magnitude": "moderate" }
+  ],
+  "events": [
+    {
+      "eventDate": "2023-10-15",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Poland: Opposition coalition wins parliamentary majority, ends eight years of PiS governance",
+      "body": "Donald Tusk's Civic Coalition together with Third Way and the Left won 248 of 460 seats in the Sejm in the October 15 parliamentary election, ending eight years of governance by the Law and Justice (PiS) party. Voter turnout reached 74.4%, the highest in Polish post-communist history. International election observers from the OSCE/ODIHR characterised the election as competitive but noted concerns about state-media bias toward the incumbent PiS government during the campaign.",
+      "hintCategory": "fair_election",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "moderate_pos"
+    },
+    {
+      "eventDate": "2023-12-13",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Poland: Tusk sworn in as prime minister, peaceful transfer of power completed",
+      "body": "Donald Tusk was sworn in as Prime Minister on December 13, 2023, formally completing the peaceful transfer of power from the Law and Justice government to the new opposition coalition. The transition occurred without procedural irregularities; the outgoing government participated in standard hand-over protocols. Human Rights Watch noted the smooth transfer as a significant positive marker for Polish democratic institutions following years of polarisation.",
+      "hintCategory": "peaceful_transfer",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "high_pos"
+    },
+    {
+      "eventDate": "2023-12-19",
+      "sourceId": "rsf_alerts",
+      "sourceType": "specialist",
+      "title": "Poland: New government begins restoration of public-media editorial independence",
+      "body": "The Tusk government took initial steps to depoliticise the public broadcaster TVP and Polish Radio, dismissing PiS-era management and beginning a structural reorganisation of the National Media Council. Reporters Without Borders noted the changes as a positive step toward restoring editorial independence after years in which public media had been substantially aligned with the ruling party. The structural changes proceeded amid legal challenges from the previous administration.",
+      "hintCategory": "press_freedom_expansion",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "moderate_pos"
+    },
+    {
+      "eventDate": "2024-01-12",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Poland: Justice ministry begins reversal of PiS judicial restructuring",
+      "body": "The Tusk government's justice ministry initiated steps to reverse PiS-era restructuring of the judicial system, including reforms to the Disciplinary Chamber of the Supreme Court and review of judicial appointments made under the previous government. Amnesty International noted the moves as positive for the long-term restoration of judicial independence in Poland, though full implementation faced constitutional and political constraints.",
+      "hintCategory": "judicial_independence_expansion",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "moderate_pos"
+    }
+  ]
+}

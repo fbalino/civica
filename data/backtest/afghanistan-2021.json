@@ -1,0 +1,84 @@
+{
+  "id": "afghanistan-2021",
+  "countryName": "Afghanistan",
+  "countryIso3": "AFG",
+  "eventDate": "2021-08-15",
+  "description": "On August 15, 2021, the Taliban entered Kabul as the Islamic Republic of Afghanistan collapsed. President Ashraf Ghani fled the country; the elected government dissolved; the constitutional order ended. Within weeks the Taliban declared an Islamic Emirate, replaced the secular legal system with Sharia rule, dissolved the elected parliament, banned all political parties, and progressively excluded women from secondary education and most paid employment. The case is the spec's archetypal catastrophic-across-all-dimensions example.",
+  "expected": [
+    { "dimension": "democratic_quality", "direction": "negative", "magnitude": "catastrophic" },
+    { "dimension": "rule_of_law", "direction": "negative", "magnitude": "catastrophic" },
+    { "dimension": "freedom_rights", "direction": "negative", "magnitude": "catastrophic" }
+  ],
+  "events": [
+    {
+      "eventDate": "2021-08-15",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Afghanistan: Republic collapses as Taliban enters Kabul",
+      "body": "The Islamic Republic of Afghanistan ceased to function on August 15, 2021, as Taliban fighters entered Kabul and President Ashraf Ghani fled the country. Government ministries emptied; the elected parliament ended its work; security forces dissolved or surrendered. The collapse of state authority was total within hours of the Taliban's arrival, marking the most rapid state collapse of the 21st century.",
+      "hintCategory": "state_collapse",
+      "hintDimension": "stability",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2021-08-19",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Afghanistan: All elected mandates voided, parliament dissolved, electoral commission abolished",
+      "body": "Every elected mandate in Afghanistan was voided on August 19, 2021. The bicameral National Assembly was dissolved; the elected presidency ceased to exist; the Independent Election Commission was abolished. The 2019 presidential election results — won by Ashraf Ghani — were nullified along with all parliamentary mandates from the 2018 elections. The action constitutes a comprehensive override of every electoral mandate held by Afghan voters and the disenfranchisement of an entire electorate.",
+      "hintCategory": "constitutional_override_electoral",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-09-07",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Afghanistan: Taliban announces all-male caretaker cabinet, no elected representation",
+      "body": "An all-male caretaker cabinet was announced, comprising senior Taliban figures and excluding any representation from the previous elected government. No women were appointed; no transition mechanism was specified; no electoral path was offered. The cabinet announcement formalises the wholesale disenfranchisement of Afghanistan's voters and women in particular, who comprised half of the 2019 electorate.",
+      "hintCategory": "mass_disenfranchisement",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-09-12",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Afghanistan: Secular legal system replaced by Sharia rule, judges dismissed en masse",
+      "body": "The Taliban announced that the country's secular legal system — built over two decades and incorporating constitutional rights — would be replaced by Sharia law as interpreted by Taliban clerics. Most judges from the previous system were dismissed; many female judges went into hiding amid threats. Constitutional rights protections, due-process guarantees, and judicial independence as institutional concepts no longer apply. Amnesty International calls this a comprehensive collapse of judicial institutions.",
+      "hintCategory": "judicial_purge",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2021-09-17",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Afghanistan: Girls excluded from secondary schools, women's ministry abolished",
+      "body": "The Taliban Ministry of Education ordered that only boys would return to secondary schools; girls were excluded from grades 7–12. The Ministry of Women's Affairs was abolished and its building handed to the Ministry for the Promotion of Virtue and the Prevention of Vice. The combined actions remove the institutional infrastructure for women's rights and exclude approximately 1.1 million girls from secondary education. Human Rights Watch documents the systematic and immediate scope.",
+      "hintCategory": "systematic_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "catastrophic_neg"
+    },
+    {
+      "eventDate": "2021-09-25",
+      "sourceId": "rsf_alerts",
+      "sourceType": "specialist",
+      "title": "Afghanistan: Press freedom collapses, dozens of media outlets close, journalists in hiding",
+      "body": "Reporters Without Borders documents the closure of more than 70% of Afghan media outlets within six weeks of the Taliban takeover. Female journalists are barred from most positions; multiple journalists have been beaten, detained, or executed. Independent reporting on Taliban rule has effectively ended. RSF placed Afghanistan in its highest severity tier for press-freedom collapse.",
+      "hintCategory": "media_shutdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2021-10-08",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Afghanistan: Reports of summary executions and reprisal killings of former officials",
+      "body": "Amnesty International documents a pattern of summary executions and reprisal killings of former Afghan National Defense and Security Forces personnel and former government officials, despite Taliban general-amnesty announcements. The pattern includes verified cases in Daykundi, Kandahar, and Ghazni provinces. The killings occur outside any legal process and represent a complete absence of rule of law for the affected communities.",
+      "hintCategory": "systematic_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "catastrophic_neg"
+    }
+  ]
+}

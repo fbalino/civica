@@ -1,0 +1,53 @@
+{
+  "id": "hungary-2010",
+  "countryName": "Hungary",
+  "countryIso3": "HUN",
+  "eventDate": "2011-12-30",
+  "description": "Hungary's democratic backsliding under successive Fidesz governments led by Viktor Orbán is the spec's archetypal gradual-erosion case. Unlike a coup, the trajectory plays out across more than a decade through legislative supermajorities, constitutional rewrites, judicial restructuring, media-ownership concentration, NGO targeting, and electoral-rule changes. The Pulse's single-event-window framework (−180 to +365 days from one anchor date) cannot capture the full arc; for backtesting purposes the case is anchored to December 30, 2011 — the date the cardinal-law judicial restructuring took effect, sitting between the April 2011 constitutional adoption (~day −250) and the January 2012 electoral law (~day +24). Readers should consult the Civica Index trend chart, which is the appropriate tool for slow-erosion cases.",
+  "expected": [
+    { "dimension": "democratic_quality", "direction": "negative", "magnitude": "severe" },
+    { "dimension": "rule_of_law", "direction": "negative", "magnitude": "severe" }
+  ],
+  "events": [
+    {
+      "eventDate": "2010-12-21",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Hungary: New media law concentrates regulatory power, threatens press freedom",
+      "body": "Parliament adopted a sweeping media law granting a new National Media and Infocommunications Authority (NMHH) — composed entirely of Fidesz appointees — broad powers to regulate, fine, and license all media outlets including print, broadcast, and online. CIVICUS Monitor and the Council of Europe expressed concern that the structure concentrates regulatory authority in a politically aligned body and creates the architecture for systematic press-freedom restrictions.",
+      "hintCategory": "systematic_crackdown",
+      "hintDimension": "freedom_rights",
+      "hintSeverityTier": "moderate_neg"
+    },
+    {
+      "eventDate": "2011-04-25",
+      "sourceId": "hrw",
+      "sourceType": "specialist",
+      "title": "Hungary: New Fundamental Law adopted by Fidesz supermajority, replaces 1989 constitution",
+      "body": "Parliament adopted a new Fundamental Law (constitution) replacing the 1989 democratic-transition constitution, using the Fidesz-KDNP supermajority elected in 2010. The new constitution was drafted by Fidesz parliamentarians without opposition input, ratified without a referendum, and entered into force on January 1, 2012. Human Rights Watch documented concerns including reduction of Constitutional Court powers, restrictions on judicial independence, and changes to electoral rules favouring the governing party.",
+      "hintCategory": "executive_constitutional_override",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2011-12-30",
+      "sourceId": "amnesty",
+      "sourceType": "specialist",
+      "title": "Hungary: Constitutional Court powers reduced, retirement age forces out senior judges",
+      "body": "Cardinal laws implementing the new Fundamental Law reduced the Constitutional Court's powers to review legislation and lowered the retirement age for judges from 70 to 62, forcing out approximately 274 senior judges including the Chief Justice of the Supreme Court. Amnesty International and the Venice Commission characterised the changes as a politically motivated purge of the judiciary that compromised judicial independence as an institution.",
+      "hintCategory": "judicial_purge",
+      "hintDimension": "rule_of_law",
+      "hintSeverityTier": "severe_neg"
+    },
+    {
+      "eventDate": "2012-01-23",
+      "sourceId": "civicus_monitor",
+      "sourceType": "specialist",
+      "title": "Hungary: New electoral law concentrates redistricting power, halves opposition seats",
+      "body": "Parliament passed a new electoral law that redrew constituency boundaries to favour the governing party, reduced the number of parliamentary seats from 386 to 199, and converted a substantial fraction to single-member districts won under first-past-the-post. CIVICUS and OSCE election observers concluded that the changes substantially advantaged Fidesz and that opposition parties faced structurally adverse competitive conditions. Subsequent elections held under the new rules returned Fidesz supermajorities with reduced vote shares.",
+      "hintCategory": "mass_disenfranchisement",
+      "hintDimension": "democratic_quality",
+      "hintSeverityTier": "severe_neg"
+    }
+  ]
+}
