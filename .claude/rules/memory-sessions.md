@@ -633,3 +633,88 @@ Afghanistan 2021, Sri Lanka 2022, Brazil 2023, Hungary 2010-pres,
 Ethiopia 2020-22, Colombia 2016, Poland 2023). Required before
 Pulse graduates from beta per spec §5.3 launch checklist. ≥80%
 match against expert consensus.
+
+## 2026-04-29 — Phase 5.8: Backtest framework shipped
+
+Plan: `~/civica/plan/phase-5-8-backtesting.md`. Five commits ship
+the backtesting framework + first 4 cases.
+
+What shipped:
+
+- **Schema** (`159098d`).
+  - `backtest_cases` — one row per spec §5.3 named historical case
+    with expected `(dimension, direction, magnitude)` triplets as
+    JSONB
+  - `backtest_events` — curated representative events per case
+    (date, title, body, source attribution + optional classifier
+    hints). Replaced wholesale on each seed re-run for idempotency.
+  - `backtest_runs` — append-only history of harness runs with
+    full trajectory + verdict + per-row detail
+
+- **Seed data** (`159098d`). 4 cases under `data/backtest/`:
+    - `colombia-2016.json` (FARC peace agreement, positive control)
+    - `myanmar-2021.json` (Tatmadaw coup)
+    - `niger-2023.json` (Bazoum ousted)
+    - `tunisia-2021.json` (Saied self-coup)
+  6 spec cases not yet curated: Afghanistan 2021, Sri Lanka 2022,
+  Brazil 2023, Hungary 2010-present, Ethiopia 2020-22, Poland
+  2023. Public archival data for the deeper time windows needs a
+  separate sourcing pass.
+
+- **Harness** at `src/lib/pulse/v2/backtest.ts` (`159098d`).
+  Identical multi-run classifier shape to production: 3 LLM calls
+  at temps [0, 0.4, 0.8] per event, agreement scoring on
+  (category, severityTier), corroboration confidence modulated by
+  press-freedom tier. Builds trajectory by sampling decayed
+  dimensional impact every 30 days from -180 to +365 relative to
+  the case's eventDate. Verdict logic compares peak |Δ| within
+  ±90d against magnitude thresholds (1.0 / 3.0 / 5.0). Writes
+  one `backtest_runs` row per run.
+
+- **Runner scripts** (`159098d`).
+  - `npm run backtest:seed` loads JSON → DB
+  - `npm run backtest:run` runs all cases (or `-- --case <id>`)
+
+- **Public report page** at /civica-index/methodology/pulse/backtest
+  (`f10f6ff`).
+  Server component; reads latest run per case via
+  `src/lib/db/queries-backtest.ts`. Header summary table + verdict
+  thresholds inline + per-case section with: pass/partial/fail
+  Pill, expected-vs-computed table, 5 SVG sparklines (one per
+  dimension) with vertical accent line at day 0 and ±90-day
+  verdict-window highlight, divergence notes. All styling via
+  `editorial.css` global classes — no inline <style> blocks.
+
+First-run results (50.9s, 60 LLM calls):
+  pass     colombia-2016    stability +7.57 ✓
+  fail     myanmar-2021     freedom_rights -8.71 ✓;
+                            democratic_quality -3.44 (need 5.0 ✕);
+                            rule_of_law 0.00 (no events mapped ✕)
+  partial  niger-2023       rule_of_law -4.24 ✓;
+                            democratic_quality -4.26 (need 5.0 ✕)
+  pass     tunisia-2021     democratic_quality -4.33 ✓;
+                            rule_of_law -4.33 ✓
+
+Genuine signals extracted from failures:
+1. Taxonomy maps "coup" events to `stability` dimension; spec
+   expected `democratic_quality`. Real disagreement.
+2. Catastrophic threshold (5.0) is hard to hit from clamped
+   [-15, +10] without 2+ severe events stacking.
+3. Myanmar's `rule_of_law` 0.00 because no curated event mapped
+   there — taxonomy lacks a "broad legal-system disruption"
+   category for post-coup regime takeovers.
+
+**Pulse cannot graduate from Beta until ≥ 8/10 cases pass** per
+spec § 6.4 launch checklist.
+
+Up next:
+- Phase 5.8.1 — source curated events for the remaining 6 cases
+  (Afghanistan, Sri Lanka, Brazil 2023, Hungary 2010-pres,
+  Ethiopia 2020-22, Poland 2023). Public archives + manual
+  curation. Re-run backtest, see how much pass rate moves.
+- Phase 5.8.2 — taxonomy + threshold tuning if 5.8.1 doesn't
+  cross the 8/10 graduation bar. Specifically: should "coup"
+  also affect democratic_quality, or should the spec's expected
+  outcome be revised? And should magnitude thresholds be
+  recalibrated against the clamped delta range?
+- Phase 5.10 — final cut-over Sept 30, 2026.
