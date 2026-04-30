@@ -515,3 +515,121 @@ events. The pulse_events_v2 rows with `published=false` AND
 admin-gated `/admin/pulse-review`. Backend already has reviewerId
 + reviewNotes + reviewStatus columns; Phase 5.7 just builds the
 operator surface.
+
+## 2026-04-29 — Editorial design-system pass
+
+Mid-Phase-5.6, both the new pulse-changelog and pulse-methodology
+pages shipped with no side padding because every editorial reader
+page was reinventing layout via inline `<style>` blocks. Fixed
+properly by:
+
+- Creating `src/app/editorial.css` — global classes for
+  `.editorial-page` (760px narrow, `--wide` 960px, `--full` 1200px),
+  breadcrumbs, page title/subtitle/meta, beta-tag pill, warning
+  callout, sections (with descendant typography for h2/h3/p/ul/
+  strong/code/table), filter bars, chips, cards, pagination,
+  footer nav, empty state. Every value is `var(--*)` role token.
+- Imported from `src/app/layout.tsx` so it ships globally.
+- Updated `<EditorialPage>` to accept `width="narrow"|"wide"|"full"`
+  prop that maps to the modifier classes. Default narrow.
+  Pages that pass their own `className` (legacy) opt out.
+- Refactored both Pulse Beta pages to drop their inline `<style>`
+  blocks — ~150 lines of CSS removed from each.
+- DESIGN.md: new "Editorial layout classes" section listing every
+  class.
+- AGENTS.md: design-system directive now reads "Reader-style
+  pages compose editorial.css classes — no per-page <style>
+  blocks."
+
+Future migration target: replication, methodology, corrections,
+pca-appendix, civica-index/changelog all still use their own
+custom layout classes (.repl-layout, .civica-methodology-layout,
+etc.). Migration is non-breaking because EditorialPage skips the
+default classes when `className` is passed. Out of scope for now.
+
+Commit: `a02b696`.
+
+## 2026-04-29 — Phase 5.7: Internal Pulse review queue UI shipped
+
+Plan: `~/civica/plan/phase-5-7-internal-review-queue.md`. Three
+commits ship the operator surface that lets a reviewer process
+the queue of severe-tier events the v2 pipeline routes for human
+review.
+
+What shipped:
+
+- **Schema + queries** (`1735f43`).
+  New `pulse_review_audit_log` table records every reviewer
+  decision with before/after JSON snapshots, reviewer name,
+  action ('approve'|'edit'|'reject'), notes, timestamp.
+  Indexed on (event_id) and (reviewer_id, created_at).
+  Query helpers in `src/lib/db/queries-pulse-review.ts`:
+  - `getPulseReviewQueue({limit?, offset?, dimension?, severity?})`
+    returns events where `review_status='pending'` AND
+    `published=false`, ordered urgency-first (catastrophic_neg
+    → severe_neg → high_pos by tier; classifier none → 2/3 →
+    all by agreement; event_date desc tiebreak).
+  - `getPulseReviewEvent(id)` returns full event detail with
+    classifier_runs + sources joined.
+  - `getPulseReviewAuditTrail(eventId)` returns prior reviewer
+    actions for the audit panel.
+
+- **Admin auth + review API** (`1735f43`).
+  Cookie-based admin session at `src/lib/admin/session.ts`.
+  ADMIN_API_KEY remains the single shared secret; the user
+  supplies it once via the sign-in form and we set HttpOnly +
+  SameSite=Strict cookies (`civica_admin_session` +
+  `civica_admin_reviewer`) with 7-day TTL.
+  Routes:
+  - `/admin/sign-in` page with token-entry form
+  - `POST /api/admin/session` — validates + sets cookies
+  - `POST /api/admin/sign-out` — clears cookies (form-friendly,
+    since browsers can't DELETE from a `<form>`)
+  - `POST /api/admin/pulse-review/[id]` — accepts
+    `{action, category?, dimension?, severityTier?, severityValue?,
+    notes?, redirect?}` from form or JSON. Auth via Bearer header
+    OR session cookie. Updates pulse_events_v2 row, writes audit
+    log row with before/after snapshots.
+
+- **(admin) route group + queue + detail** (`e041bc5`).
+  - `(admin)/layout.tsx` — checks session, redirects to sign-in
+    if missing. Renders thin admin status bar with sign-out form.
+  - `(admin)/admin/pulse-review/page.tsx` — queue list. 50/page
+    pagination. Filter chips for dimension + severity. Each row
+    is an editorial-card linked to detail page.
+  - `(admin)/admin/pulse-review/[id]/page.tsx` — detail view:
+    headline, meta, dimension/severity/agreement/confidence/RSF
+    pills, description, sources list, ALL 3 classifier runs
+    displayed verbatim (3-column grid showing run #/temp/
+    category/dimension/severityTier/severityValue/rationale),
+    decision form with category dropdown, dimension dropdown,
+    severity tier dropdown, severity value input, reviewer notes
+    textarea, three submit buttons (Approve as-is / Save edits +
+    approve / Reject), and audit trail panel showing prior
+    reviewer actions.
+
+End-to-end verified live:
+- Visited /admin/pulse-review without session → 303 to sign-in
+- Submitted reviewerName=Fernando + token → cookies set, redirect
+  to queue
+- Queue showed 7 pending events ordered urgency-first; Thailand
+  at top (severe_neg + 2/3 agree)
+- Opened Thailand detail; all 3 classifier runs visible
+- Clicked Approve as-is → POST to API → row updated
+  (published=true, review_status=approved, reviewer_id=Fernando)
+- Redirect back to queue, count went 7 → 6
+- Audit log row inserted with reviewer=Fernando + action=approve
+
+Out of scope (parked):
+- Bulk approve/reject (single-event review is enough for v0.1)
+- Public reviewer attribution (event card doesn't yet show
+  "approved by [name]" on the public changelog — could add later)
+- Multi-reviewer conflict resolution beyond last-write-wins
+- Email/Slack notifications
+
+Up next: Phase 5.8 — backtesting against the 10 named historical
+governance shocks (Myanmar 2021, Niger 2023, Tunisia 2021,
+Afghanistan 2021, Sri Lanka 2022, Brazil 2023, Hungary 2010-pres,
+Ethiopia 2020-22, Colombia 2016, Poland 2023). Required before
+Pulse graduates from beta per spec §5.3 launch checklist. ≥80%
+match against expert consensus.
