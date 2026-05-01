@@ -241,6 +241,24 @@ export interface PulseV2ChangelogFilters {
   offset?: number;
 }
 
+export interface PulseV2ClassifierRun {
+  run: number;
+  temp: number;
+  model?: string;
+  category: string;
+  dimension: string;
+  severityTier: string;
+  severityValue: number;
+  rationale: string;
+}
+
+export interface PulseV2SourceDetail {
+  sourceId: string;
+  sourceName: string;
+  sourceType: string;
+  sourceUrl: string | null;
+}
+
 export interface PulseV2ChangelogRow {
   id: string;
   eventDate: string;
@@ -250,12 +268,18 @@ export interface PulseV2ChangelogRow {
   severityTier: string;
   severityValue: number;
   classifierAgreement: string;
+  classifierRuns: PulseV2ClassifierRun[];
   corroborationConfidence: number;
+  pressFreedomScoreAtClassification: number | null;
   published: boolean;
   reviewStatus: string;
   headline: string;
   description: string;
+  aiSummary: string | null;
+  /** Distinct source ids (compat with existing callers). */
   sources: string[];
+  /** Full source attribution rows (name, type, url). */
+  sourceDetail: PulseV2SourceDetail[];
 }
 
 /** Paginated global changelog. Optional filters narrow the feed. */
@@ -299,16 +323,30 @@ export async function getPulseV2Changelog(
       p.severity_tier,
       p.severity_value,
       p.classifier_agreement,
+      p.classifier_runs,
       p.corroboration_confidence,
+      p.press_freedom_score_at_classification,
       p.published,
       p.review_status,
       p.headline,
       p.description,
+      p.ai_summary,
       ARRAY(
         SELECT DISTINCT ps.source_id
         FROM pulse_sources ps
         WHERE ps.event_id = p.id
-      ) AS source_ids
+      ) AS source_ids,
+      COALESCE(
+        (SELECT json_agg(
+          json_build_object(
+            'sourceId', ps.source_id,
+            'sourceName', ps.source_name,
+            'sourceType', ps.source_type,
+            'sourceUrl', ps.source_url
+          ) ORDER BY ps.source_type, ps.source_name
+        ) FROM pulse_sources ps WHERE ps.event_id = p.id),
+        '[]'::json
+      ) AS source_detail
     FROM pulse_events_v2 p
     JOIN jurisdictions j ON j.id = p.jurisdiction_id
     WHERE ${whereClause}
@@ -323,25 +361,63 @@ export async function getPulseV2Changelog(
   const hasMore = raw.length > limit;
   const trimmed = hasMore ? raw.slice(0, limit) : raw;
 
-  const rows: PulseV2ChangelogRow[] = trimmed.map((r) => ({
-    id: String(r.id),
-    eventDate: String(r.event_date),
-    country: {
-      slug: String(r.country_slug),
-      name: String(r.country_name),
-    },
-    category: String(r.category),
-    dimension: String(r.dimension),
-    severityTier: String(r.severity_tier),
-    severityValue: Number(r.severity_value),
-    classifierAgreement: String(r.classifier_agreement),
-    corroborationConfidence: Number(r.corroboration_confidence),
-    published: Boolean(r.published),
-    reviewStatus: String(r.review_status),
-    headline: String(r.headline),
-    description: String(r.description),
-    sources: Array.isArray(r.source_ids) ? (r.source_ids as string[]) : [],
-  }));
+  const rows: PulseV2ChangelogRow[] = trimmed.map((r) => {
+    const rawRuns = r.classifier_runs;
+    const runs: PulseV2ClassifierRun[] = Array.isArray(rawRuns)
+      ? (rawRuns as Array<Record<string, unknown>>).map((rr) => ({
+          run: Number(rr.run ?? 0),
+          temp: Number(rr.temp ?? 0),
+          model: rr.model ? String(rr.model) : undefined,
+          category: String(rr.category ?? ""),
+          dimension: String(rr.dimension ?? ""),
+          severityTier: String(rr.severityTier ?? rr.severity_tier ?? ""),
+          severityValue: Number(rr.severityValue ?? rr.severity_value ?? 0),
+          rationale: String(rr.rationale ?? ""),
+        }))
+      : [];
+
+    const rawDetail = r.source_detail;
+    const sourceDetail: PulseV2SourceDetail[] = Array.isArray(rawDetail)
+      ? (rawDetail as Array<Record<string, unknown>>).map((s) => ({
+          sourceId: String(s.sourceId ?? s.source_id ?? ""),
+          sourceName: String(s.sourceName ?? s.source_name ?? ""),
+          sourceType: String(s.sourceType ?? s.source_type ?? ""),
+          sourceUrl: s.sourceUrl
+            ? String(s.sourceUrl)
+            : s.source_url
+              ? String(s.source_url)
+              : null,
+        }))
+      : [];
+
+    const rsfRaw = r.press_freedom_score_at_classification;
+    const pressFreedomScoreAtClassification =
+      rsfRaw === null || rsfRaw === undefined ? null : Number(rsfRaw);
+
+    return {
+      id: String(r.id),
+      eventDate: String(r.event_date),
+      country: {
+        slug: String(r.country_slug),
+        name: String(r.country_name),
+      },
+      category: String(r.category),
+      dimension: String(r.dimension),
+      severityTier: String(r.severity_tier),
+      severityValue: Number(r.severity_value),
+      classifierAgreement: String(r.classifier_agreement),
+      classifierRuns: runs,
+      corroborationConfidence: Number(r.corroboration_confidence),
+      pressFreedomScoreAtClassification,
+      published: Boolean(r.published),
+      reviewStatus: String(r.review_status),
+      headline: String(r.headline),
+      description: String(r.description),
+      aiSummary: r.ai_summary ? String(r.ai_summary) : null,
+      sources: Array.isArray(r.source_ids) ? (r.source_ids as string[]) : [],
+      sourceDetail,
+    };
+  });
 
   return { rows, hasMore };
 }

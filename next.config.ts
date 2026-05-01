@@ -64,6 +64,15 @@ const nextConfig: NextConfig = {
         destination: "/elections",
         permanent: true,
       },
+      // Phase 5.10 polish — the legacy v1 changelog page reads from
+      // pulse_changelog / pulse_daily_scores tables that are no longer
+      // surfaced post-cut-over. Public users get the v2 changelog at
+      // /civica-index/pulse-changelog. Preserve any external links.
+      {
+        source: "/civica-index/changelog",
+        destination: "/civica-index/pulse-changelog",
+        permanent: true,
+      },
     ];
   },
 };

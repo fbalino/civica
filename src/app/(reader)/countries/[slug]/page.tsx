@@ -1232,7 +1232,7 @@ export default async function CountryPage({
               See full Civica Index breakdown →
             </Link>
             <Link
-              href={`/civica-index/changelog?country=${slug}`}
+              href={`/civica-index/pulse-changelog?country=${slug}`}
               style={{ color: "var(--color-accent)", textDecoration: "none" }}
             >
               Pulse events

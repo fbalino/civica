@@ -296,7 +296,7 @@ export default async function CivicaIndexShellPage({
               <Link href="/civica-index/government-types">
                 By government type
               </Link>
-              <Link href="/civica-index/changelog">Pulse changelog</Link>
+              <Link href="/civica-index/pulse-changelog">Pulse changelog</Link>
             </footer>
           </>
         ) : (

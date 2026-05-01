@@ -94,7 +94,13 @@ function ProvenanceDot() {
   );
 }
 
-function DimensionRowView({ row }: { row: DimensionRow }) {
+function DimensionRowView({
+  row,
+  countrySlug,
+}: {
+  row: DimensionRow;
+  countrySlug: string;
+}) {
   const significant = Math.abs(row.delta) >= SIGNIFICANCE_THRESHOLD;
   const color = deltaColor(row.delta);
 
@@ -171,7 +177,18 @@ function DimensionRowView({ row }: { row: DimensionRow }) {
                 >
                   {ev.eventDate}
                 </span>
-                <span style={{ minWidth: 0 }}>{ev.headline}</span>
+                <Link
+                  href={`/civica-index/pulse-changelog?country=${countrySlug}#evt-${ev.id}`}
+                  style={{
+                    minWidth: 0,
+                    color: "var(--color-text-55)",
+                    textDecoration: "none",
+                    borderBottom:
+                      "1px dotted var(--color-card-border)",
+                  }}
+                >
+                  {ev.headline}
+                </Link>
               </li>
             ))}
           </ul>
@@ -323,7 +340,11 @@ export function PulseDimensionalDeltas({ data }: Props) {
       ) : (
         <div>
           {dimensionRows.map((row) => (
-            <DimensionRowView key={row.dimension} row={row} />
+            <DimensionRowView
+              key={row.dimension}
+              row={row}
+              countrySlug={jurisdiction.slug}
+            />
           ))}
         </div>
       )}

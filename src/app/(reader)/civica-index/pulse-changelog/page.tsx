@@ -3,13 +3,13 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { jurisdictions } from "@/lib/db/schema";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
-import { Pill } from "@/components/editorial/Pill";
-import { SourceDot } from "@/components/SourceDot";
-import {
-  getPulseV2Changelog,
-  type PulseV2ChangelogRow,
-} from "@/lib/db/queries-pulse-v2";
+import { PulseEventDetailCard } from "@/components/pulse/PulseEventDetailCard";
+import { getPulseV2Changelog } from "@/lib/db/queries-pulse-v2";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
+import {
+  DIMENSION_LABELS,
+  SEVERITY_TIER_LABELS,
+} from "@/lib/pulse/v2/labels";
 
 export const metadata: Metadata = {
   title: "Pulse changelog (Beta) — Civica Index",
@@ -18,37 +18,6 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/pulse-changelog",
   },
-};
-
-const DIMENSION_LABELS: Record<string, string> = {
-  democratic_quality: "Democratic Quality",
-  rule_of_law: "Rule of Law",
-  freedom_rights: "Rights & Freedoms",
-  corruption_control: "Corruption Control",
-  stability: "Stability",
-};
-
-const SEVERITY_LABELS: Record<string, string> = {
-  low_pos: "Low +",
-  moderate_pos: "Moderate +",
-  high_pos: "High +",
-  low_neg: "Low −",
-  moderate_neg: "Moderate −",
-  severe_neg: "Severe −",
-  catastrophic_neg: "Catastrophic −",
-};
-
-const SEVERITY_VARIANT: Record<
-  string,
-  "default" | "accent" | "success" | "warn" | "danger"
-> = {
-  low_pos: "success",
-  moderate_pos: "success",
-  high_pos: "success",
-  low_neg: "warn",
-  moderate_neg: "warn",
-  severe_neg: "danger",
-  catastrophic_neg: "danger",
 };
 
 interface PageProps {
@@ -74,16 +43,6 @@ function buildHref(
   return qs ? `?${qs}` : "/civica-index/pulse-changelog";
 }
 
-function formatEventDate(d: string): string {
-  const dt = new Date(d);
-  if (Number.isNaN(dt.getTime())) return d;
-  return dt.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 function FilterChip({
   active,
   href,
@@ -102,80 +61,6 @@ function FilterChip({
     >
       {children}
     </Link>
-  );
-}
-
-function EventCard({ event }: { event: PulseV2ChangelogRow }) {
-  const isPos = event.severityValue > 0;
-  return (
-    <article className="editorial-card">
-      <header className="editorial-card-head">
-        <div className="editorial-card-head-left">
-          <Link
-            href={`/countries/${event.country.slug}`}
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "var(--text-16)",
-              fontWeight: 500,
-              color: "var(--color-text-primary)",
-              textDecoration: "none",
-            }}
-          >
-            {event.country.name}
-          </Link>
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
-              color: "var(--color-text-40)",
-              letterSpacing: "0.05em",
-            }}
-          >
-            {formatEventDate(event.eventDate)}
-          </span>
-        </div>
-        <div className="editorial-card-pills">
-          <Pill>{DIMENSION_LABELS[event.dimension] ?? event.dimension}</Pill>
-          <Pill variant={SEVERITY_VARIANT[event.severityTier] ?? "default"}>
-            {SEVERITY_LABELS[event.severityTier] ?? event.severityTier} ·{" "}
-            {event.severityValue > 0
-              ? `+${event.severityValue}`
-              : event.severityValue}
-          </Pill>
-          {event.classifierAgreement === "all" ? (
-            <Pill variant="success">3/3 agree</Pill>
-          ) : event.classifierAgreement === "two_of_three" ? (
-            <Pill>2/3 agree</Pill>
-          ) : (
-            <Pill variant="warn">No consensus</Pill>
-          )}
-          {!event.published ? (
-            <Pill variant="warn">Queued for review</Pill>
-          ) : null}
-        </div>
-      </header>
-
-      <h3 className="editorial-card-headline">{event.headline}</h3>
-
-      <p className="editorial-card-desc">
-        {event.description.length > 320
-          ? `${event.description.slice(0, 320)}…`
-          : event.description}
-      </p>
-
-      <footer className="editorial-card-foot">
-        <div className="editorial-card-foot-row">
-          {event.sources.map((src) => (
-            <SourceDot key={src} source={src} retrievedAt={null} />
-          ))}
-        </div>
-        <span>
-          Confidence{" "}
-          {(event.corroborationConfidence ?? 0).toFixed(2)} · {isPos ? "+" : ""}
-          {event.severityValue}
-        </span>
-      </footer>
-    </article>
   );
 }
 
@@ -320,7 +205,7 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
           >
             Any
           </FilterChip>
-          {Object.entries(SEVERITY_LABELS).map(([key, label]) => (
+          {Object.entries(SEVERITY_TIER_LABELS).map(([key, label]) => (
             <FilterChip
               key={key}
               href={buildHref(baseParams, { severity: key, page: undefined })}
@@ -377,7 +262,7 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
       ) : (
         <div style={{ marginBottom: 24 }}>
           {result.rows.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <PulseEventDetailCard key={event.id} event={event} />
           ))}
         </div>
       )}
