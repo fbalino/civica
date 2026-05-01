@@ -1,0 +1,1 @@
+ALTER TABLE "pulse_events_v2" ADD COLUMN "ai_summary" text;

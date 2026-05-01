@@ -39,8 +39,29 @@ export default async function AdminLayout({
         }}
       >
         <div style={{ display: "inline-flex", gap: 16, alignItems: "center" }}>
-          <span style={{ color: "var(--color-status-warning)" }}>
-            Admin · pulse review
+          <Link
+            href="/admin/pulse-review"
+            style={{
+              color: "var(--color-status-warning)",
+              textDecoration: "none",
+            }}
+          >
+            Admin
+          </Link>
+          <span aria-hidden style={{ color: "var(--color-text-40)" }}>
+            ·
+          </span>
+          <Link
+            href="/admin/pulse-review"
+            style={{
+              color: "var(--color-status-warning)",
+              textDecoration: "none",
+            }}
+          >
+            Pulse review
+          </Link>
+          <span aria-hidden style={{ color: "var(--color-text-40)" }}>
+            ·
           </span>
           <Link
             href="/admin/pulse-review"

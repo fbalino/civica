@@ -10,18 +10,18 @@ import {
 } from "@/lib/db/queries-pulse-review";
 import { EVENT_CATEGORIES } from "@/lib/pulse/v2/taxonomy";
 import { PULSE_DIMENSIONS } from "@/lib/pulse/v2/types";
+import {
+  categoryLabel,
+  dimensionLabel,
+  severityTierLabel,
+  severityTierLongLabel,
+  signedSeverity,
+} from "@/lib/pulse/v2/labels";
+import { ensurePulseSummary } from "@/lib/pulse/v2/summarize";
 
 export const metadata: Metadata = {
   title: "Review event — Civica admin",
   robots: { index: false, follow: false },
-};
-
-const DIMENSION_LABELS: Record<string, string> = {
-  democratic_quality: "Democratic Quality",
-  rule_of_law: "Rule of Law",
-  freedom_rights: "Rights & Freedoms",
-  corruption_control: "Corruption Control",
-  stability: "Stability",
 };
 
 const SEVERITY_TIERS = [
@@ -33,16 +33,6 @@ const SEVERITY_TIERS = [
   "severe_neg",
   "catastrophic_neg",
 ] as const;
-
-const SEVERITY_LABELS: Record<string, string> = {
-  low_pos: "Low + (1 to 2)",
-  moderate_pos: "Moderate + (3 to 4)",
-  high_pos: "High + (5 to 6)",
-  low_neg: "Low − (-1 to -2)",
-  moderate_neg: "Moderate − (-3 to -4)",
-  severe_neg: "Severe − (-5 to -7)",
-  catastrophic_neg: "Catastrophic − (-8 to -10)",
-};
 
 const ACTION_LABELS: Record<string, string> = {
   approve: "Approved",
@@ -66,6 +56,36 @@ function formatDate(d: string): string {
   });
 }
 
+/** Splits the raw RSS-derived description into clean paragraphs.
+ *  Drops the leading "- HEADLINE (Click to expand Image" boilerplate
+ *  some HRW feed items emit, drops standalone copyright lines and
+ *  image-credit lines, and collapses runs of blank lines. The result
+ *  is rendered as separate <p> elements for readability. */
+function cleanDescriptionParagraphs(
+  raw: string,
+  headline: string
+): string[] {
+  if (!raw) return [];
+  let text = raw;
+  // Some feeds prefix a "- HEADLINE (Click to expand Image" line.
+  const lead = `- ${headline}`;
+  if (text.startsWith(lead)) text = text.slice(lead.length);
+  text = text.replace(/\(Click to expand Image\b/gi, "");
+  // Normalise newlines + collapse 3+ blanks to a paragraph break.
+  text = text.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n");
+  const paragraphs = text
+    .split(/\n\n+/)
+    .map((p) => p.replace(/\s+\n/g, "\n").trim())
+    .filter((p) => p.length > 0);
+  return paragraphs.filter((p) => {
+    // Drop standalone image credits + copyright artifacts.
+    if (/^©\s/.test(p)) return false;
+    if (/Getty Images$/.test(p) && p.length < 220) return false;
+    if (/^Click to expand /i.test(p)) return false;
+    return true;
+  });
+}
+
 export default async function PulseReviewDetailPage({ params }: PageProps) {
   const { id } = await params;
   const event = await getPulseReviewEvent(id);
@@ -73,13 +93,44 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
 
   const auditTrail = await getPulseReviewAuditTrail(id);
 
+  // Lazy-generate the AI summary on first view. If generation fails
+  // we fall back to rendering just the cleaned raw description.
+  const aiSummary = await ensurePulseSummary({
+    eventId: event.id,
+    country: event.country.name,
+    headline: event.headline,
+    description: event.description,
+    existingSummary: event.aiSummary,
+  });
+
+  const paragraphs = cleanDescriptionParagraphs(
+    event.description,
+    event.headline
+  );
+
+  const severityVariant: "danger" | "success" | "warn" =
+    event.severityValue < 0
+      ? "danger"
+      : event.severityValue > 0
+      ? "success"
+      : "warn";
+
   return (
     <EditorialPage width="wide">
       <nav className="editorial-breadcrumbs">
-        <Link href="/admin/pulse-review">← Review queue</Link>
+        <Link href="/admin/pulse-review">/ admin</Link>
+        <span aria-hidden> / </span>
+        <Link href="/admin/pulse-review">Pulse review</Link>
+        <span aria-hidden> / </span>
+        <span style={{ color: "var(--color-text-60)" }}>
+          {event.country.name}
+        </span>
       </nav>
 
-      <h1 className="editorial-page-title" style={{ fontSize: "var(--text-32)" }}>
+      <h1
+        className="editorial-page-title"
+        style={{ fontSize: "var(--text-32)" }}
+      >
         {event.country.name} — {event.headline}
       </h1>
 
@@ -102,14 +153,10 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
       <div
         style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 24 }}
       >
-        <Pill>{DIMENSION_LABELS[event.dimension] ?? event.dimension}</Pill>
-        <Pill
-          variant={event.severityValue < 0 ? "danger" : "success"}
-        >
-          {event.severityTier} ·{" "}
-          {event.severityValue > 0
-            ? `+${event.severityValue}`
-            : event.severityValue}
+        <Pill>{dimensionLabel(event.dimension)}</Pill>
+        <Pill variant={severityVariant}>
+          {severityTierLabel(event.severityTier)} ·{" "}
+          {signedSeverity(event.severityValue)}
         </Pill>
         {event.classifierAgreement === "all" ? (
           <Pill variant="success">Classifier 3/3 agree</Pill>
@@ -122,33 +169,129 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
           Confidence {(event.corroborationConfidence ?? 0).toFixed(2)}
         </Pill>
         {event.pressFreedomScoreAtClassification != null ? (
-          <Pill>RSF {event.pressFreedomScoreAtClassification}</Pill>
+          <Pill>
+            RSF {event.pressFreedomScoreAtClassification.toFixed(0)}
+          </Pill>
         ) : null}
       </div>
 
+      {aiSummary ? (
+        <section className="editorial-section">
+          <h2>Summary</h2>
+          <div
+            style={{
+              background: "var(--color-card-bg)",
+              border: "1px solid var(--color-card-border)",
+              borderLeft: "3px solid var(--color-accent)",
+              borderRadius: "var(--radius-md)",
+              padding: "16px 20px",
+              fontSize: "var(--text-15)",
+              lineHeight: 1.6,
+              color: "var(--color-text-primary)",
+            }}
+          >
+            {aiSummary}
+          </div>
+          <p
+            style={{
+              marginTop: 8,
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-11)",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              color: "var(--color-text-40)",
+            }}
+          >
+            AI summary · Claude Haiku · for reviewer context only
+          </p>
+        </section>
+      ) : null}
+
       <section className="editorial-section">
-        <h2>Description</h2>
-        <p style={{ whiteSpace: "pre-wrap" }}>{event.description}</p>
+        <h2>Source description</h2>
+        <p
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-11)",
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            color: "var(--color-text-40)",
+            marginBottom: 12,
+          }}
+        >
+          Raw text from the source feed
+        </p>
+        <div
+          style={{
+            display: "grid",
+            gap: 12,
+            fontSize: "var(--text-14)",
+            lineHeight: 1.65,
+            color: "var(--color-text-primary)",
+          }}
+        >
+          {paragraphs.length > 0 ? (
+            paragraphs.map((p, i) => (
+              <p key={i} style={{ margin: 0 }}>
+                {p}
+              </p>
+            ))
+          ) : (
+            <p style={{ margin: 0, color: "var(--color-text-40)" }}>
+              No description available.
+            </p>
+          )}
+        </div>
       </section>
 
       <section className="editorial-section">
         <h2>Sources</h2>
-        <ul>
+        <ul
+          style={{
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            display: "grid",
+            gap: 8,
+          }}
+        >
           {event.sources.map((src, i) => (
-            <li key={i}>
-              <SourceDot source={src.sourceId} retrievedAt={null} /> ·{" "}
-              <strong>{src.sourceName}</strong> ({src.sourceType})
+            <li
+              key={i}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
+                background: "var(--color-card-bg)",
+                border: "1px solid var(--color-card-border)",
+                borderRadius: "var(--radius-md)",
+                padding: "10px 14px",
+                fontSize: "var(--text-14)",
+              }}
+            >
+              <SourceDot source={src.sourceId} retrievedAt={null} />
+              <strong style={{ color: "var(--color-text-primary)" }}>
+                {src.sourceName}
+              </strong>
+              <Pill variant={src.sourceType === "specialist" ? "success" : undefined}>
+                {src.sourceType}
+              </Pill>
               {src.sourceUrl ? (
-                <>
-                  {" — "}
-                  <a
-                    href={src.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    open ↗
-                  </a>
-                </>
+                <a
+                  href={src.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    marginLeft: "auto",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-12)",
+                    letterSpacing: "0.04em",
+                    color: "var(--color-accent)",
+                  }}
+                >
+                  Read source ↗
+                </a>
               ) : null}
             </li>
           ))}
@@ -186,7 +329,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
                   color: "var(--color-text-40)",
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
-                  marginBottom: 6,
+                  marginBottom: 8,
                 }}
               >
                 Run {run.run} · temp {run.temp}
@@ -194,21 +337,42 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               <div
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-13)",
+                  fontSize: "var(--text-14)",
                   color: "var(--color-text-primary)",
                   marginBottom: 4,
+                  fontWeight: 500,
                 }}
               >
-                <strong>{run.category}</strong> · {run.dimension} ·{" "}
-                {run.severityTier} ({run.severityValue >= 0 ? "+" : ""}
-                {run.severityValue})
+                {categoryLabel(run.category)}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 6,
+                  flexWrap: "wrap",
+                  marginBottom: 10,
+                }}
+              >
+                <Pill>{dimensionLabel(run.dimension)}</Pill>
+                <Pill
+                  variant={
+                    run.severityValue < 0
+                      ? "danger"
+                      : run.severityValue > 0
+                      ? "success"
+                      : "warn"
+                  }
+                >
+                  {severityTierLabel(run.severityTier)} ·{" "}
+                  {signedSeverity(run.severityValue)}
+                </Pill>
               </div>
               <div
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--text-13)",
                   color: "var(--color-text-60)",
-                  lineHeight: 1.5,
+                  lineHeight: 1.55,
                 }}
               >
                 {run.rationale}
@@ -258,7 +422,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
           >
             {EVENT_CATEGORIES.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.label} ({c.id})
+                {c.label}
               </option>
             ))}
           </select>
@@ -274,7 +438,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
           >
             {PULSE_DIMENSIONS.map((d) => (
               <option key={d} value={d}>
-                {DIMENSION_LABELS[d]}
+                {dimensionLabel(d)}
               </option>
             ))}
           </select>
@@ -290,7 +454,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
           >
             {SEVERITY_TIERS.map((t) => (
               <option key={t} value={t}>
-                {SEVERITY_LABELS[t]}
+                {severityTierLongLabel(t)}
               </option>
             ))}
           </select>

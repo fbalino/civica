@@ -181,6 +181,7 @@ export interface ReviewEventDetail {
   published: boolean;
   headline: string;
   description: string;
+  aiSummary: string | null;
   pressFreedomScoreAtClassification: number | null;
   createdAt: string;
   updatedAt: string;
@@ -214,6 +215,7 @@ export async function getPulseReviewEvent(
       published: pulseEventsV2.published,
       headline: pulseEventsV2.headline,
       description: pulseEventsV2.description,
+      aiSummary: pulseEventsV2.aiSummary,
       pressFreedomScoreAtClassification:
         pulseEventsV2.pressFreedomScoreAtClassification,
       createdAt: pulseEventsV2.createdAt,
@@ -273,6 +275,7 @@ export async function getPulseReviewEvent(
     published: event.published,
     headline: event.headline,
     description: event.description,
+    aiSummary: event.aiSummary,
     pressFreedomScoreAtClassification: event.pressFreedomScoreAtClassification,
     createdAt: event.createdAt.toISOString(),
     updatedAt: event.updatedAt.toISOString(),

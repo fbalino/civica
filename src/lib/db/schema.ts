@@ -840,6 +840,11 @@ export const pulseEventsV2 = pgTable(
     published: boolean("published").notNull().default(false),
     headline: text("headline").notNull(),
     description: text("description").notNull(),
+    /** Plain-English 2-3 sentence summary generated via Claude Haiku
+     *  for the review queue. Lazily populated on first view of the
+     *  review-detail page; null until then. See
+     *  `src/lib/pulse/v2/summarize.ts`. */
+    aiSummary: text("ai_summary"),
     /** RSF press freedom score for the country at classification time —
      *  pinned for reproducibility per spec §3.5 */
     pressFreedomScoreAtClassification: real(
