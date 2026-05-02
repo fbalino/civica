@@ -1146,3 +1146,120 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
     font-size: var(--text-13);
   }
 }
+
+/* === Government org chart (Phase G) ======================================
+   Top-down SVG diagram replacing the side-by-side Executive/Legislative
+   card layout. Renders only relationships explicitly in the schema —
+   no inferred cross-branch edges. Branch colour drives the top-of-box
+   accent. */
+.factbook-org-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-stat-border);
+  background: color-mix(in oklab, var(--color-text-primary) 1.5%, transparent);
+  border-radius: var(--radius-sm, 2px);
+}
+.factbook-org-chart--empty {
+  border-style: dashed;
+  background: transparent;
+  text-align: center;
+}
+.factbook-org-chart-note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  font-style: italic;
+}
+.factbook-org-chart-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Node visuals — light box, branch-coloured top stripe, Fraunces label
+   on the first line, mono holder/sublabel on the second. */
+.factbook-org-chart-node-bg {
+  fill: var(--color-bg);
+  stroke: var(--color-stat-border);
+  stroke-width: 1;
+}
+.factbook-org-chart-node--body .factbook-org-chart-node-bg {
+  stroke: var(--color-text-40);
+}
+.factbook-org-chart-node--ceremonial .factbook-org-chart-node-bg {
+  stroke-dasharray: 3 3;
+}
+.factbook-org-chart-node-label {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 400;
+  fill: var(--color-text-primary);
+  letter-spacing: var(--tracking-tighter);
+}
+.factbook-org-chart-node-sublabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  fill: var(--color-text-60);
+}
+
+/* Edges — thin lines. Type-specific dash via inline strokeDasharray;
+   colour driven here by class. */
+.factbook-org-chart-edge {
+  stroke: var(--color-text-40);
+  stroke-width: 1;
+}
+.factbook-org-chart-edge--contains,
+.factbook-org-chart-edge--reports_to,
+.factbook-org-chart-edge--subordinates {
+  stroke: var(--color-text-40);
+}
+.factbook-org-chart-edge--appoints {
+  stroke: var(--color-accent);
+}
+.factbook-org-chart-edge--confidence {
+  stroke: var(--color-warn);
+}
+.factbook-org-chart-edge--elects {
+  stroke: var(--color-success);
+}
+
+/* Legend below the chart */
+.factbook-org-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-stat-border);
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-40);
+}
+.factbook-org-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.factbook-org-chart-legend-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .factbook-org-chart {
+    padding: var(--space-3);
+  }
+  .factbook-org-chart-node-label {
+    font-size: 11px;
+  }
+  .factbook-org-chart-node-sublabel {
+    font-size: 9px;
+  }
+}

@@ -23,7 +23,8 @@ import {
 } from "@/components/factbook/FactbookRightRail";
 import { CivicaAIDrawer } from "@/components/factbook/CivicaAIDrawer";
 import type { LightboxImage } from "@/components/factbook/FactbookLightbox";
-import { GovStructureDiagram } from "@/components/GovStructureDiagram";
+import { FactbookGovOrgChart } from "@/components/factbook/FactbookGovOrgChart";
+import { buildOrgChartFromGovernmentStructure } from "@/lib/factbook/gov-org-chart";
 import { FactbookLegislature } from "@/components/factbook/FactbookLegislature";
 import { FactbookLeaders } from "@/components/factbook/FactbookLeaders";
 import { FactbookBills } from "@/components/factbook/FactbookBills";
@@ -337,8 +338,14 @@ export default async function FactbookCountryPage({
                   <h2 className="factbook-section-title">{section.label}</h2>
                 </header>
 
-                {section.kind === "factbook+civica-gov" &&
-                  govStructure.offices.length > 0 && (
+                {section.kind === "factbook+civica-gov" && (() => {
+                  const orgChart = buildOrgChartFromGovernmentStructure(
+                    govStructure.bodies,
+                    govStructure.offices,
+                    govStructure.currentTerms
+                  );
+                  if (!orgChart) return null;
+                  return (
                     <div
                       id={`${section.id}--structure`}
                       style={{
@@ -368,14 +375,13 @@ export default async function FactbookCountryPage({
                       >
                         How power is organised
                       </h3>
-                      <GovStructureDiagram
-                        bodies={govStructure.bodies}
-                        offices={govStructure.offices}
-                        currentTerms={govStructure.currentTerms}
+                      <FactbookGovOrgChart
+                        chart={orgChart}
                         countryName={jurisdiction.name}
                       />
                     </div>
-                  )}
+                  );
+                })()}
 
                 {/* Civica section bodies — each component does its own
                     data fetch and renders nothing if empty (we already
