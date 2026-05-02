@@ -10,13 +10,17 @@ function MetaPill({
   label,
   value,
   dotColor,
+  className,
 }: {
   label?: string;
   value: string;
   dotColor?: string;
+  className?: string;
 }) {
   return (
     <span
+      className={`factbook-meta-pill${className ? ` ${className}` : ""}`}
+      title={value}
       style={{
         display: "inline-flex",
         alignItems: "baseline",
@@ -42,7 +46,9 @@ function MetaPill({
           {label}
         </span>
       )}
-      <span style={{ color: "var(--color-text-primary)" }}>{value}</span>
+      <span className="factbook-meta-pill-value" style={{ color: "var(--color-text-primary)" }}>
+        {value}
+      </span>
     </span>
   );
 }
@@ -142,7 +148,12 @@ export function FactbookHeaderStrip({
           </div>
 
           <div className="factbook-hero-pills">
-            {governmentTypeLabel && <MetaPill value={governmentTypeLabel} />}
+            {governmentTypeLabel && (
+              <MetaPill
+                value={governmentTypeLabel}
+                className="factbook-meta-pill--government"
+              />
+            )}
             {popStr && <MetaPill label="Pop" value={popStr} />}
             {gdpStr && <MetaPill label="GDP" value={gdpStr} />}
             {ciScore != null && (

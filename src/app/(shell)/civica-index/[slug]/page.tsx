@@ -1279,6 +1279,9 @@ const DETAIL_CSS = `
     }
   }
   @media (max-width: 640px) {
+    .ci-country-detail-container {
+      padding: 0 var(--space-5) 64px;
+    }
     .ci-country-header {
       align-items: flex-start;
       gap: 12px;
@@ -1288,6 +1291,30 @@ const DETAIL_CSS = `
     }
     .ci-country-name {
       font-size: 34px;
+    }
+    .ci-country-panel {
+      padding: 20px;
+    }
+    .ci-country-subnav a {
+      padding: 10px 12px 12px;
+    }
+    .ci-country-event-card {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      padding: 16px;
+    }
+    .ci-country-event-severity {
+      width: fit-content;
+      min-width: 48px;
+    }
+    .ci-country-event-meta {
+      grid-column: auto;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ci-country-event-headline,
+    .ci-country-event-justification {
+      overflow-wrap: anywhere;
     }
   }
 `;

@@ -1,5 +1,19 @@
 # Project Memory Sessions
 
+## 2026-05-02 — Mobile overflow repair
+
+- Fixed mobile horizontal overflow on factbook country pages. Root causes found during browser verification:
+  - the factbook hero government-type label could not shrink/truncate
+  - invisible `SourceDot` tooltips used opacity-only hiding and still widened the document
+  - the factbook government org-chart SVG kept a fixed min-width on mobile
+- Removed the shell mobile panel tabs (`Nav`, `Content`, `Ask AI`) for now by suppressing the mobile panel bar in `ThreePaneShell`.
+- Reworked the country Pulse dimensional rows on mobile so event date/headline content stacks inside the card instead of pushing past the viewport.
+- Local mobile checks used `agent-browser` at 393px width:
+  - `/factbook/andorra`, `/factbook/france`, `/civica-index/afghanistan`, `/`
+  - all measured `documentElement.scrollWidth <= innerWidth`
+  - footer was reachable on `/`
+- Recorded verification video at `/tmp/civica-mobile-overflow-check.webm`.
+
 ## 2026-04-30 — Phase 5.10 cut-over verified live
 
 The Pulse v2 / taxonomy-v2.0 cut-over had effectively been deploying

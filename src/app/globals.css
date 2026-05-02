@@ -280,6 +280,7 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
 }
 
 body {
@@ -289,6 +290,7 @@ body {
   line-height: var(--leading-normal);
   margin: 0;
   transition: background-color 0.3s ease, color 0.2s ease;
+  overflow-x: clip;
 }
 
 *, *::before, *::after {
@@ -344,6 +346,7 @@ a {
 
 .source-dot::after {
   content: attr(data-source) "\A" attr(data-date);
+  display: none;
   white-space: pre-line;
   position: absolute;
   bottom: calc(100% + 8px);
@@ -359,7 +362,6 @@ a {
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-tooltip-border);
   pointer-events: none;
-  opacity: 0;
   transition: none;
   z-index: 50;
   min-width: max-content;
@@ -368,7 +370,15 @@ a {
 
 .source-dot:hover::after,
 .source-dot:focus-visible::after {
-  opacity: 1;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .source-dot::after {
+    min-width: 0;
+    max-width: min(220px, calc(100vw - var(--space-8)));
+    white-space: normal;
+  }
 }
 
 /* ============================================================

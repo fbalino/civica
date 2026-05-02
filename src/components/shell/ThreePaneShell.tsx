@@ -98,7 +98,7 @@ export function ThreePaneShell({
   // Hide the resizer along with the pane itself so collapsed gives 0px.
   const showLeftResizer = !hideLeft && !leftCollapsedDesktop;
   const showRightResizer = !hideRight && !rightCollapsedDesktop;
-  const hideMobilePanelBar = hideLeft && hideRight;
+  const hideMobilePanelBar = isMobile || (hideLeft && hideRight);
 
   useEffect(() => {
     if (hideRight && mobilePanel === "chat") {
@@ -126,41 +126,6 @@ export function ThreePaneShell({
         } as React.CSSProperties
       }
     >
-      {isMobile && !hideMobilePanelBar && (
-        <div className="mobile-panel-bar" role="tablist" aria-label="Panels">
-          <button
-            role="tab"
-            aria-selected={mobilePanel === "countries"}
-            className={mobilePanel === "countries" ? "on" : ""}
-            onClick={() =>
-              setMobilePanel(mobilePanel === "countries" ? "center" : "countries")
-            }
-          >
-            Nav
-          </button>
-          <button
-            role="tab"
-            aria-selected={mobilePanel === "center"}
-            className={mobilePanel === "center" ? "on" : ""}
-            onClick={() => setMobilePanel("center")}
-          >
-            Content
-          </button>
-          {!hideRight && (
-            <button
-              role="tab"
-              aria-selected={mobilePanel === "chat"}
-              className={mobilePanel === "chat" ? "on" : ""}
-              onClick={() =>
-                setMobilePanel(mobilePanel === "chat" ? "center" : "chat")
-              }
-            >
-              Ask AI
-            </button>
-          )}
-        </div>
-      )}
-
       <div
         className={`chamber-grid${compareMode ? " compare-mode" : ""}`}
         style={{
@@ -181,7 +146,9 @@ export function ThreePaneShell({
         {!hideLeft && (
           <aside
             className={`chamber-left${
-              isMobile && mobilePanel === "countries" ? " mobile-visible" : ""
+              !hideMobilePanelBar && isMobile && mobilePanel === "countries"
+                ? " mobile-visible"
+                : ""
             }${leftCollapsedDesktop ? " is-collapsed" : ""}`}
             role="navigation"
             aria-label="Context navigation"
@@ -236,7 +203,9 @@ export function ThreePaneShell({
         {!hideRight && (
           <aside
             className={`chamber-right${
-              isMobile && mobilePanel === "chat" ? " mobile-visible" : ""
+              !hideMobilePanelBar && isMobile && mobilePanel === "chat"
+                ? " mobile-visible"
+                : ""
             }${rightCollapsedDesktop ? " is-collapsed" : ""}`}
             role="complementary"
             aria-label="Ask Civica AI assistant"

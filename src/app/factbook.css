@@ -38,6 +38,8 @@
   margin: 0;
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tighter);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .factbook-hero-pills {
   display: flex;
@@ -46,6 +48,23 @@
   row-gap: var(--space-3);
   margin-top: var(--space-3);
   align-items: center;
+}
+.factbook-meta-pill {
+  min-width: 0;
+  max-width: 100%;
+}
+.factbook-meta-pill--government {
+  flex: 1 1 100%;
+}
+.factbook-meta-pill-value {
+  display: inline-block;
+  min-width: 0;
+  max-width: 100%;
+}
+.factbook-meta-pill--government .factbook-meta-pill-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .factbook-hero-switcher-wrap {
   margin-top: auto;
@@ -290,6 +309,10 @@
   }
   .factbook-hero-pills {
     column-gap: var(--space-4);
+    min-width: 0;
+  }
+  .factbook-meta-pill--government {
+    max-width: 100%;
   }
 
   .factbook-body {
@@ -1385,6 +1408,10 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   max-width: 100%;
   height: auto;
 }
+.factbook-org-chart-scroll {
+  min-width: 0;
+  max-width: 100%;
+}
 
 /* Node visuals — light box, branch-coloured top stripe, Fraunces label
    on the first line, mono holder/sublabel on the second. */
@@ -1462,6 +1489,18 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 @media (max-width: 768px) {
   .factbook-org-chart {
     padding: var(--space-3);
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .factbook-org-chart-scroll {
+    width: 100%;
+    overflow-x: hidden !important;
+  }
+  .factbook-org-chart-svg {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
   }
   .factbook-org-chart-node-label {
     font-size: 11px;

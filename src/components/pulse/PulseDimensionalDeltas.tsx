@@ -106,6 +106,7 @@ function DimensionRowView({
 
   return (
     <div
+      className="pulse-dimension-row"
       style={{
         display: "grid",
         gridTemplateColumns: "minmax(160px, 200px) auto 1fr",
@@ -116,6 +117,7 @@ function DimensionRowView({
       }}
     >
       <div
+        className="pulse-dimension-label"
         style={{
           fontFamily: "var(--font-body)",
           fontSize: "var(--text-14)",
@@ -127,6 +129,7 @@ function DimensionRowView({
       </div>
 
       <div
+        className="pulse-dimension-value"
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
@@ -155,6 +158,7 @@ function DimensionRowView({
             {row.drivingEvents.map((ev) => (
               <li
                 key={ev.id}
+                className="pulse-dimension-event"
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: "var(--text-13)",
@@ -163,10 +167,12 @@ function DimensionRowView({
                   display: "flex",
                   gap: 8,
                   alignItems: "baseline",
+                  minWidth: 0,
                 }}
               >
                 <span
                   aria-hidden="true"
+                  className="pulse-dimension-event-date"
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontSize: "var(--text-10)",
@@ -179,12 +185,14 @@ function DimensionRowView({
                 </span>
                 <Link
                   href={`/civica-index/pulse-changelog?country=${countrySlug}#evt-${ev.id}`}
+                  className="pulse-dimension-event-link"
                   style={{
                     minWidth: 0,
                     color: "var(--color-text-55)",
                     textDecoration: "none",
                     borderBottom:
                       "1px dotted var(--color-card-border)",
+                    overflowWrap: "anywhere",
                   }}
                 >
                   {ev.headline}
@@ -220,6 +228,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
 
   return (
     <section
+      className="pulse-dimensions-panel"
       aria-label={`Civica Pulse Beta dimensional impact for ${jurisdiction.name}`}
       style={{
         background: "var(--color-card-bg)",
@@ -240,7 +249,16 @@ export function PulseDimensionalDeltas({ data }: Props) {
           marginBottom: 16,
         }}
       >
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+        <div
+          className="pulse-dimensions-heading"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+            minWidth: 0,
+          }}
+        >
           <ProvenanceDot />
           <span
             style={{
