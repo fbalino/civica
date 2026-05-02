@@ -53,24 +53,10 @@ export function SiteHeader({
               letterSpacing: "var(--tracking-tighter)",
               color: "var(--color-text-primary)",
               lineHeight: 1,
-            }}
-          >
-            Civica
-          </span>
-          <span
-            className="hidden sm:inline"
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-10)",
-              color: "var(--color-text-30)",
-              letterSpacing: "var(--tracking-caps)",
-              textTransform: "uppercase",
-              lineHeight: 1,
               whiteSpace: "nowrap",
             }}
           >
-            Atlas of governance
+            Civica Atlas
           </span>
         </span>
       </Link>

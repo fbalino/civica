@@ -69,6 +69,21 @@ export async function getAllJurisdictions() {
   }));
 }
 
+export async function getFactbookCountryOptions() {
+  return db
+    .select({
+      slug: jurisdictions.slug,
+      name: jurisdictions.name,
+      iso2: jurisdictions.iso2,
+      iso3: jurisdictions.iso3,
+    })
+    .from(jurisdictions)
+    .where(
+      sql`${jurisdictions.type} = 'sovereign_state' AND LOWER(${jurisdictions.name}) <> 'none'`
+    )
+    .orderBy(asc(jurisdictions.name));
+}
+
 // Non-territory sovereign states with population data. Used for the homepage
 // featured grid so we never surface Akrotiri / Antarctica / Bouvet Island first.
 export async function getFeaturedCountries(limit = 24) {

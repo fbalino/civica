@@ -126,14 +126,16 @@
   /* Shell grid: single column. Explicit height so .chamber-center's
    * flex: 1 has something to expand into — without this the inner
    * panes (e.g. the map SVG with height: 100%) collapse and you end
-   * up with a tiny strip at the top of the screen. 56px header +
-   * ~42px mobile-panel-bar = ~98px of chrome. */
+   * up with a tiny strip at the top of the screen. */
   .chamber-grid {
     display: flex !important;
     flex-direction: column;
     grid-template-columns: unset !important;
     overflow: hidden;
-    height: calc(100dvh - 100px) !important;
+    height: calc(100dvh - 96px) !important;
+  }
+  .atlas-root--no-mobile-tabs .chamber-grid {
+    height: calc(100dvh - 56px) !important;
   }
 
   /* Hide resizers on mobile */
@@ -147,7 +149,7 @@
   .chamber-left.mobile-visible {
     display: block;
     position: absolute;
-    top: 42px;
+    top: 40px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -171,7 +173,7 @@
   .chamber-right.mobile-visible {
     display: flex;
     position: absolute;
-    top: 42px;
+    top: 40px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -183,6 +185,8 @@
   .mobile-panel-bar {
     display: flex;
     gap: 0;
+    height: 40px;
+    padding: 0;
     border-bottom: 1px solid var(--atlas-rule);
     background: var(--atlas-paper-2);
     flex-shrink: 0;
@@ -191,11 +195,12 @@
   }
   .mobile-panel-bar button {
     flex: 1;
-    padding: 10px 8px;
+    height: 40px;
+    padding: 0;
     background: var(--atlas-paper-2);
     color: var(--atlas-ink-2);
     border: none;
-    border-bottom: 2px solid transparent;
+    border-bottom: 3px solid transparent;
     font-family: ui-monospace, monospace;
     font-size: 10px;
     letter-spacing: 0.1em;

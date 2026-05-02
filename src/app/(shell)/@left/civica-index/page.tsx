@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   getStructuralFamilyDistribution,
 } from "@/lib/db/queries";
@@ -8,6 +7,7 @@ import {
   type StructuralFamilyKey,
 } from "@/lib/government-taxonomy";
 import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
+import { CivicaIndexFilterSelects } from "@/components/civica-index/CivicaIndexFilterSelects";
 
 const CONTINENTS = [
   "Africa",
@@ -50,20 +50,15 @@ export default async function CivicaIndexLeftSlot({
 
   const { countries } = await loadAtlasData();
 
-  const continentHref = (c: string | null) => {
-    const qs = new URLSearchParams();
-    if (c) qs.set("continent", c);
-    if (structuralFamily) qs.set("family", structuralFamily);
-    const q = qs.toString();
-    return q ? `/civica-index?${q}` : "/civica-index";
-  };
-  const familyHref = (f: string | null) => {
-    const qs = new URLSearchParams();
-    if (continent) qs.set("continent", continent);
-    if (f) qs.set("family", f);
-    const q = qs.toString();
-    return q ? `/civica-index?${q}` : "/civica-index";
-  };
+  const families = familyOptionsSorted.map((f) => {
+    const meta = STRUCTURAL_FAMILY_META[f.key as StructuralFamilyKey];
+    return {
+      key: f.key,
+      label: meta?.label ?? f.key,
+      totalCount: f.totalCount,
+      scoredCount: f.scoredCount,
+    };
+  });
 
   return (
     <ShellCountryRail
@@ -78,71 +73,12 @@ export default async function CivicaIndexLeftSlot({
       }
       filters={
         <div className="left-filter-block">
-          <div className="left-filter-group">
-            <div className="left-filter-label">Region</div>
-            <div className="chips">
-              <Link
-                href={
-                  structuralFamily
-                    ? `/civica-index?family=${encodeURIComponent(structuralFamily)}`
-                    : "/civica-index"
-                }
-                className={`chip ${!continent ? "active" : ""}`}
-                scroll={false}
-              >
-                All
-              </Link>
-              {CONTINENTS.map((c) => (
-                <Link
-                  key={c}
-                  href={continentHref(c)}
-                  className={`chip ${continent === c ? "active" : ""}`}
-                  scroll={false}
-                >
-                  {c}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {familyOptionsSorted.length > 0 && (
-            <div className="left-filter-group">
-              <div className="left-filter-label">Government type</div>
-              <div className="chips">
-                <Link
-                  href={
-                    continent
-                      ? `/civica-index?continent=${encodeURIComponent(continent)}`
-                      : "/civica-index"
-                  }
-                  className={`chip ${!structuralFamily ? "active" : ""}`}
-                  scroll={false}
-                >
-                  All
-                </Link>
-                {familyOptionsSorted.map((f) => {
-                  const meta =
-                    STRUCTURAL_FAMILY_META[f.key as StructuralFamilyKey];
-                  const label = meta?.label ?? f.key;
-                  return (
-                    <Link
-                      key={f.key}
-                      href={familyHref(f.key)}
-                      className={`chip ${structuralFamily === f.key ? "active" : ""}`}
-                      scroll={false}
-                      title={`${f.totalCount} countries · ${f.scoredCount} scored`}
-                    >
-                      {label}
-                      <span className="chip-count">
-                        {" "}
-                        {f.scoredCount}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          <CivicaIndexFilterSelects
+            continents={CONTINENTS}
+            families={families}
+            activeContinent={continent}
+            activeFamily={structuralFamily}
+          />
         </div>
       }
     />

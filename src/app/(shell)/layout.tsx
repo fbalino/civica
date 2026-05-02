@@ -1,5 +1,5 @@
 import { ShellProvider } from "@/components/shell/ShellContext";
-import { ThreePaneShell } from "@/components/shell/ThreePaneShell";
+import { ShellRouteFrame } from "@/components/shell/ShellRouteFrame";
 
 /**
  * (shell) route group layout — wraps every route inside the three-pane
@@ -21,9 +21,9 @@ export default function ShellLayout({
 }) {
   return (
     <ShellProvider>
-      <ThreePaneShell leftSlot={left} rightSlot={right}>
+      <ShellRouteFrame leftSlot={left} rightSlot={right}>
         {children}
-      </ThreePaneShell>
+      </ShellRouteFrame>
     </ShellProvider>
   );
 }

@@ -24,8 +24,13 @@ const ACRONYMS = new Set([
   "UN", "EU", "GDP", "GNI", "GNP", "ISO", "NGO", "IMF", "NATO",
   "ECOWAS", "AU", "EEA", "WHO", "WTO", "ASEAN", "OPEC", "BRICS",
   "UTC", "UK", "US", "USA", "UAE", "DC", "IT", "TV", "FM", "AM",
-  "ID", "GPS", "PIN", "VAT", "CO2",
+  "ID", "GPS", "PIN", "VAT", "CO2", "CC", "BY", "SA", "NC", "API",
+  "HDI", "WGI", "CPI", "GPI", "QOG",
 ]);
+
+const ACRONYM_DISPLAY: Record<string, string> = {
+  QOG: "QoG",
+};
 
 // Words that stay lowercase in title case unless they're the first word.
 // Standard Chicago / AP-style "small words". `&` is treated as a small
@@ -85,7 +90,7 @@ const OVERRIDES_TITLE: Record<string, string> = {
 function applyAcronyms(input: string): string {
   return input.replace(/\b([a-z]+)\b/gi, (m) => {
     const upper = m.toUpperCase();
-    return ACRONYMS.has(upper) ? upper : m;
+    return ACRONYMS.has(upper) ? ACRONYM_DISPLAY[upper] ?? upper : m;
   });
 }
 
@@ -101,6 +106,18 @@ export function humanizeLabel(key: string): string {
   // Sentence case: first letter upper, rest lower.
   const result = normalised.charAt(0).toUpperCase() + normalised.slice(1);
   return applyAcronyms(result);
+}
+
+/**
+ * Central display cleanup for raw database enum-ish values. This should be
+ * used before rendering values that may arrive as snake_case, kebab-case, or
+ * source abbreviations.
+ */
+export function prettyDisplayValue(value: string | null | undefined, fallback = "—"): string {
+  if (!value) return fallback;
+  const trimmed = value.trim();
+  if (!trimmed) return fallback;
+  return humanizeLabel(trimmed);
 }
 
 /**
@@ -127,7 +144,7 @@ export function humanizeSectionLabel(key: string): string {
     const rest = m?.[2] ?? "";
     if (!rest) return word;
     const upper = rest.toUpperCase();
-    if (ACRONYMS.has(upper)) return lead + upper;
+    if (ACRONYMS.has(upper)) return lead + (ACRONYM_DISPLAY[upper] ?? upper);
     if (i !== 0 && SMALL_WORDS.has(rest)) return word;
     return lead + rest.charAt(0).toUpperCase() + rest.slice(1);
   });

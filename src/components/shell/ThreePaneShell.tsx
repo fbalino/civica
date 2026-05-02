@@ -98,6 +98,13 @@ export function ThreePaneShell({
   // Hide the resizer along with the pane itself so collapsed gives 0px.
   const showLeftResizer = !hideLeft && !leftCollapsedDesktop;
   const showRightResizer = !hideRight && !rightCollapsedDesktop;
+  const hideMobilePanelBar = hideLeft && hideRight;
+
+  useEffect(() => {
+    if (hideRight && mobilePanel === "chat") {
+      setMobilePanel("center");
+    }
+  }, [hideRight, mobilePanel, setMobilePanel]);
 
   // Grid template varies by mode + collapse state. Resizer columns get 0px
   // when their pane is collapsed/hidden so the seam disappears too.
@@ -111,7 +118,7 @@ export function ThreePaneShell({
 
   return (
     <div
-      className="atlas-root"
+      className={`atlas-root${hideMobilePanelBar ? " atlas-root--no-mobile-tabs" : ""}`}
       style={
         {
           "--atlas-leftW": `${effectiveLeftW}px`,
@@ -119,7 +126,7 @@ export function ThreePaneShell({
         } as React.CSSProperties
       }
     >
-      {isMobile && (
+      {isMobile && !hideMobilePanelBar && (
         <div className="mobile-panel-bar" role="tablist" aria-label="Panels">
           <button
             role="tab"
@@ -139,16 +146,18 @@ export function ThreePaneShell({
           >
             Content
           </button>
-          <button
-            role="tab"
-            aria-selected={mobilePanel === "chat"}
-            className={mobilePanel === "chat" ? "on" : ""}
-            onClick={() =>
-              setMobilePanel(mobilePanel === "chat" ? "center" : "chat")
-            }
-          >
-            Ask AI
-          </button>
+          {!hideRight && (
+            <button
+              role="tab"
+              aria-selected={mobilePanel === "chat"}
+              className={mobilePanel === "chat" ? "on" : ""}
+              onClick={() =>
+                setMobilePanel(mobilePanel === "chat" ? "center" : "chat")
+              }
+            >
+              Ask AI
+            </button>
+          )}
         </div>
       )}
 

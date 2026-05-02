@@ -118,7 +118,7 @@ export default async function CivicaIndexShellPage({
         <section className="ci-hero">
           <div className="ci-hero-eyebrow">
             <span className="dot live" aria-hidden="true" />
-            Civica Index · Beta · Updated daily
+            Civica Index · Updated daily
             <span
               className="ci-beta-pill"
               aria-label="Beta — methodology under active revision"

@@ -161,7 +161,7 @@ export default function RootLayout({
                         background: "var(--color-source-frozen)",
                       }}
                     />
-                    Archived (Jan 2026)
+                    Archived
                   </span>
                 </div>
               </div>
@@ -174,25 +174,12 @@ export default function RootLayout({
                   textAlign: "right",
                 }}
               >
-                <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-                  <Link href="/countries" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Countries</Link>
-                  <span>&middot;</span>
-                  <Link href="/elections" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Elections</Link>
-                  <span>&middot;</span>
-                  <Link href="/government-types" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Gov Types</Link>
-                  <span>&middot;</span>
-                  <Link href="/compare" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Compare</Link>
-                  <span>&middot;</span>
-                  <Link href="/rankings" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Rankings</Link>
-                  <span>&middot;</span>
-                  <Link href="/blog" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>The Record</Link>
-                </div>
-                <div style={{ marginTop: 6, display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                <div style={{ display: "flex", flexWrap: "wrap", rowGap: 6, columnGap: 12, justifyContent: "flex-end" }}>
                   <Link href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>About</Link>
                   <span>&middot;</span>
                   <Link href="/api-docs" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>API</Link>
                   <span>&middot;</span>
-                  <Link href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</Link>
+                  <Link href="/about#sources" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</Link>
                   <span>&middot;</span>
                   <Link href="/contact" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Contact</Link>
                   <span>&middot;</span>
@@ -202,11 +189,8 @@ export default function RootLayout({
                     href="https://statuspage.incident.io/civica-atlas"
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ color: "var(--color-text-25)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4 }}
+                    style={{ color: "var(--color-text-25)", textDecoration: "none" }}
                   >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                    </svg>
                     Status
                   </a>
                 </div>

@@ -361,7 +361,6 @@ html[data-theme="light"] .atlas-root {
   margin-left: 2px;
   font-size: var(--text-9);
 }
-
 .left-country-list { padding: 6px 16px 20px; font-family: var(--font-body); font-size: var(--text-13); }
 .left-country-list .region-group { margin-top: 10px; }
 .left-country-list .region-label {
@@ -955,7 +954,9 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 
   /* HUD bottom: mobile-friendly */
   .atlas-hud-bottom {
-    left: 10px; right: 10px; bottom: 10px;
+    left: var(--space-4);
+    right: calc(var(--space-8) + var(--space-5));
+    bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
     flex-direction: column; align-items: stretch;
   }
   .atlas-hints {
@@ -967,7 +968,10 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .atlas-hints .cta--mobile { display: block; }
 
   .atlas-zoombar {
-    position: fixed; right: 10px; bottom: 10px; z-index: 10;
+    position: fixed;
+    right: var(--space-4);
+    bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+    z-index: 10;
   }
   .atlas-zoombar button { width: 48px; height: 48px; font-size: var(--text-20); }
 
@@ -2006,3 +2010,121 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   margin-top: 4px;
 }
 .home-wiki-feature-link:hover { color: var(--atlas-accent); }
+
+/* ===== HOMEPAGE GRID VARIANT ============================================ */
+.home-grid {
+  min-height: calc(100svh - 56px);
+  background: var(--atlas-paper);
+  color: var(--atlas-ink);
+  padding: var(--space-5);
+}
+.home-grid-hero {
+  position: relative;
+  min-height: calc(100svh - 56px);
+  border: 1px solid var(--atlas-ink);
+  border-radius: var(--radius-md);
+  padding: clamp(var(--space-8), 7vw, 7rem) var(--space-7);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(var(--space-8), 8vw, 8rem);
+  isolation: isolate;
+}
+.home-grid-intro {
+  width: 100%;
+  text-align: center;
+  animation: home-grid-rise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.home-grid-title {
+  font-family: var(--font-heading);
+  font-size: clamp(var(--text-52), 10vw, 9.5rem);
+  line-height: 0.95;
+  letter-spacing: var(--tracking-tighter);
+  font-weight: 300;
+  margin: 0 auto;
+  max-width: 72rem;
+  text-wrap: balance;
+}
+.home-grid-links {
+  width: min(100%, 58rem);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(var(--space-7), 4.8vw, 5rem);
+}
+.home-grid-link {
+  color: var(--atlas-ink);
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transform: translateY(var(--space-4));
+  opacity: 0;
+  animation: home-grid-rise 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: color 160ms ease, transform 160ms ease;
+}
+.home-grid-link:nth-child(1) {
+  animation-delay: 120ms;
+}
+.home-grid-link:nth-child(2) {
+  animation-delay: 200ms;
+}
+.home-grid-link:nth-child(3) {
+  animation-delay: 280ms;
+}
+.home-grid-link:hover {
+  color: var(--atlas-accent);
+  transform: translateX(var(--space-3));
+}
+.home-grid-link-title {
+  font-family: var(--font-heading);
+  font-size: clamp(var(--text-28), 3vw, var(--text-44));
+  line-height: var(--leading-tight);
+  font-weight: 300;
+}
+.home-grid-link-body {
+  font-family: var(--font-body);
+  font-size: clamp(var(--text-16), 1.5vw, var(--text-22));
+  line-height: var(--leading-normal);
+  color: var(--atlas-ink-2);
+  transition:
+    color 160ms ease;
+}
+.home-grid-link:hover .home-grid-link-body {
+  color: currentColor;
+}
+@keyframes home-grid-rise {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-4));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 61.25rem) {
+  .home-grid-hero {
+    justify-content: flex-start;
+    padding: var(--space-8) var(--space-5);
+    gap: var(--space-8);
+  }
+}
+@media (max-width: 38.75rem) {
+  .home-grid {
+    padding: var(--space-3);
+  }
+  .home-grid-hero {
+    min-height: calc(100svh - 56px - var(--space-6));
+    padding: var(--space-8) var(--space-4);
+  }
+  .home-grid-title {
+    font-size: clamp(var(--text-44), 17vw, 5.5rem);
+  }
+  .home-grid-link-title {
+    font-size: var(--text-32);
+  }
+  .home-grid-link-body {
+    font-size: var(--text-16);
+  }
+}

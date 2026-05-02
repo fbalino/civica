@@ -115,6 +115,102 @@
      iPad-portrait widths. */
   min-width: 0;
 }
+.factbook-search {
+  position: relative;
+  margin-bottom: var(--space-5);
+}
+.factbook-search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-card-bg);
+  padding: var(--space-2) var(--space-3);
+  cursor: text;
+}
+.factbook-search-icon {
+  width: var(--space-4);
+  height: var(--space-4);
+  color: var(--color-text-30);
+  flex-shrink: 0;
+}
+.factbook-search-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.factbook-search input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+.factbook-search-results {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  right: 0;
+  z-index: 45;
+  border: 1px solid var(--color-text-primary);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-hard);
+  overflow: hidden;
+}
+.factbook-search-result {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--color-divider);
+  background: transparent;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  text-align: left;
+  cursor: pointer;
+}
+.factbook-search-result:last-child {
+  border-bottom: 0;
+}
+.factbook-search-result.is-selected,
+.factbook-search-result:hover {
+  background: var(--color-card-hover-bg);
+}
+.factbook-search-flag {
+  width: var(--space-5);
+  flex-shrink: 0;
+}
+.factbook-search-result-main {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+}
+.factbook-search-result-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-size: var(--text-14);
+}
+.factbook-search-result-code {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-30);
+}
+.factbook-mobile-subheader {
+  display: none;
+}
 
 .factbook-rail {
   position: sticky;
@@ -201,6 +297,62 @@
     padding: var(--space-5);
     padding-bottom: 120px;
     gap: var(--space-5);
+  }
+
+  .factbook-mobile-subheader {
+    position: sticky;
+    top: 56px;
+    z-index: 30;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    border-bottom: 1px solid var(--color-card-border);
+    background: color-mix(in oklab, var(--color-bg) 96%, transparent);
+    backdrop-filter: blur(var(--space-2));
+  }
+  .factbook-mobile-subheader.is-visible {
+    display: flex;
+  }
+  .factbook-mobile-subheader.is-searching {
+    align-items: flex-start;
+  }
+  .factbook-mobile-subheader-country {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-heading);
+    font-size: var(--text-16);
+    color: var(--color-text-primary);
+  }
+  .factbook-mobile-subheader-country span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .factbook-mobile-subheader-action {
+    border: 1px solid var(--color-card-border);
+    background: var(--color-card-bg);
+    color: var(--color-text-primary);
+    font-family: var(--font-mono);
+    font-size: var(--text-10);
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    padding: var(--space-2) var(--space-3);
+    flex-shrink: 0;
+  }
+  .factbook-mobile-subheader .factbook-search {
+    flex: 1;
+    margin-bottom: 0;
+  }
+  .factbook-mobile-subheader .factbook-search-results {
+    position: fixed;
+    top: calc(56px + var(--space-8));
+    left: var(--space-4);
+    right: var(--space-4);
   }
 
   /* Sidebar collapses to a bordered "On this page" panel. Not sticky on
@@ -515,6 +667,54 @@
 }
 
 /* === Index page list grid ================================================= */
+.factbook-index-search {
+  display: grid;
+  gap: var(--space-3);
+}
+.factbook-index-search-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-30);
+}
+.factbook-index-search-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-card-bg);
+  padding: var(--space-3) var(--space-4);
+  max-width: 32rem;
+}
+.factbook-index-search-field svg {
+  width: var(--space-5);
+  height: var(--space-5);
+  color: var(--color-text-30);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.factbook-index-search-field input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-16);
+}
+.factbook-index-search-field input::placeholder {
+  color: var(--color-text-30);
+}
+.factbook-index-search-count {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-30);
+}
 .factbook-index-grid {
   list-style: none;
   padding: 0;
@@ -535,8 +735,15 @@
 }
 .factbook-index-card:hover { border-color: var(--color-text-primary); }
 @media (max-width: 768px) {
+  .factbook-index-search-field {
+    max-width: none;
+  }
   .factbook-index-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: 1fr;
+  }
+  .factbook-index-card {
+    min-height: var(--space-9);
+    font-size: var(--text-16);
   }
 }
 

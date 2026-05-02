@@ -70,7 +70,7 @@ export function ShellCountryRail({
   }, [q, countries]);
 
   return (
-    <div className="chamber-left">
+    <div className="left-rail">
       {header && <div className="left-side-head">{header}</div>}
       {filters}
       <div className="left-search">

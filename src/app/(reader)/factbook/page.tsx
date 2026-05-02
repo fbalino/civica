@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getAllJurisdictions } from "@/lib/db/queries";
-import { CountryFlag } from "@/components/CountryFlag";
+import { FactbookIndexSearchList } from "@/components/factbook/FactbookIndexSearchList";
 
 // Minimal Phase C landing for /factbook. Uses the shared `.editorial-page`
 // container + `.factbook-index-*` classes from factbook.css so it picks up
@@ -35,16 +34,7 @@ export default async function FactbookIndexPage() {
         </p>
       </header>
 
-      <ul className="factbook-index-grid">
-        {sorted.map((c) => (
-          <li key={c.id}>
-            <Link href={`/factbook/${c.slug}`} className="factbook-index-card">
-              <CountryFlag iso2={c.iso2} size={20} />
-              <span>{c.name}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <FactbookIndexSearchList countries={sorted} />
     </div>
   );
 }

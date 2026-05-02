@@ -53,10 +53,9 @@ const monoLabel: React.CSSProperties = {
   color: "var(--color-text-30)",
 };
 
-const monoBody: React.CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-  fontSize: "var(--text-13)",
+const bodyText: React.CSSProperties = {
+  fontFamily: "var(--font-body)",
+  fontSize: "var(--text-15)",
   color: "var(--color-text-50)",
   lineHeight: "var(--leading-relaxed)",
 };
@@ -75,12 +74,10 @@ const fieldBase: React.CSSProperties = {
 };
 
 const errorText: React.CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-  fontSize: "var(--text-11)",
-  color: "#E06C6C",
+  fontFamily: "var(--font-body)",
+  fontSize: "var(--text-13)",
+  color: "var(--color-danger)",
   marginTop: 6,
-  letterSpacing: "var(--tracking-wide)",
 };
 
 const buttonPrimary: React.CSSProperties = {
@@ -91,7 +88,7 @@ const buttonPrimary: React.CSSProperties = {
   textTransform: "uppercase",
   padding: "12px 20px",
   background: "var(--color-accent)",
-  color: "#0C0C0B",
+  color: "var(--color-bg)",
   border: "none",
   borderRadius: "var(--radius-sm)",
   cursor: "pointer",
@@ -137,7 +134,7 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
       >
         Thanks — we&rsquo;ve got it.
       </h3>
-      <p style={{ ...monoBody, margin: 0 }}>
+      <p style={{ ...bodyText, margin: 0 }}>
         The editors usually reply within <strong style={{ color: "var(--color-text-85)" }}>3 business days</strong>.
         For urgent data corrections, open an issue on GitHub.
       </p>
@@ -169,7 +166,7 @@ function InfoTile({ label, body }: { label: string; body: React.ReactNode }) {
   return (
     <div className="cv-card">
       <div style={monoLabel}>{label}</div>
-      <p style={{ ...monoBody, margin: "10px 0 0" }}>{body}</p>
+      <p style={{ ...bodyText, margin: "10px 0 0" }}>{body}</p>
     </div>
   );
 }
@@ -245,14 +242,13 @@ export default function ContactClient() {
         onClick={() => setSubject(value)}
         aria-pressed={active}
         style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-          fontSize: "var(--text-11)",
-          letterSpacing: "var(--tracking-wide)",
+          fontFamily: "var(--font-body)",
+          fontWeight: 500,
+          fontSize: "var(--text-13)",
           padding: "8px 14px",
           borderRadius: 999,
           border: `1px solid ${active ? "var(--color-accent)" : "var(--color-card-border)"}`,
-          background: active ? "rgba(212, 160, 74, 0.14)" : "transparent",
+          background: active ? "color-mix(in oklab, var(--color-accent) 14%, transparent)" : "transparent",
           color: active ? "var(--color-accent)" : "var(--color-text-60)",
           cursor: "pointer",
           whiteSpace: "nowrap",
@@ -268,7 +264,7 @@ export default function ContactClient() {
       <div style={{ textAlign: "center" }}>
         <div style={monoLabel}>Contact</div>
         <h1 className="page-heading" style={{ marginTop: 16, fontSize: "var(--text-52)" }}>Dispatch desk</h1>
-        <p style={{ ...monoBody, margin: "16px auto 0", maxWidth: 560 }}>
+        <p style={{ ...bodyText, margin: "16px auto 0", maxWidth: 560 }}>
           Story tips, data corrections, partnerships, press. Pick a category, send a note — a human on the editorial team will read it.
         </p>
       </div>
@@ -319,10 +315,10 @@ export default function ContactClient() {
                 style={{
                   marginTop: 20,
                   padding: "10px 12px",
-                  borderLeft: "2px solid #E06C6C",
-                  background: "rgba(224, 108, 108, 0.08)",
-                  ...monoBody,
-                  color: "#E06C6C",
+                  borderLeft: "2px solid var(--color-danger)",
+                  background: "color-mix(in oklab, var(--color-danger) 10%, transparent)",
+                  ...bodyText,
+                  color: "var(--color-danger)",
                 }}
               >
                 {serverError}
@@ -346,10 +342,6 @@ export default function ContactClient() {
         <InfoTile
           label="SLA · Response"
           body={<>We usually reply within <strong style={{ color: "var(--color-text-85)" }}>3 business days</strong>.</>}
-        />
-        <InfoTile
-          label="Dispatch · Mailing"
-          body={<>Civica Editors<br/>1180 Brickell Ave · Suite 2100<br/>Miami, FL 33131</>}
         />
         <InfoTile
           label="Developers · API"

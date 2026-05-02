@@ -18,7 +18,7 @@ export interface ShellOrgRailProps {
  */
 export function ShellOrgRail({ groups, selectedSlug }: ShellOrgRailProps) {
   return (
-    <div className="chamber-left">
+    <div className="left-rail">
       <div className="left-side-head">
         <div className="kicker">Atlas</div>
         <div className="title">Pick an organization</div>

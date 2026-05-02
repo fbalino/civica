@@ -10,21 +10,37 @@ type NavItem = {
   label: string;
   descriptor: string;
   glyph: string;
+  children?: Array<{
+    href: string;
+    label: string;
+    descriptor: string;
+  }>;
 };
 
 const PRIMARY: NavItem[] = [
-  { href: "/", label: "Home", descriptor: "Today in governance", glyph: "◐" },
-  { href: "/countries", label: "Countries", descriptor: "Index of 250+ nations", glyph: "◯" },
-  { href: "/civica-index", label: "Civica Index", descriptor: "Governance quality scores", glyph: "◈" },
-  { href: "/elections", label: "Elections", descriptor: "Upcoming & historical", glyph: "▲" },
-  { href: "/government-types", label: "Gov Types", descriptor: "Systems compared", glyph: "▣" },
-  { href: "/compare", label: "Compare", descriptor: "Side-by-side analysis", glyph: "⇆" },
-  { href: "/rankings", label: "Rankings", descriptor: "Data-backed leaderboards", glyph: "☰" },
+  { href: "/factbook", label: "Factbook", descriptor: "World factbook", glyph: "▤" },
+  { href: "/atlas", label: "Atlas", descriptor: "Explore the map", glyph: "◯" },
+  {
+    href: "/civica-index",
+    label: "Index",
+    descriptor: "Civica Index (beta)",
+    glyph: "◈",
+    children: [
+      { href: "/civica-index", label: "Overview", descriptor: "Index home" },
+      { href: "/civica-index/methodology", label: "Methodology", descriptor: "Scoring model" },
+      { href: "/civica-index/pulse-changelog", label: "Pulse changelog", descriptor: "Daily changes" },
+      { href: "/civica-index/methodology/pulse", label: "Pulse methodology", descriptor: "Event scoring" },
+      { href: "/civica-index/government-types", label: "Government types", descriptor: "Taxonomy" },
+      { href: "/civica-index/corrections", label: "Corrections", descriptor: "Data fixes" },
+      { href: "/civica-index/replication", label: "Replication", descriptor: "Academic use" },
+      { href: "/civica-index/widget", label: "Widgets", descriptor: "Embeds" },
+    ],
+  },
   { href: "/blog", label: "The Record", descriptor: "Essays & dispatches", glyph: "✎" },
+  { href: "/about", label: "About", descriptor: "Mission & methodology", glyph: "ⓘ" },
 ];
 
 const REFERENCE: NavItem[] = [
-  { href: "/about", label: "About", descriptor: "Mission & methodology", glyph: "ⓘ" },
   { href: "/about#sources", label: "Sources", descriptor: "Data provenance", glyph: "✦" },
   { href: "/api-docs", label: "API", descriptor: "Developer reference", glyph: "{ }" },
   { href: "/contact", label: "Contact", descriptor: "Get in touch with the editors", glyph: "✉" },
@@ -207,67 +223,121 @@ function MenuOverlay({
 
 function PanelRow({ item, active, delay = 0 }: { item: NavItem; active: boolean; delay?: number }) {
   return (
-    <Link
-      href={item.href}
+    <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "24px 1fr auto",
-        alignItems: "center",
-        gap: 14,
-        padding: "12px 12px",
-        borderRadius: "var(--radius-md)",
-        textDecoration: "none",
-        background: active ? "var(--color-card-bg)" : "transparent",
-        border: `1px solid ${active ? "var(--color-card-border)" : "transparent"}`,
         animation: `civ-slide-up 320ms ${delay}ms cubic-bezier(0.22, 1, 0.36, 1) both`,
       }}
     >
-      <span
+      <Link
+        href={item.href}
         style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-14)",
-          color: active ? "var(--color-accent)" : "var(--color-text-30)",
-          textAlign: "center",
+          display: "grid",
+          gridTemplateColumns: "24px 1fr auto",
+          alignItems: "center",
+          gap: 14,
+          padding: "12px 12px",
+          borderRadius: "var(--radius-md)",
+          textDecoration: "none",
+          background: active ? "var(--color-card-bg)" : "transparent",
+          border: `1px solid ${active ? "var(--color-card-border)" : "transparent"}`,
         }}
       >
-        {item.glyph}
-      </span>
-      <span style={{ minWidth: 0 }}>
         <span
           style={{
-            display: "block",
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-16)",
-            fontWeight: 500,
-            color: active ? "var(--color-accent)" : "var(--color-text-primary)",
-            lineHeight: 1.2,
-          }}
-        >
-          {item.label}
-        </span>
-        <span
-          style={{
-            display: "block",
-            marginTop: 2,
             fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-11)",
-            color: "var(--color-text-30)",
+            fontSize: "var(--text-14)",
+            color: active ? "var(--color-accent)" : "var(--color-text-primary)",
+            textAlign: "center",
           }}
         >
-          {item.descriptor}
+          {item.glyph}
         </span>
-      </span>
-      <span
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-12)",
-          color: "var(--color-text-25)",
-        }}
-      >
-        →
-      </span>
-    </Link>
+        <span style={{ minWidth: 0 }}>
+          <span
+            style={{
+              display: "block",
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-16)",
+              fontWeight: 500,
+              color: active ? "var(--color-accent)" : "var(--color-text-primary)",
+              lineHeight: 1.2,
+            }}
+          >
+            {item.label}
+          </span>
+          <span
+            style={{
+              display: "block",
+              marginTop: 2,
+              fontFamily: "var(--font-mono)",
+              fontWeight: "var(--font-weight-mono)",
+              fontSize: "var(--text-11)",
+              color: "var(--color-text-30)",
+            }}
+          >
+            {item.descriptor}
+          </span>
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-12)",
+            color: "var(--color-text-25)",
+          }}
+        >
+          →
+        </span>
+      </Link>
+      {item.children ? (
+        <div
+          style={{
+            display: "grid",
+            gap: 2,
+            margin: "4px 0 8px 38px",
+            paddingLeft: 12,
+            borderLeft: "1px solid var(--color-card-border)",
+          }}
+        >
+          {item.children.map((child) => (
+            <Link
+              key={child.href}
+              href={child.href}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr auto",
+                gap: 10,
+                padding: "8px 10px",
+                borderRadius: "var(--radius-md)",
+                color: "var(--color-text-60)",
+                textDecoration: "none",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-14)",
+                  fontWeight: 500,
+                  color: "var(--color-text-primary)",
+                }}
+              >
+                {child.label}
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontWeight: "var(--font-weight-mono)",
+                  fontSize: "var(--text-10)",
+                  color: "var(--color-text-30)",
+                  textTransform: "uppercase",
+                }}
+              >
+                {child.descriptor}
+              </span>
+            </Link>
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -375,7 +445,7 @@ function OverlayFooter() {
         }}
       >
         <LegendDot color="var(--color-source-live)" label="Live" />
-        <LegendDot color="var(--color-source-frozen)" label="Archived (Jan 2026)" />
+        <LegendDot color="var(--color-source-frozen)" label="Archived" />
       </div>
 
       <p
@@ -411,7 +481,7 @@ function OverlayFooter() {
             textTransform: "uppercase",
           }}
         >
-          Atlas of governance
+          Civica Atlas
         </span>
         <span
           style={{

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { getCIRankings } from "@/lib/db/queries";
 import { ciTier } from "@/lib/ci/tiers";
 import { HomeClean } from "@/components/home/HomeClean";
+import { HomeGrid } from "@/components/home/HomeGrid";
 import { HomeWiki } from "@/components/home/HomeWiki";
 
 export const metadata: Metadata = {
@@ -36,13 +36,12 @@ export default async function LandingPage({
   // Phase F — A/B mockup of two homepage variants behind ?home=.
   // ?home=clean → minimalist circle-mark + tagline + CTAs
   // ?home=wiki  → 6-card directory with rankings + recent feeds
-  // No param → keep redirecting to /atlas (the user's preferred default
-  // while testing the redesign). After they pick a variant, the
-  // follow-up commit will drop both the loser and the redirect.
+  // No param → use the editorial grid homepage.
   const sp = await searchParams;
+  if (sp.home === "grid") return <HomeGrid />;
   if (sp.home === "clean") return <HomeClean />;
   if (sp.home === "wiki") return <HomeWiki />;
-  redirect("/atlas");
+  return <HomeGrid />;
 
   // Best-effort data; if queries fail (e.g. local dev without DB) we still
   // render the page with empty lists rather than a crash.

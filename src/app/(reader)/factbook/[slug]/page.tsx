@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import {
   getJurisdictionBySlug,
   getFactbookSections,
+  getFactbookCountryOptions,
   getCICountryDetail,
   getGovernmentStructure,
   getLeaderTimeline,
@@ -17,6 +18,7 @@ import {
   FactbookSidebar,
   type FactbookSidebarItem,
 } from "@/components/factbook/FactbookSidebar";
+import { FactbookMobileSubheader } from "@/components/factbook/FactbookMobileSubheader";
 import {
   FactbookRightRail,
   type SubsectionEntry,
@@ -136,6 +138,7 @@ export default async function FactbookCountryPage({
     legislatureData,
     billsResult,
     scoresRows,
+    countryOptions,
   ] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -145,6 +148,7 @@ export default async function FactbookCountryPage({
     getLegislatureForJurisdiction(jurisdiction.id).catch(() => null),
     getBillsForJurisdiction(slug, 1).catch(() => null),
     getScoresForJurisdiction(jurisdiction.id).catch(() => []),
+    getFactbookCountryOptions().catch(() => []),
   ]);
 
   const hasLegislature = !!legislatureData;
@@ -290,9 +294,16 @@ export default async function FactbookCountryPage({
         mapCaption={mapCaption}
         photos={photos}
       />
+      <div id="factbook-header-sentinel" aria-hidden="true" />
+
+      <FactbookMobileSubheader
+        country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
+        countries={countryOptions}
+        sentinelId="factbook-header-sentinel"
+      />
 
       <div className="factbook-body">
-        <FactbookSidebar items={sidebarItems} />
+        <FactbookSidebar items={sidebarItems} countries={countryOptions} />
 
         <div className="factbook-main">
           {visibleSections.map((section, idx) => {

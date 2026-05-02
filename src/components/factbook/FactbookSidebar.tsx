@@ -2,6 +2,10 @@
 
 import { useMemo } from "react";
 import { useActiveSection } from "@/hooks/useActiveSection";
+import {
+  FactbookCountrySearch,
+  type FactbookCountryOption,
+} from "./FactbookCountrySearch";
 
 export interface FactbookSidebarItem {
   id: string;
@@ -10,17 +14,22 @@ export interface FactbookSidebarItem {
 
 interface FactbookSidebarProps {
   items: ReadonlyArray<FactbookSidebarItem>;
+  countries: ReadonlyArray<FactbookCountryOption>;
 }
 
 // Layout (sticky, max-height, mobile collapse) lives in
 // src/app/factbook.css under `.factbook-sidebar` so @media queries can
 // override it. Inline styles only carry component-local typography.
-export function FactbookSidebar({ items }: FactbookSidebarProps) {
+export function FactbookSidebar({ items, countries }: FactbookSidebarProps) {
   const ids = useMemo(() => items.map((i) => i.id), [items]);
   const active = useActiveSection(ids);
 
   return (
     <aside aria-label="Page sections" className="factbook-sidebar">
+      <FactbookCountrySearch
+        countries={countries}
+        placeholder="Jump to country..."
+      />
       <h3
         style={{
           fontFamily: "var(--font-mono)",

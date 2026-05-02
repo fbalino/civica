@@ -1139,6 +1139,17 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
             flex: 0 0 110px;
           }
         }
+        @media (max-width: 600px) {
+          .band-cell {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 10px 14px;
+          }
+          .band-cell strong {
+            flex: none;
+          }
+        }
       `}</style>
     </EditorialPage>
   );

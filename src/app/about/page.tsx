@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SourceDot } from "@/components/SourceDot";
+import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ export default async function AboutPage() {
   const sourcesForDisplay = dbSources.map((source) => ({
     id: source.id,
     name: source.name,
-    license: source.license ?? "—",
+    license: prettyDisplayValue(source.license),
     retrievedAt: source.lastSyncAt ? source.lastSyncAt.toISOString() : null,
     description:
       SOURCE_DESCRIPTIONS[source.id] ??
@@ -99,7 +100,7 @@ export default async function AboutPage() {
 
       <div style={{ height: 1, background: "var(--color-divider)", margin: "var(--spacing-section-y) 0" }} />
 
-      <section>
+      <section id="sources">
         <h2 className="page-heading" style={{ marginBottom: 8 }}>
           Data Sources
         </h2>
