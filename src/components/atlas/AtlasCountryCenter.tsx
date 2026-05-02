@@ -119,6 +119,7 @@ export interface AtlasCountryCenterProps {
   leadersData: LeaderEntry[] | null;
   constitutionData: ConstitutionData | null;
   internationalData: InternationalData | null;
+  scoresRows: import("@/lib/db/queries-scores").ScoreRow[] | null;
   tabDataLoading: boolean;
 
   // Interactions
@@ -173,6 +174,7 @@ export function AtlasCountryCenter({
   leadersData,
   constitutionData,
   internationalData,
+  scoresRows,
   tabDataLoading,
   onTabChange,
   onHouseChange,
@@ -416,6 +418,7 @@ export function AtlasCountryCenter({
         loading={tabDataLoading}
         country={country}
         democracyData={democracyData}
+        scoresRows={scoresRows}
       />
 
       {/* Phase E — auto-citation. Sits inside .atlas-pane padding so it

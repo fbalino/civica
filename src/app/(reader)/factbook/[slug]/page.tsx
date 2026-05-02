@@ -27,6 +27,10 @@ import { GovStructureDiagram } from "@/components/GovStructureDiagram";
 import { FactbookLegislature } from "@/components/factbook/FactbookLegislature";
 import { FactbookLeaders } from "@/components/factbook/FactbookLeaders";
 import { FactbookBills } from "@/components/factbook/FactbookBills";
+import { FactbookOutcomes } from "@/components/factbook/FactbookOutcomes";
+import { ScoresAndRankings } from "@/components/scores/ScoresAndRankings";
+import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
+import { getCountryOutcomes } from "@/lib/db/queries";
 import { classifyGovernment } from "@/lib/data/government-category";
 import { formatGovernmentType } from "@/lib/text/clean";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
@@ -50,14 +54,23 @@ const SECTION_PLAN: SectionPlan[] = [
   { kind: "civica", id: "legislature", label: "Legislature" },
   { kind: "civica", id: "leaders", label: "Leaders" },
   { kind: "civica", id: "bills", label: "Bills" },
+  // Outcomes (Civica + 3rd-party indicators with peer-band visualization)
+  // sits between Bills and the CIA-sourced reference sections.
+  { kind: "civica", id: "outcomes", label: "Outcomes" },
   { kind: "factbook", id: "economy", label: "Economy", sourceKey: "economy" },
   { kind: "factbook", id: "energy", label: "Energy", sourceKey: "energy" },
   { kind: "factbook", id: "communications", label: "Communications", sourceKey: "communications" },
   { kind: "factbook", id: "transport", label: "Transport", sourceKey: "transportation" },
   { kind: "factbook", id: "environment", label: "Environment", sourceKey: "environment" },
   { kind: "factbook", id: "military", label: "Military & Security", sourceKey: "military_and_security" },
+  // Terrorism section — 102 countries have data; auto-hidden when empty.
+  { kind: "factbook", id: "terrorism", label: "Terrorism", sourceKey: "terrorism" },
   { kind: "factbook", id: "space", label: "Space", sourceKey: "space" },
   { kind: "factbook", id: "transnational", label: "Transnational Issues", sourceKey: "transnational_issues" },
+  // Scores & Rankings sits at the very end — the long-tail reference data
+  // above stays organized while the curated Civica scores anchor the
+  // conclusion of the page.
+  { kind: "civica", id: "scores", label: "Scores & Rankings" },
 ];
 
 const FACTBOOK_RETRIEVED_AT = "2026-01-23";
@@ -109,6 +122,7 @@ export default async function FactbookCountryPage({
   // <100ms typical). Refactoring the components to accept pre-fetched
   // data as props is a bigger change that we'll do if profiling shows
   // it matters.
+  const outcomesYear = new Date().getFullYear();
   const [
     sections,
     govStructure,
@@ -117,6 +131,8 @@ export default async function FactbookCountryPage({
     leadersRows,
     legislatureData,
     billsResult,
+    outcomesResult,
+    scoresRows,
   ] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -125,11 +141,24 @@ export default async function FactbookCountryPage({
     getLeaderTimeline(jurisdiction.id).catch(() => []),
     getLegislatureForJurisdiction(jurisdiction.id).catch(() => null),
     getBillsForJurisdiction(slug, 1).catch(() => null),
+    getCountryOutcomes(jurisdiction.id, outcomesYear).catch(() => null),
+    getScoresForJurisdiction(jurisdiction.id).catch(() => []),
   ]);
 
   const hasLegislature = !!legislatureData;
   const hasLeaders = leadersRows.length > 0;
   const hasBills = !!billsResult && billsResult.rows.length > 0;
+  // `getCountryOutcomes().metrics` is typed as NeonHttpQueryResult but
+  // is either a row array or `{ rows: [...] }` at runtime. Mirrors the
+  // normalization inside <FactbookOutcomes> itself so the visibility
+  // gate doesn't disagree with the component's empty-state check.
+  const outcomesMetrics = outcomesResult
+    ? Array.isArray(outcomesResult.metrics)
+      ? outcomesResult.metrics
+      : ((outcomesResult.metrics as { rows?: unknown[] })?.rows ?? [])
+    : [];
+  const hasOutcomes = outcomesMetrics.length > 0;
+  const hasScores = scoresRows.length > 0;
 
   const sectionDataMap = new Map(
     sections.map((s) => [s.sectionName, s.sectionData])
@@ -142,6 +171,8 @@ export default async function FactbookCountryPage({
       if (s.id === "legislature") return hasLegislature;
       if (s.id === "leaders") return hasLeaders;
       if (s.id === "bills") return hasBills;
+      if (s.id === "outcomes") return hasOutcomes;
+      if (s.id === "scores") return hasScores;
       return true;
     }
     const data = sectionDataMap.get(s.sourceKey);
@@ -309,6 +340,10 @@ export default async function FactbookCountryPage({
                       ? "Civica · Leaders"
                       : section.id === "bills"
                       ? "Civica · Bills"
+                      : section.id === "outcomes"
+                      ? "Civica + 3rd-party · Outcomes"
+                      : section.id === "scores"
+                      ? "Civica · Scores & Rankings"
                       : "Civica · Governance"}
                   </p>
                   <h2 className="factbook-section-title">{section.label}</h2>
@@ -373,6 +408,20 @@ export default async function FactbookCountryPage({
                   <FactbookBills
                     countrySlug={slug}
                     countryName={jurisdiction.name}
+                  />
+                )}
+                {section.kind === "civica" && section.id === "outcomes" && (
+                  <FactbookOutcomes
+                    jurisdictionId={jurisdiction.id}
+                    countryName={jurisdiction.name}
+                    countrySlug={slug}
+                  />
+                )}
+                {section.kind === "civica" && section.id === "scores" && (
+                  <ScoresAndRankings
+                    jurisdictionId={jurisdiction.id}
+                    countryName={jurisdiction.name}
+                    variant="factbook"
                   />
                 )}
 

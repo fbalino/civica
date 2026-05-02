@@ -17,6 +17,7 @@ import {
 } from "./AtlasCountryCenter";
 import type { ConstitutionData } from "./tabs/ConstitutionTab";
 import type { InternationalData } from "./tabs/InternationalTab";
+import type { ScoreRow } from "@/lib/db/queries-scores";
 import { useAtlasUrlState } from "@/hooks/useAtlasUrlState";
 import { atlasIdToSlug } from "@/lib/atlas/ids";
 import { dispatchCivicaAsk } from "@/lib/shell/events";
@@ -103,6 +104,7 @@ export function AtlasCountryShellClient({
     useState<ConstitutionData | null>(null);
   const [internationalData, setInternationalData] =
     useState<InternationalData | null>(null);
+  const [scoresRows, setScoresRows] = useState<ScoreRow[] | null>(null);
   const [tabDataLoading, setTabDataLoading] = useState(false);
 
 
@@ -114,6 +116,7 @@ export function AtlasCountryShellClient({
     setLeadersData(null);
     setConstitutionData(null);
     setInternationalData(null);
+    setScoresRows(null);
     setDimmed(new Set());
   }, [country.id]);
 
@@ -161,9 +164,34 @@ export function AtlasCountryShellClient({
       }
       setTabDataLoading(true);
       try {
-        if (tab === "scores" && !democracyData) {
-          const res = await fetch(`/api/countries/${slug}/democracy`);
-          if (!cancelled && res.ok) setDemocracyData(await res.json());
+        if (tab === "scores") {
+          // Two parallel fetches: the new Scores & Rankings table (P1.1
+          // canonical surface) and the legacy democracy payload (which
+          // ScoresTab still uses for its Freedom House facts strip and
+          // regional comparison list, kept until those move into the
+          // unified row format).
+          const tasks: Promise<unknown>[] = [];
+          if (!scoresRows) {
+            tasks.push(
+              fetch(`/api/countries/${slug}/scores`)
+                .then((res) => (res.ok ? res.json() : null))
+                .then((json) => {
+                  if (!cancelled && json?.rows) setScoresRows(json.rows);
+                })
+                .catch(() => {}),
+            );
+          }
+          if (!democracyData) {
+            tasks.push(
+              fetch(`/api/countries/${slug}/democracy`)
+                .then((res) => (res.ok ? res.json() : null))
+                .then((json) => {
+                  if (!cancelled && json) setDemocracyData(json);
+                })
+                .catch(() => {}),
+            );
+          }
+          await Promise.all(tasks);
         } else if (tab === "leaders" && !leadersData) {
           const res = await fetch(`/api/countries/${slug}/leaders`);
           if (!cancelled && res.ok) {
@@ -185,7 +213,7 @@ export function AtlasCountryShellClient({
     return () => {
       cancelled = true;
     };
-  }, [country, tab, billsData, democracyData, leadersData, constitutionData, structureData]);
+  }, [country, tab, billsData, democracyData, leadersData, constitutionData, structureData, scoresRows]);
 
   function toggleDim(partyId: string) {
     setDimmed((prev) => {
@@ -211,6 +239,7 @@ export function AtlasCountryShellClient({
         leadersData={leadersData}
         constitutionData={constitutionData}
         internationalData={internationalData}
+        scoresRows={scoresRows}
         tabDataLoading={tabDataLoading}
         onTabChange={setTab}
         onHouseChange={(h) => {

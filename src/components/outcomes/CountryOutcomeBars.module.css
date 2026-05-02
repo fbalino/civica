@@ -1,22 +1,19 @@
 /*
- * CountryOutcomeBars component styles — ported from CIV-133 mockup.
+ * CountryOutcomeBars component styles.
  *
- * Per-row positional data is injected as CSS custom properties on .cob__chart
- * via React inline styles:
+ * Per-row positional data is injected as CSS custom properties on the
+ * row's chart element (via React inline styles):
  *   --peer-lo, --peer-hi   : percent positions of peer band edges
  *   --peer-median          : percent position of peer median tick
  *   --pos                  : percent position of country marker
  *
- * Token mapping (design-spec → project globals.css):
- *   --color-surface-primary   → var(--color-bg)
- *   --color-surface-secondary → var(--color-surface-elevated)
- *   --color-surface-tertiary  → var(--color-select-bg)
- *   --color-text-secondary    → var(--color-text-60)
- *   --color-text-muted        → var(--color-text-40)
- *   --color-border-strong     → var(--color-text-primary)
- *   --color-border-default    → var(--color-card-border)
- *   --color-border-subtle     → var(--color-stat-border)
- *   --color-status-warning    → var(--color-warn)
+ * Per-row tier + government accent colours are injected on the row
+ * itself:
+ *   --tier-color   : `var(--tier-exceptional|strong|mixed|weak|failed)`
+ *   --gov-accent   : `var(--color-gov-*)` from classifyGovernment()
+ *
+ * All visual values use design-system tokens — no hard-coded hex / rgb /
+ * oklch literals (per AGENTS.md + DESIGN.md).
  */
 
 /* ---- Block ---------------------------------------------------------------- */
@@ -30,10 +27,10 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
-  padding-bottom: 12px;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-text-primary);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-5);
 }
 
 .cob__title {
@@ -58,24 +55,75 @@
   font-weight: 500;
 }
 
+/* ---- Group divider -------------------------------------------------------- */
+.cob__group {
+  margin-top: var(--space-6);
+}
+
+.cob__group:first-of-type {
+  margin-top: 0;
+}
+
+.cob__groupHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3) 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-text-60);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-stat-border);
+}
+
 /* ---- Row ----------------------------------------------------------------- */
 .cob__row {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
-  padding: 16px 0;
+  gap: var(--space-3);
+  padding: var(--space-5) 0 var(--space-6);
   border-bottom: 1px solid var(--color-stat-border);
+  position: relative;
+  transition: background 160ms ease;
+}
+
+/* Government-type peer accent: a subtle 2px left bar that picks up the
+   --gov-accent injected per-row. Only applies when peer-by-government is
+   the active comparator. The bar pulls outside the row's content edge so
+   it reads as a margin tick rather than padding. */
+.cob__row--gov-accent {
+  padding-left: var(--space-4);
+}
+
+.cob__row--gov-accent::before {
+  content: "";
+  position: absolute;
+  top: var(--space-5);
+  bottom: var(--space-5);
+  left: 0;
+  width: 2px;
+  background: var(--gov-accent, var(--color-card-border));
+  border-radius: 1px;
+  opacity: 0.7;
 }
 
 .cob__row:last-of-type {
   border-bottom: none;
 }
 
-/* ---- Meta line (name + unit + direction | value + rank) ------------------ */
+.cob__row:hover {
+  background: color-mix(in oklab, var(--color-text-primary) 3%, transparent);
+}
+
+/* ---- Meta line (name + unit + direction | value + verdict) --------------- */
 .cob__meta {
   display: grid;
   grid-template-columns: 1fr auto;
-  column-gap: 16px;
+  column-gap: var(--space-5);
   align-items: baseline;
 }
 
@@ -91,20 +139,20 @@
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--color-text-40);
-  margin-left: 8px;
+  margin-left: var(--space-3);
   letter-spacing: 0.02em;
 }
 
 .cob__direction {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-2);
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-text-40);
-  margin-left: 12px;
+  margin-left: var(--space-4);
   white-space: nowrap;
 }
 
@@ -114,11 +162,11 @@
   flex-shrink: 0;
 }
 
-/* ---- Value + rank block (right side) ------------------------------------- */
+/* ---- Value + verdict block (right side) ---------------------------------- */
 .cob__value {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: var(--space-4);
   justify-content: flex-end;
   text-align: right;
   flex-wrap: nowrap;
@@ -134,10 +182,47 @@
   white-space: nowrap;
 }
 
+/* ---- Tier verdict chip --------------------------------------------------- */
+/*
+ * The verdict reads as a scorecard pill: the row's tier colour ramps the
+ * border + text + a translucent fill via color-mix. Falls back to the
+ * neutral card-border colour if --tier-color is absent.
+ */
+.cob__verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 3px 9px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--tier-color, var(--color-text-60));
+  background: color-mix(in oklab, var(--tier-color, transparent) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--tier-color, var(--color-card-border)) 55%, transparent);
+}
+
+.cob__verdictLabel {
+  font-weight: 500;
+}
+
+.cob__verdictSep {
+  opacity: 0.5;
+}
+
+.cob__verdictRank {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* Legacy small-peer-group pill (kept as a fallback look). */
 .cob__rank {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-2);
   padding: 2px 8px;
   border: 1px solid var(--color-card-border);
   border-radius: 2px;
@@ -159,7 +244,7 @@
 /* ---- Stale badge --------------------------------------------------------- */
 .cob__stale {
   display: inline-block;
-  margin-left: 6px;
+  margin-left: var(--space-3);
   padding: 1px 6px;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -176,7 +261,7 @@
   position: relative;
   height: 44px;
   width: 100%;
-  margin-top: 8px;
+  margin-top: var(--space-3);
 }
 
 .cob__rail {
@@ -190,7 +275,11 @@
   border-bottom: 1px dashed var(--color-stat-border);
 }
 
-/* Peer band: peer-min → peer-max */
+/*
+ * Peer band: peer-min → peer-max. Replaced the heavier select-bg fill
+ * with a translucent ink wash so the country dot's tier colour reads
+ * cleanly above it on both light and dark surfaces.
+ */
 .cob__band {
   position: absolute;
   top: 50%;
@@ -198,20 +287,21 @@
   height: 12px;
   left: var(--peer-lo);
   width: calc(var(--peer-hi) - var(--peer-lo));
-  background: var(--color-select-bg);
-  border: 1px solid var(--color-card-border);
+  background: color-mix(in oklab, var(--color-text-primary) 8%, transparent);
+  border: 1px solid color-mix(in oklab, var(--color-text-primary) 14%, transparent);
   border-radius: 2px;
 }
 
-/* Median tick */
+/* Median tick — taller and higher contrast than before */
 .cob__median {
   position: absolute;
-  top: calc(50% - 10px);
-  height: 20px;
+  top: calc(50% - 11px);
+  height: 22px;
   width: 2px;
   left: var(--peer-median);
   transform: translateX(-50%);
-  background: var(--color-text-40);
+  background: var(--color-text-60);
+  border-radius: 1px;
 }
 
 .cob__median-label {
@@ -228,16 +318,20 @@
   pointer-events: none;
 }
 
-/* Country marker — full-height needle + circle at top */
+/*
+ * Country marker — full-height needle + 11px tier-coloured dot with a
+ * glow halo. The needle is dimmed so the dot reads as the focal point.
+ */
 .cob__marker {
   position: absolute;
   left: var(--pos);
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: 2px;
   transform: translateX(-50%);
-  background: var(--color-accent);
+  background: color-mix(in oklab, var(--tier-color, var(--color-accent)) 55%, transparent);
   z-index: 2;
+  border-radius: 1px;
 }
 
 .cob__marker::before {
@@ -245,12 +339,17 @@
   position: absolute;
   top: -3px;
   left: 50%;
-  width: 14px;
-  height: 14px;
-  background: var(--color-accent);
+  width: 12px;
+  height: 12px;
+  background: var(--tier-color, var(--color-accent));
   border: 2px solid var(--color-bg);
   border-radius: 50%;
   transform: translateX(-50%);
+  box-shadow:
+    0 0 0 4px
+      color-mix(in oklab, var(--tier-color, var(--color-accent)) 28%, transparent),
+    0 1px 2px color-mix(in oklab, var(--color-text-primary) 25%, transparent);
+  transition: box-shadow 180ms ease, transform 180ms ease;
 }
 
 /* Out-of-range arrow variants */
@@ -269,14 +368,15 @@
   background: transparent;
   border-radius: 0;
   transform: translate(-50%, -50%);
+  box-shadow: none;
 }
 
 .cob__marker--outside-low::before {
-  border-right: 10px solid var(--color-accent);
+  border-right: 10px solid var(--tier-color, var(--color-accent));
 }
 
 .cob__marker--outside-high::before {
-  border-left: 10px solid var(--color-accent);
+  border-left: 10px solid var(--tier-color, var(--color-accent));
 }
 
 /* Axis endpoint labels (Peer low / Peer high) */
@@ -303,7 +403,7 @@
 
 /* ---- Dek sentence -------------------------------------------------------- */
 .cob__dek {
-  margin: 32px 0 0 0;
+  margin: var(--space-7) 0 0 0;
   font-family: var(--font-heading);
   font-style: italic;
   font-size: 17px;
@@ -335,8 +435,8 @@
 
 /* ---- Footer CTA ---------------------------------------------------------- */
 .cob__footer {
-  margin-top: 24px;
-  padding-top: 12px;
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
   border-top: 1px solid var(--color-text-primary);
 }
 
@@ -358,14 +458,18 @@
 /* ---- Hover / focus -------------------------------------------------------- */
 .cob__row:focus-within .cob__marker::before,
 .cob__row:hover .cob__marker::before {
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-accent) 20%, transparent);
+  transform: translateX(-50%) scale(1.08);
+  box-shadow:
+    0 0 0 6px
+      color-mix(in oklab, var(--tier-color, var(--color-accent)) 32%, transparent),
+    0 2px 4px color-mix(in oklab, var(--color-text-primary) 30%, transparent);
 }
 
 /* ---- Responsive ---------------------------------------------------------- */
 @media (max-width: 640px) {
   .cob__meta {
     grid-template-columns: 1fr;
-    row-gap: 4px;
+    row-gap: var(--space-2);
   }
 
   .cob__value {
@@ -379,6 +483,15 @@
   .cob__direction {
     margin-left: 0;
   }
+
+  .cob__row--gov-accent {
+    padding-left: var(--space-3);
+  }
+
+  .cob__verdict {
+    font-size: 9px;
+    padding: 2px 7px;
+  }
 }
 
 /* ---- Forced colors (Windows High Contrast) ------------------------------- */
@@ -387,9 +500,16 @@
   .cob__marker::before {
     background: CanvasText;
     border-color: Canvas;
+    box-shadow: none;
   }
 
   .cob__band {
     border-color: CanvasText;
+  }
+
+  .cob__verdict {
+    border-color: CanvasText;
+    color: CanvasText;
+    background: Canvas;
   }
 }

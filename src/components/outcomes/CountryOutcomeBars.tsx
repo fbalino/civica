@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { classifyGovernment } from "@/lib/data/government-category";
 import styles from "./CountryOutcomeBars.module.css";
 
@@ -41,6 +41,112 @@ export interface CountryOutcomeBarsProps {
   slug: string;
   countryName: string;
   year?: number;
+  /**
+   * When false, hides any "trend"-style chrome (e.g. stale-year badge,
+   * future trend column). The factbook shim sets this to false to match
+   * the cleaner reader layout. Defaults to true to preserve the
+   * `/countries/[slug]` Outcomes tab visual.
+   */
+  showTrend?: boolean;
+}
+
+// ─── Tier classification ────────────────────────────────────────────────────
+
+type Tier = "exceptional" | "strong" | "mixed" | "weak" | "failed";
+
+interface TierVerdict {
+  tier: Tier;
+  label: string;
+  /** "TOP QUARTILE", "BOTTOM QUARTILE", "ABOVE PEER MEDIAN", "BELOW PEER MEDIAN" */
+  shortLabel: string;
+}
+
+/**
+ * Compute a tier verdict for a country on a given metric.
+ *
+ * Preferred path: rank-based percentile (rank / totalRanked). Rank is
+ * stored 1-best in `country_metrics` regardless of higherIsBetter — the
+ * scoring upstream already inverts for "lower is better" metrics.
+ *
+ * Fallback: value vs (peerMin / peerMedian / peerMax) when rank is
+ * unavailable. We classify above-median vs below-median, then split each
+ * half at the midpoint to peerMin/peerMax to approximate quartiles.
+ *
+ * Direction is honoured throughout: for `higherIsBetter: false` metrics
+ * (e.g. child mortality), a value below the peer median earns the
+ * top-tier verdict.
+ */
+function classifyTier(m: MetricRow): TierVerdict | null {
+  if (!m.peer) return null;
+
+  // Rank-based path (preferred — covers most CI / outcome metrics).
+  if (m.rank && m.totalRanked && m.totalRanked > 0) {
+    const pct = m.rank / m.totalRanked; // 0..1, lower is better
+    if (pct <= 0.25)
+      return { tier: "exceptional", label: "Exceptional", shortLabel: "Top quartile" };
+    if (pct <= 0.5)
+      return { tier: "strong", label: "Strong", shortLabel: "Above peer median" };
+    if (pct <= 0.75)
+      return { tier: "mixed", label: "Mixed", shortLabel: "Below peer median" };
+    return { tier: "failed", label: "Bottom quartile", shortLabel: "Bottom quartile" };
+  }
+
+  // Value-based fallback (when rank is null, e.g. only a peer-group of <5).
+  const { peerMin, peerMedian, peerMax } = m.peer;
+  const v = m.value;
+
+  // Better-than-median midpoint — halfway between median and the "good" extreme.
+  const goodExtreme = m.higherIsBetter ? peerMax : peerMin;
+  const badExtreme = m.higherIsBetter ? peerMin : peerMax;
+  const goodHalf = (peerMedian + goodExtreme) / 2;
+  const badHalf = (peerMedian + badExtreme) / 2;
+
+  const isBetter = m.higherIsBetter ? v >= peerMedian : v <= peerMedian;
+
+  if (isBetter) {
+    const beyondGoodHalf = m.higherIsBetter ? v >= goodHalf : v <= goodHalf;
+    return beyondGoodHalf
+      ? { tier: "exceptional", label: "Exceptional", shortLabel: "Top quartile" }
+      : { tier: "strong", label: "Strong", shortLabel: "Above peer median" };
+  }
+
+  const beyondBadHalf = m.higherIsBetter ? v <= badHalf : v >= badHalf;
+  return beyondBadHalf
+    ? { tier: "failed", label: "Bottom quartile", shortLabel: "Bottom quartile" }
+    : { tier: "mixed", label: "Mixed", shortLabel: "Below peer median" };
+}
+
+// ─── Category grouping ──────────────────────────────────────────────────────
+
+/**
+ * Friendly labels for `metric_definitions.category` slugs. Anything not in
+ * this map falls back to title-cased category text. Keep this small —
+ * the list is curated by the schema, not user-generated.
+ */
+const CATEGORY_LABEL: Record<string, string> = {
+  health: "Health",
+  wealth: "Wealth & Economy",
+  economy: "Wealth & Economy",
+  peace: "Peace & Stability",
+  stability: "Peace & Stability",
+  governance: "Governance",
+  freedom: "Rights & Freedoms",
+  rights: "Rights & Freedoms",
+  education: "Education",
+  environment: "Environment",
+  inequality: "Equality",
+  development: "Human Development",
+};
+
+function prettyCategory(raw: string): string {
+  if (!raw) return "Other";
+  const key = raw.toLowerCase().trim();
+  if (CATEGORY_LABEL[key]) return CATEGORY_LABEL[key];
+  return raw
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -219,17 +325,25 @@ function SkeletonRow() {
 interface MetricBarRowProps {
   metric: MetricRow;
   govType: string | null;
+  showTrend: boolean;
 }
 
-function MetricBarRow({ metric: m, govType }: MetricBarRowProps) {
+function MetricBarRow({ metric: m, govType, showTrend }: MetricBarRowProps) {
   const noData = m.peer === null;
   const pos = m.peer ? computePositions(m.value, m.peer) : null;
+  const tier = classifyTier(m);
   const dek = noData
     ? "Not reported for this country in any source we have loaded."
     : generateDek(m, govType);
 
-  const chartStyle = pos
-    ? ({
+  // Government-type peer accent — drives the row's left border colour
+  // when peer comparison is "vs same-government-type peers".
+  const govAccent = govType ? classifyGovernment(govType).color : null;
+
+  // Compose the inline CSS variable bag the row uses for positioning,
+  // tier colour, and the gov-accent stripe. The CSS module reads these.
+  const chartStyle: React.CSSProperties = pos
+    ? {
         "--peer-lo": `${pos.peerLoPct.toFixed(2)}%`,
         "--peer-hi": `${pos.peerHiPct.toFixed(2)}%`,
         "--peer-median": `${pos.medianPct.toFixed(2)}%`,
@@ -238,13 +352,22 @@ function MetricBarRow({ metric: m, govType }: MetricBarRowProps) {
           : pos.isOutsideHigh
           ? "98%"
           : `${pos.valuePct.toFixed(2)}%`,
-      } as React.CSSProperties)
+      } as React.CSSProperties
     : ({
         "--peer-lo": "15%",
         "--peer-hi": "85%",
         "--peer-median": "50%",
         "--pos": "50%",
       } as React.CSSProperties);
+
+  const rowStyle: React.CSSProperties = {
+    ...(tier
+      ? ({ "--tier-color": `var(--tier-${tier.tier})` } as React.CSSProperties)
+      : {}),
+    ...(govAccent
+      ? ({ "--gov-accent": govAccent } as React.CSSProperties)
+      : {}),
+  };
 
   const markerClass = [
     styles.cob__marker,
@@ -257,6 +380,8 @@ function MetricBarRow({ metric: m, govType }: MetricBarRowProps) {
   const rowClass = [
     styles.cob__row,
     noData ? styles["cob__row--no-data"] : "",
+    govAccent ? styles["cob__row--gov-accent"] : "",
+    tier ? styles[`cob__row--tier-${tier.tier}`] : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -264,7 +389,7 @@ function MetricBarRow({ metric: m, govType }: MetricBarRowProps) {
   const valueFmt = noData ? "—" : formatNumber(m.value);
 
   return (
-    <article className={rowClass} aria-label={m.name}>
+    <article className={rowClass} style={rowStyle} aria-label={m.name}>
       {/* Meta line */}
       <div className={styles.cob__meta}>
         <div>
@@ -286,7 +411,7 @@ function MetricBarRow({ metric: m, govType }: MetricBarRowProps) {
         </div>
         <div className={styles.cob__value}>
           <span className={styles.cob__number}>{valueFmt}</span>
-          {m.isStale && !noData && (
+          {showTrend && m.isStale && !noData && (
             <span
               className={styles.cob__stale}
               title={`Most recent datapoint is from ${m.asOfYear}`}
@@ -296,9 +421,24 @@ function MetricBarRow({ metric: m, govType }: MetricBarRowProps) {
           )}
           {noData ? (
             <span className={styles.cob__rank}>No data</span>
-          ) : m.rank && m.totalRanked ? (
-            <span className={styles.cob__rank}>
-              Rank <b>{m.rank} / {m.totalRanked}</b>
+          ) : tier ? (
+            <span
+              className={styles.cob__verdict}
+              title={`${tier.label}${
+                m.rank && m.totalRanked
+                  ? ` · ranked ${m.rank} of ${m.totalRanked} peers`
+                  : ""
+              }`}
+            >
+              <span className={styles.cob__verdictLabel}>{tier.shortLabel}</span>
+              {m.rank && m.totalRanked && (
+                <>
+                  <span className={styles.cob__verdictSep}>·</span>
+                  <span className={styles.cob__verdictRank}>
+                    {m.rank}/{m.totalRanked}
+                  </span>
+                </>
+              )}
             </span>
           ) : m.peer && m.peer.peerCount < 5 ? (
             <span className={styles.cob__rank}>
@@ -343,6 +483,7 @@ export function CountryOutcomeBars({
   slug,
   countryName,
   year,
+  showTrend = true,
 }: CountryOutcomeBarsProps) {
   const [data, setData] = useState<OutcomesPayload | null>(null);
   const [loading, setLoading] = useState(true);
@@ -373,6 +514,31 @@ export function CountryOutcomeBars({
     ? classifyGovernment(data.govType).label.toLowerCase()
     : null;
   const firstMetricId = data?.metrics[0]?.metricId ?? "";
+
+  // Group metrics by category. Preserve first-occurrence order so the
+  // visual sequence still reflects what the API returned (it's sorted
+  // upstream by definition order).
+  const grouped = useMemo(() => {
+    if (!data) return [] as Array<{ label: string; rows: MetricRow[] }>;
+    const order: string[] = [];
+    const buckets = new Map<string, MetricRow[]>();
+    for (const m of data.metrics) {
+      const key = (m.category || "other").toLowerCase();
+      if (!buckets.has(key)) {
+        buckets.set(key, []);
+        order.push(key);
+      }
+      buckets.get(key)!.push(m);
+    }
+    return order.map((key) => ({
+      label: prettyCategory(key),
+      rows: buckets.get(key)!,
+    }));
+  }, [data]);
+
+  // Show group headers only when we have at least 2 distinct categories —
+  // otherwise the header is just visual noise.
+  const showGroupHeaders = grouped.length >= 2;
 
   // Accessible SR table (visually hidden)
   const srTable =
@@ -497,9 +663,28 @@ export function CountryOutcomeBars({
         )}
       </header>
 
-      {data.metrics.map((m) => (
-        <MetricBarRow key={m.metricId} metric={m} govType={data.govType} />
-      ))}
+      {showGroupHeaders
+        ? grouped.map((group) => (
+            <div key={group.label} className={styles.cob__group}>
+              <h3 className={styles.cob__groupHeader}>{group.label}</h3>
+              {group.rows.map((m) => (
+                <MetricBarRow
+                  key={m.metricId}
+                  metric={m}
+                  govType={data.govType}
+                  showTrend={showTrend}
+                />
+              ))}
+            </div>
+          ))
+        : data.metrics.map((m) => (
+            <MetricBarRow
+              key={m.metricId}
+              metric={m}
+              govType={data.govType}
+              showTrend={showTrend}
+            />
+          ))}
 
       <footer className={styles.cob__footer}>
         <a href={`/outcomes${firstMetricId ? `?metric=${firstMetricId}` : ""}`}>

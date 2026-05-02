@@ -1,0 +1,167 @@
+/* P1.1 — `<ScoresAndRankings>` table.
+ *
+ * Compact, dense, print-y. Two visual variants:
+ *   - .scores-rankings--factbook : full-width inside the factbook center
+ *     column. Slightly more breathing room.
+ *   - .scores-rankings--atlas    : narrow atlas pane (~640px). Higher
+ *     density, smaller type, no extra outer padding.
+ *
+ * Container queries make the table collapse the "As of" column into the
+ * value cell when the row is below ~600px wide so it stays readable on
+ * mobile and inside the atlas pane on narrow window widths.
+ */
+
+.scores-rankings {
+  --row-padding-y: var(--space-3);
+  container-type: inline-size;
+  width: 100%;
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+}
+
+.scores-rankings--atlas {
+  --row-padding-y: 6px;
+}
+
+.scores-rankings__head,
+.scores-rankings__row {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.6fr)
+    minmax(0, 1.4fr)
+    minmax(0, 1fr)
+    minmax(0, 0.9fr)
+    minmax(0, 0.9fr);
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+.scores-rankings__head {
+  padding: 0 var(--space-3) var(--space-2);
+  border-bottom: 1px solid var(--color-border-default);
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+.scores-rankings__row {
+  padding: var(--row-padding-y) var(--space-3);
+  border-bottom: 1px solid var(--color-border-default);
+  font-size: var(--text-13);
+  line-height: 1.35;
+}
+
+.scores-rankings__row:last-child {
+  border-bottom: none;
+}
+
+.scores-rankings__row--hero .scores-rankings__label,
+.scores-rankings__row--hero .scores-rankings__value {
+  font-weight: 600;
+}
+
+.scores-rankings__label {
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+}
+
+.scores-rankings__value {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.scores-rankings__rank {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+}
+
+.scores-rankings__trend {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+
+.scores-rankings__trend--up {
+  color: var(--color-success);
+}
+
+.scores-rankings__trend--down {
+  color: var(--color-danger);
+}
+
+.scores-rankings__trend--flat {
+  color: var(--color-text-40);
+}
+
+.scores-rankings__as-of {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+}
+
+.scores-rankings__as-of-inline {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-40);
+  display: none;
+}
+
+.scores-rankings__empty {
+  padding: var(--space-5) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  text-align: center;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+/* Container-query fold for narrow widths.
+ *
+ * Below ~600px we collapse the dedicated "As of" column. The date moves
+ * into the Value cell as a second line; the SourceDot stays in the
+ * fifth grid cell but its column shrinks (no header label, no date
+ * text — just the dot). */
+@container (max-width: 600px) {
+  .scores-rankings__head,
+  .scores-rankings__row {
+    grid-template-columns:
+      minmax(0, 1.6fr)
+      minmax(0, 1.5fr)
+      minmax(0, 0.8fr)
+      minmax(0, 0.8fr)
+      auto;
+  }
+  .scores-rankings__head > span:last-child {
+    visibility: hidden;
+  }
+  .scores-rankings__as-of > .scores-rankings__as-of-date {
+    display: none;
+  }
+  .scores-rankings__as-of-inline {
+    display: block;
+  }
+}
+
+/* Atlas variant: tighter typographic scale to keep ~7 rows in ≈280px.
+ * Atlas role tokens already adapt via [data-theme]. */
+.scores-rankings--atlas .scores-rankings__row {
+  font-size: var(--text-12);
+}
+.scores-rankings--atlas .scores-rankings__value {
+  font-size: var(--text-10);
+}
