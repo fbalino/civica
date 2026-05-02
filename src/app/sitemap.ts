@@ -36,6 +36,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
+      url: `${SITE_URL}/factbook`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${SITE_URL}/countries`,
       lastModified: new Date(),
       changeFrequency: "weekly",
@@ -73,11 +79,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Both /factbook/[slug] and /countries/[slug] are indexed because both
+  // remain live (per the factbook plan §2.2 — /countries stays alongside
+  // /factbook). /factbook is the new canonical reader; /countries is the
+  // legacy surface that may inform a future revamp.
+  const factbookPages: MetadataRoute.Sitemap = countries.map((country) => ({
+    url: `${SITE_URL}/factbook/${country.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.9,
+  }));
+
   const countryPages: MetadataRoute.Sitemap = countries.map((country) => ({
     url: `${SITE_URL}/countries/${country.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
-    priority: 0.8,
+    priority: 0.7,
   }));
 
   const posts = getAllPosts();
@@ -116,6 +133,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...govTypePages,
     ...comparisonPages,
+    ...factbookPages,
     ...countryPages,
     ...blogPages,
   ];

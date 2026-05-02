@@ -73,6 +73,28 @@ const nextConfig: NextConfig = {
         destination: "/civica-index/pulse-changelog",
         permanent: true,
       },
+      // Phase D.2 — /factbook is the new canonical country reader.
+      // The legacy /countries/[slug] parent page stays live (per the
+      // factbook plan §2.2), but the per-tab sub-routes redirect into
+      // the matching factbook section anchor. /countries/[slug]/outcomes
+      // is intentionally NOT redirected — Outcomes is postponed pending
+      // a methodology project, so the legacy page is the only home for
+      // peer-band data right now.
+      {
+        source: "/countries/:slug/leaders",
+        destination: "/factbook/:slug#leaders",
+        permanent: true,
+      },
+      {
+        source: "/countries/:slug/democracy",
+        destination: "/factbook/:slug#scores",
+        permanent: true,
+      },
+      {
+        source: "/countries/:slug/constitution",
+        destination: "/atlas/:slug/constitution",
+        permanent: true,
+      },
     ];
   },
 };
