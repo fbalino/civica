@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllSlugs, getAllPosts, getPostBySlug } from "@/lib/blog";
-import { HemicycleCover } from "@/components/blog/HemicycleCover";
+import { BlogCover } from "@/components/blog/BlogCover";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 
@@ -21,6 +21,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = getPostBySlug(slug);
   if (!post) return {};
+  const coverUrl = post.coverImage ? `${SITE_URL}${post.coverImage}` : undefined;
   return {
     title: post.title,
     description: post.description,
@@ -33,6 +34,16 @@ export async function generateMetadata({
       publishedTime: post.date,
       authors: [post.author],
       tags: post.tags,
+      images: coverUrl
+        ? [
+            {
+              url: coverUrl,
+              width: 1672,
+              height: 941,
+              alt: post.coverAlt ?? post.title,
+            },
+          ]
+        : undefined,
     },
   };
 }
@@ -118,6 +129,7 @@ export default async function BlogPostPage({
     publisher: { "@type": "Organization", name: "Civica" },
     url: `${SITE_URL}/blog/${post.slug}`,
     keywords: post.tags,
+    image: post.coverImage ? `${SITE_URL}${post.coverImage}` : undefined,
   };
 
   const authorInitials = post.author
@@ -165,10 +177,16 @@ export default async function BlogPostPage({
         {/* Hero figure */}
         <figure className="post-hero-fig">
           <div className="post-hero-img">
-            <HemicycleCover slug={post.slug} variant="hero" />
+            <BlogCover
+              alt={post.coverAlt ?? post.title}
+              image={post.coverImage}
+              priority
+              slug={post.slug}
+              variant="hero"
+            />
           </div>
           <div className="post-hero-cap">
-            <span>Illustration · Civica Desk</span>
+            <span>{post.coverCaption ?? "Illustration · Civica Desk"}</span>
             <span>{post.tags.join(" · ")}</span>
           </div>
         </figure>
@@ -232,7 +250,12 @@ export default async function BlogPostPage({
                   className="post-more-card"
                 >
                   <div className="post-more-card-cover">
-                    <HemicycleCover slug={p.slug} variant="card" />
+                    <BlogCover
+                      alt={p.coverAlt ?? ""}
+                      image={p.coverImage}
+                      slug={p.slug}
+                      variant="card"
+                    />
                   </div>
                   <div className="post-more-card-kicker">
                     {p.tags[0] ?? "Essay"}

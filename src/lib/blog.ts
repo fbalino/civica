@@ -10,6 +10,8 @@ export interface BlogPost {
   description: string;
   tags: string[];
   coverImage: string | null;
+  coverAlt: string | null;
+  coverCaption: string | null;
   content: string;
 }
 
@@ -29,6 +31,8 @@ export function getAllPosts(): BlogPost[] {
       description: data.description ?? "",
       tags: data.tags ?? [],
       coverImage: data.coverImage ?? null,
+      coverAlt: data.coverAlt ?? null,
+      coverCaption: data.coverCaption ?? null,
       content,
     };
   });

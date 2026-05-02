@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
-import { HemicycleCover } from "@/components/blog/HemicycleCover";
+import { BlogCover } from "@/components/blog/BlogCover";
 
 const SITE_URL = "https://civicaatlas.org";
 
@@ -106,7 +106,13 @@ export default function BlogIndex() {
             className="record-lead-cover"
             aria-label="Open article"
           >
-            <HemicycleCover slug={featured.slug} variant="lead" />
+            <BlogCover
+              alt={featured.coverAlt ?? ""}
+              image={featured.coverImage}
+              priority
+              slug={featured.slug}
+              variant="lead"
+            />
           </Link>
           <div className="record-lead-copy">
             <span className="record-kicker">
@@ -147,7 +153,12 @@ export default function BlogIndex() {
                     className="record-story-cover"
                     aria-label="Open"
                   >
-                    <HemicycleCover slug={post.slug} variant="card" />
+                    <BlogCover
+                      alt={post.coverAlt ?? ""}
+                      image={post.coverImage}
+                      slug={post.slug}
+                      variant="card"
+                    />
                   </Link>
                   <div className="record-story-kicker">
                     {post.tags[0] ?? "Essay"}
