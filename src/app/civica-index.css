@@ -39,6 +39,14 @@
   background: transparent;
   white-space: nowrap;
 }
+/* Light-theme contrast: the default --color-warn lands ~3.5:1 against
+   the light surface. Override locally to push the pill text past the
+   WCAG AA 4.5:1 floor at 12px without disturbing other warn-coloured
+   UI. */
+[data-theme="light"] .ci-beta-pill {
+  color: oklch(50% 0.14 75);
+  border-color: oklch(50% 0.14 75);
+}
 .ci-hero-rework-note {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);

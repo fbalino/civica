@@ -29,6 +29,7 @@ export default async function AtlasMapPage() {
     gdp: c.gdp,
     capital: c.capital,
     featured: c.featured,
+    masthead: c.masthead,
   }));
 
   return <AtlasMapShellClient countries={countries} />;

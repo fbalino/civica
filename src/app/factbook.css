@@ -1,0 +1,981 @@
+/* ==========================================================================
+   /factbook/[slug] page layout
+   --------------------------------------------------------------------------
+   All layout-only declarations for the new Factbook surface live here so
+   per-component inline styles don't shadow @media breakpoints. Component
+   styles for typography/colour stay inline (they reference design tokens
+   directly and don't need media queries).
+   ========================================================================== */
+
+/* === Hero ================================================================= */
+.factbook-hero {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-6) var(--space-5);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-6);
+  align-items: stretch;
+  border-bottom: 1px solid var(--color-stat-border);
+}
+.factbook-hero-left {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.factbook-hero-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+.factbook-hero-flag {
+  flex-shrink: 0;
+}
+.factbook-hero-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-44);
+  font-weight: 400;
+  margin: 0;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tighter);
+}
+.factbook-hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-5);
+  row-gap: var(--space-3);
+  margin-top: var(--space-3);
+  align-items: center;
+}
+.factbook-hero-switcher-wrap {
+  margin-top: auto;
+  padding-top: var(--space-5);
+}
+.factbook-hero-boxes {
+  display: flex;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+.factbook-hero-box {
+  position: relative;
+  width: 200px;
+  height: 140px;
+  border: 1px solid var(--color-text-primary);
+  background: var(--color-surface, var(--color-bg));
+  padding: 0;
+  cursor: pointer;
+  display: block;
+  overflow: hidden;
+  font-family: inherit;
+  color: inherit;
+}
+.factbook-hero-box[disabled] {
+  cursor: default;
+}
+.factbook-hero-box img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.factbook-hero-box .label-strip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-60);
+  border-top: 1px solid var(--color-stat-border);
+  background: color-mix(in oklab, var(--color-bg) 95%, transparent);
+  text-align: left;
+}
+
+/* === Body grid ============================================================ */
+.factbook-body {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 280px;
+  gap: var(--space-7);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-6);
+  padding-bottom: 120px; /* leave room for the docked Civica AI drawer */
+}
+
+.factbook-sidebar {
+  position: sticky;
+  top: calc(56px + var(--space-3));
+  align-self: start;
+  max-height: calc(100vh - 56px - var(--space-5));
+  overflow-y: auto;
+  /* Prevents long sidebar entries from forcing the column wider than
+     the grid track and squeezing the main content below 0px on
+     iPad-portrait widths. */
+  min-width: 0;
+}
+
+.factbook-rail {
+  position: sticky;
+  top: calc(56px + var(--space-3));
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+.factbook-main {
+  min-width: 0;
+}
+
+/* === Drawer =============================================================== */
+/* The drawer floats at the bottom of the viewport on both desktop and
+   mobile (per the wireframe). `position: fixed` keeps the input always
+   visible no matter how far the user scrolls. The conversation body
+   expands upward when there are messages.
+
+   `bottom: max(var(--space-5), env(safe-area-inset-bottom))` lifts the
+   drawer above iOS Safari's bottom toolbar so the input doesn't hide
+   behind it when the address bar is visible. The `max()` ensures we
+   still get a small floating gap from the viewport edge on browsers
+   that don't ship a safe-area inset.
+
+   On mobile (≤768px) the gap collapses and the drawer becomes a
+   bottom-anchored sheet with no left/right margin. */
+.factbook-drawer {
+  position: fixed;
+  bottom: max(var(--space-5), env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(720px, calc(100vw - var(--space-6)));
+  background: var(--color-bg);
+  border: 1px solid var(--color-text-primary);
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 12px 32px color-mix(in oklab, var(--color-text-primary) 14%, transparent),
+    0 4px 8px color-mix(in oklab, var(--color-text-primary) 6%, transparent);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  /* iOS Safari: keep the drawer above the bottom UI */
+  padding-bottom: 0;
+}
+
+/* === Tablet (<= 1100px): drop right rail ================================== */
+@media (max-width: 1100px) {
+  .factbook-body {
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+  .factbook-rail {
+    display: none;
+  }
+}
+
+/* === Mobile (<= 768px): single column, no sticky =========================== */
+@media (max-width: 768px) {
+  .factbook-hero {
+    grid-template-columns: 1fr;
+    padding: var(--space-5);
+    gap: var(--space-5);
+  }
+  .factbook-hero-name {
+    font-size: var(--text-32);
+  }
+  .factbook-hero-boxes {
+    width: 100%;
+    gap: var(--space-3);
+  }
+  .factbook-hero-box {
+    flex: 1;
+    width: auto;
+    height: 100px;
+  }
+  .factbook-hero-pills {
+    column-gap: var(--space-4);
+  }
+
+  .factbook-body {
+    grid-template-columns: 1fr;
+    padding: var(--space-5);
+    padding-bottom: 120px;
+    gap: var(--space-5);
+  }
+
+  /* Sidebar collapses to a bordered "On this page" panel. Not sticky on
+     mobile — its tall list would otherwise pin half the screen. */
+  .factbook-sidebar {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+    border: 1px solid var(--color-stat-border);
+    padding: var(--space-4);
+    background: color-mix(in oklab, var(--color-text-primary) 2%, transparent);
+  }
+
+  /* Mobile: drawer becomes a slim floating bar, NOT full-bleed.
+     Keeps the floating-input feel from the wireframe and stays above
+     iOS Safari's bottom UI via env(safe-area-inset-bottom). */
+  .factbook-drawer {
+    width: calc(100vw - var(--space-4));
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    border-radius: var(--radius-md);
+  }
+  /* Body content gets extra bottom padding so the last section isn't
+     hidden under the floating drawer at rest. */
+  .factbook-body {
+    padding-bottom: 140px;
+  }
+}
+
+/* === Sidebar item ========================================================= */
+.factbook-sidebar-link {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-14);
+  border-left: 2px solid transparent;
+  color: var(--color-text-60);
+  text-decoration: none;
+}
+.factbook-sidebar-link:hover {
+  color: var(--color-text-primary);
+}
+.factbook-sidebar-link.is-active {
+  border-left-color: var(--color-text-primary);
+  color: var(--color-text-primary);
+  background: color-mix(in oklab, var(--color-text-primary) 4%, transparent);
+  font-weight: 500;
+}
+.factbook-sidebar-num {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-30);
+  align-self: center;
+  min-width: 20px;
+}
+
+/* === Country switcher chips =============================================== */
+.factbook-chip-row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.factbook-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--color-stat-border);
+  font-size: var(--text-14);
+  color: var(--color-text-60);
+  text-decoration: none;
+  font-family: inherit;
+}
+.factbook-chip:hover:not(.is-active) {
+  border-color: var(--color-text-primary);
+  color: var(--color-text-primary);
+}
+.factbook-chip.is-active {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  border-color: var(--color-text-primary);
+}
+.factbook-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-bg);
+}
+@media (max-width: 768px) {
+  /* Chips stay inline on mobile. With flex-wrap they'll fold to two
+     rows on the narrowest viewports rather than turning into giant
+     stacked pseudo-buttons. */
+  .factbook-chip {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-13);
+  }
+}
+
+/* === Section headers ===================================================== */
+.factbook-section {
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-7);
+  border-bottom: 1px solid var(--color-stat-border);
+  scroll-margin-top: calc(56px + var(--space-5));
+}
+.factbook-section:first-child { padding-top: 0; }
+.factbook-section-header { margin-bottom: var(--space-6); }
+.factbook-section-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-3);
+}
+.factbook-section-eyebrow.is-civica { color: var(--color-accent); }
+.factbook-section-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: var(--tracking-tighter);
+}
+
+/* === Bills section =======================================================
+   Ports the visual contract of the legacy Atlas BillsTab into the factbook
+   reader page. Shape mirrors `.atlas-bill` (index · body · actions) but the
+   tokens are the editorial set rather than the atlas-* palette so the cards
+   sit naturally inside `.factbook-section` content. */
+.factbook-bills-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.factbook-bill {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 160px;
+  gap: var(--space-5);
+  align-items: start;
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--color-stat-border);
+  background: var(--color-surface, var(--color-bg));
+}
+.factbook-bill:hover { border-color: var(--color-text-primary); }
+.factbook-bill-idx {
+  font-family: var(--font-heading);
+  font-size: var(--text-32);
+  color: var(--color-text-40);
+  letter-spacing: var(--tracking-tighter);
+  line-height: 1;
+}
+.factbook-bill-body { min-width: 0; }
+.factbook-bill-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  font-weight: 400;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tighter);
+  margin: 0;
+  color: var(--color-text-primary);
+}
+.factbook-bill-summary {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-60);
+  line-height: var(--leading-relaxed);
+  margin: var(--space-3) 0 0;
+  max-width: 640px;
+}
+.factbook-bill-tags {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
+}
+.factbook-bill-tag {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-60);
+  border: 1px solid var(--color-stat-border);
+  padding: 3px 7px;
+}
+.factbook-bill-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.factbook-bill-timeline {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: var(--space-4);
+  max-width: 640px;
+}
+.factbook-bill-timeline-step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+.factbook-bill-timeline-step:last-child { flex: 0 0 auto; }
+.factbook-bill-dot {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--color-text-40);
+  border-radius: 50%;
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+.factbook-bill-dot.is-done {
+  background: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+}
+.factbook-bill-dot.is-now {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 3px var(--color-bg),
+    0 0 0 4px var(--color-accent);
+}
+.factbook-bill-line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-stat-border);
+}
+.factbook-bill-tlabs {
+  display: flex;
+  justify-content: space-between;
+  max-width: 640px;
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-9, var(--text-10));
+  color: var(--color-text-40);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+.factbook-bill-vote-bar {
+  display: flex;
+  height: 6px;
+  margin-top: var(--space-4);
+  max-width: 640px;
+  overflow: hidden;
+}
+.factbook-bill-vote-yes { background: var(--color-success); }
+.factbook-bill-vote-no { background: var(--color-danger); }
+.factbook-bill-vote-abs { background: var(--color-stat-border); }
+.factbook-bill-vote-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  max-width: 640px;
+}
+.factbook-bill-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+.factbook-bill-btn {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  text-align: center;
+  text-decoration: none;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-text-primary);
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-weight: inherit;
+}
+.factbook-bill-btn:hover {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+}
+.factbook-bill-btn--primary {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+}
+.factbook-bill-btn--primary:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+@media (max-width: 768px) {
+  .factbook-bill {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: var(--space-4);
+    padding: var(--space-4);
+  }
+  .factbook-bill-idx { font-size: var(--text-22); }
+  .factbook-bill-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .factbook-bill-btn { flex: 1; min-width: 120px; }
+}
+
+/* === Index page list grid ================================================= */
+.factbook-index-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-3);
+}
+.factbook-index-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-stat-border);
+  text-decoration: none;
+  color: inherit;
+  font-size: var(--text-14);
+}
+.factbook-index-card:hover { border-color: var(--color-text-primary); }
+@media (max-width: 768px) {
+  .factbook-index-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+/* === Leaders section =====================================================
+   Renders inside the Government section (or its own factbook-section,
+   orchestrator's choice). One card per person with a stack of office
+   stints — a person who held both Head of State and Head of Government
+   shows up as a single card with two bullets, not two duplicate cards.
+
+   Pre-dedup the underlying terms table had ~7× duplicate rows (Wikidata
+   sync was inserting on every run); the fix landed in
+   scripts/sync-wikidata-officeholders.ts. Component still groups
+   defensively by person name in case a future ingest path reintroduces
+   the issue. */
+.factbook-leaders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+.factbook-leaders-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.factbook-leaders-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0;
+  font-weight: 400;
+}
+.factbook-leaders-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.factbook-leaders-card {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--color-stat-border);
+  background: var(--color-surface, var(--color-bg));
+}
+.factbook-leaders-avatar {
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--color-stat-border);
+  background: var(--color-bg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.factbook-leaders-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.factbook-leaders-avatar-fallback {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  color: var(--color-text-40);
+  letter-spacing: var(--tracking-tight);
+}
+.factbook-leaders-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.factbook-leaders-name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.factbook-leaders-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+.factbook-leaders-stints {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.factbook-leaders-stint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: var(--text-14);
+  color: var(--color-text-primary);
+}
+.factbook-leaders-office {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+.factbook-leaders-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+}
+.factbook-leaders-dates {
+  color: var(--color-text-primary);
+}
+.factbook-leaders-party {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.factbook-leaders-party-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+@media (max-width: 768px) {
+  .factbook-leaders-card {
+    padding: var(--space-4) var(--space-5);
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+  .factbook-leaders-avatar {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* === Legislature section ==================================================
+   Ported from the atlas Chamber tab (src/components/atlas/tabs/ChamberTab.tsx
+   + src/components/atlas/Hemicycle.tsx + .atlas-* CSS in atlas.css). Atlas
+   uses --atlas-* tokens that resolve to role tokens; the factbook section
+   talks to role tokens directly so it doesn't carry an atlas.css
+   dependency. */
+.factbook-legislature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+.factbook-legislature-chamber {
+  display: flex;
+  flex-direction: column;
+}
+.factbook-legislature-head {
+  margin-bottom: 14px;
+}
+.factbook-legislature-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.factbook-legislature-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-32);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tighter);
+  line-height: 1;
+  margin: 4px 0 0;
+  color: var(--color-text-primary);
+}
+.factbook-legislature-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+  margin-top: 6px;
+}
+.factbook-legislature-stage {
+  padding: 14px 0 8px;
+  position: relative;
+}
+.factbook-legislature-empty {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-40);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  text-align: center;
+  padding: 60px 16px;
+  border: 1px dashed var(--color-stat-border);
+}
+svg.factbook-legislature-hemi {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+svg.factbook-legislature-hemi .factbook-legislature-seat {
+  cursor: pointer;
+  transition: transform 100ms ease, opacity 120ms ease;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+svg.factbook-legislature-hemi .factbook-legislature-seat:hover {
+  transform: scale(1.9);
+}
+svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
+  opacity: 0.12;
+}
+
+/* Hover tooltip — positioned via clientX/clientY in the component */
+.factbook-legislature-tip {
+  pointer-events: none;
+  z-index: 50;
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: 1.25;
+  box-shadow: 4px 4px 0 color-mix(in oklab, var(--color-text-primary) 25%, transparent);
+}
+.factbook-legislature-tip-name { font-weight: 500; }
+.factbook-legislature-tip-seat {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--color-bg) 75%, transparent);
+  margin-top: 2px;
+}
+
+/* Stats grid below hemicycle */
+.factbook-legislature-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--color-stat-border);
+  margin-top: 18px;
+}
+.factbook-legislature-stat {
+  padding: 14px 18px;
+  border-right: 1px solid var(--color-stat-border);
+  min-width: 0;
+}
+.factbook-legislature-stat:last-child { border-right: 0; }
+.factbook-legislature-stat-key {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+.factbook-legislature-stat-val {
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  letter-spacing: var(--tracking-tight);
+  margin-top: 3px;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+.factbook-legislature-stat-val--text {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: 1.25;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+/* All political parties — interactive table, click row to dim hemicycle */
+.factbook-legislature-parties {
+  margin-top: 18px;
+  border: 1px solid var(--color-stat-border);
+  background: var(--color-bg);
+}
+.factbook-legislature-parties-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-stat-border);
+}
+.factbook-legislature-parties-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-16);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+.factbook-legislature-parties-meta {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.factbook-legislature-parties-list { padding: 4px 0; }
+.factbook-legislature-row {
+  display: grid;
+  grid-template-columns: 14px 1fr minmax(80px, 200px) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 16px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background 120ms, opacity 120ms;
+}
+.factbook-legislature-row:hover {
+  background: var(--color-surface-elevated);
+}
+.factbook-legislature-row + .factbook-legislature-row {
+  border-top: 1px solid var(--color-stat-border);
+}
+.factbook-legislature-row.is-dim { opacity: 0.42; }
+.factbook-legislature-row.is-dim:hover { opacity: 0.6; }
+.factbook-legislature-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.factbook-legislature-party-name {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+.factbook-legislature-bar {
+  height: 4px;
+  background: var(--color-surface-elevated);
+  position: relative;
+  border: 1px solid var(--color-stat-border);
+}
+.factbook-legislature-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+.factbook-legislature-seats {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-60);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.factbook-legislature-pct { color: var(--color-text-40); }
+
+/* Bicameral divider */
+.factbook-legislature-divider {
+  position: relative;
+  margin: 36px 0 22px;
+  border-top: 1px solid var(--color-stat-border);
+}
+.factbook-legislature-divider-label {
+  position: absolute;
+  top: -10px;
+  left: 0;
+  padding-right: 14px;
+  background: var(--color-bg);
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+/* Coalition + next-election ribbon at the bottom */
+.factbook-legislature-ribbon {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 1px solid var(--color-stat-border);
+  margin-top: var(--space-3);
+}
+.factbook-legislature-ribbon-cell {
+  padding: 14px 18px;
+  border-right: 1px solid var(--color-stat-border);
+}
+.factbook-legislature-ribbon-cell:last-child { border-right: 0; }
+.factbook-legislature-ribbon-key {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+}
+.factbook-legislature-ribbon-val {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  margin-top: 3px;
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 900px) {
+  .factbook-legislature-stat { padding: 10px 12px; }
+  .factbook-legislature-stat-val { font-size: var(--text-18); }
+}
+
+@media (max-width: 600px) {
+  .factbook-legislature-name { font-size: var(--text-24); }
+  .factbook-legislature-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .factbook-legislature-stat {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-stat-border);
+  }
+  .factbook-legislature-stat:nth-child(odd) {
+    border-right: 1px solid var(--color-stat-border);
+  }
+  .factbook-legislature-stat:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+  .factbook-legislature-row {
+    grid-template-columns: 12px 1fr auto;
+    gap: 8px;
+  }
+  .factbook-legislature-bar { display: none; }
+  .factbook-legislature-ribbon {
+    grid-template-columns: 1fr;
+  }
+  .factbook-legislature-ribbon-cell {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-stat-border);
+  }
+  .factbook-legislature-ribbon-cell:last-child { border-bottom: 0; }
+}

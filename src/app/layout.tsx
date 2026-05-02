@@ -10,6 +10,8 @@ import "./editorial.css";
 import "./atlas.css";
 import "./shell.css";
 import "./civica-index.css";
+import "./factbook.css";
+import "./civica-chat.css";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",

@@ -34,9 +34,13 @@ import {
   Vote,
   Wallet,
 } from "lucide-react";
-import { type Country } from "./data";
-import { ciTier } from "@/lib/ci/tiers";
+import {
+  type Country,
+  type CountryFactValue,
+  type CountryMembershipChip,
+} from "./data";
 import { QuickCompareSearch } from "@/components/widget/QuickCompareSearch";
+import { SourceDot } from "@/components/SourceDot";
 
 /**
  * Phase A masthead — country page header.
@@ -56,263 +60,45 @@ import { QuickCompareSearch } from "@/components/widget/QuickCompareSearch";
  * 5. Identifiers (calling code, TLD, time zone, ISO, drives-on,
  *    anthem, national day)
  *
- * Real fields (capital, pop, gdp, gov, leader, region, id) come from
- * the existing `Country` shape. Everything else is demo data tagged
- * data-demo="true" — Phase A is a layout pass, not a data pass.
+ * Every value shown here must be source-backed or rendered as "No source".
+ * The previous Phase A demo generator was removed because generated facts
+ * looked authoritative and damaged trust.
  */
-
-interface MockData {
-  ci: number;
-  cp: number;
-  hdi: number;
-  dq: number;
-  rol: number;
-  fnr: number;
-  cc: number;
-  ss: number;
-  govDetail: string;
-  headOfGovernment: string;
-  area: string;
-  currency: string;
-  language: string;
-  mainExport: string;
-  mainImport: string;
-  tradeBalance: string;
-  foundingYear: string;
-  constitutionYear: string;
-  lastElection: string;
-  dominantReligion: string;
-  literacyRate: string;
-  olympicMedals: string;
-  callingCode: string;
-  tld: string;
-  timeZone: string;
-  drivesOn: string;
-  anthem: string;
-  nationalDay: string;
-}
-
-function hashSlug(slug: string): number {
-  let h = 0;
-  for (let i = 0; i < slug.length; i++) {
-    h = (h * 31 + slug.charCodeAt(i)) >>> 0;
-  }
-  return h;
-}
-
-function mockScore(seed: number, base: number, spread: number): number {
-  const x = Math.sin(seed) * 10000;
-  const r = x - Math.floor(x);
-  return Math.max(0, Math.min(100, Math.round(base + (r - 0.5) * spread)));
-}
-
-function pick<T>(seed: number, arr: readonly T[]): T {
-  return arr[seed % arr.length]!;
-}
-
-function mockData(country: Country): MockData {
-  const seed = hashSlug(country.slug ?? country.id);
-  const usa = country.id === "usa";
-
-  return {
-    ci: mockScore(seed + 1, 70, 50),
-    cp: mockScore(seed + 2, 70, 40),
-    hdi: mockScore(seed + 3, 75, 40),
-    dq: mockScore(seed + 4, 70, 60),
-    rol: mockScore(seed + 5, 70, 50),
-    fnr: mockScore(seed + 6, 70, 50),
-    cc: mockScore(seed + 7, 65, 60),
-    ss: mockScore(seed + 8, 75, 40),
-
-    govDetail: usa
-      ? "Presidential Democracy"
-      : pick(seed, [
-          "Parliamentary Democracy",
-          "Constitutional Monarchy",
-          "Federal Republic",
-          "Semi-Presidential",
-          "Directorial Republic",
-        ]),
-    headOfGovernment: usa
-      ? "JD Vance"
-      : pick(seed, [
-          "Cabinet Chief",
-          "Prime Minister",
-          "Vice President",
-          "Deputy Head",
-        ]),
-    area: usa
-      ? "9.8M km²"
-      : pick(seed, ["8.5M km²", "1.7M km²", "643k km²", "377k km²", "551k km²"]),
-    currency: usa
-      ? "US Dollar (USD)"
-      : pick(seed, [
-          "Euro (EUR)",
-          "Pound Sterling (GBP)",
-          "Yen (JPY)",
-          "Yuan (CNY)",
-          "Real (BRL)",
-          "Peso (MXN)",
-          "Rupee (INR)",
-        ]),
-    language: usa
-      ? "English"
-      : pick(seed, [
-          "French",
-          "Spanish",
-          "German",
-          "Mandarin",
-          "Portuguese",
-          "Arabic",
-          "Hindi",
-        ]),
-    mainExport: pick(seed, [
-      "Machinery",
-      "Vehicles",
-      "Electronics",
-      "Pharmaceuticals",
-      "Energy",
-    ]),
-    mainImport: pick(seed + 11, [
-      "Pharmaceuticals",
-      "Vehicles",
-      "Machinery",
-      "Refined oil",
-      "Electronics",
-    ]),
-    tradeBalance: usa
-      ? "−$948B"
-      : pick(seed + 13, ["+$112B", "−$54B", "+$31B", "+$210B", "−$78B"]),
-    foundingYear: usa
-      ? "1776"
-      : pick(seed, ["1789", "1804", "1867", "1949", "1922", "1945"]),
-    constitutionYear: usa ? "1787" : pick(seed + 17, ["1789", "1949", "1958", "1978", "1991"]),
-    lastElection: usa
-      ? "Nov 2024"
-      : pick(seed + 19, ["May 2024", "Oct 2023", "Apr 2024", "Sep 2024", "Jul 2025"]),
-    dominantReligion: usa
-      ? "Christianity"
-      : pick(seed + 21, [
-          "Islam",
-          "Buddhism",
-          "Hinduism",
-          "Christianity",
-          "Secular",
-          "Shinto",
-        ]),
-    literacyRate: usa
-      ? "99%"
-      : pick(seed + 23, ["96%", "92%", "78%", "99%", "85%"]),
-    olympicMedals: usa
-      ? "2,977"
-      : pick(seed + 25, ["402", "856", "1,140", "237", "94"]),
-    callingCode: usa ? "+1" : pick(seed + 27, ["+33", "+44", "+49", "+55", "+81", "+86", "+91"]),
-    tld: usa ? ".us" : pick(seed + 29, [".fr", ".uk", ".de", ".br", ".jp", ".cn", ".in"]),
-    timeZone: usa ? "UTC−5 to −10" : pick(seed + 31, ["UTC+1", "UTC+0", "UTC+9", "UTC−3", "UTC+8", "UTC+5:30"]),
-    drivesOn: pick(seed + 33, ["Right", "Left"]),
-    anthem: usa
-      ? "Star-Spangled Banner"
-      : pick(seed + 35, [
-          "La Marseillaise",
-          "God Save the King",
-          "Hino Nacional",
-          "Kimigayo",
-          "Jana Gana Mana",
-        ]),
-    nationalDay: usa ? "Jul 4" : pick(seed + 37, ["Jul 14", "May 5", "Sep 7", "Aug 15", "Oct 1"]),
-  };
-}
-
-function BigScore({
-  abbr,
-  label,
-  value,
-}: {
-  abbr: string;
-  label: string;
-  value: number;
-}) {
-  const tier = ciTier(value);
-  return (
-    <div className="cm-bigscore" data-demo="true">
-      <span className="cm-bigscore-label">{abbr}</span>
-      <span className="cm-bigscore-value" style={{ color: tier.cssVar }}>
-        {value}
-      </span>
-      <span className="cm-bigscore-meta">
-        <span className="cm-bigscore-tier" style={{ color: tier.cssVar }}>
-          {tier.label}
-        </span>
-        <span className="cm-bigscore-name">{label}</span>
-      </span>
-    </div>
-  );
-}
-
-interface ChipScore {
-  abbr: string;
-  label: string;
-  value: number;
-}
-
-function ScoreChip({ abbr, label, value }: ChipScore) {
-  const tier = ciTier(value);
-  return (
-    <div
-      className="cm-chip"
-      title={`${label}: ${value}/100 — ${tier.label}`}
-      data-demo="true"
-    >
-      <span className="cm-chip-label">{abbr}</span>
-      <span className="cm-chip-value" style={{ color: tier.cssVar }}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function ChipStrip({ d }: { d: MockData }) {
-  const chips: ChipScore[] = [
-    { abbr: "HDI", label: "Human Development", value: d.hdi },
-    { abbr: "DQ", label: "Democratic Quality", value: d.dq },
-    { abbr: "ROL", label: "Rule of Law", value: d.rol },
-    { abbr: "FNR", label: "Freedom & Rights", value: d.fnr },
-    { abbr: "CC", label: "Corruption Control", value: d.cc },
-    { abbr: "SS", label: "Stability & Security", value: d.ss },
-  ];
-  return (
-    <div className="cm-chip-strip" role="list">
-      {chips.map((c) => (
-        <ScoreChip key={c.abbr} {...c} />
-      ))}
-    </div>
-  );
-}
 
 function Fact({
   icon,
   label,
-  value,
-  demo,
+  fact,
+  fallback,
 }: {
   icon: React.ReactNode;
   label: string;
-  value: string;
-  demo?: boolean;
+  fact?: CountryFactValue;
+  fallback?: string;
 }) {
+  const fallbackValue = fallback && fallback !== "—" ? fallback : null;
+  const value = fact?.value ?? fallbackValue;
+  const source = value ? fact?.source : undefined;
+  const displayValue = value ?? "No source";
+  const isMissing = !value;
+
   return (
     <div
-      className="cm-fact"
-      data-demo={demo ? "true" : undefined}
-      title={`${label}: ${value}`}
+      className={`cm-fact${isMissing ? " cm-fact--missing" : ""}`}
+      aria-label={`${label}: ${displayValue}`}
     >
       <span className="cm-fact-icon" aria-hidden="true">
         {icon}
       </span>
       <span className="cm-fact-text">
         <span className="cm-fact-label">{label}:</span>{" "}
-        <span className="cm-fact-value">{value}</span>
+        <span className="cm-fact-value">{displayValue}</span>
       </span>
+      {source && (
+        <span className="cm-fact-source">
+          <SourceDot source={source.source} retrievedAt={source.retrievedAt} />
+        </span>
+      )}
     </div>
   );
 }
@@ -321,27 +107,33 @@ function Spacer() {
   return <div className="cm-fact-spacer" aria-hidden="true" />;
 }
 
-function Memberships({ orgs }: { orgs: string[] }) {
+function Memberships({ memberships }: { memberships: CountryMembershipChip[] }) {
+  const source = memberships.find((m) => m.source)?.source;
+
   return (
-    <div className="cm-orgs" data-demo="true">
+    <div className="cm-orgs">
       <div className="cm-mini-title">
         <Network size={13} aria-hidden="true" />
         <span>Memberships</span>
+        {source && (
+          <SourceDot source={source.source} retrievedAt={source.retrievedAt} />
+        )}
       </div>
       <div className="cm-orgs-list">
-        {orgs.map((o) => {
-          const slug = o.toLowerCase();
-          return (
+        {memberships.length > 0 ? (
+          memberships.map((membership) => (
             <Link
-              key={o}
-              href={`/atlas/organizations/${slug}`}
+              key={membership.slug}
+              href={`/atlas/organizations/${membership.slug}`}
               className="cm-org-chip"
-              title={`Open ${o} in the Atlas`}
+              title={`Open ${membership.name} in the Atlas`}
             >
-              {o}
+              {membership.name}
             </Link>
-          );
-        })}
+          ))
+        ) : (
+          <span className="cm-org-empty">No source</span>
+        )}
       </div>
     </div>
   );
@@ -361,8 +153,8 @@ function QuickCompareBlock({ currentSlug }: { currentSlug: string }) {
 
 export function CountryMasthead({ country }: { country: Country }) {
   const [expanded, setExpanded] = useState(false);
-  const d = mockData(country);
   const slug = country.slug ?? country.id;
+  const f = country.masthead;
 
   return (
     <section className="cm">
@@ -373,10 +165,6 @@ export function CountryMasthead({ country }: { country: Country }) {
           </div>
           <h1 className="cm-name">{country.name}</h1>
         </div>
-        {/* CI / CP big scores are hidden until the v2 methodology lands.
-            The mock-data values were misleading (e.g. Congo reading like
-            paradise). Re-enable by restoring <BigScore> here and
-            <ChipStrip d={d} /> below the grid. */}
       </header>
 
       <div className="cm-grid-wrap">
@@ -399,43 +187,43 @@ export function CountryMasthead({ country }: { country: Country }) {
             <Fact
               icon={<Building2 size={15} />}
               label="Gov"
-              value={country.gov}
+              fact={f?.gov}
+              fallback={country.gov}
             />
             <Fact
               icon={<ScrollText size={15} />}
               label="Detail"
-              value={d.govDetail}
-              demo
+              fact={f?.govDetail}
+              fallback={country.govDetail}
             />
             <Spacer />
             <Fact
               icon={<User size={15} />}
               label="Head of state"
-              value={country.leader}
+              fact={f?.headOfState}
+              fallback={country.leader}
             />
             <Fact
               icon={<UserPlus size={15} />}
               label="Head of govt"
-              value={d.headOfGovernment}
-              demo
+              fact={f?.headOfGovernment}
             />
             <Spacer />
             <Fact
               icon={<MapPin size={15} />}
               label="Capital"
-              value={country.capital}
+              fact={f?.capital}
+              fallback={country.capital}
             />
             <Fact
               icon={<Languages size={15} />}
               label="Language"
-              value={d.language}
-              demo
+              fact={f?.language}
             />
             <Fact
               icon={<Coins size={15} />}
               label="Currency"
-              value={d.currency}
-              demo
+              fact={f?.currency}
             />
           </div>
 
@@ -444,43 +232,42 @@ export function CountryMasthead({ country }: { country: Country }) {
             <Fact
               icon={<Compass size={15} />}
               label="Region"
-              value={country.region}
+              fact={f?.region}
+              fallback={country.region}
             />
             <Fact
               icon={<Square size={15} />}
               label="Area"
-              value={d.area}
-              demo
+              fact={f?.area}
             />
             <Spacer />
             <Fact
               icon={<Users size={15} />}
               label="Population"
-              value={country.pop}
+              fact={f?.population}
+              fallback={country.pop}
             />
             <Fact
               icon={<TrendingUp size={15} />}
-              label="GDP"
-              value={country.gdp}
+              label="GDP (PPP)"
+              fact={f?.gdpPpp}
+              fallback={country.gdp}
             />
             <Spacer />
             <Fact
               icon={<Truck size={15} />}
-              label="Main export"
-              value={d.mainExport}
-              demo
+              label="Main exports"
+              fact={f?.mainExport}
             />
             <Fact
               icon={<Package size={15} />}
-              label="Main import"
-              value={d.mainImport}
-              demo
+              label="Main imports"
+              fact={f?.mainImport}
             />
             <Fact
               icon={<Wallet size={15} />}
               label="Trade bal."
-              value={d.tradeBalance}
-              demo
+              fact={f?.tradeBalance}
             />
           </div>
 
@@ -489,41 +276,35 @@ export function CountryMasthead({ country }: { country: Country }) {
             <div className="cm-fact-col">
               <Fact
                 icon={<Calendar size={15} />}
-                label="Founded"
-                value={d.foundingYear}
-                demo
+                label="Independence"
+                fact={f?.independence}
               />
               <Spacer />
               <Fact
                 icon={<Landmark size={15} />}
                 label="Constitution"
-                value={d.constitutionYear}
-                demo
+                fact={f?.constitution}
               />
               <Fact
                 icon={<Vote size={15} />}
                 label="Last election"
-                value={d.lastElection}
-                demo
+                fact={f?.lastElection}
               />
               <Spacer />
               <Fact
                 icon={<Church size={15} />}
                 label="Religion"
-                value={d.dominantReligion}
-                demo
+                fact={f?.religion}
               />
               <Fact
                 icon={<BookOpen size={15} />}
                 label="Literacy"
-                value={d.literacyRate}
-                demo
+                fact={f?.literacy}
               />
               <Fact
                 icon={<Award size={15} />}
                 label="Olympic medals"
-                value={d.olympicMedals}
-                demo
+                fact={f?.olympicMedals}
               />
             </div>
           )}
@@ -534,60 +315,52 @@ export function CountryMasthead({ country }: { country: Country }) {
               <Fact
                 icon={<Phone size={15} />}
                 label="Calling"
-                value={d.callingCode}
-                demo
+                fact={f?.callingCode}
               />
               <Fact
                 icon={<Globe size={15} />}
                 label="TLD"
-                value={d.tld}
-                demo
+                fact={f?.tld}
               />
               <Fact
                 icon={<Clock size={15} />}
                 label="Time zone"
-                value={d.timeZone}
-                demo
+                fact={f?.timeZone}
               />
               <Spacer />
               <Fact
                 icon={<Hash size={15} />}
                 label="ISO"
-                value={country.id.toUpperCase()}
+                fact={f?.iso}
+                fallback={country.id.toUpperCase()}
               />
               <Fact
                 icon={<CarFront size={15} />}
                 label="Drives on"
-                value={d.drivesOn}
-                demo
+                fact={f?.drivesOn}
               />
               <Spacer />
               <Fact
                 icon={<Music size={15} />}
                 label="Anthem"
-                value={d.anthem}
-                demo
+                fact={f?.anthem}
               />
               <Fact
                 icon={<Flag size={15} />}
                 label="National day"
-                value={d.nationalDay}
-                demo
+                fact={f?.nationalDay}
               />
             </div>
           )}
 
           {/* Column 5 — Memberships + Quick compare (always visible, last) */}
           <div className="cm-fact-col cm-col-membership">
-            <Memberships orgs={["NATO", "WHO", "WTO"]} />
+            <Memberships memberships={f?.memberships ?? []} />
             <Spacer />
             <QuickCompareBlock currentSlug={slug} />
           </div>
         </div>
       </div>
-
-      {/* ChipStrip (HDI/DQ/ROL/FNR/CC/SS) hidden until v2 — see
-          comment above. */}
     </section>
   );
 }

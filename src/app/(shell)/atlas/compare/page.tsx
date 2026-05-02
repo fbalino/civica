@@ -40,6 +40,7 @@ export default async function AtlasComparePage({ searchParams }: PageProps) {
     gdp: c.gdp,
     capital: c.capital,
     featured: c.featured,
+    masthead: c.masthead,
   }));
 
   return (

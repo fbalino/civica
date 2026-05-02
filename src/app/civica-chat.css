@@ -1,0 +1,278 @@
+/* ==========================================================================
+   Civica Chat — shared styles
+   --------------------------------------------------------------------------
+   Used by both <AskCivicaPanel> (atlas right-rail) and <CivicaAIDrawer>
+   (factbook bottom drawer). Markdown bubbles, "thinking…" placeholder,
+   pretty scrollbar — all unified here so the two surfaces stay in sync.
+
+   Variant rules:
+   - .civica-chat-msg--atlas:  avatar on the left, prose bubble.
+   - .civica-chat-msg--drawer: no avatar; AI bubble left, user bubble
+                               right (filled, like an iMessage send).
+   ========================================================================== */
+
+/* === Pretty scrollbar (used on any chat scroll container) ================== */
+/* The atlas right-rail panel uses .atlas-chat-scroll; the factbook drawer
+   uses .civica-chat-scroll. Same treatment on both so they look unified. */
+.civica-chat-scroll,
+.atlas-chat-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--color-text-primary) 18%, transparent)
+    transparent;
+}
+.civica-chat-scroll::-webkit-scrollbar,
+.atlas-chat-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.civica-chat-scroll::-webkit-scrollbar-track,
+.atlas-chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.civica-chat-scroll::-webkit-scrollbar-thumb,
+.atlas-chat-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-text-primary) 18%, transparent);
+  border-radius: 4px;
+}
+.civica-chat-scroll::-webkit-scrollbar-thumb:hover,
+.atlas-chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--color-text-primary) 28%, transparent);
+}
+
+/* === Message wrapper ====================================================== */
+.civica-chat-msg {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* Atlas variant — avatar on left, single column */
+.civica-chat-msg--atlas {
+  flex-direction: row;
+}
+
+/* Drawer variant — no avatar; align user bubbles to the right */
+.civica-chat-msg--drawer {
+  flex-direction: column;
+  max-width: 90%;
+}
+.civica-chat-msg--drawer.civica-chat-msg--user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+.civica-chat-msg--drawer.civica-chat-msg--ai {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+/* === Avatar (atlas only) ================================================= */
+.civica-chat-msg-av {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-text-primary);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  flex-shrink: 0;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--color-text-primary);
+}
+.civica-chat-msg-av--ai {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+}
+
+/* === Role label (drawer only — replaces the avatar) ====================== */
+.civica-chat-msg-role {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin-bottom: var(--space-2);
+}
+
+/* === Bubble (the actual content container) =============================== */
+.civica-chat-msg-bub {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+  color: var(--color-text-85);
+  min-width: 0; /* allow long words/URLs to wrap inside flex children */
+}
+
+/* In the drawer, the user bubble gets the ink-fill treatment so it's
+   visually separable from the AI bubble at a glance. */
+.civica-chat-msg--drawer .civica-chat-msg-bub {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-stat-border);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm, 4px);
+}
+.civica-chat-msg--drawer.civica-chat-msg--user .civica-chat-msg-bub {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+  border-color: var(--color-text-primary);
+}
+
+/* Atlas bubbles are flat (no border, no fill) */
+.civica-chat-msg--atlas .civica-chat-msg-bub {
+  font-size: var(--text-13);
+  color: var(--color-text-primary);
+}
+
+/* === Eyebrow lead ("About Nigeria · Lower house") ======================== */
+.civica-chat-msg-lead {
+  font-family: var(--font-heading);
+  font-size: var(--text-14);
+  color: var(--color-text-40);
+  font-style: italic;
+  margin-bottom: var(--space-2);
+}
+
+/* === Citation chip (after bubble) ======================================== */
+.civica-chat-msg-cite {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+  border-left: 2px solid var(--color-accent);
+  padding-left: var(--space-3);
+  margin-top: var(--space-2);
+  letter-spacing: 0.04em;
+}
+
+/* === "Thinking…" placeholder ============================================= */
+.civica-chat-msg-thinking {
+  color: var(--color-text-40);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Markdown rendering inside .civica-chat-msg-md
+   --------------------------------------------------------------------------
+   ReactMarkdown emits standard tags (p, h1-h6, ul, ol, li, code, pre,
+   blockquote, strong, em, a, hr). Style them tightly so a streamed
+   response from /api/chat looks like editorial prose, not a wall of raw
+   markdown characters.
+   ========================================================================== */
+
+.civica-chat-msg-md > *:first-child { margin-top: 0; }
+.civica-chat-msg-md > *:last-child  { margin-bottom: 0; }
+
+.civica-chat-msg-md p {
+  margin: 0 0 var(--space-3);
+}
+.civica-chat-msg-md p:last-child {
+  margin-bottom: 0;
+}
+
+.civica-chat-msg-md h1,
+.civica-chat-msg-md h2,
+.civica-chat-msg-md h3,
+.civica-chat-msg-md h4,
+.civica-chat-msg-md h5,
+.civica-chat-msg-md h6 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  margin: var(--space-4) 0 var(--space-2);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tighter);
+  color: var(--color-text-primary);
+}
+.civica-chat-msg-md h1 { font-size: var(--text-20); }
+.civica-chat-msg-md h2 { font-size: var(--text-18); }
+.civica-chat-msg-md h3 { font-size: var(--text-16); }
+.civica-chat-msg-md h4,
+.civica-chat-msg-md h5,
+.civica-chat-msg-md h6 { font-size: var(--text-14); }
+
+.civica-chat-msg-md ul,
+.civica-chat-msg-md ol {
+  margin: var(--space-2) 0 var(--space-3);
+  padding-left: var(--space-6);
+}
+.civica-chat-msg-md li {
+  margin-bottom: var(--space-2);
+}
+.civica-chat-msg-md li > p {
+  margin: 0;
+}
+.civica-chat-msg-md li > ul,
+.civica-chat-msg-md li > ol {
+  margin-top: var(--space-2);
+  margin-bottom: 0;
+}
+
+.civica-chat-msg-md strong {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.civica-chat-msg-md em {
+  font-style: italic;
+}
+
+.civica-chat-msg-md a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.civica-chat-msg-md a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.civica-chat-msg-md code {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  background: color-mix(in oklab, var(--color-text-primary) 6%, transparent);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.civica-chat-msg-md pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  background: color-mix(in oklab, var(--color-text-primary) 6%, transparent);
+  padding: var(--space-3) var(--space-4);
+  margin: var(--space-3) 0;
+  overflow-x: auto;
+  border: 1px solid var(--color-stat-border);
+  border-radius: 2px;
+  white-space: pre;
+}
+.civica-chat-msg-md pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+.civica-chat-msg-md blockquote {
+  border-left: 2px solid var(--color-accent);
+  padding-left: var(--space-3);
+  margin: var(--space-3) 0;
+  color: var(--color-text-60);
+  font-style: italic;
+}
+
+.civica-chat-msg-md hr {
+  border: 0;
+  border-top: 1px solid var(--color-stat-border);
+  margin: var(--space-4) 0;
+}
+
+/* When the user bubble is the ink-fill, recolour markdown so links and
+   strongs don't disappear into the dark background. */
+.civica-chat-msg--drawer.civica-chat-msg--user .civica-chat-msg-md a {
+  color: var(--color-bg);
+  text-decoration-color: color-mix(in oklab, var(--color-bg) 60%, transparent);
+}
+.civica-chat-msg--drawer.civica-chat-msg--user .civica-chat-msg-md strong {
+  color: var(--color-bg);
+}
+.civica-chat-msg--drawer.civica-chat-msg--user .civica-chat-msg-md code,
+.civica-chat-msg--drawer.civica-chat-msg--user .civica-chat-msg-md pre {
+  background: color-mix(in oklab, var(--color-bg) 18%, transparent);
+  border-color: color-mix(in oklab, var(--color-bg) 24%, transparent);
+}

@@ -1613,24 +1613,19 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .cm-fact-value {
   color: var(--atlas-ink);
 }
-/* CSS tooltip — appears below the row on hover. Uses data-tooltip
-   so it's always visible (the native title attribute has a delay
-   that made earlier hover feedback feel broken). */
-.cm-fact[data-tooltip]:hover::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 22px;
-  z-index: 10;
-  background: var(--atlas-ink);
-  color: var(--atlas-paper);
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
+.cm-fact--missing .cm-fact-value {
+  color: var(--atlas-muted);
   font-family: var(--font-mono);
   font-size: var(--text-11);
-  letter-spacing: 0.04em;
-  white-space: nowrap;
-  pointer-events: none;
+  letter-spacing: 0.02em;
+}
+.cm-fact-source {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin-left: -3px;
+  padding-top: 7px;
+  vertical-align: middle;
 }
 
 /* Column 5 — memberships + quick compare */
@@ -1663,6 +1658,13 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   background: var(--atlas-accent);
   border-color: var(--atlas-accent);
   color: var(--atlas-paper);
+}
+.cm-org-empty {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  letter-spacing: 0.06em;
+  color: var(--atlas-muted);
 }
 
 /* Quick compare typeahead */

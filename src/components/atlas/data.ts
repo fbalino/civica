@@ -49,6 +49,53 @@ export interface Bill {
   sourceLastSyncAt?: string | null;
 }
 
+export interface CountryFactSource {
+  source: string;
+  retrievedAt: string | null;
+}
+
+export interface CountryFactValue {
+  value: string | null;
+  source?: CountryFactSource;
+}
+
+export interface CountryMembershipChip {
+  name: string;
+  slug: string;
+  source?: CountryFactSource;
+}
+
+export interface CountryMastheadFacts {
+  gov?: CountryFactValue;
+  govDetail?: CountryFactValue;
+  headOfState?: CountryFactValue;
+  headOfGovernment?: CountryFactValue;
+  capital?: CountryFactValue;
+  language?: CountryFactValue;
+  currency?: CountryFactValue;
+  region?: CountryFactValue;
+  area?: CountryFactValue;
+  population?: CountryFactValue;
+  gdpPpp?: CountryFactValue;
+  mainExport?: CountryFactValue;
+  mainImport?: CountryFactValue;
+  tradeBalance?: CountryFactValue;
+  independence?: CountryFactValue;
+  constitution?: CountryFactValue;
+  lastElection?: CountryFactValue;
+  religion?: CountryFactValue;
+  literacy?: CountryFactValue;
+  olympicMedals?: CountryFactValue;
+  callingCode?: CountryFactValue;
+  tld?: CountryFactValue;
+  timeZone?: CountryFactValue;
+  iso?: CountryFactValue;
+  drivesOn?: CountryFactValue;
+  anthem?: CountryFactValue;
+  nationalDay?: CountryFactValue;
+  memberships?: CountryMembershipChip[];
+}
+
 export interface Country {
   id: string;
   slug?: string;
@@ -62,6 +109,7 @@ export interface Country {
   gdp: string;
   capital: string;
   featured?: boolean;
+  masthead?: CountryMastheadFacts;
 }
 
 export const COUNTRIES: Country[] = [

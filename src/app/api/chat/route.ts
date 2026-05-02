@@ -11,6 +11,7 @@ const TAB_LABELS: Record<string, string> = {
   democracy: "Democracy index",
   leaders: "Leadership",
   constitution: "Constitution",
+  factbook: "Country factbook",
 };
 
 export async function POST(req: NextRequest) {
@@ -19,7 +20,10 @@ export async function POST(req: NextRequest) {
     message: string;
     context: {
       country: string;
-      house: "lower" | "upper";
+      // House is only meaningful on chamber/bills tabs (per
+      // memory-decisions.md). Optional so factbook / structure /
+      // democracy callers don't bleed a default value into the prompt.
+      house?: "lower" | "upper";
       tab: string;
       parties?: { name: string; seats: number }[];
       coalition?: string;
@@ -32,10 +36,14 @@ export async function POST(req: NextRequest) {
   }
 
   const tabLabel = TAB_LABELS[context.tab] ?? context.tab;
-  const houseLabel = context.house === "upper" ? "upper house" : "lower house";
+  const houseLabel = context.house
+    ? context.house === "upper"
+      ? "upper house"
+      : "lower house"
+    : null;
 
   let chamberContext = "";
-  if (context.parties && context.parties.length > 0) {
+  if (context.parties && context.parties.length > 0 && houseLabel) {
     const partyList = context.parties
       .map((p) => `${p.name} (${p.seats} seats)`)
       .join(", ");
@@ -44,11 +52,13 @@ export async function POST(req: NextRequest) {
     if (context.nextElection) chamberContext += ` Next election: ${context.nextElection}.`;
   }
 
+  // Only include the Chamber line when house is genuinely relevant.
+  const chamberLine = houseLabel ? `\n- Chamber: ${houseLabel}` : "";
+
   const systemPrompt = `You are Civica AI, an expert on global governance, legislatures, and political systems. You speak clearly, cite facts, and avoid political bias.
 
 Current user context:
-- Country: ${context.country}
-- Chamber: ${houseLabel}
+- Country: ${context.country}${chamberLine}
 - Active tab: ${tabLabel}${chamberContext}
 
 Answer questions grounded in this context. If the user asks about something on the current tab (${tabLabel}), focus your answer there. Be concise — 2-4 short paragraphs max. Use plain language. If you cite a source, say so briefly at the end.`;

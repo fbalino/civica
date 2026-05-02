@@ -8,9 +8,21 @@ import {
   terms,
   persons,
   legislatureParties,
+  countryFacts,
+  countryFactbookSections,
+  sources,
+  organizations,
+  organizationMemberships,
+  elections,
 } from "@/lib/db/schema";
 import { formatGovernmentDisplay } from "@/lib/text/clean";
 import { resolvePartyColor } from "@/lib/data/party-colors";
+import type {
+  CountryFactSource,
+  CountryFactValue,
+  CountryMastheadFacts,
+  CountryMembershipChip,
+} from "@/components/atlas/data";
 
 export interface AtlasCountry {
   id: string;
@@ -26,6 +38,7 @@ export interface AtlasCountry {
   capital: string;
   iso3: string;
   featured?: boolean;
+  masthead?: CountryMastheadFacts;
 }
 
 export interface AtlasParty {
@@ -77,6 +90,212 @@ function formatGdp(b: number | null): string {
   return `$${b.toFixed(0)}B`;
 }
 
+function formatArea(n: number | null): string | null {
+  if (!n) return null;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M km²`;
+  return `${n.toLocaleString()} km²`;
+}
+
+function formatMoneyDollars(n: number): string {
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000_000_000) return `$${(abs / 1_000_000_000_000).toFixed(1)}T`;
+  if (abs >= 1_000_000_000) return `$${(abs / 1_000_000_000).toFixed(1)}B`;
+  if (abs >= 1_000_000) return `$${(abs / 1_000_000).toFixed(0)}M`;
+  return `$${abs.toLocaleString()}`;
+}
+
+function normalizeKey(key: string): string {
+  return key
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-z0-9_]/g, "");
+}
+
+function decodeHtmlEntities(value: string): string {
+  return value.replace(/&([a-z]+);/gi, (_, entity: string) => {
+    const map: Record<string, string> = {
+      amp: "&",
+      lt: "<",
+      gt: ">",
+      quot: '"',
+      apos: "'",
+      nbsp: " ",
+    };
+    return map[entity.toLowerCase()] ?? `&${entity};`;
+  });
+}
+
+function cleanText(value: string): string {
+  return decodeHtmlEntities(value)
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractText(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value === "string") return cleanText(value);
+  if (typeof value === "number") return value.toLocaleString();
+  if (typeof value === "object" && "text" in (value as Record<string, unknown>)) {
+    return extractText((value as Record<string, unknown>).text);
+  }
+  return null;
+}
+
+function getNestedValue(data: unknown, ...keys: string[]): unknown {
+  let current = data;
+  for (const key of keys) {
+    if (!current || typeof current !== "object") return undefined;
+    const obj = current as Record<string, unknown>;
+    const found = Object.keys(obj).find(
+      (candidate) => normalizeKey(candidate) === normalizeKey(key)
+    );
+    current = found ? obj[found] : undefined;
+  }
+  return current;
+}
+
+function getNestedText(data: unknown, ...keys: string[]): string | null {
+  return extractText(getNestedValue(data, ...keys));
+}
+
+function sourceWithValue(
+  value: string | null | undefined,
+  source: CountryFactSource
+): CountryFactValue {
+  const clean = value?.trim();
+  if (!clean || clean === "—") return { value: null };
+  return { value: clean, source };
+}
+
+function formatCurrency(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const withoutRate = cleanText(raw)
+    .replace(/\s+per\s+US\s+dollar.*$/i, "")
+    .replace(/\s+-$/i, "")
+    .trim();
+  const codeMatch = withoutRate.match(/\(([A-Z]{3})\)/);
+  const code = codeMatch?.[1];
+  const name = withoutRate.replace(/\s*\([A-Z]{3}\)\s*/g, "").trim();
+  if (!name) return code ? `(${code})` : null;
+
+  const singulars: Record<string, string> = {
+    afghanis: "Afghani",
+    baht: "Baht",
+    birr: "Birr",
+    dinars: "Dinar",
+    dollars: "Dollar",
+    dong: "Dong",
+    euros: "Euro",
+    francs: "Franc",
+    kwanza: "Kwanza",
+    kyats: "Kyat",
+    liras: "Lira",
+    nairas: "Naira",
+    pesos: "Peso",
+    pounds: "Pound",
+    rand: "Rand",
+    reals: "Real",
+    rials: "Rial",
+    rubles: "Ruble",
+    rupees: "Rupee",
+    shillings: "Shilling",
+    taka: "Taka",
+    won: "Won",
+    yen: "Yen",
+    yuan: "Yuan",
+  };
+
+  const words = name.split(/\s+/);
+  const last = words[words.length - 1]?.toLowerCase();
+  if (last && singulars[last]) words[words.length - 1] = singulars[last];
+
+  const titleName = words
+    .map((word) =>
+      /^[A-Z]{2,}$/.test(word)
+        ? word
+        : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`
+    )
+    .join(" ");
+  return code ? `${titleName} (${code})` : titleName;
+}
+
+function formatGovernmentDetail(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  return cleanText(raw)
+    .split(/\s+/)
+    .map((word) =>
+      word.length <= 3 && word === word.toUpperCase()
+        ? word
+        : `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}`
+    )
+    .join(" ");
+}
+
+function formatCommodityList(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const withoutYear = cleanText(raw).replace(/\s*\(\d{4}(?:\s+est\.)?\)\s*$/i, "");
+  const items = withoutYear
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+  if (items.length === 0) return null;
+  const joined = items.join(", ");
+  return `${joined.charAt(0).toUpperCase()}${joined.slice(1)}`;
+}
+
+function formatConstitution(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const text = cleanText(raw);
+  const latest = text.match(/latest adopted\s+([^,;]+)/i);
+  if (latest?.[1]) return latest[1].trim();
+  const year = text.match(/\b(1[6-9]\d{2}|20\d{2})\b/);
+  return year?.[0] ?? text.split(/[.;]/)[0]?.trim() ?? null;
+}
+
+function formatTimeZone(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  return cleanText(raw).split("(")[0]?.trim() || null;
+}
+
+function formatElectionDate(value: string | Date | null | undefined): string | null {
+  if (!value) return null;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+}
+
+function isoTimestamp(value: Date | string | null | undefined): string | null {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+function sortMemberships(items: CountryMembershipChip[]): CountryMembershipChip[] {
+  const priority = new Map(
+    [
+      "united-nations",
+      "un",
+      "african-union",
+      "european-union",
+      "ecowas",
+      "nato",
+      "who",
+      "wto",
+      "imf",
+      "world-bank",
+    ].map((slug, index) => [slug, index])
+  );
+  return [...items].sort((a, b) => {
+    const pa = priority.get(a.slug) ?? 100;
+    const pb = priority.get(b.slug) ?? 100;
+    if (pa !== pb) return pa - pb;
+    return a.name.localeCompare(b.name);
+  });
+}
+
 
 // React `cache()` dedupes calls within a single render. Shell routes for
 // /atlas/[slug]/[tab] call this from the page AND from each parallel slot;
@@ -100,6 +319,134 @@ async function _loadAtlasData(): Promise<{
     .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
 
   const jurisdictionIds = allJurisdictions.map((j) => j.id);
+
+  const sourceRows = await db
+    .select({ id: sources.id, lastSyncAt: sources.lastSyncAt })
+    .from(sources);
+  const sourceById = new Map<string, CountryFactSource>(
+    sourceRows.map((s) => [
+      s.id,
+      { source: s.id, retrievedAt: isoTimestamp(s.lastSyncAt) },
+    ])
+  );
+  const ciaSource = sourceById.get("cia_factbook") ?? {
+    source: "cia_factbook",
+    retrievedAt: null,
+  };
+  const wikidataSource = sourceById.get("wikidata") ?? {
+    source: "wikidata",
+    retrievedAt: null,
+  };
+  const curatedSource: CountryFactSource = {
+    source: "civica_curated",
+    retrievedAt: null,
+  };
+
+  const mastheadFactKeys = [
+    "export_commodities",
+    "exports_total",
+    "imports_total",
+    "languages",
+    "literacy_rate",
+    "religions",
+    "total_area",
+  ];
+
+  const allCountryFacts = jurisdictionIds.length > 0
+    ? await db
+        .select({
+          jurisdictionId: countryFacts.jurisdictionId,
+          factKey: countryFacts.factKey,
+          factValue: countryFacts.factValue,
+          factValueNumeric: countryFacts.factValueNumeric,
+          factUnit: countryFacts.factUnit,
+          factYear: countryFacts.factYear,
+        })
+        .from(countryFacts)
+        .where(
+          sql`${countryFacts.jurisdictionId} IN ${jurisdictionIds}
+            AND ${countryFacts.factKey} IN ${mastheadFactKeys}`
+        )
+    : [];
+
+  const factbookSectionNames = ["communications", "economy", "government"];
+  const mastheadSections = jurisdictionIds.length > 0
+    ? await db
+        .select({
+          jurisdictionId: countryFactbookSections.jurisdictionId,
+          sectionName: countryFactbookSections.sectionName,
+          sectionData: countryFactbookSections.sectionData,
+        })
+        .from(countryFactbookSections)
+        .where(
+          sql`${countryFactbookSections.jurisdictionId} IN ${jurisdictionIds}
+            AND ${countryFactbookSections.sectionName} IN ${factbookSectionNames}`
+        )
+    : [];
+
+  const allMemberships = jurisdictionIds.length > 0
+    ? await db
+        .select({
+          jurisdictionId: organizationMemberships.jurisdictionId,
+          orgSlug: organizations.slug,
+          orgName: organizations.name,
+        })
+        .from(organizationMemberships)
+        .innerJoin(organizations, sql`${organizationMemberships.orgId} = ${organizations.id}`)
+        .where(sql`${organizationMemberships.jurisdictionId} IN ${jurisdictionIds}`)
+    : [];
+
+  const pastElections = jurisdictionIds.length > 0
+    ? await db
+        .select({
+          jurisdictionId: elections.jurisdictionId,
+          electionDate: elections.electionDate,
+        })
+        .from(elections)
+        .where(
+          sql`${elections.jurisdictionId} IN ${jurisdictionIds}
+            AND ${elections.electionDate} <= CURRENT_DATE`
+        )
+        .orderBy(desc(elections.electionDate))
+    : [];
+
+  const factsByJurisdiction = new Map<
+    string,
+    Map<string, (typeof allCountryFacts)[number]>
+  >();
+  for (const fact of allCountryFacts) {
+    const facts = factsByJurisdiction.get(fact.jurisdictionId) ?? new Map();
+    facts.set(fact.factKey, fact);
+    factsByJurisdiction.set(fact.jurisdictionId, facts);
+  }
+
+  const sectionsByJurisdiction = new Map<string, Map<string, unknown>>();
+  for (const section of mastheadSections) {
+    const sections = sectionsByJurisdiction.get(section.jurisdictionId) ?? new Map();
+    sections.set(section.sectionName, section.sectionData);
+    sectionsByJurisdiction.set(section.jurisdictionId, sections);
+  }
+
+  const membershipsByJurisdiction = new Map<string, CountryMembershipChip[]>();
+  for (const membership of allMemberships) {
+    const memberships = membershipsByJurisdiction.get(membership.jurisdictionId) ?? [];
+    memberships.push({
+      name: membership.orgName,
+      slug: membership.orgSlug,
+      source: curatedSource,
+    });
+    membershipsByJurisdiction.set(membership.jurisdictionId, memberships);
+  }
+
+  const latestElectionByJurisdiction = new Map<
+    string,
+    (typeof pastElections)[number]
+  >();
+  for (const election of pastElections) {
+    if (!latestElectionByJurisdiction.has(election.jurisdictionId)) {
+      latestElectionByJurisdiction.set(election.jurisdictionId, election);
+    }
+  }
 
   // Batch: all legislative bodies
   const allBodies = jurisdictionIds.length > 0
@@ -152,6 +499,10 @@ async function _loadAtlasData(): Promise<{
   const bodyToJurisdiction = new Map([...allBodies, ...execBodies].map((b) => [b.id, b.jurisdictionId]));
   const officeTypeMap = new Map(headOffices.map((o) => [o.id, o.officeType]));
 
+  const headsByJurisdiction = new Map<
+    string,
+    { headOfState?: string; headOfGovernment?: string }
+  >();
   const leaderByJurisdiction = new Map<string, { name: string; isHeadOfState: boolean }>();
   for (const h of currentHeads) {
     if (/^Q\d+$/.test(h.person.name)) continue;
@@ -161,6 +512,15 @@ async function _loadAtlasData(): Promise<{
     if (!jId) continue;
     const existing = leaderByJurisdiction.get(jId);
     const isHeadOfState = officeTypeMap.get(h.officeId) === "head_of_state";
+    const officeType = officeTypeMap.get(h.officeId);
+    const heads = headsByJurisdiction.get(jId) ?? {};
+    if (officeType === "head_of_state" && !heads.headOfState) {
+      heads.headOfState = h.person.name;
+    }
+    if (officeType === "head_of_government" && !heads.headOfGovernment) {
+      heads.headOfGovernment = h.person.name;
+    }
+    headsByJurisdiction.set(jId, heads);
     if (!existing || (isHeadOfState && !existing.isHeadOfState)) {
       leaderByJurisdiction.set(jId, { name: h.person.name, isHeadOfState });
     }
@@ -172,6 +532,99 @@ async function _loadAtlasData(): Promise<{
       j.governmentTypeDetail || j.governmentType,
       j.name
     );
+    const facts = factsByJurisdiction.get(j.id) ?? new Map();
+    const sections = sectionsByJurisdiction.get(j.id) ?? new Map();
+    const economySection = sections.get("economy");
+    const governmentSection = sections.get("government");
+    const communicationsSection = sections.get("communications");
+    const heads = headsByJurisdiction.get(j.id) ?? {};
+
+    const factText = (key: string) => facts.get(key)?.factValue ?? null;
+    const area =
+      formatArea(j.areaSqKm) ??
+      formatArea(Math.round(facts.get("total_area")?.factValueNumeric ?? 0)) ??
+      factText("total_area");
+    const exportsValue = facts.get("exports_total")?.factValueNumeric;
+    const importsValue = facts.get("imports_total")?.factValueNumeric;
+    const tradeBalance =
+      typeof exportsValue === "number" && typeof importsValue === "number"
+        ? `${exportsValue - importsValue >= 0 ? "+" : "-"}${formatMoneyDollars(
+            exportsValue - importsValue
+          )}`
+        : null;
+    const latestElection = latestElectionByJurisdiction.get(j.id);
+    const memberships = sortMemberships(
+      membershipsByJurisdiction.get(j.id) ?? []
+    ).slice(0, 6);
+
+    const masthead: CountryMastheadFacts = {
+      gov: sourceWithValue(government.label, ciaSource),
+      govDetail: sourceWithValue(
+        formatGovernmentDetail(government.detail ?? j.governmentTypeDetail),
+        ciaSource
+      ),
+      headOfState: sourceWithValue(heads.headOfState ?? null, wikidataSource),
+      headOfGovernment: sourceWithValue(
+        heads.headOfGovernment ?? null,
+        wikidataSource
+      ),
+      capital: sourceWithValue(j.capital, ciaSource),
+      language: sourceWithValue(j.languages ?? factText("languages"), ciaSource),
+      currency: sourceWithValue(formatCurrency(j.currency), ciaSource),
+      region: sourceWithValue(
+        CONTINENT_TO_REGION[j.continent || ""] || j.continent || null,
+        ciaSource
+      ),
+      area: sourceWithValue(area, ciaSource),
+      population: sourceWithValue(formatPop(j.population), ciaSource),
+      gdpPpp: sourceWithValue(formatGdp(j.gdpBillions), ciaSource),
+      mainExport: sourceWithValue(
+        formatCommodityList(factText("export_commodities")),
+        ciaSource
+      ),
+      mainImport: sourceWithValue(
+        formatCommodityList(getNestedText(economySection, "Imports - commodities")),
+        ciaSource
+      ),
+      tradeBalance: sourceWithValue(tradeBalance, ciaSource),
+      independence: sourceWithValue(
+        getNestedText(governmentSection, "Independence"),
+        ciaSource
+      ),
+      constitution: sourceWithValue(
+        formatConstitution(
+          getNestedText(governmentSection, "Constitution", "history")
+        ),
+        ciaSource
+      ),
+      lastElection: sourceWithValue(
+        formatElectionDate(latestElection?.electionDate),
+        curatedSource
+      ),
+      religion: sourceWithValue(factText("religions"), ciaSource),
+      literacy: sourceWithValue(factText("literacy_rate"), ciaSource),
+      olympicMedals: { value: null },
+      callingCode: { value: null },
+      tld: sourceWithValue(
+        getNestedText(communicationsSection, "Internet country code"),
+        ciaSource
+      ),
+      timeZone: sourceWithValue(
+        formatTimeZone(getNestedText(governmentSection, "Capital", "time difference")),
+        ciaSource
+      ),
+      iso: sourceWithValue(j.iso3?.toUpperCase() ?? null, ciaSource),
+      drivesOn: { value: null },
+      anthem: sourceWithValue(
+        getNestedText(governmentSection, "National anthem(s)", "title"),
+        ciaSource
+      ),
+      nationalDay: sourceWithValue(
+        getNestedText(governmentSection, "National holiday"),
+        ciaSource
+      ),
+      memberships,
+    };
 
     return {
       id: j.iso3!.toLowerCase(),
@@ -187,6 +640,7 @@ async function _loadAtlasData(): Promise<{
       capital: j.capital || "—",
       iso3: j.iso3!,
       featured: TOP_COUNTRIES.has(j.iso3!.toUpperCase()),
+      masthead,
     };
   });
 

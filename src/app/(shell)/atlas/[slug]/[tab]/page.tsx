@@ -49,6 +49,7 @@ export default async function AtlasCountryPage({ params }: PageProps) {
     gdp: match.gdp,
     capital: match.capital,
     featured: match.featured,
+    masthead: match.masthead,
   };
 
   return (

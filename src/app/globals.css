@@ -360,13 +360,14 @@ a {
   border: 1px solid var(--color-tooltip-border);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transition: none;
   z-index: 50;
   min-width: max-content;
   text-align: center;
 }
 
-.source-dot:hover::after {
+.source-dot:hover::after,
+.source-dot:focus-visible::after {
   opacity: 1;
 }
 

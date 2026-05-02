@@ -98,3 +98,13 @@ This same principle applies to any future per-tab context (e.g. a future
   for the legacy `/` route because `setAtlasControls` at lines 359–415 reads them to
   inject into the global header. `AtlasCountryLeft` receives them as props, does not
   own them.
+
+## 2026-05-01 — Atlas masthead facts must never be generated
+
+The country masthead may only show source-backed facts or the explicit placeholder
+`No source`. Do not reintroduce slug-hash/generated/demo values for language,
+currency, trade, identifiers, literacy, medals, memberships, or other fact slots.
+
+GDP in the masthead is CIA Factbook real GDP PPP and must be labeled `GDP (PPP)`.
+If a future task switches to nominal GDP, update the label and source at the same
+time.

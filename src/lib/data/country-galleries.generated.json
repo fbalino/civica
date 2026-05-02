@@ -1,0 +1,1095 @@
+{
+  "_meta": {
+    "source": "Wikidata SPARQL (P18, P242)",
+    "fetchedAt": "2026-05-01T22:00:23.840Z",
+    "countCountries": 271,
+    "countWithLocator": 267,
+    "countWithCover": 220
+  },
+  "galleries": {
+    "ABW": {
+      "locatorMapFile": "Aruba in its region.svg",
+      "coverPhotoFile": "Aruba World Wind.jpg"
+    },
+    "AFG": {
+      "locatorMapFile": "Afghanistan (orthographic projection).svg",
+      "coverPhotoFile": "Afghanistan - Location Map (2013) - AFG - UNOCHA.svg"
+    },
+    "AFI": {
+      "locatorMapFile": null,
+      "coverPhotoFile": null
+    },
+    "AGO": {
+      "locatorMapFile": "Angola (orthographic projection).svg",
+      "coverPhotoFile": "Angola - Location Map (2013) - AGO - UNOCHA.svg"
+    },
+    "AIA": {
+      "locatorMapFile": "Anguilla on the globe (Americas centered).svg",
+      "coverPhotoFile": "Anguilla - Location Map (2013) - AIA - UNOCHA.svg"
+    },
+    "ALA": {
+      "locatorMapFile": "Ahvenanmaa sijainti Suomi.svg",
+      "coverPhotoFile": "Alands flag.jpg"
+    },
+    "ALB": {
+      "locatorMapFile": "Albania (orthographic projection).svg",
+      "coverPhotoFile": "Albania - Location Map (2013) - ALB - UNOCHA.svg"
+    },
+    "AND": {
+      "locatorMapFile": "Andorra on the globe (Europe centered).svg",
+      "coverPhotoFile": "Andorra la Vella - footpath.jpg"
+    },
+    "ANT": {
+      "locatorMapFile": "Kingdom of the Netherlands in its region (Caribbean special).svg",
+      "coverPhotoFile": null
+    },
+    "ARE": {
+      "locatorMapFile": "United Arab Emirates (orthographic projection).svg",
+      "coverPhotoFile": "Souq Al Bahar From Burj Khalifa, Dubai (7997597156).jpg"
+    },
+    "ARG": {
+      "locatorMapFile": "ARG orthographic.svg",
+      "coverPhotoFile": "Fitz Roy 1b.jpg"
+    },
+    "ARM": {
+      "locatorMapFile": "Armenia (orthographic projection).svg",
+      "coverPhotoFile": "Noravank panorama.jpg"
+    },
+    "ASC": {
+      "locatorMapFile": null,
+      "coverPhotoFile": "View from peak of Two Sisters to Two Boats Village.jpg"
+    },
+    "ASM": {
+      "locatorMapFile": "American Samoa on the globe (Polynesia centered).svg",
+      "coverPhotoFile": "AmericanSamoa.jpg"
+    },
+    "ATA": {
+      "locatorMapFile": "Mapa Polo Sur.png",
+      "coverPhotoFile": "Antarctica 6400px from Blue Marble.jpg"
+    },
+    "ATB": {
+      "locatorMapFile": "BritishAntarcticTerritory.svg",
+      "coverPhotoFile": "Rothera from reptile.jpg"
+    },
+    "ATF": {
+      "locatorMapFile": "French Southern and Antarctic Lands in France (zoomed).svg",
+      "coverPhotoFile": null
+    },
+    "ATG": {
+      "locatorMapFile": "LocationAntiguaAndBarbuda.png",
+      "coverPhotoFile": "Satellite image of Antigua And Barbuda in September 2002.jpg"
+    },
+    "ATN": {
+      "locatorMapFile": "Antarctica, Norway territorial claim.svg",
+      "coverPhotoFile": "Hochlinfjellet.jpg"
+    },
+    "AUS": {
+      "locatorMapFile": "AUS orthographic.svg",
+      "coverPhotoFile": "Australia satellite plane.jpg"
+    },
+    "AUT": {
+      "locatorMapFile": "EU-Austria.svg",
+      "coverPhotoFile": "Austria - Location Map (2019) - AUT - UNOCHA.svg"
+    },
+    "AZE": {
+      "locatorMapFile": "Azerbaijan orthographic projection.svg",
+      "coverPhotoFile": "Aj-map.png"
+    },
+    "BDI": {
+      "locatorMapFile": "Burundi (orthographic projection).svg",
+      "coverPhotoFile": "By-map-fr.png"
+    },
+    "BEL": {
+      "locatorMapFile": "EU-Belgium.svg",
+      "coverPhotoFile": "Belgique - Bruxelles - Grand-Place - Côté nord-est.jpg"
+    },
+    "BEN": {
+      "locatorMapFile": "Benin (orthographic projection with inset).svg",
+      "coverPhotoFile": null
+    },
+    "BES": {
+      "locatorMapFile": "BES islands location map.svg",
+      "coverPhotoFile": "Bonaire (34769022732).jpg"
+    },
+    "BFA": {
+      "locatorMapFile": "BFA orthographic.svg",
+      "coverPhotoFile": null
+    },
+    "BGD": {
+      "locatorMapFile": "Bangladesh (orthographic projection).svg",
+      "coverPhotoFile": null
+    },
+    "BGR": {
+      "locatorMapFile": "Bulgaria (orthographic projection).svg",
+      "coverPhotoFile": "Rila Monastery, August 2013.jpg"
+    },
+    "BHR": {
+      "locatorMapFile": "Map of Bahrain.svg",
+      "coverPhotoFile": "Manama, Bahrain Decembre 2014.jpg"
+    },
+    "BHS": {
+      "locatorMapFile": "Bahamas in its region.svg",
+      "coverPhotoFile": "Bahamas regions map-es.svg"
+    },
+    "BIH": {
+      "locatorMapFile": "Bosnia and Herzegovina (orthographic projection).svg",
+      "coverPhotoFile": "Gornji Orahovac, Bosnia y Herzegovina, 2014-04-14, DD 10-13 PAN.jpg"
+    },
+    "BLM": {
+      "locatorMapFile": "Saint Barthelemy in France.svg",
+      "coverPhotoFile": "Saint Barth - Vue panoramique - Octobre 2009.jpg"
+    },
+    "BLR": {
+      "locatorMapFile": "Belarus on the globe (Europe centered).svg",
+      "coverPhotoFile": "Satellite image of Belarus in December 2002.jpg"
+    },
+    "BLZ": {
+      "locatorMapFile": "Belize in its region.svg",
+      "coverPhotoFile": "Belize Topography.png"
+    },
+    "BMU": {
+      "locatorMapFile": "United Kingdom on the globe (Bermuda special) (Americas centered).svg",
+      "coverPhotoFile": "ISS017-E-10695 - View of Bermuda.jpg"
+    },
+    "BOL": {
+      "locatorMapFile": "BOL orthographic.svg",
+      "coverPhotoFile": "LagunaChiarKhota2013.jpg"
+    },
+    "BRA": {
+      "locatorMapFile": "BRA orthographic.svg",
+      "coverPhotoFile": "Cidade Maravilhosa.jpg"
+    },
+    "BRB": {
+      "locatorMapFile": "BRB orthographic.svg",
+      "coverPhotoFile": "Barbados (50).jpg"
+    },
+    "BRN": {
+      "locatorMapFile": "Brunei on the globe (Southeast Asia centered).svg",
+      "coverPhotoFile": "BN-bsb-jame-asr-hassanil-m-2.jpg"
+    },
+    "BTN": {
+      "locatorMapFile": "Bhutan (orthographic projection).svg",
+      "coverPhotoFile": null
+    },
+    "BVT": {
+      "locatorMapFile": "PAT - Bouvet.gif",
+      "coverPhotoFile": "Bouvet island 0.jpg"
+    },
+    "BWA": {
+      "locatorMapFile": "Botswana (orthographic projection).svg",
+      "coverPhotoFile": "Okavango Delta, Botswana (2674364913).jpg"
+    },
+    "BYS": {
+      "locatorMapFile": "Byelorussian SSR in the Soviet Union.svg",
+      "coverPhotoFile": null
+    },
+    "CAF": {
+      "locatorMapFile": "CAF orthographic.svg",
+      "coverPhotoFile": null
+    },
+    "CAN": {
+      "locatorMapFile": "CAN orthographic.svg",
+      "coverPhotoFile": "Canada - Location Map (2013) - CAN - UNOCHA.svg"
+    },
+    "CCK": {
+      "locatorMapFile": "Cocos (Keeling) Islands on the globe (Southeast Asia centered).svg",
+      "coverPhotoFile": "Cocos (Keeling) Islands (32206670676).jpg"
+    },
+    "CHE": {
+      "locatorMapFile": "Switzerland on the globe (Europe centered).svg",
+      "coverPhotoFile": null
+    },
+    "CHL": {
+      "locatorMapFile": "CHL orthographic (+all claims).svg",
+      "coverPhotoFile": "Macizo Paine al Amanecer Torres del Paine.jpg"
+    },
+    "CHN": {
+      "locatorMapFile": "CHN orthographic.svg",
+      "coverPhotoFile": "Badaling China Great-Wall-of-China-01.jpg"
+    },
+    "CIV": {
+      "locatorMapFile": "CIV orthographic.svg",
+      "coverPhotoFile": "Ivory Coast - Location Map (2013) - CIV - UNOCHA.svg"
+    },
+    "CMR": {
+      "locatorMapFile": "CMR orthographic.svg",
+      "coverPhotoFile": null
+    },
+    "COD": {
+      "locatorMapFile": "COD orthographic.svg",
+      "coverPhotoFile": "DR Congo - collage.jpg"
+    },
+    "COG": {
+      "locatorMapFile": "LocationRepublicoftheCongo.svg",
+      "coverPhotoFile": "Republic of the Congo - Location Map (2011) - COG - UNOCHA.svg"
+    },
+    "COK": {
+      "locatorMapFile": "Cook Islands on the globe (small islands magnified) (Polynesia centered).svg",
+      "coverPhotoFile": "ISS006-E-38664 - View of the Cook Islands.jpg"
+    },
+    "COL": {
+      "locatorMapFile": "COL orthographic (San Andrés and Providencia special).svg",
+      "coverPhotoFile": null
+    },
+    "COM": {
+      "locatorMapFile": "Comoros (orthographic projection).svg",
+      "coverPhotoFile": "Fish Harvest.jpg"
+    },
+    "CPV": {
+      "locatorMapFile": "CPV orthographic NaturalEarth.svg",
+      "coverPhotoFile": "Satellite image of Cape Verde in December 2002.jpg"
+    },
+    "CRI": {
+      "locatorMapFile": "Costa Rica (orthographic projection).svg",
+      "coverPhotoFile": null
+    },
+    "CRQ": {
+      "locatorMapFile": "Guernsey-Sark.png",
+      "coverPhotoFile": "Sark-aerial.jpg"
+    },
+    "CSK": {
+      "locatorMapFile": "Czechoslovakia (orthographic projection).svg",
+      "coverPhotoFile": "Czechoslovakia1920-38.jpg"
+    },
+    "CTE": {
+      "locatorMapFile": null,
+      "coverPhotoFile": "Aerial view of Canton Island.jpg"
+    },
+    "CUB": {
+      "locatorMapFile": "Cuba (orthographic projection).svg",
+      "coverPhotoFile": "Santa Clara (Cuba).jpg"
+    },
+    "CUW": {
+      "locatorMapFile": "Curacao in its region.svg",
+      "coverPhotoFile": "Facades of Handelskade, Willemstad, Curaçao - February 2020.jpg"
+    },
+    "CXR": {
+      "locatorMapFile": "Christmas Island on globe (Southeast Asia centered).svg",
+      "coverPhotoFile": "Crab migration extra - chris bray-1.jpg"
+    },
+    "CYM": {
+      "locatorMapFile": "Cayman Islands in United Kingdom.svg",
+      "coverPhotoFile": "ISS014-E-20406 - View of the Cayman Islands.jpg"
+    },
+    "CYP": {
+      "locatorMapFile": "EU-Cyprus highlighted.svg",
+      "coverPhotoFile": "CGI Cyprus Flag.png"
+    },
+    "CZE": {
+      "locatorMapFile": "EU-Czech Republic.svg",
+      "coverPhotoFile": "Czechia Montage.jpg"
+    },
+    "DDR": {
+      "locatorMapFile": "East Germany 1956-1990.svg",
+      "coverPhotoFile": null
+    },
+    "DEU": {
+      "locatorMapFile": "Germany (orthographic projection).svg",
+      "coverPhotoFile": "Aerial view of Berlin (32881394137).jpg"
+    },
+    "DHY": {
+      "locatorMapFile": "Benin in its region.svg",
+      "coverPhotoFile": null
+    },
+    "DJI": {
+      "locatorMapFile": "Djibouti (orthographic projection).svg",
+      "coverPhotoFile": "An aerial view of Djibouti City.jpg"
+    },
+    "DMA": {
+      "locatorMapFile": "LocationDominica.svg",
+      "coverPhotoFile": "Dominica from ISS.jpg"
+    },
+    "DNK": {
+      "locatorMapFile": "Denmark on the globe (Europe centered).svg",
+      "coverPhotoFile": "Dannebrog.jpg"
+    },
+    "DOM": {
+      "locatorMapFile": "LocationDominicanRepublic.svg",
+      "coverPhotoFile": null
+    },
+    "DZA": {
+      "locatorMapFile": "Algeria (centered orthographic projection).svg",
+      "coverPhotoFile": "Algeria - Location Map (2013) - DZA - UNOCHA.svg"
+    },
+    "ECU": {
+      "locatorMapFile": "ECU orthographic.svg",
+      "coverPhotoFile": "Ecuador Blue Marble.png"
+    },
+    "EGY": {
+      "locatorMapFile": "EGY orthographic.svg",
+      "coverPhotoFile": "All Gizah Pyramids.jpg"
+    },
+    "ERI": {
+      "locatorMapFile": "Eritrea (Africa orthographic projection).svg",
+      "coverPhotoFile": "Eritrea - Location Map (2013) - ERI - UNOCHA.svg"
+    },
+    "ESH": {
+      "locatorMapFile": "Western Sahara (orthographic projection).svg",
+      "coverPhotoFile": "Atlantic Ocean in Western Sahara.jpg"
+    },
+    "ESP": {
+      "locatorMapFile": "Spain on the globe (Europe centered).svg",
+      "coverPhotoFile": "Spain - Location Map (2013) - ESP - UNOCHA.svg"
+    },
+    "EST": {
+      "locatorMapFile": "EU-Estonia.svg",
+      "coverPhotoFile": "Estonia - Location Map (2013) - EST - UNOCHA.svg"
+    },
+    "ETH": {
+      "locatorMapFile": "Ethiopia (Africa orthographic projection).svg",
+      "coverPhotoFile": "Ethiopia in its region.svg"
+    },
+    "FIN": {
+      "locatorMapFile": "Finland on the globe (Europe centered).svg",
+      "coverPhotoFile": null
+    },
+    "FJI": {
+      "locatorMapFile": "Fiji (orthographic projection).svg",
+      "coverPhotoFile": "Куинс-роуд, город Нанди (Queens Rd., Nadi).jpg"
+    },
+    "FLK": {
+      "locatorMapFile": "Location map of the Falklands – Alternative version 4.svg",
+      "coverPhotoFile": null
+    },
+    "FRA": {
+      "locatorMapFile": "EU-France (orthographic projection).svg",
+      "coverPhotoFile": "Paris from the Arc de Triomphe, 17 October 2019.jpg"
+    },
+    "FRO": {
+      "locatorMapFile": "Europe-Faroe Islands.svg",
+      "coverPhotoFile": "Faroe Islands by Sentinel-2.jpg"
+    },
+    "FSM": {
+      "locatorMapFile": "Micronesia on the globe (Micronesia centered).svg",
+      "coverPhotoFile": null
+    },
+    "FXX": {
+      "locatorMapFile": null,
+      "coverPhotoFile": null
+    },
+    "GAB": {
+      "locatorMapFile": "Gabon (orthographic projection).svg",
+      "coverPhotoFile": "Topographic map of Gabon-fr.svg"
+    },
+    "GBR": {
+      "locatorMapFile": "Europe-UK.svg",
+      "coverPhotoFile": "Palace of Westminster from the dome on Methodist Central Hall.jpg"
+    },
+    "GEL": {
+      "locatorMapFile": "LocationGilbertandEllice.png",
+      "coverPhotoFile": null
+    },
+    "GEO": {
+      "locatorMapFile": "Georgia (orthographic projection with inset).svg",
+      "coverPhotoFile": "Abudelauri valley under clouds, early summer, Georgia.jpg"
+    },
+    "GGY": {
+      "locatorMapFile": "Europe-Guernsey.svg",
+      "coverPhotoFile": "Guernsey from the air - geograph.ci - 371.jpg"
+    },
+    "GHA": {
+      "locatorMapFile": "Ghana (orthographic projection).svg",
+      "coverPhotoFile": "Beach with palms Ghana.jpg"
+    },
+    "GIB": {
+      "locatorMapFile": "Gibraltar location in Europe.svg",
+      "coverPhotoFile": "Gibraltar aerial view looking northwest.jpg"
+    },
+    "GIN": {
+      "locatorMapFile": "Guinea (orthographic projection).svg",
+      "coverPhotoFile": "LocationGuinea.svg"
+    },
+    "GLP": {
+      "locatorMapFile": "Guadeloupe in France 2016.svg",
+      "coverPhotoFile": "Pointe de la Petite-Tortue.JPG"
+    },
+    "GMB": {
+      "locatorMapFile": "Gambia (orthographic projection with inset).svg",
+      "coverPhotoFile": "Map drawing of the Republic of The Gambia.jpg"
+    },
+    "GNB": {
+      "locatorMapFile": "Guinea-Bissau on the globe (Africa centered).svg",
+      "coverPhotoFile": "Guinea-Bissau - Location Map (2013) - GNB - UNOCHA.svg"
+    },
+    "GNQ": {
+      "locatorMapFile": "LocationEquatorialGuinea.svg",
+      "coverPhotoFile": "Equatorialguinea w1 locator.svg"
+    },
+    "GRC": {
+      "locatorMapFile": "Greece on the globe (Europe centered).svg",
+      "coverPhotoFile": "The Acropolis and Mount Hymettus from Philopappos Hill on July 18, 2019.jpg"
+    },
+    "GRD": {
+      "locatorMapFile": "Grenada in its region.svg",
+      "coverPhotoFile": "StGeorgesGrenada2000.jpg"
+    },
+    "GRL": {
+      "locatorMapFile": "Greenland (orthographic projection).svg",
+      "coverPhotoFile": "Greenland 42.74746W 71.57394N.jpg"
+    },
+    "GTM": {
+      "locatorMapFile": "Guatemala on the globe (Americas centered).svg",
+      "coverPhotoFile": "Satellite image of Guatemala in April 2002.jpg"
+    },
+    "GUF": {
+      "locatorMapFile": "French Guiana (orthographic projection).svg",
+      "coverPhotoFile": "ISS009-E-21542 - View of French Guiana.jpg"
+    },
+    "GUM": {
+      "locatorMapFile": "Guam on the globe (small islands magnified) (Polynesia centered).svg",
+      "coverPhotoFile": "Guam satellite photo map.jpg"
+    },
+    "GUY": {
+      "locatorMapFile": "GUY orthographic.svg",
+      "coverPhotoFile": null
+    },
+    "HKG": {
+      "locatorMapFile": "Hong Kong in China (zoomed) (+all claims hatched).svg",
+      "coverPhotoFile": "Hong Kong from Victoria Peak1.jpg"
+    },
+    "HMD": {
+      "locatorMapFile": "Heard Island and McDonald Islands on the globe (Antarctica centered).svg",
+      "coverPhotoFile": "Heard Island.jpg"
+    },
+    "HND": {
+      "locatorMapFile": "Honduras (orthographic projection).svg",
+      "coverPhotoFile": "Copan sculpture.jpg"
+    },
+    "HRV": {
+      "locatorMapFile": "EU-Croatia (orthographic projection).png",
+      "coverPhotoFile": "Dubrovnik june 2011..JPG"
+    },
+    "HTI": {
+      "locatorMapFile": "Haiti (orthographic projection).svg",
+      "coverPhotoFile": "ISS020-E-43300 - View of Haiti.jpg"
+    },
+    "HUN": {
+      "locatorMapFile": "EU-Hungary.svg",
+      "coverPhotoFile": "20190502 Widok na Budapeszt z Góry Gellerta 1651 2150 DxO.jpg"
+    },
+    "HVO": {
+      "locatorMapFile": "LocationBurkinaFaso.svg",
+      "coverPhotoFile": null
+    },
+    "IDN": {
+      "locatorMapFile": "Indonesia (orthographic projection).svg",
+      "coverPhotoFile": "Indonesian Culture.jpg"
+    },
+    "IMN": {
+      "locatorMapFile": "Europe-Isle of Man.svg",
+      "coverPhotoFile": "Isle of Man by Sentinel-2.jpg"
+    },
+    "IND": {
+      "locatorMapFile": "India (orthographic projection).svg",
+      "coverPhotoFile": "India-locator-map-blank.svg"
+    },
+    "IOT": {
+      "locatorMapFile": "British Indian Ocean Territory on the globe (Afro-Eurasia centered).svg",
+      "coverPhotoFile": null
+    },
+    "IRL": {
+      "locatorMapFile": "EU-Ireland.svg",
+      "coverPhotoFile": "000 Irlanda harta.PNG"
+    },
+    "IRN": {
+      "locatorMapFile": "Iran (orthographic projection).svg",
+      "coverPhotoFile": "Iran - Location Map (2013) - IRN - UNOCHA.svg"
+    },
+    "IRQ": {
+      "locatorMapFile": "Iraq (orthographic-projection).svg",
+      "coverPhotoFile": "View of Sulaymaniyah (Slemani) City in Winter - Snow 2015.JPG"
+    },
+    "ISL": {
+      "locatorMapFile": "Iceland (orthographic projection).svg",
+      "coverPhotoFile": "Cloud-free Iceland ESA22181280 (cropped).jpeg"
+    },
+    "ISR": {
+      "locatorMapFile": "Israel (orthographic projection) with disputed territories.svg",
+      "coverPhotoFile": "Часовая башня султана Абдул Хамида II - panoramio.jpg"
+    },
+    "ITA": {
+      "locatorMapFile": "Italy on the globe (Europe centered).svg",
+      "coverPhotoFile": "Colosseo 2020.jpg"
+    },
+    "JAM": {
+      "locatorMapFile": "Jamaica (orthographic projection).svg",
+      "coverPhotoFile": "Satellite image of Jamaica in November 2001.jpg"
+    },
+    "JEY": {
+      "locatorMapFile": "Europe-Jersey.svg",
+      "coverPhotoFile": "Jersey by Sentinel-2.jpg"
+    },
+    "JOR": {
+      "locatorMapFile": "Jordan on the globe (Afro-Eurasia centered).svg",
+      "coverPhotoFile": "17 Dead Sea (13) (13252089754).jpg"
+    },
+    "JPN": {
+      "locatorMapFile": "Japan on the globe (de-facto) (Japan centered).svg",
+      "coverPhotoFile": "Satellite image of Japan in May 2003.jpg"
+    },
+    "JTN": {
+      "locatorMapFile": "LocationJohnstonAtoll.png",
+      "coverPhotoFile": "Johnston Atoll.png"
+    },
+    "KAZ": {
+      "locatorMapFile": "Kazakhstan (orthographic projection).svg",
+      "coverPhotoFile": null
+    },
+    "KEN": {
+      "locatorMapFile": "Kenya (orthographic projection).svg",
+      "coverPhotoFile": "Kenya - Location Map (2013) - KEN - UNOCHA.svg"
+    },
+    "KGZ": {
+      "locatorMapFile": "Kyrgyzstan on the globe (Eurasia centered).svg",
+      "coverPhotoFile": null
+    },
+    "KHM": {
+      "locatorMapFile": "Cambodia on the globe (Asia centered).svg",
+      "coverPhotoFile": "Angkor Wat W-Seite.jpg"
+    },
+    "KIR": {
+      "locatorMapFile": "Kiribati on the globe (Polynesia centered).svg",
+      "coverPhotoFile": null
+    },
+    "KNA": {
+      "locatorMapFile": "KNA orthographic.svg",
+      "coverPhotoFile": "Approaching St Kitts and Nevis - southern tip of St. Kitts - panoramio.jpg"
+    },
+    "KOR": {
+      "locatorMapFile": "South Korea (orthographic projection).svg",
+      "coverPhotoFile": "South Korea - Location Map (2013) - KOR - UNOCHA.svg"
+    },
+    "KWT": {
+      "locatorMapFile": "KWT orthographic.svg",
+      "coverPhotoFile": null
+    },
+    "LAO": {
+      "locatorMapFile": "Laos on the globe (Asia centered).svg",
+      "coverPhotoFile": "Karst peaks and green paddy fields under a stormy sky, South view from Mount Nam Xay, Vang Vieng, Laos.jpg"
+    },
+    "LBN": {
+      "locatorMapFile": "Lebanon (orthographic projection).svg",
+      "coverPhotoFile": "Beirut skyline, Beirut, Lebanon.jpg"
+    },
+    "LBR": {
+      "locatorMapFile": "Liberia (orthographic projection).svg",
+      "coverPhotoFile": "Liberian Capitol Building.jpg"
+    },
+    "LBY": {
+      "locatorMapFile": "Libya (orthographic projection).svg",
+      "coverPhotoFile": "Tripoli at night.jpg"
+    },
+    "LCA": {
+      "locatorMapFile": "Saint Lucia on the globe (Americas centered).svg",
+      "coverPhotoFile": "Saint Lucia.png"
+    },
+    "LIE": {
+      "locatorMapFile": "Liechtenstein on the globe (Europe centered).svg",
+      "coverPhotoFile": "Liechtenstein asv2022-10 img02 Vaduz Aussicht beim Schloss.jpg"
+    },
+    "LKA": {
+      "locatorMapFile": "Sri Lanka (orthographic projection).svg",
+      "coverPhotoFile": "Topography Sri Lanka.jpg"
+    },
+    "LSO": {
+      "locatorMapFile": "Lesotho (orthographic projection with inset).svg",
+      "coverPhotoFile": "Lesotho - Location Map (2013) - LSO - UNOCHA.svg"
+    },
+    "LTU": {
+      "locatorMapFile": "Lithuania on the globe (Europe centered).svg",
+      "coverPhotoFile": null
+    },
+    "LUX": {
+      "locatorMapFile": "EU-Luxembourg.svg",
+      "coverPhotoFile": "Luxemburg.jpg"
+    },
+    "LVA": {
+      "locatorMapFile": "Latvia on the globe (Europe centered).svg",
+      "coverPhotoFile": "Satellite image of Latvia in March 2003.jpg"
+    },
+    "MAC": {
+      "locatorMapFile": "Macau locator map.svg",
+      "coverPhotoFile": "Panorama of Macau Peninsula2021.jpg"
+    },
+    "MAF": {
+      "locatorMapFile": "Saint Martin in its region (zoom).svg",
+      "coverPhotoFile": null
+    },
+    "MAR": {
+      "locatorMapFile": "Morocco WS-excluded (orthographic projection).svg",
+      "coverPhotoFile": "Volubilis Longshot II.jpg"
+    },
+    "MCO": {
+      "locatorMapFile": "Monaco on the globe (Europe centered).svg",
+      "coverPhotoFile": "Panorama von Monaco-La Turbie.jpg"
+    },
+    "MDA": {
+      "locatorMapFile": "Location Moldova Europe.png",
+      "coverPhotoFile": "MoldRelief.jpg"
+    },
+    "MDG": {
+      "locatorMapFile": "MDG orthographic.svg",
+      "coverPhotoFile": "Satellite image of Madagascar in September 2003.jpg"
+    },
+    "MDV": {
+      "locatorMapFile": "Maldives (orthographic projection).svg",
+      "coverPhotoFile": null
+    },
+    "MEX": {
+      "locatorMapFile": "MEX orthographic.svg",
+      "coverPhotoFile": "Ciudad.de.Mexico.City.Distrito.Federal.DF.Paseo.Reforma.Skyline.jpg"
+    },
+    "MHL": {
+      "locatorMapFile": "Marshall Islands on the globe (small islands magnified) (Polynesia centered).svg",
+      "coverPhotoFile": "Marshall Islands - Location Map (2013) - MHL - UNOCHA.svg"
+    },
+    "MID": {
+      "locatorMapFile": "Midway Atoll in United States.svg",
+      "coverPhotoFile": "Midway Atoll aerial photo 2008.JPG"
+    },
+    "MKD": {
+      "locatorMapFile": "North Macedonia on the globe (Europe centered).svg",
+      "coverPhotoFile": "Map of the Republic of Macedonia-mk.svg"
+    },
+    "MLI": {
+      "locatorMapFile": "Mali (orthographic projection).svg",
+      "coverPhotoFile": "Mali - Location Map (2013) - MLI - UNOCHA.svg"
+    },
+    "MLT": {
+      "locatorMapFile": "EU-Malta.svg",
+      "coverPhotoFile": "Malta, 2010 - panoramio - Bengt Nyman (23).jpg"
+    },
+    "MMR": {
+      "locatorMapFile": "Myanmar on the globe (Myanmar centered).svg",
+      "coverPhotoFile": "@HaNgryBam.jpg"
+    },
+    "MNE": {
+      "locatorMapFile": "LocationMontenegro.svg",
+      "coverPhotoFile": "R-1 regional road (Montenegro) 07.jpg"
+    },
+    "MNG": {
+      "locatorMapFile": "Mongolia (orthographic projection).svg",
+      "coverPhotoFile": "Gurvger.jpg"
+    },
+    "MNP": {
+      "locatorMapFile": "Northern Mariana Islands in Oceania.svg",
+      "coverPhotoFile": null
+    },
+    "MOZ": {
+      "locatorMapFile": "Mozambique (orthographic projection).svg",
+      "coverPhotoFile": "Mozambique - Location Map (2013) - MOZ - UNOCHA.svg"
+    },
+    "MRT": {
+      "locatorMapFile": "LocationMauritania.svg",
+      "coverPhotoFile": "Flag map of Mauritania.svg"
+    },
+    "MSR": {
+      "locatorMapFile": "Montserrat in its region.svg",
+      "coverPhotoFile": "Plymouth City & Volcano.jpg"
+    },
+    "MTQ": {
+      "locatorMapFile": "Martinique-CIA WFB Map.png",
+      "coverPhotoFile": "Martinique 14.6346N 61.0051W Landsat7.jpg"
+    },
+    "MUS": {
+      "locatorMapFile": "Mauritius (orthographic projection with inset).svg",
+      "coverPhotoFile": "Mauritius 23.08.2009 11-42-31.jpg"
+    },
+    "MWI": {
+      "locatorMapFile": "LocationMalawi.svg",
+      "coverPhotoFile": "Malawi - Location Map (2013) - MWI - UNOCHA.svg"
+    },
+    "MYS": {
+      "locatorMapFile": "Malaysia (orthographic projection).svg",
+      "coverPhotoFile": null
+    },
+    "MYT": {
+      "locatorMapFile": "Mayotte (orthographic projection).svg",
+      "coverPhotoFile": "Mayotte, vue par Sentinel 2 (cropped).jpg"
+    },
+    "NAM": {
+      "locatorMapFile": "Namibia (orthographic projection).svg",
+      "coverPhotoFile": "Duna en Sossusvlei, Namibia, 2018-08-06, DD 002.jpg"
+    },
+    "NCL": {
+      "locatorMapFile": "New Caledonia in France (zoomed).svg",
+      "coverPhotoFile": "New Caledonia after the passage of tropical cyclone Niran.jpg"
+    },
+    "NER": {
+      "locatorMapFile": "LocationNiger.svg",
+      "coverPhotoFile": "Niger - Location Map (2011) - NER - UNOCHA.svg"
+    },
+    "NFK": {
+      "locatorMapFile": "Australia in its region (Norfolk Island special).svg",
+      "coverPhotoFile": "Dusk on Norfolk Island.jpg"
+    },
+    "NGA": {
+      "locatorMapFile": "Nigeria (orthographic projection).svg",
+      "coverPhotoFile": "The City Gate of Abuja.jpg"
+    },
+    "NHB": {
+      "locatorMapFile": "LocationVanuatu.png",
+      "coverPhotoFile": null
+    },
+    "NIC": {
+      "locatorMapFile": "Nicaragua (orthographic projection).svg",
+      "coverPhotoFile": "Кафедральный собор в Манагуа.jpg"
+    },
+    "NIU": {
+      "locatorMapFile": "Niue on the globe (small islands magnified) (Polynesia centered).svg",
+      "coverPhotoFile": "Niue ISS004.jpg"
+    },
+    "NLD": {
+      "locatorMapFile": "Kingdom of the Netherlands in its region (special marker).svg",
+      "coverPhotoFile": null
+    },
+    "NOR": {
+      "locatorMapFile": "Europe-Norway.svg",
+      "coverPhotoFile": null
+    },
+    "NPL": {
+      "locatorMapFile": "Nepal (orthographic projection).svg",
+      "coverPhotoFile": "Satellite image of Nepal in October 2002.jpg"
+    },
+    "NRU": {
+      "locatorMapFile": "Nauru on the globe (small islands magnified) (Polynesia centered).svg",
+      "coverPhotoFile": "Coral reef on Nauru.jpg"
+    },
+    "NZL": {
+      "locatorMapFile": "NZL orthographic.svg",
+      "coverPhotoFile": "New Zealand Topography.jpg"
+    },
+    "OMN": {
+      "locatorMapFile": "Oman (better) (orthographic projection).svg",
+      "coverPhotoFile": "Nakhal Fort Sultanate of Oman 001.jpg"
+    },
+    "PAK": {
+      "locatorMapFile": "Pakistan on the globe (de-facto and claimed hatched) (Afro-Eurasia centered).svg",
+      "coverPhotoFile": "Blue Hour at Pakistan Monument.jpg"
+    },
+    "PAN": {
+      "locatorMapFile": "PAN orthographic.svg",
+      "coverPhotoFile": "Panama flag.png"
+    },
+    "PCI": {
+      "locatorMapFile": "TTPI-locatormap.png",
+      "coverPhotoFile": null
+    },
+    "PCN": {
+      "locatorMapFile": "Pitcairn Islands on the globe (French Polynesia centered).svg",
+      "coverPhotoFile": "Stpaulspoint.jpg"
+    },
+    "PER": {
+      "locatorMapFile": "Peru (orthographic projection).svg",
+      "coverPhotoFile": "Cuarentena Lima (19 de marzo 2).jpg"
+    },
+    "PHL": {
+      "locatorMapFile": "Philippines on the globe (Philippines centered).svg",
+      "coverPhotoFile": null
+    },
+    "PLW": {
+      "locatorMapFile": "Palau on the globe (Southeast Asia centered) (small islands magnified).svg",
+      "coverPhotoFile": null
+    },
+    "PNG": {
+      "locatorMapFile": "Papua New Guinea (orthographic projection).svg",
+      "coverPhotoFile": "Papua New Guinea map.png"
+    },
+    "POL": {
+      "locatorMapFile": "Poland on the globe (Europe centered).svg",
+      "coverPhotoFile": "Warsaw Old Town Market Square 10.JPG"
+    },
+    "PRI": {
+      "locatorMapFile": "LocationPuertoRico.svg",
+      "coverPhotoFile": null
+    },
+    "PRK": {
+      "locatorMapFile": "LocationNorthKorea.svg",
+      "coverPhotoFile": "North Korea - Location Map (2013) - PRK - UNOCHA.svg"
+    },
+    "PRT": {
+      "locatorMapFile": "Portugal on the globe (Europe centered).svg",
+      "coverPhotoFile": "Carte du Portugal.png"
+    },
+    "PRY": {
+      "locatorMapFile": "PRY orthographic.svg",
+      "coverPhotoFile": null
+    },
+    "PSE": {
+      "locatorMapFile": "State of Palestine (orthographic projection).svg",
+      "coverPhotoFile": "Palestine - 20190204-DSC 0007.jpg"
+    },
+    "PYF": {
+      "locatorMapFile": "French Polynesia on the globe (French Polynesia centered).svg",
+      "coverPhotoFile": "Archipel des Tuamotu.jpg"
+    },
+    "QAT": {
+      "locatorMapFile": "QAT orthographic.svg",
+      "coverPhotoFile": "Skyline of Doha West Bay.jpg"
+    },
+    "REU": {
+      "locatorMapFile": "Département 974 in France.svg",
+      "coverPhotoFile": "L'île de la Réunion vue par le satellite Sentinel-2 (cropped).jpg"
+    },
+    "ROU": {
+      "locatorMapFile": "Romania on the globe (Europe centered).svg",
+      "coverPhotoFile": "Bucharest University Square (cropped).jpg"
+    },
+    "RUS": {
+      "locatorMapFile": "LocationRussia.svg",
+      "coverPhotoFile": "Kremlin Moscow.jpg"
+    },
+    "RWA": {
+      "locatorMapFile": "LocationRwanda.svg",
+      "coverPhotoFile": "An aerial of Kigali Convention Center on June 19, 2019. Photo by Emmanuel Kwizera.jpg"
+    },
+    "SAU": {
+      "locatorMapFile": "Saudi Arabia (orthographic projection).svg",
+      "coverPhotoFile": "Saudi Arabia - Location Map (2013) - SAU - UNOCHA.svg"
+    },
+    "SCG": {
+      "locatorMapFile": "Serbia and Montenegro.svg",
+      "coverPhotoFile": null
+    },
+    "SDN": {
+      "locatorMapFile": "Sudan (orthographic projection).svg",
+      "coverPhotoFile": "Western Deffufa - Kerma.jpg"
+    },
+    "SEN": {
+      "locatorMapFile": "LocationSenegal.svg",
+      "coverPhotoFile": "Flag map of Senegal.svg"
+    },
+    "SGP": {
+      "locatorMapFile": "Singapore on the globe (Southeast Asia centered) zoom.svg",
+      "coverPhotoFile": "Raffles Place.jpg"
+    },
+    "SGS": {
+      "locatorMapFile": "South Georgia and the South Sandwich Islands in United Kingdom.svg",
+      "coverPhotoFile": "South Georgia Island as seen by Sentinel-2.jpg"
+    },
+    "SHN": {
+      "locatorMapFile": "Saint Helena, Ascension and Tristan da Cunha in its region.svg",
+      "coverPhotoFile": "SH-St Helena.png"
+    },
+    "SJM": {
+      "locatorMapFile": "Svalbard and Jan Mayen in the world (W3).svg",
+      "coverPhotoFile": null
+    },
+    "SLB": {
+      "locatorMapFile": "Solomon Islands on the globe (Oceania centered).svg",
+      "coverPhotoFile": "Solomon Islands - Location Map (2012) - SLB - UNOCHA.svg"
+    },
+    "SLE": {
+      "locatorMapFile": "Sierra Leone (orthographic projection).svg",
+      "coverPhotoFile": "Sierra Leone-Mappa.gif"
+    },
+    "SLV": {
+      "locatorMapFile": "Orthographic Map of El Salvador.svg",
+      "coverPhotoFile": "ES JoyadeCeren 06 2011 Estructura 9 Area 2 Tamazcal 2106 zoom out.jpg"
+    },
+    "SMR": {
+      "locatorMapFile": "Location San Marino Europe.svg",
+      "coverPhotoFile": "View of Mount Titano - San Marino.jpg"
+    },
+    "SOM": {
+      "locatorMapFile": "Somalia (orthographic projection)2.svg",
+      "coverPhotoFile": "A man carries a huge hammerhead through the streets of Mogadishu.jpg"
+    },
+    "SPM": {
+      "locatorMapFile": "Saint Pierre and Miquelon in France.svg",
+      "coverPhotoFile": "Saint-PierreEtMiquelonFromTheISS.jpg"
+    },
+    "SRB": {
+      "locatorMapFile": "Europe-Serbia (2006–2008).svg",
+      "coverPhotoFile": null
+    },
+    "SSD": {
+      "locatorMapFile": "LocationSouthSudan.svg",
+      "coverPhotoFile": "South Sudan topographic map.svg"
+    },
+    "STP": {
+      "locatorMapFile": "Sao Tome and Principe on the globe (Africa centered).svg",
+      "coverPhotoFile": "São Tomé and Príncipe administrative divisions+location in Africa.svg"
+    },
+    "SUN": {
+      "locatorMapFile": "Soviet Union on the globe (Soviet Union centered).svg",
+      "coverPhotoFile": null
+    },
+    "SUR": {
+      "locatorMapFile": "Suriname1991 Karte umstrittene Gebiete.jpg",
+      "coverPhotoFile": null
+    },
+    "SVK": {
+      "locatorMapFile": "EU-Slovakia.svg",
+      "coverPhotoFile": "000 Sllovakia harta.PNG"
+    },
+    "SVN": {
+      "locatorMapFile": "EU-Slovenia.svg",
+      "coverPhotoFile": "SLO — Ljubljana (Blick auf Burg) 2020.JPG"
+    },
+    "SWE": {
+      "locatorMapFile": "Sweden on the globe (Europe centered).svg",
+      "coverPhotoFile": "Sweden - Location Map (2013) - SWE - UNOCHA.svg"
+    },
+    "SWZ": {
+      "locatorMapFile": "Location Eswatini.png",
+      "coverPhotoFile": null
+    },
+    "SXM": {
+      "locatorMapFile": "Sint Maarten on the globe (Americas centered).svg",
+      "coverPhotoFile": "Philipsburg and the Great Bay, Sint Maarten, Caribbean.jpg"
+    },
+    "SYC": {
+      "locatorMapFile": "SYC orthographic.svg",
+      "coverPhotoFile": "Grand Anse-La Digue-Seychellen.jpg"
+    },
+    "SYR": {
+      "locatorMapFile": "Syria (orthographic projection).svg",
+      "coverPhotoFile": "Damascus, Syria, Panoramic view of Damascus.jpg"
+    },
+    "TCA": {
+      "locatorMapFile": "Turks and Caicos Islands in its region.svg",
+      "coverPhotoFile": "Caribbean Luxury (5182090833).jpg"
+    },
+    "TCD": {
+      "locatorMapFile": "TCD orthographic.svg",
+      "coverPhotoFile": null
+    },
+    "TGO": {
+      "locatorMapFile": "Togo on the globe (Africa centered).svg",
+      "coverPhotoFile": "Kpalime.jpg"
+    },
+    "THA": {
+      "locatorMapFile": "Thailand (orthographic projection).svg",
+      "coverPhotoFile": "Temple of the Emerald of buddha or Wat Phra Kaew (cropped).jpg"
+    },
+    "TJK": {
+      "locatorMapFile": "Tajikistan (orthographic projection).svg",
+      "coverPhotoFile": "Tajikistan - Location Map (2013) - TJK - UNOCHA.svg"
+    },
+    "TKL": {
+      "locatorMapFile": "LocationTokelau.png",
+      "coverPhotoFile": "Landscape-tokelau-2011-photo-new-zealand-ministry-of-foreign-affairs-and-trade 12779814375 o.jpg"
+    },
+    "TKM": {
+      "locatorMapFile": "Turkmenistan on the globe (Turkmenistan centered).svg",
+      "coverPhotoFile": "Historical turkmen wedding of the bride.jpg"
+    },
+    "TLS": {
+      "locatorMapFile": "Timor Leste (orthographic projection).svg",
+      "coverPhotoFile": "Lospalos klein.jpg"
+    },
+    "TON": {
+      "locatorMapFile": "Tonga on the globe (small islands magnified) (Polynesia centered).svg",
+      "coverPhotoFile": null
+    },
+    "TTO": {
+      "locatorMapFile": "Trinidad and Tobago (orthographic projection).svg",
+      "coverPhotoFile": "Pigeon Point beach.jpg"
+    },
+    "TUN": {
+      "locatorMapFile": "Tunisia (orthographic projection).svg",
+      "coverPhotoFile": "Tunisia - Location Map (2013) - TUN - UNOCHA.svg"
+    },
+    "TUR": {
+      "locatorMapFile": "Turkey (orthographic projection).svg",
+      "coverPhotoFile": "Ankara (16290014657).jpg"
+    },
+    "TUV": {
+      "locatorMapFile": "Tuvalu in its region.svg",
+      "coverPhotoFile": "Nui atoll.jpg"
+    },
+    "TWN": {
+      "locatorMapFile": "Locator map of the ROC Taiwan.svg",
+      "coverPhotoFile": "Taipei Night Skyline from Hongludi 20240113.jpg"
+    },
+    "TZA": {
+      "locatorMapFile": "Tanzania (orthographic projection).svg",
+      "coverPhotoFile": "Tanzania - Location Map (2013) - TZA - UNOCHA.svg"
+    },
+    "UGA": {
+      "locatorMapFile": "Uganda (orthographic projection).svg",
+      "coverPhotoFile": "Uganda - Location Map (2013) - UGA - UNOCHA.svg"
+    },
+    "UKR": {
+      "locatorMapFile": "Ukraine (orthographic projection).svg",
+      "coverPhotoFile": "Maidan Nezalezhnosti view.jpg"
+    },
+    "UMI": {
+      "locatorMapFile": "United States Minor Outlying Island in Oceania (small islands magnified).svg",
+      "coverPhotoFile": null
+    },
+    "URY": {
+      "locatorMapFile": "URY orthographic.svg",
+      "coverPhotoFile": "Uruguay - Location Map (2013) - URY - UNOCHA.svg"
+    },
+    "USA": {
+      "locatorMapFile": "United States - Location Map (2013) - USA - UNOCHA.svg",
+      "coverPhotoFile": "United States - Location Map (2013) - USA - UNOCHA.svg"
+    },
+    "UZB": {
+      "locatorMapFile": "UZB orthographic.svg",
+      "coverPhotoFile": "Uzbekistan - Location Map (2011) - UZB - UNOCHA.svg"
+    },
+    "VAT": {
+      "locatorMapFile": "Location of the Vatican City in Europe.svg",
+      "coverPhotoFile": "0 Basilique Saint-Pierre - Rome (1).JPG"
+    },
+    "VCT": {
+      "locatorMapFile": "VCT orthographic.svg",
+      "coverPhotoFile": "ISS006-E-38029 - View of the Lesser Antilles.jpg"
+    },
+    "VEN": {
+      "locatorMapFile": "VEN orthographic.svg",
+      "coverPhotoFile": "Embalse la Vueltosa 2022.jpg"
+    },
+    "VGB": {
+      "locatorMapFile": "British Virgin Islands on the globe (Americas centered).svg",
+      "coverPhotoFile": "British Virgin Islands.jpg"
+    },
+    "VIR": {
+      "locatorMapFile": "United States Virgin Islands on the globe (Americas centered).svg",
+      "coverPhotoFile": "St. John, U.S. Virgin Islands.jpg"
+    },
+    "VNM": {
+      "locatorMapFile": "Vietnam on the globe (Asia centered).svg",
+      "coverPhotoFile": "Hanoi Temple of Literature.jpg"
+    },
+    "VUT": {
+      "locatorMapFile": "Vanuatu on the globe (Polynesia centered).svg",
+      "coverPhotoFile": "Satellite image of Vanuatu in October 1998.jpg"
+    },
+    "WLF": {
+      "locatorMapFile": "Wallis and Futuna in France (zoomed).svg",
+      "coverPhotoFile": null
+    },
+    "WSM": {
+      "locatorMapFile": "Samoa on the globe (small islands magnified) (Polynesia centered).svg",
+      "coverPhotoFile": "Beach on Upolu Island, Samoa, 2009.jpg"
+    },
+    "XKS": {
+      "locatorMapFile": "Europe-Republic of Kosovo.svg",
+      "coverPhotoFile": "Gebäude der UNMIK NEW BORN SIGN PRISTINA KOSOVO Giv Owned Image 23 August 2008.jpg"
+    },
+    "YEM": {
+      "locatorMapFile": "Yemen (orthographic projection).svg",
+      "coverPhotoFile": "MallaDistrict.jpg"
+    },
+    "YUG": {
+      "locatorMapFile": "Yugoslavia 1956-1990.svg",
+      "coverPhotoFile": "MapaSrbijeiCrneGore.JPG"
+    },
+    "ZAF": {
+      "locatorMapFile": "LocationSouthAfrica.svg",
+      "coverPhotoFile": "South Africa - Location Map (2013) - ZAF - UNOCHA.svg"
+    },
+    "ZMB": {
+      "locatorMapFile": "Zambia (orthographic projection).svg",
+      "coverPhotoFile": "Zambia - Location Map (2011) - ZMB - UNOCHA.svg"
+    },
+    "ZWE": {
+      "locatorMapFile": "LocationZimbabwe.svg",
+      "coverPhotoFile": "Zimbabwe - Location Map (2013) - ZWE - UNOCHA.svg"
+    }
+  }
+}

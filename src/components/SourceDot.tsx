@@ -25,6 +25,7 @@ const SOURCE_NAMES: Record<string, string> = {
   rsf_press_freedom: "RSF Press Freedom",
   world_happiness: "World Happiness Report",
   unodc: "UNODC",
+  civica_curated: "Civica curated data",
   // Phase 5.5 — Pulse Beta sources
   acled: "ACLED",
   civicus_monitor: "CIVICUS Monitor",
@@ -64,6 +65,7 @@ export function SourceDot({
       data-source={label}
       data-date={date}
       role="img"
+      tabIndex={0}
       aria-label={`Source: ${label}, ${date}`}
     />
   );

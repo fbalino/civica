@@ -1,8 +1,12 @@
-interface FactbookField {
-  label: string;
-  value: string;
-  subfields?: FactbookField[];
-}
+// Discriminated union of factbook fields.
+//
+// A "leaf" is a key that resolves to a renderable string value.
+// A "group" is a key whose value is a nested object — its children
+// are rendered as a subsection (heading + nested rows), NOT as a row
+// with an empty value above its indented children.
+export type FactbookField =
+  | { kind: "leaf"; label: string; value: string }
+  | { kind: "group"; label: string; children: FactbookField[] };
 
 function extractText(v: unknown): string {
   if (v === null || v === undefined) return "";
@@ -28,14 +32,14 @@ export function jsonbToFields(data: unknown, maxDepth = 3): FactbookField[] {
     const directText = extractText(value);
 
     if (directText) {
-      fields.push({ label: key, value: directText });
+      fields.push({ kind: "leaf", label: key, value: directText });
       continue;
     }
 
     if (typeof value === "object" && !Array.isArray(value)) {
-      const subfields = jsonbToFields(value, maxDepth - 1);
-      if (subfields.length > 0) {
-        fields.push({ label: key, value: "", subfields });
+      const children = jsonbToFields(value, maxDepth - 1);
+      if (children.length > 0) {
+        fields.push({ kind: "group", label: key, children });
       }
       continue;
     }
@@ -43,7 +47,7 @@ export function jsonbToFields(data: unknown, maxDepth = 3): FactbookField[] {
     if (Array.isArray(value)) {
       const items = value.map(extractText).filter(Boolean);
       if (items.length > 0) {
-        fields.push({ label: key, value: items.join(", ") });
+        fields.push({ kind: "leaf", label: key, value: items.join(", ") });
       }
     }
   }

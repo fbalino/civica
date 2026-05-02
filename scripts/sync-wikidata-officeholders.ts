@@ -256,7 +256,37 @@ async function upsertTerm(
   personId: string,
   startDate: string | null
 ) {
-  // Mark previous terms as not current
+  // 1. If a term already exists for this (officeId, personId, startDate),
+  //    just make sure it's marked current. Without this guard, every sync
+  //    run was inserting a fresh duplicate row — that's how Nigeria ended
+  //    up with 16 Tinubu rows (8 sync runs × 2 offices). See
+  //    .claude/rules/memory-decisions.md for the data-cleanup note.
+  const existing = await db
+    .select({ id: terms.id, isCurrent: terms.isCurrent })
+    .from(terms)
+    .where(
+      sql`${terms.officeId} = ${officeId} AND ${terms.personId} = ${personId} AND ${terms.startDate} IS NOT DISTINCT FROM ${startDate}`
+    )
+    .limit(1);
+
+  // 2. Mark every other term on this office as not current — the new one
+  //    (or the existing match) is the only current incumbent.
+  if (existing.length > 0) {
+    await db
+      .update(terms)
+      .set({ isCurrent: false })
+      .where(
+        sql`${terms.officeId} = ${officeId} AND ${terms.id} <> ${existing[0].id} AND ${terms.isCurrent} = true`
+      );
+    if (!existing[0].isCurrent) {
+      await db
+        .update(terms)
+        .set({ isCurrent: true })
+        .where(eq(terms.id, existing[0].id));
+    }
+    return;
+  }
+
   await db
     .update(terms)
     .set({ isCurrent: false })
@@ -269,6 +299,48 @@ async function upsertTerm(
     personId,
     startDate,
     isCurrent: true,
+  });
+}
+
+async function upsertStatement(
+  personId: string,
+  predicate: string,
+  objectValue: string,
+  stateQid: string
+) {
+  // Same pattern as upsertTerm — without this guard the statements table
+  // accumulated 8× duplicates per officeholder across sync runs.
+  const existing = await db
+    .select({ id: statements.id })
+    .from(statements)
+    .where(
+      sql`${statements.subjectTable} = ${"terms"} AND ${statements.subjectId} = ${personId} AND ${statements.predicate} = ${predicate}`
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db
+      .update(statements)
+      .set({
+        objectValue,
+        sourceId: "wikidata",
+        sourceUrl: `https://www.wikidata.org/wiki/${stateQid}`,
+        sourceLicense: "CC0",
+        retrievedAt: new Date(),
+      })
+      .where(eq(statements.id, existing[0].id));
+    return;
+  }
+
+  await db.insert(statements).values({
+    subjectTable: "terms",
+    subjectId: personId,
+    predicate,
+    objectValue,
+    sourceId: "wikidata",
+    sourceUrl: `https://www.wikidata.org/wiki/${stateQid}`,
+    sourceLicense: "CC0",
+    retrievedAt: new Date(),
   });
 }
 
@@ -331,17 +403,7 @@ async function main() {
         "head_of_state"
       );
       await upsertTerm(officeId, personId, hosStart);
-
-      await db.insert(statements).values({
-        subjectTable: "terms",
-        subjectId: personId,
-        predicate: "head_of_state",
-        objectValue: hosName,
-        sourceId: "wikidata",
-        sourceUrl: `https://www.wikidata.org/wiki/${stateQid}`,
-        sourceLicense: "CC0",
-        retrievedAt: new Date(),
-      });
+      await upsertStatement(personId, "head_of_state", hosName, stateQid);
     }
 
     // Head of Government
@@ -357,17 +419,7 @@ async function main() {
         "head_of_government"
       );
       await upsertTerm(officeId, personId, hogStart);
-
-      await db.insert(statements).values({
-        subjectTable: "terms",
-        subjectId: personId,
-        predicate: "head_of_government",
-        objectValue: hogName,
-        sourceId: "wikidata",
-        sourceUrl: `https://www.wikidata.org/wiki/${stateQid}`,
-        sourceLicense: "CC0",
-        retrievedAt: new Date(),
-      });
+      await upsertStatement(personId, "head_of_government", hogName, stateQid);
     }
 
     synced++;

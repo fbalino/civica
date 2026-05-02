@@ -41,6 +41,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Claude Code per-checkout state (worktrees, plans). Keep launch.json
+# committed since it documents the dev server, but ignore everything
+# under worktrees/ which is just transient agent isolation copies.
+.claude/worktrees/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
