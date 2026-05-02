@@ -3,54 +3,83 @@ config({ path: ".env.local" });
 
 import { createDb, runIngestion } from "../src/lib/ci/ingest";
 import type { SourceDataRecord, IngestionResult } from "../src/lib/ci/types";
+import {
+  buildIso3ByCountryName,
+  DEFAULT_CI_DATASET_YEAR,
+  fetchBuffer,
+  minMax,
+  normalizeCountryName,
+  rowsToObjects,
+  toNumber,
+  xlsxSheetRows,
+} from "../src/lib/ci/source-utils";
 
 const db = createDb();
 
 const SOURCE_ID = "freedom_house";
 const DIMENSION = "freedom_rights" as const;
-const INDICATOR = "total";
-
-// Freedom House Freedom in the World 2023: Freedom Rating scale 1-7, INVERTED (1 = most free, 7 = least free)
-// In production, download from https://freedomhouse.org/report/freedom-world (CSV/XLS)
-// Reference values are Freedom in the World 2023 country ratings (political rights + civil liberties averaged)
-const FH_2023: Record<string, number> = {
-  DNK: 1.0, NOR: 1.0, SWE: 1.0, FIN: 1.0, CHE: 1.0,
-  NZL: 1.0, NLD: 1.0, DEU: 1.0, CAN: 1.0, IRL: 1.0,
-  AUS: 1.0, AUT: 1.0, GBR: 1.0, BEL: 1.0, FRA: 1.0,
-  ESP: 1.0, JPN: 1.5, ISR: 1.5, CZE: 1.5, ITA: 1.5,
-  USA: 2.0, KOR: 2.0, CHL: 2.0, ARG: 2.0, GRC: 2.0,
-  BRA: 2.5, ZAF: 2.5, POL: 2.5, UKR: 3.0, IND: 3.0,
-  IDN: 3.0, COL: 3.5, MEX: 3.5, KEN: 3.5, PHL: 3.5,
-  SGP: 4.0, MOZ: 4.5, NGA: 4.5, PAK: 4.5, BGD: 4.5,
-  TUR: 5.0, THA: 5.0, HKG: 5.5, RUS: 6.5, ETH: 6.5,
-  VNM: 6.5, VEN: 6.5, CHN: 6.5, EGY: 6.0, SAU: 7.0,
-  SYR: 7.0, SSD: 7.0,
-};
+const INDICATOR = "pr_cl_total";
+const DATA_URL =
+  process.env.FREEDOM_HOUSE_FIW_XLSX_URL ??
+  "https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx";
 
 async function main() {
-  console.log("Ingesting Freedom House Freedom in the World ratings...\n");
+  const datasetYear = DEFAULT_CI_DATASET_YEAR;
+  console.log(`Ingesting Freedom House Freedom in the World (${datasetYear})...\n`);
 
-  const records: SourceDataRecord[] = Object.entries(FH_2023).map(
-    ([iso3, rawValue]) => ({
-      iso3,
-      year: 2023,
-      dimension: DIMENSION,
-      indicator: INDICATOR,
-      rawValue,
-      nativeMin: 1,
-      nativeMax: 7,
-      isInverted: true,
-    })
+  const buffer = await fetchBuffer(DATA_URL);
+  const rows = rowsToObjects(
+    xlsxSheetRows(buffer, "FIW06-24"),
+    (row) => row.includes("Country/Territory") && row.includes("Edition"),
   );
+  const iso3ByName = await buildIso3ByCountryName(db);
+  const unmatched = new Set<string>();
 
-  const values = records.map((r) => r.rawValue);
+  const records: SourceDataRecord[] = rows.flatMap((row) => {
+    if (Number(row.Edition) !== datasetYear) return [];
+    if ((row["C/T?"] ?? "").toLowerCase() !== "c") return [];
+
+    const countryName = row["Country/Territory"]?.trim();
+    const pr = toNumber(row["PR Rating"]);
+    const cl = toNumber(row["CL Rating"]);
+    if (!countryName || pr === null || cl === null) return [];
+
+    const iso3 = iso3ByName.get(normalizeCountryName(countryName));
+    if (!iso3) {
+      unmatched.add(countryName);
+      return [];
+    }
+
+    return [
+      {
+        iso3,
+        year: datasetYear,
+        dimension: DIMENSION,
+        indicator: INDICATOR,
+        rawValue: pr + cl,
+        nativeMin: 2,
+        nativeMax: 14,
+        isInverted: true,
+      },
+    ];
+  });
+
+  if (unmatched.size > 0) {
+    console.warn(
+      `Unmatched Freedom House country names (${unmatched.size}): ${[
+        ...unmatched,
+      ].join(", ")}`,
+    );
+  }
+
+  const { min, max } = minMax(records.map((r) => r.rawValue));
   const result: IngestionResult = {
     sourceId: SOURCE_ID,
     dimension: DIMENSION,
-    datasetYear: 2023,
+    datasetYear,
     records,
-    globalMinObserved: Math.min(...values),
-    globalMaxObserved: Math.max(...values),
+    globalMinObserved: min,
+    globalMaxObserved: max,
   };
 
   const { ingested, skipped } = await runIngestion(db, result);

@@ -1,8 +1,9 @@
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { sql as dsql } from "drizzle-orm";
+import { eq, sql as dsql } from "drizzle-orm";
 import {
   jurisdictions,
+  sources,
   ciSourceIngestions,
   ciDimensionScores,
   ciMethodologyVersions,
@@ -126,6 +127,11 @@ export async function runIngestion(
 
     ingested++;
   }
+
+  await db
+    .update(sources)
+    .set({ lastSyncAt: new Date() })
+    .where(eq(sources.id, result.sourceId));
 
   return { ingested, skipped };
 }
