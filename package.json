@@ -16,6 +16,7 @@
     "seed:ci-methodology:beta": "tsx scripts/seed-ci-methodology-beta.ts",
     "calculate:ci:v2": "tsx scripts/calculate-ci-v2.ts",
     "report:ci:divergence": "tsx scripts/divergence-report-ci-v2.ts",
+    "ingest:ci:wgi-democracy-fallback": "tsx scripts/ingest-ci-wgi-democracy-fallback.ts",
     "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
     "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
