@@ -49,6 +49,7 @@
     "sync:factbook:vdem-row": "tsx scripts/sync-factbook-vdem-row.ts",
     "sync:factbook:monarchy": "tsx scripts/sync-factbook-monarchy-status.ts",
     "sync:factbook:classifications": "npm run sync:factbook:wb-classifications && npm run sync:factbook:vdem-row && npm run sync:factbook:monarchy",
+    "sync:factbook:wdi": "tsx scripts/sync-factbook-worldbank-wdi.ts",
     "snapshot:fact-vintage": "tsx scripts/snapshot-fact-vintage.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts"

@@ -16,6 +16,7 @@
     { "path": "/api/cron/bills/fr", "schedule": "30 5 * * *" },
     { "path": "/api/cron/factbook/sync-wikidata", "schedule": "0 6 1 1,4,7,10 *" },
     { "path": "/api/cron/factbook/refresh-cache", "schedule": "30 6 * * *" },
-    { "path": "/api/cron/factbook/sync-classifications", "schedule": "0 7 15 7 *" }
+    { "path": "/api/cron/factbook/sync-classifications", "schedule": "0 7 15 7 *" },
+    { "path": "/api/cron/factbook/sync-wdi", "schedule": "0 8 2 1,4,7,10 *" }
   ]
 }
