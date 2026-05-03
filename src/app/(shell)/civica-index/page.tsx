@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getCIRankings } from "@/lib/db/queries";
 import { CountryFlag } from "@/components/CountryFlag";
 import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
+import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 
 export const metadata: Metadata = {
   title: "Civica Index — Global Governance Rankings",
@@ -234,6 +235,10 @@ export default async function CivicaIndexShellPage({
                   const tier = ciTier(r.score ?? 0);
                   const isTop3 = r.rank <= 3;
                   const govClass = govBadgeClass(r.governmentType);
+                  const cachedPopulation = readCachedFieldFromRow(
+                    r,
+                    "population_total",
+                  );
                   return (
                     <Link
                       key={r.jurisdictionId}
@@ -258,7 +263,9 @@ export default async function CivicaIndexShellPage({
                             {shortGovLabel(r.governmentType)}
                           </span>
                           {r.continent ?? ""}
-                          {r.population ? ` · ${formatPop(r.population)}` : ""}
+                          {cachedPopulation
+                            ? ` · ${formatPop(cachedPopulation)}`
+                            : ""}
                         </div>
                       </div>
 

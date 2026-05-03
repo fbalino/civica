@@ -17,6 +17,7 @@ import {
 } from "@/lib/db/schema";
 import { formatGovernmentDisplay } from "@/lib/text/clean";
 import { resolvePartyColor } from "@/lib/data/party-colors";
+import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import type {
   CountryFactSource,
   CountryFactValue,
@@ -540,8 +541,14 @@ async function _loadAtlasData(): Promise<{
     const heads = headsByJurisdiction.get(j.id) ?? {};
 
     const factText = (key: string) => facts.get(key)?.factValue ?? null;
+    const cachedArea = readCachedFieldFromRow(j, "area_total_km2");
+    const cachedCapital = readCachedFieldFromRow(j, "capital");
+    const cachedLanguages = readCachedFieldFromRow(j, "official_languages");
+    const cachedCurrency = readCachedFieldFromRow(j, "currency_code");
+    const cachedPopulation = readCachedFieldFromRow(j, "population_total");
+    const cachedGdpBillions = readCachedFieldFromRow(j, "gdp_ppp_usd_billions");
     const area =
-      formatArea(j.areaSqKm) ??
+      formatArea(cachedArea) ??
       formatArea(Math.round(facts.get("total_area")?.factValueNumeric ?? 0)) ??
       factText("total_area");
     const exportsValue = facts.get("exports_total")?.factValueNumeric;
@@ -568,16 +575,16 @@ async function _loadAtlasData(): Promise<{
         heads.headOfGovernment ?? null,
         wikidataSource
       ),
-      capital: sourceWithValue(j.capital, ciaSource),
-      language: sourceWithValue(j.languages ?? factText("languages"), ciaSource),
-      currency: sourceWithValue(formatCurrency(j.currency), ciaSource),
+      capital: sourceWithValue(cachedCapital, ciaSource),
+      language: sourceWithValue(cachedLanguages ?? factText("languages"), ciaSource),
+      currency: sourceWithValue(formatCurrency(cachedCurrency), ciaSource),
       region: sourceWithValue(
         CONTINENT_TO_REGION[j.continent || ""] || j.continent || null,
         ciaSource
       ),
       area: sourceWithValue(area, ciaSource),
-      population: sourceWithValue(formatPop(j.population), ciaSource),
-      gdpPpp: sourceWithValue(formatGdp(j.gdpBillions), ciaSource),
+      population: sourceWithValue(formatPop(cachedPopulation), ciaSource),
+      gdpPpp: sourceWithValue(formatGdp(cachedGdpBillions), ciaSource),
       mainExport: sourceWithValue(
         formatCommodityList(factText("export_commodities")),
         ciaSource
@@ -635,9 +642,9 @@ async function _loadAtlasData(): Promise<{
       gov: government.label,
       govDetail: government.detail ?? undefined,
       region: CONTINENT_TO_REGION[j.continent || ""] || j.continent || "—",
-      pop: formatPop(j.population),
-      gdp: formatGdp(j.gdpBillions),
-      capital: j.capital || "—",
+      pop: formatPop(cachedPopulation),
+      gdp: formatGdp(cachedGdpBillions),
+      capital: cachedCapital || "—",
       iso3: j.iso3!,
       featured: TOP_COUNTRIES.has(j.iso3!.toUpperCase()),
       masthead,

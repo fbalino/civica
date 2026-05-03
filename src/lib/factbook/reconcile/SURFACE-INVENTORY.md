@@ -34,21 +34,21 @@ Per methodology §1.0 + schema §11:
 | Surface | File(s) | Disposition | Status | Notes |
 |---|---|---|---|---|
 | Atlas masthead | `src/components/atlas/CountryMasthead.tsx`, `src/app/(shell)/atlas/[slug]/[tab]/page.tsx`, `src/components/atlas/AtlasCountryShellClient.tsx`, `src/components/atlas/AtlasCountryCenter.tsx` | R | ✓ migrated 2026-05-02 | Population + GDP rows render `<FactValueDot>` (clickable alternates panel) when resolver data is present; falls back to plain `<SourceDot>` otherwise. `headerFacts` prop threads through page → ShellClient → Center → Masthead. |
-| Atlas world-map hover | `src/components/atlas/AtlasWorldMap.tsx`, `src/lib/atlas/load-atlas-data.ts` | C | pending F.4 | Hover tooltip; no provenance UI |
-| Atlas compare picker | `src/app/(shell)/atlas/compare/page.tsx` | C | pending F.4 | List-shaped; per-row SourceDots can fetch lazily |
-| Civica-index landing leaderboard | `src/app/(shell)/civica-index/page.tsx` | C | pending F.4 | List rows; main scoring surface |
+| Atlas world-map hover | `src/components/atlas/AtlasWorldMap.tsx`, `src/lib/atlas/load-atlas-data.ts` | C | ✓ migrated 2026-05-02 | `load-atlas-data.ts` reads cached fields via `readCachedFieldFromRow(j, factKey)` for capital/languages/currency/population/gdp/area; `AtlasWorldMap.tsx` itself only consumes the typed `AtlasCountry` shape and required no changes. |
+| Atlas compare picker | `src/app/(shell)/atlas/compare/page.tsx` | C | ✓ migrated 2026-05-02 | Page consumes `loadAtlasData()` output (already migrated above); no direct cached-column reads at this surface. |
+| Civica-index landing leaderboard | `src/app/(shell)/civica-index/page.tsx` | C | ✓ migrated 2026-05-02 | Leaderboard row population read swapped to `readCachedFieldFromRow(r, "population_total")`. |
 | Civica-index country detail | `src/app/(shell)/civica-index/[slug]/page.tsx` | R | ✓ migrated 2026-05-02 | Hero meta strip (capital + population) and right-panel meta-grid (Capital + Population rows) render `<FactValueDot>` inline when resolver returns canonical data; degrade to plain text otherwise. Resolver canonical takes precedence over `jurisdictions` cache (consistent with public API contract). Capital currently has no canonical rows across countries — graceful degradation verified. |
 | Factbook header strip | `src/components/factbook/FactbookHeaderStrip.tsx` (verify name) | R | pending F.4 | Carries SourceDots |
 | Factbook structured sections | `src/components/FactbookSection.tsx`, `src/components/factbook/*` | R | pending F.4 | Per-field SourceDots |
 | Legacy `/countries/[slug]` | `src/app/(reader)/countries/[slug]/page.tsx` and subroutes | R | pending F.4 | Still live; gets the same upgrade |
 | Compare page overview | `src/components/compare/CompareOverview.tsx` | R | pending F.4 | Per-country fact comparisons |
 | Embed widget | `src/app/embed/[slug]/route.ts` | R | pending F.4 | Citation-bearing public widget |
-| Government-types listing | `src/app/government-types/page.tsx`, `src/app/government-types/[type]/page.tsx` | C | pending F.4 | Aggregate listing; no per-row SourceDots |
+| Government-types listing | `src/app/government-types/page.tsx`, `src/app/government-types/[type]/page.tsx` | C | n/a — surface archived 2026-05-02 | Pages deleted in `structural_family` removal Phase 3d; `next.config.ts` now 308-redirects `/government-types` and `/government-types/:type` to `/civica-index/methodology/peer-grouping`. No live traffic to migrate. |
 | Public API `/api/v1/countries/[code]` | `src/app/api/v1/countries/[code]/route.ts` | R | ✓ migrated 2026-05-02 | Response gains 5 new top-level classification fields (`worldBankRegion`, `worldBankIncomeGroup`, `vdemRow`, `monarchyStatus`, `governmentFormDescription`), a `provenance` block keyed by flat field name with `factKey` cross-reference + `alternates[]`, and a `meta.reconciliation` envelope (`{status, version, reference, vintage}`). Existing flat fields preserved for back-compat; resolver canonical takes precedence over `jurisdictions` cache when present. |
-| Public API `/api/v1/countries/` | `src/app/api/v1/countries/route.ts` | C | pending F.4 | List endpoint; provenance available via per-country detail call |
+| Public API `/api/v1/countries/` | `src/app/api/v1/countries/route.ts` | C | ✓ migrated 2026-05-02 | Both branches of the list query now project the cached fact columns through `cachedJurisdictionColumns` from `src/lib/factbook/reconcile/api.ts` (capital, population, gdpBillions, areaSqKm). Wire shape unchanged; consumers wanting provenance still go to `/api/v1/countries/[code]`. |
 | Country export route | `src/app/api/countries/[slug]/export/route.ts` | R | pending F.4 | Citation-bearing |
-| Global search snippet | `src/components/GlobalSearch.tsx`, `GlobalSearchWrapper.tsx` | C | pending F.4 | Snippets only; no SourceDots |
-| `/about` stat callouts | `src/app/about/page.tsx` | C | pending F.4 | Static-feel stats; staleness fine |
+| Global search snippet | `src/components/GlobalSearch.tsx`, `GlobalSearchWrapper.tsx` | C | ✓ migrated 2026-05-02 | `GlobalSearchWrapper` reads `capital` via `readCachedFieldFromRow(c, "capital")` when projecting jurisdictions into the snippet shape. The client component itself only consumes typed snippet props and required no changes. |
+| `/about` stat callouts | `src/app/about/page.tsx` | C | n/a — no in-scope reads | The current `/about` page reads only the `sources` table for source-card listings; it does not surface population/GDP/capital/etc. No migration required at this revision. |
 
 ## Pre-existing data quality issues to fix in F.4
 

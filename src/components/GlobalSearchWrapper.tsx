@@ -1,4 +1,5 @@
 import { getAllJurisdictions } from "@/lib/db/queries";
+import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import { GlobalSearch } from "./GlobalSearch";
 
 export async function GlobalSearchWrapper() {
@@ -9,7 +10,7 @@ export async function GlobalSearchWrapper() {
       slug: c.slug,
       name: c.name,
       iso2: c.iso2,
-      capital: c.capital,
+      capital: readCachedFieldFromRow(c, "capital"),
     }));
   } catch {}
 
