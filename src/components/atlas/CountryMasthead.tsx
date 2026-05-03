@@ -56,12 +56,12 @@ import type { AtlasHeaderFacts } from "./AtlasCountryShellClient";
  * 3. Memberships (clickable chips → International tab) + Quick compare
  *    typeahead search
  *
- * A "+" toggle to the left of the grid expands to a 5-column layout
- * adding two extra columns:
- * 4. History & culture (founded, constitution, last election,
- *    religion, literacy, olympics)
- * 5. Identifiers (calling code, TLD, time zone, ISO, drives-on,
- *    anthem, national day)
+ * A "+" toggle to the left of the grid expands a second row below the
+ * primary facts:
+ * 4. History & culture (founded, constitution, last election, religion,
+ *    literacy, olympics)
+ * 5. Identifiers (calling code, TLD, time zone, ISO, drives-on, anthem,
+ *    national day)
  *
  * Every value shown here must be source-backed or rendered as "No source".
  * The previous Phase A demo generator was removed because generated facts
@@ -88,7 +88,8 @@ function Fact({
   resolverFactLabel?: string;
 }) {
   const fallbackValue = fallback && fallback !== "—" ? fallback : null;
-  const value = fact?.value ?? fallbackValue;
+  const rawValue = fact?.value ?? fallbackValue;
+  const value = formatFactDisplay(rawValue);
   const source = value ? fact?.source : undefined;
   const displayValue = value ?? "No source";
   const isMissing = !value;
@@ -138,6 +139,35 @@ function Fact({
       )}
     </div>
   );
+}
+
+function formatFactDisplay(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value === "string") {
+    const clean = value.trim();
+    return clean && clean !== "—" ? clean : null;
+  }
+  if (typeof value === "number") return value.toLocaleString();
+  if (Array.isArray(value)) {
+    const clean = value
+      .map((item) => formatFactDisplay(item))
+      .filter((item): item is string => !!item);
+    return clean.length > 0 ? clean.join(", ") : null;
+  }
+  if (typeof value === "object") {
+    const obj = value as Record<string, unknown>;
+    const direct = obj.text ?? obj.value ?? obj.name ?? obj.label;
+    const directText = formatFactDisplay(direct);
+    if (directText) return directText;
+    const parts = Object.entries(obj)
+      .map(([key, entry]) => {
+        const text = formatFactDisplay(entry);
+        return text ? `${key}: ${text}` : null;
+      })
+      .filter((item): item is string => !!item);
+    return parts.length > 0 ? parts.join(", ") : null;
+  }
+  return null;
 }
 
 function Spacer() {
@@ -222,9 +252,7 @@ export function CountryMasthead({
           {expanded ? <Minus size={14} /> : <Plus size={14} />}
         </button>
 
-        <div
-          className={`cm-fact-grid${expanded ? " cm-fact-grid--expanded" : ""}`}
-        >
+        <div className="cm-fact-grid">
           {/* Column 1: Government, leadership, capital/lang/currency */}
           <div className="cm-fact-col">
             <Fact
@@ -320,94 +348,92 @@ export function CountryMasthead({
             />
           </div>
 
-          {/* Column 3 — History & culture (only when expanded) */}
-          {expanded && (
-            <div className="cm-fact-col">
-              <Fact
-                icon={<Calendar size={15} />}
-                label="Independence"
-                fact={f?.independence}
-              />
-              <Spacer />
-              <Fact
-                icon={<Landmark size={15} />}
-                label="Constitution"
-                fact={f?.constitution}
-              />
-              <Fact
-                icon={<Vote size={15} />}
-                label="Last election"
-                fact={f?.lastElection}
-              />
-              <Spacer />
-              <Fact
-                icon={<Church size={15} />}
-                label="Religion"
-                fact={f?.religion}
-              />
-              <Fact
-                icon={<BookOpen size={15} />}
-                label="Literacy"
-                fact={f?.literacy}
-              />
-              <Fact
-                icon={<Award size={15} />}
-                label="Olympic medals"
-                fact={f?.olympicMedals}
-              />
-            </div>
-          )}
-
-          {/* Column 4 — Identifiers (only when expanded) */}
-          {expanded && (
-            <div className="cm-fact-col">
-              <Fact
-                icon={<Phone size={15} />}
-                label="Calling"
-                fact={f?.callingCode}
-              />
-              <Fact
-                icon={<Globe size={15} />}
-                label="TLD"
-                fact={f?.tld}
-              />
-              <Fact
-                icon={<Clock size={15} />}
-                label="Time zone"
-                fact={f?.timeZone}
-              />
-              <Spacer />
-              <Fact
-                icon={<Hash size={15} />}
-                label="ISO"
-                fact={f?.iso}
-                fallback={country.id.toUpperCase()}
-              />
-              <Fact
-                icon={<CarFront size={15} />}
-                label="Drives on"
-                fact={f?.drivesOn}
-              />
-              <Spacer />
-              <Fact
-                icon={<Music size={15} />}
-                label="Anthem"
-                fact={f?.anthem}
-              />
-              <Fact
-                icon={<Flag size={15} />}
-                label="National day"
-                fact={f?.nationalDay}
-              />
-            </div>
-          )}
-
           {/* Column 5 — Memberships + Quick compare (always visible, last) */}
           <div className="cm-fact-col cm-col-membership">
             <Memberships memberships={f?.memberships ?? []} />
             <Spacer />
             <QuickCompareBlock currentSlug={slug} />
           </div>
+
+          {expanded && (
+            <div className="cm-extra-grid">
+              <div className="cm-fact-col">
+                <Fact
+                  icon={<Calendar size={15} />}
+                  label="Independence"
+                  fact={f?.independence}
+                />
+                <Spacer />
+                <Fact
+                  icon={<Landmark size={15} />}
+                  label="Constitution"
+                  fact={f?.constitution}
+                />
+                <Fact
+                  icon={<Vote size={15} />}
+                  label="Last election"
+                  fact={f?.lastElection}
+                />
+                <Spacer />
+                <Fact
+                  icon={<Church size={15} />}
+                  label="Religion"
+                  fact={f?.religion}
+                />
+                <Fact
+                  icon={<BookOpen size={15} />}
+                  label="Literacy"
+                  fact={f?.literacy}
+                />
+                <Fact
+                  icon={<Award size={15} />}
+                  label="Olympic medals"
+                  fact={f?.olympicMedals}
+                />
+              </div>
+
+              <div className="cm-fact-col">
+                <Fact
+                  icon={<Phone size={15} />}
+                  label="Calling"
+                  fact={f?.callingCode}
+                />
+                <Fact
+                  icon={<Globe size={15} />}
+                  label="TLD"
+                  fact={f?.tld}
+                />
+                <Fact
+                  icon={<Clock size={15} />}
+                  label="Time zone"
+                  fact={f?.timeZone}
+                />
+                <Spacer />
+                <Fact
+                  icon={<Hash size={15} />}
+                  label="ISO"
+                  fact={f?.iso}
+                  fallback={country.id.toUpperCase()}
+                />
+                <Fact
+                  icon={<CarFront size={15} />}
+                  label="Drives on"
+                  fact={f?.drivesOn}
+                />
+                <Spacer />
+                <Fact
+                  icon={<Music size={15} />}
+                  label="Anthem"
+                  fact={f?.anthem}
+                />
+                <Fact
+                  icon={<Flag size={15} />}
+                  label="National day"
+                  fact={f?.nationalDay}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

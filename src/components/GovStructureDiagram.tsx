@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 
 interface GovBody {
   id: string;
@@ -132,20 +132,15 @@ function HoverCard({
   branchColor: string;
   anchorRef: HTMLElement | null;
 }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-
-  useEffect(() => {
-    if (!anchorRef || !cardRef.current) return;
+  const pos = (() => {
+    if (!anchorRef) return null;
     const rect = anchorRef.getBoundingClientRect();
-    const card = cardRef.current.getBoundingClientRect();
     let top = rect.bottom + 6;
     let left = rect.left;
-    if (left + card.width > window.innerWidth - 8) left = window.innerWidth - card.width - 8;
     if (left < 8) left = 8;
-    if (top + card.height > window.innerHeight - 8) top = rect.top - card.height - 6;
-    setPos({ top, left });
-  }, [anchorRef]);
+    if (top > window.innerHeight - 160) top = Math.max(8, rect.top - 160);
+    return { top, left };
+  })();
 
   const holder = office.holder;
   const initials = holder
@@ -158,7 +153,6 @@ function HoverCard({
 
   return (
     <div
-      ref={cardRef}
       className="ghc-hover-card"
       role="tooltip"
       style={{
@@ -259,19 +253,28 @@ function OfficeNodeItem({
   office,
   branchColor,
   depth,
+  expandMode,
 }: {
   office: OfficeNode;
   branchColor: string;
   depth: number;
+  expandMode: "default" | "expanded" | "collapsed";
 }) {
   const [hoverAnchor, setHoverAnchor] = useState<HTMLElement | null>(null);
   const hasChildren = office.children.length > 0;
-  const [expanded, setExpanded] = useState(depth < 2);
+  const [expanded, setExpanded] = useState(
+    expandMode === "expanded"
+      ? true
+      : expandMode === "collapsed"
+        ? false
+        : depth < 2
+  );
   const hasHolder = !!office.holder;
 
   return (
     <li
       role="treeitem"
+      aria-selected={false}
       aria-expanded={hasChildren ? expanded : undefined}
       className={!expanded && hasChildren ? "collapsed" : undefined}
     >
@@ -323,6 +326,7 @@ function OfficeNodeItem({
               office={child}
               branchColor={branchColor}
               depth={depth + 1}
+              expandMode={expandMode}
             />
           ))}
         </ul>
@@ -335,18 +339,27 @@ function BodyNodeItem({
   node,
   branchColor,
   depth,
+  expandMode,
 }: {
   node: BodyNode;
   branchColor: string;
   depth: number;
+  expandMode: "default" | "expanded" | "collapsed";
 }) {
-  const [expanded, setExpanded] = useState(depth < 1);
+  const [expanded, setExpanded] = useState(
+    expandMode === "expanded"
+      ? true
+      : expandMode === "collapsed"
+        ? false
+        : depth < 1
+  );
   const hasContent = node.offices.length > 0 || node.children.length > 0;
   const isChamber = node.body.chamberType || (node.body.totalSeats && node.body.totalSeats > 0);
 
   return (
     <li
       role="treeitem"
+      aria-selected={false}
       aria-expanded={hasContent ? expanded : undefined}
       className={!expanded && hasContent ? "collapsed" : undefined}
     >
@@ -390,6 +403,7 @@ function BodyNodeItem({
               office={office}
               branchColor={branchColor}
               depth={depth + 1}
+              expandMode={expandMode}
             />
           ))}
           {node.children.map((child) => (
@@ -398,6 +412,7 @@ function BodyNodeItem({
               node={child}
               branchColor={branchColor}
               depth={depth + 1}
+              expandMode={expandMode}
             />
           ))}
         </ul>
@@ -435,6 +450,8 @@ export function GovStructureDiagram({
   countryName: string;
   parties?: PartyData[];
 }) {
+  const [treeVersion, setTreeVersion] = useState(0);
+  const [expandMode, setExpandMode] = useState<"default" | "expanded" | "collapsed">("default");
   const isQid = (name: string) => /^Q\d+$/.test(name);
 
   const allBranches = BRANCH_ORDER.filter((branch) =>
@@ -482,22 +499,34 @@ export function GovStructureDiagram({
 
   if (branchTrees.length === 0) return null;
 
-  const expandAllRef = useRef<(() => void) | null>(null);
-  const [expandKey, setExpandKey] = useState(0);
-  const [collapseKey, setCollapseKey] = useState(0);
-
   return (
     <div className="ghc-root" role="tree" aria-label={`Government structure of ${countryName}`}>
-      <div className="ghc-toolbar">
-        <span>Full government structure</span>
+      <div className="ghc-toolbar ghc-toolbar--controls-only">
         <div className="ghc-toolbar-controls">
-          <button className="ghc-ctrl" onClick={() => setExpandKey((k) => k + 1)}>Expand all</button>
-          <button className="ghc-ctrl" onClick={() => setCollapseKey((k) => k + 1)}>Collapse all</button>
+          <button
+            className="ghc-ctrl"
+            onClick={() => {
+              setExpandMode("expanded");
+              setTreeVersion((k) => k + 1);
+            }}
+          >
+            Expand all
+          </button>
+          <button
+            className="ghc-ctrl"
+            onClick={() => {
+              setExpandMode("collapsed");
+              setTreeVersion((k) => k + 1);
+            }}
+          >
+            Collapse all
+          </button>
         </div>
       </div>
 
       <div className="ghc-canvas">
         <div
+          key={`${treeVersion}-${expandMode}`}
           className="ghc-branches"
           style={{ "--ghc-cols": branchTrees.length } as React.CSSProperties}
         >
@@ -517,6 +546,7 @@ export function GovStructureDiagram({
                           office={office}
                           branchColor={color}
                           depth={0}
+                          expandMode={expandMode}
                         />
                       ))}
                       {tree[0].children.map((child) => (
@@ -525,6 +555,7 @@ export function GovStructureDiagram({
                           node={child}
                           branchColor={color}
                           depth={0}
+                          expandMode={expandMode}
                         />
                       ))}
                     </>
@@ -535,6 +566,7 @@ export function GovStructureDiagram({
                         node={node}
                         branchColor={color}
                         depth={0}
+                        expandMode={expandMode}
                       />
                     ))
                   )}

@@ -91,7 +91,7 @@ export function ShellCountryRail({
                   key={i}
                   d={p.d}
                   data-id={p.id || undefined}
-                  className={p.id === selectedId ? "sel" : ""}
+                  className={selectedId && p.id === selectedId ? "sel" : ""}
                   onClick={() => {
                     if (!p.country) return;
                     const match = countries.find((c) => c.id === p.country!.id);
@@ -105,7 +105,7 @@ export function ShellCountryRail({
                   key={id}
                   d={data.d}
                   data-id={id}
-                  className={id === selectedId ? "sel" : ""}
+                  className={selectedId && id === selectedId ? "sel" : ""}
                   onClick={() => {
                     const match = countries.find((c) => c.id === id);
                     if (match) router.push(buildHref(match, hrefMode));

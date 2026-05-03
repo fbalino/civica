@@ -1234,6 +1234,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   cursor: pointer; transition: background 120ms;
 }
 .intl-mem-row:hover { background: var(--atlas-paper-2); }
+.intl-mem-row--static { cursor: default; }
 .intl-mem-row .dot { width: 8px; height: 8px; border-radius: 50%; }
 .intl-mem-row .name {
   font-family: var(--font-heading); font-size: var(--text-16); letter-spacing: -0.01em;
@@ -1273,11 +1274,13 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   width: 72px; height: 72px; display: grid; place-items: center;
   font-family: var(--font-mono); font-size: var(--text-22); font-weight: 600;
   color: var(--color-on-accent); letter-spacing: 0.02em;
+  background: var(--org-color, var(--atlas-accent));
+  border: 1px solid var(--atlas-ink);
 }
 .org-masthead .eyebrow {
   font-family: var(--font-mono); font-size: var(--text-10);
   letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--atlas-accent); margin-bottom: 4px;
+  color: var(--org-color, var(--atlas-accent)); margin-bottom: 4px;
 }
 .org-masthead h1 {
   font-family: var(--font-heading); font-weight: 400; font-size: var(--text-44);
@@ -1287,15 +1290,35 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   font-family: var(--font-heading); font-size: var(--text-14); font-style: italic;
   color: var(--atlas-ink-2); margin-top: 8px;
 }
+.org-masthead .desc {
+  max-width: 760px;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: 1.45;
+  color: var(--atlas-ink-2);
+  margin-top: 6px;
+}
+.org-masthead-chips {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
 .org-masthead .type-chip {
   display: inline-flex; align-items: center; gap: 6px;
   font-family: var(--font-mono); font-size: var(--text-10);
   letter-spacing: 0.1em; text-transform: uppercase;
-  border: 1px solid var(--atlas-rule);
-  padding: 3px 8px; color: var(--atlas-ink-2); margin-top: 10px;
+  border: 1px solid var(--org-color, var(--atlas-rule));
+  padding: 3px 8px; color: var(--org-color, var(--atlas-ink-2));
 }
-.org-masthead .type-chip .dot { width: 7px; height: 7px; border-radius: 50%; }
+.org-masthead .type-chip .dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--org-color, var(--atlas-accent));
+}
 .org-masthead .founded {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   font-family: var(--font-mono); font-size: var(--text-11);
   color: var(--atlas-muted); text-align: right; letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1311,6 +1334,12 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   border: 1px solid var(--atlas-rule);
   margin: 22px 40px 0;
 }
+.org-detail-content {
+  padding: 0 40px 60px;
+}
+.org-detail-content .org-stats {
+  margin: 22px 0 0;
+}
 .org-stats .cell {
   padding: 12px 16px; border-right: 1px solid var(--atlas-rule);
 }
@@ -1323,6 +1352,61 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .org-stats .v {
   font-family: var(--font-heading); font-size: var(--text-24);
   letter-spacing: -0.02em; margin-top: 3px; line-height: 1;
+}
+
+.intl-panel--map {
+  padding: 8px;
+}
+
+.org-region-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--org-region-cols, 1), minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+.org-region-card {
+  border: 1px solid var(--atlas-rule-2);
+  padding: 10px 12px;
+  background: var(--atlas-paper-2);
+}
+.org-region-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  color: var(--atlas-muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.org-region-value {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  letter-spacing: -0.01em;
+  margin-top: 2px;
+}
+.org-region-value span {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--atlas-muted);
+  letter-spacing: 0.1em;
+}
+.org-region-bar {
+  height: 3px;
+  background: var(--atlas-rule);
+  margin-top: 6px;
+  position: relative;
+}
+.org-region-bar > div {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--org-color, var(--atlas-accent));
+}
+
+.intl-mem-list--org {
+  margin-top: 6px;
+}
+.intl-mem-list--org .intl-mem-row {
+  color: inherit;
+  text-decoration: none;
 }
 
 .org-members {
@@ -1399,10 +1483,13 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .intl-stats .cell:last-child { border-bottom: 0; }
   .org-masthead { grid-template-columns: auto 1fr; padding: 18px 16px; }
   .org-masthead .founded { grid-column: 1 / -1; text-align: left; }
+  .org-detail-content { padding: 0 16px 40px; }
   .org-stats { grid-template-columns: 1fr 1fr; margin: 16px; }
+  .org-detail-content .org-stats { margin: 16px 0; }
   .org-stats .cell:nth-child(2n) { border-right: 0; }
   .org-stats .cell { border-bottom: 1px solid var(--atlas-rule); }
   .org-stats .cell:nth-last-child(-n+2) { border-bottom: 0; }
+  .org-region-grid { grid-template-columns: 1fr 1fr; }
   .org-members { padding: 16px 16px 40px; }
 }
 
@@ -1547,21 +1634,48 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   color: var(--atlas-accent);
 }
 
-/* Default 3-column fact grid (cols 1, 2, 5). When expanded, a class
-   bumps it to 4 columns (cols 1, 2, 3, 4 — col 5 wraps to a second
-   row alongside the other two when needed, or sits at the right end
-   when the container is wide). */
+/* Primary facts stay in three columns: two roomy data columns plus a
+   narrower utility column. Expanded facts render as rows below. */
 .cm-fact-grid {
   flex: 1; min-width: 0;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px 24px;
+  grid-template-columns: 1fr;
+  gap: 18px;
 }
 @container (min-width: 560px) {
-  .cm-fact-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cm-fact-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px 24px;
+  }
+  .cm-col-membership {
+    grid-column: 1 / -1;
+  }
 }
-@container (min-width: 900px) {
-  .cm-fact-grid--expanded { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 24px; }
+@container (min-width: 1040px) {
+  .cm-fact-grid {
+    grid-template-columns:
+      minmax(280px, 1.25fr)
+      minmax(280px, 1.25fr)
+      minmax(190px, 0.7fr);
+    gap: 18px 34px;
+  }
+  .cm-col-membership {
+    grid-column: auto;
+  }
+}
+.cm-extra-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px 24px;
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px solid var(--atlas-rule);
+}
+@container (min-width: 720px) {
+  .cm-extra-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 /* Narrow center pane (phone) — shrink the headline + scores so the
  * masthead doesn't tower over the rest of the page. The hero already
@@ -1574,8 +1688,8 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .cm-hero-scores { gap: 18px; flex-wrap: wrap; }
   .cm-chip-strip { gap: 6px; margin-top: 14px; padding-top: 10px; }
   .cm-chip { padding: 4px 8px; }
-  .cm-fact-grid { gap: 10px 18px; }
-  .cm-grid-wrap { gap: 6px; }
+  .cm-grid-wrap { gap: 8px; }
+  .cm-expand-btn { width: 28px; height: 28px; }
 }
 .cm-fact-col {
   display: flex; flex-direction: column; gap: 5px;
@@ -1644,6 +1758,13 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 }
 
 /* Column 5 — memberships + quick compare */
+.cm-col-membership {
+  gap: 12px;
+  align-self: start;
+}
+.cm-col-membership .cm-fact-spacer {
+  display: none;
+}
 .cm-mini-title {
   display: flex; align-items: center; gap: 6px;
   font-family: var(--font-mono);
@@ -1730,6 +1851,44 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   .cm-bigscore-value { font-size: var(--text-44); }
   .cm-hero { gap: 16px; }
   .cm-hero-scores { gap: 18px; }
+  .cm {
+    padding: 18px 18px 20px;
+  }
+  .cm-grid-wrap {
+    align-items: flex-start;
+  }
+  .cm-fact-grid {
+    gap: 20px;
+  }
+  .cm-fact-col {
+    gap: 8px;
+  }
+  .cm-fact-spacer {
+    height: 6px;
+  }
+  .cm-fact-text {
+    display: inline;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: initial;
+    overflow-wrap: anywhere;
+  }
+  .cm-fact-source {
+    padding-top: 5px;
+  }
+  .cm-col-membership {
+    padding-top: 8px;
+    border-top: 1px solid var(--atlas-rule);
+  }
+  .cm-orgs-list {
+    gap: 6px;
+  }
+  .cm-org-chip {
+    padding: 6px 8px;
+  }
+  .cm-qc-search input {
+    min-height: 42px;
+  }
 }
 
 

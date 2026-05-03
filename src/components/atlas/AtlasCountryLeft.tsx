@@ -73,7 +73,7 @@ export function AtlasCountryLeft({
                       key={i}
                       d={p.d}
                       data-id={p.id || undefined}
-                      className={p.id === selectedId ? "sel" : ""}
+                      className={selectedId && p.id === selectedId ? "sel" : ""}
                       onClick={() => {
                         if (p.country) onPickCountry(p.country);
                       }}
@@ -85,7 +85,7 @@ export function AtlasCountryLeft({
                       key={id}
                       d={data.d}
                       data-id={id}
-                      className={id === selectedId ? "sel" : ""}
+                      className={selectedId && id === selectedId ? "sel" : ""}
                       onClick={() => {
                         const c = countries.find((c) => c.id === id);
                         if (c) onPickCountry(c);

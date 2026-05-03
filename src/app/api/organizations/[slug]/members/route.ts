@@ -2,8 +2,10 @@ import { NextResponse } from "next/server";
 import {
   getOrganizationBySlug,
   getMembersOfOrg,
+  getMemberCount,
+  getOrgMemberCountryFallback,
 } from "@/lib/data/international-organizations";
-import { COUNTRIES } from "@/components/atlas/data";
+import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 
 export async function GET(
   _req: Request,
@@ -15,18 +17,21 @@ export async function GET(
     return NextResponse.json({ error: "Organization not found" }, { status: 404 });
   }
 
+  const { countries } = await loadAtlasData();
   const membersRaw = getMembersOfOrg(org.id);
   const members = membersRaw
     .map((m) => {
-      const c = COUNTRIES.find((x) => x.id === m.countryId);
-      if (!c) return null;
+      const c = countries.find((x) => x.id === m.countryId);
+      const fallback = c ? null : getOrgMemberCountryFallback(m.countryId);
+      if (!c && !fallback) return null;
       return {
-        id: c.id,
-        name: c.name,
-        slug: c.slug ?? c.id,
-        region: c.region,
+        id: c?.id ?? fallback!.id,
+        name: c?.name ?? fallback!.name,
+        slug: c?.slug ?? fallback!.slug,
+        region: c?.region ?? fallback!.region,
         joinYear: m.joinYear,
         role: m.role ?? null,
+        inAtlas: !!c,
       };
     })
     .filter(Boolean)
@@ -41,6 +46,7 @@ export async function GET(
       type: org.type,
       foundedYear: org.foundedYear,
       hqCountry: org.hqCountry ?? null,
+      memberCount: getMemberCount(org.id),
       description: org.description ?? null,
       extra: org.extra ?? null,
     },

@@ -1,16 +1,46 @@
 "use client";
 
 import { useMemo } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type Country, WORLD_PATHS } from "./data";
-import { buildNeIdMap } from "./map-geom";
+import { buildNeIdMap, proj } from "./map-geom";
 import { useMapPaths } from "./useMapPaths";
 import {
   type OrgDetail,
   ORG_TYPE_COLOR,
   ORG_TYPE_LABEL,
 } from "./organizations";
+
+const ORG_MAP_MARKER_COORDS: Record<string, [number, number]> = {
+  and: [1.52, 42.51],
+  atg: [-61.8, 17.06],
+  are: [54.3, 24.4],
+  aze: [47.58, 40.14],
+  bhr: [50.55, 26.07],
+  brb: [-59.54, 13.19],
+  caf: [20.94, 6.61],
+  cpv: [-23.62, 15.12],
+  com: [43.33, -11.65],
+  cyp: [33.43, 35.13],
+  esh: [-12.89, 24.22],
+  grd: [-61.68, 12.12],
+  gnb: [-15.18, 11.8],
+  lbn: [35.86, 33.85],
+  lie: [9.55, 47.16],
+  lux: [6.13, 49.82],
+  mco: [7.42, 43.74],
+  mlt: [14.38, 35.94],
+  mus: [57.55, -20.2],
+  pse: [35.2, 31.9],
+  qat: [51.18, 25.35],
+  smr: [12.46, 43.94],
+  sgp: [103.82, 1.35],
+  stp: [6.61, 0.19],
+  syc: [55.45, -4.68],
+  swz: [31.47, -26.52],
+};
 
 /**
  * Phase A.5 — Organization detail view, recovered from the deleted
@@ -43,6 +73,21 @@ export function OrgDetailPanel({
 
   const memberIds = new Set(detail.members.map((m) => m.id));
   const memberBySlug = new Map(detail.members.map((m) => [m.slug, m]));
+  const highlightedCount = detail.members.length;
+  const mappedMemberIds = new Set(
+    mapLoaded
+      ? mapPaths
+          .map((p) => p.id)
+          .filter((id): id is string => !!id && memberIds.has(id))
+      : Object.keys(WORLD_PATHS).filter((id) => memberIds.has(id)),
+  );
+  const markerMembers = detail.members
+    .filter((m) => !mappedMemberIds.has(m.id) && ORG_MAP_MARKER_COORDS[m.id])
+    .map((m) => {
+      const [lon, lat] = ORG_MAP_MARKER_COORDS[m.id];
+      const [x, y] = proj(lon, lat);
+      return { ...m, x, y };
+    });
 
   const regionCounts = new Map<string, number>();
   for (const m of detail.members) {
@@ -60,117 +105,80 @@ export function OrgDetailPanel({
   );
 
   const goToCountry = (slug: string) => {
-    if (memberBySlug.has(slug)) {
+    if (memberBySlug.get(slug)?.inAtlas) {
       router.push(`/atlas/${slug}/structure`);
     }
   };
 
   return (
     <>
-      <div className="atlas-masthead">
+      <div
+        className="org-masthead"
+        style={{ "--org-color": typeVar } as CSSProperties}
+      >
+        <div className="badge" aria-hidden="true">
+          {o.name.slice(0, 3)}
+        </div>
         <div>
           <div className="eyebrow">
             {typeLabel.toUpperCase()} &middot; {o.slug.toUpperCase()}
             {eyebrowTail ? <> &middot; {eyebrowTail}</> : null}
           </div>
           <h1>{o.name}</h1>
-          <div className="dek">
+          <div className="full">
             {o.fullName}
-            {o.description ? <> &mdash; {o.description}</> : null}
           </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 6,
-              marginTop: 10,
-              flexWrap: "wrap",
-            }}
-          >
-            <span
-              className="atlas-mono"
-              style={{
-                fontSize: 10,
-                letterSpacing: ".1em",
-                textTransform: "uppercase",
-                padding: "3px 9px",
-                border: `1px solid ${typeVar}`,
-                color: typeVar,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <span
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: "50%",
-                  background: typeVar,
-                }}
-              />
+          {o.description ? <div className="desc">{o.description}</div> : null}
+          <div className="org-masthead-chips">
+            <span className="type-chip">
+              <span className="dot" />
               {typeLabel}
             </span>
           </div>
         </div>
-        <div className="quick-facts">
-          <div className="r">
-            <b>Members</b>
-            <span>{detail.members.length}</span>
-          </div>
-          <div className="r">
-            <b>Founding</b>
-            <span>{founding}</span>
-          </div>
-          <div className="r">
-            <b>Observers</b>
-            <span>{observers}</span>
-          </div>
+        <div className="founded">
           {o.foundedYear ? (
-            <div className="r">
-              <b>Founded</b>
-              <span>{o.foundedYear}</span>
-            </div>
+            <>
+              Founded
+              <b>{o.foundedYear}</b>
+            </>
           ) : null}
-          {o.hqCountry ? (
-            <div className="r">
-              <b>HQ</b>
-              <span>{o.hqCountry.toUpperCase()}</span>
-            </div>
-          ) : null}
+          {o.hqCountry ? <span>HQ {o.hqCountry.toUpperCase()}</span> : null}
         </div>
       </div>
 
-      <div className="org-stats">
-        <div className="cell">
-          <div className="k">Members</div>
-          <div className="v">{detail.members.length}</div>
-        </div>
-        <div className="cell">
-          <div className="k">Founding members</div>
-          <div className="v">{founding}</div>
-        </div>
-        <div className="cell">
-          <div className="k">Observers</div>
-          <div className="v">{observers}</div>
-        </div>
-        <div className="cell">
-          <div className="k">HQ</div>
-          <div className="v" style={{ fontSize: 14 }}>
-            {o.hqCountry ? o.hqCountry.toUpperCase() : "—"}
+      <div className="org-detail-content">
+        <div className="org-stats">
+          <div className="cell">
+            <div className="k">Members</div>
+            <div className="v">{o.memberCount}</div>
+          </div>
+          <div className="cell">
+            <div className="k">Shown in Atlas</div>
+            <div className="v">{highlightedCount}</div>
+          </div>
+          <div className="cell">
+            <div className="k">Founding shown</div>
+            <div className="v">{founding}</div>
+          </div>
+          <div className="cell">
+            <div className="k">Observers shown</div>
+            <div className="v">{observers}</div>
           </div>
         </div>
-      </div>
 
-      <div className="intl-section-head">
-        Membership map{" "}
-        <span>{detail.members.length} countries highlighted</span>
-      </div>
-      <div className="intl-panel" style={{ padding: 8 }}>
-        <svg
-          viewBox="0 100 2000 800"
-          preserveAspectRatio="xMidYMid meet"
-          className="org-mini-map"
-        >
+        <div className="intl-section-head">
+          Membership map{" "}
+          <span>
+            {highlightedCount} of {o.memberCount} members shown in Civica
+          </span>
+        </div>
+        <div className="intl-panel intl-panel--map">
+          <svg
+            viewBox="0 100 2000 800"
+            preserveAspectRatio="xMidYMid meet"
+            className="org-mini-map"
+          >
           {mapLoaded
             ? mapPaths.map((p, i) => {
                 const isMember = !!(p.id && memberIds.has(p.id));
@@ -218,91 +226,73 @@ export function OrgDetailPanel({
                   />
                 );
               })}
-        </svg>
-      </div>
+          <g className="org-map-markers" aria-hidden="true">
+            {markerMembers.map((m) => (
+              <circle
+                key={m.id}
+                data-id={m.id}
+                cx={m.x}
+                cy={m.y}
+                r={8}
+                className="member-marker"
+                style={{
+                  fill: typeVar,
+                  stroke: "var(--atlas-paper)",
+                  strokeWidth: 3,
+                  cursor: m.inAtlas ? "pointer" : "default",
+                }}
+                onClick={() => {
+                  if (m.inAtlas) goToCountry(m.slug);
+                }}
+              />
+            ))}
+          </g>
+          </svg>
+        </div>
 
-      <div className="intl-section-head">
-        Regional distribution <span>share of membership</span>
-      </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${regionOrder.filter((r) => regionCounts.get(r)).length || 1}, 1fr)`,
-          gap: 8,
-          margin: "8px 0 4px",
-        }}
-      >
+        <div className="intl-section-head">
+          Regional distribution <span>share of shown members</span>
+        </div>
+        <div
+          className="org-region-grid"
+          style={{
+            "--org-region-cols":
+              regionOrder.filter((r) => regionCounts.get(r)).length || 1,
+          } as CSSProperties}
+        >
         {regionOrder.map((r) => {
           const ct = regionCounts.get(r);
           if (!ct) return null;
           const pct = Math.round((ct / totalMembers) * 100);
           return (
-            <div
-              key={r}
-              style={{
-                border: "1px solid var(--atlas-rule-2)",
-                padding: "10px 12px",
-                background: "var(--atlas-paper-2)",
-              }}
-            >
-              <div
-                className="atlas-mono"
-                style={{
-                  fontSize: 10,
-                  color: "var(--atlas-muted)",
-                  letterSpacing: ".14em",
-                  textTransform: "uppercase",
-                }}
-              >
+            <div key={r} className="org-region-card">
+              <div className="org-region-label">
                 {r}
               </div>
-              <div
-                className="atlas-serif"
-                style={{
-                  fontSize: 20,
-                  letterSpacing: "-0.01em",
-                  marginTop: 2,
-                }}
-              >
+              <div className="org-region-value">
                 {ct}{" "}
-                <span
-                  style={{
-                    fontSize: 10,
-                    color: "var(--atlas-muted)",
-                    letterSpacing: ".1em",
-                  }}
-                >
+                <span>
                   &middot; {pct}%
                 </span>
               </div>
-              <div
-                style={{
-                  height: 3,
-                  background: "var(--atlas-rule)",
-                  marginTop: 6,
-                  position: "relative",
-                }}
-              >
+              <div className="org-region-bar">
                 <div
                   style={{
-                    position: "absolute",
-                    inset: 0,
                     width: `${pct}%`,
-                    background: typeVar,
                   }}
                 />
               </div>
             </div>
           );
         })}
-      </div>
+        </div>
 
-      <div className="intl-section-head">
-        Members <span>join year ascending</span>
-      </div>
-      <div className="intl-mem-list" style={{ marginTop: 6 }}>
-        <div className="intl-mem-group">
-          {sortedMembers.map((m) => {
+        <div className="intl-section-head">
+          Members <span>join year ascending</span>
+        </div>
+        <div className="intl-mem-list intl-mem-list--org">
+          <div className="intl-mem-group">
+            {sortedMembers.map((m) => {
             const role = (m.role ?? "").toLowerCase();
             const isP5 = o.type === "un" && role === "permanent";
             const badgeClass =
@@ -315,13 +305,8 @@ export function OrgDetailPanel({
                     : role
                       ? "role-badge"
                       : "";
-            return (
-              <Link
-                key={m.id}
-                href={`/atlas/${m.slug}/chamber`}
-                className="intl-mem-row"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
+            const rowContent = (
+              <>
                 <span className="dot" style={{ background: typeVar }} />
                 <span className="name">
                   {m.name}
@@ -333,9 +318,26 @@ export function OrgDetailPanel({
                 {m.role ? (
                   <span className={badgeClass}>{isP5 ? "P5" : m.role}</span>
                 ) : null}
-              </Link>
+              </>
             );
-          })}
+            return m.inAtlas ? (
+              <Link
+                key={m.id}
+                href={`/atlas/${m.slug}/structure`}
+                className="intl-mem-row"
+              >
+                {rowContent}
+              </Link>
+            ) : (
+              <div
+                key={m.id}
+                className="intl-mem-row intl-mem-row--static"
+              >
+                {rowContent}
+              </div>
+            );
+            })}
+          </div>
         </div>
       </div>
     </>

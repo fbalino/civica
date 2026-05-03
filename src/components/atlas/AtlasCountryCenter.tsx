@@ -235,11 +235,7 @@ export function AtlasCountryCenter({
               className="atlas-section-divider"
               role="separator"
               aria-label="Full government structure"
-            >
-              <span className="atlas-section-divider-label">
-                Full government structure
-              </span>
-            </div>
+            />
 
             {structureData && structureData.bodies.length > 0 ? (
               <GovStructureDiagram

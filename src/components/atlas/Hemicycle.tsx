@@ -8,6 +8,10 @@ function resolveColor(color: string): string {
   return PARTY_COLORS[color] || color;
 }
 
+function roundSvgNumber(value: number): number {
+  return Number(value.toFixed(4));
+}
+
 interface SeatPos {
   x: number;
   y: number;
@@ -38,8 +42,8 @@ function seatLayout(total: number): SeatPos[] {
     for (let s = 0; s < n; s++) {
       const t = n === 1 ? 0.5 : s / (n - 1);
       const angle = Math.PI * (1 - t);
-      const x = Math.cos(angle) * radius;
-      const y = -Math.sin(angle) * radius;
+      const x = roundSvgNumber(Math.cos(angle) * radius);
+      const y = roundSvgNumber(-Math.sin(angle) * radius);
       seats.push({ x, y, angle, row: r });
     }
   }

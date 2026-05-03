@@ -426,7 +426,7 @@ a {
 .tab-nav {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   background: none;
   border: none;
   padding: 10px 14px;
@@ -506,6 +506,119 @@ a {
   color: var(--color-text-primary);
   background: var(--color-card-bg);
   border-color: var(--color-card-border);
+}
+
+/* ============================================================
+   Site footer
+   ============================================================ */
+
+.site-footer {
+  width: 100%;
+  border-top: 1px solid var(--color-divider);
+  margin-top: var(--space-8);
+  padding: var(--spacing-page-x);
+  background: var(--color-bg);
+}
+
+.site-footer__inner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-5);
+}
+
+.site-footer__brand {
+  width: 100%;
+}
+
+.site-footer__mark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.site-footer__mark span {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: 400;
+  color: var(--color-text-primary);
+}
+
+.site-footer__source {
+  max-width: 56rem;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-25);
+  margin-top: var(--space-2);
+}
+
+.site-footer__legend,
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+}
+
+.site-footer__legend {
+  margin-top: var(--space-3);
+  font-size: var(--text-10);
+  color: var(--color-text-30);
+}
+
+.site-footer__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.site-footer__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.site-footer__dot--live {
+  background: var(--color-source-live);
+}
+
+.site-footer__dot--frozen {
+  background: var(--color-source-frozen);
+}
+
+.site-footer__links {
+  justify-content: flex-start;
+  max-width: none;
+  font-size: var(--text-11);
+  color: var(--color-text-25);
+  text-align: left;
+}
+
+.site-footer__links a {
+  color: var(--color-text-25);
+  text-decoration: none;
+}
+
+.site-footer__links a:hover {
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 768px) {
+  .site-footer {
+    padding: var(--space-5) var(--spacing-page-x);
+  }
+
+  .site-footer__inner {
+    gap: var(--space-4);
+  }
+
+  .site-footer__links {
+    justify-content: flex-start;
+    text-align: left;
+  }
 }
 
 /* ============================================================
@@ -2647,6 +2760,10 @@ a {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-40);
+}
+
+.ghc-toolbar--controls-only {
+  justify-content: flex-end;
 }
 
 .ghc-toolbar-controls {

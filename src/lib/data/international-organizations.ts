@@ -19,6 +19,7 @@ export interface Organization {
   type: OrgType;
   foundedYear: number;
   hqCountry?: string;
+  memberCount?: number;
   description?: string;
   extra?: Record<string, string | number>;
 }
@@ -30,6 +31,43 @@ export interface Membership {
   role?: MemberRole;
 }
 
+export interface OrganizationMemberCountryFallback {
+  id: string;
+  name: string;
+  slug: string;
+  region: string;
+}
+
+const ORG_MEMBER_COUNTRY_FALLBACKS: Record<
+  string,
+  OrganizationMemberCountryFallback
+> = {
+  are: {
+    id: "are",
+    name: "United Arab Emirates",
+    slug: "united-arab-emirates",
+    region: "Asia",
+  },
+  caf: {
+    id: "caf",
+    name: "Central African Republic",
+    slug: "central-african-republic",
+    region: "Africa",
+  },
+  esh: {
+    id: "esh",
+    name: "Western Sahara",
+    slug: "western-sahara",
+    region: "Africa",
+  },
+  pse: {
+    id: "pse",
+    name: "Palestine",
+    slug: "palestine",
+    region: "Asia",
+  },
+};
+
 export const ORG_TYPE_LABEL: Record<OrgType, string> = {
   security: "Security & Defense",
   regional: "Regional Blocs",
@@ -39,11 +77,11 @@ export const ORG_TYPE_LABEL: Record<OrgType, string> = {
 };
 
 export const ORG_TYPE_COLOR: Record<OrgType, string> = {
-  security: "#D4764E",
-  regional: "#4E8BD4",
-  trade: "#5CAA6E",
-  un: "#9B6DC6",
-  cultural: "#8a8370",
+  security: "var(--cat-security)",
+  regional: "var(--cat-regional)",
+  trade: "var(--cat-trade)",
+  un: "var(--cat-un)",
+  cultural: "var(--cat-cultural)",
 };
 
 export const ORG_TYPE_ORDER: OrgType[] = [
@@ -64,6 +102,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "un",
     foundedYear: 1945,
     hqCountry: "usa",
+    memberCount: 193,
     description: "Global intergovernmental body for peace, security, human rights, and development.",
   },
   {
@@ -74,6 +113,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "un",
     foundedYear: 1945,
     hqCountry: "usa",
+    memberCount: 15,
     description: "15-member Council responsible for international peace and security.",
     extra: { seats: 15 },
   },
@@ -85,6 +125,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "un",
     foundedYear: 1948,
     hqCountry: "che",
+    memberCount: 194,
   },
   {
     id: "unesco",
@@ -94,6 +135,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "un",
     foundedYear: 1945,
     hqCountry: "fra",
+    memberCount: 194,
   },
 
   // Security & Defense
@@ -105,6 +147,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "security",
     foundedYear: 1949,
     hqCountry: "bel",
+    memberCount: 32,
     description: "Transatlantic military alliance for collective defense.",
     extra: { gdpTargetPercent: 2 },
   },
@@ -118,6 +161,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "regional",
     foundedYear: 1993,
     hqCountry: "bel",
+    memberCount: 27,
     description: "Political and economic union of European states.",
   },
   {
@@ -128,6 +172,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "regional",
     foundedYear: 1949,
     hqCountry: "fra",
+    memberCount: 46,
   },
   {
     id: "asean",
@@ -137,6 +182,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "regional",
     foundedYear: 1967,
     hqCountry: "idn",
+    memberCount: 10,
   },
   {
     id: "au",
@@ -146,6 +192,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "regional",
     foundedYear: 2002,
     hqCountry: "eth",
+    memberCount: 55,
   },
   {
     id: "arableague",
@@ -155,6 +202,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "regional",
     foundedYear: 1945,
     hqCountry: "egy",
+    memberCount: 22,
   },
   {
     id: "oas",
@@ -164,6 +212,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "regional",
     foundedYear: 1948,
     hqCountry: "usa",
+    memberCount: 35,
   },
 
   // Trade & finance
@@ -175,6 +224,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "trade",
     foundedYear: 1995,
     hqCountry: "che",
+    memberCount: 166,
   },
   {
     id: "imf",
@@ -184,6 +234,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "trade",
     foundedYear: 1944,
     hqCountry: "usa",
+    memberCount: 191,
   },
   {
     id: "worldbank",
@@ -193,6 +244,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "trade",
     foundedYear: 1944,
     hqCountry: "usa",
+    memberCount: 189,
   },
   {
     id: "oecd",
@@ -202,6 +254,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "trade",
     foundedYear: 1961,
     hqCountry: "fra",
+    memberCount: 38,
   },
   {
     id: "g7",
@@ -210,6 +263,7 @@ export const ORGANIZATIONS: Organization[] = [
     fullName: "Group of Seven",
     type: "trade",
     foundedYear: 1975,
+    memberCount: 7,
   },
   {
     id: "g20",
@@ -218,6 +272,7 @@ export const ORGANIZATIONS: Organization[] = [
     fullName: "Group of Twenty",
     type: "trade",
     foundedYear: 1999,
+    memberCount: 21,
   },
   {
     id: "brics",
@@ -226,6 +281,7 @@ export const ORGANIZATIONS: Organization[] = [
     fullName: "Brazil, Russia, India, China, South Africa",
     type: "trade",
     foundedYear: 2009,
+    memberCount: 10,
   },
 
   // Cultural & language
@@ -237,6 +293,7 @@ export const ORGANIZATIONS: Organization[] = [
     type: "cultural",
     foundedYear: 1931,
     hqCountry: "gbr",
+    memberCount: 56,
   },
   {
     id: "oif",
@@ -246,8 +303,37 @@ export const ORGANIZATIONS: Organization[] = [
     type: "cultural",
     foundedYear: 1970,
     hqCountry: "fra",
+    memberCount: 88,
   },
 ];
+
+const DEFAULT_JOIN_YEAR = 1945;
+
+function orgMembers(
+  orgId: string,
+  countryIds: string[],
+  joinYear = DEFAULT_JOIN_YEAR,
+  role: MemberRole = null,
+): Membership[] {
+  return countryIds.map((countryId) => ({
+    orgId,
+    countryId,
+    joinYear,
+    role,
+  }));
+}
+
+function orgMemberEntries(
+  orgId: string,
+  entries: Array<[countryId: string, joinYear?: number, role?: MemberRole]>,
+): Membership[] {
+  return entries.map(([countryId, joinYear = DEFAULT_JOIN_YEAR, role = null]) => ({
+    orgId,
+    countryId,
+    joinYear,
+    role,
+  }));
+}
 
 /**
  * Memberships. Each entry links a country (by 3-letter id used in the Atlas)
@@ -298,38 +384,71 @@ export const MEMBERSHIPS: Membership[] = [
   { orgId: "nato", countryId: "esp", joinYear: 1982, role: null },
   { orgId: "nato", countryId: "deu", joinYear: 1955, role: null },
 
-  // EU — founding 6: France, Germany, Italy (via EEC 1957 → EU 1993). Spain 1986.
-  { orgId: "eu", countryId: "fra", joinYear: 1957, role: "founding" },
-  { orgId: "eu", countryId: "deu", joinYear: 1957, role: "founding" },
-  { orgId: "eu", countryId: "ita", joinYear: 1957, role: "founding" },
-  { orgId: "eu", countryId: "esp", joinYear: 1986, role: null },
+  // EU — official 27 members.
+  ...orgMemberEntries("eu", [
+    ["bel", 1958, "founding"], ["fra", 1958, "founding"], ["deu", 1958, "founding"],
+    ["ita", 1958, "founding"], ["lux", 1958, "founding"], ["nld", 1958, "founding"],
+    ["dnk", 1973], ["irl", 1973], ["grc", 1981], ["prt", 1986], ["esp", 1986],
+    ["aut", 1995], ["fin", 1995], ["swe", 1995], ["cyp", 2004], ["cze", 2004],
+    ["est", 2004], ["hun", 2004], ["lva", 2004], ["ltu", 2004], ["mlt", 2004],
+    ["pol", 2004], ["svk", 2004], ["svn", 2004], ["bgr", 2007], ["rou", 2007],
+    ["hrv", 2013],
+  ]),
 
-  // Council of Europe
-  { orgId: "coe", countryId: "fra", joinYear: 1949, role: "founding" },
-  { orgId: "coe", countryId: "gbr", joinYear: 1949, role: "founding" },
-  { orgId: "coe", countryId: "ita", joinYear: 1949, role: "founding" },
-  { orgId: "coe", countryId: "deu", joinYear: 1950, role: null },
-  { orgId: "coe", countryId: "esp", joinYear: 1977, role: null },
+  // Council of Europe — 46 current members.
+  ...orgMemberEntries("coe", [
+    ["bel", 1949, "founding"], ["dnk", 1949, "founding"], ["fra", 1949, "founding"],
+    ["gbr", 1949, "founding"], ["irl", 1949, "founding"], ["ita", 1949, "founding"],
+    ["lux", 1949, "founding"], ["nld", 1949, "founding"], ["nor", 1949, "founding"],
+    ["swe", 1949, "founding"], ["grc", 1949], ["isl", 1950], ["tur", 1950],
+    ["deu", 1950], ["aut", 1956], ["cyp", 1961], ["che", 1963], ["mlt", 1965],
+    ["prt", 1976], ["esp", 1977], ["lie", 1978], ["smr", 1988], ["fin", 1989],
+    ["hun", 1990], ["pol", 1991], ["bgr", 1992], ["est", 1993], ["ltu", 1993],
+    ["svn", 1993], ["cze", 1993], ["svk", 1993], ["rou", 1993], ["and", 1994],
+    ["lva", 1995], ["alb", 1995], ["mda", 1995], ["mkd", 1995], ["ukr", 1995],
+    ["hrv", 1996], ["geo", 1999], ["arm", 2001], ["aze", 2001], ["bih", 2002],
+    ["srb", 2003], ["mco", 2004], ["mne", 2007],
+  ]),
 
-  // ASEAN founding: Indonesia. Others not in Atlas set.
-  { orgId: "asean", countryId: "idn", joinYear: 1967, role: "founding" },
+  // ASEAN — official 10 members.
+  ...orgMemberEntries("asean", [
+    ["idn", 1967, "founding"], ["mys", 1967, "founding"], ["phl", 1967, "founding"],
+    ["sgp", 1967, "founding"], ["tha", 1967, "founding"], ["brn", 1984],
+    ["vnm", 1995], ["lao", 1997], ["mmr", 1997], ["khm", 1999],
+  ]),
 
-  // AU — founding members: Egypt, Nigeria, South Africa, Kenya present in Atlas.
-  { orgId: "au", countryId: "egy", joinYear: 2002, role: "founding" },
-  { orgId: "au", countryId: "nga", joinYear: 2002, role: "founding" },
-  { orgId: "au", countryId: "zaf", joinYear: 2002, role: "founding" },
-  { orgId: "au", countryId: "ken", joinYear: 2002, role: "founding" },
+  // AU — current African Union members represented in Civica's atlas data.
+  ...orgMembers("au", [
+    "dza","ago","ben","bwa","bfa","bdi","cpv","cmr","caf","tcd","com","cog","civ",
+    "cod","dji","egy","gnq","eri","swz","eth","gab","gmb","gha","gin","gnb",
+    "ken","lso","lbr","lby","mdg","mwi","mli","mrt","mus","mar","moz","nam",
+    "ner","nga","rwa","stp","sen","syc","sle","som","zaf","ssd","sdn","tza",
+    "tgo","tun","uga","esh","zmb","zwe",
+  ], 2002),
 
-  // Arab League — Egypt, Saudi Arabia (Atlas subset)
-  { orgId: "arableague", countryId: "egy", joinYear: 1945, role: "founding" },
-  { orgId: "arableague", countryId: "sau", joinYear: 1945, role: "founding" },
+  // Arab League — 22 members; Atlas highlights/listing covers members present in the country dataset.
+  ...orgMemberEntries("arableague", [
+    ["egy", 1945, "founding"], ["irq", 1945, "founding"], ["jor", 1945, "founding"],
+    ["lbn", 1945, "founding"], ["sau", 1945, "founding"], ["syr", 1945, "founding"],
+    ["yem", 1945, "founding"], ["lby", 1953], ["sdn", 1956], ["mar", 1958],
+    ["tun", 1958], ["kwt", 1961], ["dza", 1962], ["bhr", 1971], ["omn", 1971],
+    ["qat", 1971], ["are", 1971], ["mrt", 1973], ["som", 1974], ["pse", 1976],
+    ["dji", 1977], ["com", 1993],
+  ]),
 
-  // OAS — Atlas Americas
-  { orgId: "oas", countryId: "usa", joinYear: 1948, role: "founding" },
-  { orgId: "oas", countryId: "can", joinYear: 1990, role: null },
-  { orgId: "oas", countryId: "mex", joinYear: 1948, role: "founding" },
-  { orgId: "oas", countryId: "bra", joinYear: 1948, role: "founding" },
-  { orgId: "oas", countryId: "arg", joinYear: 1948, role: "founding" },
+  // OAS — 35 member states in the Americas.
+  ...orgMemberEntries("oas", [
+    ["arg", 1948, "founding"], ["bol", 1948, "founding"], ["bra", 1948, "founding"],
+    ["chl", 1948, "founding"], ["col", 1948, "founding"], ["cri", 1948, "founding"],
+    ["cub", 1948, "founding"], ["dom", 1948, "founding"], ["ecu", 1948, "founding"],
+    ["slv", 1948, "founding"], ["gtm", 1948, "founding"], ["hti", 1948, "founding"],
+    ["hnd", 1948, "founding"], ["mex", 1948, "founding"], ["nic", 1948, "founding"],
+    ["pan", 1948, "founding"], ["pry", 1948, "founding"], ["per", 1948, "founding"],
+    ["usa", 1948, "founding"], ["ury", 1948, "founding"], ["ven", 1948, "founding"],
+    ["brb", 1967], ["tto", 1967], ["jam", 1969], ["grd", 1975], ["sur", 1977],
+    ["dma", 1979], ["lca", 1979], ["atg", 1981], ["vct", 1981], ["bhs", 1982],
+    ["kna", 1984], ["can", 1990], ["blz", 1991], ["guy", 1991],
+  ]),
 
   // WTO
   ...["usa","can","mex","bra","arg","gbr","fra","deu","esp","ita","egy","nga","zaf","ken","chn","ind","jpn","kor","sau","idn","aus","nzl"].map((c) => ({
@@ -384,8 +503,18 @@ export const MEMBERSHIPS: Membership[] = [
   { orgId: "oif", countryId: "kor", joinYear: 2016, role: "observer" },
 ];
 
+const ORG_SLUG_ALIASES: Record<string, string> = {
+  "european-union": "eu",
+  "council-of-europe": "coe",
+  "african-union": "au",
+  "united-nations": "un",
+  "un-security-council": "unsc",
+  "la-francophonie": "oif",
+};
+
 export function getOrganizationBySlug(slug: string): Organization | undefined {
-  return ORGANIZATIONS.find((o) => o.slug === slug || o.id === slug);
+  const canonical = ORG_SLUG_ALIASES[slug] ?? slug;
+  return ORGANIZATIONS.find((o) => o.slug === canonical || o.id === canonical);
 }
 
 export function getMembershipsForCountry(countryId: string): Membership[] {
@@ -396,7 +525,20 @@ export function getMembersOfOrg(orgId: string): Membership[] {
   return MEMBERSHIPS.filter((m) => m.orgId === orgId);
 }
 
+export function getOrgMemberCountryFallback(
+  countryId: string,
+): OrganizationMemberCountryFallback | null {
+  return ORG_MEMBER_COUNTRY_FALLBACKS[countryId] ?? null;
+}
+
 export function getMemberCount(orgId: string): number {
+  return (
+    ORGANIZATIONS.find((o) => o.id === orgId)?.memberCount ??
+    MEMBERSHIPS.filter((m) => m.orgId === orgId).length
+  );
+}
+
+export function getHighlightedMemberCount(orgId: string): number {
   return MEMBERSHIPS.filter((m) => m.orgId === orgId).length;
 }
 

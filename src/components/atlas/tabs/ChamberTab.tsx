@@ -81,37 +81,14 @@ export function ChamberTab({
 
           <div className="atlas-chamber-head">
             <div
-              className="atlas-mono"
-              style={{
-                fontSize: 10,
-                color: "var(--atlas-muted)",
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-              }}
-            >
-              {country.name.toUpperCase()} &middot;{" "}
-              {house === "upper" ? "UPPER" : "LOWER"} HOUSE
-            </div>
-            <div
               className="atlas-serif"
               style={{
                 fontSize: 40,
                 letterSpacing: "-0.02em",
                 lineHeight: 1,
-                marginTop: 4,
               }}
             >
               {currentHouse.name}
-            </div>
-            <div
-              className="atlas-sans"
-              style={{
-                fontSize: 13,
-                color: "var(--atlas-ink-2)",
-                marginTop: 6,
-              }}
-            >
-              {currentHouse.sub}
             </div>
           </div>
 

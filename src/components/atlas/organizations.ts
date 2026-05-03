@@ -29,6 +29,7 @@ export interface OrgMember {
   region: string;
   joinYear: number | null;
   role: string | null;
+  inAtlas?: boolean;
 }
 
 export interface OrgDetail {
@@ -40,6 +41,7 @@ export interface OrgDetail {
     type: OrgType;
     foundedYear: number | null;
     hqCountry: string | null;
+    memberCount: number;
     description: string | null;
     extra: Record<string, unknown> | null;
   };

@@ -126,7 +126,7 @@ export function CiteAccordion({
           ))}
         </div>
 
-        <pre className="cite-text" aria-live="polite">
+        <pre className="cite-text" aria-live="polite" suppressHydrationWarning>
           {text || "—"}
         </pre>
 

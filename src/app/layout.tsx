@@ -76,125 +76,49 @@ export default function RootLayout({
 
           <main style={{ flex: 1 }}>{children}</main>
 
-          {/* Footer — prototype: border-top, 40px padding, 60px margin-top */}
-          <footer
-            style={{
-              borderTop: "1px solid var(--color-divider)",
-              padding: "var(--spacing-page-x)",
-              marginTop: 60,
-            }}
-          >
-            <div
-              style={{
-                maxWidth: "var(--max-w-content)",
-                margin: "0 auto",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                flexWrap: "wrap",
-                gap: 24,
-              }}
-            >
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <footer className="site-footer">
+            <div className="site-footer__inner">
+              <div className="site-footer__brand">
+                <div className="site-footer__mark">
                   <CivicaLogo size={28} />
-                  <span
-                    style={{
-                      fontFamily: "var(--font-heading)",
-                      fontSize: "var(--text-20)",
-                      fontWeight: 400,
-                      color: "var(--color-text-primary)",
-                    }}
-                  >
-                    Civica
-                  </span>
+                  <span>Civica</span>
                 </div>
-                <p
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-11)",
-                    color: "var(--color-text-25)",
-                    marginTop: 8,
-                  }}
-                >
+                <p className="site-footer__source">
                   Data from Wikidata (CC0), IPU Parline, Constitute Project, CIA World Factbook (archived)
                 </p>
-                <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                      fontFamily: "var(--font-mono)",
-                      fontWeight: "var(--font-weight-mono)",
-                      fontSize: "var(--text-10)",
-                      color: "var(--color-text-30)",
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        background: "var(--color-source-live)",
-                      }}
-                    />
+                <div className="site-footer__legend">
+                  <span>
+                    <span className="site-footer__dot site-footer__dot--live" />
                     Live source
                   </span>
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 4,
-                      fontFamily: "var(--font-mono)",
-                      fontWeight: "var(--font-weight-mono)",
-                      fontSize: "var(--text-10)",
-                      color: "var(--color-text-30)",
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        background: "var(--color-source-frozen)",
-                      }}
-                    />
+                  <span>
+                    <span className="site-footer__dot site-footer__dot--frozen" />
                     Archived
                   </span>
                 </div>
               </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-11)",
-                  color: "var(--color-text-25)",
-                  textAlign: "right",
-                }}
-              >
-                <div style={{ display: "flex", flexWrap: "wrap", rowGap: 6, columnGap: 12, justifyContent: "flex-end" }}>
-                  <Link href="/about" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>About</Link>
-                  <span>&middot;</span>
-                  <Link href="/api-docs" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>API</Link>
-                  <span>&middot;</span>
-                  <Link href="/about#sources" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Sources</Link>
-                  <span>&middot;</span>
-                  <Link href="/contact" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Contact</Link>
-                  <span>&middot;</span>
-                  <Link href="/design-system" style={{ color: "var(--color-text-25)", textDecoration: "none" }}>Design System</Link>
-                  <span>&middot;</span>
-                  <a
-                    href="https://statuspage.incident.io/civica-atlas"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ color: "var(--color-text-25)", textDecoration: "none" }}
-                  >
-                    Status
-                  </a>
-                </div>
-              </div>
+
+              <nav className="site-footer__links" aria-label="Footer navigation">
+                <Link href="/blog">Blog</Link>
+                <span>&middot;</span>
+                <Link href="/api-docs">API Docs</Link>
+                <span>&middot;</span>
+                <Link href="/design-system">Design System</Link>
+                <span>&middot;</span>
+                <a
+                  href="https://statuspage.incident.io/civica-atlas"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Status Page
+                </a>
+                <span>&middot;</span>
+                <Link href="/contact">Contact</Link>
+                <span>&middot;</span>
+                <Link href="/about">About</Link>
+                <span>&middot;</span>
+                <Link href="/about#sources">Sources</Link>
+              </nav>
             </div>
           </footer>
         </ThemeProvider>

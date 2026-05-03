@@ -136,7 +136,10 @@ function cleanText(value: string): string {
 
 function extractText(value: unknown): string | null {
   if (value == null) return null;
-  if (typeof value === "string") return cleanText(value);
+  if (typeof value === "string") {
+    const clean = cleanText(value);
+    return clean && clean !== "[object Object]" ? clean : null;
+  }
   if (typeof value === "number") return value.toLocaleString();
   if (typeof value === "object" && "text" in (value as Record<string, unknown>)) {
     return extractText((value as Record<string, unknown>).text);
@@ -161,11 +164,19 @@ function getNestedText(data: unknown, ...keys: string[]): string | null {
   return extractText(getNestedValue(data, ...keys));
 }
 
+function firstText(...values: unknown[]): string | null {
+  for (const value of values) {
+    const clean = extractText(value);
+    if (clean) return clean;
+  }
+  return null;
+}
+
 function sourceWithValue(
-  value: string | null | undefined,
+  value: unknown,
   source: CountryFactSource
 ): CountryFactValue {
-  const clean = value?.trim();
+  const clean = extractText(value);
   if (!clean || clean === "—") return { value: null };
   return { value: clean, source };
 }
@@ -370,7 +381,12 @@ async function _loadAtlasData(): Promise<{
         )
     : [];
 
-  const factbookSectionNames = ["communications", "economy", "government"];
+  const factbookSectionNames = [
+    "communications",
+    "economy",
+    "government",
+    "people_and_society",
+  ];
   const mastheadSections = jurisdictionIds.length > 0
     ? await db
         .select({
@@ -538,6 +554,7 @@ async function _loadAtlasData(): Promise<{
     const economySection = sections.get("economy");
     const governmentSection = sections.get("government");
     const communicationsSection = sections.get("communications");
+    const peopleSection = sections.get("people_and_society");
     const heads = headsByJurisdiction.get(j.id) ?? {};
 
     const factText = (key: string) => facts.get(key)?.factValue ?? null;
@@ -576,7 +593,14 @@ async function _loadAtlasData(): Promise<{
         wikidataSource
       ),
       capital: sourceWithValue(cachedCapital, ciaSource),
-      language: sourceWithValue(cachedLanguages ?? factText("languages"), ciaSource),
+      language: sourceWithValue(
+        firstText(
+          cachedLanguages,
+          factText("languages"),
+          getNestedText(peopleSection, "Languages", "Languages")
+        ),
+        ciaSource
+      ),
       currency: sourceWithValue(formatCurrency(cachedCurrency), ciaSource),
       region: sourceWithValue(
         CONTINENT_TO_REGION[j.continent || ""] || j.continent || null,
