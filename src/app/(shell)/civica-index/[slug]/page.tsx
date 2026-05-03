@@ -23,6 +23,8 @@ import {
   getGovernancePeerSet,
 } from "@/lib/peer-grouping";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
+import { FactValueDot } from "@/components/factbook/FactValueDot";
+import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 
 /**
  * Phase 5.4 cut-over — display the four governance dimensions of the
@@ -474,9 +476,31 @@ export default async function CICountryDetailPage({
   // when 5.10 cuts over fully, the legacy `pulse` field disappears.
   const pulseV2 = await getPulseV2ForCountry(slug).catch(() => null);
 
+  // Phase F.4 — resolver-direct fetch for the in-scope facts surfaced
+  // on this page (capital + population in the hero meta strip and the
+  // right-panel meta grid). Same migration pattern as the factbook
+  // header strip and atlas masthead — when the resolver returns a
+  // canonical row, we render `<FactValueDot>` inline next to the value
+  // so the alternate-values panel is one click away. When no canonical
+  // row exists yet, the page degrades gracefully to the legacy
+  // `jurisdictions` cache values without a dot.
+  const reconciledFacts = await getCanonicalFactsForJurisdiction(
+    detail.jurisdiction.id,
+    ["population_total", "capital"],
+  ).catch(() => ({}) as Record<string, never>);
+  const populationFact = reconciledFacts["population_total"] ?? null;
+  const capitalFact = reconciledFacts["capital"] ?? null;
+
   const { jurisdiction, composite, dimensions, pulse } = detail;
   const taxonomy = jurisdiction.governmentClassification ?? null;
   const score = composite ? Math.round(composite.score) : null;
+  // Resolver canonical takes precedence over the legacy cache, mirroring
+  // the public API route's contract (see /api/v1/countries/[code]).
+  const resolvedCapital = capitalFact?.canonical?.factValue ?? jurisdiction.capital ?? null;
+  const resolvedPopulation =
+    populationFact?.canonical?.factValueNumeric != null
+      ? Math.round(populationFact.canonical.factValueNumeric)
+      : jurisdiction.population;
 
   const historyArr = Array.isArray(history)
     ? history
@@ -526,12 +550,33 @@ export default async function CICountryDetailPage({
           latestHistoryPoint.score - previousHistoryPoint.score
         ).toFixed(1)} vs ${formatQuarter(previousHistoryPoint.quarter)}`
       : null;
-  const heroMeta = [
+  // Hero meta strip. We mark each item with an optional fact-key so
+  // the renderer can drop a `<FactValueDot>` inline beside it for
+  // resolver-backed values (capital, population).
+  type HeroMetaItem = {
+    text: string;
+    factKey?: "capital" | "population_total";
+  };
+  const heroMeta: HeroMetaItem[] = [
     taxonomy?.structuralSubtypeLabel ?? taxonomy?.rawLabel ?? jurisdiction.governmentType ?? null,
-    jurisdiction.capital ?? null,
-    formatPopulationCompact(jurisdiction.population),
+    resolvedCapital,
+    formatPopulationCompact(resolvedPopulation),
     jurisdiction.continent ?? null,
-  ].filter(Boolean) as string[];
+  ]
+    .map((text, index): HeroMetaItem | null =>
+      text
+        ? {
+            text,
+            factKey:
+              index === 1
+                ? "capital"
+                : index === 2
+                  ? "population_total"
+                  : undefined,
+          }
+        : null,
+    )
+    .filter((item): item is HeroMetaItem => item !== null);
   const rankLabel =
     composite?.rank && composite?.totalRanked
       ? `Rank ${composite.rank} / ${composite.totalRanked}`
@@ -642,12 +687,32 @@ export default async function CICountryDetailPage({
 
           {heroMeta.length > 0 ? (
             <div className="ci-country-meta">
-              {heroMeta.map((item, index) => (
-                <span key={`${item}-${index}`}>
-                  {index > 0 ? <span className="ci-country-meta-dot">·</span> : null}
-                  {item}
-                </span>
-              ))}
+              {heroMeta.map((item, index) => {
+                const fact =
+                  item.factKey === "capital"
+                    ? capitalFact
+                    : item.factKey === "population_total"
+                      ? populationFact
+                      : null;
+                return (
+                  <span
+                    key={`${item.text}-${index}`}
+                    style={{ display: "inline-flex", alignItems: "baseline", gap: 4 }}
+                  >
+                    {index > 0 ? <span className="ci-country-meta-dot">·</span> : null}
+                    <span>{item.text}</span>
+                    {fact?.canonical && item.factKey ? (
+                      <FactValueDot
+                        factKey={item.factKey}
+                        factLabel={item.factKey === "capital" ? "Capital" : "Population"}
+                        resolverOutput={fact}
+                        canonicalSourceId={fact.canonical.sourceId ?? null}
+                        ariaLabel={`${item.factKey === "capital" ? "Capital" : "Population"} ${item.text}, see sources`}
+                      />
+                    ) : null}
+                  </span>
+                );
+              })}
             </div>
           ) : null}
 
@@ -783,11 +848,33 @@ export default async function CICountryDetailPage({
             <div className="ci-country-meta-grid">
               <div className="ci-country-meta-row">
                 <span>Capital</span>
-                <strong>{jurisdiction.capital ?? "—"}</strong>
+                <strong style={{ display: "inline-flex", alignItems: "baseline", gap: 6 }}>
+                  <span>{resolvedCapital ?? "—"}</span>
+                  {capitalFact?.canonical ? (
+                    <FactValueDot
+                      factKey="capital"
+                      factLabel="Capital"
+                      resolverOutput={capitalFact}
+                      canonicalSourceId={capitalFact.canonical.sourceId ?? null}
+                      ariaLabel={`Capital ${resolvedCapital ?? ""}, see sources`}
+                    />
+                  ) : null}
+                </strong>
               </div>
               <div className="ci-country-meta-row">
                 <span>Population</span>
-                <strong>{formatPopulationLong(jurisdiction.population)}</strong>
+                <strong style={{ display: "inline-flex", alignItems: "baseline", gap: 6 }}>
+                  <span>{formatPopulationLong(resolvedPopulation)}</span>
+                  {populationFact?.canonical ? (
+                    <FactValueDot
+                      factKey="population_total"
+                      factLabel="Population"
+                      resolverOutput={populationFact}
+                      canonicalSourceId={populationFact.canonical.sourceId ?? null}
+                      ariaLabel={`Population ${formatPopulationLong(resolvedPopulation)}, see sources`}
+                    />
+                  ) : null}
+                </strong>
               </div>
               <div className="ci-country-meta-row">
                 <span>Current quarter</span>

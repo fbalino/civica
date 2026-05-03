@@ -37,7 +37,7 @@ Per methodology §1.0 + schema §11:
 | Atlas world-map hover | `src/components/atlas/AtlasWorldMap.tsx`, `src/lib/atlas/load-atlas-data.ts` | C | pending F.4 | Hover tooltip; no provenance UI |
 | Atlas compare picker | `src/app/(shell)/atlas/compare/page.tsx` | C | pending F.4 | List-shaped; per-row SourceDots can fetch lazily |
 | Civica-index landing leaderboard | `src/app/(shell)/civica-index/page.tsx` | C | pending F.4 | List rows; main scoring surface |
-| Civica-index country detail | `src/app/(shell)/civica-index/[slug]/page.tsx` | R | pending F.4 | Country card displays sourced facts |
+| Civica-index country detail | `src/app/(shell)/civica-index/[slug]/page.tsx` | R | ✓ migrated 2026-05-02 | Hero meta strip (capital + population) and right-panel meta-grid (Capital + Population rows) render `<FactValueDot>` inline when resolver returns canonical data; degrade to plain text otherwise. Resolver canonical takes precedence over `jurisdictions` cache (consistent with public API contract). Capital currently has no canonical rows across countries — graceful degradation verified. |
 | Factbook header strip | `src/components/factbook/FactbookHeaderStrip.tsx` (verify name) | R | pending F.4 | Carries SourceDots |
 | Factbook structured sections | `src/components/FactbookSection.tsx`, `src/components/factbook/*` | R | pending F.4 | Per-field SourceDots |
 | Legacy `/countries/[slug]` | `src/app/(reader)/countries/[slug]/page.tsx` and subroutes | R | pending F.4 | Still live; gets the same upgrade |
