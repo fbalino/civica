@@ -1,5 +1,121 @@
 # Project Memory Sessions
 
+## 2026-05-02 — `structural_family` removal — Phase 3 consumer refactor shipped
+
+Phase 3 of the structural-family removal landed end-to-end after
+Phase F greenlit at F.2.1 cut-over (full coverage on
+`world_bank_region`, `world_bank_income_group`, `vdem_row`,
+`monarchy_status`, `government_form_description`). Five sub-phases
+shipped, each verified against the live preview:
+
+- **3a — country detail rank panels.** `(shell)/civica-index/[slug]`
+  drops the `familyRank` block and renders two `<PeerLensPanel>`
+  components (material peer = World Bank region+income, governance
+  peer = V-Dem RoW). `getMaterialPeerSet()` and
+  `getGovernancePeerSet()` from `src/lib/peer-grouping/` call
+  Phase F's `getCanonicalFactsForJurisdictions()`. Verified on
+  Germany (region+income n=35), USA (region+income n<8 → income-only
+  fallback fires correctly), and mobile (393px no-overflow).
+
+- **3b — civica-index left rail + page filter.**
+  `(shell)/@left/civica-index` now fetches
+  `getVDemRowDistribution()`, `getWorldBankRegionDistribution()`,
+  `getWorldBankIncomeGroupDistribution()`, and
+  `getCgvRegimeDistribution()` (CGV is in an expandable advanced
+  panel). New typed URL params: `?vdem=`, `?region=`, `?income=`,
+  `?cgv=`. Legacy `?family=*` 308-redirects to bare `/civica-index`.
+  `getCIRankings()` extended with the four new filter options;
+  multi-filter intersections work (e.g.
+  `?vdem=Liberal+Democracy&income=High+income` → 31 countries).
+
+- **3c — bi-lens explorer.**
+  `(reader)/civica-index/government-types` is now a V-Dem RoW
+  (default) + BR/CGV (toggle) explorer. Old `?lens=structural`
+  silently falls through to V-Dem RoW. The "How to read this page"
+  panel was rewritten to cite Lührmann et al. 2018 + the new
+  peer-grouping methodology page rather than the old structural-form
+  framing. `GovernmentTypesAccordionExplorer.lensTabs.id` type
+  changed from `"structural" | "regime"` to `"vdem_row" | "regime"`.
+
+- **3d — archive `/government-types` URLs.** The top-level page +
+  the 9 dynamic `[type]/page.tsx` files were deleted; `next.config.ts`
+  308-redirects both `/government-types` and `/government-types/:type`
+  to `/civica-index/methodology/peer-grouping`. Verified via
+  `curl -I` — both return `308 Permanent Redirect` with the right
+  `location` header.
+
+- **3e — compare + taxonomy block label swap.** Compare card's
+  `prettyGov` now reads `classification.regimeTypeLabel` instead of
+  the retired `structuralFamilyLabel`. `<GovernmentTaxonomyBlock>`
+  drops the "Structure" row entirely; the descriptive constitutional
+  form will move to a `getConstitutionalForm()`-backed surface in a
+  follow-up. `/api-docs` example JSON marks both `structuralFamily`
+  and `structuralSubtype` fields as `(DEPRECATED — sunset T+2
+  vintages)` to set external-consumer expectations.
+
+### Phase F vocabulary alignment
+
+Phase F's canonical-fact-layer values are human-readable strings, NOT
+snake_case slugs:
+- V-Dem RoW: `"Closed Autocracy"`, `"Electoral Autocracy"`,
+  `"Electoral Democracy"`, `"Liberal Democracy"`
+- World Bank region: `"East Asia & Pacific"`,
+  `"Europe & Central Asia"`, `"Latin America & Caribbean"`,
+  `"Middle East, North Africa, Afghanistan & Pakistan"` (note: the
+  non-standard MENA-AP regional grouping is the World Bank's lending-
+  group label preserved verbatim), `"North America"`, `"South Asia"`,
+  `"Sub-Saharan Africa"`
+- World Bank income: `"Low income"`, `"Lower middle income"`,
+  `"Upper middle income"`, `"High income"`
+- CGV regime: snake_case (matches existing `REGIME_TYPE_META`)
+- monarchy_status: lowercase enum (matches the §C-Q2 spec)
+
+`src/lib/peer-grouping/lens-metadata.ts` keys updated to match
+canonical strings. `getPeerLensValueMeta()` is tolerant — unknown
+values return `null` rather than crash, so future Phase F vocabulary
+drift won't break the UI.
+
+### Open follow-ups (Phase 4)
+
+- Phase 4 — public API deprecation contract (Deprecation +
+  Sunset headers on `/api/v1/government-types`,
+  `/api/v1/countries`, `/api/v1/index/rankings`; `/api/v1/peer-groupings`
+  successor endpoint; migration table; replication-script discovery).
+- Phase 4 will also need to rewire `<GovernmentTaxonomyBlock>` (or a
+  successor surface) to surface the descriptive constitutional-form
+  text via `getConstitutionalForm()`.
+- Phase 6 — T+2 vintage hard cut. `structural_family` /
+  `structural_subtype` columns and the `STRUCTURAL_FAMILY_META`
+  / `STRUCTURAL_GOVERNMENT_TYPES` constants get deleted at that
+  point.
+
+## 2026-05-02 — `structural_family` removal — Phase 2 + Phase 5 kickoff
+
+- Audit completed: 19 files reference `structural_family` (vs. ~17 estimate).
+  80% of code-level complexity in 3 files (`government-taxonomy/index.ts`,
+  `db/queries.ts`, the two `government-types` page suites). The other 16
+  files are mechanical follow-ups.
+- Implementation plan v1.1 at
+  `~/civica/plan/structural-family-removal-implementation-plan.md`. User
+  approved 2026-05-02 with three locked decisions: (Q1) archive
+  `/government-types*` with 308 redirects, (Q2) wait for Phase F sync —
+  no throwaway local ingestion, (Q3) ship methodology page with
+  "Pending external review" footer, no BETA pill, v1.1 changelog if
+  revisions return.
+- **Phase F coordination point.** Phase F shipped F.3 (resolver layer
+  flipped for first three flipped fact-keys) on 2026-05-02. The four
+  peer-grouping fact-keys (`world_bank_region`, `world_bank_income_group`,
+  `vdem_row`, `monarchy_status`) are next in their sync queue (~2–4 weeks).
+  Phase 2 of this work writes against the actual `resolveFact()` API.
+  Phase F should coordinate on the `monarchy_status` enum vocabulary
+  (this plan §C-Q2 lists 6 values: none/constitutional/absolute/
+  ceremonial/elective/theocratic — if Phase F's regex picks different
+  values, this plan adopts theirs per the canonical-fact-layer authority).
+- Phase 2 + Phase 5 running in parallel during the Phase F sync wait.
+  Phase 3 (consumer refactor) gates on the four sync scripts firing
+  with ≥200 jurisdiction coverage — pause point before starting.
+- Memory-decisions.md updated with the cross-session decision record.
+
 ## 2026-05-02 — Mobile overflow repair
 
 - Fixed mobile horizontal overflow on factbook country pages. Root causes found during browser verification:

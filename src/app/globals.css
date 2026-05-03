@@ -84,6 +84,25 @@
   --color-branch-judicial: #5CAA6E;
   --color-branch-monarchy: #b48bff;
 
+  /* --- Peer-grouping lens tokens (peer-grouping-resolution-v1) ---
+     Material lenses (World Bank region + income) get their own
+     palette so income tiers don't collide with governance tiers.
+     Governance lens (V-Dem RoW) intentionally maps onto the
+     existing --tier-* ramp via lens-metadata.ts so readers
+     associate the same palette with governance quality across CI
+     scoring and peer-grouping presentation. */
+  --peer-region-eap: #4E8BD4;
+  --peer-region-eca: #6B7FAB;
+  --peer-region-lac: #D4764E;
+  --peer-region-mena: #C4A44E;
+  --peer-region-na: #5C9AA0;
+  --peer-region-sa: #9B6DC6;
+  --peer-region-ssa: #5CAA6E;
+  --peer-income-low: #C65A37;
+  --peer-income-lower-mid: #D4A04A;
+  --peer-income-upper-mid: #6B9A6B;
+  --peer-income-high: #4E8BD4;
+
   /* --- Layout --- */
   --max-w-content: 1200px;
 
@@ -3098,4 +3117,102 @@ a {
   0%   { box-shadow: 0 0 0 0   rgba(92, 170, 110, 0.6); }
   70%  { box-shadow: 0 0 0 10px rgba(92, 170, 110, 0); }
   100% { box-shadow: 0 0 0 0   rgba(92, 170, 110, 0); }
+}
+
+/* ============================================================
+   Peer-grouping lens panel — country detail surface
+   Renders a single peer-lens cohort with rank + provenance.
+   Two of these stack on country pages: material + governance.
+   ============================================================ */
+.peer-lens-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+}
+.peer-lens-panel--unavailable {
+  opacity: 0.85;
+}
+
+.peer-lens-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.peer-lens-panel__lens-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-30);
+}
+
+.peer-lens-panel__cohort-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+.peer-lens-panel__cohort-label--muted {
+  color: var(--color-text-40);
+  font-size: var(--text-15);
+}
+.peer-lens-panel__cohort-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.peer-lens-panel__rank {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+.peer-lens-panel__rank-position {
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+.peer-lens-panel__rank-of {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-30);
+}
+.peer-lens-panel__rank--no-score {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+}
+
+.peer-lens-panel__fallback-note {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-11);
+  letter-spacing: 0.02em;
+  color: var(--color-text-40);
+  line-height: 1.45;
+}
+
+/* Stacked peer-lens panels on the country detail "Regional rank"
+   panel — material peer + governance peer side-by-side on wider
+   viewports, stacking vertically on narrow ones. */
+.ci-country-peer-lenses {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
 }

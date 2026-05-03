@@ -979,7 +979,16 @@ export async function getCIRankings(
   filters?: {
     continent?: string;
     governmentType?: string;
+    /** @deprecated Phase 3 of structural_family removal — pass
+     *  `vdemRow` / `worldBankRegion` / `worldBankIncomeGroup` /
+     *  `cgvRegime` instead. Retained for the API deprecation window
+     *  but no longer wired to any UI surface as of 2026-05-02. */
     structuralFamily?: string;
+    /** Phase 3 — peer-grouping filters. Multiple filters AND together. */
+    vdemRow?: string;
+    worldBankRegion?: string;
+    worldBankIncomeGroup?: string;
+    cgvRegime?: string;
     /** Defaults to "beta" — Phase 5.4 cut-over. */
     methodologyVersion?: string;
   }
@@ -998,6 +1007,32 @@ export async function getCIRankings(
         WHERE gt.jurisdiction_id = j.id
           AND gt.taxonomy_version = '2026_v1'
           AND gt.structural_family = ${filters.structuralFamily}
+      )`
+    : sql``;
+  const peerLensFilter = (factKey: string, value: string | undefined) =>
+    value
+      ? sql`AND EXISTS (
+          SELECT 1 FROM country_facts cf
+          WHERE cf.jurisdiction_id = j.id
+            AND cf.fact_key = ${factKey}
+            AND cf.status = 'active'
+            AND cf.fact_value = ${value}
+        )`
+      : sql``;
+  const vdemFilter = peerLensFilter("vdem_row", filters?.vdemRow);
+  const wbRegionFilter = peerLensFilter(
+    "world_bank_region",
+    filters?.worldBankRegion,
+  );
+  const wbIncomeFilter = peerLensFilter(
+    "world_bank_income_group",
+    filters?.worldBankIncomeGroup,
+  );
+  const cgvFilter = filters?.cgvRegime
+    ? sql`AND EXISTS (
+        SELECT 1 FROM government_taxonomies gt
+        WHERE gt.jurisdiction_id = j.id
+          AND gt.regime_type_cgv = ${filters.cgvRegime}
       )`
     : sql``;
 
@@ -1033,6 +1068,10 @@ export async function getCIRankings(
       ${continentFilter}
       ${govTypeFilter}
       ${familyFilter}
+      ${vdemFilter}
+      ${wbRegionFilter}
+      ${wbIncomeFilter}
+      ${cgvFilter}
     ORDER BY cs.rank ASC
   `);
   const rows = Array.isArray(result)
@@ -1473,7 +1512,10 @@ export async function getInternationalMembershipsBySlugs(
   return rows;
 }
 
-async function getLatestAvailableQuarter(
+// Exported for `queries-peer-grouping.ts` (Phase 3 structural_family
+// removal workstream) and any other consumer that needs the latest
+// CI-vintage quarter as a peg.
+export async function getLatestAvailableQuarter(
   methodologyVersion: string = "beta",
 ): Promise<string> {
   const [row] = await db

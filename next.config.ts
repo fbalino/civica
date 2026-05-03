@@ -95,6 +95,23 @@ const nextConfig: NextConfig = {
         destination: "/atlas/:slug/constitution",
         permanent: true,
       },
+      // Phase 3d (structural_family removal) — top-level
+      // /government-types and /government-types/[type] pages are
+      // archived per the 2026-05-02 peer-grouping resolution. The
+      // educational appeal of "what's a parliamentary democracy"
+      // now lives in the methodology page, where the constitutional
+      // form is descriptive metadata rather than an analytical
+      // taxonomy. Implementation plan §B-3d locks this redirect.
+      {
+        source: "/government-types",
+        destination: "/civica-index/methodology/peer-grouping",
+        permanent: true,
+      },
+      {
+        source: "/government-types/:type",
+        destination: "/civica-index/methodology/peer-grouping",
+        permanent: true,
+      },
     ];
   },
 };

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-interface FamilyOption {
+interface LensOption {
   key: string;
   label: string;
   totalCount: number;
@@ -11,26 +11,56 @@ interface FamilyOption {
 
 interface CivicaIndexFilterSelectsProps {
   continents: string[];
-  families: FamilyOption[];
+  vdemOptions: LensOption[];
+  worldBankRegionOptions: LensOption[];
+  worldBankIncomeOptions: LensOption[];
+  cgvOptions: LensOption[];
   activeContinent?: string;
-  activeFamily?: string;
+  activeVdem?: string;
+  activeWorldBankRegion?: string;
+  activeWorldBankIncome?: string;
+  activeCgv?: string;
 }
 
-function buildHref(continent?: string, family?: string) {
+interface QueryShape {
+  continent?: string;
+  vdem?: string;
+  region?: string;
+  income?: string;
+  cgv?: string;
+}
+
+function buildHref(q: QueryShape) {
   const qs = new URLSearchParams();
-  if (continent) qs.set("continent", continent);
-  if (family) qs.set("family", family);
-  const q = qs.toString();
-  return q ? `/civica-index?${q}` : "/civica-index";
+  if (q.continent) qs.set("continent", q.continent);
+  if (q.vdem) qs.set("vdem", q.vdem);
+  if (q.region) qs.set("region", q.region);
+  if (q.income) qs.set("income", q.income);
+  if (q.cgv) qs.set("cgv", q.cgv);
+  const out = qs.toString();
+  return out ? `/civica-index?${out}` : "/civica-index";
 }
 
 export function CivicaIndexFilterSelects({
   continents,
-  families,
+  vdemOptions,
+  worldBankRegionOptions,
+  worldBankIncomeOptions,
+  cgvOptions,
   activeContinent,
-  activeFamily,
+  activeVdem,
+  activeWorldBankRegion,
+  activeWorldBankIncome,
+  activeCgv,
 }: CivicaIndexFilterSelectsProps) {
   const router = useRouter();
+  const baseQuery: QueryShape = {
+    continent: activeContinent,
+    vdem: activeVdem,
+    region: activeWorldBankRegion,
+    income: activeWorldBankIncome,
+    cgv: activeCgv,
+  };
 
   return (
     <>
@@ -39,9 +69,11 @@ export function CivicaIndexFilterSelects({
         <select
           className="civica-filter-select"
           value={activeContinent ?? ""}
-          onChange={(event) => {
-            router.push(buildHref(event.target.value || undefined, activeFamily));
-          }}
+          onChange={(e) =>
+            router.push(
+              buildHref({ ...baseQuery, continent: e.target.value || undefined }),
+            )
+          }
         >
           <option value="">All regions</option>
           {continents.map((continent) => (
@@ -52,26 +84,97 @@ export function CivicaIndexFilterSelects({
         </select>
       </label>
 
-      {families.length > 0 && (
+      {vdemOptions.length > 0 && (
         <label className="civica-filter-select-wrap">
-          <span className="left-filter-label">Government type</span>
+          <span className="left-filter-label">V-Dem regime</span>
           <select
             className="civica-filter-select"
-            value={activeFamily ?? ""}
-            onChange={(event) => {
+            value={activeVdem ?? ""}
+            onChange={(e) =>
               router.push(
-                buildHref(activeContinent, event.target.value || undefined)
-              );
-            }}
+                buildHref({ ...baseQuery, vdem: e.target.value || undefined }),
+              )
+            }
           >
-            <option value="">All types</option>
-            {families.map((family) => (
-              <option key={family.key} value={family.key}>
-                {family.label} ({family.scoredCount})
+            <option value="">All regimes</option>
+            {vdemOptions.map((opt) => (
+              <option key={opt.key} value={opt.key}>
+                {opt.label} ({opt.scoredCount})
               </option>
             ))}
           </select>
         </label>
+      )}
+
+      {worldBankRegionOptions.length > 0 && (
+        <label className="civica-filter-select-wrap">
+          <span className="left-filter-label">World Bank region</span>
+          <select
+            className="civica-filter-select"
+            value={activeWorldBankRegion ?? ""}
+            onChange={(e) =>
+              router.push(
+                buildHref({ ...baseQuery, region: e.target.value || undefined }),
+              )
+            }
+          >
+            <option value="">All World Bank regions</option>
+            {worldBankRegionOptions.map((opt) => (
+              <option key={opt.key} value={opt.key}>
+                {opt.label} ({opt.scoredCount})
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {worldBankIncomeOptions.length > 0 && (
+        <label className="civica-filter-select-wrap">
+          <span className="left-filter-label">Income group</span>
+          <select
+            className="civica-filter-select"
+            value={activeWorldBankIncome ?? ""}
+            onChange={(e) =>
+              router.push(
+                buildHref({ ...baseQuery, income: e.target.value || undefined }),
+              )
+            }
+          >
+            <option value="">All income groups</option>
+            {worldBankIncomeOptions.map((opt) => (
+              <option key={opt.key} value={opt.key}>
+                {opt.label} ({opt.scoredCount})
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {cgvOptions.length > 0 && (
+        <details className="civica-filter-advanced">
+          <summary className="civica-filter-advanced-summary">
+            Alternate regime lens (BR/CGV)
+          </summary>
+          <label className="civica-filter-select-wrap">
+            <span className="left-filter-label">CGV regime</span>
+            <select
+              className="civica-filter-select"
+              value={activeCgv ?? ""}
+              onChange={(e) =>
+                router.push(
+                  buildHref({ ...baseQuery, cgv: e.target.value || undefined }),
+                )
+              }
+            >
+              <option value="">All CGV regimes</option>
+              {cgvOptions.map((opt) => (
+                <option key={opt.key} value={opt.key}>
+                  {opt.label} ({opt.scoredCount})
+                </option>
+              ))}
+            </select>
+          </label>
+        </details>
       )}
     </>
   );

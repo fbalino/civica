@@ -362,8 +362,8 @@ export default function ApiDocsPage() {
         "regimeType": "presidential_democracy",
         "regimeSource": "Bjornskov-Rode / CGV (QoG Standard)",
         "regimeYear": 2025,
-        "structuralFamily": "presidential_republic",
-        "structuralSubtype": "federal_presidential_republic",
+        "structuralFamily": "presidential_republic (DEPRECATED — sunset T+2 vintages)",
+        "structuralSubtype": "federal_presidential_republic (DEPRECATED — sunset T+2 vintages)",
         "primitives": {
           "isFederal": true,
           "isMonarchy": false,
@@ -413,8 +413,8 @@ export default function ApiDocsPage() {
       "regimeType": "semi_presidential_democracy",
       "regimeSource": "Bjornskov-Rode / CGV (QoG Standard)",
       "regimeYear": 2025,
-      "structuralFamily": "semi_presidential",
-      "structuralSubtype": "semi_presidential_republic",
+      "structuralFamily": "semi_presidential (DEPRECATED — sunset T+2 vintages)",
+      "structuralSubtype": "semi_presidential_republic (DEPRECATED — sunset T+2 vintages)",
       "primitives": {
         "isFederal": false,
         "isMonarchy": false,

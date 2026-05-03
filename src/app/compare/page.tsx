@@ -162,12 +162,15 @@ export default async function ComparePage({
   const selectedCards: Array<SelectedCountryCard | null> = [0, 1, 2].map((i) => {
     const ciRow = orderedCI[i];
     if (!ciRow) return null;
-    // Prefer the pretty-printed structural family from the taxonomy layer
-    // (e.g. "Federal Republic", "Parliamentary Democracy") over the raw DB
-    // `government_type` which is often a long snake_case factbook string.
+    // Phase 3e (structural_family removal) — prefer the pretty-printed
+    // BR/CGV regime type label from the taxonomy layer (e.g.
+    // "Parliamentary democracy", "Civilian dictatorship") over the raw
+    // DB `government_type` factbook string. The legacy
+    // `structuralFamilyLabel` was retired with the heuristic taxonomy
+    // per the 2026-05-02 peer-grouping resolution.
     const classification = ciRow.jurisdiction.governmentClassification;
     const prettyGov =
-      classification?.structuralFamilyLabel ??
+      classification?.regimeTypeLabel ??
       govShort(ciRow.jurisdiction.governmentType);
     return {
       slug: ciRow.jurisdiction.slug,

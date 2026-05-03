@@ -29,7 +29,7 @@ type Props = {
   plotHelper: string;
   footerLabel: string;
   lensTabs: Array<{
-    id: "structural" | "regime";
+    id: "vdem_row" | "regime";
     label: string;
     href: string;
     active: boolean;
@@ -518,21 +518,27 @@ export function GovernmentTypesAccordionExplorer({
         <div className="taxonomy-explainer">
           <div className="taxonomy-explainer-label">How to read this page</div>
           <p>
-            <strong>Structural form</strong> answers what the system is:
-            parliamentary republic, constitutional monarchy, directorial
-            republic, and related forms.
+            <strong>V-Dem RoW</strong> is the default governance lens
+            (Lührmann et al. 2018). Four tiers spanning closed autocracy
+            through liberal democracy &mdash; the standard regime
+            classification used in comparative politics.
           </p>
           <p>
-            <strong>Regime type</strong> answers how executive-legislative
-            accountability works in the Bjornskov-Rode / CGV tradition:
-            parliamentary, semi-presidential, or presidential democracy, plus
-            civilian, military, or royal dictatorship.
+            <strong>BR / CGV regime</strong> is the alternate lens
+            (Bjørnskov-Rode / Cheibub-Gandhi-Vreeland). Six published
+            categories distinguishing democracies by executive form
+            (parliamentary, semi-presidential, presidential) and
+            authoritarian systems by ruling-elite structure (civilian,
+            military, royal).
           </p>
           <p>
-            These lenses can disagree for valid academic reasons. Switzerland,
-            for example, can appear as a <em>presidential democracy</em> in the
-            accountability sense while remaining a <em>federal directorial
-            republic</em> structurally.
+            These lenses can disagree for valid academic reasons. The
+            structural <code>structural_family</code> heuristic that used
+            to live here was retired on 2026-05-02; see the{" "}
+            <a href="/civica-index/methodology/peer-grouping">
+              peer-grouping methodology
+            </a>{" "}
+            for why the bi-lens replacement is a better fit.
           </p>
         </div>
       </section>

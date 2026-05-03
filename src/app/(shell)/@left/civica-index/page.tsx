@@ -1,11 +1,20 @@
 import {
-  getStructuralFamilyDistribution,
-} from "@/lib/db/queries";
+  getWorldBankRegionDistribution,
+  getWorldBankIncomeGroupDistribution,
+  getVDemRowDistribution,
+  getCgvRegimeDistribution,
+} from "@/lib/db/queries-peer-grouping";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import {
-  STRUCTURAL_FAMILY_META,
-  type StructuralFamilyKey,
-} from "@/lib/government-taxonomy";
+  WORLD_BANK_REGION_META,
+  WORLD_BANK_INCOME_GROUP_META,
+  VDEM_ROW_META,
+  CGV_REGIME_TYPE_META,
+  type WorldBankRegionKey,
+  type WorldBankIncomeGroupKey,
+  type VDemRowKey,
+  type CGVRegimeTypeKey,
+} from "@/lib/peer-grouping/lens-metadata";
 import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
 import { CivicaIndexFilterSelects } from "@/components/civica-index/CivicaIndexFilterSelects";
 
@@ -18,6 +27,31 @@ const CONTINENTS = [
   "Oceania",
 ];
 
+interface RawDistRow {
+  key: string;
+  totalCount: number;
+  scoredCount: number;
+}
+
+function decorateOptions<K extends string>(
+  raw: RawDistRow[],
+  meta: Record<K, { label: string; order: number }>,
+): Array<{ key: string; label: string; totalCount: number; scoredCount: number }> {
+  return [...raw]
+    .sort((a, b) => {
+      const orderA = meta[a.key as K]?.order ?? 999;
+      const orderB = meta[b.key as K]?.order ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return b.totalCount - a.totalCount;
+    })
+    .map((r) => ({
+      key: r.key,
+      label: meta[r.key as K]?.label ?? r.key,
+      totalCount: r.totalCount,
+      scoredCount: r.scoredCount,
+    }));
+}
+
 export default async function CivicaIndexLeftSlot({
   searchParams,
 }: {
@@ -26,39 +60,41 @@ export default async function CivicaIndexLeftSlot({
   const sp = await searchParams;
   const continent =
     typeof sp?.continent === "string" ? sp.continent : undefined;
-  const structuralFamily =
-    typeof sp?.family === "string" ? sp.family : undefined;
+  const vdem = typeof sp?.vdem === "string" ? sp.vdem : undefined;
+  const region = typeof sp?.region === "string" ? sp.region : undefined;
+  const income = typeof sp?.income === "string" ? sp.income : undefined;
+  const cgv = typeof sp?.cgv === "string" ? sp.cgv : undefined;
 
-  let familyOptions: Array<{
-    key: string;
-    totalCount: number;
-    scoredCount: number;
-  }> = [];
+  let vdemRaw: RawDistRow[] = [];
+  let regionRaw: RawDistRow[] = [];
+  let incomeRaw: RawDistRow[] = [];
+  let cgvRaw: RawDistRow[] = [];
   try {
-    familyOptions = await getStructuralFamilyDistribution();
+    [vdemRaw, regionRaw, incomeRaw, cgvRaw] = await Promise.all([
+      getVDemRowDistribution(),
+      getWorldBankRegionDistribution(),
+      getWorldBankIncomeGroupDistribution(),
+      getCgvRegimeDistribution(),
+    ]);
   } catch {
     // DB not seeded
   }
-  const familyOptionsSorted = [...familyOptions].sort((a, b) => {
-    const orderA =
-      STRUCTURAL_FAMILY_META[a.key as StructuralFamilyKey]?.order ?? 999;
-    const orderB =
-      STRUCTURAL_FAMILY_META[b.key as StructuralFamilyKey]?.order ?? 999;
-    if (orderA !== orderB) return orderA - orderB;
-    return b.totalCount - a.totalCount;
-  });
+
+  const vdemOptions = decorateOptions<VDemRowKey>(vdemRaw, VDEM_ROW_META);
+  const worldBankRegionOptions = decorateOptions<WorldBankRegionKey>(
+    regionRaw,
+    WORLD_BANK_REGION_META,
+  );
+  const worldBankIncomeOptions = decorateOptions<WorldBankIncomeGroupKey>(
+    incomeRaw,
+    WORLD_BANK_INCOME_GROUP_META,
+  );
+  const cgvOptions = decorateOptions<CGVRegimeTypeKey>(
+    cgvRaw,
+    CGV_REGIME_TYPE_META,
+  );
 
   const { countries } = await loadAtlasData();
-
-  const families = familyOptionsSorted.map((f) => {
-    const meta = STRUCTURAL_FAMILY_META[f.key as StructuralFamilyKey];
-    return {
-      key: f.key,
-      label: meta?.label ?? f.key,
-      totalCount: f.totalCount,
-      scoredCount: f.scoredCount,
-    };
-  });
 
   return (
     <ShellCountryRail
@@ -75,9 +111,15 @@ export default async function CivicaIndexLeftSlot({
         <div className="left-filter-block">
           <CivicaIndexFilterSelects
             continents={CONTINENTS}
-            families={families}
+            vdemOptions={vdemOptions}
+            worldBankRegionOptions={worldBankRegionOptions}
+            worldBankIncomeOptions={worldBankIncomeOptions}
+            cgvOptions={cgvOptions}
             activeContinent={continent}
-            activeFamily={structuralFamily}
+            activeVdem={vdem}
+            activeWorldBankRegion={region}
+            activeWorldBankIncome={income}
+            activeCgv={cgv}
           />
         </div>
       }

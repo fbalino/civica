@@ -218,6 +218,21 @@
   font-family: var(--font-body);
   font-size: var(--text-13);
 }
+
+/* Horizontally-scrollable wrapper for wide editorial tables. Body
+   has overflow-x: clip set globally, so a wide table inside a normal
+   .editorial-section gets clipped on mobile rather than scrolling
+   the document. This wrapper restores horizontal scroll for the
+   table only, leaving the page's vertical flow untouched. */
+.editorial-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 16px 0 8px;
+}
+.editorial-table-scroll > table {
+  margin: 0;
+  min-width: max-content;
+}
 .editorial-section thead th {
   text-align: left;
   padding: 8px 12px;
@@ -483,4 +498,262 @@
 .editorial-empty a {
   color: var(--color-accent);
   text-decoration: none;
+}
+
+/* ── Phase F: alternate-values panel ─────────────────────────────
+ * Used by `<FactValuePanel>` / `<FactValueDot>`. Click a SourceDot
+ * with reconciled multi-source data → panel opens listing every
+ * source row with the resolver's canonical pick highlighted.
+ *
+ * Design notes (v2 — 2026-05-02 redesign):
+ *  - Mono ONLY for numeric values, the fact-key slug, and the
+ *    small "Civica pick" tag. Source names + meta + footer are
+ *    sans (Inter) for readability.
+ *  - Rows use flex with wrap. Wide values wrap to a new line so
+ *    the source name never gets squeezed.
+ *  - Footer uses gap not justify-between so the methodology link
+ *    can't be pushed off and never wraps mid-word.
+ *
+ * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §6.2
+ * ───────────────────────────────────────────────────────────────── */
+
+.fact-value-popover {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.fact-value-trigger {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  line-height: 1;
+}
+.fact-value-trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.fact-value-trigger-caret {
+  font-family: var(--font-body);
+  font-size: 10px;
+  color: var(--color-text-40);
+  line-height: 1;
+  margin-top: 1px;
+}
+
+/* The panel itself is positioned by `<FactValueDot>` via a React
+ * portal — `.fact-value-panel-host` is the wrapper that sets
+ * `position: fixed`, top/left from the trigger rect, and z-index.
+ * Keep `.fact-value-panel` purely visual (border/padding/bg). */
+.fact-value-panel {
+  width: 360px;
+  max-width: min(420px, calc(100vw - 2 * var(--space-3)));
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-default);
+  box-shadow: var(--shadow-hard);
+  padding: 14px 16px 12px;
+  font-family: var(--font-body);
+  text-align: left;
+  white-space: normal;
+  color: var(--color-text-primary);
+}
+.fact-value-panel-host {
+  /* position/top/left/z-index set inline by FactValueDot. */
+}
+@media (max-width: 640px) {
+  .fact-value-panel-host {
+    /* Portal-host stays at the trigger position; the panel inside
+     * gets a mobile-friendly bottom-sheet shape via the panel rule. */
+  }
+  .fact-value-panel {
+    width: calc(100vw - 2 * var(--space-3));
+    max-width: none;
+  }
+}
+
+.fact-value-panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-default);
+}
+.fact-value-panel-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.fact-value-panel-fact-key {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-40);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.fact-value-disputed-banner {
+  display: block;
+  margin-bottom: 10px;
+  padding: 8px 10px;
+  background: color-mix(in oklab, var(--color-status-warning) 8%, transparent);
+  border-left: 3px solid var(--color-status-warning);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.fact-value-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.fact-value-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 10px;
+  row-gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg);
+  border-radius: 2px;
+}
+.fact-value-row--canonical {
+  border-color: var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent) 5%, transparent);
+}
+.fact-value-row--rejected {
+  opacity: 0.55;
+  border-style: dashed;
+}
+.fact-value-row-source {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  flex: 1 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.fact-value-row-canonical-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.fact-value-row-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-14);
+  color: var(--color-text-primary);
+  text-align: right;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+.fact-value-row-meta {
+  flex-basis: 100%;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  line-height: 1.4;
+}
+.fact-value-row-meta a {
+  color: var(--color-text-60);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.fact-value-row-meta a:hover {
+  color: var(--color-accent);
+}
+.fact-value-row-status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-status-warning);
+  white-space: nowrap;
+}
+
+.fact-value-panel-foot {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border-default);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  line-height: 1.4;
+}
+.fact-value-panel-foot-cite {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.fact-value-panel-foot-link {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  color: var(--color-text-60);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.fact-value-panel-foot-link:hover {
+  color: var(--color-accent);
+}
+.fact-value-panel-foot-beta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-status-warning);
+  font-weight: 500;
+  margin-left: 4px;
+}
+
+.fact-value-disputed-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-1);
+  padding: 0 6px;
+  border: 1px solid var(--color-status-warning);
+  color: var(--color-status-warning);
+  background: color-mix(in oklab, var(--color-status-warning) 6%, transparent);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  line-height: 1.6;
+}
+
+.fact-value-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: transparent;
 }

@@ -1,5 +1,128 @@
 # Project Memory Decisions
 
+## 2026-05-02 — `structural_family` retirement adopted; domain-specific peer lenses replace it
+
+Civica's leadership adopted `peer-grouping-resolution-v1` after a multi-LLM
+deliberation panel rejected the alternatives (write a methodology paper for
+the existing heuristic; keep `structural_family` with a disclaimer). The
+resolution retires `structural_family` — the in-house, regex-derived
+10-bucket taxonomy used as the site-wide default peer-grouping primitive —
+and replaces it with a domain-specific peer-lens architecture:
+
+- **Material outcomes** (HDI, GDP, health, demographics): default to
+  World Bank region × World Bank income group.
+- **Governance outcomes** (Civica Index, Pulse, democracy, rule of law):
+  default to V-Dem Regimes of the World (RoW).
+- **Optional alternate regime lens**: Bjørnskov-Rode / CGV (already
+  ingested) remains user-toggleable.
+- **Constitutional form**: `government_form_description` (free text) +
+  `monarchy_status` (small enum) — descriptive metadata only, NOT an
+  analytical taxonomy.
+
+Resolution audit trail at `~/civica/plan/peer-grouping-resolution-v1.md` +
+`~/civica/plan/peer-grouping-deliberation-transcript.md`. Implementation
+plan at `~/civica/plan/structural-family-removal-implementation-plan.md`
+(plan v1.1, six phases, Phase 2 + Phase 5 in parallel during the Phase F
+sync wait, hard cut at T+2 vintages).
+
+User-locked decisions (2026-05-02):
+- Q1: `/government-types` and `/government-types/[type]` archive with 308
+  redirects to `/civica-index/methodology#peer-grouping`. Repurposing as
+  educational reference would recreate the controlled-vocabulary problem
+  the resolution just retired. The bi-lens explorer at
+  `/civica-index/government-types` survives, refactored to V-Dem RoW
+  (default) + BR/CGV (toggle).
+- Q2: Wait for Phase F's sync of the four peer-grouping fact-keys; no
+  throwaway local ingestion (would violate the canonical-fact-layer
+  architecture).
+- Q3: Methodology page ships with "Pending external review by a
+  comparative-politics scholar" footer; v1 vintage cut does NOT gate
+  on review; revisions ship as methodology v1.1 with a documented
+  changelog.
+- No BETA pill on the new methodology page — Civica is citing
+  externally-attested classifications, not asserting a novel composite.
+
+How to apply:
+- Do NOT introduce new code paths that read `structural_family` or
+  derive a Civica-asserted government-type taxonomy.
+- For peer-grouping logic, use `src/lib/peer-grouping/` helpers
+  against Phase F's `resolveFact()` resolver.
+- Country pages display two peer-lens panels (material + governance)
+  with separate `<SourceDot>`s — different vintages.
+- Apply the `n ≥ 8` minimum-n rule with the documented fallback chain
+  (region+income → region → income → global for material; RoW tier →
+  global for governance).
+- Non-coverage cases (Taiwan, Vatican, Western Sahara, etc.) render a
+  "limited peer comparison available" pill rather than silently mapping
+  to the closest peer.
+
+## 2026-05-02 — Civica is operating as a research lab; treat methodology decisions as first-class artifacts
+
+Civica's scope has progressively shifted from "website with academic data" toward
+"academic publication with a UI on top," in the same posture as Our World in Data,
+V-Dem, the World Bank statistical division. This is now explicit, not implicit.
+
+Concrete signals: published Civica Index methodology (with PCA-derived weights,
+Monte Carlo uncertainty intervals, frozen reference periods, BETA pill until
+external review), Pulse v2 backtesting against named historical shocks, Pulse
+methodology + replication doc, the in-flight Phase F Wikidata reconciliation
+methodology, and the 2026-05-02 peer-grouping resolution which Civica's lead
+delegated to a multi-LLM deliberation panel rather than vibe-coding internally.
+
+Implications for how every agent works on this project:
+
+- **Methodology decisions are first-class deliverables, not planning notes.**
+  When a substantive methodology question surfaces (peer grouping, indicator
+  basket, regime classification, source allowlist, vintage cadence, etc.), the
+  artifact you produce is a citable resolution document, not a Slack message
+  or an inline code comment. Save under `~/civica/plan/<topic>-v<n>.md`.
+- **Audit trail matters.** When a resolution is reached through deliberation,
+  the deliberation transcript is preserved alongside the resolution itself
+  (see `~/civica/plan/peer-grouping-deliberation-transcript.md` as the
+  template). Future external reviewers should be able to see HOW Civica
+  reached a methodology decision, not just WHAT was decided.
+- **Citations, not vibes.** Methodology recommendations need grounding in
+  external academic literature, peer institutions (OWID, World Bank, IMF, UN,
+  V-Dem), or named methodological frameworks. "Seems more rigorous" is not
+  acceptable justification.
+- **Don't conflate "deeply integrated" with "academically defensible."** The
+  cost of removing a Civica-derived heuristic from many files is a fact about
+  the work, not a reason to keep it. If the methodology fails the rigor bar,
+  the integration cost is incidental.
+- **Beta posture is the default for novel work.** New Civica-asserted
+  methodologies (composites, taxonomies) ship with a BETA pill until reviewed
+  externally, mirroring the CI / Pulse pattern. Resolutions that cite
+  EXTERNAL methodologies (V-Dem RoW, World Bank classifications, BR/CGV) do
+  not need a BETA pill — they inherit the source's standing.
+- **Eventual publication.** Methodology resolutions should eventually be
+  published as reader-facing pages under `/civica-index/methodology/...` (or
+  a future `/research/...` subsection) with the underlying audit trail
+  linkable. The deliberation transcript pattern from peer-grouping-v1 is the
+  template.
+- **Org framing.** Civica is not yet a formal research lab, but it is
+  operating like one. The lead has acknowledged that scope is expanding and
+  may eventually warrant separating the research function from the
+  publication function organisationally. For now, keep both in this repo,
+  but maintain the discipline of citable artefact production so the split
+  is cheap when it happens.
+
+How to apply, agent-by-agent:
+
+- When you encounter a methodology question mid-task, do NOT silently make a
+  call and ship code. Either (a) escalate to the user with the question and
+  the options, or (b) produce a methodology mini-resolution in
+  `~/civica/plan/` first, get sign-off, then implement.
+- When the user delegates a methodology question to deliberation, the
+  resolution that comes back is the contract. Do not re-litigate. If you
+  find an implementation issue that affects the resolution's feasibility,
+  flag it as an open question, not as a basis for ignoring the resolution.
+- When writing code that uses a methodology-grade primitive (peer grouping,
+  CI dimension weights, taxonomy classifications), comment-link to the
+  resolution document so future readers can trace the decision.
+
+This decision is itself a methodology decision. Future agents may revise it
+under the same discipline that produced it.
+
 ## 2026-04-24 — Civica Index/Pulse methodology is beta and under rework
 
 User disclosed (end of Phase 2.2 session) that the CI v1 composite + CP daily

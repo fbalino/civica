@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getCIRankings } from "@/lib/db/queries";
 import { CountryFlag } from "@/components/CountryFlag";
 import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
@@ -88,16 +89,37 @@ export default async function CivicaIndexShellPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const sp = await searchParams;
+
+  // Phase 3b — `?family=` is retired. The 2026-05-02 peer-grouping
+  // resolution replaces `structural_family` with domain-specific peer
+  // lenses; an inbound link with `?family=*` no longer maps to a
+  // single new lens, so we drop the filter and serve the bare page.
+  // Documented in ~/civica/plan/structural-family-removal-implementation-plan.md §F.3.
+  if (typeof sp?.family === "string") {
+    redirect("/civica-index");
+  }
+
   const continent =
     typeof sp?.continent === "string" ? sp.continent : undefined;
-  const structuralFamily =
-    typeof sp?.family === "string" ? sp.family : undefined;
+  const vdemRow = typeof sp?.vdem === "string" ? sp.vdem : undefined;
+  const worldBankRegion =
+    typeof sp?.region === "string" ? sp.region : undefined;
+  const worldBankIncomeGroup =
+    typeof sp?.income === "string" ? sp.income : undefined;
+  const cgvRegime = typeof sp?.cgv === "string" ? sp.cgv : undefined;
+
+  const hasFilter = Boolean(
+    continent || vdemRow || worldBankRegion || worldBankIncomeGroup || cgvRegime,
+  );
 
   let rawRows: CIRankingRow[] = [];
   try {
     const result = await getCIRankings(undefined, {
       continent,
-      structuralFamily,
+      vdemRow,
+      worldBankRegion,
+      worldBankIncomeGroup,
+      cgvRegime,
     });
     rawRows = Array.isArray(result)
       ? (result as unknown as CIRankingRow[])
@@ -153,9 +175,7 @@ export default async function CivicaIndexShellPage({
                 {avgCI > 0 ? avgCI.toFixed(1) : "—"}
               </div>
               <div className="ci-stat-label">
-                {continent || structuralFamily
-                  ? "Filtered average CI"
-                  : "Global average CI"}
+                {hasFilter ? "Filtered average CI" : "Global average CI"}
               </div>
             </div>
             <div className="ci-stat">
@@ -197,9 +217,7 @@ export default async function CivicaIndexShellPage({
             <div className="ci-section-eyebrow" style={{ marginTop: 8 }}>
               {rawRows.length}{" "}
               {rawRows.length === 1 ? "country" : "countries"}
-              {continent || structuralFamily
-                ? " · filtered"
-                : " · ranked by CI"}
+              {hasFilter ? " · filtered" : " · ranked by CI"}
             </div>
 
             <section aria-label="Civica Index leaderboard">

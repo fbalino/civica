@@ -573,6 +573,17 @@ export default async function MethodologyPage() {
             trajectories. The data is presented as observation, never
             as ranking.
           </p>
+          <p>
+            How Civica chooses peer sets for ranking comparisons —
+            different lenses for material vs governance vs descriptive
+            comparisons — is documented in{" "}
+            <Link href="/civica-index/methodology/peer-grouping">
+              the peer-grouping methodology page
+            </Link>
+            . That page replaces the retired{" "}
+            <code>structural_family</code> heuristic per the
+            2026-05-02 peer-grouping resolution.
+          </p>
         </section>
 
         {/* ────────────────────────────────────────────────────── */}

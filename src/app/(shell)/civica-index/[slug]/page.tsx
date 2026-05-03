@@ -17,6 +17,11 @@ import { PulseDimensionalDeltas } from "@/components/pulse/PulseDimensionalDelta
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 import { CountryFlag } from "@/components/CountryFlag";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
+import { PeerLensPanel } from "@/components/peer-grouping/PeerLensPanel";
+import {
+  getMaterialPeerSet,
+  getGovernancePeerSet,
+} from "@/lib/peer-grouping";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
 
 /**
@@ -451,6 +456,18 @@ export default async function CICountryDetailPage({
     }
   } catch {}
 
+  // Phase 3a — peer-grouping panels (material + governance) replace
+  // the retired structural-family rank panel. Each helper hits Phase
+  // F's `getCanonicalFactsForJurisdictions` once and degrades to an
+  // "unavailable" state if the classification fact-keys haven't synced
+  // for this jurisdiction. See ~/civica/plan/structural-family-removal-implementation-plan.md.
+  const [materialPeerSet, governancePeerSet] = detail
+    ? await Promise.all([
+        getMaterialPeerSet(detail.jurisdiction.id).catch(() => null),
+        getGovernancePeerSet(detail.jurisdiction.id).catch(() => null),
+      ])
+    : [null, null];
+
   if (!detail) notFound();
 
   // Pulse v2 dimensional deltas. Independent of legacy `pulse` —
@@ -530,24 +547,25 @@ export default async function CICountryDetailPage({
           slug,
         )
       : null;
-  const familyRows = taxonomy?.structuralFamily
-    ? (
-        globalRankings as Array<{
-          slug?: string | null;
-          governmentClassification?: {
-            structuralFamily?: string | null;
-          } | null;
-        }>
-      ).filter(
-        (row) =>
-          row.governmentClassification?.structuralFamily ===
-          taxonomy.structuralFamily,
-      )
-    : [];
-  const familyRank =
-    taxonomy?.structuralFamily && familyRows.length > 0
-      ? findRankInList(familyRows, slug)
+  // Compute rank within each peer cohort. The `globalRankings` list
+  // is keyed by slug; each peer-set helper returns `peerJurisdictionSlugs`
+  // so we can intersect without re-resolving IDs here.
+  const rankInCohort = (
+    cohortSlugs: string[] | undefined,
+  ): { rank: number; total: number } | null => {
+    if (!cohortSlugs || cohortSlugs.length === 0) return null;
+    const cohortSet = new Set(cohortSlugs);
+    const cohortRanked = (
+      globalRankings as Array<{ slug?: string | null }>
+    ).filter((row) => row.slug && cohortSet.has(row.slug));
+    return cohortRanked.length > 0
+      ? findRankInList(cohortRanked, slug)
       : null;
+  };
+  const materialRank = rankInCohort(materialPeerSet?.peerJurisdictionSlugs);
+  const governanceRank = rankInCohort(
+    governancePeerSet?.peerJurisdictionSlugs,
+  );
   const rankedPeerSuggestions = (() => {
     const rankedRows = regionalRankings as Array<{
       slug?: string | null;
@@ -590,12 +608,6 @@ export default async function CICountryDetailPage({
       ? {
           label: jurisdiction.continent,
           value: `#${regionalRank.rank} of ${regionalRank.total}`,
-        }
-      : null,
-    familyRank && taxonomy?.structuralFamilyLabel
-      ? {
-          label: taxonomy.structuralFamilyLabel,
-          value: `#${familyRank.rank} of ${familyRank.total}`,
         }
       : null,
   ].filter(Boolean) as Array<{ label: string; value: string }>;
@@ -723,6 +735,33 @@ export default async function CICountryDetailPage({
                 Rank context is not available yet for this country.
               </p>
             )}
+
+            {materialPeerSet || governancePeerSet ? (
+              <div className="ci-country-peer-lenses">
+                {materialPeerSet ? (
+                  <PeerLensPanel
+                    lens="world_bank_region"
+                    peerSet={materialPeerSet}
+                    rank={
+                      materialRank
+                        ? { position: materialRank.rank, total: materialRank.total }
+                        : null
+                    }
+                  />
+                ) : null}
+                {governancePeerSet ? (
+                  <PeerLensPanel
+                    lens="vdem_row"
+                    peerSet={governancePeerSet}
+                    rank={
+                      governanceRank
+                        ? { position: governanceRank.rank, total: governanceRank.total }
+                        : null
+                    }
+                  />
+                ) : null}
+              </div>
+            ) : null}
 
             {compareCards.length > 0 ? (
               <div className="ci-country-compare-block">

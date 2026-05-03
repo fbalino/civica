@@ -6,25 +6,30 @@ import {
 } from "@/components/ci/GovernmentTypesAccordionExplorer";
 import {
   REGIME_TYPE_META,
-  STRUCTURAL_FAMILY_META,
   type GovernmentClassification,
   type RegimeTypeKey,
-  type StructuralFamilyKey,
 } from "@/lib/government-taxonomy";
+import {
+  VDEM_ROW_META,
+  type VDemRowKey,
+} from "@/lib/peer-grouping/lens-metadata";
 import {
   getCIByGovernmentTypeDots,
   getGovTypeTrajectory,
 } from "@/lib/db/queries";
+import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
 
 export const metadata: Metadata = {
-  title: "Governance Outcomes by Government Type — Civica Index",
+  title: "Civica Index by Peer Lens — Bi-Lens Explorer",
   description:
-    "Compare governance outcomes by structural form or BR/CGV regime type. Civica shows both the constitutional form and the executive-accountability lens without changing CI scores.",
-  alternates: { canonical: "https://civicaatlas.org/civica-index/government-types" },
+    "Compare Civica Index scores grouped by V-Dem Regimes of the World (default) or Bjørnskov-Rode / CGV regime type (alternate). Replaces the retired structural_family lens per the 2026-05-02 peer-grouping resolution.",
+  alternates: {
+    canonical: "https://civicaatlas.org/civica-index/government-types",
+  },
   openGraph: {
-    title: "Governance Outcomes by Government Type | Civica Index",
+    title: "Civica Index by peer lens | Civica Index",
     description:
-      "Structural families by default, BR/CGV regime types on demand. Distribution, spread, and trajectory for every visible system.",
+      "V-Dem Regimes of the World by default; BR/CGV regime type on demand. Distribution, spread, and trajectory for every lens cohort.",
     url: "https://civicaatlas.org/civica-index/government-types",
   },
 };
@@ -70,7 +75,7 @@ type GroupBucket = {
   maxScore: number;
 };
 
-type Lens = "structural" | "regime";
+type Lens = "vdem_row" | "regime";
 
 type RegimeMetaWithUnknown = {
   label: string;
@@ -81,6 +86,13 @@ type RegimeMetaWithUnknown = {
 
 const UNKNOWN_REGIME_META: RegimeMetaWithUnknown = {
   label: "Not yet coded",
+  colorVar: "var(--gov-other, #8899AA)",
+  fallback: "#8899AA",
+  order: 999,
+};
+
+const UNKNOWN_VDEM_META = {
+  label: "No V-Dem coverage",
   colorVar: "var(--gov-other, #8899AA)",
   fallback: "#8899AA",
   order: 999,
@@ -108,35 +120,46 @@ function normalizeTrajectory(raw: unknown): TrajectoryRow[] {
   );
 }
 
-function structuralFamilyMeta(
-  classification: GovernmentClassification | null | undefined,
+/**
+ * V-Dem RoW classifier. Reads the canonical V-Dem RoW value from a
+ * pre-fetched map (Phase F's resolver, batched up-front). When a
+ * country lacks V-Dem coverage (Taiwan, Vatican, etc.) it falls into
+ * the "No V-Dem coverage" bucket — explicit unavailability rather
+ * than silent miscoding, per the resolution's coverage commitment.
+ */
+function vdemRowMetaFor(
+  jurisdictionId: string,
+  vdemByJurisdiction: Map<string, string | null>,
 ): GroupMeta {
-  const family = (classification?.structuralFamily ??
-    "other") as StructuralFamilyKey;
-  const meta = STRUCTURAL_FAMILY_META[family] ?? STRUCTURAL_FAMILY_META.other;
+  const value = vdemByJurisdiction.get(jurisdictionId) ?? null;
+  if (!value) {
+    return {
+      key: "no_vdem_coverage",
+      label: UNKNOWN_VDEM_META.label,
+      familyId: "no_vdem_coverage",
+      colorVar: UNKNOWN_VDEM_META.colorVar,
+      fallback: UNKNOWN_VDEM_META.fallback,
+      order: UNKNOWN_VDEM_META.order,
+    };
+  }
+  const meta = VDEM_ROW_META[value as VDemRowKey];
+  if (!meta) {
+    return {
+      key: value,
+      label: value,
+      familyId: value,
+      colorVar: UNKNOWN_VDEM_META.colorVar,
+      fallback: UNKNOWN_VDEM_META.fallback,
+      order: UNKNOWN_VDEM_META.order,
+    };
+  }
   return {
-    key: family,
-    label: classification?.structuralFamilyLabel ?? meta.label,
-    familyId: family,
+    key: value,
+    label: meta.label,
+    familyId: value,
     colorVar: meta.colorVar,
     fallback: meta.fallback,
     order: meta.order,
-  };
-}
-
-function structuralSubtypeMeta(
-  classification: GovernmentClassification | null | undefined,
-): GroupMeta {
-  const familyMeta = structuralFamilyMeta(classification);
-  const subtypeKey = classification?.structuralSubtype ?? familyMeta.key;
-  const subtypeLabel = classification?.structuralSubtypeLabel ?? familyMeta.label;
-  return {
-    key: subtypeKey,
-    label: subtypeLabel,
-    familyId: familyMeta.familyId,
-    colorVar: familyMeta.colorVar,
-    fallback: familyMeta.fallback,
-    order: familyMeta.order + (subtypeKey === familyMeta.key ? 0 : 10),
   };
 }
 
@@ -157,7 +180,7 @@ function regimeTypeMeta(
 
 function buildGroups(
   dots: DotRow[],
-  classifier: (classification: GovernmentClassification | null | undefined) => GroupMeta,
+  classifier: (dot: DotRow) => GroupMeta,
 ): GroupBucket[] {
   const grouped = new Map<
     string,
@@ -167,7 +190,7 @@ function buildGroups(
   >();
 
   for (const dot of dots) {
-    const meta = classifier(dot.governmentClassification ?? null);
+    const meta = classifier(dot);
     const bucket = grouped.get(meta.key) ?? {
       meta,
       dots: [],
@@ -204,7 +227,7 @@ function buildGroups(
 
 function buildTrajectoryMap(
   rows: TrajectoryRow[],
-  classifier: (classification: GovernmentClassification | null | undefined) => GroupMeta,
+  classifier: (row: TrajectoryRow) => GroupMeta,
 ): Map<string, { quarter: string; avgScore: number }[]> {
   const grouped = new Map<
     string,
@@ -212,7 +235,7 @@ function buildTrajectoryMap(
   >();
 
   for (const row of rows) {
-    const meta = classifier(row.governmentClassification ?? null);
+    const meta = classifier(row);
     const byQuarter =
       grouped.get(meta.key) ??
       new Map<string, { scoreTotal: number; countryCount: number }>();
@@ -269,39 +292,6 @@ function sortLeaves(a: GovernmentTypeLeaf, b: GovernmentTypeLeaf): number {
   );
 }
 
-function buildStructuralFamilies(
-  familyGroups: GroupBucket[],
-  subtypeGroups: GroupBucket[],
-  familyTrajectories: Map<string, { quarter: string; avgScore: number }[]>,
-  subtypeTrajectories: Map<string, { quarter: string; avgScore: number }[]>,
-): GovernmentTypeFamily[] {
-  const subtypesByFamily = new Map<string, GroupBucket[]>();
-
-  for (const subtype of subtypeGroups) {
-    const list = subtypesByFamily.get(subtype.meta.familyId) ?? [];
-    list.push(subtype);
-    subtypesByFamily.set(subtype.meta.familyId, list);
-  }
-
-  return familyGroups
-    .map((family) => {
-      const siblingSubtypes = (subtypesByFamily.get(family.meta.familyId) ?? [])
-        .filter((subtype) => subtype.meta.key !== family.meta.key)
-        .sort(
-          (a, b) =>
-            a.meta.order - b.meta.order || a.meta.label.localeCompare(b.meta.label),
-        );
-
-      return {
-        ...toLeaf(family, familyTrajectories),
-        subtypes: siblingSubtypes
-          .map((subtype) => toLeaf(subtype, subtypeTrajectories))
-          .sort(sortLeaves),
-      };
-    })
-    .sort(sortLeaves);
-}
-
 function buildFlatFamilies(
   groups: GroupBucket[],
   trajectoryMap: Map<string, { quarter: string; avgScore: number }[]>,
@@ -316,7 +306,7 @@ function buildFlatFamilies(
 
 function buildLensHref(lens: Lens, quarter?: string) {
   const params = new URLSearchParams();
-  if (lens === "regime") params.set("lens", lens);
+  if (lens === "regime") params.set("lens", "regime");
   if (quarter) params.set("quarter", quarter);
   const query = params.toString();
   return query
@@ -331,7 +321,10 @@ export default async function GovernmentTypesPage({
 }) {
   const sp = await searchParams;
   const quarter = typeof sp?.quarter === "string" ? sp.quarter : undefined;
-  const lens: Lens = sp?.lens === "regime" ? "regime" : "structural";
+  // Phase 3c — `?lens=structural` was the legacy default. Treat any
+  // unknown lens (including `structural`) as the new default
+  // (`vdem_row`) per the 2026-05-02 peer-grouping resolution.
+  const lens: Lens = sp?.lens === "regime" ? "regime" : "vdem_row";
 
   let dots: DotRow[] = [];
   let trajectoryRows: TrajectoryRow[] = [];
@@ -347,28 +340,56 @@ export default async function GovernmentTypesPage({
     // DB not seeded
   }
 
-  const structuralFamilyGroups = buildGroups(dots, structuralFamilyMeta);
-  const structuralSubtypeGroups = buildGroups(dots, structuralSubtypeMeta);
-  const structuralFamilyTrajectories = buildTrajectoryMap(
-    trajectoryRows,
-    structuralFamilyMeta,
-  );
-  const structuralSubtypeTrajectories = buildTrajectoryMap(
-    trajectoryRows,
-    structuralSubtypeMeta,
-  );
-  const structuralFamilies = buildStructuralFamilies(
-    structuralFamilyGroups,
-    structuralSubtypeGroups,
-    structuralFamilyTrajectories,
-    structuralSubtypeTrajectories,
-  );
+  // Batch-fetch V-Dem RoW for every jurisdiction in scope. One
+  // resolver round-trip; same data feeds both dot-grouping and
+  // trajectory-grouping classifiers.
+  const allJurisdictionIds = Array.from(
+    new Set([
+      ...dots.map((d) => d.jurisdictionId),
+      ...trajectoryRows.map((t) => t.jurisdictionId),
+    ]),
+  ).filter(Boolean);
 
-  const regimeGroups = buildGroups(dots, regimeTypeMeta);
-  const regimeTrajectories = buildTrajectoryMap(trajectoryRows, regimeTypeMeta);
+  const vdemByJurisdiction = new Map<string, string | null>();
+  if (allJurisdictionIds.length > 0) {
+    try {
+      const resolved = await getCanonicalFactsForJurisdictions(
+        allJurisdictionIds,
+        ["vdem_row"],
+      );
+      for (const jurId of allJurisdictionIds) {
+        const value = resolved[jurId]?.["vdem_row"]?.canonical?.factValue ?? null;
+        vdemByJurisdiction.set(jurId, value);
+      }
+    } catch {
+      // Phase F not yet synced — every country falls into "no coverage"
+    }
+  }
+
+  const vdemDotClassifier = (dot: DotRow) =>
+    vdemRowMetaFor(dot.jurisdictionId, vdemByJurisdiction);
+  const vdemTrajectoryClassifier = (row: TrajectoryRow) =>
+    vdemRowMetaFor(row.jurisdictionId, vdemByJurisdiction);
+  const regimeDotClassifier = (dot: DotRow) =>
+    regimeTypeMeta(dot.governmentClassification ?? null);
+  const regimeTrajectoryClassifier = (row: TrajectoryRow) =>
+    regimeTypeMeta(row.governmentClassification ?? null);
+
+  const vdemGroups = buildGroups(dots, vdemDotClassifier);
+  const vdemTrajectories = buildTrajectoryMap(
+    trajectoryRows,
+    vdemTrajectoryClassifier,
+  );
+  const vdemFamilies = buildFlatFamilies(vdemGroups, vdemTrajectories);
+
+  const regimeGroups = buildGroups(dots, regimeDotClassifier);
+  const regimeTrajectories = buildTrajectoryMap(
+    trajectoryRows,
+    regimeTrajectoryClassifier,
+  );
   const regimeFamilies = buildFlatFamilies(regimeGroups, regimeTrajectories);
 
-  const families = lens === "regime" ? regimeFamilies : structuralFamilies;
+  const families = lens === "regime" ? regimeFamilies : vdemFamilies;
   const totalCountries = dots.length;
 
   return (
@@ -377,35 +398,35 @@ export default async function GovernmentTypesPage({
       totalCountries={totalCountries}
       lensTitle={
         lens === "regime"
-          ? "Regime type (Bjornskov-Rode / CGV)"
-          : "Structural form"
+          ? "Regime type (Bjørnskov-Rode / CGV)"
+          : "V-Dem Regimes of the World"
       }
       lensSummary={
         lens === "regime"
-          ? "This lens uses published accountability categories. Because the regime classes are already the normalized endpoints, rows stay flat rather than expanding into subtypes."
-          : "Broad structural families stay visible by default. Expand a family to reveal its subtypes in both the chart and the table below."
+          ? "Bjørnskov-Rode / CGV is the alternate accountability lens. Six published categories distinguishing democratic systems by executive form (parliamentary / presidential / semi-presidential) and authoritarian systems by ruling-elite structure (civilian / military / royal)."
+          : "V-Dem Regimes of the World is the default governance lens (Lührmann et al. 2018). Four tiers spanning closed autocracy through liberal democracy. See methodology for why this replaced the retired structural_family heuristic."
       }
       axisLabel={
         lens === "regime"
           ? "Y-AXIS: BR / CGV REGIME TYPE · X-AXIS: CIVICA INDEX 0–100 · WHITE BAR: AVG"
-          : "Y-AXIS: STRUCTURAL FAMILY & SUBTYPE · X-AXIS: CIVICA INDEX 0–100 · WHITE BAR: AVG"
+          : "Y-AXIS: V-DEM ROW TIER · X-AXIS: CIVICA INDEX 0–100 · WHITE BAR: AVG"
       }
       plotHelper={
         lens === "regime"
-          ? "These are the published accountability categories. Use the structural lens when you want constitutional form instead."
-          : "Click any family name or chevron to reveal subtype rows without changing the axis scale."
+          ? "These are the published BR/CGV accountability categories. Use V-Dem RoW for the default governance lens."
+          : "Default lens. Switch to BR/CGV for the alternate executive-form classification."
       }
-      footerLabel={lens === "regime" ? "regime types" : "families"}
+      footerLabel={lens === "regime" ? "regime types" : "RoW tiers"}
       lensTabs={[
         {
-          id: "structural",
-          label: "Structural form",
-          href: buildLensHref("structural", quarter),
-          active: lens === "structural",
+          id: "vdem_row",
+          label: "V-Dem RoW",
+          href: buildLensHref("vdem_row", quarter),
+          active: lens === "vdem_row",
         },
         {
           id: "regime",
-          label: "Regime type",
+          label: "BR / CGV regime",
           href: buildLensHref("regime", quarter),
           active: lens === "regime",
         },
