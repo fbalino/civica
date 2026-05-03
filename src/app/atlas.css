@@ -1632,6 +1632,17 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   vertical-align: middle;
 }
 
+/* Phase F.4 — inline FactValueDot variant. Sits inside the text
+ * span, immediately after the value, so the click target stays
+ * tight against the number rather than floating to the column's
+ * right edge. */
+.cm-fact-inline-source {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  vertical-align: baseline;
+}
+
 /* Column 5 — memberships + quick compare */
 .cm-mini-title {
   display: flex; align-items: center; gap: 6px;

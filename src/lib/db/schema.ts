@@ -24,6 +24,16 @@ export const jurisdictions = pgTable("jurisdictions", {
   continent: text("continent"),
   governmentType: text("government_type"),
   governmentTypeDetail: text("government_type_detail"),
+
+  // ── Phase F cache columns (eventually-consistent with the resolver). ──
+  //
+  // Per ~/civica/plan/phase-f-schema-v0.1.md §11: these stay as
+  // a denormalised read-through optimisation, refreshed nightly
+  // by `scripts/refresh-jurisdiction-cache.ts`. Surfaces that
+  // need provenance / alternates call the resolver directly via
+  // `getCanonicalFact()`. Surfaces that just need the value (map
+  // hover, search snippets, list pages) may read from these
+  // columns and accept up-to-24h staleness.
   capital: text("capital"),
   population: integer("population"),
   gdpBillions: real("gdp_billions"),
@@ -31,6 +41,11 @@ export const jurisdictions = pgTable("jurisdictions", {
   languages: text("languages"),
   currency: text("currency"),
   democracyIndex: real("democracy_index"),
+  /** When the nightly cache refresh last ran for this jurisdiction.
+   *  SourceDots reading the cache should display this timestamp,
+   *  not a fake "live" stamp. Phase F.3.5 addition. */
+  factCacheRefreshedAt: timestamp("fact_cache_refreshed_at"),
+
   flagUrl: text("flag_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -166,32 +181,302 @@ export const countryFactbookSections = pgTable(
   ]
 );
 
+/**
+ * Phase F — multi-source country facts.
+ *
+ * Pre-Phase F shape: one row per (jurisdiction_id, fact_key), CIA-
+ * sourced. F.1 extends this in place to one row per
+ * (jurisdiction_id, fact_key, source_id) so the resolver can pick
+ * canonical values from CIA / Wikidata / World Bank / IMF / UN.
+ *
+ * Existing column names (`fact_value`, `fact_value_numeric`,
+ * `fact_unit`, `fact_year`, `source_note`) preserved for
+ * back-compat with existing callers (atlas masthead, factbook
+ * reader, queries lib). F.4 migrates them to the resolver.
+ *
+ * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md
+ * Schema doc: ~/civica/plan/phase-f-schema-v0.1.md §1, §11
+ */
 export const countryFacts = pgTable(
   "country_facts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+
+    // ── Identity ──
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    /** Stable Civica fact-key — see
+     *  src/lib/factbook/reconcile/fact-keys.ts for the enum. */
+    factKey: text("fact_key").notNull(),
+    /** 'A' (identity, slow-changing) | 'B' (quantitative, fast-changing)
+     *  | 'C' (categorical / structural) per methodology §1.1.
+     *  Legacy CIA-only rows backfilled to 'B'; resolver overrides
+     *  per-fact-key from the canonical enum at runtime. */
+    factGroup: text("fact_group").notNull().default("B"),
+    /** Logical category for UI grouping. */
+    category: text("category").notNull(),
+
+    // ── Source provenance (Phase F additions) ──
+    /** FK to sources.id. Default 'cia_factbook' lets existing
+     *  legacy rows backfill automatically on schema push. New
+     *  inserts always specify source_id explicitly. */
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull()
+      .default("cia_factbook"),
+    /** Direct URL to upstream record where applicable. */
+    sourceUrl: text("source_url"),
+    /** Wikidata-only: Q-ID of the entity (e.g. "Q1033"). */
+    wikidataQid: text("wikidata_qid"),
+    /** Wikidata-only: P-ID of the property (e.g. "P1082"). */
+    wikidataPid: text("wikidata_pid"),
+    /** Wikidata-only: claim rank — 'preferred' | 'normal' | 'deprecated'. */
+    wikidataRank: text("wikidata_rank"),
+    /** JSON array of accepted reference Q-IDs / URLs from upstream
+     *  claim, captured at sync time. Lets the alternate-values
+     *  panel show readers exactly which World Bank URL a Wikidata
+     *  claim cites. Per OQ-2 (resolved) / methodology §13.4. */
+    references: jsonb("references"),
+    /** Stable hash of the upstream payload + value, for sync
+     *  idempotency (skip upsert if nothing changed). */
+    sourceHash: text("source_hash"),
+
+    // ── Value (parallel typed columns; one or more populated) ──
+    /** Display value, always populated. Existing column name
+     *  preserved for back-compat. */
+    factValue: text("fact_value"),
+    /** Numeric form when available, used for material-error checks
+     *  and sorting. Existing column name preserved. */
+    factValueNumeric: real("fact_value_numeric"),
+    /** Unit when relevant. Existing column name preserved. */
+    factUnit: text("fact_unit"),
+    /** Year (int) the upstream source assigned. Existing column. */
+    factYear: integer("fact_year"),
+    /** Free-form structured value where neither text nor numeric
+     *  fits — religion / ethnic / language breakdowns. Phase F. */
+    valueJson: jsonb("value_json"),
+
+    // ── Vintaging / freshness (Phase F additions) ──
+    /** Full date the upstream assigned, where finer than year. */
+    asOf: date("as_of"),
+    /** When our sync pulled the row. Backfilled to created_at. */
+    retrievedAt: timestamp("retrieved_at").defaultNow().notNull(),
+    /** Upstream dataset version handle, e.g. "WB WDI 2026.04",
+     *  "CIA Factbook 2026-01-frozen". */
+    upstreamVintageLabel: text("upstream_vintage_label"),
+
+    // ── Civica-side bookkeeping (Phase F additions) ──
+    /** Methodology version that admitted this row. */
+    methodologyVersion: text("methodology_version")
+      .notNull()
+      .default("v0.1-beta"),
+    /** 'active' | 'rejected' | 'superseded'. Rejected rows are
+     *  kept for transparency but excluded from resolver input. */
+    status: text("status").notNull().default("active"),
+    /** Reason text when status='rejected'. */
+    statusReason: text("status_reason"),
+    /** Pointer to immutable upstream snapshot. */
+    snapshotId: uuid("snapshot_id"),
+
+    /** Free-form note from the seed/sync script. Existing column. */
+    sourceNote: text("source_note"),
+
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => [
+    /** Phase F: identity is now (jurisdiction, fact_key, source). */
+    uniqueIndex("idx_country_facts_jurisdiction_factkey_source").on(
+      table.jurisdictionId,
+      table.factKey,
+      table.sourceId
+    ),
+    index("idx_country_facts_key").on(table.factKey),
+    index("idx_country_facts_category").on(table.category),
+    index("idx_country_facts_status").on(table.status),
+    index("idx_country_facts_factgroup").on(table.factGroup),
+    index("idx_country_facts_jurisdiction").on(table.jurisdictionId),
+    index("idx_country_facts_numeric").on(
+      table.factKey,
+      table.factValueNumeric
+    ),
+  ]
+);
+
+/**
+ * Phase F — quarterly fact vintages.
+ *
+ * Frozen snapshot of resolver output per (jurisdiction, fact_key,
+ * vintage_label). Mirrors `ci_composite_scores.vintage_label`.
+ * Lets a reader citing "Civica Atlas, Nigeria GDP, vintage 2026Q3"
+ * get a value that won't move.
+ *
+ * Methodology §4. Schema doc §2.
+ */
+export const countryFactVintages = pgTable(
+  "country_fact_vintages",
   {
     id: uuid("id").primaryKey().defaultRandom(),
     jurisdictionId: uuid("jurisdiction_id")
       .references(() => jurisdictions.id)
       .notNull(),
-    category: text("category").notNull(),
     factKey: text("fact_key").notNull(),
-    factValue: text("fact_value"),
-    factValueNumeric: real("fact_value_numeric"),
-    factUnit: text("fact_unit"),
-    factYear: integer("fact_year"),
-    sourceNote: text("source_note"),
-    createdAt: timestamp("created_at").defaultNow(),
+    /** Civica-side vintage handle: "Civica Atlas 2026Q3". */
+    vintageLabel: text("vintage_label").notNull(),
+    /** The country_facts.id that won the resolver at vintage time. */
+    canonicalFactId: uuid("canonical_fact_id")
+      .references(() => countryFacts.id)
+      .notNull(),
+    /** Frozen-at-vintage copy of the value fields, queryable
+     *  without joining country_facts. */
+    valueText: text("value_text"),
+    valueNumeric: real("value_numeric"),
+    valueUnit: text("value_unit"),
+    valueJson: jsonb("value_json"),
+    asOf: date("as_of"),
+    sourceId: text("source_id").notNull(),
+    methodologyVersion: text("methodology_version").notNull(),
+    snapshotAt: timestamp("snapshot_at").defaultNow().notNull(),
   },
   (table) => [
-    uniqueIndex("idx_country_facts_unique").on(
+    uniqueIndex("idx_fact_vintage_unique").on(
+      table.jurisdictionId,
+      table.factKey,
+      table.vintageLabel
+    ),
+    index("idx_fact_vintage_label").on(table.vintageLabel),
+    index("idx_fact_vintage_jurisdiction").on(
+      table.jurisdictionId,
+      table.vintageLabel
+    ),
+  ]
+);
+
+/**
+ * Phase F — operator dispute queue.
+ *
+ * Mirrors `pulse_corrections` and `correction_log`. Triggered when
+ * the resolver hits material-error guards, plausibility envelope
+ * rejections, would silently override a Group A/C value, or
+ * receives a public correction.
+ *
+ * Methodology §7. Schema doc §3.
+ */
+export const dataDisputes = pgTable(
+  "data_disputes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    factKey: text("fact_key").notNull(),
+    factGroup: text("fact_group").notNull(),
+    /** 'material_error' | 'group_a_override' | 'group_c_override'
+     *  | 'plausibility_envelope' | 'rank_demoted' |
+     *  'public_correction' | 'other' */
+    disputeKind: text("dispute_kind").notNull(),
+    factIdA: uuid("fact_id_a").references(() => countryFacts.id),
+    factIdB: uuid("fact_id_b").references(() => countryFacts.id),
+    /** 'prefer_a' | 'prefer_b' | 'hold' */
+    proposedAction: text("proposed_action"),
+    /** 'open' | 'in_review' | 'resolved_a_wins' | 'resolved_b_wins'
+     *  | 'resolved_held' | 'rejected_invalid' */
+    status: text("status").notNull().default("open"),
+    description: text("description"),
+    reviewerId: text("reviewer_id"),
+    reviewerNotes: text("reviewer_notes"),
+    resolvedAt: timestamp("resolved_at"),
+    resolutionAction: text("resolution_action"),
+    submitterName: text("submitter_name"),
+    submitterEmail: text("submitter_email"),
+    submitterAffiliation: text("submitter_affiliation"),
+    isPublic: boolean("is_public").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_disputes_status_kind").on(
+      table.status,
+      table.disputeKind
+    ),
+    index("idx_disputes_jurisdiction").on(table.jurisdictionId),
+    index("idx_disputes_factkey").on(table.factKey),
+  ]
+);
+
+/**
+ * Phase F — immutable upstream payload snapshots.
+ *
+ * Stores the raw payload from each upstream sync call, hashed for
+ * de-dup. Lets us replay the resolver against any historical
+ * vintage.
+ *
+ * Methodology §5.1. Schema doc §4.
+ */
+export const factSnapshots = pgTable(
+  "fact_snapshots",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    /** Upstream URL or query that produced the payload. */
+    upstreamRef: text("upstream_ref").notNull(),
+    /** Stable hash — primary de-dup key. */
+    payloadHash: text("payload_hash").notNull(),
+    payload: jsonb("payload").notNull(),
+    upstreamVintageLabel: text("upstream_vintage_label"),
+    fetchedAt: timestamp("fetched_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_fact_snapshots_unique").on(
+      table.sourceId,
+      table.payloadHash
+    ),
+    index("idx_fact_snapshots_ref").on(
+      table.upstreamRef,
+      table.fetchedAt
+    ),
+  ]
+);
+
+/**
+ * Phase F — fact reconciliation audit log.
+ *
+ * Every reviewer decision and every resolver override (e.g. on a
+ * methodology version bump) writes a row. Mirrors
+ * `pulse_review_audit_log`.
+ *
+ * Methodology §7.4. Schema doc §5.
+ */
+export const dataFactsAuditLog = pgTable(
+  "data_facts_audit_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id").references(
+      () => jurisdictions.id
+    ),
+    factKey: text("fact_key"),
+    disputeId: uuid("dispute_id").references(() => dataDisputes.id),
+    /** 'reviewer_decision' | 'resolver_recompute' |
+     *  'methodology_version_bump' | 'sync_rejected' |
+     *  'sync_admitted' */
+    action: text("action").notNull(),
+    actorId: text("actor_id").notNull(),
+    before: jsonb("before"),
+    after: jsonb("after"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_facts_audit_dispute").on(table.disputeId),
+    index("idx_facts_audit_jurisdiction_factkey").on(
       table.jurisdictionId,
       table.factKey
     ),
-    index("idx_country_facts_key").on(table.factKey),
-    index("idx_country_facts_category").on(table.category),
-    index("idx_country_facts_numeric").on(
-      table.factKey,
-      table.factValueNumeric
+    index("idx_facts_audit_actor_date").on(
+      table.actorId,
+      table.createdAt
     ),
   ]
 );

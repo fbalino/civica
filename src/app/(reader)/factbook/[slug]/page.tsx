@@ -32,6 +32,7 @@ import { FactbookLeaders } from "@/components/factbook/FactbookLeaders";
 import { FactbookBills } from "@/components/factbook/FactbookBills";
 import { ScoresAndRankings } from "@/components/scores/ScoresAndRankings";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
+import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 // Outcomes section is intentionally NOT imported. The dense peer-band
 // graph at <FactbookOutcomes>/<FactbookOutcomesGraph> is shipped in the
 // repo but the underlying peer-comparison methodology needs work before
@@ -139,6 +140,7 @@ export default async function FactbookCountryPage({
     billsResult,
     scoresRows,
     countryOptions,
+    headerFacts,
   ] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -149,6 +151,16 @@ export default async function FactbookCountryPage({
     getBillsForJurisdiction(slug, 1).catch(() => null),
     getScoresForJurisdiction(jurisdiction.id).catch(() => []),
     getFactbookCountryOptions().catch(() => []),
+    // Phase F.4 — resolver-direct fetch for the header strip's
+    // pop + GDP pills. Returns the canonical row + alternates for
+    // each fact-key; the header passes them through to
+    // `<FactValueDot>` for the click-to-expand panel.
+    getCanonicalFactsForJurisdiction(jurisdiction.id, [
+      "population_total",
+      "gdp_ppp_usd_billions",
+    ]).catch(
+      () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>
+    ),
   ]);
 
   const hasLegislature = !!legislatureData;
@@ -287,6 +299,8 @@ export default async function FactbookCountryPage({
             ? jurisdiction.gdpBillions * 1_000_000_000
             : null
         }
+        populationResolver={headerFacts["population_total"] ?? null}
+        gdpResolver={headerFacts["gdp_ppp_usd_billions"] ?? null}
         ciScore={ciScore}
         cpDelta={cpDelta}
         cpTrend={cpTrend}
@@ -294,6 +308,43 @@ export default async function FactbookCountryPage({
         mapCaption={mapCaption}
         photos={photos}
       />
+
+      {/* Phase F.4 — show a one-line reconciliation disclosure
+       *  whenever at least one header fact has a non-CIA canonical
+       *  source (i.e. the resolver actually swapped in fresher
+       *  data). Quiet when only CIA values render. */}
+      {(headerFacts["population_total"]?.canonical &&
+        headerFacts["population_total"].canonical.sourceId !== "cia_factbook") ||
+      (headerFacts["gdp_ppp_usd_billions"]?.canonical &&
+        headerFacts["gdp_ppp_usd_billions"].canonical.sourceId !==
+          "cia_factbook") ? (
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--text-11)",
+            color: "var(--color-text-40)",
+            letterSpacing: "var(--tracking-wide)",
+            padding: "var(--space-2) 0 var(--space-3)",
+            borderBottom: "1px solid var(--color-border-default)",
+            marginBottom: "var(--space-3)",
+          }}
+        >
+          Some figures reconciled across multiple sources via Civica&apos;s
+          methodology (v0.1{" "}
+          <span style={{ color: "var(--color-status-warning)" }}>BETA</span>).{" "}
+          <a
+            href="/factbook/methodology/reconciliation"
+            style={{
+              color: "var(--color-text-60)",
+              textDecoration: "underline",
+              textUnderlineOffset: "2px",
+            }}
+          >
+            Methodology →
+          </a>
+        </div>
+      ) : null}
+
       <div id="factbook-header-sentinel" aria-hidden="true" />
 
       <FactbookMobileSubheader

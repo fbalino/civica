@@ -496,20 +496,29 @@ async function processCountryFile(
   for (const fact of facts) {
     if (!fact.factValue) continue;
 
+    // Phase F: country_facts is now multi-source. CIA seed always
+    // uses source_id='cia_factbook' (the schema default); the
+    // conflict target now includes source_id.
     await db
       .insert(countryFacts)
       .values({
         jurisdictionId,
+        sourceId: "cia_factbook",
         ...fact,
       })
       .onConflictDoUpdate({
-        target: [countryFacts.jurisdictionId, countryFacts.factKey],
+        target: [
+          countryFacts.jurisdictionId,
+          countryFacts.factKey,
+          countryFacts.sourceId,
+        ],
         set: {
           factValue: fact.factValue,
           factValueNumeric: fact.factValueNumeric,
           factUnit: fact.factUnit,
           factYear: fact.factYear,
           sourceNote: fact.sourceNote,
+          retrievedAt: new Date(),
         },
       });
     stats.facts++;

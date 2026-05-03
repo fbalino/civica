@@ -41,6 +41,9 @@ import {
 } from "./data";
 import { QuickCompareSearch } from "@/components/widget/QuickCompareSearch";
 import { SourceDot } from "@/components/SourceDot";
+import { FactValueDot } from "@/components/factbook/FactValueDot";
+import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+import type { AtlasHeaderFacts } from "./AtlasCountryShellClient";
 
 /**
  * Phase A masthead — country page header.
@@ -70,17 +73,31 @@ function Fact({
   label,
   fact,
   fallback,
+  resolverOutput,
+  resolverFactKey,
+  resolverFactLabel,
 }: {
   icon: React.ReactNode;
   label: string;
   fact?: CountryFactValue;
   fallback?: string;
+  /** Phase F.4 — when provided, the source dot becomes a clickable
+   *  `<FactValueDot>` that opens the alternate-values panel. */
+  resolverOutput?: ResolverOutput | null;
+  resolverFactKey?: string;
+  resolverFactLabel?: string;
 }) {
   const fallbackValue = fallback && fallback !== "—" ? fallback : null;
   const value = fact?.value ?? fallbackValue;
   const source = value ? fact?.source : undefined;
   const displayValue = value ?? "No source";
   const isMissing = !value;
+  const hasResolverData = !!(
+    resolverOutput &&
+    resolverOutput.canonical &&
+    resolverFactKey &&
+    resolverFactLabel
+  );
 
   return (
     <div
@@ -93,10 +110,30 @@ function Fact({
       <span className="cm-fact-text">
         <span className="cm-fact-label">{label}:</span>{" "}
         <span className="cm-fact-value">{displayValue}</span>
+        {/* Phase F.4 — when resolver data is present, the
+         *  `<FactValueDot>` renders INSIDE the text span, tight
+         *  against the value, so the click target sits adjacent
+         *  to the number it describes. The plain SourceDot keeps
+         *  using the separate `.cm-fact-source` slot to align
+         *  vertically with neighboring rows. */}
+        {hasResolverData && (
+          <span className="cm-fact-inline-source">
+            <FactValueDot
+              factKey={resolverFactKey!}
+              factLabel={resolverFactLabel!}
+              resolverOutput={resolverOutput!}
+              canonicalSourceId={resolverOutput!.canonical?.sourceId ?? null}
+              ariaLabel={`${label} ${displayValue}, see sources`}
+            />
+          </span>
+        )}
       </span>
-      {source && (
+      {!hasResolverData && source && (
         <span className="cm-fact-source">
-          <SourceDot source={source.source} retrievedAt={source.retrievedAt} />
+          <SourceDot
+            source={source.source}
+            retrievedAt={source.retrievedAt}
+          />
         </span>
       )}
     </div>
@@ -151,7 +188,13 @@ function QuickCompareBlock({ currentSlug }: { currentSlug: string }) {
   );
 }
 
-export function CountryMasthead({ country }: { country: Country }) {
+export function CountryMasthead({
+  country,
+  headerFacts,
+}: {
+  country: Country;
+  headerFacts?: AtlasHeaderFacts;
+}) {
   const [expanded, setExpanded] = useState(false);
   const slug = country.slug ?? country.id;
   const f = country.masthead;
@@ -246,12 +289,18 @@ export function CountryMasthead({ country }: { country: Country }) {
               label="Population"
               fact={f?.population}
               fallback={country.pop}
+              resolverOutput={headerFacts?.population}
+              resolverFactKey="population_total"
+              resolverFactLabel="Population"
             />
             <Fact
               icon={<TrendingUp size={15} />}
               label="GDP (PPP)"
               fact={f?.gdpPpp}
               fallback={country.gdp}
+              resolverOutput={headerFacts?.gdp}
+              resolverFactKey="gdp_ppp_usd_billions"
+              resolverFactLabel="GDP (PPP)"
             />
             <Spacer />
             <Fact

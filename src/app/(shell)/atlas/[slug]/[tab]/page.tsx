@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { eq } from "drizzle-orm";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { AtlasCountryShellClient } from "@/components/atlas/AtlasCountryShellClient";
 import type { Country } from "@/components/atlas/data";
@@ -8,6 +9,10 @@ import {
   isAtlasTab,
   slugToCountry,
 } from "@/lib/atlas/ids";
+import { db } from "@/lib/db";
+import { jurisdictions } from "@/lib/db/schema";
+import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
+import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 
 interface PageProps {
   params: Promise<{ slug: string; tab: string }>;
@@ -52,11 +57,41 @@ export default async function AtlasCountryPage({ params }: PageProps) {
     masthead: match.masthead,
   };
 
+  // Phase F.4 — resolver-direct fetch for the masthead's pop + GDP
+  // facts. Does one extra DB hit to map slug → jurisdictionId, then
+  // a batch resolver call. Same pattern as the factbook header.
+  // Falls back to plain SourceDots if the lookup fails.
+  let headerFacts: {
+    population: ResolverOutput | null;
+    gdp: ResolverOutput | null;
+  } = { population: null, gdp: null };
+  try {
+    const jrows = await db
+      .select({ id: jurisdictions.id })
+      .from(jurisdictions)
+      .where(eq(jurisdictions.slug, match.slug))
+      .limit(1);
+    const jurisdictionId = jrows[0]?.id;
+    if (jurisdictionId) {
+      const facts = await getCanonicalFactsForJurisdiction(jurisdictionId, [
+        "population_total",
+        "gdp_ppp_usd_billions",
+      ]);
+      headerFacts = {
+        population: facts["population_total"] ?? null,
+        gdp: facts["gdp_ppp_usd_billions"] ?? null,
+      };
+    }
+  } catch {
+    // graceful degrade — plain SourceDots will render
+  }
+
   return (
     <AtlasCountryShellClient
       country={country}
       dbCountries={dbCountries}
       dbChambers={dbChambers}
+      headerFacts={headerFacts}
     />
   );
 }

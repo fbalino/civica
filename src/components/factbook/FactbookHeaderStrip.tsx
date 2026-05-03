@@ -5,6 +5,8 @@ import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
 import { CountrySwitcherChips } from "./CountrySwitcherChips";
 import { FactbookLightbox, type LightboxImage } from "./FactbookLightbox";
+import { FactValueDot } from "./FactValueDot";
+import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 
 function MetaPill({
   label,
@@ -77,6 +79,13 @@ interface FactbookHeaderStripProps {
   mapUrl?: string | null;
   mapCaption?: string;
   photos: LightboxImage[];
+  /** Phase F.4 — resolver output for population_total. When
+   *  provided, the Pop pill renders a `<FactValueDot>` that opens
+   *  the alternate-values panel on click. Falls back to plain pill
+   *  if absent (no reconciled data yet). */
+  populationResolver?: ResolverOutput | null;
+  /** Phase F.4 — resolver output for gdp_ppp_usd_billions. */
+  gdpResolver?: ResolverOutput | null;
 }
 
 function formatPop(n: number | null): string | null {
@@ -108,6 +117,8 @@ export function FactbookHeaderStrip({
   mapUrl,
   mapCaption,
   photos,
+  populationResolver,
+  gdpResolver,
 }: FactbookHeaderStripProps) {
   const [lbOpen, setLbOpen] = useState(false);
   const [lbMode, setLbMode] = useState<"map" | "photos">("photos");
@@ -154,8 +165,76 @@ export function FactbookHeaderStrip({
                 className="factbook-meta-pill--government"
               />
             )}
-            {popStr && <MetaPill label="Pop" value={popStr} />}
-            {gdpStr && <MetaPill label="GDP" value={gdpStr} />}
+            {popStr &&
+              (populationResolver?.canonical ? (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "baseline",
+                    gap: 6,
+                    fontSize: "var(--text-14)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "var(--color-text-40)",
+                      fontSize: "var(--text-12)",
+                    }}
+                  >
+                    Pop
+                  </span>
+                  <span style={{ color: "var(--color-text-primary)" }}>
+                    {popStr}
+                  </span>
+                  <FactValueDot
+                    factKey="population_total"
+                    factLabel="Population"
+                    resolverOutput={populationResolver}
+                    canonicalSourceId={
+                      populationResolver.canonical?.sourceId ?? null
+                    }
+                    ariaLabel={`Population ${popStr}, see sources`}
+                  />
+                </span>
+              ) : (
+                <MetaPill label="Pop" value={popStr} />
+              ))}
+            {gdpStr &&
+              (gdpResolver?.canonical ? (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "baseline",
+                    gap: 6,
+                    fontSize: "var(--text-14)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "var(--color-text-40)",
+                      fontSize: "var(--text-12)",
+                    }}
+                  >
+                    GDP (PPP)
+                  </span>
+                  <span style={{ color: "var(--color-text-primary)" }}>
+                    {gdpStr}
+                  </span>
+                  <FactValueDot
+                    factKey="gdp_ppp_usd_billions"
+                    factLabel="GDP (PPP)"
+                    resolverOutput={gdpResolver}
+                    canonicalSourceId={
+                      gdpResolver.canonical?.sourceId ?? null
+                    }
+                    ariaLabel={`GDP (PPP) ${gdpStr}, see sources`}
+                  />
+                </span>
+              ) : (
+                <MetaPill label="GDP" value={gdpStr} />
+              ))}
             {ciScore != null && (
               <Link
                 href={`/civica-index/${slug}`}

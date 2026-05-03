@@ -12,6 +12,42 @@ import {
   constitutions,
 } from "@/lib/db/schema";
 import { eq, sql, asc, desc } from "drizzle-orm";
+import {
+  getCanonicalFactsForJurisdiction,
+  buildApiProvenanceEntry,
+  FACTBOOK_RECONCILIATION_META,
+  type ApiProvenanceEntry,
+} from "@/lib/factbook/reconcile/api";
+
+/**
+ * Phase F.4 — public-API provenance map.
+ *
+ * Each entry maps a flat top-level response field (e.g.
+ * `"population"`) to the canonical Phase F fact-key that backs it
+ * (e.g. `"population_total"`). The order of this object is the
+ * order provenance entries appear in the JSON response.
+ *
+ * Adding a new reconciled field to the API:
+ *   1. Add it here.
+ *   2. Read its value into `data` from
+ *      `facts[FACT_FIELDS[<flatName>]]?.canonical`.
+ *   3. Update API documentation.
+ */
+const FACT_FIELDS = {
+  capital: "capital",
+  population: "population_total",
+  gdpBillions: "gdp_ppp_usd_billions",
+  areaSqKm: "area_total_km2",
+  languages: "official_languages",
+  currency: "currency_code",
+  worldBankRegion: "world_bank_region",
+  worldBankIncomeGroup: "world_bank_income_group",
+  vdemRow: "vdem_row",
+  monarchyStatus: "monarchy_status",
+  governmentFormDescription: "government_form_description",
+} as const;
+
+type FlatFieldName = keyof typeof FACT_FIELDS;
 
 export async function GET(
   request: Request,
@@ -93,6 +129,60 @@ export async function GET(
        * useful even when the score subsystem isn't available. */
     }
 
+    // Phase F.4 — resolver-direct fetch for every reconciled fact.
+    // One batch query covers all 11 in-scope fact-keys.
+    const facts = await getCanonicalFactsForJurisdiction(
+      country.id,
+      Object.values(FACT_FIELDS)
+    );
+
+    /**
+     * For each flat field, prefer the resolver's canonical value
+     * over the legacy `jurisdictions` cache when both exist. The
+     * cache is eventually-consistent; the resolver IS the source
+     * of truth.
+     */
+    function resolverValueFor(field: FlatFieldName): {
+      text: string | null;
+      numeric: number | null;
+    } {
+      const out = facts[FACT_FIELDS[field]];
+      const row = out?.canonical;
+      if (!row) return { text: null, numeric: null };
+      return {
+        text: row.factValue,
+        numeric: row.factValueNumeric,
+      };
+    }
+
+    const popResolver = resolverValueFor("population");
+    const gdpResolver = resolverValueFor("gdpBillions");
+    const areaResolver = resolverValueFor("areaSqKm");
+    const capitalResolver = resolverValueFor("capital");
+    const languagesResolver = resolverValueFor("languages");
+    const currencyResolver = resolverValueFor("currency");
+    const wbRegionResolver = resolverValueFor("worldBankRegion");
+    const wbIncomeResolver = resolverValueFor("worldBankIncomeGroup");
+    const vdemRowResolver = resolverValueFor("vdemRow");
+    const monarchyResolver = resolverValueFor("monarchyStatus");
+    const govFormResolver = resolverValueFor("governmentFormDescription");
+
+    /**
+     * Build the provenance block — one entry per flat field where
+     * the resolver returned a canonical row. Fields with no
+     * canonical row (rare; means we have zero sources for that
+     * fact) are omitted from `provenance` entirely.
+     */
+    const provenance: Record<string, ApiProvenanceEntry> = {};
+    for (const [flatField, factKey] of Object.entries(FACT_FIELDS) as Array<
+      [FlatFieldName, string]
+    >) {
+      const out = facts[factKey];
+      if (!out) continue;
+      const entry = buildApiProvenanceEntry(factKey, out);
+      if (entry) provenance[flatField] = entry;
+    }
+
     const branches = bodies.reduce(
       (acc, body) => {
         const branch = body.branch ?? "other";
@@ -151,16 +241,33 @@ export async function GET(
         iso2: country.iso2,
         iso3: country.iso3,
         continent: country.continent,
-        capital: country.capital,
-        population: country.population,
+        // ── Reconciled flat fields. Resolver canonical takes
+        // precedence over the `jurisdictions` cache; cache is the
+        // back-compat fallback for fields the resolver doesn't
+        // cover yet.
+        capital: capitalResolver.text ?? country.capital,
+        population:
+          popResolver.numeric != null
+            ? Math.round(popResolver.numeric)
+            : country.population,
+        gdpBillions: gdpResolver.numeric ?? country.gdpBillions,
+        areaSqKm:
+          areaResolver.numeric != null
+            ? Math.round(areaResolver.numeric)
+            : country.areaSqKm,
+        languages: languagesResolver.text ?? country.languages,
+        currency: currencyResolver.text ?? country.currency,
+        democracyIndex: country.democracyIndex,
+        // ── Phase F.4 — peer-grouping classifications (new fields).
+        worldBankRegion: wbRegionResolver.text,
+        worldBankIncomeGroup: wbIncomeResolver.text,
+        vdemRow: vdemRowResolver.text,
+        monarchyStatus: monarchyResolver.text,
+        governmentFormDescription: govFormResolver.text,
+        // ── Existing fields ──
         governmentType: country.governmentType,
         governmentTypeDetail: country.governmentTypeDetail,
         governmentClassification: classificationMap.get(country.id) ?? null,
-        gdpBillions: country.gdpBillions,
-        areaSqKm: country.areaSqKm,
-        languages: country.languages,
-        currency: country.currency,
-        democracyIndex: country.democracyIndex,
         flagUrl: country.flagUrl,
         constitution: constitutionResults[0] ?? null,
         government: branches,
@@ -192,6 +299,11 @@ export async function GET(
               isLowConfidence: ciDetail.pulse.isLowConfidence,
             }
           : null,
+        // ── Phase F.4 — provenance block keyed by flat field ──
+        provenance,
+      },
+      meta: {
+        reconciliation: FACTBOOK_RECONCILIATION_META,
       },
     });
   } catch (e) {

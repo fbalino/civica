@@ -21,6 +21,15 @@ import type { ScoreRow } from "@/lib/db/queries-scores";
 import { useAtlasUrlState } from "@/hooks/useAtlasUrlState";
 import { atlasIdToSlug } from "@/lib/atlas/ids";
 import { dispatchCivicaAsk } from "@/lib/shell/events";
+import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+
+export interface AtlasHeaderFacts {
+  /** Resolver output for `population_total`. Null when the
+   *  resolver lookup failed or returned no rows. */
+  population: ResolverOutput | null;
+  /** Resolver output for `gdp_ppp_usd_billions`. */
+  gdp: ResolverOutput | null;
+}
 
 export interface AtlasCountryShellClientProps {
   country: Country;
@@ -28,6 +37,11 @@ export interface AtlasCountryShellClientProps {
   dbCountries: AtlasCountry[];
   /** SSR-loaded chamber composition keyed by 3-letter id. */
   dbChambers: Record<string, AtlasChamberData>;
+  /** Phase F.4 — pre-fetched resolver outputs for the masthead's
+   *  pop + GDP rows. When provided, the masthead renders a
+   *  `<FactValueDot>` (clickable alternate-values panel) instead
+   *  of the plain `<SourceDot>`. */
+  headerFacts?: AtlasHeaderFacts;
 }
 
 /**
@@ -43,6 +57,7 @@ export function AtlasCountryShellClient({
   country,
   dbCountries,
   dbChambers,
+  headerFacts,
 }: AtlasCountryShellClientProps) {
   const router = useRouter();
   const { tab, house, setTab, setHouse } = useAtlasUrlState();
@@ -228,6 +243,7 @@ export function AtlasCountryShellClient({
     <div style={{ paddingTop: 32, paddingBottom: 32 }}>
       <AtlasCountryCenter
         country={country}
+        headerFacts={headerFacts}
         cd={cd}
         tab={tab}
         house={house}

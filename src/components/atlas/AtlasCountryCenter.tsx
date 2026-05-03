@@ -106,6 +106,10 @@ export interface StructureData {
 
 export interface AtlasCountryCenterProps {
   country: Country;
+  /** Phase F.4 — pre-fetched resolver outputs for the masthead's
+   *  pop + GDP rows. Threaded through from
+   *  AtlasCountryShellClient. */
+  headerFacts?: import("./AtlasCountryShellClient").AtlasHeaderFacts;
   cd: ChamberData;
   tab: Tab;
   house: House;
@@ -163,6 +167,7 @@ export interface AtlasCountryCenterProps {
  */
 export function AtlasCountryCenter({
   country,
+  headerFacts,
   cd,
   tab,
   house,
@@ -187,7 +192,7 @@ export function AtlasCountryCenter({
 }: AtlasCountryCenterProps) {
   return (
     <>
-      <CountryMasthead country={country} />
+      <CountryMasthead country={country} headerFacts={headerFacts} />
 
       <div className="atlas-tabs">
         {ATLAS_TAB_ORDER.map((t) => (

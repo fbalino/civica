@@ -274,6 +274,92 @@ const SOURCES = [
     isCommercialUseAllowed: false,
     lastSyncAt: null,
   },
+  // --- Phase F — Tier 1 multilateral statistical agencies ---
+  // Per ~/civica/plan/phase-f-methodology-v0.1.md §2.1.
+  // These are the upstream sources that the resolver prefers for
+  // Group B fast-changing quantitative facts. Every Wikidata claim
+  // we accept must cite one of these (or a Tier 2 NSO). World Bank
+  // and UNDP HDI already seeded above.
+  {
+    id: "imf_weo",
+    name: "IMF World Economic Outlook",
+    baseUrl: "https://www.imf.org/en/Publications/WEO",
+    license: "open_data_attribution",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "un_data",
+    name: "UN Statistics Division",
+    baseUrl: "https://data.un.org",
+    license: "open_data_attribution",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "unesco_uis",
+    name: "UNESCO Institute for Statistics",
+    baseUrl: "https://uis.unesco.org",
+    license: "CC-BY-3.0-IGO",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "who_gho",
+    name: "WHO Global Health Observatory",
+    baseUrl: "https://www.who.int/data/gho",
+    license: "CC-BY-NC-SA-3.0-IGO",
+    isCommercialUseAllowed: false,
+    lastSyncAt: null,
+  },
+  {
+    id: "oecd_stat",
+    name: "OECD.Stat",
+    baseUrl: "https://stats.oecd.org",
+    license: "OECD_terms_attribution",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "fao_faostat",
+    name: "FAO FAOSTAT",
+    baseUrl: "https://www.fao.org/faostat",
+    license: "CC-BY-4.0",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "iea_data",
+    name: "International Energy Agency",
+    baseUrl: "https://www.iea.org/data-and-statistics",
+    license: "CC-BY-4.0",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "ilo_ilostat",
+    name: "ILO ILOSTAT",
+    baseUrl: "https://ilostat.ilo.org",
+    license: "open_data_attribution",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "eurostat",
+    name: "Eurostat",
+    baseUrl: "https://ec.europa.eu/eurostat",
+    license: "CC-BY-4.0",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  {
+    id: "wto_stats",
+    name: "WTO Stats",
+    baseUrl: "https://stats.wto.org",
+    license: "open_data_attribution",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
 ];
 
 const METRIC_DEFINITIONS = [

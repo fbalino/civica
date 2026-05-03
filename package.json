@@ -43,7 +43,15 @@
     "pulse:v2:score": "tsx scripts/sync-pulse-v2-score.ts",
     "pulse:v2:all": "tsx scripts/run-pulse-v2.ts",
     "backtest:seed": "tsx scripts/seed-backtest-cases.ts",
-    "backtest:run": "tsx scripts/run-backtest.ts"
+    "backtest:run": "tsx scripts/run-backtest.ts",
+    "sync:factbook:wikidata": "tsx scripts/sync-factbook-wikidata.ts",
+    "sync:factbook:wb-classifications": "tsx scripts/sync-factbook-worldbank-classifications.ts",
+    "sync:factbook:vdem-row": "tsx scripts/sync-factbook-vdem-row.ts",
+    "sync:factbook:monarchy": "tsx scripts/sync-factbook-monarchy-status.ts",
+    "sync:factbook:classifications": "npm run sync:factbook:wb-classifications && npm run sync:factbook:vdem-row && npm run sync:factbook:monarchy",
+    "snapshot:fact-vintage": "tsx scripts/snapshot-fact-vintage.ts",
+    "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
+    "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
