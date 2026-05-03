@@ -1,5 +1,30 @@
 import { type NextRequest } from "next/server";
 import { getCICountryDetail, getCountryFacts } from "@/lib/db/queries";
+import {
+  getCanonicalFactsForJurisdiction,
+  FACTBOOK_RECONCILIATION_META,
+  sourceName,
+} from "@/lib/factbook/reconcile/api";
+
+/**
+ * Phase F.4 — embed widget reconciled fact-keys.
+ *
+ * The custom widget surfaces capital / population / GDP / area; pull
+ * each from the resolver so the widget cites the same canonical
+ * value as the public API and the country page. Resolver canonical
+ * takes precedence over the `jurisdictions` cache — they may diverge
+ * by up to 24h while the nightly cache job catches up.
+ *
+ * The widget is read-only HTML inside an iframe, so we render
+ * static attribution rather than the interactive `<FactValueDot>`
+ * panel used on civicaatlas.org surfaces.
+ */
+const WIDGET_FACT_KEYS = [
+  "capital",
+  "population_total",
+  "gdp_ppp_usd_billions",
+  "area_total_km2",
+] as const;
 
 function corsHeaders() {
   return {
@@ -46,11 +71,28 @@ export async function GET(
 
   let detail: Awaited<ReturnType<typeof getCICountryDetail>> = null;
   let facts: Awaited<ReturnType<typeof getCountryFacts>> = [];
+  let canonicalFacts: Awaited<
+    ReturnType<typeof getCanonicalFactsForJurisdiction>
+  > = {};
 
   try {
     detail = await getCICountryDetail(slug);
-    if (detail && size === "lg" && dims) {
-      facts = await getCountryFacts(detail.jurisdiction.id);
+    if (detail) {
+      const tasks: Promise<unknown>[] = [
+        getCanonicalFactsForJurisdiction(detail.jurisdiction.id, [
+          ...WIDGET_FACT_KEYS,
+        ]).then((r) => {
+          canonicalFacts = r;
+        }),
+      ];
+      if (size === "lg" && dims) {
+        tasks.push(
+          getCountryFacts(detail.jurisdiction.id).then((r) => {
+            facts = r;
+          })
+        );
+      }
+      await Promise.all(tasks);
     }
   } catch {
     return new Response("Service unavailable", {
@@ -67,6 +109,39 @@ export async function GET(
   }
 
   const { jurisdiction, composite } = detail;
+
+  // Phase F.4 — prefer resolver canonical over the `jurisdictions`
+  // cache for every reconciled field this widget renders.
+  const capitalRow = canonicalFacts["capital"]?.canonical;
+  const populationRow = canonicalFacts["population_total"]?.canonical;
+  const gdpRow = canonicalFacts["gdp_ppp_usd_billions"]?.canonical;
+  const areaRow = canonicalFacts["area_total_km2"]?.canonical;
+
+  const reconciledCapital = capitalRow?.factValue ?? jurisdiction.capital ?? null;
+  const reconciledPopulation =
+    populationRow?.factValueNumeric != null
+      ? Math.round(populationRow.factValueNumeric)
+      : jurisdiction.population ?? null;
+  const reconciledGdpBillions =
+    gdpRow?.factValueNumeric ?? jurisdiction.gdpBillions ?? null;
+  const reconciledAreaSqKm =
+    areaRow?.factValueNumeric != null
+      ? Math.round(areaRow.factValueNumeric)
+      : jurisdiction.areaSqKm ?? null;
+
+  // Build a static citation line for the widget footer (read-only,
+  // no interactive panel inside the iframe). Dedupes the canonical
+  // sources backing the visible fields and keeps the order stable.
+  const attributionSourceIds: string[] = [];
+  for (const row of [capitalRow, populationRow, gdpRow, areaRow]) {
+    if (row?.sourceId && !attributionSourceIds.includes(row.sourceId)) {
+      attributionSourceIds.push(row.sourceId);
+    }
+  }
+  const attributionLabel =
+    attributionSourceIds.length > 0
+      ? attributionSourceIds.map((id) => sourceName(id)).join(" · ")
+      : null;
   const ciScore = composite?.score ?? null;
   const ciInt = ciScore !== null ? Math.round(ciScore) : null;
   const ciDisplay = ciInt !== null ? String(ciInt) : "—";
@@ -96,7 +171,16 @@ export async function GET(
     size,
     themeParam,
     dims,
-    jurisdiction,
+    jurisdiction: {
+      ...jurisdiction,
+      // Override cache with resolver canonical for any field the
+      // widget renders, falling back to cache when the resolver has
+      // no row.
+      capital: reconciledCapital,
+      population: reconciledPopulation,
+      gdpBillions: reconciledGdpBillions,
+      areaSqKm: reconciledAreaSqKm,
+    },
     ciDisplay,
     ciMeta,
     cpScore,
@@ -109,6 +193,7 @@ export async function GET(
     width,
     height,
     include,
+    attributionLabel,
   });
 
   return new Response(html, {
@@ -237,6 +322,13 @@ interface BuildHtmlArgs {
   width: number;
   height: number;
   include: Set<string>;
+  /**
+   * Phase F.4 — static attribution string for the widget footer
+   * (e.g. `"CIA World Factbook · Wikidata"`). Built from the
+   * canonical source IDs backing the visible reconciled fields.
+   * `null` when the resolver returned no canonical rows.
+   */
+  attributionLabel: string | null;
 }
 
 function buildHtml(args: BuildHtmlArgs): string {
@@ -244,7 +336,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     size, themeParam, dims, jurisdiction,
     ciDisplay, ciMeta, cpScore,
     tier, rank, totalRanked, quarterLabel, updatedDate,
-    dimScores, width, height, include,
+    dimScores, width, height, include, attributionLabel,
   } = args;
 
   const themeAttr = themeParam ? ` data-theme="${themeParam}"` : "";
@@ -256,6 +348,14 @@ function buildHtml(args: BuildHtmlArgs): string {
       ? `Rank ${rank} of ${totalRanked}`
       : "";
   const tierPct = ciDisplay !== "—" ? Math.round(Number(ciDisplay)) : 0;
+
+  // Phase F.4 — read-only attribution line that lists the canonical
+  // sources backing the visible reconciled facts (population, GDP,
+  // area, capital). Only renders when the resolver returned at least
+  // one canonical row; the small widget skips it for space reasons.
+  const attributionHtml = attributionLabel
+    ? `<div class="attribution mono">Source: ${esc(attributionLabel)} · Civica Atlas reconciled ${esc(FACTBOOK_RECONCILIATION_META.version)}</div>`
+    : "";
 
   const dimBarsHtml = dimScores
     .map((d) => {
@@ -288,8 +388,9 @@ function buildHtml(args: BuildHtmlArgs): string {
     <span>${esc(tier.label)}</span><span class="mono">CP ${esc(cpScore)} &middot; LIVE</span>
   </div>
   <div class="tier-bar"><span style="width:${tierPct}%"></span></div>
+  ${attributionHtml}
   <div class="foot mono">
-    <span>civica.io/countries/${esc(jurisdiction.slug)}</span>
+    <span>civicaatlas.org/countries/${esc(jurisdiction.slug)}</span>
     <span>LIVE</span>
   </div>
 </a>`;
@@ -311,8 +412,9 @@ function buildHtml(args: BuildHtmlArgs): string {
   </div>
   <div class="tier-bar"><span style="width:${tierPct}%"></span></div>
   ${dims ? `<div class="dims">${dimBarsHtml}</div>` : ""}
+  ${attributionHtml}
   <div class="foot mono">
-    <span>civica.io/countries/${esc(jurisdiction.slug)}</span>
+    <span>civicaatlas.org/countries/${esc(jurisdiction.slug)}</span>
     <span>UPDATED &middot; ${esc(updatedDate)}</span>
   </div>
 </a>`;
@@ -367,6 +469,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   </div>
   <div class="cf-name serif">${esc(jurisdiction.name)}</div>
   <div class="cf-rows">${customRowsHtml}</div>
+  ${attributionHtml}
   <div class="cf-foot mono">
     <span>civicaatlas.org/atlas/${esc(jurisdiction.slug)}</span>
     <span>UPDATED &middot; ${esc(updatedDate)}</span>
@@ -461,6 +564,11 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
 }
 .civica-widget:hover{transform:translate(-1px,-1px);box-shadow:var(--shadow-hard-lg)}
 .civica-widget:focus-visible{outline:2px solid var(--t-mixed);outline-offset:2px}
+
+/* Phase F.4 — read-only source attribution line. Sized to match the
+   existing widget meta typography so it doesn't visually compete
+   with the foot URL row. */
+.civica-widget .attribution{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:9px;color:var(--ink-3);letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ── Small 300×80 ── */
 .civica-widget.small{
