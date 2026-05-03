@@ -38,6 +38,9 @@ import { stripHtml, firstSentences, formatGovernmentType } from "@/lib/text/clea
 import { fetchParliamentBills, getParliamentSource, type Bill } from "@/lib/data/parliament-feeds";
 import { CountryOutcomeBars } from "@/components/outcomes/CountryOutcomeBars";
 import { CivicaConditionsPanel } from "@/components/conditions/CivicaConditionsPanel";
+import { FactValueDot } from "@/components/factbook/FactValueDot";
+import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
+import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
@@ -50,13 +53,44 @@ function formatArea(n: number): string {
   return `${n.toLocaleString()} km\u00B2`;
 }
 
-function StatRow({ label, val, source, date }: { label: string; val: string; source?: string; date?: string }) {
+function StatRow({
+  label,
+  val,
+  source,
+  date,
+  factKey,
+  resolverFact,
+}: {
+  label: string;
+  val: string;
+  source?: string;
+  date?: string;
+  /**
+   * Phase F.4 — when this row is backed by the Phase F resolver and
+   * has a canonical row, the SourceDot is replaced with a clickable
+   * `<FactValueDot>` that opens the alternates panel. The row falls
+   * back to the legacy SourceDot when `resolverFact?.canonical` is null.
+   */
+  factKey?: string;
+  resolverFact?: ResolverOutput | null;
+}) {
+  const hasCanonical = resolverFact?.canonical != null;
   return (
     <div className="stat-row">
       <span className="stat-row__label">{label}</span>
       <span className="stat-row__value">
         {val}
-        <SourceDot source={source ?? "cia_factbook"} retrievedAt={date ?? "2026-01-23"} />
+        {hasCanonical && resolverFact && factKey ? (
+          <FactValueDot
+            factKey={factKey}
+            factLabel={label}
+            resolverOutput={resolverFact}
+            canonicalSourceId={resolverFact.canonical?.sourceId ?? null}
+            ariaLabel={`${label} ${val}, see sources`}
+          />
+        ) : (
+          <SourceDot source={source ?? "cia_factbook"} retrievedAt={date ?? "2026-01-23"} />
+        )}
       </span>
     </div>
   );
@@ -117,7 +151,7 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline, ciDetail, pulseV2] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline, ciDetail, pulseV2, reconciledFacts] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -131,6 +165,18 @@ export default async function CountryPage({
     getLeaderTimeline(jurisdiction.id),
     getCICountryDetail(slug).catch(() => null),
     getPulseV2ForCountry(slug).catch(() => null),
+    // Phase F.4 — resolver-direct fetch. Used by both the country
+    // profile stats card (capital/pop/gdp/area/languages/currency) and
+    // the FactbookSection LeafRow (Languages/Capital/etc that share
+    // labels with fact-keys). One batch query covers both.
+    getCanonicalFactsForJurisdiction(jurisdiction.id, [
+      "population_total",
+      "gdp_ppp_usd_billions",
+      "area_total_km2",
+      "capital",
+      "official_languages",
+      "currency_code",
+    ]).catch(() => ({}) as Record<string, ResolverOutput>),
   ]);
   const ciScore: CIScoreData | null = ciDetail?.composite
     ? {
@@ -188,14 +234,89 @@ export default async function CountryPage({
     sections.map((s) => [s.sectionName, s.sectionData])
   );
 
-  const profileRows: { label: string; value: string; source?: string; date?: string }[] = [];
-  if (jurisdiction.capital) profileRows.push({ label: "Capital", value: jurisdiction.capital });
-  if (jurisdiction.population) profileRows.push({ label: "Population", value: formatNumber(jurisdiction.population) });
-  if (jurisdiction.gdpBillions) profileRows.push({ label: "GDP", value: `$${jurisdiction.gdpBillions.toFixed(1)}B` });
-  if (jurisdiction.areaSqKm) profileRows.push({ label: "Area", value: formatArea(jurisdiction.areaSqKm) });
-  if (jurisdiction.languages) profileRows.push({ label: "Language", value: jurisdiction.languages });
-  if (jurisdiction.currency) profileRows.push({ label: "Currency", value: jurisdiction.currency });
-  if (jurisdiction.democracyIndex) profileRows.push({ label: "Democracy", value: jurisdiction.democracyIndex.toFixed(2), source: "V-Dem Institute", date: "2025" });
+  // Phase F.4 — resolver canonical takes precedence over the legacy
+  // jurisdictions cache, mirroring the public-API contract at
+  // /api/v1/countries/[code]. When the resolver lacks a canonical row
+  // the row degrades to the legacy cache value with the legacy
+  // SourceDot.
+  const popResolver = reconciledFacts["population_total"] ?? null;
+  const gdpResolver = reconciledFacts["gdp_ppp_usd_billions"] ?? null;
+  const areaResolver = reconciledFacts["area_total_km2"] ?? null;
+  const capitalResolver = reconciledFacts["capital"] ?? null;
+  const langsResolver = reconciledFacts["official_languages"] ?? null;
+  const currencyResolver = reconciledFacts["currency_code"] ?? null;
+
+  const resolvedCapital = capitalResolver?.canonical?.factValue ?? jurisdiction.capital;
+  const resolvedPopulation =
+    popResolver?.canonical?.factValueNumeric != null
+      ? Math.round(popResolver.canonical.factValueNumeric)
+      : jurisdiction.population;
+  const resolvedGdp = gdpResolver?.canonical?.factValueNumeric ?? jurisdiction.gdpBillions;
+  const resolvedArea =
+    areaResolver?.canonical?.factValueNumeric != null
+      ? Math.round(areaResolver.canonical.factValueNumeric)
+      : jurisdiction.areaSqKm;
+  const resolvedLangs = langsResolver?.canonical?.factValue ?? jurisdiction.languages;
+  const resolvedCurrency = currencyResolver?.canonical?.factValue ?? jurisdiction.currency;
+
+  type ProfileRow = {
+    label: string;
+    value: string;
+    source?: string;
+    date?: string;
+    factKey?: string;
+    resolverFact?: ResolverOutput | null;
+  };
+  const profileRows: ProfileRow[] = [];
+  if (resolvedCapital)
+    profileRows.push({
+      label: "Capital",
+      value: resolvedCapital,
+      factKey: "capital",
+      resolverFact: capitalResolver,
+    });
+  if (resolvedPopulation)
+    profileRows.push({
+      label: "Population",
+      value: formatNumber(resolvedPopulation),
+      factKey: "population_total",
+      resolverFact: popResolver,
+    });
+  if (resolvedGdp)
+    profileRows.push({
+      label: "GDP",
+      value: `$${resolvedGdp.toFixed(1)}B`,
+      factKey: "gdp_ppp_usd_billions",
+      resolverFact: gdpResolver,
+    });
+  if (resolvedArea)
+    profileRows.push({
+      label: "Area",
+      value: formatArea(resolvedArea),
+      factKey: "area_total_km2",
+      resolverFact: areaResolver,
+    });
+  if (resolvedLangs)
+    profileRows.push({
+      label: "Language",
+      value: resolvedLangs,
+      factKey: "official_languages",
+      resolverFact: langsResolver,
+    });
+  if (resolvedCurrency)
+    profileRows.push({
+      label: "Currency",
+      value: resolvedCurrency,
+      factKey: "currency_code",
+      resolverFact: currencyResolver,
+    });
+  if (jurisdiction.democracyIndex)
+    profileRows.push({
+      label: "Democracy",
+      value: jurisdiction.democracyIndex.toFixed(2),
+      source: "V-Dem Institute",
+      date: "2025",
+    });
 
   const govCat = classifyGovernment(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType);
   const color = govCat.color;
@@ -433,7 +554,15 @@ export default async function CountryPage({
       <div className="cv-card">
         <h3 className="section-header">Profile</h3>
         {profileRows.map((row) => (
-          <StatRow key={row.label} label={row.label} val={row.value} source={row.source} date={row.date} />
+          <StatRow
+            key={row.label}
+            label={row.label}
+            val={row.value}
+            source={row.source}
+            date={row.date}
+            factKey={row.factKey}
+            resolverFact={row.resolverFact}
+          />
         ))}
       </div>
 
@@ -801,6 +930,7 @@ export default async function CountryPage({
               fields={fields}
               source="cia_factbook"
               retrievedAt="2026-01-23"
+              resolverFacts={reconciledFacts}
             />
           );
         })}

@@ -3,6 +3,27 @@ import { SourceDot } from "./SourceDot";
 import type { FactbookField } from "@/lib/data/factbook-fields";
 import { humanizeLabel, humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
+import { FactValueDot } from "@/components/factbook/FactValueDot";
+import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+
+/**
+ * Phase F.4 — for the small set of structured-section leaves whose
+ * label maps cleanly to a Phase F fact-key, we can swap the generic
+ * `<SourceDot>` (which only attributes "CIA Factbook") for a clickable
+ * `<FactValueDot>` that opens the alternates panel. Most factbook leaf
+ * labels (Coastline, Climate, Industries, etc.) are CIA-prose-only and
+ * stay on the generic SourceDot.
+ *
+ * Keys are the human label as rendered by `humanizeLabel(field.label)`
+ * — match what the user sees on screen, not the raw underlying key.
+ */
+const LABEL_TO_FACT_KEY: Record<string, string> = {
+  Capital: "capital",
+  Population: "population_total",
+  Languages: "official_languages",
+  Currency: "currency_code",
+  "GDP (PPP)": "gdp_ppp_usd_billions",
+};
 
 // Match opening or closing tags for a small allowlist of inline elements.
 // Note: there is no negative lookahead — earlier `(?!<)` caused the first
@@ -88,6 +109,13 @@ interface FactbookSectionProps {
    *  section's id. Yields ids like `government--legal-system` so a
    *  scroll-spy / right-rail can target individual subsections. */
   idPrefix?: string;
+  /** Phase F.4 — resolver outputs keyed by Phase F fact-key. When a
+   *  leaf's humanized label matches a key in `LABEL_TO_FACT_KEY` AND
+   *  the resolver returned a canonical row, the row renders
+   *  `<FactValueDot>` (clickable alternates panel) instead of the
+   *  plain CIA-Factbook `<SourceDot>`. Optional — pages that don't
+   *  pass this still get the legacy single-source attribution. */
+  resolverFacts?: Record<string, ResolverOutput>;
 }
 
 type LeafField = Extract<FactbookField, { kind: "leaf" }>;
@@ -97,11 +125,21 @@ function LeafRow({
   field,
   source,
   retrievedAt,
+  resolverFacts,
 }: {
   field: LeafField;
   source?: string;
   retrievedAt?: string;
+  resolverFacts?: Record<string, ResolverOutput>;
 }) {
+  const humanLabel = humanizeLabel(field.label);
+  // Phase F.4 — does this leaf map to a Phase F fact-key, AND did the
+  // resolver return a canonical row? If yes, swap the SourceDot for a
+  // FactValueDot so the alternates panel is one click away.
+  const factKey = LABEL_TO_FACT_KEY[humanLabel];
+  const resolverFact = factKey ? resolverFacts?.[factKey] : undefined;
+  const hasCanonical = resolverFact?.canonical != null;
+
   return (
     <div
       style={{
@@ -118,7 +156,7 @@ function LeafRow({
           marginBottom: 4,
         }}
       >
-        {humanizeLabel(field.label)}
+        {humanLabel}
       </dt>
       <dd
         style={{
@@ -130,9 +168,17 @@ function LeafRow({
         }}
       >
         {renderInlineHtml(field.value)}
-        {source && retrievedAt && (
+        {hasCanonical && resolverFact && factKey ? (
+          <FactValueDot
+            factKey={factKey}
+            factLabel={humanLabel}
+            resolverOutput={resolverFact}
+            canonicalSourceId={resolverFact.canonical?.sourceId ?? null}
+            ariaLabel={`${humanLabel}, see sources`}
+          />
+        ) : source && retrievedAt ? (
           <SourceDot source={source} retrievedAt={retrievedAt} />
-        )}
+        ) : null}
       </dd>
     </div>
   );
@@ -144,12 +190,14 @@ function GroupBlock({
   retrievedAt,
   depth = 0,
   idPrefix,
+  resolverFacts,
 }: {
   field: GroupField;
   source?: string;
   retrievedAt?: string;
   depth?: number;
   idPrefix?: string;
+  resolverFacts?: Record<string, ResolverOutput>;
 }) {
   const HeadingTag = depth === 0 ? "h3" : "h4";
   const headingFontSize = depth === 0 ? "var(--text-20)" : "var(--text-16)";
@@ -178,7 +226,7 @@ function GroupBlock({
       >
         {headingText}
       </HeadingTag>
-      {renderFields(field.children, source, retrievedAt, depth + 1, idPrefix)}
+      {renderFields(field.children, source, retrievedAt, depth + 1, idPrefix, resolverFacts)}
     </div>
   );
 }
@@ -191,7 +239,8 @@ function renderFields(
   source: string | undefined,
   retrievedAt: string | undefined,
   depth: number,
-  idPrefix?: string
+  idPrefix?: string,
+  resolverFacts?: Record<string, ResolverOutput>
 ): ReactNode[] {
   const out: ReactNode[] = [];
   let leafBuffer: LeafField[] = [];
@@ -209,6 +258,7 @@ function renderFields(
             field={leaf}
             source={source}
             retrievedAt={retrievedAt}
+            resolverFacts={resolverFacts}
           />
         ))}
       </dl>
@@ -229,6 +279,7 @@ function renderFields(
         retrievedAt={retrievedAt}
         depth={depth}
         idPrefix={idPrefix}
+        resolverFacts={resolverFacts}
       />
     );
   }
@@ -242,6 +293,7 @@ export function FactbookSection({
   source,
   retrievedAt,
   idPrefix,
+  resolverFacts,
 }: FactbookSectionProps) {
   if (fields.length === 0) {
     return (
@@ -261,7 +313,7 @@ export function FactbookSection({
 
   return (
     <section aria-label={sectionName}>
-      {renderFields(fields, source, retrievedAt, 0, idPrefix)}
+      {renderFields(fields, source, retrievedAt, 0, idPrefix, resolverFacts)}
     </section>
   );
 }

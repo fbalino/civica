@@ -151,13 +151,22 @@ export default async function FactbookCountryPage({
     getBillsForJurisdiction(slug, 1).catch(() => null),
     getScoresForJurisdiction(jurisdiction.id).catch(() => []),
     getFactbookCountryOptions().catch(() => []),
-    // Phase F.4 — resolver-direct fetch for the header strip's
-    // pop + GDP pills. Returns the canonical row + alternates for
-    // each fact-key; the header passes them through to
-    // `<FactValueDot>` for the click-to-expand panel.
+    // Phase F.4 — resolver-direct fetch.
+    // Used by:
+    //   - Header strip (Pop + GDP pills) → uses population_total +
+    //     gdp_ppp_usd_billions.
+    //   - Structured sections (FactbookSection LeafRow) → also keys off
+    //     capital / official_languages / currency_code so leaves whose
+    //     human label matches `LABEL_TO_FACT_KEY` swap their generic
+    //     CIA-Factbook SourceDot for a clickable FactValueDot.
+    // One batch query covers both surfaces — keeps the page server-
+    // round-trip count flat.
     getCanonicalFactsForJurisdiction(jurisdiction.id, [
       "population_total",
       "gdp_ppp_usd_billions",
+      "capital",
+      "official_languages",
+      "currency_code",
     ]).catch(
       () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>
     ),
@@ -481,6 +490,7 @@ export default async function FactbookCountryPage({
                     source="cia_factbook"
                     retrievedAt={FACTBOOK_RETRIEVED_AT}
                     idPrefix={section.id}
+                    resolverFacts={headerFacts}
                   />
                 ) : section.kind === "factbook+civica-gov" ||
                   section.kind === "civica" ? null : (
