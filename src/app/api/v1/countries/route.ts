@@ -4,6 +4,7 @@ import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { jurisdictions } from "@/lib/db/schema";
 import { sql, asc, desc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
+import { cachedJurisdictionColumns } from "@/lib/factbook/reconcile/api";
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
@@ -49,12 +50,12 @@ export async function GET(request: Request) {
           iso2: jurisdictions.iso2,
           iso3: jurisdictions.iso3,
           continent: jurisdictions.continent,
-          capital: jurisdictions.capital,
-          population: jurisdictions.population,
+          capital: cachedJurisdictionColumns.capital,
+          population: cachedJurisdictionColumns.population,
           governmentType: jurisdictions.governmentType,
           governmentTypeDetail: jurisdictions.governmentTypeDetail,
-          gdpBillions: jurisdictions.gdpBillions,
-          areaSqKm: jurisdictions.areaSqKm,
+          gdpBillions: cachedJurisdictionColumns.gdpBillions,
+          areaSqKm: cachedJurisdictionColumns.areaSqKm,
           flagUrl: jurisdictions.flagUrl,
         })
         .from(jurisdictions)
@@ -99,12 +100,12 @@ export async function GET(request: Request) {
           iso2: jurisdictions.iso2,
           iso3: jurisdictions.iso3,
           continent: jurisdictions.continent,
-          capital: jurisdictions.capital,
-          population: jurisdictions.population,
+          capital: cachedJurisdictionColumns.capital,
+          population: cachedJurisdictionColumns.population,
           governmentType: jurisdictions.governmentType,
           governmentTypeDetail: jurisdictions.governmentTypeDetail,
-          gdpBillions: jurisdictions.gdpBillions,
-          areaSqKm: jurisdictions.areaSqKm,
+          gdpBillions: cachedJurisdictionColumns.gdpBillions,
+          areaSqKm: cachedJurisdictionColumns.areaSqKm,
           flagUrl: jurisdictions.flagUrl,
         })
         .from(jurisdictions)

@@ -496,6 +496,115 @@ export async function readCachedField(
   };
 }
 
+/**
+ * Phase F.4 — Drizzle column-projection helper for the cached
+ * jurisdictions fields.
+ *
+ * Spread this into a `.select({ ... })` call when a route or query
+ * needs the cached fact columns (capital, population, gdp, area,
+ * languages, currency, democracy index). Keeps the
+ * `jurisdictions.<col>` references contained inside this module so
+ * the F.4 lint rule (banning direct cached-column reads outside
+ * `src/lib/factbook/reconcile/`) can stay tight.
+ *
+ * Usage:
+ *   const rows = await db
+ *     .select({ id: jurisdictions.id, ...cachedJurisdictionColumns })
+ *     .from(jurisdictions);
+ */
+export const cachedJurisdictionColumns = {
+  capital: jurisdictions.capital,
+  population: jurisdictions.population,
+  gdpBillions: jurisdictions.gdpBillions,
+  areaSqKm: jurisdictions.areaSqKm,
+  languages: jurisdictions.languages,
+  currency: jurisdictions.currency,
+  democracyIndex: jurisdictions.democracyIndex,
+} as const;
+
+/**
+ * Phase F.4 — fact-key-aware cached read against an already-loaded
+ * jurisdictions row.
+ *
+ * Use this overload from list-shaped surfaces that already SELECT
+ * the jurisdictions row(s) and just need the value off the cached
+ * column. It maps the canonical Phase F fact-key (e.g.
+ * `"population_total"`) to the matching `jurisdictions` column
+ * (e.g. `population`) and returns the value directly. Synchronous,
+ * zero DB hits.
+ *
+ * For surfaces that haven't loaded the row yet, use the async
+ * `readCachedField(jurisdictionId, field)` overload above.
+ *
+ * The fact-key → column mapping mirrors `COLUMN_TO_FACT_KEY` in
+ * `src/lib/factbook/reconcile/cache.ts`.
+ */
+export type FactKeyForCache =
+  | "capital"
+  | "population_total"
+  | "gdp_ppp_usd_billions"
+  | "area_total_km2"
+  | "official_languages"
+  | "currency_code"
+  | "vdem_row";
+
+const FACT_KEY_TO_COLUMN: Record<FactKeyForCache, CachedField> = {
+  capital: "capital",
+  population_total: "population",
+  gdp_ppp_usd_billions: "gdpBillions",
+  area_total_km2: "areaSqKm",
+  official_languages: "languages",
+  currency_code: "currency",
+  vdem_row: "democracyIndex",
+};
+
+type CachedFieldHolder = {
+  capital?: string | null;
+  population?: number | null;
+  gdpBillions?: number | null;
+  areaSqKm?: number | null;
+  languages?: string | null;
+  currency?: string | null;
+  democracyIndex?: number | null;
+};
+
+export function readCachedFieldFromRow<R extends CachedFieldHolder>(
+  row: R,
+  factKey: "capital"
+): string | null;
+export function readCachedFieldFromRow<R extends CachedFieldHolder>(
+  row: R,
+  factKey: "population_total"
+): number | null;
+export function readCachedFieldFromRow<R extends CachedFieldHolder>(
+  row: R,
+  factKey: "gdp_ppp_usd_billions"
+): number | null;
+export function readCachedFieldFromRow<R extends CachedFieldHolder>(
+  row: R,
+  factKey: "area_total_km2"
+): number | null;
+export function readCachedFieldFromRow<R extends CachedFieldHolder>(
+  row: R,
+  factKey: "official_languages"
+): string | null;
+export function readCachedFieldFromRow<R extends CachedFieldHolder>(
+  row: R,
+  factKey: "currency_code"
+): string | null;
+export function readCachedFieldFromRow<R extends CachedFieldHolder>(
+  row: R,
+  factKey: "vdem_row"
+): number | null;
+export function readCachedFieldFromRow<R extends CachedFieldHolder>(
+  row: R,
+  factKey: FactKeyForCache
+): string | number | null {
+  const column = FACT_KEY_TO_COLUMN[factKey];
+  const value = row[column];
+  return (value ?? null) as string | number | null;
+}
+
 /* ────────────────────────────────────────────────────────────────
  * Helpers
  * ──────────────────────────────────────────────────────────────── */
