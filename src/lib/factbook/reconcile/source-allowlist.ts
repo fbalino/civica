@@ -66,7 +66,17 @@ export interface AllowlistEntry {
 
 const TIER_1: AllowlistEntry[] = [
   {
-    qid: "Q1199363",
+    // R.0 / 2026-05-03: corrected to Q21540096 (World Bank Open
+    // Data, the data portal). The previous value Q1199363 maps
+    // to "Taika — Wikimedia disambiguation page" on live
+    // Wikidata, so the QID branch of the allowlist never matched
+    // a real WB reference; the URL-domain branch was carrying
+    // 100% of the load. The bug was latent until the same R.0
+    // patch broadened reference extraction to include `pr:P123`
+    // (publisher), where references arrive QID-only without a
+    // URL. See `~/civica/plan/wikidata-sort-resolution-v1.md`
+    // §3 item 3.
+    qid: "Q21540096",
     domains: ["data.worldbank.org", "databank.worldbank.org", "worldbank.org"],
     name: "World Bank Open Data",
     tier: 1,

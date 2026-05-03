@@ -59,6 +59,13 @@ export interface PerFactCounters {
   rejected_allowlist: number;
   rejected_envelope: number;
   unit_mismatch: number;
+  /** Phase R.0 / 2026-05-03: number of times the date-first-with-
+   *  rank-floor sort displaced a preferred-rank admissible claim
+   *  in favour of a fresher normal-rank admissible claim. A spike
+   *  is a leading indicator of upstream Wikidata curation
+   *  regression on this fact-key. See
+   *  `~/civica/plan/wikidata-sort-resolution-v1.md` §4 Risk 3. */
+  floor_displaced_preferred: number;
 }
 
 export interface WikidataSyncSummary {
@@ -87,7 +94,54 @@ function freshCounters(factKey: string): PerFactCounters {
     rejected_allowlist: 0,
     rejected_envelope: 0,
     unit_mismatch: 0,
+    floor_displaced_preferred: 0,
   };
+}
+
+/**
+ * Wikidata claim-sort methodology, Phase R.0 / 2026-05-03.
+ *
+ * Per `~/civica/plan/wikidata-sort-resolution-v1.md` (Option B —
+ * date-first with a 5-year rank floor):
+ *
+ *   1. Among the claims that pass the envelope + reference +
+ *      allowlist gates, prefer the one whose `point in time` is
+ *      most recent.
+ *   2. Exception (the anti-vandalism floor): if a preferred-rank
+ *      admissible claim exists whose `point in time` is at most
+ *      `RANK_FLOOR_YEARS` years older than the most recent
+ *      admissible normal-rank claim, the preferred-rank claim
+ *      still wins. Above `RANK_FLOOR_YEARS`, freshness wins.
+ *
+ * Wikidata's `preferred` rank is editor-maintained and decays
+ * silently: a 2014 preferred-rank claim can sit on a country page
+ * for years while the World Bank ships fresh annual updates that
+ * arrive as normal-rank entries underneath. The pre-R.0 sort was
+ * rank-first / date-second, which silently picked the stale
+ * curated value. The floor preserves the one property of
+ * preferred-rank that genuinely matters (vandalism resistance for
+ * malicious-but-recent normal-rank edits) without serving stale
+ * data when the curation has been abandoned.
+ *
+ * Calibration of N=5 (resolution §2c): all eight Group B
+ * fact-keys currently in WIKIDATA_FACT_MAPPING are updated at
+ * least annually upstream (population, GDP, life expectancy,
+ * fertility, etc.). Five years is well past the longest
+ * legitimate publication lag while short enough that fertility /
+ * unemployment / inflation drift is not silently absorbed.
+ *
+ * If a future phase adds a slow-moving Group A fact-key
+ * (capital city, ISO codes) to Wikidata-syncable scope, the
+ * floor needs to become per-fact-key configuration on
+ * `WikidataFactConfig`. See resolution §6 open question 1.
+ */
+const RANK_FLOOR_YEARS = 5;
+
+function yearOf(pointInTime: string | undefined): number | null {
+  if (!pointInTime) return null;
+  const cleaned = pointInTime.startsWith("+") ? pointInTime.slice(1) : pointInTime;
+  const m = cleaned.match(/^(\d{4})/);
+  return m ? parseInt(m[1], 10) : null;
 }
 
 function pickAdmissibleClaim(
@@ -96,14 +150,16 @@ function pickAdmissibleClaim(
   envelope: { min?: number; max?: number; isPercent?: boolean } | undefined,
   counters: PerFactCounters
 ): GroupedClaim | null {
-  const sorted = [...claims].sort((a, b) => {
-    if (a.rank !== b.rank) return a.rank === "preferred" ? -1 : 1;
-    const ta = a.pointInTime ?? "";
-    const tb = b.pointInTime ?? "";
-    return tb.localeCompare(ta);
-  });
+  // Two-pass selection (resolution §2c, §2d):
+  //   Pass 1 — filter to the admissible set (envelope + reference +
+  //            allowlist gates pass) AND increment per-claim
+  //            counters along the way so the existing operator-
+  //            facing summary remains accurate.
+  //   Pass 2 — apply the date-first-with-rank-floor selection.
 
-  for (const claim of sorted) {
+  const admissible: GroupedClaim[] = [];
+
+  for (const claim of claims) {
     counters.considered++;
 
     const value = applyUnitConversion(config, claim.valueRaw);
@@ -148,10 +204,69 @@ function pickAdmissibleClaim(
       counters.unit_mismatch++;
     }
 
-    return claim;
+    admissible.push(claim);
   }
 
-  return null;
+  if (admissible.length === 0) return null;
+
+  // Pass 2 — date-first selection with rank floor.
+  //
+  // Sort admissible claims by `point in time` descending; an
+  // undefined `point in time` sorts last (treat as oldest). Among
+  // claims with the same year, prefer preferred-rank, then by raw
+  // pointInTime string for full-precision tiebreak.
+  const sortedByDate = [...admissible].sort((a, b) => {
+    const ta = a.pointInTime ?? "";
+    const tb = b.pointInTime ?? "";
+    if (ta !== tb) return tb.localeCompare(ta);
+    if (a.rank !== b.rank) return a.rank === "preferred" ? -1 : 1;
+    return 0;
+  });
+
+  const newest = sortedByDate[0]!;
+
+  // If the newest admissible claim is already preferred-rank, we
+  // are done — the floor has nothing to do here.
+  if (newest.rank === "preferred") return newest;
+
+  // Otherwise, look for a preferred-rank admissible claim that
+  // sits within the floor window. The `point in time` comparison
+  // is year-resolution because Wikidata routinely uses
+  // year-precision dates (e.g. "2014-01-01" is a year-precision
+  // claim with the day arbitrarily set to Jan 1). Year arithmetic
+  // also matches the resolution doc's natural-language framing
+  // ("more than five years older").
+  const newestYear = yearOf(newest.pointInTime);
+  if (newestYear === null) return newest; // can't compute floor — fall back to newest
+
+  const preferredAdmissible = admissible.filter((c) => c.rank === "preferred");
+  if (preferredAdmissible.length === 0) return newest;
+
+  // Among preferred-rank admissible claims, pick the most recent.
+  const newestPreferred = preferredAdmissible.sort((a, b) => {
+    const ta = a.pointInTime ?? "";
+    const tb = b.pointInTime ?? "";
+    return tb.localeCompare(ta);
+  })[0]!;
+
+  const preferredYear = yearOf(newestPreferred.pointInTime);
+  if (preferredYear === null) return newest;
+
+  // Floor rule: preferred wins iff it is at most RANK_FLOOR_YEARS
+  // older than the newest normal-rank admissible claim. The
+  // (newestYear - preferredYear) value can be negative if the
+  // preferred claim is somehow newer — in that case it still wins
+  // (the date sort would have surfaced it earlier, but be defensive).
+  const gap = newestYear - preferredYear;
+  if (gap <= RANK_FLOOR_YEARS) return newestPreferred;
+
+  // Floor displaced: a preferred-rank admissible claim exists, but
+  // it is more than RANK_FLOOR_YEARS older than the newest
+  // admissible normal-rank claim. Operator-facing telemetry
+  // (resolution §4 Risk 3) — bump the counter so a future
+  // monitoring step can detect upstream curation regression.
+  counters.floor_displaced_preferred++;
+  return newest;
 }
 
 function isoYearFromPit(pit: string | undefined): {

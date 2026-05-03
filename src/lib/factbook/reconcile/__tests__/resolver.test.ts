@@ -143,7 +143,7 @@ test("§12.1 Nigeria population — World Bank wins (fresher_winner)", () => {
     wikidataQid: "Q1033",
     wikidataPid: "P1082",
     wikidataRank: "preferred",
-    references: [{ statedInQid: "Q1199363", url: "https://data.worldbank.org/" }],
+    references: [{ statedInQid: "Q21540096", url: "https://data.worldbank.org/" }],
   });
   const wb = row({
     factKey: "population",
@@ -173,7 +173,7 @@ test("§12.2 Nigeria capital — agreement (CIA preferred)", () => {
     sourceId: "wikidata",
     factValue: "Abuja",
     wikidataRank: "preferred",
-    references: [{ statedInQid: "Q1199363", url: "https://nigeria.gov.ng/" }],
+    references: [{ statedInQid: "Q21540096", url: "https://nigeria.gov.ng/" }],
   });
   const out = resolveFromRows([cia, wd], CAPITAL_DEF);
   assertWinner(out, cia.id, "agreement");
@@ -221,7 +221,7 @@ test("§12.4 Nigeria GDP material-error — CIA stays, candidate rejected", () =
     factYear: 2024,
     asOf: "2024-06-01",
     wikidataRank: "preferred",
-    references: [{ statedInQid: "Q1199363" }],
+    references: [{ statedInQid: "Q21540096" }],
   });
   const out = resolveFromRows([cia, wd], GDP_NOMINAL_DEF);
   // 2 active rows enter the resolver; WD is rejected during the

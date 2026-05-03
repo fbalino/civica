@@ -80,7 +80,8 @@ async function main() {
         ` rej_envelope=${c.rejected_envelope}` +
         ` rej_no_ref=${c.rejected_no_reference}` +
         ` rej_allowlist=${c.rejected_allowlist}` +
-        ` unit_mismatch=${c.unit_mismatch}`
+        ` unit_mismatch=${c.unit_mismatch}` +
+        ` floor_displaced=${c.floor_displaced_preferred}`
     );
   }
 }

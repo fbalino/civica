@@ -40,8 +40,12 @@ test("Tier 2 has at least 30 NSO entries per §13.3", () => {
   );
 });
 
-test("World Bank Q1199363 is on the allowlist", () => {
-  assert.equal(isAllowedReference({ qid: "Q1199363" }), true);
+test("World Bank Q21540096 is on the allowlist (R.0 / 2026-05-03 corrected QID)", () => {
+  // Pre-R.0 the allowlist mapped WB to Q1199363 ("Taika —
+  // Wikimedia disambiguation page" on live Wikidata) — wrong.
+  // The correct entity is Q21540096 ("World Bank Open Data").
+  // See `~/civica/plan/wikidata-sort-resolution-v1.md` §3 item 3.
+  assert.equal(isAllowedReference({ qid: "Q21540096" }), true);
 });
 
 test("World Bank URL via data.worldbank.org is on the allowlist", () => {
@@ -52,10 +56,17 @@ test("World Bank URL via data.worldbank.org is on the allowlist", () => {
 });
 
 test("World Bank entry resolves via findAllowlistEntry", () => {
-  const e = findAllowlistEntry({ qid: "Q1199363" });
+  const e = findAllowlistEntry({ qid: "Q21540096" });
   assert.ok(e);
   assert.equal(e!.tier, 1);
   assert.equal(e!.civicaSourceId, "world_bank");
+});
+
+test("Q1199363 (the previous, incorrect WB QID) is no longer on the allowlist", () => {
+  // Regression guard for the R.0 fix. Q1199363 is "Taika —
+  // Wikimedia disambiguation page" on live Wikidata; the
+  // allowlist must not falsely match it.
+  assert.equal(isAllowedReference({ qid: "Q1199363" }), false);
 });
 
 test("Wikipedia URL is rejected (mirror, not a primary source)", () => {

@@ -27,6 +27,24 @@
  * land in F.6 — the multi-source expansion sub-phase. This is
  * documented in the Phase F open-questions doc and the F.2
  * coverage report.
+ *
+ * R.0 / 2026-05-03 update (per
+ * `~/civica/plan/wikidata-sort-resolution-v1.md` §3): the table
+ * below is now 7 entries, not 8. `gdp_per_capita_usd` has been
+ * retired — it was the third in the original list of "sparsely
+ * populated" fact-keys above, and direct measurement on
+ * 2026-05-03 confirmed only 9 sovereign states carry P2132 at
+ * all (versus 195 for P1082 population). Phase R.1 expands the
+ * World Bank WDI sync to cover this fact-key directly.
+ *
+ * `birth_rate` and `death_rate` are unchanged in the table but
+ * began producing rows after the same 2026-05-03 R.0 patch
+ * extended `wikidata-client.ts` to also extract `pr:P123`
+ * (publisher) references in addition to `pr:P248` (stated in).
+ * The two demographic properties almost exclusively use P123 on
+ * Wikidata; the prior reference-extraction code was silently
+ * filtering all 188 sovereign-state claims out at the
+ * "no admissible reference" gate.
  */
 
 export interface WikidataFactConfig {
@@ -49,10 +67,13 @@ export interface WikidataFactConfig {
 }
 
 /**
- * The F.2 sync target list. Each entry is one fact-key; one
- * SPARQL query per (jurisdiction, entry). 8 entries × ~270
- * jurisdictions = ~2160 SPARQL hits per quarterly cron, well
- * within Wikidata's politeness floor at our 4 req/s throttle.
+ * The F.2 / R.0 sync target list. Each entry is one fact-key; one
+ * SPARQL query per (jurisdiction, entry). 7 entries × ~191
+ * jurisdictions with `wikidata_qid` = ~1,337 SPARQL hits per
+ * quarterly cron, well within Wikidata's politeness floor at our
+ * 4 req/s throttle (this floor was 8×270 / 2,160 hits before R.0
+ * retired the gdp_per_capita_usd entry; the runtime budget is
+ * unchanged in scale).
  */
 export const WIKIDATA_FACT_MAPPING: WikidataFactConfig[] = [
   {
@@ -68,12 +89,23 @@ export const WIKIDATA_FACT_MAPPING: WikidataFactConfig[] = [
     unitMultiplier: 1e-9,
     unitNote: "Wikidata stores absolute USD; Civica wants billions",
   },
-  {
-    factKey: "gdp_per_capita_usd",
-    pid: "P2132",
-    expectedUnitQid: "Q4917", // United States dollar
-    unitNote: "USD, no unit conversion",
-  },
+  // R.0 / 2026-05-03: gdp_per_capita_usd Wikidata mapping retired.
+  // SPARQL meta-query against Q3624078 (sovereign state) on
+  // 2026-05-03 found that property P2132 has only 9 sovereign
+  // states with any statement, and 0 sovereign states with a
+  // referenced statement that survives the allowlist (the lone
+  // pre-retirement DB row was Botswana, citing data.worldbank.org
+  // via P854). This is upstream sparsity — Wikidata does not
+  // carry GDP-per-capita for most countries — not a P-ID or
+  // unit-conversion error, so no Wikidata-side code change can
+  // fix it. The fact-key itself stays in `fact-keys.ts`; the
+  // World Bank WDI sync (Phase R.1) provides the canonical
+  // alternate, with CIA Factbook already covering primary. Per
+  // resolution doc `~/civica/plan/wikidata-sort-resolution-v1.md`
+  // §3 item 4. Botswana's existing pre-retirement Wikidata row
+  // ages out harmlessly: the resolver picks the fresher CIA / WB
+  // alternates and the orphaned Wikidata row drops from
+  // multi-source coverage.
   {
     factKey: "unemployment_rate_pct",
     pid: "P1198",

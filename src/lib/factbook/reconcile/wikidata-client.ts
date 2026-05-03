@@ -139,9 +139,15 @@ export interface WikidataClaimRow {
   /** Wikidata rank — 'preferred' | 'normal'. Deprecated already
    *  filtered out at the SPARQL level. */
   rank: "preferred" | "normal";
-  /** Q-ID of the `stated in` reference value (P248), if any. */
+  /** Q-ID of the upstream source entity. Sourced from
+   *  `stated in` (P248) when present, otherwise from
+   *  `publisher` (P123). R.0 / 2026-05-03: P123 fallback added
+   *  because Wikidata editors are inconsistent about which
+   *  property they use for source attribution; some demographic
+   *  properties (P8763 birth_rate, P10091 death_rate) almost
+   *  exclusively use P123. The allowlist treats both identically. */
   refStatedInQid: string | undefined;
-  /** English label for the stated-in entity, where available. */
+  /** English label for the source entity, where available. */
   refStatedInLabel: string | undefined;
   /** Reference URL (P854), if any. */
   refUrl: string | undefined;
@@ -162,10 +168,30 @@ export async function getClaimsForEntity(
   //
   // The same statement may appear N times (one per reference).
   // The caller groups by ?stmt.
+  //
+  // R.0 / 2026-05-03 (per `~/civica/plan/wikidata-sort-resolution-v1.md`
+  // §3 item 2): the original query asked for `pr:P248` (stated in)
+  // and `pr:P854` (URL) only. Empirical SPARQL probe on
+  // 2026-05-03 against Q3624078 sovereign states found:
+  //   P8763 (birth_rate)         — 0 statements with pr:P248,
+  //                                 751 with pr:P123 (publisher).
+  //   P10091 (death_rate)        — 0 with pr:P248, 750 with P123.
+  //   P1082 (population_total)   — 8,658 with P248 (working
+  //                                 baseline; this is why population
+  //                                 sync produced 26 rows while
+  //                                 birth/death produced 0).
+  //
+  // Wikidata editors are inconsistent about whether to attach a
+  // source citation via `stated in` (P248) or `publisher` (P123);
+  // both are structurally Q-IDs pointing at the same kind of
+  // organisation. The fix is to extract both and let the
+  // allowlist gate (`isAllowedReference`) sort tier-1 from
+  // junk in the consumer. P248 still takes precedence when
+  // present; P123 is the fallback.
   const query = `
     SELECT
       ?stmt ?value ?unit ?pit ?startTime ?rank
-      ?refStatedIn ?refStatedInLabel ?refUrl
+      ?refStatedIn ?refStatedInLabel ?refPublisher ?refPublisherLabel ?refUrl
     WHERE {
       wd:${entityQid} p:${propertyPid} ?stmt.
       ?stmt ps:${propertyPid} ?value.
@@ -186,6 +212,13 @@ export async function getClaimsForEntity(
           OPTIONAL {
             ?refStatedIn rdfs:label ?refStatedInLabel.
             FILTER(LANG(?refStatedInLabel) = 'en')
+          }
+        }
+        OPTIONAL {
+          ?ref pr:P123 ?refPublisher.
+          OPTIONAL {
+            ?refPublisher rdfs:label ?refPublisherLabel.
+            FILTER(LANG(?refPublisherLabel) = 'en')
           }
         }
         OPTIONAL { ?ref pr:P854 ?refUrl. }
@@ -210,11 +243,16 @@ export async function getClaimsForEntity(
     const rank: "preferred" | "normal" = rankRaw.endsWith("PreferredRank")
       ? "preferred"
       : "normal";
-    const refStatedInFull = b.refStatedIn?.value;
+    // R.0 / 2026-05-03: prefer P248 (stated in) when present,
+    // fall back to P123 (publisher). Both are Q-IDs naming the
+    // upstream source entity; the allowlist treats them
+    // identically. See the SPARQL comment block above.
+    const refStatedInFull = b.refStatedIn?.value ?? b.refPublisher?.value;
     const refStatedInQid = refStatedInFull
       ? refStatedInFull.split("/").pop()
       : undefined;
-    const refStatedInLabel = b.refStatedInLabel?.value;
+    const refStatedInLabel =
+      b.refStatedInLabel?.value ?? b.refPublisherLabel?.value;
     const refUrl = b.refUrl?.value;
 
     return {
