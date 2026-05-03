@@ -3,6 +3,8 @@ import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { formatGovernmentType } from "@/lib/text/clean";
 import type { getGovernmentStructure } from "@/lib/db/queries";
 import type { GovernmentClassification } from "@/lib/government-taxonomy";
+import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { CompareColumnHeader } from "./CompareColumnHeader";
 
 function formatNumber(n: number): string {
@@ -34,6 +36,14 @@ interface CompareOverviewProps {
     jurisdiction: Jurisdiction;
     govStructure: Awaited<ReturnType<typeof getGovernmentStructure>>;
     seriesColor: string;
+    /**
+     * Phase F.4 — resolver outputs keyed by fact-key for this country.
+     * When a fact has a `canonical` row, the row is rendered with a
+     * `<FactValueDot>` next to the value so the alternates panel is one
+     * click away. When absent (e.g. capital not yet synced), we fall
+     * back to the legacy `jurisdictions` cache value with no dot.
+     */
+    facts?: Record<string, ResolverOutput>;
   }>;
 }
 
@@ -56,15 +66,46 @@ interface Row {
   values: (string | null)[];
   numericValues?: (number | null)[];
   source?: string;
+  /**
+   * Phase F.4 — when set, we look up `facts[factKey]` per country and
+   * render a `<FactValueDot>` for any column where the resolver
+   * returned a canonical row.
+   */
+  factKey?: string;
+}
+
+/**
+ * Phase F.4 — resolver canonical takes precedence over the legacy
+ * `jurisdictions` cache when both exist. Mirrors the public-API
+ * contract at /api/v1/countries/[code].
+ */
+function resolverText(facts: Record<string, ResolverOutput> | undefined, factKey: string): string | null {
+  return facts?.[factKey]?.canonical?.factValue ?? null;
+}
+function resolverNumber(facts: Record<string, ResolverOutput> | undefined, factKey: string): number | null {
+  return facts?.[factKey]?.canonical?.factValueNumeric ?? null;
 }
 
 export function CompareOverview({ countries }: CompareOverviewProps) {
   if (countries.length === 0) return null;
 
+  // Resolved values per country — resolver canonical → legacy cache.
+  const resolved = countries.map((c) => {
+    const f = c.facts;
+    const popN = resolverNumber(f, "population_total") ?? c.jurisdiction.population;
+    const gdpN = resolverNumber(f, "gdp_ppp_usd_billions") ?? c.jurisdiction.gdpBillions;
+    const areaN = resolverNumber(f, "area_total_km2") ?? c.jurisdiction.areaSqKm;
+    const cap = resolverText(f, "capital") ?? c.jurisdiction.capital;
+    const langs = resolverText(f, "official_languages") ?? c.jurisdiction.languages;
+    const curr = resolverText(f, "currency_code") ?? c.jurisdiction.currency;
+    return { popN, gdpN, areaN, cap, langs, curr };
+  });
+
   const rows: Row[] = [
     {
       label: "Capital",
-      values: countries.map((c) => c.jurisdiction.capital),
+      values: resolved.map((r) => r.cap),
+      factKey: "capital",
     },
     {
       label: "Continent",
@@ -72,34 +113,33 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
     },
     {
       label: "Population",
-      values: countries.map((c) =>
-        c.jurisdiction.population ? formatNumber(c.jurisdiction.population) : null
-      ),
-      numericValues: countries.map((c) => c.jurisdiction.population),
+      values: resolved.map((r) => (r.popN != null ? formatNumber(r.popN) : null)),
+      numericValues: resolved.map((r) => r.popN),
+      factKey: "population_total",
     },
     {
       label: "GDP",
-      values: countries.map((c) =>
-        c.jurisdiction.gdpBillions ? `$${c.jurisdiction.gdpBillions.toFixed(1)}B` : null
-      ),
-      numericValues: countries.map((c) => c.jurisdiction.gdpBillions),
+      values: resolved.map((r) => (r.gdpN != null ? `$${r.gdpN.toFixed(1)}B` : null)),
+      numericValues: resolved.map((r) => r.gdpN),
+      factKey: "gdp_ppp_usd_billions",
     },
     {
       label: "Area",
-      values: countries.map((c) =>
-        c.jurisdiction.areaSqKm
-          ? `${c.jurisdiction.areaSqKm.toLocaleString()} km²`
-          : null
+      values: resolved.map((r) =>
+        r.areaN != null ? `${r.areaN.toLocaleString()} km²` : null,
       ),
-      numericValues: countries.map((c) => c.jurisdiction.areaSqKm),
+      numericValues: resolved.map((r) => r.areaN),
+      factKey: "area_total_km2",
     },
     {
       label: "Languages",
-      values: countries.map((c) => c.jurisdiction.languages),
+      values: resolved.map((r) => r.langs),
+      factKey: "official_languages",
     },
     {
       label: "Currency",
-      values: countries.map((c) => c.jurisdiction.currency),
+      values: resolved.map((r) => r.curr),
+      factKey: "currency_code",
     },
     {
       label: "Government",
@@ -197,38 +237,52 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
                 {row.label}
               </span>
             </div>,
-            ...row.values.map((val, i) => (
-              <div
-                key={`${row.label}-${i}`}
-                style={{
-                  background: "var(--color-bg)",
-                  padding: 16,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                }}
-              >
-                <span
+            ...row.values.map((val, i) => {
+              const country = countries[i];
+              const fact = row.factKey ? country?.facts?.[row.factKey] : null;
+              const hasCanonical = fact?.canonical != null;
+              return (
+                <div
+                  key={`${row.label}-${i}`}
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-13)",
-                    color:
-                      maxIdx === i && row.numericValues
-                        ? "var(--color-accent)"
-                        : "var(--color-text-primary)",
-                    fontWeight:
-                      maxIdx === i && row.numericValues ? 500 : 400,
-                    textAlign: "center",
+                    background: "var(--color-bg)",
+                    padding: 16,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
                   }}
                 >
-                  {val ?? "—"}
-                </span>
-                {val && row.source && (
-                  <SourceDot source={row.source} retrievedAt={null} />
-                )}
-              </div>
-            )),
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-13)",
+                      color:
+                        maxIdx === i && row.numericValues
+                          ? "var(--color-accent)"
+                          : "var(--color-text-primary)",
+                      fontWeight:
+                        maxIdx === i && row.numericValues ? 500 : 400,
+                      textAlign: "center",
+                    }}
+                  >
+                    {val ?? "—"}
+                  </span>
+                  {val && row.factKey && hasCanonical && fact ? (
+                    <FactValueDot
+                      factKey={row.factKey}
+                      factLabel={row.label}
+                      resolverOutput={fact}
+                      canonicalSourceId={fact.canonical?.sourceId ?? null}
+                      ariaLabel={`${row.label} ${val}, see sources`}
+                    />
+                  ) : null}
+                  {val && row.source && !hasCanonical && (
+                    <SourceDot source={row.source} retrievedAt={null} />
+                  )}
+                </div>
+              );
+            }),
           ];
         })}
 

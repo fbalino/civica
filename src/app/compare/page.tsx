@@ -18,6 +18,7 @@ import { CompareCivicaIndex } from "@/components/compare/CompareCivicaIndex";
 import { CompareChambers } from "@/components/compare/CompareChambers";
 import { CompareElections } from "@/components/compare/CompareElections";
 import { CompareInternational } from "@/components/compare/CompareInternational";
+import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
 
 const SERIES_VARS = [
   "var(--series-a, oklch(72% 0.15 35))",
@@ -187,10 +188,29 @@ export default async function ComparePage({
   const seriesColorFor = (index: number) =>
     SERIES_VARS[index] ?? SERIES_VARS[0];
 
+  // Phase F.4 — multi-country resolver fetch for the overview row.
+  // Pulls every in-scope reconciled fact-key for every selected country
+  // in a single batch query. The component renders `<FactValueDot>`
+  // inline next to each value when the resolver has a canonical row.
+  let factsByJurisdiction: Awaited<
+    ReturnType<typeof getCanonicalFactsForJurisdictions>
+  > = {};
+  if (ids.length > 0) {
+    factsByJurisdiction = await getCanonicalFactsForJurisdictions(ids, [
+      "population_total",
+      "gdp_ppp_usd_billions",
+      "area_total_km2",
+      "capital",
+      "official_languages",
+      "currency_code",
+    ]).catch(() => ({}));
+  }
+
   const overviewCountries = selectedJurisdictions.map((jurisdiction, i) => ({
     jurisdiction,
     govStructure: govStructures[i] ?? { bodies: [], offices: [], currentTerms: [] },
     seriesColor: seriesColorFor(i),
+    facts: factsByJurisdiction[jurisdiction.id] ?? {},
   }));
 
   const chamberCountries = selectedJurisdictions.map((jurisdiction, i) => ({
