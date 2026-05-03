@@ -35,6 +35,10 @@ import {
   isAllowedReference,
   findAllowlistEntry,
 } from "./source-allowlist";
+import {
+  persistProposedDisputes,
+  type PersistDisputeSummary,
+} from "./dispute-persistence";
 
 export interface WikidataSyncOptions {
   jurisdictionSlug?: string;
@@ -64,6 +68,10 @@ export interface WikidataSyncSummary {
   jurisdictionsProcessed: number;
   factCountersByKey: Record<string, PerFactCounters>;
   totalAdmitted: number;
+  /** Phase F.6.1 — disputes the resolver flagged as needing review,
+   *  written to `data_disputes` after the sync completes. Null on
+   *  dry runs. */
+  disputes: PersistDisputeSummary | null;
   dryRun: boolean;
 }
 
@@ -205,6 +213,12 @@ export async function syncFactbookWikidata(
     factCounters.set(c.factKey, freshCounters(c.factKey));
   }
 
+  // Phase F.6.1 — track every (jurisdictionId, factKey) pair we
+  // upserted (or admitted in dry run) so the resolver can re-evaluate
+  // and we can persist any disputes after the loop. See comment in
+  // sync-wdi.ts for the same pattern.
+  const touchedPairs = new Set<string>();
+
   for (const j of allJurisdictions) {
     if (!j.wikidataQid) continue;
 
@@ -276,6 +290,7 @@ export async function syncFactbookWikidata(
             ` [${chosen.rank}] refs=${allowedRefsPayload.length}`
         );
         counters.admitted++;
+        touchedPairs.add(`${j.id}|${config.factKey}`);
         continue;
       }
 
@@ -365,10 +380,16 @@ export async function syncFactbookWikidata(
             retrievedAt: factRow.retrievedAt,
             snapshotId: factRow.snapshotId,
             updatedAt: new Date(),
+            // F.5.1 invariant: do NOT add `status` or `statusReason`
+            // to this set clause. Reviewer-demoted rows must survive
+            // a re-sync so the resolver continues to honour the
+            // human decision. The same invariant applies to every
+            // country_facts upsert in this codebase.
           },
         });
 
       counters.admitted++;
+      touchedPairs.add(`${j.id}|${config.factKey}`);
     }
   }
 
@@ -377,6 +398,34 @@ export async function syncFactbookWikidata(
       .update(sources)
       .set({ lastSyncAt: new Date() })
       .where(eq(sources.id, "wikidata"));
+  }
+
+  // Phase F.6.1 — persist resolver-proposed disputes for every pair
+  // we touched. Same dedup contract as the WB WDI sync.
+  let disputes: PersistDisputeSummary | null = null;
+  if (touchedPairs.size > 0) {
+    const touched = [...touchedPairs].map((s) => {
+      const [jurisdictionId, factKey] = s.split("|");
+      return { jurisdictionId, factKey };
+    });
+    log(
+      `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`
+    );
+    try {
+      disputes = await persistProposedDisputes(db, touched, {
+        dryRun: options.dryRun,
+        onProgress: (line) => {
+          if (line.startsWith("[DRY]")) return;
+          log(`  ${line}`);
+        },
+      });
+    } catch (err) {
+      log(
+        `! dispute persistence failed: ${
+          err instanceof Error ? err.message : err
+        }`
+      );
+    }
   }
 
   const finishedAtMs = Date.now();
@@ -394,6 +443,7 @@ export async function syncFactbookWikidata(
     jurisdictionsProcessed: allJurisdictions.length,
     factCountersByKey,
     totalAdmitted,
+    disputes,
     dryRun: options.dryRun ?? false,
   };
 }

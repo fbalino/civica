@@ -20,8 +20,17 @@
  * - `superseded` — outranked by a fresher row from the same source;
  *                  also kept for the alternate-values panel but not
  *                  considered current.
+ * - `demoted`    — F.5.1: a reviewer resolved a `data_disputes` row
+ *                  in favour of a different source. Kept for the
+ *                  alternate-values panel + audit; the resolver
+ *                  excludes it from its `active` filter so the
+ *                  reviewer's choice survives.
  */
-export type FactRowStatus = "active" | "rejected" | "superseded";
+export type FactRowStatus =
+  | "active"
+  | "rejected"
+  | "superseded"
+  | "demoted";
 
 /**
  * Civica fact-group classification (methodology §1.1).

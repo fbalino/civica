@@ -387,9 +387,16 @@ function isMaterialError(
   const a = prior.factValueNumeric;
   const b = candidate.factValueNumeric;
 
-  if (def.envelope?.isPercent) {
-    const pp = def.materialErrorPpThreshold;
-    if (pp == null) return false;
+  // F.6.1 — prefer the absolute (pp / unit) threshold whenever the
+  // fact-key registers one. Percentage-shaped facts (inflation_rate,
+  // public_debt_pct_gdp, literacy_rate, internet_users_pct, etc.)
+  // express their material-error policy in percentage points, and
+  // some of them register `isPercent: false` deliberately to skip
+  // the [-1, 101] envelope auto-tightening (inflation can exceed
+  // 100%). The previous gate on `def.envelope?.isPercent` silently
+  // bypassed the pp threshold for those keys.
+  const pp = def.materialErrorPpThreshold;
+  if (pp != null) {
     return Math.abs(a - b) > pp;
   }
 

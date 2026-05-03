@@ -194,6 +194,8 @@ async function main() {
             countryFacts.factKey,
             countryFacts.sourceId,
           ],
+          // F.5.1 invariant: do NOT add `status` or `statusReason`
+          // here — reviewer-demoted rows must survive a re-bridge.
           set: {
             factValue: row.factValue,
             factValueNumeric: numericValue,

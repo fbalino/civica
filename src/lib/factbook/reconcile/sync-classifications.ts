@@ -228,6 +228,9 @@ export async function syncWorldBankClassifications(
                 countryFacts.factKey,
                 countryFacts.sourceId,
               ],
+              // F.5.1 invariant: do NOT add `status` or
+              // `statusReason` here — reviewer-demoted rows must
+              // survive a re-sync.
               set: {
                 factValue: regionValue,
                 valueJson: { regionId, regionValue },
@@ -314,6 +317,8 @@ export async function syncWorldBankClassifications(
               countryFacts.factKey,
               countryFacts.sourceId,
             ],
+            // F.5.1 invariant: do NOT add `status` or `statusReason`
+            // here — reviewer-demoted rows must survive a re-sync.
             set: {
               factValue: incomeValue,
               valueJson: { incomeId, incomeValue },
@@ -641,6 +646,8 @@ export async function syncVdemRow(
             countryFacts.factKey,
             countryFacts.sourceId,
           ],
+          // F.5.1 invariant: do NOT add `status` or `statusReason`
+          // here — reviewer-demoted rows must survive a re-sync.
           set: {
             factValue: label,
             factValueNumeric: row.v2xRegime,
@@ -925,6 +932,8 @@ export async function syncMonarchyAndGovernmentForm(
               countryFacts.factKey,
               countryFacts.sourceId,
             ],
+            // F.5.1 invariant: do NOT add `status` or `statusReason`
+            // here — reviewer-demoted rows must survive a re-sync.
             set: {
               factValue: monarchy,
               sourceHash: monarchyHash,
@@ -980,6 +989,8 @@ export async function syncMonarchyAndGovernmentForm(
               countryFacts.factKey,
               countryFacts.sourceId,
             ],
+            // F.5.1 invariant: do NOT add `status` or `statusReason`
+            // here — reviewer-demoted rows must survive a re-sync.
             set: {
               factValue: prose,
               sourceHash: formHash,

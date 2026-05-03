@@ -18,9 +18,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { dataDisputes } from "@/lib/db/schema";
+import { countryFacts, dataDisputes } from "@/lib/db/schema";
 import {
   getAdminSession,
   ADMIN_REVIEWER_COOKIE,
@@ -131,6 +131,52 @@ export async function POST(
   const newStatus = ACTION_TO_STATUS[body.action];
   const now = new Date();
 
+  // Phase F.5.1 — wire the reviewer decision through to the resolver.
+  // For 'resolve_a' / 'resolve_b' we identify the winner row, then
+  // demote every OTHER active country_facts row for the same
+  // (jurisdiction, fact_key). The resolver only consumes status='active'
+  // rows (see resolver.ts), so flipping the loser to 'demoted' makes
+  // the next read return the reviewer-chosen value.
+  //
+  // 'hold' / 'reject' leave country_facts untouched — the dispute
+  // resolution is recorded for audit and the resolver continues to
+  // compute canonical via methodology rules.
+  let demotedCount = 0;
+  if (body.action === "resolve_a" || body.action === "resolve_b") {
+    const winnerId =
+      body.action === "resolve_a" ? existing.factIdA : existing.factIdB;
+    if (!winnerId) {
+      return NextResponse.json(
+        {
+          error:
+            body.action === "resolve_a"
+              ? "cannot resolve in favour of A: dispute has no fact_id_a"
+              : "cannot resolve in favour of B: dispute has no fact_id_b",
+        },
+        { status: 400 },
+      );
+    }
+    const demoteResult = await db
+      .update(countryFacts)
+      .set({
+        status: "demoted",
+        // Status reason carries the dispute id so the audit trail can
+        // be reconstructed even if data_disputes evolves later.
+        statusReason: `demoted_by_dispute_${id}`,
+        updatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(countryFacts.jurisdictionId, existing.jurisdictionId),
+          eq(countryFacts.factKey, existing.factKey),
+          ne(countryFacts.id, winnerId),
+          eq(countryFacts.status, "active"),
+        ),
+      )
+      .returning({ id: countryFacts.id });
+    demotedCount = demoteResult.length;
+  }
+
   await db
     .update(dataDisputes)
     .set({
@@ -155,5 +201,6 @@ export async function POST(
     status: newStatus,
     reviewerId: auth.reviewerId,
     resolvedAt: now.toISOString(),
+    demotedFactIds: demotedCount,
   });
 }

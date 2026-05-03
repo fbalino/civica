@@ -41,6 +41,10 @@ import {
   sources,
 } from "@/lib/db/schema";
 import { getFactKey } from "./fact-keys";
+import {
+  persistProposedDisputes,
+  type PersistDisputeSummary,
+} from "./dispute-persistence";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -155,6 +159,10 @@ export interface WdiSyncSummary {
   jurisdictionsInScope: number;
   countersByFactKey: Record<string, PerWdiCounters>;
   totalWritten: number;
+  /** Phase F.6.1 — disputes the resolver flagged as needing review,
+   *  written to `data_disputes` after the sync completes. Null on
+   *  dry runs. */
+  disputes: PersistDisputeSummary | null;
   errors: string[];
   dryRun: boolean;
 }
@@ -288,6 +296,7 @@ export async function syncWorldBankWdi(
       jurisdictionsInScope: 0,
       countersByFactKey: {},
       totalWritten: 0,
+      disputes: null,
       errors: ["no WDI indicators matched the filter"],
       dryRun: options.dryRun ?? false,
     };
@@ -322,6 +331,12 @@ export async function syncWorldBankWdi(
   const startYear = endYear - WB_LOOKBACK_YEARS;
 
   let totalWritten = 0;
+  // Phase F.6.1 — track every (jurisdictionId, factKey) pair we
+  // upserted so the resolver can re-evaluate them and we can persist
+  // any disputes after the write loop. Using a Set keyed by
+  // `${jurisdictionId}|${factKey}` to dedup across indicators that
+  // happen to write to the same key (none today, but cheap).
+  const touchedPairs = new Set<string>();
 
   for (const config of targets) {
     const counter = counters.get(config.factKey)!;
@@ -412,6 +427,7 @@ export async function syncWorldBankWdi(
         );
         counter.written++;
         totalWritten++;
+        touchedPairs.add(`${j.id}|${config.factKey}`);
         continue;
       }
 
@@ -471,6 +487,10 @@ export async function syncWorldBankWdi(
               countryFacts.factKey,
               countryFacts.sourceId,
             ],
+            // F.5.1 invariant: do NOT add `status` or `statusReason`
+            // to this set clause. Reviewer-demoted rows must survive
+            // a re-sync so the resolver continues to honour the
+            // human decision.
             set: {
               factValue: String(numericValue),
               factValueNumeric: numericValue,
@@ -488,6 +508,7 @@ export async function syncWorldBankWdi(
           });
         counter.written++;
         totalWritten++;
+        touchedPairs.add(`${j.id}|${config.factKey}`);
       } catch (err) {
         errors.push(
           `${j.slug} ${config.factKey}: ${
@@ -510,6 +531,36 @@ export async function syncWorldBankWdi(
       .where(eq(sources.id, "world_bank"));
   }
 
+  // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
+  // factKey) we touched and persist any new disputes. Idempotent:
+  // duplicates are filtered out by `persistProposedDisputes`.
+  let disputes: PersistDisputeSummary | null = null;
+  if (touchedPairs.size > 0) {
+    const touched = [...touchedPairs].map((s) => {
+      const [jurisdictionId, factKey] = s.split("|");
+      return { jurisdictionId, factKey };
+    });
+    log(
+      `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
+    );
+    try {
+      disputes = await persistProposedDisputes(db, touched, {
+        dryRun: options.dryRun,
+        onProgress: (line) => {
+          if (line.startsWith("[DRY]")) return; // too verbose
+          log(`  ${line}`);
+        },
+      });
+      for (const e of disputes.errors) errors.push(`disputes: ${e}`);
+    } catch (err) {
+      errors.push(
+        `dispute persistence failed: ${
+          err instanceof Error ? err.message : err
+        }`,
+      );
+    }
+  }
+
   const finishedAtMs = Date.now();
   const countersByFactKey: Record<string, PerWdiCounters> = {};
   for (const c of counters.values()) {
@@ -523,6 +574,7 @@ export async function syncWorldBankWdi(
     jurisdictionsInScope: allJurisdictions.length,
     countersByFactKey,
     totalWritten,
+    disputes,
     errors,
     dryRun: options.dryRun ?? false,
   };
