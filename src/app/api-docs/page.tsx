@@ -321,7 +321,7 @@ export default function ApiDocsPage() {
       <EndpointSection
         method="GET"
         path="/api/v1/countries"
-        description="Returns a paginated list of sovereign states with basic metadata. Filter by continent or government type."
+        description="Returns a paginated list of sovereign states with basic metadata. Filter by continent or peer-lens taxonomy. The legacy ?taxonomy=structural and ?taxonomy=regime filters remain functional through 2027-03-31; new code should pass the typed peer-lens values (region | income | vdem | cgv | monarchy)."
         parameters={[
           {
             name: "continent",
@@ -329,10 +329,16 @@ export default function ApiDocsPage() {
             description: 'Filter by continent (e.g. "Africa", "Europe")',
           },
           {
+            name: "taxonomy",
+            type: "string",
+            description:
+              'Filter lens. Accepts: raw | region | income | vdem | cgv | monarchy | structural (DEPRECATED) | regime (DEPRECATED). When non-raw, pair with `government_type` to filter by lens value.',
+          },
+          {
             name: "government_type",
             type: "string",
             description:
-              'Filter by government type (partial match, e.g. "republic")',
+              'Lens value. With taxonomy=region: "Sub-Saharan Africa". With taxonomy=vdem: "Liberal Democracy". With taxonomy=raw: partial match against the CIA prose. See /api/v1/peer-groupings for the full list of valid values per lens.',
           },
           {
             name: "limit",
@@ -457,21 +463,112 @@ export default function ApiDocsPage() {
       <EndpointSection
         method="GET"
         path="/api/v1/government-types"
-        description="Returns all government type classifications with the number of countries under each type, plus the five most populous examples."
+        description="DEPRECATED — sunsets 2027-03-31. Returns government types under the retired structural_family heuristic. Successor: /api/v1/peer-groupings (single endpoint returning all four peer-grouping lenses)."
         exampleResponse={`{
   "data": [
     {
       "governmentType": "presidential republic",
       "count": 42,
       "topExamples": ["United States", "Brazil", "Indonesia", "Nigeria", "Mexico"]
-    },
-    {
-      "governmentType": "parliamentary republic",
-      "count": 31,
-      "topExamples": ["India", "Germany", "Italy", "South Africa", "Ethiopia"]
     }
   ],
-  "meta": { "total": 12 }
+  "meta": {
+    "total": 12,
+    "deprecations": [
+      {
+        "identifier": "structural_family",
+        "kind": "field+filter",
+        "sunset": "2027-03-31",
+        "successor": "/api/v1/peer-groupings",
+        "replacedBy": [
+          "world_bank_region",
+          "world_bank_income_group",
+          "vdem_row",
+          "monarchy_status",
+          "government_form_description"
+        ],
+        "migrationTable": "/civica-index/methodology/peer-grouping/migration"
+      }
+    ]
+  }
+}`}
+      />
+
+      <EndpointSection
+        method="GET"
+        path="/api/v1/peer-groupings"
+        description="Civica's peer-grouping successor endpoint. Returns the four peer-grouping lenses (World Bank region, World Bank income group, V-Dem RoW, BR/CGV regime) plus monarchy_status as descriptive metadata, in a single response. See https://civicaatlas.org/civica-index/methodology/peer-grouping for the underlying methodology."
+        exampleResponse={`{
+  "data": {
+    "world_bank_region": {
+      "factKey": "world_bank_region",
+      "filterParam": "region",
+      "source": "world_bank",
+      "sourceName": "World Bank",
+      "description": "World Bank Country and Lending Groups regional classification (7 regions). Default material peer lens — pair with world_bank_income_group for the canonical material cohort. Refreshed annually each July.",
+      "values": [
+        { "value": "East Asia & Pacific", "label": "East Asia & Pacific", "totalCountries": 29, "scoredCountries": 29 },
+        { "value": "Europe & Central Asia", "label": "Europe & Central Asia", "totalCountries": 52, "scoredCountries": 52 }
+      ]
+    },
+    "vdem_row": {
+      "factKey": "vdem_row",
+      "filterParam": "vdem",
+      "source": "vdem",
+      "sourceName": "V-Dem",
+      "values": [
+        { "value": "Liberal Democracy", "label": "Liberal Democracy", "totalCountries": 33, "scoredCountries": 33 }
+      ]
+    }
+  },
+  "meta": {
+    "peerGrouping": {
+      "status": "stable",
+      "version": "v1.0",
+      "adopted": "2026-05-02",
+      "methodology": "https://civicaatlas.org/civica-index/methodology/peer-grouping",
+      "migrationTable": "/civica-index/methodology/peer-grouping/migration",
+      "replaces": "structural_family (sunset 2027-03-31)"
+    }
+  }
+}`}
+      />
+
+      <EndpointSection
+        method="GET"
+        path="/api/v1/peer-groupings/migration"
+        description="Per-country migration table — bulk-rewrite source for replication scripts that join on the retired structural_family column. Returns one row per sovereign state with both the deprecated values and their peer-lens replacements. Same data the reader-facing /civica-index/methodology/peer-grouping/migration page renders."
+        exampleResponse={`{
+  "data": [
+    {
+      "slug": "united-states",
+      "name": "United States",
+      "iso2": "US",
+      "iso3": "USA",
+      "structuralFamily": "presidential_republic",
+      "structuralSubtype": "federal_presidential_republic",
+      "worldBankRegion": "North America",
+      "worldBankIncomeGroup": "High income",
+      "vdemRow": "Liberal Democracy",
+      "cgvRegime": "presidential_democracy",
+      "monarchyStatus": "none",
+      "governmentFormDescription": "constitutional federal republic"
+    }
+  ],
+  "meta": {
+    "total": 195,
+    "schema": {
+      "deprecated": ["structuralFamily", "structuralSubtype"],
+      "replacement": [
+        "worldBankRegion",
+        "worldBankIncomeGroup",
+        "vdemRow",
+        "cgvRegime",
+        "monarchyStatus",
+        "governmentFormDescription"
+      ]
+    }
+  }
 }`}
       />
 
@@ -509,7 +606,9 @@ export default function ApiDocsPage() {
         </h3>
         <CodeBlock>{`curl "${BASE_URL}/countries?continent=Europe&limit=10"
 curl "${BASE_URL}/countries/us"
-curl "${BASE_URL}/government-types"`}</CodeBlock>
+curl "${BASE_URL}/peer-groupings"            # successor (preferred)
+curl "${BASE_URL}/peer-groupings/migration"  # per-country migration
+curl "${BASE_URL}/government-types"          # DEPRECATED — sunsets 2027-03-31`}</CodeBlock>
 
         <h3
           style={{

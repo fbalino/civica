@@ -480,16 +480,29 @@ export default function PeerGroupingMethodologyPage() {
       <section className="editorial-section">
         <h2>Migration table</h2>
         <p>
-          For API consumers and replication-script maintainers,
-          here&rsquo;s the rough mapping from old{" "}
-          <code>structural_family</code> values to the new peer-lens
-          fields. There are deliberately rows where the mapping is
-          one-to-many or many-to-one &mdash; that is the point of the
-          change. The legacy <code>structural_family</code> column and
-          API field remain for two quarterly vintages with{" "}
-          <code>Deprecation</code> headers; the hard cut lands at
-          T+2 vintages with concrete dates pinned in the API
-          documentation when the deprecation header ships.
+          The full per-country mapping &mdash; old{" "}
+          <code>structural_family</code> values to new peer-lens
+          fields, country by country &mdash; is published as a
+          separate page at{" "}
+          <Link href="/civica-index/methodology/peer-grouping/migration">
+            /civica-index/methodology/peer-grouping/migration
+          </Link>
+          . Replication-script maintainers can consume the same data
+          as JSON via{" "}
+          <Link href="/api/v1/peer-groupings/migration">
+            /api/v1/peer-groupings/migration
+          </Link>
+          .
+        </p>
+        <p>
+          The summary mapping below shows the typical replacement for
+          each retired bucket. There are deliberately rows where the
+          mapping is one-to-many or many-to-one &mdash; that is the
+          point of the change. The legacy <code>structural_family</code>{" "}
+          column and API field remain for two quarterly vintages with{" "}
+          <code>Deprecation</code> + <code>Sunset</code> headers
+          pointing at <code>2027-03-31</code>; the hard cut lands on
+          that date.
         </p>
         <div className="editorial-table-scroll">
           <table className="editorial-table">

@@ -1,5 +1,120 @@
 # Project Memory Sessions
 
+## 2026-05-03 — `structural_family` removal — Phase 4 public API deprecation contract shipped
+
+Phase 4 of the structural-family removal landed. Sunset date locked
+at **2027-03-31** (calendar-anchored, not vintage-anchored — gives
+external API consumers ~10 months of overlap regardless of small
+shifts in Phase 4 ship date). Successor endpoint locked as a single
+`/api/v1/peer-groupings` returning all four lenses + monarchy_status
+in one response (matches Phase F's `meta.reconciliation` envelope
+conventions; consumers almost always want all lenses for
+orientation, sub-paths would force multiple round-trips for the
+common case).
+
+### What shipped
+
+- **`src/lib/api/deprecation.ts`** — shared constants module:
+  `STRUCTURAL_FAMILY_SUNSET_DATE` ("Wed, 31 Mar 2027 23:59:59 GMT"),
+  `STRUCTURAL_FAMILY_DEPRECATION_HEADERS`,
+  `STRUCTURAL_FAMILY_DEPRECATION_META` (the `meta.deprecations`
+  block to merge into JSON envelopes), and
+  `withStructuralFamilyDeprecation(res)` helper that mirrors the
+  existing Pulse v1 → v2 deprecation pattern.
+
+- **`src/app/api/v1/peer-groupings/route.ts`** — successor endpoint.
+  Single response with all four peer-grouping lenses (World Bank
+  region, World Bank income, V-Dem RoW, BR/CGV regime) plus
+  monarchy_status as descriptive metadata. Each lens block carries
+  the canonical `factKey`, the `filterParam` consumers pass to the
+  legacy filter endpoints, source attribution matching Phase F's
+  `provenance.source` shape, and a sorted list of values with cohort
+  sizes.
+
+- **`src/app/api/v1/peer-groupings/migration/route.ts`** — per-country
+  migration table as JSON. Replication-script maintainers consume
+  this to bulk-rewrite `structural_family` joins. One row per
+  sovereign state with both deprecated values and the peer-lens
+  replacements.
+
+- **`src/app/(reader)/civica-index/methodology/peer-grouping/migration/page.tsx`**
+  — reader-facing version of the same data. Wide table inside
+  `.editorial-table-scroll` for mobile compatibility. Linked from
+  the methodology page Section 12.
+
+- **All four legacy endpoints** now serve `Deprecation: true` +
+  `Sunset: Wed, 31 Mar 2027 23:59:59 GMT` +
+  `Link: </api/v1/peer-groupings>; rel="successor-version"` headers
+  AND a `meta.deprecations` block in the response body:
+  - `/api/v1/government-types`
+  - `/api/v1/countries/[code]` (Phase F shipped the additive
+    migration; my work added the deprecation contract on top)
+  - `/api/v1/countries` (list)
+  - `/api/v1/index/rankings`
+
+  The list + rankings endpoints also accept the new typed
+  `?taxonomy=` values: `region`, `income`, `vdem`, `cgv`, `monarchy`.
+  Each filters via an EXISTS subquery against `country_facts` (or
+  `government_taxonomies.regime_type_cgv` for CGV) — paginated, no
+  in-memory filter step. Legacy `?taxonomy=structural` and
+  `?taxonomy=regime` keep working through 2027-03-31.
+
+- **`src/app/api-docs/page.tsx`** updated:
+  - `/api/v1/government-types` marked DEPRECATED with a clear sunset
+    note in its description
+  - New `EndpointSection` for `/api/v1/peer-groupings` and
+    `/api/v1/peer-groupings/migration`
+  - `/api/v1/countries` description + parameters extended to document
+    the new typed `taxonomy` values
+  - curl examples updated to highlight the successor
+
+- **Replication-script discovery (Resolution §6 Q9) closed.** Sweep
+  found NO external academic-replication scripts referencing
+  `structural_family`. The three internal scripts that touch the
+  field (`derive-government-taxonomy.ts`,
+  `check-taxonomy-state.ts`, `ingest-government-taxonomy-br.ts`)
+  are diagnostic/preservation tooling that gets deleted in Phase 6
+  alongside the column drops. The
+  `/civica-index/replication` reader page describes the Civica Index
+  replication package as future work and contains no `structural_family`
+  references.
+
+### Coordination move that paid off
+
+Following the user's "extend Phase F's `meta.reconciliation` envelope
+rather than parallel-author" guidance: every legacy endpoint's
+response merges `STRUCTURAL_FAMILY_DEPRECATION_META` INTO the
+existing `meta` object alongside `meta.reconciliation` (and
+`meta.methodology` on the rankings endpoint). Single `meta` object,
+multiple discipline-specific keys. No parallel envelopes.
+
+### Verification
+
+- `npm run build` clean.
+- `curl -I` confirms all four legacy endpoints return the three
+  deprecation headers.
+- `curl /api/v1/peer-groupings` returns all four lenses + monarchy
+  with proper cohort counts (29/52/33/20/2/6/47 across the WB
+  regions, etc.).
+- New typed taxonomy filters confirmed: `?taxonomy=vdem&government_type=Liberal+Democracy`
+  → 33 countries; `?taxonomy=region&government_type=North+America`
+  → 2 countries (USA + Canada).
+- `/civica-index/methodology/peer-grouping/migration` reader page
+  renders the full per-country table with horizontal scroll on
+  mobile.
+
+### Outstanding
+
+Only Phase 6 (T+2 hard cut on 2027-03-31) remains. That's
+calendar-gated, not effort-gated — at that date drop the
+`structural_family` and `structural_subtype` columns from the
+`government_taxonomies` schema, delete `STRUCTURAL_FAMILY_META` /
+`STRUCTURAL_GOVERNMENT_TYPES` constants, return 410 Gone (or 301
+to `/api/v1/peer-groupings`) from `/api/v1/government-types`, and
+remove the `structuralFamily*` fields from the other endpoints'
+response bodies + the `?taxonomy=structural|regime` query-param
+handling.
+
 ## 2026-05-02 — `structural_family` removal — Phase 3 consumer refactor shipped
 
 Phase 3 of the structural-family removal landed end-to-end after

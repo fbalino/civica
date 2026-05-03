@@ -18,6 +18,10 @@ import {
   FACTBOOK_RECONCILIATION_META,
   type ApiProvenanceEntry,
 } from "@/lib/factbook/reconcile/api";
+import {
+  STRUCTURAL_FAMILY_DEPRECATION_META,
+  withStructuralFamilyDeprecation,
+} from "@/lib/api/deprecation";
 
 /**
  * Phase F.4 — public-API provenance map.
@@ -70,7 +74,9 @@ export async function GET(
 
     const country = results[0];
     if (!country) {
-      return apiError(`Country not found: ${code}`, 404);
+      return withStructuralFamilyDeprecation(
+        apiError(`Country not found: ${code}`, 404),
+      );
     }
     const classificationMap = await buildGovernmentClassificationMap([country]);
 
@@ -234,7 +240,7 @@ export async function GET(
       {} as Record<string, unknown[]>
     );
 
-    return apiResponse({
+    return withStructuralFamilyDeprecation(apiResponse({
       data: {
         slug: country.slug,
         name: country.name,
@@ -304,11 +310,14 @@ export async function GET(
       },
       meta: {
         reconciliation: FACTBOOK_RECONCILIATION_META,
+        ...STRUCTURAL_FAMILY_DEPRECATION_META,
       },
-    });
+    }));
   } catch (e) {
     console.error("API /v1/countries/[code] error:", e);
-    return apiError("Internal server error", 500);
+    return withStructuralFamilyDeprecation(
+      apiError("Internal server error", 500),
+    );
   }
 }
 

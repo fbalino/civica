@@ -3216,3 +3216,48 @@ a {
   gap: var(--space-4);
   margin-top: var(--space-5);
 }
+
+/* Per-country migration table — `/civica-index/methodology/peer-grouping/migration`.
+   Wide table; lives inside the `.editorial-table-scroll` wrapper so
+   it scrolls horizontally on mobile rather than overflowing. Mono
+   columns for the deprecated/canonical-value fields stay distinct
+   from prose columns. */
+.peer-migration-table {
+  border-collapse: collapse;
+  width: max-content;
+  min-width: 100%;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+}
+.peer-migration-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-10);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  border-bottom: 1px solid var(--color-card-border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  background: var(--color-page-bg);
+}
+.peer-migration-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--color-card-border);
+  color: var(--color-text-primary);
+  vertical-align: top;
+  white-space: nowrap;
+}
+.peer-migration-table td code {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  color: var(--color-text-60);
+  background: transparent;
+  padding: 0;
+}
+.peer-migration-table tr:hover td {
+  background: var(--color-card-bg);
+}
