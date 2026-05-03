@@ -1,15 +1,12 @@
 /**
- * Phase F.6 — World Bank WDI sync orchestrator.
+ * Phase F.6 + R.1 — World Bank WDI sync orchestrator.
  *
- * Direct sync from the World Bank's World Development Indicators API
- * for the six fact-keys deferred from F.2:
- *
- *   - inflation_rate            (FP.CPI.TOTL.ZG, consumer prices annual %)
- *   - public_debt_pct_gdp       (GC.DOD.TOTL.GD.ZS, central gov debt %GDP)
- *   - infant_mortality_per_1000 (SP.DYN.IMRT.IN, per 1000 live births)
- *   - co2_emissions_total_mt    (EN.GHG.CO2.MT.CE.AR5, Mt CO2 eq)
- *   - internet_users_pct        (IT.NET.USER.ZS, % of population)
- *   - gdp_per_capita_usd        (NY.GDP.PCAP.PP.CD, GDP per capita PPP USD)
+ * Direct sync from the World Bank's World Development Indicators API.
+ * F.6 shipped 6 fact-keys (inflation, public debt, infant mortality,
+ * CO₂, internet users, GDP per capita PPP). R.1 expands to 20 total
+ * indicators across demographics, economy, trade, labour, education,
+ * energy, and military domains. See `WDI_INDICATORS` below for the
+ * full list and per-indicator canonical/alternate role.
  *
  * For each indicator we ask the WB API for the most recent ~10 years
  * of data globally (`country/all/indicator/<code>`), pick the latest
@@ -20,16 +17,24 @@
  *
  * The Phase F resolver picks between WB and CIA / Wikidata per
  * methodology §3.3 — material-error guard + freshness preference.
+ * The new `civicaRole` field on each indicator config is informational
+ * only (NOT used by the resolver); it persists into the fact row's
+ * `references[].civicaRole` payload so the methodology page rewrite
+ * (Phase R.23) can render canonical-vs-alternate without a separate
+ * lookup. See `~/civica/plan/wb-wdi-expansion-resolution-v1.md` §2d.
  *
- * Why some indicators benefit from a future IMF/UN supplement (out of
- * scope for v1):
- *   - Public debt: WB coverage is patchy; IMF WEO has better coverage.
- *   - CO2: WB indicator is annual; UN/EDGAR ship more granular updates.
- * F.6 v1 ships WB-only; an IMF/UN extension can land as F.6.1 without
- * touching this file.
+ * Most R.1 indicators are tagged `'alternate'` because Phases R.2–R.12
+ * will introduce canonical Tier-1 publishers (IMF for inflation /
+ * public debt, UN WPP for population / fertility / births / deaths,
+ * WHO for life expectancy / infant mortality, UNESCO for literacy,
+ * ILO for unemployment, WTO for trade). WB stays canonical for
+ * domains without a planned upstream Tier-1 (CO₂ via WDI, internet
+ * users via ITU republication, electricity access, current account,
+ * reserves, urbanization).
  *
  * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §2 / §3.3
- * Plan:        ~/civica/plan/phase-f-implementation-plan.md F.6
+ * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.1
+ * Resolution:  ~/civica/plan/wb-wdi-expansion-resolution-v1.md
  */
 import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
@@ -60,6 +65,25 @@ const WB_LOOKBACK_YEARS = 10;
 const WDI_VINTAGE = "World Bank WDI 2026Q3";
 
 /**
+ * Civica's editorial role for a given (source, fact-key) pair.
+ *
+ * - `canonical` — Civica regards this source as the authoritative
+ *   reference for this fact-key (e.g. WB nominal GDP). The Phase F
+ *   resolver does NOT use this field for runtime selection (the
+ *   resolver is freshness-driven per methodology §3.3); the field
+ *   is informational metadata for the methodology page rewrite at
+ *   Phase R.23 and for downstream phases (R.3 UN WPP, R.4 WHO,
+ *   R.5 UNESCO, R.10 ILO, R.12 WTO) so they inherit the
+ *   canonical/alternate assignment without re-deciding.
+ * - `alternate` — Civica regards this source as a corroborating
+ *   reference; another Tier-1 publisher is or will be canonical.
+ *   This is the default when omitted.
+ *
+ * Per `~/civica/plan/wb-wdi-expansion-resolution-v1.md` §2d.
+ */
+export type CivicaSourceRole = "canonical" | "alternate";
+
+/**
  * One WDI indicator we care about. Each entry maps an upstream WB
  * indicator code to a Civica fact-key. The optional `valueTransform`
  * lets us reshape upstream units to fact-key units (e.g. WB ships
@@ -79,14 +103,26 @@ export interface WdiIndicatorConfig {
   /** Documentation URL for the indicator. Stored in the fact row's
    *  references payload so the alternates panel can link out. */
   docUrl: string;
+  /** Civica's editorial role for this WB indicator. Defaults to
+   *  `'alternate'` when omitted. Persisted into the row's
+   *  `references[].civicaRole` so the methodology page rewrite
+   *  (R.23) can render canonical-vs-alternate without a separate
+   *  lookup. Per `~/civica/plan/wb-wdi-expansion-resolution-v1.md`
+   *  §2d. */
+  civicaRole?: CivicaSourceRole;
 }
 
 export const WDI_INDICATORS: readonly WdiIndicatorConfig[] = [
+  // ─── F.6 originals (6 indicators) — civicaRole per
+  //     `~/civica/plan/wb-wdi-expansion-resolution-v1.md` §2b. ───
   {
     wbCode: "FP.CPI.TOTL.ZG",
     factKey: "inflation_rate",
     label: "Inflation, consumer prices (annual %)",
     docUrl: "https://data.worldbank.org/indicator/FP.CPI.TOTL.ZG",
+    // IMF WEO becomes canonical at R.2; WB stays as alternate per
+    // resolution §2d.
+    civicaRole: "alternate",
   },
   {
     // WB code for central government debt as % of GDP. Coverage is
@@ -96,12 +132,16 @@ export const WDI_INDICATORS: readonly WdiIndicatorConfig[] = [
     factKey: "public_debt_pct_gdp",
     label: "Central government debt, total (% of GDP)",
     docUrl: "https://data.worldbank.org/indicator/GC.DOD.TOTL.GD.ZS",
+    // IMF WEO canonical at R.2; WB alternate.
+    civicaRole: "alternate",
   },
   {
     wbCode: "SP.DYN.IMRT.IN",
     factKey: "infant_mortality_per_1000",
     label: "Mortality rate, infant (per 1,000 live births)",
     docUrl: "https://data.worldbank.org/indicator/SP.DYN.IMRT.IN",
+    // WHO GHO canonical at R.4; WB alternate.
+    civicaRole: "alternate",
   },
   {
     // CO2 emissions. WB ships in kt CO2 eq under EN.GHG.CO2.MT.CE.AR5;
@@ -113,12 +153,18 @@ export const WDI_INDICATORS: readonly WdiIndicatorConfig[] = [
     factKey: "co2_emissions_total_mt",
     label: "CO₂ emissions (Mt CO₂ eq)",
     docUrl: "https://data.worldbank.org/indicator/EN.GHG.CO2.MT.CE.AR5",
+    // WB is the standard reference for CO₂ via the WDI; UNFCCC /
+    // EDGAR alternates exist but are not in v1 scope. WB canonical.
+    civicaRole: "canonical",
   },
   {
     wbCode: "IT.NET.USER.ZS",
     factKey: "internet_users_pct",
     label: "Individuals using the Internet (% of population)",
     docUrl: "https://data.worldbank.org/indicator/IT.NET.USER.ZS",
+    // ITU is technically canonical for telecom indicators; not in
+    // v1 scope. WB republishes ITU and is the practical canonical.
+    civicaRole: "canonical",
   },
   {
     // GDP per capita, PPP (current international $). Matches the
@@ -127,6 +173,186 @@ export const WDI_INDICATORS: readonly WdiIndicatorConfig[] = [
     factKey: "gdp_per_capita_usd",
     label: "GDP per capita, PPP (current international $)",
     docUrl: "https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.CD",
+    // WB PPP-per-capita is the standard reference; IMF has matching
+    // PPP estimates but WB's are the most-cited. WB canonical until
+    // R.2 IMF WEO ships, after which the resolver picks the fresher
+    // — informationally WB stays canonical for v1 publication.
+    civicaRole: "canonical",
+  },
+
+  // ─── R.1 expansion (14 indicators) — see resolution §2b. ───
+  // Demographics: 6 indicators (population, life expectancy, growth,
+  // fertility, birth rate, death rate).
+  {
+    wbCode: "SP.POP.TOTL",
+    factKey: "population_total",
+    label: "Population, total",
+    docUrl: "https://data.worldbank.org/indicator/SP.POP.TOTL",
+    // UN WPP becomes canonical at R.3. Per resolution §6 Q4 + Q6,
+    // WB tagged 'alternate' now so R.3 inherits without re-deciding.
+    civicaRole: "alternate",
+  },
+  {
+    wbCode: "SP.DYN.LE00.IN",
+    factKey: "life_expectancy_years",
+    label: "Life expectancy at birth, total (years)",
+    docUrl: "https://data.worldbank.org/indicator/SP.DYN.LE00.IN",
+    // WHO GHO canonical at R.4; WB alternate.
+    civicaRole: "alternate",
+  },
+  {
+    wbCode: "SP.POP.GROW",
+    factKey: "population_growth_rate",
+    label: "Population growth (annual %)",
+    docUrl: "https://data.worldbank.org/indicator/SP.POP.GROW",
+    // UN WPP canonical at R.3; WB alternate.
+    civicaRole: "alternate",
+  },
+  {
+    wbCode: "SP.DYN.TFRT.IN",
+    factKey: "fertility_rate",
+    label: "Fertility rate, total (births per woman)",
+    docUrl: "https://data.worldbank.org/indicator/SP.DYN.TFRT.IN",
+    // UN WPP / WHO canonical; WB alternate. WB displaces the
+    // 2014-vintage UNESCO Wikidata stale data surfaced in R.0.
+    civicaRole: "alternate",
+  },
+  {
+    wbCode: "SP.DYN.CBRT.IN",
+    factKey: "birth_rate",
+    label: "Birth rate, crude (per 1,000 people)",
+    docUrl: "https://data.worldbank.org/indicator/SP.DYN.CBRT.IN",
+    // UN WPP canonical; WB alternate.
+    civicaRole: "alternate",
+  },
+  {
+    wbCode: "SP.DYN.CDRT.IN",
+    factKey: "death_rate",
+    label: "Death rate, crude (per 1,000 people)",
+    docUrl: "https://data.worldbank.org/indicator/SP.DYN.CDRT.IN",
+    // UN WPP canonical; WB alternate.
+    civicaRole: "alternate",
+  },
+
+  // Economy: 4 indicators (GDP nominal, GDP growth, urbanization,
+  // current account, reserves). Skipping NY.GDP.PCAP.CD (nominal
+  // per-capita) per resolution §2b row #9 + §6 Q5 — would conflict
+  // with existing NY.GDP.PCAP.PP.CD on the unique constraint.
+  // Deferred to v1.1 fact-key split.
+  {
+    // WB nominal GDP ships in raw USD (e.g. USA = 28_750_957_000_000).
+    // Civica's `gdp_nominal_usd_billions` envelope is in billions
+    // [0.05, 30_000]. Transform: divide by 1e9. Verified
+    // 2026-05-03 against probe: USA 28_750_957_000_000 → 28,750.957
+    // billions → passes envelope. Per resolution §2b + §3 step 3.
+    wbCode: "NY.GDP.MKTP.CD",
+    factKey: "gdp_nominal_usd_billions",
+    label: "GDP (current US$, nominal)",
+    docUrl: "https://data.worldbank.org/indicator/NY.GDP.MKTP.CD",
+    valueTransform: (raw: number) => raw / 1e9,
+    // WB canonical for nominal GDP until IMF WEO ships at R.2;
+    // resolver's freshness rule then picks per row.
+    civicaRole: "canonical",
+  },
+  {
+    wbCode: "NY.GDP.MKTP.KD.ZG",
+    factKey: "gdp_real_growth_rate",
+    label: "GDP growth (annual %)",
+    docUrl: "https://data.worldbank.org/indicator/NY.GDP.MKTP.KD.ZG",
+    // WB canonical until R.2 IMF WEO; WB stays canonical for v1
+    // publication.
+    civicaRole: "canonical",
+  },
+  {
+    wbCode: "SP.URB.TOTL.IN.ZS",
+    factKey: "urbanization_rate",
+    label: "Urban population (% of total population)",
+    docUrl: "https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS",
+    // UN-HABITAT is technically canonical; not in v1 scope. WB
+    // republishes UN data; functionally canonical for v1.
+    civicaRole: "canonical",
+  },
+  {
+    wbCode: "BN.CAB.XOKA.CD",
+    factKey: "current_account_balance_usd",
+    label: "Current account balance (current US$)",
+    docUrl: "https://data.worldbank.org/indicator/BN.CAB.XOKA.CD",
+    // IMF tracks for surveillance but WB BoP is the open data; this
+    // fact-key currently has 0 rows in country_facts — WB closes the
+    // gap entirely. Canonical for v1 publication.
+    civicaRole: "canonical",
+  },
+  {
+    wbCode: "FI.RES.TOTL.CD",
+    factKey: "foreign_exchange_reserves_usd",
+    label: "Total reserves (includes gold, current US$)",
+    docUrl: "https://data.worldbank.org/indicator/FI.RES.TOTL.CD",
+    // Same as current account — currently 0 rows in country_facts;
+    // WB canonical for v1.
+    civicaRole: "canonical",
+  },
+
+  // Trade: 2 indicators (exports, imports). Note: existing CIA rows
+  // store on the legacy `exports_total` / `imports_total` keys
+  // (not the `_usd` aliases). WB writes to the `_usd` aliases per
+  // the resolution; resolver's per-fact lookup handles the alias.
+  {
+    wbCode: "NE.EXP.GNFS.CD",
+    factKey: "exports_total_usd",
+    label: "Exports of goods and services (current US$)",
+    docUrl: "https://data.worldbank.org/indicator/NE.EXP.GNFS.CD",
+    // WTO canonical at R.12; WB alternate.
+    civicaRole: "alternate",
+  },
+  {
+    wbCode: "NE.IMP.GNFS.CD",
+    factKey: "imports_total_usd",
+    label: "Imports of goods and services (current US$)",
+    docUrl: "https://data.worldbank.org/indicator/NE.IMP.GNFS.CD",
+    // WTO canonical at R.12; WB alternate.
+    civicaRole: "alternate",
+  },
+
+  // Labour: 1 indicator (unemployment).
+  {
+    wbCode: "SL.UEM.TOTL.ZS",
+    factKey: "unemployment_rate_pct",
+    label: "Unemployment, total (% of total labor force)",
+    docUrl: "https://data.worldbank.org/indicator/SL.UEM.TOTL.ZS",
+    // ILO ILOSTAT canonical at R.10; WB alternate.
+    civicaRole: "alternate",
+  },
+
+  // Education: 1 indicator (literacy).
+  {
+    wbCode: "SE.ADT.LITR.ZS",
+    factKey: "literacy_rate",
+    label: "Literacy rate, adult total (% of people ages 15+)",
+    docUrl: "https://data.worldbank.org/indicator/SE.ADT.LITR.ZS",
+    // UNESCO UIS canonical at R.5; WB alternate.
+    civicaRole: "alternate",
+  },
+
+  // Energy: 1 indicator (electricity access).
+  {
+    wbCode: "EG.ELC.ACCS.ZS",
+    factKey: "electricity_access",
+    label: "Access to electricity (% of population)",
+    docUrl: "https://data.worldbank.org/indicator/EG.ELC.ACCS.ZS",
+    // WB is the standard reference for access-to-electricity
+    // globally. IEA paywalled for non-OECD. WB canonical.
+    civicaRole: "canonical",
+  },
+
+  // Military: 1 indicator (mil. expenditure as % GDP).
+  {
+    wbCode: "MS.MIL.XPND.GD.ZS",
+    factKey: "military_expenditure_pct_gdp",
+    label: "Military expenditure (% of GDP)",
+    docUrl: "https://data.worldbank.org/indicator/MS.MIL.XPND.GD.ZS",
+    // SIPRI is canonical for military expenditure; not in v1 scope.
+    // WB republishes SIPRI; functionally canonical for v1.
+    civicaRole: "alternate",
   },
 ];
 
@@ -418,6 +644,11 @@ export async function syncWorldBankWdi(
           url: config.docUrl,
           allowlistTier: 1,
           allowlistName: "World Bank Open Data",
+          // R.1 — Civica's canonical/alternate editorial role for
+          // this (source, fact-key) pair. Default 'alternate' when
+          // omitted on the indicator config. See
+          // `~/civica/plan/wb-wdi-expansion-resolution-v1.md` §2d.
+          civicaRole: config.civicaRole ?? "alternate",
         },
       ];
 
