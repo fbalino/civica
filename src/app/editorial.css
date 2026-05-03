@@ -278,6 +278,64 @@
 
 /* ── Filter bar (changelog-style faceted filtering) ─────────────── */
 
+/* ── Shared reader sidebar + country jump search ───────────────── */
+
+.reader-sidebar {
+  min-width: 0;
+}
+
+.reader-sidebar-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-4);
+  font-weight: 400;
+}
+
+.reader-sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.reader-sidebar-link {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-left: 2px solid transparent;
+  color: var(--color-text-60);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  text-decoration: none;
+}
+
+.reader-sidebar-link:hover {
+  color: var(--color-text-primary);
+}
+
+.reader-sidebar-link.is-active {
+  border-left-color: var(--color-text-primary);
+  color: var(--color-text-primary);
+  background: color-mix(in oklab, var(--color-text-primary) 4%, transparent);
+  font-weight: 500;
+}
+
+.reader-sidebar-num {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-30);
+  align-self: center;
+  min-width: 20px;
+}
+
+.reader-sidebar-text {
+  min-width: 0;
+}
+
 .editorial-filter-bar {
   display: flex;
   flex-direction: column;
@@ -310,16 +368,16 @@
 .editorial-chip {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
+  padding: 5px 11px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-card-border);
   background: var(--color-page-bg);
   color: var(--color-text-60);
-  font-family: var(--font-mono);
-  font-size: var(--text-11);
-  font-weight: var(--font-weight-mono, 500);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -343,21 +401,21 @@
   align-items: center;
 }
 .editorial-filter-form select {
-  padding: 4px 8px;
-  font-family: var(--font-mono);
-  font-size: var(--text-11);
+  padding: 5px 9px;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-card-border);
   background: var(--color-page-bg);
   color: var(--color-text-primary);
 }
 .editorial-filter-form button {
-  padding: 4px 10px;
-  font-family: var(--font-mono);
-  font-size: var(--text-11);
-  font-weight: var(--font-weight-mono, 500);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  padding: 5px 11px;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-card-border);
   background: var(--color-page-bg);
@@ -430,6 +488,238 @@
   gap: 12px;
   flex-wrap: wrap;
   align-items: center;
+}
+
+/* ── Pulse event accordion cards ───────────────────────────────── */
+
+.pulse-event-card {
+  scroll-margin-top: 80px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.pulse-event-accordion {
+  display: block;
+}
+
+.pulse-event-summary {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: start;
+  padding: var(--space-5) var(--space-6) var(--space-5) var(--space-7);
+  cursor: pointer;
+  list-style: none;
+}
+
+.pulse-event-summary::-webkit-details-marker {
+  display: none;
+}
+
+.pulse-event-summary::before {
+  content: "›";
+  position: absolute;
+  left: var(--space-3);
+  top: var(--space-5);
+  font-family: var(--font-mono);
+  color: var(--color-text-40);
+  transform: rotate(0deg);
+}
+
+.pulse-event-accordion[open] .pulse-event-summary::before {
+  transform: rotate(90deg);
+}
+
+.pulse-event-summary-main {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.pulse-event-kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: baseline;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+}
+
+.pulse-event-kicker span:first-child {
+  font-family: var(--font-heading);
+  font-size: var(--text-16);
+  color: var(--color-text-primary);
+}
+
+.pulse-event-kicker span:last-child {
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-40);
+}
+
+.pulse-event-headline {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+
+.pulse-event-result-pills {
+  justify-content: flex-end;
+}
+
+.pulse-event-expanded {
+  padding: 0 var(--space-6) var(--space-5);
+}
+
+.pulse-event-actions {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+}
+
+.pulse-event-actions a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.pulse-event-actions a:hover {
+  text-decoration: underline;
+}
+
+.pulse-event-ai-summary {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+}
+
+.pulse-event-meta-label,
+.pulse-event-nested-details summary,
+.pulse-event-source-chip span {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+.pulse-event-meta-label {
+  margin-top: var(--space-2);
+}
+
+.pulse-event-nested-details {
+  margin-bottom: var(--space-4);
+}
+
+.pulse-event-nested-details summary {
+  cursor: pointer;
+  padding: var(--space-2) 0;
+}
+
+.pulse-event-paragraphs {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--color-card-border);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-60);
+}
+
+.pulse-event-paragraphs p {
+  margin: 0;
+}
+
+.pulse-event-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.pulse-event-source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+}
+
+.pulse-event-source-chip strong {
+  color: var(--color-text-primary);
+}
+
+.pulse-event-source-chip a {
+  color: var(--color-accent);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  text-decoration: none;
+}
+
+.pulse-event-classifier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.pulse-event-classifier-run {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+}
+
+.pulse-event-classifier-category {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.pulse-event-classifier-pills {
+  display: flex;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+
+.pulse-event-rationale {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-60);
+  line-height: var(--leading-relaxed);
+}
+
+@media (max-width: 720px) {
+  .pulse-event-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .pulse-event-result-pills {
+    justify-content: flex-start;
+  }
 }
 
 /* ── Pagination row ─────────────────────────────────────────────── */

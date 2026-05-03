@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   getJurisdictionBySlug,
@@ -341,7 +342,7 @@ export default async function FactbookCountryPage({
           Some figures reconciled across multiple sources via Civica&apos;s
           methodology (v0.1{" "}
           <span style={{ color: "var(--color-status-warning)" }}>BETA</span>).{" "}
-          <a
+          <Link
             href="/factbook/methodology/reconciliation"
             style={{
               color: "var(--color-text-60)",
@@ -350,7 +351,7 @@ export default async function FactbookCountryPage({
             }}
           >
             Methodology →
-          </a>
+          </Link>
         </div>
       ) : null}
 
@@ -366,8 +367,7 @@ export default async function FactbookCountryPage({
         <FactbookSidebar items={sidebarItems} countries={countryOptions} />
 
         <div className="factbook-main">
-          {visibleSections.map((section, idx) => {
-            const num = String(idx + 1).padStart(2, "0");
+          {visibleSections.map((section) => {
             const data =
               section.kind === "civica"
                 ? null
@@ -383,29 +383,6 @@ export default async function FactbookCountryPage({
                 className="factbook-section"
               >
                 <header className="factbook-section-header">
-                  <p
-                    className={`factbook-section-eyebrow${
-                      section.kind === "factbook+civica-gov" ||
-                      section.kind === "civica"
-                        ? " is-civica"
-                        : ""
-                    }`}
-                  >
-                    {num} —{" "}
-                    {section.kind === "factbook+civica-gov"
-                      ? `Civica + CIA Factbook · retrieved ${FACTBOOK_RETRIEVED_AT}`
-                      : section.kind === "factbook"
-                      ? `CIA World Factbook · retrieved ${FACTBOOK_RETRIEVED_AT}`
-                      : section.id === "legislature"
-                      ? "Civica · Legislature"
-                      : section.id === "leaders"
-                      ? "Civica · Leaders"
-                      : section.id === "bills"
-                      ? "Civica · Bills"
-                      : section.id === "scores"
-                      ? "Civica · Scores & Rankings"
-                      : "Civica · Governance"}
-                  </p>
                   <h2 className="factbook-section-title">{section.label}</h2>
                 </header>
 

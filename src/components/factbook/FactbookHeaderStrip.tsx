@@ -7,6 +7,7 @@ import { CountrySwitcherChips } from "./CountrySwitcherChips";
 import { FactbookLightbox, type LightboxImage } from "./FactbookLightbox";
 import { FactValueDot } from "./FactValueDot";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+import { ciTier } from "@/lib/ci/tiers";
 
 function MetaPill({
   label,
@@ -25,9 +26,10 @@ function MetaPill({
       title={value}
       style={{
         display: "inline-flex",
-        alignItems: "baseline",
+        alignItems: "center",
         gap: 6,
         fontSize: "var(--text-14)",
+        lineHeight: 1,
         color: "var(--color-text-60)",
         whiteSpace: "nowrap",
       }}
@@ -59,7 +61,7 @@ function BetaTag() {
   return (
     <span
       className="ci-beta-pill"
-      style={{ marginLeft: "var(--space-1)", alignSelf: "center" }}
+      style={{ marginLeft: "var(--space-1)", alignSelf: "center", lineHeight: 1 }}
     >
       Beta
     </span>
@@ -130,6 +132,7 @@ export function FactbookHeaderStrip({
     cpDelta == null
       ? null
       : `${cpDelta > 0 ? "+" : cpDelta < 0 ? "−" : ""}${Math.abs(cpDelta).toFixed(1)}`;
+  const ciScoreColor = ciScore != null ? ciTier(ciScore).cssVar : "var(--color-accent)";
 
   const trendArrow =
     cpTrend === "up" ? "↑" : cpTrend === "down" ? "↓" : cpTrend === "flat" ? "→" : null;
@@ -170,9 +173,10 @@ export function FactbookHeaderStrip({
                 <span
                   style={{
                     display: "inline-flex",
-                    alignItems: "baseline",
+                    alignItems: "center",
                     gap: 6,
                     fontSize: "var(--text-14)",
+                    lineHeight: 1,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -205,9 +209,10 @@ export function FactbookHeaderStrip({
                 <span
                   style={{
                     display: "inline-flex",
-                    alignItems: "baseline",
+                    alignItems: "center",
                     gap: 6,
                     fontSize: "var(--text-14)",
+                    lineHeight: 1,
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -240,33 +245,24 @@ export function FactbookHeaderStrip({
                 href={`/civica-index/${slug}`}
                 style={{
                   display: "inline-flex",
-                  alignItems: "baseline",
+                  alignItems: "center",
                   gap: 6,
                   fontSize: "var(--text-14)",
+                  lineHeight: 1,
                   color: "var(--color-text-60)",
                   textDecoration: "none",
                   whiteSpace: "nowrap",
                 }}
                 title="View Civica Index detail"
               >
-                <span
-                  aria-hidden
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: "var(--color-accent)",
-                    alignSelf: "center",
-                    flexShrink: 0,
-                  }}
-                />
                 <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-12)" }}>CI</span>
                 <span
                   style={{
                     fontFamily: "var(--font-heading)",
-                    fontSize: "var(--text-20)",
+                    fontSize: "var(--text-18)",
                     fontWeight: 400,
-                    color: "var(--color-accent)",
+                    lineHeight: 1,
+                    color: ciScoreColor,
                   }}
                 >
                   {Math.round(ciScore)}
@@ -279,34 +275,25 @@ export function FactbookHeaderStrip({
                 href={`/civica-index/${slug}#pulse`}
                 style={{
                   display: "inline-flex",
-                  alignItems: "baseline",
+                  alignItems: "center",
                   gap: 6,
                   fontSize: "var(--text-14)",
+                  lineHeight: 1,
                   color: "var(--color-text-60)",
                   textDecoration: "none",
                   whiteSpace: "nowrap",
                 }}
                 title="View Civica Pulse detail"
               >
-                <span
-                  aria-hidden
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: trendColor,
-                    alignSelf: "center",
-                    flexShrink: 0,
-                  }}
-                />
                 <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-12)" }}>CP</span>
-                <span style={{ color: "var(--color-text-primary)" }}>{cpDisplay}</span>
+                <span style={{ color: "var(--color-text-primary)", lineHeight: 1 }}>{cpDisplay}</span>
                 {trendArrow && (
                   <span
                     aria-label={`trending ${cpTrend}`}
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontSize: "var(--text-12)",
+                      lineHeight: 1,
                       marginLeft: 2,
                       color: trendColor,
                     }}

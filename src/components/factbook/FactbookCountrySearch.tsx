@@ -23,6 +23,8 @@ interface FactbookCountrySearchProps {
   placeholder?: string;
   compact?: boolean;
   autoFocus?: boolean;
+  countryPathPrefix?: string;
+  ariaLabel?: string;
 }
 
 function flagEmoji(iso2: string | null): string {
@@ -37,6 +39,8 @@ export function FactbookCountrySearch({
   placeholder = "Jump to country...",
   compact = false,
   autoFocus = false,
+  countryPathPrefix = "/factbook",
+  ariaLabel = "Jump to a country",
 }: FactbookCountrySearchProps) {
   const router = useRouter();
   const resultsId = useId();
@@ -61,13 +65,8 @@ export function FactbookCountrySearch({
   }, [countries, query]);
 
   useEffect(() => {
-    setSelectedIdx(0);
-  }, [query]);
-
-  useEffect(() => {
     if (!autoFocus) return;
     inputRef.current?.focus();
-    setOpen(true);
   }, [autoFocus]);
 
   useEffect(() => {
@@ -88,9 +87,9 @@ export function FactbookCountrySearch({
     (slug: string) => {
       setOpen(false);
       setQuery("");
-      router.push(`/factbook/${slug}`);
+      router.push(`${countryPathPrefix.replace(/\/$/, "")}/${slug}`);
     },
-    [router]
+    [countryPathPrefix, router]
   );
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -134,6 +133,7 @@ export function FactbookCountrySearch({
           placeholder={placeholder}
           onChange={(event) => {
             setQuery(event.target.value);
+            setSelectedIdx(0);
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
@@ -142,7 +142,7 @@ export function FactbookCountrySearch({
           aria-expanded={open && filtered.length > 0}
           aria-controls={resultsId}
           aria-autocomplete="list"
-          aria-label="Jump to a country factbook"
+          aria-label={ariaLabel}
         />
       </div>
 
@@ -151,7 +151,7 @@ export function FactbookCountrySearch({
           id={resultsId}
           className="factbook-search-results"
           role="listbox"
-          aria-label="Factbook country results"
+          aria-label="Country results"
         >
           {filtered.map((country, index) => (
             <button

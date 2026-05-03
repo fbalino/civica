@@ -83,6 +83,13 @@ function trajectoryDelta(points: Array<{ quarter: string; avgScore: number }>): 
   return latest.avgScore - earlier.avgScore;
 }
 
+function pluralizeCohortLabel(label: string): string {
+  if (/coverage$/i.test(label)) return `${label} countries`;
+  if (/[^aeiou]y$/i.test(label)) return `${label.slice(0, -1)}ies`;
+  if (/s$/i.test(label)) return label;
+  return `${label}s`;
+}
+
 function Chevron({ open }: { open: boolean }) {
   return (
     <svg
@@ -535,9 +542,9 @@ export function GovernmentTypesAccordionExplorer({
             These lenses can disagree for valid academic reasons. The
             structural <code>structural_family</code> heuristic that used
             to live here was retired on 2026-05-02; see the{" "}
-            <a href="/civica-index/methodology/peer-grouping">
+            <Link href="/civica-index/methodology/peer-grouping">
               peer-grouping methodology
-            </a>{" "}
+            </Link>{" "}
             for why the bi-lens replacement is a better fit.
           </p>
         </div>
@@ -747,7 +754,7 @@ export function GovernmentTypesAccordionExplorer({
             <div className="panel">
               <div className="section-eyebrow no-margin">What the data does not say</div>
               <h3>
-                &ldquo;{highestAvg ? highestAvg.label : "Some systems"} are better.&rdquo;
+                &ldquo;{highestAvg ? pluralizeCohortLabel(highestAvg.label) : "Some systems"} are better.&rdquo;{" "}
                 The data only shows where systems cluster today.
               </h3>
               <p className="panel-lede">

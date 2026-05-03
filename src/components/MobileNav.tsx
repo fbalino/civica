@@ -4,6 +4,7 @@ import { useState, useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 
 type NavItem = {
   href: string;
@@ -61,7 +62,6 @@ function useIsActive(pathname: string) {
 
 export function MobileNav({ searchSlot, logoSlot }: { searchSlot?: ReactNode; logoSlot?: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const [lastPathname, setLastPathname] = useState(pathname);
 
@@ -69,10 +69,6 @@ export function MobileNav({ searchSlot, logoSlot }: { searchSlot?: ReactNode; lo
     setLastPathname(pathname);
     setOpen(false);
   }
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -118,7 +114,7 @@ export function MobileNav({ searchSlot, logoSlot }: { searchSlot?: ReactNode; lo
         )}
       </button>
 
-      {mounted && open && createPortal(
+      {open && typeof document !== "undefined" && createPortal(
         <MenuOverlay onClose={() => setOpen(false)} pathname={pathname} searchSlot={searchSlot} logoSlot={logoSlot} />,
         document.body
       )}
@@ -320,7 +316,7 @@ function PanelRow({ item, active, delay = 0 }: { item: NavItem; active: boolean;
                   color: "var(--color-text-primary)",
                 }}
               >
-                {child.label}
+                {humanizeSectionLabel(child.label)}
               </span>
               <span
                 style={{

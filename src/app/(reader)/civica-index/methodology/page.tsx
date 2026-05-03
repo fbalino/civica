@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Banner } from "@/components/editorial/Banner";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
-import { getCIMethodology, getCIMethodologyHistory } from "@/lib/db/queries";
+import { ReaderSidebar } from "@/components/editorial/ReaderSidebar";
+import {
+  getCIMethodology,
+  getCIMethodologyHistory,
+  getFactbookCountryOptions,
+} from "@/lib/db/queries";
+import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 
 export const metadata: Metadata = {
   title: "Civica Index Methodology — How Governance Is Scored",
@@ -60,7 +66,7 @@ const DIMENSIONS: DimensionRow[] = [
   {
     label: "Freedoms & rights",
     weight: 25,
-    tierVar: "oklch(70% 0.13 35)",
+    tierVar: "var(--color-accent)",
     primary: "Freedom House (PR + CL combined)",
     secondary: "RSF Press Freedom Index",
   },
@@ -143,21 +149,22 @@ export default async function MethodologyPage() {
   const lastRevision = methodology?.publishedAt
     ? formatDate(methodology.publishedAt)
     : "Apr 2026";
+  const countryOptions = await getFactbookCountryOptions().catch(() => []);
+  const sidebarItems = SECTIONS.map((s) => ({
+    id: s.id,
+    label: humanizeSectionLabel(s.label),
+  }));
 
   return (
     <EditorialPage className="civica-methodology-layout">
-      <aside className="meth-toc" aria-label="On this page">
-        <div className="meth-toc-label">On this page</div>
-        <ol className="meth-toc-list">
-          {SECTIONS.map((s) => (
-            <li key={s.id}>
-              <a href={`#${s.id}`}>
-                {s.num} · {s.label}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </aside>
+      <ReaderSidebar
+        items={sidebarItems}
+        countries={countryOptions}
+        countryPathPrefix="/civica-index"
+        searchPlaceholder="Jump to country..."
+        searchAriaLabel="Jump to a country Civica Index page"
+        className="meth-toc"
+      />
 
       <article className="meth-article">
         <nav className="breadcrumb">
@@ -806,6 +813,7 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           grid-template-columns: 220px minmax(0, 1fr);
           gap: 64px;
           color: var(--color-text-primary);
+          overflow-x: clip;
         }
         .meth-toc {
           position: sticky;
@@ -848,7 +856,9 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
 
         .meth-article {
           padding: 60px 0 80px;
-          max-width: 760px;
+          width: 100%;
+          max-width: min(760px, 100%);
+          min-width: 0;
         }
         .meth-article .breadcrumb {
           font-family: var(--font-mono);
@@ -870,6 +880,7 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           letter-spacing: -0.04em;
           line-height: 1.02;
           margin-bottom: 12px;
+          overflow-wrap: anywhere;
         }
         .meth-article .page-meta {
           font-family: var(--font-mono);
@@ -986,7 +997,9 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
         }
 
         .meth-article table {
+          display: block;
           width: 100%;
+          overflow-x: auto;
           border-collapse: collapse;
           margin: 16px 0 28px;
           font-size: 14px;
@@ -1039,7 +1052,7 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           font-size: 11px;
           color: var(--color-text-primary);
           min-width: 80px;
-          border-right: 1px solid rgba(0,0,0,0.2);
+          border-right: 1px solid color-mix(in oklab, var(--color-text-primary) 20%, transparent);
         }
         .weight-slice:last-child { border-right: none; }
         .weight-slice strong {

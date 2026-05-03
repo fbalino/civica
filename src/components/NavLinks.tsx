@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 
 const LINKS = [
   { href: "/factbook", label: "Factbook" },
@@ -64,7 +65,7 @@ export function NavLinks() {
               href={item.href}
               className="nav-dropdown-item"
             >
-              {item.label}
+              {humanizeSectionLabel(item.label)}
             </Link>
           ))}
         </div>

@@ -100,6 +100,37 @@ function renderInlineHtml(raw: string): ReactNode {
   return <>{nodes}</>;
 }
 
+function renderValueWithSource(raw: string, sourceNode: ReactNode): ReactNode {
+  if (/<[a-z]/i.test(raw)) {
+    return (
+      <>
+        {renderInlineHtml(raw.replace(/\s*<\/p>\s*$/i, ""))}
+        <span className="factbook-source-hang">{sourceNode}</span>
+      </>
+    );
+  }
+
+  const match = raw.match(/(\S+)\s*$/);
+  if (!match || match.index == null) {
+    return (
+      <>
+        {raw}
+        <span className="factbook-value-source-lock">{sourceNode}</span>
+      </>
+    );
+  }
+
+  return (
+    <>
+      {raw.slice(0, match.index)}
+      <span className="factbook-value-source-lock">
+        {match[1]}
+        {sourceNode}
+      </span>
+    </>
+  );
+}
+
 interface FactbookSectionProps {
   sectionName: string;
   fields: FactbookField[];
@@ -139,6 +170,19 @@ function LeafRow({
   const factKey = LABEL_TO_FACT_KEY[humanLabel];
   const resolverFact = factKey ? resolverFacts?.[factKey] : undefined;
   const hasCanonical = resolverFact?.canonical != null;
+  const hasInteractiveSource = hasCanonical && resolverFact && factKey;
+  const sourceNode =
+    hasInteractiveSource ? (
+      <FactValueDot
+        factKey={factKey}
+        factLabel={humanLabel}
+        resolverOutput={resolverFact}
+        canonicalSourceId={resolverFact.canonical?.sourceId ?? null}
+        ariaLabel={`${humanLabel}, see sources`}
+      />
+    ) : source && retrievedAt ? (
+      <SourceDot source={source} retrievedAt={retrievedAt} />
+    ) : null;
 
   return (
     <div
@@ -167,18 +211,9 @@ function LeafRow({
           margin: 0,
         }}
       >
-        {renderInlineHtml(field.value)}
-        {hasCanonical && resolverFact && factKey ? (
-          <FactValueDot
-            factKey={factKey}
-            factLabel={humanLabel}
-            resolverOutput={resolverFact}
-            canonicalSourceId={resolverFact.canonical?.sourceId ?? null}
-            ariaLabel={`${humanLabel}, see sources`}
-          />
-        ) : source && retrievedAt ? (
-          <SourceDot source={source} retrievedAt={retrievedAt} />
-        ) : null}
+        {sourceNode
+          ? renderValueWithSource(field.value, sourceNode)
+          : renderInlineHtml(field.value)}
       </dd>
     </div>
   );

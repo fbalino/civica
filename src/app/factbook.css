@@ -501,6 +501,21 @@
   margin: 0;
   letter-spacing: var(--tracking-tighter);
 }
+.factbook-value-source-lock {
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+.factbook-source-hang {
+  display: inline-block;
+  width: 0;
+  margin-left: var(--space-2);
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+.factbook-source-hang .source-dot {
+  margin-left: 0;
+}
 
 /* === Bills section =======================================================
    Ports the visual contract of the legacy Atlas BillsTab into the factbook
