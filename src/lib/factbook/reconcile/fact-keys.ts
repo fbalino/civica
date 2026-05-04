@@ -453,6 +453,22 @@ const GROUP_B: FactKeyInput[] = [
     materialErrorPpThreshold: 50,
   },
   {
+    // Phase R.2 — General government net lending/borrowing as % of GDP.
+    // IMF WEO `GGXCNL_NGDP` is the canonical source; OECD (R.7) and
+    // Eurostat (R.11) will alternate for OECD members + EU members
+    // respectively. Currently 0 rows in `country_facts`; IMF closes
+    // 0→~189 single-source coverage. See
+    // `~/civica/plan/imf-weo-resolution-v1.md` §6 Q2.
+    key: "fiscal_balance_pct_gdp",
+    group: "B",
+    category: "economy",
+    label: "Fiscal balance (general government)",
+    unit: "% of GDP",
+    envelope: { min: -50, max: 50, isPercent: false },
+    higherIsBetter: true,
+    materialErrorPpThreshold: 50,
+  },
+  {
     key: "unemployment_rate",
     group: "B",
     category: "economy",

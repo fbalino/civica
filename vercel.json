@@ -17,6 +17,9 @@
     { "path": "/api/cron/factbook/sync-wikidata", "schedule": "0 6 1 1,4,7,10 *" },
     { "path": "/api/cron/factbook/refresh-cache", "schedule": "30 6 * * *" },
     { "path": "/api/cron/factbook/sync-classifications", "schedule": "0 7 15 7 *" },
-    { "path": "/api/cron/factbook/sync-wdi", "schedule": "0 8 2 1,4,7,10 *" }
+    { "path": "/api/cron/factbook/sync-wdi", "schedule": "0 8 2 1,4,7,10 *" },
+    { "path": "/api/cron/factbook/sync-imf-weo", "schedule": "0 9 5 4,10 *" },
+    { "path": "/api/cron/factbook/sync-un-data", "schedule": "0 11 3 1,4,7,10 *" },
+    { "path": "/api/cron/factbook/sync-who-gho", "schedule": "0 10 2 1,4,7,10 *" }
   ]
 }

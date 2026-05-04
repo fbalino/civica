@@ -504,6 +504,137 @@ export default function ReconciliationMethodologyPage() {
       </section>
 
       <section className="editorial-section">
+        <h2>Editorial canonical vs displayed value</h2>
+        <p>
+          Sometimes the source Civica regards as the editorial
+          authority for a fact is not the source whose number ends up
+          on the country page. This is intentional. Civica separates
+          two questions:
+        </p>
+        <ul>
+          <li>
+            <strong>Who measured this?</strong> The editorial
+            canonical — the publisher Civica trusts as the
+            authoritative reference for the fact. For health facts
+            like life expectancy and infant mortality, that is the
+            World Health Organization (WHO). For trade, the World
+            Trade Organization. For unemployment, the International
+            Labour Organization. Civica records this as a tag
+            (<code>civicaRole: &ldquo;canonical&rdquo;</code>) on
+            the source row.
+          </li>
+          <li>
+            <strong>What&rsquo;s the most recent measurement?</strong>{" "}
+            The displayed value — the freshest within-envelope row
+            from any allow-listed source. The resolver picks this
+            by date. The methodology page documents the rule
+            elsewhere on this page (see &ldquo;The resolver&rdquo;
+            section above).
+          </li>
+        </ul>
+        <p>
+          When the editorial canonical happens to also be the
+          freshest source, both questions resolve to the same row
+          and there is nothing to explain. But canonical publishers
+          often release on slow cycles — the UN Population Division,
+          for example, refreshes its World Population Prospects
+          dataset only every two years. While that cycle runs,
+          fresher data from the CIA World Factbook may sit on the
+          same fact and win on freshness. The country page shows
+          the freshest value; the alternates panel shows the
+          editorial canonical alongside, clearly labelled.
+        </p>
+        <p>
+          <strong>Worked example: Brazil population.</strong> Civica
+          holds five values for this fact, each from a different
+          publisher, each with a different measurement date:
+        </p>
+        <ul>
+          <li>
+            UN World Population Prospects (2024 Revision):{" "}
+            <strong>211,998,573 people</strong> (2024) —{" "}
+            <em>editorial canonical</em>
+          </li>
+          <li>
+            World Bank Open Data: <strong>211,998,573 people</strong>{" "}
+            (2024) — bit-exact match to UN, because the World Bank
+            republishes UN WPP figures verbatim
+          </li>
+          <li>
+            CIA World Factbook: <strong>221,359,387 people</strong>{" "}
+            (2025 estimate) — currently displayed
+          </li>
+          <li>
+            IMF World Economic Outlook:{" "}
+            <strong>216,989,000 people</strong> (2031 forecast)
+          </li>
+          <li>
+            Wikidata: <strong>203,062,512 people</strong> (2022)
+          </li>
+        </ul>
+        <p>
+          The UN Population Division is the editorial canonical for
+          population because nearly every other source — including
+          the World Bank — derives its number from UN WPP. The World
+          Bank&rsquo;s row matches UN&rsquo;s digit-for-digit because
+          the World Bank literally republishes the UN figure. The
+          CIA Factbook produces an independent forward estimate by
+          extrapolating from UN&rsquo;s most recent published year,
+          and ships that estimate one calendar year ahead of UN.
+        </p>
+        <p>
+          Civica&rsquo;s resolver picks the freshest within-envelope
+          row, which here is CIA&rsquo;s 221.4 million (2025). The
+          country page renders 221,359,387; the alternates panel
+          shows UN 211,998,573 (2024) labelled as the editorial
+          canonical, with World Bank, IMF, and Wikidata listed as
+          the other alternates. When the UN publishes the 2026
+          Revision (expected mid-2026 with a 2025 reference year),
+          the UN row will move back to the displayed slot
+          automatically — no methodology change needed.
+        </p>
+        <p>
+          The 11-million difference between CIA 2025 and UN 2024
+          (~5 per cent) reflects a one-year forward projection plus
+          differences in the demographic models the two
+          organizations use. Both values sit inside Civica&rsquo;s
+          plausibility envelope and below the material-error guard,
+          so neither is rejected. The resolver simply picks the more
+          recent of two admissible rows.
+        </p>
+        <p>
+          <strong>Second worked example: United States life expectancy.</strong>
+          {" "}
+          Same pattern, different domain. As of this writing four
+          sources publish a value:
+        </p>
+        <ul>
+          <li>WHO Global Health Observatory: 76.37 years (2021)</li>
+          <li>World Bank: 78.89 years (2024)</li>
+          <li>CIA World Factbook: 80.9 years (2024)</li>
+          <li>Wikidata: 77.0 years (2022)</li>
+        </ul>
+        <p>
+          WHO is the editorial canonical for health statistics. The
+          resolver picks the freshest within-envelope row, which is
+          CIA 80.9 (2024). The country page renders 80.9; the
+          alternates panel shows WHO 76.37 (2021) labelled as the
+          editorial canonical, with WB and Wikidata as other
+          alternates. When WHO ships a 2024 release, WHO will move
+          back to the displayed slot automatically.
+        </p>
+        <p>
+          This is not a contradiction. It is how Civica balances
+          two honest answers to two different questions:{" "}
+          <em>who measured this</em>, and{" "}
+          <em>what&rsquo;s the most recent measurement</em>. A
+          reader who sees a CIA Factbook value on the country page
+          and a UN or WHO label on this methodology page is seeing
+          the system working as designed.
+        </p>
+      </section>
+
+      <section className="editorial-section">
         <h2>Disputes</h2>
         <p>
           A dispute row is opened automatically when a numeric
