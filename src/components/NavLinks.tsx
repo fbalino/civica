@@ -2,24 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { humanizeSectionLabel } from "@/lib/data/humanize-label";
+import { INDEX_NAV_GROUPS } from "@/components/indexNavItems";
 
 const LINKS = [
   { href: "/factbook", label: "Factbook" },
   { href: "/atlas", label: "Atlas" },
   { href: "/blog", label: "The Record" },
   { href: "/about", label: "About" },
-];
-
-const INDEX_LINKS = [
-  { href: "/civica-index", label: "Overview" },
-  { href: "/civica-index/methodology", label: "Methodology" },
-  { href: "/civica-index/pulse-changelog", label: "Pulse changelog" },
-  { href: "/civica-index/methodology/pulse", label: "Pulse methodology" },
-  { href: "/civica-index/government-types", label: "Government types" },
-  { href: "/civica-index/corrections", label: "Corrections" },
-  { href: "/civica-index/replication", label: "Replication" },
-  { href: "/civica-index/widget", label: "Widgets" },
 ];
 
 export function NavLinks() {
@@ -59,14 +48,19 @@ export function NavLinks() {
           </span>
         </Link>
         <div className="nav-dropdown-menu" aria-label="Index sections">
-          {INDEX_LINKS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="nav-dropdown-item"
-            >
-              {humanizeSectionLabel(item.label)}
-            </Link>
+          {INDEX_NAV_GROUPS.map((group) => (
+            <div className="nav-dropdown-group" key={group.label}>
+              <div className="nav-dropdown-group-label">{group.label}</div>
+              {group.items.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="nav-dropdown-item"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           ))}
         </div>
       </div>

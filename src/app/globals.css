@@ -472,13 +472,13 @@ a {
   top: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(var(--space-2));
-  min-width: 13rem;
-  padding: var(--space-2);
+  min-width: 17.5rem;
+  padding: var(--space-3);
   border: 1px solid var(--color-card-border);
   background: var(--color-bg);
   box-shadow: var(--shadow-hard);
   display: grid;
-  gap: var(--space-1);
+  gap: var(--space-3);
   opacity: 0;
   pointer-events: none;
   transition: opacity 140ms ease, transform 140ms ease;
@@ -492,13 +492,38 @@ a {
   transform: translateX(-50%) translateY(0);
 }
 
+.nav-dropdown-group {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.nav-dropdown-group + .nav-dropdown-group {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-card-border);
+}
+
+.nav-dropdown-group-label {
+  padding: 0 var(--space-3) var(--space-1);
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono);
+  font-size: var(--text-10);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-30);
+  white-space: nowrap;
+}
+
 .nav-dropdown-item {
+  display: block;
   font-family: var(--font-body);
   font-size: var(--text-13);
+  line-height: 1.25;
   color: var(--color-text-60);
   text-decoration: none;
   padding: var(--space-2) var(--space-3);
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .nav-dropdown-item:hover,

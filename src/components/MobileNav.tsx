@@ -4,18 +4,14 @@ import { useState, useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { humanizeSectionLabel } from "@/lib/data/humanize-label";
+import { INDEX_NAV_GROUPS, type IndexNavGroup } from "@/components/indexNavItems";
 
 type NavItem = {
   href: string;
   label: string;
   descriptor: string;
   glyph: string;
-  children?: Array<{
-    href: string;
-    label: string;
-    descriptor: string;
-  }>;
+  childGroups?: IndexNavGroup[];
 };
 
 const PRIMARY: NavItem[] = [
@@ -26,16 +22,7 @@ const PRIMARY: NavItem[] = [
     label: "Index",
     descriptor: "Civica Index (beta)",
     glyph: "◈",
-    children: [
-      { href: "/civica-index", label: "Overview", descriptor: "Index home" },
-      { href: "/civica-index/methodology", label: "Methodology", descriptor: "Scoring model" },
-      { href: "/civica-index/pulse-changelog", label: "Pulse changelog", descriptor: "Daily changes" },
-      { href: "/civica-index/methodology/pulse", label: "Pulse methodology", descriptor: "Event scoring" },
-      { href: "/civica-index/government-types", label: "Government types", descriptor: "Taxonomy" },
-      { href: "/civica-index/corrections", label: "Corrections", descriptor: "Data fixes" },
-      { href: "/civica-index/replication", label: "Replication", descriptor: "Academic use" },
-      { href: "/civica-index/widget", label: "Widgets", descriptor: "Embeds" },
-    ],
+    childGroups: INDEX_NAV_GROUPS,
   },
   { href: "/blog", label: "The Record", descriptor: "Essays & dispatches", glyph: "✎" },
   { href: "/about", label: "About", descriptor: "Mission & methodology", glyph: "ⓘ" },
@@ -183,7 +170,13 @@ function MenuOverlay({
         <Eyebrow>The Atlas</Eyebrow>
         <nav style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 10 }}>
           {PRIMARY.map((item, i) => (
-            <PanelRow key={item.href} item={item} active={isActive(item.href)} delay={i * 22} />
+            <PanelRow
+              key={item.href}
+              item={item}
+              active={isActive(item.href)}
+              delay={i * 22}
+              isActive={isActive}
+            />
           ))}
         </nav>
       </div>
@@ -192,7 +185,13 @@ function MenuOverlay({
         <Eyebrow>Reference</Eyebrow>
         <nav style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 10 }}>
           {REFERENCE.map((item, i) => (
-            <PanelRow key={item.href} item={item} active={isActive(item.href)} delay={(PRIMARY.length + i) * 22} />
+            <PanelRow
+              key={item.href}
+              item={item}
+              active={isActive(item.href)}
+              delay={(PRIMARY.length + i) * 22}
+              isActive={isActive}
+            />
           ))}
         </nav>
       </div>
@@ -206,6 +205,7 @@ function MenuOverlay({
               item={item}
               active={isActive(item.href)}
               delay={(PRIMARY.length + REFERENCE.length + i) * 22}
+              isActive={isActive}
             />
           ))}
         </nav>
@@ -217,7 +217,17 @@ function MenuOverlay({
   );
 }
 
-function PanelRow({ item, active, delay = 0 }: { item: NavItem; active: boolean; delay?: number }) {
+function PanelRow({
+  item,
+  active,
+  delay = 0,
+  isActive,
+}: {
+  item: NavItem;
+  active: boolean;
+  delay?: number;
+  isActive: (href: string) => boolean;
+}) {
   return (
     <div
       style={{
@@ -284,52 +294,80 @@ function PanelRow({ item, active, delay = 0 }: { item: NavItem; active: boolean;
           →
         </span>
       </Link>
-      {item.children ? (
+      {item.childGroups ? (
         <div
           style={{
             display: "grid",
-            gap: 2,
+            gap: 10,
             margin: "4px 0 8px 38px",
             paddingLeft: 12,
             borderLeft: "1px solid var(--color-card-border)",
           }}
         >
-          {item.children.map((child) => (
-            <Link
-              key={child.href}
-              href={child.href}
+          {item.childGroups.map((group) => (
+            <div
+              key={group.label}
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr auto",
-                gap: 10,
-                padding: "8px 10px",
-                borderRadius: "var(--radius-md)",
-                color: "var(--color-text-60)",
-                textDecoration: "none",
+                gap: 2,
               }}
             >
               <span
                 style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-14)",
-                  fontWeight: 500,
-                  color: "var(--color-text-primary)",
-                }}
-              >
-                {humanizeSectionLabel(child.label)}
-              </span>
-              <span
-                style={{
+                  padding: "6px 10px 2px",
                   fontFamily: "var(--font-mono)",
                   fontWeight: "var(--font-weight-mono)",
                   fontSize: "var(--text-10)",
-                  color: "var(--color-text-30)",
+                  letterSpacing: "var(--tracking-caps)",
                   textTransform: "uppercase",
+                  color: "var(--color-text-30)",
                 }}
               >
-                {child.descriptor}
+                {group.label}
               </span>
-            </Link>
+              {group.items.map((child) => {
+                const childActive = isActive(child.href);
+                return (
+                  <Link
+                    key={child.href}
+                    href={child.href}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr auto",
+                      gap: 10,
+                      padding: "8px 10px",
+                      borderRadius: "var(--radius-md)",
+                      color: "var(--color-text-60)",
+                      textDecoration: "none",
+                      background: childActive ? "var(--color-card-bg)" : "transparent",
+                      border: `1px solid ${childActive ? "var(--color-card-border)" : "transparent"}`,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "var(--text-14)",
+                        fontWeight: 500,
+                        color: childActive ? "var(--color-accent)" : "var(--color-text-primary)",
+                      }}
+                    >
+                      {child.label}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontWeight: "var(--font-weight-mono)",
+                        fontSize: "var(--text-10)",
+                        color: "var(--color-text-30)",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {child.descriptor}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           ))}
         </div>
       ) : null}
