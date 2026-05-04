@@ -506,6 +506,69 @@ const GROUP_B: FactKeyInput[] = [
     higherIsBetter: false,
     materialErrorPpThreshold: 50,
   },
+  // ─── Phase R.10 — ILO ILOSTAT canonical labour-market fact-keys
+  //     (3 new declarations). Each Group B, category economy, envelope
+  //     [0, 100, isPercent: true]. ILO is single-source canonical at
+  //     ship time; OECD R.7 explicitly deferred LFS scope to R.10 and
+  //     WB does not publish these as standalone indicators (only its
+  //     republished ILO unemployment series). See
+  //     `~/civica/plan/ilo-ilostat-resolution-v1.md` §2b + §6 Q1. ───
+  {
+    // ILO `EAP_2WAP_SEX_AGE_RT_A` — Labour force participation rate
+    // by sex and age (ILO modelled estimates, Nov. 2025). Probe
+    // 2026-05-04: range 31.6% (Yemen 2024) to 89.4% (Tanzania 2024)
+    // across 276 ref_areas. Identity transform — ILO ships %, our
+    // unit is %.
+    //
+    // higherIsBetter undefined: more LFPR is generally good for
+    // economic capacity but the standard interpretation isn't
+    // unambiguous (high LFPR may reflect distress informal-sector
+    // participation in low-income countries).
+    key: "labor_force_participation_rate_pct",
+    group: "B",
+    category: "economy",
+    label: "Labour force participation rate",
+    unit: "%",
+    envelope: { min: 0, max: 100, isPercent: true },
+    materialErrorPpThreshold: 50,
+  },
+  {
+    // ILO `EMP_2WAP_SEX_AGE_RT_A` — Employment-to-population ratio
+    // by sex and age (ILO modelled estimates, Nov. 2025). Probe
+    // 2026-05-04: range 22.7% (Yemen 2024) to 87.3% (Tanzania 2024)
+    // across 276 ref_areas. Identity transform.
+    //
+    // higherIsBetter undefined: same caveat as LFPR — the
+    // employment-pop ratio is a structural indicator that shouldn't
+    // be ranked simplistically.
+    key: "employment_pop_ratio_pct",
+    group: "B",
+    category: "economy",
+    label: "Employment-to-population ratio",
+    unit: "%",
+    envelope: { min: 0, max: 100, isPercent: true },
+    materialErrorPpThreshold: 50,
+  },
+  {
+    // ILO `SDG_0111_SEX_AGE_RT_A` — SDG indicator 1.1.1 Working
+    // poverty rate (% of employed living below US$3 PPP per day).
+    // Probe 2026-05-04: range 0.099% (Argentina 2024) to ~63%
+    // (DRC, Burundi, Madagascar typical) across 193 ref_areas.
+    // High-income countries are not measured separately by ILO
+    // (statistically near-zero); coverage smaller than LFS-suite
+    // indicators (~165 Civica jurisdictions vs ~190 for unemployment).
+    //
+    // higherIsBetter: false — lower working poverty rate is
+    // unambiguously preferred. SDG target is 0%.
+    key: "working_poor_rate_pct",
+    group: "B",
+    category: "economy",
+    label: "Working poverty rate (SDG 1.1.1)",
+    unit: "%",
+    envelope: { min: 0, max: 100, isPercent: true },
+    higherIsBetter: false,
+    materialErrorPpThreshold: 50,
+  },
   {
     key: "exports_total",
     group: "B",
@@ -990,6 +1053,83 @@ const GROUP_B: FactKeyInput[] = [
     envelope: { min: 0, max: 60, isPercent: false },
     materialErrorPpThreshold: 5,
   },
+
+  // ─── Phase R.8 — FAO FAOSTAT Land Use (3 new fact-keys + 1 reuse).
+  //     FAO is the upstream-canonical publisher for agriculture-,
+  //     forestry-, and land-use-specific indicators; WB's
+  //     `AG.LND.AGRI.ZS` and OECD's ENV-AGRI dataflow both republish
+  //     FAO without methodological adjustment. Per
+  //     `~/civica/plan/fao-faostat-resolution-v1.md` §2d.
+  //
+  //     All 4 R.8 indicators are Group B per user sign-off Q2
+  //     (annual cadence, numerical, freshness-driven). The existing
+  //     `irrigated_land_km2` slot (declared in Group C as a CIA-prose
+  //     companion) is also flipped to Group B here — see comment on
+  //     that fact-key below.
+  //
+  //     Mode B (declare-and-ship) per resolution Q1: 3 new fact-keys
+  //     declared inline rather than deferred to a future R.7.5+
+  //     batch. Master-plan flagships (`agricultural_land_pct`,
+  //     `forest_area_pct`) need to land. ───
+  {
+    // FAO FAOSTAT Land Use Item 6610 (Agricultural land), Element
+    // 7209 (Share in Land area). Probe (2023): min Suriname ~1%,
+    // max Saudi Arabia ~81%, Brazil 28.33%, USA 45%. Bounded `[0,
+    // 100]` by definition; `isPercent: true` triggers resolver
+    // percentage-clamp.
+    //
+    // higherIsBetter undefined per resolution Q5 — direction is
+    // genuinely ambiguous (food-security contexts favor higher;
+    // deforestation-pressure contexts favor lower). Same convention
+    // as `tax_revenue_pct_gdp`.
+    key: "agricultural_land_pct",
+    group: "B",
+    category: "economy",
+    label: "Agricultural land",
+    unit: "%",
+    envelope: { min: 0, max: 100, isPercent: true },
+    materialErrorPpThreshold: 5,
+  },
+  {
+    // FAO FAOSTAT Land Use Item 6646 (Forest land), Element 7209
+    // (Share in Land area). Probe (2023): min Egypt 0.04%, max
+    // Suriname 97%, Brazil 59.33%, USA 33.79%. Bounded `[0, 100]`
+    // by definition.
+    //
+    // higherIsBetter undefined per resolution Q5 — for political
+    // neutrality. Forest cover is broadly a positive ecological
+    // indicator (biodiversity, carbon sequestration), but
+    // baked-in direction is omitted to mirror `tax_revenue_pct_gdp`.
+    key: "forest_area_pct",
+    group: "B",
+    category: "environment",
+    label: "Forest area",
+    unit: "%",
+    envelope: { min: 0, max: 100, isPercent: true },
+    materialErrorPpThreshold: 5,
+  },
+  {
+    // FAO FAOSTAT Land Use Item 6610 (Agricultural land), Element
+    // 5110 (Area). Probe (2023): min ~10 km² (small island states),
+    // max Russia ~2.16M km², Brazil ~2.36M km² (236782.8 × 10),
+    // USA ~4M km². Envelope max 50M provides ample headroom for
+    // larger countries; the global-aggregate row would exceed it
+    // and is filtered out by ISO3 lookup miss.
+    //
+    // FAO unit is `1000 ha`; transform `× 10` to `km2` (1 ha =
+    // 0.01 km²; 1000 ha = 10 km²). Verified live 2026-05-04.
+    //
+    // higherIsBetter undefined — direction depends on country
+    // context (food security favors higher; deforestation pressure
+    // favors lower).
+    key: "agricultural_land_km2",
+    group: "B",
+    category: "geography",
+    label: "Agricultural land area",
+    unit: "km2",
+    envelope: { min: 0, max: 50_000_000 },
+    materialErrorPctThreshold: 0.5,
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────
@@ -1218,12 +1358,21 @@ const GROUP_C: FactKeyInput[] = [
     label: "Import partners",
   },
   {
+    // R.8 — flipped from Group C to Group B per user sign-off Q2.
+    // The slot existed as a CIA-prose companion (legacy "irrigated
+    // land" descriptor) but is now populated by FAO FAOSTAT Land
+    // Use Item 6611 (Agriculture area actually irrigated) /
+    // Element 5110 (Area), `1000 ha → km2` transform. Numeric,
+    // annual cadence, freshness-driven — Group B is the correct
+    // classification. Per
+    // `~/civica/plan/fao-faostat-resolution-v1.md` §2e.
     key: "irrigated_land_km2",
-    group: "C",
+    group: "B",
     category: "geography",
     label: "Irrigated land",
     unit: "km2",
     envelope: { min: 0, max: 1_000_000 },
+    materialErrorPctThreshold: 0.5,
   },
   // Legacy CIA "land area" / "water area" / "total area" came in as
   // Group A above. The legacy `land_area` / `water_area` / `total_area`

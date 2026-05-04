@@ -242,9 +242,6 @@ export default function ReconciliationMethodologyPage() {
             <Link href="https://www.fao.org/faostat">FAO FAOSTAT</Link>
           </li>
           <li>
-            <Link href="https://www.iea.org">IEA energy data</Link>
-          </li>
-          <li>
             <Link href="https://ilostat.ilo.org">ILO ILOSTAT</Link>
           </li>
           <li>

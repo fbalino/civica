@@ -209,10 +209,20 @@ const TIER_1: AllowlistEntry[] = [
   {
     // R.3 audit / 2026-05-04: Q82151 verified correct ("Food and
     // Agriculture Organization") — no QID change needed.
+    //
+    // R.8 / 2026-05-04: added `civicaSourceId: "fao_faostat"` so the
+    // Wikidata reference-tier promotion logic recognises FAOSTAT
+    // references as Tier 1 and so the R.8 sync's per-row references
+    // payload can resolve to the matching `sources` row. The QID
+    // and existing domains are unchanged. Bulk-download CDN hosts
+    // (`bulks-faostat.fao.org`, `fenixservices.fao.org`) match via
+    // the `fao.org` suffix matcher.
+    // Per `~/civica/plan/fao-faostat-resolution-v1.md` §3a item 8.
     qid: "Q82151",
     domains: ["fao.org", "faostat.fao.org"],
     name: "FAO FAOSTAT",
     tier: 1,
+    civicaSourceId: "fao_faostat",
   },
   {
     // R.3 audit / 2026-05-04: corrected to Q826700 (International
@@ -230,9 +240,19 @@ const TIER_1: AllowlistEntry[] = [
     // "Organization of the Petroleum Exporting Countries" (OPEC) on
     // live Wikidata — a different intergovernmental body entirely.
     // Same bug-class as R.0/R.2.
+    //
+    // R.10 / 2026-05-04: added `rplumber.ilo.org` to cover the ILOSTAT
+    // public plumber API endpoint (the keyless data interface used by
+    // R.10's sync orchestrator), and stamped `civicaSourceId:
+    // "ilo_ilostat"` matching the existing `sources` row so the
+    // Wikidata reference-tier promotion logic recognises ILO
+    // references as Tier 1 and the R.10 sync's references payload
+    // resolves to the matching `sources` row. See
+    // `~/civica/plan/ilo-ilostat-resolution-v1.md` §3 step 8 + §6 Q4.
     qid: "Q54129",
-    domains: ["ilostat.ilo.org", "ilo.org"],
+    domains: ["ilostat.ilo.org", "rplumber.ilo.org", "ilo.org"],
     name: "ILO ILOSTAT",
+    civicaSourceId: "ilo_ilostat",
     tier: 1,
   },
   {

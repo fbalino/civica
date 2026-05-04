@@ -23,6 +23,8 @@
     { "path": "/api/cron/factbook/sync-who-gho", "schedule": "0 10 2 1,4,7,10 *" },
     { "path": "/api/cron/factbook/sync-unesco-uis", "schedule": "0 12 4 1,4,7,10 *" },
     { "path": "/api/cron/factbook/sync-undp-hdi", "schedule": "0 13 6 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-oecd-stat", "schedule": "0 14 7 1,4,7,10 *" }
+    { "path": "/api/cron/factbook/sync-oecd-stat", "schedule": "0 14 7 1,4,7,10 *" },
+    { "path": "/api/cron/factbook/sync-fao-faostat", "schedule": "0 15 8 1,4,7,10 *" },
+    { "path": "/api/cron/factbook/sync-ilo-ilostat", "schedule": "0 9 5 11 *" }
   ]
 }

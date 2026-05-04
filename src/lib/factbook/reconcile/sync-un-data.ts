@@ -246,8 +246,16 @@ export const UN_DATA_INDICATORS: readonly UnDataIndicatorConfig[] = [
  * to Civica jurisdictions with ISO3 codes. Aggregates (regions,
  * unions, BRICS) get M49 codes >900 and are filtered out by ISO3
  * lookup failing.
+ *
+ * R.8 / 2026-05-04: exported so `sync-fao-faostat.ts` can reuse
+ * the same map without duplication. FAO FAOSTAT uses the same
+ * UN M49 numeric area codes (in the `Area Code (M49)` column of
+ * each CSV row). Per
+ * `~/civica/plan/fao-faostat-resolution-v1.md` §2h + Q7. A future
+ * Wave-3+ phase may promote this constant to a shared `m49.ts`
+ * module; for now, importing from sync-un-data is zero-conflict.
  */
-const M49_TO_ISO3: Record<number, string> = {
+export const M49_TO_ISO3: Record<number, string> = {
   4: "AFG", 8: "ALB", 12: "DZA", 16: "ASM", 20: "AND", 24: "AGO",
   28: "ATG", 31: "AZE", 32: "ARG", 36: "AUS", 40: "AUT", 44: "BHS",
   48: "BHR", 50: "BGD", 51: "ARM", 52: "BRB", 56: "BEL", 60: "BMU",
