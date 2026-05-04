@@ -607,13 +607,21 @@ export async function syncWorldBankWdi(
       const numericValue = transform(dp.value as number);
 
       // Plausibility envelope per fact-key registry §3.6.
+      // R.1.1 fix: when isPercent is true, the [-1, 101] range is only a
+      // fallback for fact-keys that do not declare their own min/max. When
+      // min/max are explicitly set in the fact-key definition (e.g.
+      // gdp_real_growth_rate min:-50, population_growth_rate min:-10), the
+      // per-fact-key values take precedence. This prevents the coarse
+      // isPercent guard from silently dropping legitimate negative growth
+      // rates, contraction episodes, and population-decline figures.
+      // See ~/civica/plan/wb-wdi-expansion-resolution-v1.md §3b.
       const env = factKeyDef.envelope;
       if (env) {
         const min = env.isPercent
-          ? Math.max(env.min ?? -1, -1)
+          ? (env.min !== undefined ? env.min : -1)
           : env.min;
         const max = env.isPercent
-          ? Math.min(env.max ?? 101, 101)
+          ? (env.max !== undefined ? env.max : 101)
           : env.max;
         if (
           (min !== undefined && numericValue < min) ||
