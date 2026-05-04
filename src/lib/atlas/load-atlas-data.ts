@@ -138,6 +138,15 @@ function extractText(value: unknown): string | null {
   if (value == null) return null;
   if (typeof value === "string") {
     const clean = cleanText(value);
+    // Belt-and-braces: as of Bug 3 fix (2026-05-04, see
+    // ~/civica/plan/factbook-prose-extraction-v1.md) no live source
+    // emits `"[object Object]"` into the canonical fact layer. The
+    // seed script's own `extractText` now returns null in that case
+    // rather than stringifying. This filter remains as
+    // defense-in-depth so any future regression — a new seed-script
+    // call site, a sync adapter, a manual DB edit — is caught at
+    // the read-time boundary instead of rendered to readers. Not
+    // load-bearing for normal operation.
     return clean && clean !== "[object Object]" ? clean : null;
   }
   if (typeof value === "number") return value.toLocaleString();

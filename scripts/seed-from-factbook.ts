@@ -80,7 +80,7 @@ function normalizeKey(key: string): string {
     .replace(/[^a-z0-9_]/g, "");
 }
 
-function parseNumeric(text: string): { value: number | null; unit: string; year: number | null; note: string } {
+function parseNumeric(text: string | null | undefined): { value: number | null; unit: string; year: number | null; note: string } {
   if (!text) return { value: null, unit: "", year: null, note: "" };
 
   let note = "";
@@ -133,13 +133,35 @@ function decodeHtmlEntities(str: string): string {
   });
 }
 
-function extractText(obj: unknown): string {
-  if (!obj) return "";
-  if (typeof obj === "string") return decodeHtmlEntities(obj);
-  if (typeof obj === "object" && "text" in (obj as Record<string, unknown>)) {
-    return decodeHtmlEntities(String((obj as Record<string, unknown>).text));
+/**
+ * Canonical extraction helper, ported from
+ * `src/lib/atlas/load-atlas-data.ts:137–148` per Bug 3 resolution
+ * v1.0 (`~/civica/plan/factbook-prose-extraction-v1.md`).
+ *
+ * Honest about absence: returns `null` when the input is missing,
+ * empty, or the literal `"[object Object]"` artifact. Recursively
+ * descends `{text}` shapes so wrapped CIA prose
+ * (`{Languages: {text}, ...}`) is handled symmetrically with flat
+ * (`{text, note}`).
+ *
+ * The pre-Bug-3 implementation fell through to `String(obj)` on
+ * objects without a top-level `text` key and produced the literal
+ * `"[object Object]"` for 139 of 235 jurisdictions on the
+ * `languages` fact-key (and 1 each on `exports_total` /
+ * `imports_total` for Western Sahara). Audit + root-cause analysis
+ * documented in the resolution doc § 1 and § 2a.
+ */
+function extractText(value: unknown): string | null {
+  if (value == null) return null;
+  if (typeof value === "string") {
+    const clean = decodeHtmlEntities(value).trim();
+    return clean && clean !== "[object Object]" ? clean : null;
   }
-  return decodeHtmlEntities(String(obj));
+  if (typeof value === "number") return value.toLocaleString();
+  if (typeof value === "object" && "text" in (value as Record<string, unknown>)) {
+    return extractText((value as Record<string, unknown>).text);
+  }
+  return null;
 }
 
 function getNestedValue(data: Record<string, unknown>, ...keys: string[]): unknown {
@@ -285,7 +307,18 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
 
     addFact("demographics", "ethnic_groups", getNestedValue(people, "Ethnic groups"));
     addFact("demographics", "religions", getNestedValue(people, "Religions"));
-    addFact("demographics", "languages", getNestedValue(people, "Languages"));
+
+    // CIA prose has two mutually exclusive shapes for `Languages`
+    // (audit Section 2a in `~/civica/plan/factbook-prose-extraction-v1.md`):
+    //   - flat (96 jurisdictions): {text, note}
+    //   - wrapped (139 jurisdictions): {Languages: {text}, "major-language sample(s)": {...}, note}
+    // Try wrapped first (descends two levels) and fall back to flat
+    // (one level). `extractText` correctly descends a `{text}` shape;
+    // the previous `getNestedValue(people, "Languages")`-only call
+    // was the source of the 139-row `[object Object]` corruption.
+    const langWrapped = getNestedValue(people, "Languages", "Languages");
+    const langFlat = getNestedValue(people, "Languages");
+    addFact("demographics", "languages", langWrapped ?? langFlat);
   }
 
   // Geography
@@ -354,32 +387,43 @@ function extractProfileFields(data: Record<string, unknown>) {
     const gdpPPP = getNestedValue(econ ?? {}, "Real GDP (purchasing power parity)");
     if (gdpPPP && typeof gdpPPP === "object") {
       const entries = Object.entries(gdpPPP as Record<string, unknown>);
-      return entries.length > 0 ? extractText(entries[0][1]) : "";
+      return entries.length > 0 ? extractText(entries[0][1]) : null;
     }
-    return "";
+    return null;
   })();
   const gdpParsed = parseNumeric(gdpText);
   const gdpBillions = gdpParsed.value ? gdpParsed.value / 1e9 : null;
 
-  const languages = extractText(getNestedValue(people ?? {}, "Languages", "Languages"));
-  let currency = extractText(getNestedValue(econ ?? {}, "Exchange rates", "Currency"));
-  if (!currency) {
-    const erText = extractText(getNestedValue(econ ?? {}, "Exchange rates"));
-    if (erText && /per US dollar/i.test(erText)) {
-      currency = "US dollars (USD)";
-    }
-  }
+  // Same wrapped-then-flat shape-awareness as extractFacts() above.
+  // Pre-Bug-3 the wrapped-only path silently returned null for
+  // flat-shape jurisdictions (Andorra, Angola, US, Nigeria, ...) —
+  // a separate, smaller bug masked by the fact that those
+  // jurisdictions also had a working `country_facts.languages` row
+  // via the flat-shape path in extractFacts().
+  const languages =
+    extractText(getNestedValue(people ?? {}, "Languages", "Languages")) ??
+    extractText(getNestedValue(people ?? {}, "Languages"));
+
+  // Currency: decoupled per Bug 3 resolution v1.0 § 2f, OQ2.
+  // CIA's `Economy.Exchange rates.Currency` field is the
+  // exchange-rate-denominator description (e.g.
+  // "nairas (NGN) per US dollar -"), not an ISO 4217 code.
+  // Phase F's canonical `currency_code` ingests from World Bank
+  // (Phase R.6/R.7). Until then, `jurisdictions.currency` stays
+  // null and the atlas masthead's `formatCurrency` helper degrades
+  // gracefully to "—".
+  const currency: string | null = null;
 
   return {
     name: countryName,
-    governmentType: slugify(govType).replace(/-/g, "_") || null,
+    governmentType: govType ? slugify(govType).replace(/-/g, "_") || null : null,
     governmentTypeDetail: govType || null,
     capital: capital || null,
     population: popParsed.value ? Math.round(popParsed.value) : null,
     areaSqKm: areaParsed.value ? Math.round(areaParsed.value) : null,
     gdpBillions,
     languages: languages || null,
-    currency: currency || null,
+    currency,
   };
 }
 
@@ -418,10 +462,16 @@ async function processCountryFile(
     return;
   }
 
-  const profile = extractProfileFields(data);
-  if (!profile.name) {
+  const rawProfile = extractProfileFields(data);
+  if (!rawProfile.name) {
     return;
   }
+  // Narrow `name` from `string | null` to `string` for the
+  // schema's notNull() constraint. The earlier `if (!rawProfile.name)`
+  // guard already filters CIA entries with no resolvable country
+  // name (territories without Government sections are filtered
+  // upstream at line 461).
+  const profile = { ...rawProfile, name: rawProfile.name };
 
   const slug = slugify(profile.name);
   const continent = REGION_TO_CONTINENT[region] ?? "Unknown";
