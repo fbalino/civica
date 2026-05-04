@@ -665,6 +665,70 @@ export default function ReconciliationMethodologyPage() {
       </section>
 
       <section className="editorial-section">
+        <h2>Canonical-flip handoffs and shared canonical publishers</h2>
+        <p>
+          Two refinements of the editorial-canonical convention land
+          in Phase R.7.5 (May 2026), both worth surfacing here so a
+          reader who notices the unusual pattern in the alternates
+          panel can understand why.
+        </p>
+        <p>
+          <strong>Canonical-flip handoffs.</strong> When Civica adds
+          a new sync orchestrator that ingests data directly from an
+          upstream-of-record publisher, fact-keys previously sourced
+          from a downstream republisher get their editorial role
+          flipped — the upstream publisher becomes canonical, the
+          republisher becomes alternate. The values do not change;
+          only the citation label moves.
+        </p>
+        <p>
+          The most recent example: in Phase R.6 (April 2026), Civica
+          ingested mean and expected years of schooling from the UN
+          Development Programme&rsquo;s Human Development Report.
+          UNDP HDR was tagged canonical because it was the only Tier
+          1 source Civica ingested for those two indicators. Phase
+          R.7.5 added a direct UNESCO Institute for Statistics sync
+          for the same indicators. UNESCO is the upstream-of-record
+          — UNDP republishes UNESCO&rsquo;s figures as inputs to the
+          HDI composite. The editorial canonical flipped to UNESCO;
+          UNDP rows in <code>country_facts</code> were re-written on
+          the next idempotent sync with the alternate label. Same
+          values, same citation count, more accurate attribution.
+        </p>
+        <p>
+          <strong>Shared canonical publishers.</strong> A small
+          number of fact-keys are computed by two independent
+          Tier 1 publishers using the same joint methodology. When
+          this happens, both publishers ship as canonical — neither
+          is the &ldquo;true&rdquo; upstream.
+        </p>
+        <p>
+          The first example landed at R.7.5: current health
+          expenditure as a share of GDP, computed by both the WHO
+          Global Health Expenditure Database (~190 countries) and
+          the OECD System of Health Accounts (51 countries — 38
+          OECD members plus 13 SHA partners). Both apply the
+          SHA-2011 methodology jointly developed by WHO, OECD, and
+          Eurostat. Their numerators (current health expenditure
+          summed across all financing schemes) and denominators
+          (GDP at market prices) come from the same primary national
+          health-account submissions; values converge to within
+          ~0.1 percentage points and the small remaining noise
+          reflects GDP-revision pickup timing rather than real
+          methodological disagreement. The resolver picks the
+          fresher row within envelope; the alternates panel renders
+          both as editorial canonical for their respective coverage
+          scopes.
+        </p>
+        <p>
+          A reader who sees two canonical labels next to one fact
+          is looking at the second pattern. A reader who sees a
+          UNESCO canonical label on a row that used to cite UNDP is
+          looking at the first.
+        </p>
+      </section>
+
+      <section className="editorial-section">
         <h2>Disputes</h2>
         <p>
           A dispute row is opened automatically when a numeric

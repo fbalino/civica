@@ -3,17 +3,20 @@
  *
  * Direct sync from the OECD Data Explorer SDMX API at
  * `https://sdmx.oecd.org/public/rest/`. Mirrors the F.6 / R.1 / R.2 /
- * R.3 / R.4 pattern. Ships 2 indicators in v1 (post-narrowing) from
- * the Government at a Glance 2023 dataflow, both writing to existing
- * Civica fact-keys:
+ * R.3 / R.4 pattern. Ships 5 indicators after R.7.5:
  *   - `MEASURE=GNLB` → `fiscal_balance_pct_gdp` (canonical alongside IMF)
  *   - `MEASURE=GGD`  → `public_debt_pct_gdp` (canonical alongside IMF, WB; CIA stays alternate)
+ *   - `MSTI MEASURE=G + UNIT=PT_B1GQ` → `gerd_pct_gdp` (canonical; R.7.5 NEW)
+ *   - `RSOECD STANDARD_REVENUE=_T` → `tax_revenue_pct_gdp` (canonical; R.7.5 NEW)
+ *   - `SHA EXP_HEALTH UNIT=PT_B1GQ` → `health_expenditure_pct_gdp` (shared canonical with WHO GHED; R.7.5 NEW)
  *
- * Both are tagged `civicaRole: 'canonical'`. Three additional indicators
- * investigated during R.7 (GERD-as-%-GDP, tax revenue, health
- * expenditure) require new Civica fact-keys; they are deferred to the
- * dedicated fact-key registry expansion phase R.7.5 per
- * `~/civica/plan/oecd-stat-resolution-v1.md` Strategic Q1.
+ * All ship as `civicaRole: 'canonical'`. The 3 R.7.5 additions cover
+ * the deferrals from R.7's original scope per
+ * `~/civica/plan/fact-key-registry-expansion-resolution-v1.md` §2c.
+ * Note: `health_expenditure_pct_gdp` is **shared canonical** with
+ * WHO GHED — both publishers compute SHA-2011 joint methodology and
+ * write rows tagged `canonical`; the resolver picks fresher within
+ * envelope.
  *
  * **OECD-only-for-OECD-members scope.** Unlike R.1–R.4 (which write
  * rows for ~190 sovereign countries), R.7 writes rows for the 38
@@ -182,6 +185,23 @@ export interface OecdStatIndicatorConfig {
    *  is informational metadata for the methodology page rewrite at
    *  Phase R.23. Mirrors R.1's `WdiIndicatorConfig.civicaRole`. */
   civicaRole?: CivicaSourceRole;
+  /** Whether to filter the upstream observation set to OECD members
+   *  only. Default `true` — applies the `OECD_MEMBER_SET` filter so
+   *  partner-country rows are silently dropped. R.7 indicators
+   *  (Government at a Glance: fiscal balance, public debt) all use
+   *  the default because IMF / WB / Eurostat are canonical for
+   *  non-members on those indicators.
+   *
+   *  R.7.5 introduces two indicators where OECD is the ONLY Tier-1
+   *  publisher and partner-country coverage is in scope:
+   *  - `gerd_pct_gdp` (MSTI; 46 ISO3 native scope incl ARG, BGR,
+   *    CHN, HRV, ROU, SGP, TWN, ZAF)
+   *  - `health_expenditure_pct_gdp` (SHA; 51 ISO3 native scope incl
+   *    ARG, BRA, CHN, COL, IDN, IND, MLT, PER, ROU, ZAF)
+   *  These set `oecdMemberOnly: false` so the full native scope
+   *  writes. See `~/civica/plan/fact-key-registry-expansion-resolution-v1.md`
+   *  §5d / §5e. */
+  oecdMemberOnly?: boolean;
 }
 
 /**
@@ -224,6 +244,108 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
     docUrl:
       "https://www.oecd.org/governance/government-at-a-glance/",
     civicaRole: "canonical",
+  },
+
+  // ─── R.7.5 ship list (3 new economy fact-keys; resolution §2c). ───
+  {
+    // OECD MSTI Main Science and Technology Indicators — gross
+    // domestic expenditure on R&D as % of GDP.
+    //
+    // Filter dimension positions for DSD_MSTI@DF_MSTI/1.3 are:
+    //   0. REF_AREA (wildcard)
+    //   1. FREQ (A = annual)
+    //   2. MEASURE (G = gross domestic R&D)
+    //   3. UNIT_MEASURE (PT_B1GQ = % of GDP)
+    //   4. PRICE_BASE (wildcard)
+    //   5. TRANSFORMATION (_Z = no transformation)
+    // See resolution §2c.i + Appendix A. Probe (2022-2024): min
+    // ~1.8% (Canada/Greece), max Israel 6.7%. 46 ISO3 native scope.
+    //
+    // R.7.5 §5d — OECD MSTI extends beyond 38 OECD members
+    // (ARG, BGR, CHN, HRV, ROU, SGP, TWN, ZAF). OECD is the ONLY
+    // Tier-1 publisher of GERD; partner-country coverage IS in
+    // scope. `oecdMemberOnly: false` opts out of the OECD-member
+    // filter.
+    agency: "OECD.STI.STP",
+    dataflowId: "DSD_MSTI@DF_MSTI",
+    dataflowVersion: "1.3",
+    dimensionFilter: ".A.G.PT_B1GQ.._Z",
+    factKey: "gerd_pct_gdp",
+    label: "Gross domestic expenditure on R&D (GERD) as % of GDP",
+    docUrl: "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CInnovation%20and%20Technology%23INT%23&pg=0&fc=Topic&bp=true&snb=27&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_MSTI%40DF_MSTI&df[ag]=OECD.STI.STP",
+    civicaRole: "canonical",
+    oecdMemberOnly: false,
+  },
+  {
+    // OECD CTP Revenue Statistics — total tax revenue (general
+    // government, all standard revenue categories, OECD-harmonized
+    // methodology) as % of GDP.
+    //
+    // Filter dimension positions for DSD_REV_COMP_OECD@DF_RSOECD/2.0:
+    //   0. REF_AREA (wildcard)
+    //   1. MEASURE (TAX_REV = tax revenue)
+    //   2. SECTOR (S13 = general government)
+    //   3. STANDARD_REVENUE (_T = total tax revenue)
+    //   4. CTRY_SPECIFIC_REVENUE (_T = total)
+    //   5. UNIT_MEASURE (PT_B1GQ = % of GDP)
+    //   6. FREQ (A = annual)
+    // See resolution §2c.ii + Appendix A. Probe (2022): min Mexico
+    // 16.8%, max France 45.9%.
+    //
+    // OECD-member-only scope retained. Only OECD members report
+    // via Revenue Statistics; partner-country coverage is not in
+    // scope here. `oecdMemberOnly` defaults to `true`.
+    //
+    // Distinct from the (now-removed) legacy `taxes_revenues_pct_gdp`
+    // CIA-prose-mapped slot — methodologically distinct (OECD
+    // harmonized SHA-equivalent for taxes).
+    agency: "OECD.CTP.TPS",
+    dataflowId: "DSD_REV_COMP_OECD@DF_RSOECD",
+    dataflowVersion: "2.0",
+    dimensionFilter: ".TAX_REV.S13._T._T.PT_B1GQ.A",
+    factKey: "tax_revenue_pct_gdp",
+    label: "Total tax revenue, general government (% of GDP)",
+    docUrl: "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CGovernment%23GOV%23&pg=0&fc=Topic&bp=true&snb=12&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_REV_COMP_OECD%40DF_RSOECD&df[ag]=OECD.CTP.TPS",
+    civicaRole: "canonical",
+  },
+  {
+    // OECD ELS HD System of Health Accounts (SHA-2011) — current
+    // health expenditure as % of GDP. SHARED CANONICAL with WHO
+    // GHED (`GHED_CHEGDP_SHA2011` from `sync-who-gho.ts`); both
+    // publishers compute SHA-2011 joint methodology and converge
+    // to ~0.1pp.
+    //
+    // Filter dimension positions for DSD_SHA@DF_SHA/1.0:
+    //   0.  REF_AREA (wildcard)
+    //   1.  FREQ (A = annual)
+    //   2.  MEASURE (EXP_HEALTH = health expenditure)
+    //   3.  UNIT_MEASURE (PT_B1GQ = % of GDP)
+    //   4.  FINANCING_SCHEME (_T = all financing schemes)
+    //   5.  FINANCING_SCHEME_REV (wildcard)
+    //   6.  FUNCTION (_T = all health functions)
+    //   7.  MODE_PROVISION (_T = all modes)
+    //   8.  PROVIDER (_T = all providers)
+    //   9.  FACTOR_PROVISION (wildcard)
+    //   10. ASSET_TYPE (wildcard)
+    //   11. PRICE_BASE (wildcard)
+    // See resolution §2a.v + §2c.iii + Appendix A. Probe (2022):
+    // 51 ISO3 native scope (38 OECD members + 13 SHA partners
+    // ARG, BRA, BGR, CHN, COL, HRV, CYP, IDN, IND, MLT, PER, ROU,
+    // ZAF). Min Indonesia 2.7%, max USA 16.5%.
+    //
+    // R.7.5 §5e — `oecdMemberOnly: false` opts out of the
+    // OECD-member filter; SHA partners are in scope and the
+    // shared-canonical pattern with WHO GHED handles 38 OECD
+    // members + WHO covers ~190 ISO3 globally.
+    agency: "OECD.ELS.HD",
+    dataflowId: "DSD_SHA@DF_SHA",
+    dataflowVersion: "1.0",
+    dimensionFilter: ".A.EXP_HEALTH.PT_B1GQ._T.._T._T._T...",
+    factKey: "health_expenditure_pct_gdp",
+    label: "Current health expenditure (% of GDP), SHA-2011",
+    docUrl: "https://data-explorer.oecd.org/vis?fs[0]=Topic%2C0%7CHealth%23HEA%23&pg=0&fc=Topic&bp=true&snb=27&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_SHA%40DF_SHA&df[ag]=OECD.ELS.HD",
+    civicaRole: "canonical",
+    oecdMemberOnly: false,
   },
 ];
 
@@ -459,13 +581,22 @@ async function fetchIndicator(
     const year = parseInt(yearStr, 10);
     if (!Number.isFinite(year)) continue;
 
-    // Apply OECD-member-only scope filter. Per resolution §2c:
+    // Apply OECD-member-only scope filter. Per R.7 resolution §2c:
     // for non-members, OECD is not canonical and rows are not
     // written. The OECD endpoint returns ~9 partner/aggregate codes
     // (Brazil, Bulgaria, Croatia, Romania, South Africa, China,
     // OECD aggregate, EUOECD aggregate, OECD_REP); these get
     // counted but not retained.
-    if (!OECD_MEMBER_SET.has(iso3)) {
+    //
+    // R.7.5 §5d/§5e — for fact-keys where OECD is the ONLY Tier-1
+    // publisher (`gerd_pct_gdp`, `health_expenditure_pct_gdp`),
+    // partner-country coverage IS in scope and the indicator config
+    // sets `oecdMemberOnly: false` to opt out of this filter. The
+    // default (true) preserves R.7's OECD-member-only behavior for
+    // `fiscal_balance_pct_gdp`, `public_debt_pct_gdp`, and
+    // `tax_revenue_pct_gdp`.
+    const memberOnly = config.oecdMemberOnly !== false;
+    if (memberOnly && !OECD_MEMBER_SET.has(iso3)) {
       nonMemberCount++;
       continue;
     }

@@ -2,18 +2,23 @@
  * Phase R.4 — WHO Global Health Observatory sync orchestrator.
  *
  * Direct sync from WHO's Global Health Observatory OData API
- * (`https://ghoapi.azureedge.net/api/`). R.4 ships 2 indicators
- * mapped to existing Civica fact-keys:
+ * (`https://ghoapi.azureedge.net/api/`). After R.7.5 ships 7
+ * indicators total (R.4's 2 + R.7.5's 5):
  *   - `WHOSIS_000001` → `life_expectancy_years` (canonical)
  *   - `MDG_0000000001` → `infant_mortality_per_1000` (canonical)
+ *   - `WHOSIS_000002` → `healthy_life_expectancy_years` (canonical; R.7.5 NEW)
+ *   - `MDG_0000000026` → `maternal_mortality_per_100000` (canonical; R.7.5 NEW)
+ *   - `MDG_0000000007` → `under_five_mortality_per_1000` (canonical; R.7.5 NEW)
+ *   - `NCDMORT3070` → `ncd_premature_mortality_pct` (canonical; R.7.5 NEW)
+ *   - `GHED_CHEGDP_SHA2011` → `health_expenditure_pct_gdp` (shared canonical with OECD SHA; R.7.5 NEW)
  *
- * Both are tagged `civicaRole: 'canonical'`. The 5 additional WHO
- * indicators investigated during R.4 (HALE, maternal mortality,
- * under-5 mortality, NCD premature mortality, current health
- * expenditure as % GDP) require new Civica fact-keys with
- * envelopes and material-error guards; they are deferred to a
- * future fact-key-registry expansion phase per
- * `~/civica/plan/who-gho-resolution-v1.md` §2c.
+ * All ship as `civicaRole: 'canonical'`. The 5 R.7.5 additions cover
+ * the deferrals from R.4's original scope per
+ * `~/civica/plan/fact-key-registry-expansion-resolution-v1.md` §2a.
+ * Note: `health_expenditure_pct_gdp` is **shared canonical** with
+ * OECD SHA — both publishers compute SHA-2011 joint methodology and
+ * write rows tagged `canonical`; the resolver picks fresher within
+ * envelope.
  *
  * For each indicator we ask the WHO GHO OData API for the full
  * country-tagged time series (`/{IndicatorCode}` filtered by
@@ -156,6 +161,83 @@ export const WHO_GHO_INDICATORS: readonly WhoGhoIndicatorConfig[] = [
       "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/infant-mortality-rate-(probability-of-dying-between-birth-and-age-1-per-1000-live-births)",
     dim1Filter: "SEX_BTSX",
     dim2Filter: "AGEGROUP_MONTHS0-11",
+    civicaRole: "canonical",
+  },
+
+  // ─── R.7.5 ship list (5 new health fact-keys; resolution §2a). ───
+  // All canonical for WHO. `health_expenditure_pct_gdp` is shared
+  // canonical with OECD SHA per resolution L3 — both WHO GHED and
+  // OECD SHA write rows tagged `canonical`. The resolver picks fresher
+  // within envelope; both publishers compute SHA-2011 joint methodology
+  // and converge to ~0.1pp.
+  {
+    // Healthy life expectancy at birth (HALE), both sexes. Multi-year
+    // refresh; latest 2021. Probe (2021): min Lesotho 44.6, max
+    // Singapore 73.6. ~191 ISO3 coverage.
+    whoCode: "WHOSIS_000002",
+    factKey: "healthy_life_expectancy_years",
+    label: "Healthy life expectancy at birth, both sexes (years)",
+    docUrl:
+      "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/gho-ghe-hale-healthy-life-expectancy-at-birth",
+    dim1Filter: "SEX_BTSX",
+    civicaRole: "canonical",
+  },
+  {
+    // Maternal mortality ratio per 100,000 live births. Annual to
+    // multi-year refresh; latest 2023. Probe (2023): min Cook Islands
+    // 0.1, max Nigeria 992.8. ~190 ISO3 coverage.
+    whoCode: "MDG_0000000026",
+    factKey: "maternal_mortality_per_100000",
+    label: "Maternal mortality ratio (per 100,000 live births)",
+    docUrl:
+      "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/maternal-mortality-ratio-(per-100-000-live-births)",
+    civicaRole: "canonical",
+  },
+  {
+    // Under-five mortality rate (per 1,000 live births). The
+    // `WEALTHQUINTILE_TOTL` Dim3 filter takes the wealth-quintile
+    // total (i.e. the country aggregate, not a quintile breakdown).
+    // Annual refresh; latest 2023. Probe (2023): min San Marino 1.3,
+    // max Niger 118.5. ~190 ISO3 coverage.
+    whoCode: "MDG_0000000007",
+    factKey: "under_five_mortality_per_1000",
+    label: "Under-five mortality rate (per 1,000 live births)",
+    docUrl:
+      "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/under-five-mortality-rate-(probability-of-dying-by-age-5-per-1000-live-births)",
+    dim3Filter: "WEALTHQUINTILE_TOTL",
+    civicaRole: "canonical",
+  },
+  {
+    // Probability of dying between ages 30-70 from CVD/cancer/
+    // diabetes/CRD (NCD premature mortality). Both sexes. Multi-year
+    // refresh; latest 2021. Probe (2021, BTSX): min South Korea 6.9,
+    // max Kiribati 44.1. Value scaled 0-100 (probability percentage).
+    // ~180 ISO3 coverage.
+    whoCode: "NCDMORT3070",
+    factKey: "ncd_premature_mortality_pct",
+    label:
+      "Probability of dying between exact ages 30 and 70 from CVD/cancer/diabetes/CRD",
+    docUrl:
+      "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/probability-(-)-of-dying-between-age-30-and-exact-age-70-from-any-of-cardiovascular-disease-cancer-diabetes-or-chronic-respiratory-disease",
+    dim1Filter: "SEX_BTSX",
+    civicaRole: "canonical",
+  },
+  {
+    // Current health expenditure as % of GDP. WHO Global Health
+    // Expenditure Database (GHED) under the SHA-2011 methodology.
+    // Annual refresh; latest 2022. Probe (2022): min Brunei 1.8%,
+    // max Afghanistan 23.1%, USA 16.5%. ~190 ISO3 coverage.
+    //
+    // R.7.5 L3 — SHARED CANONICAL with OECD SHA. Both publishers
+    // compute the same SHA-2011 methodology; values converge to
+    // ~0.1pp. The resolver picks fresher within envelope; methodology
+    // page renders both as editorial canonical for their respective
+    // scopes (WHO ~190, OECD 51).
+    whoCode: "GHED_CHEGDP_SHA2011",
+    factKey: "health_expenditure_pct_gdp",
+    label: "Current health expenditure (% of GDP)",
+    docUrl:
+      "https://www.who.int/data/gho/data/indicators/indicator-details/GHO/current-health-expenditure-(che)-as-percentage-of-gross-domestic-product-(gdp)-(-)",
     civicaRole: "canonical",
   },
 ];

@@ -7,19 +7,26 @@
  * `sync-who-gho.ts` (closest precedent — also a tight scope into one
  * already-declared fact-key tagged `civicaRole: 'canonical'`).
  *
- * R.5 ships 1 indicator mapped to an existing Civica fact-key:
+ * After R.7.5 ships 8 indicators (R.5's 1 + R.7.5's 5 new education
+ * fact-keys + 2 canonical-flips):
  *   - `LR.AG15T99` → `literacy_rate` (canonical)
+ *   - `XGDP.FSGOV` → `government_education_expenditure_pct_gdp` (canonical; R.7.5 NEW)
+ *   - `MYS.1T8.AG25T99` → `mean_years_schooling` (canonical; R.7.5 CANONICAL-FLIP from UNDP)
+ *   - `SLE.1T8` → `expected_years_schooling` (canonical; R.7.5 CANONICAL-FLIP from UNDP)
+ *   - `GER.1` → `gross_enrollment_ratio_primary_pct` (canonical; R.7.5 NEW)
+ *   - `GER.2T3` → `gross_enrollment_ratio_secondary_pct` (canonical; R.7.5 NEW)
+ *   - `CR.1` → `completion_rate_primary_pct` (canonical; R.7.5 NEW)
+ *   - `LR.AG15T99.GPIA` → `gender_parity_index_literacy` (canonical; R.7.5 NEW)
  *
- * Tagged `civicaRole: 'canonical'` per R.1's explicit handoff (R.1
- * tagged WB's `SE.ADT.LITR.ZS` as `'alternate'` so R.5 inherits
- * canonical without re-deciding). The 6 additional UIS indicators
- * investigated during R.5 (XGDP.FSGOV gov ed expenditure, MYS.1T8.AG25T99
- * mean years of schooling, GER.1 / GER.2T3 / GER.5T8 gross enrolment
- * ratios primary/secondary/tertiary, ROFST.1.CP out-of-school primary,
- * CR.1 completion primary, LR.AG15T99.GPIA gender parity literacy) each
- * require new Civica fact-keys with envelopes and material-error
- * guards; they are deferred to a future fact-key-registry expansion
- * phase per `~/civica/plan/unesco-uis-resolution-v1.md` §2c.
+ * All ship as `civicaRole: 'canonical'`. The 7 R.7.5 additions cover
+ * the deferrals from R.5's original scope (5 new fact-keys) plus the
+ * canonical-flip handoff from R.6 UNDP for the 2 schooling-years
+ * fact-keys. UNDP HDR republishes UNESCO's values for HDI calculation;
+ * UNESCO is the upstream-of-record. Per
+ * `~/civica/plan/fact-key-registry-expansion-resolution-v1.md` §2b
+ * + §3, UNESCO is now editorial canonical for these indicators and
+ * UNDP rows flip to alternate via `sync-undp-hdi.ts` config update.
+ * `out_of_school_rate_primary` deferred to v1.1 per resolution Q4.
  *
  * Endpoint shape:
  *   - `GET /api/public/versions/default` returns the current default
@@ -162,6 +169,93 @@ export const UNESCO_UIS_INDICATORS: readonly UnescoUisIndicatorConfig[] = [
     factKey: "literacy_rate",
     label: "Adult literacy rate, population 15+ years, both sexes (%)",
     docUrl: "https://databrowser.uis.unesco.org/indicator/LR.AG15T99",
+    civicaRole: "canonical",
+  },
+
+  // ─── R.7.5 ship list (5 new education fact-keys + 2 canonical-flips
+  //     for the schooling-years fact-keys originally registered by R.6
+  //     UNDP). See `~/civica/plan/fact-key-registry-expansion-resolution-v1.md`
+  //     §2b + §3. UNESCO is the upstream-of-record for these indicators;
+  //     UNDP HDR republishes UNESCO's values for HDI calculation.
+  //     `out_of_school_rate_primary` deferred to v1.1 per §7 Q4. ───
+  {
+    // Government expenditure on education as % of GDP. Probe
+    // (2020-2025): per-country range ~0.5-16.4% (Cuba historic
+    // high). 205 ISO3 coverage. UNESCO is the upstream-of-record;
+    // World Bank republishes UIS as `SE.XPD.TOTL.GD.ZS` (alternate).
+    uisCode: "XGDP.FSGOV",
+    factKey: "government_education_expenditure_pct_gdp",
+    label: "Government expenditure on education as % of GDP",
+    docUrl: "https://databrowser.uis.unesco.org/indicator/XGDP.FSGOV",
+    civicaRole: "canonical",
+  },
+  {
+    // Mean years of schooling (ISCED 1+, population 25+).
+    // CANONICAL-FLIP: UNDP HDR R.6 originally tagged this canonical;
+    // R.7.5 §3 flips UNESCO to canonical (upstream-of-record) and
+    // UNDP to alternate. The flip is enacted by the next idempotent
+    // sync re-run on `sync-undp-hdi.ts` (UNDP rows write
+    // `civicaRole: 'alternate'`).
+    //
+    // Probe (2018-2024): min Mali 1.6, max Germany 14.3. 199 ISO3
+    // coverage.
+    uisCode: "MYS.1T8.AG25T99",
+    factKey: "mean_years_schooling",
+    label: "Mean years of schooling (ISCED 1+), population 25+",
+    docUrl: "https://databrowser.uis.unesco.org/indicator/MYS.1T8.AG25T99",
+    civicaRole: "canonical",
+  },
+  {
+    // Expected years of schooling (school life expectancy, ISCED
+    // 1-8). CANONICAL-FLIP: UNDP HDR R.6 originally tagged this
+    // canonical; R.7.5 §3 flips UNESCO to canonical (upstream-of-
+    // record) and UNDP to alternate. Probe (2024+): min Burkina
+    // Faso 7.5, max Monaco 21.0. 144+ ISO3 coverage.
+    uisCode: "SLE.1T8",
+    factKey: "expected_years_schooling",
+    label: "School life expectancy from primary to tertiary (ISCED 1-8), both sexes",
+    docUrl: "https://databrowser.uis.unesco.org/indicator/SLE.1T8",
+    civicaRole: "canonical",
+  },
+  {
+    // Gross enrollment ratio, primary, both sexes. Probe (2020+):
+    // min Somalia 20.9, max Sierra Leone 162. 220 ISO3 coverage.
+    // GER routinely exceeds 100% because over-age and under-age
+    // children get enrolled in primary — fact-key envelope max 200
+    // (NOT isPercent: true; would clamp to 101).
+    uisCode: "GER.1",
+    factKey: "gross_enrollment_ratio_primary_pct",
+    label: "Gross enrollment ratio, primary, both sexes",
+    docUrl: "https://databrowser.uis.unesco.org/indicator/GER.1",
+    civicaRole: "canonical",
+  },
+  {
+    // Gross enrollment ratio, secondary, both sexes (combined lower
+    // + upper secondary). Probe (2020+): min Somalia 3.3, max
+    // Monaco 158.5. 220 ISO3 coverage.
+    uisCode: "GER.2T3",
+    factKey: "gross_enrollment_ratio_secondary_pct",
+    label: "Gross enrollment ratio, secondary, both sexes",
+    docUrl: "https://databrowser.uis.unesco.org/indicator/GER.2T3",
+    civicaRole: "canonical",
+  },
+  {
+    // Completion rate, primary education, both sexes. Probe (2020+):
+    // min Niger 35.8, max Norway/Qatar 100. 159 ISO3 coverage.
+    uisCode: "CR.1",
+    factKey: "completion_rate_primary_pct",
+    label: "Primary education completion rate, both sexes",
+    docUrl: "https://databrowser.uis.unesco.org/indicator/CR.1",
+    civicaRole: "canonical",
+  },
+  {
+    // Gender parity index, adult literacy. Probe (2018+): min Chad
+    // 0.42, max Lesotho 1.14. 166 ISO3 coverage. GPI = (female
+    // literacy rate) / (male literacy rate); 1.0 = parity.
+    uisCode: "LR.AG15T99.GPIA",
+    factKey: "gender_parity_index_literacy",
+    label: "Gender parity index, adult literacy",
+    docUrl: "https://databrowser.uis.unesco.org/indicator/LR.AG15T99.GPIA",
     civicaRole: "canonical",
   },
 ];

@@ -108,6 +108,12 @@ test("Legacy CIA fact_keys are all classified", () => {
   // The 37 keys currently present in country_facts (queried 2026-05-02)
   // must each have a registry entry so the resolver can pick them up
   // without a backfill pass.
+  //
+  // Phase R.7.5 (2026-05-04) note: the legacy `taxes_revenues_pct_gdp`
+  // declaration was removed because no sync ever wrote rows to it
+  // (verified 0 rows in `country_facts`). It is intentionally NOT in
+  // this list. The new OECD-canonical `tax_revenue_pct_gdp` replaces
+  // it. See `~/civica/plan/fact-key-registry-expansion-resolution-v1.md`.
   const legacyKeys = [
     "agriculture_products",
     "birth_rate",
@@ -152,6 +158,83 @@ test("Legacy CIA fact_keys are all classified", () => {
       getFactKey(key),
       `legacy CIA fact_key '${key}' missing from registry`,
     );
+  }
+});
+
+test("R.7.5 — vestigial taxes_revenues_pct_gdp is removed", () => {
+  // Per `~/civica/plan/fact-key-registry-expansion-resolution-v1.md`
+  // §7 Q1 sign-off (Option B: remove). The OECD-harmonized
+  // `tax_revenue_pct_gdp` replaces it.
+  assert.equal(
+    getFactKey("taxes_revenues_pct_gdp"),
+    undefined,
+    "taxes_revenues_pct_gdp should be removed; tax_revenue_pct_gdp replaces it",
+  );
+});
+
+test("R.7.5 — 12 new fact-keys are declared with valid envelopes", () => {
+  // Per `~/civica/plan/fact-key-registry-expansion-resolution-v1.md`
+  // §2 + Appendix A. Each fact-key must (a) be present, (b) be Group B,
+  // (c) have an envelope, (d) have a material-error threshold.
+  const newKeys = [
+    "healthy_life_expectancy_years",
+    "maternal_mortality_per_100000",
+    "under_five_mortality_per_1000",
+    "ncd_premature_mortality_pct",
+    "health_expenditure_pct_gdp",
+    "government_education_expenditure_pct_gdp",
+    "gross_enrollment_ratio_primary_pct",
+    "gross_enrollment_ratio_secondary_pct",
+    "completion_rate_primary_pct",
+    "gender_parity_index_literacy",
+    "gerd_pct_gdp",
+    "tax_revenue_pct_gdp",
+  ];
+  for (const key of newKeys) {
+    const def = getFactKey(key);
+    assert.ok(def, `R.7.5 fact-key '${key}' missing from registry`);
+    assert.equal(def!.group, "B", `R.7.5 fact-key '${key}' should be Group B`);
+    assert.ok(def!.envelope, `R.7.5 fact-key '${key}' missing envelope`);
+    const hasGuard =
+      def!.materialErrorPctThreshold !== undefined ||
+      def!.materialErrorPpThreshold !== undefined;
+    assert.ok(hasGuard, `R.7.5 fact-key '${key}' missing material-error threshold`);
+  }
+});
+
+test("R.7.5 — health_expenditure_pct_gdp envelope matches probe range", () => {
+  // Probe (2022): WHO range 1.8-23.1%, OECD range 2.7-16.5%.
+  // Envelope [0, 30] is the proposed methodology decision.
+  const def = getFactKey("health_expenditure_pct_gdp");
+  assert.ok(def);
+  assert.equal(def!.envelope!.min, 0);
+  assert.equal(def!.envelope!.max, 30);
+  assert.equal(def!.envelope!.isPercent, false);
+  assert.equal(def!.higherIsBetter, undefined,
+    "health_expenditure_pct_gdp higherIsBetter should be undefined per §7 Q6");
+  assert.equal(def!.materialErrorPpThreshold, 2);
+});
+
+test("R.7.5 — gender_parity_index_literacy higherIsBetter is undefined", () => {
+  // Per §7 Q5 sign-off — closer to 1 is better, both directions
+  // (>1 and <1) indicate disparity. Not representable as
+  // higherIsBetter.
+  const def = getFactKey("gender_parity_index_literacy");
+  assert.ok(def);
+  assert.equal(def!.higherIsBetter, undefined);
+});
+
+test("R.7.5 — GER fact-keys allow values >100 (over-age enrollment)", () => {
+  // Gross enrollment ratios routinely exceed 100% because over-age
+  // and under-age children get enrolled in primary. Envelope max
+  // 200 (NOT 100, NOT isPercent: true).
+  const primary = getFactKey("gross_enrollment_ratio_primary_pct");
+  const secondary = getFactKey("gross_enrollment_ratio_secondary_pct");
+  for (const def of [primary, secondary]) {
+    assert.ok(def);
+    assert.equal(def!.envelope!.max, 200);
+    assert.equal(def!.envelope!.isPercent, false,
+      "GER envelope must NOT be isPercent: true (would clamp to 101)");
   }
 });
 

@@ -13,8 +13,8 @@
  *   - `hdi_rank_2023` → `hdi_rank`                (canonical, NEW)
  *   - `gnipc`         → `gni_per_capita_ppp_usd`  (alternate, NEW)
  *   - `le`            → `life_expectancy_years`   (alternate; WHO canonical via R.4)
- *   - `eys`           → `expected_years_schooling` (canonical-for-now, NEW; flips to UNESCO at R.7.5)
- *   - `mys`           → `mean_years_schooling`     (canonical-for-now, NEW; flips to UNESCO at R.7.5)
+ *   - `eys`           → `expected_years_schooling` (alternate; UNESCO canonical via R.7.5 §3 canonical-flip)
+ *   - `mys`           → `mean_years_schooling`     (alternate; UNESCO canonical via R.7.5 §3 canonical-flip)
  *
  * Key architectural differences from `sync-wdi.ts` / `sync-who-gho.ts`:
  *   - UNDP ships a **single 1.9 MB wide-format CSV** rather than a
@@ -45,10 +45,15 @@
  * UNDP is **canonical-by-construction** for the HDI composite + rank
  * (no other publisher computes them). UNDP is alternate for life
  * expectancy (WHO canonical via R.4) and for GNI per capita
- * (distinct fact-key from `gdp_per_capita_usd`). UNDP is canonical-
- * for-now for `expected_years_schooling` and `mean_years_schooling`,
- * with a documented flip-to-alternate plan when the R.7.5 fact-key
- * registry expansion phase wires UNESCO direct-sync for these keys.
+ * (distinct fact-key from `gdp_per_capita_usd`). UNDP was canonical
+ * for `expected_years_schooling` and `mean_years_schooling` in R.6;
+ * R.7.5 §3 ENACTED THE CANONICAL-FLIP — UNESCO UIS (`SLE.1T8`,
+ * `MYS.1T8.AG25T99`) is the upstream-of-record and now ships as
+ * canonical via `sync-unesco-uis.ts`; UNDP HDR republishes UNESCO,
+ * so UNDP rows now ship as alternate. Existing UNDP rows in
+ * `country_facts` flip on the next idempotent re-sync (eventual
+ * consistency). See
+ * `~/civica/plan/fact-key-registry-expansion-resolution-v1.md` §3.
  *
  * License: UNDP HDR data is published under CC-BY-3.0-IGO (commercial
  * use OK with attribution; no NC clause; no SA clause). Each row's
@@ -214,28 +219,34 @@ export const UNDP_HDI_INDICATORS: readonly UndpHdiIndicatorConfig[] = [
     civicaRole: "alternate",
   },
 
-  // Expected years of schooling. UNDP canonical-for-now; the
-  // R.7.5 fact-key registry expansion phase will wire UNESCO
-  // direct-sync, at which point UNDP flips to alternate via a
-  // methodology v1.1 update (no code churn beyond the civicaRole
-  // flag). Spot-checks (2023): USA 15.92, Norway 18.79, Niger 8.31.
+  // Expected years of schooling. R.7.5 §3 — CANONICAL-FLIP enacted:
+  // UNESCO UIS (`SLE.1T8`) is the upstream-of-record and now ships as
+  // canonical via `sync-unesco-uis.ts`; UNDP HDR republishes UNESCO
+  // for the HDI composite calculation, so UNDP rows flip to alternate.
+  // The 189 existing UNDP rows tagged `civicaRole: 'canonical'`
+  // (from R.6) get re-written with `civicaRole: 'alternate'` on the
+  // next idempotent re-sync (eventual-consistency pattern per §7 Q2
+  // sign-off Option A). Spot-checks (2023): USA 15.92, Norway 18.79,
+  // Niger 8.31.
   {
     undpCode: "eys",
     factKey: "expected_years_schooling",
     label: "Expected years of schooling",
     docUrl: "https://hdr.undp.org/data-center/composite-indices",
-    civicaRole: "canonical",
+    civicaRole: "alternate",
   },
 
-  // Mean years of schooling (adults 25+). Same R.7.5 flip plan as
-  // expected_years_schooling. Spot-checks (2023): USA 13.91,
-  // Norway 13.12, Niger 1.41.
+  // Mean years of schooling (adults 25+). Same R.7.5 §3 canonical-flip
+  // pattern as expected_years_schooling — UNESCO UIS
+  // (`MYS.1T8.AG25T99`) is canonical, UNDP HDR (republisher) is
+  // alternate. The 187 existing UNDP rows flip on next re-sync.
+  // Spot-checks (2023): USA 13.91, Norway 13.12, Niger 1.41.
   {
     undpCode: "mys",
     factKey: "mean_years_schooling",
     label: "Mean years of schooling (adults 25+)",
     docUrl: "https://hdr.undp.org/data-center/composite-indices",
-    civicaRole: "canonical",
+    civicaRole: "alternate",
   },
 ];
 

@@ -563,15 +563,17 @@ const GROUP_B: FactKeyInput[] = [
     higherIsBetter: true,
     materialErrorPctThreshold: 0.8,
   },
-  {
-    key: "taxes_revenues_pct_gdp",
-    group: "B",
-    category: "economy",
-    label: "Tax revenue",
-    unit: "% of GDP",
-    envelope: { min: 0, max: 100, isPercent: false },
-    materialErrorPpThreshold: 50,
-  },
+  // Phase R.7.5 — `taxes_revenues_pct_gdp` removed.
+  //
+  // The legacy `taxes_revenues_pct_gdp` declaration was a CIA-prose-mapped
+  // slot intended for CIA Factbook's "Taxes and other revenues" indicator,
+  // but no sync ever wrote rows to it (verified 2026-05-04: 0 rows in
+  // `country_facts`). Phase R.7.5 introduces `tax_revenue_pct_gdp` as the
+  // OECD-canonical replacement (Group B, economy, Revenue Statistics
+  // SECTOR=S13/STANDARD_REVENUE=_T/UNIT_MEASURE=PT_B1GQ harmonized
+  // methodology) — see the GROUP_B additions block below and
+  // `~/civica/plan/fact-key-registry-expansion-resolution-v1.md` §2c.ii / §7
+  // Q1 (sign-off Option B: remove).
   {
     key: "budget_revenue",
     group: "B",
@@ -748,11 +750,245 @@ const GROUP_B: FactKeyInput[] = [
     label: "Mean years of schooling (adults 25+)",
     unit: "years",
     // 2023 vintage range: 1.41 (Niger) to 13.9+ (USA / Czechia).
-    // Envelope [0, 20] is conservative. Same canonical-flip plan
-    // as expected_years_schooling.
+    // Envelope [0, 20] is conservative.
+    //
+    // R.7.5 — canonical-flip enacted: UNESCO UIS (`MYS.1T8.AG25T99`,
+    // 199 ISO3 coverage) is now the editorial canonical via
+    // `sync-unesco-uis.ts` config; UNDP HDR (which republishes
+    // UNESCO) flips to alternate via `sync-undp-hdi.ts` config. The
+    // 187 existing UNDP rows flip on next idempotent re-sync. See
+    // `~/civica/plan/fact-key-registry-expansion-resolution-v1.md` §3.
     envelope: { min: 0, max: 20 },
     higherIsBetter: true,
     materialErrorPctThreshold: 0.5,
+  },
+
+  // ─── Phase R.7.5 — fact-key registry expansion (12 new fact-keys).
+  //     Consolidates the deferrals from R.4 WHO (5 health), R.5 UNESCO
+  //     (5 education), and R.7 OECD (2 economy) into one batch.
+  //     Each entry's envelope, isPercent flag, materialError threshold,
+  //     and `higherIsBetter` direction are derived from live upstream
+  //     probes (2026-05-04). See
+  //     `~/civica/plan/fact-key-registry-expansion-resolution-v1.md`
+  //     §2 + Appendix A for the per-fact-key methodology table. ───
+
+  // Health — 5 fact-keys (WHO GHO canonical, sourced via
+  // `sync-who-gho.ts`; `health_expenditure_pct_gdp` is shared canonical
+  // with OECD SHA per resolution L3).
+  {
+    // WHO GHO `WHOSIS_000002` (HALE at birth, both sexes). Probe (2021):
+    // min Lesotho 44.6, max Singapore 73.6. Conservative envelope
+    // [20, 90] — 20 floor for extreme-conflict scenarios (Sierra
+    // Leone bottomed near 36 in 2000); 90 ceiling for medical-progress
+    // headroom for Singapore-class outliers.
+    key: "healthy_life_expectancy_years",
+    group: "B",
+    category: "demographics",
+    label: "Healthy life expectancy at birth",
+    unit: "years",
+    envelope: { min: 20, max: 90 },
+    higherIsBetter: true,
+    materialErrorPctThreshold: 0.5,
+  },
+  {
+    // WHO GHO `MDG_0000000026` (maternal mortality ratio). Probe
+    // (2023): min Cook Islands 0.1, max Nigeria 992.8. Sierra Leone
+    // historically peaked near 1,200. Envelope max 2,000 absorbs any
+    // conflict-zone outlier.
+    key: "maternal_mortality_per_100000",
+    group: "B",
+    category: "demographics",
+    label: "Maternal mortality ratio",
+    unit: "per 100,000 live births",
+    envelope: { min: 0, max: 2_000 },
+    higherIsBetter: false,
+    materialErrorPctThreshold: 0.5,
+  },
+  {
+    // WHO GHO `MDG_0000000007` (under-5 mortality, with
+    // `Dim3 eq 'WEALTHQUINTILE_TOTL'` filter). Probe (2023): min
+    // San Marino 1.3, max Niger 118.5. Sierra Leone historically
+    // peaked at ~225 in 2000 wartime; envelope max 250 provides
+    // margin. Spelled-out `under_five_` matches existing
+    // `infant_mortality_per_1000` convention.
+    key: "under_five_mortality_per_1000",
+    group: "B",
+    category: "demographics",
+    label: "Under-five mortality rate",
+    unit: "per 1,000 live births",
+    envelope: { min: 0, max: 250 },
+    higherIsBetter: false,
+    materialErrorPctThreshold: 0.5,
+  },
+  {
+    // WHO GHO `NCDMORT3070` (probability of dying between 30-70 from
+    // CVD/cancer/diabetes/CRD, both sexes). Probe (2021, BTSX): min
+    // South Korea 6.9, max Kiribati 44.1. The underlying value is a
+    // probability scaled to 0-100 — `isPercent: true` triggers
+    // resolver percentage-clamp logic.
+    key: "ncd_premature_mortality_pct",
+    group: "B",
+    category: "demographics",
+    label: "NCD premature mortality (probability of dying between 30-70)",
+    unit: "%",
+    envelope: { min: 0, max: 100, isPercent: true },
+    higherIsBetter: false,
+    materialErrorPpThreshold: 50,
+  },
+  {
+    // SHARED CANONICAL: WHO GHED `GHED_CHEGDP_SHA2011` (~190 ISO3
+    // coverage) AND OECD SHA `DSD_SHA@DF_SHA/1.0` (51 ISO3 = 38
+    // OECD members + 13 SHA partners). Both publishers compute
+    // SHA-2011 joint methodology — values converge to ~0.1pp.
+    // Resolver picks fresher within envelope; methodology page
+    // renders both as editorial canonical for their respective
+    // scopes. Probe (2022): WHO range 1.8-23.1%; OECD range
+    // 2.7-16.5%. NOT `isPercent: true` because % of GDP follows
+    // the public_debt_pct_gdp / military_expenditure_pct_gdp
+    // convention. higherIsBetter undefined (USA at 16% is not
+    // obviously "better" than Singapore at 4%).
+    //
+    // Tight materialErrorPpThreshold (2pp) catches material upstream
+    // errors without flagging legitimate methodology-convergence
+    // noise between WHO and OECD; year-over-year shifts are
+    // typically <1pp.
+    key: "health_expenditure_pct_gdp",
+    group: "B",
+    category: "economy",
+    label: "Current health expenditure",
+    unit: "% of GDP",
+    envelope: { min: 0, max: 30, isPercent: false },
+    materialErrorPpThreshold: 2,
+  },
+
+  // Education — 5 fact-keys (UNESCO UIS canonical, sourced via
+  // `sync-unesco-uis.ts`). `out_of_school_rate_primary` deferred to
+  // v1.1 per resolution Q4.
+  {
+    // UNESCO UIS `XGDP.FSGOV` (government expenditure on education
+    // as % GDP). Probe (2020-2025): per-country range ~0.5-16.4%
+    // (Cuba historic high). NOT a percent (% of GDP follows the
+    // public_debt_pct_gdp convention). higherIsBetter true per
+    // R.5 §2c — Q4 in resolution doc captures the caveat that
+    // higher spending isn't unambiguously "better" but the
+    // standard interpretation is positive.
+    key: "government_education_expenditure_pct_gdp",
+    group: "B",
+    category: "economy",
+    label: "Government education expenditure",
+    unit: "% of GDP",
+    envelope: { min: 0, max: 25, isPercent: false },
+    higherIsBetter: true,
+    materialErrorPpThreshold: 2,
+  },
+  {
+    // UNESCO UIS `GER.1` (gross enrollment ratio, primary, both
+    // sexes). Probe (2020+): min Somalia 20.9, max Sierra Leone 162.
+    // GER routinely exceeds 100% because over-age and under-age
+    // children get enrolled in primary — envelope max 200 provides
+    // margin. NOT `isPercent: true` because the percentage-clamp
+    // logic ([-1, 101]) would silently drop legitimate values >100.
+    key: "gross_enrollment_ratio_primary_pct",
+    group: "B",
+    category: "society",
+    label: "Gross enrollment ratio, primary",
+    unit: "%",
+    envelope: { min: 0, max: 200, isPercent: false },
+    higherIsBetter: true,
+    materialErrorPpThreshold: 50,
+  },
+  {
+    // UNESCO UIS `GER.2T3` (gross enrollment ratio, secondary,
+    // both sexes; combined lower + upper secondary). Probe (2020+):
+    // min Somalia 3.3, max Monaco 158.5. Same envelope/convention
+    // as primary GER.
+    key: "gross_enrollment_ratio_secondary_pct",
+    group: "B",
+    category: "society",
+    label: "Gross enrollment ratio, secondary",
+    unit: "%",
+    envelope: { min: 0, max: 200, isPercent: false },
+    higherIsBetter: true,
+    materialErrorPpThreshold: 50,
+  },
+  {
+    // UNESCO UIS `CR.1` (primary education completion rate, both
+    // sexes). Probe (2020+): min Niger 35.8, max Norway/Qatar 100.
+    // Envelope [0, 100] matches the bounded probability domain;
+    // `isPercent: true` triggers percentage-clamp.
+    key: "completion_rate_primary_pct",
+    group: "B",
+    category: "society",
+    label: "Primary education completion rate",
+    unit: "%",
+    envelope: { min: 0, max: 100, isPercent: true },
+    higherIsBetter: true,
+    materialErrorPpThreshold: 50,
+  },
+  {
+    // UNESCO UIS `LR.AG15T99.GPIA` (gender parity index, adult
+    // literacy). Probe (2018+): min Chad 0.42, max Lesotho 1.14.
+    // GPI = (female literacy rate) / (male literacy rate); 1.0 =
+    // parity. higherIsBetter undefined — closer to 1 is better,
+    // but that semantic isn't representable as a single direction.
+    // No `unit` string (matches existing convention for ratios
+    // like `population_total`).
+    key: "gender_parity_index_literacy",
+    group: "B",
+    category: "society",
+    label: "Gender parity index, adult literacy",
+    envelope: { min: 0, max: 2, isPercent: false },
+    materialErrorPctThreshold: 0.5,
+  },
+
+  // Economy — 2 fact-keys (OECD canonical, sourced via
+  // `sync-oecd-stat.ts`). Note that `health_expenditure_pct_gdp`
+  // (above, Health block) is also shared canonical with OECD SHA.
+  {
+    // OECD MSTI `OECD.STI.STP,DSD_MSTI@DF_MSTI,1.3` with
+    // `MEASURE=G & UNIT_MEASURE=PT_B1GQ`. Probe (2022-2024): min
+    // Canada/Greece etc. ~1.8%, max Israel 6.7%, South Korea 5.1%.
+    // Envelope max 10 provides ample headroom. higherIsBetter
+    // true (proxy for innovation capacity).
+    //
+    // R.7.5 §5d: OECD MSTI scope extends beyond 38 OECD members
+    // (probe showed 46 ISO3 incl ARG, BGR, CHN, HRV, ROU, SGP, TWN,
+    // ZAF). Because OECD is the ONLY Tier-1 publisher of GERD,
+    // sync-oecd-stat.ts drops the OECD-member-only filter for this
+    // fact-key — all 46 ISO3 in MSTI's native scope are written.
+    key: "gerd_pct_gdp",
+    group: "B",
+    category: "economy",
+    label: "R&D expenditure (GERD)",
+    unit: "% of GDP",
+    envelope: { min: 0, max: 10, isPercent: false },
+    higherIsBetter: true,
+    materialErrorPpThreshold: 1,
+  },
+  {
+    // OECD `OECD.CTP.TPS,DSD_REV_COMP_OECD@DF_RSOECD,2.0` with
+    // `MEASURE=TAX_REV & SECTOR=S13 & STANDARD_REVENUE=_T &
+    //  UNIT_MEASURE=PT_B1GQ & FREQ=A` — total tax revenue as % GDP
+    // (general government, all standard revenue categories,
+    // OECD-harmonized methodology). Probe (2022): min Mexico 16.8,
+    // max France 45.9. Envelope max 60 provides margin (Denmark/
+    // Sweden historically peaked near 50). higherIsBetter undefined
+    // (politically charged).
+    //
+    // Distinct from the (now-removed) legacy `taxes_revenues_pct_gdp`
+    // CIA-prose-mapped slot. OECD-member-only scope retained
+    // (only OECD members report via Revenue Statistics).
+    //
+    // Looser materialErrorPpThreshold (5pp) than other fiscal
+    // fact-keys because tax-as-share-of-GDP can move 2-3pp in a
+    // single fiscal year (e.g. COVID stimulus year-on-year).
+    key: "tax_revenue_pct_gdp",
+    group: "B",
+    category: "economy",
+    label: "Tax revenue",
+    unit: "% of GDP",
+    envelope: { min: 0, max: 60, isPercent: false },
+    materialErrorPpThreshold: 5,
   },
 ];
 
