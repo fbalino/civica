@@ -125,8 +125,36 @@ export function FactbookHeaderStrip({
   const [lbOpen, setLbOpen] = useState(false);
   const [lbMode, setLbMode] = useState<"map" | "photos">("photos");
 
-  const popStr = formatPop(population);
-  const gdpStr = formatGdp(gdp);
+  // Bug 2 fix (2026-05-04): derive displayed values from the resolver's
+  // canonical pick when available. The legacy `population` / `gdp` props
+  // come from `jurisdictions.population` / `jurisdictions.gdp_billions` —
+  // denormalised cache columns that may be up to 24 h stale and do NOT
+  // reflect the multi-source reconciliation result.
+  //
+  // `populationResolver.canonical.factValueNumeric` is the raw head-count
+  // (e.g. 45_700_000 for Argentina).
+  // `gdpResolver.canonical.factValueNumeric` is in USD billions, so multiply
+  // by 1e9 before passing to `formatGdp` (which expects raw USD).
+  //
+  // Falls back to the legacy props when the resolver returns no canonical
+  // row (no `country_facts` data yet for the country).
+  //
+  // Coordination note: Bug 1 (forecast-vs-measurement resolver fix) is a
+  // separate agent. Once Bug 1 lands, the resolver's canonical pick for
+  // Argentina population will flip from the IMF 2030 forecast (50.4 M) to
+  // the UN/WB 2023 measurement (~45.7 M). This component is agnostic to
+  // that — it just consumes whatever the resolver returns.
+  const resolvedPop =
+    populationResolver?.canonical?.factValueNumeric ?? null;
+  const resolvedGdpBillions =
+    gdpResolver?.canonical?.factValueNumeric ?? null;
+
+  const popStr = formatPop(resolvedPop !== null ? resolvedPop : population);
+  const gdpStr = formatGdp(
+    resolvedGdpBillions !== null
+      ? resolvedGdpBillions * 1_000_000_000
+      : gdp
+  );
 
   const cpDisplay =
     cpDelta == null
