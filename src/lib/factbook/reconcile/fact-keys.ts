@@ -357,7 +357,12 @@ const GROUP_B: FactKeyInput[] = [
     category: "economy",
     label: "GDP (nominal)",
     unit: "USD billions",
-    envelope: { min: 0.05, max: 30_000 },
+    // R.2.1 — envelope widened from 30_000 to 60_000 to accommodate IMF
+    // WEO 5-year forecast-horizon values. USA 2031 forecast = $39.0T
+    // (39,031 bn) exceeded the prior max calibrated for current-year
+    // actuals. 60_000 ($60T) provides margin through the ~2031 horizon for
+    // the largest economies. See ~/civica/plan/imf-weo-resolution-v1.md §3b.
+    envelope: { min: 0.05, max: 60_000 },
     higherIsBetter: true,
     materialErrorPctThreshold: 0.8,
   },
@@ -367,7 +372,13 @@ const GROUP_B: FactKeyInput[] = [
     category: "economy",
     label: "GDP (PPP)",
     unit: "USD billions",
-    envelope: { min: 0.05, max: 40_000 },
+    // R.2.1 — envelope widened from 40_000 to 80_000 to accommodate IMF
+    // WEO 5-year forecast-horizon values. China 2031 PPP forecast = $58.1T
+    // (58,100 bn) exceeded the prior max. PPP aggregates grow faster than
+    // nominal given international-dollar rebasing; 80_000 ($80T) provides
+    // margin for the largest PPP economy through the ~2031 horizon.
+    // See ~/civica/plan/imf-weo-resolution-v1.md §3b.
+    envelope: { min: 0.05, max: 80_000 },
     higherIsBetter: true,
     materialErrorPctThreshold: 0.8,
   },
@@ -459,12 +470,19 @@ const GROUP_B: FactKeyInput[] = [
     // respectively. Currently 0 rows in `country_facts`; IMF closes
     // 0→~189 single-source coverage. See
     // `~/civica/plan/imf-weo-resolution-v1.md` §6 Q2.
+    //
+    // R.2.1 — envelope floor widened from -50 to -100 to accommodate IMF
+    // WEO 5-year forecast-horizon values. Timor-Leste 2031 fiscal balance
+    // forecast = -51.7% of GDP, just below the prior floor. Small/oil-
+    // dependent economies with large resource-fund drawdown cycles can have
+    // swings past ±50%. Max stays at 50 (no positive outlier observed in
+    // the April 2026 WEO). See ~/civica/plan/imf-weo-resolution-v1.md §3b.
     key: "fiscal_balance_pct_gdp",
     group: "B",
     category: "economy",
     label: "Fiscal balance (general government)",
     unit: "% of GDP",
-    envelope: { min: -50, max: 50, isPercent: false },
+    envelope: { min: -100, max: 50, isPercent: false },
     higherIsBetter: true,
     materialErrorPpThreshold: 50,
   },
