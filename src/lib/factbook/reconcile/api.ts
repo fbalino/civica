@@ -96,6 +96,10 @@ export interface ApiAlternate {
   url: string | null;
   rejected?: true;
   rejectionReason?: string;
+  /** Bug 1 — `'measured'` (default) or `'projected'`. UIs render a
+   *  visual badge (e.g. amber "projected" pill) when the value is a
+   *  forecast/projection. See `~/civica/plan/forecast-vs-measurement-v1.md`. */
+  valueType: "measured" | "projected";
 }
 
 /**
@@ -116,6 +120,18 @@ export interface ApiProvenanceEntry {
   decisionReason: string;
   isDisputed: boolean;
   alternates: ApiAlternate[];
+  /** Bug 1 — `'measured'` (default) or `'projected'`. The canonical
+   *  row's value type. Always `'measured'` unless no measurement was
+   *  available and the resolver fell back to a projection (e.g.
+   *  `fiscal_balance_pct_gdp`, where IMF is the only source globally
+   *  and IMF only ships projections). See
+   *  `~/civica/plan/forecast-vs-measurement-v1.md` § 2e. */
+  valueType: "measured" | "projected";
+  /** Bug 1 — convenience flag mirroring
+   *  `ResolverOutput.canonicalIsProjection`. True iff `valueType ===
+   *  'projected'`; broken out for callers that prefer a flag-shaped
+   *  boolean over an enum check. */
+  canonicalIsProjection: boolean;
 }
 
 function buildAlternateUrl(row: FactRow): string | null {
@@ -159,6 +175,9 @@ export function buildApiProvenanceEntry(
         asOf: row.asOf,
         vintageLabel: row.upstreamVintageLabel,
         url: buildAlternateUrl(row),
+        // Bug 1 — surface the per-row valueType so consumers can
+        // render a "projected" badge on alternate rows.
+        valueType: row.valueType,
       };
       if (row.status === "rejected") {
         entry.rejected = true;
@@ -176,6 +195,8 @@ export function buildApiProvenanceEntry(
     decisionReason: output.decisionReason,
     isDisputed: output.isDisputed,
     alternates,
+    valueType: canonical.valueType,
+    canonicalIsProjection: output.canonicalIsProjection,
   };
 }
 
@@ -218,18 +239,21 @@ export async function getCanonicalFact(
         isDisputed: false,
         decisionReason: "no_active_rows",
         proposedDisputes: [],
+        canonicalIsProjection: false,
       };
     }
     const active = rows.filter((r) => r.status === "active");
+    const canonical = active[0] ?? null;
     return {
       jurisdictionId,
       factKey,
-      canonical: active[0] ?? null,
+      canonical,
       alternates: active,
       all: rows,
       isDisputed: false,
       decisionReason: active.length > 0 ? "single_source" : "no_active_rows",
       proposedDisputes: [],
+      canonicalIsProjection: canonical?.valueType === "projected",
     };
   }
 
@@ -313,16 +337,18 @@ export async function getCanonicalFactsForJurisdiction(
     const factKeyDef = getFactKey(factKey);
     if (!factKeyDef) {
       const active = rows.filter((r) => r.status === "active");
+      const canonical = active[0] ?? null;
       out[factKey] = {
         jurisdictionId,
         factKey,
-        canonical: active[0] ?? null,
+        canonical,
         alternates: active,
         all: rows,
         isDisputed: disputedKeys.has(factKey),
         decisionReason:
           active.length > 0 ? "single_source" : "no_active_rows",
         proposedDisputes: [],
+        canonicalIsProjection: canonical?.valueType === "projected",
       };
       continue;
     }
@@ -411,16 +437,18 @@ export async function getCanonicalFactsForJurisdictions(
 
       if (!factKeyDef) {
         const active = rows.filter((r) => r.status === "active");
+        const canonical = active[0] ?? null;
         out[jurisdictionId][factKey] = {
           jurisdictionId,
           factKey,
-          canonical: active[0] ?? null,
+          canonical,
           alternates: active,
           all: rows,
           isDisputed,
           decisionReason:
             active.length > 0 ? "single_source" : "no_active_rows",
           proposedDisputes: [],
+          canonicalIsProjection: canonical?.valueType === "projected",
         };
         continue;
       }
@@ -633,6 +661,8 @@ interface CountryFactDbRow {
   status: string;
   statusReason: string | null;
   sourceNote: string | null;
+  /** Bug 1 — `'measured'` (default) or `'projected'`. */
+  valueType?: string | null;
 }
 
 export function dbRowToFactRow(row: CountryFactDbRow): FactRow {
@@ -676,5 +706,6 @@ export function dbRowToFactRow(row: CountryFactDbRow): FactRow {
         : "active",
     statusReason: row.statusReason,
     sourceNote: row.sourceNote,
+    valueType: row.valueType === "projected" ? "projected" : "measured",
   };
 }

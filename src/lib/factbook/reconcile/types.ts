@@ -33,6 +33,25 @@ export type FactRowStatus =
   | "demoted";
 
 /**
+ * Bug 1 — measurement vs. projection partition.
+ *
+ * - `measured`  — empirical observation at the upstream's vintage cut
+ *                  (or a model-imputed measurement the upstream itself
+ *                  publishes as a measurement, e.g., ILO modelled
+ *                  estimates, UNDP HDI composite).
+ * - `projected` — a model output the upstream itself publishes as a
+ *                  projection / forecast (e.g., IMF WEO forecast-year
+ *                  rows, OECD Economic Outlook projection-year rows).
+ *
+ * The resolver prefers `measured` over `projected` for canonical
+ * purposes; projected rows stay in alternates for transparency.
+ *
+ * See `~/civica/plan/forecast-vs-measurement-v1.md` for the
+ * methodology.
+ */
+export type FactValueType = "measured" | "projected";
+
+/**
  * Civica fact-group classification (methodology §1.1).
  *
  * Mirrors the `FactGroup` exported by the parallel agent's
@@ -72,6 +91,12 @@ export interface FactRow {
   status: FactRowStatus;
   statusReason: string | null;
   sourceNote: string | null;
+  /** Bug 1 — `measured` (default) or `projected`. Set by each sync
+   *  orchestrator at write time. The resolver requires canonical to
+   *  be a measured row whenever any measured row exists; falls back
+   *  to projected rows only when no measurement is available.
+   *  See `~/civica/plan/forecast-vs-measurement-v1.md`. */
+  valueType: FactValueType;
 }
 
 /**
@@ -142,4 +167,12 @@ export interface ResolverOutput {
   decisionReason: DecisionReason;
   /** Disputes the resolver would create if asked to materialize. */
   proposedDisputes: ProposedDispute[];
+  /** Bug 1 — true when the canonical row is a `projected` (forecast)
+   *  row because no `measured` row was available for this
+   *  (jurisdiction, factKey). The fallback path described in
+   *  `~/civica/plan/forecast-vs-measurement-v1.md` § 2e. UI surfaces
+   *  use this flag to render a "projected" / amber-frozen badge.
+   *  Always `false` when no rows exist or when the canonical row is
+   *  itself measured. */
+  canonicalIsProjection: boolean;
 }

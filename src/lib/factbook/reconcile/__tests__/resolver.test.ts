@@ -71,6 +71,7 @@ function row(partial: Partial<FactRow>): FactRow {
     status: partial.status ?? "active",
     statusReason: partial.statusReason ?? null,
     sourceNote: partial.sourceNote ?? null,
+    valueType: partial.valueType ?? "measured",
   };
 }
 

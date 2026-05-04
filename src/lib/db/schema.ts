@@ -282,6 +282,27 @@ export const countryFacts = pgTable(
     /** Free-form note from the seed/sync script. Existing column. */
     sourceNote: text("source_note"),
 
+    /** 'measured' | 'projected'. A `measured` row is an empirical
+     *  observation at the upstream's vintage cut (or a model-imputed
+     *  measurement that the upstream itself publishes as a measurement,
+     *  e.g., ILO modelled estimates, UNDP HDI composite). A `projected`
+     *  row is a model output that the upstream itself publishes as a
+     *  projection / forecast (e.g., IMF WEO forecast-year rows,
+     *  OECD Economic Outlook projection-year rows). The resolver
+     *  prefers `measured` over `projected` for canonical purposes;
+     *  projected rows stay in alternates for transparency.
+     *
+     *  Set by each sync orchestrator at write time. Defaults to
+     *  `'measured'` so legacy rows backfill correctly on schema push
+     *  (no projections existed pre-Bug-1; IMF's 1,716 forecast rows
+     *  are flipped to `'projected'` by the Bug-1 backfill SQL).
+     *
+     *  See `~/civica/plan/forecast-vs-measurement-v1.md` for the
+     *  methodology, the resolver rule ("any measured row beats all
+     *  projected rows"), and the per-source tagging policies for
+     *  R.2 IMF / R.6 UNDP HDI / R.7 OECD / R.10 ILO. */
+    valueType: text("value_type").notNull().default("measured"),
+
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
@@ -301,8 +322,27 @@ export const countryFacts = pgTable(
       table.factKey,
       table.factValueNumeric
     ),
+    /** Bug-1 — supports the resolver's "any measured row exists?"
+     *  partition probe and the replication CSV's value-type filter. */
+    index("idx_country_facts_factkey_valuetype").on(
+      table.factKey,
+      table.valueType
+    ),
   ]
 );
+
+/**
+ * `country_facts.value_type` enum values.
+ *
+ * - `measured` — empirical observation at the upstream's vintage
+ *   cut, or a model-imputed measurement the upstream itself
+ *   publishes as a measurement.
+ * - `projected` — a model output the upstream itself publishes as
+ *   a projection / forecast.
+ *
+ * See `~/civica/plan/forecast-vs-measurement-v1.md` § 2d.
+ */
+export type FactValueType = "measured" | "projected";
 
 /**
  * Phase F — quarterly fact vintages.

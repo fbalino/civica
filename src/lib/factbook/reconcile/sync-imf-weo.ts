@@ -615,6 +615,19 @@ export async function syncImfWeo(
       const factYear = dp.year;
       const asOf = `${factYear}-01-01`;
 
+      // Bug 1 — value-type discriminator. A row whose fact_year is in
+      // the future is a forecast (IMF's WEO ships projections through
+      // current_year + 5y); a row whose fact_year is in the past is
+      // either a measurement at the current vintage or a terminal-year
+      // measurement for a country whose IMF series ended (Syria 2010,
+      // Eritrea 2019, etc. — those countries have no recent IMF data
+      // because of state collapse / sanctions). Both classes of past
+      // rows are 'measured' for resolver purposes.
+      //
+      // See ~/civica/plan/forecast-vs-measurement-v1.md.
+      const valueType: "measured" | "projected" =
+        factYear > currentYear ? "projected" : "measured";
+
       // Track forecast rows (year > current year) for the methodology
       // page rewrite at R.23.
       if (factYear > currentYear) {
@@ -705,6 +718,7 @@ export async function syncImfWeo(
             statusReason: null,
             snapshotId,
             sourceNote: null,
+            valueType,
           })
           .onConflictDoUpdate({
             target: [
@@ -716,6 +730,13 @@ export async function syncImfWeo(
             // to this set clause. Reviewer-demoted rows must survive
             // a re-sync so the resolver continues to honour the
             // human decision.
+            //
+            // Bug 1 — `valueType` IS included in the set clause. As
+            // the calendar year advances, IMF rows that were forecasts
+            // become measurements (e.g. a 2026 row written in April
+            // 2026 is a forecast; the same year-key row in 2027 is a
+            // measurement). Re-sync must reflect the current
+            // year-vs-fact_year relationship.
             set: {
               factValue: String(numericValue),
               factValueNumeric: numericValue,
@@ -729,6 +750,7 @@ export async function syncImfWeo(
               upstreamVintageLabel: vintageLabel,
               snapshotId,
               updatedAt: new Date(),
+              valueType,
             },
           });
         counter.written++;

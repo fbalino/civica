@@ -72,6 +72,7 @@ export async function resolveFact(
       isDisputed: false,
       decisionReason: "no_active_rows",
       proposedDisputes: [],
+      canonicalIsProjection: false,
     };
   }
 
@@ -125,16 +126,33 @@ export function resolveFromRows(
       all: enforced,
       decisionReason: "no_active_rows",
       proposedDisputes,
+      canonicalIsProjection: false,
     };
   }
 
-  // §3.1 single source
-  if (active.length === 1) {
-    return finalize(active[0], active, enforced, "single_source", proposedDisputes);
+  // Bug 1 — measurement-vs-projection partition (forecast-vs-measurement-v1.md).
+  // Partition active rows into measured + projected sets. The decision
+  // logic below runs over `candidatePool`:
+  //   - if any measured row exists, candidatePool = measuredActive
+  //     (projected rows still surface in `alternates` via `enforced`)
+  //   - if no measured row exists, candidatePool = projectedActive
+  //     (the documented fallback path; e.g. fiscal_balance_pct_gdp
+  //      where IMF is the only source globally and IMF only ships
+  //      projections for it)
+  //
+  // `enforced` (the full active+rejected set) keeps flowing through
+  // to `finalize()` unchanged so the alternates panel sees every row.
+  const measuredActive = active.filter((r) => r.valueType !== "projected");
+  const projectedActive = active.filter((r) => r.valueType === "projected");
+  const candidatePool = measuredActive.length > 0 ? measuredActive : projectedActive;
+
+  // §3.1 single source — applied to the chosen pool.
+  if (candidatePool.length === 1) {
+    return finalize(candidatePool[0], candidatePool, enforced, "single_source", proposedDisputes);
   }
 
-  const cia = active.find((r) => r.sourceId === "cia_factbook") ?? null;
-  const nonCia = active.filter((r) => r.sourceId !== "cia_factbook");
+  const cia = candidatePool.find((r) => r.sourceId === "cia_factbook") ?? null;
+  const nonCia = candidatePool.filter((r) => r.sourceId !== "cia_factbook");
 
   // §3.2 agreement-within-tolerance.
   // For Group A and Group C (slow-changing), agreement → CIA wins,
@@ -146,20 +164,20 @@ export function resolveFromRows(
   // identity for a quantitative fact. We instead let `resolveGroupB`
   // walk the freshness ladder; if no challenger is fresher, the
   // `single_source` path returns CIA naturally.
-  if (def.group !== "B" && allAgree(active, def)) {
-    const winner = cia ?? lowestTierFirst(active);
-    return finalize(winner, active, enforced, "agreement", proposedDisputes);
+  if (def.group !== "B" && allAgree(candidatePool, def)) {
+    const winner = cia ?? lowestTierFirst(candidatePool);
+    return finalize(winner, candidatePool, enforced, "agreement", proposedDisputes);
   }
 
   // Disagreement — branch on group.
   if (def.group === "A") {
-    return resolveGroupA(active, cia, nonCia, enforced, def, proposedDisputes);
+    return resolveGroupA(candidatePool, cia, nonCia, enforced, def, proposedDisputes);
   }
   if (def.group === "C") {
-    return resolveGroupC(active, cia, nonCia, enforced, def, proposedDisputes);
+    return resolveGroupC(candidatePool, cia, nonCia, enforced, def, proposedDisputes);
   }
   // Group B — fast-changing quantitative.
-  return resolveGroupB(active, cia, nonCia, enforced, def, proposedDisputes);
+  return resolveGroupB(candidatePool, cia, nonCia, enforced, def, proposedDisputes);
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -328,11 +346,31 @@ function finalize(
   decisionReason: DecisionReason,
   proposedDisputes: ProposedDispute[]
 ): Omit<ResolverOutput, "jurisdictionId" | "factKey" | "isDisputed"> {
+  // Bug 1 — alternates includes BOTH measured + projected active rows
+  // so the alternate-values panel can render the full source set.
+  // The decision logic above already chose `canonical` from the
+  // measurement pool when one existed; projected rows that lost the
+  // canonical race still surface here for transparency.
+  //
+  // We deliberately build alternates from `all` (the enforced set,
+  // status='active') rather than the `active` parameter (which is
+  // typically the measured-only candidatePool). Rejected rows in
+  // `all` (envelope failures) stay in `all` itself for audit but are
+  // excluded from the alternates list.
+  const activeFromAll = all.filter((r) => r.status === "active");
   const alternates = [
     canonical,
-    ...active.filter((r) => r.id !== canonical.id),
+    ...activeFromAll.filter((r) => r.id !== canonical.id),
   ];
-  return { canonical, alternates, all, decisionReason, proposedDisputes };
+  const canonicalIsProjection = canonical.valueType === "projected";
+  return {
+    canonical,
+    alternates,
+    all,
+    decisionReason,
+    proposedDisputes,
+    canonicalIsProjection,
+  };
 }
 
 function hasValue(row: FactRow): boolean {
@@ -558,5 +596,10 @@ function rowFromDb(r: typeof countryFacts.$inferSelect): FactRow {
     status: (r.status as FactRowStatus) ?? "active",
     statusReason: r.statusReason ?? null,
     sourceNote: r.sourceNote ?? null,
+    // Bug 1 — defensive hydrate. Schema default is 'measured' so legacy
+    // rows backfill correctly; this nullish coalesce just makes the
+    // resolver robust against a hypothetical DB-side null.
+    valueType:
+      r.valueType === "projected" ? "projected" : "measured",
   };
 }

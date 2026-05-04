@@ -86,6 +86,8 @@ interface FactRowDb {
   status: string;
   statusReason: string | null;
   sourceNote: string | null;
+  /** Bug 1 — `'measured'` (default) or `'projected'`. */
+  valueType?: string | null;
 }
 
 function dbRowToFactRow(row: FactRowDb): FactRow {
@@ -128,6 +130,7 @@ function dbRowToFactRow(row: FactRowDb): FactRow {
         : "active",
     statusReason: row.statusReason,
     sourceNote: row.sourceNote,
+    valueType: row.valueType === "projected" ? "projected" : "measured",
   };
 }
 
