@@ -1127,3 +1127,17 @@ blocking for graduation.
 Up next: Phase 5.10 — final cut-over (target Sept 30, 2026).
 Phase 5.9 (licensing + advisory board + SSRN preprint)
 remains deferred per 2026-04-28 user decision.
+
+## 2026-05-04 — Multi-source provenance panel review fix
+
+Addressed review comments on `/factbook/argentina` source dialogs through the
+shared `FactValueDot` / `FactValuePanel` layer, not a hero-only patch. The
+multi-source trigger now shows a source dot plus compact `+` affordance instead
+of the tiny chevron. Panel rows use grid: short numeric values stay on the same
+row as the source, `CIVICA PICK` sits under the source label, and long prose
+values stack/wrap inside the panel. Values use Inter via `var(--font-body)` and
+`var(--text-12)`. Verified in `agent-browser` with Languages and Population
+panels. Evidence files:
+`~/civica/plan/factvalue-dot-languages-panel-final.png`,
+`~/civica/plan/factvalue-dot-population-panel-final.png`, and
+`~/civica/plan/factvalue-dot-panel-global-fix-final-both.webm`.

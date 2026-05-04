@@ -10,6 +10,7 @@
  * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §6.2
  * Plan:        ~/civica/plan/phase-f-implementation-plan.md F.4
  */
+import Link from "next/link";
 import type { FactRow, ResolverOutput } from "@/lib/factbook/reconcile/types";
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -82,6 +83,10 @@ function buildSourceUrl(row: FactRow): string | null {
   return null;
 }
 
+function shouldStackValue(value: string): boolean {
+  return value.length > 40;
+}
+
 export interface FactValuePanelProps {
   factKey: string;
   factLabel: string;
@@ -123,9 +128,9 @@ export function FactValuePanel({
           <strong>This fact has a pending data dispute.</strong>{" "}
           The value below is the prior canonical value while
           reviewers investigate the conflict. See the{" "}
-          <a href="/factbook/methodology/reconciliation#disputes">
+          <Link href="/factbook/methodology/reconciliation#disputes">
             methodology
-          </a>{" "}
+          </Link>{" "}
           for what this means.
         </div>
       )}
@@ -135,17 +140,21 @@ export function FactValuePanel({
           const isCanonical = row.id === canonicalId;
           const url = buildSourceUrl(row);
           const isRejected = row.status === "rejected";
+          const value = formatValue(row, factKey);
           return (
             <li
               key={row.id}
               className={
                 "fact-value-row" +
                 (isCanonical ? " fact-value-row--canonical" : "") +
-                (isRejected ? " fact-value-row--rejected" : "")
+                (isRejected ? " fact-value-row--rejected" : "") +
+                (shouldStackValue(value) ? " fact-value-row--stacked-value" : "")
               }
             >
-              <div className="fact-value-row-source">
-                {sourceLabel(row.sourceId)}
+              <div className="fact-value-row-source-block">
+                <div className="fact-value-row-source">
+                  {sourceLabel(row.sourceId)}
+                </div>
                 {isCanonical && (
                   <span className="fact-value-row-canonical-tag">
                     Civica pick
@@ -158,7 +167,7 @@ export function FactValuePanel({
                 )}
               </div>
               <div className="fact-value-row-value">
-                {formatValue(row, factKey)}
+                {value}
               </div>
               <div className="fact-value-row-meta">
                 As of {formatAsOf(row)}
@@ -187,12 +196,12 @@ export function FactValuePanel({
           Reconciled per Civica Atlas methodology v0.1
           <span className="fact-value-panel-foot-beta">Beta</span>
         </span>
-        <a
+        <Link
           className="fact-value-panel-foot-link"
           href="/factbook/methodology/reconciliation"
         >
           Methodology →
-        </a>
+        </Link>
       </footer>
     </div>
   );

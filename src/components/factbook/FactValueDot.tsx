@@ -3,7 +3,8 @@
 /**
  * Phase F.4 — Clickable / hoverable SourceDot variant.
  *
- * Renders a small dot + chevron next to a value. On hover (desktop)
+ * Renders a source dot + compact "more sources" marker next to a value.
+ * On hover (desktop)
  * or click (any input), opens the alternate-values panel. The
  * panel is rendered via a React portal into `document.body` so
  * it can't be clipped by ancestor `overflow: hidden` containers
@@ -88,7 +89,6 @@ export function FactValueDot({
   /** Pinned = opened by click; survives mouse-leave. */
   const [pinned, setPinned] = useState(false);
   const [pos, setPos] = useState<PortalPosition>({ top: -9999, left: -9999 });
-  const [mounted, setMounted] = useState(false);
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
@@ -99,11 +99,7 @@ export function FactValueDot({
     ? FROZEN_SOURCES.has(canonicalSourceId)
     : false;
   const isDisputed = disputed ?? resolverOutput.isDisputed;
-
-  // Avoid SSR mismatch — only portal after mount.
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const portalRoot = typeof document === "undefined" ? null : document.body;
 
   // Cleanup any pending timers on unmount.
   useEffect(() => {
@@ -228,15 +224,15 @@ export function FactValueDot({
           }
           aria-hidden
         />
-        <span className="fact-value-trigger-caret" aria-hidden>
-          ▾
+        <span className="fact-value-trigger-more" aria-hidden>
+          +
         </span>
         {isDisputed && (
           <span className="fact-value-disputed-chip">disputed</span>
         )}
       </button>
 
-      {mounted && open
+      {portalRoot && open
         ? createPortal(
             <>
               {/* Backdrop only when pinned — for click-anywhere-to-close.
@@ -269,7 +265,7 @@ export function FactValueDot({
                 />
               </div>
             </>,
-            document.body
+            portalRoot
           )
         : null}
     </>
