@@ -26,7 +26,7 @@
  * and government press releases when an NSO exists for the same fact.
  *
  * The Wikidata Q-IDs below were verified against Wikidata (live as of
- * 2026-05-02) where confidently identifiable. NSO Q-IDs that we do
+ * 2026-05-04) where confidently identifiable. NSO Q-IDs that we do
  * NOT yet have authoritative confirmation for are listed with `qid`
  * undefined and matched on domain only — Wikidata claims that cite an
  * unverified-Q-ID NSO will fall through the QID branch but pass via
@@ -38,7 +38,7 @@
 export type AllowlistTier = 1 | 2 | 3 | 4;
 
 export interface AllowlistEntry {
-  /** Wikidata Q-ID of the source entity (e.g. "Q1199363" for World
+  /** Wikidata Q-ID of the source entity (e.g. "Q21540096" for World
    *  Bank Open Data). Optional — when missing, only domain matching
    *  applies. */
   qid?: string;
@@ -83,67 +83,136 @@ const TIER_1: AllowlistEntry[] = [
     civicaSourceId: "world_bank",
   },
   {
-    qid: "Q7150",
+    // R.2 / 2026-05-03: corrected to Q7804 (International Monetary
+    // Fund). The previous value Q7150 maps to "ecology" on live
+    // Wikidata, so the QID branch of the allowlist never matched
+    // a real IMF reference; the URL-domain branch was carrying
+    // 100% of the load. The bug was latent (no IMF-cited Wikidata
+    // claims in Civica's pipe yet) but becomes load-bearing as
+    // R.3 / R.10 / etc. introduce IMF cross-references. See
+    // `~/civica/plan/imf-weo-resolution-v1.md` §6 Q4. Same
+    // bug-class as R.0's WB QID correction.
+    qid: "Q7804",
     domains: ["imf.org", "data.imf.org"],
     name: "International Monetary Fund (WEO / IFS)",
     tier: 1,
+    civicaSourceId: "imf_weo",
   },
   {
-    qid: "Q220563",
-    domains: ["unstats.un.org", "data.un.org"],
+    // R.3 / 2026-05-03: added `population.un.org` to cover the UN
+    // Population Division (WPP 2024 Revision) sync. The Population
+    // Division is administratively part of UN DESA but publishes
+    // through the UN Statistics umbrella; per
+    // `~/civica/plan/un-data-resolution-v1.md` §2e the single
+    // `un_data` source slug covers both PopDiv and UN Stats data.
+    // The domain is added here so reference URLs starting with
+    // `https://population.un.org/wpp/` pass `isAllowedReference()`.
+    // Also stamped with `civicaSourceId: "un_data"` matching the
+    // existing `sources` row.
+    //
+    // R.3 audit / 2026-05-04: corrected QID to Q2265585 (United
+    // Nations Statistics Division). The previous value Q220563 maps
+    // to "United Nations Secretariat" — the administrative organ of
+    // the UN, not the Statistics Division (a separate DESA entity).
+    // Same bug-class as R.0/R.2.
+    qid: "Q2265585",
+    domains: [
+      "unstats.un.org",
+      "data.un.org",
+      "population.un.org",
+    ],
     name: "UN Statistics Division",
+    civicaSourceId: "un_data",
     tier: 1,
   },
   {
-    qid: "Q41716",
+    // R.3 audit / 2026-05-04: corrected to Q161718 (United Nations
+    // Development Programme). The previous value Q41716 maps to
+    // "boiling" (a physical phenomenon) on live Wikidata — entirely
+    // unrelated to UNDP. Same bug-class as R.0/R.2.
+    qid: "Q161718",
     domains: ["hdr.undp.org", "undp.org"],
     name: "UNDP Human Development Reports",
     tier: 1,
   },
   {
+    // R.4 / 2026-05-03: added `civicaSourceId: "who_gho"` so the
+    // Wikidata reference-tier promotion logic recognises WHO GHO
+    // references as Tier 1 and so the WHO sync's per-row references
+    // payload can resolve to the matching `sources` row. The QID
+    // and domain are unchanged. See
+    // `~/civica/plan/who-gho-resolution-v1.md` §3.
     qid: "Q7817",
     domains: ["who.int"],
     name: "WHO Global Health Observatory",
     tier: 1,
+    civicaSourceId: "who_gho",
   },
   {
-    qid: "Q7649",
+    // R.3 audit / 2026-05-04: corrected to Q3152127 (UNESCO Institute
+    // for Statistics). The previous value Q7649 maps to "1761" (a
+    // calendar year) on live Wikidata — entirely unrelated to
+    // UNESCO-UIS. Same bug-class as R.0/R.2.
+    qid: "Q3152127",
     domains: ["uis.unesco.org", "unesco.org"],
     name: "UNESCO Institute for Statistics",
     tier: 1,
   },
   {
-    qid: "Q7822",
+    // R.3 audit / 2026-05-04: corrected to Q41550 (Organisation for
+    // Economic Co-operation and Development). The previous value Q7822
+    // maps to "1886" (a calendar year) on live Wikidata — entirely
+    // unrelated to the OECD. Same bug-class as R.0/R.2.
+    qid: "Q41550",
     domains: ["stats.oecd.org", "oecd.org"],
     name: "OECD.Stat",
     tier: 1,
   },
   {
+    // R.3 audit / 2026-05-04: Q82151 verified correct ("Food and
+    // Agriculture Organization") — no QID change needed.
     qid: "Q82151",
     domains: ["fao.org", "faostat.fao.org"],
     name: "FAO FAOSTAT",
     tier: 1,
   },
   {
-    qid: "Q35872",
+    // R.3 audit / 2026-05-04: corrected to Q826700 (International
+    // Energy Agency). The previous value Q35872 maps to "boat" (a
+    // watercraft) on live Wikidata — entirely unrelated to the IEA.
+    // Same bug-class as R.0/R.2.
+    qid: "Q826700",
     domains: ["iea.org"],
     name: "International Energy Agency",
     tier: 1,
   },
   {
-    qid: "Q7795",
+    // R.3 audit / 2026-05-04: corrected to Q54129 (International
+    // Labour Organization). The previous value Q7795 maps to
+    // "Organization of the Petroleum Exporting Countries" (OPEC) on
+    // live Wikidata — a different intergovernmental body entirely.
+    // Same bug-class as R.0/R.2.
+    qid: "Q54129",
     domains: ["ilostat.ilo.org", "ilo.org"],
     name: "ILO ILOSTAT",
     tier: 1,
   },
   {
-    qid: "Q58373",
+    // R.3 audit / 2026-05-04: corrected to Q217659 (Eurostat). The
+    // previous value Q58373 maps to "Amun" (an ancient Egyptian deity)
+    // on live Wikidata — entirely unrelated to the EU statistical
+    // office. Same bug-class as R.0/R.2.
+    qid: "Q217659",
     domains: ["ec.europa.eu/eurostat", "eurostat.ec.europa.eu"],
     name: "Eurostat",
     tier: 1,
   },
   {
-    qid: "Q210913",
+    // R.3 audit / 2026-05-04: corrected to Q7825 (World Trade
+    // Organization). The previous value Q210913 returned a 404 on
+    // live Wikidata — the QID did not resolve to any entity.
+    // Same bug-class as R.0/R.2.
+    qid: "Q7825",
     domains: ["stats.wto.org", "wto.org"],
     name: "WTO Stats",
     tier: 1,
@@ -170,42 +239,64 @@ const TIER_1: AllowlistEntry[] = [
 const TIER_2: AllowlistEntry[] = [
   // Americas
   {
-    qid: "Q668509",
+    // R.3 audit / 2026-05-04: corrected to Q637413 (United States
+    // Census Bureau). The previous value Q668509 maps to
+    // "Oberheimbach" (a German municipality) on live Wikidata.
+    qid: "Q637413",
     domains: ["census.gov"],
     name: "US Census Bureau",
     tier: 2,
     countryIso2: "US",
   },
   {
-    qid: "Q801253",
+    // R.3 audit / 2026-05-04: corrected to Q1155740 (Statistics
+    // Canada). The previous value Q801253 maps to "New Cross railway
+    // station" (a London rail station) on live Wikidata.
+    qid: "Q1155740",
     domains: ["statcan.gc.ca"],
     name: "Statistics Canada",
     tier: 2,
     countryIso2: "CA",
   },
   {
-    qid: "Q579149",
+    // R.3 audit / 2026-05-04: corrected to Q268072 (Instituto
+    // Brasileiro de Geografia e Estatística — IBGE). The previous
+    // value Q579149 maps to "Honkajoki" (a former Finnish
+    // municipality) on live Wikidata.
+    qid: "Q268072",
     domains: ["ibge.gov.br"],
     name: "IBGE (Brazil)",
     tier: 2,
     countryIso2: "BR",
   },
   {
-    qid: "Q1820228",
+    // R.3 audit / 2026-05-04: corrected to Q795074 (National
+    // Institute of Statistics and Geography — INEGI Mexico). The
+    // previous value Q1820228 maps to "snow coach" (a vehicle type)
+    // on live Wikidata.
+    qid: "Q795074",
     domains: ["inegi.org.mx"],
     name: "INEGI (Mexico)",
     tier: 2,
     countryIso2: "MX",
   },
   {
-    qid: "Q1430351",
+    // R.3 audit / 2026-05-04: corrected to Q1665219 (National
+    // Institute of Statistics and Censuses — INDEC Argentina). The
+    // previous value Q1430351 maps to "Hadžiabdić" (a surname) on
+    // live Wikidata.
+    qid: "Q1665219",
     domains: ["indec.gob.ar"],
     name: "INDEC (Argentina)",
     tier: 2,
     countryIso2: "AR",
   },
   {
-    qid: "Q5198789",
+    // R.3 audit / 2026-05-04: corrected to Q1190181 (Departamento
+    // Administrativo Nacional de Estadística — DANE Colombia). The
+    // previous value Q5198789 maps to "Cyclone Erica" (a 2003
+    // weather event) on live Wikidata.
+    qid: "Q1190181",
     domains: ["dane.gov.co"],
     name: "DANE (Colombia)",
     tier: 2,
@@ -228,77 +319,115 @@ const TIER_2: AllowlistEntry[] = [
 
   // Europe
   {
-    qid: "Q1334420",
+    // R.3 audit / 2026-05-04: corrected to Q1334971 (Office for
+    // National Statistics — ONS UK). The previous value Q1334420
+    // maps to "Elya Baskin" (a Russian actor) on live Wikidata.
+    qid: "Q1334971",
     domains: ["ons.gov.uk"],
     name: "ONS (UK)",
     tier: 2,
     countryIso2: "GB",
   },
   {
-    qid: "Q156521",
+    // R.3 audit / 2026-05-04: corrected to Q156616 (National
+    // Institute of Statistics and Economic Studies — INSEE France).
+    // The previous value Q156521 maps to "Andrea Doria" (a
+    // 16th-century Genoese admiral) on live Wikidata.
+    qid: "Q156616",
     domains: ["insee.fr"],
     name: "INSEE (France)",
     tier: 2,
     countryIso2: "FR",
   },
   {
-    qid: "Q160547",
+    // R.3 audit / 2026-05-04: corrected to Q764739 (Federal
+    // Statistical Office of Germany — Destatis). The previous value
+    // Q160547 maps to "Scheckwitz/Šekecy" (a German village) on
+    // live Wikidata.
+    qid: "Q764739",
     domains: ["destatis.de"],
     name: "Destatis (Germany)",
     tier: 2,
     countryIso2: "DE",
   },
   {
-    qid: "Q605493",
+    // R.3 audit / 2026-05-04: corrected to Q214195 (Italian National
+    // Institute of Statistics — ISTAT). The previous value Q605493
+    // maps to "Aderus robustus" (a species of insect) on live
+    // Wikidata.
+    qid: "Q214195",
     domains: ["istat.it"],
     name: "ISTAT (Italy)",
     tier: 2,
     countryIso2: "IT",
   },
   {
-    qid: "Q1278125",
+    // R.3 audit / 2026-05-04: corrected to Q845937 (National
+    // Statistics Institute — INE Spain). The previous value Q1278125
+    // maps to "Lüttmoorsiel-Nordstrandischmoor island railway" (a
+    // German narrow-gauge railway) on live Wikidata.
+    qid: "Q845937",
     domains: ["ine.es"],
     name: "INE (Spain)",
     tier: 2,
     countryIso2: "ES",
   },
   {
-    qid: "Q1798917",
+    // R.3 audit / 2026-05-04: corrected to Q167086 (Statistics
+    // Netherlands — CBS). The previous value Q1798917 maps to
+    // "La Luna" (a 2011 Pixar animated short film) on live Wikidata.
+    qid: "Q167086",
     domains: ["cbs.nl"],
     name: "CBS (Netherlands)",
     tier: 2,
     countryIso2: "NL",
   },
   {
-    qid: "Q1377887",
+    // R.3 audit / 2026-05-04: corrected to Q1472511 (Statistics
+    // Sweden — SCB). The previous value Q1377887 maps to "European
+    // Culture Prize" (a cultural award) on live Wikidata.
+    qid: "Q1472511",
     domains: ["scb.se"],
     name: "Statistics Sweden",
     tier: 2,
     countryIso2: "SE",
   },
   {
-    qid: "Q1972749",
+    // R.3 audit / 2026-05-04: corrected to Q2367019 (Statistics
+    // Norway — SSB). The previous value Q1972749 maps to "Phương 5"
+    // (a ward in Ho Chi Minh City, Vietnam) on live Wikidata.
+    qid: "Q2367019",
     domains: ["ssb.no"],
     name: "Statistics Norway",
     tier: 2,
     countryIso2: "NO",
   },
   {
-    qid: "Q1788313",
+    // R.3 audit / 2026-05-04: corrected to Q1164337 (Statistics
+    // Denmark). The previous value Q1788313 maps to "Kreuzkapelle"
+    // (a Catholic pilgrimage chapel in Germany) on live Wikidata.
+    qid: "Q1164337",
     domains: ["dst.dk"],
     name: "Statistics Denmark",
     tier: 2,
     countryIso2: "DK",
   },
   {
-    qid: "Q623076",
+    // R.3 audit / 2026-05-04: corrected to Q798557 (Statistics
+    // Finland). The previous value Q623076 maps to "aquaphobia"
+    // (a fear of water) on live Wikidata.
+    qid: "Q798557",
     domains: ["stat.fi"],
     name: "Statistics Finland",
     tier: 2,
     countryIso2: "FI",
   },
   {
-    qid: "Q686566",
+    // R.3 audit / 2026-05-04: corrected to Q285453 (Federal
+    // Statistical Office — BFS/OFS Switzerland). The previous value
+    // Q686566 maps to "1984 Olympics stamps of the German Democratic
+    // Republic" (a philatelic collection) on live Wikidata.
+    qid: "Q285453",
     domains: ["bfs.admin.ch"],
     name: "Federal Statistical Office (Switzerland)",
     tier: 2,
@@ -314,7 +443,10 @@ const TIER_2: AllowlistEntry[] = [
 
   // Africa
   {
-    qid: "Q3500630",
+    // R.3 audit / 2026-05-04: corrected to Q7604433 (Statistics
+    // South Africa). The previous value Q3500630 maps to "bird egg"
+    // (a natural history concept) on live Wikidata.
+    qid: "Q7604433",
     domains: ["statssa.gov.za"],
     name: "Statistics South Africa",
     tier: 2,
@@ -351,35 +483,54 @@ const TIER_2: AllowlistEntry[] = [
 
   // Asia + Oceania
   {
-    qid: "Q1326003",
+    // R.3 audit / 2026-05-04: corrected to Q11606829 (Statistics
+    // Bureau of Japan). The previous value Q1326003 maps to
+    // "Psalm 44" (a biblical psalm) on live Wikidata.
+    qid: "Q11606829",
     domains: ["stat.go.jp"],
     name: "Statistics Bureau of Japan",
     tier: 2,
     countryIso2: "JP",
   },
   {
-    qid: "Q489388",
+    // R.3 audit / 2026-05-04: corrected to Q11233101 (Ministry of
+    // Data and Statistics — KOSTAT / Statistics Korea). The previous
+    // value Q489388 maps to "Ancistrura" (a genus of insects) on
+    // live Wikidata.
+    qid: "Q11233101",
     domains: ["kostat.go.kr", "kosis.kr"],
     name: "KOSTAT (South Korea)",
     tier: 2,
     countryIso2: "KR",
   },
   {
-    qid: "Q1474711",
+    // R.3 audit / 2026-05-04: corrected to Q15715087 (Department
+    // of Statistics Singapore — SingStat). The previous value
+    // Q1474711 maps to "1950 World Wrestling Championships" (a
+    // sporting event) on live Wikidata.
+    qid: "Q15715087",
     domains: ["singstat.gov.sg"],
     name: "SingStat (Singapore)",
     tier: 2,
     countryIso2: "SG",
   },
   {
-    qid: "Q866120",
+    // R.3 audit / 2026-05-04: corrected to Q123347 (Australian
+    // Bureau of Statistics). The previous value Q866120 maps to
+    // "Mr. Smith Goes to Washington" (a 1939 Frank Capra film) on
+    // live Wikidata.
+    qid: "Q123347",
     domains: ["abs.gov.au"],
     name: "Australian Bureau of Statistics",
     tier: 2,
     countryIso2: "AU",
   },
   {
-    qid: "Q1130645",
+    // R.3 audit / 2026-05-04: corrected to Q1819197 (Statistics
+    // New Zealand). The previous value Q1130645 maps to
+    // "open-source software" (a software licensing concept) on
+    // live Wikidata.
+    qid: "Q1819197",
     domains: ["stats.govt.nz"],
     name: "Stats NZ",
     tier: 2,
