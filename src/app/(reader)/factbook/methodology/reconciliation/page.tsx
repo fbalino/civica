@@ -157,6 +157,36 @@ export default function ReconciliationMethodologyPage() {
           are also out of scope — they have purpose-built sync paths
           that predate Phase F.
         </p>
+
+        <h3>Country coverage policy</h3>
+        <p>
+          Civica covers all 193 UN member states as sovereign
+          jurisdictions, plus the 2 UN observer states (the Holy See and
+          Palestine), plus partially-recognized entities that have a
+          user-assigned ISO 3166-1 code AND are treated as distinct
+          statistical units by the World Bank and IMF (Kosovo). This
+          mirrors the country lists used by Our World in Data, the World
+          Bank, the UN Statistical Division, UNDP, and V-Dem. Civica
+          makes no editorial claim about any country&rsquo;s sovereignty
+          or recognition status — the coverage floor is &ldquo;what UN
+          agencies and the World Bank treat as a country,&rdquo; not
+          Civica&rsquo;s own judgment.
+        </p>
+        <p>
+          For Palestine, two parallel records exist:
+          territory-level CIA Factbook entries for the West Bank and
+          Gaza Strip (preserving the Factbook&rsquo;s separate prose for
+          each territory) sit alongside a unified <code>PSE</code> row
+          that acts as the iso3-keyed reconciliation target for World
+          Bank, IMF, WHO, UNDP, UNESCO, and V-Dem data. Kosovo is
+          included under the user-assigned ISO code <code>XKX</code>,
+          following World Bank, IMF, and UNDP practice. Western Sahara,
+          Hong Kong, and other CIA Factbook territory entries remain in
+          the database with their Factbook content but without iso3
+          codes — they receive only Civica&rsquo;s CIA Factbook
+          treatment because Tier-1 publishers do not write separate
+          rows for them.
+        </p>
       </section>
 
       <section className="editorial-section">
