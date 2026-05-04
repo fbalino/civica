@@ -130,10 +130,18 @@ const TIER_1: AllowlistEntry[] = [
     // Development Programme). The previous value Q41716 maps to
     // "boiling" (a physical phenomenon) on live Wikidata — entirely
     // unrelated to UNDP. Same bug-class as R.0/R.2.
+    //
+    // R.6 / 2026-05-04: added `civicaSourceId: "undp_hdi"` so the
+    // Wikidata reference-tier promotion logic recognises UNDP HDR
+    // references as Tier 1 and so the UNDP sync's per-row references
+    // payload can resolve to the matching `sources` row. The QID
+    // and domains are unchanged. See
+    // `~/civica/plan/undp-hdi-resolution-v1.md` §3.
     qid: "Q161718",
     domains: ["hdr.undp.org", "undp.org"],
     name: "UNDP Human Development Reports",
     tier: 1,
+    civicaSourceId: "undp_hdi",
   },
   {
     // R.4 / 2026-05-03: added `civicaSourceId: "who_gho"` so the
@@ -153,9 +161,25 @@ const TIER_1: AllowlistEntry[] = [
     // for Statistics). The previous value Q7649 maps to "1761" (a
     // calendar year) on live Wikidata — entirely unrelated to
     // UNESCO-UIS. Same bug-class as R.0/R.2.
+    //
+    // R.5 / 2026-05-04: added explicit `api.uis.unesco.org` and
+    // `databrowser.uis.unesco.org` domain entries (per resolution
+    // §6 Q7) for methodology-page transparency. Both already match
+    // via the `unesco.org` suffix matcher, so the entries are
+    // belt-and-braces. Also stamped `civicaSourceId: "unesco_uis"`
+    // matching the existing `sources` row, so the Wikidata
+    // reference-tier promotion logic recognises UIS references and
+    // the R.5 sync's references payload resolves to the matching
+    // sources row.
     qid: "Q3152127",
-    domains: ["uis.unesco.org", "unesco.org"],
+    domains: [
+      "uis.unesco.org",
+      "unesco.org",
+      "api.uis.unesco.org",
+      "databrowser.uis.unesco.org",
+    ],
     name: "UNESCO Institute for Statistics",
+    civicaSourceId: "unesco_uis",
     tier: 1,
   },
   {
@@ -163,9 +187,23 @@ const TIER_1: AllowlistEntry[] = [
     // Economic Co-operation and Development). The previous value Q7822
     // maps to "1886" (a calendar year) on live Wikidata — entirely
     // unrelated to the OECD. Same bug-class as R.0/R.2.
+    //
+    // R.7 / 2026-05-03: added `sdmx.oecd.org` and
+    // `data-explorer.oecd.org` to cover the new OECD Data Explorer
+    // SDMX endpoint that replaced the legacy `stats.oecd.org/SDMX-JSON/`
+    // surface. Also stamped `civicaSourceId: "oecd_stat"` matching
+    // the existing `sources` row, so the Wikidata reference-tier
+    // promotion logic recognises OECD references and the R.7 sync's
+    // references payload resolves to the matching sources row.
     qid: "Q41550",
-    domains: ["stats.oecd.org", "oecd.org"],
+    domains: [
+      "stats.oecd.org",
+      "oecd.org",
+      "sdmx.oecd.org",
+      "data-explorer.oecd.org",
+    ],
     name: "OECD.Stat",
+    civicaSourceId: "oecd_stat",
     tier: 1,
   },
   {

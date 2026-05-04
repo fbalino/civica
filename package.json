@@ -53,6 +53,9 @@
     "sync:factbook:imf-weo": "tsx scripts/sync-factbook-imf-weo.ts",
     "sync:factbook:un-data": "tsx scripts/sync-factbook-un-data.ts",
     "sync:factbook:who-gho": "tsx scripts/sync-factbook-who-gho.ts",
+    "sync:factbook:unesco-uis": "tsx scripts/sync-factbook-unesco-uis.ts",
+    "sync:factbook:undp-hdi": "tsx scripts/sync-factbook-undp-hdi.ts",
+    "sync:factbook:oecd-stat": "tsx scripts/sync-factbook-oecd-stat.ts",
     "snapshot:fact-vintage": "tsx scripts/snapshot-fact-vintage.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts"

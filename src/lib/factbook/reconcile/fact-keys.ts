@@ -676,6 +676,84 @@ const GROUP_B: FactKeyInput[] = [
     envelope: { min: 0, max: 50_000_000 },
     materialErrorPctThreshold: 0.5,
   },
+
+  // ─── Phase R.6 — UNDP HDR composite + components (5 new fact-keys).
+  //     UNDP is the sole publisher of the HDI composite, so HDI score
+  //     and HDI rank have no canonical/alternate ambiguity. The 3
+  //     component fact-keys (GNI per capita PPP, expected years of
+  //     schooling, mean years of schooling) are tagged via the
+  //     sync-orchestrator's `civicaRole` field per indicator, NOT
+  //     here — fact-keys.ts is source-agnostic. See
+  //     ~/civica/plan/undp-hdi-resolution-v1.md §2c, §2e. ───
+  {
+    key: "hdi_score",
+    group: "B",
+    category: "society",
+    label: "Human Development Index (HDI)",
+    unit: "index (0–1)",
+    // UNDP's HDI composite is bounded [0, 1] by construction. The
+    // 2023 vintage range observed: 0.394 (Somalia) to 0.972
+    // (Switzerland). Envelope [0, 1] is exact.
+    envelope: { min: 0, max: 1 },
+    higherIsBetter: true,
+    materialErrorPctThreshold: 0.5,
+  },
+  {
+    key: "hdi_rank",
+    group: "B",
+    category: "society",
+    label: "HDI rank (UNDP)",
+    unit: "rank",
+    // UNDP ranks ~193 jurisdictions in the 2023 vintage; envelope
+    // max 250 absorbs future expansions. lower rank = better;
+    // Norway #2, Switzerland #1, Somalia #193.
+    envelope: { min: 1, max: 250 },
+    higherIsBetter: false,
+    materialErrorPctThreshold: 0.5,
+  },
+  {
+    key: "gni_per_capita_ppp_usd",
+    group: "B",
+    category: "economy",
+    label: "GNI per capita (PPP, constant 2017 international $)",
+    unit: "international $ (2017 PPP)",
+    // UNDP uses CONSTANT 2017 PPP USD (different methodology from
+    // WB's NY.GDP.PCAP.PP.CD which is current PPP USD). Distinct
+    // fact-key from `gdp_per_capita_usd` — no double-write conflict.
+    // 2023 vintage range: $700 (Burundi) to $112,710 (Norway);
+    // Liechtenstein/Monaco can exceed $140k. Envelope [100, 200_000]
+    // gives margin for the highest-income jurisdictions.
+    envelope: { min: 100, max: 200_000 },
+    higherIsBetter: true,
+    materialErrorPctThreshold: 0.8,
+  },
+  {
+    key: "expected_years_schooling",
+    group: "B",
+    category: "society",
+    label: "Expected years of schooling",
+    unit: "years",
+    // UNDP's HDI methodology caps EYS at 18 years for the index
+    // calculation; raw values can exceed 18 (Australia 21.0 in some
+    // vintages). Envelope [0, 25] gives generous margin. UNDP
+    // canonical for v1; flips to UNESCO alternate when R.7.5 ships.
+    envelope: { min: 0, max: 25 },
+    higherIsBetter: true,
+    materialErrorPctThreshold: 0.5,
+  },
+  {
+    key: "mean_years_schooling",
+    group: "B",
+    category: "society",
+    label: "Mean years of schooling (adults 25+)",
+    unit: "years",
+    // 2023 vintage range: 1.41 (Niger) to 13.9+ (USA / Czechia).
+    // Envelope [0, 20] is conservative. Same canonical-flip plan
+    // as expected_years_schooling.
+    envelope: { min: 0, max: 20 },
+    higherIsBetter: true,
+    materialErrorPctThreshold: 0.5,
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────
