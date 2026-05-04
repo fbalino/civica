@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 
 export const metadata: Metadata = {
   title: "Peer grouping in Civica — Methodology",
@@ -84,10 +85,28 @@ const FALLBACK_TABLE: Array<{
   },
 ];
 
+const SECTIONS = [
+  { id: "problem", label: "The problem" },
+  { id: "principle", label: "Peer-set principle" },
+  { id: "material-outcomes", label: "Material outcomes" },
+  { id: "governance-outcomes", label: "Governance outcomes" },
+  { id: "alternate-regime-lens", label: "BR / CGV lens" },
+  { id: "constitutional-form", label: "Constitutional form" },
+  { id: "minimum-n", label: "Minimum-n rule" },
+  { id: "coverage-limitations", label: "Coverage limitations" },
+  { id: "reference-vintage", label: "Reference vintage" },
+  { id: "decision-record", label: "Decision record" },
+  { id: "limitations", label: "Limitations" },
+  { id: "migration-table", label: "Migration table" },
+  { id: "versioning", label: "Versioning" },
+  { id: "references", label: "References" },
+];
+
 export default function PeerGroupingMethodologyPage() {
   void HALF_LIFE_NOTE;
   return (
-    <EditorialPage>
+    <MethodologyLayout items={SECTIONS}>
+      <EditorialPage>
       <nav className="editorial-breadcrumbs">
         <Link href="/civica-index">← Civica Index</Link>
         <span>/</span>
@@ -122,7 +141,7 @@ export default function PeerGroupingMethodologyPage() {
         composite.
       </div>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="problem">
         <h2>The problem</h2>
         <p>
           Every comparison needs a peer set. Saying that France
@@ -163,7 +182,7 @@ export default function PeerGroupingMethodologyPage() {
         </ul>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="principle">
         <h2>The principle: peer sets are domain-specific</h2>
         <p>
           No major reference institution defaults peer grouping to a
@@ -189,7 +208,7 @@ export default function PeerGroupingMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="material-outcomes">
         <h2>Material outcomes — World Bank region × income</h2>
         <p>
           For Civica Conditions, the Human Development Index, GDP-based
@@ -214,7 +233,7 @@ export default function PeerGroupingMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="governance-outcomes">
         <h2>Governance outcomes — V-Dem Regimes of the World</h2>
         <p>
           For Civica Index dimensions (democratic quality, rule of law,
@@ -246,7 +265,7 @@ export default function PeerGroupingMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="alternate-regime-lens">
         <h2>Optional alternate regime lens — Bjørnskov-Rode / CGV</h2>
         <p>
           For users who want the executive-form-of-autocracy distinction
@@ -270,7 +289,7 @@ export default function PeerGroupingMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="constitutional-form">
         <h2>Constitutional form as metadata</h2>
         <p>
           &ldquo;Is there a king?&rdquo; &ldquo;Is the country
@@ -308,7 +327,7 @@ export default function PeerGroupingMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="minimum-n">
         <h2>Minimum-n rule and fallback chain</h2>
         <p>
           A peer band only renders when the cohort has at least{" "}
@@ -347,7 +366,7 @@ export default function PeerGroupingMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="coverage-limitations">
         <h2>Coverage limitations — non-sovereign and ambiguous jurisdictions</h2>
         <p>
           Some jurisdictions lack World Bank or V-Dem coverage entirely.
@@ -384,7 +403,7 @@ export default function PeerGroupingMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="reference-vintage">
         <h2>Reference vintage</h2>
         <p>
           Every external classification is pinned to a specific upstream
@@ -418,7 +437,7 @@ export default function PeerGroupingMethodologyPage() {
         </ul>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="decision-record">
         <h2>How this methodology was decided</h2>
         <p>
           Civica adopted this peer-grouping architecture on
@@ -441,7 +460,7 @@ export default function PeerGroupingMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="limitations">
         <h2>Limitations</h2>
         <ul>
           <li>
@@ -477,7 +496,7 @@ export default function PeerGroupingMethodologyPage() {
         </ul>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="migration-table">
         <h2>Migration table</h2>
         <p>
           The full per-country mapping &mdash; old{" "}
@@ -574,7 +593,7 @@ export default function PeerGroupingMethodologyPage() {
         </div>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="versioning">
         <h2>Versioning + changelog</h2>
         <ul>
           <li>
@@ -586,7 +605,7 @@ export default function PeerGroupingMethodologyPage() {
         </ul>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="references">
         <h2>References</h2>
         <ol>
           <li>
@@ -747,6 +766,7 @@ export default function PeerGroupingMethodologyPage() {
           Pulse methodology →
         </Link>
       </footer>
-    </EditorialPage>
+      </EditorialPage>
+    </MethodologyLayout>
   );
 }

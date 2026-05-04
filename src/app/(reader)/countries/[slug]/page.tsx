@@ -31,7 +31,7 @@ import { CountryTabs } from "./tabs";
 import { CountryFlag } from "@/components/CountryFlag";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { GovStructureDiagram } from "@/components/GovStructureDiagram";
-import { HemicycleChart } from "@/components/HemicycleChart";
+import { FactbookLegislatureChart } from "@/components/factbook/FactbookLegislatureChart";
 import { classifyGovernment } from "@/lib/data/government-category";
 import { resolvePartyColor } from "@/lib/data/party-colors";
 import { stripHtml, firstSentences, formatGovernmentType } from "@/lib/text/clean";
@@ -942,15 +942,34 @@ export default async function CountryPage({
   const legislatureTab = legislatureData.length > 0 ? (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {legislatureData.map(({ body, parties }) => (
-        <HemicycleChart
+        <FactbookLegislatureChart
           key={body.id}
-          chamberName={body.name}
-          totalSeats={body.totalSeats ?? parties.reduce((s, p) => s + p.seatCount, 0)}
-          parties={parties.map((p, i) => ({
-            name: p.partyName,
-            seats: p.seatCount,
-            color: resolvePartyColor(p.partyColor, p.partyName, i),
-          }))}
+          chamber={{
+            id: body.id,
+            slot: body.chamberType === "upper" ? "upper" : "lower",
+            name: body.name,
+            total:
+              body.totalSeats ??
+              parties.reduce((s, p) => s + p.seatCount, 0),
+            sub: `${
+              body.totalSeats ??
+              parties.reduce((s, p) => s + p.seatCount, 0)
+            } seats`,
+            parties: parties.map((p, i) => ({
+              id: p.id,
+              name: p.partyName,
+              seats: p.seatCount,
+              color: resolvePartyColor(p.partyColor, p.partyName, i),
+            })),
+          }}
+          houseLabel={
+            body.chamberType === "upper"
+              ? "Upper house"
+              : body.chamberType === "lower"
+                ? "Lower house"
+                : "Legislature"
+          }
+          countryName={jurisdiction.name}
         />
       ))}
     </div>

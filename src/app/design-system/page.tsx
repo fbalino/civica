@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DesignSystemSwatch } from "@/components/DesignSystemSwatch";
-import { HemicycleChart } from "@/components/HemicycleChart";
+import { FactbookLegislatureChart } from "@/components/factbook/FactbookLegislatureChart";
+import { ATLAS_TAB_LABELS, ATLAS_TAB_ORDER } from "@/lib/atlas/ids";
 
 import "./design-system.css";
 
@@ -44,12 +45,21 @@ const SPACING = [
 ];
 
 const SAMPLE_PARTIES = [
-  { name: "Civic Alliance", seats: 46, color: "var(--gov-parl)" },
-  { name: "National Union", seats: 38, color: "var(--gov-pres)" },
-  { name: "Green List", seats: 25, color: "var(--gov-theo)" },
-  { name: "Liberal Forum", seats: 22, color: "var(--gov-semi)" },
-  { name: "Independents", seats: 19, color: "var(--color-text-40)" },
+  { id: "civic-alliance", name: "Civic Alliance", seats: 46, color: "var(--gov-parl)" },
+  { id: "national-union", name: "National Union", seats: 38, color: "var(--gov-pres)" },
+  { id: "green-list", name: "Green List", seats: 25, color: "var(--gov-theo)" },
+  { id: "liberal-forum", name: "Liberal Forum", seats: 22, color: "var(--gov-semi)" },
+  { id: "independents", name: "Independents", seats: 19, color: "var(--color-text-40)" },
 ];
+
+const SAMPLE_CHAMBER = {
+  id: "sample-lower",
+  slot: "lower" as const,
+  name: "Sample Country · National Assembly",
+  total: 150,
+  sub: "150 seats",
+  parties: SAMPLE_PARTIES,
+};
 
 export default function DesignSystemPage() {
   return (
@@ -170,13 +180,13 @@ export default function DesignSystemPage() {
 
           <div className="ds-type-row">
             <span className="lab">Display / H1</span>
-            <span style={{ fontFamily: "var(--serif)", fontWeight: 400, fontSize: 72, lineHeight: 0.95, letterSpacing: "-0.03em" }}>Every chamber.</span>
-            <span className="spec">Fraunces · 400 · 72/0.95 · -3%</span>
+            <span style={{ fontFamily: "var(--font-heading)", fontWeight: 400, fontSize: "var(--text-56)", lineHeight: 1.02, letterSpacing: "-0.04em" }}>Every chamber.</span>
+            <span className="spec">Fraunces · 400 · 56/1.02 · -4%</span>
           </div>
           <div className="ds-type-row">
             <span className="lab">H2 / Section</span>
-            <span style={{ fontFamily: "var(--serif)", fontWeight: 400, fontSize: 40, letterSpacing: "-0.02em" }}>Parliament, live.</span>
-            <span className="spec">Fraunces · 400 · 40 · -2%</span>
+            <span style={{ fontFamily: "var(--font-heading)", fontWeight: 400, fontSize: "var(--text-44)", letterSpacing: "-0.03em" }}>Parliament, live.</span>
+            <span className="spec">Fraunces · 400 · 44 · -3%</span>
           </div>
           <div className="ds-type-row">
             <span className="lab">H3 / Subhead</span>
@@ -288,9 +298,11 @@ export default function DesignSystemPage() {
             <div className="ds-comp">
               <h4>Tabs</h4>
               <div className="ds-tabs">
-                <button className="on">I · The Chamber</button>
-                <button>II · Laws in Motion</button>
-                <button>III · Full Structure</button>
+                {ATLAS_TAB_ORDER.map((tab) => (
+                  <button key={tab} className={tab === "structure" ? "on" : ""}>
+                    {ATLAS_TAB_LABELS[tab]}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -329,12 +341,12 @@ export default function DesignSystemPage() {
               </div>
             </div>
 
-            <div className="ds-comp">
+            <div className="ds-comp ds-comp--wide">
               <h4>Hemicycle</h4>
-              <HemicycleChart
-                totalSeats={150}
-                parties={SAMPLE_PARTIES}
-                chamberName="Sample Country · National Assembly"
+              <FactbookLegislatureChart
+                chamber={SAMPLE_CHAMBER}
+                houseLabel="Lower house"
+                countryName="Sample Country"
               />
             </div>
           </div>

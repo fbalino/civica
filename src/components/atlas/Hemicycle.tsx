@@ -82,12 +82,12 @@ export function Hemicycle({ chamber, dimmed, onSeatHover, onSeatLeave }: Hemicyc
     <svg className="atlas-hemi" viewBox="-260 -240 520 260" preserveAspectRatio="xMidYMid meet">
       {/* Rostrum */}
       <path d="M -50 0 A 50 50 0 0 1 50 0 L 50 -8 L -50 -8 Z" fill="var(--atlas-paper-2)" stroke="var(--atlas-ink)" strokeWidth="1" />
-      <text x={0} y={-18} textAnchor="middle" fontFamily="ui-monospace,monospace" fontSize="6" letterSpacing="1.2" fill="var(--atlas-muted)">
+      <text x={0} y={-18} textAnchor="middle" fontFamily="var(--font-mono)" fontSize="6" letterSpacing="1.2" fill="var(--atlas-muted)">
         ROSTRUM
       </text>
       {/* Majority line */}
       <line x1={0} x2={0} y1={-240} y2={-50} stroke="var(--atlas-accent)" strokeWidth="0.6" strokeDasharray="2 3" />
-      <text x={3} y={-230} fontFamily="ui-monospace,monospace" fontSize="5" letterSpacing="1" fill="var(--atlas-accent)">
+      <text x={3} y={-230} fontFamily="var(--font-mono)" fontSize="5" letterSpacing="1" fill="var(--atlas-accent)">
         MAJORITY {Math.ceil(chamber.total / 2) + 1}
       </text>
       {/* Seats */}

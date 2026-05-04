@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import {
   getPeerGroupingMigrationTable,
   type PeerGroupingMigrationRow,
@@ -31,7 +32,14 @@ export default async function PeerGroupingMigrationPage() {
   }
 
   return (
-    <EditorialPage width="full">
+    <MethodologyLayout
+      items={[
+        { id: "how-to-read", label: "How to read" },
+        { id: "table", label: "The table" },
+      ]}
+      contentClassName="methodology-content--wide"
+    >
+      <EditorialPage width="full">
       <nav className="editorial-breadcrumbs">
         <Link href="/civica-index">← Civica Index</Link>
         <span>/</span>
@@ -73,7 +81,7 @@ export default async function PeerGroupingMigrationPage() {
         is the recommended bulk-rewrite source.
       </div>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="how-to-read">
         <h2>How to read</h2>
         <p>
           Each row is one sovereign state. The first two columns show
@@ -96,7 +104,7 @@ export default async function PeerGroupingMigrationPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="table">
         <h2>The table</h2>
         {rows.length === 0 ? (
           <p>No rows available — check back after the next data sync.</p>
@@ -154,6 +162,7 @@ export default async function PeerGroupingMigrationPage() {
         </Link>
         <Link href="/api/v1/peer-groupings/migration">JSON →</Link>
       </footer>
-    </EditorialPage>
+      </EditorialPage>
+    </MethodologyLayout>
   );
 }

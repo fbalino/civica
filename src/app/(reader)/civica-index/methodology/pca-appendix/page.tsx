@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 
 export const metadata: Metadata = {
   title: "PCA appendix — Civica Index methodology",
@@ -126,9 +127,21 @@ const CORRELATIONS: CorrRow[] = [
   },
 ];
 
+const SECTIONS = [
+  { id: "summary", label: "Headline finding" },
+  { id: "data", label: "Data" },
+  { id: "correlations", label: "Correlations" },
+  { id: "eigenvalues", label: "Eigenvalues" },
+  { id: "loadings", label: "Loadings" },
+  { id: "five-dim", label: "Fifth dimension" },
+  { id: "limitations", label: "Limitations" },
+  { id: "reproduction", label: "Reproduction" },
+];
+
 export default function PcaAppendixPage() {
   return (
-    <EditorialPage className="pca-layout">
+    <MethodologyLayout items={SECTIONS}>
+      <EditorialPage className="pca-layout">
       <article className="pca-article">
         <nav className="breadcrumb">
           <Link href="/civica-index">← Civica Index</Link>
@@ -683,6 +696,7 @@ export default function PcaAppendixPage() {
           .pca-article h2 { font-size: 24px; }
         }
       `}</style>
-    </EditorialPage>
+      </EditorialPage>
+    </MethodologyLayout>
   );
 }

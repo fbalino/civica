@@ -43,7 +43,7 @@ Hex, `rgb`, `rgba`, and raw `oklch` literals belong only in token-definition blo
 
 ## Typography
 
-Use Fraunces for display and country/editorial headings through `var(--font-heading)`. Use Inter for body/interface text through `var(--font-body)` or `var(--font-sans)`. Use `var(--font-mono)` for labels, IDs, metadata, and data-dense UI.
+Use Fraunces for display and country/editorial headings through `var(--font-heading)`. The canonical page H1 is 56px (`var(--text-56)`) except for `/blog`, which is allowed to keep its heavier editorial nameplate. Use Inter for body/interface text through `var(--font-body)`. Use `var(--font-mono)` only for labels, IDs, source/meta rows, code, and dense numeric UI. Do not use mono for readable facts such as government type, region, capital, population, GDP, or tab labels.
 
 Use `var(--text-*)` tokens for font sizes. Do not add new pixel font sizes in page-level CSS.
 
@@ -51,9 +51,11 @@ Use `var(--text-*)` tokens for font sizes. Do not add new pixel font sizes in pa
 
 Use the standard container widths:
 
-- `.editorial-container` for narrow reading pages.
-- `.wide-container` for medium-width editorial/product surfaces.
-- `.full-bleed-container` for atlas-scale layouts.
+- `.editorial-page` — 760px narrow reading column.
+- `.editorial-page--wide` — 960px medium editorial/list surface.
+- `.editorial-page--full` — 1200px standard product/editorial surface. This is the default target for most pages.
+- `.methodology-layout` — 1200px methodology shell with a left `ReaderSidebar` and no country search input.
+- `.factbook-body` — 1280px is allowed only for the factbook surface because it carries two sidebars.
 
 Use `var(--space-*)` for new spacing decisions unless an existing component contract requires a fixed dimension.
 
@@ -80,6 +82,10 @@ Prefer shared primitives for new editorial UI:
 
 Every visible data point should carry provenance where possible. Use `SourceDot`; do not hand-roll provenance markers.
 
+The canonical legislature/hemicycle pattern is the factbook legislature component (`FactbookLegislatureChart`): rostrum, majority line, seat hover, stats grid, and all-party rows. Older standalone hemicycle demos are non-canonical.
+
+Tabs use Inter body text with normal casing, matching the Atlas tab bar (`Structure`, `Bills`, `Leaders`, etc.). Do not use Roman numerals or monospace for tabs.
+
 ## Editorial layout classes
 
 Reader-style pages (methodology, replication, corrections, changelog, etc.) compose global layout classes from `src/app/editorial.css`. **Do not ship inline `<style>` blocks for layout, typography, spacing, or container width on a new editorial page.** If a missing class would force a `<style>` block, add the class to `editorial.css` and reuse it.
@@ -88,12 +94,13 @@ Container:
 
 - `.editorial-page` — narrow column (760px), default. Applied by `<EditorialPage>` automatically.
 - `.editorial-page--wide` — 960px column for filterable lists / changelogs. Pass `width="wide"` to `<EditorialPage>`.
-- `.editorial-page--full` — 1200px atlas-scale.
+- `.editorial-page--full` — 1200px standard product/editorial width. Pass `width="full"` to `<EditorialPage>`.
+- `.methodology-layout` — 1200px methodology shell with left sidebar; use it for `/civica-index/methodology` and every methodology subpage.
 
 Header chrome:
 
 - `.editorial-breadcrumbs` — mono breadcrumb row with separators.
-- `.editorial-page-title` (or default `<h1>` inside `.editorial-page`) — display heading.
+- `.editorial-page-title` (or default `<h1>` inside `.editorial-page`) — display heading at 56px desktop.
 - `.editorial-page-subtitle` — serif subtitle / dek.
 - `.editorial-page-meta` — mono meta strip.
 - `.editorial-beta-tag` — inline Beta pill for use next to a heading.

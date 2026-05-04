@@ -1,4 +1,4 @@
-import { HemicycleChart } from "@/components/HemicycleChart";
+import { FactbookLegislatureChart } from "@/components/factbook/FactbookLegislatureChart";
 import { CompareColumnHeader } from "./CompareColumnHeader";
 import type { getLegislatureComposition } from "@/lib/db/queries";
 
@@ -18,6 +18,29 @@ function classifyChamber(
   const name = (body.chamberType ?? "").toLowerCase();
   if (name === "upper" || name === "lower" || name === "unicameral") return name;
   return "other";
+}
+
+function toCanonicalChamber(
+  entry: Composition[number],
+  fallbackSlot: "lower" | "upper"
+) {
+  const total =
+    entry.body.totalSeats ??
+    entry.parties.reduce((sum, party) => sum + (party.seatCount ?? 0), 0);
+
+  return {
+    id: entry.body.id,
+    slot: fallbackSlot,
+    name: entry.body.name,
+    total,
+    sub: `${total} seats`,
+    parties: entry.parties.map((party) => ({
+      id: party.id,
+      name: party.partyName,
+      seats: party.seatCount ?? 0,
+      color: party.partyColor ?? "var(--color-text-40)",
+    })),
+  };
 }
 
 export function CompareChambers({ countries }: CompareChambersProps) {
@@ -61,23 +84,14 @@ export function CompareChambers({ countries }: CompareChambersProps) {
                     ? "LEGISLATURE"
                     : "LOWER CHAMBER"}
                 </div>
-                <HemicycleChart
-                  totalSeats={lower.body.totalSeats ?? 0}
-                  parties={lower.parties.map((p) => ({
-                    name: p.partyName,
-                    seats: p.seatCount ?? 0,
-                    color: p.partyColor ?? "#888",
-                  }))}
-                  chamberName={lower.body.name}
-                />
-                <ChamberMetadata
-                  majoritySeats={
-                    lower.body.totalSeats
-                      ? Math.floor(lower.body.totalSeats / 2) + 1
-                      : null
+                <FactbookLegislatureChart
+                  chamber={toCanonicalChamber(lower, "lower")}
+                  houseLabel={
+                    classifyChamber(lower.body) === "unicameral"
+                      ? "Legislature"
+                      : "Lower house"
                   }
-                  totalSeats={lower.body.totalSeats ?? 0}
-                  parties={lower.parties.length}
+                  countryName={c.jurisdiction.name}
                 />
               </div>
             ) : (
@@ -89,55 +103,16 @@ export function CompareChambers({ countries }: CompareChambersProps) {
             {upper && (
               <div className="compare-chamber-block">
                 <div className="compare-chamber-eyebrow">UPPER CHAMBER</div>
-                <HemicycleChart
-                  totalSeats={upper.body.totalSeats ?? 0}
-                  parties={upper.parties.map((p) => ({
-                    name: p.partyName,
-                    seats: p.seatCount ?? 0,
-                    color: p.partyColor ?? "#888",
-                  }))}
-                  chamberName={upper.body.name}
-                />
-                <ChamberMetadata
-                  majoritySeats={
-                    upper.body.totalSeats
-                      ? Math.floor(upper.body.totalSeats / 2) + 1
-                      : null
-                  }
-                  totalSeats={upper.body.totalSeats ?? 0}
-                  parties={upper.parties.length}
+                <FactbookLegislatureChart
+                  chamber={toCanonicalChamber(upper, "upper")}
+                  houseLabel="Upper house"
+                  countryName={c.jurisdiction.name}
                 />
               </div>
             )}
           </div>
         );
       })}
-    </div>
-  );
-}
-
-function ChamberMetadata({
-  majoritySeats,
-  totalSeats,
-  parties,
-}: {
-  majoritySeats: number | null;
-  totalSeats: number;
-  parties: number;
-}) {
-  return (
-    <div className="compare-chamber-meta">
-      <span>
-        <strong>{totalSeats}</strong> seats
-      </span>
-      {majoritySeats && (
-        <span>
-          Majority: <strong>{majoritySeats}</strong>
-        </span>
-      )}
-      <span>
-        <strong>{parties}</strong> {parties === 1 ? "party" : "parties"}
-      </span>
     </div>
   );
 }

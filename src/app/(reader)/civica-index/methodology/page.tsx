@@ -6,7 +6,6 @@ import { ReaderSidebar } from "@/components/editorial/ReaderSidebar";
 import {
   getCIMethodology,
   getCIMethodologyHistory,
-  getFactbookCountryOptions,
 } from "@/lib/db/queries";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 
@@ -149,7 +148,6 @@ export default async function MethodologyPage() {
   const lastRevision = methodology?.publishedAt
     ? formatDate(methodology.publishedAt)
     : "Apr 2026";
-  const countryOptions = await getFactbookCountryOptions().catch(() => []);
   const sidebarItems = SECTIONS.map((s) => ({
     id: s.id,
     label: humanizeSectionLabel(s.label),
@@ -159,10 +157,6 @@ export default async function MethodologyPage() {
     <EditorialPage className="civica-methodology-layout">
       <ReaderSidebar
         items={sidebarItems}
-        countries={countryOptions}
-        countryPathPrefix="/civica-index"
-        searchPlaceholder="Jump to country..."
-        searchAriaLabel="Jump to a country Civica Index page"
         className="meth-toc"
       />
 

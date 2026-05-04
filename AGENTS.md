@@ -48,13 +48,16 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 ## Design System (authoritative)
 **See `https://www.civicaatlas.org/design-system` for the live reference.** Code lives in `src/app/globals.css`, `src/app/atlas.css`, and `src/app/design-system/page.tsx`.
 
-- **Typography**: Fraunces (serif, display + country cards), Inter (sans, body), `ui-monospace` (labels, meta). Do NOT substitute IBM Plex or other fonts.
+- **Typography**: Fraunces (serif, display + country cards), Inter (sans, body/interface), `ui-monospace` (labels, source/meta rows, IDs, code, dense numeric UI only). Do NOT substitute IBM Plex or other fonts. Do NOT use mono for tabs or readable facts like government type, region, capital, population, or GDP.
 - **Color palette** (light): paper `#f4f1ea`, ink `#1a1a1a`, muted `#8a8370`, rule `#c4bdae`, accent (cinnabar) `oklch(58% 0.14 35)`. Dark mode flips via `data-theme="dark"`.
 - **Signal colors**: olive (success), amber (warn/frozen), brick (danger), slate (info).
 - **Government-type palette**: parliamentary blue, presidential rust, semi-presidential purple, monarchy gold, theocracy green — always use the CSS vars (`--gov-parl`, `--gov-pres`, etc.).
 - **Tier palette** (CI 0-100): exceptional → strong → mixed → weak → failed, mapped via `var(--tier-*)`.
 - **Shadows**: hard-offset, no blur (`4px 4px 0 var(--ink)`). Print-inspired.
-- **Layout containers**: `.editorial-container` (720px), `.wide-container` (960px), `.full-bleed-container` (1200px).
+- **Layout containers**: `.editorial-page` (760px narrow reading column), `.editorial-page--wide` (960px), `.editorial-page--full` (1200px standard page width). Most pages should target 1200px; 1280px is reserved for factbook-style pages with two sidebars. Methodology pages and subpages use `.methodology-layout` (1200px with left `ReaderSidebar`, no country search input).
+- **Headings**: canonical page H1 is 56px (`var(--text-56)`) except `/blog`, which can keep its separate editorial nameplate.
+- **Tabs**: use Inter/body text with normal casing, matching Atlas (`Structure`, `Bills`, etc.). No Roman-numeral monospace tab labels.
+- **Hemicycle**: the factbook legislature hemicycle is canonical sitewide (`FactbookLegislatureChart`: rostrum, majority line, stats grid, all-party rows). Do not revive the old design-system demo hemicycle.
 - **SourceDot**: every data point carries a provenance dot (green=live, amber=frozen). Use `src/components/SourceDot.tsx` — do not hand-roll.
 
 ## Data Sources

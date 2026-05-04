@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 
 export const metadata: Metadata = {
   title: "Pulse methodology (Beta) — Civica Index",
@@ -28,9 +29,28 @@ const HALF_LIVES: Array<[string, number]> = [
   ["Armed conflict (active)", 180],
 ];
 
+const SECTIONS = [
+  { id: "what-pulse-is", label: "What the Pulse is" },
+  { id: "what-pulse-is-not", label: "What the Pulse is not" },
+  { id: "sources", label: "Sources" },
+  { id: "daily-pipeline", label: "Daily pipeline" },
+  { id: "event-categories", label: "Event categories" },
+  { id: "disambiguation", label: "Disambiguation" },
+  { id: "cascade-model", label: "Cascade model" },
+  { id: "multi-run-classifier", label: "Multi-run classifier" },
+  { id: "asymmetric-scoring", label: "Asymmetric scoring" },
+  { id: "press-freedom-rule", label: "Press-freedom rule" },
+  { id: "decay", label: "Decay" },
+  { id: "bounds", label: "Bounds" },
+  { id: "coverage-limitations", label: "Coverage limitations" },
+  { id: "known-limitations", label: "Known limitations" },
+  { id: "corrections", label: "Corrections" },
+];
+
 export default function PulseMethodologyPage() {
   return (
-    <EditorialPage>
+    <MethodologyLayout items={SECTIONS}>
+      <EditorialPage>
       <nav className="editorial-breadcrumbs">
         <Link href="/civica-index">← Civica Index</Link>
         <span>/</span>
@@ -57,7 +77,7 @@ export default function PulseMethodologyPage() {
         graduates to publishable status.
       </div>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="what-pulse-is">
         <h2>What the Pulse is</h2>
         <p>
           The Civica Pulse fills the gap between quarterly Civica Index
@@ -78,7 +98,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="what-pulse-is-not">
         <h2>What the Pulse is not</h2>
         <ul>
           <li>
@@ -102,7 +122,7 @@ export default function PulseMethodologyPage() {
         </ul>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="sources">
         <h2>Sources — specialist feeds first, news second</h2>
         <p>
           The first version of the Pulse relied on general news ingestion
@@ -169,7 +189,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="daily-pipeline">
         <h2>Daily pipeline</h2>
         <ol>
           <li>
@@ -211,7 +231,7 @@ export default function PulseMethodologyPage() {
         </ol>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="event-categories">
         <h2>Event categories — the v2 taxonomy</h2>
         <p>
           The Pulse classifies every event into exactly one category
@@ -500,7 +520,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="disambiguation">
         <h2>Disambiguation — when an event could fit multiple categories</h2>
         <p>
           v2.0 expanded the taxonomy from 30 to 61 categories. Several
@@ -552,7 +572,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="cascade-model">
         <h2>How coups are classified — the cascade model</h2>
         <p>
           Reviewers occasionally ask why a coup d&apos;état drives the
@@ -576,7 +596,7 @@ export default function PulseMethodologyPage() {
             {" "}→ Democratic Quality
           </li>
           <li>
-            "Transition plans" or term extensions → <code>term_extension</code>
+            &ldquo;Transition plans&rdquo; or term extensions → <code>term_extension</code>
             {" "}→ Democratic Quality
           </li>
           <li>
@@ -606,7 +626,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="multi-run-classifier">
         <h2>Multi-run classifier — agreement is the confidence signal</h2>
         <p>
           LLM self-reported confidence is not calibrated. The Pulse
@@ -633,7 +653,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="asymmetric-scoring">
         <h2>Asymmetric scoring — anti-gaming</h2>
         <p>
           Authoritarian regimes can manufacture positive-seeming events
@@ -670,7 +690,7 @@ export default function PulseMethodologyPage() {
         </ul>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="press-freedom-rule">
         <h2>Press-freedom rule</h2>
         <p>
           A country&apos;s current RSF Press Freedom score modulates how
@@ -702,7 +722,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="decay">
         <h2>Decay — different events fade at different rates</h2>
         <p>
           A coup d&apos;état has structural impact for years. A
@@ -735,7 +755,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="bounds">
         <h2>Bounds and double-counting prevention</h2>
         <p>
           Each dimensional delta is clamped to <strong>[−15, +10]</strong>{" "}
@@ -753,7 +773,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="coverage-limitations">
         <h2>Coverage limitations — closed regimes</h2>
         <p>
           The Pulse depends on observable, reportable events. For
@@ -779,7 +799,7 @@ export default function PulseMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="known-limitations">
         <h2>Known limitations</h2>
         <ul>
           <li>
@@ -814,7 +834,7 @@ export default function PulseMethodologyPage() {
         </ul>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="corrections">
         <h2>Corrections and disputes</h2>
         <p>
           File a Pulse dispute via the{" "}
@@ -833,6 +853,7 @@ export default function PulseMethodologyPage() {
         <Link href="/civica-index/pulse-changelog">Pulse changelog</Link>
         <Link href="/civica-index/corrections">Corrections form</Link>
       </nav>
-    </EditorialPage>
+      </EditorialPage>
+    </MethodologyLayout>
   );
 }

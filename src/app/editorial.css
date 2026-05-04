@@ -62,7 +62,7 @@
 .editorial-page-title,
 .editorial-page h1 {
   font-family: var(--font-heading);
-  font-size: var(--text-52);
+  font-size: var(--text-56);
   font-weight: 400;
   letter-spacing: -0.04em;
   line-height: 1.02;
@@ -334,6 +334,81 @@
 
 .reader-sidebar-text {
   min-width: 0;
+}
+
+/* ── Methodology pages: 1200px shell + left section rail ───────────
+ *
+ * Methodology pages are product documentation, not narrow essays. The
+ * 1200px shell gives the left "On this page" rail room while keeping
+ * the article column readable. The rail intentionally omits the country
+ * search input used on factbook pages.
+ */
+
+.methodology-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-page-x, 40px);
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 64px;
+  color: var(--color-text-primary);
+  overflow-x: clip;
+}
+
+.methodology-sidebar {
+  position: sticky;
+  top: 80px;
+  align-self: start;
+  padding: 60px 0 40px;
+}
+
+.methodology-content {
+  width: 100%;
+  max-width: 800px;
+  min-width: 0;
+  padding: 60px 0 80px;
+}
+
+.methodology-content--wide {
+  max-width: none;
+}
+
+.methodology-content > .editorial-page,
+.methodology-content .pca-layout {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .methodology-layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0 20px;
+  }
+
+  .methodology-sidebar {
+    position: static;
+    padding: 32px 0 0;
+  }
+
+  .methodology-content {
+    max-width: none;
+    padding: 32px 0 70px;
+  }
+
+  .methodology-sidebar .reader-sidebar-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .methodology-sidebar .reader-sidebar-link {
+    padding: 4px 10px;
+    border-left: 0;
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+  }
 }
 
 .editorial-filter-bar {

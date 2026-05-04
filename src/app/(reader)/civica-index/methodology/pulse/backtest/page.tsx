@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { Pill } from "@/components/editorial/Pill";
 import {
   getBacktestSnapshot,
@@ -353,9 +354,18 @@ export default async function BacktestReportPage() {
     stats.passCount + stats.partialCount + stats.failCount;
   const ratio =
     totalRunCases > 0 ? Math.round((passingCases / totalRunCases) * 100) : 0;
+  const sidebarItems = [
+    { id: "summary", label: "Summary" },
+    { id: "verdict-thresholds", label: "Verdict thresholds" },
+    ...snapshot.map((c) => ({
+      id: c.id,
+      label: c.countryName,
+    })),
+  ];
 
   return (
-    <EditorialPage>
+    <MethodologyLayout items={sidebarItems}>
+      <EditorialPage>
       <nav className="editorial-breadcrumbs">
         <Link href="/civica-index">← Civica Index</Link>
         <span>/</span>
@@ -384,7 +394,7 @@ export default async function BacktestReportPage() {
         {ratio}% pass rate among the cases run so far).
       </div>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="summary">
         <h2>Summary</h2>
         <table>
           <thead>
@@ -426,7 +436,7 @@ export default async function BacktestReportPage() {
         </table>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="verdict-thresholds">
         <h2>Verdict thresholds</h2>
         <p>
           For each expected (dimension, direction) row, the case passes
@@ -461,6 +471,7 @@ export default async function BacktestReportPage() {
         <Link href="/civica-index/pulse-changelog">Pulse changelog</Link>
         <Link href="/civica-index/corrections">Corrections form</Link>
       </nav>
-    </EditorialPage>
+      </EditorialPage>
+    </MethodologyLayout>
   );
 }
