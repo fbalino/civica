@@ -5,6 +5,14 @@ import {
   ReaderSidebar,
   type ReaderSidebarItem,
 } from "@/components/editorial/ReaderSidebar";
+import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
+import {
+  tier1Publishers,
+  nsoWave1,
+  pulse,
+  civicaIndex,
+  adoptedResolutionCount,
+} from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "How we approach data — Civica Atlas",
@@ -26,7 +34,22 @@ const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "contact", label: "Get in touch" },
 ];
 
-export default function ApproachPage() {
+export default async function ApproachPage() {
+  // Soft-fail: page should still render if the DB is unreachable, with
+  // generic prose in place of live counts.
+  let stats: SiteStats | null = null;
+  try {
+    stats = await getSiteStats();
+  } catch {
+    stats = null;
+  }
+
+  const tier1Shipped = tier1Publishers.filter((p) => p.shipped);
+  const tier1ShortNames = tier1Shipped.map((p) => p.shortName);
+  const nsoActive = nsoWave1.filter((n) => n.status === "in-progress");
+  const nsoActiveNames = nsoActive.map((n) => n.name);
+
+
   return (
     <EditorialPage className="methodology-layout">
       <ReaderSidebar items={SIDEBAR_ITEMS} className="methodology-sidebar" />
@@ -91,9 +114,10 @@ export default function ApproachPage() {
         >
           <h2 id="multi-source-heading">Multi-source reconciliation</h2>
           <p>
-            Civica integrates multiple source orchestrators &mdash; one per
-            upstream publisher &mdash; into a single canonical data layer.
-            Currently:
+            Civica integrates{" "}
+            {stats ? `${stats.activeSources} ` : "multiple "}
+            source orchestrators &mdash; one per upstream publisher &mdash;
+            into a single canonical data layer. Currently:
           </p>
           <ul>
             <li>
@@ -101,8 +125,8 @@ export default function ApproachPage() {
               January 2026 vintage, public domain).
             </li>
             <li>
-              <strong>Tier-1 publishers:</strong> World Bank, IMF, UN, WHO,
-              UNESCO, UNDP, OECD, FAO, ILO, Eurostat, WTO.
+              <strong>Tier-1 publishers ({tier1Shipped.length}):</strong>{" "}
+              {tier1ShortNames.join(", ")}.
             </li>
             <li>
               <strong>Governance-specialist sources:</strong> V-Dem (Varieties
@@ -113,9 +137,8 @@ export default function ApproachPage() {
             </li>
             <li>
               <strong>National statistics offices:</strong> rolling out in
-              waves &mdash; US Census, ONS-UK, INSEE-FR, Destatis-DE,
-              Statistics Canada, IBGE-BR, Stats SA, NBS-Nigeria as the first
-              wave.
+              waves &mdash; {nsoActiveNames.join(", ")} in the first
+              in-progress wave of {nsoActive.length}.
             </li>
           </ul>
           <p>
@@ -273,14 +296,16 @@ export default function ApproachPage() {
           </p>
           <p>
             The <strong>Civica Index</strong> composite scoring methodology
-            (PCA-derived weights, six dimensions, frozen reference periods)
-            is published and stable, but external academic review has not
-            yet been completed. The page is in BETA pending review. Same for
-            the <strong>Civica Pulse</strong> classification taxonomy &mdash;
-            it has been backtested against ten historical shocks but has not
-            been externally reviewed. <strong>Reconciliation rules</strong>{" "}
-            are documented and live but the public-facing methodology page
-            is being expanded as v1 closes out.
+            (PCA-derived weights, {civicaIndex.dimensionCount} governance
+            dimensions, frozen reference periods) is published and stable,
+            but external academic review has not yet been completed. The
+            page is in BETA pending review. Same for the{" "}
+            <strong>Civica Pulse</strong> classification taxonomy &mdash;
+            it has been backtested against {pulse.backtest.cases.length}{" "}
+            historical shocks but has not been externally reviewed.{" "}
+            <strong>Reconciliation rules</strong> are documented and live
+            but the public-facing methodology page is being expanded as v1
+            closes out.
           </p>
           <p>
             External methodologies that Civica cites &mdash; V-Dem Regimes of
@@ -312,7 +337,10 @@ export default function ApproachPage() {
           <p>Things you may notice as the rollout progresses:</p>
           <ul>
             <li>
-              <strong>Some fact-keys are single-sourced.</strong> Many
+              <strong>Some fact-keys are single-sourced.</strong>{" "}
+              {stats
+                ? `${stats.singleSourcedFactKeys} of ${stats.distinctFactKeys} `
+                : "Many "}
               declared fact-keys currently have only one publisher.
               Reconciliation requires two sources to compare; for
               single-sourced facts, the reader page renders provenance but no
@@ -332,9 +360,9 @@ export default function ApproachPage() {
               <strong>
                 Some methodology resolutions are not yet public.
               </strong>{" "}
-              Civica has multiple adopted internal resolution documents
-              covering specific decisions. Public publication of a curated
-              subset is on the roadmap.
+              Civica has {adoptedResolutionCount}+ adopted internal
+              resolution documents covering specific decisions. Public
+              publication of a curated subset is on the roadmap.
             </li>
           </ul>
         </section>
