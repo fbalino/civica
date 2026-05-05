@@ -4,77 +4,40 @@ export type IndexNavItem = {
   descriptor: string;
 };
 
-export type IndexNavGroup = {
-  label: string;
-  items: IndexNavItem[];
-};
-
-export const INDEX_NAV_GROUPS: IndexNavGroup[] = [
+/**
+ * Flat list of Index-related sub-pages shown in the "Index" dropdown.
+ *
+ * Methodology pages are NOT listed here — they live under the
+ * top-level /methodology nav link (the methodology hub at
+ * `src/app/(reader)/methodology/page.tsx` indexes every methodology
+ * document on the site, including the Civica Index methodology).
+ *
+ * If you're tempted to re-add methodology entries to this dropdown,
+ * remember the duplication problem: the methodology hub is the single
+ * source of truth for methodology navigation. The Index dropdown is
+ * for non-methodology Index sub-pages only.
+ */
+export const INDEX_NAV_ITEMS: IndexNavItem[] = [
+  { href: "/civica-index", label: "Overview", descriptor: "Index home" },
   {
-    label: "Index",
-    items: [
-      { href: "/civica-index", label: "Overview", descriptor: "Index home" },
-      {
-        href: "/civica-index/government-types",
-        label: "Government Types",
-        descriptor: "Taxonomy",
-      },
-      {
-        href: "/civica-index/pulse-changelog",
-        label: "Pulse Changelog",
-        descriptor: "Daily changes",
-      },
-    ],
+    href: "/civica-index/government-types",
+    label: "Government Types",
+    descriptor: "Taxonomy",
   },
   {
-    label: "Methodology",
-    items: [
-      {
-        href: "/civica-index/methodology",
-        label: "Methodology",
-        descriptor: "Scoring model",
-      },
-      {
-        href: "/civica-index/methodology/peer-grouping",
-        label: "Peer Grouping",
-        descriptor: "Comparison sets",
-      },
-      {
-        href: "/civica-index/methodology/pulse",
-        label: "Pulse Methodology",
-        descriptor: "Event scoring",
-      },
-      {
-        href: "/civica-index/methodology/pca-appendix",
-        label: "PCA Appendix",
-        descriptor: "Factor analysis",
-      },
-      {
-        href: "/civica-index/methodology/pulse/backtest",
-        label: "Pulse Backtest",
-        descriptor: "Validation",
-      },
-      {
-        href: "/civica-index/methodology/peer-grouping/migration",
-        label: "Migration Table",
-        descriptor: "Peer fields",
-      },
-    ],
+    href: "/civica-index/pulse-changelog",
+    label: "Pulse Changelog",
+    descriptor: "Daily changes",
   },
   {
-    label: "Use / Verify",
-    items: [
-      {
-        href: "/civica-index/replication",
-        label: "Replication",
-        descriptor: "Academic use",
-      },
-      { href: "/civica-index/widget", label: "Widgets", descriptor: "Embeds" },
-      {
-        href: "/civica-index/corrections",
-        label: "Corrections",
-        descriptor: "Data fixes",
-      },
-    ],
+    href: "/civica-index/replication",
+    label: "Replication",
+    descriptor: "Academic use",
+  },
+  { href: "/civica-index/widget", label: "Widgets", descriptor: "Embeds" },
+  {
+    href: "/civica-index/corrections",
+    label: "Corrections",
+    descriptor: "Data fixes",
   },
 ];

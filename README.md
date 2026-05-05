@@ -1,36 +1,192 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Civica Atlas
 
-## Getting Started
+An open reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.
 
-First, run the development server:
+[civicaatlas.org](https://civicaatlas.org)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+> **Status: pre-launch beta.** The data layer and reader pages are live and being used by the team for end-to-end review. Public launch + external methodology review are planned phases, not shipped yet. See [Current state](#current-state) below.
+
+---
+
+## What this is
+
+Civica Atlas is a research-lab-grade reference work for every country in the world. It is built in the same posture as [Our World in Data](https://ourworldindata.org), the [V-Dem Institute](https://v-dem.net), and the World Bank's statistical division — an academic publication with a UI on top, not a website that happens to have data. Every fact carries provenance, every methodology decision is documented in a citable resolution, and every disagreement between sources is surfaced rather than hidden.
+
+The project's near-term goal is to be the visual, interactive successor to the CIA World Factbook (which was sunset on 4 February 2026), but the long-term project is bigger: a unified, methodologically defensible reference layer that academics, journalists, NGOs, and the public can cite without disclaimer.
+
+## Three flagship outputs
+
+### Civica Factbook — `/factbook/[country]`
+
+Country dossiers covering geography, demographics, government, economy, energy, communications, transport, environment, military, and transnational issues for ~200 countries and territories. Each fact is reconciled across multiple authoritative sources (where coverage exists) and carries a per-fact provenance dot revealing every alternate source, freshness date, and license.
+
+### Civica Index — `/civica-index`
+
+An original composite governance score on a 0–100 scale, computed quarterly across six dimensions: democratic quality, rule of law, freedoms, corruption control, stability, and government effectiveness. Built on V-Dem, World Bank Worldwide Governance Indicators, UNDP Human Development Index, Freedom House, Transparency International CPI, Global Peace Index, and Fragile States Index. PCA-derived weights, frozen reference periods, Monte Carlo uncertainty intervals. Currently in BETA pending external methodological review.
+
+### Civica Pulse — `/civica-index/pulse-changelog`
+
+A daily directional signal layered on top of the Index. Ingests governance-relevant events from CIVICUS Monitor, Human Rights Watch, Amnesty International, ACLED, IPU, GDELT, and others. Multi-run LLM classifier with three-temperature agreement scoring. Asymmetric corroboration (positive events require specialist sources; restricted-press countries require multi-source confirmation). Backtested against 10 named historical governance shocks (Myanmar 2021, Niger 2023, Tunisia 2021, etc.). Currently in BETA.
+
+## What makes this different
+
+Most public country-data sites republish a single upstream source (usually CIA Factbook, sometimes Wikipedia infoboxes). When sources disagree, the disagreement gets hidden behind whichever number won. When sources go stale, the staleness propagates silently. When new data lands, methodology questions get patched ad-hoc.
+
+Civica's pipeline is built on opposite premises:
+
+- **Multi-source reconciliation.** Currently 14 active source orchestrators (CIA Factbook, World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats, V-Dem, Wikidata) writing into a canonical `country_facts` table. ~26,000 reconciled facts across 88 declared fact-keys. v1 target is 11 Tier-1 publishers (live) plus 30–40 national statistics offices (in progress).
+
+- **Per-fact provenance.** Every value on every reader-facing page renders a `<FactValueDot>` chevron. Click it and you see the canonical pick, every alternate source, the as-of date per source, the publisher's license, and the freshness winner. Disagreements above a configurable threshold create disputes routed to a human review queue.
+
+- **Forecast vs measurement.** The resolver distinguishes measured rows from projected rows (IMF WEO ships forecasts to 2030; ILO publishes nowcasts beyond the current year). Canonical picks come from measured rows when both exist. See [`forecast-vs-measurement-v1.md`](./docs/methodology-decisions.md#forecast-vs-measurement).
+
+- **Multi-canonical with scope predicate.** When two Tier-1 publishers are concurrently authoritative for a fact-key in a defined scope (e.g., Eurostat + IMF + OECD all canonical for European public debt), the system honors all three rather than forcing one into "alternate."
+
+- **Citable methodology.** Every load-bearing methodology decision is documented as a resolution document with citations to peer institutions and academic literature. Currently 19+ adopted resolutions covering peer grouping, reconciliation rules, fact-key registry expansions, source allowlist, classification taxonomy, dispute thresholds, and more.
+
+- **Honest beta posture.** Novel Civica-asserted methodologies (the Civica Index composite, the Pulse classifier, the reconciliation rules) ship with a BETA pill until external academic review. Civica-cited external methodologies (V-Dem Regimes of the World, World Bank classifications, Bjørnskov-Rode regime taxonomy) inherit the source's standing without a beta marker.
+
+## Current state
+
+This is a pre-launch project. Honest snapshot:
+
+| Metric | Status |
+|---|---|
+| Active source orchestrators | 14 of 14 planned for Tier-1 (IEA scrapped due to license incompatibility) |
+| `country_facts` rows | ~26,000 across 88 declared fact-keys |
+| Multi-sourced fact-keys (≥2 sources) | 25 |
+| 5+ source fact-keys | 3 (population, life expectancy, unemployment) |
+| Adopted methodology resolution docs | 19+ |
+| NSO (national statistics office) syncs | In progress (US Census, ONS-UK, INSEE-FR, Destatis-DE, Statistics Canada, IBGE-BR, Stats SA, NBS-Nigeria as the first wave of 8) |
+| External methodology review | Not yet — planned post-v1 |
+| Public launch | Pre-launch; URLs are live but no inbound traffic yet |
+
+The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index v1 methodology is published and stable; v2 (recalibrated weights, expanded indicator basket) is on the roadmap.
+
+Reader pages may show "BETA" markers in places where the underlying data layer or methodology is still being finalized. This is by design — silent staleness is dishonest; flagged staleness is academic discipline.
+
+## Architecture
+
+High-level data flow:
+
+```
+┌───────────────────┐    ┌──────────────────┐    ┌──────────────────┐
+│ Sync orchestrators│───▶│  country_facts   │───▶│     resolver     │
+│   (one per src)   │    │ (provenance per  │    │ (freshness rules │
+│  e.g. WB WDI,     │    │   row, source,   │    │  + editorial     │
+│  IMF WEO,         │    │   as_of, license,│    │  assertion +     │
+│  UN, WHO, etc.)   │    │   value_type)    │    │  dispute guard)  │
+└───────────────────┘    └──────────────────┘    └────────┬─────────┘
+                                                          ▼
+                                       ┌──────────────────────────────┐
+                                       │ Reader surfaces              │
+                                       │   /factbook/[country]        │
+                                       │   /civica-index/[country]    │
+                                       │   /atlas/[country]/[tab]     │
+                                       │   /api/v1/...                │
+                                       │ (FactValueDot per fact)      │
+                                       └──────────────────────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Detailed architecture: see [Methodology — Reconciliation](https://civicaatlas.org/factbook/methodology/reconciliation).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Methodology
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Public methodology pages (in approximate read order):
 
-## Learn More
+| Topic | URL |
+|---|---|
+| **How we approach data** (intro, plain English) | `/methodology/approach` |
+| **Methodology hub** (index of every methodology page) | `/methodology` |
+| Reconciliation — multi-source resolver, dispute rules, provenance | `/factbook/methodology/reconciliation` |
+| Civica Index — composite scoring, dimensions, weights | `/civica-index/methodology` |
+| Civica Index — PCA appendix (the math) | `/civica-index/methodology/pca-appendix` |
+| Civica Pulse — event classification + scoring | `/civica-index/methodology/pulse` |
+| Civica Pulse — backtest results | `/civica-index/methodology/pulse/backtest` |
+| Peer grouping — V-Dem RoW, World Bank region/income, regime classification | `/civica-index/methodology/peer-grouping` |
+| Peer grouping — migration table (post-`structural_family` retirement) | `/civica-index/methodology/peer-grouping/migration` |
 
-To learn more about Next.js, take a look at the following resources:
+Internal methodology resolution documents (audit trail, eventually published) cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, and more. Public publication of these resolutions is a v1.x deliverable.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Standing on the shoulders of giants
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Civica's data and posture are deeply indebted to the institutions whose work it cites and integrates:
 
-## Deploy on Vercel
+- [Our World in Data](https://ourworldindata.org) — the canonical model for academic-grade public data presentation; Civica's reconciliation patterns mirror OWID's source-domain conventions.
+- [V-Dem Institute](https://v-dem.net) — Varieties of Democracy data + Regimes of the World classification; the methodological gold standard for comparative-politics regime classification.
+- [World Bank](https://data.worldbank.org) — World Development Indicators, Worldwide Governance Indicators, country & lending classifications.
+- [International Monetary Fund](https://www.imf.org/en/Publications/WEO) — World Economic Outlook macroeconomic data and projections.
+- [United Nations Statistics Division](https://unstats.un.org), [UN Population Division](https://population.un.org), [UNDP](https://hdr.undp.org), [WHO Global Health Observatory](https://www.who.int/data/gho), [UNESCO Institute for Statistics](https://uis.unesco.org), [OECD.Stat](https://stats.oecd.org), [FAO FAOSTAT](https://www.fao.org/faostat), [ILO ILOSTAT](https://ilostat.ilo.org), [Eurostat](https://ec.europa.eu/eurostat), [WTO Stats](https://stats.wto.org).
+- [Inter-Parliamentary Union (IPU Parline)](https://data.ipu.org) — national parliament structural data.
+- [Constitute Project](https://constituteproject.org) — full-text constitutions for 200+ countries.
+- [Bjørnskov-Rode / CGV regime classification](https://qog.pol.gu.se) — academic regime taxonomy.
+- [Wikidata](https://www.wikidata.org) — structured knowledge spine.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+A complete list of sources, licenses, and last-sync timestamps is at [/about](https://civicaatlas.org/about).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tech stack
+
+- **[Next.js 16](https://nextjs.org)** (App Router, Turbopack, React 19)
+- **[Neon](https://neon.tech)** (serverless Postgres) via `@neondatabase/serverless`
+- **[Drizzle ORM](https://orm.drizzle.team)** (type-safe schema in `src/lib/db/schema.ts`)
+- **Tailwind CSS v4** + hand-authored editorial CSS with a strict design-token discipline (no hex literals in component code)
+- **[Anthropic SDK](https://docs.anthropic.com)** — Claude powers `/api/chat` and the Pulse event classifier
+- **[Vercel](https://vercel.com)** for hosting and cron orchestration
+
+The full design system reference lives at [/design-system](https://civicaatlas.org/design-system) on the running site.
+
+## Getting started
+
+```bash
+git clone https://github.com/fbalino/civica.git
+cd civica
+npm install
+cp .env.example .env.local
+# Fill in DATABASE_URL, ANTHROPIC_API_KEY, ADMIN_API_KEY, CRON_SECRET
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+Required env vars (documented in `.env.example`):
+
+- `DATABASE_URL` — Neon Postgres connection string
+- `ANTHROPIC_API_KEY` — required for `/api/chat` and Pulse event classification
+- `ADMIN_API_KEY` — bearer token for `/api/admin/*` (returns 401 if unset)
+- `CRON_SECRET` — bearer token for the Vercel cron endpoints
+
+Common npm scripts:
+
+```bash
+npm run db:generate              # Drizzle schema migration
+npm run db:push                  # Push schema to Neon
+npm run seed:sources             # Seed the sources table
+npm run seed:factbook            # Import the CIA Factbook archive
+npm run sync:factbook:wb-wdi     # World Bank WDI sync
+npm run sync:factbook:imf-weo    # IMF WEO sync
+npm run sync:factbook:un-data    # UN Data sync
+# ... one sync orchestrator per source; see package.json
+npm run pulse:v2:all             # Run the full Pulse pipeline (ingest → cluster → classify → score)
+```
+
+Full script reference: see [AGENTS.md](./AGENTS.md).
+
+## Contributing
+
+Civica is open-source and welcomes contributions. Most public-facing content is CC0 or under the original publisher's license (preserved per-row in `country_facts.license`). The Civica codebase itself is MIT-licensed.
+
+If you're an academic interested in reviewing the methodology, please get in touch — external review is an explicit goal of the project, not a hypothetical.
+
+For development conventions and project memory, see [AGENTS.md](./AGENTS.md) and [DESIGN.md](./DESIGN.md).
+
+## Status & contact
+
+- **Live site**: [civicaatlas.org](https://civicaatlas.org)
+- **Status page**: [statuspage.incident.io/civica-atlas](https://statuspage.incident.io/civica-atlas)
+- **API documentation**: [civicaatlas.org/api-docs](https://civicaatlas.org/api-docs)
+- **Design system reference**: [civicaatlas.org/design-system](https://civicaatlas.org/design-system)
+- **Contact**: [civicaatlas.org/contact](https://civicaatlas.org/contact)
+
+---
+
+*Civica Atlas is a research-lab-grade reference work in active development. The data layer is real; the methodology is documented; the academic posture is taken seriously. None of that is the same as "finished." If you spot a methodological gap, a data error, or a documentation inconsistency, please open an issue or get in touch.*

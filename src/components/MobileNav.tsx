@@ -4,14 +4,15 @@ import { useState, useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { INDEX_NAV_GROUPS, type IndexNavGroup } from "@/components/indexNavItems";
+import { INDEX_NAV_ITEMS, type IndexNavItem } from "@/components/indexNavItems";
+import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
 
 type NavItem = {
   href: string;
   label: string;
   descriptor: string;
   glyph: string;
-  childGroups?: IndexNavGroup[];
+  children?: IndexNavItem[];
 };
 
 const PRIMARY: NavItem[] = [
@@ -22,7 +23,14 @@ const PRIMARY: NavItem[] = [
     label: "Index",
     descriptor: "Civica Index (beta)",
     glyph: "◈",
-    childGroups: INDEX_NAV_GROUPS,
+    children: INDEX_NAV_ITEMS,
+  },
+  {
+    href: "/methodology",
+    label: "Methodology",
+    descriptor: "How Civica decides",
+    glyph: "✦",
+    children: METHODOLOGY_NAV_ITEMS,
   },
   { href: "/blog", label: "The Record", descriptor: "Essays & dispatches", glyph: "✎" },
   { href: "/about", label: "About", descriptor: "Mission & methodology", glyph: "ⓘ" },
@@ -294,81 +302,58 @@ function PanelRow({
           →
         </span>
       </Link>
-      {item.childGroups ? (
+      {item.children ? (
         <div
           style={{
             display: "grid",
-            gap: 10,
+            gap: 2,
             margin: "4px 0 8px 38px",
             paddingLeft: 12,
             borderLeft: "1px solid var(--color-card-border)",
           }}
         >
-          {item.childGroups.map((group) => (
-            <div
-              key={group.label}
-              style={{
-                display: "grid",
-                gap: 2,
-              }}
-            >
-              <span
+          {item.children.map((child) => {
+            const childActive = isActive(child.href);
+            return (
+              <Link
+                key={child.href}
+                href={child.href}
                 style={{
-                  padding: "6px 10px 2px",
-                  fontFamily: "var(--font-mono)",
-                  fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-10)",
-                  letterSpacing: "var(--tracking-caps)",
-                  textTransform: "uppercase",
-                  color: "var(--color-text-30)",
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: 10,
+                  padding: "8px 10px",
+                  borderRadius: "var(--radius-md)",
+                  color: "var(--color-text-60)",
+                  textDecoration: "none",
+                  background: childActive ? "var(--color-card-bg)" : "transparent",
+                  border: `1px solid ${childActive ? "var(--color-card-border)" : "transparent"}`,
                 }}
               >
-                {group.label}
-              </span>
-              {group.items.map((child) => {
-                const childActive = isActive(child.href);
-                return (
-                  <Link
-                    key={child.href}
-                    href={child.href}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr auto",
-                      gap: 10,
-                      padding: "8px 10px",
-                      borderRadius: "var(--radius-md)",
-                      color: "var(--color-text-60)",
-                      textDecoration: "none",
-                      background: childActive ? "var(--color-card-bg)" : "transparent",
-                      border: `1px solid ${childActive ? "var(--color-card-border)" : "transparent"}`,
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "var(--text-14)",
-                        fontWeight: 500,
-                        color: childActive ? "var(--color-accent)" : "var(--color-text-primary)",
-                      }}
-                    >
-                      {child.label}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontWeight: "var(--font-weight-mono)",
-                        fontSize: "var(--text-10)",
-                        color: "var(--color-text-30)",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {child.descriptor}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
+                <span
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "var(--text-14)",
+                    fontWeight: 500,
+                    color: childActive ? "var(--color-accent)" : "var(--color-text-primary)",
+                  }}
+                >
+                  {child.label}
+                </span>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontWeight: "var(--font-weight-mono)",
+                    fontSize: "var(--text-10)",
+                    color: "var(--color-text-30)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {child.descriptor}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       ) : null}
     </div>

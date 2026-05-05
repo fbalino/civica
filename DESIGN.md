@@ -92,12 +92,27 @@ Dropdown triggers use a token-sized SVG chevron (`ChevronDown` from `lucide-reac
 
 Reader-style pages (methodology, replication, corrections, changelog, etc.) compose global layout classes from `src/app/editorial.css`. **Do not ship inline `<style>` blocks for layout, typography, spacing, or container width on a new editorial page.** If a missing class would force a `<style>` block, add the class to `editorial.css` and reuse it.
 
-Container:
+### Picking the layout — read this before writing a new page
 
-- `.editorial-page` — narrow column (760px), default. Applied by `<EditorialPage>` automatically.
+Page type drives the layout, not the prose length. **Do not default to `width="narrow"` because the prose is long.** The narrow column is for short-form editorial content (blog posts, single-topic essays). Methodology pages, regardless of how long the prose is, use the methodology layout with a sidebar.
+
+| Page type | Class / prop | Width | Sidebar? | Examples |
+|---|---|---|---|---|
+| Methodology page or methodology subpage | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/factbook/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
+| Filterable list / changelog | `<EditorialPage width="wide">` | 960px | No | `/civica-index/changelog`, `/civica-index/pulse-changelog` |
+| Standard product/editorial page | `<EditorialPage width="full">` | 1200px | No | Atlas-scale layouts |
+| Short-form editorial / blog | `<EditorialPage>` (default `width="narrow"`) | 760px | No | Single-topic blog posts, short essays |
+
+**Default disambiguation rule**: if the URL is under `/methodology`, `/*/methodology`, or otherwise documents a methodology decision, use `methodology-layout`. Reaching for `width="narrow"` on a methodology page is wrong even if the prose feels short — methodology pages share a sidebar convention readers expect to find.
+
+The `<EditorialPage>` component's prop docstring describes what each width prop *technically* does. This document describes which one to *pick*. When they conflict, this document wins.
+
+Container classes:
+
+- `.editorial-page` — narrow column (760px), default. Applied by `<EditorialPage>` automatically when no className/width override is set.
 - `.editorial-page--wide` — 960px column for filterable lists / changelogs. Pass `width="wide"` to `<EditorialPage>`.
 - `.editorial-page--full` — 1200px standard product/editorial width. Pass `width="full"` to `<EditorialPage>`.
-- `.methodology-layout` — 1200px methodology shell with left sidebar; use it for `/civica-index/methodology` and every methodology subpage.
+- `.methodology-layout` — 1200px methodology shell with left sidebar (220px) + content (max 800px). Pass via `className="methodology-layout"` and pair with `<ReaderSidebar items={...} className="methodology-sidebar">` plus `<article className="methodology-content">` wrapping the prose.
 
 Header chrome:
 

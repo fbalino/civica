@@ -7,9 +7,20 @@ interface EditorialPageProps {
   /**
    * Layout width. Maps to the global modifier classes defined in
    * `src/app/editorial.css`:
-   *   narrow → max-width 760px (default; long-form reading)
+   *   narrow → max-width 760px (short-form editorial / blog posts)
    *   wide   → max-width 960px (changelog/list surfaces)
-   *   full   → max-width 1200px (atlas-scale layouts)
+   *   full   → max-width 1200px (atlas-scale layouts, no sidebar)
+   *
+   * IMPORTANT — read DESIGN.md before picking a width. Methodology
+   * pages do NOT use any of these widths; they use
+   * `<EditorialPage className="methodology-layout">` paired with a
+   * `<ReaderSidebar>` and an `<article className="methodology-content">`.
+   * This component's width prop is for non-methodology editorial pages
+   * only. See DESIGN.md → "Picking the layout" for the decision table.
+   *
+   * Do not default to "narrow" because prose is long. Long methodology
+   * prose still uses the methodology-layout. The narrow column is for
+   * short-form editorial / blog posts.
    */
   width?: EditorialWidth;
   /**

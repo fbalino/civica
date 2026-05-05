@@ -481,11 +481,18 @@ a {
   background: var(--color-bg);
   box-shadow: var(--shadow-hard);
   display: grid;
-  gap: var(--space-3);
+  gap: var(--space-1);
   opacity: 0;
   pointer-events: none;
   transition: opacity 140ms ease, transform 140ms ease;
   z-index: 120;
+}
+
+/* When the menu contains group wrappers (legacy layout), use the
+   wider inter-group spacing. Min-width inherits from the base rule
+   above. */
+.nav-dropdown-menu:has(.nav-dropdown-group) {
+  gap: var(--space-3);
 }
 
 .nav-dropdown:hover .nav-dropdown-menu,
@@ -524,7 +531,7 @@ a {
   line-height: 1.25;
   color: var(--color-text-60);
   text-decoration: none;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3);
   border: 1px solid transparent;
   white-space: nowrap;
 }
