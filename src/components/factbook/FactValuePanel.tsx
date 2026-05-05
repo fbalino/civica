@@ -189,6 +189,7 @@ export function FactValuePanel({
           const isCanonical = row.id === canonicalId;
           const url = buildSourceUrl(row);
           const isRejected = row.status === "rejected";
+          const isProjected = row.valueType === "projected";
           const value = formatValue(row, factKey);
           return (
             <li
@@ -197,6 +198,7 @@ export function FactValuePanel({
                 "fact-value-row" +
                 (isCanonical ? " fact-value-row--canonical" : "") +
                 (isRejected ? " fact-value-row--rejected" : "") +
+                (isProjected ? " fact-value-row--projected" : "") +
                 (shouldStackValue(value) ? " fact-value-row--stacked-value" : "")
               }
             >
@@ -212,6 +214,11 @@ export function FactValuePanel({
                 {isRejected && (
                   <span className="fact-value-row-status">
                     rejected
+                  </span>
+                )}
+                {isProjected && (
+                  <span className="fact-value-row-projected-tag">
+                    Projected
                   </span>
                 )}
               </div>

@@ -1124,6 +1124,10 @@
   border-color: var(--color-accent);
   background: color-mix(in oklab, var(--color-accent) 5%, transparent);
 }
+.fact-value-row--projected {
+  border-color: var(--color-status-info);
+  background: color-mix(in oklab, var(--color-status-info) 12%, var(--color-bg));
+}
 .fact-value-row--rejected {
   opacity: 0.55;
   border-style: dashed;
@@ -1146,14 +1150,17 @@
   line-height: var(--leading-tight);
   overflow-wrap: anywhere;
 }
-.fact-value-row-canonical-tag {
+.fact-value-row-canonical-tag,
+.fact-value-row-projected-tag {
   font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.06em;
+  font-size: var(--text-9);
+  letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
-  color: var(--color-accent);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   white-space: nowrap;
+}
+.fact-value-row-canonical-tag {
+  color: var(--color-accent);
 }
 .fact-value-row-value {
   grid-column: 2;
@@ -1205,6 +1212,9 @@
   text-transform: uppercase;
   color: var(--color-status-warning);
   white-space: nowrap;
+}
+.fact-value-row-projected-tag {
+  color: var(--color-status-info);
 }
 
 .fact-value-panel-foot {
