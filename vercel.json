@@ -33,6 +33,7 @@
     { "path": "/api/cron/factbook/sync-ons-uk", "schedule": "0 19 11 1,4,7,10 *" },
     { "path": "/api/cron/factbook/sync-ibge-br", "schedule": "0 22 11 1,4,7,10 *" },
     { "path": "/api/cron/factbook/sync-statcan-ca", "schedule": "0 21 11 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-stats-sa", "schedule": "0 23 11 1,4,7,10 *" }
+    { "path": "/api/cron/factbook/sync-stats-sa", "schedule": "0 23 11 1,4,7,10 *" },
+    { "path": "/api/cron/factbook/auto-resolve-disputes", "schedule": "30 2 * * *" }
   ]
 }

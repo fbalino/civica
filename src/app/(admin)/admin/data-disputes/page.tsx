@@ -1,21 +1,41 @@
 /**
  * Phase F.5 — operator data-disputes queue.
+ * Extended in R.21:
+ *   - severity-desc default sort (normalized `|gap| / threshold`)
+ *   - filter chips for source-pair, fact-key, severity bucket, age bucket
+ *   - severity badge on each card
+ *   - sort selector (severity / newest / oldest)
+ *   - link to /admin/data-disputes/audit
  *
  * Mirrors `/admin/pulse-review`:
- *   - Filter chips by dispute_kind + fact_group
+ *   - Filter chips
  *   - Editorial cards listing each open dispute
  *   - Click into `/admin/data-disputes/[id]` for the resolution form
  *
  * Auth gating happens in `(admin)/layout.tsx`. This page assumes a
  * valid admin session.
  *
- * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §7
+ * Methodology:
+ *   - Phase F.5: ~/civica/plan/phase-f-methodology-v0.1.md §7
+ *   - R.21: ~/civica/plan/disputes-triage-resolution-v1.md §2c
  */
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Pill } from "@/components/editorial/Pill";
-import { getDataDisputeQueue } from "@/lib/db/queries-data-disputes";
+import {
+  getDataDisputeQueue,
+  getDisputeFilterDistributions,
+  type DisputeSortKey,
+  type AgeBucket,
+} from "@/lib/db/queries-data-disputes";
+import {
+  SEVERITY_BUCKETS,
+  SEVERITY_BUCKET_LABELS,
+  formatSeverity,
+  type SeverityBucket,
+  type SeverityScore,
+} from "@/lib/factbook/reconcile/dispute-severity";
 
 export const metadata: Metadata = {
   title: "Data disputes queue — Civica admin",
@@ -45,18 +65,35 @@ const KIND_VARIANT: Record<
   other: "default",
 };
 
-const FACT_GROUP_LABELS: Record<string, string> = {
-  A: "Group A · slow-changing identity",
-  B: "Group B · fast-changing quantitative",
-  C: "Group C · structural categorical",
+const FACT_GROUPS = ["A", "B", "C"] as const;
+
+const SEVERITY_VARIANT: Record<
+  SeverityBucket,
+  "default" | "accent" | "success" | "warn" | "danger"
+> = {
+  lo: "default",
+  mid: "warn",
+  hi: "danger",
+  xhi: "danger",
 };
 
-const FACT_GROUPS = ["A", "B", "C"] as const;
+const AGE_BUCKETS: AgeBucket[] = ["0-7d", "7-30d", "30-90d", "90d+"];
+
+const SORT_LABELS: Record<DisputeSortKey, string> = {
+  severity: "Severity",
+  age: "Newest",
+  oldest: "Oldest",
+};
 
 interface PageProps {
   searchParams: Promise<{
     kind?: string;
     group?: string;
+    factKey?: string;
+    sourcePair?: string;
+    severityBucket?: string;
+    ageBucket?: string;
+    sort?: string;
     page?: string;
     showResolved?: string;
   }>;
@@ -123,31 +160,68 @@ function formatFactValue(
   return fact.factValue ?? "—";
 }
 
+function severityBadgeVariant(score: SeverityScore) {
+  if (score.bucket == null) return "default" as const;
+  return SEVERITY_VARIANT[score.bucket];
+}
+
 export default async function DataDisputesQueuePage({
   searchParams,
 }: PageProps) {
   const params = await searchParams;
-  const kind = params.kind && KIND_LABELS[params.kind] ? params.kind : undefined;
+
+  const kind =
+    params.kind && KIND_LABELS[params.kind] ? params.kind : undefined;
   const group =
     params.group && (FACT_GROUPS as readonly string[]).includes(params.group)
       ? params.group
       : undefined;
+  const factKey = params.factKey ? params.factKey : undefined;
+  const sourcePair = params.sourcePair ? params.sourcePair : undefined;
+  const severityBucket =
+    params.severityBucket && (SEVERITY_BUCKETS as string[]).includes(params.severityBucket)
+      ? (params.severityBucket as SeverityBucket)
+      : undefined;
+  const ageBucket =
+    params.ageBucket && (AGE_BUCKETS as string[]).includes(params.ageBucket)
+      ? (params.ageBucket as AgeBucket)
+      : undefined;
+  const sort: DisputeSortKey =
+    params.sort === "age" || params.sort === "oldest"
+      ? params.sort
+      : "severity";
   const showResolved = params.showResolved === "1";
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
   const limit = 50;
   const offset = (page - 1) * limit;
 
-  const { rows, totalOpen } = await getDataDisputeQueue({
-    disputeKind: kind,
-    factGroup: group,
-    includeResolved: showResolved,
-    limit,
-    offset,
-  });
+  const [{ rows, totalOpen, totalMatching }, distributions] = await Promise.all([
+    getDataDisputeQueue({
+      disputeKind: kind,
+      factGroup: group,
+      factKey,
+      sourcePair,
+      severityBucket,
+      ageBucket,
+      includeResolved: showResolved,
+      sort,
+      limit,
+      offset,
+    }),
+    getDisputeFilterDistributions({
+      includeResolved: showResolved,
+      topN: 8,
+    }),
+  ]);
 
   const baseParams = {
     kind,
     group,
+    factKey,
+    sourcePair,
+    severityBucket,
+    ageBucket,
+    sort: sort === "severity" ? undefined : sort, // omit default
     showResolved: showResolved ? "1" : undefined,
   };
 
@@ -165,11 +239,14 @@ export default async function DataDisputesQueuePage({
 
       <p
         className="editorial-page-meta"
-        style={{ marginBottom: 24 }}
+        style={{ marginBottom: 24, gap: 12, flexWrap: "wrap" }}
       >
         <span>{totalOpen} open</span>
         <span>·</span>
-        <span>Showing {rows.length}</span>
+        <span>
+          Showing {rows.length} of {totalMatching}
+          {totalMatching !== totalOpen ? " (filtered)" : ""}
+        </span>
         <span>·</span>
         <Link
           href={buildHref(baseParams, {
@@ -180,13 +257,64 @@ export default async function DataDisputesQueuePage({
         >
           {showResolved ? "Hide resolved" : "Show resolved"}
         </Link>
+        <span>·</span>
+        <Link
+          href="/admin/data-disputes/audit"
+          style={{ color: "var(--color-accent)" }}
+        >
+          Audit log →
+        </Link>
       </p>
 
       <div className="editorial-filter-bar">
         <div className="editorial-filter-row">
+          <span className="editorial-filter-label">Sort</span>
+          {(["severity", "age", "oldest"] as DisputeSortKey[]).map((s) => (
+            <FilterChip
+              key={s}
+              href={buildHref(baseParams, {
+                sort: s === "severity" ? undefined : s,
+                page: undefined,
+              })}
+              active={sort === s}
+            >
+              {SORT_LABELS[s]}
+            </FilterChip>
+          ))}
+        </div>
+
+        <div className="editorial-filter-row">
+          <span className="editorial-filter-label">Severity</span>
+          <FilterChip
+            href={buildHref(baseParams, {
+              severityBucket: undefined,
+              page: undefined,
+            })}
+            active={!severityBucket}
+          >
+            Any
+          </FilterChip>
+          {SEVERITY_BUCKETS.map((b) => (
+            <FilterChip
+              key={b}
+              href={buildHref(baseParams, {
+                severityBucket: b,
+                page: undefined,
+              })}
+              active={severityBucket === b}
+            >
+              {SEVERITY_BUCKET_LABELS[b]}
+            </FilterChip>
+          ))}
+        </div>
+
+        <div className="editorial-filter-row">
           <span className="editorial-filter-label">Kind</span>
           <FilterChip
-            href={buildHref(baseParams, { kind: undefined, page: undefined })}
+            href={buildHref(baseParams, {
+              kind: undefined,
+              page: undefined,
+            })}
             active={!kind}
           >
             All
@@ -205,7 +333,10 @@ export default async function DataDisputesQueuePage({
         <div className="editorial-filter-row">
           <span className="editorial-filter-label">Group</span>
           <FilterChip
-            href={buildHref(baseParams, { group: undefined, page: undefined })}
+            href={buildHref(baseParams, {
+              group: undefined,
+              page: undefined,
+            })}
             active={!group}
           >
             Any
@@ -217,6 +348,85 @@ export default async function DataDisputesQueuePage({
               active={group === g}
             >
               {g}
+            </FilterChip>
+          ))}
+        </div>
+
+        {distributions.factKeys.length > 0 ? (
+          <div className="editorial-filter-row">
+            <span className="editorial-filter-label">Fact-key</span>
+            <FilterChip
+              href={buildHref(baseParams, {
+                factKey: undefined,
+                page: undefined,
+              })}
+              active={!factKey}
+            >
+              Any
+            </FilterChip>
+            {distributions.factKeys.map((fk) => (
+              <FilterChip
+                key={fk.value}
+                href={buildHref(baseParams, {
+                  factKey: fk.value,
+                  page: undefined,
+                })}
+                active={factKey === fk.value}
+              >
+                {fk.value} ({fk.count})
+              </FilterChip>
+            ))}
+          </div>
+        ) : null}
+
+        {distributions.sourcePairs.length > 0 ? (
+          <div className="editorial-filter-row">
+            <span className="editorial-filter-label">Source pair</span>
+            <FilterChip
+              href={buildHref(baseParams, {
+                sourcePair: undefined,
+                page: undefined,
+              })}
+              active={!sourcePair}
+            >
+              Any
+            </FilterChip>
+            {distributions.sourcePairs.map((sp) => (
+              <FilterChip
+                key={sp.value}
+                href={buildHref(baseParams, {
+                  sourcePair: sp.value,
+                  page: undefined,
+                })}
+                active={sourcePair === sp.value}
+              >
+                {sp.label} ({sp.count})
+              </FilterChip>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="editorial-filter-row">
+          <span className="editorial-filter-label">Age</span>
+          <FilterChip
+            href={buildHref(baseParams, {
+              ageBucket: undefined,
+              page: undefined,
+            })}
+            active={!ageBucket}
+          >
+            Any
+          </FilterChip>
+          {AGE_BUCKETS.map((b) => (
+            <FilterChip
+              key={b}
+              href={buildHref(baseParams, {
+                ageBucket: b,
+                page: undefined,
+              })}
+              active={ageBucket === b}
+            >
+              {b}
             </FilterChip>
           ))}
         </div>
@@ -274,6 +484,11 @@ export default async function DataDisputesQueuePage({
                     </span>
                   </div>
                   <div className="editorial-card-pills">
+                    {dispute.severity.severity != null ? (
+                      <Pill variant={severityBadgeVariant(dispute.severity)}>
+                        {formatSeverity(dispute.severity)}
+                      </Pill>
+                    ) : null}
                     <Pill
                       variant={KIND_VARIANT[dispute.disputeKind] ?? "default"}
                     >
@@ -283,7 +498,9 @@ export default async function DataDisputesQueuePage({
                     {dispute.status !== "open" ? (
                       <Pill
                         variant={
-                          dispute.status === "in_review" ? "accent" : "default"
+                          dispute.status === "in_review"
+                            ? "accent"
+                            : "default"
                         }
                       >
                         {dispute.status.replaceAll("_", " ")}
@@ -358,7 +575,9 @@ export default async function DataDisputesQueuePage({
                   style={{ marginTop: 12 }}
                 >
                   <span>
-                    {dispute.submitterName ? `Submitted by ${dispute.submitterName} · ` : ""}
+                    {dispute.submitterName
+                      ? `Submitted by ${dispute.submitterName} · `
+                      : ""}
                     Open →
                   </span>
                 </footer>
@@ -368,7 +587,7 @@ export default async function DataDisputesQueuePage({
         </div>
       )}
 
-      {totalOpen > limit ? (
+      {totalMatching > limit ? (
         <nav className="editorial-pagination" aria-label="Pagination">
           {page > 1 ? (
             <Link href={buildHref(baseParams, { page: String(page - 1) })}>
@@ -378,7 +597,7 @@ export default async function DataDisputesQueuePage({
             <span>—</span>
           )}
           <span>Page {page}</span>
-          {offset + rows.length < totalOpen ? (
+          {offset + rows.length < totalMatching ? (
             <Link href={buildHref(baseParams, { page: String(page + 1) })}>
               Page {page + 1} →
             </Link>

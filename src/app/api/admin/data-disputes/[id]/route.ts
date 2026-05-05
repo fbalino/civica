@@ -1,20 +1,33 @@
 /**
  * Phase F.5 — dispute resolution endpoint.
+ * Extended in R.21 with `reopen` action + audit-log writes on every
+ * state change.
  *
  * POST /api/admin/data-disputes/[id]
  *
  * Form body or JSON:
- *   action     'resolve_a' | 'resolve_b' | 'hold' | 'reject' (required)
+ *   action     'resolve_a' | 'resolve_b' | 'hold' | 'reject' | 'reopen'
+ *              (required)
  *   notes      reviewer notes                                 (optional)
  *   redirect   post-success redirect path                     (default: queue)
  *
- * On success, the row's status flips per the action map below,
- * `resolved_at` is stamped, and reviewer fields are populated. Form
- * callers get a 303 redirect; JSON callers get JSON.
+ * On success the row's status flips per the action map below,
+ * `resolved_at` is stamped (or cleared on reopen), reviewer fields
+ * are populated, and a `data_facts_audit_log` row is written with
+ * the pre/post snapshots and reviewer notes. Form callers get a
+ * 303 redirect; JSON callers get JSON.
+ *
+ * `reopen` flips a previously-resolved dispute back to `status='open'`,
+ * clears `resolved_at` / `resolution_action`, preserves reviewer notes
+ * (history), and writes an audit-log row with `action='reopen'`. It
+ * does NOT undo `country_facts` demotions — manual de-demotion is
+ * out of scope for v1.0 (see resolution doc §6 Q3).
  *
  * Auth: Bearer ADMIN_API_KEY (CLI / API) or admin session cookie.
  *
- * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §7
+ * Methodology:
+ *   - Phase F.5: ~/civica/plan/phase-f-methodology-v0.1.md §7
+ *   - R.21 audit-log + reopen: ~/civica/plan/disputes-triage-resolution-v1.md §2b
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -25,17 +38,23 @@ import {
   getAdminSession,
   ADMIN_REVIEWER_COOKIE,
 } from "@/lib/admin/session";
+import {
+  snapshotDispute,
+  writeDisputeAuditLog,
+  type DisputeAuditAction,
+} from "@/lib/factbook/reconcile/dispute-audit-log";
 
-type Action = "resolve_a" | "resolve_b" | "hold" | "reject";
+type Action = "resolve_a" | "resolve_b" | "hold" | "reject" | "reopen";
 
 const VALID_ACTIONS: Set<Action> = new Set([
   "resolve_a",
   "resolve_b",
   "hold",
   "reject",
+  "reopen",
 ]);
 
-const ACTION_TO_STATUS: Record<Action, string> = {
+const ACTION_TO_STATUS: Record<Exclude<Action, "reopen">, string> = {
   resolve_a: "resolved_a_wins",
   resolve_b: "resolved_b_wins",
   hold: "resolved_held",
@@ -128,8 +147,63 @@ export async function POST(
     return NextResponse.json({ error: "dispute not found" }, { status: 404 });
   }
 
-  const newStatus = ACTION_TO_STATUS[body.action];
+  const beforeSnap = snapshotDispute(existing);
   const now = new Date();
+
+  // ── Reopen branch ────────────────────────────────────────────────
+  if (body.action === "reopen") {
+    // Reopen is only meaningful on resolved/rejected rows. Reopening
+    // an already-open dispute is a no-op (return ok).
+    const isResolved =
+      existing.status.startsWith("resolved_") ||
+      existing.status === "rejected_invalid";
+    if (!isResolved) {
+      return NextResponse.json(
+        { ok: true, action: "reopen", status: existing.status, noop: true },
+      );
+    }
+
+    await db
+      .update(dataDisputes)
+      .set({
+        status: "open",
+        resolvedAt: null,
+        resolutionAction: null,
+        // reviewerId / reviewerNotes preserved as historical context;
+        // the audit-log row is what carries the reopen reviewer.
+      })
+      .where(eq(dataDisputes.id, id));
+
+    const afterRows = await db
+      .select()
+      .from(dataDisputes)
+      .where(eq(dataDisputes.id, id))
+      .limit(1);
+    const after = afterRows[0] ?? existing;
+
+    await writeDisputeAuditLog({
+      dispute: after,
+      action: "reopen" as DisputeAuditAction,
+      actorId: auth.reviewerId,
+      before: beforeSnap,
+      after: snapshotDispute(after),
+      notes: body.notes ?? null,
+    });
+
+    if (isForm) {
+      const redirect = body.redirect ?? `/admin/data-disputes/${id}`;
+      return NextResponse.redirect(new URL(redirect, request.url), 303);
+    }
+    return NextResponse.json({
+      ok: true,
+      action: "reopen",
+      status: "open",
+      reviewerId: auth.reviewerId,
+    });
+  }
+
+  // ── Resolve / hold / reject branch ───────────────────────────────
+  const newStatus = ACTION_TO_STATUS[body.action];
 
   // Phase F.5.1 — wire the reviewer decision through to the resolver.
   // For 'resolve_a' / 'resolve_b' we identify the winner row, then
@@ -190,6 +264,33 @@ export async function POST(
       resolutionAction: body.action,
     })
     .where(eq(dataDisputes.id, id));
+
+  // Re-read the post-update row so the audit-log captures committed
+  // state, defensive against races. Then write the audit-log row.
+  const afterRows = await db
+    .select()
+    .from(dataDisputes)
+    .where(eq(dataDisputes.id, id))
+    .limit(1);
+  const after = afterRows[0] ?? existing;
+  try {
+    await writeDisputeAuditLog({
+      dispute: after,
+      action: "reviewer_decision" as DisputeAuditAction,
+      actorId: auth.reviewerId,
+      before: beforeSnap,
+      after: snapshotDispute(after),
+      notes: body.notes ?? null,
+    });
+  } catch (err) {
+    // Audit-log failure should NOT block the reviewer's update —
+    // their decision is committed in `data_disputes` already. Surface
+    // a console warning so a regression is visible in logs.
+    console.warn(
+      "[admin/data-disputes] audit-log insert failed:",
+      err instanceof Error ? err.message : err,
+    );
+  }
 
   if (isForm) {
     const redirect = body.redirect ?? `/admin/data-disputes/${id}`;

@@ -1,22 +1,27 @@
 /**
  * Phase F.5 — operator data-dispute detail + resolution form.
+ * Extended in R.21:
+ *   - severity badge in the meta strip
+ *   - "auto-resolve eligible" informational badge when the resolver
+ *     no longer emits this dispute
+ *   - "Audit history" panel listing prior state changes
+ *   - "Reopen" button on resolved/rejected disputes
  *
  * Two columns side-by-side showing fact A vs fact B with their full
- * provenance metadata. Resolution form below offers four actions:
+ * provenance metadata. Resolution form below offers five actions:
  *   - Resolve: A wins
  *   - Resolve: B wins
  *   - Hold (no change)
  *   - Reject as invalid
+ *   - Reopen (resolved disputes only)
  *
  * Each action POSTs to /api/admin/data-disputes/[id], updating
- * `data_disputes.status` + reviewer fields and recording
- * resolved_at + reviewer notes. Note: this surface ONLY records the
- * review decision; the resolver continues to compute canonical picks
- * via methodology rules. A future extension can add explicit
- * `country_facts.status='demoted'` writes from "A wins" / "B wins"
- * to pin the choice durably.
+ * `data_disputes.status` + reviewer fields, recording resolved_at +
+ * reviewer notes, and writing a `data_facts_audit_log` row.
  *
- * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §7
+ * Methodology:
+ *   - Phase F.5: ~/civica/plan/phase-f-methodology-v0.1.md §7
+ *   - R.21: ~/civica/plan/disputes-triage-resolution-v1.md §2b + §2c
  */
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -24,6 +29,12 @@ import { notFound } from "next/navigation";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Pill } from "@/components/editorial/Pill";
 import { getDataDispute } from "@/lib/db/queries-data-disputes";
+import { getAuditLogForDispute } from "@/lib/factbook/reconcile/dispute-audit-log";
+import {
+  formatSeverity,
+  type SeverityBucket,
+  type SeverityScore,
+} from "@/lib/factbook/reconcile/dispute-severity";
 
 export const metadata: Metadata = {
   title: "Dispute detail — Civica admin",
@@ -46,7 +57,28 @@ const STATUS_LABELS: Record<string, string> = {
   resolved_a_wins: "Resolved · A wins",
   resolved_b_wins: "Resolved · B wins",
   resolved_held: "Resolved · held",
+  resolved_auto_stale: "Resolved · auto (stale)",
   rejected_invalid: "Rejected as invalid",
+};
+
+const SEVERITY_VARIANT: Record<
+  SeverityBucket,
+  "default" | "accent" | "success" | "warn" | "danger"
+> = {
+  lo: "default",
+  mid: "warn",
+  hi: "danger",
+  xhi: "danger",
+};
+
+const AUDIT_ACTION_LABELS: Record<string, string> = {
+  reviewer_decision: "Reviewer decision",
+  auto_resolve_stale: "Auto-resolved (stale)",
+  reopen: "Reopened",
+  resolver_recompute: "Resolver recompute",
+  methodology_version_bump: "Methodology bump",
+  sync_rejected: "Sync rejected",
+  sync_admitted: "Sync admitted",
 };
 
 interface PageProps {
@@ -61,6 +93,19 @@ function formatDate(iso: string | null): string {
     year: "numeric",
     month: "short",
     day: "numeric",
+  });
+}
+
+function formatDateTime(iso: string | null): string {
+  if (!iso) return "—";
+  const dt = new Date(iso);
+  if (Number.isNaN(dt.getTime())) return iso;
+  return dt.toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -79,6 +124,11 @@ function formatFactValue(
     return fact.factUnit ? `${formatted} ${fact.factUnit}` : formatted;
   }
   return fact.factValue ?? "—";
+}
+
+function severityBadgeVariant(score: SeverityScore) {
+  if (score.bucket == null) return "default" as const;
+  return SEVERITY_VARIANT[score.bucket];
 }
 
 function FactColumn({
@@ -161,7 +211,10 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
   const dispute = await getDataDispute(id);
   if (!dispute) notFound();
 
-  const isResolved = dispute.status.startsWith("resolved_") ||
+  const auditTrail = await getAuditLogForDispute(id);
+
+  const isResolved =
+    dispute.status.startsWith("resolved_") ||
     dispute.status === "rejected_invalid";
 
   return (
@@ -190,18 +243,54 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
       >
         <Pill>{KIND_LABELS[dispute.disputeKind] ?? dispute.disputeKind}</Pill>
         <Pill>{`Group ${dispute.factGroup}`}</Pill>
+        {dispute.severity.severity != null ? (
+          <Pill variant={severityBadgeVariant(dispute.severity)}>
+            {formatSeverity(dispute.severity)}
+          </Pill>
+        ) : null}
         <Pill
           variant={
-            isResolved ? "default" : dispute.status === "in_review" ? "accent" : "warn"
+            isResolved
+              ? "default"
+              : dispute.status === "in_review"
+                ? "accent"
+                : "warn"
           }
         >
           {STATUS_LABELS[dispute.status] ?? dispute.status}
         </Pill>
+        {dispute.autoResolveEligible ? (
+          <Pill variant="accent">Auto-resolve eligible</Pill>
+        ) : null}
         <span>Created {formatDate(dispute.createdAt)}</span>
         {dispute.proposedAction ? (
           <span>· Proposed: {dispute.proposedAction}</span>
         ) : null}
       </div>
+
+      {dispute.autoResolveEligible && dispute.autoResolveNote ? (
+        <p
+          style={{
+            background: "var(--color-card-bg)",
+            border: "1px solid var(--color-card-border)",
+            borderRadius: "var(--radius-sm)",
+            padding: "10px 14px",
+            marginBottom: 24,
+            fontFamily: "var(--font-body)",
+            fontSize: "var(--text-13)",
+            color: "var(--color-text-60)",
+          }}
+        >
+          <strong style={{ color: "var(--color-text-primary)" }}>
+            Note —
+          </strong>{" "}
+          {dispute.autoResolveNote}. The next auto-resolve cron run
+          (daily at 02:30 UTC) will close this dispute as
+          <code> resolved_auto_stale</code>. Manual resolution remains
+          available and is preserved in the audit trail; pick whichever
+          action best reflects the editorial record you want.
+        </p>
+      ) : null}
 
       <div
         style={{
@@ -246,16 +335,60 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
               Notes: {dispute.reviewerNotes}
             </p>
           ) : null}
+
+          <form
+            method="POST"
+            action={`/api/admin/data-disputes/${dispute.id}`}
+            style={{ marginTop: 16 }}
+          >
+            <input
+              type="hidden"
+              name="redirect"
+              value={`/admin/data-disputes/${dispute.id}`}
+            />
+            <input
+              type="hidden"
+              name="action"
+              value="reopen"
+            />
+            <button
+              type="submit"
+              className="editorial-button"
+              style={{
+                background: "var(--color-card-bg)",
+                color: "var(--color-text-primary)",
+                border: "1px solid var(--color-card-border)",
+              }}
+            >
+              Reopen this dispute
+            </button>
+          </form>
+          <p
+            style={{
+              marginTop: 8,
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-11)",
+              color: "var(--color-text-40)",
+            }}
+          >
+            Reopen flips the status back to <code>open</code>, preserves
+            reviewer notes for history, and writes a <code>reopen</code>
+            audit-log row. The next auto-resolve cron may re-close the
+            dispute as stale unless the underlying values changed.
+          </p>
         </section>
       ) : (
         <section className="editorial-section" style={{ marginBottom: 24 }}>
           <h2 className="editorial-section-title">Resolve</h2>
           <p style={{ color: "var(--color-text-60)", marginBottom: 16 }}>
             Recording your decision sets <code>data_disputes.status</code>,
-            stamps <code>resolved_at</code>, and writes your reviewer ID +
-            notes. Per F.5 v1, the resolver continues to compute canonical
-            picks via methodology rules — manual pinning of canonical
-            <code>country_facts</code> rows is left as a follow-up.
+            stamps <code>resolved_at</code>, writes your reviewer ID +
+            notes, and inserts a <code>data_facts_audit_log</code> row
+            with the pre/post snapshot. Per F.5 v1, the resolver
+            continues to compute canonical picks via methodology rules
+            for <code>hold</code> / <code>reject</code>; <code>resolve_a</code>
+            / <code>resolve_b</code> demote the losing rows so the
+            resolver returns the chosen value on next read.
           </p>
           <form
             method="POST"
@@ -355,6 +488,75 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
           </form>
         </section>
       )}
+
+      <section className="editorial-section" style={{ marginBottom: 24 }}>
+        <h2 className="editorial-section-title">Audit history</h2>
+        {auditTrail.length === 0 ? (
+          <p style={{ color: "var(--color-text-60)" }}>
+            No audit entries yet. The audit log starts at 2026-05-05
+            (R.21 wiring); pre-R.21 reviewer decisions are recoverable
+            from the resolution metadata above.
+          </p>
+        ) : (
+          <ul
+            style={{
+              listStyle: "none",
+              padding: 0,
+              margin: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
+            {auditTrail.map((row) => (
+              <li
+                key={row.id}
+                style={{
+                  borderLeft: "2px solid var(--color-card-border)",
+                  paddingLeft: 12,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-12)",
+                    color: "var(--color-text-40)",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {formatDateTime(row.createdAt)} · {row.actorId}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "var(--text-14)",
+                    color: "var(--color-text-primary)",
+                  }}
+                >
+                  <strong>
+                    {AUDIT_ACTION_LABELS[row.action] ?? row.action}
+                  </strong>
+                  {row.before && row.after
+                    ? `: ${row.before.status} → ${row.after.status}`
+                    : ""}
+                </div>
+                {row.notes ? (
+                  <div
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "var(--text-13)",
+                      color: "var(--color-text-60)",
+                      marginTop: 2,
+                    }}
+                  >
+                    {row.notes}
+                  </div>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </EditorialPage>
   );
 }
