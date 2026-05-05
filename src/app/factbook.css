@@ -356,6 +356,30 @@
   padding-bottom: 0;
 }
 
+.factbook-drawer-beta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  color: var(--color-text-60);
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-wider);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.factbook-drawer-beta__pill {
+  border: 1px solid var(--color-warn);
+  border-radius: var(--radius-sm);
+  color: var(--color-warn);
+  padding: var(--space-1) var(--space-2);
+}
+
+.factbook-drawer-beta__copy {
+  white-space: nowrap;
+}
+
 /* === Tablet (<= 1100px): drop right rail ================================== */
 @media (max-width: 1100px) {
   .factbook-body {
@@ -491,6 +515,9 @@
     transform: translateX(-50%);
     bottom: max(var(--space-3), env(safe-area-inset-bottom));
     border-radius: var(--radius-md);
+  }
+  .factbook-drawer-beta__copy {
+    display: none;
   }
   /* Body content gets extra bottom padding so the last section isn't
      hidden under the floating drawer at rest. */

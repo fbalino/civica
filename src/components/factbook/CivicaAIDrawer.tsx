@@ -366,6 +366,15 @@ export function CivicaAIDrawer({
           flexShrink: 0,
         }}
       >
+        <div
+          className="factbook-drawer-beta"
+          aria-label="Civica AI is in beta. Verify important answers."
+        >
+          <span className="factbook-drawer-beta__pill">Beta</span>
+          <span className="factbook-drawer-beta__copy">
+            Verify important answers
+          </span>
+        </div>
         <input
           type="text"
           value={draft}
