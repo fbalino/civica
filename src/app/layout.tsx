@@ -84,7 +84,7 @@ export default function RootLayout({
                   <span>Civica</span>
                 </div>
                 <p className="site-footer__source">
-                  Data from Wikidata (CC0), IPU Parline, Constitute Project, CIA World Factbook (archived)
+                  Sources include CIA World Factbook, Wikidata, Wikimedia Commons, World Bank, IMF, UN, WHO, UNESCO, UNDP, OECD, FAO, ILO, Eurostat, WTO, V-Dem, IPU Parline, Constitute Project, BR/CGV, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index, and GDELT.
                 </p>
                 <div className="site-footer__legend">
                   <span>

@@ -86,6 +86,8 @@ The canonical legislature/hemicycle pattern is the factbook legislature componen
 
 Tabs use Inter body text with normal casing, matching the Atlas tab bar (`Structure`, `Bills`, `Leaders`, etc.). Do not use Roman numerals or monospace for tabs.
 
+Dropdown triggers use a token-sized SVG chevron (`ChevronDown` from `lucide-react`) aligned with the text. Do not use text chevron glyphs.
+
 ## Editorial layout classes
 
 Reader-style pages (methodology, replication, corrections, changelog, etc.) compose global layout classes from `src/app/editorial.css`. **Do not ship inline `<style>` blocks for layout, typography, spacing, or container width on a new editorial page.** If a missing class would force a `<style>` block, add the class to `editorial.css` and reuse it.

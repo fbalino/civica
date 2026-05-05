@@ -36,12 +36,46 @@ function sourceLabel(sourceId: string): string {
 }
 
 function formatNumeric(v: number, factKey: string): string {
-  if (factKey.endsWith("_pct") || factKey.includes("rate_pct")) {
+  // Percentages (rate_pct, _pct, _pct_gdp, growth_rate, inflation_rate,
+  // and other rate-shaped fact-keys whose envelope.isPercent is true).
+  // The `_pct_gdp` fiscal indicators store the raw percentage value
+  // (e.g. 55 for 55% of GDP), not a decimal.
+  if (
+    factKey.endsWith("_pct") ||
+    factKey.endsWith("_pct_gdp") ||
+    factKey.includes("rate_pct") ||
+    factKey === "gdp_real_growth_rate" ||
+    factKey === "inflation_rate" ||
+    factKey === "population_growth_rate" ||
+    factKey === "birth_rate" ||
+    factKey === "death_rate" ||
+    factKey === "fertility_rate"
+  ) {
     return `${v.toFixed(1)}%`;
   }
   if (factKey.includes("usd_billions")) {
     if (v >= 1000) return `$${(v / 1000).toFixed(2)}T`;
     return `$${v.toLocaleString(undefined, { maximumFractionDigits: 1 })}B`;
+  }
+  // GDP per capita is a USD figure that should NOT be scaled to T/B/M
+  // (always in the $1k–$200k range). Check before the generic `_usd`
+  // bucket since per-capita keys also end with `_usd`.
+  if (factKey === "gdp_per_capita_usd" || factKey === "gni_per_capita_ppp_usd") {
+    return `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  }
+  // USD totals (raw dollars) — exports/imports/current account balance/
+  // budget/forex reserves. Display with $-sign + B/T scale where useful.
+  if (factKey.endsWith("_usd")) {
+    const abs = Math.abs(v);
+    if (abs >= 1_000_000_000_000)
+      return `${v < 0 ? "-" : ""}$${(abs / 1_000_000_000_000).toFixed(2)}T`;
+    if (abs >= 1_000_000_000)
+      return `${v < 0 ? "-" : ""}$${(abs / 1_000_000_000).toFixed(1)}B`;
+    if (abs >= 1_000_000)
+      return `${v < 0 ? "-" : ""}$${(abs / 1_000_000).toFixed(1)}M`;
+    return `${v < 0 ? "-" : ""}$${abs.toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    })}`;
   }
   if (factKey === "population_total" || factKey === "population") {
     if (v >= 1_000_000_000) return `${(v / 1_000_000_000).toFixed(2)}B`;
@@ -51,13 +85,28 @@ function formatNumeric(v: number, factKey: string): string {
   return v.toLocaleString();
 }
 
+/**
+ * Format a single resolver row's value for display. Exported so the
+ * factbook structured-section "Civica canonical (reconciled)" leaf
+ * (Augment design at
+ * `~/civica/plan/factbook-multi-year-rendering-v1.md`) can render
+ * the canonical pick using the same formatter as the alternates
+ * panel — keeps the headline row and the panel's first row visually
+ * consistent.
+ */
+export function formatFactRowValue(row: FactRow, factKey: string): string {
+  return formatValue(row, factKey);
+}
+
 function formatValue(row: FactRow, factKey: string): string {
   // Prefer the upstream display string when it looks formatted —
   // CIA prose has commas + (year est.) tags that are informative.
-  // Wikidata raw values like "190886311" are plain integers; use
-  // the numeric formatter instead.
+  // Wikidata / WB / IMF / Eurostat raw values like "190886311" or
+  // "-1.34293072157739" are plain numbers; use the numeric
+  // formatter instead. Allow optional leading minus to catch
+  // negative growth rates.
   if (row.factValue) {
-    const looksRaw = /^\d+(\.\d+)?$/.test(row.factValue.trim());
+    const looksRaw = /^-?\d+(\.\d+)?$/.test(row.factValue.trim());
     if (!looksRaw) return row.factValue;
   }
   if (row.factValueNumeric === null) return row.factValue ?? "—";

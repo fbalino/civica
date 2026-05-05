@@ -900,9 +900,10 @@
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-1);
   line-height: 1;
-  vertical-align: baseline;
+  vertical-align: middle;
 }
 .fact-value-trigger:hover,
 .fact-value-trigger[aria-expanded="true"] {
@@ -932,7 +933,7 @@
   font-family: var(--font-body);
   font-size: var(--text-10);
   color: var(--color-text-60);
-  line-height: 1;
+  line-height: var(--leading-none);
   font-weight: 600;
 }
 

@@ -4,6 +4,7 @@ import type { FactbookField } from "@/lib/data/factbook-fields";
 import { humanizeLabel, humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { slugify } from "@/lib/text/slugify";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
+import { formatFactRowValue } from "@/components/factbook/FactValuePanel";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 
 /**
@@ -16,13 +17,61 @@ import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
  *
  * Keys are the human label as rendered by `humanizeLabel(field.label)`
  * — match what the user sees on screen, not the raw underlying key.
+ *
+ * For multi-year CIA prose groups (Inflation rate, Public debt, etc.)
+ * see `MULTI_YEAR_GROUP_TO_FACT_KEY` below — those render a leading
+ * "Civica canonical (reconciled)" row above the per-year CIA leaves
+ * per the Augment design at
+ * `~/civica/plan/factbook-multi-year-rendering-v1.md`.
  */
 const LABEL_TO_FACT_KEY: Record<string, string> = {
   Capital: "capital",
   Population: "population_total",
   Languages: "official_languages",
   Currency: "currency_code",
-  "GDP (PPP)": "gdp_ppp_usd_billions",
+  // Single-shot economy + demographics leaves — CIA emits one row
+  // without a year suffix on the label (the year is in the value
+  // string instead, e.g. "10.47 births/1,000 population (2025 est.)").
+  "Birth rate": "birth_rate",
+  "Death rate": "death_rate",
+  "Population growth rate": "population_growth_rate",
+  "Total fertility rate": "fertility_rate",
+  "GDP (official exchange rate)": "gdp_nominal_usd_billions",
+};
+
+/**
+ * Phase F.4 — multi-year CIA prose groups. The CIA prose stores one
+ * leaf per year ("Inflation rate (consumer prices) 2022", "...2023",
+ * "...2024") under a top-level group whose humanized label is
+ * `"Inflation rate (consumer prices)"`. The resolver returns a single
+ * canonical pick from across all sources (WB / IMF / Eurostat / etc.).
+ *
+ * The Augment design (resolution v1.0, ADOPTED 2026-05-04) prepends
+ * one "Civica canonical (reconciled)" row at the top of the group's
+ * children, rendering the resolver's pick with `<FactValueDot>`
+ * (alternates panel reveals every source). The per-year CIA leaves
+ * stay below, unchanged.
+ *
+ * Doc: `~/civica/plan/factbook-multi-year-rendering-v1.md`
+ */
+const MULTI_YEAR_GROUP_TO_FACT_KEY: Record<string, string> = {
+  // Economy — multi-year CIA prose sets reconciled against Tier-1
+  // measurements (WB / IMF / Eurostat / OECD / WTO).
+  "Real GDP (purchasing power parity)": "gdp_ppp_usd_billions",
+  "Real GDP per capita": "gdp_per_capita_usd",
+  "Real GDP growth rate": "gdp_real_growth_rate",
+  "Inflation rate (consumer prices)": "inflation_rate",
+  "Public debt": "public_debt_pct_gdp",
+  "Unemployment rate": "unemployment_rate_pct",
+  "Current account balance": "current_account_balance_usd",
+  // R.12 trade-aggregate split — CIA reports goods+services per its
+  // glossary, so map both Exports and Imports to the goods+services
+  // fact-key (WB canonical) per
+  // `~/civica/plan/trade-aggregate-fact-keys-v1.md`.
+  Exports: "exports_goods_services_usd",
+  Imports: "imports_goods_services_usd",
+  // Military section.
+  "Military expenditures": "military_expenditure_pct_gdp",
 };
 
 // Match opening or closing tags for a small allowlist of inline elements.
@@ -219,6 +268,78 @@ function LeafRow({
   );
 }
 
+/**
+ * Phase F.4 — Augment row.
+ *
+ * The "Civica canonical (reconciled)" leaf rendered at the top of
+ * each multi-year CIA prose group whose humanized label appears in
+ * `MULTI_YEAR_GROUP_TO_FACT_KEY`. Visual contract is identical to
+ * `<LeafRow>` — same `<dt>/<dd>` shape, same tokens — so the row
+ * sits alongside the group's existing per-year CIA leaves without
+ * any visual treatment that would compete for attention.
+ *
+ * The displayed value is formatted by `formatFactRowValue()`
+ * (re-export from `<FactValuePanel>`) so the headline number and
+ * the panel's first row are guaranteed to match.
+ *
+ * Resolution doc: `~/civica/plan/factbook-multi-year-rendering-v1.md`
+ * (ADOPTED 2026-05-04).
+ */
+function CanonicalLeafRow({
+  factKey,
+  factLabel,
+  resolverOutput,
+}: {
+  factKey: string;
+  factLabel: string;
+  resolverOutput: ResolverOutput;
+}) {
+  const canonical = resolverOutput.canonical;
+  if (!canonical) return null;
+  const value = formatFactRowValue(canonical, factKey);
+
+  return (
+    <div
+      style={{
+        padding: "10px 0",
+        borderBottom: "1px solid var(--color-stat-border)",
+      }}
+    >
+      <dt
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontWeight: "var(--font-weight-mono)",
+          fontSize: "var(--text-12)",
+          color: "var(--color-text-40)",
+          marginBottom: 4,
+        }}
+      >
+        Civica canonical (reconciled)
+      </dt>
+      <dd
+        style={{
+          fontFamily: "var(--font-body)",
+          fontSize: "var(--text-14)",
+          lineHeight: "var(--leading-relaxed)",
+          color: "var(--color-text-85)",
+          margin: 0,
+        }}
+      >
+        {renderValueWithSource(
+          value,
+          <FactValueDot
+            factKey={factKey}
+            factLabel={factLabel}
+            resolverOutput={resolverOutput}
+            canonicalSourceId={canonical.sourceId ?? null}
+            ariaLabel={`${factLabel}, see all sources`}
+          />
+        )}
+      </dd>
+    </div>
+  );
+}
+
 function GroupBlock({
   field,
   source,
@@ -245,6 +366,28 @@ function GroupBlock({
     ? `${idPrefix}--${slugify(headingText)}`
     : undefined;
 
+  // Phase F.4 — multi-year group augmentation. If this group's
+  // humanized label matches `MULTI_YEAR_GROUP_TO_FACT_KEY` AND the
+  // resolver returned a canonical row, prepend a "Civica canonical
+  // (reconciled)" leaf above the group's existing CIA per-year
+  // leaves. See the Augment design at
+  // `~/civica/plan/factbook-multi-year-rendering-v1.md`.
+  //
+  // Use the sentence-case humanized label for matching (matches the
+  // map keys), but the title-case section label for the heading
+  // (matches the existing typography contract). v1 only canonicalizes
+  // top-level groups (depth === 0); composition tables and other
+  // nested groups stay pure CIA prose per the resolution's §6 Q1.
+  const groupHumanLabel = humanizeLabel(field.label);
+  const canonicalFactKey =
+    depth === 0 ? MULTI_YEAR_GROUP_TO_FACT_KEY[groupHumanLabel] : undefined;
+  const canonicalResolverOutput = canonicalFactKey
+    ? resolverFacts?.[canonicalFactKey]
+    : undefined;
+  const renderCanonicalRow =
+    canonicalFactKey != null &&
+    canonicalResolverOutput?.canonical != null;
+
   return (
     <div style={{ marginTop: blockMarginTop, scrollMarginTop: "calc(56px + var(--space-5))" }}>
       <HeadingTag
@@ -261,6 +404,15 @@ function GroupBlock({
       >
         {headingText}
       </HeadingTag>
+      {renderCanonicalRow && canonicalFactKey && canonicalResolverOutput && (
+        <dl style={{ margin: 0 }}>
+          <CanonicalLeafRow
+            factKey={canonicalFactKey}
+            factLabel={headingText}
+            resolverOutput={canonicalResolverOutput}
+          />
+        </dl>
+      )}
       {renderFields(field.children, source, retrievedAt, depth + 1, idPrefix, resolverFacts)}
     </div>
   );

@@ -161,18 +161,38 @@ export default async function FactbookCountryPage({
     // Used by:
     //   - Header strip (Pop + GDP pills) → uses population_total +
     //     gdp_ppp_usd_billions.
-    //   - Structured sections (FactbookSection LeafRow) → also keys off
-    //     capital / official_languages / currency_code so leaves whose
-    //     human label matches `LABEL_TO_FACT_KEY` swap their generic
-    //     CIA-Factbook SourceDot for a clickable FactValueDot.
-    // One batch query covers both surfaces — keeps the page server-
+    //   - Structured sections (FactbookSection LeafRow) → keyed off
+    //     `LABEL_TO_FACT_KEY` (single-shot leaves) and
+    //     `MULTI_YEAR_GROUP_TO_FACT_KEY` (multi-year groups, augmented
+    //     with a "Civica canonical (reconciled)" row at the top per
+    //     `~/civica/plan/factbook-multi-year-rendering-v1.md`).
+    // One batch query covers all surfaces — keeps the page server-
     // round-trip count flat.
     getCanonicalFactsForJurisdiction(jurisdiction.id, [
+      // Identity / society leaves (also feed header strip).
       "population_total",
       "gdp_ppp_usd_billions",
       "capital",
       "official_languages",
       "currency_code",
+      // Single-shot economy + demographics leaves.
+      "birth_rate",
+      "death_rate",
+      "population_growth_rate",
+      "fertility_rate",
+      "gdp_nominal_usd_billions",
+      // Multi-year groups — augmented with reconciled canonical row.
+      // (`gdp_ppp_usd_billions` is already in the list above for the
+      // header strip; reused here for the structured-section group.)
+      "gdp_per_capita_usd",
+      "gdp_real_growth_rate",
+      "inflation_rate",
+      "public_debt_pct_gdp",
+      "unemployment_rate_pct",
+      "current_account_balance_usd",
+      "exports_goods_services_usd",
+      "imports_goods_services_usd",
+      "military_expenditure_pct_gdp",
     ]).catch(
       () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>
     ),
@@ -333,30 +353,18 @@ export default async function FactbookCountryPage({
       (headerFacts["gdp_ppp_usd_billions"]?.canonical &&
         headerFacts["gdp_ppp_usd_billions"].canonical.sourceId !==
           "cia_factbook") ? (
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-11)",
-            color: "var(--color-text-40)",
-            letterSpacing: "var(--tracking-wide)",
-            padding: "var(--space-2) 0 var(--space-3)",
-            borderBottom: "1px solid var(--color-border-default)",
-            marginBottom: "var(--space-3)",
-          }}
-        >
-          Some figures reconciled across multiple sources via Civica&apos;s
-          methodology (v0.1{" "}
-          <span style={{ color: "var(--color-status-warning)" }}>BETA</span>).{" "}
-          <Link
-            href="/factbook/methodology/reconciliation"
-            style={{
-              color: "var(--color-text-60)",
-              textDecoration: "underline",
-              textUnderlineOffset: "2px",
-            }}
-          >
-            Methodology →
-          </Link>
+        <div className="factbook-reconciliation-notice">
+          <div className="factbook-reconciliation-notice__inner">
+            Some figures reconciled across multiple sources via Civica&apos;s
+            methodology (v0.1{" "}
+            <span className="factbook-reconciliation-notice__beta">BETA</span>).{" "}
+            <Link
+              href="/factbook/methodology/reconciliation"
+              className="factbook-reconciliation-notice__link"
+            >
+              Methodology →
+            </Link>
+          </div>
         </div>
       ) : null}
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { INDEX_NAV_GROUPS } from "@/components/indexNavItems";
 
@@ -43,9 +44,11 @@ export function NavLinks() {
           style={{ textDecoration: "none" }}
         >
           Index
-          <span className="nav-dropdown-chevron" aria-hidden="true">
-            ▾
-          </span>
+          <ChevronDown
+            className="nav-dropdown-chevron"
+            aria-hidden="true"
+            focusable="false"
+          />
         </Link>
         <div className="nav-dropdown-menu" aria-label="Index sections">
           {INDEX_NAV_GROUPS.map((group) => (

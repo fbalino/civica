@@ -46,7 +46,7 @@ function MetaPill({
         }}
       />
       {label && (
-        <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-12)" }}>
+        <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-14)" }}>
           {label}
         </span>
       )}
@@ -210,7 +210,7 @@ export function FactbookHeaderStrip({
                   <span
                     style={{
                       color: "var(--color-text-40)",
-                      fontSize: "var(--text-12)",
+                      fontSize: "var(--text-14)",
                     }}
                   >
                     Pop
@@ -246,7 +246,7 @@ export function FactbookHeaderStrip({
                   <span
                     style={{
                       color: "var(--color-text-40)",
-                      fontSize: "var(--text-12)",
+                      fontSize: "var(--text-14)",
                     }}
                   >
                     GDP (PPP)
@@ -282,11 +282,11 @@ export function FactbookHeaderStrip({
                 }}
                 title="View Civica Index detail"
               >
-                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-12)" }}>CI</span>
+                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-14)" }}>CI</span>
                 <span
                   style={{
                     fontFamily: "var(--font-heading)",
-                    fontSize: "var(--text-18)",
+                    fontSize: "var(--text-14)",
                     fontWeight: 400,
                     lineHeight: 1,
                     color: ciScoreColor,
@@ -312,7 +312,7 @@ export function FactbookHeaderStrip({
                 }}
                 title="View Civica Pulse detail"
               >
-                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-12)" }}>CP</span>
+                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-14)" }}>CP</span>
                 <span style={{ color: "var(--color-text-primary)", lineHeight: 1 }}>{cpDisplay}</span>
                 {trendArrow && (
                   <span
