@@ -5,6 +5,7 @@ import {
   ReaderSidebar,
   type ReaderSidebarItem,
 } from "@/components/editorial/ReaderSidebar";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
@@ -154,11 +155,7 @@ export default function MethodologyHubPage() {
       <ReaderSidebar items={SIDEBAR_ITEMS} className="methodology-sidebar" />
 
       <article className="methodology-content">
-        <nav className="editorial-breadcrumbs" aria-label="Breadcrumb">
-          <Link href="/">Civica Atlas</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">Methodology</span>
-        </nav>
+        <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Methodology</h1>
         <p className="editorial-page-subtitle">
           Every load-bearing methodology decision in Civica is documented as a

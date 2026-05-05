@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { civicaIndex } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
@@ -150,13 +151,7 @@ export default function PcaAppendixPage() {
     <MethodologyLayout items={SECTIONS}>
       <EditorialPage className="pca-layout">
       <article className="pca-article">
-        <nav className="breadcrumb">
-          <Link href="/civica-index">← Civica Index</Link>
-          <span>/</span>
-          <Link href="/civica-index/methodology">Methodology</Link>
-          <span>/</span>
-          PCA appendix
-        </nav>
+        <SmartBreadcrumbs />
 
         <h1 className="page-title">PCA appendix.</h1>
         <div className="page-meta">
@@ -557,20 +552,11 @@ export default function PcaAppendixPage() {
           padding: 60px var(--spacing-page-x, 40px) 80px;
           color: var(--color-text-primary);
         }
-        .pca-article .breadcrumb {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 12px;
-          letter-spacing: 0.03em;
-          color: var(--color-text-30);
-          margin-bottom: 16px;
-          display: flex;
-          gap: 8px;
-          align-items: center;
+        .pca-article .editorial-breadcrumbs a {
+          color: var(--color-text-secondary);
         }
-        .pca-article .breadcrumb a {
-          color: var(--color-text-30);
-          text-decoration: none;
+        .pca-article .editorial-breadcrumbs a:hover {
+          color: var(--color-text-primary);
         }
         .pca-article .page-title {
           font-family: var(--font-heading, var(--font-serif));

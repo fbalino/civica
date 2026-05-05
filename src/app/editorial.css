@@ -37,18 +37,51 @@
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wide);
-  color: var(--color-text-30);
+  color: var(--color-text-muted);
   margin-bottom: var(--space-5);
   display: flex;
-  gap: var(--space-3);
   align-items: center;
   flex-wrap: wrap;
+  gap: var(--space-2);
 }
+
+.editorial-breadcrumbs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.editorial-breadcrumbs-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.editorial-breadcrumbs-item + .editorial-breadcrumbs-item::before {
+  content: "/";
+  color: var(--color-text-muted);
+}
+
 .editorial-breadcrumbs a {
-  color: var(--color-text-30);
+  color: var(--color-text-secondary);
   text-decoration: none;
+  text-underline-offset: var(--space-1);
+  transition:
+    color var(--motion-fast) var(--motion-ease),
+    text-decoration-color var(--motion-fast) var(--motion-ease);
 }
+
 .editorial-breadcrumbs a:hover {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+}
+
+.editorial-breadcrumbs [aria-current="page"] {
   color: var(--color-text-primary);
 }
 

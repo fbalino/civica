@@ -5,6 +5,7 @@ import {
   ReaderSidebar,
   type ReaderSidebarItem,
 } from "@/components/editorial/ReaderSidebar";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
 import {
   tier1Publishers,
@@ -55,13 +56,7 @@ export default async function ApproachPage() {
       <ReaderSidebar items={SIDEBAR_ITEMS} className="methodology-sidebar" />
 
       <article className="methodology-content">
-        <nav className="editorial-breadcrumbs" aria-label="Breadcrumb">
-          <Link href="/">Civica Atlas</Link>
-          <span aria-hidden="true">/</span>
-          <Link href="/methodology">Methodology</Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">How we approach data</span>
-        </nav>
+        <SmartBreadcrumbs />
         <h1 className="editorial-page-title">How we approach data</h1>
         <p className="editorial-page-subtitle">
           A plain-English walkthrough of how Civica handles country data, why

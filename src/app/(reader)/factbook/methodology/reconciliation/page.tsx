@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import {
@@ -49,13 +50,7 @@ const SECTIONS = [
 export default function ReconciliationMethodologyPage() {
   return (
     <MethodologyLayout items={SECTIONS}>
-      <nav className="editorial-breadcrumbs">
-        <Link href="/methodology">Methodology</Link>
-        <span>/</span>
-        <Link href="/factbook">Factbook</Link>
-        <span>/</span>
-        Reconciliation
-      </nav>
+      <SmartBreadcrumbs />
 
       <h1 className="editorial-page-title">
         Factbook Reconciliation

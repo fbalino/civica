@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import {
   getPeerGroupingMigrationTable,
   type PeerGroupingMigrationRow,
@@ -41,17 +42,7 @@ export default async function PeerGroupingMigrationPage() {
       contentClassName="methodology-content--wide"
     >
       <EditorialPage width="full">
-      <nav className="editorial-breadcrumbs">
-        <Link href="/civica-index">← Civica Index</Link>
-        <span>/</span>
-        <Link href="/civica-index/methodology">Methodology</Link>
-        <span>/</span>
-        <Link href="/civica-index/methodology/peer-grouping">
-          Peer grouping
-        </Link>
-        <span>/</span>
-        Migration table
-      </nav>
+      <SmartBreadcrumbs />
 
       <h1 className="editorial-page-title">
         Per-country migration table

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { pulse, disputeSla } from "@/lib/content/site-state";
 
@@ -64,13 +65,7 @@ export default function PulseMethodologyPage() {
   return (
     <MethodologyLayout items={SECTIONS}>
       <EditorialPage>
-      <nav className="editorial-breadcrumbs">
-        <Link href="/civica-index">← Civica Index</Link>
-        <span>/</span>
-        <Link href="/civica-index/methodology">Methodology</Link>
-        <span>/</span>
-        Pulse methodology
-      </nav>
+      <SmartBreadcrumbs />
 
       <h1 className="editorial-page-title">
         Pulse methodology

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import {
   getCIMethodology,
   getCIMethodologyHistory,
@@ -162,11 +163,7 @@ export default async function MethodologyPage() {
 
   return (
     <MethodologyLayout items={sidebarItems}>
-      <nav className="editorial-breadcrumbs">
-        <Link href="/civica-index">← Civica Index</Link>
-        <span>/</span>
-        Methodology
-      </nav>
+      <SmartBreadcrumbs />
       <h1 className="editorial-page-title">The Civica Index methodology.</h1>
       <div className="editorial-page-meta">
         <span>Beta — methodology in active development</span>

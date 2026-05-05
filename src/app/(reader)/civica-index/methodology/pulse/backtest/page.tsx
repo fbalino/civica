@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { Pill } from "@/components/editorial/Pill";
 import {
   getBacktestSnapshot,
@@ -371,15 +372,7 @@ export default async function BacktestReportPage() {
   return (
     <MethodologyLayout items={sidebarItems}>
       <EditorialPage>
-      <nav className="editorial-breadcrumbs">
-        <Link href="/civica-index">← Civica Index</Link>
-        <span>/</span>
-        <Link href="/civica-index/methodology">Methodology</Link>
-        <span>/</span>
-        <Link href="/civica-index/methodology/pulse">Pulse methodology</Link>
-        <span>/</span>
-        Backtest report
-      </nav>
+      <SmartBreadcrumbs />
 
       <h1 className="editorial-page-title">
         Pulse backtest report

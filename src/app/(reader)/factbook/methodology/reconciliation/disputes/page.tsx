@@ -25,6 +25,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { Pill } from "@/components/editorial/Pill";
 import {
   getPublicDisputeFeed,
@@ -602,15 +603,7 @@ export default async function PublicDisputesPage({ searchParams }: PageProps) {
 
   return (
     <EditorialPage width="wide">
-      <nav className="editorial-breadcrumbs">
-        <Link href="/factbook">Factbook</Link>
-        <span>/</span>
-        <Link href="/factbook/methodology/reconciliation">
-          Reconciliation methodology
-        </Link>
-        <span>/</span>
-        Disputes
-      </nav>
+      <SmartBreadcrumbs />
 
       <h1 className="editorial-page-title">
         Data disputes
