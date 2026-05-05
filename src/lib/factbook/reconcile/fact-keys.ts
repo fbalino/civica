@@ -441,7 +441,16 @@ const GROUP_B: FactKeyInput[] = [
     unit: "%",
     envelope: { min: -50, max: 1_000, isPercent: false },
     higherIsBetter: false,
-    materialErrorPpThreshold: 50,
+    // Threshold raised 50 → 300 (2026-05-05) to permit hyperinflation upgrades.
+    // Argentina 2022→2024 moved 73.1% → 219.9% (147 pp gap), a confirmed
+    // hyperinflationary episode (IMF, WB, OWID all report ~210–220% for
+    // Argentina 2024). The 50 pp ceiling treated this as a data error and
+    // pinned canonical to a 2-year-stale CIA reading. 300 pp comfortably
+    // handles Argentina + Venezuela + Turkey-class episodes while still
+    // catching gross errors (e.g., a decimal-error reading of 2,190%
+    // would still trip at 2,117 pp gap > 300).
+    // Audit trail: ~/civica/plan/canonical-pick-vs-freshness-investigation-v1.md
+    materialErrorPpThreshold: 300,
   },
   {
     key: "inflation_rate_pct",
