@@ -67,6 +67,7 @@
     "sync:factbook:statcan-ca": "tsx scripts/sync-factbook-statcan-ca.ts",
     "sync:factbook:stats-sa": "tsx scripts/sync-factbook-stats-sa.ts",
     "snapshot:fact-vintage": "tsx scripts/snapshot-fact-vintage.ts",
+    "backfill:upstream-vintage-labels": "tsx scripts/backfill-upstream-vintage-labels.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts"
   },

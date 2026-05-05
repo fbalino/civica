@@ -31,7 +31,7 @@ import { getFactKey } from "./fact-keys";
 import type { FactRow, ResolverOutput } from "./types";
 
 /**
- * Phase F.4 — public-API metadata block.
+ * Phase F.4 / R.22 — public-API metadata block.
  *
  * Sibling of `CI_METHODOLOGY_META` and `PULSE_METHODOLOGY_META` in
  * `src/lib/api/helpers.ts`. API endpoints that surface reconciled
@@ -40,17 +40,30 @@ import type { FactRow, ResolverOutput } from "./types";
  * their response envelope so machine consumers can detect the
  * Phase F development phase, version handle, and citation vintage.
  *
- * The vintage handle updates quarterly via the snapshot script
- * (`scripts/snapshot-fact-vintage.ts`); when a new vintage is cut,
- * update `vintage` here in the same commit so API responses cite
- * the live frozen snapshot.
+ * `vintage` is the Civica-side cut handle (single string per
+ * response). The cut handle answers "which Civica reconciled
+ * snapshot is the cite handle?" Per-row upstream vintage labels
+ * answer "which upstream cadence cut produced this row?" and live
+ * inline on each provenance entry — see
+ * `ApiProvenanceEntry.vintageLabel` and `ApiAlternate.vintageLabel`.
+ *
+ * The vintage handle updates quarterly via the snapshot cron
+ * (`/api/cron/factbook/snapshot-vintage`, T+15 days after each
+ * quarter close). When a new vintage is cut, update `vintage`
+ * here in the same commit so API responses cite the live frozen
+ * snapshot.
+ *
+ * Format spec (resolution v1.0 § 2a):
+ *   "Civica Atlas Reconciled v<methodology_version> — vintage <YYYY-Qn>"
+ *
+ * Methodology: ~/civica/plan/vintage-cadence-resolution-v1.md
  */
 export const FACTBOOK_RECONCILIATION_META = Object.freeze({
   status: "beta" as const,
   version: "v0.1",
   reference:
     "https://civicaatlas.org/factbook/methodology/reconciliation",
-  vintage: "Civica Atlas 2026Q3",
+  vintage: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
 });
 
 /**

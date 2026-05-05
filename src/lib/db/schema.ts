@@ -353,6 +353,22 @@ export type FactValueType = "measured" | "projected";
  * get a value that won't move.
  *
  * Methodology §4. Schema doc §2.
+ *
+ * Phase R.22 (2026-05-05) added three additive nullable columns
+ * for academic-replication purposes: `cut_at_timestamp` (per-cut
+ * batch timestamp distinct from per-row `snapshot_at`),
+ * `content_hash` (SHA-256 of the canonical row's reproducibility-
+ * relevant fields), and `is_disputed_at_cut` (frozen copy of the
+ * resolver's cut-time dispute state). See
+ * `~/civica/plan/vintage-cadence-resolution-v1.md`.
+ *
+ * The runtime-vs-snapshot split: reader-facing factbook pages and
+ * the public API call the resolver at runtime via
+ * `getCanonicalFact()` (live data, includes new sources
+ * immediately). This table is the *citation-handle* surface — a
+ * frozen artefact for academic replication. Cuts are quarterly via
+ * the `/api/cron/factbook/snapshot-vintage` cron at T+15 days
+ * after each quarter close.
  */
 export const countryFactVintages = pgTable(
   "country_fact_vintages",
@@ -362,7 +378,12 @@ export const countryFactVintages = pgTable(
       .references(() => jurisdictions.id)
       .notNull(),
     factKey: text("fact_key").notNull(),
-    /** Civica-side vintage handle: "Civica Atlas 2026Q3". */
+    /** Civica-side vintage handle. Phase R.22+: format
+     *  `"Civica Atlas Reconciled v<methodology_version> — vintage
+     *  <YYYY-Qn>"` (e.g. `"Civica Atlas Reconciled v0.2-beta —
+     *  vintage 2026-Q1"`). Pre-R.22 legacy format
+     *  `"Civica Atlas <YYYYQn>"` is preserved on existing rows for
+     *  backwards compatibility. */
     vintageLabel: text("vintage_label").notNull(),
     /** The country_facts.id that won the resolver at vintage time. */
     canonicalFactId: uuid("canonical_fact_id")
@@ -378,6 +399,25 @@ export const countryFactVintages = pgTable(
     sourceId: text("source_id").notNull(),
     methodologyVersion: text("methodology_version").notNull(),
     snapshotAt: timestamp("snapshot_at").defaultNow().notNull(),
+    /** R.22 — cut-batch timestamp. Distinct from `snapshotAt`
+     *  (per-row insert time): all rows in the same vintage cut
+     *  share this timestamp, allowing replication queries to
+     *  group rows by cut without joining `vintage_label`. NULL on
+     *  legacy pre-R.22 rows. See
+     *  `~/civica/plan/vintage-cadence-resolution-v1.md` § 2f. */
+    cutAtTimestamp: timestamp("cut_at_timestamp"),
+    /** R.22 — SHA-256 hash of the canonical row's reproducibility-
+     *  relevant fields: `(source_id, value_text, value_numeric,
+     *  as_of, methodology_version)`. Lets a downstream replication
+     *  script detect content drift between identical-label
+     *  re-cuts. NULL on legacy pre-R.22 rows. */
+    contentHash: text("content_hash"),
+    /** R.22 — frozen-at-cut copy of `ResolverOutput.isDisputed`.
+     *  The dispute itself stays in `data_disputes` and may resolve
+     *  post-cut; this column records the cut-time state so a
+     *  replication reader knows whether the canonical pick was
+     *  contested when frozen. NULL on legacy pre-R.22 rows. */
+    isDisputedAtCut: boolean("is_disputed_at_cut"),
   },
   (table) => [
     uniqueIndex("idx_fact_vintage_unique").on(
