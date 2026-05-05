@@ -1,13 +1,29 @@
+// Party-color palette mapped to design tokens where a close match exists.
+// Token sources: globals.css --gov-* and --color-* families.
+//
+// Mapping:
+//   red    → var(--gov-pres)    presidential rust
+//   blue   → var(--gov-parl)    parliamentary blue
+//   green  → var(--gov-theo)    theocracy green (also matches --color-source-live)
+//   yellow → var(--gov-mon)     monarchy gold
+//   purple → var(--gov-semi)    semi-presidential purple
+//   teal   → kept as oklch — no teal token exists in globals.css; nearest is
+//             --color-info which is oklch(68% 0.10 240) (blue-hued, not teal).
+//             Keeping the original value is the correct exception here.
+//   gray   → var(--color-text-40)  muted neutral, flips with theme
+//   orange → var(--gov-mil)     military orange-brick
+//   black  → var(--color-text-primary)  inverts to cream on dark bg, fixing
+//             the dark-mode invisibility of the original fixed oklch value
 export const PARTY_COLORS: Record<string, string> = {
-  red: "oklch(55% 0.16 25)",
-  blue: "oklch(52% 0.13 245)",
-  green: "oklch(56% 0.13 145)",
-  yellow: "oklch(72% 0.14 85)",
-  purple: "oklch(50% 0.13 310)",
-  teal: "oklch(58% 0.10 195)",
-  gray: "oklch(55% 0.01 90)",
-  orange: "oklch(64% 0.15 55)",
-  black: "oklch(28% 0.02 90)",
+  red:    "var(--gov-pres)",
+  blue:   "var(--gov-parl)",
+  green:  "var(--gov-theo)",
+  yellow: "var(--gov-mon)",
+  purple: "var(--gov-semi)",
+  teal:   "oklch(58% 0.10 195)",  // known-exception: no teal token in globals.css
+  gray:   "var(--color-text-40)",
+  orange: "var(--gov-mil)",
+  black:  "var(--color-text-primary)",
 };
 
 export interface Party {

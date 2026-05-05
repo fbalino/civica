@@ -54,20 +54,40 @@ type VisibleRow = {
   depth: 0 | 1;
 };
 
+// Shades are theme-adaptive color-mix() expressions keyed by token name only (no hex
+// fallback in the key). The lookup helper strips any ", #fallback" suffix from
+// row.colorVar before matching so callers can keep the "var(--gov-*, #fallback)" form.
+// color-mix(in oklab, ...) resolves in the browser at paint time and inherits the
+// current --gov-* value, so dark/light mode flip works automatically.
+function getGovShades(govVar: string): string[] {
+  return [
+    `color-mix(in oklab, ${govVar} 85%, white 15%)`,  // ~lighter
+    `color-mix(in oklab, ${govVar} 80%, black 20%)`,  // ~darker
+    `color-mix(in oklab, ${govVar} 70%, white 30%)`,  // ~lightest
+  ];
+}
+
 const SUBTYPE_SHADES: Record<string, string[]> = {
-  "var(--gov-parl, #4E8BD4)": ["#6b9ddb", "#4d7cb5", "#87b5ee"],
-  "var(--gov-pres, #D4764E)": ["#d97757", "#b85a3e", "#e58f72"],
-  "var(--gov-semi, #9B6DC6)": ["#a878c7", "#815595", "#c59de1"],
-  "var(--gov-mon, #C4A44E)": ["#c9a84e", "#8f763a", "#d8bc6d"],
-  "var(--gov-abs, #B8893A)": ["#b8893a", "#8a6528", "#cda058"],
-  "var(--gov-one, #D4764E)": ["#c7614d", "#954535", "#e38a77"],
-  "var(--gov-mil, #C65A37)": ["#c65a37", "#964126", "#dc7f5d"],
-  "var(--gov-theo, #5CAA6E)": ["#5caa6e", "#417a4e", "#7dc18d"],
+  "var(--gov-parl)": getGovShades("var(--gov-parl)"),
+  "var(--gov-pres)": getGovShades("var(--gov-pres)"),
+  "var(--gov-semi)": getGovShades("var(--gov-semi)"),
+  "var(--gov-mon)":  getGovShades("var(--gov-mon)"),
+  "var(--gov-abs)":  getGovShades("var(--gov-abs)"),
+  "var(--gov-one)":  getGovShades("var(--gov-one)"),
+  "var(--gov-mil)":  getGovShades("var(--gov-mil)"),
+  "var(--gov-theo)": getGovShades("var(--gov-theo)"),
 };
+
+/** Strip the optional ", #fallback" from a CSS var() reference so keys match SUBTYPE_SHADES. */
+function normalizeColorVar(colorVar: string): string {
+  // "var(--gov-parl, #4E8BD4)" → "var(--gov-parl)"
+  return colorVar.replace(/,\s*[^)]+\)$/, ")");
+}
 
 function toneFor(row: VisibleRow, familyIndex: number, subtypeIndex: number): string {
   if (row.kind === "family") return row.colorVar;
-  const shades = SUBTYPE_SHADES[row.colorVar] ?? [row.fallback];
+  const key = normalizeColorVar(row.colorVar);
+  const shades = SUBTYPE_SHADES[key] ?? [row.fallback];
   return shades[(familyIndex + subtypeIndex) % shades.length] ?? row.fallback;
 }
 

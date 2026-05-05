@@ -84,7 +84,7 @@ export function CompareTimelineOverlay({ series }: { series: TimelineSeries[] })
           key={v}
           x={4}
           y={yAt(v) + 3}
-          fontFamily="ui-monospace, 'SF Mono', Menlo, monospace"
+          fontFamily="var(--font-mono)"
           fontSize="10"
           fill="var(--color-text-30)"
           fontWeight="500"
@@ -113,7 +113,7 @@ export function CompareTimelineOverlay({ series }: { series: TimelineSeries[] })
         );
       })}
       <g
-        fontFamily="ui-monospace, 'SF Mono', Menlo, monospace"
+        fontFamily="var(--font-mono)"
         fontSize="10"
         fill="var(--color-text-30)"
         fontWeight="500"

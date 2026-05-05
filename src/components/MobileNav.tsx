@@ -146,7 +146,7 @@ function MenuOverlay({
         style={{
           position: "absolute",
           inset: 0,
-          background: "rgba(0, 0, 0, 0.3)",
+          background: "color-mix(in oklab, var(--color-text-primary) 30%, transparent)",
           animation: "civ-fade-in 200ms ease-out",
         }}
       />
@@ -165,7 +165,7 @@ function MenuOverlay({
           overflow: "auto",
           overscrollBehavior: "contain",
           WebkitOverflowScrolling: "touch",
-          boxShadow: "-8px 0 32px rgba(0, 0, 0, 0.15)",
+          boxShadow: "var(--shadow-hard-lg)",
         }}
       >
       <OverlayHeader onClose={onClose} logoSlot={logoSlot} />

@@ -224,7 +224,7 @@ export function CivicaAIDrawer({
                 : "var(--color-source-live, #5CAA6E)",
               boxShadow: streaming
                 ? "0 0 0 3px color-mix(in srgb, var(--color-warn) 30%, transparent)"
-                : "0 0 0 3px rgba(92,170,110,0.2)",
+                : "0 0 0 3px color-mix(in oklab, var(--color-success) 20%, transparent)",
             }}
           />
           <span

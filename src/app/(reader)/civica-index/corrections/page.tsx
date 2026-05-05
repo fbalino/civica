@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { correctionLog, jurisdictions } from "@/lib/db/schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { CorrectionsForm } from "./CorrectionsForm";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { Banner } from "@/components/editorial/Banner";
 
 export const metadata: Metadata = {
   title: "Corrections — Civica Index",
@@ -122,76 +123,29 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
   const totalPages = Math.ceil(totalCount / perPage);
 
   return (
-    <EditorialPage className="corr-layout">
+    <EditorialPage
+      width="wide"
+      breadcrumbs={
+        <>
+          <Link href="/civica-index">← Civica Index</Link>
+          <span>/</span>
+          Corrections
+        </>
+      }
+      title="Corrections."
+    >
       <style>{`
-        .corr-layout {
-          max-width: 760px;
-          margin: 0 auto;
-          padding: 60px 24px 80px;
-        }
-        .corr-breadcrumb {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 12px;
-          letter-spacing: 0.03em;
-          color: var(--color-text-30);
-          margin-bottom: 16px;
-          display: flex;
-          gap: 8px;
-          align-items: center;
-        }
-        .corr-breadcrumb a {
-          color: var(--color-text-30);
-          text-decoration: none;
-        }
-        .corr-breadcrumb a:hover { color: var(--color-text-primary); }
-
-        .corr-title {
-          font-family: var(--font-heading, var(--font-serif));
-          font-size: 48px;
-          font-weight: 400;
-          letter-spacing: -0.04em;
-          line-height: 1.02;
-          margin: 0 0 12px;
-          color: var(--color-text-primary);
-        }
-        .corr-lede {
-          font-family: var(--font-sans);
-          font-size: 16px;
-          line-height: 1.65;
-          color: var(--color-text-60);
-          margin: 0 0 32px;
-          max-width: 640px;
-        }
+        /* Explainer callout (padding/typography only; background+border from Banner) */
         .corr-explainer {
-          background: var(--color-grid-cell);
-          border: 1px solid var(--color-card-border);
-          border-left: 4px solid var(--color-accent);
-          border-radius: 4px;
           padding: 20px 24px;
           margin-bottom: 40px;
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           line-height: 1.65;
-          color: var(--color-text-60);
         }
         .corr-explainer strong { color: var(--color-text-primary); font-weight: 500; }
         .corr-explainer ul { margin: 10px 0 0 20px; padding: 0; }
         .corr-explainer li { margin-bottom: 4px; }
-
-        .corr-section-title {
-          font-family: var(--font-heading, var(--font-serif));
-          font-size: 28px;
-          font-weight: 400;
-          letter-spacing: -0.02em;
-          color: var(--color-text-primary);
-          margin: 0 0 24px;
-        }
-        .corr-divider {
-          border: none;
-          border-top: 1px solid var(--color-card-border);
-          margin: 48px 0;
-        }
 
         /* Form */
         .corr-form { display: flex; flex-direction: column; gap: 20px; }
@@ -206,7 +160,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         }
         .corr-required { color: var(--color-accent); margin-left: 2px; }
         .corr-hint {
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 11px;
           font-style: italic;
           color: var(--color-text-40);
@@ -215,7 +169,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           margin-left: 4px;
         }
         .corr-select, .corr-input {
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           color: var(--color-text-primary);
           background: var(--color-page-bg);
@@ -232,7 +186,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           box-shadow: 0 0 0 2px color-mix(in oklch, var(--color-accent) 15%, transparent);
         }
         .corr-textarea {
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           color: var(--color-text-primary);
           background: var(--color-page-bg);
@@ -275,7 +229,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           display: flex;
           align-items: flex-start;
           gap: 10px;
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 13px;
           line-height: 1.55;
           color: var(--color-text-60);
@@ -304,7 +258,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           border: 1px solid var(--tier-failed);
           border-radius: 4px;
           padding: 12px 16px;
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 13px;
           color: var(--color-text-primary);
         }
@@ -313,7 +267,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           border: 1px solid var(--tier-exceptional);
           border-radius: 4px;
           padding: 18px 22px;
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           line-height: 1.6;
           color: var(--color-text-primary);
@@ -322,7 +276,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
 
         /* Log */
         .corr-log-empty {
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           color: var(--color-text-40);
           padding: 32px 0;
@@ -354,14 +308,14 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           border-radius: 3px;
         }
         .corr-log-desc {
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           line-height: 1.6;
           color: var(--color-text-60);
           margin: 0 0 8px;
         }
         .corr-log-disposition {
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 13px;
           line-height: 1.55;
           color: var(--color-text-primary);
@@ -389,33 +343,23 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         }
         .corr-pagination a:hover { text-decoration: underline; }
         .corr-resolution-note {
-          font-family: var(--font-sans);
+          font-family: var(--font-body);
           font-size: 13px;
           color: var(--color-text-40);
           margin-top: 32px;
           padding-top: 16px;
           border-top: 1px solid var(--color-card-border);
         }
-        @media (max-width: 480px) {
-          .corr-title { font-size: 36px; }
-        }
       `}</style>
 
-      <nav className="corr-breadcrumb">
-        <Link href="/civica-index">← Civica Index</Link>
-        <span>/</span>
-        Corrections
-      </nav>
-
-      <h1 className="corr-title">Corrections.</h1>
-      <p className="corr-lede">
+      <p className="editorial-page-subtitle">
         Every score in the Civica Index traces to a public data source.
         If you believe a value is wrong, a methodology decision is flawed,
         or a Pulse event has been misclassified, you can dispute it here.
         All submissions are reviewed by the Civica team.
       </p>
 
-      <div className="corr-explainer">
+      <Banner variant="info" className="corr-explainer">
         <strong>What corrections are for:</strong>
         <ul>
           <li><strong>CI data errors</strong> — a source value was ingested incorrectly, or the underlying dataset has been revised.</li>
@@ -426,20 +370,20 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           Governments, researchers, NGOs, journalists, and any affected party may submit.
           You do not need to provide your name or email.
         </p>
-      </div>
+      </Banner>
 
       {/* Submission form */}
-      <section>
-        <h2 className="corr-section-title">Submit a correction</h2>
+      <section className="editorial-section">
+        <h2>Submit a correction</h2>
         <CorrectionsForm countries={countries} submitted={submitted} />
       </section>
 
-      <hr className="corr-divider" />
+      <hr style={{ border: "none", borderTop: "1px solid var(--color-card-border)", margin: "48px 0" }} />
 
       {/* Public log */}
-      <section>
-        <h2 className="corr-section-title">Public corrections log</h2>
-        <p style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--color-text-40)", marginBottom: 24, lineHeight: 1.6 }}>
+      <section className="editorial-section">
+        <h2>Public corrections log</h2>
+        <p>
           Every public submission is listed here, newest first. Submissions where
           the submitter requested privacy are omitted. Contact details are never displayed.
         </p>

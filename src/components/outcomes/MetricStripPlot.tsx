@@ -725,7 +725,7 @@ export function MetricStripPlot({
                 padding: "8px 10px",
                 minWidth: 160,
                 maxWidth: 220,
-                boxShadow: "0 4px 12px rgba(0,0,0,0.35)",
+                boxShadow: "var(--shadow-hard)",
               }}
             >
               <div

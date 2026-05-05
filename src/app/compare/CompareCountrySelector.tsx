@@ -185,9 +185,9 @@ export function CompareCountrySelector({
   ];
   const slotLabels = ["Country A", "Country B", "Country C"];
   const seriesColors = [
-    "var(--series-a, oklch(72% 0.15 35))",
-    "var(--series-b, oklch(68% 0.13 220))",
-    "var(--series-c, oklch(72% 0.14 150))",
+    "var(--series-a)",
+    "var(--series-b)",
+    "var(--series-c)",
   ];
 
   return (

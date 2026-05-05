@@ -20,7 +20,7 @@
 .editorial-page {
   max-width: 760px;
   margin: 0 auto;
-  padding: 60px 24px 80px;
+  padding: 60px var(--space-6) 80px;
   color: var(--color-text-primary);
 }
 .editorial-page--wide  { max-width: 960px;  }
@@ -36,11 +36,11 @@
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
-  letter-spacing: 0.03em;
+  letter-spacing: var(--tracking-wide);
   color: var(--color-text-30);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-5);
   display: flex;
-  gap: 8px;
+  gap: var(--space-3);
   align-items: center;
   flex-wrap: wrap;
 }
@@ -56,7 +56,7 @@
 
 .editorial-header,
 .editorial-page-header {
-  margin-bottom: 28px;
+  margin-bottom: 28px; /* 28px — no exact token; between --space-6(24) and --space-7(32) */
 }
 
 .editorial-page-title,
@@ -64,9 +64,9 @@
   font-family: var(--font-heading);
   font-size: var(--text-56);
   font-weight: 400;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--tracking-tighter);
   line-height: 1.02;
-  margin: 0 0 12px;
+  margin: 0 0 var(--space-4);
   color: var(--color-text-primary);
 }
 @media (max-width: 480px) {
@@ -78,9 +78,9 @@
   font-family: var(--font-heading);
   font-size: var(--text-20);
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.01em; /* -0.01em — no exact token; between --tracking-snug(-0.02) and --tracking-normal(0) */
   color: var(--color-text-60);
-  margin: 0 0 28px;
+  margin: 0 0 28px; /* 28px — no exact token */
   line-height: 1.4;
   max-width: 640px;
 }
@@ -90,11 +90,11 @@
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
-  letter-spacing: 0.03em;
+  letter-spacing: var(--tracking-wide);
   color: var(--color-text-30);
-  margin: 0 0 28px;
+  margin: 0 0 28px; /* 28px — no exact token */
   display: flex;
-  gap: 12px;
+  gap: var(--space-4);
   flex-wrap: wrap;
   align-items: center;
 }
@@ -105,7 +105,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-12);
   font-weight: var(--font-weight-mono, 500);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   /* Bg is mostly page-bg with a hint of warning colour, so text reads
      against the page palette. --color-text-primary keeps the tag
@@ -118,10 +118,10 @@
   );
   border: 1px solid var(--color-status-warning);
   border-radius: var(--radius-sm);
-  padding: 2px 8px;
+  padding: var(--space-1) var(--space-3);
   white-space: nowrap;
   vertical-align: middle;
-  margin-left: 8px;
+  margin-left: var(--space-3);
 }
 
 /* ── Warning callout (used for Beta disclosures, methodology
@@ -135,8 +135,8 @@
   );
   border: 1px solid var(--color-status-warning);
   border-radius: var(--radius-md);
-  padding: 14px 18px;
-  margin-bottom: 32px;
+  padding: 14px 18px; /* 14px/18px — no exact tokens */
+  margin-bottom: var(--space-7);
   font-family: var(--font-body);
   font-size: var(--text-14);
   line-height: 1.55;
@@ -150,19 +150,49 @@
   text-decoration: underline;
 }
 
+/* ── Banner callout primitive ───────────────────────────────────── */
+
+.editorial-banner {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-7);
+}
+
+.editorial-banner--warn {
+  background: color-mix(in oklch, var(--color-status-warning) 10%, var(--color-page-bg) 90%);
+  border-color: var(--color-status-warning);
+}
+
+.editorial-banner--success {
+  background: color-mix(in oklch, var(--color-status-success) 10%, var(--color-page-bg) 90%);
+  border-color: var(--color-status-success);
+}
+
+.editorial-banner--danger {
+  background: color-mix(in oklch, var(--color-status-danger) 10%, var(--color-page-bg) 90%);
+  border-color: var(--color-status-danger);
+}
+
+.editorial-banner--info {
+  background: color-mix(in oklch, var(--color-status-info) 10%, var(--color-page-bg) 90%);
+  border-color: var(--color-status-info);
+}
+
 /* ── Content sections ───────────────────────────────────────────── */
 
 .editorial-section {
-  margin-top: 36px;
+  margin-top: 36px; /* 36px — no exact token; between --space-7(32) and --space-8(48) */
 }
 .editorial-section h2,
 .editorial-section .editorial-h2 {
   font-family: var(--font-heading);
   font-size: var(--text-26);
   font-weight: 400;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-snug);
   color: var(--color-text-primary);
-  margin: 0 0 16px;
+  margin: 0 0 var(--space-5);
 }
 .editorial-section h3,
 .editorial-section .editorial-h3 {
@@ -170,14 +200,14 @@
   font-size: var(--text-18);
   font-weight: 400;
   color: var(--color-text-primary);
-  margin: 24px 0 8px;
+  margin: var(--space-6) 0 var(--space-3);
 }
 .editorial-section p {
   font-family: var(--font-body);
   font-size: var(--text-14);
   line-height: 1.7;
   color: var(--color-text-60);
-  margin: 0 0 12px;
+  margin: 0 0 var(--space-4);
 }
 .editorial-section ul,
 .editorial-section ol {
@@ -185,11 +215,11 @@
   font-size: var(--text-14);
   line-height: 1.7;
   color: var(--color-text-60);
-  padding-left: 22px;
-  margin: 0 0 12px;
+  padding-left: 22px; /* 22px — no exact token */
+  margin: 0 0 var(--space-4);
 }
 .editorial-section li {
-  margin-bottom: 6px;
+  margin-bottom: 6px; /* 6px — no exact token; between --space-2(4) and --space-3(8) */
 }
 .editorial-section strong {
   color: var(--color-text-primary);
@@ -211,10 +241,11 @@
 }
 
 /* Lightweight table styling for in-section data */
-.editorial-section table {
+.editorial-section table,
+.editorial-data-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 16px 0 8px;
+  margin: var(--space-5) 0 var(--space-3);
   font-family: var(--font-body);
   font-size: var(--text-13);
 }
@@ -227,45 +258,69 @@
 .editorial-table-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  margin: 16px 0 8px;
+  margin: var(--space-5) 0 var(--space-3);
 }
 .editorial-table-scroll > table {
   margin: 0;
   min-width: max-content;
 }
-.editorial-section thead th {
+.editorial-section thead th,
+.editorial-data-table thead th {
   text-align: left;
-  padding: 8px 12px;
+  padding: var(--space-3) var(--space-4);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-11);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.06em; /* 0.06em — no exact token; between --tracking-wide(0.03) and --tracking-wider(0.08) */
   text-transform: uppercase;
   color: var(--color-text-40);
   border-bottom: 1px solid var(--color-card-border);
 }
-.editorial-section tbody td {
-  padding: 8px 12px;
+.editorial-section tbody td,
+.editorial-data-table tbody td {
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-card-border);
   color: var(--color-text-primary);
+  vertical-align: top;
+  line-height: var(--leading-relaxed, 1.7);
 }
-.editorial-section td.editorial-td-num {
+.editorial-data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.editorial-data-table tbody tr:hover td {
+  background: var(--color-card-hover-bg, var(--color-card-bg));
+}
+.editorial-section td.editorial-td-num,
+.editorial-data-table td.num,
+.editorial-data-table th.num {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
   color: var(--color-text-60);
 }
+
+/* ── Data table standalone (used outside .editorial-section) ─────── */
+/* .editorial-data-table base rules are aliased to .editorial-section
+ * table above so both surfaces stay in sync. The rules below extend
+ * the standalone class with extras the descendant selector doesn't
+ * need (last-child reset, hover row, numeric variant, compact modifier). */
+
+/* Compact density variant */
+.editorial-data-table--compact thead th { padding: 6px 10px; }
+.editorial-data-table--compact tbody td { padding: 6px 10px; }
 
 /* ── Footer nav (link row at the bottom of an editorial page) ───── */
 
 .editorial-footer-nav {
-  margin-top: 56px;
-  padding-top: 24px;
+  margin-top: 56px; /* 56px — no exact token; between --space-8(48) and --space-9(64) */
+  padding-top: var(--space-6);
   border-top: 1px solid var(--color-card-border);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
   color: var(--color-text-60);
   display: flex;
-  gap: 24px;
+  gap: var(--space-6);
   flex-wrap: wrap;
 }
 .editorial-footer-nav a {
@@ -350,23 +405,23 @@
   padding: 0 var(--spacing-page-x, 40px);
   display: grid;
   grid-template-columns: 220px minmax(0, 1fr);
-  gap: 64px;
+  gap: var(--space-9);
   color: var(--color-text-primary);
   overflow-x: clip;
 }
 
 .methodology-sidebar {
   position: sticky;
-  top: 80px;
+  top: 80px; /* 80px — no exact token; consider calc(var(--header-height) + var(--space-6)) in future */
   align-self: start;
-  padding: 60px 0 40px;
+  padding: 60px 0 40px; /* 60px/40px — no exact tokens */
 }
 
 .methodology-content {
   width: 100%;
   max-width: 800px;
   min-width: 0;
-  padding: 60px 0 80px;
+  padding: 60px 0 80px; /* 60px/80px — no exact tokens */
 }
 
 .methodology-content--wide {
@@ -389,22 +444,22 @@
 
   .methodology-sidebar {
     position: static;
-    padding: 32px 0 0;
+    padding: var(--space-7) 0 0;
   }
 
   .methodology-content {
     max-width: none;
-    padding: 32px 0 70px;
+    padding: var(--space-7) 0 70px; /* 70px — no exact token */
   }
 
   .methodology-sidebar .reader-sidebar-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-3);
   }
 
   .methodology-sidebar .reader-sidebar-link {
-    padding: 4px 10px;
+    padding: var(--space-2) 10px; /* 10px — no exact token */
     border-left: 0;
     border: 1px solid var(--color-card-border);
     border-radius: var(--radius-sm);
@@ -414,9 +469,9 @@
 .editorial-filter-bar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 32px;
-  padding: 18px 20px;
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+  padding: 18px 20px; /* 18px/20px — no exact tokens */
   background: var(--color-card-bg);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-md);
@@ -424,7 +479,7 @@
 .editorial-filter-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 .editorial-filter-label {
@@ -432,9 +487,9 @@
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-11);
   color: var(--color-text-40);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.06em; /* 0.06em — no exact token */
   text-transform: uppercase;
-  min-width: 80px;
+  min-width: 80px; /* 80px — intentional min-width, not spacing */
 }
 @media (max-width: 480px) {
   .editorial-filter-label { min-width: 0; }
@@ -508,26 +563,26 @@
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-hard);
-  padding: 20px 24px;
-  margin-bottom: 16px;
+  padding: 20px var(--space-6); /* 20px — no exact token */
+  margin-bottom: var(--space-5);
 }
 .editorial-card-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-4);
   flex-wrap: wrap;
-  margin-bottom: 8px;
+  margin-bottom: var(--space-3);
 }
 .editorial-card-head-left {
   display: inline-flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 10px; /* 10px — no exact token; between --space-3(8) and --space-4(12) */
   flex-wrap: wrap;
 }
 .editorial-card-pills {
   display: inline-flex;
-  gap: 6px;
+  gap: 6px; /* 6px — no exact token; between --space-2(4) and --space-3(8) */
   flex-wrap: wrap;
 }
 .editorial-card-headline {
@@ -535,11 +590,11 @@
   font-size: var(--text-18);
   font-weight: 400;
   line-height: 1.3;
-  margin: 8px 0 12px;
+  margin: var(--space-3) 0 var(--space-4);
   color: var(--color-text-primary);
 }
 .editorial-card-desc {
-  margin: 0 0 12px;
+  margin: 0 0 var(--space-4);
   font-family: var(--font-body);
   font-size: var(--text-13);
   line-height: 1.55;
@@ -549,18 +604,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-4);
   flex-wrap: wrap;
-  padding-top: 10px;
+  padding-top: 10px; /* 10px — no exact token */
   border-top: 1px solid var(--color-card-border);
   font-family: var(--font-mono);
   font-size: var(--text-11);
   color: var(--color-text-40);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.04em; /* 0.04em — no exact token; between --tracking-wide(0.03) and --tracking-wider(0.08) */
 }
 .editorial-card-foot-row {
   display: inline-flex;
-  gap: 12px;
+  gap: var(--space-4);
   flex-wrap: wrap;
   align-items: center;
 }
@@ -568,7 +623,7 @@
 /* ── Pulse event accordion cards ───────────────────────────────── */
 
 .pulse-event-card {
-  scroll-margin-top: 80px;
+  scroll-margin-top: calc(var(--header-height) + var(--space-5));
   padding: 0;
   overflow: hidden;
 }
@@ -803,8 +858,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding-top: 16px;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
   border-top: 1px solid var(--color-card-border);
   font-family: var(--font-mono);
   font-size: var(--text-12);
@@ -822,16 +877,16 @@
 
 .editorial-section-header,
 .editorial-results-header-block {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-5);
 }
 .editorial-eyebrow {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-11);
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-40);
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-3);
   display: block;
 }
 .editorial-section-header h2,
@@ -839,22 +894,22 @@
   font-family: var(--font-heading);
   font-size: var(--text-22);
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.01em; /* -0.01em — no exact token */
   color: var(--color-text-primary);
-  margin: 0 0 6px;
+  margin: 0 0 6px; /* 6px — no exact token */
 }
 .editorial-section-header p,
 .editorial-results-dek {
   font-family: var(--font-body);
   font-size: var(--text-13);
   color: var(--color-text-60);
-  margin: 0 0 20px;
+  margin: 0 0 20px; /* 20px — no exact token; between --space-5(16) and --space-6(24) */
 }
 
 /* ── Empty state ────────────────────────────────────────────────── */
 
 .editorial-empty {
-  margin: 16px 0 24px;
+  margin: var(--space-5) 0 var(--space-6);
   font-family: var(--font-body);
   font-size: var(--text-14);
   color: var(--color-text-60);
@@ -1177,4 +1232,224 @@
   inset: 0;
   z-index: 39;
   background: transparent;
+}
+
+/* ── API documentation surface ──────────────────────────────────
+ * Used exclusively by /api-docs. Companion to <MethodologyLayout>
+ * with contentClassName="methodology-content--wide" — the wide
+ * variant gives endpoint code blocks and parameter rows room
+ * without clamping to the 800px reader column.
+ *
+ * Used by: src/app/api-docs/page.tsx
+ * ─────────────────────────────────────────────────────────────── */
+
+.api-endpoint {
+  margin-bottom: var(--space-8);
+  scroll-margin-top: calc(var(--header-height) + var(--space-5));
+}
+
+.api-endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 10px — no exact token */
+  margin-bottom: var(--space-4);
+}
+
+.api-method-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-badge-text);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-badge-get);
+}
+.api-method-badge--get    { background: var(--color-badge-get); }
+.api-method-badge--post   { background: var(--color-badge-post); }
+.api-method-badge--put    { background: var(--color-badge-post); }
+.api-method-badge--delete { background: var(--color-badge-post); }
+.api-method-badge--patch  { background: var(--color-badge-post); }
+
+.api-endpoint-path {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-14);
+  color: var(--color-text-primary);
+}
+
+.api-endpoint-desc {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+  line-height: var(--leading-relaxed);
+  margin: 0 0 var(--space-5);
+}
+
+.api-section-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-10);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-30);
+  margin: 0 0 var(--space-3);
+}
+
+.api-code-block {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-divider);
+  border-radius: 6px; /* 6px — no exact token; preserves visual weight */
+  padding: var(--space-5) var(--space-6);
+  overflow-x: auto;
+  color: var(--color-text-60);
+  line-height: 1.6; /* 1.6 — no exact token; tighter than --leading-relaxed for code */
+  margin: 0;
+}
+
+.api-info-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-divider);
+  border-radius: 6px; /* 6px — no exact token; matches .api-code-block */
+  padding: var(--space-5) var(--space-6);
+}
+.api-info-card__row {
+  margin-top: var(--space-5);
+}
+.api-info-card__row:first-child {
+  margin-top: 0;
+}
+.api-info-card__body {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+  line-height: var(--leading-relaxed);
+  margin: 0;
+}
+.api-info-card__body code {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+}
+.api-info-card__value {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-13);
+  color: var(--color-text-primary);
+}
+.api-info-card__link {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  color: var(--color-text-50);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px; /* 6px — no exact token */
+}
+.api-info-card__link:hover {
+  color: var(--color-text-primary);
+}
+
+.api-params {
+  border: 1px solid var(--color-divider);
+  border-radius: 6px; /* 6px — no exact token; matches .api-code-block */
+  overflow: hidden;
+  margin: 0 0 var(--space-5);
+}
+.api-params__row {
+  display: flex;
+  gap: var(--space-5);
+  padding: var(--space-3) var(--space-5);
+  align-items: baseline;
+  border-top: 1px solid var(--color-divider);
+}
+.api-params__row:first-child {
+  border-top: 0;
+}
+.api-params__name {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  color: var(--color-text-primary);
+  min-width: 140px; /* 140px — no exact token; column rhythm */
+}
+.api-params__type {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-10);
+  color: var(--color-text-30);
+  min-width: 60px; /* 60px — no exact token; column rhythm */
+}
+.api-params__desc {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  color: var(--color-text-50);
+}
+.api-params--embed .api-params__name { min-width: 80px;  /* 80px — no exact token */ }
+.api-params--embed .api-params__type { min-width: 110px; /* 110px — no exact token */ }
+.api-params--embed .api-params__row  { padding: 10px var(--space-5); /* 10px — no exact token */ }
+.api-params__header {
+  padding: 10px var(--space-5); /* 10px — no exact token */
+  border-bottom: 1px solid var(--color-divider);
+  background: var(--color-card-bg);
+}
+.api-params__header .api-section-label {
+  margin: 0;
+}
+
+.api-embed-size-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  color: var(--color-text-30);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  margin: 0 0 var(--space-3);
+}
+
+.api-embed-block {
+  margin-bottom: 28px; /* 28px — no exact token; matches .editorial-page-subtitle */
+}
+
+.api-example-heading {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-12);
+  color: var(--color-text-primary);
+  margin: var(--space-6) 0 var(--space-3);
+}
+.api-example-heading:first-of-type {
+  margin-top: 0;
+}
+
+.api-intro {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-13);
+  color: var(--color-text-50);
+  line-height: var(--leading-relaxed);
+  margin: 0 0 var(--space-5);
+}
+
+.api-accent-rule {
+  width: 40px; /* 40px — no exact token; small decorative bar */
+  height: 2px; /* 2px — no exact token */
+  background: var(--color-accent);
+  border-radius: 1px; /* 1px — no exact token */
+  margin: 0 0 var(--space-7);
+}
+
+.api-section-divider {
+  height: 1px;
+  background: var(--color-divider);
+  margin: var(--space-8) 0;
+  border: 0;
 }

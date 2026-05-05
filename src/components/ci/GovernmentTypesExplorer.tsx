@@ -19,11 +19,11 @@ type SortKey = "avgScore" | "countryCount";
 // ── Tier ─────────────────────────────────────────────────────────────────────
 
 function tierInfo(score: number): { label: string; color: string; bg: string } {
-  if (score >= 90) return { label: "Elite",    color: "#fff",    bg: "oklch(55% 0.18 245)" };
-  if (score >= 75) return { label: "Strong",   color: "#fff",    bg: "oklch(52% 0.18 145)" };
-  if (score >= 50) return { label: "Moderate", color: "#1a1208", bg: "oklch(82% 0.17 85)"  };
-  if (score >= 25) return { label: "Weak",     color: "#fff",    bg: "oklch(60% 0.17 45)"  };
-  return              { label: "Critical",  color: "#fff",    bg: "oklch(52% 0.20 25)"  };
+  if (score >= 90) return { label: "Elite",    color: "var(--color-on-accent)",    bg: "var(--tier-exceptional)" };
+  if (score >= 75) return { label: "Strong",   color: "var(--color-on-accent)",    bg: "var(--tier-strong)"      };
+  if (score >= 50) return { label: "Moderate", color: "var(--color-text-primary)", bg: "var(--tier-mixed)"       };
+  if (score >= 25) return { label: "Weak",     color: "var(--color-on-accent)",    bg: "var(--tier-weak)"        };
+  return              { label: "Critical",  color: "var(--color-on-accent)",    bg: "var(--tier-failed)"      };
 }
 
 // ── SVG Box Plot ──────────────────────────────────────────────────────────────
@@ -72,10 +72,10 @@ function BoxPlot({ rows }: BoxPlotProps) {
 
       {/* Tier zone backgrounds */}
       {[
-        { from: 75, to: 100, color: "oklch(52% 0.18 145 / 0.06)" },
-        { from: 50, to: 75,  color: "oklch(82% 0.17 85  / 0.06)" },
-        { from: 25, to: 50,  color: "oklch(60% 0.17 45  / 0.05)" },
-        { from:  0, to: 25,  color: "oklch(52% 0.20 25  / 0.05)" },
+        { from: 75, to: 100, color: "color-mix(in oklab, var(--tier-strong) 6%, transparent)" },
+        { from: 50, to: 75,  color: "color-mix(in oklab, var(--tier-mixed) 6%, transparent)"  },
+        { from: 25, to: 50,  color: "color-mix(in oklab, var(--tier-weak) 5%, transparent)"   },
+        { from:  0, to: 25,  color: "color-mix(in oklab, var(--tier-failed) 5%, transparent)" },
       ].map(({ from, to, color }) => (
         <rect
           key={from}

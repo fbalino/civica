@@ -103,7 +103,7 @@ function ciTier(score: number): { label: string; color: string; bg: string } {
   const info = ciTierCanonical(score);
   return {
     label: info.label,
-    color: score >= 50 && score < 75 ? "#1a1208" : "#fff",
+    color: "var(--color-text-primary)",
     bg: info.cssVar,
   };
 }
@@ -113,10 +113,10 @@ function dimensionColor(score: number): string {
 }
 
 function pulseImpactColor(impact: number): string {
-  if (impact > 2) return "var(--color-danger, oklch(52% 0.20 25))";
-  if (impact > 0) return "oklch(60% 0.17 45)";
-  if (impact < -2) return "oklch(52% 0.18 145)";
-  if (impact < 0) return "oklch(65% 0.17 85)";
+  if (impact > 2) return "var(--color-danger)";
+  if (impact > 0) return "var(--pulse-impact-mid-pos)";
+  if (impact < -2) return "var(--pulse-impact-strong-neg)";
+  if (impact < 0) return "var(--pulse-impact-mid-neg)";
   return "var(--color-text-30)";
 }
 
@@ -182,8 +182,8 @@ function HistoryChart({
     >
       <defs>
         <linearGradient id="ci-area-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="oklch(55% 0.18 245)" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="oklch(55% 0.18 245)" stopOpacity="0" />
+          <stop offset="0%" stopColor="var(--chart-line-default)" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="var(--chart-line-default)" stopOpacity="0" />
         </linearGradient>
       </defs>
 
@@ -221,7 +221,7 @@ function HistoryChart({
       <path
         d={pathD}
         fill="none"
-        stroke="oklch(55% 0.18 245)"
+        stroke="var(--chart-line-default)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -234,7 +234,7 @@ function HistoryChart({
           cx={xAt(i)}
           cy={yAt(h.score)}
           r="3"
-          fill="oklch(55% 0.18 245)"
+          fill="var(--chart-line-default)"
         />
       ))}
 
@@ -918,7 +918,7 @@ export default async function CICountryDetailPage({
           </div>
         ) : null}
 
-        <section id="cite" style={{ marginTop: 64 }}>
+        <section id="cite" className="ci-country-cite-section">
           <div className="ci-country-section-eyebrow">Cite this page</div>
           <div className="ci-country-panel ci-country-citation">
             {citationText}
@@ -931,516 +931,6 @@ export default async function CICountryDetailPage({
           <Link href={`/countries/${slug}`}>{jurisdiction.name} profile →</Link>
         </div>
       </div>
-      <style>{DETAIL_CSS}</style>
     </div>
   );
 }
-
-const DETAIL_CSS = `
-  .ci-country-detail-page {
-    background: var(--color-bg);
-  }
-  .ci-country-detail-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 40px 72px;
-  }
-  .ci-country-meta-dot {
-    color: var(--color-text-20);
-    margin: 0 8px;
-  }
-  .ci-country-hero {
-    padding: 8px 0 40px;
-  }
-  .ci-country-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-  }
-  .ci-country-title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    flex-wrap: wrap;
-  }
-  .ci-country-name {
-    font-family: var(--font-heading);
-    font-size: 56px;
-    font-weight: 400;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    margin: 0;
-    color: var(--color-text-primary);
-  }
-  .ci-country-rank {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 13px;
-    letter-spacing: 0.08em;
-    color: var(--color-text-40);
-    padding: 6px 12px;
-    border: 1px solid var(--color-card-border);
-    border-radius: 2px;
-  }
-  .ci-country-meta {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 12px;
-    color: var(--color-text-40);
-    display: flex;
-    gap: 0;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-  }
-  .ci-country-score-shell {
-    margin-bottom: 48px;
-  }
-  .ci-country-subnav {
-    display: flex;
-    gap: 0;
-    margin-bottom: 40px;
-    border-bottom: 1px solid var(--color-divider);
-    flex-wrap: wrap;
-  }
-  .ci-country-subnav a {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 12px;
-    letter-spacing: 0.03em;
-    padding: 12px 18px 14px;
-    background: transparent;
-    color: var(--color-text-30);
-    border-bottom: 1px solid transparent;
-    text-decoration: none;
-    margin-bottom: -1px;
-  }
-  .ci-country-subnav a:hover {
-    color: var(--color-text-primary);
-    border-bottom-color: var(--color-accent);
-  }
-  .ci-country-section-eyebrow {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-text-30);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .ci-country-section-eyebrow small {
-    color: var(--color-text-20);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-  }
-  .ci-country-section-title {
-    font-family: var(--font-heading);
-    font-size: 32px;
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    margin: 0 0 28px;
-  }
-  .ci-country-dimensions {
-    border: 1px solid var(--color-card-border);
-    border-radius: 4px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1px;
-    background: var(--color-grid-bg);
-    margin-bottom: 48px;
-  }
-  .ci-country-dim-row {
-    background: var(--color-grid-cell);
-    padding: 20px 28px;
-    display: grid;
-    grid-template-columns: 260px 80px minmax(0, 1fr) 80px 180px;
-    gap: 24px;
-    align-items: center;
-  }
-  .ci-country-dim-label {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .ci-country-dim-name {
-    font-family: var(--font-heading);
-    font-size: 18px;
-    color: var(--color-text-primary);
-    line-height: 1.2;
-  }
-  .ci-country-dim-source {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 11px;
-    color: var(--color-text-30);
-  }
-  .ci-country-dim-weight,
-  .ci-country-dim-contribution {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 12px;
-    color: var(--color-text-40);
-    text-align: right;
-  }
-  .ci-country-dim-bar {
-    height: 6px;
-    background: var(--color-divider);
-    border-radius: 1px;
-    overflow: hidden;
-    position: relative;
-  }
-  .ci-country-dim-bar-fill {
-    height: 100%;
-    border-radius: 1px;
-  }
-  .ci-country-dim-score {
-    font-family: var(--font-heading);
-    font-size: 22px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    text-align: right;
-  }
-  .ci-country-dim-contribution strong {
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-mono);
-  }
-  .ci-country-two-col {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 32px;
-    margin-bottom: 48px;
-  }
-  .ci-country-panel {
-    border: 1px solid var(--color-card-border);
-    border-radius: 4px;
-    background: var(--color-grid-cell);
-    padding: 28px 32px;
-  }
-  .ci-country-panel-title {
-    font-family: var(--font-heading);
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 1.15;
-    margin: 0 0 20px;
-    color: var(--color-text-primary);
-  }
-  .ci-country-panel-copy {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--color-text-60);
-    margin: 0;
-  }
-  .ci-country-chart-wrap {
-    position: relative;
-    margin-bottom: 12px;
-  }
-  .ci-country-chart-legend {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 11px;
-    color: var(--color-text-40);
-  }
-  .ci-country-legend-swatch {
-    display: inline-block;
-    width: 14px;
-    height: 3px;
-    margin-right: 6px;
-    vertical-align: middle;
-  }
-  .ci-country-legend-swatch.ci-line {
-    background: oklch(55% 0.18 245);
-  }
-  .ci-country-rank-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    margin-bottom: 24px;
-  }
-  .ci-country-rank-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 16px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--color-divider);
-  }
-  .ci-country-rank-row:last-child {
-    border-bottom: none;
-  }
-  .ci-country-rank-label {
-    color: var(--color-text-60);
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 13px;
-  }
-  .ci-country-rank-value {
-    color: var(--color-text-primary);
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 13px;
-    text-align: right;
-  }
-  .ci-country-compare-block {
-    margin: 24px 0;
-  }
-  .ci-country-compare-label,
-  .ci-country-meta-row span {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--color-text-30);
-  }
-  .ci-country-compare-label {
-    margin-bottom: 8px;
-  }
-  .ci-country-compare-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .ci-country-compare-link {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 11px;
-    color: var(--color-text-40);
-    text-decoration: none;
-    border: 1px solid var(--color-card-border);
-    border-radius: 4px;
-    padding: 8px 12px;
-  }
-  .ci-country-meta-grid {
-    border-top: 1px solid var(--color-divider);
-    padding-top: 18px;
-    display: grid;
-    gap: 10px;
-  }
-  .ci-country-meta-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    align-items: baseline;
-  }
-  .ci-country-meta-row strong {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 13px;
-    color: var(--color-text-primary);
-    text-align: right;
-  }
-  .ci-country-taxonomy-wrap {
-    margin-top: 24px;
-  }
-  .ci-country-event-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    background: var(--color-grid-bg);
-    border: 1px solid var(--color-card-border);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-bottom: 48px;
-  }
-  .ci-country-event-card {
-    background: var(--color-grid-cell);
-    padding: 20px 24px;
-    display: grid;
-    grid-template-columns: 64px 1fr auto;
-    gap: 18px;
-    align-items: start;
-    text-decoration: none;
-    color: inherit;
-  }
-  .ci-country-event-card.is-link:hover {
-    background: var(--color-grid-cell-hover);
-  }
-  .ci-country-event-severity {
-    font-family: var(--font-heading);
-    font-size: 24px;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    line-height: 1;
-    text-align: center;
-    padding: 8px 0;
-    border-radius: 2px;
-    min-width: 56px;
-  }
-  .ci-country-event-severity.sev-pos {
-    background: rgba(92,170,110,0.14);
-    color: var(--tier-exceptional);
-  }
-  .ci-country-event-severity.sev-sev {
-    background: rgba(230,140,65,0.14);
-    color: var(--tier-weak);
-  }
-  .ci-country-event-severity.sev-sig {
-    background: rgba(230,180,70,0.14);
-    color: var(--tier-mixed);
-  }
-  .ci-country-event-severity.sev-mod {
-    background: rgba(196,189,174,0.08);
-    color: var(--color-text-50);
-  }
-  .ci-country-event-body {
-    min-width: 0;
-  }
-  .ci-country-event-category {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--color-text-30);
-    margin-bottom: 4px;
-  }
-  .ci-country-event-headline {
-    font-family: var(--font-heading);
-    font-size: 17px;
-    color: var(--color-text-primary);
-    line-height: 1.3;
-    margin: 0 0 6px;
-  }
-  .ci-country-event-justification {
-    font-size: 13px;
-    color: var(--color-text-60);
-    line-height: 1.55;
-    margin: 0;
-  }
-  .ci-country-event-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-end;
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 11px;
-    color: var(--color-text-30);
-    white-space: nowrap;
-  }
-  .ci-country-event-confidence {
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    color: var(--color-text-20);
-  }
-  .ci-country-citation {
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: 13px;
-    color: var(--color-text-60);
-    line-height: 1.7;
-  }
-  .ci-country-footer-links {
-    margin-top: 40px;
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    border-top: 1px solid var(--color-card-border);
-    padding-top: 24px;
-    font-family: var(--font-mono);
-    font-weight: var(--font-weight-mono);
-    font-size: var(--text-12);
-  }
-  .ci-country-footer-links a {
-    color: var(--color-text-40);
-    text-decoration: none;
-  }
-  .ci-country-empty-copy {
-    font-family: var(--font-body-sans, var(--font-body));
-    font-size: var(--text-14);
-    color: var(--color-text-50);
-    margin: 0;
-    line-height: var(--leading-relaxed);
-  }
-  @media (max-width: 900px) {
-    .ci-country-detail-container {
-      padding: 0 20px 64px;
-    }
-    .ci-country-name {
-      font-size: 40px;
-    }
-    .ci-country-dim-row {
-      grid-template-columns: 1fr;
-      gap: 10px;
-      padding: 16px 20px;
-    }
-    .ci-country-dim-weight,
-    .ci-country-dim-score,
-    .ci-country-dim-contribution {
-      text-align: left;
-    }
-    .ci-country-two-col {
-      grid-template-columns: 1fr;
-    }
-    .ci-country-rank-row,
-    .ci-country-meta-row {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-    }
-    .ci-country-rank-value,
-    .ci-country-meta-row strong {
-      text-align: left;
-    }
-    .ci-country-event-card {
-      grid-template-columns: 48px 1fr;
-    }
-    .ci-country-event-meta {
-      grid-column: 1 / -1;
-      align-items: flex-start;
-      flex-direction: row;
-      gap: 14px;
-      white-space: normal;
-    }
-  }
-  @media (max-width: 640px) {
-    .ci-country-detail-container {
-      padding: 0 var(--space-5) 64px;
-    }
-    .ci-country-header {
-      align-items: flex-start;
-      gap: 12px;
-    }
-    .ci-country-title-wrap {
-      gap: 12px;
-    }
-    .ci-country-name {
-      font-size: 34px;
-    }
-    .ci-country-panel {
-      padding: 20px;
-    }
-    .ci-country-subnav a {
-      padding: 10px 12px 12px;
-    }
-    .ci-country-event-card {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
-      padding: 16px;
-    }
-    .ci-country-event-severity {
-      width: fit-content;
-      min-width: 48px;
-    }
-    .ci-country-event-meta {
-      grid-column: auto;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .ci-country-event-headline,
-    .ci-country-event-justification {
-      overflow-wrap: anywhere;
-    }
-  }
-`;

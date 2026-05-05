@@ -985,7 +985,7 @@ export default async function CountryPage({
             <span
               style={{
                 fontFamily: "var(--font-heading)",
-                fontSize: "var(--text-36)",
+                fontSize: "var(--text-44)",
                 color: "var(--color-text-primary)",
               }}
             >

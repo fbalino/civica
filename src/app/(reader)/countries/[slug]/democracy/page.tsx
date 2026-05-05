@@ -63,7 +63,7 @@ export default async function DemocracyPage({ params }: { params: Promise<{ slug
           <h3 className="section-header">Democracy Index</h3>
           {democracyData.democracyIndex != null ? (
             <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 16 }}>
-              <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-36)", color: "var(--color-text-primary)" }}>
+              <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-44)", color: "var(--color-text-primary)" }}>
                 {democracyData.democracyIndex.toFixed(2)}
               </span>
               <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-30)" }}>

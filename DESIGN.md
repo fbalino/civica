@@ -41,11 +41,17 @@ Use global CSS variables only. Component code and page CSS should use role token
 
 Hex, `rgb`, `rgba`, and raw `oklch` literals belong only in token-definition blocks or the documented swatch primitive.
 
+Text colors use **semantic role tokens**: `var(--color-text-primary)`, `var(--color-text-secondary)`, `var(--color-text-muted)`. The numeric scheme (`--color-text-85`, `-60`, `-50`, `-40`, `-30`, `-25`, `-20`) is preserved for legacy code but new work prefers the semantic names. Note: the numeric suffixes do NOT match the actual alpha values (`--color-text-85` is alpha 0.88, `--color-text-50` is alpha 0.62–0.64) — another reason to prefer semantic names.
+
 ## Typography
 
-Use Fraunces for display and country/editorial headings through `var(--font-heading)`. The canonical page H1 is 56px (`var(--text-56)`) except for `/blog`, which is allowed to keep its heavier editorial nameplate. Use Inter for body/interface text through `var(--font-body)`. Use `var(--font-mono)` only for labels, IDs, source/meta rows, code, and dense numeric UI. Do not use mono for readable facts such as government type, region, capital, population, GDP, or tab labels.
+Use Fraunces for display and country/editorial headings through **`var(--font-heading)`**. (`--font-serif` is a deprecated alias preserved for backwards compatibility — new code uses `--font-heading`.) The canonical page H1 is 56px (`var(--text-56)`) except for `/blog`, which is allowed to keep its heavier editorial nameplate. Use Inter for body/interface text through **`var(--font-body)`**. (`--font-body-sans` and `--font-sans` are deprecated aliases preserved for backwards compatibility — new code uses `--font-body`.) Use `var(--font-mono)` only for labels, IDs, source/meta rows, code, and dense numeric UI. Do not use mono for readable facts such as government type, region, capital, population, GDP, or tab labels.
 
 Use `var(--text-*)` tokens for font sizes. Do not add new pixel font sizes in page-level CSS.
+
+Font weight tokens: `--font-weight-regular` (400), `--font-weight-medium` (500), `--font-weight-semibold` (600), `--font-weight-bold` (700). Plus `--font-weight-mono` (alias of medium, for monospace UI labels). Avoid hardcoded `font-weight: 400` etc. in new code.
+
+Letter-spacing uses `--tracking-*` tokens: `--tracking-tighter` (-0.04em), `--tracking-tight` (-0.03em), `--tracking-snug` (-0.02em), `--tracking-normal` (0), `--tracking-wide` (0.03em), `--tracking-wider` (0.08em), `--tracking-caps` (0.15em), `--tracking-widest` (0.2em). Avoid hardcoded em values in new code.
 
 ## Layout
 
@@ -68,6 +74,13 @@ Do not add blurred decorative shadows unless the component already has that beha
 ## Shapes
 
 Use small, print-like radii: `var(--radius-sm)` and `var(--radius-md)`. Pills are allowed for status chips and badges only.
+
+## Stacking, motion, breakpoints, and header
+
+- Stacking order tokens: `--z-base`, `--z-rule`, `--z-sticky`, `--z-popover`, `--z-overlay`, `--z-modal`, `--z-toast`. Use these instead of raw integers.
+- Motion tokens: `--motion-fast` (120ms), `--motion-base` (180ms), `--motion-slow` (300ms), `--motion-slower` (500ms). Plus easing tokens: `--motion-ease`, `--motion-ease-out`, `--motion-ease-in-out`, `--motion-linear`.
+- Breakpoint tokens: `--bp-sm` (480px), `--bp-md` (768px), `--bp-lg` (960px), `--bp-xl` (1200px), `--bp-2xl` (1280px). These are declarative — `@media` rules cannot read CSS custom properties, so use the values directly in `@media`. The tokens exist as the source of truth for which breakpoints are canonical.
+- Header height: `--header-height` (56px). Use `calc(var(--header-height) + var(--space-5))` for `scroll-margin-top` instead of the magic `80px`.
 
 ## Components
 

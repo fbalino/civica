@@ -17,12 +17,12 @@ function seededRandom(seed: number) {
 }
 
 const PARTY_COLORS = [
-  "oklch(55% 0.15 25)",
-  "oklch(55% 0.18 15)",
-  "oklch(58% 0.13 145)",
-  "oklch(60% 0.14 270)",
-  "oklch(62% 0.14 55)",
-  "oklch(52% 0.15 300)",
+  "var(--gov-parl)",  // blue — parliamentary
+  "var(--gov-pres)",  // rust/red — presidential
+  "var(--gov-theo)",  // green — theocratic
+  "var(--gov-semi)",  // purple — semi-presidential
+  "var(--gov-mon)",   // gold/amber — monarchy
+  "var(--gov-mil)",   // deep red — military
 ];
 
 type CoverVariant = "lead" | "card" | "hero";

@@ -316,7 +316,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
               <div
                 style={{
                   fontFamily: "var(--font-heading)",
-                  fontSize: "var(--text-15)",
+                  fontSize: "var(--text-14)",
                   color: "var(--color-text-primary)",
                   marginTop: 6,
                 }}

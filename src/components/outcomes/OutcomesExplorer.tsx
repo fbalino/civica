@@ -345,7 +345,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
         borderRadius: "var(--radius-md) 0 0 var(--radius-md)",
         padding: "24px 20px",
         zIndex: 100,
-        boxShadow: "-4px 0 24px rgba(0,0,0,0.3)",
+        boxShadow: "var(--shadow-hard-lg)",
         animation: "slideInRight 200ms ease",
       }
     : {
@@ -360,7 +360,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
         borderRadius: "var(--radius-md) var(--radius-md) 0 0",
         padding: "20px 20px 32px",
         zIndex: 100,
-        boxShadow: "0 -4px 24px rgba(0,0,0,0.3)",
+        boxShadow: "var(--shadow-hard-lg)",
         animation: "slideInUp 200ms ease",
       };
 
@@ -373,7 +373,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(0,0,0,0.4)",
+            background: "color-mix(in oklab, var(--color-text-primary) 40%, transparent)",
             zIndex: 99,
           }}
         />

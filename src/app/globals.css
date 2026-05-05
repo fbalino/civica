@@ -30,13 +30,20 @@
   --text-26: 26px;
   --text-28: 28px;
   --text-32: 32px;
+  --text-36: 36px;
+  --text-40: 40px;
   --text-44: 44px;
+  --text-48: 48px;
   --text-52: 52px;
   --text-56: 56px;
   --text-64: 64px;
 
   /* --- Font weight --- */
-  --font-weight-mono: 500;
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+  --font-weight-mono: var(--font-weight-medium); /* alias: monospace UI labels */
 
   /* --- Leading --- */
   --leading-none: 1;
@@ -106,6 +113,7 @@
 
   /* --- Layout --- */
   --max-w-content: 1200px;
+  --header-height: 56px; /* use calc(var(--header-height) + ...) instead of magic 80px */
 
   /* --- Spacing --- */
   --spacing-page-x: 40px;
@@ -181,6 +189,12 @@
   --color-status-warning: var(--color-warn);
   --color-status-danger: var(--color-danger);
   --color-status-info: var(--color-info);
+
+  /* --- StatusDot role tokens (non-provenance status indicators) --- */
+  --color-status-active: #5CAA6E;     /* same green as --color-success / source-live, separate role */
+  --color-status-idle:   #c4bdae;     /* same as --color-rule, neutral */
+  --color-status-warn:   #d4a04a;     /* same amber as --color-source-frozen */
+  --color-status-down:   #b94328;     /* same brick as --color-danger */
   --color-on-warning: #1a1a1a;
   --color-on-accent: #ffffff;
 
@@ -212,6 +226,36 @@
   --shadow-hard-md: 5px 5px 0 #000;
   --shadow-hard-lg: 6px 6px 0 #000;
   --shadow-dark: 4px 4px 0 #000;
+
+  /* --- Stacking order --- */
+  --z-base:    1;
+  --z-rule:    5;
+  --z-sticky:  20;
+  --z-popover: 40;
+  --z-overlay: 60;
+  --z-modal:   100;
+  --z-toast:   200;
+
+  /* --- Motion --- */
+  --motion-instant: 0ms;
+  --motion-fast:    120ms;
+  --motion-base:    180ms;
+  --motion-slow:    300ms;
+  --motion-slower:  500ms;
+  --motion-ease:        cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --motion-linear:      linear;
+
+  /* --- Breakpoints (reference only — @media cannot read CSS custom properties)
+         These are the canonical breakpoint values for Civica.
+         When writing @media rules, copy the raw px value from here.
+         When a breakpoint needs to change, update this token and all @media uses. --- */
+  --bp-sm:  480px;
+  --bp-md:  768px;
+  --bp-lg:  960px;
+  --bp-xl:  1200px;
+  --bp-2xl: 1280px;
 
   /* --- Logo tokens (dark mode defaults) --- */
   --logo-fg: var(--color-text-primary);  /* cream on dark */
@@ -3179,7 +3223,7 @@ a {
   border: 1px solid var(--color-card-hover-border);
   border-radius: 10px;
   border-top: 3px solid;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-hard-lg);
   padding: 14px 16px;
   pointer-events: none;
   transition: opacity 0.1s;
@@ -3371,7 +3415,7 @@ a {
 }
 .peer-lens-panel__cohort-label--muted {
   color: var(--color-text-40);
-  font-size: var(--text-15);
+  font-size: var(--text-14);
 }
 .peer-lens-panel__cohort-swatch {
   display: inline-block;
@@ -3467,4 +3511,17 @@ a {
 }
 .peer-migration-table tr:hover td {
   background: var(--color-card-bg);
+}
+
+/* ── Reduced motion ────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

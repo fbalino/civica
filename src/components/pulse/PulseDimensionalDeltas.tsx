@@ -87,7 +87,7 @@ function ProvenanceDot() {
           height: 8,
           borderRadius: "999px",
           background: "var(--color-source-live)",
-          boxShadow: "0 0 0 1px rgba(92, 170, 110, 0.22)",
+          boxShadow: "0 0 0 1px color-mix(in oklab, var(--color-success) 22%, transparent)",
         }}
       />
     </span>

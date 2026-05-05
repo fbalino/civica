@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SectionHeader } from "@/components/editorial/SectionHeader";
 
 export const metadata: Metadata = {
   title: "Factbook reconciliation methodology (Beta) — Civica Atlas",
@@ -12,9 +13,24 @@ export const metadata: Metadata = {
   },
 };
 
+const SECTIONS = [
+  { id: "what-this-is", label: "What this is" },
+  { id: "scope", label: "Scope" },
+  { id: "sources", label: "Sources" },
+  { id: "resolver", label: "The resolver" },
+  { id: "vintaging", label: "Vintaging" },
+  { id: "source-dot", label: "How to read a SourceDot" },
+  { id: "editorial-canonical", label: "Editorial canonical vs displayed" },
+  { id: "canonical-flips", label: "Canonical-flip handoffs" },
+  { id: "disputes", label: "Disputes" },
+  { id: "replication", label: "Replication" },
+  { id: "beta-status", label: "Beta status and roadmap" },
+  { id: "citing", label: "Citing this methodology" },
+];
+
 export default function ReconciliationMethodologyPage() {
   return (
-    <EditorialPage>
+    <MethodologyLayout items={SECTIONS}>
       <nav className="editorial-breadcrumbs">
         <Link href="/factbook">← Factbook</Link>
         <span>/</span>
@@ -47,8 +63,12 @@ export default function ReconciliationMethodologyPage() {
         below for graduation criteria.
       </div>
 
-      <section className="editorial-section">
-        <h2>What this is</h2>
+      <section className="editorial-section" id="what-this-is">
+        <SectionHeader
+          eyebrow="Overview"
+          title="What this is"
+          dek="A rule-based system for picking one canonical value per country fact when multiple sources disagree."
+        />
         <p>
           Civica&apos;s factbook draws on multiple sources for the same
           underlying fact. The CIA World Factbook is comprehensive but
@@ -71,7 +91,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="scope">
         <h2>Scope</h2>
         <p>
           We classify each fact into one of three groups by an explicit
@@ -189,7 +209,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="sources">
         <h2>Sources</h2>
         <p>
           A Wikidata claim is accepted only if its references — via the{" "}
@@ -293,7 +313,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="resolver">
         <h2>The resolver</h2>
         <p>
           Given a country and a fact key, the resolver returns one
@@ -460,7 +480,7 @@ export default function ReconciliationMethodologyPage() {
         </div>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="vintaging">
         <h2>Vintaging</h2>
         <p>
           Each country-facts row carries the upstream measurement date
@@ -495,7 +515,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="source-dot">
         <h2>How to read a SourceDot</h2>
         <p>
           Every reconciled fact on the site carries a small dot to its
@@ -530,7 +550,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="editorial-canonical">
         <h2>Editorial canonical vs displayed value</h2>
         <p>
           Sometimes the source Civica regards as the editorial
@@ -661,7 +681,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="canonical-flips">
         <h2>Canonical-flip handoffs and shared canonical publishers</h2>
         <p>
           Two refinements of the editorial-canonical convention land
@@ -725,7 +745,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="disputes">
         <h2>Disputes</h2>
         <p>
           A dispute row is opened automatically when a numeric
@@ -775,7 +795,7 @@ export default function ReconciliationMethodologyPage() {
         </ul>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="replication">
         <h2>Replication</h2>
         <p>
           The resolver is a pure function. Given a fixed snapshot of
@@ -832,7 +852,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="beta-status">
         <h2>Beta status and roadmap</h2>
         <p>
           The reconciliation layer ships behind a Beta pill. While the
@@ -876,7 +896,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
       </section>
 
-      <section className="editorial-section">
+      <section className="editorial-section" id="citing">
         <h2>Citing this methodology</h2>
         <p>
           Recommended citation:
@@ -916,6 +936,6 @@ export default function ReconciliationMethodologyPage() {
         </Link>
         <Link href="/civica-index/corrections">Corrections form</Link>
       </nav>
-    </EditorialPage>
+    </MethodologyLayout>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { SectionHeader } from "@/components/editorial/SectionHeader";
 
 export const metadata: Metadata = {
   title: "Pulse methodology (Beta) — Civica Index",
@@ -627,7 +628,11 @@ export default function PulseMethodologyPage() {
       </section>
 
       <section className="editorial-section" id="multi-run-classifier">
-        <h2>Multi-run classifier — agreement is the confidence signal</h2>
+        <SectionHeader
+          eyebrow="Classification"
+          title="Multi-run classifier"
+          dek="Agreement across runs is the confidence signal — LLM self-reported confidence is ignored."
+        />
         <p>
           LLM self-reported confidence is not calibrated. The Pulse
           ignores it. Instead, each cluster is classified three times with

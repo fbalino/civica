@@ -10,6 +10,7 @@ import "./editorial.css";
 import "./atlas.css";
 import "./shell.css";
 import "./civica-index.css";
+import "./civica-index-detail.css";
 import "./factbook.css";
 import "./civica-chat.css";
 

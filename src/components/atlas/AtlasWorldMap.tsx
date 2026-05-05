@@ -392,7 +392,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                       data-tier={tier}
                       textAnchor="middle"
                       dominantBaseline="central"
-                      fontFamily="ui-monospace,monospace"
+                      fontFamily="var(--font-mono)"
                       letterSpacing="1.5"
                       fill="var(--atlas-ink)"
                       opacity={tier === 1 ? 0.8 : 0.6}

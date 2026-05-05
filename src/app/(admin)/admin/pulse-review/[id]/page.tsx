@@ -185,7 +185,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               borderLeft: "3px solid var(--color-accent)",
               borderRadius: "var(--radius-md)",
               padding: "16px 20px",
-              fontSize: "var(--text-15)",
+              fontSize: "var(--text-14)",
               lineHeight: 1.6,
               color: "var(--color-text-primary)",
             }}

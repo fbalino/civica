@@ -1,7 +1,7 @@
 /* Civica Index styles. Previously inline inside the legacy
    src/app/civica-index/page.tsx <style> block; extracted as part of the
-   Phase 2.2 shell migration so the filter chips in @left/civica-index/
-   can share the same `.ci-chip` rules as the center-pane leaderboard. */
+   Phase 2.2 shell migration. Filter chips now use .editorial-chip from
+   editorial.css. */
 
 .civica-index-page {
   background: var(--color-bg);
@@ -169,34 +169,6 @@
   align-items: flex-start; flex-wrap: wrap;
 }
 .ci-control-group { display: flex; gap: 8px; flex-wrap: wrap; }
-.ci-chip {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  padding: 7px 14px;
-  background: var(--color-card-bg);
-  color: var(--color-text-40);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  transition: background-color .15s, color .15s, border-color .15s;
-  white-space: nowrap;
-}
-.ci-chip:hover {
-  background: var(--color-card-hover-bg);
-  color: var(--color-text-primary);
-  border-color: var(--color-card-hover-border);
-}
-.ci-chip--active {
-  background: var(--color-accent);
-  color: var(--color-bg);
-  border-color: var(--color-accent);
-}
-.ci-chip--active:hover {
-  background: var(--color-accent);
-  color: var(--color-bg);
-  border-color: var(--color-accent);
-}
 
 .civica-filter-select-wrap {
   display: flex;
@@ -216,7 +188,7 @@
   padding: var(--space-2) var(--space-3);
 }
 .civica-filter-select:focus {
-  outline: 2px solid var(--atlas-accent);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
@@ -290,11 +262,11 @@
   padding: 2px 6px;
   border-radius: 2px;
 }
-.gov-parl { background: rgba(78, 139, 212, 0.15); color: #4E8BD4; }
-.gov-pres { background: rgba(212, 118, 78, 0.15); color: #D4764E; }
-.gov-semi { background: rgba(155, 109, 198, 0.15); color: #9B6DC6; }
-.gov-mon  { background: rgba(196, 164, 78, 0.15); color: #C4A44E; }
-.gov-oth  { background: rgba(136, 153, 170, 0.15); color: #8899AA; }
+.gov-parl { background: color-mix(in oklab, var(--gov-parl) 15%, transparent); color: var(--gov-parl); }
+.gov-pres { background: color-mix(in oklab, var(--gov-pres) 15%, transparent); color: var(--gov-pres); }
+.gov-semi { background: color-mix(in oklab, var(--gov-semi) 15%, transparent); color: var(--gov-semi); }
+.gov-mon  { background: color-mix(in oklab, var(--gov-mon)  15%, transparent); color: var(--gov-mon); }
+.gov-oth  { background: color-mix(in oklab, var(--gov-other) 15%, transparent); color: var(--gov-other); }
 
 .ci-lb-score {
   display: flex; align-items: baseline; gap: 8px;

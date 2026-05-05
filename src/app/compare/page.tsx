@@ -19,11 +19,14 @@ import { CompareChambers } from "@/components/compare/CompareChambers";
 import { CompareElections } from "@/components/compare/CompareElections";
 import { CompareInternational } from "@/components/compare/CompareInternational";
 import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
+import { EditorialPage } from "@/components/editorial/EditorialPage";
 
+// Series colors resolve from the global :root block in globals.css.
+// No fallback literals — the globals are always present.
 const SERIES_VARS = [
-  "var(--series-a, oklch(72% 0.15 35))",
-  "var(--series-b, oklch(68% 0.13 220))",
-  "var(--series-c, oklch(72% 0.14 150))",
+  "var(--series-a)",
+  "var(--series-b)",
+  "var(--series-c)",
 ];
 
 function parseSlugs(
@@ -248,14 +251,14 @@ export default async function ComparePage({
   const hasEnough = validSlugs.length >= 2;
 
   return (
-    <div className="civica-compare-page">
-      <section className="page-hero">
-        <h1 className="page-title">
+    <EditorialPage width="full">
+      <section className="compare-page-hero">
+        <h1 className="editorial-page-title">
           {countryLabels.length === 0
             ? "Compare countries, side by side."
             : `${countryLabels.join(" vs. ")}`}
         </h1>
-        <p className="page-lede">
+        <p className="compare-page-lede">
           Overview, Civica Index, chambers, elections, and international
           memberships — everything about any two or three countries in one
           view.
@@ -347,27 +350,15 @@ export default async function ComparePage({
         </>
       )}
 
-      {/* Page-scoped styles — the compare sections share an editorial visual
-          language. These were originally authored inside /civica-index/compare;
-          keeping them here so the legacy route's inline style block can be
-          deleted. */}
+      {/* Page-scoped styles — compare-specific component CSS that has no
+          canonical equivalent in editorial.css. Layout chrome (max-width,
+          padding, page title, lede) is handled by EditorialPage + editorial.css.
+          What remains here is truly compare-specific: the country-picker card
+          grid, the sticky section nav, CI score cards, dimension grid, H2H
+          cards, chamber/election column layouts, and international table cells. */}
       <style>{`
-        .civica-compare-page {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 32px var(--spacing-page-x, 40px) 64px;
-          color: var(--color-text-primary);
-        }
-        .page-hero { padding: 32px 0 32px; }
-        .page-title {
-          font-family: var(--font-heading, var(--font-serif));
-          font-size: 56px;
-          font-weight: 400;
-          letter-spacing: -0.04em;
-          line-height: 1.02;
-          margin-bottom: 12px;
-        }
-        .page-lede {
+        .compare-page-hero { padding: 32px 0 32px; }
+        .compare-page-lede {
           font-size: 17px;
           color: var(--color-text-60);
           max-width: 700px;
@@ -384,7 +375,7 @@ export default async function ComparePage({
           background: var(--color-grid-cell);
           border: 1px solid var(--color-card-border);
           border-top: 3px solid var(--series-a);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           padding: 20px 22px;
           min-height: 196px;
           display: flex;
@@ -439,17 +430,17 @@ export default async function ComparePage({
           letter-spacing: 0.12em;
           text-transform: uppercase;
           padding: 6px 10px;
-          border-radius: 3px;
+          border-radius: var(--radius-sm);
           cursor: pointer;
         }
         .ci-compare-picker-remove:hover { color: var(--color-text-primary); }
         .ci-compare-picker-search {
-          font-family: var(--font-body-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           padding: 10px 12px;
           background: var(--color-surface-elevated, var(--color-bg));
           border: 1px solid var(--color-card-border);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           color: var(--color-text-primary);
           width: 100%;
         }
@@ -459,7 +450,7 @@ export default async function ComparePage({
           padding: 10px 14px;
           background: transparent;
           border: none;
-          font-family: var(--font-body-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           color: var(--color-text-primary);
           cursor: pointer;
@@ -522,7 +513,7 @@ export default async function ComparePage({
         }
 
         .compare-section {
-          scroll-margin-top: 80px;
+          scroll-margin-top: calc(56px + var(--space-5));
           padding: 32px 0;
         }
         .compare-section-eyebrow {
@@ -555,7 +546,7 @@ export default async function ComparePage({
           margin-bottom: 8px;
         }
         .compare-empty-sub {
-          font-family: var(--font-body-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           color: var(--color-text-40);
           max-width: 560px;
@@ -591,7 +582,7 @@ export default async function ComparePage({
           background: var(--color-grid-cell);
           border: 1px solid var(--color-card-border);
           border-top: 3px solid var(--series-a);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           padding: 22px;
           display: flex;
           flex-direction: column;
@@ -616,7 +607,7 @@ export default async function ComparePage({
           color: var(--color-text-30);
         }
         .compare-ci-card-placeholder {
-          font-family: var(--font-body-sans);
+          font-family: var(--font-body);
           font-size: 14px;
           color: var(--color-text-40);
           line-height: 1.4;
@@ -626,7 +617,7 @@ export default async function ComparePage({
           padding: 24px;
           background: var(--color-grid-cell);
           border: 1px solid var(--color-card-border);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
         }
         .compare-ci-eyebrow {
           font-family: var(--font-mono);
@@ -663,7 +654,7 @@ export default async function ComparePage({
         .dim-compare {
           background: var(--color-grid-cell);
           border: 1px solid var(--color-card-border);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           overflow: hidden;
           margin-top: 16px;
         }
@@ -693,7 +684,7 @@ export default async function ComparePage({
         .dim-compare-row { border-bottom: 1px solid var(--color-card-border); }
         .dim-compare-row:last-child { border-bottom: none; }
         .dim-compare-row .dim-name {
-          font-family: var(--font-body-sans);
+          font-family: var(--font-body);
           font-size: 13px;
           color: var(--color-text-primary);
         }
@@ -708,7 +699,7 @@ export default async function ComparePage({
         .dim-compare-cell .bar {
           height: 3px;
           background: var(--color-card-border);
-          border-radius: 2px;
+          border-radius: var(--radius-sm);
           overflow: hidden;
         }
         .dim-compare-cell .bar span {
@@ -732,7 +723,7 @@ export default async function ComparePage({
         .h2h-card {
           background: var(--color-grid-cell);
           border: 1px solid var(--color-card-border);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           padding: 22px;
         }
         .h2h-eyebrow {
@@ -743,7 +734,7 @@ export default async function ComparePage({
           margin-bottom: 8px;
         }
         .h2h-body {
-          font-family: var(--font-body-sans);
+          font-family: var(--font-body);
           font-size: 15px;
           color: var(--color-text-primary);
           line-height: 1.55;
@@ -784,7 +775,7 @@ export default async function ComparePage({
           padding: 48px 20px;
           background: var(--color-grid-cell);
           border: 1px dashed var(--color-card-border);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           font-family: var(--font-mono);
           font-size: 12px;
           color: var(--color-text-30);
@@ -818,7 +809,7 @@ export default async function ComparePage({
         .compare-election-card {
           background: var(--color-grid-cell);
           border: 1px solid var(--color-card-border);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           padding: 14px 16px;
           display: flex;
           flex-direction: column;
@@ -862,7 +853,7 @@ export default async function ComparePage({
         .compare-election-result-bar {
           height: 4px;
           background: var(--color-card-border);
-          border-radius: 2px;
+          border-radius: var(--radius-sm);
           overflow: hidden;
         }
         .compare-election-result-bar span {
@@ -883,7 +874,7 @@ export default async function ComparePage({
           padding: 48px 20px;
           background: var(--color-grid-cell);
           border: 1px dashed var(--color-card-border);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           font-family: var(--font-mono);
           font-size: 12px;
           color: var(--color-text-30);
@@ -895,7 +886,7 @@ export default async function ComparePage({
           padding: 48px 20px;
           background: var(--color-grid-cell);
           border: 1px dashed var(--color-card-border);
-          border-radius: 4px;
+          border-radius: var(--radius-md);
           font-family: var(--font-mono);
           font-size: 12px;
           color: var(--color-text-30);
@@ -932,7 +923,7 @@ export default async function ComparePage({
           color: var(--color-accent);
           padding: 2px 6px;
           border: 1px solid var(--color-accent);
-          border-radius: 2px;
+          border-radius: var(--radius-sm);
           vertical-align: middle;
         }
         .compare-intl-member {
@@ -968,16 +959,6 @@ export default async function ComparePage({
           letter-spacing: 0.04em;
         }
 
-        /* Series color CSS vars fallback — scoped to this page so we don't
-           pollute globals, and using the plain oklch values so the selector
-           cards' border-top renders even without the (optional) design-system
-           override. */
-        .civica-compare-page {
-          --series-a: oklch(72% 0.15 35);
-          --series-b: oklch(68% 0.13 220);
-          --series-c: oklch(72% 0.14 150);
-        }
-
         @media (max-width: 900px) {
           .compare-selector-grid,
           .h2h {
@@ -990,13 +971,13 @@ export default async function ComparePage({
           }
         }
         @media (max-width: 640px) {
-          .page-title { font-size: 36px; }
+          .editorial-page-title { font-size: 36px; }
           .dim-compare-header, .dim-compare-row {
             grid-template-columns: 1fr;
             gap: 8px;
           }
         }
       `}</style>
-    </div>
+    </EditorialPage>
   );
 }

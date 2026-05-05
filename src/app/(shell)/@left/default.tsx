@@ -19,7 +19,7 @@ export default function LeftDefault() {
     <div style={{ padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18 }}>
       <div
         style={{
-          fontFamily: "ui-monospace, monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: 10,
           letterSpacing: "0.15em",
           textTransform: "uppercase",
@@ -50,7 +50,7 @@ export default function LeftDefault() {
                   style={{
                     display: "block",
                     marginTop: 2,
-                    fontFamily: "ui-monospace, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     color: "var(--atlas-muted)",
                     letterSpacing: "0.04em",

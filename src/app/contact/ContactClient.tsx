@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import Link from "next/link";
+import { StatusDot } from "@/components/editorial/StatusDot";
 
 const SUBJECTS = [
   { value: "Data correction", label: "Data correction" },
@@ -55,7 +56,7 @@ const monoLabel: React.CSSProperties = {
 
 const bodyText: React.CSSProperties = {
   fontFamily: "var(--font-body)",
-  fontSize: "var(--text-15)",
+  fontSize: "var(--text-14)",
   color: "var(--color-text-50)",
   lineHeight: "var(--leading-relaxed)",
 };
@@ -119,7 +120,7 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--color-source-live)" }} aria-hidden />
+        <StatusDot state="active" label="Editors are responding" />
         <span style={monoLabel}>Message received</span>
       </div>
       <h3

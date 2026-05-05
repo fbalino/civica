@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import type { ReaderSidebarItem } from "@/components/editorial/ReaderSidebar";
 
 export const metadata: Metadata = {
   title: "API Documentation — Civica Public API",
@@ -15,343 +17,183 @@ export const metadata: Metadata = {
 
 const BASE_URL = "https://civicaatlas.org/api/v1";
 
-const mono = {
-  fontFamily: "var(--font-mono)",
-  fontWeight: "var(--font-weight-mono)" as const,
-};
+const SECTIONS: ReaderSidebarItem[] = [
+  { id: "overview", label: "Overview" },
+  { id: "endpoints", label: "Endpoints" },
+  { id: "countries", label: "List countries" },
+  { id: "country-detail", label: "Country detail" },
+  { id: "government-types", label: "Government types" },
+  { id: "peer-groupings", label: "Peer groupings" },
+  { id: "peer-groupings-migration", label: "Migration table" },
+  { id: "usage-examples", label: "Usage examples" },
+  { id: "data-sources", label: "Data sources" },
+  { id: "widget-embed", label: "Widget embed" },
+];
 
-const bodyText = {
-  ...mono,
-  fontSize: "var(--text-12)",
-  color: "var(--color-text-50)",
-  lineHeight: "var(--leading-relaxed)",
-};
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 function CodeBlock({ children }: { children: string }) {
-  return (
-    <pre
-      style={{
-        ...mono,
-        fontSize: "var(--text-11)",
-        background: "var(--color-card-bg)",
-        border: "1px solid var(--color-divider)",
-        borderRadius: 6,
-        padding: "16px 20px",
-        overflowX: "auto",
-        color: "var(--color-text-60)",
-        lineHeight: 1.6,
-      }}
-    >
-      {children}
-    </pre>
-  );
+  return <pre className="api-code-block">{children}</pre>;
 }
 
 function EndpointSection({
+  id,
   method,
   path,
   description,
   parameters,
   exampleResponse,
 }: {
-  method: string;
+  id: string;
+  method: HttpMethod;
   path: string;
   description: string;
   parameters?: { name: string; type: string; description: string }[];
   exampleResponse: string;
 }) {
+  const methodModifier = `api-method-badge--${method.toLowerCase()}`;
   return (
-    <div style={{ marginBottom: 48 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-        <span
-          style={{
-            ...mono,
-            fontSize: "var(--text-10)",
-            color: "var(--color-badge-text)",
-            background: method === "GET" ? "var(--color-badge-get)" : "var(--color-badge-post)",
-            padding: "2px 8px",
-            borderRadius: 4,
-            letterSpacing: "var(--tracking-caps)",
-          }}
-        >
-          {method}
-        </span>
-        <code
-          style={{
-            ...mono,
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-primary)",
-          }}
-        >
-          {path}
-        </code>
+    <section className="api-endpoint" id={id}>
+      <div className="api-endpoint-head">
+        <span className={`api-method-badge ${methodModifier}`}>{method}</span>
+        <code className="api-endpoint-path">{path}</code>
       </div>
 
-      <p style={{ ...bodyText, marginBottom: 16 }}>{description}</p>
+      <p className="api-endpoint-desc">{description}</p>
 
       {parameters && parameters.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <h4
-            style={{
-              ...mono,
-              fontSize: "var(--text-10)",
-              color: "var(--color-text-30)",
-              letterSpacing: "var(--tracking-caps)",
-              textTransform: "uppercase",
-              marginBottom: 8,
-            }}
-          >
-            Parameters
-          </h4>
-          <div
-            style={{
-              border: "1px solid var(--color-divider)",
-              borderRadius: 6,
-              overflow: "hidden",
-            }}
-          >
-            {parameters.map((param, i) => (
-              <div
-                key={param.name}
-                style={{
-                  display: "flex",
-                  gap: 16,
-                  padding: "8px 16px",
-                  borderTop: i > 0 ? "1px solid var(--color-divider)" : undefined,
-                  alignItems: "baseline",
-                }}
-              >
-                <code
-                  style={{
-                    ...mono,
-                    fontSize: "var(--text-11)",
-                    color: "var(--color-text-primary)",
-                    minWidth: 140,
-                  }}
-                >
-                  {param.name}
-                </code>
-                <span
-                  style={{
-                    ...mono,
-                    fontSize: "var(--text-10)",
-                    color: "var(--color-text-30)",
-                    minWidth: 60,
-                  }}
-                >
-                  {param.type}
-                </span>
-                <span
-                  style={{
-                    ...mono,
-                    fontSize: "var(--text-11)",
-                    color: "var(--color-text-50)",
-                  }}
-                >
-                  {param.description}
-                </span>
+        <>
+          <h4 className="api-section-label">Parameters</h4>
+          <div className="api-params">
+            {parameters.map((param) => (
+              <div key={param.name} className="api-params__row">
+                <code className="api-params__name">{param.name}</code>
+                <span className="api-params__type">{param.type}</span>
+                <span className="api-params__desc">{param.description}</span>
               </div>
             ))}
           </div>
-        </div>
+        </>
       )}
 
-      <h4
-        style={{
-          ...mono,
-          fontSize: "var(--text-10)",
-          color: "var(--color-text-30)",
-          letterSpacing: "var(--tracking-caps)",
-          textTransform: "uppercase",
-          marginBottom: 8,
-        }}
-      >
-        Example Response
-      </h4>
+      <h4 className="api-section-label">Example Response</h4>
       <CodeBlock>{exampleResponse}</CodeBlock>
-    </div>
+    </section>
   );
 }
 
+const EMBED_PARAMS = [
+  { name: "size", type: "sm | md | lg", description: "Widget dimensions. Default: md" },
+  {
+    name: "theme",
+    type: "light | dark",
+    description: "Override color scheme. Default: system prefers-color-scheme",
+  },
+  {
+    name: "dims",
+    type: "0 | 1",
+    description: "Show 6 dimension mini-bars in large widget. Default: 0",
+  },
+];
+
 export default function ApiDocsPage() {
   return (
-    <div
-      style={{
-        maxWidth: "var(--max-w-content)",
-        margin: "0 auto",
-        padding: "var(--spacing-section-y) var(--spacing-page-x)",
-      }}
-    >
-      <h1 className="page-heading" style={{ marginBottom: 24 }}>
-        Public API
-      </h1>
+    <MethodologyLayout items={SECTIONS} contentClassName="methodology-content--wide">
+      <section id="overview" className="editorial-section">
+        <h1 className="editorial-page-title">Public API</h1>
+        <div className="api-accent-rule" aria-hidden="true" />
 
-      <div
-        style={{
-          width: 40,
-          height: 2,
-          background: "var(--color-accent)",
-          borderRadius: 1,
-          marginBottom: 32,
-        }}
-      />
+        <p className="api-intro">
+          The Civica API provides read-only access to government structure data for
+          250+ countries. All responses are JSON. No authentication is required.
+        </p>
 
-      <p style={{ ...bodyText, fontSize: "var(--text-13)", marginBottom: 16 }}>
-        The Civica API provides read-only access to government structure data for
-        250+ countries. All responses are JSON. No authentication is required.
-      </p>
-
-      <div className="cv-card" style={{ marginBottom: 40 }}>
-        <h3
-          style={{
-            ...mono,
-            fontSize: "var(--text-10)",
-            color: "var(--color-text-30)",
-            letterSpacing: "var(--tracking-caps)",
-            textTransform: "uppercase",
-            marginBottom: 8,
-          }}
-        >
-          Base URL
-        </h3>
-        <code
-          style={{
-            ...mono,
-            fontSize: "var(--text-13)",
-            color: "var(--color-text-primary)",
-          }}
-        >
-          {BASE_URL}
-        </code>
-
-        <div style={{ marginTop: 16 }}>
-          <h3
-            style={{
-              ...mono,
-              fontSize: "var(--text-10)",
-              color: "var(--color-text-30)",
-              letterSpacing: "var(--tracking-caps)",
-              textTransform: "uppercase",
-              marginBottom: 8,
-            }}
-          >
-            Rate Limits
-          </h3>
-          <p style={{ ...bodyText }}>
-            60 requests per minute per IP address. Exceeding the limit returns a
-            429 status with a Retry-After header.
-          </p>
+        <div className="api-info-card">
+          <div className="api-info-card__row">
+            <h3 className="api-section-label">Base URL</h3>
+            <code className="api-info-card__value">{BASE_URL}</code>
+          </div>
+          <div className="api-info-card__row">
+            <h3 className="api-section-label">Rate Limits</h3>
+            <p className="api-info-card__body">
+              60 requests per minute per IP address. Exceeding the limit returns a
+              429 status with a Retry-After header.
+            </p>
+          </div>
+          <div className="api-info-card__row">
+            <h3 className="api-section-label">CORS</h3>
+            <p className="api-info-card__body">
+              All endpoints support cross-origin requests. The API sets{" "}
+              <code>Access-Control-Allow-Origin: *</code>.
+            </p>
+          </div>
+          <div className="api-info-card__row">
+            <h3 className="api-section-label">API Status</h3>
+            <a
+              href="https://statuspage.incident.io/civica-atlas"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="api-info-card__link"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+              </svg>
+              Check current API status on our status page ↗
+            </a>
+          </div>
         </div>
+      </section>
 
-        <div style={{ marginTop: 16 }}>
-          <h3
-            style={{
-              ...mono,
-              fontSize: "var(--text-10)",
-              color: "var(--color-text-30)",
-              letterSpacing: "var(--tracking-caps)",
-              textTransform: "uppercase",
-              marginBottom: 8,
-            }}
-          >
-            CORS
-          </h3>
-          <p style={{ ...bodyText }}>
-            All endpoints support cross-origin requests. The API sets{" "}
-            <code style={mono}>Access-Control-Allow-Origin: *</code>.
-          </p>
-        </div>
+      <hr className="api-section-divider" />
 
-        <div style={{ marginTop: 16 }}>
-          <h3
-            style={{
-              ...mono,
-              fontSize: "var(--text-10)",
-              color: "var(--color-text-30)",
-              letterSpacing: "var(--tracking-caps)",
-              textTransform: "uppercase",
-              marginBottom: 8,
-            }}
-          >
-            API Status
-          </h3>
-          <a
-            href="https://statuspage.incident.io/civica-atlas"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              ...mono,
-              fontSize: "var(--text-11)",
-              color: "var(--color-text-50)",
-              textDecoration: "none",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-            Check current API status on our status page ↗
-          </a>
-        </div>
-      </div>
+      <section id="endpoints" className="editorial-section">
+        <h2>Endpoints</h2>
 
-      <div
-        style={{
-          height: 1,
-          background: "var(--color-divider)",
-          margin: "40px 0",
-        }}
-      />
-
-      <h2
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-24)",
-          fontWeight: 400,
-          letterSpacing: "var(--tracking-tight)",
-          marginBottom: 32,
-          color: "var(--color-text-primary)",
-        }}
-      >
-        Endpoints
-      </h2>
-
-      <EndpointSection
-        method="GET"
-        path="/api/v1/countries"
-        description="Returns a paginated list of sovereign states with basic metadata. Filter by continent or peer-lens taxonomy. The legacy ?taxonomy=structural and ?taxonomy=regime filters remain functional through 2027-03-31; new code should pass the typed peer-lens values (region | income | vdem | cgv | monarchy)."
-        parameters={[
-          {
-            name: "continent",
-            type: "string",
-            description: 'Filter by continent (e.g. "Africa", "Europe")',
-          },
-          {
-            name: "taxonomy",
-            type: "string",
-            description:
-              'Filter lens. Accepts: raw | region | income | vdem | cgv | monarchy | structural (DEPRECATED) | regime (DEPRECATED). When non-raw, pair with `government_type` to filter by lens value.',
-          },
-          {
-            name: "government_type",
-            type: "string",
-            description:
-              'Lens value. With taxonomy=region: "Sub-Saharan Africa". With taxonomy=vdem: "Liberal Democracy". With taxonomy=raw: partial match against the CIA prose. See /api/v1/peer-groupings for the full list of valid values per lens.',
-          },
-          {
-            name: "limit",
-            type: "integer",
-            description: "Results per page (default 50, max 250)",
-          },
-          {
-            name: "offset",
-            type: "integer",
-            description: "Number of results to skip (default 0)",
-          },
-        ]}
-        exampleResponse={`{
+        <EndpointSection
+          id="countries"
+          method="GET"
+          path="/api/v1/countries"
+          description="Returns a paginated list of sovereign states with basic metadata. Filter by continent or peer-lens taxonomy. The legacy ?taxonomy=structural and ?taxonomy=regime filters remain functional through 2027-03-31; new code should pass the typed peer-lens values (region | income | vdem | cgv | monarchy)."
+          parameters={[
+            {
+              name: "continent",
+              type: "string",
+              description: 'Filter by continent (e.g. "Africa", "Europe")',
+            },
+            {
+              name: "taxonomy",
+              type: "string",
+              description:
+                "Filter lens. Accepts: raw | region | income | vdem | cgv | monarchy | structural (DEPRECATED) | regime (DEPRECATED). When non-raw, pair with `government_type` to filter by lens value.",
+            },
+            {
+              name: "government_type",
+              type: "string",
+              description:
+                'Lens value. With taxonomy=region: "Sub-Saharan Africa". With taxonomy=vdem: "Liberal Democracy". With taxonomy=raw: partial match against the CIA prose. See /api/v1/peer-groupings for the full list of valid values per lens.',
+            },
+            {
+              name: "limit",
+              type: "integer",
+              description: "Results per page (default 50, max 250)",
+            },
+            {
+              name: "offset",
+              type: "integer",
+              description: "Number of results to skip (default 0)",
+            },
+          ]}
+          exampleResponse={`{
   "data": [
     {
       "slug": "united-states",
@@ -389,21 +231,22 @@ export default function ApiDocsPage() {
     "hasMore": true
   }
 }`}
-      />
+        />
 
-      <EndpointSection
-        method="GET"
-        path="/api/v1/countries/:code"
-        description="Returns detailed government structure for a single country. Look up by slug, ISO 3166-1 alpha-2, or alpha-3 code."
-        parameters={[
-          {
-            name: ":code",
-            type: "string",
-            description:
-              'Country slug, ISO-2, or ISO-3 code (e.g. "us", "USA", "united-states")',
-          },
-        ]}
-        exampleResponse={`{
+        <EndpointSection
+          id="country-detail"
+          method="GET"
+          path="/api/v1/countries/:code"
+          description="Returns detailed government structure for a single country. Look up by slug, ISO 3166-1 alpha-2, or alpha-3 code."
+          parameters={[
+            {
+              name: ":code",
+              type: "string",
+              description:
+                'Country slug, ISO-2, or ISO-3 code (e.g. "us", "USA", "united-states")',
+            },
+          ]}
+          exampleResponse={`{
   "data": {
     "slug": "france",
     "name": "France",
@@ -458,13 +301,14 @@ export default function ApiDocsPage() {
     }
   }
 }`}
-      />
+        />
 
-      <EndpointSection
-        method="GET"
-        path="/api/v1/government-types"
-        description="DEPRECATED — sunsets 2027-03-31. Returns government types under the retired structural_family heuristic. Successor: /api/v1/peer-groupings (single endpoint returning all four peer-grouping lenses)."
-        exampleResponse={`{
+        <EndpointSection
+          id="government-types"
+          method="GET"
+          path="/api/v1/government-types"
+          description="DEPRECATED — sunsets 2027-03-31. Returns government types under the retired structural_family heuristic. Successor: /api/v1/peer-groupings (single endpoint returning all four peer-grouping lenses)."
+          exampleResponse={`{
   "data": [
     {
       "governmentType": "presidential republic",
@@ -492,13 +336,14 @@ export default function ApiDocsPage() {
     ]
   }
 }`}
-      />
+        />
 
-      <EndpointSection
-        method="GET"
-        path="/api/v1/peer-groupings"
-        description="Civica's peer-grouping successor endpoint. Returns the four peer-grouping lenses (World Bank region, World Bank income group, V-Dem RoW, BR/CGV regime) plus monarchy_status as descriptive metadata, in a single response. See https://civicaatlas.org/civica-index/methodology/peer-grouping for the underlying methodology."
-        exampleResponse={`{
+        <EndpointSection
+          id="peer-groupings"
+          method="GET"
+          path="/api/v1/peer-groupings"
+          description="Civica's peer-grouping successor endpoint. Returns the four peer-grouping lenses (World Bank region, World Bank income group, V-Dem RoW, BR/CGV regime) plus monarchy_status as descriptive metadata, in a single response. See https://civicaatlas.org/civica-index/methodology/peer-grouping for the underlying methodology."
+          exampleResponse={`{
   "data": {
     "world_bank_region": {
       "factKey": "world_bank_region",
@@ -532,13 +377,14 @@ export default function ApiDocsPage() {
     }
   }
 }`}
-      />
+        />
 
-      <EndpointSection
-        method="GET"
-        path="/api/v1/peer-groupings/migration"
-        description="Per-country migration table — bulk-rewrite source for replication scripts that join on the retired structural_family column. Returns one row per sovereign state with both the deprecated values and their peer-lens replacements. Same data the reader-facing /civica-index/methodology/peer-grouping/migration page renders."
-        exampleResponse={`{
+        <EndpointSection
+          id="peer-groupings-migration"
+          method="GET"
+          path="/api/v1/peer-groupings/migration"
+          description="Per-country migration table — bulk-rewrite source for replication scripts that join on the retired structural_family column. Returns one row per sovereign state with both the deprecated values and their peer-lens replacements. Same data the reader-facing /civica-index/methodology/peer-grouping/migration page renders."
+          exampleResponse={`{
   "data": [
     {
       "slug": "united-states",
@@ -570,72 +416,27 @@ export default function ApiDocsPage() {
     }
   }
 }`}
-      />
+        />
+      </section>
 
-      <div
-        style={{
-          height: 1,
-          background: "var(--color-divider)",
-          margin: "40px 0",
-        }}
-      />
+      <hr className="api-section-divider" />
 
-      <section>
-        <h2
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-24)",
-            fontWeight: 400,
-            letterSpacing: "var(--tracking-tight)",
-            marginBottom: 16,
-            color: "var(--color-text-primary)",
-          }}
-        >
-          Usage Examples
-        </h2>
+      <section id="usage-examples" className="editorial-section">
+        <h2>Usage Examples</h2>
 
-        <h3
-          style={{
-            ...mono,
-            fontSize: "var(--text-12)",
-            color: "var(--color-text-primary)",
-            marginBottom: 8,
-          }}
-        >
-          curl
-        </h3>
+        <h3 className="api-example-heading">curl</h3>
         <CodeBlock>{`curl "${BASE_URL}/countries?continent=Europe&limit=10"
 curl "${BASE_URL}/countries/us"
 curl "${BASE_URL}/peer-groupings"            # successor (preferred)
 curl "${BASE_URL}/peer-groupings/migration"  # per-country migration
 curl "${BASE_URL}/government-types"          # DEPRECATED — sunsets 2027-03-31`}</CodeBlock>
 
-        <h3
-          style={{
-            ...mono,
-            fontSize: "var(--text-12)",
-            color: "var(--color-text-primary)",
-            marginTop: 24,
-            marginBottom: 8,
-          }}
-        >
-          JavaScript (fetch)
-        </h3>
+        <h3 className="api-example-heading">JavaScript (fetch)</h3>
         <CodeBlock>{`const res = await fetch("${BASE_URL}/countries/fr");
 const { data } = await res.json();
 console.log(data.government.executive);`}</CodeBlock>
 
-        <h3
-          style={{
-            ...mono,
-            fontSize: "var(--text-12)",
-            color: "var(--color-text-primary)",
-            marginTop: 24,
-            marginBottom: 8,
-          }}
-        >
-          Python (requests)
-        </h3>
+        <h3 className="api-example-heading">Python (requests)</h3>
         <CodeBlock>{`import requests
 
 resp = requests.get("${BASE_URL}/countries", params={"government_type": "monarchy"})
@@ -643,28 +444,11 @@ for country in resp.json()["data"]:
     print(country["name"], country["population"])`}</CodeBlock>
       </section>
 
-      <div
-        style={{
-          height: 1,
-          background: "var(--color-divider)",
-          margin: "40px 0",
-        }}
-      />
+      <hr className="api-section-divider" />
 
-      <section>
-        <h2
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-24)",
-            fontWeight: 400,
-            letterSpacing: "var(--tracking-tight)",
-            marginBottom: 16,
-            color: "var(--color-text-primary)",
-          }}
-        >
-          Data Sources & Licensing
-        </h2>
-        <p style={bodyText}>
+      <section id="data-sources" className="editorial-section">
+        <h2>Data Sources & Licensing</h2>
+        <p className="api-info-card__body">
           API data is sourced from the CIA World Factbook (public domain, archived
           January 2026), Wikidata (CC0), IPU Parline, and the Constitute Project.
           All public-domain and CC0 data is freely available for any use. Data from
@@ -673,96 +457,52 @@ for country in resp.json()["data"]:
         </p>
       </section>
 
-      <div style={{ height: 1, background: "var(--color-divider)", margin: "40px 0" }} />
+      <hr className="api-section-divider" />
 
-      <section>
-        <h2
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-24)",
-            fontWeight: 400,
-            letterSpacing: "var(--tracking-tight)",
-            marginBottom: 16,
-            color: "var(--color-text-primary)",
-          }}
-        >
-          Widget Embed
-        </h2>
-        <p style={{ ...bodyText, fontSize: "var(--text-13)", marginBottom: 24 }}>
+      <section id="widget-embed" className="editorial-section">
+        <h2>Widget Embed</h2>
+        <p className="api-intro">
           Embed a live Civica Index widget on any website using a standard{" "}
-          <code style={mono}>&lt;iframe&gt;</code>. Widgets update every 5 minutes and
-          respect the visitor&rsquo;s system color scheme by default. Override with{" "}
-          <code style={mono}>?theme=light</code> or <code style={mono}>?theme=dark</code>.
-          Add <code style={mono}>?dims=1</code> to the large widget to show dimension mini-bars.
+          <code>&lt;iframe&gt;</code>. Widgets update every 5 minutes and respect
+          the visitor&rsquo;s system color scheme by default. Override with{" "}
+          <code>?theme=light</code> or <code>?theme=dark</code>. Add{" "}
+          <code>?dims=1</code> to the large widget to show dimension mini-bars.
         </p>
 
-        <div style={{ marginBottom: 28 }}>
-          <p style={{ ...mono, fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
-            Small — 300 × 80
-          </p>
+        <div className="api-embed-block">
+          <p className="api-embed-size-label">Small — 300 × 80</p>
           <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=sm"
         width="300" height="80" loading="lazy"
         title="Civica Index — Brazil"></iframe>`}</CodeBlock>
         </div>
 
-        <div style={{ marginBottom: 28 }}>
-          <p style={{ ...mono, fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
-            Medium — 320 × 180
-          </p>
+        <div className="api-embed-block">
+          <p className="api-embed-size-label">Medium — 320 × 180</p>
           <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/denmark?size=md"
         width="320" height="180" loading="lazy"
         title="Civica Index — Denmark"></iframe>`}</CodeBlock>
         </div>
 
-        <div style={{ marginBottom: 28 }}>
-          <p style={{ ...mono, fontSize: "var(--text-11)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 }}>
-            Large — 400 × 260 (with dimensions)
-          </p>
+        <div className="api-embed-block">
+          <p className="api-embed-size-label">Large — 400 × 260 (with dimensions)</p>
           <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=lg&dims=1"
         width="400" height="260" loading="lazy"
         title="Civica Index — Brazil"></iframe>`}</CodeBlock>
         </div>
 
-        <div
-          style={{
-            border: "1px solid var(--color-divider)",
-            borderRadius: 6,
-            overflow: "hidden",
-          }}
-        >
-          <div style={{ padding: "10px 16px", borderBottom: "1px solid var(--color-divider)", background: "var(--color-card-bg)" }}>
-            <span style={{ ...mono, fontSize: "var(--text-10)", color: "var(--color-text-30)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-              Query Parameters
-            </span>
+        <div className="api-params api-params--embed">
+          <div className="api-params__header">
+            <span className="api-section-label">Query Parameters</span>
           </div>
-          {[
-            { name: "size", type: "sm | md | lg", description: "Widget dimensions. Default: md" },
-            { name: "theme", type: "light | dark", description: "Override color scheme. Default: system prefers-color-scheme" },
-            { name: "dims", type: "0 | 1", description: "Show 6 dimension mini-bars in large widget. Default: 0" },
-          ].map((param, i) => (
-            <div
-              key={param.name}
-              style={{
-                display: "flex",
-                gap: 16,
-                padding: "10px 16px",
-                borderTop: i > 0 ? "1px solid var(--color-divider)" : undefined,
-                alignItems: "baseline",
-              }}
-            >
-              <code style={{ ...mono, fontSize: "var(--text-11)", color: "var(--color-text-primary)", minWidth: 80 }}>
-                {param.name}
-              </code>
-              <span style={{ ...mono, fontSize: "var(--text-10)", color: "var(--color-text-30)", minWidth: 110 }}>
-                {param.type}
-              </span>
-              <span style={{ ...bodyText, fontSize: "var(--text-11)" }}>
-                {param.description}
-              </span>
+          {EMBED_PARAMS.map((param) => (
+            <div key={param.name} className="api-params__row">
+              <code className="api-params__name">{param.name}</code>
+              <span className="api-params__type">{param.type}</span>
+              <span className="api-params__desc">{param.description}</span>
             </div>
           ))}
         </div>
       </section>
-    </div>
+    </MethodologyLayout>
   );
 }
