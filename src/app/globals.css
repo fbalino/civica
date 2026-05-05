@@ -2495,6 +2495,59 @@ a {
   content: "\00A7 \00A7 \00A7";
 }
 
+.post-table-scroll {
+  margin: var(--space-7) 0;
+  overflow-x: auto;
+  border: 1px solid var(--color-border-default);
+  background: var(--color-surface-primary);
+}
+
+.post-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: 1.45;
+  color: var(--color-text-primary);
+}
+
+.post-table th,
+.post-table td {
+  padding: var(--space-4) var(--space-5);
+  border-right: 1px solid var(--color-border-default);
+  border-bottom: 1px solid var(--color-border-default);
+  text-align: left;
+  vertical-align: top;
+}
+
+.post-table th:last-child,
+.post-table td:last-child {
+  border-right: 0;
+}
+
+.post-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.post-table thead th {
+  background: var(--color-surface-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--text-11);
+  font-weight: var(--font-weight-mono);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.post-table tbody tr:nth-child(even) td {
+  background: color-mix(in oklab, var(--color-text-primary) 3%, transparent);
+}
+
+.post-table tbody tr:hover td {
+  background: color-mix(in oklab, var(--color-accent) 9%, transparent);
+}
+
 /* Pull quote */
 .post-pull {
   margin: 44px -40px;

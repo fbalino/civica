@@ -380,6 +380,37 @@ export default function DesignSystemPage() {
                 <h2 style={{ fontSize: "var(--text-28)" }}>Readable structure.</h2>
               </div>
             </div>
+            <div className="ds-comp ds-comp--wide">
+              <h4>Blog table</h4>
+              <div className="post-table-scroll">
+                <table className="post-table">
+                  <thead>
+                    <tr>
+                      <th>Feature</th>
+                      <th>CIA World Factbook</th>
+                      <th>Civica</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Data freshness</td>
+                      <td>Annual updates</td>
+                      <td>Live from reconciled sources</td>
+                    </tr>
+                    <tr>
+                      <td>Comparisons</td>
+                      <td>Separate country pages</td>
+                      <td>Side-by-side country views</td>
+                    </tr>
+                    <tr>
+                      <td>Reader mode</td>
+                      <td>Static reference</td>
+                      <td>Responsive, cited, dark/light</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
 
           <h3 className="ds-sub" style={{ marginTop: 48 }}>Country masthead</h3>

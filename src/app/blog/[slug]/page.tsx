@@ -105,6 +105,87 @@ const mdxComponents = {
   ),
 };
 
+function parsePipeTableRow(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
+function isPipeTableSeparator(line: string): boolean {
+  const cells = parsePipeTableRow(line);
+  return (
+    cells.length > 1 &&
+    cells.every((cell) => /^:?-{3,}:?$/.test(cell))
+  );
+}
+
+function escapeMdxText(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/{/g, "&#123;")
+    .replace(/}/g, "&#125;");
+}
+
+function renderBlogTable(lines: string[]): string {
+  const [headerLine, , ...bodyLines] = lines;
+  const headers = parsePipeTableRow(headerLine);
+  const rows = bodyLines.map(parsePipeTableRow);
+
+  return [
+    '<div className="post-table-scroll">',
+    '<table className="post-table">',
+    "<thead>",
+    "<tr>",
+    ...headers.map((header) => `<th>${escapeMdxText(header)}</th>`),
+    "</tr>",
+    "</thead>",
+    "<tbody>",
+    ...rows.flatMap((row) => [
+      "<tr>",
+      ...headers.map(
+        (_, index) => `<td>${escapeMdxText(row[index] ?? "")}</td>`
+      ),
+      "</tr>",
+    ]),
+    "</tbody>",
+    "</table>",
+    "</div>",
+  ].join("\n");
+}
+
+function renderBlogPipeTables(content: string): string {
+  const lines = content.split(/\r?\n/);
+  const out: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const current = lines[i];
+    const next = lines[i + 1];
+    if (
+      current?.trim().startsWith("|") &&
+      next &&
+      isPipeTableSeparator(next)
+    ) {
+      const tableLines = [current, next];
+      i += 2;
+      while (i < lines.length && lines[i].trim().startsWith("|")) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      i--;
+      out.push(renderBlogTable(tableLines));
+      continue;
+    }
+    out.push(current);
+  }
+
+  return out.join("\n");
+}
+
 export default async function BlogPostPage({
   params,
 }: {
@@ -216,7 +297,10 @@ export default async function BlogPostPage({
 
           {/* Prose */}
           <main className="post-prose">
-            <MDXRemote source={post.content} components={mdxComponents} />
+            <MDXRemote
+              source={renderBlogPipeTables(post.content)}
+              components={mdxComponents}
+            />
           </main>
 
           {/* Right rail (empty — breathing room) */}
