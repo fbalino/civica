@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://civicaatlas.org/factbook" },
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function FactbookIndexPage() {
   let countries: Awaited<ReturnType<typeof getAllJurisdictions>> = [];
   try {
@@ -26,7 +28,6 @@ export default async function FactbookIndexPage() {
   return (
     <div className="editorial-page editorial-page--full">
       <header className="editorial-page-header">
-        <p className="editorial-page-meta">Factbook</p>
         <h1 className="editorial-page-title">All countries</h1>
         <p className="editorial-page-subtitle">
           Reference dossiers for every country. Each page combines the CIA

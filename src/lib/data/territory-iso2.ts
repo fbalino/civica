@@ -1,0 +1,51 @@
+// ISO 3166-1 alpha-2 codes for Factbook territory entries whose rows
+// intentionally remain outside the reconciliation ISO3 pipeline.
+//
+// Keep this slug-keyed. These values support flag display and ISO2 lookup
+// only; they must not imply that `iso3` or `wikidata_qid` should be filled.
+export const TERRITORY_ISO2_BY_SLUG: Record<string, string> = {
+  "american-samoa": "AS",
+  anguilla: "AI",
+  antarctica: "AQ",
+  aruba: "AW",
+  bermuda: "BM",
+  "bouvet-island": "BV",
+  "british-virgin-islands": "VG",
+  "cayman-islands": "KY",
+  "christmas-island": "CX",
+  "cocos-keeling-islands": "CC",
+  "cook-islands": "CK",
+  curacao: "CW",
+  "falkland-islands-islas-malvinas": "FK",
+  "faroe-islands": "FO",
+  "french-polynesia": "PF",
+  "french-southern-and-antarctic-lands": "TF",
+  gibraltar: "GI",
+  greenland: "GL",
+  guam: "GU",
+  guernsey: "GG",
+  "heard-island-and-mcdonald-islands": "HM",
+  "hong-kong": "HK",
+  "isle-of-man": "IM",
+  jersey: "JE",
+  macau: "MO",
+  montserrat: "MS",
+  "new-caledonia": "NC",
+  niue: "NU",
+  "norfolk-island": "NF",
+  "northern-mariana-islands": "MP",
+  "pitcairn-islands": "PN",
+  "puerto-rico": "PR",
+  "saint-barthelemy": "BL",
+  "saint-martin": "MF",
+  "saint-pierre-and-miquelon": "PM",
+  "sint-maarten": "SX",
+  "south-georgia-and-south-sandwich-islands": "GS",
+  tokelau: "TK",
+  "turks-and-caicos-islands": "TC",
+  "virgin-islands": "VI",
+  "wallis-and-futuna": "WF",
+  "western-sahara": "EH",
+};
+
+export const ISO2_ONLY_TERRITORY_SLUGS = Object.keys(TERRITORY_ISO2_BY_SLUG);

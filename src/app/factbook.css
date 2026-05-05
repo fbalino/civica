@@ -709,14 +709,6 @@
   display: grid;
   gap: var(--space-3);
 }
-.factbook-index-search-label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--color-text-30);
-}
 .factbook-index-search-field {
   display: flex;
   align-items: center;
@@ -747,7 +739,7 @@
   color: var(--color-text-30);
 }
 .factbook-index-search-count {
-  margin: 0 0 var(--space-2);
+  margin: 0;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
   font-size: var(--text-11);

@@ -78,8 +78,7 @@ interface FactbookHeaderStripProps {
   ciScore?: number | null;
   cpDelta?: number | null;
   cpTrend?: "up" | "down" | "flat" | null;
-  mapUrl?: string | null;
-  mapCaption?: string;
+  mapImages?: LightboxImage[];
   photos: LightboxImage[];
   /** Phase F.4 — resolver output for population_total. When
    *  provided, the Pop pill renders a `<FactValueDot>` that opens
@@ -116,8 +115,7 @@ export function FactbookHeaderStrip({
   ciScore,
   cpDelta,
   cpTrend,
-  mapUrl,
-  mapCaption,
+  mapImages = [],
   photos,
   populationResolver,
   gdpResolver,
@@ -172,10 +170,11 @@ export function FactbookHeaderStrip({
       : "var(--color-text-40)";
 
   const lightboxImages: LightboxImage[] =
-    lbMode === "map" && mapUrl
-      ? [{ src: mapUrl, alt: `${countryName} locator map`, caption: mapCaption ?? `${countryName} — locator map · Wikimedia Commons` }]
+    lbMode === "map"
+      ? mapImages
       : photos;
 
+  const coverMap = mapImages[0];
   const coverPhoto = photos[0];
 
   return (
@@ -346,12 +345,18 @@ export function FactbookHeaderStrip({
               setLbMode("map");
               setLbOpen(true);
             }}
-            aria-label="Open detailed map"
+            aria-label={
+              mapImages.length === 0
+                ? "No maps available"
+                : `Open ${mapImages.length} ${mapImages.length === 1 ? "map" : "maps"}`
+            }
+            disabled={mapImages.length === 0}
             className="factbook-hero-box"
+            style={{ cursor: mapImages.length === 0 ? "default" : "pointer" }}
           >
-            {mapUrl ? (
+            {coverMap ? (
               <img
-                src={mapUrl}
+                src={coverMap.src}
                 alt=""
                 style={{
                   objectFit: "contain",
@@ -365,17 +370,34 @@ export function FactbookHeaderStrip({
                   height: "100%",
                   display: "grid",
                   placeItems: "center",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-10)",
+                  color: "var(--color-text-40)",
+                  letterSpacing: "var(--tracking-wider)",
+                  textTransform: "uppercase",
                 }}
               >
-                <svg viewBox="0 0 240 200" aria-hidden style={{ width: "90%", height: "90%" }}>
-                  <path
-                    d="M70,30 L150,25 L185,55 L195,90 L188,135 L170,170 L135,185 L100,190 L75,175 L60,140 L55,95 L62,60 Z"
-                    fill="#bdb39c"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                  />
-                </svg>
+                No map yet
               </div>
+            )}
+            {mapImages.length > 0 && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: "var(--space-3)",
+                  right: "var(--space-3)",
+                  background:
+                    "color-mix(in oklab, var(--color-text-primary) 75%, transparent)",
+                  color: "var(--color-bg)",
+                  padding: "var(--space-1) var(--space-3)",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "var(--text-10)",
+                  letterSpacing: "var(--tracking-wider)",
+                  textTransform: "uppercase",
+                }}
+              >
+                {mapImages.length} map{mapImages.length === 1 ? "" : "s"}
+              </span>
             )}
             <span className="label-strip">Map</span>
           </button>

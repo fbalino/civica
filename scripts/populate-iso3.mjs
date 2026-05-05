@@ -1,7 +1,9 @@
 import { neon } from "@neondatabase/serverless";
 
-const DATABASE_URL = process.env.DATABASE_URL
-  || "postgresql://neondb_owner:npg_nReFt17NXjau@ep-bitter-night-amod9dl6-pooler.c-5.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require";
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set");
+}
 const sql = neon(DATABASE_URL);
 
 const ISO2_TO_ISO3 = {
@@ -33,18 +35,70 @@ const ISO2_TO_ISO3 = {
   BQ:"BES",SS:"SSD",
 };
 
+const ISO2_ONLY_TERRITORY_SLUGS = new Set([
+  "american-samoa",
+  "anguilla",
+  "antarctica",
+  "aruba",
+  "bermuda",
+  "bouvet-island",
+  "british-virgin-islands",
+  "cayman-islands",
+  "christmas-island",
+  "cocos-keeling-islands",
+  "cook-islands",
+  "curacao",
+  "falkland-islands-islas-malvinas",
+  "faroe-islands",
+  "french-polynesia",
+  "french-southern-and-antarctic-lands",
+  "gibraltar",
+  "greenland",
+  "guam",
+  "guernsey",
+  "heard-island-and-mcdonald-islands",
+  "hong-kong",
+  "isle-of-man",
+  "jersey",
+  "macau",
+  "montserrat",
+  "new-caledonia",
+  "niue",
+  "norfolk-island",
+  "northern-mariana-islands",
+  "pitcairn-islands",
+  "puerto-rico",
+  "saint-barthelemy",
+  "saint-martin",
+  "saint-pierre-and-miquelon",
+  "sint-maarten",
+  "south-georgia-and-south-sandwich-islands",
+  "tokelau",
+  "turks-and-caicos-islands",
+  "virgin-islands",
+  "wallis-and-futuna",
+  "western-sahara",
+]);
+
 async function main() {
   console.log("=== Populating ISO3 codes ===\n");
 
   const rows = await sql`
-    SELECT id, name, iso2 FROM jurisdictions
+    SELECT id, slug, name, iso2 FROM jurisdictions
     WHERE type = 'sovereign_state' AND iso2 IS NOT NULL AND iso3 IS NULL
   `;
 
   let updated = 0;
   let skipped = 0;
+  let protectedSkipped = 0;
 
   for (const row of rows) {
+    if (ISO2_ONLY_TERRITORY_SLUGS.has(row.slug)) {
+      protectedSkipped++;
+      console.log(`  • ${row.name}: protected ISO2-only territory; iso3 left null`);
+      continue;
+    }
+
     const iso3 = ISO2_TO_ISO3[row.iso2];
     if (iso3) {
       await sql`UPDATE jurisdictions SET iso3 = ${iso3} WHERE id = ${row.id}`;
@@ -56,7 +110,7 @@ async function main() {
     }
   }
 
-  console.log(`\n=== Done === Updated: ${updated}, Skipped: ${skipped}`);
+  console.log(`\n=== Done === Updated: ${updated}, Skipped: ${skipped}, Protected: ${protectedSkipped}`);
 
   // Verify key countries
   const verify = await sql`

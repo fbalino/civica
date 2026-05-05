@@ -33,9 +33,11 @@ export function FactbookIndexSearchList({
 
   return (
     <section className="factbook-index-search" aria-label="Search countries">
-      <label className="factbook-index-search-label" htmlFor="factbook-index-search">
-        Search countries
-      </label>
+      <p className="factbook-index-search-count" aria-live="polite">
+        {filtered.length === countries.length
+          ? `${countries.length} countries and territories`
+          : `${filtered.length} matching ${filtered.length === 1 ? "country" : "countries"}`}
+      </p>
       <div className="factbook-index-search-field">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true">
           <circle cx="7" cy="7" r="5" />
@@ -47,14 +49,10 @@ export function FactbookIndexSearchList({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search by country or code..."
+          aria-label="Search countries"
           autoComplete="off"
         />
       </div>
-      <p className="factbook-index-search-count" aria-live="polite">
-        {filtered.length === countries.length
-          ? `${countries.length} countries and territories`
-          : `${filtered.length} matching ${filtered.length === 1 ? "country" : "countries"}`}
-      </p>
 
       <ul className="factbook-index-grid">
         {filtered.map((country) => (

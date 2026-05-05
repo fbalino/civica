@@ -84,6 +84,11 @@ const SECTION_PLAN: SectionPlan[] = [
 
 const FACTBOOK_RETRIEVED_AT = "2026-01-23";
 
+function galleryCaption(p: { caption: string; license?: string }): string {
+  const license = p.license && p.license !== "Wikimedia Commons" ? ` · ${p.license}` : "";
+  return `${p.caption}${license} · Wikimedia Commons`;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -237,25 +242,26 @@ export default async function FactbookCountryPage({
       jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType
     ).label;
 
-  // Gallery: Wikimedia photos + locator map. Falls back to empty when
-  // the country doesn't have curated entries yet.
-  const gallery = getCountryGallery(jurisdiction.iso3);
+  // Gallery: Wikimedia photos + map assets. Slug lookup covers media for
+  // territory pages without changing reconciliation identity fields.
+  const gallery = getCountryGallery({
+    iso3: jurisdiction.iso3,
+    slug: jurisdiction.slug,
+  });
+  const mapImages: LightboxImage[] = gallery
+    ? gallery.mapImages.map((p) => ({
+        src: wikimediaUrl(p.file, 1200),
+        alt: p.caption,
+        caption: galleryCaption(p),
+      }))
+    : [];
   const photos: LightboxImage[] = gallery
     ? gallery.photos.map((p) => ({
         src: wikimediaUrl(p.file, 1200),
         alt: p.caption,
-        caption: `${p.caption}${p.license ? ` · ${p.license}` : ""} · Wikimedia Commons`,
+        caption: galleryCaption(p),
       }))
     : [];
-  // `locatorMapFile` is nullable inside the gallery (some countries have
-  // a cover photo but no curated locator map yet). Guard against it
-  // explicitly so the type narrows down to `string` for `wikimediaUrl`.
-  const mapUrl =
-    gallery && gallery.locatorMapFile
-      ? wikimediaUrl(gallery.locatorMapFile, 1024)
-      : null;
-  const mapCaption = `${jurisdiction.name} — locator map · Wikimedia Commons`;
-
   // Build the sources list shown in the right rail.
   const sources = [
     { name: "CIA Factbook", date: FACTBOOK_RETRIEVED_AT },
@@ -314,8 +320,7 @@ export default async function FactbookCountryPage({
         ciScore={ciScore}
         cpDelta={cpDelta}
         cpTrend={cpTrend}
-        mapUrl={mapUrl}
-        mapCaption={mapCaption}
+        mapImages={mapImages}
         photos={photos}
       />
 

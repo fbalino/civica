@@ -61,7 +61,7 @@ export function FactbookLightbox({
         onClose();
         return;
       }
-      if (mode === "photos") {
+      if (images.length > 1) {
         if (e.key === "ArrowRight") next(1);
         else if (e.key === "ArrowLeft") next(-1);
       }
@@ -85,7 +85,7 @@ export function FactbookLightbox({
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [open, mode, next, onClose]);
+  }, [open, images.length, next, onClose]);
 
   // Lock body scroll while open.
   useEffect(() => {
@@ -100,6 +100,8 @@ export function FactbookLightbox({
   if (!open) return null;
   const current = images[idx];
   if (!current) return null;
+  const hasMultipleImages = images.length > 1;
+  const itemLabel = mode === "map" ? "Map" : "Photo";
 
   return (
     <div
@@ -142,7 +144,7 @@ export function FactbookLightbox({
       >
         ×
       </button>
-      {mode === "photos" && images.length > 1 && (
+      {hasMultipleImages && (
         <>
           <button
             type="button"
@@ -202,7 +204,7 @@ export function FactbookLightbox({
       <div
         style={{
           position: "absolute",
-          bottom: mode === "photos" && images.length > 1
+          bottom: hasMultipleImages
             ? "calc(var(--space-7) + 80px)"
             : "var(--space-7)",
           left: "50%",
@@ -218,7 +220,7 @@ export function FactbookLightbox({
       >
         {current.caption}
       </div>
-      {mode === "photos" && images.length > 1 && (
+      {hasMultipleImages && (
         <div
           style={{
             position: "absolute",
@@ -237,7 +239,7 @@ export function FactbookLightbox({
               key={img.src}
               type="button"
               onClick={() => setIdx(i)}
-              aria-label={`Photo ${i + 1}`}
+              aria-label={`${itemLabel} ${i + 1}`}
               style={{
                 width: 64,
                 height: 48,
