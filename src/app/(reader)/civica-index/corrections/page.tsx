@@ -6,11 +6,11 @@ import { eq, desc } from "drizzle-orm";
 import { CorrectionsForm } from "./CorrectionsForm";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Banner } from "@/components/editorial/Banner";
+import { disputeSla } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Corrections — Civica Index",
-  description:
-    "Dispute a data error, methodology decision, or Pulse event classification. Every submission is logged publicly and reviewed within 30 days.",
+  description: `Dispute a data error, methodology decision, or Pulse event classification. Every submission is logged publicly and reviewed within ${disputeSla.fullDispositionDays} days.`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/corrections" },
 };
 
@@ -432,8 +432,11 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         )}
 
         <p className="corr-resolution-note">
-          Resolution targets: initial response within <strong>7 days</strong>,
-          full disposition within <strong>30 days</strong> of submission.
+          Resolution targets: initial response within{" "}
+          <strong>{disputeSla.initialResponseDays} days</strong>, full
+          disposition within{" "}
+          <strong>{disputeSla.fullDispositionDays} days</strong> of
+          submission.
         </p>
       </section>
     </EditorialPage>

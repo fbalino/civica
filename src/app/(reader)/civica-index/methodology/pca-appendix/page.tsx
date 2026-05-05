@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { civicaIndex } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "PCA appendix — Civica Index methodology",
-  description:
-    "Empirical justification for the Civica Index Beta dimension weights. PCA on the four governance dimensions confirms a single dominant latent factor; weights are derived from the squared loadings on the first principal component.",
+  description: `Empirical justification for the Civica Index Beta dimension weights. PCA on the ${civicaIndex.dimensionCount} governance dimensions confirms a single dominant latent factor; weights are derived from the squared loadings on the first principal component.`,
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/methodology/pca-appendix",
   },
@@ -21,11 +21,17 @@ interface LoadingRow {
   pc4: number;
   /** Squared PC1 loading, normalized to sum to 1.00. */
   weightSuggested: number;
-  /** What the spec proposed before the PCA. */
+  /** What the spec proposed before the PCA. Historical record — the
+   *  initial pre-PCA weights documented in the resolution archive.
+   *  Frozen analysis output. */
   weightProvisional: number;
-  /** What we adopted (rounded suggested to 2dp). */
-  weightAdopted: number;
 }
+
+/** Adopted-weight lookup, derived from `state.civicaIndex.dimensions`
+ *  so the appendix and the running scorer stay in sync. */
+const ADOPTED_WEIGHT_BY_ID: Record<string, number> = Object.fromEntries(
+  civicaIndex.dimensions.map((d) => [d.id, d.weight]),
+);
 
 const LOADINGS: LoadingRow[] = [
   {
@@ -37,7 +43,6 @@ const LOADINGS: LoadingRow[] = [
     pc4: 0.621,
     weightSuggested: 0.266,
     weightProvisional: 0.30,
-    weightAdopted: 0.27,
   },
   {
     dimension: "rule_of_law",
@@ -48,7 +53,6 @@ const LOADINGS: LoadingRow[] = [
     pc4: 0.333,
     weightSuggested: 0.257,
     weightProvisional: 0.25,
-    weightAdopted: 0.26,
   },
   {
     dimension: "freedom_rights",
@@ -59,7 +63,6 @@ const LOADINGS: LoadingRow[] = [
     pc4: -0.452,
     weightSuggested: 0.229,
     weightProvisional: 0.25,
-    weightAdopted: 0.23,
   },
   {
     dimension: "corruption_control",
@@ -70,7 +73,6 @@ const LOADINGS: LoadingRow[] = [
     pc4: -0.547,
     weightSuggested: 0.248,
     weightProvisional: 0.20,
-    weightAdopted: 0.24,
   },
 ];
 
@@ -139,6 +141,11 @@ const SECTIONS = [
 ];
 
 export default function PcaAppendixPage() {
+  const { pca } = civicaIndex;
+  const pc1VariancePct = (pca.pc1VarianceExplained * 100).toFixed(1);
+  const [loadLow, loadHigh] = pca.pc1LoadingRange;
+  const loadRange = (loadHigh - loadLow).toFixed(2);
+  const [corrLow, corrHigh] = pca.correlationRange;
   return (
     <MethodologyLayout items={SECTIONS}>
       <EditorialPage className="pca-layout">
@@ -155,9 +162,9 @@ export default function PcaAppendixPage() {
         <div className="page-meta">
           <span>Empirical weight derivation</span>
           <span className="dim">·</span>
-          <span>Run: April 2026</span>
+          <span>Run: {pca.lastRunDate}</span>
           <span className="dim">·</span>
-          <span>n = 46 countries</span>
+          <span>n = {pca.panelSize} countries</span>
         </div>
 
         <p className="abstract">
@@ -173,24 +180,30 @@ export default function PcaAppendixPage() {
             <span className="num">Section 1</span>Headline finding
           </h2>
           <p>
-            The four governance dimensions of the Civica Index are{" "}
-            <strong>highly correlated</strong> (range 0.74 to 0.98).
-            Principal component analysis confirms a single dominant
-            latent factor: <strong>PC1 explains 90.7% of the variance</strong>{" "}
-            in the panel, and all four dimensions load on it with
-            similar magnitude (0.479 to 0.516). Components 2 through 4
-            each have eigenvalues well below the Kaiser threshold of
-            1.0, meaning the data does not support breaking the
-            governance core into multiple distinct factors.
+            The {civicaIndex.dimensionCount} governance dimensions of
+            the Civica Index are <strong>highly correlated</strong>{" "}
+            (range {corrLow} to {corrHigh}). Principal component
+            analysis confirms a single dominant latent factor:{" "}
+            <strong>
+              PC1 explains {pc1VariancePct}% of the variance
+            </strong>{" "}
+            in the panel, and all {civicaIndex.dimensionCount}{" "}
+            dimensions load on it with similar magnitude ({loadLow} to{" "}
+            {loadHigh}). Components 2 through{" "}
+            {civicaIndex.dimensionCount} each have eigenvalues well
+            below the Kaiser threshold of 1.0, meaning the data does
+            not support breaking the governance core into multiple
+            distinct factors.
           </p>
           <p>
-            The four-dimension breakout is therefore best understood
-            as a <strong>transparency device</strong> — it lets readers
-            see how each facet contributes — rather than as a claim
-            that the four are statistically independent. The composite
-            score is, in effect, a single &ldquo;governance
-            quality&rdquo; index disaggregated into four interpretable
-            sub-scores.
+            The {civicaIndex.dimensionCount}-dimension breakout is
+            therefore best understood as a{" "}
+            <strong>transparency device</strong> — it lets readers see
+            how each facet contributes — rather than as a claim that
+            the {civicaIndex.dimensionCount} are statistically
+            independent. The composite score is, in effect, a single
+            &ldquo;governance quality&rdquo; index disaggregated into{" "}
+            {civicaIndex.dimensionCount} interpretable sub-scores.
           </p>
           <p>
             Weights are taken proportional to the squared PC1 loadings
@@ -207,20 +220,23 @@ export default function PcaAppendixPage() {
               </tr>
             </thead>
             <tbody>
-              {LOADINGS.map((r) => (
-                <tr key={r.dimension}>
-                  <td>{r.label}</td>
-                  <td className="num-cell">
-                    {r.weightProvisional.toFixed(2)}
-                  </td>
-                  <td className="num-cell">
-                    {r.weightSuggested.toFixed(3)}
-                  </td>
-                  <td className="num-cell weight-adopted">
-                    {r.weightAdopted.toFixed(2)}
-                  </td>
-                </tr>
-              ))}
+              {LOADINGS.map((r) => {
+                const adopted = ADOPTED_WEIGHT_BY_ID[r.dimension] ?? 0;
+                return (
+                  <tr key={r.dimension}>
+                    <td>{r.label}</td>
+                    <td className="num-cell">
+                      {r.weightProvisional.toFixed(2)}
+                    </td>
+                    <td className="num-cell">
+                      {r.weightSuggested.toFixed(3)}
+                    </td>
+                    <td className="num-cell weight-adopted">
+                      {adopted.toFixed(2)}
+                    </td>
+                  </tr>
+                );
+              })}
               <tr className="row-total">
                 <td>Sum</td>
                 <td className="num-cell">1.00</td>
@@ -231,12 +247,14 @@ export default function PcaAppendixPage() {
           </table>
 
           <p>
-            The biggest revision is corruption control (0.20 → 0.24,
-            +20% relative). Democratic quality drops slightly
-            (0.30 → 0.27). The other two are essentially unchanged.
-            Because the indicators are so correlated, the impact on
-            country rankings is small: the largest delta from the
-            weight revision alone is under one point.
+            The biggest revision is corruption control (0.20 →{" "}
+            {(ADOPTED_WEIGHT_BY_ID.corruption_control ?? 0).toFixed(2)},
+            +20% relative). Democratic quality drops slightly (0.30 →{" "}
+            {(ADOPTED_WEIGHT_BY_ID.democratic_quality ?? 0).toFixed(2)}
+            ). The other two are essentially unchanged. Because the
+            indicators are so correlated, the impact on country
+            rankings is small: the largest delta from the weight
+            revision alone is under one point.
           </p>
         </section>
 
@@ -246,9 +264,10 @@ export default function PcaAppendixPage() {
             <span className="num">Section 2</span>The panel
           </h2>
           <p>
-            <strong>n = 46 countries</strong> with all four governance
-            dimensions present. Data vintage: 2023 (the most recent
-            year fully ingested into Civica). Source:{" "}
+            <strong>n = {pca.panelSize} countries</strong> with all{" "}
+            {civicaIndex.dimensionCount} governance dimensions present.
+            Data vintage: {pca.dataVintage} (the most recent year fully
+            ingested into Civica). Source:{" "}
             <code>ci_dimension_scores</code> table, normalized via the
             Beta fixed-bound transforms documented in the{" "}
             <Link href="/civica-index/methodology#normalization">
@@ -262,10 +281,10 @@ export default function PcaAppendixPage() {
             authoritarian states with active governance research
             coverage. Coverage is sparser in small island states and
             in microstates. This is a known limitation of the panel and
-            does not change the conclusion that the four indicators
-            are highly correlated, but it does mean the absolute
-            magnitude of the loadings might shift slightly with a
-            broader sample.
+            does not change the conclusion that the{" "}
+            {civicaIndex.dimensionCount} indicators are highly
+            correlated, but it does mean the absolute magnitude of the
+            loadings might shift slightly with a broader sample.
           </p>
         </section>
 
@@ -275,7 +294,8 @@ export default function PcaAppendixPage() {
             <span className="num">Section 3</span>Correlation matrix
           </h2>
           <p>
-            Pearson correlations between the four normalized dimensions:
+            Pearson correlations between the{" "}
+            {civicaIndex.dimensionCount} normalized dimensions:
           </p>
           <table>
             <thead>
@@ -306,13 +326,14 @@ export default function PcaAppendixPage() {
             </tbody>
           </table>
           <p>
-            Every off-diagonal correlation is above 0.74 — strong by
-            any reasonable threshold. Rule of law and corruption
-            control are nearly indistinguishable empirically (r =
-            0.98), which suggests the weight on those two could be
-            partially redundant. The 5th-dimension test in §6 partially
-            addresses this question; a fuller answer requires the
-            ingestion of separate WGI Government Effectiveness data.
+            Every off-diagonal correlation is above {corrLow} — strong
+            by any reasonable threshold. Rule of law and corruption
+            control are nearly indistinguishable empirically (r ={" "}
+            {corrHigh}), which suggests the weight on those two could
+            be partially redundant. The 5th-dimension test in §6
+            partially addresses this question; a fuller answer requires
+            the ingestion of separate WGI Government Effectiveness
+            data.
           </p>
         </section>
 
@@ -402,12 +423,13 @@ export default function PcaAppendixPage() {
             </tbody>
           </table>
           <p>
-            On PC1 — the only component the data supports — the four
-            loadings are tightly clustered (0.479 to 0.516, range 0.04).
-            All four dimensions contribute roughly equally to the
-            single &ldquo;governance quality&rdquo; latent factor. PC2
-            through PC4 represent residual variance below the noise
-            floor.
+            On PC1 — the only component the data supports — the{" "}
+            {civicaIndex.dimensionCount} loadings are tightly clustered
+            ({loadLow} to {loadHigh}, range {loadRange}). All{" "}
+            {civicaIndex.dimensionCount} dimensions contribute roughly
+            equally to the single &ldquo;governance quality&rdquo;
+            latent factor. PC2 through PC{civicaIndex.dimensionCount}{" "}
+            represent residual variance below the noise floor.
           </p>
           <p>
             Squaring the PC1 loadings and normalizing them to sum to
@@ -434,13 +456,13 @@ export default function PcaAppendixPage() {
             <strong>This phase does not test that question.</strong> The
             WGI Government Effectiveness indicator is not yet ingested
             into Civica. The high correlation between Rule of Law and
-            Corruption Control (r = 0.98) hints that adding a related
-            governance-quality indicator might simply load on the same
-            factor as Rule of Law — but that&rsquo;s a hypothesis, not
-            a finding. The test is deferred to a follow-up phase
-            (after the indicator is ingested), at which point this
-            appendix will be re-run and, if warranted, the methodology
-            updated.
+            Corruption Control (r = {corrHigh}) hints that adding a
+            related governance-quality indicator might simply load on
+            the same factor as Rule of Law — but that&rsquo;s a
+            hypothesis, not a finding. The test is deferred to a
+            follow-up phase (after the indicator is ingested), at which
+            point this appendix will be re-run and, if warranted, the
+            methodology updated.
           </p>
         </section>
 
@@ -452,13 +474,14 @@ export default function PcaAppendixPage() {
           <p>
             <strong>Sample size.</strong> The methodology spec
             envisions a panel of 2000–2024 country-years (thousands of
-            observations). The current panel is 46 countries from a
-            single year — statistically usable but underpowered. Final
-            weights will be re-validated when the historical panel is
-            ingested. The structural decision (4-dim core, near-equal
-            weights) is unlikely to change because the underlying
-            correlation structure of these indicators is well-documented
-            in the governance-measurement literature, but the precise
+            observations). The current panel is {pca.panelSize}{" "}
+            countries from a single year — statistically usable but
+            underpowered. Final weights will be re-validated when the
+            historical panel is ingested. The structural decision (
+            {civicaIndex.dimensionCount}-dim core, near-equal weights)
+            is unlikely to change because the underlying correlation
+            structure of these indicators is well-documented in the
+            governance-measurement literature, but the precise
             magnitudes might shift.
           </p>
           <p>
@@ -468,8 +491,9 @@ export default function PcaAppendixPage() {
             decades. The historical panel will address this.
           </p>
           <p>
-            <strong>Source coverage.</strong> The 46 countries with all
-            four dimensions are skewed toward larger states and active
+            <strong>Source coverage.</strong> The {pca.panelSize}{" "}
+            countries with all {civicaIndex.dimensionCount} dimensions
+            are skewed toward larger states and active
             governance-research targets. Microstates and small island
             states are under-represented. The PCA findings should be
             understood as describing &ldquo;the kinds of countries we

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
+import { pulse, disputeSla } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Pulse methodology (Beta) — Civica Index",
@@ -49,6 +50,17 @@ const SECTIONS = [
 ];
 
 export default function PulseMethodologyPage() {
+  const taxonomy = pulse.taxonomy;
+  const dimsPer = taxonomy.categoriesPerDimension;
+  const backtestCount = pulse.backtest.cases.length;
+  const graduationRatio = pulse.backtest.graduationThresholdRatio;
+  const graduationPct = Math.round(graduationRatio * 100);
+  const graduationCount = Math.ceil(backtestCount * graduationRatio);
+  // v1 → v2 evolution from versionHistory (first vs current entry).
+  const v1Entry = taxonomy.versionHistory[0];
+  const currentEntry =
+    taxonomy.versionHistory[taxonomy.versionHistory.length - 1];
+
   return (
     <MethodologyLayout items={SECTIONS}>
       <EditorialPage>
@@ -73,9 +85,10 @@ export default function PulseMethodologyPage() {
         <strong>This is an experimental system.</strong> Pulse values are not
         yet peer-reviewed and should not be cited as authoritative. The
         pipeline is under active validation; backtesting against historical
-        governance shocks is in progress, with at least 80% of the 10 named
-        test cases required to match expert consensus before the Pulse
-        graduates to publishable status.
+        governance shocks is in progress, with at least {graduationPct}% (
+        {graduationCount} of {backtestCount}) of the named test cases
+        required to match expert consensus before the Pulse graduates to
+        publishable status.
       </div>
 
       <section className="editorial-section" id="what-pulse-is">
@@ -134,9 +147,10 @@ export default function PulseMethodologyPage() {
           up rewarding censorship. Fatal if unaddressed.
         </p>
         <p>
-          Pulse Beta uses <strong>stacked source integration</strong>:
-          specialised structured feeds are the primary signal; general news
-          augments but does not dominate.
+          Pulse {pulse.status === "beta" ? "Beta" : "v1"} uses{" "}
+          <strong>stacked source integration</strong>: specialised structured
+          feeds are the primary signal; general news augments but does not
+          dominate.
         </p>
 
         <h3>Primary (specialist)</h3>
@@ -233,22 +247,22 @@ export default function PulseMethodologyPage() {
       </section>
 
       <section className="editorial-section" id="event-categories">
-        <h2>Event categories — the v2 taxonomy</h2>
+        <h2>Event categories — the {taxonomy.version} taxonomy</h2>
         <p>
           The Pulse classifies every event into exactly one category
-          drawn from a fixed taxonomy. v2.0 ships{" "}
-          <strong>61 categories</strong> across the five dimensions,
-          derived from a top-down completeness review against five
-          established political-science frameworks (V-Dem, ACLED, the
-          Comparative Constitutions Project, the Polity Project, and
-          Freedom House). Full derivation lives in{" "}
+          drawn from a fixed taxonomy. {taxonomy.version} ships{" "}
+          <strong>{taxonomy.categoryCount} categories</strong> across the
+          five dimensions, derived from a top-down completeness review
+          against five established political-science frameworks (V-Dem,
+          ACLED, the Comparative Constitutions Project, the Polity
+          Project, and Freedom House). Full derivation lives in{" "}
           <Link href="https://github.com/civicaatlas/civica/blob/main/docs/taxonomy-v2-gap-analysis.md">
             the gap-analysis document
           </Link>
           .
         </p>
 
-        <h3>Democratic Quality (12 categories)</h3>
+        <h3>Democratic Quality ({dimsPer.democratic_quality} categories)</h3>
         <ul>
           <li>
             <code>fair_election</code> — free and fair election (V-Dem
@@ -305,7 +319,7 @@ export default function PulseMethodologyPage() {
           </li>
         </ul>
 
-        <h3>Rule of Law (13 categories)</h3>
+        <h3>Rule of Law ({dimsPer.rule_of_law} categories)</h3>
         <ul>
           <li>
             <code>judicial_purge</code> — mass dismissal or
@@ -364,7 +378,7 @@ export default function PulseMethodologyPage() {
           </li>
         </ul>
 
-        <h3>Rights &amp; Freedoms (19 categories)</h3>
+        <h3>Rights &amp; Freedoms ({dimsPer.freedom_rights} categories)</h3>
         <ul>
           <li>
             <code>journalist_arrest</code>, <code>media_shutdown</code>{" "}
@@ -440,7 +454,7 @@ export default function PulseMethodologyPage() {
           </li>
         </ul>
 
-        <h3>Corruption Control (6 categories)</h3>
+        <h3>Corruption Control ({dimsPer.corruption_control} categories)</h3>
         <ul>
           <li>
             <code>corruption_conviction</code> — high-level corruption
@@ -468,7 +482,7 @@ export default function PulseMethodologyPage() {
           </li>
         </ul>
 
-        <h3>Stability (11 categories)</h3>
+        <h3>Stability ({dimsPer.stability} categories)</h3>
         <ul>
           <li>
             <code>armed_conflict</code>, <code>state_collapse</code> —
@@ -524,11 +538,12 @@ export default function PulseMethodologyPage() {
       <section className="editorial-section" id="disambiguation">
         <h2>Disambiguation — when an event could fit multiple categories</h2>
         <p>
-          v2.0 expanded the taxonomy from 30 to 61 categories. Several
-          of the new fine-grained categories overlap at the prompt
-          level with v1 categories — an event could plausibly fit
-          either. The classifier prompt enforces a single rule for
-          these cases:
+          {currentEntry.version} expanded the taxonomy from{" "}
+          {v1Entry.categoryCount} to {currentEntry.categoryCount}{" "}
+          categories. Several of the new fine-grained categories overlap
+          at the prompt level with {v1Entry.version} categories — an
+          event could plausibly fit either. The classifier prompt
+          enforces a single rule for these cases:
         </p>
         <p>
           <strong>The more dimension-specific category wins over the
@@ -847,8 +862,9 @@ export default function PulseMethodologyPage() {
           Pulse-specific dispute categories include event misclassification,
           severity miscalibration, false positives, missing events, and
           duplicate events. Each dispute is logged publicly with its
-          disposition and outcome. Resolution target: 7 days initial
-          response, 30 days full disposition.
+          disposition and outcome. Resolution target:{" "}
+          {disputeSla.initialResponseDays} days initial response,{" "}
+          {disputeSla.fullDispositionDays} days full disposition.
         </p>
       </section>
 

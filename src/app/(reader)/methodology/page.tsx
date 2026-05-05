@@ -5,6 +5,7 @@ import {
   ReaderSidebar,
   type ReaderSidebarItem,
 } from "@/components/editorial/ReaderSidebar";
+import { civicaIndex, pulse } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Methodology — Civica Atlas",
@@ -61,13 +62,13 @@ const SECTIONS: MethodologySection[] = [
     id: "scoring",
     heading: "Composite scoring — the Civica Index",
     intro:
-      "The Civica Index is an original 0–100 composite governance score covering six dimensions, computed quarterly. Its methodology covers indicator selection, weighting, reference periods, and uncertainty.",
+      `The Civica Index is an original 0–100 composite governance score covering ${civicaIndex.dimensionCount} governance dimensions, computed quarterly. Its methodology covers indicator selection, weighting, reference periods, and uncertainty.`,
     entries: [
       {
         href: "/civica-index/methodology",
         title: "Civica Index methodology",
         blurb:
-          "The composite specification — six dimensions, indicator basket, sources, frozen reference periods, weighting approach, uncertainty intervals.",
+          `The composite specification — ${civicaIndex.dimensionCount} governance dimensions, indicator basket, sources, frozen reference periods, weighting approach, uncertainty intervals.`,
         beta: true,
       },
       {
@@ -96,7 +97,7 @@ const SECTIONS: MethodologySection[] = [
         href: "/civica-index/methodology/pulse/backtest",
         title: "Pulse backtest",
         blurb:
-          "Backtest results against ten named historical governance shocks (Myanmar 2021, Niger 2023, Tunisia 2021, Afghanistan 2021, Sri Lanka 2022, Brazil 2023, Hungary 2010-present, Ethiopia 2020–22, Colombia 2016, Poland 2023).",
+          `Backtest results against ${pulse.backtest.cases.length} named historical governance shocks (${pulse.backtest.cases.map((c) => c.label).join(", ")}).`,
         beta: true,
       },
     ],

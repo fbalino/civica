@@ -1,10 +1,11 @@
 # The Civica Index methodology.
 
 <!-- Source: src/app/(reader)/civica-index/methodology/page.tsx · Extracted 2026-05-04 -->
+<!-- Values below mirror src/lib/content/site-state.ts as of 2026-05-05. Update both when state changes. -->
 
 *Beta — methodology in active development · Apr 2026 · Cut-over target Sept 30, 2026*
 
-> **Beta.** The methodology described on this page is in active development. Civica's published scores will be republished under these rules at cut-over (target Sept 30, 2026). Substantive details — the empirical factor analysis, source-substitution sensitivity testing, and the PCA appendix — are still being finalized; the dimension weights below are provisional.
+> **Beta.** The methodology described on this page is in active development. Civica's published scores will be republished under these rules at cut-over (target Sept 30, 2026). The empirical factor analysis described in §4 has shipped — the dimension weights below are the PCA-derived adopted values, documented in detail at [/civica-index/methodology/pca-appendix](https://civicaatlas.org/civica-index/methodology/pca-appendix). External academic review is still pending.
 
 The Civica Index measures the quality of governing institutions in every country on a 0–100 scale, with explicit uncertainty, rank bands, and full transparency on sources. It is the scoring layer of Civica Atlas — useful for orientation, honestly presented, never oversold as definitive.
 
@@ -27,18 +28,18 @@ Scores are integers, not decimals. The underlying data is not precise enough to 
 <a id="dimensions"></a>
 ## Section 2 · Dimensions
 
-The CI measures **governing institutions and practices** — and only those. Material conditions like human development, security, and economic stability live on the separate [Civica Conditions](#conditions) layer. The four governance dimensions:
+The CI measures **governing institutions and practices** — and only those. Material conditions like human development, security, and economic stability live on the separate [Civica Conditions](#conditions) layer. The 4 governance dimensions:
 
-<!-- Dimension weight bar visualization: 30% Democratic quality / 25% Rule of law / 25% Freedoms & rights / 20% Corruption control -->
+<!-- Dimension weight bar visualization: 27% Democratic quality / 26% Rule of law / 23% Freedoms & rights / 24% Corruption control (PCA-derived, adopted Apr 2026) -->
 
 | Dimension | Weight | Primary source | Secondary / cross-check |
 |---|---|---|---|
-| Democratic quality | 30% | V-Dem Liberal Democracy Index | V-Dem Electoral Democracy Index |
-| Rule of law | 25% | V-Dem Rule of Law | World Bank WGI Rule of Law |
-| Freedoms & rights | 25% | Freedom House (PR + CL combined) | RSF Press Freedom Index |
-| Corruption control | 20% | Transparency International CPI | World Bank WGI Control of Corruption |
+| Democratic quality | 27% | V-Dem Liberal Democracy Index | V-Dem Electoral Democracy Index |
+| Rule of law | 26% | V-Dem Rule of Law | World Bank WGI Rule of Law |
+| Freedoms & rights | 23% | Freedom House (PR + CL combined) | RSF Press Freedom Index |
+| Corruption control | 24% | Transparency International CPI | World Bank WGI Control of Corruption |
 
-**The weights above are provisional.** Final weights are determined by the empirical factor analysis described in §4. A fifth dimension — *Administrative Capacity*, drawn from World Bank WGI Government Effectiveness and Regulatory Quality — is added if and only if it emerges as empirically distinct from Rule of Law in that analysis.
+**The weights above are PCA-derived and adopted.** They come from the empirical factor analysis described in §4 and documented in full at [/civica-index/methodology/pca-appendix](https://civicaatlas.org/civica-index/methodology/pca-appendix). A fifth dimension — *Administrative Capacity*, drawn from World Bank WGI Government Effectiveness and Regulatory Quality — is added if and only if it emerges as empirically distinct from Rule of Law in a future re-run of that analysis once the WGI indicator is ingested.
 
 ---
 
@@ -68,7 +69,7 @@ Weights are derived from the data itself rather than asserted, using two standar
 - **Factor analysis with varimax rotation** to map each source onto its primary latent factor. This is what tells us whether Administrative Capacity is its own dimension or just another face of Rule of Law.
 - **Source-substitution sensitivity testing**: swap each primary source for its secondary, recompute, and confirm that scores stay stable within their published uncertainty intervals.
 
-The full PCA results — eigenvalues, scree plot, factor loadings, and decision rationale — are published as a separate appendix at [/civica-index/methodology/pca-appendix](https://civicaatlas.org/civica-index/methodology/pca-appendix). Headline finding: the four governance dimensions are highly correlated (r = 0.74 to 0.98), one dominant latent factor explains 90.7% of the variance, and weights proportional to the squared first-component loadings come out near-equal — close enough to the provisional values that rankings barely move under the revision.
+The full PCA results — eigenvalues, scree plot, factor loadings, and decision rationale — are published as a separate appendix at [/civica-index/methodology/pca-appendix](https://civicaatlas.org/civica-index/methodology/pca-appendix). Headline finding: the 4 governance dimensions are highly correlated (r = 0.74 to 0.98), one dominant latent factor explains 90.7% of the variance, and weights proportional to the squared first-component loadings come out near-equal — close enough to the provisional values that rankings barely move under the revision.
 
 ---
 
@@ -117,7 +118,7 @@ Different countries have different data coverage. Civica enforces three rules to
 
 - **Mandatory dimensions.** Democratic Quality and Rule of Law are required. If either is missing, no CI is published for that country — the page reads "Insufficient data for governance index" with an explanation of which dimensions are missing.
 - **Partial CI.** If the mandatory dimensions are present but one of the others (Freedoms & Rights or Corruption Control) is missing, a partial CI is published — flagged visually, with the confidence interval widened by 20% to reflect the added uncertainty.
-- **Complete CI.** All four (or five) dimensions present. No flag.
+- **Complete CI.** All 4 dimensions present. No flag.
 
 Re-proportioning weights to fill in missing data is explicitly avoided — that approach silently biases the scores of fragile states upward, since the dimensions most likely to be missing are the ones that would have scored lowest.
 
@@ -183,7 +184,7 @@ Both series are accessible via the API. See §13 for citation format.
 
 **Construct narrowing.** By design, the CI measures governing institutions only. If a reader wants to ask "is this country a good place to live?" — a different and broader question — the CI alone does not answer that. Read it together with [Civica Conditions](https://civicaatlas.org/civica-conditions).
 
-**Provisional weights.** Until the empirical factor analysis described in §4 completes, the dimension weights are scaffolding. Country pages and API responses indicate this status.
+**PCA panel underpowered.** The PCA in §4 was run on n = 46 countries from a single year (2023). Final weights will be re-validated when the historical panel is ingested. The structural decision (4-dim core, near-equal weights) is unlikely to change because the underlying correlation structure is well-documented in the literature, but precise magnitudes might shift.
 
 ---
 
@@ -215,7 +216,7 @@ Every CI API response includes a `meta.methodology` block describing the methodo
 
 ### 13.2 · Disputes & corrections
 
-Every score is open to dispute. Submit data-error corrections, methodology disagreements, or Pulse event misclassifications at [/civica-index/corrections](https://civicaatlas.org/civica-index/corrections). Resolution targets: 7 days initial response, 30 days full disposition. Every dispute and outcome is logged publicly.
+Every score is open to dispute. Submit data-error corrections, methodology disagreements, or Pulse event misclassifications at [/civica-index/corrections](https://civicaatlas.org/civica-index/corrections). Resolution targets: 7 days initial response, 30 days full disposition (mirrored from `state.disputeSla` in `src/lib/content/site-state.ts`). Every dispute and outcome is logged publicly.
 
 ### 13.3 · Replication
 

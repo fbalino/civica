@@ -5,11 +5,17 @@ import { advisoryBoardMembers } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Banner } from "@/components/editorial/Banner";
+import { advisoryBoard, civicaIndex } from "@/lib/content/site-state";
+
+const ADVISORY_BOARD_STATUS_LABEL: Record<string, string> = {
+  "coming-soon": "Coming soon",
+  recruiting: "Recruiting",
+  active: "Active",
+};
 
 export const metadata: Metadata = {
   title: "Advisory board — Civica Index",
-  description:
-    "Independent academic review for the Civica Index methodology. 3–5 scholars in governance measurement, political methodology, and comparative politics.",
+  description: `Independent academic review for the Civica Index methodology. ${advisoryBoard.targetSize.min}–${advisoryBoard.targetSize.max} scholars in governance measurement, political methodology, and comparative politics.`,
   alternates: { canonical: "https://civicaatlas.org/about/advisory-board" },
 };
 
@@ -46,7 +52,9 @@ export default async function AdvisoryBoardPage() {
       <header>
         <h1 className="editorial-page-title">
           Advisory board
-          <span className="editorial-beta-tag">Coming soon</span>
+          <span className="editorial-beta-tag">
+            {ADVISORY_BOARD_STATUS_LABEL[advisoryBoard.status] ?? advisoryBoard.status}
+          </span>
         </h1>
         <p className="editorial-page-subtitle">
           Independent review for the Civica Index methodology.
@@ -55,17 +63,20 @@ export default async function AdvisoryBoardPage() {
 
       <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", lineHeight: 1.7, color: "var(--color-text-60)", margin: "0 0 32px", maxWidth: "640px" }}>
         Per the v2 methodology specification, the Civica Index will be reviewed
-        by an independent academic advisory board of 3–5 scholars with
-        expertise in governance measurement, political methodology, or
-        comparative politics. The board reviews the methodology quarterly
-        and has named authority to request changes. Their role is credibility
-        infrastructure, not marketing.
+        by an independent academic advisory board of{" "}
+        {advisoryBoard.targetSize.min}–{advisoryBoard.targetSize.max} scholars
+        with expertise in governance measurement, political methodology, or
+        comparative politics. The board reviews the methodology{" "}
+        {advisoryBoard.reviewCadence} and has named authority to request
+        changes. Their role is credibility infrastructure, not marketing.
       </p>
 
       <Banner variant="warn">
         <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "12px 18px", fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", fontWeight: "var(--font-weight-mono, 500)", letterSpacing: "0.04em" }}>
           <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--color-status-warning)", flexShrink: 0, display: "inline-block" }} />
-          Coming soon — recruitment opens after methodology v2 cut-over (target Q3 2026)
+          {ADVISORY_BOARD_STATUS_LABEL[advisoryBoard.status] ?? advisoryBoard.status}{" "}
+          — recruitment opens {advisoryBoard.recruitmentTrigger} (target{" "}
+          {civicaIndex.cutoverTarget})
         </div>
       </Banner>
 

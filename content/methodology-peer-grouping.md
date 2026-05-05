@@ -1,6 +1,7 @@
 # Peer grouping in Civica
 
 <!-- Source: src/app/(reader)/civica-index/methodology/peer-grouping/page.tsx · Extracted 2026-05-04 -->
+<!-- Values below mirror src/lib/content/site-state.ts (state.peerGrouping + state.civicaIndex.dimensionCount) as of 2026-05-05. Update both when state changes. -->
 
 *Why countries are compared the way they are.*
 
@@ -47,7 +48,7 @@ For Civica Index dimensions (democratic quality, rule of law, freedoms and right
 
 Why V-Dem RoW over Bjørnskov-Rode / CGV for the default? RoW splits autocracy along the analytically meaningful electoral / closed axis — eliminating the 64-country civilian-dictatorship blob that prompted the change — and is methodologically coherent with the Civica Index's existing V-Dem dependency.[8] [9]
 
-**Transparency note on V-Dem dependency.** The Civica Index already uses V-Dem indicators in two of its four dimensions (Democratic Quality, Rule of Law). Using V-Dem RoW as the governance peer set is presentational only — it determines which countries appear together in a ranking, not how their scores are computed. The CI's scoring formula is unchanged. There is no circularity, but the overlap is worth disclosing.
+**Transparency note on V-Dem dependency.** The Civica Index already uses V-Dem indicators in two of its 4 dimensions (Democratic Quality, Rule of Law). Using V-Dem RoW as the governance peer set is presentational only — it determines which countries appear together in a ranking, not how their scores are computed. The CI's scoring formula is unchanged. There is no circularity, but the overlap is worth disclosing.
 
 ---
 

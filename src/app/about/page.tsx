@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SourceDot } from "@/components/SourceDot";
 import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
+import { civicaIndex, pulse } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "About Civica Atlas — Open Reference Atlas of World Governments",
@@ -241,11 +242,14 @@ export default async function AboutPage() {
               }}
             >
               An original composite governance score (0&ndash;100) computed
-              quarterly across six dimensions: democratic quality, rule of law,
-              freedoms, corruption control, stability, and government
-              effectiveness. PCA-derived weights, frozen reference periods,
-              Monte Carlo uncertainty intervals. Currently in BETA pending
-              external review.
+              quarterly across {civicaIndex.dimensionCount} governance
+              dimensions:{" "}
+              {civicaIndex.dimensions.map((d) => d.label.toLowerCase()).join(", ")}.
+              Material outcomes (human development, peace &amp; security,
+              economic stability) live on the separate Civica Conditions
+              companion layer at <Link href="/civica-conditions">/civica-conditions</Link>.
+              PCA-derived weights, frozen reference periods, Monte Carlo
+              uncertainty intervals. Currently in BETA pending external review.
             </p>
           </div>
 
@@ -286,7 +290,8 @@ export default async function AboutPage() {
               A daily, event-driven directional signal layered on the Index.
               Multi-run LLM classifier with three-temperature agreement scoring,
               asymmetric corroboration rules, severity-tier human review.
-              Backtested against ten named historical governance shocks.
+              Backtested against {pulse.backtest.cases.length} named historical
+              governance shocks.
               Currently in BETA.
             </p>
           </div>

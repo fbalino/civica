@@ -3,12 +3,25 @@ import Link from "next/link";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
+import {
+  reconciliation,
+  tier1Publishers,
+  nsoWave1,
+  nsoTarget,
+  currentVintage,
+  disputeSla,
+} from "@/lib/content/site-state";
+
+const tier1Shipped = tier1Publishers.filter((p) => p.shipped);
+const tier1Scrapped = tier1Publishers.filter((p) => p.scrapped);
+const nsoActive = nsoWave1.filter((n) => n.status === "in-progress");
+const nsoDeferred = nsoWave1.filter(
+  (n) => n.status === "deferred" || n.status === "deferred-permanently",
+);
 
 export const metadata: Metadata = {
-  title:
-    "Factbook reconciliation methodology (v0.2-beta) — Civica Atlas",
-  description:
-    "How Civica picks one canonical value per country fact across CIA Factbook, 11 multilateral publishers, 6 national statistical offices, and Wikidata. Source allowlist, resolver rules, vintaging, disputes, replication, and worked examples drawn from live data.",
+  title: `Factbook reconciliation methodology (${reconciliation.version}) — Civica Atlas`,
+  description: `How Civica picks one canonical value per country fact across CIA Factbook, ${tier1Shipped.length} multilateral publishers, ${nsoActive.length} national statistical offices, and Wikidata. Source allowlist, resolver rules, vintaging, disputes, replication, and worked examples drawn from live data.`,
   alternates: {
     canonical:
       "https://civicaatlas.org/factbook/methodology/reconciliation",
@@ -46,27 +59,32 @@ export default function ReconciliationMethodologyPage() {
 
       <h1 className="editorial-page-title">
         Factbook Reconciliation
-        <span className="editorial-beta-tag">v0.2-beta</span>
+        <span className="editorial-beta-tag">{reconciliation.version}</span>
       </h1>
       <p className="editorial-page-subtitle">
         How Civica picks one canonical value per country fact when
         multiple sources disagree, and how readers can audit the
-        choice. Methodology v0.2-beta — perpetual-beta posture; the
-        rules continue to refine, but vintaged data is stable.
+        choice. Methodology {reconciliation.version} — perpetual-beta
+        posture; the rules continue to refine, but vintaged data is
+        stable.
       </p>
       <div className="editorial-meta">
-        <span>Methodology v0.2-beta</span>
-        <span>First v1 vintage 2026-Q1</span>
-        <span>Updated 2026-05-05</span>
+        <span>Methodology {reconciliation.version}</span>
+        <span>First v1 vintage {reconciliation.firstVintage}</span>
+        <span>Updated {reconciliation.lastUpdated}</span>
       </div>
 
       <div className="editorial-warning">
         <strong>Methodology in perpetual beta.</strong> Civica is a
         research lab. Methodology decisions ship as version bumps
-        (<code>v0.2-beta</code> → <code>v0.3-beta</code> → ...) rather
-        than as a graduation event. Each quarterly vintage embeds the
-        methodology version that produced it, so a citation pinned to{" "}
-        <code>Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1</code>{" "}
+        (<code>{reconciliation.version}</code> → next-revision → ...)
+        rather than as a graduation event. Each quarterly vintage
+        embeds the methodology version that produced it, so a
+        citation pinned to{" "}
+        <code>
+          Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+          {reconciliation.firstVintage}
+        </code>{" "}
         is stable: the underlying rules are tied to the label. See
         the{" "}
         <Link href="#version-policy">version-policy section</Link>{" "}
@@ -105,8 +123,9 @@ export default function ReconciliationMethodologyPage() {
           source allowlist must be able to reproduce the choice.
         </p>
         <p>
-          As of vintage 2026-Q1, the canonical-fact layer holds 25,821
-          rows across 88 fact-keys and 20 active sources. The
+          As of vintage {reconciliation.firstVintage}, the
+          canonical-fact layer holds 25,821 rows across 88 fact-keys
+          and 20 active sources. The
           headline reconciled fact-keys carry six or more publishers
           each: unemployment rate (12 sources), population (11),
           inflation rate (9), GDP real growth rate (7), life
@@ -251,7 +270,10 @@ export default function ReconciliationMethodologyPage() {
           resolver import from it.
         </p>
 
-        <h3>Tier 1 — Multilateral statistical agencies (11 active)</h3>
+        <h3>
+          Tier 1 — Multilateral statistical agencies ({tier1Shipped.length}{" "}
+          active)
+        </h3>
         <ul>
           <li>
             <Link href="https://data.worldbank.org">World Bank Open Data</Link>{" "}
@@ -311,19 +333,24 @@ export default function ReconciliationMethodologyPage() {
           ~190-country redistribution model. No commercial budget was
           allocated to upgrade. The audit trail for the scrap
           decision is preserved as an internal resolution document;
-          the v1 commitment is the 11 active publishers above.
+          the v1 commitment is the {tier1Shipped.length} active
+          publishers above.
         </p>
 
-        <h3>Tier 2 — National statistical offices (6 of 8 active)</h3>
+        <h3>
+          Tier 2 — National statistical offices ({nsoActive.length} of{" "}
+          {nsoWave1.length} active)
+        </h3>
         <p>
-          The methodology page enumerated 8 NSOs by name during early
-          design. Six are live in v1 and two are deferred to v1.1
-          with specific blockers. New NSOs are added on demand —
-          when a fact-key for a specific country has no Tier-1
-          coverage, an NSO is its authoritative source, or readers
-          ask for it. The long-term goal is ≥40 NSOs, which
-          subsequent NSO waves will pursue. Every addition triggers a
-          methodology version bump.
+          The methodology page enumerated {nsoWave1.length} NSOs by name
+          during early design. {nsoActive.length} are live in v1 and{" "}
+          {nsoDeferred.length} are deferred with specific blockers (see
+          per-NSO entries below). New NSOs are added on demand — when a
+          fact-key for a specific country has no Tier-1 coverage, an NSO
+          is its authoritative source, or readers ask for it. The
+          long-term goal is roughly {nsoTarget.min}–{nsoTarget.max} NSO
+          domains, which subsequent NSO waves will pursue. Every addition
+          triggers a methodology version bump.
         </p>
         <ul>
           <li>
@@ -450,10 +477,27 @@ export default function ReconciliationMethodologyPage() {
         </ul>
         <p>
           The eight worked examples that follow are normative — they
-          are pinned to the live database as of the methodology
-          v0.2-beta cut. Each illustrates a distinct reconciliation
-          pattern. Every value is real and was probed against the
-          resolver before this page shipped.
+          are pinned to the live database as of the methodology{" "}
+          {reconciliation.version} cut. Each illustrates a distinct
+          reconciliation pattern. Every value is real and was probed
+          against the resolver before this page shipped.
+        </p>
+        <p
+          style={{
+            fontFamily: "var(--font-body)",
+            fontSize: "var(--text-12)",
+            color: "var(--color-text-40)",
+            fontStyle: "italic",
+            margin: "var(--space-2) 0 var(--space-5)",
+          }}
+        >
+          Footnote on vintage. Specific numerical values cited below
+          reflect {currentVintage}; the methodologically-relevant
+          claim in each example is the pattern of canonical/alternate
+          attribution, not the exact figure. Future vintages may
+          refresh the underlying numbers; the resolver outcome
+          (which row wins canonical) is preserved by the rule, not
+          the figure.
         </p>
 
         <h3 id="example-argentina-inflation">
@@ -946,15 +990,18 @@ export default function ReconciliationMethodologyPage() {
         <p>
           The first frozen v1 vintage is{" "}
           <strong>
-            <code>Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1</code>
+            <code>
+              Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+              {reconciliation.firstVintage}
+            </code>
           </strong>
           , cut on 5 May 2026 over 17 active sources writing through
           the resolver. The methodology version is embedded in the
           label so any cited vintage value carries the rules that
-          produced it. When methodology revises to{" "}
-          <code>v0.3-beta</code>, the next vintage label embeds that
-          version, and the v0.2-beta vintages remain stable as
-          historical citations.
+          produced it. When methodology revises to the next version,
+          the next vintage label embeds it, and the{" "}
+          {reconciliation.version} vintages remain stable as historical
+          citations.
         </p>
         <p>
           Pinning a citation to a specific vintage gives the reader a
@@ -1225,14 +1272,23 @@ export default function ReconciliationMethodologyPage() {
         </p>
         <ul>
           <li>
-            Numeric disagreements with both sources Tier-1 — 14 days.
+            Numeric disagreements with both sources Tier-1 —{" "}
+            {disputeSla.group.B_tier1} days.
           </li>
-          <li>Group A identity overrides — 7 days.</li>
-          <li>Group C breakdown overrides — 30 days.</li>
+          <li>
+            Group A identity overrides — {disputeSla.group.A} days.
+          </li>
+          <li>
+            Group C breakdown overrides — {disputeSla.group.C} days.
+          </li>
           <li>
             Plausibility-envelope rejections (likely data corruption)
-            — 24 hours, since these are usually pipeline bugs rather
-            than data questions.
+            —{" "}
+            {disputeSla.group.plausibility === 1
+              ? "1 day"
+              : `${disputeSla.group.plausibility} days`}
+            , since these are usually pipeline bugs rather than data
+            questions.
           </li>
         </ul>
       </section>
@@ -1296,10 +1352,10 @@ export default function ReconciliationMethodologyPage() {
           <code>/factbook/methodology/reconciliation/replication</code>{" "}
           (not yet shipped). For the present, the inputs above are
           load-bearing in their git-tagged form, and an external
-          reviewer with access to the repository can replay the
-          v0.2-beta vintage 2026-Q1 cut by running the sync scripts
-          against the archived payloads and the snapshot script
-          against the resulting rows.
+          reviewer with access to the repository can replay the{" "}
+          {reconciliation.version} vintage {reconciliation.firstVintage}{" "}
+          cut by running the sync scripts against the archived payloads
+          and the snapshot script against the resulting rows.
         </p>
       </section>
 
@@ -1317,25 +1373,27 @@ export default function ReconciliationMethodologyPage() {
         </p>
         <p>
           The methodology version stamp stays in beta indefinitely.
-          Version bumps (<code>v0.2-beta</code> →{" "}
-          <code>v0.3-beta</code> → <code>v0.4-beta</code>) signal a
-          methodology refinement; they do not signal a graduation
-          event. Civica&rsquo;s posture is that the reconciliation
-          rules will continue to refine as new publishers ship, new
-          fact-keys are added, and external reviewers contribute
-          feedback. There is no calendar gate at which the methodology
-          stops being beta.
+          Version bumps (<code>{reconciliation.version}</code> →
+          successor revisions) signal a methodology refinement; they
+          do not signal a graduation event. Civica&rsquo;s posture is
+          that the reconciliation rules will continue to refine as new
+          publishers ship, new fact-keys are added, and external
+          reviewers contribute feedback. There is no calendar gate at
+          which the methodology stops being beta.
         </p>
         <p>
           What this does <em>not</em> mean: vintaged data is not
           unstable. The vintage label embeds the methodology version,
           so a reader citing{" "}
-          <code>Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1</code>{" "}
+          <code>
+            Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+            {reconciliation.firstVintage}
+          </code>{" "}
           gets a value that does not move and is unambiguously tied
-          to the v0.2-beta rules. When methodology revises to
-          v0.3-beta, the new vintage label carries the new version;
-          the v0.2-beta vintages remain as stable historical
-          citations.
+          to the {reconciliation.version} rules. When methodology
+          revises to a successor version, the new vintage label
+          carries that version; the {reconciliation.version} vintages
+          remain as stable historical citations.
         </p>
         <p>
           External review is an explicit project goal, not a
@@ -1370,8 +1428,8 @@ export default function ReconciliationMethodologyPage() {
         <h3>Citing the methodology page itself</h3>
         <p>
           <em>
-            Civica Atlas Reconciliation Methodology v0.2-beta. Civica
-            Atlas, 2026.{" "}
+            Civica Atlas Reconciliation Methodology{" "}
+            {reconciliation.version}. Civica Atlas, 2026.{" "}
             <Link href="https://civicaatlas.org/factbook/methodology/reconciliation">
               https://civicaatlas.org/factbook/methodology/reconciliation
             </Link>
@@ -1383,8 +1441,9 @@ export default function ReconciliationMethodologyPage() {
         <p>
           <em>
             Civica Atlas (2026). [Country] [fact], vintage Civica
-            Atlas Reconciled v0.2-beta — vintage 2026-Q1. Sourced
-            from [primary publisher]. Methodology v0.2-beta.
+            Atlas Reconciled {reconciliation.version} — vintage{" "}
+            {reconciliation.firstVintage}. Sourced from [primary
+            publisher]. Methodology {reconciliation.version}.
           </em>
         </p>
         <p>
@@ -1394,21 +1453,23 @@ export default function ReconciliationMethodologyPage() {
         <p>
           <em>
             Civica Atlas (2026). Argentina inflation rate, vintage
-            Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1.
-            Sourced from World Bank World Development Indicators
-            2026Q3 (2024 reading: 219.88%). Methodology v0.2-beta.
+            Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+            {reconciliation.firstVintage}. Sourced from World Bank
+            World Development Indicators 2026Q3 (2024 reading:
+            219.88%). Methodology {reconciliation.version}.
           </em>
         </p>
 
         <h3>Citing a frozen vintage of the entire reconciled atlas</h3>
         <p>
           <em>
-            Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1.
-            Civica Atlas, 2026.{" "}
+            Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
+            {reconciliation.firstVintage}. Civica Atlas, 2026.{" "}
             <Link href="https://civicaatlas.org/factbook/methodology/reconciliation">
               https://civicaatlas.org/factbook/methodology/reconciliation
             </Link>
-            . Cut date: 5 May 2026. Methodology version v0.2-beta.
+            . Cut date: 5 May 2026. Methodology version{" "}
+            {reconciliation.version}.
           </em>
         </p>
 
@@ -1420,7 +1481,7 @@ export default function ReconciliationMethodologyPage() {
         </p>
 
         <CiteAccordion
-          subject="Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1"
+          subject={`Civica Atlas Reconciled ${reconciliation.version} — vintage ${reconciliation.firstVintage}`}
           pageTitle="Factbook Reconciliation Methodology"
           url="https://civicaatlas.org/factbook/methodology/reconciliation"
           sourceNames={[

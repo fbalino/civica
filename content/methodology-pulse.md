@@ -1,12 +1,13 @@
 # Pulse methodology
 
 <!-- Source: src/app/(reader)/civica-index/methodology/pulse/page.tsx · Extracted 2026-05-04 -->
+<!-- Values mirror src/lib/content/site-state.ts (pulse.*, disputeSla) as of 2026-05-05. Do not edit prose counts here without updating site-state.ts in lockstep. -->
 
 *Beta — methodology under active validation*
 
 A real-time governance shock monitor layered on top of the quarterly Civica Index. Beta — methodology under active validation.
 
-> **This is an experimental system.** Pulse values are not yet peer-reviewed and should not be cited as authoritative. The pipeline is under active validation; backtesting against historical governance shocks is in progress, with at least 80% of the 10 named test cases required to match expert consensus before the Pulse graduates to publishable status.
+> **This is an experimental system.** Pulse values are not yet peer-reviewed and should not be cited as authoritative. The pipeline is under active validation; backtesting against historical governance shocks is in progress, with at least 80% (8 of 10) of the named test cases required to match expert consensus before the Pulse graduates to publishable status.
 
 ---
 

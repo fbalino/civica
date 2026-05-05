@@ -6,6 +6,7 @@ import {
   getPeerGroupingMigrationTable,
   type PeerGroupingMigrationRow,
 } from "@/lib/db/queries-peer-grouping";
+import { currentVintage } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Per-country migration table — Peer-grouping methodology",
@@ -62,7 +63,7 @@ export default async function PeerGroupingMigrationPage() {
       <div className="editorial-page-meta">
         <span>{rows.length} sovereign states</span>
         <span>·</span>
-        <span>Vintage: Civica Atlas 2026Q3</span>
+        <span>Vintage: {currentVintage}</span>
         <span>·</span>
         <span>Sunset 2027-03-31</span>
       </div>

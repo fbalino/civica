@@ -6,11 +6,12 @@ import {
   getCIMethodologyHistory,
 } from "@/lib/db/queries";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
+import { civicaIndex, disputeSla } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Civica Index Methodology — How Governance Is Scored",
   description:
-    "The Civica Index methodology: four governance dimensions, fixed-bound normalization, Monte Carlo uncertainty intervals, A–F rank bands, and a separate Civica Conditions companion layer. Beta — methodology in active development.",
+    `The Civica Index methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, Monte Carlo uncertainty intervals, A–F rank bands, and a separate Civica Conditions companion layer. Beta — methodology in active development.`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/methodology" },
 };
 
@@ -40,41 +41,44 @@ interface DimensionRow {
 }
 
 /**
- * Governance core — 4 dimensions. Weights are provisional until the
- * empirical factor analysis described in the weights section confirms
- * the structure. A 5th dimension (Administrative Capacity) is added if
- * and only if PCA shows it's distinct from Rule of Law.
+ * Per-dimension presentation metadata (visualization color + source
+ * attribution). Adopted weights are read from
+ * `state.civicaIndex.dimensions` to keep the methodology page in sync
+ * with the running scorer (`src/lib/ci/dimensions-v2.ts`). The PCA
+ * appendix at /civica-index/methodology/pca-appendix is the canonical
+ * derivation record.
  */
-const DIMENSIONS: DimensionRow[] = [
-  {
-    label: "Democratic quality",
-    weight: 30,
+const DIMENSION_PRESENTATION: Record<
+  string,
+  Pick<DimensionRow, "tierVar" | "primary" | "secondary">
+> = {
+  democratic_quality: {
     tierVar: "var(--tier-exceptional)",
     primary: "V-Dem Liberal Democracy Index",
     secondary: "V-Dem Electoral Democracy Index",
   },
-  {
-    label: "Rule of law",
-    weight: 25,
+  rule_of_law: {
     tierVar: "var(--tier-strong)",
     primary: "V-Dem Rule of Law",
     secondary: "World Bank WGI Rule of Law",
   },
-  {
-    label: "Freedoms & rights",
-    weight: 25,
+  freedom_rights: {
     tierVar: "var(--color-accent)",
     primary: "Freedom House (PR + CL combined)",
     secondary: "RSF Press Freedom Index",
   },
-  {
-    label: "Corruption control",
-    weight: 20,
+  corruption_control: {
     tierVar: "var(--tier-weak)",
     primary: "Transparency International CPI",
     secondary: "World Bank WGI Control of Corruption",
   },
-];
+};
+
+const DIMENSIONS: DimensionRow[] = civicaIndex.dimensions.map((d) => ({
+  label: d.label,
+  weight: Math.round(d.weight * 100),
+  ...DIMENSION_PRESENTATION[d.id],
+}));
 
 /** Fixed normalization bounds — see normalization section. */
 const NORMALIZATION: Array<{
@@ -145,7 +149,12 @@ export default async function MethodologyPage() {
 
   const lastRevision = methodology?.publishedAt
     ? formatDate(methodology.publishedAt)
-    : "Apr 2026";
+    : civicaIndex.lastRevision;
+  const cutoverTarget = civicaIndex.cutoverTarget;
+  const pc1VariancePct = (civicaIndex.pca.pc1VarianceExplained * 100).toFixed(
+    1,
+  );
+  const [corrLow, corrHigh] = civicaIndex.pca.correlationRange;
   const sidebarItems = SECTIONS.map((s) => ({
     id: s.id,
     label: humanizeSectionLabel(s.label),
@@ -164,17 +173,20 @@ export default async function MethodologyPage() {
         <span>·</span>
         <span>{lastRevision}</span>
         <span>·</span>
-        <span>Cut-over target Sept 30, 2026</span>
+        <span>Cut-over target {cutoverTarget}</span>
       </div>
 
       <div className="editorial-warning">
         <strong>Beta.</strong> The methodology described on this page
-        is in active development. Civica&rsquo;s published scores
-        will be republished under these rules at cut-over (target
-        Sept 30, 2026). Substantive details — the empirical factor
-        analysis, source-substitution sensitivity testing, and the
-        PCA appendix — are still being finalized; the dimension
-        weights below are provisional.
+        is in active development. Civica&rsquo;s published scores will
+        be republished under these rules at cut-over (target{" "}
+        {cutoverTarget}). The empirical factor analysis described in
+        §4 has shipped — the dimension weights below are the
+        PCA-derived adopted values, documented in detail at{" "}
+        <Link href="/civica-index/methodology/pca-appendix">
+          /civica-index/methodology/pca-appendix
+        </Link>
+        . External academic review is still pending.
       </div>
 
       <p className="meth-abstract">
@@ -234,14 +246,14 @@ export default async function MethodologyPage() {
           <strong>governing institutions and practices</strong> — and
           only those. Material conditions like human development,
           security, and economic stability live on the separate{" "}
-          <a href="#conditions">Civica Conditions</a> layer. The four
-          governance dimensions:
+          <a href="#conditions">Civica Conditions</a> layer. The{" "}
+          {civicaIndex.dimensionCount} governance dimensions:
         </p>
 
         <div
           className="meth-weights-bar"
           role="img"
-          aria-label="Dimension weight visualization (provisional)"
+          aria-label={`Dimension weight visualization (PCA-derived, adopted ${civicaIndex.lastRevision})`}
         >
           {DIMENSIONS.map((d) => (
             <div
@@ -277,13 +289,17 @@ export default async function MethodologyPage() {
         </table>
 
         <p>
-          <strong>The weights above are provisional.</strong> Final
-          weights are determined by the empirical factor analysis
-          described in §4. A fifth dimension — <em>Administrative
-          Capacity</em>, drawn from World Bank WGI Government
-          Effectiveness and Regulatory Quality — is added if and only
-          if it emerges as empirically distinct from Rule of Law in
-          that analysis.
+          <strong>The weights above are PCA-derived and adopted.</strong>{" "}
+          They come from the empirical factor analysis described in §4
+          and documented in full at{" "}
+          <Link href="/civica-index/methodology/pca-appendix">
+            /civica-index/methodology/pca-appendix
+          </Link>
+          . A fifth dimension — <em>Administrative Capacity</em>,
+          drawn from World Bank WGI Government Effectiveness and
+          Regulatory Quality — is added if and only if it emerges as
+          empirically distinct from Rule of Law in a future re-run of
+          that analysis once the WGI indicator is ingested.
         </p>
       </section>
 
@@ -369,12 +385,13 @@ export default async function MethodologyPage() {
           <Link href="/civica-index/methodology/pca-appendix">
             /civica-index/methodology/pca-appendix
           </Link>
-          . Headline finding: the four governance dimensions are
-          highly correlated (r = 0.74 to 0.98), one dominant latent
-          factor explains 90.7% of the variance, and weights
-          proportional to the squared first-component loadings come
-          out near-equal — close enough to the provisional values
-          that rankings barely move under the revision.
+          . Headline finding: the {civicaIndex.dimensionCount}{" "}
+          governance dimensions are highly correlated (r = {corrLow} to{" "}
+          {corrHigh}), one dominant latent factor explains{" "}
+          {pc1VariancePct}% of the variance, and weights proportional
+          to the squared first-component loadings come out near-equal
+          — close enough to the provisional values that rankings barely
+          move under the revision.
         </p>
       </section>
 
@@ -472,8 +489,8 @@ export default async function MethodologyPage() {
             widened by 20% to reflect the added uncertainty.
           </li>
           <li>
-            <strong>Complete CI.</strong> All four (or five)
-            dimensions present. No flag.
+            <strong>Complete CI.</strong> All{" "}
+            {civicaIndex.dimensionCount} dimensions present. No flag.
           </li>
         </ul>
         <p>
@@ -679,10 +696,15 @@ export default async function MethodologyPage() {
           <Link href="/civica-conditions">Civica Conditions</Link>.
         </p>
         <p>
-          <strong>Provisional weights.</strong> Until the empirical
-          factor analysis described in §4 completes, the dimension
-          weights are scaffolding. Country pages and API responses
-          indicate this status.
+          <strong>PCA panel underpowered.</strong> The PCA in §4 was
+          run on n = {civicaIndex.pca.panelSize} countries from a
+          single year ({civicaIndex.pca.dataVintage}). Final weights
+          will be re-validated when the historical panel is ingested.
+          The structural decision (
+          {civicaIndex.dimensionCount}-dim core, near-equal weights)
+          is unlikely to change because the underlying correlation
+          structure is well-documented in the literature, but precise
+          magnitudes might shift.
         </p>
       </section>
 
@@ -726,7 +748,8 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           <Link href="/civica-index/corrections">
             /civica-index/corrections
           </Link>
-          . Resolution targets: 7 days initial response, 30 days full
+          . Resolution targets: {disputeSla.initialResponseDays} days
+          initial response, {disputeSla.fullDispositionDays} days full
           disposition. Every dispute and outcome is logged publicly.
         </p>
 
@@ -757,7 +780,7 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           </div>
           <div className="meth-version-cell">
             <div className="meth-version-label">Cut-over target</div>
-            <div className="meth-version-value">Sept 30, 2026</div>
+            <div className="meth-version-value">{cutoverTarget}</div>
           </div>
           <div className="meth-version-cell">
             <div className="meth-version-label">Quarterly update</div>

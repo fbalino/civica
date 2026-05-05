@@ -12,19 +12,29 @@ Worse, single-source sites tend to hide the limitation. When the source goes sta
 
 Civica's approach is to integrate multiple authoritative publishers, expose the disagreements, and document the rules.
 
+<!--
+  Phase 3 update 2026-05-05: prose values mirror the canonical
+  rendered page at src/app/(reader)/methodology/approach/page.tsx,
+  which interpolates against src/lib/content/site-state.ts and
+  getSiteStats(). When this markdown is migrated to runtime
+  rendering (Phase 5 design), the inline numbers below get
+  replaced by `{{stats.activeSources}}` etc. — see the audit's
+  §5.3 variable schema.
+-->
+
 ## Multi-source reconciliation
 
-Civica integrates 14 active source orchestrators — one per upstream publisher — into a single canonical data layer. Currently:
+Civica integrates 20 active source orchestrators — one per upstream publisher — into a single canonical data layer. Currently:
 
 - **Frozen archive**: CIA World Factbook (final January 2026 vintage, public domain)
-- **Tier-1 publishers**: World Bank, IMF, UN, WHO, UNESCO, UNDP, OECD, FAO, ILO, Eurostat, WTO
+- **Tier-1 publishers (11)**: World Bank, IMF, UN, WHO, UNESCO, UNDP, OECD, FAO, ILO, Eurostat, WTO (IEA scrapped due to license incompatibility)
 - **Governance-specialist sources**: V-Dem (Varieties of Democracy)
 - **Knowledge spine**: Wikidata
-- **National statistics offices**: in progress (US Census, ONS-UK, INSEE-FR, Destatis-DE, Statistics Canada, IBGE-BR, Stats SA, NBS-Nigeria as the first wave)
+- **National statistics offices**: first wave of 6 in progress (US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA); Destatis-DE deferred to v1.1 (Eurostat republishes Destatis figures); NBS-Nigeria permanently deferred
 
 Each source has a dedicated sync orchestrator that pulls fresh data on a documented cadence (quarterly for most Tier-1 publishers, annually for some classification sources, daily for the Pulse event ingest). Each sync writes into a single canonical table called `country_facts`, with statement-level provenance: which source, which date the source measured the value, which license the data is shared under, which fact-key it corresponds to, and whether the row is a measurement or a forecast.
 
-Across these sources, ~26,000 reconciled facts cover 88 declared fact-keys. Twenty-five of those fact-keys have multi-source coverage — meaning two or more publishers have a row for the same country and indicator, allowing real reconciliation rather than blind republication.
+Across these sources, ~26,000 reconciled facts cover 88 declared fact-keys. 27 of those fact-keys have multi-source coverage — meaning two or more publishers have a row for the same country and indicator, allowing real reconciliation rather than blind republication.
 
 ## What happens when sources disagree
 
@@ -61,7 +71,7 @@ The data layer and reconciliation logic are real and load-bearing. The reader pa
 
 Some surfaces still carry a BETA marker. This means one of two things:
 
-The Civica Index composite scoring methodology (PCA-derived weights, six dimensions, frozen reference periods) is published and stable, but external academic review has not yet been completed. The page is in BETA pending review. Same for the Civica Pulse classification taxonomy — it has been backtested against ten historical shocks but has not been externally reviewed. Reconciliation rules are documented and live but the public-facing methodology page is being expanded as v1 closes out.
+The Civica Index composite scoring methodology (PCA-derived weights, 4 governance dimensions, frozen reference periods) is published and stable, but external academic review has not yet been completed. The page is in BETA pending review. Same for the Civica Pulse classification taxonomy — it has been backtested against 10 historical shocks but has not been externally reviewed. Reconciliation rules are documented and live but the public-facing methodology page is being expanded as v1 closes out.
 
 External methodologies that Civica cites — V-Dem Regimes of the World, World Bank country classifications, Bjørnskov-Rode regime taxonomy, the Cheibub-Gandhi-Vreeland classification — do not carry a BETA marker. They inherit the source institution's standing.
 

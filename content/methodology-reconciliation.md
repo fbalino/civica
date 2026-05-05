@@ -1,6 +1,7 @@
 # Factbook Reconciliation
 
 <!-- Source: src/app/(reader)/factbook/methodology/reconciliation/page.tsx · Rewritten 2026-05-05 (Phase R.23) -->
+<!-- Values mirror src/lib/content/site-state.ts as of 2026-05-05; refresh in lockstep with state updates. -->
 
 *How Civica picks one canonical value per country fact when multiple sources disagree, and how readers can audit the choice. Methodology v0.2-beta — perpetual-beta posture; the rules continue to refine, but vintaged data is stable.*
 
@@ -79,7 +80,7 @@ The International Energy Agency was scoped for v1 and **scrapped on 4 May 2026**
 
 ### Tier 2 — National statistical offices (6 of 8 active)
 
-The methodology page enumerated 8 NSOs by name during early design. Six are live in v1 and two are deferred to v1.1 with specific blockers. New NSOs are added on demand — when a fact-key for a specific country has no Tier-1 coverage, an NSO is its authoritative source, or readers ask for it. The long-term goal is ≥40 NSOs, which subsequent NSO waves will pursue. Every addition triggers a methodology version bump.
+The methodology page enumerated 8 NSOs by name during early design. 6 are live in v1 and 2 are deferred with specific blockers (see per-NSO entries below). New NSOs are added on demand — when a fact-key for a specific country has no Tier-1 coverage, an NSO is its authoritative source, or readers ask for it. The long-term goal is roughly 30–40 NSO domains, which subsequent NSO waves will pursue. Every addition triggers a methodology version bump.
 
 - **US Census Bureau** (live) — ACS 1-Year + Decennial; population, unemployment, urbanisation indicators for the United States.
 - **ONS-UK** (live) — public time-series API; population, CPIH inflation, GDP real growth, unemployment for the United Kingdom.
@@ -116,6 +117,8 @@ When sources disagree, two guards apply for Group B:
 - **Reference-quality floor.** The fresher source must have at least one Tier-1 or Tier-2 reference. A Wikidata claim whose references are all rejected per the allowlist cannot win even if it is fresher.
 
 The eight worked examples that follow are normative — they are pinned to the live database as of the methodology v0.2-beta cut. Each illustrates a distinct reconciliation pattern. Every value is real and was probed against the resolver before this page shipped.
+
+*Footnote on vintage. Specific numerical values cited below reflect Civica Atlas 2026Q3; the methodologically-relevant claim in each example is the pattern of canonical/alternate attribution, not the exact figure. Future vintages may refresh the underlying numbers; the resolver outcome (which row wins canonical) is preserved by the rule, not the figure.*
 
 ### Worked example 1 — Argentina inflation, hyperinflation hot-fix
 

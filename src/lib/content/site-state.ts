@@ -161,13 +161,29 @@ export const pulse = {
 // ─────────────────────────────────────────────────────────────────────
 
 export const reconciliation = {
-  version: "v0.1" as const,
+  /** Methodology version stamp embedded in vintage labels.
+   *  R.23 rewrite (2026-05-05) bumped from v0.1 to v0.2-beta and
+   *  re-framed graduation as a perpetual-beta posture: version
+   *  bumps signal refinements, not graduation events. */
+  version: "v0.2-beta" as const,
   status: "beta" as const,
+  /** Original publication date of the methodology page; the R.23
+   *  rewrite is dated separately as `lastUpdated`. */
   publishedAt: "2026-05-02" as const,
+  /** Date of the most recent methodology-page rewrite. The
+   *  reconciliation methodology meta line cites both dates. */
+  lastUpdated: "2026-05-05" as const,
+  /** First v1 quarterly vintage cut. */
+  firstVintage: "2026-Q1" as const,
+  /** Date the first v1 vintage was cut. */
+  firstVintageCutDate: "2026-05-05" as const,
 
-  /** v1.0 graduation criteria from
-   *  `/factbook/methodology/reconciliation` § beta-status. Drives
-   *  the same section on the public page. */
+  /** Forward-looking v1.0 graduation criteria. Currently NOT
+   *  rendered on the public page — the R.23 rewrite (2026-05-05)
+   *  re-framed graduation as a perpetual-beta posture (version
+   *  bumps signal refinement, not graduation). Preserved in state
+   *  for future use; revisit if a "graduation" page is reintroduced
+   *  or if external reviewers ask for explicit criteria. */
   v1GraduationCriteria: [
     "At least one external reviewer with relevant expertise plus a public response to their feedback.",
     "At least three quarters of vintaged Beta data so reviewers can audit drift.",
@@ -224,12 +240,23 @@ export const tier1Publishers = [
 
 /** NSO Wave 1 — first wave of national-statistics-office syncs.
  *  Per user resolution 2026-05-05, NBS-Nigeria is permanently
- *  deferred (not just deferred for this wave). */
+ *  deferred (not just deferred for this wave). Destatis-DE is
+ *  deferred to v1.1 per the reconciliation methodology page
+ *  (Genesis-Online API requires manual account creation outside
+ *  Civica's unattended-cron architecture; Eurostat republishes
+ *  Destatis figures in the meantime).
+ *
+ *  In live status terms:
+ *    - 6 NSOs are `in-progress` (live) — US Census, ONS-UK,
+ *      INSEE-FR, Statistics Canada, IBGE-BR, Stats SA.
+ *    - 1 NSO is `deferred` to v1.1 — Destatis-DE.
+ *    - 1 NSO is `deferred-permanently` — NBS-Nigeria. */
 export const nsoWave1 = [
   { id: "us_census",    name: "US Census Bureau",  status: "in-progress" as const },
   { id: "ons_uk",       name: "ONS-UK",            status: "in-progress" as const },
   { id: "insee_fr",     name: "INSEE-FR",          status: "in-progress" as const },
-  { id: "destatis_de",  name: "Destatis-DE",       status: "in-progress" as const },
+  { id: "destatis_de",  name: "Destatis-DE",       status: "deferred" as const,
+    deferReason: "Deferred to v1.1 — Genesis-Online API requires manual account creation with regulatory review, outside Civica's unattended-cron architecture. Eurostat republishes Destatis figures in the meantime." },
   { id: "statcan_ca",   name: "Statistics Canada", status: "in-progress" as const },
   { id: "ibge_br",      name: "IBGE-BR",           status: "in-progress" as const },
   { id: "stats_sa",     name: "Stats SA",          status: "in-progress" as const },

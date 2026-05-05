@@ -8,6 +8,7 @@ import {
   getBacktestStats,
   type BacktestSnapshotCase,
 } from "@/lib/db/queries-backtest";
+import { pulse } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Pulse backtest report (Beta) — Civica Index",
@@ -354,6 +355,10 @@ export default async function BacktestReportPage() {
     stats.passCount + stats.partialCount + stats.failCount;
   const ratio =
     totalRunCases > 0 ? Math.round((passingCases / totalRunCases) * 100) : 0;
+  const backtestCount = pulse.backtest.cases.length;
+  const graduationCount = Math.ceil(
+    backtestCount * pulse.backtest.graduationThresholdRatio
+  );
   const sidebarItems = [
     { id: "summary", label: "Summary" },
     { id: "verdict-thresholds", label: "Verdict thresholds" },
@@ -388,10 +393,11 @@ export default async function BacktestReportPage() {
       <div className="editorial-warning">
         <strong>This is the publicly-readable status of beta validation.</strong>{" "}
         Per the launch checklist, the Pulse cannot graduate from Beta
-        until backtesting matches expert consensus on at least 8 of 10
-        named cases. Current standing: <strong>{passingCases} pass</strong>{" "}
-        / {totalRunCases} run / {stats.totalCases} total cases (
-        {ratio}% pass rate among the cases run so far).
+        until backtesting matches expert consensus on at least{" "}
+        {graduationCount} of {backtestCount} named cases. Current standing:{" "}
+        <strong>{passingCases} pass</strong> / {totalRunCases} run /{" "}
+        {stats.totalCases} total cases ({ratio}% pass rate among the cases
+        run so far).
       </div>
 
       <section className="editorial-section" id="summary">

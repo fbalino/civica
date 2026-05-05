@@ -4,6 +4,8 @@ import { Banner } from "@/components/editorial/Banner";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
+import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
+import { replication, civicaIndex } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Replication package — Civica Index",
@@ -16,7 +18,20 @@ const SECTIONS = [
   { id: "package-contents", label: "Package contents" },
 ];
 
-export default function ReplicationPage() {
+const REPLICATION_STATUS_LABEL: Record<string, string> = {
+  "coming-soon": "Coming soon",
+  shipped: "Shipped",
+};
+
+export default async function ReplicationPage() {
+  let stats: SiteStats | null = null;
+  try {
+    stats = await getSiteStats();
+  } catch {
+    stats = null;
+  }
+  const scoredJurisdictions = stats?.jurisdictionsWithIso3 ?? null;
+
   return (
     <MethodologyLayout items={SECTIONS}>
       <EditorialPage>
@@ -28,7 +43,9 @@ export default function ReplicationPage() {
 
         <h1 className="editorial-page-title">
           Replication package{" "}
-          <span className="editorial-beta-tag">Coming soon</span>
+          <span className="editorial-beta-tag">
+            {REPLICATION_STATUS_LABEL[replication.status]}
+          </span>
         </h1>
         <p className="editorial-page-subtitle">
           Reproduce every Civica Index score from primary sources.
@@ -39,13 +56,13 @@ export default function ReplicationPage() {
           publishing not just the scores, but every formula, normalization step,
           source dataset reference, and codebook entry needed to re-derive the
           same numbers from scratch. The replication package ships at Beta
-          cut-over (target: Q3 2026), once the PCA / factor analysis and
-          confidence-interval work are finalized. The contents are described
-          below.
+          cut-over (target: {replication.shipTarget}), once the PCA / factor
+          analysis and confidence-interval work are finalized. The contents
+          are described below.
         </p>
 
         <Banner variant="warn">
-          Status: coming at Beta launch — target Q3 2026
+          Status: coming at Beta launch — target {civicaIndex.cutoverTarget}
         </Banner>
 
         <section id="package-contents" className="editorial-section">
@@ -79,9 +96,12 @@ export default function ReplicationPage() {
               release date, and coverage notes.
             </li>
             <li>
-              <strong>Downloadable outputs.</strong> Country-level CSV covering
-              all 197 scored jurisdictions: CI score, 90% confidence interval,
-              rank, rank band, dimensional breakdowns, completeness flag (Full /
+              <strong>Downloadable outputs.</strong> Country-level CSV covering{" "}
+              {scoredJurisdictions !== null
+                ? `all ${scoredJurisdictions}`
+                : "all"}{" "}
+              scored jurisdictions: CI score, 90% confidence interval, rank,
+              rank band, dimensional breakdowns, completeness flag (Full /
               Partial / Insufficient), and data vintage per source.
             </li>
             <li>

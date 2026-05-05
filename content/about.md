@@ -1,3 +1,12 @@
+<!--
+  Phase 3 update 2026-05-05: prose values mirror the rendered page at
+  src/app/about/page.tsx, which interpolates against
+  src/lib/content/site-state.ts. When this markdown is migrated to
+  runtime rendering (Phase 5 design), the inline values below get
+  replaced by `{{state.civicaIndex.dimensionCount}}` etc. — see the
+  audit's §5.3 variable schema.
+-->
+
 # About Civica Atlas
 
 Civica Atlas is an open reference atlas of the world's countries, governments, and governance outcomes. It combines data from authoritative sources into a single, browsable atlas of political systems, demographics, economies, and the institutions that shape them.
@@ -14,11 +23,11 @@ For each country and territory, the Factbook presents the kind of comprehensive 
 
 ### Civica Index — composite governance score
 
-The Index is an original composite governance score on a 0–100 scale, computed quarterly across six dimensions: democratic quality, rule of law, freedoms, corruption control, stability, and government effectiveness. It draws on V-Dem, the World Bank Worldwide Governance Indicators, the UNDP Human Development Index, Freedom House, Transparency International, the Global Peace Index, and the Fragile States Index. Weights are PCA-derived, reference periods are frozen, and uncertainty intervals are produced via Monte Carlo simulation. The current version is in BETA pending external academic review.
+The Index is an original composite governance score on a 0–100 scale, computed quarterly across 4 governance dimensions: democratic quality, rule of law, freedoms & rights, and corruption control. Material outcomes (human development, peace & security, economic stability) live on the separate Civica Conditions companion layer at `/civica-conditions`. The Index draws on V-Dem, the World Bank Worldwide Governance Indicators, Freedom House, Transparency International, and supporting indices. Weights are PCA-derived (27/26/23/24, see `/civica-index/methodology/pca-appendix`), reference periods are frozen, and uncertainty intervals are produced via Monte Carlo simulation. Currently in BETA pending external academic review; the post-Beta cut-over is targeted for September 30, 2026.
 
 ### Civica Pulse — daily directional signal
 
-The Pulse is a daily, event-driven signal layered on top of the Index. It ingests governance-relevant events from CIVICUS Monitor, Human Rights Watch, Amnesty International, ACLED, the Inter-Parliamentary Union, GDELT, and other sources, then routes each event through a multi-run LLM classifier with three-temperature agreement scoring. Severe-tier events are routed to human review before publication. Asymmetric corroboration rules raise the bar for positive events and for events from countries with restricted press freedom. The full pipeline is backtested against ten named historical governance shocks. Currently in BETA.
+The Pulse is a daily, event-driven signal layered on top of the Index. It ingests governance-relevant events from CIVICUS Monitor, Human Rights Watch, Amnesty International, ACLED, the Inter-Parliamentary Union, GDELT, and other sources, then routes each event through a multi-run LLM classifier with three-temperature agreement scoring. Severe-tier events are routed to human review before publication. Asymmetric corroboration rules raise the bar for positive events and for events from countries with restricted press freedom. The full pipeline is backtested against 10 named historical governance shocks. Currently in BETA.
 
 ## How it works
 

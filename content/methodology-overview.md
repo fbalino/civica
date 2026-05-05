@@ -1,3 +1,11 @@
+<!--
+  Phase 3 update 2026-05-05: prose values mirror the rendered page at
+  src/app/(reader)/methodology/page.tsx, which interpolates against
+  src/lib/content/site-state.ts. When this markdown is migrated to
+  runtime rendering (Phase 5 design), inline counts get replaced
+  by `{{state.*}}` per the audit's §5.3 variable schema.
+-->
+
 # Methodology
 
 Every load-bearing methodology decision in Civica is documented as a citable resolution before the corresponding code ships. This page indexes every published methodology document on the site, organized by domain.
@@ -32,7 +40,7 @@ The Pulse is a daily directional signal layered on the Index. It ingests governa
 | Document | What it covers |
 |---|---|
 | [Pulse methodology](/civica-index/methodology/pulse) | The full pipeline — source taxonomy, multi-run classifier, severity tiers, corroboration rules, press-freedom modulation, decay function, double-counting prevention. |
-| [Pulse backtest](/civica-index/methodology/pulse/backtest) | Backtest results against ten named historical governance shocks (Myanmar 2021, Niger 2023, Tunisia 2021, Afghanistan 2021, Sri Lanka 2022, Brazil 2023, Hungary 2010-present, Ethiopia 2020–22, Colombia 2016, Poland 2023). |
+| [Pulse backtest](/civica-index/methodology/pulse/backtest) | Backtest results against 10 named historical governance shocks (Myanmar 2021, Niger 2023, Tunisia 2021, Afghanistan 2021, Sri Lanka 2022, Brazil 2023, Hungary 2010-present, Ethiopia 2020–22, Colombia 2016, Poland 2023). |
 
 ## Classification and peer grouping
 

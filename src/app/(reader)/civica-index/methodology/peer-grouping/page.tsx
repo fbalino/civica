@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { peerGrouping, civicaIndex } from "@/lib/content/site-state";
+
+const REVIEW_STATUS_LABEL: Record<"pending" | "in-review" | "complete", string> = {
+  pending: "Pending external review",
+  "in-review": "External review in progress",
+  complete: "Externally reviewed",
+};
 
 export const metadata: Metadata = {
   title: "Peer grouping in Civica — Methodology",
@@ -122,19 +129,27 @@ export default function PeerGroupingMethodologyPage() {
         Why countries are compared the way they are.
       </p>
       <div className="editorial-page-meta">
-        <span>Methodology v1.0</span>
+        <span>Methodology {peerGrouping.version}</span>
         <span>·</span>
-        <span>Adopted 2026-05-02</span>
+        <span>Adopted {peerGrouping.adoptedAt}</span>
         <span>·</span>
-        <span>Pending external review</span>
+        <span>
+          {REVIEW_STATUS_LABEL[peerGrouping.externalReviewStatus] ??
+            "Pending external review"}
+        </span>
       </div>
 
       <div className="editorial-warning">
-        <strong>Pending external review.</strong> This methodology page is
-        published in v1.0 form before external comparative-politics
-        review. Material revisions, if any, will ship as methodology
-        v1.1 with a documented changelog at the bottom of this page.
-        The underlying classifications (World Bank region, World Bank
+        <strong>
+          {REVIEW_STATUS_LABEL[peerGrouping.externalReviewStatus] ??
+            "Pending external review"}
+          .
+        </strong>{" "}
+        This methodology page is published in {peerGrouping.version}{" "}
+        form before external comparative-politics review. Material
+        revisions, if any, will ship as the next methodology version
+        with a documented changelog at the bottom of this page. The
+        underlying classifications (World Bank region, World Bank
         income group, V-Dem Regimes of the World, Bjørnskov-Rode / CGV)
         are externally-attested standards published by their respective
         institutions; Civica is citing them, not asserting a novel
@@ -255,13 +270,13 @@ export default function PeerGroupingMethodologyPage() {
         </p>
         <p>
           <strong>Transparency note on V-Dem dependency.</strong> The
-          Civica Index already uses V-Dem indicators in two of its four
-          dimensions (Democratic Quality, Rule of Law). Using V-Dem RoW
-          as the governance peer set is presentational only — it
-          determines which countries appear together in a ranking, not
-          how their scores are computed. The CI&rsquo;s scoring formula
-          is unchanged. There is no circularity, but the overlap is
-          worth disclosing.
+          Civica Index already uses V-Dem indicators in two of its{" "}
+          {civicaIndex.dimensionCount} dimensions (Democratic Quality,
+          Rule of Law). Using V-Dem RoW as the governance peer set is
+          presentational only — it determines which countries appear
+          together in a ranking, not how their scores are computed. The
+          CI&rsquo;s scoring formula is unchanged. There is no
+          circularity, but the overlap is worth disclosing.
         </p>
       </section>
 
@@ -596,12 +611,14 @@ export default function PeerGroupingMethodologyPage() {
       <section className="editorial-section" id="versioning">
         <h2>Versioning + changelog</h2>
         <ul>
-          <li>
-            <strong>v1.0 (2026-05-02).</strong> Initial publication.
-            Adopted via peer-grouping-resolution-v1. Pending external
-            review by a comparative-politics scholar; v1.1 entries
-            below if material revisions return.
-          </li>
+          {peerGrouping.versionHistory.map((entry) => (
+            <li key={entry.version}>
+              <strong>
+                {entry.version} ({entry.adoptedAt}).
+              </strong>{" "}
+              {entry.note}
+            </li>
+          ))}
         </ul>
       </section>
 

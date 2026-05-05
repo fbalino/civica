@@ -22,7 +22,7 @@ Country dossiers covering geography, demographics, government, economy, energy, 
 
 ### Civica Index — `/civica-index`
 
-An original composite governance score on a 0–100 scale, computed quarterly across six dimensions: democratic quality, rule of law, freedoms, corruption control, stability, and government effectiveness. Built on V-Dem, World Bank Worldwide Governance Indicators, UNDP Human Development Index, Freedom House, Transparency International CPI, Global Peace Index, and Fragile States Index. PCA-derived weights, frozen reference periods, Monte Carlo uncertainty intervals. Currently in BETA pending external methodological review.
+An original composite governance score on a 0–100 scale, computed quarterly across four governance dimensions: democratic quality, rule of law, freedoms & rights, and corruption control. Material conditions (human development, peace & security, economic stability) live on the separate `/civica-conditions` companion layer. Built on V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting indices. PCA-derived weights (27/26/23/24), frozen reference periods, Monte Carlo uncertainty intervals. Currently in BETA pending external methodological review.
 
 ### Civica Pulse — `/civica-index/pulse-changelog`
 
@@ -34,7 +34,7 @@ Most public country-data sites republish a single upstream source (usually CIA F
 
 Civica's pipeline is built on opposite premises:
 
-- **Multi-source reconciliation.** Currently 14 active source orchestrators (CIA Factbook, World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats, V-Dem, Wikidata) writing into a canonical `country_facts` table. ~26,000 reconciled facts across 88 declared fact-keys. v1 target is 11 Tier-1 publishers (live) plus 30–40 national statistics offices (in progress).
+- **Multi-source reconciliation.** Currently 20 active source orchestrators (CIA Factbook archive; the eleven Tier-1 publishers — World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats; V-Dem; Wikidata; and six national statistics offices already syncing — US Census, INSEE-FR, ONS-UK, IBGE-BR, Stats SA, Statistics Canada) writing into a canonical `country_facts` table. ~26,000 reconciled facts across 88 declared fact-keys. v1 target is 11 Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus 30–40 national statistics offices (first wave: 6 in progress; Destatis-DE deferred to v1.1; NBS-Nigeria permanently deferred).
 
 - **Per-fact provenance.** Every value on every reader-facing page renders a `<FactValueDot>` chevron. Click it and you see the canonical pick, every alternate source, the as-of date per source, the publisher's license, and the freshness winner. Disagreements above a configurable threshold create disputes routed to a human review queue.
 
@@ -42,7 +42,7 @@ Civica's pipeline is built on opposite premises:
 
 - **Multi-canonical with scope predicate.** When two Tier-1 publishers are concurrently authoritative for a fact-key in a defined scope (e.g., Eurostat + IMF + OECD all canonical for European public debt), the system honors all three rather than forcing one into "alternate."
 
-- **Citable methodology.** Every load-bearing methodology decision is documented as a resolution document with citations to peer institutions and academic literature. Currently 19+ adopted resolutions covering peer grouping, reconciliation rules, fact-key registry expansions, source allowlist, classification taxonomy, dispute thresholds, and more.
+- **Citable methodology.** Every load-bearing methodology decision is documented as a resolution document with citations to peer institutions and academic literature. Currently 30+ adopted resolutions covering peer grouping, reconciliation rules, fact-key registry expansions, source allowlist, classification taxonomy, dispute thresholds, NSO source decisions (per-country), and more.
 
 - **Honest beta posture.** Novel Civica-asserted methodologies (the Civica Index composite, the Pulse classifier, the reconciliation rules) ship with a BETA pill until external academic review. Civica-cited external methodologies (V-Dem Regimes of the World, World Bank classifications, Bjørnskov-Rode regime taxonomy) inherit the source's standing without a beta marker.
 
@@ -52,16 +52,18 @@ This is a pre-launch project. Honest snapshot:
 
 | Metric | Status |
 |---|---|
-| Active source orchestrators | 14 of 14 planned for Tier-1 (IEA scrapped due to license incompatibility) |
+| Active source orchestrators writing facts | 20 (11 Tier-1 + CIA archive + Wikidata + V-Dem + 6 NSO Wave 1) — IEA scrapped due to license incompatibility |
 | `country_facts` rows | ~26,000 across 88 declared fact-keys |
-| Multi-sourced fact-keys (≥2 sources) | 25 |
-| 5+ source fact-keys | 3 (population, life expectancy, unemployment) |
-| Adopted methodology resolution docs | 19+ |
-| NSO (national statistics office) syncs | In progress (US Census, ONS-UK, INSEE-FR, Destatis-DE, Statistics Canada, IBGE-BR, Stats SA, NBS-Nigeria as the first wave of 8) |
+| Multi-sourced fact-keys (≥2 sources, at least one country) | 27 |
+| 5+ source fact-keys | 5 (population, life expectancy, unemployment, inflation, public debt) |
+| Adopted methodology resolution docs | 30+ |
+| NSO (national statistics office) syncs | First wave: 6 in progress (US Census, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA); Destatis-DE deferred to v1.1 (Genesis-Online API requires manual account creation outside Civica's unattended-cron architecture; Eurostat republishes Destatis figures in the meantime); NBS-Nigeria permanently deferred (PDF/Excel-only data) |
 | External methodology review | Not yet — planned post-v1 |
 | Public launch | Pre-launch; URLs are live but no inbound traffic yet |
 
-The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index v1 methodology is published and stable; v2 (recalibrated weights, expanded indicator basket) is on the roadmap.
+The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in BETA, scored under the v2-Beta four-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`); the post-Beta stabilization cut-over is targeted for September 30, 2026 pending external academic review.
+
+For live numbers (active sources, fact counts, multi-sourced coverage), see `/about` — values are read directly from the database, not maintained as inline prose. Page values may briefly differ from the metrics above as new vintages land.
 
 Reader pages may show "BETA" markers in places where the underlying data layer or methodology is still being finalized. This is by design — silent staleness is dishonest; flagged staleness is academic discipline.
 
