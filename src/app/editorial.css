@@ -925,22 +925,20 @@
 .fact-value-trigger-more {
   display: inline-grid;
   place-items: center;
-  width: var(--space-3);
-  height: var(--space-3);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface-primary);
-  font-family: var(--font-body);
-  font-size: var(--text-10);
-  color: var(--color-text-60);
+  width: var(--space-4);
+  height: var(--space-4);
+  color: var(--color-text-40);
   line-height: var(--leading-none);
-  font-weight: 600;
 }
 .fact-value-trigger-more svg {
   display: block;
-  width: var(--space-2);
-  height: var(--space-2);
-  stroke-width: 2.25;
+  width: var(--space-4);
+  height: var(--space-4);
+  stroke-width: 2;
+}
+.fact-value-trigger:hover .fact-value-trigger-more,
+.fact-value-trigger:focus-visible .fact-value-trigger-more {
+  color: var(--color-text-primary);
 }
 
 /* The panel itself is positioned by `<FactValueDot>` via a React
