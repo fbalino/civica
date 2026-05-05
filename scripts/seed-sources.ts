@@ -400,6 +400,39 @@ const SOURCES = [
     isCommercialUseAllowed: true,
     lastSyncAt: null,
   },
+  // --- Phase R.17 — Statistics Canada (NSO Wave 2) ---
+  // Per ~/civica/plan/statcan-resolution-v1.md §3 step 1.
+  // Open token-less REST endpoint at www150.statcan.gc.ca; Statistics
+  // Canada Open Licence (commercial-use OK with attribution; functionally
+  // equivalent to CC-BY but governed by Ontario law and includes
+  // identification-via-merging + federal-logos prohibitions that CC-BY
+  // does not — license slug intentionally `statcan_open_licence`, not
+  // `CC-BY`).
+  {
+    id: "statcan_ca",
+    name: "Statistics Canada",
+    baseUrl: "https://www150.statcan.gc.ca/t1/wds/rest",
+    license: "Statistics Canada Open Licence",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  // --- Phase R.18 — IBGE (Brazil) (NSO Wave 2) ---
+  // Per ~/civica/plan/ibge-br-resolution-v1.md §3 step 1.
+  // Open token-less SIDRA REST endpoint at apisidra.ibge.gov.br;
+  // Brazilian Federal Open Data Policy via Decreto 8.777/2016
+  // + Lei 12.527/2011 (LAI) + Art. 8 Lei 9.610/1998. License
+  // slug `public_domain` matches R.13 US Census convention.
+  // Per-row `references[].license` payload carries the explicit
+  // Brazilian-framework descriptor for academic citation
+  // precision.
+  {
+    id: "ibge_br",
+    name: "IBGE (Brazil)",
+    baseUrl: "https://apisidra.ibge.gov.br",
+    license: "public_domain",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
 ];
 
 const METRIC_DEFINITIONS = [

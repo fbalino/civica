@@ -336,22 +336,41 @@ const TIER_2: AllowlistEntry[] = [
     // R.3 audit / 2026-05-04: corrected to Q1155740 (Statistics
     // Canada). The previous value Q801253 maps to "New Cross railway
     // station" (a London rail station) on live Wikidata.
+    //
+    // R.17 / 2026-05-04: stamped `civicaSourceId: "statcan_ca"` matching
+    // the new `sources` row added by R.17 (NSO Wave 2). The QID,
+    // domain, and tier are unchanged. Per
+    // `~/civica/plan/statcan-resolution-v1.md` §3 step 2 + §6 Q8.
     qid: "Q1155740",
     domains: ["statcan.gc.ca"],
     name: "Statistics Canada",
     tier: 2,
     countryIso2: "CA",
+    civicaSourceId: "statcan_ca",
   },
   {
     // R.3 audit / 2026-05-04: corrected to Q268072 (Instituto
     // Brasileiro de Geografia e Estatística — IBGE). The previous
     // value Q579149 maps to "Honkajoki" (a former Finnish
     // municipality) on live Wikidata.
+    //
+    // R.18 / 2026-05-05: stamped `civicaSourceId: "ibge_br"` matching
+    // the new `sources` row added by R.18 (NSO Wave 2). Added
+    // SIDRA + servicodados subdomains so per-row references that
+    // cite `apisidra.ibge.gov.br/...` URLs resolve to this Tier-2
+    // entry via the same allowlist matcher used by every other
+    // sync. Per `~/civica/plan/ibge-br-resolution-v1.md` §3 step 2.
     qid: "Q268072",
-    domains: ["ibge.gov.br"],
+    domains: [
+      "ibge.gov.br",
+      "sidra.ibge.gov.br",
+      "apisidra.ibge.gov.br",
+      "servicodados.ibge.gov.br",
+    ],
     name: "IBGE (Brazil)",
     tier: 2,
     countryIso2: "BR",
+    civicaSourceId: "ibge_br",
   },
   {
     // R.3 audit / 2026-05-04: corrected to Q795074 (National

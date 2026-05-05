@@ -84,6 +84,12 @@ export const SOURCE_LABELS: Record<string, string> = {
   // R.15 — NSO Wave 1, INSEE (France). Per
   // `~/civica/plan/insee-fr-resolution-v1.md` §3 step 3.
   insee_fr: "INSEE (France)",
+  // R.17 — NSO Wave 2, Statistics Canada. Per
+  // `~/civica/plan/statcan-resolution-v1.md` §3 step 3.
+  statcan_ca: "Statistics Canada",
+  // R.18 — NSO Wave 2, IBGE (Brazil). Per
+  // `~/civica/plan/ibge-br-resolution-v1.md` §3 step 3.
+  ibge_br: "IBGE (Brazil)",
 };
 
 export function sourceName(sourceId: string): string {

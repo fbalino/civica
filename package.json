@@ -63,6 +63,8 @@
     "sync:factbook:us-census": "tsx scripts/sync-factbook-us-census.ts",
     "sync:factbook:ons-uk": "tsx scripts/sync-factbook-ons-uk.ts",
     "sync:factbook:insee-fr": "tsx scripts/sync-factbook-insee-fr.ts",
+    "sync:factbook:ibge-br": "tsx scripts/sync-factbook-ibge-br.ts",
+    "sync:factbook:statcan-ca": "tsx scripts/sync-factbook-statcan-ca.ts",
     "snapshot:fact-vintage": "tsx scripts/snapshot-fact-vintage.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts"
