@@ -12,18 +12,22 @@ import { ciTier } from "@/lib/ci/tiers";
 function MetaPill({
   label,
   value,
+  note,
   dotColor,
   className,
 }: {
   label?: string;
   value: string;
+  note?: string | null;
   dotColor?: string;
   className?: string;
 }) {
+  const title = note ? `${value}; ${note}` : value;
+
   return (
     <span
       className={`factbook-meta-pill${className ? ` ${className}` : ""}`}
-      title={value}
+      title={title}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -53,6 +57,17 @@ function MetaPill({
       <span className="factbook-meta-pill-value" style={{ color: "var(--color-text-primary)" }}>
         {value}
       </span>
+      {note ? (
+        <button
+          type="button"
+          className="factbook-meta-pill-help"
+          aria-label={`${value}: ${note}`}
+          data-tooltip={note}
+          title={note}
+        >
+          ?
+        </button>
+      ) : null}
     </span>
   );
 }
@@ -103,6 +118,18 @@ function formatGdp(n: number | null | undefined): string | null {
   if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(1)}B`;
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
   return `$${n.toLocaleString()}`;
+}
+
+function splitGovernmentTypeLabel(label: string): {
+  value: string;
+  note: string | null;
+} {
+  const [value, ...noteParts] = label.split(";").map((part) => part.trim());
+  const note = noteParts.join("; ").trim();
+  return {
+    value: value || label,
+    note: note || null,
+  };
 }
 
 export function FactbookHeaderStrip({
@@ -176,6 +203,7 @@ export function FactbookHeaderStrip({
 
   const coverMap = mapImages[0];
   const coverPhoto = photos[0];
+  const governmentTypeDisplay = splitGovernmentTypeLabel(governmentTypeLabel);
 
   return (
     <>
@@ -191,7 +219,8 @@ export function FactbookHeaderStrip({
           <div className="factbook-hero-pills">
             {governmentTypeLabel && (
               <MetaPill
-                value={governmentTypeLabel}
+                value={governmentTypeDisplay.value}
+                note={governmentTypeDisplay.note}
                 className="factbook-meta-pill--government"
               />
             )}

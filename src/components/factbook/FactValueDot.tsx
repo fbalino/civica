@@ -23,6 +23,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Plus } from "lucide-react";
 import {
   FactValuePanel,
   type FactValuePanelProps,
@@ -225,7 +226,7 @@ export function FactValueDot({
           aria-hidden
         />
         <span className="fact-value-trigger-more" aria-hidden>
-          +
+          <Plus focusable="false" />
         </span>
         {isDisputed && (
           <span className="fact-value-disputed-chip">disputed</span>
