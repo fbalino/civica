@@ -77,38 +77,49 @@
   height: var(--space-4);
   padding: 0;
   margin: 0;
-  border: 1px solid var(--color-border-default);
-  border-radius: 50%;
-  background: var(--color-surface-primary);
-  color: var(--color-text-60);
-  font-family: var(--font-mono);
-  font-size: var(--text-10);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-40);
   line-height: var(--leading-none);
   cursor: help;
+}
+.factbook-meta-pill-help:hover,
+.factbook-meta-pill-help:focus-visible {
+  color: var(--color-text-primary);
+}
+.factbook-meta-pill-help:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: var(--space-1);
+}
+.factbook-meta-pill-help svg {
+  display: block;
+  width: var(--space-4);
+  height: var(--space-4);
+  stroke-width: 2;
 }
 .factbook-meta-pill-help::after {
   content: attr(data-tooltip);
   position: absolute;
-  left: 50%;
+  left: 0;
   bottom: calc(100% + var(--space-2));
-  transform: translateX(-50%);
   display: none;
-  width: max-content;
-  max-width: min(28rem, calc(100vw - var(--space-8)));
+  width: min(28rem, calc(100vw - var(--space-8)));
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-tooltip-border);
   border-radius: var(--radius-sm);
   background: var(--color-tooltip-bg);
   color: var(--color-tooltip-text);
-  font-family: var(--font-mono);
-  font-size: var(--text-11);
-  line-height: var(--leading-snug);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
   white-space: normal;
   text-align: left;
   z-index: 70;
   pointer-events: none;
 }
 .factbook-meta-pill-help:hover::after,
+.factbook-meta-pill-help:focus::after,
 .factbook-meta-pill-help:focus-visible::after {
   display: block;
 }
@@ -382,6 +393,15 @@
   .factbook-hero-pills {
     column-gap: var(--space-4);
     min-width: 0;
+  }
+  .factbook-meta-pill-help::after {
+    position: fixed;
+    top: calc(56px + var(--space-3));
+    right: var(--space-5);
+    bottom: auto;
+    left: var(--space-5);
+    width: auto;
+    max-width: none;
   }
   .factbook-meta-pill--government {
     max-width: 100%;

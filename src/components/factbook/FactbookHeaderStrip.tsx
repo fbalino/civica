@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Info } from "lucide-react";
 import { CountryFlag } from "@/components/CountryFlag";
 import { CountrySwitcherChips } from "./CountrySwitcherChips";
 import { FactbookLightbox, type LightboxImage } from "./FactbookLightbox";
@@ -22,12 +23,10 @@ function MetaPill({
   dotColor?: string;
   className?: string;
 }) {
-  const title = note ? `${value}; ${note}` : value;
-
   return (
     <span
       className={`factbook-meta-pill${className ? ` ${className}` : ""}`}
-      title={title}
+      title={note ? undefined : value}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -63,9 +62,8 @@ function MetaPill({
           className="factbook-meta-pill-help"
           aria-label={`${value}: ${note}`}
           data-tooltip={note}
-          title={note}
         >
-          ?
+          <Info focusable="false" />
         </button>
       ) : null}
     </span>
