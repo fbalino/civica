@@ -1172,6 +1172,92 @@ const GROUP_B: FactKeyInput[] = [
     envelope: { min: 0, max: 50_000_000 },
     materialErrorPctThreshold: 0.5,
   },
+
+  // ─── Phase R.13 — US Census Bureau (NSO Wave 1, first phase).
+  //     New fact-key declared inline per Mode B precedent (R.6 HDI,
+  //     R.8 FAO). Rationale: all 8 NSOs in Wave 1 (US Census, ONS-UK,
+  //     INSEE-FR, Destatis-DE, Statistics Canada, IBGE-BR, Stats SA,
+  //     NBS-Nigeria) publish median household income as a foundational
+  //     statistic; declaring once at R.13 enables R.14–R.20 to populate
+  //     the same fact-key without re-deciding. Civica has no
+  //     analogous income measurement currently — UNDP's
+  //     `gni_per_capita_ppp_usd` is GNI per capita using PPP, a
+  //     different statistic.
+  //
+  //     Per `~/civica/plan/us-census-resolution-v1.md` §2c.4 +
+  //     Open Question Q3 (sign-off Option A: declare inline). ───
+  {
+    // ACS 1-Year Profile DP03_0062E for the US (probe 2026-05-05:
+    // $77,719 for ACS 2023 1-Year; $80,610 for ACS 2024 1-Year).
+    // Range across other NSOs: low-income NSOs publish ~$1k median;
+    // high-income NSOs ~$80–90k. Envelope [500, 200_000] gives margin
+    // without restricting the legitimate distribution.
+    //
+    // higherIsBetter: true — higher household income is unambiguously
+    // a positive indicator of material well-being. Same convention
+    // as `gdp_per_capita_usd`.
+    key: "median_household_income_usd",
+    group: "B",
+    category: "economy",
+    label: "Median household income",
+    unit: "USD",
+    envelope: { min: 500, max: 200_000 },
+    higherIsBetter: true,
+    materialErrorPctThreshold: 0.5,
+  },
+
+  // ─── Phase R.14 — ONS-UK (NSO Wave 1, second phase).
+  //     New fact-key declared inline per the R.12 trade-aggregate
+  //     two-fact-key precedent (`exports_merchandise_usd` vs
+  //     `exports_goods_services_usd` — both ship; both display;
+  //     tooltip explains scope).
+  //
+  //     ONS publishes UK fiscal data under "Public Sector Net Debt
+  //     excluding public sector banks" (HF6X), a UK-specific narrower
+  //     scope than the IMF/OECD/Eurostat Maastricht-style General
+  //     Government Gross Debt that populates the existing
+  //     `public_debt_pct_gdp` fact-key. The two are NOT alternates
+  //     of one another — they are different concepts that ONS publishes
+  //     separately and that headline UK reporting cites side-by-side.
+  //     Surfacing both as canonical for the SAME `public_debt_pct_gdp`
+  //     fact-key would mix incommensurable measurements.
+  //
+  //     The R.14 user override (sign-off 2026-05-05) pulled this from
+  //     v1.1 into v1 ship via the R.12 precedent: declare a UK-only
+  //     fact-key for the PSND-excl-PSB measure. Existing
+  //     `public_debt_pct_gdp` (Maastricht definition) keeps WB/IMF/
+  //     OECD/Eurostat as canonicals globally and continues unchanged.
+  //
+  //     UK live values for context (probed 2026-05-04):
+  //       - ONS HF6X (PSND excl. PSB) 2025 = 95.0% GDP
+  //       - IMF GG-Gross-Debt UK 2031 forecast = 102.6% GDP
+  //       - OECD UK 2022 = 103.6% GDP
+  //       - WB UK 2024 = 131.1% GDP (different methodology again)
+  //
+  //     `materialErrorPpThreshold: 50` — same as the v0.1 default.
+  //     Unlike `public_debt_pct_gdp` (raised to 300 per
+  //     `canonical-pick-vs-freshness-investigation-v1.md` §11c), this
+  //     fact-key is single-publisher (ONS only); no multi-source
+  //     dispute volume requires the wider threshold. Future cross-NSO
+  //     ingestion (e.g. when other NSOs publish PSND-style debt under
+  //     national methodologies) may revisit.
+  //
+  //     `higherIsBetter: false` — like Maastricht debt, more PSND is
+  //     a worse fiscal-stability signal.
+  //
+  //     Per `~/civica/plan/ons-uk-resolution-v1.md` §6 Q3 (sign-off
+  //     override: pulled into v1 from v1.1) + R.12 trade-aggregate
+  //     precedent. ───
+  {
+    key: "public_debt_psnd_pct_gdp",
+    group: "B",
+    category: "economy",
+    label: "Public Sector Net Debt (excl. public sector banks)",
+    unit: "% of GDP",
+    envelope: { min: 0, max: 400, isPercent: false },
+    higherIsBetter: false,
+    materialErrorPpThreshold: 50,
+  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────

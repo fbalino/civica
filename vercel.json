@@ -27,6 +27,9 @@
     { "path": "/api/cron/factbook/sync-fao-faostat", "schedule": "0 15 8 1,4,7,10 *" },
     { "path": "/api/cron/factbook/sync-ilo-ilostat", "schedule": "0 9 5 11 *" },
     { "path": "/api/cron/factbook/sync-eurostat", "schedule": "0 16 9 1,4,7,10 *" },
-    { "path": "/api/cron/factbook/sync-wto-stats", "schedule": "0 9 25 1,4,7,10 *" }
+    { "path": "/api/cron/factbook/sync-wto-stats", "schedule": "0 9 25 1,4,7,10 *" },
+    { "path": "/api/cron/factbook/sync-insee-fr", "schedule": "0 4 1 * *" },
+    { "path": "/api/cron/factbook/sync-us-census", "schedule": "0 18 11 1,4,7,10 *" },
+    { "path": "/api/cron/factbook/sync-ons-uk", "schedule": "0 19 11 1,4,7,10 *" }
   ]
 }

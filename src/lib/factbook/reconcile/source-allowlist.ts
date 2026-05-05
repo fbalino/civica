@@ -320,11 +320,17 @@ const TIER_2: AllowlistEntry[] = [
     // R.3 audit / 2026-05-04: corrected to Q637413 (United States
     // Census Bureau). The previous value Q668509 maps to
     // "Oberheimbach" (a German municipality) on live Wikidata.
+    //
+    // R.13 / 2026-05-05: stamped `civicaSourceId: "us_census"` matching
+    // the new `sources` row added by R.13 (NSO Wave 1, first phase).
+    // The QID, domain, and tier are unchanged. Per
+    // `~/civica/plan/us-census-resolution-v1.md` §3 step 2 + §6 Q8.
     qid: "Q637413",
     domains: ["census.gov"],
     name: "US Census Bureau",
     tier: 2,
     countryIso2: "US",
+    civicaSourceId: "us_census",
   },
   {
     // R.3 audit / 2026-05-04: corrected to Q1155740 (Statistics
@@ -400,22 +406,38 @@ const TIER_2: AllowlistEntry[] = [
     // R.3 audit / 2026-05-04: corrected to Q1334971 (Office for
     // National Statistics — ONS UK). The previous value Q1334420
     // maps to "Elya Baskin" (a Russian actor) on live Wikidata.
+    //
+    // R.14 / 2026-05-05: stamped `civicaSourceId: "ons_uk"` matching
+    // the new `sources` row added by R.14 (NSO Wave 1, ONS-UK). The
+    // QID, domain, and tier are unchanged. Per
+    // `~/civica/plan/ons-uk-resolution-v1.md` §3 step 7 + §6 Q6.
     qid: "Q1334971",
     domains: ["ons.gov.uk"],
     name: "ONS (UK)",
     tier: 2,
     countryIso2: "GB",
+    civicaSourceId: "ons_uk",
   },
   {
     // R.3 audit / 2026-05-04: corrected to Q156616 (National
     // Institute of Statistics and Economic Studies — INSEE France).
     // The previous value Q156521 maps to "Andrea Doria" (a
     // 16th-century Genoese admiral) on live Wikidata.
+    //
+    // R.15 / 2026-05-05: stamped `civicaSourceId: "insee_fr"` matching
+    // the new `sources` row, so the Wikidata reference-tier
+    // promotion logic recognises INSEE references as Tier 2 and the
+    // R.15 sync's references payload resolves to the matching
+    // `sources` row. Added `bdm.insee.fr` domain explicitly for the
+    // open SDMX endpoint used by R.15 (matches via the `insee.fr`
+    // suffix matcher anyway, but belt-and-braces). See
+    // `~/civica/plan/insee-fr-resolution-v1.md` §3 step 2.
     qid: "Q156616",
-    domains: ["insee.fr"],
+    domains: ["insee.fr", "bdm.insee.fr"],
     name: "INSEE (France)",
     tier: 2,
     countryIso2: "FR",
+    civicaSourceId: "insee_fr",
   },
   {
     // R.3 audit / 2026-05-04: corrected to Q764739 (Federal

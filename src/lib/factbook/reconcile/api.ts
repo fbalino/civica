@@ -75,6 +75,15 @@ export const SOURCE_LABELS: Record<string, string> = {
   wto_stats: "WTO Stats",
   vdem: "V-Dem",
   undp_hdi: "UNDP HDR",
+  // R.13 — NSO Wave 1, first phase. Per
+  // `~/civica/plan/us-census-resolution-v1.md` §3 step 9.
+  us_census: "US Census Bureau",
+  // R.14 — NSO Wave 1, ONS (UK). Per
+  // `~/civica/plan/ons-uk-resolution-v1.md` §3 step 6.
+  ons_uk: "ONS (UK)",
+  // R.15 — NSO Wave 1, INSEE (France). Per
+  // `~/civica/plan/insee-fr-resolution-v1.md` §3 step 3.
+  insee_fr: "INSEE (France)",
 };
 
 export function sourceName(sourceId: string): string {

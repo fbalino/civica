@@ -360,6 +360,46 @@ const SOURCES = [
     isCommercialUseAllowed: true,
     lastSyncAt: null,
   },
+  // --- Phase R.13 — US Census Bureau (NSO Wave 1, first phase) ---
+  // Per ~/civica/plan/us-census-resolution-v1.md §3 step 1.
+  // U.S. Government works are public domain (17 U.S.C. § 105);
+  // commercial use OK with required attribution notice ("This product
+  // uses the Census Bureau Data API but is not endorsed or certified
+  // by the Census Bureau"). Cleanest license posture in v1.
+  {
+    id: "us_census",
+    name: "US Census Bureau",
+    baseUrl: "https://api.census.gov/data",
+    license: "public_domain",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  // --- Phase R.14 — ONS-UK (NSO Wave 1, second phase) ---
+  // Per ~/civica/plan/ons-uk-resolution-v1.md §3 step 7 + §6 Q4
+  // (license string `OGL-UK-3.0`). The ONS sync also defensively
+  // upserts this row at sync start so cron deploys without a fresh
+  // `seed:sources` run still work; this entry is the canonical seed.
+  {
+    id: "ons_uk",
+    name: "Office for National Statistics (UK)",
+    baseUrl: "https://www.ons.gov.uk",
+    license: "OGL-UK-3.0",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
+  // --- Phase R.15 — INSEE (France) (NSO Wave 1) ---
+  // Per ~/civica/plan/insee-fr-resolution-v1.md §3 step 1.
+  // Open token-less SDMX endpoint at bdm.insee.fr; Etalab Open
+  // Licence v2.0 (commercial-OK with attribution; SPDX
+  // `Etalab-2.0`).
+  {
+    id: "insee_fr",
+    name: "INSEE (France)",
+    baseUrl: "https://www.bdm.insee.fr",
+    license: "Etalab Open Licence v2.0",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
 ];
 
 const METRIC_DEFINITIONS = [

@@ -31,6 +31,10 @@ import { buildOrgChartFromGovernmentStructure } from "@/lib/factbook/gov-org-cha
 import { FactbookLegislature } from "@/components/factbook/FactbookLegislature";
 import { FactbookLeaders } from "@/components/factbook/FactbookLeaders";
 import { FactbookBills } from "@/components/factbook/FactbookBills";
+import {
+  FactbookAdditionalIndicators,
+  hasAdditionalIndicators,
+} from "@/components/factbook/FactbookAdditionalIndicators";
 import { ScoresAndRankings } from "@/components/scores/ScoresAndRankings";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
@@ -76,10 +80,19 @@ const SECTION_PLAN: SectionPlan[] = [
   { kind: "factbook", id: "terrorism", label: "Terrorism", sourceKey: "terrorism" },
   { kind: "factbook", id: "space", label: "Space", sourceKey: "space" },
   { kind: "factbook", id: "transnational", label: "Transnational Issues", sourceKey: "transnational_issues" },
-  // Scores & Rankings sits at the very end — the long-tail reference data
+  // Scores & Rankings sits near the end — the long-tail reference data
   // above stays organized while the curated Civica scores anchor the
   // conclusion of the page.
   { kind: "civica", id: "scores", label: "Scores & Rankings" },
+  // R.13 — Additional Indicators is the bottom-of-page home for any
+  // Civica-curated reader-facing fact-key that does NOT map to a CIA
+  // Factbook prose group. First row: median household income for the
+  // United States (US Census ACS 1-Year). Future R.14–R.20 NSOs and
+  // any new Civica-asserted fact-keys land here. Visibility is gated
+  // on `hasAdditionalIndicators(headerFacts)` so the section + sidebar
+  // entry only appear when a row has data. Per
+  // `~/civica/plan/us-census-resolution-v1.md` §3 + user 2026-05-05.
+  { kind: "civica", id: "additional-indicators", label: "Additional Indicators" },
 ];
 
 const FACTBOOK_RETRIEVED_AT = "2026-01-23";
@@ -188,11 +201,22 @@ export default async function FactbookCountryPage({
       "gdp_real_growth_rate",
       "inflation_rate",
       "public_debt_pct_gdp",
+      // R.14 — Public Sector Net Debt (excl. PSB), ONS-UK only. Renders
+      // as a sibling row to the Maastricht-style `public_debt_pct_gdp`
+      // canonical inside the "Public debt" group via
+      // `MULTI_YEAR_GROUP_TO_AUX_FACT_KEYS`. Non-UK pages skip the row
+      // silently because no `ons_uk` row exists for them. Per
+      // `~/civica/plan/ons-uk-resolution-v1.md` §6 Q3.
+      "public_debt_psnd_pct_gdp",
       "unemployment_rate_pct",
       "current_account_balance_usd",
       "exports_goods_services_usd",
       "imports_goods_services_usd",
       "military_expenditure_pct_gdp",
+      // R.13 — Additional Indicators section. Fact-keys consumed by
+      // <FactbookAdditionalIndicators>. Add to this batch when adding
+      // a row to ADDITIONAL_INDICATOR_ROWS.
+      "median_household_income_usd",
     ]).catch(
       () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>
     ),
@@ -202,6 +226,12 @@ export default async function FactbookCountryPage({
   const hasLeaders = leadersRows.length > 0;
   const hasBills = !!billsResult && billsResult.rows.length > 0;
   const hasScores = scoresRows.length > 0;
+  // R.13 — visibility gate for the Additional Indicators section. True
+  // when at least one row in ADDITIONAL_INDICATOR_ROWS has a canonical
+  // resolver row for this jurisdiction. The component reuses
+  // `headerFacts` from the resolver batch above, so this is a cheap
+  // synchronous check.
+  const hasAdditional = hasAdditionalIndicators(headerFacts);
 
   const sectionDataMap = new Map(
     sections.map((s) => [s.sectionName, s.sectionData])
@@ -215,6 +245,7 @@ export default async function FactbookCountryPage({
       if (s.id === "leaders") return hasLeaders;
       if (s.id === "bills") return hasBills;
       if (s.id === "scores") return hasScores;
+      if (s.id === "additional-indicators") return hasAdditional;
       return true;
     }
     const data = sectionDataMap.get(s.sourceKey);
@@ -472,6 +503,10 @@ export default async function FactbookCountryPage({
                     variant="factbook"
                   />
                 )}
+                {section.kind === "civica" &&
+                  section.id === "additional-indicators" && (
+                    <FactbookAdditionalIndicators resolverFacts={headerFacts} />
+                  )}
 
                 {fields.length > 0 ? (
                   <FactbookSection
