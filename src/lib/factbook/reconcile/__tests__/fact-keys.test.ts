@@ -114,6 +114,13 @@ test("Legacy CIA fact_keys are all classified", () => {
   // (verified 0 rows in `country_facts`). It is intentionally NOT in
   // this list. The new OECD-canonical `tax_revenue_pct_gdp` replaces
   // it. See `~/civica/plan/fact-key-registry-expansion-resolution-v1.md`.
+  //
+  // Phase R.12 (2026-05-04) note: the legacy `exports_total` and
+  // `imports_total` declarations were removed and the rows in
+  // `country_facts` migrated to `exports_goods_services_usd` /
+  // `imports_goods_services_usd` (CIA reports goods+services in its
+  // Factbook prose). They are intentionally NOT in this list. See
+  // `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d.
   const legacyKeys = [
     "agriculture_products",
     "birth_rate",
@@ -126,12 +133,10 @@ test("Legacy CIA fact_keys are all classified", () => {
     "ethnic_groups",
     "export_commodities",
     "export_partners",
-    "exports_total",
     "gdp_growth_rate",
     "gdp_per_capita_ppp",
     "gdp_ppp",
     "import_partners",
-    "imports_total",
     "industries",
     "inflation_rate",
     "land_area",
@@ -235,6 +240,50 @@ test("R.7.5 — GER fact-keys allow values >100 (over-age enrollment)", () => {
     assert.equal(def!.envelope!.max, 200);
     assert.equal(def!.envelope!.isPercent, false,
       "GER envelope must NOT be isPercent: true (would clamp to 101)");
+  }
+});
+
+test("R.12 — legacy trade aggregate fact-keys are removed", () => {
+  // Per `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d.
+  // The two `*_total_usd` declarations and two CIA-prose `*_total`
+  // aliases are collapsed into the four-fact-key trade split.
+  for (const removed of [
+    "exports_total",
+    "exports_total_usd",
+    "imports_total",
+    "imports_total_usd",
+  ]) {
+    assert.equal(
+      getFactKey(removed),
+      undefined,
+      `${removed} should be removed; replaced by the merchandise/goods_services split per R.12`,
+    );
+  }
+});
+
+test("R.12 — 4 new trade aggregate fact-keys are declared", () => {
+  // Per `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d step 5.
+  // All Group B economy, USD unit, envelope [100_000, 5e12],
+  // materialErrorPctThreshold 0.8.
+  const newKeys = [
+    "exports_merchandise_usd",
+    "exports_goods_services_usd",
+    "imports_merchandise_usd",
+    "imports_goods_services_usd",
+  ];
+  for (const key of newKeys) {
+    const def = getFactKey(key);
+    assert.ok(def, `R.12 fact-key '${key}' missing from registry`);
+    assert.equal(def!.group, "B", `R.12 fact-key '${key}' should be Group B`);
+    assert.equal(def!.category, "economy",
+      `R.12 fact-key '${key}' should be category 'economy'`);
+    assert.equal(def!.unit, "USD", `R.12 fact-key '${key}' unit should be USD`);
+    assert.equal(def!.envelope!.min, 100_000);
+    assert.equal(def!.envelope!.max, 5_000_000_000_000);
+    assert.equal(def!.materialErrorPctThreshold, 0.8);
+    assert.equal(def!.higherIsBetter, undefined,
+      `R.12 fact-key '${key}' higherIsBetter should be undefined ` +
+      `(more trade is not unambiguously better)`);
   }
 });
 

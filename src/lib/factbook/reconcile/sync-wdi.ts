@@ -292,25 +292,35 @@ export const WDI_INDICATORS: readonly WdiIndicatorConfig[] = [
     civicaRole: "canonical",
   },
 
-  // Trade: 2 indicators (exports, imports). Note: existing CIA rows
-  // store on the legacy `exports_total` / `imports_total` keys
-  // (not the `_usd` aliases). WB writes to the `_usd` aliases per
-  // the resolution; resolver's per-fact lookup handles the alias.
+  // Trade: 2 indicators (exports, imports). Phase R.12 split the
+  // single `exports_total_usd` / `imports_total_usd` fact-keys into a
+  // two-fact-key shape because WTO and WB measure different things
+  // under similar names. WB's `NE.EXP.GNFS.CD` ships goods+services
+  // (BoP concept); WTO's `ITS_MTV_AX` ships merchandise only. Civica
+  // declares one fact-key per measurement and treats them as distinct
+  // facts rather than alternates of one. Per
+  // `~/civica/plan/trade-aggregate-fact-keys-v1.md` (ADOPTED
+  // 2026-05-04). WB writes to `*_goods_services_usd`, WTO writes to
+  // `*_merchandise_usd`. Both publishers tag canonical for their
+  // respective fact-key; no alternate handoff at R.12 since they no
+  // longer share a fact-key.
   {
     wbCode: "NE.EXP.GNFS.CD",
-    factKey: "exports_total_usd",
+    factKey: "exports_goods_services_usd",
     label: "Exports of goods and services (current US$)",
     docUrl: "https://data.worldbank.org/indicator/NE.EXP.GNFS.CD",
-    // WTO canonical at R.12; WB alternate.
-    civicaRole: "alternate",
+    // WB canonical for the goods+services aggregate (BoP/national-
+    // accounts-style measurement). WTO at R.12 ships the
+    // merchandise-only counterpart at `exports_merchandise_usd`.
+    civicaRole: "canonical",
   },
   {
     wbCode: "NE.IMP.GNFS.CD",
-    factKey: "imports_total_usd",
+    factKey: "imports_goods_services_usd",
     label: "Imports of goods and services (current US$)",
     docUrl: "https://data.worldbank.org/indicator/NE.IMP.GNFS.CD",
-    // WTO canonical at R.12; WB alternate.
-    civicaRole: "alternate",
+    // WB canonical for the goods+services aggregate (see exports).
+    civicaRole: "canonical",
   },
 
   // Labour: 1 indicator (unemployment).

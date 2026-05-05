@@ -363,10 +363,16 @@ async function _loadAtlasData(): Promise<{
     retrievedAt: null,
   };
 
+  // Phase R.12 — `exports_total` / `imports_total` renamed to
+  // `exports_goods_services_usd` / `imports_goods_services_usd` per
+  // `~/civica/plan/trade-aggregate-fact-keys-v1.md`. The masthead's
+  // trade-balance computation reads from the goods+services aggregate
+  // (the broader BoP-aligned measure that CIA reports in its Factbook
+  // prose; preserves the prior masthead semantics).
   const mastheadFactKeys = [
     "export_commodities",
-    "exports_total",
-    "imports_total",
+    "exports_goods_services_usd",
+    "imports_goods_services_usd",
     "languages",
     "literacy_rate",
     "religions",
@@ -577,8 +583,18 @@ async function _loadAtlasData(): Promise<{
       formatArea(cachedArea) ??
       formatArea(Math.round(facts.get("total_area")?.factValueNumeric ?? 0)) ??
       factText("total_area");
-    const exportsValue = facts.get("exports_total")?.factValueNumeric;
-    const importsValue = facts.get("imports_total")?.factValueNumeric;
+    // Phase R.12 — read from the goods+services aggregate keys (CIA prose
+    // is goods+services per its Factbook glossary; the legacy
+    // `exports_total` / `imports_total` aliases were renamed to
+    // `exports_goods_services_usd` / `imports_goods_services_usd` in-band
+    // with R.12's first sync run). Per
+    // `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d.
+    const exportsValue = facts.get(
+      "exports_goods_services_usd"
+    )?.factValueNumeric;
+    const importsValue = facts.get(
+      "imports_goods_services_usd"
+    )?.factValueNumeric;
     const tradeBalance =
       typeof exportsValue === "number" && typeof importsValue === "number"
         ? `${exportsValue - importsValue >= 0 ? "+" : "-"}${formatMoneyDollars(

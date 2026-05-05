@@ -260,9 +260,17 @@ const TIER_1: AllowlistEntry[] = [
     // previous value Q58373 maps to "Amun" (an ancient Egyptian deity)
     // on live Wikidata — entirely unrelated to the EU statistical
     // office. Same bug-class as R.0/R.2.
+    //
+    // R.11 / 2026-05-04: stamped `civicaSourceId: "eurostat"` matching
+    // the existing `sources` row so the Wikidata reference-tier
+    // promotion logic recognises Eurostat references as Tier 1 and
+    // the R.11 sync's references payload resolves to the matching
+    // `sources` row. See `~/civica/plan/eurostat-resolution-v1.md` §3
+    // step 11 + §6 Q7.
     qid: "Q217659",
     domains: ["ec.europa.eu/eurostat", "eurostat.ec.europa.eu"],
     name: "Eurostat",
+    civicaSourceId: "eurostat",
     tier: 1,
   },
   {
@@ -270,9 +278,21 @@ const TIER_1: AllowlistEntry[] = [
     // Organization). The previous value Q210913 returned a 404 on
     // live Wikidata — the QID did not resolve to any entity.
     // Same bug-class as R.0/R.2.
+    //
+    // R.12 / 2026-05-04: added `data.wto.org` to cover the WTO Data
+    // Portal CKAN endpoint (used for vintage probes during sync
+    // startup) and `api.wto.org` for the keyed REST API surface
+    // (R.12's sync uses the keyless bulk path under stats.wto.org,
+    // but a Wikidata reference may cite the API host). Stamped
+    // `civicaSourceId: "wto_stats"` matching the existing `sources`
+    // row, so the Wikidata reference-tier promotion logic recognises
+    // WTO references as Tier 1 and the R.12 sync's references payload
+    // resolves to the matching `sources` row. See
+    // `~/civica/plan/wto-stats-resolution-v1.md` §3 step 8 + §6 Q8.
     qid: "Q7825",
-    domains: ["stats.wto.org", "wto.org"],
+    domains: ["stats.wto.org", "data.wto.org", "api.wto.org", "wto.org"],
     name: "WTO Stats",
+    civicaSourceId: "wto_stats",
     tier: 1,
   },
 ];

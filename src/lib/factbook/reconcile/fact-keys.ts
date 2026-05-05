@@ -569,40 +569,64 @@ const GROUP_B: FactKeyInput[] = [
     higherIsBetter: false,
     materialErrorPpThreshold: 50,
   },
+  // Phase R.12 — `exports_total`, `exports_total_usd`, `imports_total`,
+  // `imports_total_usd` removed.
+  //
+  // Replaced by the two-fact-key trade aggregate split per
+  // `~/civica/plan/trade-aggregate-fact-keys-v1.md` §2d (ADOPTED
+  // 2026-05-04). The two legacy `_usd` declarations and two CIA-prose
+  // aliases were collapsed into:
+  //   - `exports_merchandise_usd` (WTO Stats canonical) — goods only
+  //   - `exports_goods_services_usd` (World Bank canonical) — goods + services
+  //   - `imports_merchandise_usd` (WTO Stats canonical) — goods only
+  //   - `imports_goods_services_usd` (World Bank canonical) — goods + services
+  //
+  // The 171 + 171 WB rows for `exports_total_usd` / `imports_total_usd`
+  // and the 210 + 209 CIA rows for the legacy `exports_total` /
+  // `imports_total` aliases were renamed in-place via SQL UPDATE during
+  // R.12's first sync run (idempotent: the migration is gated by a
+  // `WHERE fact_key = '<old>'` check that no-ops on subsequent runs).
+  // CIA's prose values fold into `_goods_services_usd` because CIA
+  // reports goods+services in its Factbook glossary; WB's `civicaRole`
+  // flips back to `'canonical'` since WB is the canonical publisher of
+  // the goods+services aggregate post-R.12.
+  //
+  // Per `~/civica/plan/wto-stats-resolution-v1.md` §3.4.
   {
-    key: "exports_total",
+    key: "exports_merchandise_usd",
     group: "B",
     category: "economy",
-    label: "Exports",
+    label: "Exports of merchandise",
     unit: "USD",
     envelope: { min: 100_000, max: 5_000_000_000_000 },
-    higherIsBetter: true,
+    materialErrorPctThreshold: 0.8,
+    // higherIsBetter: undefined — more exports is not unambiguously
+    // "better" (export concentration risks, currency-driven swings,
+    // commodity vs. manufacturing mix all complicate the value-judgment).
+  },
+  {
+    key: "exports_goods_services_usd",
+    group: "B",
+    category: "economy",
+    label: "Exports of goods and services",
+    unit: "USD",
+    envelope: { min: 100_000, max: 5_000_000_000_000 },
     materialErrorPctThreshold: 0.8,
   },
   {
-    key: "exports_total_usd",
+    key: "imports_merchandise_usd",
     group: "B",
     category: "economy",
-    label: "Exports",
-    unit: "USD",
-    envelope: { min: 100_000, max: 5_000_000_000_000 },
-    higherIsBetter: true,
-    materialErrorPctThreshold: 0.8,
-  },
-  {
-    key: "imports_total",
-    group: "B",
-    category: "economy",
-    label: "Imports",
+    label: "Imports of merchandise",
     unit: "USD",
     envelope: { min: 100_000, max: 5_000_000_000_000 },
     materialErrorPctThreshold: 0.8,
   },
   {
-    key: "imports_total_usd",
+    key: "imports_goods_services_usd",
     group: "B",
     category: "economy",
-    label: "Imports",
+    label: "Imports of goods and services",
     unit: "USD",
     envelope: { min: 100_000, max: 5_000_000_000_000 },
     materialErrorPctThreshold: 0.8,

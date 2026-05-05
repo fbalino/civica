@@ -58,6 +58,8 @@
     "sync:factbook:oecd-stat": "tsx scripts/sync-factbook-oecd-stat.ts",
     "sync:factbook:fao-faostat": "tsx scripts/sync-factbook-fao-faostat.ts",
     "sync:factbook:ilo-ilostat": "tsx scripts/sync-factbook-ilo-ilostat.ts",
+    "sync:factbook:eurostat": "tsx scripts/sync-factbook-eurostat.ts",
+    "sync:factbook:wto-stats": "tsx scripts/sync-factbook-wto-stats.ts",
     "snapshot:fact-vintage": "tsx scripts/snapshot-fact-vintage.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts"
