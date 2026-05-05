@@ -470,7 +470,16 @@ const GROUP_B: FactKeyInput[] = [
     unit: "% of GDP",
     envelope: { min: 0, max: 400, isPercent: false },
     higherIsBetter: false,
-    materialErrorPpThreshold: 50,
+    // Threshold raised 50 → 300 (2026-05-05) — companion to inflation_rate
+    // hot-fix. DB probe found 4 blocked cases (Bolivia, Eritrea, Somalia,
+    // Venezuela), all confirmed real-world economic events on stale CIA
+    // snapshots: Bolivia post-COVID rise (53.7 pp); Eritrea opaque
+    // accumulation (127.6 pp); Somalia HIPC debt relief Dec 2023 — $4.5B
+    // written off (80.3 pp); Venezuela economic collapse (269.8 pp). Same
+    // C1 methodology as inflation_rate; 300 pp comfortably handles
+    // Venezuela (max gap) while still catching gross errors.
+    // Audit trail: ~/civica/plan/canonical-pick-vs-freshness-investigation-v1.md §11c
+    materialErrorPpThreshold: 300,
   },
   {
     // Phase R.2 — General government net lending/borrowing as % of GDP.
