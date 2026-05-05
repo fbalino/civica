@@ -14,12 +14,13 @@
  */
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { countryFacts, dataDisputes } from "@/lib/db/schema";
+import { countryFacts, dataDisputes, jurisdictions } from "@/lib/db/schema";
 import {
   getFactKey,
   type FactKeyDefinition,
 } from "@/lib/factbook/reconcile/fact-keys";
 import { isAllowedReference } from "@/lib/factbook/reconcile/source-allowlist";
+import { isNsoForJurisdiction } from "@/lib/factbook/reconcile/nso-overrides";
 import type {
   DecisionReason,
   FactRow,
@@ -43,6 +44,16 @@ export interface ResolverOptions {
   /** Inject a row set directly, bypassing the DB read. Used by
    *  tests and by replay against `fact_snapshots`. */
   rows?: FactRow[];
+  /**
+   * ISO-3166-1 alpha-3 code for the jurisdiction being resolved.
+   * When provided, the NSO for that country wins tied-date races
+   * over other Tier-1 publishers (NSO-priority-tier patch, R.13–R.20).
+   *
+   * `resolveFact()` looks this up from the `jurisdictions` table
+   * automatically. Tests that call `resolveFromRows()` directly should
+   * pass it here so they don't need a DB connection.
+   */
+  jurisdictionIso3?: string | null;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -77,7 +88,17 @@ export async function resolveFact(
   }
 
   const rows = options?.rows ?? (await readRows(jurisdictionId, factKey));
-  const pure = resolveFromRows(rows, def);
+
+  // NSO-priority-tier patch (R.13–R.20): look up the ISO3 once so
+  // resolveFromRows can apply the NSO tiebreak deterministically.
+  // Prefer an injected value (for tests / vintage replay via options)
+  // over the DB lookup to keep resolveFact() mockable without a DB.
+  const jurisdictionIso3 =
+    options?.jurisdictionIso3 !== undefined
+      ? options.jurisdictionIso3
+      : await readJurisdictionIso3(jurisdictionId);
+
+  const pure = resolveFromRows(rows, def, jurisdictionIso3);
 
   const isDisputed = await readIsDisputed(jurisdictionId, factKey);
 
@@ -92,10 +113,17 @@ export async function resolveFact(
 /**
  * Pure resolution. No IO. Apply methodology §3 rules to the row
  * set and return canonical / alternates / proposed disputes.
+ *
+ * @param jurisdictionIso3 - ISO-3166-1 alpha-3 for the jurisdiction.
+ *   When supplied, the NSO for that country wins tied-date races over
+ *   other Tier-1 publishers (NSO-priority-tier patch, R.13–R.20).
+ *   Omit (or pass null) to use the pre-patch 3-tier priority; this is
+ *   the correct behaviour for jurisdictions with no registered NSO.
  */
 export function resolveFromRows(
   rows: FactRow[],
-  def: FactKeyDefinition
+  def: FactKeyDefinition,
+  jurisdictionIso3?: string | null
 ): Omit<ResolverOutput, "jurisdictionId" | "factKey" | "isDisputed"> {
   const all = [...rows];
 
@@ -177,7 +205,7 @@ export function resolveFromRows(
     return resolveGroupC(candidatePool, cia, nonCia, enforced, def, proposedDisputes);
   }
   // Group B — fast-changing quantitative.
-  return resolveGroupB(candidatePool, cia, nonCia, enforced, def, proposedDisputes);
+  return resolveGroupB(candidatePool, cia, nonCia, enforced, def, proposedDisputes, jurisdictionIso3);
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -258,7 +286,8 @@ function resolveGroupB(
   _nonCia: FactRow[],
   all: FactRow[],
   def: FactKeyDefinition,
-  base: ProposedDispute[]
+  base: ProposedDispute[],
+  jurisdictionIso3?: string | null
 ): Omit<ResolverOutput, "jurisdictionId" | "factKey" | "isDisputed"> {
   // §3.3 — fresher allow-listed source wins, with two guards.
   // Prior canonical is CIA when available, else the freshest active
@@ -270,14 +299,31 @@ function resolveGroupB(
       .sort((a, b) => freshness(b) - freshness(a))[0] ??
     lowestTierFirst(active);
 
-  // Sort challengers freshest-first; on tie, prefer direct primary
-  // sources (anything not Wikidata, not CIA) over the Wikidata pipe.
-  // This ensures §12.1 Nigeria-pop scenario picks World Bank rather
-  // than Wikidata when both quote the same year.
+  // Sort challengers freshest-first; on tie, prefer the row with the
+  // lowest priority number (higher priority).
+  //
+  // NSO-priority-tier patch (R.13–R.20):
+  //   Tier 0 — NSO for own country: deterministic NSO-prefer for tied
+  //             dates (Eurozone coexistence fix — see nso-overrides.ts
+  //             and ~/civica/plan/insee-fr-resolution-v1.md §"Eurostat
+  //             coexistence handling").
+  //   Tier 1 — direct primary publishers (World Bank, IMF, UN, OECD,
+  //             Eurostat, any non-Wikidata non-CIA non-NSO source).
+  //   Tier 2 — Wikidata (identity spine, not a primary measurement source).
+  //   Tier 3 — CIA Factbook (frozen Jan 2026; last preference among ties).
+  //
+  // For countries without a registered NSO, NSO-tier is never
+  // assigned (isNsoForJurisdiction returns false), so the old
+  // 3-tier behaviour is preserved exactly.
   const sourcePriority = (r: FactRow): number => {
-    if (r.sourceId === "cia_factbook") return 2; // last preference among ties
-    if (r.sourceId === "wikidata") return 1;
-    return 0; // direct primary (World Bank, IMF, UN, NSO) wins ties
+    // Tier 0 — NSO for own country (deterministic NSO-prefer for tied dates)
+    if (isNsoForJurisdiction(r.sourceId, jurisdictionIso3)) return 0;
+    // Tier 3 — least preference for ties (CIA Factbook is frozen Jan 2026)
+    if (r.sourceId === "cia_factbook") return 3;
+    // Tier 2 — Wikidata is the identity spine, not a primary measurement source
+    if (r.sourceId === "wikidata") return 2;
+    // Tier 1 — direct primary publishers (World Bank, IMF, UN, OECD, Eurostat, ...)
+    return 1;
   };
   const challengers = active
     .filter((r) => r.id !== prior.id)
@@ -545,6 +591,26 @@ async function readRows(
     .orderBy(desc(countryFacts.retrievedAt));
 
   return dbRows.map(rowFromDb);
+}
+
+/**
+ * Look up the ISO-3166-1 alpha-3 code for a jurisdiction by its
+ * internal UUID. Returns null for non-sovereign territories (Vatican,
+ * Taiwan, Western Sahara) that may lack an iso3 value.
+ *
+ * NSO-priority-tier patch (R.13–R.20): called once per `resolveFact()`
+ * invocation so `resolveGroupB` can apply the NSO tiebreak without
+ * an extra round-trip inside the pure resolution logic.
+ */
+async function readJurisdictionIso3(
+  jurisdictionId: string
+): Promise<string | null> {
+  const rows = await db
+    .select({ iso3: jurisdictions.iso3 })
+    .from(jurisdictions)
+    .where(eq(jurisdictions.id, jurisdictionId))
+    .limit(1);
+  return rows[0]?.iso3 ?? null;
 }
 
 async function readIsDisputed(
