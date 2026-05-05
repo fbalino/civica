@@ -565,11 +565,24 @@ const TIER_2: AllowlistEntry[] = [
     // R.3 audit / 2026-05-04: corrected to Q7604433 (Statistics
     // South Africa). The previous value Q3500630 maps to "bird egg"
     // (a natural history concept) on live Wikidata.
+    //
+    // R.19 / 2026-05-05: stamped `civicaSourceId: "stats_sa"` matching
+    // the new R.19 ingestion. Domain list extended to include the
+    // sub-domains that publish data programmatically — defensive
+    // against future Wikidata references that may cite SuperWEB2 /
+    // Nesstar / ISIbalo URLs rather than the bare statssa.gov.za.
+    // Per `~/civica/plan/stats-sa-resolution-v1.md` §6 Q5.
     qid: "Q7604433",
-    domains: ["statssa.gov.za"],
+    domains: [
+      "statssa.gov.za",
+      "superweb.statssa.gov.za",
+      "nesstar.statssa.gov.za",
+      "isibaloweb.statssa.gov.za",
+    ],
     name: "Statistics South Africa",
     tier: 2,
     countryIso2: "ZA",
+    civicaSourceId: "stats_sa",
   },
   {
     domains: ["nigerianstat.gov.ng"],

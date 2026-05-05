@@ -90,6 +90,9 @@ export const SOURCE_LABELS: Record<string, string> = {
   // R.18 — NSO Wave 2, IBGE (Brazil). Per
   // `~/civica/plan/ibge-br-resolution-v1.md` §3 step 3.
   ibge_br: "IBGE (Brazil)",
+  // R.19 — NSO Wave 3, Stats SA (South Africa). Per
+  // `~/civica/plan/stats-sa-resolution-v1.md` §3 step 3.
+  stats_sa: "Statistics South Africa",
 };
 
 export function sourceName(sourceId: string): string {

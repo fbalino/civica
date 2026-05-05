@@ -433,6 +433,28 @@ const SOURCES = [
     isCommercialUseAllowed: true,
     lastSyncAt: null,
   },
+  // --- Phase R.19 — Stats SA (South Africa) (NSO Wave 3) ---
+  // Per ~/civica/plan/stats-sa-resolution-v1.md §3 step 1 + §6 Q6.
+  // Stats SA has no programmatic API; R.19 ingests headline
+  // values from PDF statistical releases at stable URLs under
+  // `/publications/<P-CODE>/`, extracted via Anthropic SDK
+  // native PDF support (Claude Haiku 4.5, tool-use mode,
+  // temperature 0). The `baseUrl` field is the publishing root.
+  //
+  // License: Stats SA Copyright (CC-BY-4.0 equivalent) per the
+  // verbatim text at https://www.statssa.gov.za/?page_id=425 —
+  // attribution required, commercial-use OK, redistribution OK,
+  // modification OK; no share-alike. NOT an SPDX-listed license,
+  // mirroring R.17 StatCan's non-SPDX human-readable convention.
+  // Per-row `references[].license` carries the full citation.
+  {
+    id: "stats_sa",
+    name: "Statistics South Africa",
+    baseUrl: "https://www.statssa.gov.za",
+    license: "Stats SA Copyright (CC-BY-4.0 equivalent)",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
 ];
 
 const METRIC_DEFINITIONS = [

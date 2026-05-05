@@ -65,6 +65,7 @@
     "sync:factbook:insee-fr": "tsx scripts/sync-factbook-insee-fr.ts",
     "sync:factbook:ibge-br": "tsx scripts/sync-factbook-ibge-br.ts",
     "sync:factbook:statcan-ca": "tsx scripts/sync-factbook-statcan-ca.ts",
+    "sync:factbook:stats-sa": "tsx scripts/sync-factbook-stats-sa.ts",
     "snapshot:fact-vintage": "tsx scripts/snapshot-fact-vintage.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts"
@@ -80,6 +81,7 @@
     "lucide-react": "^1.11.0",
     "next": "16.2.3",
     "next-mdx-remote": "^6.0.0",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
