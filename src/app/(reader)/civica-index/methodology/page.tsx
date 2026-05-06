@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import {
   getCIMethodology,
   getCIMethodologyHistory,
@@ -771,6 +772,13 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
           </Link>
           .
         </p>
+
+        <h3>13.4 · Generate a citation</h3>
+        <CiteAccordion
+          subject="Civica Atlas Methodology — Civica Index methodology (Beta)"
+          pageTitle="Civica Index methodology"
+          url="https://civicaatlas.org/civica-index/methodology"
+        />
       </section>
 
       {/* ────────────────────────────────────────────────────── */}

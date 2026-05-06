@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { civicaIndex } from "@/lib/content/site-state";
 
@@ -139,6 +140,7 @@ const SECTIONS = [
   { id: "five-dim", label: "Fifth dimension" },
   { id: "limitations", label: "Limitations" },
   { id: "reproduction", label: "Reproduction" },
+  { id: "cite", label: "Cite this page" },
 ];
 
 export default function PcaAppendixPage() {
@@ -542,6 +544,15 @@ export default function PcaAppendixPage() {
             <a href="https://docs.astral.sh/uv/">uv</a> and the lockfile
             is committed for reproducibility.
           </p>
+        </section>
+
+        <section className="editorial-section" id="cite">
+          <h2>Cite this page</h2>
+          <CiteAccordion
+            subject="Civica Atlas Methodology — PCA appendix"
+            pageTitle="PCA appendix"
+            url="https://civicaatlas.org/civica-index/methodology/pca-appendix"
+          />
         </section>
       </article>
 

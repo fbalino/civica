@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { Pill } from "@/components/editorial/Pill";
 import {
@@ -367,6 +368,7 @@ export default async function BacktestReportPage() {
       id: c.id,
       label: c.countryName,
     })),
+    { id: "cite", label: "Cite this page" },
   ];
 
   return (
@@ -461,6 +463,15 @@ export default async function BacktestReportPage() {
       {snapshot.map((c) => (
         <CaseSection key={c.id} caseRow={c} />
       ))}
+
+      <section className="editorial-section" id="cite">
+        <h2>Cite this page</h2>
+        <CiteAccordion
+          subject="Civica Atlas Methodology — Pulse backtest report (Beta)"
+          pageTitle="Pulse backtest report"
+          url="https://civicaatlas.org/civica-index/methodology/pulse/backtest"
+        />
+      </section>
 
       <nav
         className="editorial-footer-nav"

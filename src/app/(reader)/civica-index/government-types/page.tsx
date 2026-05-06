@@ -17,7 +17,11 @@ import {
   getCIByGovernmentTypeDots,
   getGovTypeTrajectory,
 } from "@/lib/db/queries";
-import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
+import {
+  getCanonicalFactsForJurisdictions,
+  FACTBOOK_RECONCILIATION_META,
+} from "@/lib/factbook/reconcile/api";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 
 export const metadata: Metadata = {
   title: "Civica Index by Peer Lens — Bi-Lens Explorer",
@@ -393,44 +397,63 @@ export default async function GovernmentTypesPage({
   const totalCountries = dots.length;
 
   return (
-    <GovernmentTypesAccordionExplorer
-      families={families}
-      totalCountries={totalCountries}
-      lensTitle={
-        lens === "regime"
-          ? "Regime type (Bjørnskov-Rode / CGV)"
-          : "V-Dem Regimes of the World"
-      }
-      lensSummary={
-        lens === "regime"
-          ? "Bjørnskov-Rode / CGV is the alternate accountability lens. Six published categories distinguishing democratic systems by executive form (parliamentary / presidential / semi-presidential) and authoritarian systems by ruling-elite structure (civilian / military / royal)."
-          : "V-Dem Regimes of the World is the default governance lens (Lührmann et al. 2018). Four tiers spanning closed autocracy through liberal democracy. See methodology for why this replaced the retired structural_family heuristic."
-      }
-      axisLabel={
-        lens === "regime"
-          ? "Y-AXIS: BR / CGV REGIME TYPE · X-AXIS: CIVICA INDEX 0–100 · WHITE BAR: AVG"
-          : "Y-AXIS: V-DEM ROW TIER · X-AXIS: CIVICA INDEX 0–100 · WHITE BAR: AVG"
-      }
-      plotHelper={
-        lens === "regime"
-          ? "These are the published BR/CGV accountability categories. Use V-Dem RoW for the default governance lens."
-          : "Default lens. Switch to BR/CGV for the alternate executive-form classification."
-      }
-      footerLabel={lens === "regime" ? "regime types" : "RoW tiers"}
-      lensTabs={[
-        {
-          id: "vdem_row",
-          label: "V-Dem RoW",
-          href: buildLensHref("vdem_row", quarter),
-          active: lens === "vdem_row",
-        },
-        {
-          id: "regime",
-          label: "BR / CGV regime",
-          href: buildLensHref("regime", quarter),
-          active: lens === "regime",
-        },
-      ]}
-    />
+    <>
+      <GovernmentTypesAccordionExplorer
+        families={families}
+        totalCountries={totalCountries}
+        lensTitle={
+          lens === "regime"
+            ? "Regime type (Bjørnskov-Rode / CGV)"
+            : "V-Dem Regimes of the World"
+        }
+        lensSummary={
+          lens === "regime"
+            ? "Bjørnskov-Rode / CGV is the alternate accountability lens. Six published categories distinguishing democratic systems by executive form (parliamentary / presidential / semi-presidential) and authoritarian systems by ruling-elite structure (civilian / military / royal)."
+            : "V-Dem Regimes of the World is the default governance lens (Lührmann et al. 2018). Four tiers spanning closed autocracy through liberal democracy. See methodology for why this replaced the retired structural_family heuristic."
+        }
+        axisLabel={
+          lens === "regime"
+            ? "Y-AXIS: BR / CGV REGIME TYPE · X-AXIS: CIVICA INDEX 0–100 · WHITE BAR: AVG"
+            : "Y-AXIS: V-DEM ROW TIER · X-AXIS: CIVICA INDEX 0–100 · WHITE BAR: AVG"
+        }
+        plotHelper={
+          lens === "regime"
+            ? "These are the published BR/CGV accountability categories. Use V-Dem RoW for the default governance lens."
+            : "Default lens. Switch to BR/CGV for the alternate executive-form classification."
+        }
+        footerLabel={lens === "regime" ? "regime types" : "RoW tiers"}
+        lensTabs={[
+          {
+            id: "vdem_row",
+            label: "V-Dem RoW",
+            href: buildLensHref("vdem_row", quarter),
+            active: lens === "vdem_row",
+          },
+          {
+            id: "regime",
+            label: "BR / CGV regime",
+            href: buildLensHref("regime", quarter),
+            active: lens === "regime",
+          },
+        ]}
+      />
+
+      <section
+        id="cite"
+        className="editorial-section"
+        style={{
+          maxWidth: 760,
+          margin: "0 auto",
+          padding: "var(--space-8) var(--space-5)",
+        }}
+      >
+        <h2>Cite this page</h2>
+        <CiteAccordion
+          subject={`Civica Atlas — Government Types Explorer — ${FACTBOOK_RECONCILIATION_META.vintage}`}
+          pageTitle="Government Types Explorer"
+          url="https://civicaatlas.org/civica-index/government-types"
+        />
+      </section>
+    </>
   );
 }

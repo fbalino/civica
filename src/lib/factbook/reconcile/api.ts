@@ -114,6 +114,60 @@ export function sourceName(sourceId: string): string {
 }
 
 /**
+ * Pure helper: turn a list of distinct source IDs into the
+ * `[{ id, name }]` shape the `<CiteAccordion>` consumes, sorted
+ * alphabetically by display name with `CIA World Factbook` and
+ * `Wikidata` pinned to the end (matches the curated-list order on
+ * the reconciliation methodology page).
+ *
+ * Exported for unit-test access. Production callers should prefer
+ * `getDistinctActiveSourcesForJurisdiction()` below, which wraps
+ * the DB query.
+ */
+export function labelAndSortSourceIds(
+  sourceIds: ReadonlyArray<string>
+): { id: string; name: string }[] {
+  const PIN_TO_END = new Set(["cia_factbook", "wikidata"]);
+  const labelled = sourceIds.map((id) => ({ id, name: sourceName(id) }));
+  labelled.sort((a, b) => {
+    const aPin = PIN_TO_END.has(a.id);
+    const bPin = PIN_TO_END.has(b.id);
+    if (aPin !== bPin) return aPin ? 1 : -1;
+    return a.name.localeCompare(b.name);
+  });
+  return labelled;
+}
+
+/**
+ * Distinct active source IDs that wrote rows for a given jurisdiction.
+ *
+ * Used by the per-country `<CiteAccordion>` on `/factbook/[slug]` to
+ * derive the dynamic `sourceNames` list — Marshall Islands has 10
+ * sources, the United States has 14, Argentina has 13. A static list
+ * would misrepresent every country.
+ *
+ * Single SQL hit (`SELECT DISTINCT source_id FROM country_facts WHERE
+ * jurisdiction_id = $1 AND status = 'active'`).
+ *
+ * Methodology: ~/civica/plan/cite-accordion-rollout-v1.md §4.
+ */
+export async function getDistinctActiveSourcesForJurisdiction(
+  jurisdictionId: string
+): Promise<{ id: string; name: string }[]> {
+  const rows = await db
+    .selectDistinct({ sourceId: countryFacts.sourceId })
+    .from(countryFacts)
+    .where(
+      and(
+        eq(countryFacts.jurisdictionId, jurisdictionId),
+        eq(countryFacts.status, "active")
+      )
+    );
+
+  return labelAndSortSourceIds(rows.map((r) => r.sourceId));
+}
+
+/**
  * One alternate source's data, as serialised in the public API's
  * `provenance.{field}.alternates` array.
  */

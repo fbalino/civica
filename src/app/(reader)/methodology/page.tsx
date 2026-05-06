@@ -6,6 +6,7 @@ import {
   type ReaderSidebarItem,
 } from "@/components/editorial/ReaderSidebar";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
@@ -147,6 +148,7 @@ const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "peer-grouping", label: "Peer grouping" },
   { id: "beta-meaning", label: "BETA meaning" },
   { id: "not-yet-published", label: "Not yet published" },
+  { id: "cite", label: "Cite this page" },
 ];
 
 export default function MethodologyHubPage() {
@@ -268,6 +270,19 @@ export default function MethodologyHubPage() {
             <Link href="/contact">contact us</Link>. External review is an
             explicit project goal, not a hypothetical.
           </p>
+        </section>
+
+        <section
+          id="cite"
+          className="editorial-section"
+          aria-labelledby="cite-heading"
+        >
+          <h2 id="cite-heading">Cite this page</h2>
+          <CiteAccordion
+            subject="Civica Atlas Methodology — Methodology hub"
+            pageTitle="Methodology hub"
+            url="https://civicaatlas.org/methodology"
+          />
         </section>
       </article>
     </EditorialPage>

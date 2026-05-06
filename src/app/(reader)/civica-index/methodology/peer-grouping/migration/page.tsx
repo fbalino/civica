@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import {
   getPeerGroupingMigrationTable,
   type PeerGroupingMigrationRow,
@@ -39,6 +40,7 @@ export default async function PeerGroupingMigrationPage() {
       items={[
         { id: "how-to-read", label: "How to read" },
         { id: "table", label: "The table" },
+        { id: "cite", label: "Cite this page" },
       ]}
       contentClassName="methodology-content--wide"
     >
@@ -147,6 +149,15 @@ export default async function PeerGroupingMigrationPage() {
             </table>
           </div>
         )}
+      </section>
+
+      <section className="editorial-section" id="cite">
+        <h2>Cite this page</h2>
+        <CiteAccordion
+          subject="Civica Atlas Methodology — Peer-grouping migration table"
+          pageTitle="Peer-grouping migration table"
+          url="https://civicaatlas.org/civica-index/methodology/peer-grouping/migration"
+        />
       </section>
 
       <footer className="editorial-footer-nav">

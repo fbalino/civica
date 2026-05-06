@@ -4,6 +4,7 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { pulse, disputeSla } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
@@ -48,6 +49,7 @@ const SECTIONS = [
   { id: "coverage-limitations", label: "Coverage limitations" },
   { id: "known-limitations", label: "Known limitations" },
   { id: "corrections", label: "Corrections" },
+  { id: "cite", label: "Cite this page" },
 ];
 
 export default function PulseMethodologyPage() {
@@ -863,6 +865,15 @@ export default function PulseMethodologyPage() {
           {disputeSla.initialResponseDays} days initial response,{" "}
           {disputeSla.fullDispositionDays} days full disposition.
         </p>
+      </section>
+
+      <section className="editorial-section" id="cite">
+        <h2>Cite this page</h2>
+        <CiteAccordion
+          subject="Civica Atlas Methodology — Pulse methodology (Beta)"
+          pageTitle="Pulse methodology"
+          url="https://civicaatlas.org/civica-index/methodology/pulse"
+        />
       </section>
 
       <nav className="editorial-footer-nav" aria-label="Methodology navigation">

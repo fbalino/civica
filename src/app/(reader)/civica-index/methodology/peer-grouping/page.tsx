@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { peerGrouping, civicaIndex } from "@/lib/content/site-state";
 import { STRUCTURAL_FAMILY_SUNSET_DATE_ISO } from "@/lib/api/deprecation";
@@ -109,6 +110,7 @@ const SECTIONS = [
   { id: "migration-table", label: "Migration table" },
   { id: "versioning", label: "Versioning" },
   { id: "references", label: "References" },
+  { id: "cite", label: "Cite this page" },
 ];
 
 export default function PeerGroupingMethodologyPage() {
@@ -769,6 +771,15 @@ export default function PeerGroupingMethodologyPage() {
             <code>peer-grouping-deliberation-transcript.md</code>).
           </li>
         </ol>
+      </section>
+
+      <section className="editorial-section" id="cite">
+        <h2>Cite this page</h2>
+        <CiteAccordion
+          subject="Civica Atlas Methodology — Peer grouping"
+          pageTitle="Peer grouping"
+          url="https://civicaatlas.org/civica-index/methodology/peer-grouping"
+        />
       </section>
 
       <footer className="editorial-footer-nav">

@@ -38,7 +38,12 @@ import {
 } from "@/components/factbook/FactbookAdditionalIndicators";
 import { ScoresAndRankings } from "@/components/scores/ScoresAndRankings";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
-import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
+import {
+  getCanonicalFactsForJurisdiction,
+  getDistinctActiveSourcesForJurisdiction,
+  FACTBOOK_RECONCILIATION_META,
+} from "@/lib/factbook/reconcile/api";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 // Outcomes section is intentionally NOT imported. The dense peer-band
 // graph at <FactbookOutcomes>/<FactbookOutcomesGraph> is shipped in the
 // repo but the underlying peer-comparison methodology needs work before
@@ -161,6 +166,7 @@ export default async function FactbookCountryPage({
     scoresRows,
     countryOptions,
     headerFacts,
+    citeSources,
   ] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -221,6 +227,13 @@ export default async function FactbookCountryPage({
     ]).catch(
       () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>
     ),
+    // Per-country distinct active sources for the page-bottom
+    // <CiteAccordion>. Soft-fail to [] so a Neon hiccup doesn't 500
+    // the whole page; the accordion renders fine without source names.
+    // Methodology: ~/civica/plan/cite-accordion-rollout-v1.md §4.
+    getDistinctActiveSourcesForJurisdiction(jurisdiction.id).catch(
+      () => [] as Array<{ id: string; name: string }>
+    ),
   ]);
 
   const hasLegislature = !!legislatureData;
@@ -260,10 +273,15 @@ export default async function FactbookCountryPage({
     return jsonbToFields(data).length > 0;
   });
 
-  const sidebarItems: FactbookSidebarItem[] = visibleSections.map((s) => ({
-    id: s.id,
-    label: s.label,
-  }));
+  const sidebarItems: FactbookSidebarItem[] = [
+    ...visibleSections.map((s) => ({
+      id: s.id,
+      label: s.label,
+    })),
+    // Cite anchor sits below all data sections — methodology:
+    // ~/civica/plan/cite-accordion-rollout-v1.md §5.
+    { id: "cite", label: "Cite this page" },
+  ];
 
   const ciScore =
     ciDetail?.composite?.score != null
@@ -540,6 +558,28 @@ export default async function FactbookCountryPage({
               </section>
             );
           })}
+
+          {/* Per-country citation footer. Sits at the bottom of the
+              main content column, below all data sections, above the
+              AI drawer overlay. Sidebar TOC anchors to #cite via
+              sidebarItems above. Methodology:
+              ~/civica/plan/cite-accordion-rollout-v1.md §3.3 + §5. */}
+          <section
+            id="cite"
+            className="editorial-section"
+            aria-labelledby="cite-heading"
+          >
+            <h2 id="cite-heading">Cite this page</h2>
+            <CiteAccordion
+              subject={`Civica Atlas — ${jurisdiction.name} — vintage ${
+                FACTBOOK_RECONCILIATION_META.vintage.split("vintage ")[1] ?? ""
+              }`}
+              pageTitle={`${jurisdiction.name} factbook`}
+              url={`https://civicaatlas.org/factbook/${slug}`}
+              downloadSlug={slug}
+              sourceNames={citeSources.map((s) => s.name)}
+            />
+          </section>
         </div>
 
         <FactbookRightRail

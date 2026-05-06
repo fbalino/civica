@@ -27,6 +27,8 @@ import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { Pill } from "@/components/editorial/Pill";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
+import { FACTBOOK_RECONCILIATION_META } from "@/lib/factbook/reconcile/api";
 import {
   getPublicDisputeFeed,
   getPublicDisputeFilterDistributions,
@@ -855,6 +857,19 @@ export default async function PublicDisputesPage({ searchParams }: PageProps) {
           )}
         </nav>
       ) : null}
+
+      <section
+        id="cite"
+        className="editorial-section"
+        style={{ marginTop: "var(--space-7)" }}
+      >
+        <h2>Cite this page</h2>
+        <CiteAccordion
+          subject={FACTBOOK_RECONCILIATION_META.vintage}
+          pageTitle="Data disputes log"
+          url="https://civicaatlas.org/factbook/methodology/reconciliation/disputes"
+        />
+      </section>
 
       <footer
         className="editorial-footer-nav"

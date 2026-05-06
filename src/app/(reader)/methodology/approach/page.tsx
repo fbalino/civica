@@ -6,6 +6,7 @@ import {
   type ReaderSidebarItem,
 } from "@/components/editorial/ReaderSidebar";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
 import {
   tier1Publishers,
@@ -33,6 +34,7 @@ const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "rolling-out", label: "Still rolling out" },
   { id: "dig-deeper", label: "Dig deeper" },
   { id: "contact", label: "Get in touch" },
+  { id: "cite", label: "Cite this page" },
 ];
 
 export default async function ApproachPage() {
@@ -419,6 +421,19 @@ export default async function ApproachPage() {
             treat external feedback as load-bearing &mdash; the
             project&apos;s academic standing depends on it.
           </p>
+        </section>
+
+        <section
+          id="cite"
+          className="editorial-section"
+          aria-labelledby="cite-heading"
+        >
+          <h2 id="cite-heading">Cite this page</h2>
+          <CiteAccordion
+            subject="Civica Atlas Methodology — How we approach data"
+            pageTitle="How we approach data"
+            url="https://civicaatlas.org/methodology/approach"
+          />
         </section>
       </article>
     </EditorialPage>

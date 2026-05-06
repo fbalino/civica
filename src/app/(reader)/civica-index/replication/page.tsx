@@ -4,6 +4,7 @@ import { Banner } from "@/components/editorial/Banner";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
 import { replication, civicaIndex } from "@/lib/content/site-state";
 
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
 
 const SECTIONS = [
   { id: "package-contents", label: "Package contents" },
+  { id: "cite", label: "Cite this page" },
 ];
 
 const REPLICATION_STATUS_LABEL: Record<string, string> = {
@@ -111,6 +113,15 @@ export default async function ReplicationPage() {
               — only the processing code that consumes them.
             </li>
           </ul>
+        </section>
+
+        <section id="cite" className="editorial-section">
+          <h2>Cite this page</h2>
+          <CiteAccordion
+            subject="Civica Atlas Methodology — Civica Index replication package"
+            pageTitle="Civica Index replication package"
+            url="https://civicaatlas.org/civica-index/replication"
+          />
         </section>
 
         <footer className="editorial-footer-nav">
