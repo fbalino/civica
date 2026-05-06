@@ -1,9 +1,9 @@
 import {
-  DIMENSION_LABELS,
-  DIMENSION_ORDER,
-  DIMENSION_WEIGHTS,
-  type CIDimensionKey,
-} from "@/lib/ci/dimensions";
+  V2_DIMENSIONS,
+  V2_DIMENSION_LABELS,
+  V2_WEIGHTS,
+  type CIDimensionV2,
+} from "@/lib/ci/dimensions-v2";
 import { CompareTimelineOverlay } from "./CompareTimelineOverlay";
 import type { compareCICountries, getCICountryHistory } from "@/lib/db/queries";
 import { ciTier } from "@/lib/ci/tiers";
@@ -45,8 +45,8 @@ export function CompareCivicaIndex({
   const hasTimeline = timelineSeries.some((s) => s.data.length >= 2);
 
   // Head-to-head insights only when exactly 2 countries
-  type DimRow = { dim: CIDimensionKey; values: (number | null)[] };
-  const dimRows: DimRow[] = DIMENSION_ORDER.map((dim) => {
+  type DimRow = { dim: CIDimensionV2; values: (number | null)[] };
+  const dimRows: DimRow[] = V2_DIMENSIONS.map((dim) => {
     const values = ordered.map((country) => {
       const d = country.dimensions.find((x) => x.dimension === dim);
       return d && d.normalizedScore !== null && d.normalizedScore !== undefined
@@ -56,8 +56,8 @@ export function CompareCivicaIndex({
     return { dim, values };
   });
 
-  let insightA: { country: string; dim: CIDimensionKey; delta: number } | null = null;
-  let insightB: { country: string; dim: CIDimensionKey; delta: number } | null = null;
+  let insightA: { country: string; dim: CIDimensionV2; delta: number } | null = null;
+  let insightB: { country: string; dim: CIDimensionV2; delta: number } | null = null;
 
   if (ordered.length === 2) {
     const diffs = dimRows
@@ -67,7 +67,7 @@ export function CompareCivicaIndex({
         if (a === null || b === null) return null;
         return { dim: r.dim, a, b, delta: a - b };
       })
-      .filter(Boolean) as { dim: CIDimensionKey; a: number; b: number; delta: number }[];
+      .filter(Boolean) as { dim: CIDimensionV2; a: number; b: number; delta: number }[];
     const aLead = diffs.filter((d) => d.delta > 0).sort((x, y) => y.delta - x.delta);
     const bLead = diffs.filter((d) => d.delta < 0).sort((x, y) => x.delta - y.delta);
     if (aLead[0]) {
@@ -182,11 +182,11 @@ export function CompareCivicaIndex({
               ))}
             <div style={{ textAlign: "right" }}>Weight</div>
           </div>
-          {DIMENSION_ORDER.map((dim) => {
-            const weight = DIMENSION_WEIGHTS[dim];
+          {V2_DIMENSIONS.map((dim) => {
+            const weight = Math.round(V2_WEIGHTS[dim] * 100);
             return (
               <div key={dim} className="dim-compare-row">
-                <div className="dim-name">{DIMENSION_LABELS[dim]}</div>
+                <div className="dim-name">{V2_DIMENSION_LABELS[dim]}</div>
                 {ordered.map((country, i) => {
                   const d = country.dimensions.find(
                     (x) => x.dimension === dim
@@ -256,7 +256,7 @@ export function CompareCivicaIndex({
               <div className="h2h-body">
                 {insightA.country} scores{" "}
                 <strong>{insightA.delta.toFixed(1)} points</strong> higher on{" "}
-                <em>{DIMENSION_LABELS[insightA.dim]}</em>, its largest advantage
+                <em>{V2_DIMENSION_LABELS[insightA.dim]}</em>, its largest advantage
                 in this matchup.
               </div>
             </article>
@@ -268,9 +268,9 @@ export function CompareCivicaIndex({
               </div>
               <div className="h2h-body">
                 {insightB.country} leads on{" "}
-                <em>{DIMENSION_LABELS[insightB.dim]}</em> by{" "}
+                <em>{V2_DIMENSION_LABELS[insightB.dim]}</em> by{" "}
                 <strong>{insightB.delta.toFixed(1)} points</strong> — its
-                biggest win across the six dimensions.
+                biggest win across the {V2_DIMENSIONS.length} dimensions.
               </div>
             </article>
           )}

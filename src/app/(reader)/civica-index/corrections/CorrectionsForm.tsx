@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { disputeSla } from "@/lib/content/site-state";
+import { civicaIndex, disputeSla } from "@/lib/content/site-state";
 
 interface Country {
   slug: string;
@@ -24,14 +24,14 @@ const CATEGORIES = [
   { value: "other", label: "Other" },
 ];
 
-const CI_DIMENSIONS = [
-  { value: "democratic_quality", label: "Democratic quality" },
-  { value: "rule_of_law", label: "Rule of law & institutions" },
-  { value: "human_development", label: "Human development" },
-  { value: "freedoms_rights", label: "Freedoms & rights" },
-  { value: "corruption_control", label: "Corruption control" },
-  { value: "stability_security", label: "Stability & security" },
-];
+// Derived from src/lib/content/site-state.ts so the form's CI dimension
+// options always match the running scored composite. v2 Beta is 4-dim;
+// human_development and stability_security are now part of Civica
+// Conditions, not CI — they're intentionally absent here.
+const CI_DIMENSIONS = civicaIndex.dimensions.map((d) => ({
+  value: d.id,
+  label: d.label,
+}));
 
 const CI_RELATED_CATEGORIES = ["ci_data_error", "ci_methodology"];
 

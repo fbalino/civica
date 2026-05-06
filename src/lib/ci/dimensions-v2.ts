@@ -29,8 +29,6 @@
  * to change.
  */
 
-import type { CIDimensionKey } from "./dimensions";
-
 /** Subset of CI dimensions used in the Beta governance core. */
 export type CIDimensionV2 =
   | "democratic_quality"
@@ -82,6 +80,3 @@ export const V2_DIMENSION_LABELS: Record<CIDimensionV2, string> = {
 export function isV2Dimension(d: string): d is CIDimensionV2 {
   return (V2_DIMENSIONS as readonly string[]).includes(d);
 }
-
-/** Re-export for callers that want the wider type. */
-export type { CIDimensionKey };

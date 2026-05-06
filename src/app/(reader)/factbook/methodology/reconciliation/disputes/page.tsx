@@ -624,7 +624,9 @@ export default async function PublicDisputesPage({ searchParams }: PageProps) {
       <div className="editorial-warning">
         These disputes are part of the reconciliation methodology under
         active revision. The resolver, source allowlist, and
-        material-error thresholds may change before v1.0. See the{" "}
+        material-error thresholds may change in future methodology
+        version bumps (currently <code>{reconciliation.version}</code>).
+        See the{" "}
         <Link href="/factbook/methodology/reconciliation">
           full reconciliation methodology
         </Link>{" "}
