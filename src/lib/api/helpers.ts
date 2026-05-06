@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { civicaIndex } from "@/lib/content/site-state";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -13,18 +14,21 @@ const CORS_HEADERS = {
  * The Civica Index is in active methodology development. Published
  * scores carry a "Beta" status flag; the cut-over to the published
  * methodology described at /civica-index/methodology is targeted
- * for 2026-09-30. Citations follow the year-quarter convention
- * (e.g. "Civica Index 2026 Q3 (Beta)") — there is no public version
- * number.
+ * for `civicaIndex.cutoverTarget`. Citations follow the year-quarter
+ * convention (e.g. "Civica Index 2026 Q3 (Beta)") — there is no
+ * public version number.
  *
  * Endpoints that surface CI or Pulse data include this object as
  * `meta.methodology` in their response envelope so machine consumers
  * can detect the development phase and the cut-over window.
+ *
+ * Drives off `state.civicaIndex.{status, lastRevisionIso, cutoverTargetIso}`
+ * so a single state-file edit propagates to every API endpoint.
  */
 export const CI_METHODOLOGY_META = Object.freeze({
-  status: "beta",
-  last_revised: "2026-04",
-  cutover_target: "2026-09-30",
+  status: civicaIndex.status,
+  last_revised: civicaIndex.lastRevisionIso,
+  cutover_target: civicaIndex.cutoverTargetIso,
   reference: "https://civicaatlas.org/civica-index/methodology",
 });
 

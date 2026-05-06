@@ -69,7 +69,9 @@ export default function PulseMethodologyPage() {
 
       <h1 className="editorial-page-title">
         Pulse methodology
-        <span className="editorial-beta-tag">Beta</span>
+        {pulse.status === "beta" ? (
+          <span className="editorial-beta-tag">Beta</span>
+        ) : null}
       </h1>
       <p className="editorial-page-subtitle">
         A real-time governance shock monitor layered on top of the quarterly

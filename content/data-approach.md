@@ -83,9 +83,9 @@ Civica is in pre-launch. The reconciliation v1 milestone (full Tier-1 publisher 
 
 Things you may notice as the rollout progresses:
 
-- **Some fact-keys are single-sourced.** ~50 of 88 declared fact-keys currently have only one publisher. Reconciliation requires two sources to compare; for single-sourced facts, the reader page renders provenance but no alternates panel. As the NSO wave lands, single-sourced fact-keys gain second sources.
+- **Some fact-keys are single-sourced.** 61 of 88 declared fact-keys currently have only one publisher. Reconciliation requires two sources to compare; for single-sourced facts, the reader page renders provenance but no alternates panel. As the NSO wave lands, single-sourced fact-keys gain second sources.
 - **Some methodology pages are still being written.** Specifically, the reconciliation methodology page is being expanded as the rules formalize. Read the [methodology hub](/methodology) for the current state.
-- **Some methodology resolutions are not yet public.** Civica has 19+ adopted internal resolution documents covering specific decisions. Public publication of a curated subset is on the roadmap. In the meantime, if you want to see the audit trail behind a specific decision, get in touch.
+- **Some methodology resolutions are not yet public.** Civica has 30+ adopted internal resolution documents covering specific decisions. Public publication of a curated subset is on the roadmap. In the meantime, if you want to see the audit trail behind a specific decision, get in touch.
 
 ## Where to dig deeper
 

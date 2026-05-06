@@ -8,6 +8,7 @@ import {
   type PeerGroupingMigrationRow,
 } from "@/lib/db/queries-peer-grouping";
 import { currentVintage } from "@/lib/content/site-state";
+import { STRUCTURAL_FAMILY_SUNSET_DATE_ISO } from "@/lib/api/deprecation";
 
 export const metadata: Metadata = {
   title: "Per-country migration table — Peer-grouping methodology",
@@ -56,14 +57,14 @@ export default async function PeerGroupingMigrationPage() {
         <span>·</span>
         <span>Vintage: {currentVintage}</span>
         <span>·</span>
-        <span>Sunset 2027-03-31</span>
+        <span>Sunset {STRUCTURAL_FAMILY_SUNSET_DATE_ISO}</span>
       </div>
 
       <div className="editorial-warning">
         <strong>For replication-script maintainers.</strong> The
         legacy <code>structural_family</code> column on{" "}
         <code>government_taxonomies</code> and the corresponding API
-        fields remain available through 2027-03-31. After that date
+        fields remain available through {STRUCTURAL_FAMILY_SUNSET_DATE_ISO}. After that date
         the column is dropped and the API fields return only the
         peer-lens replacements. Update country-metadata joins now;
         the JSON form of this table at{" "}

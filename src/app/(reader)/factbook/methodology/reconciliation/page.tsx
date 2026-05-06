@@ -4,6 +4,7 @@ import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
+import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
 import {
   reconciliation,
   tier1Publishers,
@@ -19,6 +20,38 @@ const nsoActive = nsoWave1.filter((n) => n.status === "in-progress");
 const nsoDeferred = nsoWave1.filter(
   (n) => n.status === "deferred" || n.status === "deferred-permanently",
 );
+const nsoActiveNames = nsoActive.map((n) => n.name);
+const nsoActiveNamesProse = nsoActiveNames.join(", ");
+
+// Compose the headline-publisher prose from `tier1Publishers`. Picks the
+// first four shipped publishers by short-name and counts the rest, so
+// "the World Bank, IMF, UN, WHO, and seven others" stays in sync with
+// `tier1Publishers` without hand-editing this prose every time a Tier-1
+// orchestrator lands or is scrapped.
+const tier1ShippedShortNames = tier1Shipped.map((p) => p.shortName);
+const tier1HeadlineFour = tier1ShippedShortNames.slice(0, 4);
+const tier1HeadlineRemaining = Math.max(
+  0,
+  tier1ShippedShortNames.length - tier1HeadlineFour.length,
+);
+const tier1HeadlineProse = `${tier1HeadlineFour.join(", ")}, and ${tier1HeadlineRemaining} others`;
+
+// NBS-Nigeria status — per user resolution 2026-05-05, NBS-Nigeria is
+// `deferred-permanently` (not `deferred` to v1.1). Compose the
+// parenthetical from the live state so a future status change here
+// updates both the prose and downstream filter buckets.
+const nbsNigeria = nsoWave1.find((n) => n.id === "nbs_nigeria");
+const nbsNigeriaParenthetical =
+  nbsNigeria?.status === "deferred-permanently"
+    ? "permanently deferred"
+    : "deferred to v1.1";
+
+// Destatis-DE status — short label drawn from `deferReason`. The state
+// entry's `deferReason` opens with "Deferred to v1.1 — ..."; we surface
+// just the short label here.
+const destatisDe = nsoWave1.find((n) => n.id === "destatis_de");
+const destatisDeParenthetical =
+  destatisDe?.status === "deferred" ? "deferred to v1.1" : "deferred";
 
 export const metadata: Metadata = {
   title: `Factbook reconciliation methodology (${reconciliation.version}) — Civica Atlas`,
@@ -47,7 +80,17 @@ const SECTIONS = [
   { id: "citing", label: "Citing this methodology" },
 ];
 
-export default function ReconciliationMethodologyPage() {
+export default async function ReconciliationMethodologyPage() {
+  // Soft-fail: page should still render if the DB is unreachable, with
+  // generic prose in place of live counts. Mirrors the canonical pattern
+  // at src/app/(reader)/methodology/approach/page.tsx.
+  let stats: SiteStats | null = null;
+  try {
+    stats = await getSiteStats();
+  } catch {
+    stats = null;
+  }
+
   return (
     <MethodologyLayout items={SECTIONS}>
       <SmartBreadcrumbs />
@@ -97,10 +140,9 @@ export default function ReconciliationMethodologyPage() {
           underlying fact. The CIA World Factbook is comprehensive but
           stopped updating in January 2026. Wikidata is fresh but its
           claims vary in quality. Multilateral statistical agencies
-          (the World Bank, IMF, UN, WHO, and seven others) are
+          ({tier1HeadlineProse}) are
           authoritative but cover narrower fact sets. National
-          statistical offices (US Census, ONS-UK, INSEE-FR, Statistics
-          Canada, IBGE-BR, Stats SA) are authoritative for their own
+          statistical offices ({nsoActiveNamesProse}) are authoritative for their own
           country and ship faster than any multilateral. For any
           given country and fact — Argentina&apos;s inflation,
           Brazil&apos;s population, the United Kingdom&apos;s
@@ -119,8 +161,11 @@ export default function ReconciliationMethodologyPage() {
         </p>
         <p>
           As of vintage {reconciliation.firstVintage}, the
-          canonical-fact layer holds 25,821 rows across 88 fact-keys
-          and 20 active sources. The
+          canonical-fact layer holds{" "}
+          {stats
+            ? `${stats.totalFacts.toLocaleString()} rows across ${stats.distinctFactKeys} fact-keys and ${stats.activeSources} active sources`
+            : "tens of thousands of rows across the declared fact-keys and active sources"}
+          .{/* TODO: derive from new stats helper post-sweep */} The
           headline reconciled fact-keys carry six or more publishers
           each: unemployment rate (12 sources), population (11),
           inflation rate (9), GDP real growth rate (7), life
@@ -380,7 +425,7 @@ export default function ReconciliationMethodologyPage() {
             Africa. First PDF-extraction NSO precedent.
           </li>
           <li>
-            <strong>Destatis-DE</strong> (deferred to v1.1) — the
+            <strong>Destatis-DE</strong> ({destatisDeParenthetical}) — the
             Genesis-Online API requires manual account creation with
             regulatory review, which falls outside Civica&rsquo;s
             unattended-cron architecture. Eurostat republishes
@@ -390,7 +435,7 @@ export default function ReconciliationMethodologyPage() {
             or manual provisioning becomes feasible.
           </li>
           <li>
-            <strong>NBS-Nigeria</strong> (deferred to v1.1) — the
+            <strong>NBS-Nigeria</strong> ({nbsNigeriaParenthetical}) — the
             National Bureau of Statistics license forbids
             redistribution without a written partnership agreement,
             and the public API surface is unstable. Nigeria has World
@@ -650,9 +695,8 @@ export default function ReconciliationMethodologyPage() {
           metadata, not a resolver input. The methodology resolution
           for ONS-UK explicitly chose &ldquo;freshness alone
           implements the NSO override&rdquo; rather than introducing
-          an NSO priority tier. The same pattern applies to all six
-          NSOs in v1: US Census, ONS-UK, INSEE-FR, Statistics Canada,
-          IBGE-BR, and Stats SA. CPI as a separate ONS measure is
+          an NSO priority tier. The same pattern applies to all{" "}
+          {nsoActive.length} NSOs in v1: {nsoActiveNamesProse}. CPI as a separate ONS measure is
           deferred to v1.1 with a future <code>inflation_rate_cpi</code>{" "}
           fact-key extension; for v1, only CPIH ships.
         </p>
@@ -990,7 +1034,12 @@ export default function ReconciliationMethodologyPage() {
               {reconciliation.firstVintage}
             </code>
           </strong>
-          , cut on 5 May 2026 over 17 active sources writing through
+          , cut on{" "}
+          {new Date(reconciliation.firstVintageCutDate).toLocaleDateString(
+            "en-GB",
+            { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" },
+          )}{" "}
+          over {stats ? stats.activeSources : "the"} active sources writing through
           the resolver. The methodology version is embedded in the
           label so any cited vintage value carries the rules that
           produced it. When methodology revises to the next version,

@@ -79,13 +79,22 @@ export const civicaIndex = {
   ] as const,
 
   /** Quarterly cut-over target — when the in-development methodology
-   *  graduates from in-active-development to stable-Beta. */
+   *  graduates from in-active-development to stable-Beta. Display form
+   *  for prose ("Sept 30, 2026"); pair with `cutoverTargetIso` for
+   *  API + machine-readable consumers. */
   cutoverTarget: "Sept 30, 2026" as const,
+  /** ISO-formatted form of `cutoverTarget`. Used by API
+   *  `meta.methodology` envelopes (src/lib/api/helpers.ts) and any
+   *  machine-readable surface. Update both fields together. */
+  cutoverTargetIso: "2026-09-30" as const,
 
   /** Last methodology-doc revision label. Pages prefer the database
    *  `methodology.publishedAt` value when present; this string is the
-   *  fallback when the DB is unseeded. */
+   *  fallback when the DB is unseeded. Pair with `lastRevisionIso`. */
   lastRevision: "Apr 2026" as const,
+  /** ISO-formatted (year-month) form of `lastRevision`. Used by API
+   *  `meta.methodology.last_revised`. Update both fields together. */
+  lastRevisionIso: "2026-04" as const,
 
   /** Phase 5.3 PCA results — the empirical justification for
    *  weights above. Single source of truth for both the methodology

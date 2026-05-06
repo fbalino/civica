@@ -249,7 +249,10 @@ export default async function AboutPage() {
               economic stability) live on the separate Civica Conditions
               companion layer at <Link href="/civica-conditions">/civica-conditions</Link>.
               PCA-derived weights, frozen reference periods, Monte Carlo
-              uncertainty intervals. Currently in BETA pending external review.
+              uncertainty intervals.
+              {civicaIndex.status === "beta"
+                ? " Currently in BETA pending external review."
+                : ""}
             </p>
           </div>
 
@@ -292,7 +295,7 @@ export default async function AboutPage() {
               asymmetric corroboration rules, severity-tier human review.
               Backtested against {pulse.backtest.cases.length} named historical
               governance shocks.
-              Currently in BETA.
+              {pulse.status === "beta" ? " Currently in BETA." : ""}
             </p>
           </div>
         </div>

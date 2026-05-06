@@ -45,6 +45,7 @@ import {
   type SeverityBucket,
   type SeverityScore,
 } from "@/lib/factbook/reconcile/dispute-severity";
+import { reconciliation } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title:
@@ -607,7 +608,9 @@ export default async function PublicDisputesPage({ searchParams }: PageProps) {
 
       <h1 className="editorial-page-title">
         Data disputes
-        <span className="editorial-beta-tag">Beta</span>
+        {reconciliation.status === "beta" ? (
+          <span className="editorial-beta-tag">Beta</span>
+        ) : null}
       </h1>
       <p className="editorial-page-subtitle">
         Public read-only log of conflicts the resolver flagged across the

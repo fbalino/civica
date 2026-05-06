@@ -4,6 +4,7 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { peerGrouping, civicaIndex } from "@/lib/content/site-state";
+import { STRUCTURAL_FAMILY_SUNSET_DATE_ISO } from "@/lib/api/deprecation";
 
 const REVIEW_STATUS_LABEL: Record<"pending" | "in-review" | "complete", string> = {
   pending: "Pending external review",
@@ -530,7 +531,7 @@ export default function PeerGroupingMethodologyPage() {
           point of the change. The legacy <code>structural_family</code>{" "}
           column and API field remain for two quarterly vintages with{" "}
           <code>Deprecation</code> + <code>Sunset</code> headers
-          pointing at <code>2027-03-31</code>; the hard cut lands on
+          pointing at <code>{STRUCTURAL_FAMILY_SUNSET_DATE_ISO}</code>; the hard cut lands on
           that date.
         </p>
         <div className="editorial-table-scroll">

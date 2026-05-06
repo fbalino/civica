@@ -27,9 +27,25 @@ import type { NextResponse } from "next/server";
  * Sunset date in HTTP-date format (RFC 5322). 23:59:59 UTC on
  * 2027-03-31 = Wed, 31 Mar 2027 23:59:59 GMT. Anything after this
  * instant returns the v1.0 hard-cut behavior.
+ *
+ * Used by API HTTP `Sunset:` headers. Reader pages prefer
+ * `STRUCTURAL_FAMILY_SUNSET_DATE_ISO` below for prose.
  */
 export const STRUCTURAL_FAMILY_SUNSET_DATE =
   "Wed, 31 Mar 2027 23:59:59 GMT" as const;
+
+/**
+ * Sunset date in ISO-8601 calendar form (`YYYY-MM-DD`). Same date
+ * as `STRUCTURAL_FAMILY_SUNSET_DATE`, formatted for reader-page
+ * prose (peer-grouping methodology page, migration page) and API
+ * response-body `meta.deprecations.sunset` blocks where the
+ * HTTP-date format would read as machine-noise to a human.
+ *
+ * Update both constants together if the sunset date ever moves
+ * (which it shouldn't — the user-locked decision is calendar-
+ * anchored per peer-grouping resolution v1 §6 Q3).
+ */
+export const STRUCTURAL_FAMILY_SUNSET_DATE_ISO = "2027-03-31" as const;
 
 /** Successor endpoint introduced in Phase 4. */
 export const PEER_GROUPINGS_SUCCESSOR_HREF =

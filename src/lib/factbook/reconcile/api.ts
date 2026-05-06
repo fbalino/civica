@@ -26,6 +26,7 @@ import { eq, sql, and, inArray } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { countryFacts, jurisdictions, dataDisputes } from "@/lib/db/schema";
+import { reconciliation } from "@/lib/content/site-state";
 import { resolveFromRows } from "./resolver";
 import { getFactKey } from "./fact-keys";
 import type { FactRow, ResolverOutput } from "./types";
@@ -59,11 +60,11 @@ import type { FactRow, ResolverOutput } from "./types";
  * Methodology: ~/civica/plan/vintage-cadence-resolution-v1.md
  */
 export const FACTBOOK_RECONCILIATION_META = Object.freeze({
-  status: "beta" as const,
-  version: "v0.1",
+  status: reconciliation.status,
+  version: reconciliation.version,
   reference:
     "https://civicaatlas.org/factbook/methodology/reconciliation",
-  vintage: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
+  vintage: `Civica Atlas Reconciled ${reconciliation.version} — vintage ${reconciliation.firstVintage}`,
 });
 
 /**

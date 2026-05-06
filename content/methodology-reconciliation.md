@@ -89,7 +89,7 @@ The methodology page enumerated 8 NSOs by name during early design. 6 are live i
 - **IBGE-BR** (live) — SIDRA REST; population, IPCA inflation, PNADC unemployment, real GDP growth for Brazil. First Portuguese-only NSO precedent.
 - **Stats SA** (live) — PDF release ingest via Anthropic SDK native PDF support; population, CPI inflation, QLFS unemployment, quarterly GDP for South Africa. First PDF-extraction NSO precedent.
 - **Destatis-DE** (deferred to v1.1) — the Genesis-Online API requires manual account creation with regulatory review, which falls outside Civica's unattended-cron architecture. Eurostat republishes Destatis figures within weeks at harmonised methodology, so Germany has Tier-1 coverage today via Eurostat. Destatis ships when the registration step is automated or manual provisioning becomes feasible.
-- **NBS-Nigeria** (deferred to v1.1) — the National Bureau of Statistics license forbids redistribution without a written partnership agreement, and the public API surface is unstable. Nigeria has World Bank, IMF, UN, and UNDP coverage; the NBS NSO channel ships when the license posture is renegotiated.
+- **NBS-Nigeria** (permanently deferred per 2026-05-05 user resolution) — primary data is PDF/Excel; ingestion cost is not justified for v1. Nigeria retains Tier-1 coverage from World Bank, IMF, UN, and UNDP. Reopened only if a structured-API surface lands or the data-shape decision is revisited.
 
 ### Tier 3 — CIA World Factbook
 

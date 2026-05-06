@@ -12,6 +12,7 @@
  */
 import Link from "next/link";
 import type { FactRow, ResolverOutput } from "@/lib/factbook/reconcile/types";
+import { reconciliation } from "@/lib/content/site-state";
 
 const SOURCE_LABELS: Record<string, string> = {
   cia_factbook: "CIA World Factbook",
@@ -249,8 +250,11 @@ export function FactValuePanel({
 
       <footer className="fact-value-panel-foot">
         <span className="fact-value-panel-foot-cite">
-          Reconciled per Civica Atlas methodology v0.1
-          <span className="fact-value-panel-foot-beta">Beta</span>
+          Reconciled per Civica Atlas methodology{" "}
+          {reconciliation.version.replace(/-beta$/, "")}
+          {reconciliation.status === "beta" ? (
+            <span className="fact-value-panel-foot-beta">Beta</span>
+          ) : null}
         </span>
         <Link
           className="fact-value-panel-foot-link"

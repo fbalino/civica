@@ -13,6 +13,7 @@
  */
 
 import { BAND_RANGES, type CIBand } from "@/lib/ci/bands";
+import { civicaIndex } from "@/lib/content/site-state";
 
 export interface CIScoreData {
   score: number;
@@ -175,13 +176,15 @@ function ScorePane({
           >
             {title}
           </span>
-          <span
-            className="ci-beta-pill"
-            aria-label="Beta — methodology under active revision"
-            title="Methodology under active revision. See /civica-index/methodology for details."
-          >
-            Beta
-          </span>
+          {civicaIndex.status === "beta" ? (
+            <span
+              className="ci-beta-pill"
+              aria-label="Beta — methodology under active revision"
+              title="Methodology under active revision. See /civica-index/methodology for details."
+            >
+              Beta
+            </span>
+          ) : null}
         </div>
         <span
           style={{
@@ -330,7 +333,7 @@ export function CIPulseScoreDisplay({
         ciScore.rank && ciScore.totalRanked
           ? `Rank ${ciScore.rank} of ${ciScore.totalRanked}.`
           : null,
-        "Composite of four governance dimensions.",
+        `Composite of ${civicaIndex.dimensionCount} governance dimensions.`,
         ciScore.completenessFlag === "partial"
           ? "Partial — one optional dimension missing."
           : "Updated quarterly.",
@@ -352,7 +355,7 @@ export function CIPulseScoreDisplay({
     >
       <ScorePane
         title="Civica Index"
-        chip={ciScore ? `CI · ${formatQuarter(ciScore.quarter)} (Beta)` : "CI · Pending"}
+        chip={ciScore ? `CI · ${formatQuarter(ciScore.quarter)}${civicaIndex.status === "beta" ? " (Beta)" : ""}` : "CI · Pending"}
         scoreLabel="/ 100"
         bandLetter={(ciBandLetter as string | null) ?? null}
         bandLabel={ciBandRow.label}

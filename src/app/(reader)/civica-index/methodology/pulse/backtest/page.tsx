@@ -376,7 +376,9 @@ export default async function BacktestReportPage() {
 
       <h1 className="editorial-page-title">
         Pulse backtest report
-        <span className="editorial-beta-tag">Beta</span>
+        {pulse.status === "beta" ? (
+          <span className="editorial-beta-tag">Beta</span>
+        ) : null}
       </h1>
       <p className="editorial-page-subtitle">
         How the Pulse Beta pipeline performs against named historical

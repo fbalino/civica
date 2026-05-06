@@ -26,11 +26,11 @@ How Civica integrates and reconciles data from multiple authoritative publishers
 
 ## Composite scoring — the Civica Index
 
-The Civica Index is an original 0–100 composite governance score covering six dimensions, computed quarterly. Its methodology covers indicator selection, weighting, reference periods, and uncertainty.
+The Civica Index is an original 0–100 composite governance score covering 4 governance dimensions, computed quarterly. Its methodology covers indicator selection, weighting, reference periods, and uncertainty.
 
 | Document | What it covers |
 |---|---|
-| [Civica Index methodology](/civica-index/methodology) | The composite specification — six dimensions, indicator basket, sources, frozen reference periods, weighting approach, uncertainty intervals. |
+| [Civica Index methodology](/civica-index/methodology) | The composite specification — 4 governance dimensions, indicator basket, sources, frozen reference periods, weighting approach, uncertainty intervals. |
 | [PCA appendix](/civica-index/methodology/pca-appendix) | The mathematical derivation of the Index weights from principal component analysis on the indicator basket. |
 
 ## Event-driven scoring — the Civica Pulse

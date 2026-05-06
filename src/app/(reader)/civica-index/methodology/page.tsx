@@ -7,12 +7,12 @@ import {
   getCIMethodologyHistory,
 } from "@/lib/db/queries";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
-import { civicaIndex, disputeSla } from "@/lib/content/site-state";
+import { civicaIndex, disputeSla, pulse } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Civica Index Methodology — How Governance Is Scored",
   description:
-    `The Civica Index methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, Monte Carlo uncertainty intervals, A–F rank bands, and a separate Civica Conditions companion layer. Beta — methodology in active development.`,
+    `The Civica Index methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, Monte Carlo uncertainty intervals, A–F rank bands, and a separate Civica Conditions companion layer.${civicaIndex.status === "beta" ? " Beta — methodology in active development." : ""}`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/methodology" },
 };
 
@@ -611,9 +611,17 @@ export default async function MethodologyPage() {
           gaming.
         </p>
         <p>
-          The Pulse is currently a clearly labelled <em>Beta</em> —
-          experimental, not yet citable as authoritative. Its
-          methodology is documented in detail at{" "}
+          {pulse.status === "beta" ? (
+            <>
+              The Pulse is currently a clearly labelled <em>Beta</em> —
+              experimental, not yet citable as authoritative. Its
+              methodology is documented in detail at{" "}
+            </>
+          ) : (
+            <>
+              The Pulse methodology is documented in detail at{" "}
+            </>
+          )}
           <Link href="/civica-index/methodology/pulse">
             /civica-index/methodology/pulse
           </Link>
@@ -711,18 +719,22 @@ export default async function MethodologyPage() {
           <span className="meth-num">Section 13</span>Citation
         </h2>
         <p>
-          For published vintages, cite by year and quarter. While the
-          Index is in Beta, include the &ldquo;Beta&rdquo; suffix:
+          For published vintages, cite by year and quarter.
+          {civicaIndex.status === "beta"
+            ? " While the Index is in Beta, include the “Beta” suffix:"
+            : ""}
         </p>
-        <pre className="meth-formula">{`Civica Index 2026 Q3 (Beta). Civica Atlas. https://civicaatlas.org/civica-index
+        <pre className="meth-formula">{`Civica Index 2026 Q3${civicaIndex.status === "beta" ? " (Beta)" : ""}. Civica Atlas. https://civicaatlas.org/civica-index
 For a specific country:
-  Civica Index for [Country], 2026 Q3 (Beta). Civica Atlas.
+  Civica Index for [Country], 2026 Q3${civicaIndex.status === "beta" ? " (Beta)" : ""}. Civica Atlas.
     https://civicaatlas.org/civica-index/[country-slug]`}</pre>
-        <p>
-          Once the Beta exits and the Index stabilizes, the
-          &ldquo;Beta&rdquo; suffix drops; the year-quarter remains
-          the canonical citation handle.
-        </p>
+        {civicaIndex.status === "beta" ? (
+          <p>
+            Once the Beta exits and the Index stabilizes, the
+            &ldquo;Beta&rdquo; suffix drops; the year-quarter remains
+            the canonical citation handle.
+          </p>
+        ) : null}
 
         <h3>13.1 · API access</h3>
         <pre className="meth-formula">{`GET /api/v1/index/{country_slug}
@@ -769,7 +781,9 @@ GET /api/v1/pulse/changelog                   (Beta)`}</pre>
         <div className="meth-version-strip">
           <div className="meth-version-cell">
             <div className="meth-version-label">Status</div>
-            <div className="meth-version-value">Beta</div>
+            <div className="meth-version-value">
+              {civicaIndex.status === "beta" ? "Beta" : "Stable"}
+            </div>
           </div>
           <div className="meth-version-cell">
             <div className="meth-version-label">Last revision</div>

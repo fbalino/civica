@@ -23,6 +23,7 @@ import {
   getGovernancePeerSet,
 } from "@/lib/peer-grouping";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
+import { civicaIndex } from "@/lib/content/site-state";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 
@@ -746,7 +747,9 @@ export default async function CICountryDetailPage({
         {dimensions.length > 0 ? (
           <section id="dimensions">
             <div className="ci-country-section-eyebrow">
-              <span>Civica Index breakdown · 4 governance dimensions</span>
+              <span>
+                Civica Index breakdown · {civicaIndex.dimensionCount} governance dimensions
+              </span>
               <small>weights empirically derived · source-specific inputs</small>
             </div>
             <h2 className="ci-country-section-title">
@@ -880,10 +883,12 @@ export default async function CICountryDetailPage({
                 <span>Current quarter</span>
                 <strong>{composite?.quarter ? formatQuarterLong(composite.quarter) : "—"}</strong>
               </div>
-              <div className="ci-country-meta-row">
-                <span>Methodology</span>
-                <strong>Beta</strong>
-              </div>
+              {civicaIndex.status === "beta" ? (
+                <div className="ci-country-meta-row">
+                  <span>Methodology</span>
+                  <strong>Beta</strong>
+                </div>
+              ) : null}
             </div>
 
             <div className="ci-country-taxonomy-wrap">

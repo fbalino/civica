@@ -5,11 +5,12 @@ import { getCIRankings } from "@/lib/db/queries";
 import { CountryFlag } from "@/components/CountryFlag";
 import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
+import { civicaIndex } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Civica Index — Global Governance Rankings",
   description:
-    "Composite governance score for every sovereign state and territory. Four governance dimensions, empirically-derived weights, fixed-bound normalization, 90% confidence intervals. Beta methodology — see /civica-index/methodology.",
+    `Composite governance score for every sovereign state and territory. ${civicaIndex.dimensionCount} governance dimensions, empirically-derived weights, fixed-bound normalization, 90% confidence intervals.${civicaIndex.status === "beta" ? " Beta methodology" : ""} — see /civica-index/methodology.`,
   alternates: { canonical: "https://civicaatlas.org/civica-index" },
   openGraph: {
     title: "Civica Index — Global Governance Rankings | Civica Atlas",
@@ -160,10 +161,10 @@ export default async function CivicaIndexShellPage({
           </p>
           <p className="ci-hero-lede">
             The Civica Index is a composite governance score for every
-            sovereign state and territory. Four governance dimensions,
-            empirically-derived weights, fixed-bound normalization, and
-            published 90% confidence intervals. The Civica Pulse layers
-            real-time event sensitivity on top.
+            sovereign state and territory. {civicaIndex.dimensionCount}{" "}
+            governance dimensions, empirically-derived weights, fixed-bound
+            normalization, and published 90% confidence intervals. The Civica
+            Pulse layers real-time event sensitivity on top.
           </p>
 
           <div className="ci-stats-strip" role="group" aria-label="Index coverage">
@@ -180,7 +181,7 @@ export default async function CivicaIndexShellPage({
               </div>
             </div>
             <div className="ci-stat">
-              <div className="ci-stat-value">4</div>
+              <div className="ci-stat-value">{civicaIndex.dimensionCount}</div>
               <div className="ci-stat-label">Dimensions</div>
             </div>
             <div className="ci-stat">
@@ -297,14 +298,14 @@ export default async function CivicaIndexShellPage({
                       <div className="ci-lb-dims" role="cell">
                         {r.completenessFlag === "partial" ? (
                           <span
-                            title={`${r.dimensionsAvailable}/4 dimensions available`}
+                            title={`${r.dimensionsAvailable}/${civicaIndex.dimensionCount} dimensions available`}
                           >
-                            {r.dimensionsAvailable}/4
+                            {r.dimensionsAvailable}/{civicaIndex.dimensionCount}
                             <span className="ci-dim-warn" aria-hidden="true" />
                           </span>
                         ) : (
                           <span>
-                            4/4
+                            {civicaIndex.dimensionCount}/{civicaIndex.dimensionCount}
                             <span className="ci-dim-ok" aria-hidden="true" />
                           </span>
                         )}

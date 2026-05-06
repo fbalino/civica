@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Pill } from "@/components/editorial/Pill";
 import type { PulseV2ForCountry, DimensionRow } from "@/lib/db/queries-pulse-v2";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
+import { pulse } from "@/lib/content/site-state";
 
 const DIMENSION_LABELS: Record<PulseDimension, string> = {
   democratic_quality: "Democratic Quality",
@@ -272,7 +273,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
           >
             Civica Pulse
           </span>
-          <Pill variant="warn">Beta</Pill>
+          {pulse.status === "beta" ? <Pill variant="warn">Beta</Pill> : null}
           <span
             style={{
               fontFamily: "var(--font-mono)",

@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { tier1Publishers } from "@/lib/content/site-state";
 import "./globals.css";
 import "./editorial.css";
 import "./atlas.css";
@@ -13,6 +14,25 @@ import "./civica-index.css";
 import "./civica-index-detail.css";
 import "./factbook.css";
 import "./civica-chat.css";
+
+// Sources NOT covered by `tier1Publishers` — supporting feeds,
+// governance specialists, and indices. Update by hand when a major
+// new non-Tier-1 source lands. Tier-1 publishers are appended below
+// from `tier1Publishers.filter(p => p.shipped)`.
+const NON_TIER1_FOOTER_SOURCES = [
+  "CIA World Factbook (archived)",
+  "Wikidata",
+  "Wikimedia Commons",
+  "V-Dem",
+  "IPU Parline",
+  "Constitute Project",
+  "BR/CGV",
+  "Freedom House",
+  "Transparency CPI",
+  "Global Peace Index",
+  "Fragile States Index",
+  "GDELT",
+] as const;
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -58,6 +78,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const tier1ShippedShortNames = tier1Publishers
+    .filter((p) => p.shipped)
+    .map((p) => p.shortName);
+  const footerSourceList = [
+    ...NON_TIER1_FOOTER_SOURCES,
+    ...tier1ShippedShortNames,
+  ].join(", ");
+
   return (
     <html
       lang="en"
@@ -85,7 +113,7 @@ export default function RootLayout({
                   <span>Civica</span>
                 </div>
                 <p className="site-footer__source">
-                  Sources include CIA World Factbook, Wikidata, Wikimedia Commons, World Bank, IMF, UN, WHO, UNESCO, UNDP, OECD, FAO, ILO, Eurostat, WTO, V-Dem, IPU Parline, Constitute Project, BR/CGV, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index, and GDELT.
+                  Sources include {footerSourceList}.
                 </p>
                 <div className="site-footer__legend">
                   <span>

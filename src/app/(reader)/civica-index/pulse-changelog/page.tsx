@@ -10,6 +10,7 @@ import {
   DIMENSION_LABELS,
   SEVERITY_TIER_LABELS,
 } from "@/lib/pulse/v2/labels";
+import { pulse } from "@/lib/content/site-state";
 
 export const metadata: Metadata = {
   title: "Pulse changelog (Beta) — Civica Index",
@@ -110,7 +111,9 @@ export default async function PulseChangelogPage({ searchParams }: PageProps) {
 
       <h1 className="editorial-page-title">
         Pulse changelog
-        <span className="editorial-beta-tag">Beta</span>
+        {pulse.status === "beta" ? (
+          <span className="editorial-beta-tag">Beta</span>
+        ) : null}
       </h1>
       <p className="editorial-page-subtitle">
         Every governance event classified by the Civica Pulse Beta pipeline.

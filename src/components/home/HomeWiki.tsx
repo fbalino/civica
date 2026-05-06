@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getCIRankings } from "@/lib/db/queries";
 import { ciTier } from "@/lib/ci/tiers";
+import { civicaIndex } from "@/lib/content/site-state";
 
 interface RankingRow {
   jurisdictionId: string;
@@ -40,9 +41,9 @@ export async function HomeWiki() {
           How every country is governed, in one atlas.
         </h1>
         <p className="home-wiki-lede">
-          250+ sovereign states, six governance dimensions, live Pulse
-          signals. Browse a country, compare two side-by-side, or skim the
-          latest events shaping the world.
+          250+ sovereign states, {civicaIndex.dimensionCount} governance
+          dimensions, live Pulse signals. Browse a country, compare two
+          side-by-side, or skim the latest events shaping the world.
         </p>
         <div className="home-wiki-cta">
           <Link href="/atlas" className="home-wiki-btn home-wiki-btn--primary">

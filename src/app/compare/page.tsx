@@ -20,6 +20,7 @@ import { CompareElections } from "@/components/compare/CompareElections";
 import { CompareInternational } from "@/components/compare/CompareInternational";
 import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { civicaIndex } from "@/lib/content/site-state";
 
 // Series colors resolve from the global :root block in globals.css.
 // No fallback literals — the globals are always present.
@@ -344,7 +345,7 @@ export default async function ComparePage({
             ))}
             <Link href="/civica-index/methodology">Methodology →</Link>
             <span className="compare-footer-meta">
-              Civica Index (Beta) · weighted composite of governance dimensions
+              Civica Index{civicaIndex.status === "beta" ? " (Beta)" : ""} · weighted composite of governance dimensions
             </span>
           </footer>
         </>

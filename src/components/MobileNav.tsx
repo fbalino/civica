@@ -6,6 +6,35 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { INDEX_NAV_ITEMS, type IndexNavItem } from "@/components/indexNavItems";
 import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
+import { tier1Publishers } from "@/lib/content/site-state";
+
+// Sources NOT covered by `tier1Publishers` — supporting feeds,
+// governance specialists, and indices. Update by hand when a major
+// new non-Tier-1 source lands. Tier-1 publishers are appended below
+// from `tier1Publishers.filter(p => p.shipped)`.
+const NON_TIER1_FOOTER_SOURCES = [
+  "CIA World Factbook (archived)",
+  "Wikidata",
+  "Wikimedia Commons",
+  "V-Dem",
+  "IPU Parline",
+  "Constitute Project",
+  "BR/CGV",
+  "Freedom House",
+  "Transparency CPI",
+  "Global Peace Index",
+  "Fragile States Index",
+  "GDELT",
+] as const;
+
+const TIER1_SHIPPED_SHORT_NAMES = tier1Publishers
+  .filter((p) => p.shipped)
+  .map((p) => p.shortName);
+
+const FOOTER_SOURCE_LIST = [
+  ...NON_TIER1_FOOTER_SOURCES,
+  ...TIER1_SHIPPED_SHORT_NAMES,
+].join(", ");
 
 type NavItem = {
   href: string;
@@ -477,7 +506,7 @@ function OverlayFooter() {
           margin: 0,
         }}
       >
-        Data from Wikidata (CC0), IPU Parline, Constitute Project, and the CIA World Factbook (archived).
+        Sources include {FOOTER_SOURCE_LIST}.
       </p>
 
       <div

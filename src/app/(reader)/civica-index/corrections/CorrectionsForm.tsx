@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { disputeSla } from "@/lib/content/site-state";
 
 interface Country {
   slug: string;
@@ -83,7 +84,7 @@ export function CorrectionsForm({ countries, submitted }: Props) {
   if (done) {
     return (
       <div className="corr-success-banner">
-        <strong>Submission received.</strong> We&rsquo;ll send an initial response within 7 days.
+        <strong>Submission received.</strong> We&rsquo;ll send an initial response within {disputeSla.initialResponseDays} days.
         Thank you for helping improve the Civica Index.
       </div>
     );
