@@ -23,7 +23,7 @@ const SUMMARY_MODEL = "claude-haiku-4-5-20251001";
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_PULSE_SUMMARIZE });
   }
   return _anthropic;
 }
@@ -53,7 +53,7 @@ Strip RSS artifacts (image captions, copyright lines, "Click to expand", trailin
 export async function generatePulseSummary(
   input: SummariseInput
 ): Promise<string | null> {
-  if (!process.env.ANTHROPIC_API_KEY) return null;
+  if (!process.env.ANTHROPIC_API_KEY_PULSE_SUMMARIZE) return null;
   const anthropic = getAnthropic();
 
   const userPrompt = [

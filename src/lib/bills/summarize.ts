@@ -26,7 +26,7 @@ type Db = NeonHttpDatabase<typeof schema>;
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_BILLS_SUMMARIZE });
   }
   return _anthropic;
 }
@@ -125,7 +125,7 @@ const CHUNK_SIZE = 20;
 export async function generateSummariesBatch(
   inputs: Array<{ promptTitle: string }>,
 ): Promise<string[]> {
-  if (!process.env.ANTHROPIC_API_KEY || inputs.length === 0) {
+  if (!process.env.ANTHROPIC_API_KEY_BILLS_SUMMARIZE || inputs.length === 0) {
     return inputs.map(() => "");
   }
 

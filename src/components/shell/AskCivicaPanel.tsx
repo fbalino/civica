@@ -162,7 +162,7 @@ export function AskCivicaPanel({
             role: "ai",
             lead: messageLead,
             text:
-              "The assistant returned no response. If this keeps happening, check that ANTHROPIC_API_KEY is set and /api/chat isn't throwing.",
+              "The assistant returned no response. If this keeps happening, check that ANTHROPIC_API_KEY_CHAT is set and /api/chat isn't throwing.",
           };
           return next;
         });

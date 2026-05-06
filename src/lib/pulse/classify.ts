@@ -200,7 +200,7 @@ export async function classifyPulseEvents(
 ): Promise<ClassificationSummary> {
   const { batchSize = 20, batchDelayMs = 1000 } = options;
 
-  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_PULSE_CLASSIFIER });
   const events = await fetchUnclassifiedEvents(db, 500);
 
   if (events.length === 0) {

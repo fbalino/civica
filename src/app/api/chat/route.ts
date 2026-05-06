@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 
 const TAB_LABELS: Record<string, string> = {
   chamber: "Chamber composition",
@@ -85,7 +85,7 @@ Answer questions grounded in this context. If the user asks about something on t
         console.error("[/api/chat] stream error:", err);
         controller.enqueue(
           encoder.encode(
-            `\n\n_(Chat is unavailable — ${err instanceof Error ? err.message : "unknown error"}. Check ANTHROPIC_API_KEY.)_`,
+            `\n\n_(Chat is unavailable — ${err instanceof Error ? err.message : "unknown error"}. Check ANTHROPIC_API_KEY_CHAT.)_`,
           ),
         );
       } finally {
