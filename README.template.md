@@ -1,10 +1,14 @@
 <!--
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  This file is GENERATED from README.template.md by
-  scripts/regenerate-readme.ts. Do not edit it directly — your changes
-  will be overwritten on the next regeneration. Edit the template,
-  then run:
+  This is the source of truth for README.md. Edit this file, NOT
+  README.md. Regenerate via:
       npm run regenerate:readme
+  Substitution syntax (see ~/civica/plan/readme-templating-implementation-v1.md
+  and ~/civica/plan/site-stats-and-state-templating-design-v1.md):
+      {{state.path.to.field}}
+      {{stats.path.to.field}}
+      {{stats.path | "fallback"}}     ← soft-fail when DB unreachable
+      {{ctx.helperName}}              ← pre-computed in regenerator
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -13,7 +17,7 @@ An open reference atlas of the world's countries, governments, and governance ou
 
 [civicaatlas.org](https://civicaatlas.org)
 
-> **Status: pre-launch beta.** The data layer and reader pages are live and being used by the team for end-to-end review. Public launch + external methodology review are planned phases, not shipped yet. See [Current state](#current-state) below.
+> **Status: {{ctx.launchPhaseProse}}.** The data layer and reader pages are live and being used by the team for end-to-end review. Public launch + external methodology review are planned phases, not shipped yet. See [Current state](#current-state) below.
 
 ---
 
@@ -31,11 +35,11 @@ Country dossiers covering geography, demographics, government, economy, energy, 
 
 ### Civica Index — `/civica-index`
 
-An original composite governance score on a 0–100 scale, computed quarterly across four governance dimensions: democratic quality, rule of law, freedoms & rights, and corruption control. Material conditions (human development, peace & security, economic stability) live on the separate `/civica-conditions` companion layer. Built on V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting indices. PCA-derived weights (27/26/23/24), frozen reference periods, Monte Carlo uncertainty intervals. Currently in BETA pending external methodological review.
+An original composite governance score on a 0–100 scale, computed quarterly across {{ctx.civicaIndexDimensionCountWord}} governance dimensions: {{ctx.civicaIndexDimensionLabelsProse}}. Material conditions (human development, peace & security, economic stability) live on the separate `/civica-conditions` companion layer. Built on V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting indices. PCA-derived weights ({{ctx.civicaIndexWeightsString}}), frozen reference periods, Monte Carlo uncertainty intervals. Currently in {{ctx.civicaIndexStatusUpper}} pending external methodological review.
 
 ### Civica Pulse — `/civica-index/pulse-changelog`
 
-A daily directional signal layered on top of the Index. Ingests governance-relevant events from CIVICUS Monitor, Human Rights Watch, Amnesty International, ACLED, IPU, GDELT, and others. Multi-run LLM classifier with three-temperature agreement scoring. Asymmetric corroboration (positive events require specialist sources; restricted-press countries require multi-source confirmation). Backtested against 10 named historical governance shocks (Myanmar 2021, Niger 2023, Tunisia 2021, Afghanistan 2021, Sri Lanka 2022, Brazil 2023, Hungary 2010-present, Ethiopia 2020–22, Colombia 2016, Poland 2023). Currently in BETA.
+A daily directional signal layered on top of the Index. Ingests governance-relevant events from CIVICUS Monitor, Human Rights Watch, Amnesty International, ACLED, IPU, GDELT, and others. Multi-run LLM classifier with three-temperature agreement scoring. Asymmetric corroboration (positive events require specialist sources; restricted-press countries require multi-source confirmation). Backtested against {{state.pulse.backtest.cases.length}} named historical governance shocks ({{ctx.pulseBacktestCasesProse}}). Currently in {{ctx.pulseStatusUpper}}.
 
 ## What makes this different
 
@@ -43,7 +47,7 @@ Most public country-data sites republish a single upstream source (usually CIA F
 
 Civica's pipeline is built on opposite premises:
 
-- **Multi-source reconciliation.** Currently 20 active source orchestrators (CIA Factbook archive; the eleven Tier-1 publishers — World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats; V-Dem; Wikidata; and six national statistics offices already syncing — US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) writing into a canonical `country_facts` table. ~26,000 reconciled facts across 88 declared fact-keys. v1 target is 11 Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus 30–40 national statistics offices (first wave: 6 in progress; Destatis-DE deferred to v1.1; NBS-Nigeria permanently deferred).
+- **Multi-source reconciliation.** Currently {{stats.activeSources | "20"}} active source orchestrators (CIA Factbook archive; the {{ctx.tier1ShippedCountWord}} Tier-1 publishers — {{ctx.tier1ShippedFullNamesProse}}; V-Dem; Wikidata; and {{ctx.nsoInProgressCountWord}} national statistics offices already syncing — {{ctx.nsoInProgressNamesProse}}) writing into a canonical `country_facts` table. ~{{ctx.totalFactsRoundedThousands | "26,000"}} reconciled facts across {{stats.distinctFactKeys | "88"}} declared fact-keys. v1 target is {{ctx.tier1ShippedCount}} Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus {{state.nsoTarget.min}}–{{state.nsoTarget.max}} national statistics offices (first wave: {{ctx.nsoInProgressCount}} in progress; {{ctx.nsoDeferredNamesProse}}).
 
 - **Per-fact provenance.** Every value on every reader-facing page renders a `<FactValueDot>` chevron. Click it and you see the canonical pick, every alternate source, the as-of date per source, the publisher's license, and the freshness winner. Disagreements above a configurable threshold create disputes routed to a human review queue.
 
@@ -51,7 +55,7 @@ Civica's pipeline is built on opposite premises:
 
 - **Multi-canonical with scope predicate.** When two Tier-1 publishers are concurrently authoritative for a fact-key in a defined scope (e.g., Eurostat + IMF + OECD all canonical for European public debt), the system honors all three rather than forcing one into "alternate."
 
-- **Citable methodology.** Every load-bearing methodology decision is documented as a resolution document with citations to peer institutions and academic literature. Currently 30+ adopted resolutions covering peer grouping, reconciliation rules, fact-key registry expansions, source allowlist, classification taxonomy, dispute thresholds, NSO source decisions (per-country), and more.
+- **Citable methodology.** Every load-bearing methodology decision is documented as a resolution document with citations to peer institutions and academic literature. Currently {{state.adoptedResolutionCount}}+ adopted resolutions covering peer grouping, reconciliation rules, fact-key registry expansions, source allowlist, classification taxonomy, dispute thresholds, NSO source decisions (per-country), and more.
 
 - **Honest beta posture.** Novel Civica-asserted methodologies (the Civica Index composite, the Pulse classifier, the reconciliation rules) ship with a BETA pill until external academic review. Civica-cited external methodologies (V-Dem Regimes of the World, World Bank classifications, Bjørnskov-Rode regime taxonomy) inherit the source's standing without a beta marker.
 
@@ -61,16 +65,16 @@ This is a pre-launch project. Honest snapshot:
 
 | Metric | Status |
 |---|---|
-| Active source orchestrators writing facts | 20 (11 Tier-1 + CIA archive + Wikidata + V-Dem + 6 NSO Wave 1) — IEA scrapped due to license incompatibility |
-| `country_facts` rows | ~26,000 across 88 declared fact-keys |
-| Multi-sourced fact-keys (≥2 sources, at least one country) | 27 |
-| 5+ source fact-keys | 5 (population, life expectancy, unemployment, inflation, public debt) |
-| Adopted methodology resolution docs | 30+ |
-| NSO (national statistics office) syncs | First wave: 6 in progress (US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA); Destatis-DE deferred to v1.1 (Genesis-Online API requires manual account creation with regulatory review, outside Civica's unattended-cron architecture. Eurostat republishes Destatis figures in the meantime.); NBS-Nigeria permanently deferred (primary data is PDF/Excel; ingestion cost not justified for v1.) |
-| External methodology review | Not yet — planned post-v1 |
+| Active source orchestrators writing facts | {{stats.activeSources | "20"}} ({{ctx.tier1ShippedCount}} Tier-1 + CIA archive + Wikidata + V-Dem + {{ctx.nsoInProgressCount}} NSO Wave 1) — IEA scrapped due to license incompatibility |
+| `country_facts` rows | ~{{ctx.totalFactsRoundedThousands | "26,000"}} across {{stats.distinctFactKeys | "88"}} declared fact-keys |
+| Multi-sourced fact-keys (≥2 sources, at least one country) | {{stats.multiSourcedFactKeys | "27"}} |
+| 5+ source fact-keys | {{stats.fiveSourceFactKeys | "5"}} ({{ctx.fiveSourceFactKeyNamesProse}}) |
+| Adopted methodology resolution docs | {{state.adoptedResolutionCount}}+ |
+| NSO (national statistics office) syncs | First wave: {{ctx.nsoInProgressCount}} in progress ({{ctx.nsoInProgressNamesProse}}); {{ctx.nsoDeferredStatusTableProse}} |
+| External methodology review | {{ctx.externalReviewStatusProse}} |
 | Public launch | Pre-launch; URLs are live but no inbound traffic yet |
 
-The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in BETA, scored under the v2-Beta four-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`); the post-Beta stabilization cut-over is targeted for Sept 30, 2026 pending external academic review.
+The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in {{ctx.civicaIndexStatusUpper}}, scored under the v2-Beta {{ctx.civicaIndexDimensionCountWord}}-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`); the post-Beta stabilization cut-over is targeted for {{state.civicaIndex.cutoverTarget}} pending external academic review.
 
 For live numbers (active sources, fact counts, multi-sourced coverage), see `/about` — values are read directly from the database, not maintained as inline prose. Page values may briefly differ from the metrics above as new vintages land.
 

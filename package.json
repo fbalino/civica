@@ -69,7 +69,8 @@
     "snapshot:fact-vintage": "tsx scripts/snapshot-fact-vintage.ts",
     "backfill:upstream-vintage-labels": "tsx scripts/backfill-upstream-vintage-labels.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
-    "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts"
+    "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts",
+    "regenerate:readme": "tsx scripts/regenerate-readme.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
