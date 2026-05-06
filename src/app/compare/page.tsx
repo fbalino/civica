@@ -434,31 +434,6 @@ export default async function ComparePage({
           cursor: pointer;
         }
         .ci-compare-picker-remove:hover { color: var(--color-text-primary); }
-        .ci-compare-picker-search {
-          font-family: var(--font-body);
-          font-size: 14px;
-          padding: 10px 12px;
-          background: var(--color-surface-elevated, var(--color-bg));
-          border: 1px solid var(--color-card-border);
-          border-radius: var(--radius-md);
-          color: var(--color-text-primary);
-          width: 100%;
-        }
-        .ci-compare-picker-option {
-          display: flex; align-items: center; gap: 10px;
-          width: 100%;
-          padding: 10px 14px;
-          background: transparent;
-          border: none;
-          font-family: var(--font-body);
-          font-size: 14px;
-          color: var(--color-text-primary);
-          cursor: pointer;
-          text-align: left;
-        }
-        .ci-compare-picker-option:hover {
-          background: var(--color-grid-cell-hover, var(--color-card-bg));
-        }
         .ci-compare-picker-empty {
           font-family: var(--font-mono);
           font-size: 11px;

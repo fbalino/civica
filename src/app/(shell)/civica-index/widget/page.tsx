@@ -269,63 +269,6 @@ export default async function CivicaIndexWidgetPage({
           text-transform: uppercase;
           color: var(--color-text-30);
         }
-        .widget-search-row { position: relative; }
-        .widget-search input {
-          width: 100%;
-          padding: 12px 16px;
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
-          font-size: var(--text-13);
-          color: var(--color-text-primary);
-          background: var(--color-card-bg);
-          border: 1px solid var(--color-card-border);
-          border-radius: var(--radius-sm);
-        }
-        .widget-search input:focus {
-          outline: none;
-          border-color: var(--color-accent);
-        }
-        .widget-search-results {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          margin: 6px 0 0;
-          padding: 4px;
-          list-style: none;
-          background: var(--color-card-bg);
-          border: 1px solid var(--color-card-border);
-          border-radius: var(--radius-sm);
-          z-index: 10;
-          box-shadow: var(--shadow-hard-sm, 2px 2px 0 var(--color-card-border));
-        }
-        .widget-search-results li {
-          padding: 9px 12px;
-          border-radius: var(--radius-sm);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          color: var(--color-text-primary);
-        }
-        .widget-search-results li.on,
-        .widget-search-results li:hover {
-          background: var(--color-accent);
-          color: var(--color-bg);
-        }
-        .widget-search-name {
-          font-family: var(--font-heading);
-          font-size: var(--text-16);
-        }
-        .widget-search-iso {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
-          font-size: var(--text-11);
-          letter-spacing: var(--tracking-wider);
-          color: inherit;
-          opacity: 0.7;
-        }
 
         .widget-toolbar {
           padding: 20px 0 0;

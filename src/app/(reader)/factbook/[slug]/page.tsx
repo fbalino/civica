@@ -11,6 +11,7 @@ import {
   getBillsForJurisdiction,
 } from "@/lib/db/queries";
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
+import { reconciliation } from "@/lib/content/site-state";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
 import { FactbookSection } from "@/components/FactbookSection";
@@ -19,7 +20,7 @@ import {
   FactbookSidebar,
   type FactbookSidebarItem,
 } from "@/components/factbook/FactbookSidebar";
-import { FactbookMobileSubheader } from "@/components/factbook/FactbookMobileSubheader";
+import { FactbookStickyCountrySearch } from "@/components/factbook/FactbookStickyCountrySearch";
 import {
   FactbookRightRail,
   type SubsectionEntry,
@@ -387,8 +388,16 @@ export default async function FactbookCountryPage({
         <div className="factbook-reconciliation-notice">
           <div className="factbook-reconciliation-notice__inner">
             Some figures reconciled across multiple sources via Civica&apos;s
-            methodology (v0.1{" "}
-            <span className="factbook-reconciliation-notice__beta">BETA</span>).{" "}
+            methodology ({reconciliation.version.replace(/-beta$/, "")}
+            {reconciliation.status === "beta" ? (
+              <>
+                {" "}
+                <span className="factbook-reconciliation-notice__beta">
+                  BETA
+                </span>
+              </>
+            ) : null}
+            ).{" "}
             <Link
               href="/factbook/methodology/reconciliation"
               className="factbook-reconciliation-notice__link"
@@ -401,7 +410,7 @@ export default async function FactbookCountryPage({
 
       <div id="factbook-header-sentinel" aria-hidden="true" />
 
-      <FactbookMobileSubheader
+      <FactbookStickyCountrySearch
         country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
         countries={countryOptions}
         sentinelId="factbook-header-sentinel"

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useCallback } from "react";
+import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 
 interface Country {
   slug: string;
@@ -46,22 +47,6 @@ function CountryPicker({
   slotLabel: string;
   seriesColor: string;
 }) {
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, []);
-
-  const filtered = query
-    ? countries.filter((c) => c.name.toLowerCase().includes(query.toLowerCase())).slice(0, 12)
-    : countries.slice(0, 12);
-
   const selectedCountry = selected ? countries.find((c) => c.slug === selected) : null;
 
   if (selectedCountry) {
@@ -108,51 +93,18 @@ function CountryPicker({
 
   return (
     <div
-      ref={ref}
       className="ci-compare-picker-card"
-      style={{ position: "relative", borderTopColor: seriesColor }}
+      style={{ borderTopColor: seriesColor }}
     >
       <div className="ci-compare-picker-slot">{slotLabel}</div>
-      <input
-        type="text"
+      <CountrySearchCombobox
+        countries={countries}
         placeholder={placeholder}
-        value={query}
-        onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-        onFocus={() => setOpen(true)}
-        className="ci-compare-picker-search"
+        ariaLabel={placeholder}
+        compact
+        onSelect={(country) => onSelect(country.slug)}
       />
-      {open && filtered.length > 0 && (
-        <div
-          className="ci-compare-picker-menu"
-          style={{
-            position: "absolute",
-            top: "100%",
-            marginTop: 4,
-            left: 0,
-            right: 0,
-            zIndex: 20,
-            borderRadius: "var(--radius-sm)",
-            border: "1px solid var(--color-card-border)",
-            background: "var(--color-surface-elevated)",
-            maxHeight: 240,
-            overflowY: "auto",
-          }}
-        >
-          {filtered.map((c) => (
-            <button
-              key={c.slug}
-              onClick={() => { onSelect(c.slug); setQuery(""); setOpen(false); }}
-              className="ci-compare-picker-option"
-            >
-              <span style={{ fontSize: "var(--text-18)" }}>{countryFlag(c.iso2)}</span>
-              {c.name}
-            </button>
-          ))}
-        </div>
-      )}
-      {!open && (
-        <div className="ci-compare-picker-empty">Select a country to compare</div>
-      )}
+      <div className="ci-compare-picker-empty">Select a country to compare</div>
     </div>
   );
 }
