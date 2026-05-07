@@ -63,8 +63,6 @@ html[data-theme="light"] .atlas-root {
 
 .atlas-root * {
   box-sizing: border-box;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in oklab, var(--atlas-muted) 50%, transparent) transparent;
 }
 
 .atlas-serif { font-family: var(--font-heading); }

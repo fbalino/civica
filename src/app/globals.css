@@ -260,6 +260,13 @@
   /* --- Logo tokens (dark mode defaults) --- */
   --logo-fg: var(--color-text-primary);  /* cream on dark */
   --logo-bg: var(--color-bg);            /* dark field */
+
+  /* --- Scrollbar defaults --- */
+  --scrollbar-size: var(--space-3);
+  --scrollbar-radius: var(--radius-md);
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: color-mix(in oklab, var(--color-text-muted) 50%, transparent);
+  --scrollbar-thumb-hover: color-mix(in oklab, var(--color-text-secondary) 65%, transparent);
 }
 
 /* ============================================================
@@ -359,6 +366,33 @@ body {
 
 *, *::before, *::after {
   box-sizing: border-box;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-radius);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
 }
 
 h1, h2, h3, h4, h5, h6 {

@@ -1,5 +1,16 @@
 # Project Memory Sessions
 
+## 2026-05-07 — Global scrollbar defaults
+
+Atlas-style scrollbar treatment moved into global CSS so long sidebars
+and other overflow containers inherit it by default. `src/app/globals.css`
+now defines shared `--scrollbar-*` tokens plus Firefox/WebKit global
+rules; `src/app/atlas.css` no longer owns the broad `.atlas-root *`
+scrollbar rule; `src/app/civica-chat.css` points chat scroll containers
+at the shared tokens. Verified with `npm run build` and `agent-browser`
+on `/factbook/united-states` and `/atlas`; screenshots/video live under
+`~/civica/plan/`.
+
 ## 2026-05-03 — `structural_family` removal — Phase 4 public API deprecation contract shipped
 
 Phase 4 of the structural-family removal landed. Sunset date locked
