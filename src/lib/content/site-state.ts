@@ -1,8 +1,16 @@
 /**
  * Civica site-state — typed project-state constants for reader-facing copy.
  *
- *   Adopted via: ~/civica/plan/site-stale-content-audit-v1.md (Phase 1)
- *   Companion :  src/lib/content/site-stats.ts (live DB-driven counters)
+ *   Adopted via:  ~/civica/plan/site-stale-content-audit-v1.md (Phase 1)
+ *   Companion  :  src/lib/content/site-stats.ts (live DB-driven counters)
+ *   Extended by:  ~/civica/plan/content-templating-audit-v1.md (Phase 1, §5.5)
+ *                 added `deprecation.*` re-export so the markdown
+ *                 templating layer's variable schema is self-contained
+ *                 (the peer-grouping methodology page interpolates
+ *                 `STRUCTURAL_FAMILY_SUNSET_DATE_ISO` and we want
+ *                 `{{state.deprecation.structuralFamilySunsetDateIso}}`
+ *                 to resolve without the markdown having to know about
+ *                 the deprecation module).
  *
  * This file is the single source of truth for project-state values that
  * the reader-facing site embeds in prose: Tier-1 publisher status, NSO
@@ -41,10 +49,19 @@ export const externalReviewStatus: "not-yet" | "in-review" | "complete" =
   "not-yet";
 
 /** Current public-citation vintage handle. Format follows the
- *  reconciliation methodology page §vintaging convention. Refreshed
- *  by the quarterly vintage-cut script; until that script lands,
- *  edit by hand on each cut. */
-export const currentVintage = "Civica Atlas 2026Q3" as const;
+ *  reconciliation methodology page §vintaging convention. Renders on
+ *  the reconciliation methodology page (line 535) and the peer-
+ *  grouping migration page (line 60).
+ *
+ *  Manually kept in sync with `reconciliation.version` +
+ *  `reconciliation.firstVintage` below — the quarterly snapshot cron
+ *  refreshes the underlying frozen vintages, but this string is
+ *  rendered in static prose and must be updated by hand on each cut.
+ *  v1.0 follow-up §1.5 (~/civica/plan/v1.0-followup-backlog.md)
+ *  flipped this from the legacy "Civica Atlas 2026Q3" placeholder
+ *  to the live R.22 cut on 2026-05-06. */
+export const currentVintage =
+  "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1" as const;
 
 // ─────────────────────────────────────────────────────────────────────
 // Civica Index (CI) — composite governance score
@@ -387,4 +404,30 @@ export const methodologyPages = {
   pulseBacktest:         { beta: true  },
   peerGrouping:          { beta: false },
   peerGroupingMigration: { beta: false },
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────
+// API deprecation re-exports (for content templating)
+// ─────────────────────────────────────────────────────────────────────
+
+import {
+  STRUCTURAL_FAMILY_SUNSET_DATE_ISO,
+  STRUCTURAL_FAMILY_SUNSET_DATE,
+  PEER_GROUPINGS_SUCCESSOR_HREF,
+} from "@/lib/api/deprecation";
+
+/** Re-export of the API deprecation constants so the content-templating
+ *  layer's `state.*` variable schema is self-contained. The peer-grouping
+ *  methodology page interpolates the sunset date in prose; that
+ *  interpolation should resolve via `{{state.deprecation.structuralFamilySunsetDateIso}}`
+ *  without the markdown source having to import from the deprecation
+ *  module directly.
+ *
+ *  Per content-templating audit v1.0 §5.5. The canonical authoring
+ *  location remains `src/lib/api/deprecation.ts`; this is a typed
+ *  re-export only. */
+export const deprecation = {
+  structuralFamilySunsetDateIso: STRUCTURAL_FAMILY_SUNSET_DATE_ISO,
+  structuralFamilySunsetDateHttp: STRUCTURAL_FAMILY_SUNSET_DATE,
+  peerGroupingsSuccessorHref: PEER_GROUPINGS_SUCCESSOR_HREF,
 } as const;
