@@ -9,8 +9,6 @@ import { peerGrouping, civicaIndex, deprecation } from "@/lib/content/site-state
 
 export const revalidate = 3600;
 
-export const revalidate = 3600;
-
 const REVIEW_STATUS_LABEL: Record<"pending" | "in-review" | "complete", string> = {
   pending: "Pending external review",
   "in-review": "External review in progress",
