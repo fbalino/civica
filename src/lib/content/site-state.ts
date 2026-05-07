@@ -388,6 +388,136 @@ export const replication = {
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────
+// v1.0 reconciliation verification gates
+// ─────────────────────────────────────────────────────────────────────
+
+/** Threshold table consumed by the v1.0 reconciliation verification
+ *  suite (`scripts/verify-reconciliation-v1.ts`) and the nightly
+ *  drift-detection cron at
+ *  `/api/cron/factbook/verify-reconciliation`. Single source of truth
+ *  for every numeric gate so reader-facing prose can interpolate the
+ *  same numbers without drift.
+ *
+ *  Adopted via: ~/civica/plan/v1-verification-suite-resolution-v1.md
+ *
+ *  Gate semantics:
+ *    - `gating: true`  — drives `overallStatus = "fail"` when failed
+ *    - `gating: false` — appears in report but doesn't trigger alerts
+ *
+ *  Pre-launch posture (see `launchPhase` above): while
+ *  `launchPhase === "pre-launch-beta"`, failed gates report as `warn`,
+ *  not `fail`, since there's no public traffic to harm. The cron route
+ *  applies this conditional automatically.
+ *
+ *  v1.1 re-raise plan: `multiSourcedTwoOrMore.threshold` was lowered
+ *  from the master-plan stretch target of 30 to the honest v1.0 ground
+ *  truth of 27 (after IEA was scrapped on license, Destatis-DE was
+ *  deferred to v1.1, and NBS-Nigeria was deferred permanently).
+ *  Re-raise to ≥30 when v1.1 ISTAT + ABS + INE-ES sources land
+ *  (their fact-key overlap should comfortably cross that bar). */
+export const v1ReconciliationGates = {
+  /** Distinct source_ids writing to country_facts. Master-plan target
+   *  is 11 Tier-1 + 6 NSO = 17. Live state at 2026-05-07 was 20
+   *  (cia_factbook + wikidata + vdem are bonus beyond the formal
+   *  list). Threshold stays at 17 — the bonus three are nice but
+   *  shouldn't all silently disappear. */
+  activeSources: { threshold: 17, gating: true } as const,
+
+  /** Fact-keys with ≥2 sources for at least one country. Lowered from
+   *  master-plan 30 to honest v1.0 ground truth 27. See class comment
+   *  above for re-raise plan. */
+  multiSourcedTwoOrMore: { threshold: 27, gating: true } as const,
+
+  /** Fact-keys with ≥3 sources for at least one country. */
+  multiSourcedThreeOrMore: { threshold: 10, gating: true } as const,
+
+  /** Total country_facts row count. Revised down from master-plan 30k
+   *  per v1.0-followup-backlog §1.1 — actual v1.0 ship is ~25.8k. */
+  totalFactsMin: { threshold: 25_000, gating: true } as const,
+
+  /** Wikidata rows synced within the last 2 years (ratio of total
+   *  Wikidata rows). Uses `retrieved_at`, NOT upstream `fact_year` —
+   *  Wikidata claims often lack date qualifiers. */
+  wikidataFreshnessRatio: { threshold: 0.8, gating: true } as const,
+
+  /** Wikidata fact-keys expected to have ≥1 row globally. Probe at
+   *  2026-05-07 found 8 distinct fact-keys. The gate fires if any of
+   *  these has zero rows (i.e. the Wikidata sync stopped writing for
+   *  that fact-key). Add new Wikidata fact-keys here as they land —
+   *  not adding one doesn't break the gate, it just isn't checked. */
+  wikidataFactKeys: [
+    "death_rate",
+    "population_total",
+    "fertility_rate",
+    "gdp_per_capita_usd",
+    "life_expectancy_years",
+    "birth_rate",
+    "gdp_nominal_usd_billions",
+    "unemployment_rate_pct",
+  ] as const,
+
+  /** Active NSOs (must have last_sync_at non-null). Mirrors
+   *  `nsoWave1` filtered to status === 'in-progress'. Update when an
+   *  NSO graduates from in-progress to in-progress+ or is deferred. */
+  activeNsoSources: [
+    "us_census",
+    "ons_uk",
+    "insee_fr",
+    "statcan_ca",
+    "ibge_br",
+    "stats_sa",
+  ] as const,
+
+  /** Active Tier-1 publishers (must have last_sync_at non-null).
+   *  Mirrors `tier1Publishers` filtered to shipped === true. */
+  activeTier1Sources: [
+    "world_bank",
+    "imf_weo",
+    "un_data",
+    "who_gho",
+    "unesco_uis",
+    "undp_hdi",
+    "oecd_stat",
+    "fao_faostat",
+    "ilo_ilostat",
+    "eurostat",
+    "wto_stats",
+  ] as const,
+
+  /** Maximum tolerated days since a source's last_sync_at before the
+   *  freshness gate fires. Quarterly cron + 90-day buffer = 180 days. */
+  syncFreshnessMaxDays: { threshold: 180, gating: true } as const,
+
+  /** Regex that the most recent vintage_label must match. Confirms
+   *  R.22 quarterly snapshot cron is producing well-formed labels.
+   *  Format: `Civica Atlas Reconciled v<major>.<minor>-beta — vintage <YYYY>-Q<n>`. */
+  vintageLabelRegex:
+    "^Civica Atlas Reconciled v\\d+\\.\\d+-beta — vintage \\d{4}-Q\\d$" as const,
+
+  /** Maximum tolerated days since the most recent vintage cut. R.22
+   *  cadence is quarterly; this allows for one missed cut + buffer. */
+  vintageFreshnessMaxDays: { threshold: 200, gating: true } as const,
+
+  /** Maximum number of distinct methodology_version values in
+   *  country_facts. v0.2-beta is the current stamp; multi-version
+   *  distribution flags an investigation but isn't gating
+   *  (`v0.3-beta` rolling out is expected, not a regression). */
+  methodologyVersionMaxDistinct: { threshold: 1, gating: false } as const,
+
+  /** Maximum tolerated `open` disputes before reviewer-time-budget
+   *  alarming. Informational, not gating — high volume is a process
+   *  signal, not data integrity. */
+  openDisputesMax: { threshold: 50, gating: false } as const,
+
+  /** Cron timing — used by reader-facing prose. Slot is 03:45 UTC
+   *  (15 min after the bills/us cron at 03:00 UTC clears, giving the
+   *  bills sync headroom on its 60s `maxDuration`). The full schedule
+   *  spec lives in `vercel.json`. */
+  cronSchedule: "45 3 * * *" as const,
+  cronScheduleHumanReadable: "Daily at 03:45 UTC" as const,
+} as const;
+
+// ─────────────────────────────────────────────────────────────────────
 // Methodology-page beta flags
 // ─────────────────────────────────────────────────────────────────────
 
