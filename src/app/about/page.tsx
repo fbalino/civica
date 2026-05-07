@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SourceDot } from "@/components/SourceDot";
+import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
@@ -87,6 +88,14 @@ export default async function AboutPage() {
       "Data source integrated into the Civica pipeline.",
   }));
 
+  // The pure-prose intro + "How it works" + "Methodology" + "Standing
+  // posture" + "Open and free" sections live in content/about.md.
+  // The 3-card "What we do" grid, the DB-driven sources grid, and
+  // the provenance-dot legend stay in TSX because they're either
+  // bespoke layout or live data, not prose. Per
+  // ~/civica/plan/content-templating-audit-v1.md §3.1.
+  const state = { civicaIndex, pulse };
+
   return (
     <div
       className="cv-container"
@@ -97,38 +106,16 @@ export default async function AboutPage() {
     >
       <h1 className="hero-heading">About Civica Atlas</h1>
 
-      <p
-        style={{
-          fontFamily: "var(--font-body)",
-          fontSize: "var(--text-16)",
-          color: "var(--color-text-60)",
-          lineHeight: "var(--leading-normal)",
-          maxWidth: 720,
-          marginBottom: 12,
-        }}
-      >
-        Civica Atlas is an open reference atlas of the world&apos;s countries,
-        governments, and governance outcomes. It combines data from
-        authoritative sources into a single, browsable atlas of political
-        systems, demographics, economies, and the institutions that shape them.
-      </p>
-
-      <p
-        style={{
-          fontFamily: "var(--font-body)",
-          fontSize: "var(--text-16)",
-          color: "var(--color-text-60)",
-          lineHeight: "var(--leading-normal)",
-          maxWidth: 720,
-        }}
-      >
-        The project is built in the same posture as Our World in Data, the
-        V-Dem Institute, and the World Bank&rsquo;s statistical division
-        &mdash; an academic publication with a UI on top, not a website that
-        happens to have data. Every fact carries provenance, every methodology
-        decision is documented, and every disagreement between sources is
-        surfaced rather than hidden.
-      </p>
+      {/* Intro paragraphs — markdown body, sliced to everything
+          BEFORE the "How it works" section. */}
+      <section className="editorial-section about-prose-intro">
+        <MarkdownContent
+          file="content/about.md"
+          state={state as unknown as Record<string, unknown>}
+          stats={null}
+          slice={{ to: "how-it-works" }}
+        />
+      </section>
 
       <div
         style={{
@@ -311,165 +298,15 @@ export default async function AboutPage() {
         }}
       />
 
-      <section>
-        <h2 className="page-heading" style={{ marginBottom: 8 }}>
-          How it works
-        </h2>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            marginBottom: 16,
-            maxWidth: 720,
-          }}
-        >
-          The data pipeline has three layers, each addressing a known failure
-          mode in single-source reference works.
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            marginBottom: 12,
-            maxWidth: 720,
-          }}
-        >
-          <strong style={{ color: "var(--color-text-primary)" }}>
-            Sync orchestrators (one per source).
-          </strong>{" "}
-          A dedicated module per upstream publisher pulls fresh data on a
-          documented cadence and writes into the canonical{" "}
-          <code style={{ fontFamily: "var(--font-mono)" }}>country_facts</code>{" "}
-          table with statement-level provenance.
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            marginBottom: 12,
-            maxWidth: 720,
-          }}
-        >
-          <strong style={{ color: "var(--color-text-primary)" }}>
-            Reconciliation resolver.
-          </strong>{" "}
-          When two or more sources publish a value for the same country and
-          fact-key, the resolver picks a canonical based on freshness rules,
-          editorial assertions, and forecast-vs-measurement distinctions. When
-          sources disagree by more than a configurable threshold, it creates a
-          dispute record routed to human review rather than silently picking.
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            marginBottom: 16,
-            maxWidth: 720,
-          }}
-        >
-          <strong style={{ color: "var(--color-text-primary)" }}>
-            Reader surfaces.
-          </strong>{" "}
-          Every reader-facing page consumes the resolver. Every value renders a{" "}
-          <em>FactValueDot</em> &mdash; a small chevron that opens a panel
-          revealing the canonical pick, every alternate source, freshness
-          dates, and licenses.
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            maxWidth: 720,
-          }}
-        >
-          For a plain-English walkthrough, see{" "}
-          <Link
-            href="/methodology/approach"
-            style={{
-              color: "var(--color-text-60)",
-              textDecoration: "underline",
-              textUnderlineOffset: "2px",
-            }}
-          >
-            How we approach data
-          </Link>
-          . For the deep technical specification, see{" "}
-          <Link
-            href="/factbook/methodology/reconciliation"
-            style={{
-              color: "var(--color-text-60)",
-              textDecoration: "underline",
-              textUnderlineOffset: "2px",
-            }}
-          >
-            Methodology &mdash; Reconciliation
-          </Link>
-          .
-        </p>
-      </section>
-
-      <div
-        style={{
-          height: 1,
-          background: "var(--color-divider)",
-          margin: "var(--spacing-section-y) 0",
-        }}
-      />
-
-      <section>
-        <h2 className="page-heading" style={{ marginBottom: 8 }}>
-          Methodology
-        </h2>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            marginBottom: 16,
-            maxWidth: 720,
-          }}
-        >
-          Every load-bearing methodology decision in Civica is documented as a
-          citable resolution before the corresponding code ships. Published
-          methodology pages cover composite scoring (the Civica Index), event
-          classification (the Civica Pulse), peer grouping (the V-Dem RoW +
-          World Bank region/income lens architecture), reconciliation rules,
-          forecast-vs-measurement, and regime classification.
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            marginBottom: 16,
-            maxWidth: 720,
-          }}
-        >
-          Browse the full set at{" "}
-          <Link
-            href="/methodology"
-            style={{
-              color: "var(--color-text-60)",
-              textDecoration: "underline",
-              textUnderlineOffset: "2px",
-            }}
-          >
-            /methodology
-          </Link>
-          .
-        </p>
+      {/* "How it works" + "Methodology" prose — markdown body sliced
+          to the range between those two anchors. */}
+      <section className="editorial-section about-prose-howitworks">
+        <MarkdownContent
+          file="content/about.md"
+          state={state as unknown as Record<string, unknown>}
+          stats={null}
+          slice={{ from: "how-it-works", to: "standing-posture" }}
+        />
       </section>
 
       <div
@@ -646,84 +483,15 @@ export default async function AboutPage() {
         }}
       />
 
-      <section>
-        <h2 className="page-heading" style={{ marginBottom: 8 }}>
-          Standing posture
-        </h2>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            marginBottom: 16,
-            maxWidth: 720,
-          }}
-        >
-          Civica&rsquo;s approach is shaped by the institutions it cites and
-          aspires to be cited alongside. Our World in Data is the canonical
-          model for academic-grade public data presentation. The V-Dem
-          Institute sets the methodological standard for comparative-politics
-          regime classification. The World Bank, IMF, UN agencies, OECD, and
-          other Tier-1 publishers form the backbone of the data layer.
-        </p>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            maxWidth: 720,
-          }}
-        >
-          We are not these institutions. We do not have their funding, their
-          staff, their decades of accumulated trust, or their formal review
-          processes. What we have is a discipline of treating methodology
-          decisions as citable artifacts, an honest beta posture for novel
-          work, and a commitment to surfacing disagreement rather than hiding
-          it.
-        </p>
-      </section>
-
-      <div
-        style={{
-          height: 1,
-          background: "var(--color-divider)",
-          margin: "var(--spacing-section-y) 0",
-        }}
-      />
-
-      <section>
-        <h2 className="page-heading" style={{ marginBottom: 8 }}>
-          Open and free
-        </h2>
-        <p
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-normal)",
-            maxWidth: 720,
-          }}
-        >
-          Civica Atlas is built to be a free, open reference. The codebase is
-          open-source. Public-domain and CC0-licensed data is freely available.
-          Per-source licenses are preserved at the row level and disclosed on
-          every reader page. If you are an academic interested in reviewing the
-          methodology, citing the data, or collaborating on extensions, please{" "}
-          <Link
-            href="/contact"
-            style={{
-              color: "var(--color-text-60)",
-              textDecoration: "underline",
-              textUnderlineOffset: "2px",
-            }}
-          >
-            get in touch
-          </Link>
-          . External review is an explicit goal of the project, not a
-          hypothetical.
-        </p>
+      {/* "Standing posture" + "Open and free" prose — markdown body
+          sliced from `standing-posture` to end of file. */}
+      <section className="editorial-section about-prose-outro">
+        <MarkdownContent
+          file="content/about.md"
+          state={state as unknown as Record<string, unknown>}
+          stats={null}
+          slice={{ from: "standing-posture" }}
+        />
       </section>
     </div>
   );

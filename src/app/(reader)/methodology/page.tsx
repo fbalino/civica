@@ -7,6 +7,7 @@ import {
 } from "@/components/editorial/ReaderSidebar";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
+import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -126,20 +127,12 @@ const SECTIONS: MethodologySection[] = [
       },
     ],
   },
-  {
-    id: "beta-meaning",
-    heading: "What 'BETA' means here",
-    intro:
-      "Two kinds of pages on the site carry a BETA marker. Novel Civica-asserted methodologies — the Civica Index composite, the Pulse classifier, the reconciliation rules — ship with BETA until external academic review. The methodology may be revised post-review with a documented changelog. External methodologies that Civica cites — V-Dem Regimes of the World, World Bank country classifications, Bjørnskov-Rode regime taxonomy, the Cheibub-Gandhi-Vreeland classification — do not carry a BETA marker. They inherit the source institution's standing.",
-    entries: [],
-  },
-  {
-    id: "not-yet-published",
-    heading: "What's not yet published",
-    intro:
-      "Internal methodology resolution documents cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, monarchy-status coding rules, and source-allowlist policy. These form the audit trail behind specific methodology calls and are currently held as working documents. Public publication of a curated subset is a v1.x deliverable — the goal is for any external reviewer to be able to read both what Civica decided and how.",
-    entries: [],
-  },
+  // Entry-less sections (BETA meaning, Not yet published) and the
+  // Get-in-touch / page-lead prose moved to content/methodology-overview.md
+  // and rendered via <MarkdownContent slice> below. The five sections
+  // above keep their inline intros because each owns a list of entry
+  // cards (rich React: link + beta pill + blurb) that don't translate
+  // cleanly to markdown. Per content-templating audit v1.0 §3.2.
 ];
 
 const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
@@ -260,18 +253,28 @@ export default function MethodologyHubPage() {
           </section>
         ))}
 
-        <section
-          id="get-in-touch"
-          className="editorial-section"
-          aria-labelledby="contact-heading"
-        >
-          <h2 id="contact-heading">Get in touch</h2>
-          <p>
-            If you spot a methodological gap, want to propose a refinement, or
-            are interested in formal external review, please{" "}
-            <Link href="/contact">contact us</Link>. External review is an
-            explicit project goal, not a hypothetical.
-          </p>
+        {/* "BETA meaning" + "Not yet published" prose-only sections —
+            sourced from content/methodology-overview.md per
+            content-templating audit v1.0 §3.2. The markdown's per-
+            section anchors ({#beta-meaning}, {#not-yet-published}) are
+            mirrored in SIDEBAR_ITEMS so the left rail keeps working. */}
+        <section className="editorial-section">
+          <MarkdownContent
+            file="content/methodology-overview.md"
+            stats={null}
+            slice={{ from: "beta-meaning", to: "get-in-touch" }}
+          />
+        </section>
+
+        {/* Get in touch prose — markdown source of truth. The TSX
+            shell keeps the per-section <section> wrapper for layout
+            consistency with the rest of the methodology hub. */}
+        <section className="editorial-section">
+          <MarkdownContent
+            file="content/methodology-overview.md"
+            stats={null}
+            slice={{ from: "get-in-touch" }}
+          />
         </section>
 
         <section

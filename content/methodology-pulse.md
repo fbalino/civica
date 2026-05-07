@@ -1,37 +1,39 @@
-# Pulse methodology
+<!--
+  Phase 5 (content templating, runtime) — 2026-05-06: this file is the
+  prose source of truth for /civica-index/methodology/pulse. The TSX
+  shell at src/app/(reader)/civica-index/methodology/pulse/page.tsx
+  wraps it via <MarkdownContent>.
 
-<!-- Source: src/app/(reader)/civica-index/methodology/pulse/page.tsx · Extracted 2026-05-04 -->
-<!-- Values mirror src/lib/content/site-state.ts (pulse.*, disputeSla) as of 2026-05-05. Do not edit prose counts here without updating site-state.ts in lockstep. -->
+  TSX shell handles: H1 (with beta tag), subtitle, warning callout,
+  cite section (CiteAccordion), footer nav. The markdown body covers
+  every other section in document order.
 
-*Beta — methodology under active validation*
+  Substitution markers:
+    {{state.X}}                 typed config from site-state.ts
+    {{ctx.X}}                   pre-computed helpers from the TSX shell
+                                (ctx.graduationPct, ctx.graduationCount,
+                                 ctx.v1Version, ctx.v1CategoryCount,
+                                 ctx.currentVersion, ctx.currentCategoryCount)
 
-A real-time governance shock monitor layered on top of the quarterly Civica Index. Beta — methodology under active validation.
+  Heading anchors via `## Heading {#anchor}`.
 
-> **This is an experimental system.** Pulse values are not yet peer-reviewed and should not be cited as authoritative. The pipeline is under active validation; backtesting against historical governance shocks is in progress, with at least 80% (8 of 10) of the named test cases required to match expert consensus before the Pulse graduates to publishable status.
+  Validate with: npm run validate:content-templates
+-->
 
----
-
-<a id="what-pulse-is"></a>
-## What the Pulse is
+## What the Pulse is {#what-pulse-is}
 
 The Civica Pulse fills the gap between quarterly Civica Index updates. A coup in March shouldn't wait until the next V-Dem dataset release eighteen months later to register. A peaceful transfer of power shouldn't be invisible until the next quarterly composite. The Pulse classifies governance-relevant events worldwide and publishes their impact as **per-dimension deltas** — not as a single merged score that competes with the CI.
 
 On every country page you see five rows — one per dimension — each showing the cumulative decayed impact of recent events mapped to that dimension. Below them are the 1–2 events driving the largest contribution. The dimensional format prevents single-number misreading and makes each impact explainable.
 
----
-
-<a id="what-pulse-is-not"></a>
-## What the Pulse is not
+## What the Pulse is not {#what-pulse-is-not}
 
 - Not a co-equal score alongside the CI. There is no single "Pulse number" that competes with the CI composite.
 - Not a citable standard at launch. Treat values as experimental indicators, not ground truth.
 - Not an attempt to outperform specialised sources. ACLED is still the authority on conflict events; V-Dem is still the authority on democratic trajectory. The Pulse aggregates and scores; it does not claim original empirical authority.
 - Not fully automated. High-severity events require human review before they affect published scores.
 
----
-
-<a id="sources"></a>
-## Sources — specialist feeds first, news second
+## Sources — specialist feeds first, news second {#sources}
 
 The first version of the Pulse relied on general news ingestion (GDELT + Google News). This produced the **media asymmetry problem**: closed regimes produce few detectable events because journalists are restricted, while free-press democracies produce many. The naive aggregation ended up rewarding censorship. Fatal if unaddressed.
 
@@ -54,10 +56,7 @@ Pulse Beta uses **stacked source integration**: specialised structured feeds are
 
 An event detected only in news without specialist corroboration is held at lower confidence. In countries where the press freedom score is low, news-only signals do not trigger classification on their own — see the press-freedom rule below.
 
----
-
-<a id="daily-pipeline"></a>
-## Daily pipeline
+## Daily pipeline {#daily-pipeline}
 
 1. **Ingest.** Pull the trailing 24 hours of records from every primary and secondary feed. Resolve country names to jurisdiction ids. Write to a staging table.
 2. **Cluster.** Embed each record with a sentence transformer (all-MiniLM-L6-v2, 384-dim). Group records by country and ±48-hour window using cosine similarity ≥ 0.75. Each cluster represents one real-world event regardless of how many sources covered it.
@@ -66,14 +65,11 @@ An event detected only in news without specialist corroboration is held at lower
 5. **Human review.** Severe and catastrophic severity events, plus events where the classifier didn't reach consensus, route to a review queue and do not affect published scores until reviewed.
 6. **Score.** Multiply each event's severity by its corroboration confidence and decay it by event-type-specific half-life. Sum per (country, dimension), clamp to [−15, +10], and write to the dimensional-deltas table.
 
----
+## Event categories — the {{state.pulse.taxonomy.version}} taxonomy {#event-categories}
 
-<a id="event-categories"></a>
-## Event categories — the v2 taxonomy
+The Pulse classifies every event into exactly one category drawn from a fixed taxonomy. {{state.pulse.taxonomy.version}} ships **{{state.pulse.taxonomy.categoryCount}} categories** across the five dimensions, derived from a top-down completeness review against five established political-science frameworks (V-Dem, ACLED, the Comparative Constitutions Project, the Polity Project, and Freedom House). Full derivation lives in [the gap-analysis document](https://github.com/civicaatlas/civica/blob/main/docs/taxonomy-v2-gap-analysis.md).
 
-The Pulse classifies every event into exactly one category drawn from a fixed taxonomy. v2.0 ships **61 categories** across the five dimensions, derived from a top-down completeness review against five established political-science frameworks (V-Dem, ACLED, the Comparative Constitutions Project, the Polity Project, and Freedom House). Full derivation lives in [the gap-analysis document](https://github.com/civicaatlas/civica/blob/main/docs/taxonomy-v2-gap-analysis.md).
-
-### Democratic Quality (12 categories)
+### Democratic Quality ({{state.pulse.taxonomy.categoriesPerDimension.democratic_quality}} categories)
 
 - `fair_election` — free and fair election (V-Dem Electoral Democracy Index, FH A-1).
 - `flawed_election` — irregularity-laden election (V-Dem v2elirreg).
@@ -88,7 +84,7 @@ The Pulse classifies every event into exactly one category drawn from a fixed ta
 - `term_extension` — constitutional term extension or self-coup that prolongs a leader's mandate.
 - `constitutional_override_electoral` — constitutional override of a specific electoral mandate.
 
-### Rule of Law (13 categories)
+### Rule of Law ({{state.pulse.taxonomy.categoriesPerDimension.rule_of_law}} categories)
 
 - `judicial_purge` — mass dismissal or replacement of judges (V-Dem v2juhcind).
 - `judicial_independence_rollback` — institutional erosion of judicial independence.
@@ -104,7 +100,7 @@ The Pulse classifies every event into exactly one category drawn from a fixed ta
 - `emergency_declaration` — civilian state of emergency without military jurisdiction (FH F).
 - `anticorruption_conviction` — high-profile anti-corruption conviction in independent court (also scored on Corruption Control).
 
-### Rights & Freedoms (19 categories)
+### Rights & Freedoms ({{state.pulse.taxonomy.categoriesPerDimension.freedom_rights}} categories)
 
 - `journalist_arrest`, `media_shutdown` — press-freedom incidents (RSF, V-Dem v2mecenefm).
 - `protest_crackdown` — state response to a specific protest event with casualties.
@@ -124,7 +120,7 @@ The Pulse classifies every event into exactly one category drawn from a fixed ta
 - `political_assassination` — targeted killing of journalists, activists, opposition figures (ACLED VAC attack sub-event-type).
 - `press_freedom_expansion` — press-freedom law expansion (positive).
 
-### Corruption Control (6 categories)
+### Corruption Control ({{state.pulse.taxonomy.categoriesPerDimension.corruption_control}} categories)
 
 - `corruption_conviction` — high-level corruption conviction.
 - `corruption_scandal` — major documented corruption scandal.
@@ -133,7 +129,7 @@ The Pulse classifies every event into exactly one category drawn from a fixed ta
 - `whistleblower_protection_change` — whistleblower-protection regime changes (V-Dem v2juacgr).
 - `financial_disclosure_change` — asset-disclosure and beneficial-ownership requirement changes (FH C-3).
 
-### Stability (11 categories)
+### Stability ({{state.pulse.taxonomy.categoriesPerDimension.stability}} categories)
 
 - `armed_conflict`, `state_collapse` — ACLED battles + Polity codings.
 - `coup` — military or unconstitutional seizure of power.
@@ -147,12 +143,9 @@ The Pulse classifies every event into exactly one category drawn from a fixed ta
 
 Each category in the taxonomy ships with: an inline theoretical citation, an allowed-severity-tier list, a decay half-life, and a direction (positive / negative / mixed). The classifier picks exactly one category per event; multiple related events on different dimensions form what the methodology calls a *cascade* — see below.
 
----
+## Disambiguation — when an event could fit multiple categories {#disambiguation}
 
-<a id="disambiguation"></a>
-## Disambiguation — when an event could fit multiple categories
-
-v2.0 expanded the taxonomy from 30 to 61 categories. Several of the new fine-grained categories overlap at the prompt level with v1 categories — an event could plausibly fit either. The classifier prompt enforces a single rule for these cases:
+{{ctx.currentVersion}} expanded the taxonomy from {{ctx.v1CategoryCount}} to {{ctx.currentCategoryCount}} categories. Several of the new fine-grained categories overlap at the prompt level with {{ctx.v1Version}} categories — an event could plausibly fit either. The classifier prompt enforces a single rule for these cases:
 
 **The more dimension-specific category wins over the more generic procedural one.**
 
@@ -165,10 +158,7 @@ Concrete precedence:
 
 The disambiguation rules live in `src/lib/pulse/v2/classifier-prompt.ts` as part of the system prompt sent to Claude. The same prompt drives both production classification and backtesting — they cannot drift apart.
 
----
-
-<a id="cascade-model"></a>
-## How coups are classified — the cascade model
+## How coups are classified — the cascade model {#cascade-model}
 
 Reviewers occasionally ask why a coup d'état drives the Stability dimension rather than Democratic Quality. The answer is that it drives both — but indirectly, through the cascade.
 
@@ -183,10 +173,7 @@ The Pulse models a coup as the **stability rupture**. The democratic damage that
 
 This mirrors how political scientists model regime breakdown: the coup is the rupture event, the consolidation is what kills democratic institutions over the following weeks and months. Each cascade event is independently classifiable; their dimensional impacts accumulate naturally on the right rows. A reader looking at the country page sees Stability plummet on day one and Democratic Quality, Rule of Law, and Rights & Freedoms degrade over the following months as the new regime consolidates power.
 
----
-
-<a id="multi-run-classifier"></a>
-## Multi-run classifier — agreement is the confidence signal
+## Multi-run classifier — agreement is the confidence signal {#multi-run-classifier}
 
 LLM self-reported confidence is not calibrated. The Pulse ignores it. Instead, each cluster is classified three times with different temperature settings, and **agreement across runs** drives the confidence signal:
 
@@ -196,10 +183,7 @@ LLM self-reported confidence is not calibrated. The Pulse ignores it. Instead, e
 
 The full per-run output (category, tier, severity, rationale) is stored on every event row for audit. Disputes can reference the exact classifier outputs that produced the published value.
 
----
-
-<a id="asymmetric-scoring"></a>
-## Asymmetric scoring — anti-gaming
+## Asymmetric scoring — anti-gaming {#asymmetric-scoring}
 
 Authoritarian regimes can manufacture positive-seeming events (sham elections, symbolic anti-corruption prosecutions, announced reforms without implementation) more easily than they can manufacture negative ones. Symmetric scoring invites gaming.
 
@@ -216,10 +200,7 @@ Authoritarian regimes can manufacture positive-seeming events (sham elections, s
 - No announcement vs. implementation distinction.
 - No discount based on source type.
 
----
-
-<a id="press-freedom-rule"></a>
-## Press-freedom rule
+## Press-freedom rule {#press-freedom-rule}
 
 A country's current RSF Press Freedom score modulates how much weight news-only signals carry:
 
@@ -229,15 +210,12 @@ A country's current RSF Press Freedom score modulates how much weight news-only 
 
 This addresses the media asymmetry problem directly. In closed regimes the primary signal comes from specialist feeds (ACLED, CIVICUS, RSF, HRW) that actively work to document events despite media restrictions. In free-press environments, news coverage itself is a reliable signal.
 
----
-
-<a id="decay"></a>
-## Decay — different events fade at different rates
+## Decay — different events fade at different rates {#decay}
 
 A coup d'état has structural impact for years. A journalist-arrest event is incident-level and fades faster. Pulse Beta uses event-type-specific half-lives instead of a single uniform decay constant.
 
 | Category | Half-life (days) |
-|---|---|
+|---|---:|
 | Coup d'état | 365 |
 | State collapse | 730 |
 | Constitutional override / self-coup | 365 |
@@ -255,30 +233,21 @@ A coup d'état has structural impact for years. A journalist-arrest event is inc
 
 Decay is exponential: `impact = severity × confidence × exp(−ln2 × days / half_life)`.
 
----
-
-<a id="bounds"></a>
-## Bounds and double-counting prevention
+## Bounds and double-counting prevention {#bounds}
 
 Each dimensional delta is clamped to **[−15, +10]** against the CI baseline for that dimension. Asymmetric bounds acknowledge that governance can deteriorate faster than it can improve. The cap also prevents a single catastrophic event from completely overriding years of structural data.
 
 When the quarterly CI absorbs an event via updated source data (e.g. a coup from last quarter is now reflected in V-Dem's new release), the corresponding Pulse delta is zeroed so the event isn't counted twice. The audit trail in the event row records when this happens.
 
----
-
-<a id="coverage-limitations"></a>
-## Coverage limitations — closed regimes
+## Coverage limitations — closed regimes {#coverage-limitations}
 
 The Pulse depends on observable, reportable events. For countries with severely restricted press freedom (RSF Press Freedom score below 30) or where international monitoring organisations have limited access — North Korea, Eritrea, Turkmenistan, parts of contemporary Afghanistan — the Pulse will systematically **under-detect** events and may show artificially stable dimensional deltas.
 
-This is a known limitation of any real-time governance monitor that depends on documented evidence. For these countries, the structural [Civica Index](https://civicaatlas.org/civica-index) remains the primary signal — it draws on expert assessments aggregated annually (V-Dem, Freedom House, etc.) and does not depend on observable real-time events.
+This is a known limitation of any real-time governance monitor that depends on documented evidence. For these countries, the structural [Civica Index](/civica-index) remains the primary signal — it draws on expert assessments aggregated annually (V-Dem, Freedom House, etc.) and does not depend on observable real-time events.
 
 Country pages where the country's RSF score falls below 30 surface this caveat directly on the Pulse panel.
 
----
-
-<a id="known-limitations"></a>
-## Known limitations
+## Known limitations {#known-limitations}
 
 - Coverage is uneven. Countries with rich specialist feed coverage (Sub-Saharan Africa via ACLED, etc.) will have richer Pulse signals than countries with sparse coverage. Sparse-coverage countries may show more stable deltas, which can understate real events.
 - LLM classification is imperfect. Every classification decision is logged with the per-run outputs and is subject to correction via the disputes process below.
@@ -286,13 +255,6 @@ Country pages where the country's RSF score falls below 30 surface this caveat d
 - Dimensional deltas are bounded. A single event cannot produce more than −15 or +10 points of movement on any single dimension. This prevents extremes from distorting comparisons but may understate truly catastrophic situations.
 - The Pulse is not yet peer-reviewed and should not be cited as authoritative.
 
----
+## Corrections and disputes {#corrections}
 
-<a id="corrections"></a>
-## Corrections and disputes
-
-File a Pulse dispute via the [corrections form](https://civicaatlas.org/civica-index/corrections). Pulse-specific dispute categories include event misclassification, severity miscalibration, false positives, missing events, and duplicate events. Each dispute is logged publicly with its disposition and outcome. Resolution target: 7 days initial response, 30 days full disposition.
-
----
-
-*Related pages: [Civica Index methodology](https://civicaatlas.org/civica-index/methodology) · [Backtest report](https://civicaatlas.org/civica-index/methodology/pulse/backtest) · [Pulse changelog](https://civicaatlas.org/civica-index/pulse-changelog) · [Corrections form](https://civicaatlas.org/civica-index/corrections)*
+File a Pulse dispute via the [corrections form](/civica-index/corrections). Pulse-specific dispute categories include event misclassification, severity miscalibration, false positives, missing events, and duplicate events. Each dispute is logged publicly with its disposition and outcome. Resolution target: {{state.disputeSla.initialResponseDays}} days initial response, {{state.disputeSla.fullDispositionDays}} days full disposition.

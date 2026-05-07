@@ -70,7 +70,8 @@
     "backfill:upstream-vintage-labels": "tsx scripts/backfill-upstream-vintage-labels.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts",
-    "regenerate:readme": "tsx scripts/regenerate-readme.ts"
+    "regenerate:readme": "tsx scripts/regenerate-readme.ts",
+    "validate:content-templates": "tsx scripts/validate-content-templates.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",
@@ -87,6 +88,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {

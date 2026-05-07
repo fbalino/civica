@@ -1507,3 +1507,242 @@ html:has(.factbook-sticky-country-search:focus-within)
   margin: var(--space-8) 0;
   border: 0;
 }
+
+/* ─── Methodology presentation primitives ──────────────────────────
+ *
+ * Extracted from the Civica Index methodology page's inline <style>
+ * block during Phase 5 content-templating migration (2026-05-06).
+ * Per content-templating audit v1.0 §6.C.
+ *
+ * Reusable across the methodology surface: the PCA appendix can
+ * compose `.meth-formula`, future methodology pages can use
+ * `.meth-version-strip` for their meta grids, etc.
+ *
+ * - `.meth-abstract`         pull-quote with accent left border
+ * - `.meth-num`              "Section N" eyebrow label inside h2
+ * - `.meth-formula`          styled <pre> code block (formulas, examples)
+ * - `.meth-weights-bar`      dimension weight bar (colored segments)
+ * - `.meth-weight-slice`        each segment
+ * - `.meth-band-scale`       rank band ladder (A-F colored rows)
+ * - `.meth-band-cell`           each row
+ * - `.meth-version-strip`    4-column metadata grid (status / revision / cutover / cadence)
+ * - `.meth-version-cell`        each cell
+ * - `.meth-version-label`       cell label
+ * - `.meth-version-value`       cell value
+ */
+
+.meth-abstract {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  line-height: 1.5;
+  color: var(--color-text-60);
+  letter-spacing: -0.01em;
+  border-left: 3px solid var(--color-accent);
+  padding: 4px 0 4px 24px;
+  margin: 0 0 56px;
+}
+
+.meth-num {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-12);
+  letter-spacing: 0.12em;
+  color: var(--color-text-30);
+  display: block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.meth-formula {
+  background: var(--color-grid-cell);
+  border: 1px solid var(--color-card-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 4px;
+  padding: 20px 24px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-13);
+  color: var(--color-text-primary);
+  line-height: 1.7;
+  margin: 20px 0 24px;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+.meth-weights-bar {
+  display: flex;
+  margin: 8px 0 36px;
+  height: 44px;
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid var(--color-card-border);
+}
+
+.meth-weight-slice {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 14px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-11);
+  color: var(--color-text-primary);
+  min-width: 80px;
+  border-right: 1px solid color-mix(in oklab, var(--color-text-primary) 20%, transparent);
+}
+
+.meth-weight-slice:last-child {
+  border-right: none;
+}
+
+.meth-weight-slice strong {
+  font-family: var(--font-heading);
+  font-size: var(--text-14);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  display: block;
+}
+
+.meth-weight-slice small {
+  font-size: var(--text-11);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.meth-band-scale {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 10px 0 32px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--color-card-border);
+}
+
+.meth-band-cell {
+  padding: 12px 18px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+}
+
+.meth-band-cell strong {
+  font-family: var(--font-heading);
+  font-size: var(--text-16);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  flex: 0 0 140px;
+}
+
+.meth-band-cell small {
+  font-size: var(--text-11);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.meth-version-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--color-grid-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 24px 0 48px;
+}
+
+.meth-version-cell {
+  background: var(--color-grid-cell);
+  padding: 18px 20px;
+}
+
+.meth-version-label {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-10);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-30);
+  margin-bottom: 6px;
+}
+
+.meth-version-value {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 900px) {
+  .meth-version-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+  .meth-weights-bar {
+    flex-wrap: wrap;
+    height: auto;
+  }
+  .meth-weight-slice {
+    flex: 1 1 50%;
+    padding: 10px;
+  }
+  .meth-band-cell strong {
+    flex: 0 0 110px;
+  }
+}
+
+@media (max-width: 600px) {
+  .meth-band-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 10px 14px;
+  }
+  .meth-band-cell strong {
+    flex: none;
+  }
+}
+
+/* ─── Methodology figure wrapper (charts, plots, custom SVG visuals)
+ *
+ * Added during the PCA-appendix migration (2026-05-06, Phase 6+1).
+ * Wrapper for inline-SVG components like EigenvalueChart. Replaces
+ * the old per-page `.scree-figure` styles that lived in the PCA
+ * appendix's inline <style> block.
+ *
+ * - `.meth-figure`           wrapper around an SVG + caption
+ * - `.meth-figure-caption`   mono caption text below the figure
+ */
+
+.meth-figure {
+  margin: var(--space-5) 0 var(--space-6);
+  padding: var(--space-4);
+  background: var(--color-grid-cell);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+}
+
+.meth-figure svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.meth-figure-caption {
+  font-family: var(--font-mono);
+  font-weight: var(--font-weight-mono, 500);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  line-height: 1.5;
+  margin-top: var(--space-3);
+}
+
+.meth-figure-caption code {
+  font-family: var(--font-mono);
+  background: var(--color-bg);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}

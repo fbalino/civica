@@ -95,6 +95,17 @@ Canonical npm scripts (in `package.json`):
 2. `tsx scripts/calculate-ci-composite.ts` — computes composite scores and ranks
 3. For Pulse: `tsx scripts/ingest-pulse-events.ts` → `tsx scripts/classify-pulse-events.ts` → `tsx scripts/calculate-pulse-scores.ts`
 
+## Reader-page prose lives in `content/*.md`, not TSX
+Seven `content/*.md` files are now the rendered prose source of truth for their paired pages (`/about`, `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse`, `/civica-index/methodology/pca-appendix`). The TSX shells wrap the markdown via `<MarkdownContent>` from `src/components/content/`. Edit prose in the markdown file, NOT the TSX. The TSX shell only owns layout, rich components (weights bar, bands scale, version strip, source-card grids, eigenvalue chart), DB-driven blocks (revision history, source list), CiteAccordion invocations, and footer nav.
+
+- **Any methodology number cited in `content/*.md` is a `{{state.*}}` or `{{stats.*}}` interpolation, not a hardcode.** Drift between the rendered page and the live DB is caught by `npm run validate:content-templates`. New hardcoded numbers in markdown are a bug.
+- **Sidebar anchors are stable ids written `## Heading {#anchor-id}` in markdown.** The `remark-civica-anchors` plugin assigns the id; renaming the heading prose doesn't break the sidebar link.
+- **Soft-fail every `{{stats.*}}` reference** with a `| "fallback"` arg. Pages must render coherently when `getSiteStats()` throws (e.g., DB unreachable). Mirror the try/catch in `src/app/(reader)/methodology/approach/page.tsx`.
+- **The seventh file (`content/methodology-reconciliation.md`) is deferred** until the `<WorkedExample>` editorial primitive lands (per `~/civica/plan/content-templating-implementation-v1.md` §3.2). Its TSX page at `src/app/(reader)/factbook/methodology/reconciliation/page.tsx` remains the prose source of truth in the meantime.
+- **Discipline before push:** when editing methodology prose, run `npm run validate:content-templates` and verify the affected page renders correctly on `localhost:3000`. Add `ctx.*` keys to the validator's `CTX_ALLOWLIST` whenever a markdown file references a new pre-computed helper.
+
+Full architecture documented at `~/civica/plan/content-templating-implementation-v1.md` (substitution engine, slice prop, soft-fail discipline, per-page strategy, `<WorkedExample>` follow-up).
+
 ## Footer invariants
 These links MUST survive any header/footer refactor:
 - Blog · API Docs · Design System · **Status Page** (https://statuspage.incident.io/civica-atlas) · Licensing · Contact · GitHub

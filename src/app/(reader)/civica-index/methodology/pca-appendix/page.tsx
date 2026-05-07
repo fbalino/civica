@@ -4,6 +4,8 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { MarkdownContent } from "@/components/content/MarkdownContent";
+import { EigenvalueChart } from "@/components/methodology/EigenvalueChart";
 import { civicaIndex } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -151,22 +153,36 @@ export default function PcaAppendixPage() {
   const [loadLow, loadHigh] = pca.pc1LoadingRange;
   const loadRange = (loadHigh - loadLow).toFixed(2);
   const [corrLow, corrHigh] = pca.correlationRange;
+
+  // Pre-computed helpers for the markdown body. Per Phase 5 §3.2.
+  // Keys must match the validator's per-file allowlist in
+  // scripts/validate-content-templates.ts.
+  const ctx = {
+    pc1VariancePct,
+    loadLow,
+    loadHigh,
+    loadRange,
+    corrLow,
+    corrHigh,
+  };
+
+  const state = { civicaIndex };
+
   return (
     <MethodologyLayout items={SECTIONS}>
-      <EditorialPage className="pca-layout">
-      <article className="pca-article">
+      <EditorialPage>
         <SmartBreadcrumbs />
 
-        <h1 className="page-title">PCA appendix.</h1>
-        <div className="page-meta">
+        <h1 className="editorial-page-title">PCA appendix.</h1>
+        <div className="editorial-page-meta">
           <span>Empirical weight derivation</span>
-          <span className="dim">·</span>
+          <span>·</span>
           <span>Run: {pca.lastRunDate}</span>
-          <span className="dim">·</span>
+          <span>·</span>
           <span>n = {pca.panelSize} countries</span>
         </div>
 
-        <p className="abstract">
+        <p className="meth-abstract">
           The dimension weights used in the Civica Index are derived from
           the data, not asserted. This page documents the principal
           component analysis that produced them, with full disclosure
@@ -174,9 +190,11 @@ export default function PcaAppendixPage() {
         </p>
 
         {/* ────────────────────────────────────────────────────── */}
-        <section id="summary">
+        {/* Section 1 — Headline finding (TSX: prose + adopted-weights
+            table reading from civicaIndex.dimensions) */}
+        <section id="summary" className="editorial-section">
           <h2>
-            <span className="num">Section 1</span>Headline finding
+            <span className="meth-num">Section 1</span>Headline finding
           </h2>
           <p>
             The {civicaIndex.dimensionCount} governance dimensions of
@@ -224,23 +242,23 @@ export default function PcaAppendixPage() {
                 return (
                   <tr key={r.dimension}>
                     <td>{r.label}</td>
-                    <td className="num-cell">
+                    <td className="editorial-td-num">
                       {r.weightProvisional.toFixed(2)}
                     </td>
-                    <td className="num-cell">
+                    <td className="editorial-td-num">
                       {r.weightSuggested.toFixed(3)}
                     </td>
-                    <td className="num-cell weight-adopted">
-                      {adopted.toFixed(2)}
-                    </td>
+                    <td className="editorial-td-num">{adopted.toFixed(2)}</td>
                   </tr>
                 );
               })}
-              <tr className="row-total">
-                <td>Sum</td>
-                <td className="num-cell">1.00</td>
-                <td className="num-cell">1.000</td>
-                <td className="num-cell weight-adopted">1.00</td>
+              <tr>
+                <td>
+                  <strong>Sum</strong>
+                </td>
+                <td className="editorial-td-num">1.00</td>
+                <td className="editorial-td-num">1.000</td>
+                <td className="editorial-td-num">1.00</td>
               </tr>
             </tbody>
           </table>
@@ -258,39 +276,22 @@ export default function PcaAppendixPage() {
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
-        <section id="data">
-          <h2>
-            <span className="num">Section 2</span>The panel
-          </h2>
-          <p>
-            <strong>n = {pca.panelSize} countries</strong> with all{" "}
-            {civicaIndex.dimensionCount} governance dimensions present.
-            Data vintage: {pca.dataVintage} (the most recent year fully
-            ingested into Civica). Source:{" "}
-            <code>ci_dimension_scores</code> table, normalized via the
-            Beta fixed-bound transforms documented in the{" "}
-            <Link href="/civica-index/methodology#normalization">
-              main methodology
-            </Link>
-            .
-          </p>
-          <p>
-            The countries are not a random sample — they are the
-            ingested set, weighted toward larger democracies and
-            authoritarian states with active governance research
-            coverage. Coverage is sparser in small island states and
-            in microstates. This is a known limitation of the panel and
-            does not change the conclusion that the{" "}
-            {civicaIndex.dimensionCount} indicators are highly
-            correlated, but it does mean the absolute magnitude of the
-            loadings might shift slightly with a broader sample.
-          </p>
+        {/* Section 2 — The panel (markdown body) */}
+        <section className="editorial-section">
+          <MarkdownContent
+            file="content/methodology-pca-appendix.md"
+            stats={null}
+            state={state as unknown as Record<string, unknown>}
+            ctx={ctx}
+            slice={{ from: "data", to: "five-dim" }}
+          />
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
-        <section id="correlations">
+        {/* Section 3 — Correlation matrix (TSX: 4×4 table) */}
+        <section id="correlations" className="editorial-section">
           <h2>
-            <span className="num">Section 3</span>Correlation matrix
+            <span className="meth-num">Section 3</span>Correlation matrix
           </h2>
           <p>
             Pearson correlations between the{" "}
@@ -312,12 +313,12 @@ export default function PcaAppendixPage() {
                   <td>
                     <strong>{r.dim}</strong>
                   </td>
-                  <td className="num-cell">
+                  <td className="editorial-td-num">
                     {r.democratic_quality.toFixed(2)}
                   </td>
-                  <td className="num-cell">{r.rule_of_law.toFixed(2)}</td>
-                  <td className="num-cell">{r.freedom_rights.toFixed(2)}</td>
-                  <td className="num-cell">
+                  <td className="editorial-td-num">{r.rule_of_law.toFixed(2)}</td>
+                  <td className="editorial-td-num">{r.freedom_rights.toFixed(2)}</td>
+                  <td className="editorial-td-num">
                     {r.corruption_control.toFixed(2)}
                   </td>
                 </tr>
@@ -337,9 +338,10 @@ export default function PcaAppendixPage() {
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
-        <section id="eigenvalues">
+        {/* Section 4 — Eigenvalues + scree (TSX: table + inline-SVG chart) */}
+        <section id="eigenvalues" className="editorial-section">
           <h2>
-            <span className="num">Section 4</span>Eigenvalues &amp; variance
+            <span className="meth-num">Section 4</span>Eigenvalues &amp; variance
           </h2>
           <p>
             PCA on the standardized panel (mean 0, variance 1 per
@@ -360,11 +362,11 @@ export default function PcaAppendixPage() {
                   <td>
                     <strong>{r.pc}</strong>
                   </td>
-                  <td className="num-cell">{r.eigenvalue.toFixed(3)}</td>
-                  <td className="num-cell">
+                  <td className="editorial-td-num">{r.eigenvalue.toFixed(3)}</td>
+                  <td className="editorial-td-num">
                     {(r.varExplained * 100).toFixed(1)}%
                   </td>
-                  <td className="num-cell">
+                  <td className="editorial-td-num">
                     {(r.cumulative * 100).toFixed(1)}%
                   </td>
                 </tr>
@@ -376,22 +378,21 @@ export default function PcaAppendixPage() {
             &gt; 1) selects only PC1. The scree plot makes the same
             point visually:
           </p>
-          <figure className="scree-figure">
-            <img
-              src="/methodology/phase-5-3-scree-plot.png"
-              alt="Scree plot showing PC1 eigenvalue at 3.71, all subsequent components below 1.0"
-            />
-            <figcaption>
-              Eigenvalue scree. The dashed line is the Kaiser threshold
-              (eigenvalue = 1.0); only PC1 sits above it.
-            </figcaption>
-          </figure>
+
+          <EigenvalueChart
+            data={EIGENVALUES.map((r) => ({
+              pc: r.pc,
+              eigenvalue: r.eigenvalue,
+              cumulative: r.cumulative,
+            }))}
+          />
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
-        <section id="loadings">
+        {/* Section 5 — PC loadings (TSX: 4×4 table) */}
+        <section id="loadings" className="editorial-section">
           <h2>
-            <span className="num">Section 5</span>PC loadings
+            <span className="meth-num">Section 5</span>PC loadings
           </h2>
           <p>
             How much each dimension contributes to each principal
@@ -411,12 +412,10 @@ export default function PcaAppendixPage() {
               {LOADINGS.map((r) => (
                 <tr key={r.dimension}>
                   <td>{r.label}</td>
-                  <td className="num-cell loading-pc1">
-                    {r.pc1.toFixed(3)}
-                  </td>
-                  <td className="num-cell">{r.pc2.toFixed(3)}</td>
-                  <td className="num-cell">{r.pc3.toFixed(3)}</td>
-                  <td className="num-cell">{r.pc4.toFixed(3)}</td>
+                  <td className="editorial-td-num">{r.pc1.toFixed(3)}</td>
+                  <td className="editorial-td-num">{r.pc2.toFixed(3)}</td>
+                  <td className="editorial-td-num">{r.pc3.toFixed(3)}</td>
+                  <td className="editorial-td-num">{r.pc4.toFixed(3)}</td>
                 </tr>
               ))}
             </tbody>
@@ -440,115 +439,19 @@ export default function PcaAppendixPage() {
         </section>
 
         {/* ────────────────────────────────────────────────────── */}
-        <section id="five-dim">
-          <h2>
-            <span className="num">Section 6</span>The 5th-dimension test
-          </h2>
-          <p>
-            The methodology spec considers adding a fifth dimension —
-            <em>Administrative Capacity</em>, drawn from World Bank WGI
-            Government Effectiveness and Regulatory Quality — if and
-            only if it emerges as empirically distinct from Rule of
-            Law in factor analysis.
-          </p>
-          <p>
-            <strong>This phase does not test that question.</strong> The
-            WGI Government Effectiveness indicator is not yet ingested
-            into Civica. The high correlation between Rule of Law and
-            Corruption Control (r = {corrHigh}) hints that adding a
-            related governance-quality indicator might simply load on
-            the same factor as Rule of Law — but that&rsquo;s a
-            hypothesis, not a finding. The test is deferred to a
-            follow-up phase (after the indicator is ingested), at which
-            point this appendix will be re-run and, if warranted, the
-            methodology updated.
-          </p>
+        {/* Sections 6, 7, 8 — markdown body */}
+        <section className="editorial-section">
+          <MarkdownContent
+            file="content/methodology-pca-appendix.md"
+            stats={null}
+            state={state as unknown as Record<string, unknown>}
+            ctx={ctx}
+            slice={{ from: "five-dim" }}
+          />
         </section>
 
-        {/* ────────────────────────────────────────────────────── */}
-        <section id="limitations">
-          <h2>
-            <span className="num">Section 7</span>Limitations
-          </h2>
-          <p>
-            <strong>Sample size.</strong> The methodology spec
-            envisions a panel of 2000–2024 country-years (thousands of
-            observations). The current panel is {pca.panelSize}{" "}
-            countries from a single year — statistically usable but
-            underpowered. Final weights will be re-validated when the
-            historical panel is ingested. The structural decision (
-            {civicaIndex.dimensionCount}-dim core, near-equal weights)
-            is unlikely to change because the underlying correlation
-            structure of these indicators is well-documented in the
-            governance-measurement literature, but the precise
-            magnitudes might shift.
-          </p>
-          <p>
-            <strong>Single-year panel.</strong> A cross-sectional PCA
-            captures shared variance at one moment in time. It does
-            not test whether the same factor structure holds over
-            decades. The historical panel will address this.
-          </p>
-          <p>
-            <strong>Source coverage.</strong> The {pca.panelSize}{" "}
-            countries with all {civicaIndex.dimensionCount} dimensions
-            are skewed toward larger states and active
-            governance-research targets. Microstates and small island
-            states are under-represented. The PCA findings should be
-            understood as describing &ldquo;the kinds of countries we
-            currently have data for.&rdquo;
-          </p>
-          <p>
-            <strong>No source-substitution sensitivity test.</strong>{" "}
-            The spec calls for swapping each primary source with its
-            secondary (e.g., V-Dem Liberal Democracy → V-Dem Polyarchy)
-            and confirming rank stability. This requires the secondary
-            sources to be ingested in parallel. Deferred to the same
-            follow-up.
-          </p>
-        </section>
-
-        {/* ────────────────────────────────────────────────────── */}
-        <section id="reproduction">
-          <h2>
-            <span className="num">Section 8</span>Reproducing this analysis
-          </h2>
-          <p>
-            The full Python pipeline that produced these numbers is
-            checked into the repository at{" "}
-            <code>analysis/phase-5-3/run_pca.py</code>. It pulls
-            directly from the production database, applies the same
-            fixed-bound normalization documented in the main
-            methodology, runs PCA via scikit-learn, and writes:
-          </p>
-          <ul className="bullets">
-            <li>
-              <code>eigenvalues.csv</code> — the table in §4
-            </li>
-            <li>
-              <code>loadings_pca.csv</code> — the table in §5
-            </li>
-            <li>
-              <code>correlations.csv</code> — the matrix in §3
-            </li>
-            <li>
-              <code>scree_plot.png</code> — the figure in §4
-            </li>
-            <li>
-              <code>results.json</code> — machine-readable summary
-              including the suggested weights
-            </li>
-          </ul>
-          <p>
-            To re-run the analysis on updated data:{" "}
-            <code>cd analysis/phase-5-3 && uv run python run_pca.py</code>.
-            The Python environment is managed by{" "}
-            <a href="https://docs.astral.sh/uv/">uv</a> and the lockfile
-            is committed for reproducibility.
-          </p>
-        </section>
-
-        <section className="editorial-section" id="cite">
+        {/* Cite */}
+        <section id="cite" className="editorial-section">
           <h2>Cite this page</h2>
           <CiteAccordion
             subject="Civica Atlas Methodology — PCA appendix"
@@ -556,169 +459,18 @@ export default function PcaAppendixPage() {
             url="https://civicaatlas.org/civica-index/methodology/pca-appendix"
           />
         </section>
-      </article>
 
-      <style>{`
-        .pca-layout {
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 60px var(--spacing-page-x, 40px) 80px;
-          color: var(--color-text-primary);
-        }
-        .pca-article .editorial-breadcrumbs a {
-          color: var(--color-text-secondary);
-        }
-        .pca-article .editorial-breadcrumbs a:hover {
-          color: var(--color-text-primary);
-        }
-        .pca-article .page-title {
-          font-family: var(--font-heading, var(--font-serif));
-          font-size: 56px;
-          font-weight: 400;
-          letter-spacing: -0.04em;
-          line-height: 1.02;
-          margin-bottom: 12px;
-        }
-        .pca-article .page-meta {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 12px;
-          letter-spacing: 0.03em;
-          color: var(--color-text-30);
-          margin-bottom: 32px;
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-          align-items: center;
-        }
-        .pca-article .page-meta .dim { color: var(--color-text-20); }
-        .pca-article .abstract {
-          font-family: var(--font-heading, var(--font-serif));
-          font-size: 22px;
-          line-height: 1.5;
-          color: var(--color-text-60);
-          letter-spacing: -0.01em;
-          border-left: 3px solid var(--color-accent);
-          padding: 4px 0 4px 24px;
-          margin: 0 0 56px;
-        }
-        .pca-article h2 {
-          font-family: var(--font-heading, var(--font-serif));
-          font-size: 32px;
-          font-weight: 400;
-          letter-spacing: -0.03em;
-          line-height: 1.1;
-          margin: 56px 0 16px;
-          scroll-margin-top: 80px;
-        }
-        .pca-article h2 .num {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 12px;
-          letter-spacing: 0.12em;
-          color: var(--color-text-30);
-          display: block;
-          margin-bottom: 8px;
-          text-transform: uppercase;
-        }
-        .pca-article p {
-          color: var(--color-text-60);
-          margin-bottom: 16px;
-          font-size: 16px;
-          line-height: 1.7;
-        }
-        .pca-article p strong { color: var(--color-text-primary); font-weight: 500; }
-        .pca-article p em { color: var(--color-text-primary); }
-        .pca-article a { color: var(--color-accent); }
-        .pca-article ul.bullets {
-          color: var(--color-text-60);
-          padding-left: 20px;
-          margin-bottom: 24px;
-        }
-        .pca-article ul.bullets li {
-          margin-bottom: 6px;
-          line-height: 1.6;
-        }
-        .pca-article code {
-          font-family: var(--font-mono);
-          font-size: 0.9em;
-          background: var(--color-grid-cell);
-          padding: 2px 6px;
-          border-radius: 3px;
-        }
-        .pca-article table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 16px 0 28px;
-          font-size: 14px;
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-        }
-        .pca-article thead th {
-          text-align: left;
-          padding: 12px 14px;
-          background: var(--color-grid-cell);
-          border-top: 1px solid var(--color-card-border);
-          border-bottom: 1px solid var(--color-card-border);
-          font-size: 10px;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: var(--color-text-30);
-          font-weight: 500;
-        }
-        .pca-article tbody td {
-          padding: 12px 14px;
-          border-bottom: 1px solid var(--color-divider);
-          color: var(--color-text-60);
-          vertical-align: top;
-          line-height: 1.5;
-        }
-        .pca-article tbody tr:hover { background: var(--color-grid-cell); }
-        .pca-article .num-cell {
-          font-family: var(--font-heading, var(--font-serif));
-          font-size: 16px;
-          font-weight: 500;
-          color: var(--color-text-primary);
-          letter-spacing: -0.01em;
-          text-align: right;
-        }
-        .pca-article .weight-adopted {
-          color: var(--color-accent);
-        }
-        .pca-article .loading-pc1 {
-          color: var(--color-accent);
-        }
-        .pca-article .row-total td {
-          border-top: 2px solid var(--color-card-border);
-          background: var(--color-grid-cell);
-          font-weight: 500;
-        }
-        .scree-figure {
-          margin: 24px 0;
-          padding: 16px;
-          background: var(--color-grid-cell);
-          border: 1px solid var(--color-card-border);
-          border-radius: 4px;
-        }
-        .scree-figure img {
-          display: block;
-          width: 100%;
-          height: auto;
-          border-radius: 2px;
-        }
-        .scree-figure figcaption {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
-          font-size: 12px;
-          color: var(--color-text-40);
-          margin-top: 12px;
-          line-height: 1.5;
-        }
-        @media (max-width: 700px) {
-          .pca-article .page-title { font-size: 40px; }
-          .pca-article h2 { font-size: 24px; }
-        }
-      `}</style>
+        <nav
+          className="editorial-footer-nav"
+          aria-label="Methodology navigation"
+        >
+          <Link href="/civica-index/methodology">
+            ← Civica Index methodology
+          </Link>
+          <Link href="/civica-index/methodology/peer-grouping">
+            Peer-grouping methodology →
+          </Link>
+        </nav>
       </EditorialPage>
     </MethodologyLayout>
   );

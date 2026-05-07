@@ -148,6 +148,26 @@ Lists & cards:
 - `.editorial-empty` — empty-state copy.
 - `.editorial-footer-nav` — link row at the bottom of an editorial page.
 
+Methodology presentation primitives (extracted from inline `<style>` blocks during the 2026-05-06 content-templating engagement; reusable across the methodology surface):
+
+- `.meth-abstract` — pull-quote with accent left border (page-top abstract).
+- `.meth-num` — "Section N" eyebrow inside an `<h2>` (numbered-section convention used by the Civica Index methodology page).
+- `.meth-formula` — styled `<pre>` block with accent left border for formulas, citation examples, API reference snippets.
+- `.meth-weights-bar` + `.meth-weight-slice` — colored horizontal bar visualizing dimension weights (currently used at `/civica-index/methodology` §2).
+- `.meth-band-scale` + `.meth-band-cell` — colored vertical ladder visualizing rank bands A–F (`/civica-index/methodology` §6).
+- `.meth-version-strip` + `.meth-version-cell` + `.meth-version-label` + `.meth-version-value` — 4-column metadata grid for status/revision/cutover/cadence (`/civica-index/methodology` §14).
+- `.meth-figure` + `.meth-figure-caption` — wrapper for inline-SVG methodology charts (e.g. `<EigenvalueChart>` on the PCA appendix §4). Print-inspired card aesthetic: grid-cell background, card-border, mono caption.
+
+Methodology charts:
+
+- **`<EigenvalueChart>`** (`src/components/methodology/EigenvalueChart.tsx`) — inline SVG scree plot. Composite of bars (one per principal component, dominant PC in `var(--color-accent)`, subordinate PCs in `var(--color-text-30)`) + cumulative-variance line overlay (accent thin path with marker circles) + Kaiser-threshold dashed reference rule. Server-rendered, accessible (`role="img"`, `<title>` + per-PC `<desc>`), dark-mode automatic via design tokens. Reusable for any PCA scree visualization. Currently used at `/civica-index/methodology/pca-appendix` §4.
+
+Civica's canonical SVG-construction reference is `src/components/factbook/FactbookLegislatureChart.tsx` (the hemicycle); follow its style — `viewBox` for fluid scaling, `var(--color-*)` for fills/strokes, hard 1px ink axis rules, no decorative shadows.
+
+Markdown rendering primitive:
+
+- **`<MarkdownContent>`** (`src/components/content/MarkdownContent.tsx`) — server component that reads a `content/*.md` file, runs Phase 5 substitutions (`{{state.X}}`, `{{stats.X | "fallback"}}`, `{{ctx.X}}`), and pipes through `react-markdown` with `remark-gfm` (tables + footnotes + GFM features) and a custom `remark-civica-anchors` plugin (for `## Heading {#anchor-id}` syntax). Used by every reader-style page whose prose lives under `content/`. Wrap the markdown body in `<section className="editorial-section">` so descendant `<h2>`/`<p>`/`<ul>`/`<table>` inherit editorial typography automatically. Optional `slice={{ from?, to? }}` prop renders only the lines between two heading anchors (used when interleaving markdown with TSX-only rich blocks). Full architecture documented at `~/civica/plan/content-templating-implementation-v1.md`.
+
 These classes are typed only against role tokens (`var(--color-*)`, `var(--text-*)`, `var(--space-*)`, `var(--radius-*)`, `var(--font-*)`). Read the file for the exact set; extend with new classes when a new pattern is needed.
 
 ## Do's & Don'ts
