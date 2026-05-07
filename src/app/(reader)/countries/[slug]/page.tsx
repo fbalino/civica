@@ -42,6 +42,8 @@ import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 
+export const revalidate = 3600;
+
 function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;

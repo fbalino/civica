@@ -3,6 +3,8 @@ import { slugToCountry } from "@/lib/atlas/ids";
 import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
 import { AtlasLeftModeToggle } from "@/components/shell/AtlasLeftModeToggle";
 
+export const revalidate = 3600;
+
 export default async function AtlasCountryLeftSlot({
   params,
 }: {

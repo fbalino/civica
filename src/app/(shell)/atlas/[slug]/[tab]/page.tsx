@@ -14,6 +14,8 @@ import { jurisdictions } from "@/lib/db/schema";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{ slug: string; tab: string }>;
 }

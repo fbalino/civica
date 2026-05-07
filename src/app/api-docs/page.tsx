@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import type { ReaderSidebarItem } from "@/components/editorial/ReaderSidebar";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "API Documentation — Civica Public API",
   description:

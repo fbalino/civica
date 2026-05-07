@@ -7,6 +7,8 @@ import { WidgetCopyButton } from "@/components/widget/WidgetCopyButton";
 import { WidgetCountrySearch } from "@/components/widget/WidgetCountrySearch";
 import { WidgetBuilder } from "@/components/widget/WidgetBuilder";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Civica Widget Gallery — Embed a governance score anywhere",
   description:

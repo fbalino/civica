@@ -4,6 +4,8 @@ import { HomeGrid } from "@/components/home/HomeGrid";
 import { HomeWiki } from "@/components/home/HomeWiki";
 import { civicaIndex } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Civica — Atlas of Governance",
   description:

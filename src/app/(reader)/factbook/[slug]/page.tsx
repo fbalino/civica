@@ -44,6 +44,8 @@ import {
   FACTBOOK_RECONCILIATION_META,
 } from "@/lib/factbook/reconcile/api";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
+
+export const revalidate = 3600;
 // Outcomes section is intentionally NOT imported. The dense peer-band
 // graph at <FactbookOutcomes>/<FactbookOutcomesGraph> is shipped in the
 // repo but the underlying peer-comparison methodology needs work before

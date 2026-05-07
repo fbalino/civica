@@ -8,6 +8,8 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Banner } from "@/components/editorial/Banner";
 import { disputeSla } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Corrections — Civica Index",
   description: `Dispute a data error, methodology decision, or Pulse event classification. Every submission is logged publicly and reviewed within ${disputeSla.fullDispositionDays} days.`,

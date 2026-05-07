@@ -7,6 +7,8 @@ import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { peerGrouping, civicaIndex } from "@/lib/content/site-state";
 import { STRUCTURAL_FAMILY_SUNSET_DATE_ISO } from "@/lib/api/deprecation";
 
+export const revalidate = 3600;
+
 const REVIEW_STATUS_LABEL: Record<"pending" | "in-review" | "complete", string> = {
   pending: "Pending external review",
   "in-review": "External review in progress",

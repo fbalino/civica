@@ -27,6 +27,8 @@ import { civicaIndex } from "@/lib/content/site-state";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 
+export const revalidate = 3600;
+
 /**
  * Phase 5.4 cut-over — display the four governance dimensions of the
  * Beta methodology. Human Development and Stability & Security have

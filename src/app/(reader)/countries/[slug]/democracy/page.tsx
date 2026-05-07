@@ -5,6 +5,8 @@ import { getJurisdictionBySlug, getDemocracyScores, getRegionalDemocracyComparis
 import { SourceDot } from "@/components/SourceDot";
 import { CountryFlag } from "@/components/CountryFlag";
 
+export const revalidate = 3600;
+
 function StatRow({ label, val, source, date }: { label: string; val: string; source?: string; date?: string }) {
   return (
     <div className="stat-row">

@@ -9,6 +9,8 @@ import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Methodology — Civica Atlas",
   description:

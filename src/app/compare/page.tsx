@@ -22,6 +22,8 @@ import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api"
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { civicaIndex } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 // Series colors resolve from the global :root block in globals.css.
 // No fallback literals — the globals are always present.
 const SERIES_VARS = [

@@ -49,6 +49,10 @@ import {
 } from "@/lib/factbook/reconcile/dispute-severity";
 import { reconciliation } from "@/lib/content/site-state";
 
+// Cache each filter-permutation URL for 1 hour to absorb crawler bursts
+// even if a misbehaving bot ignores the robots.txt disallow.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title:
     "Data disputes log (Beta) — Civica Atlas reconciliation methodology",
@@ -57,6 +61,14 @@ export const metadata: Metadata = {
   alternates: {
     canonical:
       "https://civicaatlas.org/factbook/methodology/reconciliation/disputes",
+  },
+  // Filter-permutation URLs are not canonical; only the parent
+  // methodology page should be indexed. Belt-and-suspenders alongside
+  // the robots.txt disallow.
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: { index: false, follow: false },
   },
 };
 

@@ -5,6 +5,8 @@ import { CountrySearch } from "./search";
 import { CountryFlag } from "@/components/CountryFlag";
 import { classifyGovernment } from "@/lib/data/government-category";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "All Countries & Territories — Government Structure Index",
   description:

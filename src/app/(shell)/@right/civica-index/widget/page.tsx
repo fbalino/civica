@@ -1,6 +1,8 @@
 import { AskCivicaPanel } from "@/components/shell/AskCivicaPanel";
 import { WIDGET_PROMPTS } from "@/lib/shell/suggested-prompts";
 
+export const revalidate = 3600;
+
 export default function CivicaIndexWidgetRight() {
   return (
     <AskCivicaPanel

@@ -11,6 +11,8 @@ import {
 import { currentVintage } from "@/lib/content/site-state";
 import { STRUCTURAL_FAMILY_SUNSET_DATE_ISO } from "@/lib/api/deprecation";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Per-country migration table — Peer-grouping methodology",
   description:

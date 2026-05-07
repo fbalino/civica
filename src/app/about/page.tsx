@@ -5,6 +5,8 @@ import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "About Civica Atlas — Open Reference Atlas of World Governments",
   description:

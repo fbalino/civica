@@ -12,6 +12,8 @@ import {
 } from "@/lib/pulse/v2/labels";
 import { pulse } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Pulse changelog (Beta) — Civica Index",
   description:

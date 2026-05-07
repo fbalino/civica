@@ -12,6 +12,8 @@ import {
 } from "@/lib/db/queries-backtest";
 import { pulse } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Pulse backtest report (Beta) — Civica Index",
   description:

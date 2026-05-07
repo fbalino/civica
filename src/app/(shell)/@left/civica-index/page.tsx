@@ -18,6 +18,8 @@ import {
 import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
 import { CivicaIndexFilterSelects } from "@/components/civica-index/CivicaIndexFilterSelects";
 
+export const revalidate = 3600;
+
 const CONTINENTS = [
   "Africa",
   "North America",

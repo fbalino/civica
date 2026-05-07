@@ -14,6 +14,8 @@ import {
   disputeSla,
 } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 const tier1Shipped = tier1Publishers.filter((p) => p.shipped);
 const tier1Scrapped = tier1Publishers.filter((p) => p.scrapped);
 const nsoActive = nsoWave1.filter((n) => n.status === "in-progress");

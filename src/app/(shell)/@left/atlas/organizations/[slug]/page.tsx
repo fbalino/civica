@@ -8,6 +8,8 @@ import {
 import type { OrgGroup } from "@/components/atlas/organizations";
 import { ShellOrgRail } from "@/components/shell/ShellOrgRail";
 
+export const revalidate = 3600;
+
 export default async function OrgLeftSlot({
   params,
 }: {

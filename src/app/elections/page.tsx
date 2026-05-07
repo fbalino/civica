@@ -5,6 +5,8 @@ import { elections, jurisdictions } from "@/lib/db/schema";
 import { sql } from "drizzle-orm";
 import ElectionsClient from "./ElectionsClient";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Election Timeline & Results — Upcoming and Past Elections Worldwide",
   description:

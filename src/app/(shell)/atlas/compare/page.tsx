@@ -3,6 +3,8 @@ import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import type { Country } from "@/components/atlas/data";
 import { CompareInAtlasClient } from "@/components/atlas/CompareInAtlasClient";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Compare — Atlas — Civica",
   description:

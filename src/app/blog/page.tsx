@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
 import { BlogCover } from "@/components/blog/BlogCover";
 
+export const revalidate = 3600;
+
 const SITE_URL = "https://civicaatlas.org";
 
 export const metadata: Metadata = {

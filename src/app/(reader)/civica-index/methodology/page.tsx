@@ -10,6 +10,8 @@ import {
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { civicaIndex, disputeSla, pulse } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Civica Index Methodology — How Governance Is Scored",
   description:

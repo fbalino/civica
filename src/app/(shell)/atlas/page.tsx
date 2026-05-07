@@ -2,6 +2,8 @@ import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import type { Country } from "@/components/atlas/data";
 import { AtlasMapShellClient } from "@/components/atlas/AtlasMapShellClient";
 
+export const revalidate = 3600;
+
 export async function generateMetadata() {
   return {
     title: "Atlas — Civica",

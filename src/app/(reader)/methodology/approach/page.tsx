@@ -16,6 +16,8 @@ import {
   adoptedResolutionCount,
 } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "How we approach data — Civica Atlas",
   description:

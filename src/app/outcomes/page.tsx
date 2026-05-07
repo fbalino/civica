@@ -4,6 +4,8 @@ import { getAllMetricDefinitionsWithCoverage } from "@/lib/db/queries";
 import { OutcomesExplorer } from "@/components/outcomes/OutcomesExplorer";
 import type { MetricOption } from "@/components/outcomes/OutcomesExplorer";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Country Outcomes by Government Type | Civica",
   description:

@@ -3,6 +3,8 @@ import { DesignSystemSwatch } from "@/components/DesignSystemSwatch";
 import { FactbookLegislatureChart } from "@/components/factbook/FactbookLegislatureChart";
 import { ATLAS_TAB_LABELS, ATLAS_TAB_ORDER } from "@/lib/atlas/ids";
 
+export const revalidate = 3600;
+
 import "./design-system.css";
 
 const SURFACE_TOKENS = [

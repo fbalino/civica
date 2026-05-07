@@ -10,6 +10,8 @@ import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { OrgDetailPanel } from "@/components/atlas/OrgDetailPanel";
 import type { OrgDetail } from "@/components/atlas/organizations";
 
+export const revalidate = 3600;
+
 export async function generateMetadata({
   params,
 }: {

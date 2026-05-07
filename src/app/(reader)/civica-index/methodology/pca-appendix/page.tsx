@@ -6,6 +6,8 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { civicaIndex } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "PCA appendix — Civica Index methodology",
   description: `Empirical justification for the Civica Index Beta dimension weights. PCA on the ${civicaIndex.dimensionCount} governance dimensions confirms a single dominant latent factor; weights are derived from the squared loadings on the first principal component.`,

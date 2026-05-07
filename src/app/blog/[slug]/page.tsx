@@ -7,6 +7,8 @@ import { BlogCover } from "@/components/blog/BlogCover";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 
+export const revalidate = 3600;
+
 const SITE_URL = "https://civicaatlas.org";
 
 export function generateStaticParams() {

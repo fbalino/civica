@@ -23,6 +23,8 @@ import {
 } from "@/lib/factbook/reconcile/api";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Civica Index by Peer Lens — Bi-Lens Explorer",
   description:

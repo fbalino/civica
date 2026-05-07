@@ -2,6 +2,8 @@ import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { slugToCountry } from "@/lib/atlas/ids";
 import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
 
+export const revalidate = 3600;
+
 export default async function CivicaIndexWidgetLeftSlot({
   searchParams,
 }: {

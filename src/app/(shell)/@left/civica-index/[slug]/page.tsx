@@ -2,6 +2,8 @@ import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { slugToCountry } from "@/lib/atlas/ids";
 import { ShellCountryRail } from "@/components/shell/ShellCountryRail";
 
+export const revalidate = 3600;
+
 // Reuse the same country-picker rail as /civica-index, but with the
 // active country highlighted. No filters on the detail page — they
 // belong on the ranked index, not here.

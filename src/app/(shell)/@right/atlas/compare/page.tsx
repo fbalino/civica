@@ -2,6 +2,8 @@ import { AskCivicaPanel } from "@/components/shell/AskCivicaPanel";
 import { COMPARE_PROMPTS } from "@/lib/shell/suggested-prompts";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 
+export const revalidate = 3600;
+
 /**
  * Right pane for the in-atlas compare route. Ask Civica is scoped to the
  * two countries currently selected via ?a= / ?b= search params, so the

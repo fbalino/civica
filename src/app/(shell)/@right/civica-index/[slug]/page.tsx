@@ -3,6 +3,8 @@ import { ATLAS_COUNTRY_PROMPTS } from "@/lib/shell/suggested-prompts";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { slugToCountry } from "@/lib/atlas/ids";
 
+export const revalidate = 3600;
+
 export default async function CivicaIndexCountryRight({
   params,
 }: {

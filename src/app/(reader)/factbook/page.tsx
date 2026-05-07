@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://civicaatlas.org/factbook" },
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function FactbookIndexPage() {
   let countries: Awaited<ReturnType<typeof getAllJurisdictions>> = [];

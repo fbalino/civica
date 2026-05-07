@@ -10,6 +10,8 @@ import {
   tabNeedsHouse,
 } from "@/lib/atlas/ids";
 
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{ slug: string; tab: string }>;
   searchParams: Promise<{ house?: string }>;

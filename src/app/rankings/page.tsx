@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { rankCountriesByFact } from "@/lib/db/queries";
 import { RankingTable } from "@/components/RankingTable";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "World Government Rankings — GDP, Population, Democracy Index",
   description:

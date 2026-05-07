@@ -8,6 +8,8 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
 import { replication, civicaIndex } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Replication package — Civica Index",
   description:

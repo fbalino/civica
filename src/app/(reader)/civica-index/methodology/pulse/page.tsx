@@ -7,6 +7,8 @@ import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { pulse, disputeSla } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Pulse methodology (Beta) — Civica Index",
   description:

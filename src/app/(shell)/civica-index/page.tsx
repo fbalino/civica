@@ -7,6 +7,8 @@ import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import { civicaIndex } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "Civica Index — Global Governance Rankings",
   description:

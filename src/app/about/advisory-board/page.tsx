@@ -7,6 +7,8 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Banner } from "@/components/editorial/Banner";
 import { advisoryBoard, civicaIndex } from "@/lib/content/site-state";
 
+export const revalidate = 3600;
+
 const ADVISORY_BOARD_STATUS_LABEL: Record<string, string> = {
   "coming-soon": "Coming soon",
   recruiting: "Recruiting",
