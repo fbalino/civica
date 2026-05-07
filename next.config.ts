@@ -113,21 +113,32 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       // Crawler-trap neutralization (2026-05-07). Bots ignored robots.txt
-      // and kept hammering filter-permutation URLs on these two pages,
-      // burning Vercel function invocations. Redirects run at the Vercel
-      // edge with no function invocation and no DB query — defense that
-      // works regardless of bot compliance. The pages still exist in code
-      // and can be reached via the canonical URLs once we re-architect to
-      // a non-trap shape (e.g. paginated cursor instead of filter combos).
+      // and kept hammering filter-permutation URLs on these pages, burning
+      // Vercel function invocations on a test project with zero users.
+      // Edge redirects run at the Vercel proxy — no function invocation,
+      // no DB query, no app code. Defense that works regardless of bot
+      // compliance. Pages exist in code and can be re-enabled by removing
+      // these rules once the filter UX is re-architected to a non-trap
+      // shape (cursor pagination instead of unbounded combos).
       {
         source: "/factbook/methodology/reconciliation/disputes",
         destination: "/factbook/methodology/reconciliation#disputes",
-        permanent: false,
+        permanent: true,
       },
       {
         source: "/factbook/methodology/reconciliation/disputes/:path*",
         destination: "/factbook/methodology/reconciliation#disputes",
-        permanent: false,
+        permanent: true,
+      },
+      {
+        source: "/civica-index/pulse-changelog",
+        destination: "/civica-index/methodology/pulse",
+        permanent: true,
+      },
+      {
+        source: "/civica-index/pulse-changelog/:path*",
+        destination: "/civica-index/methodology/pulse",
+        permanent: true,
       },
     ];
   },
