@@ -600,27 +600,31 @@ export default async function ReconciliationMethodologyPage() {
           reports 77.0 years (2022).
         </p>
         <p>
-          <strong>Resolver outcome.</strong> The World Bank&rsquo;s
-          78.89 (2024) wins canonical with{" "}
-          <code>decisionReason=&apos;fresher_winner&apos;</code>. The
-          alternates panel renders WHO 76.37 (2021) labelled as the
-          editorial canonical alongside the World Bank, UN, UNDP,
-          CIA, and Wikidata rows.
+          <strong>Resolver outcome.</strong> UN WPP&rsquo;s 77.05
+          (2024) wins canonical with{" "}
+          <code>decisionReason=&apos;fresher_winner&apos;</code>.
+          Multiple Tier-1 publishers (UN, World Bank, CIA) all carry
+          a 2024 reading; the runtime canonical pick among same-vintage
+          Tier-1 publishers is sensitive to the tied-date tiebreak
+          ordering rather than to a methodology assertion (open
+          question logged at v1.0-followup §3.1). The alternates panel
+          renders WHO 76.37 (2021) labelled as the editorial canonical
+          alongside the World Bank, CIA, UNDP, and Wikidata rows.
         </p>
         <p>
           <strong>Story.</strong> WHO is the editorial canonical for{" "}
           <code>life_expectancy_years</code> because nearly every
           other major publisher republishes WHO&rsquo;s underlying
           GHO methodology. But WHO&rsquo;s last release for the
-          United States was 2021 on its publisher cycle; the World
-          Bank&rsquo;s 2024 release is fresher. Civica&rsquo;s
-          resolver picks the freshest within-envelope row, while the
-          alternates panel discloses the editorial canonical
-          alongside. When WHO ships its 2024 release, the canonical
-          pick will move back to WHO automatically — no methodology
-          change needed. The longer expansion of this pattern lives
-          in the &ldquo;Editorial canonical vs displayed value&rdquo;
-          section below.
+          United States was 2021 on its publisher cycle; UN, the
+          World Bank, and the CIA all have 2024 readings that are
+          fresher. Civica&rsquo;s resolver picks the freshest
+          within-envelope row, while the alternates panel discloses
+          the editorial canonical alongside. When WHO ships its 2024
+          release, the canonical pick will move back to WHO
+          automatically — no methodology change needed. The longer
+          expansion of this pattern lives in the &ldquo;Editorial
+          canonical vs displayed value&rdquo; section below.
         </p>
 
         <h3 id="example-germany-gdp">
@@ -804,7 +808,7 @@ export default async function ReconciliationMethodologyPage() {
           not an error.
         </p>
         <p>
-          <strong>Live rows.</strong> IBGE reports 213,421,037
+          <strong>Live rows.</strong> IBGE reports 213,421,040
           (2025), tagged{" "}
           <code>civicaRole=&apos;canonical&apos;</code> for Brazil.
           The CIA reports 221,359,387 (2025, frozen). The World Bank
@@ -1152,7 +1156,7 @@ export default async function ReconciliationMethodologyPage() {
           freshness. The country page shows the freshest value; the
           alternates panel shows the editorial canonical alongside.
           Worked Example 2 above (United States life expectancy,
-          where the World Bank&rsquo;s 78.89 (2024) wins display
+          where UN WPP&rsquo;s 77.05 (2024) wins display
           while WHO&rsquo;s 76.37 (2021) is editorially canonical) is
           the textbook case.
         </p>
@@ -1160,7 +1164,7 @@ export default async function ReconciliationMethodologyPage() {
           The same pattern surfaces on Brazil&rsquo;s population.
           Civica holds six values for that fact, each from a
           different publisher, each with a different measurement
-          date: IBGE 213,421,037 (2025) — the NSO winner; the CIA
+          date: IBGE 213,421,040 (2025) — the NSO winner; the CIA
           221,359,387 (2025); the World Bank 211,998,573 (2024); UN
           WPP 211,998,573 (2024, bit-exact match); the IMF
           216,988,990 (2031, projected); Wikidata 203,062,512 (2022).
