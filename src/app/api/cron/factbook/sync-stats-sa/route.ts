@@ -37,7 +37,7 @@
  * indicators surface in `summary.errors[]`; the cron returns 200
  * OK with the partial summary so Vercel doesn't classify the run
  * as failed (operator inspects the response body). Catastrophic
- * failure (e.g. ANTHROPIC_API_KEY unset) returns 500.
+ * failure (e.g. ANTHROPIC_API_KEY_RECONCILIATION unset) returns 500.
  *
  * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §2 / §3.3
  * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.19

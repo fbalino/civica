@@ -191,7 +191,7 @@ const STATS_SA_EXTRACTION_PROMPT_VERSION = "v1.0";
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_RECONCILIATION });
   }
   return _anthropic;
 }
@@ -1171,9 +1171,9 @@ export async function syncStatsSa(
     `Resolved South Africa jurisdiction: ${jurisdiction.slug} (id=${jurisdiction.id}, iso2=${jurisdiction.iso2}, iso3=${jurisdiction.iso3}).`,
   );
 
-  // Pre-flight: missing ANTHROPIC_API_KEY should fail fast rather
-  // than per-indicator. If unset, skip the whole sync gracefully.
-  if (!process.env.ANTHROPIC_API_KEY) {
+  // Pre-flight: missing ANTHROPIC_API_KEY_RECONCILIATION should fail fast
+  // rather than per-indicator. If unset, skip the whole sync gracefully.
+  if (!process.env.ANTHROPIC_API_KEY_RECONCILIATION) {
     return {
       startedAt,
       finishedAt: new Date().toISOString(),
@@ -1185,7 +1185,7 @@ export async function syncStatsSa(
       sourceRowInserted,
       disputes: null,
       errors: [
-        "ANTHROPIC_API_KEY is not set — Stats SA sync requires the Anthropic SDK for PDF extraction. Aborting.",
+        "ANTHROPIC_API_KEY_RECONCILIATION is not set — Stats SA sync requires the Anthropic SDK for PDF extraction. Aborting.",
       ],
       dryRun: options.dryRun ?? false,
     };
