@@ -267,10 +267,13 @@ export const countryFacts = pgTable(
     upstreamVintageLabel: text("upstream_vintage_label"),
 
     // ── Civica-side bookkeeping (Phase F additions) ──
-    /** Methodology version that admitted this row. */
+    /** Methodology version that admitted this row.
+     *  Updated to v0.2-beta (v1.0 follow-up §1.2, 2026-05-06) —
+     *  all existing rows backfilled via scripts/backfill-methodology-version.ts.
+     */
     methodologyVersion: text("methodology_version")
       .notNull()
-      .default("v0.1-beta"),
+      .default("v0.2-beta"),
     /** 'active' | 'rejected' | 'superseded'. Rejected rows are
      *  kept for transparency but excluded from resolver input. */
     status: text("status").notNull().default("active"),
