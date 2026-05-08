@@ -286,7 +286,7 @@ export interface PulseV2ChangelogRow {
 export async function getPulseV2Changelog(
   filters: PulseV2ChangelogFilters = {}
 ): Promise<{ rows: PulseV2ChangelogRow[]; hasMore: boolean }> {
-  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 250);
+  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 2500);
   const offset = Math.max(filters.offset ?? 0, 0);
 
   // Build a SQL WHERE list

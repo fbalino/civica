@@ -679,7 +679,7 @@ const RESOLUTION_LABELS: Record<string, string> = {
 export async function getPublicDisputeFeed(
   opts: PublicDisputeFilters = {},
 ): Promise<PublicDisputeFeedResult> {
-  const limit = Math.min(Math.max(opts.limit ?? 50, 1), 200);
+  const limit = Math.min(Math.max(opts.limit ?? 50, 1), 2000);
   const offset = Math.max(opts.offset ?? 0, 0);
   const sort: DisputeSortKey = opts.sort ?? "severity";
 

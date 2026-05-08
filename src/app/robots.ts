@@ -1,16 +1,8 @@
 import type { MetadataRoute } from "next";
 
-// Crawler-trap protection. The public data-disputes log at
-// /factbook/methodology/reconciliation/disputes exposes 6 filter
-// dimensions × pagination, so naive crawlers walk a near-infinite
-// permutation space. Disallow it outright (canonical content lives
-// on the parent reconciliation methodology page).
-//
-// AI training/scraper bots are blocked entirely. Search-engine bots
-// keep full access to canonical pages.
+// AI training/scraper bots blocked entirely. Search-engine bots keep
+// full access to canonical pages. Admin and cron paths disallowed.
 const DISALLOWED_PATHS = [
-  "/factbook/methodology/reconciliation/disputes",
-  "/factbook/methodology/reconciliation/disputes/*",
   "/admin",
   "/admin/*",
   "/api/admin",
