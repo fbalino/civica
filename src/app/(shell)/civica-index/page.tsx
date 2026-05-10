@@ -248,6 +248,12 @@ export default async function CivicaIndexShellPage({
                       href={`/civica-index/${r.slug}`}
                       className="ci-lb-row"
                       role="row"
+                      style={
+                        {
+                          "--ci-lb-bar": `${Math.max(0, Math.min(100, r.score ?? 0))}%`,
+                          "--ci-lb-bar-color": tier.cssVar,
+                        } as React.CSSProperties
+                      }
                     >
                       <div
                         className={`ci-lb-rank${isTop3 ? " ci-lb-rank--top3" : ""}`}

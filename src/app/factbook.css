@@ -49,6 +49,21 @@
   margin-top: var(--space-3);
   align-items: center;
 }
+
+/* v2 — vertical separators between stats (Pop · GDP · CI · CP).
+   Skip the leading government-type pill (it spans full-width via
+   `flex: 1 1 100%`). The separator hangs at 50% height of the row,
+   matching the v2 mockup's hover-card stat column pattern. */
+.factbook-hero-pills > *:not(.factbook-meta-pill--government) + *:not(.factbook-meta-pill--government)::before {
+  content: "";
+  display: inline-block;
+  width: 1px;
+  height: var(--text-16);
+  background-color: var(--color-divider);
+  margin-right: var(--space-5);
+  vertical-align: middle;
+  align-self: center;
+}
 .factbook-meta-pill {
   min-width: 0;
   max-width: 100%;

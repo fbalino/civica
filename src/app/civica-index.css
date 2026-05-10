@@ -214,6 +214,7 @@
   color: var(--color-text-30);
 }
 .ci-lb-row {
+  position: relative;
   background: var(--color-grid-cell);
   padding: 14px 20px;
   display: grid;
@@ -225,6 +226,18 @@
   cursor: pointer;
 }
 .ci-lb-row:hover { background: var(--color-grid-cell-hover); }
+.ci-lb-row::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: var(--ci-lb-bar, 0%);
+  background-color: var(--ci-lb-bar-color, transparent);
+  opacity: 0.55;
+  pointer-events: none;
+  transition: width .2s ease;
+}
 .ci-lb-rank {
   font-family: var(--font-heading);
   font-weight: 400;

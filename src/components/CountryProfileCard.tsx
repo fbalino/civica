@@ -66,7 +66,7 @@ export function CountryProfileCard({
           <img
             src={flagUrl}
             alt={`${name} flag`}
-            style={{ width: 40, height: 28, objectFit: "cover", borderRadius: 2 }}
+            style={{ width: 40, height: 28, objectFit: "cover", borderRadius: "var(--radius-sm)" }}
           />
         )}
         <div style={{ display: "flex", flexDirection: "column" }}>

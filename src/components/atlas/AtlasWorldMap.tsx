@@ -10,6 +10,140 @@ import {
 } from "react";
 import type { Country } from "./data";
 import { type MapPath, MAP_W, MAP_H } from "./map-geom";
+import { CountryHoverCard } from "@/components/v2/CountryHoverCard";
+
+/* ----------------------------------------------------------------
+ * Choropleth helpers + indicator registry
+ *
+ * Each indicator defines an accessor (Country → numeric) and a set of
+ * 4 thresholds that bin the value into one of 5 ramp bands (warm sand
+ * → deep navy). Adding a new indicator = adding a row to METRICS.
+ *
+ * `Country.gdp` and `Country.pop` are pre-formatted display strings
+ * ("$27.4T", "334M"), so we parse them back into numerics here. Real
+ * V-Dem / Freedom House / HDI integration requires a data-layer pass
+ * — those are in METRICS as `disabled: true` until the loader exposes
+ * the underlying values.
+ * ---------------------------------------------------------------- */
+
+const RAMP_VARS = [
+  "var(--ramp-indicator-1)",
+  "var(--ramp-indicator-2)",
+  "var(--ramp-indicator-3)",
+  "var(--ramp-indicator-4)",
+  "var(--ramp-indicator-5)",
+];
+
+function parseUSD(s: string | undefined): number {
+  if (!s) return 0;
+  const m = s.match(/\$?\s*([\d.]+)\s*([TBMK]?)/i);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  const u = m[2].toUpperCase();
+  return n * (u === "T" ? 1e12 : u === "B" ? 1e9 : u === "M" ? 1e6 : u === "K" ? 1e3 : 1);
+}
+
+function parsePop(s: string | undefined): number {
+  if (!s) return 0;
+  const m = s.match(/([\d.]+)\s*([BMK]?)/i);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  const u = m[2].toUpperCase();
+  return n * (u === "B" ? 1e9 : u === "M" ? 1e6 : u === "K" ? 1e3 : 1);
+}
+
+type MetricKey =
+  | "gdp_per_capita"
+  | "gdp_total"
+  | "population"
+  | "vdem_score"
+  | "freedom_house"
+  | "hdi";
+
+interface MetricDef {
+  key: MetricKey;
+  label: string;
+  unit: string;
+  /** Returns null when the indicator can't be evaluated for this country. */
+  value: (c: Country | null | undefined) => number | null;
+  /** 4 thresholds that split the global distribution into 5 bands. */
+  thresholds: [number, number, number, number];
+  binLabels: [string, string, string, string, string];
+  /** True when the underlying field isn't available in `Country` yet. */
+  disabled?: boolean;
+}
+
+const METRICS: MetricDef[] = [
+  {
+    key: "gdp_per_capita",
+    label: "GDP per Capita",
+    unit: "USD",
+    value: (c) => {
+      if (!c) return null;
+      const gdp = parseUSD(c.gdp);
+      const pop = parsePop(c.pop);
+      return pop > 0 ? gdp / pop : null;
+    },
+    thresholds: [5_000, 15_000, 30_000, 60_000],
+    binLabels: ["< $5K", "$5–15K", "$15–30K", "$30–60K", "> $60K"],
+  },
+  {
+    key: "gdp_total",
+    label: "Total GDP",
+    unit: "USD",
+    value: (c) => (c ? parseUSD(c.gdp) || null : null),
+    thresholds: [50e9, 250e9, 1e12, 5e12],
+    binLabels: ["< $50B", "$50–250B", "$250B–1T", "$1T–5T", "> $5T"],
+  },
+  {
+    key: "population",
+    label: "Population",
+    unit: "people",
+    value: (c) => (c ? parsePop(c.pop) || null : null),
+    thresholds: [5e6, 25e6, 100e6, 500e6],
+    binLabels: ["< 5M", "5–25M", "25–100M", "100M–500M", "> 500M"],
+  },
+  {
+    key: "vdem_score",
+    label: "V-Dem Liberal Democracy",
+    unit: "0–1",
+    value: () => null,
+    thresholds: [0.2, 0.4, 0.6, 0.8],
+    binLabels: ["< 0.2", "0.2–0.4", "0.4–0.6", "0.6–0.8", "> 0.8"],
+    disabled: true,
+  },
+  {
+    key: "freedom_house",
+    label: "Freedom House",
+    unit: "0–100",
+    value: () => null,
+    thresholds: [20, 40, 60, 80],
+    binLabels: ["< 20", "20–40", "40–60", "60–80", "> 80"],
+    disabled: true,
+  },
+  {
+    key: "hdi",
+    label: "Human Development Index",
+    unit: "0–1",
+    value: () => null,
+    thresholds: [0.55, 0.7, 0.8, 0.9],
+    binLabels: ["< 0.55", "0.55–0.7", "0.7–0.8", "0.8–0.9", "> 0.9"],
+    disabled: true,
+  },
+];
+
+const METRIC_BY_KEY: Record<MetricKey, MetricDef> = Object.fromEntries(
+  METRICS.map((m) => [m.key, m]),
+) as Record<MetricKey, MetricDef>;
+
+function fillFor(c: Country | null | undefined, metric: MetricDef): string {
+  const v = metric.value(c);
+  if (v == null) return "var(--ramp-no-data)";
+  for (let i = 0; i < metric.thresholds.length; i++) {
+    if (v < metric.thresholds[i]) return RAMP_VARS[i];
+  }
+  return RAMP_VARS[RAMP_VARS.length - 1];
+}
 
 export interface AtlasWorldMapHandle {
   flyTo: (id: string) => void;
@@ -49,6 +183,9 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
     const svgRef = useRef<SVGSVGElement>(null);
     const contentRef = useRef<SVGGElement>(null);
     const labelsRef = useRef<SVGGElement>(null);
+    const [metricKey, setMetricKey] = useState<MetricKey>("gdp_per_capita");
+    const [metricMenuOpen, setMetricMenuOpen] = useState(false);
+    const metric = METRIC_BY_KEY[metricKey];
     const transformRef = useRef({ k: 1, x: 0, y: 0 });
     const dragRef = useRef({
       dragging: false,
@@ -315,69 +452,74 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                 />
               ))}
             </g>
-            {/* Country paths */}
-            {mapPaths.map((p, i) => (
-              <path
-                key={i}
-                d={p.d}
-                fill={p.country ? "var(--atlas-land)" : "var(--atlas-land-dim)"}
-                stroke="var(--atlas-ink)"
-                strokeWidth={p.country ? "0.8" : "0.5"}
-                strokeLinejoin="round"
-                vectorEffect="non-scaling-stroke"
-                data-id={p.id || undefined}
-                data-iso={p.neId}
-                style={{
-                  cursor: p.country ? "pointer" : "default",
-                  opacity: p.country
-                    ? filteredCountryIds.includes(p.id!)
-                      ? 1
-                      : 0.25
-                    : 0.55,
-                  transition: "fill 120ms, opacity 200ms",
-                }}
-                onMouseEnter={(e) => {
-                  if (p.country) {
-                    (e.target as SVGPathElement).setAttribute(
-                      "fill",
-                      "var(--atlas-land-hover)",
-                    );
-                    setHoverCard({
-                      country: p.country,
-                      x: e.clientX + 14,
-                      y: e.clientY + 14,
-                    });
-                  }
-                }}
-                onMouseMove={(e) => {
-                  if (p.country)
-                    setHoverCard((prev) =>
-                      prev
-                        ? { ...prev, x: e.clientX + 14, y: e.clientY + 14 }
-                        : null,
-                    );
-                }}
-                onMouseLeave={(e) => {
-                  if (p.country) {
-                    const sel = (e.target as SVGPathElement).getAttribute(
-                      "data-selected",
-                    );
-                    if (sel !== "1")
-                      (e.target as SVGPathElement).setAttribute(
-                        "fill",
-                        "var(--atlas-land)",
+            {/* Country paths — v2 multi-hue choropleth (GDP per capita).
+                Hover signals via stroke change instead of fill so the
+                choropleth band stays visible while the cursor is over. */}
+            {mapPaths.map((p, i) => {
+              const baseFill = p.country
+                ? fillFor(p.country, metric)
+                : "var(--ramp-no-data)";
+              return (
+                <path
+                  key={i}
+                  d={p.d}
+                  fill={baseFill}
+                  stroke="var(--atlas-ink)"
+                  strokeWidth={p.country ? "0.8" : "0.5"}
+                  strokeLinejoin="round"
+                  vectorEffect="non-scaling-stroke"
+                  data-id={p.id || undefined}
+                  data-iso={p.neId}
+                  data-base-fill={baseFill}
+                  style={{
+                    cursor: p.country ? "pointer" : "default",
+                    opacity: p.country
+                      ? filteredCountryIds.includes(p.id!)
+                        ? 1
+                        : 0.25
+                      : 0.55,
+                    transition: "stroke-width 120ms, filter 120ms, opacity 200ms",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (p.country) {
+                      const el = e.target as SVGPathElement;
+                      el.style.strokeWidth = "2";
+                      el.style.filter = "brightness(0.92)";
+                      setHoverCard({
+                        country: p.country,
+                        x: e.clientX + 14,
+                        y: e.clientY + 14,
+                      });
+                    }
+                  }}
+                  onMouseMove={(e) => {
+                    if (p.country)
+                      setHoverCard((prev) =>
+                        prev
+                          ? { ...prev, x: e.clientX + 14, y: e.clientY + 14 }
+                          : null,
                       );
-                    setHoverCard(null);
-                  }
-                }}
-                onClick={(e) => {
-                  if (p.country) {
-                    e.stopPropagation();
-                    onCountrySelect(p.country, { shift: e.shiftKey });
-                  }
-                }}
-              />
-            ))}
+                  }}
+                  onMouseLeave={(e) => {
+                    if (p.country) {
+                      const el = e.target as SVGPathElement;
+                      const sel = el.getAttribute("data-selected");
+                      if (sel !== "1") {
+                        el.style.strokeWidth = "";
+                        el.style.filter = "";
+                      }
+                      setHoverCard(null);
+                    }
+                  }}
+                  onClick={(e) => {
+                    if (p.country) {
+                      e.stopPropagation();
+                      onCountrySelect(p.country, { shift: e.shiftKey });
+                    }
+                  }}
+                />
+              );
+            })}
             {/* Country labels — visibility controlled by zoom tier via CSS */}
             <g ref={labelsRef} className="map-labels" data-zoom-tier="1">
               {mapPaths
@@ -405,6 +547,66 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
             </g>
           </g>
         </svg>
+
+        {/* Indicator picker — top-left of the map. Click to choose
+            which indicator is colouring the choropleth. */}
+        <div className="atlas-indicator">
+          <button
+            type="button"
+            className="atlas-indicator-badge"
+            aria-haspopup="listbox"
+            aria-expanded={metricMenuOpen}
+            onClick={() => setMetricMenuOpen((o) => !o)}
+          >
+            <span className="atlas-indicator-badge__eyebrow">Visualizing</span>
+            <span className="atlas-indicator-badge__value">{metric.label}</span>
+            <span className="atlas-indicator-badge__caret" aria-hidden>▾</span>
+          </button>
+
+          {metricMenuOpen && (
+            <div
+              className="atlas-indicator-menu"
+              role="listbox"
+              aria-label="Choose map indicator"
+            >
+              {METRICS.map((m) => (
+                <button
+                  key={m.key}
+                  type="button"
+                  role="option"
+                  aria-selected={m.key === metricKey}
+                  className={`atlas-indicator-menu__item${
+                    m.key === metricKey ? " is-active" : ""
+                  }${m.disabled ? " is-disabled" : ""}`}
+                  disabled={m.disabled}
+                  onClick={() => {
+                    if (m.disabled) return;
+                    setMetricKey(m.key);
+                    setMetricMenuOpen(false);
+                  }}
+                >
+                  <span className="atlas-indicator-menu__label">{m.label}</span>
+                  <span className="atlas-indicator-menu__unit">
+                    {m.disabled ? "Coming soon" : m.unit}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Compact bin legend */}
+          <div className="atlas-indicator-legend" aria-hidden>
+            {metric.binLabels.map((lbl, i) => (
+              <span key={lbl} className="atlas-indicator-legend__bin">
+                <span
+                  className="atlas-indicator-legend__chip"
+                  style={{ backgroundColor: RAMP_VARS[i] }}
+                />
+                <span className="atlas-indicator-legend__lbl">{lbl}</span>
+              </span>
+            ))}
+          </div>
+        </div>
 
         {/* Compare banner */}
         {pinned.length > 0 && (
@@ -462,47 +664,32 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
           </div>
         </div>
 
-        {/* Hover card */}
+        {/* v2 hover card — pinned near the cursor.
+            Maps Country fields onto the v2 stat trio. Hero image is
+            omitted (compact mode) so the popup stays light during
+            cursor-tracking. */}
         {hoverCard && (
           <div
-            className="atlas-hover-card"
-            style={{ left: hoverCard.x, top: hoverCard.y }}
+            style={{
+              position: "fixed",
+              left: hoverCard.x,
+              top: hoverCard.y,
+              zIndex: 60,
+              pointerEvents: "none",
+              width: 360,
+            }}
           >
-            <div className="hc-top">
-              <h3>{hoverCard.country.name}</h3>
-              <span className="hc-code">
-                {hoverCard.country.id.toUpperCase()}
-              </span>
-            </div>
-            <div className="hc-row hc-row--government">
-              <b>Government</b>
-              <span className="hc-row-value">{hoverCard.country.gov}</span>
-              {hoverCard.country.govDetail && (
-                <span className="hc-row-detail">
-                  {hoverCard.country.govDetail}
-                </span>
-              )}
-            </div>
-            <div className="hc-row">
-              <b>Capital</b>
-              <span>{hoverCard.country.capital}</span>
-            </div>
-            <div className="hc-row">
-              <b>Pop.</b>
-              <span>{hoverCard.country.pop}</span>
-            </div>
-            <div className="hc-row">
-              <b>GDP</b>
-              <span>{hoverCard.country.gdp}</span>
-            </div>
-            <div className="hc-leader">
-              <span className="r">Head of government</span>
-              <br />
-              {hoverCard.country.leader}
-            </div>
-            <div className="hc-cta">
-              Click &rarr; walk into the chamber &nearr;
-            </div>
+            <CountryHoverCard
+              name={hoverCard.country.name}
+              officialName={hoverCard.country.govDetail || hoverCard.country.gov}
+              iso2={hoverCard.country.iso2 ?? hoverCard.country.id.slice(0, 2)}
+              stats={[
+                { label: "Political System", value: hoverCard.country.gov },
+                { label: "Capital", value: hoverCard.country.capital },
+                { label: "Population", value: hoverCard.country.pop },
+              ]}
+              ctaHref={`/atlas/${hoverCard.country.slug ?? hoverCard.country.id}/structure`}
+            />
           </div>
         )}
       </>
