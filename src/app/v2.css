@@ -1,0 +1,1105 @@
+/*
+ * Civica Atlas — Design System v2.
+ *
+ * Tokens are exposed at :root so v2 components (CountryHoverCard,
+ * V2Button, V2Pill, etc.) can be used anywhere on the site, not just
+ * inside an explicit `.v2-scope` page wrapper. The `.v2-scope` selector
+ * still applies the *page-level* styling (parchment bg, paper noise,
+ * default font) for the v2 preview routes — that part stays scoped.
+ *
+ * v2 token names are prefixed `--v2-*` to avoid collisions with the
+ * production tokens in globals.css.
+ */
+
+:root,
+.v2-scope {
+  /* ---------- Foundation: Neutrals ---------- */
+  --v2-ink:        #0B1220;
+  --v2-charcoal:   #1F2937;
+  --v2-slate:      #334155;
+  --v2-stone:      #64748B;
+  --v2-pewter:     #94A3B8;
+  --v2-mist:       #CBD5E1;
+  --v2-parchment:  #FAF7F2;
+  --v2-canvas:     #FFFCF8;
+
+  /* ---------- Foundation: Brand ---------- */
+  --v2-navy:        #001B3A;
+  --v2-deep-teal:   #0B3D4E;
+  --v2-sage:        #6B7566;
+  --v2-terracotta:  #C25D3A;
+  --v2-gold:        #C9A24B;
+  --v2-sand:        #E6D8B6;
+  --v2-bronze:      #A87241;     /* between gold + terracotta — the CTA tone */
+  --v2-bronze-hover:#8E5F32;
+
+  /* ---------- Accents ---------- */
+  --v2-sky:    #4FA3D9;
+  --v2-azure:  #2D6CDF;
+  --v2-leaf:   #4C9F6E;
+  --v2-violet: #7C59C9;
+  --v2-rose:   #CC4C7A;
+  --v2-amber:  #F2A54A;
+
+  /* ---------- Semantic ---------- */
+  --v2-success: #2E7D59;
+  --v2-warning: #E0A800;
+  --v2-error:   #C62828;
+  --v2-info:    #1565C0;
+
+  /* ---------- Roles ---------- */
+  --v2-bg:           var(--v2-parchment);
+  --v2-surface:      var(--v2-canvas);
+  --v2-surface-alt:  #F2F4F7;
+  --v2-text:         var(--v2-ink);
+  --v2-text-muted:   var(--v2-stone);
+  --v2-text-subtle:  var(--v2-pewter);
+  --v2-border:       #E4E7EC;
+  --v2-divider:      #ECEFF3;
+  --v2-accent:       var(--v2-bronze);
+  --v2-accent-hover: var(--v2-bronze-hover);
+
+  /* ---------- Typography ---------- */
+  --v2-font-display: var(--font-fraunces), "Fraunces", Georgia, "Times New Roman", serif;
+  --v2-font-body:    var(--font-inter), "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Type scale (mockup §05) */
+  --v2-text-h1: 56px;
+  --v2-text-h2: 40px;
+  --v2-text-h3: 28px;
+  --v2-text-h4: 20px;
+  --v2-text-body: 16px;
+  --v2-text-small: 14px;
+  --v2-text-caption: 12px;
+
+  /* ---------- Radii ---------- */
+  --v2-radius-sm: 8px;
+  --v2-radius-md: 12px;
+  --v2-radius-lg: 16px;
+  --v2-radius-xl: 20px;
+  --v2-radius-pill: 999px;
+
+  /* ---------- Shadows ---------- */
+  /* Tighter, less spread than v0. */
+  --v2-shadow-sm: 0 1px 2px rgba(11, 18, 32, 0.05);
+  --v2-shadow-md: 0 1px 2px rgba(11, 18, 32, 0.04), 0 4px 10px rgba(11, 18, 32, 0.05);
+  --v2-shadow-lg: 0 1px 2px rgba(11, 18, 32, 0.04), 0 8px 18px rgba(11, 18, 32, 0.07);
+
+  /* ---------- Paper texture ---------- */
+  /* Page-level: warm brown speckle. Subtle, sets the parchment ground. */
+  --v2-paper-noise: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'>\
+<filter id='n'>\
+<feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/>\
+<feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.36  0 0 0 0 0.26  0 0 0 0.5 0'/>\
+</filter>\
+<rect width='100%' height='100%' filter='url(%23n)' opacity='0.18'/>\
+</svg>");
+
+  /* In-element: stronger neutral fibre — used as an overlay INSIDE
+     colored fills via mix-blend-mode: multiply, so the color varies
+     within the shape. This is what the mockup's chips and ramps do. */
+  --v2-paper-grain: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'>\
+<filter id='g'>\
+<feTurbulence type='fractalNoise' baseFrequency='1.3' numOctaves='2' stitchTiles='stitch' seed='4'/>\
+<feColorMatrix values='0 0 0 0 0.18  0 0 0 0 0.16  0 0 0 0 0.12  0 0 0 1 0'/>\
+</filter>\
+<rect width='100%' height='100%' filter='url(%23g)'/>\
+</svg>");
+
+  /* ---------- Multi-hue ramps (per mockup: hue traverse, not lightness) ---------- */
+  --v2-ramp-indicator-1: #EDE4D5;  /* warm sand, low */
+  --v2-ramp-indicator-2: #D2D6DC;  /* neutral cool grey */
+  --v2-ramp-indicator-3: #ACC1D2;  /* light blue-grey */
+  --v2-ramp-indicator-4: #6086A8;  /* mid steel blue */
+  --v2-ramp-indicator-5: #1A4970;  /* deep navy, high */
+  --v2-ramp-no-data:     #E6E1D4;  /* warm parchment swatch */
+}
+
+/* ---------- Page-level paper background ---------- */
+.v2-scope {
+  background-color: var(--v2-parchment);
+  background-image: var(--v2-paper-noise);
+  background-size: 240px 240px;
+  background-repeat: repeat;
+  color: var(--v2-text);
+  font-family: var(--v2-font-body);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.v2-scope * {
+  box-sizing: border-box;
+}
+
+/* ============================================================
+ * Country hover card
+ * ============================================================ */
+.v2-country-card {
+  width: 100%;
+  max-width: 460px;
+  /* Slight transparency so the parchment + texture show through */
+  background-color: rgba(255, 252, 248, 0.88);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  border: 1px solid var(--v2-border);
+  border-radius: var(--v2-radius-xl);
+  box-shadow: var(--v2-shadow-lg);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-family: var(--v2-font-body);
+}
+
+.v2-country-card__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.v2-country-card__flag {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--v2-canvas);
+  border: 1px solid var(--v2-divider);
+  box-shadow: var(--v2-shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.v2-country-card__flag img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.v2-country-card__title-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.v2-country-card__name {
+  font-family: var(--v2-font-display);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--v2-text);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.v2-country-card__official {
+  font-family: var(--v2-font-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--v2-text-muted);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.v2-country-card__hero {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  border-radius: var(--v2-radius-lg);
+  overflow: hidden;
+  background-color: var(--v2-surface-alt);
+}
+
+.v2-country-card__hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.v2-country-card__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--v2-divider);
+}
+
+.v2-country-card__stat {
+  padding: 0 14px;
+}
+
+.v2-country-card__stat:first-child {
+  padding-left: 0;
+}
+
+.v2-country-card__stat:last-child {
+  padding-right: 0;
+}
+
+.v2-country-card__stat + .v2-country-card__stat {
+  border-left: 1px solid var(--v2-divider);
+}
+
+.v2-country-card__stat-label {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--v2-text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+
+.v2-country-card__stat-value {
+  font-family: var(--v2-font-body);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--v2-text);
+  line-height: 1.25;
+}
+
+.v2-country-card__stat-year {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--v2-text-muted);
+  margin-top: 2px;
+}
+
+.v2-country-card__cta {
+  font-family: var(--v2-font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--v2-bronze);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+
+.v2-country-card__cta:hover,
+.v2-country-card__cta:focus-visible {
+  color: var(--v2-bronze-hover);
+}
+
+.v2-country-card__cta-arrow {
+  display: inline-block;
+  transition: transform 160ms ease;
+}
+
+.v2-country-card__cta:hover .v2-country-card__cta-arrow {
+  transform: translateX(3px);
+}
+
+/* ============================================================
+ * Buttons
+ * ============================================================ */
+.v2-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--v2-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 12px 20px;
+  /* Rounded corners (not pill) per the mockup §06 components. */
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  text-decoration: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.v2-btn:focus-visible {
+  outline: 2px solid var(--v2-bronze);
+  outline-offset: 2px;
+}
+
+/* Primary — solid ink */
+.v2-btn--primary {
+  background-color: var(--v2-ink);
+  color: var(--v2-canvas);
+  border-color: var(--v2-ink);
+  box-shadow: var(--v2-shadow-sm);
+}
+
+.v2-btn--primary:hover {
+  background-color: #1a2335;
+  border-color: #1a2335;
+}
+
+/* Secondary — outlined */
+.v2-btn--secondary {
+  background-color: transparent;
+  color: var(--v2-ink);
+  border-color: var(--v2-ink);
+}
+
+.v2-btn--secondary:hover {
+  background-color: rgba(11, 18, 32, 0.04);
+}
+
+/* Tertiary — text-only with arrow */
+.v2-btn--tertiary {
+  background-color: transparent;
+  color: var(--v2-bronze);
+  border-color: transparent;
+  padding: 12px 4px;
+}
+
+.v2-btn--tertiary:hover {
+  color: var(--v2-bronze-hover);
+}
+
+.v2-btn--tertiary .v2-btn__arrow {
+  transition: transform 160ms ease;
+}
+
+.v2-btn--tertiary:hover .v2-btn__arrow {
+  transform: translateX(3px);
+}
+
+/* Destructive — outlined error */
+.v2-btn--destructive {
+  background-color: transparent;
+  color: var(--v2-error);
+  border-color: var(--v2-error);
+}
+
+.v2-btn--destructive:hover {
+  background-color: rgba(198, 40, 40, 0.06);
+}
+
+/* ============================================================
+ * Search bar
+ * ============================================================ */
+.v2-search {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  background-color: rgba(255, 252, 248, 0.85);
+  border: 1px solid var(--v2-border);
+  border-radius: var(--v2-radius-pill);
+  padding: 12px 18px;
+  box-shadow: var(--v2-shadow-sm);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.v2-search:focus-within {
+  border-color: var(--v2-ink);
+  box-shadow: 0 0 0 3px rgba(11, 18, 32, 0.06);
+}
+
+.v2-search__icon {
+  flex-shrink: 0;
+  color: var(--v2-text-muted);
+}
+
+.v2-search__input {
+  flex: 1;
+  background: none;
+  border: 0;
+  outline: 0;
+  font-family: var(--v2-font-body);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--v2-text);
+  min-width: 0;
+}
+
+.v2-search__input::placeholder {
+  color: var(--v2-text-subtle);
+}
+
+.v2-search__shortcut {
+  font-family: var(--v2-font-body);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--v2-text-muted);
+  background-color: var(--v2-surface-alt);
+  border: 1px solid var(--v2-border);
+  border-radius: 6px;
+  padding: 3px 7px;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+ * Pills (status / category labels)
+ * ============================================================ */
+.v2-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--v2-font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: var(--v2-radius-pill);
+  border: 1px solid transparent;
+  background-color: var(--v2-surface-alt);
+  color: var(--v2-text-muted);
+  white-space: nowrap;
+}
+
+.v2-pill--neutral {
+  background-color: rgba(100, 116, 139, 0.22);
+  color: #2A3645;
+  border-color: rgba(100, 116, 139, 0.36);
+}
+
+.v2-pill--success {
+  background-color: rgba(46, 125, 89, 0.22);
+  color: #1F5A3F;
+  border-color: rgba(46, 125, 89, 0.40);
+}
+
+.v2-pill--warning {
+  background-color: rgba(224, 168, 0, 0.28);
+  color: #6E5200;
+  border-color: rgba(224, 168, 0, 0.50);
+}
+
+.v2-pill--info {
+  background-color: rgba(21, 101, 192, 0.22);
+  color: #0D4C9E;
+  border-color: rgba(21, 101, 192, 0.40);
+}
+
+.v2-pill--accent {
+  background-color: rgba(168, 114, 65, 0.24);
+  color: #7B5128;
+  border-color: rgba(168, 114, 65, 0.45);
+}
+
+.v2-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+/* ============================================================
+ * Bar chart (CI-style ranking)
+ * ============================================================ */
+.v2-bar-chart {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: var(--v2-font-body);
+}
+
+.v2-bar-chart__row {
+  display: grid;
+  grid-template-columns: 24px 110px 1fr 56px;
+  align-items: center;
+  gap: 12px;
+}
+
+.v2-bar-chart__rank {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--v2-text-muted);
+  text-align: right;
+}
+
+.v2-bar-chart__country {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--v2-text);
+}
+
+.v2-bar-chart__country-flag {
+  width: 18px;
+  height: 13px;
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.v2-bar-chart__country-flag img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.v2-bar-chart__bar-track {
+  height: 12px;
+  background-color: rgba(11, 18, 32, 0.04);
+  border-radius: var(--v2-radius-pill);
+  overflow: hidden;
+  position: relative;
+}
+
+.v2-bar-chart__bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--v2-radius-pill);
+  transition: width 240ms ease;
+  position: relative;
+  /* Color is set inline per row from the indicator ramp.
+     Texture is overlaid via ::after below — paper grain INSIDE the fill. */
+}
+
+.v2-bar-chart__bar-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--v2-paper-grain);
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.v2-bar-chart__score {
+  font-family: var(--v2-font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--v2-text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+ * Indicator legend — gradient (expanded) + binned variants.
+ * Both apply paper-grain texture INSIDE the colored areas via
+ * mix-blend-mode: multiply on a pseudo-element overlay, so the
+ * color varies within the shape (it isn't flat).
+ * ============================================================ */
+.v2-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+.v2-legend__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.v2-legend__title {
+  font-family: var(--v2-font-display);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--v2-text);
+  letter-spacing: -0.005em;
+}
+
+.v2-legend__unit {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--v2-text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Expanded (gradient) ---------- */
+.v2-legend__bar {
+  position: relative;
+  height: 22px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    var(--v2-ramp-indicator-1) 0%,
+    var(--v2-ramp-indicator-2) 25%,
+    var(--v2-ramp-indicator-3) 50%,
+    var(--v2-ramp-indicator-4) 75%,
+    var(--v2-ramp-indicator-5) 100%
+  );
+}
+
+.v2-legend__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--v2-paper-grain);
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.v2-legend__scale {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  color: var(--v2-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.v2-legend__nodata {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  color: var(--v2-text-muted);
+  margin-left: auto;
+}
+
+.v2-legend__nodata-chip {
+  position: relative;
+  width: 22px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--v2-border);
+  background-color: var(--v2-ramp-no-data);
+  overflow: hidden;
+}
+
+.v2-legend__nodata-chip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--v2-paper-grain);
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---------- Binned (discrete chips) ---------- */
+.v2-legend__bins {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.v2-legend__bin {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v2-legend__bin-chip {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(11, 18, 32, 0.04);
+}
+
+.v2-legend__bin-chip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--v2-paper-grain);
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.v2-legend__bin-label {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  color: var(--v2-text-muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.v2-legend__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ============================================================
+ * Pill texture — apply paper grain inside colored fills so they
+ * read as paper-toned, not SaaS-flat.
+ * ============================================================ */
+.v2-pill {
+  position: relative;
+}
+
+.v2-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: var(--v2-paper-grain);
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.v2-pill > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+ * Foundation swatches — also textured (the chips are colored
+ * blocks too).
+ * ============================================================ */
+.v2-swatch__chip {
+  position: relative;
+  overflow: hidden;
+}
+
+.v2-swatch__chip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--v2-paper-grain);
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* ============================================================
+ * Choropleth map (Europe preview)
+ * ============================================================ */
+.v2-map {
+  position: relative;
+  width: 100%;
+  border-radius: var(--v2-radius-lg);
+  overflow: hidden;
+  background-color: var(--v2-parchment);
+  background-image: var(--v2-paper-noise);
+  background-size: 240px 240px;
+  border: 1px solid var(--v2-border);
+  box-shadow: var(--v2-shadow-lg);
+  font-family: var(--v2-font-body);
+}
+
+.v2-map__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.v2-map__country {
+  cursor: pointer;
+  transition: filter 140ms ease, stroke 140ms ease;
+  stroke: rgba(11, 18, 32, 0.18);
+  stroke-width: 0.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.v2-map__country:hover {
+  stroke: var(--v2-ink);
+  stroke-width: 1.4;
+  filter: brightness(0.92);
+}
+
+.v2-map__country--active {
+  stroke: var(--v2-ink);
+  stroke-width: 1.6;
+}
+
+.v2-map__country--out {
+  fill: var(--v2-ramp-no-data);
+  cursor: default;
+}
+
+.v2-map__sea {
+  fill: transparent;
+}
+
+.v2-map__legend {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  background-color: rgba(255, 252, 248, 0.92);
+  backdrop-filter: blur(2px);
+  border: 1px solid var(--v2-border);
+  border-radius: var(--v2-radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--v2-shadow-md);
+  width: 280px;
+}
+
+.v2-map__hover-card {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  width: 380px;
+  max-width: calc(100% - 32px);
+  transform: translate(-50%, calc(-100% - 18px));
+  /* Slight pop-in animation */
+  animation: v2-pop 140ms ease-out;
+}
+
+@keyframes v2-pop {
+  from { opacity: 0; transform: translate(-50%, calc(-100% - 8px)); }
+  to   { opacity: 1; transform: translate(-50%, calc(-100% - 18px)); }
+}
+
+.v2-map__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--v2-font-body);
+  font-size: 13px;
+  color: var(--v2-text-muted);
+  background-color: rgba(250, 247, 242, 0.6);
+}
+
+.v2-map__corner {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--v2-text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.v2-map__corner-rule {
+  width: 24px;
+  height: 1px;
+  background-color: var(--v2-text-subtle);
+}
+
+/* Coordinates strip — bottom-left atlas chrome */
+.v2-map__coords {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: var(--v2-text-muted);
+  letter-spacing: 0.04em;
+  background-color: rgba(255, 252, 248, 0.85);
+  border: 1px solid var(--v2-border);
+  border-radius: var(--v2-radius-sm);
+  padding: 6px 10px;
+}
+
+/* ============================================================
+ * Showcase page layout
+ * ============================================================ */
+.v2-showcase {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 64px 32px 120px;
+}
+
+.v2-showcase__header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.v2-showcase__eyebrow {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--v2-text-muted);
+}
+
+.v2-showcase__title {
+  font-family: var(--v2-font-display);
+  font-size: 56px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  color: var(--v2-text);
+  margin: 0;
+}
+
+.v2-showcase__lede {
+  font-family: var(--v2-font-body);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--v2-text-muted);
+  max-width: 620px;
+  margin: 0 0 56px;
+}
+
+.v2-showcase__section {
+  margin-top: 56px;
+  padding-top: 32px;
+  border-top: 1px solid var(--v2-divider);
+}
+
+.v2-showcase__section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.v2-showcase__section-num {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  color: var(--v2-text-subtle);
+}
+
+.v2-showcase__section-label {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--v2-text-muted);
+}
+
+.v2-showcase__section-title {
+  font-family: var(--v2-font-display);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+  color: var(--v2-text);
+}
+
+.v2-showcase__section-desc {
+  font-family: var(--v2-font-body);
+  font-size: 14px;
+  color: var(--v2-text-muted);
+  margin: 0 0 24px;
+  max-width: 540px;
+  line-height: 1.5;
+}
+
+.v2-showcase__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.v2-showcase__panel {
+  background-color: rgba(255, 252, 248, 0.78);
+  border: 1px solid var(--v2-border);
+  border-radius: var(--v2-radius-lg);
+  padding: 28px;
+  box-shadow: var(--v2-shadow-md);
+}
+
+.v2-showcase__grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 760px) {
+  .v2-showcase__grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Type specimen ---------- */
+.v2-type-specimen__display {
+  font-family: var(--v2-font-display);
+  font-size: 64px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--v2-text);
+}
+
+.v2-type-specimen__body {
+  font-family: var(--v2-font-body);
+  font-size: 64px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--v2-text);
+}
+
+.v2-type-specimen__name {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--v2-text-muted);
+  margin-top: 12px;
+}
+
+.v2-type-specimen__use {
+  font-family: var(--v2-font-body);
+  font-size: 13px;
+  color: var(--v2-text-muted);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ---------- Color swatch row ---------- */
+.v2-swatch-row {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 760px) {
+  .v2-swatch-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.v2-swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.v2-swatch__chip {
+  width: 100%;
+  aspect-ratio: 1.4 / 1;
+  border-radius: var(--v2-radius-md);
+  border: 1px solid var(--v2-border);
+}
+
+.v2-swatch__name {
+  font-family: var(--v2-font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--v2-text);
+}
+
+.v2-swatch__hex {
+  font-family: var(--v2-font-body);
+  font-size: 11px;
+  color: var(--v2-text-muted);
+  letter-spacing: 0.02em;
+}
