@@ -8,50 +8,22 @@
   --atlas-ink: var(--color-text-primary);
   --atlas-ink-2: var(--color-text-60);
   --atlas-muted: var(--color-text-40);
-  --atlas-rule: #c4bdae;
-  --atlas-rule-2: #d9d2c1;
+  --atlas-rule: #E4E7EC;
+  --atlas-rule-2: #ECEFF3;
   --atlas-accent: var(--color-accent);
-  --atlas-accent-soft: oklch(92% 0.04 35);
-  --atlas-ocean: #ece7d6;
-  --atlas-land: #ddd5be;
-  --atlas-land-dim: #d0c7ad;
-  --atlas-land-hover: #1a1a1a;
-  --atlas-land-selected: oklch(58% 0.14 35);
+  --atlas-accent-soft: #F4EAE0;          /* warm Bronze tint */
+  --atlas-ocean: #F2F4F7;                /* cool grey, paper-toned */
+  --atlas-land: #D2D6DC;                 /* indicator ramp [1] */
+  --atlas-land-dim: #ACC1D2;             /* indicator ramp [2] */
+  --atlas-land-hover: #0B1220;           /* Ink */
+  --atlas-land-selected: #1A4970;        /* indicator ramp [5] — deep navy */
   --atlas-success: var(--color-success);
   --atlas-danger: var(--color-danger);
   --atlas-leftW: 290px;
   --atlas-rightW: 325px;
 }
 
-html[data-theme="dark"] .atlas-root {
-  --atlas-paper: var(--color-bg);
-  --atlas-paper-2: var(--color-surface-elevated);
-  --atlas-paper-3: var(--color-select-bg);
-  --atlas-ink: var(--color-text-primary);
-  --atlas-ink-2: var(--color-text-60);
-  --atlas-muted: var(--color-text-40);
-  --atlas-rule: #3d382d;
-  --atlas-rule-2: #2d2a22;
-  --atlas-ocean: #1b1812;
-  --atlas-land: #312c1f;
-  --atlas-land-dim: #221e16;
-  --atlas-success: var(--color-success);
-  --atlas-danger: var(--color-danger);
-}
-
-html[data-theme="light"] .atlas-root {
-  --atlas-paper: var(--color-bg);
-  --atlas-paper-2: var(--color-surface-elevated);
-  --atlas-paper-3: var(--color-select-bg);
-  --atlas-ink: var(--color-text-primary);
-  --atlas-ink-2: var(--color-text-60);
-  --atlas-muted: var(--color-text-40);
-  --atlas-rule: #c4bdae;
-  --atlas-rule-2: #d9d2c1;
-  --atlas-ocean: #ece7d6;
-  --atlas-land: #ddd5be;
-  --atlas-land-dim: #d0c7ad;
-}
+/* Dark mode override removed — v2 is light-only. Dark mode is deferred. */
 
 .atlas-root {
   font-family: var(--font-heading);
@@ -175,6 +147,142 @@ html[data-theme="light"] .atlas-root {
 .atlas-hud-bottom {
   position: absolute; left: 20px; bottom: 20px; z-index: 3;
   display: flex; gap: 10px; align-items: flex-end;
+}
+
+/* Indicator picker (top-left of the atlas map). Click the badge to
+   open the metric menu; below the badge sits a compact bin legend. */
+.atlas-indicator {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  font-family: var(--font-body);
+}
+
+.atlas-indicator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background-color: rgba(255, 252, 248, 0.92);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hard-md);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+.atlas-indicator-badge:hover {
+  background-color: rgba(255, 252, 248, 1);
+  border-color: var(--color-text-30);
+}
+.atlas-indicator-badge:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.atlas-indicator-badge__eyebrow {
+  font-size: var(--text-10);
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.atlas-indicator-badge__value {
+  font-family: var(--font-heading);
+  font-size: var(--text-16);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  letter-spacing: -0.005em;
+}
+.atlas-indicator-badge__caret {
+  color: var(--color-text-30);
+  font-size: var(--text-12);
+}
+
+.atlas-indicator-menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 260px;
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hard-lg);
+  padding: 6px;
+  margin-top: 2px;
+}
+.atlas-indicator-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 10px 12px;
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-align: left;
+  color: var(--color-text-primary);
+  transition: background-color 100ms ease;
+}
+.atlas-indicator-menu__item:hover:not(.is-disabled) {
+  background-color: var(--color-grid-cell-hover);
+}
+.atlas-indicator-menu__item.is-active {
+  background-color: var(--color-grid-cell-hover);
+}
+.atlas-indicator-menu__item.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.atlas-indicator-menu__label {
+  font-size: var(--text-13);
+  font-weight: 500;
+}
+.atlas-indicator-menu__unit {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  color: var(--color-text-40);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.atlas-indicator-legend {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 6px 12px;
+  background-color: rgba(255, 252, 248, 0.85);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  max-width: 520px;
+}
+.atlas-indicator-legend__bin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.atlas-indicator-legend__chip {
+  width: 14px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(11, 18, 32, 0.06);
+  display: inline-block;
+}
+.atlas-indicator-legend__lbl {
+  font-family: var(--font-mono);
+  font-size: var(--text-10);
+  letter-spacing: 0.02em;
+  color: var(--color-text-60);
+  white-space: nowrap;
 }
 
 /* Slim hint bar at the bottom of the Atlas map. Replaced the larger
@@ -1060,11 +1168,11 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
    INTERNATIONAL — category tokens
    ============================================ */
 .atlas-root {
-  --cat-security: #D4764E;
-  --cat-regional: #4E8BD4;
-  --cat-trade:    #5CAA6E;
-  --cat-un:       #9B6DC6;
-  --cat-cultural: #8a8370;
+  --cat-security: #C25D3A;   /* Terracotta */
+  --cat-regional: #2D6CDF;   /* Azure */
+  --cat-trade:    #4C9F6E;   /* Leaf */
+  --cat-un:       #7C59C9;   /* Violet */
+  --cat-cultural: #64748B;   /* Stone */
 }
 
 /* ============================================

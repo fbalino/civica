@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { DevDesignMount } from "@/components/dev/DevDesignMount";
 import { tier1Publishers } from "@/lib/content/site-state";
 import "./globals.css";
 import "./editorial.css";
@@ -14,6 +15,8 @@ import "./civica-index.css";
 import "./civica-index-detail.css";
 import "./factbook.css";
 import "./civica-chat.css";
+import "./v2.css";
+import "@/components/dev/dev-design.css";
 
 // Sources NOT covered by `tier1Publishers` — supporting feeds,
 // governance specialists, and indices. Update by hand when a major
@@ -90,7 +93,6 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${fraunces.variable} ${inter.variable}`}
-      data-theme="dark"
       suppressHydrationWarning
     >
       <head>
@@ -150,6 +152,7 @@ export default function RootLayout({
               </nav>
             </div>
           </footer>
+          <DevDesignMount />
         </ThemeProvider>
       </body>
     </html>
