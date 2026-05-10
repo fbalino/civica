@@ -1,0 +1,303 @@
+/*
+ * Dev design panel styles. Intentionally avoid using Civica's own
+ * design tokens — the panel needs to keep its appearance stable while
+ * the user mutates the rest of the site's tokens. Inlined values are
+ * the right choice here, not a lint violation.
+ */
+
+.dev-pill {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 99998;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #FFFCF8;
+  background-color: #0B1220;
+  border: 1px solid #0B1220;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(11, 18, 32, 0.18);
+}
+
+.dev-pill:hover {
+  background-color: #1F2937;
+}
+
+.dev-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  max-width: calc(100vw - 24px);
+  background-color: #FFFCF8;
+  border-left: 1px solid #E4E7EC;
+  box-shadow: -16px 0 32px rgba(11, 18, 32, 0.10);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #0B1220;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dev-panel__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid #E4E7EC;
+}
+
+.dev-panel__title-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.dev-panel__eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #64748B;
+}
+
+.dev-panel__title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: #0B1220;
+}
+
+.dev-panel__sub {
+  font-size: 11px;
+  color: #64748B;
+}
+
+.dev-panel__close {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #E4E7EC;
+  background-color: #FFFCF8;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.dev-panel__close:hover {
+  background-color: #F2F4F7;
+}
+
+.dev-panel__toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px 18px;
+  border-bottom: 1px solid #E4E7EC;
+  background-color: #FAF7F2;
+}
+
+.dev-panel__btn {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #0B1220;
+  background-color: #FFFCF8;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.dev-panel__btn:hover {
+  background-color: #F2F4F7;
+}
+
+.dev-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 0 24px;
+}
+
+.dev-panel__section {
+  border-bottom: 1px solid #ECEFF3;
+}
+
+.dev-panel__section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 18px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #334155;
+  text-align: left;
+}
+
+.dev-panel__section-head:hover {
+  background-color: #F6F2EB;
+}
+
+.dev-panel__caret {
+  width: 10px;
+  font-size: 10px;
+  color: #64748B;
+}
+
+.dev-panel__section-title {
+  flex: 1;
+}
+
+.dev-panel__section-reset {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: lowercase;
+  letter-spacing: 0;
+  color: #64748B;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.dev-panel__section-reset:hover {
+  background-color: #ECEFF3;
+  color: #0B1220;
+}
+
+.dev-panel__rows {
+  padding: 4px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dev-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dev-row__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dev-row__label {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dev-row__reset {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 0;
+  background-color: #ECEFF3;
+  color: #334155;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dev-row__reset:hover {
+  background-color: #CBD5E1;
+}
+
+.dev-row__control {
+  display: flex;
+}
+
+.dev-input {
+  width: 100%;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  color: #0B1220;
+  background-color: #FFFCF8;
+  border: 1px solid #E4E7EC;
+  border-radius: 6px;
+  padding: 6px 8px;
+  outline: 0;
+  transition: border-color 100ms ease;
+}
+
+.dev-input:focus {
+  border-color: #94A3B8;
+}
+
+.dev-input--shadow {
+  font-size: 11px;
+  line-height: 1.4;
+  resize: vertical;
+  min-height: 44px;
+}
+
+.dev-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.dev-color__swatch {
+  width: 36px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid #E4E7EC;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.dev-color__hex {
+  flex: 1;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 12px;
+  color: #0B1220;
+  background-color: #FFFCF8;
+  border: 1px solid #E4E7EC;
+  border-radius: 6px;
+  padding: 6px 8px;
+  outline: 0;
+  text-transform: uppercase;
+}
+
+.dev-color__hex:focus {
+  border-color: #94A3B8;
+}
+
+@media (max-width: 480px) {
+  .dev-panel {
+    width: 100%;
+    max-width: 100vw;
+  }
+}
