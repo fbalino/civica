@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export type CountryHoverCardStat = {
   label: string;
   value: string;
@@ -25,8 +23,6 @@ export function CountryHoverCard({
   heroImageUrl,
   heroImageAlt,
   stats,
-  ctaHref,
-  ctaLabel = "View country profile",
 }: CountryHoverCardProps) {
   const code = iso2.toLowerCase();
   return (
@@ -67,11 +63,6 @@ export function CountryHoverCard({
           </div>
         ))}
       </div>
-
-      <Link href={ctaHref} className="v2-country-card__cta">
-        {ctaLabel}
-        <span aria-hidden className="v2-country-card__cta-arrow">→</span>
-      </Link>
     </article>
   );
 }

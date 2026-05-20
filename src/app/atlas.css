@@ -1817,8 +1817,8 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   padding-top: 2px;
 }
 .cm-fact-text {
-  font-family: var(--font-heading);
-  font-size: var(--text-13);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1829,10 +1829,9 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 }
 .cm-fact-label {
   color: var(--atlas-muted);
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
-  letter-spacing: 0.02em;
+  font-family: var(--font-body);
+  font-size: inherit;
+  letter-spacing: var(--tracking-normal);
 }
 .cm-fact-value {
   color: var(--atlas-ink);

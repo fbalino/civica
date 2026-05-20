@@ -141,11 +141,11 @@
   width: 100%;
   max-width: 460px;
   /* Slight transparency so the parchment + texture show through */
-  background-color: rgba(255, 252, 248, 0.88);
+  background-color: rgba(255, 252, 248, 0.95);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   border: 1px solid var(--v2-border);
-  border-radius: var(--v2-radius-xl);
+  border-radius: var(--v2-radius-sm);
   box-shadow: var(--v2-shadow-lg);
   padding: 22px;
   display: flex;
@@ -161,9 +161,9 @@
 }
 
 .v2-country-card__flag {
-  width: 56px;
+  width: 86px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: 5px;
   background-color: var(--v2-canvas);
   border: 1px solid var(--v2-divider);
   box-shadow: var(--v2-shadow-sm);
