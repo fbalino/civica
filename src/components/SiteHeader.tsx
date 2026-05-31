@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { type ReactNode } from "react";
 import { NavLinks } from "@/components/NavLinks";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileNav } from "@/components/MobileNav";
 
 export function SiteHeader({
@@ -74,8 +75,9 @@ export function SiteHeader({
         <NavLinks />
       </div>
 
-      {/* Right: Hamburger (dark-mode toggle removed in v2 — light only) */}
+      {/* Right: Theme toggle + hamburger */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+        <ThemeToggle />
         <MobileNav searchSlot={searchSlot} logoSlot={logoSlotSmall} />
       </div>
     </nav>

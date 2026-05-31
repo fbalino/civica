@@ -280,9 +280,94 @@
   --scrollbar-thumb-hover: color-mix(in oklab, var(--color-text-secondary) 65%, transparent);
 }
 
-/* v1 had a [data-theme="light"] override block here. v2 is light-only —
-   the @theme inline defaults above ARE the v2 light values, so the
-   override block has been removed. Dark mode is deferred. */
+/* Dark mode override. Light mode remains the default token set above. */
+[data-theme="dark"] {
+  --color-bg: #16140f;
+  --color-bg-nav: color-mix(in oklab, #16140f 92%, transparent);
+  --color-surface-elevated: #221e16;
+  --color-select-bg: #2b2619;
+
+  --color-text-primary: #ebe6d6;
+  --color-text-85: rgba(235, 230, 214, 0.88);
+  --color-text-60: #c4bdae;
+  --color-text-50: rgba(235, 230, 214, 0.64);
+  --color-text-40: #8a8370;
+  --color-text-30: rgba(235, 230, 214, 0.50);
+  --color-text-25: rgba(235, 230, 214, 0.48);
+  --color-text-20: rgba(235, 230, 214, 0.40);
+
+  --color-accent: oklch(68% 0.15 35);
+
+  --color-card-bg: #221e16;
+  --color-card-border: #3d382d;
+  --color-card-hover-bg: #2b2619;
+  --color-card-hover-border: #8a8370;
+  --color-divider: #3d382d;
+  --color-stat-border: #3d382d;
+  --color-selection: oklch(30% 0.06 35);
+  --color-surface-primary: var(--color-bg);
+  --color-surface-secondary: var(--color-surface-elevated);
+  --color-surface-tertiary: var(--color-select-bg);
+  --color-text-secondary: var(--color-text-60);
+  --color-text-muted: var(--color-text-40);
+  --color-border-default: var(--color-divider);
+  --color-border-strong: var(--color-text-primary);
+  --color-page-bg: var(--color-bg);
+
+  --color-grid-bg: #221e16;
+  --color-grid-cell: #16140f;
+  --color-grid-cell-hover: #2b2619;
+  --color-grid-row-hover: #221e16;
+
+  --color-tooltip-bg: #221e16;
+  --color-tooltip-text: #c4bdae;
+  --color-tooltip-border: #3d382d;
+
+  --color-hemi-seat-text: rgba(235, 230, 214, 0.3);
+
+  --color-success: oklch(68% 0.14 145);
+  --color-warn: oklch(75% 0.14 75);
+  --color-danger: oklch(65% 0.18 25);
+  --color-info: oklch(68% 0.10 240);
+  --color-status-success: var(--color-success);
+  --color-status-warning: var(--color-warn);
+  --color-status-danger: var(--color-danger);
+  --color-status-info: var(--color-info);
+
+  --color-status-active: #5CAA6E;
+  --color-status-idle: #c4bdae;
+  --color-status-warn: #d4a04a;
+  --color-status-down: #b94328;
+  --color-on-warning: #1a1a1a;
+  --color-on-accent: #ffffff;
+
+  --tier-exceptional: oklch(68% 0.14 145);
+  --tier-strong: oklch(60% 0.11 155);
+  --tier-mixed: oklch(75% 0.14 75);
+  --tier-weak: oklch(62% 0.15 45);
+  --tier-failed: oklch(55% 0.18 25);
+
+  --series-a: oklch(72% 0.15 35);
+  --series-b: oklch(68% 0.13 220);
+  --series-c: oklch(72% 0.14 150);
+
+  --color-branch-executive-bg: rgba(212, 118, 78, 0.15);
+  --color-branch-legislative-bg: rgba(78, 139, 212, 0.15);
+  --color-branch-monarchy-bg: rgba(180, 139, 255, 0.15);
+
+  --color-badge-get: oklch(55% 0.12 145);
+  --color-badge-post: oklch(52% 0.10 240);
+  --color-badge-text: #ebe6d6;
+
+  --shadow-hard: 4px 4px 0 #000;
+  --shadow-hard-sm: 3px 3px 0 #000;
+  --shadow-hard-md: 5px 5px 0 #000;
+  --shadow-hard-lg: 6px 6px 0 #000;
+  --shadow-dark: 4px 4px 0 #000;
+
+  --logo-fg: var(--color-text-primary);
+  --logo-bg: var(--color-bg);
+}
 
 /* ============================================================
    Base styles

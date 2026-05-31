@@ -1,31 +1,80 @@
 "use client";
 
-/*
- * v2 is light-only. Dark mode is deferred — see ~/.claude/plans/yes-agile-kay.md
- * for the rollout plan. This provider is a stub kept around so existing
- * `useTheme()` consumers don't break; it always reports "light" and the
- * `setTheme` setter is a no-op.
- *
- * If/when dark mode is reintroduced, restore the v1 logic from
- * `git log -- src/components/ThemeProvider.tsx`.
- */
-
-import { createContext, useContext, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 
 type Theme = "light" | "dark" | "system";
 
-const VALUE = {
-  theme: "light" as Theme,
-  resolved: "light" as "light" | "dark",
+const ThemeContext = createContext<{
+  theme: Theme;
+  resolved: "light" | "dark";
+  setTheme: (t: Theme) => void;
+}>({
+  theme: "system",
+  resolved: "light",
   setTheme: () => {},
-};
-
-const ThemeContext = createContext(VALUE);
+});
 
 export function useTheme() {
   return useContext(ThemeContext);
 }
 
+function normalizeTheme(value: string | null): Theme {
+  return value === "light" || value === "dark" || value === "system"
+    ? value
+    : "system";
+}
+
+function getThemeState(): `${Theme}:light` | `${Theme}:dark` {
+  const theme = normalizeTheme(window.localStorage.getItem("theme"));
+  const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const resolved =
+    theme === "dark" || (theme === "system" && systemDark) ? "dark" : "light";
+  return `${theme}:${resolved}`;
+}
+
+function getServerThemeState(): `${Theme}:light` {
+  return "system:light";
+}
+
+function subscribeTheme(listener: () => void) {
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const notify = () => listener();
+  mq.addEventListener("change", notify);
+  window.addEventListener("storage", notify);
+  window.addEventListener("civica-theme-change", notify);
+  return () => {
+    mq.removeEventListener("change", notify);
+    window.removeEventListener("storage", notify);
+    window.removeEventListener("civica-theme-change", notify);
+  };
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  return <ThemeContext.Provider value={VALUE}>{children}</ThemeContext.Provider>;
+  const themeState = useSyncExternalStore(
+    subscribeTheme,
+    getThemeState,
+    getServerThemeState,
+  );
+  const [theme, resolved] = themeState.split(":") as [Theme, "light" | "dark"];
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", resolved);
+  }, [resolved]);
+
+  const setTheme = (t: Theme) => {
+    window.localStorage.setItem("theme", t);
+    window.dispatchEvent(new Event("civica-theme-change"));
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, resolved, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 }
