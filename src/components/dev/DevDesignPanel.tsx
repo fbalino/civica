@@ -70,18 +70,16 @@ export function DevDesignPanel({
   open: boolean;
   onClose: () => void;
 }) {
-  const [overrides, setOverrides] = useState<Overrides>({});
+  const [overrides, setOverrides] = useState<Overrides>(() => readOverrides());
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(DEV_TOKEN_GROUPS.map((g) => [g.id, true])),
   );
   const [copied, setCopied] = useState(false);
 
-  // Hydrate from localStorage once on mount.
+  // Apply localStorage-backed overrides on mount and after editor changes.
   useEffect(() => {
-    const o = readOverrides();
-    setOverrides(o);
-    Object.entries(o).forEach(([k, v]) => applyToken(k, v));
-  }, []);
+    Object.entries(overrides).forEach(([k, v]) => applyToken(k, v));
+  }, [overrides]);
 
   const setOverride = (cssVar: string, value: string | null) => {
     setOverrides((prev) => {

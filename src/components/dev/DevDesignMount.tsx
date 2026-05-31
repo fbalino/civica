@@ -39,6 +39,7 @@ export function DevDesignMount() {
   // Hydrate overrides on first paint. This makes localStorage the
   // source of truth so changes persist across reloads.
   useEffect(() => {
+    let openTimer: number | undefined;
     const o = readOverrides();
     Object.entries(o).forEach(([k, v]) => {
       if (k in DEV_TOKEN_BY_VAR) {
@@ -47,10 +48,15 @@ export function DevDesignMount() {
     });
     try {
       const sp = new URLSearchParams(window.location.search);
-      if (sp.get("dev") === "1") setOpen(true);
+      if (sp.get("dev") === "1") {
+        openTimer = window.setTimeout(() => setOpen(true), 0);
+      }
     } catch {
       /* ignore */
     }
+    return () => {
+      if (openTimer !== undefined) window.clearTimeout(openTimer);
+    };
   }, []);
 
   // Keyboard shortcut: ⌘/Ctrl + Shift + D toggles, Esc closes.
