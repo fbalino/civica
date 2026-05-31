@@ -6,8 +6,13 @@ import {
   DEV_TOKEN_GROUPS,
   DEV_TOKEN_STORAGE_KEY,
   type DevToken,
-  type DevTokenType,
 } from "./dev-tokens";
+import {
+  SliderControl,
+  NumericRawControl,
+  ShadowEditor,
+  detectRawFlavor,
+} from "./dev-controls";
 
 /*
  * DevDesignPanel — live token editor.
@@ -252,22 +257,26 @@ function DevTokenRow({
         )}
       </div>
       <div className="dev-row__control">
-        <DevTokenInput type={token.type} value={value} onChange={onChange} />
+        <DevTokenInput
+          token={token}
+          value={value}
+          onChange={onChange}
+        />
       </div>
     </div>
   );
 }
 
 function DevTokenInput({
-  type,
+  token,
   value,
   onChange,
 }: {
-  type: DevTokenType;
+  token: DevToken;
   value: string;
   onChange: (v: string) => void;
 }) {
-  if (type === "color") {
+  if (token.type === "color") {
     const isHex = /^#([0-9a-f]{6})$/i.test(value.trim());
     return (
       <div className="dev-color">
@@ -291,16 +300,22 @@ function DevTokenInput({
       </div>
     );
   }
-  if (type === "shadow") {
-    return (
-      <textarea
-        className="dev-input dev-input--shadow"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        rows={2}
-        spellCheck={false}
-      />
-    );
+  if (token.type === "shadow") {
+    return <ShadowEditor value={value} onChange={onChange} />;
+  }
+  if (token.type === "size") {
+    // Pick a sensible slider range based on the default value: small
+    // tokens (radii, spacing) cap at 100; type-scale tokens cap at
+    // ~4× their default so 64px sizes stay reachable.
+    const defaultNum = parseFloat(token.defaultValue) || 0;
+    const max = Math.max(100, Math.round(defaultNum * 4));
+    return <SliderControl value={value} onChange={onChange} min={0} max={max} step={1} />;
+  }
+  if (token.type === "raw") {
+    const flavor = detectRawFlavor(token.cssVar, token.defaultValue);
+    if (flavor) {
+      return <NumericRawControl value={value} onChange={onChange} flavor={flavor} />;
+    }
   }
   return (
     <input

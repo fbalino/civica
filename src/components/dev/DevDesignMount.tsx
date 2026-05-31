@@ -35,39 +35,31 @@ function readOverrides(): Overrides {
 
 export function DevDesignMount() {
   const [open, setOpen] = useState(false);
-  const [hasOpened, setHasOpened] = useState(false);
 
-  // Hydrate overrides on first paint, regardless of whether the panel
-  // has been opened. This makes localStorage the source of truth even
-  // for users who set tokens, closed the panel, then reload.
+  // Hydrate overrides on first paint. This makes localStorage the
+  // source of truth so changes persist across reloads.
   useEffect(() => {
     const o = readOverrides();
     Object.entries(o).forEach(([k, v]) => {
-      // Only re-apply tokens we know about — guards against stale keys.
       if (k in DEV_TOKEN_BY_VAR) {
         document.documentElement.style.setProperty(k, v);
       }
     });
-    // URL param opens the panel on first paint.
     try {
       const sp = new URLSearchParams(window.location.search);
-      if (sp.get("dev") === "1") {
-        setOpen(true);
-        setHasOpened(true);
-      }
+      if (sp.get("dev") === "1") setOpen(true);
     } catch {
       /* ignore */
     }
   }, []);
 
-  // Keyboard shortcut: ⌘/Ctrl + Shift + D.
+  // Keyboard shortcut: ⌘/Ctrl + Shift + D toggles, Esc closes.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const meta = e.metaKey || e.ctrlKey;
       if (meta && e.shiftKey && (e.key === "D" || e.key === "d")) {
         e.preventDefault();
         setOpen((prev) => !prev);
-        setHasOpened(true);
       }
       if (e.key === "Escape" && open) {
         setOpen(false);
@@ -79,10 +71,9 @@ export function DevDesignMount() {
 
   return (
     <>
-      {/* Floating tag — only appears once user has invoked the panel
-          this session, so production end-users don't see it unless
-          they intentionally toggle it on. */}
-      {hasOpened && !open && (
+      {/* Floating "Design" pill — always visible bottom-right when the
+          panel is closed. Click to open the live token editor. */}
+      {!open && (
         <button
           type="button"
           className="dev-pill"
@@ -90,16 +81,13 @@ export function DevDesignMount() {
           aria-label="Open design system editor"
           title="Design (⌘⇧D)"
         >
-          Design
+          ✦ Design
         </button>
       )}
 
-      {/* Lazy-mount the panel on first open so first paint stays clean. */}
-      {hasOpened && (
-        <Suspense fallback={null}>
-          <DevDesignPanel open={open} onClose={() => setOpen(false)} />
-        </Suspense>
-      )}
+      <Suspense fallback={null}>
+        <DevDesignPanel open={open} onClose={() => setOpen(false)} />
+      </Suspense>
     </>
   );
 }

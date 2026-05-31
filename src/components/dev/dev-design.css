@@ -301,3 +301,284 @@
     max-width: 100vw;
   }
 }
+
+/* ============================================================
+ * Slider control (used by SliderControl + NumericRawControl)
+ * ============================================================ */
+.dev-slider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.dev-slider__range {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: linear-gradient(to right, #CBD5E1, #94A3B8);
+  border-radius: 999px;
+  outline: 0;
+  cursor: pointer;
+}
+.dev-slider__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #FFFCF8;
+  border: 1px solid #0B1220;
+  cursor: grab;
+  transition: transform 80ms ease;
+}
+.dev-slider__range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.dev-slider__range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #FFFCF8;
+  border: 1px solid #0B1220;
+  cursor: grab;
+}
+.dev-slider__num {
+  width: 56px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: #0B1220;
+  background-color: #FFFCF8;
+  border: 1px solid #E4E7EC;
+  border-radius: 6px;
+  padding: 4px 6px;
+  outline: 0;
+  text-align: right;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.dev-slider__num::-webkit-outer-spin-button,
+.dev-slider__num::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.dev-slider__num:focus {
+  border-color: #94A3B8;
+}
+.dev-slider__unit {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  color: #64748B;
+  letter-spacing: 0.04em;
+}
+
+/* ============================================================
+ * Color + alpha picker (compact = inside shadow layer rows)
+ * ============================================================ */
+.dev-color-alpha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.dev-color-alpha__swatch {
+  width: 32px;
+  height: 26px;
+  flex-shrink: 0;
+  border: 1px solid #E4E7EC;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  padding: 2px;
+}
+.dev-color-alpha--compact .dev-color-alpha__swatch {
+  width: 26px;
+  height: 22px;
+}
+.dev-color-alpha__alpha {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  cursor: pointer;
+  /* Checkerboard backdrop with a transparent → opaque overlay so the
+     thumb position visually maps to alpha. */
+  background:
+    linear-gradient(to right, rgba(11, 18, 32, 0), rgba(11, 18, 32, 1)),
+    repeating-conic-gradient(#E4E7EC 0% 25%, #FFFCF8 0% 50%) 0 0/6px 6px;
+}
+.dev-color-alpha__alpha::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #FFFCF8;
+  border: 1px solid #0B1220;
+  cursor: grab;
+}
+.dev-color-alpha__alpha::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #FFFCF8;
+  border: 1px solid #0B1220;
+  cursor: grab;
+}
+.dev-color-alpha__pct {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 10px;
+  color: #334155;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* ============================================================
+ * Shadow editor
+ * ============================================================ */
+.dev-shadow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.dev-shadow__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: -apple-system, sans-serif;
+  font-size: 11px;
+}
+.dev-shadow__count {
+  color: #64748B;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.dev-shadow__mode {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  color: #334155;
+  background: none;
+  border: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.dev-shadow__mode:hover {
+  background-color: #ECEFF3;
+}
+.dev-shadow-layer {
+  background-color: #FAF7F2;
+  border: 1px solid #ECEFF3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dev-shadow-layer__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.dev-shadow-layer__title {
+  font-family: -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #334155;
+}
+.dev-shadow-layer__remove {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 0;
+  background-color: transparent;
+  color: #64748B;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.dev-shadow-layer__remove:hover {
+  background-color: #ECEFF3;
+  color: #C62828;
+}
+.dev-shadow-layer__row {
+  display: grid;
+  grid-template-columns: 50px 1fr 36px;
+  align-items: center;
+  gap: 8px;
+}
+.dev-shadow-layer__lbl {
+  font-family: -apple-system, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748B;
+}
+.dev-shadow-layer__num {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: #0B1220;
+  text-align: right;
+}
+.dev-shadow-layer__color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.dev-shadow__add {
+  font-family: -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #334155;
+  background: #FAF7F2;
+  border: 1px dashed #CBD5E1;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+}
+.dev-shadow__add:hover {
+  background-color: #ECEFF3;
+  border-color: #94A3B8;
+}
+.dev-shadow__hint {
+  font-family: -apple-system, sans-serif;
+  font-size: 10px;
+  color: #64748B;
+  line-height: 1.45;
+  margin: 0;
+}
+.dev-shadow__preview {
+  margin-top: 4px;
+  background-color: #F2F4F7;
+  border-radius: 8px;
+  padding: 24px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+}
+.dev-shadow__preview-label {
+  font-family: -apple-system, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: #64748B;
+  align-self: flex-start;
+}
+.dev-shadow__sample {
+  width: 80px;
+  height: 50px;
+  background-color: #FFFCF8;
+  border-radius: 8px;
+}
