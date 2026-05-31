@@ -351,6 +351,13 @@
   --series-b: oklch(68% 0.13 220);
   --series-c: oklch(72% 0.14 150);
 
+  --ramp-indicator-1: var(--color-card-bg);
+  --ramp-indicator-2: var(--color-surface-elevated);
+  --ramp-indicator-3: var(--color-text-40);
+  --ramp-indicator-4: var(--color-text-60);
+  --ramp-indicator-5: var(--color-accent);
+  --ramp-no-data: var(--color-select-bg);
+
   --color-branch-executive-bg: rgba(212, 118, 78, 0.15);
   --color-branch-legislative-bg: rgba(78, 139, 212, 0.15);
   --color-branch-monarchy-bg: rgba(180, 139, 255, 0.15);

@@ -34,11 +34,23 @@ function readOverrides(): Overrides {
 }
 
 export function DevDesignMount() {
+  const [isLocalhost, setIsLocalhost] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Hydrate overrides on first paint. This makes localStorage the
-  // source of truth so changes persist across reloads.
   useEffect(() => {
+    const host = window.location.hostname;
+    const local =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "::1";
+    const localTimer = window.setTimeout(() => setIsLocalhost(local), 0);
+    return () => window.clearTimeout(localTimer);
+  }, []);
+
+  // Hydrate overrides only in local development. This keeps the live site
+  // from showing or applying the token editor.
+  useEffect(() => {
+    if (!isLocalhost) return;
     let openTimer: number | undefined;
     const o = readOverrides();
     Object.entries(o).forEach(([k, v]) => {
@@ -57,10 +69,11 @@ export function DevDesignMount() {
     return () => {
       if (openTimer !== undefined) window.clearTimeout(openTimer);
     };
-  }, []);
+  }, [isLocalhost]);
 
   // Keyboard shortcut: ⌘/Ctrl + Shift + D toggles, Esc closes.
   useEffect(() => {
+    if (!isLocalhost) return;
     function onKey(e: KeyboardEvent) {
       const meta = e.metaKey || e.ctrlKey;
       if (meta && e.shiftKey && (e.key === "D" || e.key === "d")) {
@@ -73,7 +86,9 @@ export function DevDesignMount() {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [isLocalhost, open]);
+
+  if (!isLocalhost) return null;
 
   return (
     <>

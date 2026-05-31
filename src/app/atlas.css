@@ -8,22 +8,20 @@
   --atlas-ink: var(--color-text-primary);
   --atlas-ink-2: var(--color-text-60);
   --atlas-muted: var(--color-text-40);
-  --atlas-rule: #E4E7EC;
-  --atlas-rule-2: #ECEFF3;
+  --atlas-rule: var(--color-card-border);
+  --atlas-rule-2: var(--color-stat-border);
   --atlas-accent: var(--color-accent);
-  --atlas-accent-soft: #F4EAE0;          /* warm Bronze tint */
-  --atlas-ocean: #F2F4F7;                /* cool grey, paper-toned */
-  --atlas-land: #D2D6DC;                 /* indicator ramp [1] */
-  --atlas-land-dim: #ACC1D2;             /* indicator ramp [2] */
-  --atlas-land-hover: #0B1220;           /* Ink */
-  --atlas-land-selected: #1A4970;        /* indicator ramp [5] — deep navy */
+  --atlas-accent-soft: var(--color-selection);
+  --atlas-ocean: var(--color-bg);
+  --atlas-land: var(--ramp-indicator-2);
+  --atlas-land-dim: var(--ramp-indicator-3);
+  --atlas-land-hover: var(--color-text-primary);
+  --atlas-land-selected: var(--ramp-indicator-5);
   --atlas-success: var(--color-success);
   --atlas-danger: var(--color-danger);
   --atlas-leftW: 290px;
   --atlas-rightW: 325px;
 }
-
-/* Dark mode override removed — v2 is light-only. Dark mode is deferred. */
 
 .atlas-root {
   font-family: var(--font-heading);
@@ -168,7 +166,7 @@
   align-items: center;
   gap: 10px;
   padding: 8px 14px;
-  background-color: rgba(255, 252, 248, 0.92);
+  background: color-mix(in oklab, var(--color-card-bg) 92%, transparent);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-hard-md);
@@ -176,10 +174,10 @@
   -webkit-backdrop-filter: blur(2px);
   cursor: pointer;
   font-family: var(--font-body);
-  transition: border-color 120ms ease, background-color 120ms ease;
+  transition: border-color 120ms ease, background 120ms ease;
 }
 .atlas-indicator-badge:hover {
-  background-color: rgba(255, 252, 248, 1);
+  background: var(--color-card-bg);
   border-color: var(--color-text-30);
 }
 .atlas-indicator-badge:focus-visible {
@@ -259,7 +257,7 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 6px 12px;
-  background-color: rgba(255, 252, 248, 0.85);
+  background: color-mix(in oklab, var(--color-card-bg) 88%, transparent);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
@@ -274,7 +272,7 @@
   width: 14px;
   height: 10px;
   border-radius: 3px;
-  border: 1px solid rgba(11, 18, 32, 0.06);
+  border: 1px solid var(--color-card-border);
   display: inline-block;
 }
 .atlas-indicator-legend__lbl {
