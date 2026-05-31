@@ -3,6 +3,11 @@
 - Prefer simple explanations because the user is non-technical.
 - When possible, verify visual changes locally before handing back URLs.
 - Keep Civica Index and atlas concerns separated clearly in routing and UI copy.
+- Mockups location (as of 05-14-2026, CIV-208): all new PM mockups go in
+  `/Users/fernandobalino/Projects/civica/mockups`. Filenames MUST be prefixed
+  with the creation date in `MM-DD-YYYY-` format, e.g.
+  `05-14-2026-election-timeline.html`. Existing pre-CIV-208 mockups in that
+  folder are not renamed retroactively — the convention applies "from now on".
 - Don't offer to /schedule a background agent for follow-up work that another
   active workstream is already going to do. Multiple agents on Civica run in
   parallel at agent velocity (F.2.1 took ~1 hour end-to-end), so "check
