@@ -5,17 +5,25 @@ type ActiveSurface = "factbook" | "civica-index" | "atlas";
 interface CountrySwitcherChipsProps {
   slug: string;
   active: ActiveSurface;
+  /**
+   * Whether the slug is covered by the Atlas (sovereign states). Non-sovereign
+   * territories live in the Factbook only — for them the Atlas chip is hidden
+   * so we don't emit links to /atlas/[territory]/structure routes that 404.
+   */
+  inAtlas?: boolean;
 }
 
 // Persistent chip group that appears on every per-country surface so a
 // reader can flip between Factbook · Civica Index · Atlas without losing
 // their place. Layout (spacing/wrap/responsive collapse) lives in
 // factbook.css under `.factbook-chip-row` / `.factbook-chip`.
-export function CountrySwitcherChips({ slug, active }: CountrySwitcherChipsProps) {
+export function CountrySwitcherChips({ slug, active, inAtlas = true }: CountrySwitcherChipsProps) {
   const items: Array<{ id: ActiveSurface; label: string; href: string }> = [
     { id: "factbook", label: "Factbook", href: `/factbook/${slug}` },
     { id: "civica-index", label: "Civica Index", href: `/civica-index/${slug}` },
-    { id: "atlas", label: "Open in Atlas", href: `/atlas/${slug}/structure` },
+    ...(inAtlas
+      ? [{ id: "atlas" as const, label: "Open in Atlas", href: `/atlas/${slug}/structure` }]
+      : []),
   ];
 
   return (

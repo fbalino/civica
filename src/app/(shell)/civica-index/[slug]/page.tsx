@@ -840,7 +840,7 @@ export default async function CICountryDetailPage({
                   {compareCards.map((country) => (
                     <Link
                       key={country.slug}
-                      href={`/civica-index/compare?c=${encodeURIComponent(slug)}&c=${encodeURIComponent(country.slug)}`}
+                      href={`/compare?c=${encodeURIComponent(slug)}&c=${encodeURIComponent(country.slug)}`}
                       className="ci-country-compare-link"
                     >
                       + {country.name}

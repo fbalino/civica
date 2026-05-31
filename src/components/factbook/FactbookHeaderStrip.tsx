@@ -100,6 +100,9 @@ interface FactbookHeaderStripProps {
   populationResolver?: ResolverOutput | null;
   /** Phase F.4 — resolver output for gdp_ppp_usd_billions. */
   gdpResolver?: ResolverOutput | null;
+  /** Whether this jurisdiction is covered by the Atlas (sovereign states only).
+   *  Hides the "Open in Atlas" chip for non-sovereign territories. */
+  inAtlas?: boolean;
 }
 
 function formatPop(n: number | null): string | null {
@@ -144,6 +147,7 @@ export function FactbookHeaderStrip({
   photos,
   populationResolver,
   gdpResolver,
+  inAtlas = true,
 }: FactbookHeaderStripProps) {
   const [lbOpen, setLbOpen] = useState(false);
   const [lbMode, setLbMode] = useState<"map" | "photos">("photos");
@@ -361,7 +365,7 @@ export function FactbookHeaderStrip({
           </div>
 
           <div className="factbook-hero-switcher-wrap">
-            <CountrySwitcherChips slug={slug} active="factbook" />
+            <CountrySwitcherChips slug={slug} active="factbook" inAtlas={inAtlas} />
           </div>
         </div>
 

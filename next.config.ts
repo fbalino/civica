@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* cacheComponents: true — re-enable after adding `use cache` to data functions */
+  turbopack: {
+    root: __dirname,
+  },
   async redirects() {
     return [
       {
@@ -110,6 +113,14 @@ const nextConfig: NextConfig = {
       {
         source: "/government-types/:type",
         destination: "/civica-index/methodology/peer-grouping",
+        permanent: true,
+      },
+      // /factbook/methodology was the parent page referenced from older
+      // links/sitemaps but never existed as a real route. The reconciliation
+      // page is the canonical methodology home for the factbook.
+      {
+        source: "/factbook/methodology",
+        destination: "/factbook/methodology/reconciliation",
         permanent: true,
       },
     ];

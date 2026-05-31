@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
@@ -41,7 +41,18 @@ export default async function AtlasCountryPage({ params }: PageProps) {
 
   const { countries: dbCountries, chambers: dbChambers } = await loadAtlasData();
   const match = slugToCountry(slug, dbCountries);
-  if (!match) notFound();
+  if (!match) {
+    // Atlas only covers sovereign states. If the slug is a known non-sovereign
+    // jurisdiction in the Factbook (territories, dependencies), 308 the user
+    // there instead of returning a 404.
+    const fallback = await db
+      .select({ slug: jurisdictions.slug })
+      .from(jurisdictions)
+      .where(eq(jurisdictions.slug, slug))
+      .limit(1);
+    if (fallback[0]) redirect(`/factbook/${fallback[0].slug}`);
+    notFound();
+  }
 
   const country: Country = {
     id: match.id,

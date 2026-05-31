@@ -533,7 +533,7 @@ export function GovernmentTypesExplorer({ data }: { data: GovTypeRow[] }) {
         <Link href="/civica-index" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
           ← All Countries
         </Link>
-        <Link href="/civica-index/compare" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
+        <Link href="/compare" style={{ color: "var(--color-accent)", textDecoration: "none" }}>
           Compare Countries
         </Link>
         <Link href="/civica-index/methodology" style={{ color: "var(--color-accent)", textDecoration: "none" }}>

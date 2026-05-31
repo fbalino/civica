@@ -394,6 +394,7 @@ export default async function FactbookCountryPage({
         cpTrend={cpTrend}
         mapImages={mapImages}
         photos={photos}
+        inAtlas={jurisdiction.type === "sovereign_state"}
       />
 
       {/* Phase F.4 — show a one-line reconciliation disclosure

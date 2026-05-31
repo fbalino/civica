@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { getAllPosts } from "@/lib/blog";
-import { GOVERNMENT_TYPES } from "@/lib/data/government-types";
 
 const SITE_URL = "https://civicaatlas.org";
 
@@ -105,21 +104,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  const govTypePages: MetadataRoute.Sitemap = [
-    {
-      url: `${SITE_URL}/government-types`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    ...GOVERNMENT_TYPES.map((gt) => ({
-      url: `${SITE_URL}/government-types/${gt.slug}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    })),
-  ];
-
   const comparisonPages: MetadataRoute.Sitemap = PRIORITY_COMPARISONS.map(
     ([a, b]) => ({
       url: `${SITE_URL}/compare?c=${encodeURIComponent(a)}&c=${encodeURIComponent(b)}`,
@@ -131,7 +115,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...staticPages,
-    ...govTypePages,
     ...comparisonPages,
     ...factbookPages,
     ...countryPages,

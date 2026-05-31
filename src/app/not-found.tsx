@@ -29,7 +29,7 @@ const DESTINATIONS: Array<{
     description: "Recent national elections and turnout figures.",
   },
   {
-    href: "/government-types",
+    href: "/civica-index/methodology/peer-grouping",
     label: "Government Types",
     description: "Presidential, parliamentary, and other systems explained.",
   },
