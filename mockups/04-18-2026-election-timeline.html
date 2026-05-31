@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica — Election Timeline & Results (Mockup)</title>
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --color-bg: #0e0e10;
+    --color-card-bg: #18181b;
+    --color-card-border: #27272a;
+    --color-text-primary: #fafafa;
+    --color-text-85: rgba(250,250,250,0.85);
+    --color-text-50: rgba(250,250,250,0.50);
+    --color-text-30: rgba(250,250,250,0.30);
+    --color-text-20: rgba(250,250,250,0.20);
+    --color-accent: #a78bfa;
+    --color-accent-dim: rgba(167,139,250,0.15);
+    --color-branch-executive: #f59e0b;
+    --color-branch-legislative: #3b82f6;
+    --color-branch-judicial: #ef4444;
+    --color-success: #22c55e;
+    --color-warning: #eab308;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+  }
+
+  [data-theme="light"] {
+    --color-bg: #fafaf9;
+    --color-card-bg: #ffffff;
+    --color-card-border: #e4e4e7;
+    --color-text-primary: #18181b;
+    --color-text-85: rgba(24,24,27,0.85);
+    --color-text-50: rgba(24,24,27,0.50);
+    --color-text-30: rgba(24,24,27,0.30);
+    --color-text-20: rgba(24,24,27,0.15);
+    --color-accent: #7c3aed;
+    --color-accent-dim: rgba(124,58,237,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--color-card-border);
+    background: var(--color-card-bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+  .topbar-nav {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .topbar-nav a {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-30);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .topbar-nav a:hover, .topbar-nav a.active {
+    color: var(--color-accent);
+  }
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--color-card-border);
+    color: var(--color-text-50);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  .page-heading {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+  .page-subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    margin-bottom: 32px;
+  }
+
+  /* Stats strip */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--color-card-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .stat-cell {
+    background: var(--color-card-bg);
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-cell-value {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--color-accent);
+    display: block;
+  }
+  .stat-cell-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter-select {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 450;
+    color: var(--color-text-primary);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .filter-chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-card-border);
+    background: var(--color-card-bg);
+    color: var(--color-text-50);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-chip:hover, .filter-chip.active {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: var(--color-accent-dim);
+  }
+
+  /* Upcoming elections section */
+  .section-heading {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-20);
+    margin-bottom: 16px;
+  }
+
+  .upcoming-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1px;
+    background: var(--color-card-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 40px;
+  }
+  .upcoming-card {
+    background: var(--color-card-bg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .upcoming-card:hover {
+    background: var(--color-accent-dim);
+  }
+  .upcoming-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .upcoming-flag {
+    font-size: 24px;
+    line-height: 1;
+  }
+  .upcoming-country {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 400;
+  }
+  .upcoming-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    color: var(--color-accent);
+  }
+  .upcoming-type {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .upcoming-countdown {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    color: var(--color-warning);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Election results timeline */
+  .timeline {
+    position: relative;
+    margin-bottom: 40px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--color-card-border);
+  }
+  .timeline-item {
+    position: relative;
+    padding-left: 52px;
+    padding-bottom: 32px;
+  }
+  .timeline-dot {
+    position: absolute;
+    left: 14px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--color-accent);
+    background: var(--color-bg);
+    z-index: 1;
+  }
+  .timeline-dot.legislative { border-color: var(--color-branch-legislative); }
+  .timeline-dot.executive { border-color: var(--color-branch-executive); }
+
+  .timeline-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    transition: border-color 0.15s;
+    cursor: pointer;
+  }
+  .timeline-card:hover {
+    border-color: var(--color-accent);
+  }
+  .timeline-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .timeline-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .timeline-card-country {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 400;
+  }
+  .timeline-card-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    display: flex;
+    gap: 16px;
+  }
+  .election-type-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .election-type-badge.legislative {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--color-branch-legislative);
+  }
+  .election-type-badge.executive {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--color-branch-executive);
+  }
+
+  /* Turnout bar */
+  .turnout-bar-container {
+    margin-top: 12px;
+  }
+  .turnout-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .turnout-bar-bg {
+    height: 8px;
+    background: var(--color-card-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .turnout-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+
+  /* Results mini-bar chart */
+  .results-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .results-party-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    color: var(--color-text-85);
+    width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .results-bar-bg {
+    flex: 1;
+    height: 16px;
+    background: var(--color-card-border);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .results-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+  .results-pct {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    color: var(--color-text-50);
+    width: 44px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .results-seats {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    width: 50px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Electoral system chip */
+  .system-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    padding: 3px 8px;
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Year markers in timeline */
+  .timeline-year {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--color-text-20);
+    padding-left: 52px;
+    margin-bottom: 16px;
+    margin-top: 8px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .stats-strip {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .upcoming-grid {
+      grid-template-columns: 1fr;
+    }
+    .results-party-name {
+      width: 100px;
+    }
+  }
+
+  .mockup-badge {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--color-accent);
+    color: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    z-index: 200;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="#" class="topbar-logo">Civica</a>
+    <nav class="topbar-nav">
+      <a href="#">Atlas</a>
+      <a href="#">Countries</a>
+      <a href="#" class="active">Elections</a>
+      <a href="#">Compare</a>
+      <a href="#">Rankings</a>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">&#9681;</button>
+    </nav>
+  </header>
+
+  <div class="page-container">
+    <h1 class="page-heading">Elections</h1>
+    <p class="page-subtitle">Track upcoming and past elections worldwide. Turnout data from IDEA. Results from Wikidata and official sources.</p>
+
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <div class="stat-cell">
+        <span class="stat-cell-value">47</span>
+        <span class="stat-cell-label">Elections in 2026</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-value">12</span>
+        <span class="stat-cell-label">Upcoming (Next 90 Days)</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-value">62.4%</span>
+        <span class="stat-cell-label">Avg Global Turnout</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-value">1,945</span>
+        <span class="stat-cell-label">Total Elections Tracked</span>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <select class="filter-select">
+        <option>All Regions</option>
+        <option>Africa</option>
+        <option>Americas</option>
+        <option>Asia</option>
+        <option>Europe</option>
+        <option>Oceania</option>
+      </select>
+      <select class="filter-select">
+        <option>All Years</option>
+        <option selected>2026</option>
+        <option>2025</option>
+        <option>2024</option>
+        <option>2023</option>
+      </select>
+      <span class="filter-chip active" onclick="filterType(this)">All Types</span>
+      <span class="filter-chip" onclick="filterType(this)">Presidential</span>
+      <span class="filter-chip" onclick="filterType(this)">Parliamentary</span>
+      <span class="filter-chip" onclick="filterType(this)">Referendum</span>
+    </div>
+
+    <!-- Upcoming Elections -->
+    <div class="section-heading">Upcoming Elections</div>
+    <div class="upcoming-grid">
+      <a href="#" class="upcoming-card">
+        <div class="upcoming-card-header">
+          <span class="upcoming-flag">&#127468;&#127463;</span>
+          <span class="upcoming-country">United Kingdom</span>
+        </div>
+        <span class="upcoming-type">Local elections</span>
+        <span class="upcoming-date">May 7, 2026</span>
+        <span class="upcoming-countdown">&#9201; 19 days away</span>
+      </a>
+      <a href="#" class="upcoming-card">
+        <div class="upcoming-card-header">
+          <span class="upcoming-flag">&#127472;&#127479;</span>
+          <span class="upcoming-country">South Korea</span>
+        </div>
+        <span class="upcoming-type">Presidential election</span>
+        <span class="upcoming-date">June 3, 2026</span>
+        <span class="upcoming-countdown">&#9201; 46 days away</span>
+      </a>
+      <a href="#" class="upcoming-card">
+        <div class="upcoming-card-header">
+          <span class="upcoming-flag">&#127474;&#127485;</span>
+          <span class="upcoming-country">Mexico</span>
+        </div>
+        <span class="upcoming-type">Midterm legislative elections</span>
+        <span class="upcoming-date">June 7, 2026</span>
+        <span class="upcoming-countdown">&#9201; 50 days away</span>
+      </a>
+      <a href="#" class="upcoming-card">
+        <div class="upcoming-card-header">
+          <span class="upcoming-flag">&#127462;&#127482;</span>
+          <span class="upcoming-country">Australia</span>
+        </div>
+        <span class="upcoming-type">Federal election</span>
+        <span class="upcoming-date">H2 2026 (est.)</span>
+        <span class="upcoming-countdown">&#9201; TBD</span>
+      </a>
+    </div>
+
+    <!-- Recent Election Results Timeline -->
+    <div class="section-heading">Recent Election Results</div>
+    <div class="timeline">
+      <div class="timeline-year">2026</div>
+
+      <!-- Germany 2025 -->
+      <div class="timeline-item">
+        <div class="timeline-dot legislative"></div>
+        <div class="timeline-card" onclick="this.querySelector('.results-detail').classList.toggle('collapsed')">
+          <div class="timeline-card-header">
+            <div class="timeline-card-title">
+              <span style="font-size: 24px">&#127465;&#127466;</span>
+              <span class="timeline-card-country">Germany</span>
+            </div>
+            <span class="election-type-badge legislative">Parliamentary</span>
+          </div>
+          <div class="timeline-card-meta">
+            <span>February 23, 2025</span>
+            <span class="system-chip">Mixed-member proportional</span>
+          </div>
+
+          <!-- Turnout -->
+          <div class="turnout-bar-container">
+            <div class="turnout-label">
+              <span>Voter Turnout</span>
+              <span style="color: var(--color-accent)">82.5%</span>
+            </div>
+            <div class="turnout-bar-bg">
+              <div class="turnout-bar-fill" style="width: 82.5%; background: linear-gradient(90deg, var(--color-accent), var(--color-branch-legislative))"></div>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div class="results-detail" style="margin-top: 16px;">
+            <div class="results-row">
+              <span class="results-party-name">CDU/CSU</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 60%; background: #000"></div></div>
+              <span class="results-pct">28.5%</span>
+              <span class="results-seats">208 seats</span>
+            </div>
+            <div class="results-row">
+              <span class="results-party-name">AfD</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 42%; background: #009ee0"></div></div>
+              <span class="results-pct">20.8%</span>
+              <span class="results-seats">152 seats</span>
+            </div>
+            <div class="results-row">
+              <span class="results-party-name">SPD</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 30%; background: #e3000f"></div></div>
+              <span class="results-pct">13.7%</span>
+              <span class="results-seats">120 seats</span>
+            </div>
+            <div class="results-row">
+              <span class="results-party-name">Greens</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 24%; background: #64a12d"></div></div>
+              <span class="results-pct">11.6%</span>
+              <span class="results-seats">85 seats</span>
+            </div>
+            <div class="results-row">
+              <span class="results-party-name">BSW</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 12%; background: #8B0000"></div></div>
+              <span class="results-pct">4.97%</span>
+              <span class="results-seats">37 seats</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- France 2024 -->
+      <div class="timeline-item">
+        <div class="timeline-dot legislative"></div>
+        <div class="timeline-card" onclick="this.querySelector('.results-detail')?.classList.toggle('collapsed')">
+          <div class="timeline-card-header">
+            <div class="timeline-card-title">
+              <span style="font-size: 24px">&#127467;&#127479;</span>
+              <span class="timeline-card-country">France</span>
+            </div>
+            <span class="election-type-badge legislative">Parliamentary</span>
+          </div>
+          <div class="timeline-card-meta">
+            <span>June 30 &ndash; July 7, 2024</span>
+            <span class="system-chip">Two-round system</span>
+          </div>
+          <div class="turnout-bar-container">
+            <div class="turnout-label">
+              <span>Voter Turnout</span>
+              <span style="color: var(--color-accent)">66.7%</span>
+            </div>
+            <div class="turnout-bar-bg">
+              <div class="turnout-bar-fill" style="width: 66.7%; background: linear-gradient(90deg, var(--color-accent), var(--color-branch-legislative))"></div>
+            </div>
+          </div>
+          <div class="results-detail" style="margin-top: 16px;">
+            <div class="results-row">
+              <span class="results-party-name">NFP (Left)</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 56%; background: #bb1840"></div></div>
+              <span class="results-pct">25.7%</span>
+              <span class="results-seats">182 seats</span>
+            </div>
+            <div class="results-row">
+              <span class="results-party-name">Ensemble (Macron)</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 47%; background: #FFD700"></div></div>
+              <span class="results-pct">24.5%</span>
+              <span class="results-seats">168 seats</span>
+            </div>
+            <div class="results-row">
+              <span class="results-party-name">RN (Le Pen)</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 62%; background: #0D378A"></div></div>
+              <span class="results-pct">33.2%</span>
+              <span class="results-seats">143 seats</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="timeline-year">2024</div>
+
+      <!-- India 2024 -->
+      <div class="timeline-item">
+        <div class="timeline-dot legislative"></div>
+        <div class="timeline-card">
+          <div class="timeline-card-header">
+            <div class="timeline-card-title">
+              <span style="font-size: 24px">&#127470;&#127475;</span>
+              <span class="timeline-card-country">India</span>
+            </div>
+            <span class="election-type-badge legislative">Parliamentary</span>
+          </div>
+          <div class="timeline-card-meta">
+            <span>Apr 19 &ndash; Jun 1, 2024</span>
+            <span class="system-chip">First-past-the-post</span>
+          </div>
+          <div class="turnout-bar-container">
+            <div class="turnout-label">
+              <span>Voter Turnout</span>
+              <span style="color: var(--color-accent)">65.8%</span>
+            </div>
+            <div class="turnout-bar-bg">
+              <div class="turnout-bar-fill" style="width: 65.8%; background: linear-gradient(90deg, var(--color-accent), var(--color-branch-legislative))"></div>
+            </div>
+          </div>
+          <div class="results-detail" style="margin-top: 16px;">
+            <div class="results-row">
+              <span class="results-party-name">BJP</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 67%; background: #FF6600"></div></div>
+              <span class="results-pct">36.6%</span>
+              <span class="results-seats">240 seats</span>
+            </div>
+            <div class="results-row">
+              <span class="results-party-name">INC (Congress)</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 30%; background: #00BFFF"></div></div>
+              <span class="results-pct">21.2%</span>
+              <span class="results-seats">99 seats</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- US 2024 -->
+      <div class="timeline-item">
+        <div class="timeline-dot executive"></div>
+        <div class="timeline-card">
+          <div class="timeline-card-header">
+            <div class="timeline-card-title">
+              <span style="font-size: 24px">&#127482;&#127480;</span>
+              <span class="timeline-card-country">United States</span>
+            </div>
+            <span class="election-type-badge executive">Presidential</span>
+          </div>
+          <div class="timeline-card-meta">
+            <span>November 5, 2024</span>
+            <span class="system-chip">Electoral college</span>
+          </div>
+          <div class="turnout-bar-container">
+            <div class="turnout-label">
+              <span>Voter Turnout</span>
+              <span style="color: var(--color-accent)">65.6%</span>
+            </div>
+            <div class="turnout-bar-bg">
+              <div class="turnout-bar-fill" style="width: 65.6%; background: linear-gradient(90deg, var(--color-accent), var(--color-branch-executive))"></div>
+            </div>
+          </div>
+          <div class="results-detail" style="margin-top: 16px;">
+            <div class="results-row">
+              <span class="results-party-name">Donald Trump (R)</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 72%; background: #E81B23"></div></div>
+              <span class="results-pct">49.9%</span>
+              <span class="results-seats">312 EC</span>
+            </div>
+            <div class="results-row">
+              <span class="results-party-name">Kamala Harris (D)</span>
+              <div class="results-bar-bg"><div class="results-bar-fill" style="width: 65%; background: #0015BC"></div></div>
+              <span class="results-pct">48.3%</span>
+              <span class="results-seats">226 EC</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-badge">PM Mockup &mdash; Not Production</div>
+
+  <script>
+    function toggleTheme() {
+      const body = document.body;
+      const current = body.getAttribute('data-theme');
+      body.setAttribute('data-theme', current === 'light' ? '' : 'light');
+      if (current === 'light') body.removeAttribute('data-theme');
+    }
+    function filterType(el) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+    }
+  </script>
+</body>
+</html>

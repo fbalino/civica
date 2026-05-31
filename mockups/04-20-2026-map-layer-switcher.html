@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Civica — Map Layer Switcher (mockup)</title>
+<style>
+  :root {
+    --color-bg: #16140f;
+    --color-surface: #221e16;
+    --color-card-bg: rgba(255,255,255,0.03);
+    --color-card-border: #3d382d;
+    --color-text-primary: #ebe6d6;
+    --color-text-60: #c4bdae;
+    --color-text-30: rgba(235,230,214,0.50);
+    --color-divider: #3d382d;
+    --color-accent: #D4A04A;
+    --color-accent-bg: rgba(212,160,74,0.10);
+    --font-heading: Georgia, serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    /* gov type colors */
+    --gov-presidential: #D4764E;
+    --gov-parliamentary: #4E8BD4;
+    --gov-semi-presidential: #9B6DC6;
+    --gov-theocratic: #5CAA6E;
+    --gov-absolute: #C4A44E;
+    --gov-other: #8899AA;
+
+    /* atlas colors */
+    --atlas-land: #3d3828;
+    --atlas-land-dim: #2a2719;
+    --atlas-paper: #16140f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-body); min-height: 100vh; }
+
+  .layout { display: grid; grid-template-columns: 260px 1fr 280px; height: 100vh; overflow: hidden; }
+
+  /* LEFT PANEL */
+  .panel-left { border-right: 1px solid var(--color-divider); overflow-y: auto; display: flex; flex-direction: column; }
+  .panel-header { padding: 16px; border-bottom: 1px solid var(--color-divider); }
+  .panel-header h2 { font-family: var(--font-heading); font-size: 22px; font-weight: 400; color: var(--color-text-primary); }
+  .panel-header p { font-size: 12px; color: var(--color-text-30); margin-top: 4px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .country-list { flex: 1; overflow-y: auto; }
+  .country-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid rgba(61,56,45,0.4); cursor: pointer; transition: background 120ms; }
+  .country-item:hover { background: rgba(212,160,74,0.06); }
+  .country-item.active { background: rgba(212,160,74,0.10); }
+  .country-flag { width: 24px; height: 16px; object-fit: cover; border-radius: 2px; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0; background: #333; }
+  .country-name { font-size: 13px; color: var(--color-text-primary); flex: 1; }
+  .country-gov-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* MAP CENTER */
+  .panel-map { position: relative; overflow: hidden; }
+
+  /* LAYER SWITCHER */
+  .layer-switcher { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 10;
+    display: flex; gap: 1px; background: rgba(22,20,15,0.92); border: 1px solid var(--color-divider); border-radius: 4px; padding: 3px; }
+  .layer-btn { padding: 6px 14px; border: none; border-radius: 3px; font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; cursor: pointer;
+    color: var(--color-text-30); background: transparent; transition: all 120ms; white-space: nowrap; }
+  .layer-btn.active { background: var(--color-accent); color: #16140f; font-weight: 600; }
+  .layer-btn:hover:not(.active) { color: var(--color-text-60); background: rgba(255,255,255,0.05); }
+
+  /* MAP SVG */
+  .world-map-svg { width: 100%; height: 100%; }
+
+  /* LEGEND */
+  .legend { position: absolute; bottom: 24px; left: 24px; background: rgba(22,20,15,0.92); border: 1px solid var(--color-divider); border-radius: 4px; padding: 12px 14px; }
+  .legend-title { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-30); margin-bottom: 8px; }
+  .legend-items { display: flex; flex-direction: column; gap: 5px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-60); }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+  .legend-gradient { height: 8px; width: 120px; border-radius: 2px; }
+
+  /* DATA BADGE */
+  .data-badge { position: absolute; top: 16px; right: 16px; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--color-text-30); background: rgba(22,20,15,0.8); border: 1px solid var(--color-divider); border-radius: 4px; padding: 4px 8px; }
+
+  /* RIGHT PANEL */
+  .panel-right { border-left: 1px solid var(--color-divider); overflow-y: auto; display: flex; flex-direction: column; }
+  .panel-right-header { padding: 16px; border-bottom: 1px solid var(--color-divider); }
+  .panel-right-header h3 { font-family: var(--font-heading); font-size: 18px; font-weight: 400; }
+  .panel-right-header p { font-size: 11px; color: var(--color-text-30); margin-top: 3px; font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .panel-content { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .stat-card { background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: 4px; padding: 14px; }
+  .stat-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-30); }
+  .stat-value { font-family: var(--font-heading); font-size: 28px; font-weight: 400; margin-top: 4px; color: var(--color-text-primary); }
+  .stat-sub { font-size: 12px; color: var(--color-text-30); margin-top: 2px; }
+
+  .distribution-bar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 1px; margin-top: 8px; }
+  .distribution-segment { height: 100%; transition: flex 300ms; }
+
+  .tooltip { display: none; position: fixed; background: rgba(22,20,15,0.95); border: 1px solid var(--color-divider); border-radius: 4px; padding: 8px 12px; font-size: 12px; color: var(--color-text-60); pointer-events: none; z-index: 100; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- LEFT: Country list -->
+  <div class="panel-left">
+    <div class="panel-header">
+      <h2>Countries</h2>
+      <p>250 sovereign states</p>
+    </div>
+    <div class="country-list" id="countryList"></div>
+  </div>
+
+  <!-- CENTER: Map -->
+  <div class="panel-map">
+    <div class="layer-switcher">
+      <button class="layer-btn active" data-layer="govtype">Gov Type</button>
+      <button class="layer-btn" data-layer="democracy">Democracy</button>
+      <button class="layer-btn" data-layer="gdp">GDP / Capita</button>
+      <button class="layer-btn" data-layer="population">Population</button>
+    </div>
+
+    <div class="data-badge" id="dataBadge">V-Dem 2024 · Wikidata</div>
+
+    <svg class="world-map-svg" viewBox="0 0 900 500" id="worldMap">
+      <!-- Simplified placeholder regions — production uses TopoJSON -->
+      <rect x="0" y="0" width="900" height="500" fill="#0e0c09"/>
+      <text x="450" y="250" text-anchor="middle" fill="rgba(235,230,214,0.06)" font-size="11" font-family="ui-monospace">
+        Production: TopoJSON world map with per-country choropleth fill
+      </text>
+      <!-- Dots pattern -->
+      <defs>
+        <pattern id="dots" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
+          <circle cx="1" cy="1" r="0.5" fill="rgba(235,230,214,0.07)"/>
+        </pattern>
+      </defs>
+      <rect x="0" y="0" width="900" height="500" fill="url(#dots)"/>
+
+      <!-- Region blocks (simplified concept map) -->
+      <!-- North America -->
+      <g id="region-na" data-region="North America">
+        <rect x="80" y="60" width="160" height="130" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="North America"/>
+        <text x="160" y="132" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace">N. America</text>
+      </g>
+      <!-- South America -->
+      <g id="region-sa">
+        <rect x="140" y="210" width="110" height="150" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="South America"/>
+        <text x="195" y="292" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace">S. America</text>
+      </g>
+      <!-- Europe -->
+      <g id="region-eu">
+        <rect x="380" y="50" width="130" height="110" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="Europe"/>
+        <text x="445" y="112" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace">Europe</text>
+      </g>
+      <!-- Africa -->
+      <g id="region-af">
+        <rect x="360" y="180" width="140" height="200" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="Africa"/>
+        <text x="430" y="285" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace">Africa</text>
+      </g>
+      <!-- Middle East -->
+      <g id="region-me">
+        <rect x="510" y="110" width="90" height="80" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="Middle East"/>
+        <text x="555" y="156" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace" font-size="9">M. East</text>
+      </g>
+      <!-- Central/South Asia -->
+      <g id="region-ca">
+        <rect x="600" y="80" width="120" height="130" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="Asia"/>
+        <text x="660" y="150" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace">C/S Asia</text>
+      </g>
+      <!-- East Asia -->
+      <g id="region-ea">
+        <rect x="720" y="60" width="130" height="130" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="East Asia"/>
+        <text x="785" y="132" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace">E. Asia</text>
+      </g>
+      <!-- SE Asia / Pacific -->
+      <g id="region-sea">
+        <rect x="700" y="210" width="160" height="120" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="SE Asia"/>
+        <text x="780" y="276" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace">SE Asia / Pacific</text>
+      </g>
+      <!-- Oceania -->
+      <g id="region-oc">
+        <rect x="720" y="350" width="130" height="90" rx="4" fill="#3d3828" stroke="#4d4838" stroke-width="0.5" class="region-block" data-region="Oceania"/>
+        <text x="785" y="400" text-anchor="middle" fill="rgba(235,230,214,0.35)" font-size="10" font-family="ui-monospace">Oceania</text>
+      </g>
+    </svg>
+
+    <!-- Legend -->
+    <div class="legend" id="legend">
+      <div class="legend-title" id="legendTitle">Government Type</div>
+      <div class="legend-items" id="legendItems"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Country detail -->
+  <div class="panel-right">
+    <div class="panel-right-header">
+      <h3>🇩🇪 Germany</h3>
+      <p>Federal Parliamentary Republic · Europe</p>
+    </div>
+    <div class="panel-content" id="rightPanel"></div>
+  </div>
+
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const LAYERS = {
+  govtype: {
+    label: "Gov Type",
+    badge: "Wikidata · 2024",
+    legend: [
+      { label: "Presidential", color: "#D4764E" },
+      { label: "Parliamentary", color: "#4E8BD4" },
+      { label: "Semi-presidential", color: "#9B6DC6" },
+      { label: "Theocratic", color: "#5CAA6E" },
+      { label: "Absolute Monarchy", color: "#C4A44E" },
+      { label: "Other / Transitional", color: "#8899AA" },
+    ],
+    type: "categorical",
+    rightContent: () => `
+      <div class="stat-card">
+        <div class="stat-label">Government Type</div>
+        <div class="stat-value" style="font-size:18px;margin-top:6px">Federal Parliamentary Republic</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Distribution worldwide</div>
+        <div style="margin-top:8px">
+          <div class="distribution-bar">
+            <div class="distribution-segment" style="flex:57;background:#4E8BD4"></div>
+            <div class="distribution-segment" style="flex:16;background:#D4764E"></div>
+            <div class="distribution-segment" style="flex:14;background:#9B6DC6"></div>
+            <div class="distribution-segment" style="flex:8;background:#C4A44E"></div>
+            <div class="distribution-segment" style="flex:5;background:#5CAA6E"></div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--color-text-30);font-family:var(--font-mono)">
+            <div>57 Parliamentary · 16 Presidential</div>
+            <div style="margin-top:2px">14 Semi-presidential · 8 Monarchy · 5 Theocratic</div>
+          </div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Same type as Germany</div>
+        <div style="margin-top:10px;display:flex;flex-direction:column;gap:6px" id="sameType">
+          ${["Austria", "Sweden", "Canada", "Japan", "Australia", "India"].map(c => `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--color-text-60)"><div style="width:8px;height:8px;border-radius:50%;background:#4E8BD4"></div>${c}</div>`).join("")}
+        </div>
+      </div>
+    `,
+  },
+  democracy: {
+    label: "Democracy Score",
+    badge: "V-Dem Institute · 2024",
+    legend: [
+      { label: "0.8–1.0  Liberal democracy", color: "#4E8BD4" },
+      { label: "0.6–0.8  Electoral democracy", color: "#5CAA6E" },
+      { label: "0.4–0.6  Electoral autocracy", color: "#C4A44E" },
+      { label: "0.0–0.4  Closed autocracy", color: "#D4764E" },
+    ],
+    type: "gradient",
+    gradient: "linear-gradient(to right, #D4764E, #C4A44E, #5CAA6E, #4E8BD4)",
+    rightContent: () => `
+      <div class="stat-card">
+        <div class="stat-label">V-Dem Liberal Democracy Index</div>
+        <div class="stat-value" style="color:#4E8BD4">0.83</div>
+        <div class="stat-sub">Liberal Democracy · Top 15%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Regional average (Europe)</div>
+        <div class="stat-value" style="font-size:22px">0.71</div>
+        <div class="stat-sub">Germany above regional mean by 0.12</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Score trend (2014–2024)</div>
+        <svg viewBox="0 0 220 50" style="width:100%;margin-top:6px">
+          <polyline points="0,10 40,12 80,14 120,20 160,18 200,10" fill="none" stroke="#4E8BD4" stroke-width="1.5"/>
+          <circle cx="200" cy="10" r="3" fill="#4E8BD4"/>
+        </svg>
+        <div style="font-size:10px;color:var(--color-text-30);font-family:var(--font-mono);margin-top:2px">Stable · slight improvement since 2019</div>
+      </div>
+    `,
+  },
+  gdp: {
+    label: "GDP / Capita",
+    badge: "World Bank · 2024",
+    legend: [
+      { label: "> $50k  High income", color: "#D4A04A" },
+      { label: "$20–50k  Upper-middle", color: "#8ab4b0" },
+      { label: "$5–20k  Lower-middle", color: "#7a8fa0" },
+      { label: "< $5k  Low income", color: "#4d5a6a" },
+    ],
+    type: "gradient",
+    gradient: "linear-gradient(to right, #4d5a6a, #7a8fa0, #8ab4b0, #D4A04A)",
+    rightContent: () => `
+      <div class="stat-card">
+        <div class="stat-label">GDP per Capita (PPP)</div>
+        <div class="stat-value" style="color:#D4A04A">$56,900</div>
+        <div class="stat-sub">High income · 24th globally</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total GDP (PPP)</div>
+        <div class="stat-value" style="font-size:22px">$4.9T</div>
+        <div class="stat-sub">4th largest economy in the world</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">vs. European peers</div>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+          ${[["🇨🇭 Switzerland","$81k","#D4A04A"],["🇩🇰 Denmark","$64k","#D4A04A"],["🇩🇪 Germany","$57k","#D4A04A"],["🇫🇷 France","$52k","#8ab4b0"],["🇮🇹 Italy","$43k","#8ab4b0"],["🇵🇱 Poland","$38k","#7a8fa0"]].map(([c,v,col]) => `
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--color-text-60)">
+            <div style="width:8px;height:8px;border-radius:2px;background:${col}"></div>
+            <span style="flex:1">${c}</span>
+            <span style="font-family:var(--font-mono);color:var(--color-text-30)">${v}</span>
+          </div>`).join("")}
+        </div>
+      </div>
+    `,
+  },
+  population: {
+    label: "Population",
+    badge: "UN DESA · 2024",
+    legend: [
+      { label: "> 100M", color: "#D4764E" },
+      { label: "10–100M", color: "#C4A44E" },
+      { label: "1–10M", color: "#8ab4b0" },
+      { label: "< 1M", color: "#4d5a6a" },
+    ],
+    type: "gradient",
+    gradient: "linear-gradient(to right, #4d5a6a, #8ab4b0, #C4A44E, #D4764E)",
+    rightContent: () => `
+      <div class="stat-card">
+        <div class="stat-label">Population</div>
+        <div class="stat-value">84.5M</div>
+        <div class="stat-sub">18th globally · 2nd in EU</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Population density</div>
+        <div class="stat-value" style="font-size:22px">237 / km²</div>
+        <div class="stat-sub">Moderate density</div>
+      </div>
+    `,
+  },
+};
+
+let activeLayer = "govtype";
+
+// Apply region colors based on layer
+function applyLayerColors(layer) {
+  const REGION_COLORS = {
+    govtype: {
+      "North America": "#9B6DC6",    // mix of semi-pres + parliamentary
+      "South America": "#D4764E",    // mostly presidential
+      "Europe": "#4E8BD4",           // mostly parliamentary
+      "Africa": "#8899AA",           // mix/transitional
+      "Middle East": "#C4A44E",      // monarchies + authoritarian
+      "Asia": "#9B6DC6",
+      "East Asia": "#D4764E",
+      "SE Asia": "#D4764E",
+      "Oceania": "#4E8BD4",
+    },
+    democracy: {
+      "North America": "#5CAA6E",
+      "South America": "#5CAA6E",
+      "Europe": "#4E8BD4",
+      "Africa": "#D4764E",
+      "Middle East": "#C4A44E",
+      "Asia": "#C4A44E",
+      "East Asia": "#C4A44E",
+      "SE Asia": "#C4A44E",
+      "Oceania": "#4E8BD4",
+    },
+    gdp: {
+      "North America": "#D4A04A",
+      "South America": "#7a8fa0",
+      "Europe": "#D4A04A",
+      "Africa": "#4d5a6a",
+      "Middle East": "#8ab4b0",
+      "Asia": "#7a8fa0",
+      "East Asia": "#8ab4b0",
+      "SE Asia": "#7a8fa0",
+      "Oceania": "#D4A04A",
+    },
+    population: {
+      "North America": "#C4A44E",
+      "South America": "#C4A44E",
+      "Europe": "#C4A44E",
+      "Africa": "#D4764E",
+      "Middle East": "#8ab4b0",
+      "Asia": "#D4764E",
+      "East Asia": "#D4764E",
+      "SE Asia": "#D4764E",
+      "Oceania": "#4d5a6a",
+    },
+  };
+
+  const colors = REGION_COLORS[layer];
+  document.querySelectorAll(".region-block").forEach(el => {
+    const region = el.dataset.region;
+    const c = colors[region] || "#3d3828";
+    el.style.fill = c;
+    el.style.stroke = c;
+    el.style.fillOpacity = "0.7";
+  });
+}
+
+function renderLegend(layer) {
+  const def = LAYERS[layer];
+  document.getElementById("legendTitle").textContent = def.label;
+  const container = document.getElementById("legendItems");
+
+  if (def.type === "gradient") {
+    container.innerHTML = `
+      <div class="legend-gradient" style="background:${def.gradient}"></div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px">
+        <span style="font-size:10px;color:var(--color-text-30);font-family:ui-monospace">Low</span>
+        <span style="font-size:10px;color:var(--color-text-30);font-family:ui-monospace">High</span>
+      </div>
+      <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px">
+        ${def.legend.map(l => `<div class="legend-item"><div class="legend-swatch" style="background:${l.color}"></div>${l.label}</div>`).join("")}
+      </div>
+    `;
+  } else {
+    container.innerHTML = def.legend.map(l => `<div class="legend-item"><div class="legend-swatch" style="background:${l.color}"></div>${l.label}</div>`).join("");
+  }
+}
+
+function renderRight(layer) {
+  document.getElementById("rightPanel").innerHTML = LAYERS[layer].rightContent();
+}
+
+function renderCountryList() {
+  const COUNTRIES = [
+    { name: "United States", gov: "#D4764E" },
+    { name: "China", gov: "#8899AA" },
+    { name: "India", gov: "#4E8BD4" },
+    { name: "Germany", gov: "#4E8BD4" },
+    { name: "United Kingdom", gov: "#4E8BD4" },
+    { name: "France", gov: "#9B6DC6" },
+    { name: "Brazil", gov: "#D4764E" },
+    { name: "Japan", gov: "#4E8BD4" },
+    { name: "Russia", gov: "#9B6DC6" },
+    { name: "Canada", gov: "#4E8BD4" },
+    { name: "Saudi Arabia", gov: "#C4A44E" },
+    { name: "Iran", gov: "#5CAA6E" },
+    { name: "Argentina", gov: "#D4764E" },
+    { name: "Australia", gov: "#4E8BD4" },
+    { name: "Sweden", gov: "#4E8BD4" },
+    { name: "Nigeria", gov: "#D4764E" },
+    { name: "Mexico", gov: "#D4764E" },
+    { name: "South Africa", gov: "#D4764E" },
+    { name: "Turkey", gov: "#D4764E" },
+    { name: "Indonesia", gov: "#D4764E" },
+  ];
+  const container = document.getElementById("countryList");
+  container.innerHTML = COUNTRIES.map((c, i) => `
+    <div class="country-item ${i === 3 ? "active" : ""}" onclick="selectCountry(this)">
+      <div class="country-flag" style="background:${c.gov};opacity:0.6"></div>
+      <span class="country-name">${c.name}</span>
+      <div class="country-gov-dot" style="background:${c.gov}"></div>
+    </div>
+  `).join("");
+}
+
+function selectCountry(el) {
+  document.querySelectorAll(".country-item").forEach(e => e.classList.remove("active"));
+  el.classList.add("active");
+}
+
+// Layer button handlers
+document.querySelectorAll(".layer-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".layer-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeLayer = btn.dataset.layer;
+    applyLayerColors(activeLayer);
+    renderLegend(activeLayer);
+    renderRight(activeLayer);
+    document.getElementById("dataBadge").textContent = LAYERS[activeLayer].badge;
+  });
+});
+
+// Init
+renderCountryList();
+applyLayerColors(activeLayer);
+renderLegend(activeLayer);
+renderRight(activeLayer);
+</script>
+</body>
+</html>

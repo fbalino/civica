@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica Index — Brazil · Country Detail (Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    --color-bg: #16140f;
+    --color-bg-nav: rgba(22,20,15,0.92);
+    --color-surface-elevated: #221e16;
+    --color-text-primary: #ebe6d6;
+    --color-text-85: rgba(235,230,214,0.88);
+    --color-text-60: #c4bdae;
+    --color-text-50: rgba(235,230,214,0.64);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(235,230,214,0.50);
+    --color-text-25: rgba(235,230,214,0.48);
+    --color-text-20: rgba(235,230,214,0.40);
+    --color-accent: oklch(68% 0.15 35);
+    --color-card-bg: #221e16;
+    --color-card-border: #3d382d;
+    --color-card-hover-bg: #2b2619;
+    --color-card-hover-border: #8a8370;
+    --color-divider: #3d382d;
+    --color-grid-bg: #221e16;
+    --color-grid-cell: #16140f;
+    --color-grid-cell-hover: #2b2619;
+    --color-source-live: #5CAA6E;
+    --color-source-frozen: #D4A04A;
+    --color-success: oklch(68% 0.14 145);
+    --color-warn: oklch(75% 0.14 75);
+    --color-danger: oklch(65% 0.18 25);
+    --tier-exceptional: oklch(68% 0.14 145);
+    --tier-strong: oklch(60% 0.11 155);
+    --tier-mixed: oklch(75% 0.14 75);
+    --tier-weak: oklch(62% 0.15 45);
+    --tier-failed: oklch(55% 0.18 25);
+    --shadow-hard: 4px 4px 0 #000;
+  }
+  html[data-theme="light"] {
+    --color-bg: #f4f1ea;
+    --color-bg-nav: rgba(244,241,234,0.92);
+    --color-surface-elevated: #ebe6d6;
+    --color-text-primary: #1a1a1a;
+    --color-text-85: rgba(26,26,26,0.82);
+    --color-text-60: #3d382d;
+    --color-text-50: rgba(26,26,26,0.62);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(26,26,26,0.53);
+    --color-text-25: rgba(26,26,26,0.48);
+    --color-text-20: rgba(26,26,26,0.38);
+    --color-accent: oklch(58% 0.14 35);
+    --color-card-bg: #ebe6d6;
+    --color-card-border: #c4bdae;
+    --color-card-hover-bg: #e2dcc8;
+    --color-card-hover-border: #8a8370;
+    --color-divider: #c4bdae;
+    --color-grid-bg: #ebe6d6;
+    --color-grid-cell: #f4f1ea;
+    --color-grid-cell-hover: #e2dcc8;
+    --tier-exceptional: oklch(55% 0.12 145);
+    --tier-strong: oklch(48% 0.10 155);
+    --tier-mixed: oklch(65% 0.14 75);
+    --tier-weak: oklch(55% 0.15 45);
+    --tier-failed: oklch(52% 0.18 25);
+    --shadow-hard: 4px 4px 0 #1a1a1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color .3s, color .2s;
+  }
+  .nav {
+    position: sticky; top: 0; z-index: 40;
+    backdrop-filter: blur(10px);
+    background: var(--color-bg-nav);
+    border-bottom: 1px solid var(--color-divider);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto; padding: 16px 40px;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  }
+  .nav-brand { font-family: var(--font-heading); font-size: 22px; letter-spacing: -0.02em; color: var(--color-text-primary); text-decoration: none; }
+  .nav-brand em { font-style: normal; color: var(--color-accent); }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-40); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
+  .nav-links a.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+  .theme-toggle {
+    background: transparent; color: var(--color-text-50);
+    border: 1px solid var(--color-card-border);
+    padding: 6px 10px; border-radius: 4px; cursor: pointer;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  .breadcrumb {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 12px; letter-spacing: 0.03em;
+    color: var(--color-text-30);
+    padding: 32px 0 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .breadcrumb a { color: var(--color-text-30); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--color-text-50); }
+
+  /* hero */
+  .country-hero { padding: 8px 0 40px; }
+  .country-header {
+    display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .country-name {
+    font-family: var(--font-heading); font-size: 56px; font-weight: 400;
+    letter-spacing: -0.04em; line-height: 1; color: var(--color-text-primary);
+  }
+  .country-rank {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 13px; letter-spacing: 0.08em;
+    color: var(--color-text-40);
+    padding: 6px 12px; border: 1px solid var(--color-card-border);
+    border-radius: 2px;
+  }
+  .country-meta {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 12px; color: var(--color-text-40);
+    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px;
+  }
+  .country-meta-dot { color: var(--color-text-20); }
+
+  /* score display component (used inline + on country profile) */
+  .score-display {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: var(--color-grid-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: 4px; overflow: hidden;
+    margin-bottom: 48px;
+  }
+  .score-card { background: var(--color-grid-cell); padding: 32px 36px; }
+  .score-label {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--color-text-30); margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .score-number {
+    font-family: var(--font-heading); font-weight: 400;
+    font-size: 88px; letter-spacing: -0.05em; line-height: 0.9;
+    color: var(--color-text-primary);
+  }
+  .score-number--small { font-size: 64px; }
+  .score-suffix {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 14px; color: var(--color-text-25);
+    margin-left: 4px;
+  }
+  .score-tier {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-top: 16px;
+    padding: 4px 10px; border-radius: 2px;
+    background: rgba(255,255,255,0.04);
+  }
+  .score-sub {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 13px; color: var(--color-text-40);
+    margin-top: 10px;
+  }
+  .score-pulse-delta {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 2px;
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 12px; margin-left: 8px;
+  }
+
+  .tier-90 { color: var(--tier-exceptional); }
+  .tier-75 { color: var(--tier-strong); }
+  .tier-50 { color: var(--tier-mixed); }
+  .tier-25 { color: var(--tier-weak); }
+  .tier-0  { color: var(--tier-failed); }
+  .tier-50-bg { background: rgba(226,176,73,0.12); }
+  .pulse-up { background: rgba(92,170,110,0.15); color: var(--color-source-live); }
+  .pulse-down { background: rgba(212,118,78,0.15); color: var(--color-danger); }
+  .pulse-flat { background: rgba(196,189,174,0.1); color: var(--color-text-40); }
+
+  .source-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  }
+  .source-dot--live { background: var(--color-source-live); }
+  .source-dot--frozen { background: var(--color-source-frozen); }
+
+  /* section heading */
+  .section-eyebrow {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--color-text-30); margin-bottom: 14px;
+    display: flex; align-items: baseline; gap: 12px;
+  }
+  .section-eyebrow small { color: var(--color-text-20); font-size: 10px; letter-spacing: 0.08em; }
+  .section-title {
+    font-family: var(--font-heading); font-weight: 400;
+    font-size: 32px; letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 28px;
+  }
+
+  /* dimensions */
+  .dimensions {
+    border: 1px solid var(--color-card-border);
+    border-radius: 4px; overflow: hidden;
+    display: grid; grid-template-columns: 1fr; gap: 1px;
+    background: var(--color-grid-bg);
+    margin-bottom: 48px;
+  }
+  .dim-row {
+    background: var(--color-grid-cell);
+    padding: 20px 28px;
+    display: grid;
+    grid-template-columns: 260px 80px minmax(0, 1fr) 80px 180px;
+    gap: 24px; align-items: center;
+  }
+  .dim-label { display: flex; flex-direction: column; gap: 4px; }
+  .dim-name {
+    font-family: var(--font-heading); font-size: 18px;
+    color: var(--color-text-primary); line-height: 1.2;
+  }
+  .dim-source {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; color: var(--color-text-30);
+  }
+  .dim-weight {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 14px; color: var(--color-text-50);
+    text-align: right;
+  }
+  .dim-bar { height: 6px; background: var(--color-divider); border-radius: 1px; overflow: hidden; position: relative; }
+  .dim-bar-fill { height: 100%; border-radius: 1px; transition: width .3s; }
+  .dim-score {
+    font-family: var(--font-heading); font-size: 22px;
+    font-weight: 500; letter-spacing: -0.01em;
+    text-align: right;
+  }
+  .dim-contribution {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 12px; color: var(--color-text-40);
+    text-align: right;
+  }
+  .dim-contribution strong { color: var(--color-text-primary); font-weight: 500; }
+
+  /* two col */
+  .two-col {
+    display: grid; grid-template-columns: 1.3fr 1fr; gap: 32px;
+    margin-bottom: 48px;
+  }
+  .panel {
+    border: 1px solid var(--color-card-border);
+    border-radius: 4px;
+    background: var(--color-grid-cell);
+    padding: 28px 32px;
+  }
+
+  /* chart */
+  .chart-area {
+    position: relative; height: 280px; margin-bottom: 16px;
+  }
+  .chart-legend {
+    display: flex; gap: 20px;
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; color: var(--color-text-40);
+  }
+  .legend-swatch {
+    display: inline-block; width: 14px; height: 3px; margin-right: 6px; vertical-align: middle;
+  }
+  .chart-tabs {
+    display: inline-flex; border: 1px solid var(--color-card-border);
+    border-radius: 4px; overflow: hidden; margin-bottom: 20px;
+  }
+  .chart-tabs button {
+    font-family: var(--font-mono); font-weight: 500; font-size: 11px;
+    padding: 6px 12px; background: transparent; border: none;
+    color: var(--color-text-40); cursor: pointer;
+  }
+  .chart-tabs button.active { background: var(--color-accent); color: var(--color-bg); }
+
+  /* event changelog entries */
+  .event-list { display: flex; flex-direction: column; gap: 1px; background: var(--color-grid-bg); border: 1px solid var(--color-card-border); border-radius: 4px; overflow: hidden; }
+  .event-card {
+    background: var(--color-grid-cell);
+    padding: 20px 24px;
+    display: grid; grid-template-columns: 64px 1fr auto; gap: 18px;
+    align-items: start;
+  }
+  .event-card:hover { background: var(--color-grid-cell-hover); }
+  .event-severity {
+    font-family: var(--font-heading); font-size: 24px;
+    font-weight: 500; letter-spacing: -0.02em;
+    line-height: 1; text-align: center;
+    padding: 8px 0; border-radius: 2px;
+    min-width: 56px;
+  }
+  .sev-cat { background: rgba(198,90,55,0.14); color: var(--tier-failed); }
+  .sev-sev { background: rgba(230,140,65,0.14); color: var(--tier-weak); }
+  .sev-sig { background: rgba(230,180,70,0.14); color: var(--tier-mixed); }
+  .sev-mod { background: rgba(196,189,174,0.08); color: var(--color-text-50); }
+  .sev-pos { background: rgba(92,170,110,0.14); color: var(--tier-exceptional); }
+  .event-body { min-width: 0; }
+  .event-category {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--color-text-30); margin-bottom: 4px;
+  }
+  .event-headline {
+    font-family: var(--font-heading); font-size: 17px;
+    color: var(--color-text-primary); line-height: 1.3;
+    margin-bottom: 6px;
+  }
+  .event-just {
+    font-size: 13px; color: var(--color-text-60); line-height: 1.55;
+  }
+  .event-meta {
+    display: flex; flex-direction: column; gap: 4px; align-items: flex-end;
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; color: var(--color-text-30);
+    white-space: nowrap;
+  }
+  .event-conf {
+    font-size: 10px; color: var(--color-text-20);
+    letter-spacing: 0.08em;
+  }
+  .event-impact {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px;
+  }
+  .impact-pos { color: var(--color-source-live); }
+  .impact-neg { color: var(--color-danger); }
+
+  /* stat grid */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--color-grid-bg); border: 1px solid var(--color-card-border); border-radius: 4px; overflow: hidden; margin-bottom: 48px; }
+  .stat-cell { background: var(--color-grid-cell); padding: 20px 24px; }
+  .stat-cell .stat-label { margin-bottom: 4px; }
+  .stat-cell .stat-value {
+    font-family: var(--font-heading); font-size: 26px; font-weight: 400;
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .stat-cell .stat-hint { font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--color-text-30); margin-top: 4px; }
+
+  /* subnav */
+  .subnav {
+    display: flex; gap: 0; margin-bottom: 40px;
+    border-bottom: 1px solid var(--color-divider);
+  }
+  .subnav button {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 12px; letter-spacing: 0.03em;
+    padding: 12px 18px 14px; background: transparent; border: none;
+    color: var(--color-text-30);
+    border-bottom: 1px solid transparent;
+    cursor: pointer; margin-bottom: -1px;
+  }
+  .subnav button.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+
+  footer { margin-top: 80px; padding: 40px 0; border-top: 1px solid var(--color-divider); }
+  .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: 0.08em; color: var(--color-text-30); }
+
+  @media (max-width: 900px) {
+    .country-name { font-size: 40px; }
+    .score-display { grid-template-columns: 1fr; }
+    .score-number { font-size: 64px; }
+    .dim-row { grid-template-columns: 1fr; gap: 10px; padding: 16px 20px; }
+    .dim-row > :nth-child(4), .dim-row > :nth-child(5) { text-align: left; }
+    .two-col { grid-template-columns: 1fr; }
+    .stat-grid { grid-template-columns: 1fr; }
+    .container, .nav-inner { padding: 0 20px; }
+    .event-card { grid-template-columns: 48px 1fr; }
+    .event-meta { grid-column: 1 / -1; align-items: flex-start; flex-direction: row; gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">Civica <em>Atlas</em></a>
+    <div class="nav-links">
+      <a href="#">Countries</a>
+      <a href="#" class="active">Index</a>
+      <a href="#">Rankings</a>
+      <a href="#">Blog</a>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle theme</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+
+  <nav class="breadcrumb" aria-label="breadcrumb">
+    <a href="#">← Index</a>
+    <span class="country-meta-dot">/</span>
+    <a href="#">Americas</a>
+    <span class="country-meta-dot">/</span>
+    <span>Brazil</span>
+  </nav>
+
+  <section class="country-hero">
+    <div class="country-header">
+      <h1 class="country-name">Brazil</h1>
+      <div class="country-rank">Rank 58 / 197</div>
+    </div>
+    <div class="country-meta">
+      <span>Presidential federal republic</span>
+      <span class="country-meta-dot">·</span>
+      <span>Brasília</span>
+      <span class="country-meta-dot">·</span>
+      <span>214M population</span>
+      <span class="country-meta-dot">·</span>
+      <span>Americas / South America</span>
+    </div>
+
+    <!-- Main CI / CP display — this is the canonical score display component -->
+    <div class="score-display">
+      <div class="score-card">
+        <div class="score-label">
+          <span>Civica Index · structural</span>
+          <span class="source-dot source-dot--frozen" title="Updates quarterly"></span>
+        </div>
+        <div style="display: flex; align-items: baseline;">
+          <div class="score-number tier-50">62.8</div>
+          <span class="score-suffix">/100</span>
+        </div>
+        <div class="score-tier tier-50 tier-50-bg">● Mixed governance</div>
+        <div class="score-sub">Last recalculated 2026 Q1 · weighted composite of 6 dimensions</div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">
+          <span>Civica Pulse · real-time</span>
+          <span class="source-dot source-dot--live" title="Updates daily"></span>
+        </div>
+        <div style="display: flex; align-items: baseline;">
+          <div class="score-number tier-50">62.0</div>
+          <span class="score-suffix">/100</span>
+          <span class="score-pulse-delta pulse-down">▼ 0.8 (7d)</span>
+        </div>
+        <div class="score-tier tier-50 tier-50-bg">● Mixed governance</div>
+        <div class="score-sub">CI 62.8 + event impact −0.8 · updated Apr 21 · 87 events in trailing 120d</div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="subnav" role="tablist" aria-label="Country detail sections">
+    <button class="active">Overview</button>
+    <button>Dimensions</button>
+    <button>Pulse changelog</button>
+    <button>History</button>
+    <button>Methodology</button>
+    <button>Cite & embed</button>
+  </nav>
+
+  <!-- DIMENSIONS -->
+  <section>
+    <div class="section-eyebrow">
+      <span>Civica Index breakdown · 6 dimensions</span>
+      <small>weights fixed · sources live</small>
+    </div>
+    <h2 class="section-title">How the 62.8 is calculated.</h2>
+
+    <div class="dimensions">
+      <div class="dim-row">
+        <div class="dim-label">
+          <div class="dim-name">Democratic quality</div>
+          <div class="dim-source">V-Dem · Liberal Democracy Index</div>
+        </div>
+        <div class="dim-weight">30%</div>
+        <div class="dim-bar"><div class="dim-bar-fill tier-50" style="width:67%; background: currentColor"></div></div>
+        <div class="dim-score tier-50">67.2</div>
+        <div class="dim-contribution">contributes <strong>20.2</strong> pts</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-label">
+          <div class="dim-name">Rule of law & institutions</div>
+          <div class="dim-source">World Bank WGI · V-Dem RoL</div>
+        </div>
+        <div class="dim-weight">20%</div>
+        <div class="dim-bar"><div class="dim-bar-fill tier-50" style="width:58%; background: currentColor"></div></div>
+        <div class="dim-score tier-50">58.4</div>
+        <div class="dim-contribution">contributes <strong>11.7</strong> pts</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-label">
+          <div class="dim-name">Human development</div>
+          <div class="dim-source">UNDP HDI · WB indicators</div>
+        </div>
+        <div class="dim-weight">15%</div>
+        <div class="dim-bar"><div class="dim-bar-fill tier-75" style="width:76%; background: currentColor"></div></div>
+        <div class="dim-score tier-75">76.5</div>
+        <div class="dim-contribution">contributes <strong>11.5</strong> pts</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-label">
+          <div class="dim-name">Freedom & rights</div>
+          <div class="dim-source">Freedom House · RSF Press</div>
+        </div>
+        <div class="dim-weight">15%</div>
+        <div class="dim-bar"><div class="dim-bar-fill tier-50" style="width:64%; background: currentColor"></div></div>
+        <div class="dim-score tier-50">63.9</div>
+        <div class="dim-contribution">contributes <strong>9.6</strong> pts</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-label">
+          <div class="dim-name">Corruption control</div>
+          <div class="dim-source">Transparency Int'l CPI · WGI</div>
+        </div>
+        <div class="dim-weight">10%</div>
+        <div class="dim-bar"><div class="dim-bar-fill tier-25" style="width:44%; background: currentColor"></div></div>
+        <div class="dim-score tier-25">44.2</div>
+        <div class="dim-contribution">contributes <strong>4.4</strong> pts</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-label">
+          <div class="dim-name">Stability & security</div>
+          <div class="dim-source">Global Peace Index · FSI</div>
+        </div>
+        <div class="dim-weight">10%</div>
+        <div class="dim-bar"><div class="dim-bar-fill tier-50" style="width:54%; background: currentColor"></div></div>
+        <div class="dim-score tier-50">54.3</div>
+        <div class="dim-contribution">contributes <strong>5.4</strong> pts</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HISTORY CHART -->
+  <section class="two-col">
+    <div class="panel">
+      <div class="section-eyebrow">History · CI vs. Pulse overlay</div>
+      <div class="chart-tabs" role="tablist">
+        <button>1Y</button>
+        <button class="active">5Y</button>
+        <button>10Y</button>
+        <button>Max</button>
+      </div>
+      <div class="chart-area" aria-label="Line chart of Brazil CI and Pulse over 5 years">
+        <svg viewBox="0 0 600 280" preserveAspectRatio="none" style="width:100%; height:100%;">
+          <!-- tier bands -->
+          <rect x="0" y="0"   width="600" height="28" fill="var(--tier-exceptional)" opacity="0.06"/>
+          <rect x="0" y="28"  width="600" height="42" fill="var(--tier-strong)" opacity="0.05"/>
+          <rect x="0" y="70"  width="600" height="70" fill="var(--tier-mixed)" opacity="0.06"/>
+          <rect x="0" y="140" width="600" height="70" fill="var(--tier-weak)" opacity="0.05"/>
+          <rect x="0" y="210" width="600" height="70" fill="var(--tier-failed)" opacity="0.06"/>
+          <!-- gridlines -->
+          <g stroke="var(--color-divider)" stroke-width="1">
+            <line x1="0" y1="70" x2="600" y2="70"/>
+            <line x1="0" y1="140" x2="600" y2="140"/>
+            <line x1="0" y1="210" x2="600" y2="210"/>
+          </g>
+          <!-- CI line (quarterly steps) -->
+          <path d="M0 115 L100 115 L100 112 L200 112 L200 108 L300 108 L300 111 L400 111 L400 110 L500 110 L500 107 L600 107"
+                fill="none" stroke="var(--color-accent)" stroke-width="2"/>
+          <!-- Pulse line smooth, noisy -->
+          <path d="M0 120 C50 115, 80 125, 120 118 S200 110, 240 116 S320 122, 360 115 S440 105, 480 112 S560 118, 600 110"
+                fill="none" stroke="var(--color-text-60)" stroke-width="1.5" opacity="0.8"/>
+          <!-- now marker -->
+          <line x1="585" y1="0" x2="585" y2="280" stroke="var(--color-text-30)" stroke-width="1" stroke-dasharray="2 3"/>
+          <circle cx="585" cy="110" r="4" fill="var(--color-accent)"/>
+        </svg>
+      </div>
+      <div class="chart-legend">
+        <span><span class="legend-swatch" style="background: var(--color-accent);"></span>Civica Index (CI)</span>
+        <span><span class="legend-swatch" style="background: var(--color-text-60);"></span>Civica Pulse (CP)</span>
+        <span><span class="legend-swatch" style="background: var(--tier-mixed); height:8px; opacity:0.4"></span>Tier bands</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="section-eyebrow">Regional rank</div>
+      <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 4px;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; padding: 6px 0; border-bottom: 1px solid var(--color-divider); font-family: var(--font-mono); font-weight:500; font-size:13px;">
+          <span style="color: var(--color-text-60);">Global</span>
+          <span style="color: var(--color-text-primary);">#58 of 197</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; padding: 6px 0; border-bottom: 1px solid var(--color-divider); font-family: var(--font-mono); font-weight:500; font-size:13px;">
+          <span style="color: var(--color-text-60);">Americas</span>
+          <span style="color: var(--color-text-primary);">#12 of 35</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; padding: 6px 0; border-bottom: 1px solid var(--color-divider); font-family: var(--font-mono); font-weight:500; font-size:13px;">
+          <span style="color: var(--color-text-60);">South America</span>
+          <span style="color: var(--color-text-primary);">#5 of 12</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; padding: 6px 0; border-bottom: 1px solid var(--color-divider); font-family: var(--font-mono); font-weight:500; font-size:13px;">
+          <span style="color: var(--color-text-60);">Presidential republics</span>
+          <span style="color: var(--color-text-primary);">#22 of 48</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; padding: 6px 0; font-family: var(--font-mono); font-weight:500; font-size:13px;">
+          <span style="color: var(--color-text-60);">BRICS</span>
+          <span style="color: var(--color-text-primary);">#1 of 5</span>
+        </div>
+      </div>
+      <div style="margin-top: 24px;">
+        <div class="section-eyebrow" style="margin-bottom: 8px;">Compare with</div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button class="theme-toggle">+ Argentina</button>
+          <button class="theme-toggle">+ Chile</button>
+          <button class="theme-toggle">+ South Africa</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PULSE CHANGELOG -->
+  <section>
+    <div class="section-eyebrow">
+      <span>Pulse changelog · trailing 30 days</span>
+      <small>87 events scored · all justifications logged</small>
+    </div>
+    <h2 class="section-title">What's moved the score lately.</h2>
+
+    <div class="event-list">
+
+      <article class="event-card">
+        <div class="event-severity sev-pos">+6</div>
+        <div class="event-body">
+          <div class="event-category">Institutional strengthening · Apr 18 2026</div>
+          <h3 class="event-headline">Supreme court upholds anti-corruption prosecution of former minister</h3>
+          <p class="event-just">Major anti-corruption conviction strengthens institutional credibility and rule-of-law signalling, partially offsetting recent negative drift in the dimension.</p>
+        </div>
+        <div class="event-meta">
+          <div class="event-impact impact-pos">+0.42 impact</div>
+          <div class="event-conf">CONFIDENCE 0.88</div>
+          <div>3 days ago</div>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-severity sev-mod">−2</div>
+        <div class="event-body">
+          <div class="event-category">Political violence · Apr 16 2026</div>
+          <h3 class="event-headline">Attempted shooting at political rally in Rio de Janeiro — no casualties</h3>
+          <p class="event-just">Isolated incident without fatalities or institutional breakdown; modest negative impact reflecting escalating polarization rather than systemic collapse.</p>
+        </div>
+        <div class="event-meta">
+          <div class="event-impact impact-neg">−0.15 impact</div>
+          <div class="event-conf">CONFIDENCE 0.74</div>
+          <div>5 days ago</div>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-severity sev-sig">−5</div>
+        <div class="event-body">
+          <div class="event-category">Authoritarian action · Apr 12 2026</div>
+          <h3 class="event-headline">Federal police raid opposition journalist's home without warrant</h3>
+          <p class="event-just">Significant press-freedom concern; does not rise to systematic media shutdown but signals erosion of procedural protections for journalists.</p>
+        </div>
+        <div class="event-meta">
+          <div class="event-impact impact-neg">−0.67 impact</div>
+          <div class="event-conf">CONFIDENCE 0.82</div>
+          <div>9 days ago</div>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-severity sev-pos">+3</div>
+        <div class="event-body">
+          <div class="event-category">Constitutional reform · Apr 08 2026</div>
+          <h3 class="event-headline">Congress passes bill strengthening judicial-council independence</h3>
+          <p class="event-just">Moderate positive reform adds insulation between executive and judiciary; effect conditional on implementation — monitored for Q3 recalculation.</p>
+        </div>
+        <div class="event-meta">
+          <div class="event-impact impact-pos">+0.28 impact</div>
+          <div class="event-conf">CONFIDENCE 0.91</div>
+          <div>13 days ago</div>
+        </div>
+      </article>
+
+      <article class="event-card">
+        <div class="event-severity sev-sev">−8</div>
+        <div class="event-body">
+          <div class="event-category">Economic crisis · Apr 02 2026</div>
+          <h3 class="event-headline">Real drops 11% against dollar on rating downgrade</h3>
+          <p class="event-just">Severe macroeconomic instability; downgrade reflects institutional-credibility loss. Decay accelerated pending stabilization data.</p>
+        </div>
+        <div class="event-meta">
+          <div class="event-impact impact-neg">−0.88 impact</div>
+          <div class="event-conf">CONFIDENCE 0.95</div>
+          <div>19 days ago</div>
+        </div>
+      </article>
+
+    </div>
+
+    <div style="text-align:center; padding: 24px 0 8px;">
+      <button class="theme-toggle" style="padding: 10px 20px;">Show all 87 events →</button>
+    </div>
+  </section>
+
+  <!-- CITE -->
+  <section style="margin-top: 64px;">
+    <div class="section-eyebrow">Cite this page</div>
+    <div class="panel" style="font-family: var(--font-mono); font-weight: 500; font-size: 13px; color: var(--color-text-60); line-height: 1.7;">
+      Civica Pulse for Brazil, 2026-04-21. Civica Atlas.<br>
+      https://civicaatlas.org/index/brazil
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>Civica Index v1.0 · Methodology published April 2026</div>
+    <div>Every number traces back to a public source · <a href="#" style="color: var(--color-accent); text-decoration: none;">Read methodology →</a></div>
+  </div>
+</footer>
+
+<script>
+  function toggleTheme() {
+    const root = document.documentElement;
+    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+  }
+</script>
+
+</body>
+</html>

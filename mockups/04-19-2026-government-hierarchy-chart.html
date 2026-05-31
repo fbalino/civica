@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica — Government Hierarchy Chart (CIV-124 design mockup)</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --surface3: #242432;
+    --border: #2a2a3a;
+    --border-2: #3a3a4c;
+    --accent: #d4764e;
+    --text: #e8e8f0;
+    --text2: #9090a8;
+    --text3: #5a5a72;
+
+    --exec: #d4764e;
+    --legi: #4e8bd4;
+    --judi: #5caa6e;
+    --mon:  #b48bff;
+
+    --exec-bg: rgba(212,118,78,0.12);
+    --legi-bg: rgba(78,139,212,0.12);
+    --judi-bg: rgba(92,170,110,0.12);
+    --mon-bg:  rgba(180,139,255,0.12);
+
+    --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --serif: "Fraunces", Georgia, serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  [data-theme="light"] {
+    --bg: #f4f1ea;
+    --surface: #ebe6d6;
+    --surface2: #e2dcc8;
+    --surface3: #d9d2c1;
+    --border: #c4bdae;
+    --border-2: #b2a892;
+    --text: #1a1a1a;
+    --text2: #3d382d;
+    --text3: #8a8370;
+
+    --exec-bg: rgba(212,118,78,0.15);
+    --legi-bg: rgba(78,139,212,0.15);
+    --judi-bg: rgba(92,170,110,0.15);
+    --mon-bg:  rgba(180,139,255,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.5; }
+  a { color: inherit; }
+
+  /* ---------- TOP BAR ---------- */
+  nav {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 24px; display: flex; align-items: center; justify-content: space-between;
+    height: 56px; position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.01em; }
+  .nav-right { display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--text2); }
+  .badge { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text3); padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; }
+  .theme-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; color: var(--text2); cursor: pointer; font-size: 12px; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+  .theme-btn:hover { color: var(--text); border-color: var(--border-2); }
+
+  /* ---------- PAGE FRAME ---------- */
+  .container { max-width: 1320px; margin: 0 auto; padding: 40px 24px 80px; }
+  .page-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  h1.page-title { font-family: var(--serif); font-size: 40px; font-weight: 500; letter-spacing: -0.02em; line-height: 1.05; margin-bottom: 12px; }
+  .page-dek { font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--text2); max-width: 720px; margin-bottom: 32px; }
+
+  /* ---------- COUNTRY SWITCHER ---------- */
+  .country-switcher {
+    display: flex; gap: 2px; margin-bottom: 24px; padding: 4px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px; width: fit-content;
+    font-family: var(--mono); font-size: 12px;
+  }
+  .country-btn {
+    padding: 8px 14px; border-radius: 6px; background: none; border: none; color: var(--text2);
+    cursor: pointer; font-family: inherit; font-size: inherit; letter-spacing: 0.04em;
+  }
+  .country-btn:hover { color: var(--text); }
+  .country-btn.active { background: var(--surface2); color: var(--text); box-shadow: inset 0 0 0 1px var(--border-2); }
+
+  /* ---------- PAGE HEADER: COUNTRY META ---------- */
+  .country-head { display: flex; align-items: center; gap: 16px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+  .flag { width: 56px; height: 40px; border-radius: 4px; border: 1px solid var(--border); background-size: cover; background-position: center; flex-shrink: 0; font-size: 32px; display: flex; align-items: center; justify-content: center; background: var(--surface2); }
+  .country-name { font-family: var(--serif); font-size: 28px; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 2px; }
+  .country-sub { font-size: 13px; color: var(--text2); }
+
+  /* ---------- HIERARCHY CHART CANVAS ---------- */
+  .chart-toolbar {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3);
+  }
+  .chart-toolbar .ctrl-group { display: flex; gap: 6px; }
+  .ctrl {
+    background: none; border: 1px solid var(--border); color: var(--text2); padding: 6px 10px;
+    border-radius: 5px; font-family: inherit; font-size: inherit; letter-spacing: inherit; text-transform: inherit;
+    cursor: pointer;
+  }
+  .ctrl:hover { color: var(--text); border-color: var(--border-2); }
+
+  .chart-canvas {
+    background:
+      linear-gradient(var(--surface) 1px, transparent 1px),
+      linear-gradient(90deg, var(--surface) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-color: var(--bg);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 20px;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  /* ---------- BRANCH COLUMNS ---------- */
+  .branches { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(280px, 1fr)); gap: 20px; min-width: fit-content; align-items: start; }
+
+  .branch {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; position: relative;
+  }
+  .branch-head {
+    padding: 14px 16px 12px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative;
+  }
+  .branch-head::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .branch[data-branch="executive"]  .branch-head::before { background: var(--exec); }
+  .branch[data-branch="legislative"] .branch-head::before { background: var(--legi); }
+  .branch[data-branch="judicial"]   .branch-head::before { background: var(--judi); }
+  .branch[data-branch="monarchy"]   .branch-head::before { background: var(--mon); }
+
+  .branch-title {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    font-weight: 600;
+  }
+  .branch[data-branch="executive"]  .branch-title { color: var(--exec); }
+  .branch[data-branch="legislative"] .branch-title { color: var(--legi); }
+  .branch[data-branch="judicial"]   .branch-title { color: var(--judi); }
+  .branch[data-branch="monarchy"]   .branch-title { color: var(--mon); }
+
+  .branch-count { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 0.12em; }
+
+  .branch-body { padding: 20px 16px 22px; }
+
+  /* ---------- TREE ---------- */
+  .tree ul { list-style: none; padding-left: 22px; position: relative; }
+  .tree > ul { padding-left: 0; }
+
+  .tree li { position: relative; padding: 6px 0; }
+  .tree li::before,
+  .tree li::after { content: ""; position: absolute; left: -22px; }
+  .tree > ul > li::before,
+  .tree > ul > li::after { display: none; }
+
+  /* vertical trunk up to this node */
+  .tree li::before {
+    top: 0; height: 100%; width: 1px; background: var(--border-2);
+  }
+  /* horizontal leaf to this node */
+  .tree li::after {
+    top: 28px; width: 18px; height: 1px; background: var(--border-2);
+  }
+  /* last child: trunk only extends to the leaf connector */
+  .tree li:last-child::before { height: 28px; }
+
+  /* subtle branch-tinted connectors */
+  .branch[data-branch="executive"]  .tree li::before,
+  .branch[data-branch="executive"]  .tree li::after { background: color-mix(in srgb, var(--exec) 35%, transparent); }
+  .branch[data-branch="legislative"] .tree li::before,
+  .branch[data-branch="legislative"] .tree li::after { background: color-mix(in srgb, var(--legi) 35%, transparent); }
+  .branch[data-branch="judicial"]   .tree li::before,
+  .branch[data-branch="judicial"]   .tree li::after { background: color-mix(in srgb, var(--judi) 35%, transparent); }
+  .branch[data-branch="monarchy"]   .tree li::before,
+  .branch[data-branch="monarchy"]   .tree li::after { background: color-mix(in srgb, var(--mon) 35%, transparent); }
+
+  /* ---------- NODE ---------- */
+  .node {
+    display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 8px;
+    padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; position: relative;
+    cursor: pointer; transition: border-color .15s, transform .15s, background .15s;
+  }
+  .node:hover { border-color: var(--border-2); background: var(--surface3); }
+  .node.has-holder { min-height: 56px; }
+  .node-accent { width: 3px; height: 28px; border-radius: 2px; background: var(--border-2); }
+  .branch[data-branch="executive"]  .node-accent { background: var(--exec); }
+  .branch[data-branch="legislative"] .node-accent { background: var(--legi); }
+  .branch[data-branch="judicial"]   .node-accent { background: var(--judi); }
+  .branch[data-branch="monarchy"]   .node-accent { background: var(--mon); }
+
+  .node-main { min-width: 0; }
+  .node-office { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--text2); text-transform: uppercase; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .node-holder { font-family: var(--serif); font-size: 15px; font-weight: 500; letter-spacing: -0.01em; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .node-party { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10px; color: var(--text3); margin-left: 6px; }
+  .party-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  .node-toggle {
+    width: 18px; height: 18px; border-radius: 4px; background: none; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 10px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .node-toggle:hover { color: var(--text); border-color: var(--border-2); }
+  .node-toggle.is-empty { visibility: hidden; }
+
+  /* collapsed state */
+  .collapsed > ul { display: none; }
+  .collapsed .node-toggle { transform: rotate(-90deg); }
+
+  /* ---------- CHAMBER (legislative body) NODE ---------- */
+  .node.chamber { grid-template-columns: 14px 1fr auto; padding: 12px; }
+  .chamber-meta {
+    display: grid; grid-template-columns: auto auto; gap: 4px 10px; margin-top: 6px;
+    font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: 0.04em;
+  }
+  .chamber-meta strong { color: var(--text2); font-weight: 500; }
+  .party-bar {
+    margin-top: 8px; height: 4px; border-radius: 2px; overflow: hidden; display: flex;
+    background: var(--surface3);
+  }
+  .party-bar span { height: 100%; }
+
+  /* ---------- HOVER CARD ---------- */
+  .hover-card {
+    position: absolute; top: calc(100% + 6px); left: 0; z-index: 50;
+    width: 280px; background: var(--surface); border: 1px solid var(--border-2); border-radius: 10px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    padding: 14px 16px; display: none;
+  }
+  .node:hover > .hover-card { display: block; }
+  .hover-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .hover-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--surface3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 15px; color: var(--text2); flex-shrink: 0; }
+  .hover-name { font-family: var(--serif); font-size: 15px; font-weight: 500; letter-spacing: -0.01em; }
+  .hover-role { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-top: 2px; }
+  .hover-facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-family: var(--mono); font-size: 11px; }
+  .hover-facts dt { color: var(--text3); letter-spacing: 0.05em; }
+  .hover-facts dd { color: var(--text); }
+  .hover-cta { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border); font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+
+  /* ---------- LEGEND ---------- */
+  .legend {
+    display: flex; gap: 18px; margin-top: 16px; padding: 12px 16px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--text3); flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
+  .legend-swatch.exec { background: var(--exec); }
+  .legend-swatch.legi { background: var(--legi); }
+  .legend-swatch.judi { background: var(--judi); }
+  .legend-swatch.mon  { background: var(--mon); }
+
+  /* ---------- SPEC BLOCK ---------- */
+  .spec { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+  @media (max-width: 900px) { .spec { grid-template-columns: 1fr; } }
+  .spec-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .spec-card h3 { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; font-weight: 600; }
+  .spec-card p { font-size: 13px; color: var(--text2); line-height: 1.55; }
+  .spec-card ul { list-style: none; font-size: 12px; color: var(--text2); }
+  .spec-card li { padding: 4px 0; border-bottom: 1px dashed var(--border); display: flex; justify-content: space-between; gap: 10px; }
+  .spec-card li:last-child { border-bottom: 0; }
+  .spec-card code { font-family: var(--mono); font-size: 11px; color: var(--text); background: var(--surface2); padding: 1px 5px; border-radius: 3px; }
+
+  /* ---------- SECTION LABEL ---------- */
+  .section-label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text3); margin: 40px 0 12px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-label::before, .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  /* ---------- 3-PANE PREVIEW ---------- */
+  .pane-preview { display: grid; grid-template-columns: 220px 240px 1fr; gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .pane { padding: 16px; border-right: 1px solid var(--border); min-height: 360px; }
+  .pane:last-child { border-right: 0; background: var(--bg); }
+  .pane h4 { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  .pane .dim { font-size: 12px; color: var(--text3); }
+  .pane-list li { list-style: none; padding: 6px 0; font-size: 13px; color: var(--text2); border-bottom: 1px dashed var(--border); }
+  .pane-list li.active { color: var(--accent); }
+
+  /* ---------- HIDDEN COUNTRIES ---------- */
+  .country-panel { display: none; }
+  .country-panel.active { display: block; }
+
+  /* ---------- JS-free responsive scroll hint ---------- */
+  .chart-canvas::-webkit-scrollbar { height: 10px; }
+  .chart-canvas::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+
+  /* for JA / SA vertical spacing */
+  .branch.narrow .branch-body { padding-bottom: 28px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <div class="nav-logo">Civica</div>
+    <div class="badge">CIV-124 · Design Mockup</div>
+  </div>
+  <div class="nav-right">
+    <span>Designed by UX Designer agent</span>
+    <button class="theme-btn" onclick="toggleTheme()">◐ Theme</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="page-eyebrow">Pane #3 — Full Structure</div>
+  <h1 class="page-title">Government Hierarchy Chart</h1>
+  <p class="page-dek">
+    A visual org-chart replacement for the plain-text <em>Executive / Legislative / Judicial</em>
+    listing in the three-pane country view. Designed to flex across presidential, parliamentary,
+    and monarchic government forms, with interactive expansion and a hover card for each office.
+  </p>
+
+  <div class="country-switcher" role="tablist">
+    <button class="country-btn active" data-country="us">🇺🇸 United States · Presidential</button>
+    <button class="country-btn"        data-country="uk">🇬🇧 United Kingdom · Parliamentary</button>
+    <button class="country-btn"        data-country="jp">🇯🇵 Japan · Constitutional Monarchy</button>
+    <button class="country-btn"        data-country="sa">🇸🇦 Saudi Arabia · Absolute Monarchy</button>
+  </div>
+
+  <!-- ===================== USA ===================== -->
+  <div class="country-panel active" data-country="us">
+    <div class="country-head">
+      <div class="flag">🇺🇸</div>
+      <div>
+        <div class="country-name">United States of America</div>
+        <div class="country-sub">Federal presidential constitutional republic · 3 branches · Bicameral legislature</div>
+      </div>
+    </div>
+
+    <div class="chart-toolbar">
+      <div>Full government structure</div>
+      <div class="ctrl-group">
+        <button class="ctrl" onclick="expandAll(this)">Expand all</button>
+        <button class="ctrl" onclick="collapseAll(this)">Collapse all</button>
+      </div>
+    </div>
+
+    <div class="chart-canvas">
+      <div class="branches" style="--cols: 3;">
+
+        <!-- Executive -->
+        <div class="branch" data-branch="executive">
+          <div class="branch-head">
+            <div class="branch-title">Executive</div>
+            <div class="branch-count">15 offices</div>
+          </div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node has-holder">
+                  <div class="node-accent"></div>
+                  <div class="node-main">
+                    <div class="node-office">President</div>
+                    <div class="node-holder">Joseph R. Biden <span class="node-party" style="color:#3b82f6"><span class="party-dot"></span>Dem</span></div>
+                  </div>
+                  <button class="node-toggle" aria-label="Collapse">▾</button>
+                  <div class="hover-card">
+                    <div class="hover-head">
+                      <div class="hover-avatar">JB</div>
+                      <div>
+                        <div class="hover-name">Joseph R. Biden</div>
+                        <div class="hover-role">46th President</div>
+                      </div>
+                    </div>
+                    <dl class="hover-facts">
+                      <dt>Party</dt><dd>Democratic</dd>
+                      <dt>Term</dt><dd>Jan 20, 2021 — present</dd>
+                      <dt>Age</dt><dd>82</dd>
+                      <dt>Source</dt><dd>Wikidata · Q6279</dd>
+                    </dl>
+                    <div class="hover-cta">Open profile →</div>
+                  </div>
+                </div>
+                <ul>
+                  <li>
+                    <div class="node has-holder">
+                      <div class="node-accent"></div>
+                      <div class="node-main">
+                        <div class="node-office">Vice President</div>
+                        <div class="node-holder">Kamala D. Harris</div>
+                      </div>
+                      <button class="node-toggle is-empty">▾</button>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="node">
+                      <div class="node-accent"></div>
+                      <div class="node-main">
+                        <div class="node-office">Cabinet · 15 secretaries</div>
+                        <div class="node-holder" style="font-size:13px; color:var(--text2);">Expand to view all</div>
+                      </div>
+                      <button class="node-toggle" aria-label="Expand">▾</button>
+                    </div>
+                    <ul>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Secretary of State</div><div class="node-holder">Antony Blinken</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Secretary of the Treasury</div><div class="node-holder">Janet Yellen</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Secretary of Defense</div><div class="node-holder">Lloyd Austin</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Attorney General</div><div class="node-holder">Merrick Garland</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li class="collapsed"><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">11 other secretaries</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Interior, Agriculture, Commerce, …</div></div><button class="node-toggle">▾</button></div></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Legislative -->
+        <div class="branch" data-branch="legislative">
+          <div class="branch-head">
+            <div class="branch-title">Legislative</div>
+            <div class="branch-count">Bicameral · 535 seats</div>
+          </div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node">
+                  <div class="node-accent"></div>
+                  <div class="node-main">
+                    <div class="node-office">Congress</div>
+                    <div class="node-holder" style="font-size:13px; color:var(--text2);">Bicameral legislature</div>
+                  </div>
+                  <button class="node-toggle">▾</button>
+                </div>
+                <ul>
+                  <li>
+                    <div class="node chamber">
+                      <div class="node-accent"></div>
+                      <div class="node-main">
+                        <div class="node-office">Senate</div>
+                        <div class="node-holder">Upper chamber · 100 seats</div>
+                        <div class="party-bar">
+                          <span style="width:51%; background:#3b82f6"></span>
+                          <span style="width:47%; background:#e11d48"></span>
+                          <span style="width:2%;  background:#8a8370"></span>
+                        </div>
+                        <div class="chamber-meta">
+                          <strong>Majority</strong><span>Democratic (51)</span>
+                          <strong>Minority</strong><span>Republican (47)</span>
+                          <strong>Term</strong><span>6 years, staggered</span>
+                        </div>
+                      </div>
+                      <button class="node-toggle">▾</button>
+                    </div>
+                    <ul>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">President of the Senate</div><div class="node-holder">Kamala Harris <span class="node-party" style="color:#3b82f6"><span class="party-dot"></span>Dem</span></div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">President pro tempore</div><div class="node-holder">Patty Murray</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Majority Leader</div><div class="node-holder">Chuck Schumer</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <div class="node chamber">
+                      <div class="node-accent"></div>
+                      <div class="node-main">
+                        <div class="node-office">House of Representatives</div>
+                        <div class="node-holder">Lower chamber · 435 seats</div>
+                        <div class="party-bar">
+                          <span style="width:49%; background:#e11d48"></span>
+                          <span style="width:49%; background:#3b82f6"></span>
+                          <span style="width:2%;  background:#8a8370"></span>
+                        </div>
+                        <div class="chamber-meta">
+                          <strong>Majority</strong><span>Republican (222)</span>
+                          <strong>Minority</strong><span>Democratic (213)</span>
+                          <strong>Term</strong><span>2 years</span>
+                        </div>
+                      </div>
+                      <button class="node-toggle">▾</button>
+                    </div>
+                    <ul>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Speaker of the House</div><div class="node-holder">Mike Johnson <span class="node-party" style="color:#e11d48"><span class="party-dot"></span>Rep</span></div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Majority Leader</div><div class="node-holder">Steve Scalise</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Judicial -->
+        <div class="branch" data-branch="judicial">
+          <div class="branch-head">
+            <div class="branch-title">Judicial</div>
+            <div class="branch-count">3 levels</div>
+          </div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node">
+                  <div class="node-accent"></div>
+                  <div class="node-main">
+                    <div class="node-office">Supreme Court</div>
+                    <div class="node-holder" style="font-size:13px; color:var(--text2);">9 justices</div>
+                  </div>
+                  <button class="node-toggle">▾</button>
+                </div>
+                <ul>
+                  <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Chief Justice</div><div class="node-holder">John G. Roberts</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li class="collapsed"><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Associate Justices</div><div class="node-holder" style="font-size:13px; color:var(--text2);">8 justices</div></div><button class="node-toggle">▾</button></div></li>
+                  <li>
+                    <div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Courts of Appeals</div><div class="node-holder" style="font-size:13px; color:var(--text2);">13 circuits</div></div><button class="node-toggle">▾</button></div>
+                    <ul>
+                      <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">District Courts</div><div class="node-holder" style="font-size:13px; color:var(--text2);">94 districts</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch exec"></span>Executive</div>
+      <div class="legend-item"><span class="legend-swatch legi"></span>Legislative</div>
+      <div class="legend-item"><span class="legend-swatch judi"></span>Judicial</div>
+      <div class="legend-item">· Hover a node for office details · Click ▾ to collapse</div>
+    </div>
+  </div>
+
+  <!-- ===================== UK ===================== -->
+  <div class="country-panel" data-country="uk">
+    <div class="country-head">
+      <div class="flag">🇬🇧</div>
+      <div>
+        <div class="country-name">United Kingdom</div>
+        <div class="country-sub">Parliamentary constitutional monarchy · 4 pillars · Bicameral Parliament</div>
+      </div>
+    </div>
+
+    <div class="chart-toolbar">
+      <div>Full government structure</div>
+      <div class="ctrl-group">
+        <button class="ctrl" onclick="expandAll(this)">Expand all</button>
+        <button class="ctrl" onclick="collapseAll(this)">Collapse all</button>
+      </div>
+    </div>
+
+    <div class="chart-canvas">
+      <div class="branches" style="--cols: 4;">
+
+        <div class="branch narrow" data-branch="monarchy">
+          <div class="branch-head"><div class="branch-title">Crown</div><div class="branch-count">Head of state</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Monarch</div><div class="node-holder">King Charles III</div></div><button class="node-toggle is-empty">▾</button></div></li>
+              <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Heir Apparent</div><div class="node-holder">William, Prince of Wales</div></div><button class="node-toggle is-empty">▾</button></div></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch" data-branch="executive">
+          <div class="branch-head"><div class="branch-title">Executive</div><div class="branch-count">Cabinet Government</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Prime Minister</div><div class="node-holder">Keir Starmer <span class="node-party" style="color:#e11d48"><span class="party-dot"></span>Lab</span></div></div><button class="node-toggle">▾</button></div>
+                <ul>
+                  <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Deputy PM</div><div class="node-holder">Angela Rayner</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li>
+                    <div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Cabinet · 22 ministers</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Great Offices of State + departments</div></div><button class="node-toggle">▾</button></div>
+                    <ul>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Chancellor of the Exchequer</div><div class="node-holder">Rachel Reeves</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Foreign Secretary</div><div class="node-holder">David Lammy</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Home Secretary</div><div class="node-holder">Yvette Cooper</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch" data-branch="legislative">
+          <div class="branch-head"><div class="branch-title">Legislative</div><div class="branch-count">Bicameral · 1 450 seats</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Parliament of the United Kingdom</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Meets at Westminster</div></div><button class="node-toggle">▾</button></div>
+                <ul>
+                  <li>
+                    <div class="node chamber">
+                      <div class="node-accent"></div>
+                      <div class="node-main">
+                        <div class="node-office">House of Commons</div>
+                        <div class="node-holder">Lower chamber · 650 seats</div>
+                        <div class="party-bar">
+                          <span style="width:63%; background:#e11d48"></span>
+                          <span style="width:19%; background:#2563eb"></span>
+                          <span style="width:11%; background:#f59e0b"></span>
+                          <span style="width:7%; background:#8a8370"></span>
+                        </div>
+                        <div class="chamber-meta">
+                          <strong>Majority</strong><span>Labour (411)</span>
+                          <strong>Opposition</strong><span>Conservative (121)</span>
+                          <strong>Term</strong><span>Up to 5 years</span>
+                        </div>
+                      </div>
+                      <button class="node-toggle">▾</button>
+                    </div>
+                    <ul>
+                      <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Speaker</div><div class="node-holder">Lindsay Hoyle</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                    </ul>
+                  </li>
+                  <li>
+                    <div class="node chamber">
+                      <div class="node-accent"></div>
+                      <div class="node-main">
+                        <div class="node-office">House of Lords</div>
+                        <div class="node-holder">Upper chamber · ~800 seats</div>
+                        <div class="chamber-meta">
+                          <strong>Type</strong><span>Appointed + hereditary</span>
+                          <strong>Role</strong><span>Revising chamber</span>
+                        </div>
+                      </div>
+                      <button class="node-toggle is-empty">▾</button>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch" data-branch="judicial">
+          <div class="branch-head"><div class="branch-title">Judicial</div><div class="branch-count">3 jurisdictions</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Supreme Court of the UK</div><div class="node-holder" style="font-size:13px; color:var(--text2);">12 justices</div></div><button class="node-toggle">▾</button></div>
+                <ul>
+                  <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">President</div><div class="node-holder">Lord Reed</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Court of Appeal</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Civil & Criminal</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">High Court</div><div class="node-holder" style="font-size:13px; color:var(--text2);">KBD · Chancery · Family</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch mon"></span>Crown</div>
+      <div class="legend-item"><span class="legend-swatch exec"></span>Executive</div>
+      <div class="legend-item"><span class="legend-swatch legi"></span>Legislative</div>
+      <div class="legend-item"><span class="legend-swatch judi"></span>Judicial</div>
+      <div class="legend-item">· Crown column only appears for monarchies</div>
+    </div>
+  </div>
+
+  <!-- ===================== JAPAN ===================== -->
+  <div class="country-panel" data-country="jp">
+    <div class="country-head">
+      <div class="flag">🇯🇵</div>
+      <div>
+        <div class="country-name">Japan</div>
+        <div class="country-sub">Parliamentary constitutional monarchy · Bicameral National Diet</div>
+      </div>
+    </div>
+
+    <div class="chart-canvas">
+      <div class="branches" style="--cols: 4;">
+
+        <div class="branch narrow" data-branch="monarchy">
+          <div class="branch-head"><div class="branch-title">Imperial House</div><div class="branch-count">Symbolic</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Emperor</div><div class="node-holder">Naruhito</div></div><button class="node-toggle is-empty">▾</button></div></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch" data-branch="executive">
+          <div class="branch-head"><div class="branch-title">Executive</div><div class="branch-count">Cabinet</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Prime Minister</div><div class="node-holder">Shigeru Ishiba <span class="node-party" style="color:#2563eb"><span class="party-dot"></span>LDP</span></div></div><button class="node-toggle">▾</button></div>
+                <ul>
+                  <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Deputy PM</div><div class="node-holder">Yoshihiko Isozaki</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Cabinet · 19 ministers</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Finance · Foreign Affairs · Defense · …</div></div><button class="node-toggle">▾</button></div></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch" data-branch="legislative">
+          <div class="branch-head"><div class="branch-title">Legislative</div><div class="branch-count">Kokkai · 713 seats</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">National Diet</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Bicameral</div></div><button class="node-toggle">▾</button></div>
+                <ul>
+                  <li>
+                    <div class="node chamber">
+                      <div class="node-accent"></div>
+                      <div class="node-main">
+                        <div class="node-office">House of Representatives</div>
+                        <div class="node-holder">Lower chamber · 465 seats</div>
+                        <div class="party-bar">
+                          <span style="width:42%; background:#2563eb"></span>
+                          <span style="width:31%; background:#e11d48"></span>
+                          <span style="width:27%; background:#8a8370"></span>
+                        </div>
+                        <div class="chamber-meta">
+                          <strong>Majority</strong><span>LDP-Komeito (221)</span>
+                          <strong>Term</strong><span>4 years</span>
+                        </div>
+                      </div>
+                      <button class="node-toggle is-empty">▾</button>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="node chamber">
+                      <div class="node-accent"></div>
+                      <div class="node-main">
+                        <div class="node-office">House of Councillors</div>
+                        <div class="node-holder">Upper chamber · 248 seats</div>
+                        <div class="chamber-meta">
+                          <strong>Term</strong><span>6 years, staggered</span>
+                        </div>
+                      </div>
+                      <button class="node-toggle is-empty">▾</button>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch" data-branch="judicial">
+          <div class="branch-head"><div class="branch-title">Judicial</div><div class="branch-count">4 levels</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Supreme Court</div><div class="node-holder" style="font-size:13px; color:var(--text2);">15 justices</div></div><button class="node-toggle">▾</button></div>
+                <ul>
+                  <li><div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Chief Justice</div><div class="node-holder">Saburo Tokura</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">High Courts</div><div class="node-holder" style="font-size:13px; color:var(--text2);">8 regional</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">District / Family Courts</div><div class="node-holder" style="font-size:13px; color:var(--text2);">50 districts</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SAUDI ===================== -->
+  <div class="country-panel" data-country="sa">
+    <div class="country-head">
+      <div class="flag">🇸🇦</div>
+      <div>
+        <div class="country-name">Saudi Arabia</div>
+        <div class="country-sub">Absolute monarchy · No bicameral legislature · Sharia-based judiciary</div>
+      </div>
+    </div>
+
+    <div class="chart-canvas">
+      <div class="branches" style="--cols: 3;">
+
+        <div class="branch" data-branch="monarchy">
+          <div class="branch-head"><div class="branch-title">Crown</div><div class="branch-count">Head of state & government</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">King</div><div class="node-holder">Salman bin Abdulaziz</div></div><button class="node-toggle">▾</button></div>
+                <ul>
+                  <li>
+                    <div class="node has-holder"><div class="node-accent"></div><div class="node-main"><div class="node-office">Crown Prince & PM</div><div class="node-holder">Mohammed bin Salman</div></div><button class="node-toggle">▾</button></div>
+                    <ul>
+                      <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Council of Ministers</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Executive branch · ~30 ministers</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch" data-branch="legislative">
+          <div class="branch-head"><div class="branch-title">Consultative</div><div class="branch-count">Appointed body</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node chamber">
+                  <div class="node-accent"></div>
+                  <div class="node-main">
+                    <div class="node-office">Shura Council</div>
+                    <div class="node-holder">Consultative assembly · 150 members</div>
+                    <div class="chamber-meta">
+                      <strong>Selection</strong><span>Appointed by the King</span>
+                      <strong>Role</strong><span>Advisory (no binding legislation)</span>
+                    </div>
+                  </div>
+                  <button class="node-toggle is-empty">▾</button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch" data-branch="judicial">
+          <div class="branch-head"><div class="branch-title">Judicial</div><div class="branch-count">Sharia-based</div></div>
+          <div class="branch-body tree">
+            <ul>
+              <li>
+                <div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Supreme Judicial Council</div><div class="node-holder" style="font-size:13px; color:var(--text2);">11 members</div></div><button class="node-toggle">▾</button></div>
+                <ul>
+                  <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Supreme Court</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Final appeals</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">Courts of Appeal</div><div class="node-holder" style="font-size:13px; color:var(--text2);">Regional</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                  <li><div class="node"><div class="node-accent"></div><div class="node-main"><div class="node-office">First-Instance Courts</div><div class="node-holder" style="font-size:13px; color:var(--text2);">General, Criminal, Personal Status, Commercial, Labor</div></div><button class="node-toggle is-empty">▾</button></div></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== PANE CONTEXT ============== -->
+  <div class="section-label">How it fits the three-pane country view</div>
+  <div class="pane-preview">
+    <div class="pane">
+      <h4>Pane 1 · Country index</h4>
+      <ul class="pane-list">
+        <li class="active">United States</li>
+        <li>United Kingdom</li>
+        <li>Japan</li>
+        <li>Saudi Arabia</li>
+        <li class="dim">…</li>
+      </ul>
+    </div>
+    <div class="pane">
+      <h4>Pane 2 · Sections</h4>
+      <ul class="pane-list">
+        <li>Overview</li>
+        <li>Leaders</li>
+        <li class="active">Full Structure</li>
+        <li>Legislature</li>
+        <li>Elections</li>
+        <li>Constitution</li>
+      </ul>
+    </div>
+    <div class="pane">
+      <h4>Pane 3 · Detail (this chart)</h4>
+      <p class="dim" style="font-size:12px;">
+        The hierarchy chart renders inside pane 3 on the <code>/countries/[slug]</code>
+        page, replacing the plain-text Executive / Legislative / Judicial bullets
+        currently shown in the <em>Full structure</em> section.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============== DESIGN SPEC ============== -->
+  <div class="section-label">Design spec</div>
+  <div class="spec">
+
+    <div class="spec-card">
+      <h3>Data model (additive)</h3>
+      <p>Current schema supports <code>body → office</code> (flat). To render deeper trees we need two additive columns:</p>
+      <ul>
+        <li><code>government_bodies.parent_body_id</code><span>uuid · null</span></li>
+        <li><code>offices.reports_to_office_id</code><span>uuid · null</span></li>
+        <li><code>government_bodies.branch</code><span>extend: <code>monarchy</code></span></li>
+        <li><code>offices.office_type</code><span>used to style nodes</span></li>
+      </ul>
+      <p style="margin-top:10px;">Chart must render gracefully when these are null (falls back to today's flat columns).</p>
+    </div>
+
+    <div class="spec-card">
+      <h3>Tokens & theming</h3>
+      <ul>
+        <li>Executive<code>--color-branch-executive</code></li>
+        <li>Legislative<code>--color-branch-legislative</code></li>
+        <li>Judicial<code>--color-branch-judicial</code></li>
+        <li>Monarchy (new)<code>#b48bff</code> proposed</li>
+        <li>Node card<code>--color-surface-secondary</code></li>
+        <li>Connectors<code>color-mix(branch, 35%)</code></li>
+      </ul>
+      <p style="margin-top:10px;">Dark/light use the existing Civica paper ↔ ink tokens. No new base palette.</p>
+    </div>
+
+    <div class="spec-card">
+      <h3>Interactions</h3>
+      <ul>
+        <li>Hover node<span>→ popover card</span></li>
+        <li>Click ▾<span>→ collapse subtree</span></li>
+        <li>Click node<span>→ navigate to profile</span></li>
+        <li>Expand all / Collapse all<span>→ toolbar</span></li>
+        <li>Keyboard<span>↑ ↓ ← → between nodes</span></li>
+        <li>Mobile<span>horizontal scroll, columns min 260px</span></li>
+      </ul>
+    </div>
+
+    <div class="spec-card">
+      <h3>Node variants</h3>
+      <ul>
+        <li>Office (holder)<span>title + person</span></li>
+        <li>Office (vacant)<span>title only</span></li>
+        <li>Group<span>e.g. "Cabinet · 15"</span></li>
+        <li>Chamber<span>seats + party bar</span></li>
+        <li>Body<span>branch root</span></li>
+      </ul>
+    </div>
+
+    <div class="spec-card">
+      <h3>Layout rules</h3>
+      <ul>
+        <li>Columns<span>one per top-level branch</span></li>
+        <li>Min col width<span>280px · scroll on overflow</span></li>
+        <li>Max tree depth<span>no hard cap · collapse by default at depth ≥ 3</span></li>
+        <li>Initial expansion<span>branch root + direct children</span></li>
+        <li>Connectors<span>1px CSS-only (no SVG lib)</span></li>
+      </ul>
+    </div>
+
+    <div class="spec-card">
+      <h3>Accessibility</h3>
+      <ul>
+        <li>Tree role<span><code>role="tree"</code></span></li>
+        <li>Nodes<span><code>role="treeitem"</code></span></li>
+        <li>Aria expanded<span>on each collapsible</span></li>
+        <li>Color + shape<span>not color alone for branches</span></li>
+        <li>Min contrast<span>AA on both themes</span></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="section-label">Implementation notes for engineering</div>
+  <div class="spec-card" style="grid-column: 1 / -1;">
+    <ul style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px 20px;">
+      <li>Replace the SVG body of <code>GovStructureDiagram.tsx</code> with semantic <code>&lt;ul role="tree"&gt;</code> markup.<span></span></li>
+      <li>Keep the props signature; add optional <code>parentBodyId</code> / <code>reportsToOfficeId</code> to the input types.<span></span></li>
+      <li>Tree layout is pure CSS (no d3). Connectors use <code>::before</code> / <code>::after</code> on each <code>&lt;li&gt;</code>.<span></span></li>
+      <li>Hover card becomes a popover component so it can be keyboard-focusable (not hover-only).<span></span></li>
+      <li>Chamber nodes reuse <code>HemicycleChart</code> data for the party bar.<span></span></li>
+      <li>Monarchy branch key is opt-in; only show the column when at least one body has <code>branch = "monarchy"</code>.<span></span></li>
+      <li>Collapse state is local (React <code>useState</code>). No URL sync for v1.<span></span></li>
+      <li>Mobile: horizontal scroll on the <code>.chart-canvas</code>, sticky branch headers at top.<span></span></li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  // ----- theme toggle -----
+  function toggleTheme() {
+    const html = document.documentElement;
+    const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+  }
+
+  // ----- country switcher -----
+  document.querySelectorAll('.country-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const c = btn.dataset.country;
+      document.querySelectorAll('.country-btn').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.country-panel').forEach(p => p.classList.toggle('active', p.dataset.country === c));
+    });
+  });
+
+  // ----- collapse / expand -----
+  document.addEventListener('click', e => {
+    const tgl = e.target.closest('.node-toggle');
+    if (!tgl || tgl.classList.contains('is-empty')) return;
+    const li = tgl.closest('li');
+    if (li) li.classList.toggle('collapsed');
+    e.stopPropagation();
+  });
+
+  function expandAll(btn) {
+    const panel = btn.closest('.country-panel');
+    panel.querySelectorAll('li.collapsed').forEach(li => li.classList.remove('collapsed'));
+  }
+  function collapseAll(btn) {
+    const panel = btn.closest('.country-panel');
+    // collapse everything except the branch root li
+    panel.querySelectorAll('.branch-body > ul > li ul').forEach(ul => {
+      ul.closest('li').classList.add('collapsed');
+    });
+  }
+</script>
+
+</body>
+</html>

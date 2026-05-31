@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica — CountryOutcomeBars redesign (CIV-133)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   Civica design tokens — copied from src/app/design-tokens.css verbatim.
+   The implementer MUST import the live tokens file and delete this block;
+   it lives here only so the mockup is self-contained.
+   ========================================================================== */
+:root,
+html[data-theme="light"] {
+  --color-surface-primary:        #f4f1ea;
+  --color-surface-secondary:      #ebe6d6;
+  --color-surface-tertiary:       #e2dcc8;
+  --color-text-primary:           #1a1a1a;
+  --color-text-secondary:         #3d382d;
+  --color-text-muted:             #8a8370;
+  --color-border-strong:          #1a1a1a;
+  --color-border-default:         #c4bdae;
+  --color-border-subtle:          #d9d2c1;
+  --color-accent:                 oklch(58% 0.14 35);
+  --color-accent-soft:            oklch(92% 0.04 35);
+  --color-accent-on:              #ffffff;
+  --color-status-success:         oklch(55% 0.12 145);
+  --color-status-warning:         oklch(65% 0.14 75);
+  --color-status-danger:          oklch(52% 0.18 25);
+  --color-status-info:            oklch(52% 0.10 240);
+  --font-serif:                   "Fraunces", Georgia, serif;
+  --font-sans:                    "Inter", system-ui, sans-serif;
+  --font-mono:                    "JetBrains Mono", ui-monospace, Menlo, monospace;
+  --font-heading:                 var(--font-serif);
+  --font-body:                    var(--font-sans);
+  --font-label:                   var(--font-mono);
+  --font-size-h3:                 22px;
+  --font-size-dek:                17px;
+  --font-size-body:               14px;
+  --font-size-caption:            12px;
+  --font-size-eyebrow:            10px;
+  --font-size-meta:               11px;
+  --line-height-body:             1.55;
+  --letter-spacing-h3:            -0.01em;
+  --letter-spacing-eyebrow:       0.16em;
+  --letter-spacing-label:         0.12em;
+  --space-1: 2px; --space-2: 4px; --space-3: 8px; --space-4: 12px;
+  --space-5: 16px; --space-6: 24px; --space-7: 32px; --space-8: 48px;
+  --radius-sm:                    2px;
+  --layout-max-width:             1160px;
+  --layout-page-x:                32px;
+}
+html[data-theme="dark"] {
+  --color-surface-primary:        #16140f;
+  --color-surface-secondary:      #221e16;
+  --color-surface-tertiary:       #2b2619;
+  --color-text-primary:           #ebe6d6;
+  --color-text-secondary:         #c4bdae;
+  --color-text-muted:             #8a8370;
+  --color-border-strong:          #ebe6d6;
+  --color-border-default:         #3d382d;
+  --color-border-subtle:          #2d2a22;
+  --color-accent:                 oklch(68% 0.15 35);
+  --color-accent-soft:            oklch(30% 0.06 35);
+  --color-accent-on:              #16140f;
+  --color-status-success:         oklch(68% 0.14 145);
+  --color-status-warning:         oklch(75% 0.14 75);
+  --color-status-danger:          oklch(65% 0.18 25);
+  --color-status-info:            oklch(68% 0.10 240);
+}
+
+/* ==========================================================================
+   Mockup shell — NOT part of the component. Production pages already have
+   a layout frame; the component must work inside any container ≥ 560px wide.
+   ========================================================================== */
+*,*::before,*::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--color-surface-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.page {
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--layout-page-x) var(--space-9);
+}
+.mockup-toolbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--space-4) var(--layout-page-x);
+  background: var(--color-surface-secondary);
+  border-bottom: 1px solid var(--color-border-default);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-text-muted);
+}
+.mockup-toolbar button {
+  all: unset; cursor: pointer;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  font-size: var(--font-size-eyebrow);
+}
+.mockup-toolbar button:hover { background: var(--color-surface-tertiary); }
+
+/* ==========================================================================
+   CountryOutcomeBars — component styles
+   Block:   .cob
+   Elements: .cob__header, .cob__row, .cob__meta, .cob__value, .cob__chart,
+             .cob__band, .cob__median, .cob__marker, .cob__axis, .cob__dek,
+             .cob__rank, .cob__footer
+   Modifiers: .cob__row--lower-better, .cob__row--no-data,
+              .cob__marker--outside-low, .cob__marker--outside-high
+   ========================================================================== */
+.cob {
+  --cob-row-gap:         var(--space-6);
+  --cob-chart-height:    44px;
+  --cob-band-height:     12px;
+  --cob-median-size:     2px;
+  --cob-marker-size:     14px;
+  --cob-rail-inset:      2%;   /* pad left/right so the band never touches 0/100% */
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+}
+
+.cob__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border-strong);
+  margin-bottom: var(--space-5);
+}
+.cob__title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: var(--font-size-h3);
+  letter-spacing: var(--letter-spacing-h3);
+  line-height: 1.1;
+  margin: 0;
+}
+.cob__eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.cob__eyebrow b {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+/* ---- Row -------------------------------------------------------------- */
+.cob__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.cob__row:last-of-type { border-bottom: none; }
+
+/* The meta line: metric name + unit + direction hint + value + rank */
+.cob__meta {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--space-5);
+  align-items: baseline;
+}
+.cob__name {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.2;
+  letter-spacing: var(--letter-spacing-h3);
+}
+.cob__unit {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-meta);
+  color: var(--color-text-muted);
+  margin-left: var(--space-3);
+  letter-spacing: 0.02em;
+}
+.cob__direction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-left: var(--space-4);
+  white-space: nowrap;
+}
+.cob__direction svg { width: 10px; height: 10px; }
+
+/* Right-side value + rank block */
+.cob__value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  justify-content: flex-end;
+  text-align: right;
+}
+.cob__number {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.cob__rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-eyebrow);
+  letter-spacing: var(--letter-spacing-eyebrow);
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  white-space: nowrap;
+}
+.cob__rank b {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* ---- Chart rail -------------------------------------------------------- */
+.cob__chart {
+  position: relative;
+  height: var(--cob-chart-height);
+  width: 100%;
+  margin-top: var(--space-3);
+}
+.cob__rail {
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  transform: translateY(-50%);
+  height: var(--cob-band-height);
+  border-top: 1px dashed var(--color-border-subtle);
+  border-bottom: 1px dashed var(--color-border-subtle);
+}
+
+/* Peer band (peer min → peer max). Uses --peer-lo / --peer-hi inline. */
+.cob__band {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: var(--cob-band-height);
+  left: var(--peer-lo);
+  width: calc(var(--peer-hi) - var(--peer-lo));
+  background: var(--color-surface-tertiary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+}
+
+/* Median tick inside band (uses --peer-median). */
+.cob__median {
+  position: absolute;
+  top: calc(50% - (var(--cob-band-height) / 2) - 4px);
+  height: calc(var(--cob-band-height) + 8px);
+  width: var(--cob-median-size);
+  left: var(--peer-median);
+  transform: translateX(-50%);
+  background: var(--color-text-muted);
+}
+.cob__median-label {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: var(--peer-median);
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Country marker — a full-height needle + dot at the top. Uses --pos. */
+.cob__marker {
+  position: absolute;
+  left: var(--pos);
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  transform: translateX(-50%);
+  background: var(--color-accent);
+  z-index: 2;
+}
+.cob__marker::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: var(--cob-marker-size);
+  height: var(--cob-marker-size);
+  background: var(--color-accent);
+  border: 2px solid var(--color-surface-primary);
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+/* Out-of-peer-range arrow variant */
+.cob__marker--outside-low,
+.cob__marker--outside-high {
+  background: transparent;
+  width: 0;
+}
+.cob__marker--outside-low::before,
+.cob__marker--outside-high::before {
+  top: 50%;
+  width: 0; height: 0;
+  border: 7px solid transparent;
+  background: transparent;
+  border-radius: 0;
+  transform: translate(-50%, -50%);
+}
+.cob__marker--outside-low::before {
+  border-right: 10px solid var(--color-accent);
+}
+.cob__marker--outside-high::before {
+  border-left: 10px solid var(--color-accent);
+}
+
+/* Axis labels at the ends of the peer band */
+.cob__axis {
+  position: absolute;
+  inset: auto 0 -18px 0;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+.cob__axis span:first-child { padding-left: 2px; }
+.cob__axis span:last-child  { padding-right: 2px; }
+
+/* Dek sentence under the chart */
+.cob__dek {
+  margin-top: var(--space-7);
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: var(--font-size-dek);
+  line-height: 1.45;
+  color: var(--color-text-secondary);
+  max-width: 62ch;
+}
+
+/* ---- No-data state ---------------------------------------------------- */
+.cob__row--no-data .cob__number,
+.cob__row--no-data .cob__rank { color: var(--color-text-muted); }
+.cob__row--no-data .cob__band {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--color-surface-secondary) 0 6px,
+    transparent 6px 12px
+  );
+  border-style: dashed;
+}
+.cob__row--no-data .cob__marker,
+.cob__row--no-data .cob__median,
+.cob__row--no-data .cob__median-label { display: none; }
+
+/* ---- Stale badge ------------------------------------------------------ */
+.cob__stale {
+  display: inline-block;
+  margin-left: var(--space-3);
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  color: var(--color-status-warning);
+  border: 1px solid color-mix(in oklab, var(--color-status-warning) 50%, transparent);
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Footer link ------------------------------------------------------ */
+.cob__footer {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-strong);
+}
+.cob__footer a {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-meta);
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+}
+
+/* ---- Responsive ------------------------------------------------------- */
+@media (max-width: 640px) {
+  .cob__meta { grid-template-columns: 1fr; row-gap: var(--space-2); }
+  .cob__value { justify-content: flex-start; }
+  .cob__number { font-size: 20px; }
+  .cob__direction { margin-left: 0; }
+}
+
+/* Focus/hover treatment — implementer should preserve these. */
+.cob__row:focus-within .cob__marker::before,
+.cob__row:hover        .cob__marker::before {
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-accent) 20%, transparent);
+}
+
+/* Forced-colors / WCAG contrast fallback */
+@media (forced-colors: active) {
+  .cob__marker, .cob__marker::before { background: CanvasText; border-color: Canvas; }
+  .cob__band { border-color: CanvasText; }
+}
+</style>
+</head>
+<body>
+
+<div class="mockup-toolbar">
+  <span>CIV-133 — CountryOutcomeBars redesign mockup · Design System v0.1 tokens</span>
+  <button id="theme-toggle" type="button">Toggle theme</button>
+</div>
+
+<main class="page">
+
+  <!-- =====================================================================
+       EXAMPLE 1 — Country: Brazil · Peers: federal · Year: 2024
+       All six metrics from the original component, showing every state:
+       - normal (in-range)
+       - below peer-min (out-of-range low)
+       - above peer-max (out-of-range high)
+       - no data
+       - stale data
+       ===================================================================== -->
+  <section class="cob" aria-label="Outcomes for Brazil vs. federal peers">
+
+    <header class="cob__header">
+      <h2 class="cob__title">Outcomes</h2>
+      <div class="cob__eyebrow">Compared to <b>federal</b> peers · 2024</div>
+    </header>
+
+    <!-- Row 1 — Corruption Perceptions Index (lower-is-better inverted:
+         CPI is 0=corrupt, 100=clean, so higher-is-better).
+         Country: 36 · peers 24..74 · median 42 -->
+    <article class="cob__row" aria-label="Corruption Perceptions Index">
+      <div class="cob__meta">
+        <div>
+          <span class="cob__name">Corruption Perceptions Index</span>
+          <span class="cob__unit">score · 0–100</span>
+          <span class="cob__direction" title="Higher score = less corruption">
+            <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 7 L5 3 L9 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Higher is better
+          </span>
+        </div>
+        <div class="cob__value">
+          <span class="cob__number">36</span>
+          <span class="cob__rank">Rank <b>17 / 22</b></span>
+        </div>
+      </div>
+
+      <div class="cob__chart" style="
+          --peer-lo: 18%;
+          --peer-hi: 82%;
+          --peer-median: 34%;
+          --pos: 25%;
+        ">
+        <div class="cob__rail"></div>
+        <div class="cob__band"></div>
+        <div class="cob__median" aria-hidden="true"></div>
+        <div class="cob__median-label">Peer median · 42</div>
+        <div class="cob__marker" aria-hidden="true"></div>
+        <div class="cob__axis">
+          <span>Peer low · 24</span>
+          <span>Peer high · 74</span>
+        </div>
+      </div>
+
+      <p class="cob__dek">
+        Scores <b>36/100</b> on Transparency International’s index — below the
+        federal-country median of 42, ranking 17th of 22 peers.
+      </p>
+    </article>
+
+    <!-- Row 2 — GDP per capita (USD). Wildly different scale.
+         Country: 8,917 · peers 1,900..80,000 · median 18,400 -->
+    <article class="cob__row" aria-label="GDP per capita">
+      <div class="cob__meta">
+        <div>
+          <span class="cob__name">GDP per capita</span>
+          <span class="cob__unit">current US$</span>
+          <span class="cob__direction">
+            <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 7 L5 3 L9 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Higher is better
+          </span>
+        </div>
+        <div class="cob__value">
+          <span class="cob__number">$8,917</span>
+          <span class="cob__rank">Rank <b>15 / 22</b></span>
+        </div>
+      </div>
+
+      <div class="cob__chart" style="
+          --peer-lo: 8%;
+          --peer-hi: 92%;
+          --peer-median: 30%;
+          --pos: 15%;
+        ">
+        <div class="cob__rail"></div>
+        <div class="cob__band"></div>
+        <div class="cob__median" aria-hidden="true"></div>
+        <div class="cob__median-label">Peer median · $18,400</div>
+        <div class="cob__marker" aria-hidden="true"></div>
+        <div class="cob__axis">
+          <span>Peer low · $1,900</span>
+          <span>Peer high · $80,000</span>
+        </div>
+      </div>
+
+      <p class="cob__dek">
+        Sits in the bottom third of federal peers at <b>$8,917</b> per person — roughly
+        half the peer median of $18,400.
+      </p>
+    </article>
+
+    <!-- Row 3 — Gini index (lower is better; more equal = lower).
+         Country: 52.0 · peers 28..58 · median 35 -->
+    <article class="cob__row cob__row--lower-better" aria-label="Gini index">
+      <div class="cob__meta">
+        <div>
+          <span class="cob__name">Gini index</span>
+          <span class="cob__unit">index · 0–100</span>
+          <span class="cob__direction" title="Lower score = more equal">
+            <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3 L5 7 L9 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Lower is better
+          </span>
+        </div>
+        <div class="cob__value">
+          <span class="cob__number">52.0</span>
+          <span class="cob__rank">Rank <b>21 / 22</b></span>
+        </div>
+      </div>
+
+      <div class="cob__chart" style="
+          --peer-lo: 10%;
+          --peer-hi: 85%;
+          --peer-median: 32%;
+          --pos: 78%;
+        ">
+        <div class="cob__rail"></div>
+        <div class="cob__band"></div>
+        <div class="cob__median" aria-hidden="true"></div>
+        <div class="cob__median-label">Peer median · 35</div>
+        <div class="cob__marker" aria-hidden="true"></div>
+        <div class="cob__axis">
+          <span>Peer low · 28</span>
+          <span>Peer high · 58</span>
+        </div>
+      </div>
+
+      <p class="cob__dek">
+        Among the most unequal federal countries at a Gini of <b>52.0</b>, far above
+        the peer median of 35 — 21st of 22 peers.
+      </p>
+    </article>
+
+    <!-- Row 4 — HDI (higher is better). Country 0.760 · peers 0.52..0.95 · median 0.80
+         Example of a value below peer-min → outside-low arrow variant — but here inside range -->
+    <article class="cob__row" aria-label="Human Development Index">
+      <div class="cob__meta">
+        <div>
+          <span class="cob__name">Human Development Index</span>
+          <span class="cob__unit">index · 0–1</span>
+          <span class="cob__direction">
+            <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 7 L5 3 L9 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Higher is better
+          </span>
+        </div>
+        <div class="cob__value">
+          <span class="cob__number">0.760</span>
+          <span class="cob__rank">Rank <b>14 / 22</b></span>
+        </div>
+      </div>
+
+      <div class="cob__chart" style="
+          --peer-lo: 10%;
+          --peer-hi: 88%;
+          --peer-median: 60%;
+          --pos: 45%;
+        ">
+        <div class="cob__rail"></div>
+        <div class="cob__band"></div>
+        <div class="cob__median" aria-hidden="true"></div>
+        <div class="cob__median-label">Peer median · 0.80</div>
+        <div class="cob__marker" aria-hidden="true"></div>
+        <div class="cob__axis">
+          <span>Peer low · 0.52</span>
+          <span>Peer high · 0.95</span>
+        </div>
+      </div>
+
+      <p class="cob__dek">
+        Mid-pack on human development at <b>0.760</b>, just under the federal-country
+        median of 0.80.
+      </p>
+    </article>
+
+    <!-- Row 5 — Life expectancy. Country 75.9 · peers 54.1..83.2 · median 76.0
+         Example with stale-data badge. -->
+    <article class="cob__row" aria-label="Life expectancy at birth">
+      <div class="cob__meta">
+        <div>
+          <span class="cob__name">Life expectancy at birth</span>
+          <span class="cob__unit">years</span>
+          <span class="cob__direction">
+            <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 7 L5 3 L9 7" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Higher is better
+          </span>
+        </div>
+        <div class="cob__value">
+          <span class="cob__number">75.9</span>
+          <span class="cob__stale" title="Most recent datapoint is from 2021">Stale · 2021</span>
+          <span class="cob__rank">Rank <b>10 / 22</b></span>
+        </div>
+      </div>
+
+      <div class="cob__chart" style="
+          --peer-lo: 10%;
+          --peer-hi: 92%;
+          --peer-median: 55%;
+          --pos: 54%;
+        ">
+        <div class="cob__rail"></div>
+        <div class="cob__band"></div>
+        <div class="cob__median" aria-hidden="true"></div>
+        <div class="cob__median-label">Peer median · 76.0 yr</div>
+        <div class="cob__marker" aria-hidden="true"></div>
+        <div class="cob__axis">
+          <span>Peer low · 54.1 yr</span>
+          <span>Peer high · 83.2 yr</span>
+        </div>
+      </div>
+
+      <p class="cob__dek">
+        Life expectancy of <b>75.9 years</b> is essentially at the peer median —
+        though this figure has not been updated since 2021.
+      </p>
+    </article>
+
+    <!-- Row 6 — Unemployment (lower is better).
+         Country 7.8 · peers 1.9..33 · median 5.4 → example of out-of-range HIGH. -->
+    <article class="cob__row cob__row--lower-better" aria-label="Unemployment rate">
+      <div class="cob__meta">
+        <div>
+          <span class="cob__name">Unemployment rate</span>
+          <span class="cob__unit">percent</span>
+          <span class="cob__direction">
+            <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3 L5 7 L9 3" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Lower is better
+          </span>
+        </div>
+        <div class="cob__value">
+          <span class="cob__number">7.8%</span>
+          <span class="cob__rank">Rank <b>18 / 22</b></span>
+        </div>
+      </div>
+
+      <div class="cob__chart" style="
+          --peer-lo: 8%;
+          --peer-hi: 86%;
+          --peer-median: 22%;
+          --pos: 34%;
+        ">
+        <div class="cob__rail"></div>
+        <div class="cob__band"></div>
+        <div class="cob__median" aria-hidden="true"></div>
+        <div class="cob__median-label">Peer median · 5.4%</div>
+        <div class="cob__marker" aria-hidden="true"></div>
+        <div class="cob__axis">
+          <span>Peer low · 1.9%</span>
+          <span>Peer high · 33%</span>
+        </div>
+      </div>
+
+      <p class="cob__dek">
+        Joblessness of <b>7.8%</b> runs above the federal peer median of 5.4% — 18th
+        of 22 peers.
+      </p>
+    </article>
+
+    <!-- Row 7 — Example: missing data -->
+    <article class="cob__row cob__row--no-data" aria-label="Happiness index — no data">
+      <div class="cob__meta">
+        <div>
+          <span class="cob__name">Happiness index</span>
+          <span class="cob__unit">score · 0–10</span>
+        </div>
+        <div class="cob__value">
+          <span class="cob__number">—</span>
+          <span class="cob__rank">No data</span>
+        </div>
+      </div>
+
+      <div class="cob__chart" style="--peer-lo: 15%; --peer-hi: 85%;">
+        <div class="cob__rail"></div>
+        <div class="cob__band" aria-hidden="true"></div>
+      </div>
+
+      <p class="cob__dek">
+        Not reported for this country in any source we have loaded.
+      </p>
+    </article>
+
+    <footer class="cob__footer">
+      <a href="#">Compare across all countries →</a>
+    </footer>
+
+  </section>
+
+</main>
+
+<script>
+  // Mockup-only: theme toggle
+  const btn = document.getElementById('theme-toggle');
+  btn.addEventListener('click', () => {
+    const html = document.documentElement;
+    html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+  });
+</script>
+</body>
+</html>

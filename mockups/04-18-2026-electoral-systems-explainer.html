@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica — Electoral Systems Explainer (Mockup v2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --color-bg: #16140f;
+    --color-bg-nav: rgba(42,34,24,0.92);
+    --color-surface-elevated: #221e16;
+    --color-text-primary: #E8E6DF;
+    --color-text-85: rgba(255,255,255,0.88);
+    --color-text-60: rgba(255,255,255,0.72);
+    --color-text-50: rgba(255,255,255,0.64);
+    --color-text-40: rgba(255,255,255,0.56);
+    --color-text-30: rgba(255,255,255,0.50);
+    --color-text-20: rgba(255,255,255,0.40);
+    --color-accent: #D4A04A;
+    --color-accent-dim: rgba(212,160,74,0.15);
+    --color-card-bg: rgba(255,255,255,0.03);
+    --color-card-border: rgba(255,255,255,0.07);
+    --color-card-hover-bg: rgba(255,255,255,0.06);
+    --color-card-hover-border: rgba(255,255,255,0.14);
+    --color-divider: rgba(255,255,255,0.06);
+    --color-stat-border: rgba(255,255,255,0.06);
+    --color-branch-executive: #D4764E;
+    --color-branch-legislative: #4E8BD4;
+    --color-branch-judicial: #5CAA6E;
+    --color-gov-presidential: #D4764E;
+    --color-gov-parliamentary: #4E8BD4;
+    --color-gov-other: #8899AA;
+    --radius-sm: 4px;
+    --font-weight-mono: 500;
+    --tracking-caps: 0.15em;
+    --tracking-wide: 0.03em;
+    --leading-normal: 1.65;
+  }
+
+  .light {
+    --color-bg: #f4f1ea;
+    --color-bg-nav: rgba(244,241,234,0.92);
+    --color-surface-elevated: #FFFFFF;
+    --color-text-primary: #1A1A18;
+    --color-text-85: rgba(0,0,0,0.82);
+    --color-text-60: rgba(0,0,0,0.70);
+    --color-text-50: rgba(0,0,0,0.62);
+    --color-text-40: rgba(0,0,0,0.56);
+    --color-text-30: rgba(0,0,0,0.53);
+    --color-text-20: rgba(0,0,0,0.38);
+    --color-accent: #B8860B;
+    --color-accent-dim: rgba(184,134,11,0.12);
+    --color-card-bg: rgba(0,0,0,0.02);
+    --color-card-border: rgba(0,0,0,0.08);
+    --color-card-hover-bg: rgba(0,0,0,0.04);
+    --color-card-hover-border: rgba(0,0,0,0.14);
+    --color-divider: rgba(0,0,0,0.07);
+    --color-stat-border: rgba(0,0,0,0.07);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    line-height: var(--leading-normal);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease;
+  }
+
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 52px;
+    background: var(--color-bg-nav);
+    border-bottom: 1px solid var(--color-card-border);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo { font-family: var(--font-heading); font-size: 18px; font-weight: 600; }
+
+  .nav-links { display: flex; gap: 2px; }
+  .tab-nav {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 12px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding: 10px 14px;
+    color: var(--color-text-30);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    letter-spacing: var(--tracking-wide);
+    transition: color 0.15s;
+  }
+  .tab-nav:hover { color: var(--color-text-40); }
+  .tab-nav.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+
+  .theme-btn {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 11px;
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    color: var(--color-text-40);
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 40px 40px; }
+
+  .page-heading {
+    font-family: var(--font-heading);
+    font-size: 44px;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    margin: 0 0 8px;
+  }
+
+  .page-sub {
+    font-size: 15px;
+    color: var(--color-text-50);
+    margin-bottom: 36px;
+  }
+
+  .section-header {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 10px;
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--color-text-30);
+    margin: 0 0 16px;
+  }
+
+  /* System tab selector */
+  .system-tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 28px;
+    background: var(--color-card-bg);
+  }
+
+  .sys-tab {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 11px;
+    background: none;
+    border: none;
+    border-right: 1px solid var(--color-card-border);
+    padding: 12px 10px;
+    color: var(--color-text-40);
+    cursor: pointer;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .sys-tab:last-child { border-right: none; }
+  .sys-tab:hover { color: var(--color-text-60); background: var(--color-card-hover-bg); }
+  .sys-tab.active {
+    background: var(--color-accent-dim);
+    color: var(--color-accent);
+  }
+
+  .system-detail { display: none; }
+  .system-detail.active { display: block; }
+
+  /* System card */
+  .system-card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .sys-head {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--color-card-border);
+  }
+
+  .sys-name {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .sys-aka {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 11px;
+    color: var(--color-text-30);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .sys-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sys-explain {
+    padding: 24px 28px;
+    border-right: 1px solid var(--color-card-border);
+  }
+
+  .sys-visual { padding: 24px 28px; }
+
+  .explain-block { margin-bottom: 20px; }
+
+  .explain-label {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-caps);
+    color: var(--color-text-30);
+    margin-bottom: 6px;
+  }
+
+  .explain-text {
+    font-size: 14px;
+    color: var(--color-text-85);
+    line-height: 1.65;
+  }
+
+  .pros-cons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .pci {
+    font-size: 12px;
+    color: var(--color-text-50);
+    padding-left: 14px;
+    position: relative;
+    margin-bottom: 5px;
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    letter-spacing: var(--tracking-wide);
+  }
+  .pci.pro::before { content: '+'; position: absolute; left: 0; color: var(--color-branch-judicial); font-weight: 700; }
+  .pci.con::before { content: '−'; position: absolute; left: 1px; color: var(--color-branch-executive); font-weight: 700; }
+
+  .visual-label {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-caps);
+    color: var(--color-text-30);
+    margin-bottom: 14px;
+  }
+
+  /* District grid */
+  .district-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-bottom: 22px;
+  }
+
+  .district {
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+  }
+
+  /* Result bars */
+  .result-row { margin-bottom: 10px; }
+
+  .result-row-head {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 11px;
+    color: var(--color-text-40);
+    letter-spacing: var(--tracking-wide);
+    margin-bottom: 4px;
+  }
+
+  .result-track {
+    height: 6px;
+    background: var(--color-card-border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .result-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* Countries strip */
+  .sys-countries {
+    padding: 16px 28px;
+    border-top: 1px solid var(--color-card-border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .sys-countries-count {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 18px;
+    color: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .sys-countries-label {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-caps);
+    color: var(--color-text-30);
+    flex-shrink: 0;
+  }
+
+  .country-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .country-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    padding: 3px 8px;
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    font-size: 10px;
+    color: var(--color-text-60);
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+    letter-spacing: var(--tracking-wide);
+  }
+  .country-chip:hover { border-color: var(--color-accent); color: var(--color-text-85); }
+
+  .callout-box {
+    background: var(--color-accent-dim);
+    border: 1px solid rgba(212,160,74,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--color-text-60);
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-mono);
+    letter-spacing: var(--tracking-wide);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 720px) {
+    .sys-body { grid-template-columns: 1fr; }
+    .sys-explain { border-right: none; border-bottom: 1px solid var(--color-card-border); }
+    .system-tabs { flex-wrap: wrap; }
+    .sys-tab { flex-basis: 50%; min-width: 50%; }
+    .page { padding: 24px 20px; }
+    .nav-bar { padding: 0 20px; }
+    .page-heading { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav-bar">
+  <span class="logo">Civica</span>
+  <div class="nav-links">
+    <a class="tab-nav" href="#">Atlas</a>
+    <a class="tab-nav" href="#">Countries</a>
+    <a class="tab-nav" href="#">Gov Types</a>
+    <a class="tab-nav active" href="#">Electoral Systems</a>
+    <a class="tab-nav" href="#">Rankings</a>
+  </div>
+  <button class="theme-btn" onclick="toggleTheme()">Toggle</button>
+</nav>
+
+<div class="page">
+  <h1 class="page-heading">Electoral Systems</h1>
+  <p class="page-sub">How different countries translate votes into representation</p>
+
+  <div class="system-tabs">
+    <button class="sys-tab active" onclick="showSystem('fptp',this)">First Past the Post</button>
+    <button class="sys-tab" onclick="showSystem('pr',this)">Proportional Rep.</button>
+    <button class="sys-tab" onclick="showSystem('mmp',this)">Mixed Member</button>
+    <button class="sys-tab" onclick="showSystem('ranked',this)">Ranked Choice</button>
+    <button class="sys-tab" onclick="showSystem('trs',this)">Two-Round</button>
+  </div>
+
+  <!-- FPTP -->
+  <div class="system-detail active" id="fptp">
+    <div class="system-card">
+      <div class="sys-head">
+        <div class="sys-name">First Past the Post</div>
+        <div class="sys-aka">single-member plurality · winner-take-all</div>
+      </div>
+      <div class="sys-body">
+        <div class="sys-explain">
+          <div class="explain-block">
+            <div class="explain-label">How It Works</div>
+            <div class="explain-text">The country is divided into single-member districts. Voters cast one vote for a candidate. The candidate with the most votes in each district wins the seat, regardless of whether they received a majority.</div>
+          </div>
+          <div class="explain-block">
+            <div class="explain-label">Key Characteristic</div>
+            <div class="explain-text">Tends to produce two-party systems (Duverger's Law) and strong single-party governments. Votes for losing candidates have no impact on seat allocation.</div>
+          </div>
+          <div class="pros-cons">
+            <div>
+              <div class="explain-label">Advantages</div>
+              <div class="pci pro">Simple for voters</div>
+              <div class="pci pro">Clear local rep</div>
+              <div class="pci pro">Decisive results</div>
+              <div class="pci pro">Stable majorities</div>
+            </div>
+            <div>
+              <div class="explain-label">Disadvantages</div>
+              <div class="pci con">Wasted votes</div>
+              <div class="pci con">Disproportionate</div>
+              <div class="pci con">Gerrymandering risk</div>
+              <div class="pci con">Under-represents minorities</div>
+            </div>
+          </div>
+        </div>
+        <div class="sys-visual">
+          <div class="visual-label">10 districts, 3 parties</div>
+          <div class="district-grid" style="margin-bottom:28px">
+            <div class="district" style="background:#c0392b">A</div>
+            <div class="district" style="background:#2980b9">B</div>
+            <div class="district" style="background:#c0392b">A</div>
+            <div class="district" style="background:#c0392b">A</div>
+            <div class="district" style="background:#2980b9">B</div>
+            <div class="district" style="background:#c0392b">A</div>
+            <div class="district" style="background:#c0392b">A</div>
+            <div class="district" style="background:#c0392b">A</div>
+            <div class="district" style="background:#2980b9">B</div>
+            <div class="district" style="background:#d4a04a;color:#1a1a18">C</div>
+          </div>
+          <div class="visual-label">Seats vs. actual votes</div>
+          <div class="result-row">
+            <div class="result-row-head">
+              <span style="color:#c0392b">Party A</span>
+              <span>6 seats (60%) · 42% of votes</span>
+            </div>
+            <div class="result-track"><div class="result-fill" style="width:60%;background:#c0392b"></div></div>
+          </div>
+          <div class="result-row">
+            <div class="result-row-head">
+              <span style="color:#2980b9">Party B</span>
+              <span>3 seats (30%) · 35% of votes</span>
+            </div>
+            <div class="result-track"><div class="result-fill" style="width:30%;background:#2980b9"></div></div>
+          </div>
+          <div class="result-row">
+            <div class="result-row-head">
+              <span style="color:var(--color-accent)">Party C</span>
+              <span>1 seat (10%) · 23% of votes</span>
+            </div>
+            <div class="result-track"><div class="result-fill" style="width:10%;background:var(--color-accent)"></div></div>
+          </div>
+          <div class="callout-box">Party C won 23% of votes but only 10% of seats. In a PR system they'd have 23 seats in a 100-seat chamber.</div>
+        </div>
+      </div>
+      <div class="sys-countries">
+        <div>
+          <div class="sys-countries-count">47</div>
+          <div class="sys-countries-label">countries</div>
+        </div>
+        <div class="country-chips">
+          <a class="country-chip" href="#"><span>&#127468;&#127463;</span> United Kingdom</a>
+          <a class="country-chip" href="#"><span>&#127482;&#127480;</span> United States</a>
+          <a class="country-chip" href="#"><span>&#127470;&#127475;</span> India</a>
+          <a class="country-chip" href="#"><span>&#127464;&#127462;</span> Canada</a>
+          <a class="country-chip" href="#"><span>&#127475;&#127468;</span> Nigeria</a>
+          <a class="country-chip" href="#"><span>&#127468;&#127469;</span> Ghana</a>
+          <a class="country-chip" href="#"><span>&#127474;&#127486;</span> Malaysia</a>
+          <a class="country-chip" href="#">+40 more</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PR -->
+  <div class="system-detail" id="pr">
+    <div class="system-card">
+      <div class="sys-head">
+        <div class="sys-name">Proportional Representation</div>
+        <div class="sys-aka">party-list PR · D'Hondt · Sainte-Laguë</div>
+      </div>
+      <div class="sys-body">
+        <div class="sys-explain">
+          <div class="explain-block">
+            <div class="explain-label">How It Works</div>
+            <div class="explain-text">Voters choose a party (or candidates on a party list). Seats are allocated in proportion to each party's share of the total vote. Thresholds (typically 3–5%) prevent extreme fragmentation.</div>
+          </div>
+          <div class="explain-block">
+            <div class="explain-label">Key Characteristic</div>
+            <div class="explain-text">Produces multi-party systems and coalition governments. Most common electoral system worldwide. Small parties can win seats.</div>
+          </div>
+          <div class="pros-cons">
+            <div>
+              <div class="explain-label">Advantages</div>
+              <div class="pci pro">Fair representation</div>
+              <div class="pci pro">Diverse voices</div>
+              <div class="pci pro">Few wasted votes</div>
+              <div class="pci pro">Higher turnout</div>
+            </div>
+            <div>
+              <div class="explain-label">Disadvantages</div>
+              <div class="pci con">Coalition instability</div>
+              <div class="pci con">No local rep</div>
+              <div class="pci con">Complex ballots</div>
+              <div class="pci con">Small-party veto</div>
+            </div>
+          </div>
+        </div>
+        <div class="sys-visual">
+          <div class="visual-label">Seats match vote share</div>
+          <div class="result-row" style="margin-top:16px">
+            <div class="result-row-head">
+              <span style="color:#c0392b">Party A</span><span>42 seats · 42% votes</span>
+            </div>
+            <div class="result-track"><div class="result-fill" style="width:42%;background:#c0392b"></div></div>
+          </div>
+          <div class="result-row">
+            <div class="result-row-head">
+              <span style="color:#2980b9">Party B</span><span>35 seats · 35% votes</span>
+            </div>
+            <div class="result-track"><div class="result-fill" style="width:35%;background:#2980b9"></div></div>
+          </div>
+          <div class="result-row">
+            <div class="result-row-head">
+              <span style="color:var(--color-accent)">Party C</span><span>23 seats · 23% votes</span>
+            </div>
+            <div class="result-track"><div class="result-fill" style="width:23%;background:var(--color-accent)"></div></div>
+          </div>
+          <div class="callout-box">Party C with 23% of votes gets 23 seats. In FPTP, the same result would yield only ~10 seats — a 13-seat gap that vanishes under PR.</div>
+        </div>
+      </div>
+      <div class="sys-countries">
+        <div>
+          <div class="sys-countries-count">85</div>
+          <div class="sys-countries-label">countries</div>
+        </div>
+        <div class="country-chips">
+          <a class="country-chip" href="#">&#127465;&#127466; Germany</a>
+          <a class="country-chip" href="#">&#127475;&#127473; Netherlands</a>
+          <a class="country-chip" href="#">&#127480;&#127466; Sweden</a>
+          <a class="country-chip" href="#">&#127463;&#127479; Brazil</a>
+          <a class="country-chip" href="#">&#127487;&#127462; South Africa</a>
+          <a class="country-chip" href="#">+80 more</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MMP -->
+  <div class="system-detail" id="mmp">
+    <div class="system-card">
+      <div class="sys-head">
+        <div class="sys-name">Mixed Member Proportional</div>
+        <div class="sys-aka">additional member system · two-vote system</div>
+      </div>
+      <div class="sys-body">
+        <div class="sys-explain">
+          <div class="explain-block">
+            <div class="explain-label">How It Works</div>
+            <div class="explain-text">Voters cast two votes: one for a local district candidate (FPTP) and one for a party list (PR). Local seats go to district winners. "Top-up" list seats are added so total seat allocation matches the party vote share.</div>
+          </div>
+          <div class="explain-block">
+            <div class="explain-label">Key Characteristic</div>
+            <div class="explain-text">Combines local representation with proportional outcomes. Germany introduced it in 1949 to prevent both Weimar-era fragmentation and single-party dominance.</div>
+          </div>
+        </div>
+        <div class="sys-visual">
+          <div class="visual-label">Two-ballot structure</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;margin-bottom:16px">
+            <div style="background:var(--color-accent-dim);border:1px solid rgba(212,160,74,0.2);border-radius:var(--radius-sm);padding:14px;text-align:center">
+              <div class="explain-label" style="margin-bottom:8px">Vote 1: District</div>
+              <div style="font-family:var(--font-heading);font-size:24px;color:var(--color-accent)">FPTP</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--color-text-30);margin-top:4px;letter-spacing:var(--tracking-wide)">local candidate wins</div>
+            </div>
+            <div style="background:var(--color-accent-dim);border:1px solid rgba(212,160,74,0.2);border-radius:var(--radius-sm);padding:14px;text-align:center">
+              <div class="explain-label" style="margin-bottom:8px">Vote 2: Party List</div>
+              <div style="font-family:var(--font-heading);font-size:24px;color:var(--color-accent)">PR</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--color-text-30);margin-top:4px;letter-spacing:var(--tracking-wide)">top-up seats</div>
+            </div>
+          </div>
+          <div class="callout-box">Result is proportional overall. Local accountability is preserved while the final seat count reflects actual vote share.</div>
+        </div>
+      </div>
+      <div class="sys-countries">
+        <div><div class="sys-countries-count">9</div><div class="sys-countries-label">countries</div></div>
+        <div class="country-chips">
+          <a class="country-chip" href="#">&#127465;&#127466; Germany</a>
+          <a class="country-chip" href="#">&#127475;&#127487; New Zealand</a>
+          <a class="country-chip" href="#">&#127472;&#127479; South Korea</a>
+          <a class="country-chip" href="#">&#127463;&#127476; Bolivia</a>
+          <a class="country-chip" href="#">&#127473;&#127480; Lesotho</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ranked Choice -->
+  <div class="system-detail" id="ranked">
+    <div class="system-card">
+      <div class="sys-head">
+        <div class="sys-name">Ranked Choice Voting</div>
+        <div class="sys-aka">instant runoff · preferential voting · alternative vote</div>
+      </div>
+      <div class="sys-body">
+        <div class="sys-explain">
+          <div class="explain-block">
+            <div class="explain-label">How It Works</div>
+            <div class="explain-text">Voters rank candidates in order of preference (1st, 2nd, 3rd…). If no candidate has a majority, the last-place candidate is eliminated and their votes redistributed to voters' next preference. Repeat until a candidate reaches 50%+1.</div>
+          </div>
+          <div class="explain-block">
+            <div class="explain-label">Key Characteristic</div>
+            <div class="explain-text">Guarantees the winner has majority support. Reduces strategic voting. Used nationally in Australia since 1918 and adopted for presidential elections in several smaller democracies.</div>
+          </div>
+        </div>
+        <div class="sys-visual">
+          <div class="visual-label">Elimination rounds</div>
+          <div style="margin-top:12px">
+            <div style="font-family:var(--font-mono);font-weight:var(--font-weight-mono);font-size:10px;text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--color-text-30);margin-bottom:8px">Round 1</div>
+            <div class="result-row">
+              <div class="result-row-head"><span style="color:#c0392b">A</span><span>38%</span></div>
+              <div class="result-track"><div class="result-fill" style="width:38%;background:#c0392b"></div></div>
+            </div>
+            <div class="result-row">
+              <div class="result-row-head"><span style="color:#2980b9">B</span><span>35%</span></div>
+              <div class="result-track"><div class="result-fill" style="width:35%;background:#2980b9"></div></div>
+            </div>
+            <div class="result-row">
+              <div class="result-row-head"><span style="color:var(--color-accent)">C — eliminated</span><span>27%</span></div>
+              <div class="result-track"><div class="result-fill" style="width:27%;background:var(--color-accent);opacity:0.4"></div></div>
+            </div>
+            <div style="font-family:var(--font-mono);font-weight:var(--font-weight-mono);font-size:10px;text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--color-text-30);margin:14px 0 8px">Round 2 (C's votes redistributed)</div>
+            <div class="result-row">
+              <div class="result-row-head"><span style="color:#2980b9">B — winner</span><span>52%</span></div>
+              <div class="result-track"><div class="result-fill" style="width:52%;background:#2980b9"></div></div>
+            </div>
+            <div class="result-row">
+              <div class="result-row-head"><span style="color:#c0392b">A</span><span>48%</span></div>
+              <div class="result-track"><div class="result-fill" style="width:48%;background:#c0392b"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sys-countries">
+        <div><div class="sys-countries-count">4</div><div class="sys-countries-label">national level</div></div>
+        <div class="country-chips">
+          <a class="country-chip" href="#">&#127462;&#127482; Australia</a>
+          <a class="country-chip" href="#">&#127470;&#127466; Ireland (STV)</a>
+          <a class="country-chip" href="#">&#127477;&#127468; Papua New Guinea</a>
+          <a class="country-chip" href="#">&#127467;&#127471; Fiji</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two-Round -->
+  <div class="system-detail" id="trs">
+    <div class="system-card">
+      <div class="sys-head">
+        <div class="sys-name">Two-Round System</div>
+        <div class="sys-aka">runoff voting · ballotage · second round</div>
+      </div>
+      <div class="sys-body">
+        <div class="sys-explain">
+          <div class="explain-block">
+            <div class="explain-label">How It Works</div>
+            <div class="explain-text">If no candidate wins a majority (50%+1) in the first round, the top two candidates proceed to a runoff election. The runoff winner takes the seat. Most common for presidential elections.</div>
+          </div>
+          <div class="explain-block">
+            <div class="explain-label">Key Characteristic</div>
+            <div class="explain-text">Ensures every winner can claim majority legitimacy. The gap between rounds (usually 2–3 weeks) allows for coalition building and vote transfer negotiations.</div>
+          </div>
+        </div>
+        <div class="sys-visual">
+          <div class="visual-label">France — presidential example</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+            <div style="background:var(--color-card-bg);border:1px solid var(--color-card-border);border-radius:var(--radius-sm);padding:14px">
+              <div class="explain-label" style="margin-bottom:8px">Round 1</div>
+              <div style="font-family:var(--font-mono);font-weight:var(--font-weight-mono);font-size:12px;color:var(--color-text-60);line-height:1.8;letter-spacing:var(--tracking-wide)">
+                Candidate A: 28%<br>
+                Candidate B: 24%<br>
+                <span style="color:var(--color-text-30)">C: 22% · D: 14%<br>+ 4 others</span>
+              </div>
+            </div>
+            <div style="background:var(--color-accent-dim);border:1px solid rgba(212,160,74,0.2);border-radius:var(--radius-sm);padding:14px">
+              <div class="explain-label" style="margin-bottom:8px">Round 2</div>
+              <div style="font-family:var(--font-mono);font-weight:var(--font-weight-mono);font-size:12px;color:var(--color-text-85);line-height:1.8;letter-spacing:var(--tracking-wide)">
+                <span style="color:var(--color-accent)">A: 58% ✓</span><br>
+                B: 42%
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sys-countries">
+        <div><div class="sys-countries-count">88</div><div class="sys-countries-label">presidential elections</div></div>
+        <div class="country-chips">
+          <a class="country-chip" href="#">&#127467;&#127479; France</a>
+          <a class="country-chip" href="#">&#127463;&#127479; Brazil</a>
+          <a class="country-chip" href="#">&#127464;&#127476; Colombia</a>
+          <a class="country-chip" href="#">&#127477;&#127473; Poland</a>
+          <a class="country-chip" href="#">&#127472;&#127466; Kenya</a>
+          <a class="country-chip" href="#">+83 more</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleTheme() {
+  document.documentElement.classList.toggle('light');
+}
+function showSystem(id, btn) {
+  document.querySelectorAll('.sys-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.system-detail').forEach(d => d.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+</script>
+</body>
+</html>

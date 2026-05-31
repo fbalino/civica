@@ -1,0 +1,789 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Historical Trend Charts — Civica mockup</title>
+<style>
+  :root {
+    /* Civica v2 surface palette — mirrors src/app/globals.css */
+    --paper:  #FAF7F2;          /* --color-bg parchment */
+    --canvas: #FFFCF8;          /* --color-surface-elevated */
+    --alt:    #F2F4F7;          /* --color-select-bg */
+    --ink:    #0B1220;          /* --color-text-primary */
+    --ink-85: rgba(11,18,32,.88);
+    --slate:  #334155;          /* --color-text-60 */
+    --muted:  #475569;          /* --color-text-50 */
+    --stone:  #64748B;          /* --color-text-40 */
+    --pewter: #94A3B8;          /* --color-text-30 */
+    --rule:   #c4bdae;          /* parchment rule used across mockups */
+    --divider:#E4E7EC;          /* --color-divider */
+    --accent: #A87241;          /* --color-accent bronze */
+
+    /* Civica Index tier ramp — V-Dem-style */
+    --tier-exceptional: #0B3D4E;
+    --tier-strong:      #6B7566;
+    --tier-mixed:       #C9A24B;
+    --tier-weak:        #A87241;
+    --tier-failed:      #C25D3A;
+
+    /* V-Dem sub-index series colors (drawn from comparison + tier ramps) */
+    --vd-electoral:     #1A4970;  /* deep ramp navy — flagship */
+    --vd-liberal:       #2D6CDF;  /* azure */
+    --vd-participatory: #4C9F6E;  /* leaf */
+    --vd-deliberative:  #7C59C9;  /* violet */
+    --vd-egalitarian:   #C25D3A;  /* terracotta */
+    --rsf-press:        #6B7566;  /* sage — press freedom */
+    --cpi-corruption:   #C9A24B;  /* gold — corruption perceptions */
+
+    /* Comparison region series */
+    --series-region: #A87241;     /* bronze, dashed */
+
+    /* Annotation marker (events) */
+    --evt: var(--accent);
+
+    /* Signal */
+    --success: #2E7D59;
+    --danger:  #C62828;
+    --warn:    #E0A800;
+
+    --serif: Fraunces, Georgia, "Times New Roman", serif;
+    --sans:  Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono:  ui-monospace, "SF Mono", Menlo, monospace;
+
+    --r-sm: 6px;
+    --r-md: 10px;
+
+    --shadow-soft: 0 1px 2px rgba(11,18,32,.04), 0 8px 18px rgba(11,18,32,.07);
+    --shadow-md:   0 1px 2px rgba(11,18,32,.04), 0 4px 10px rgba(11,18,32,.05);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:15px; -webkit-font-smoothing:antialiased; }
+  a { color:inherit; text-decoration:none; }
+
+  .shell { max-width:1240px; margin:0 auto; padding:24px 32px 80px; }
+
+  /* ============ APP CHROME ============ */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:14px 0 16px; border-bottom:1px solid var(--divider); }
+  .brand { display:flex; align-items:center; gap:10px; }
+  .brand-mark { width:22px; height:22px; border-radius:50%; background:var(--ink); position:relative; }
+  .brand-mark::after { content:""; position:absolute; inset:5px; border-radius:50%; background:var(--accent); }
+  .brand-name { font-family:var(--serif); font-weight:500; font-size:20px; letter-spacing:-0.01em; }
+  .topnav { display:flex; gap:4px; }
+  .topnav a { font-family:var(--sans); font-size:13px; color:var(--pewter); padding:8px 12px; border-bottom:1px solid transparent; transition:color .15s; }
+  .topnav a:hover { color:var(--stone); }
+  .topnav a.on { color:var(--ink); border-bottom-color:var(--accent); }
+  .topbar-meta { display:flex; gap:14px; align-items:center; font-family:var(--mono); font-size:11px; color:var(--pewter); }
+  .pulse-dot { width:6px; height:6px; border-radius:50%; background:var(--success); display:inline-block; margin-right:5px; }
+
+  /* mockup ribbon */
+  .mockribbon { font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.12em; color:var(--pewter); padding:14px 0 6px; display:flex; gap:14px; flex-wrap:wrap; }
+  .mockribbon b { color:var(--stone); }
+
+  /* breadcrumb */
+  .crumb { font-family:var(--mono); font-size:11.5px; color:var(--pewter); margin:18px 0 6px; letter-spacing:.04em; }
+  .crumb span { color:var(--stone); }
+  .crumb .sep { margin:0 6px; color:var(--pewter); }
+
+  /* ============ COUNTRY HEADER ============ */
+  .country-head { display:flex; align-items:flex-end; gap:22px; padding-top:6px; padding-bottom:18px; }
+  .flag {
+    width:84px; height:60px; border-radius:4px; overflow:hidden;
+    box-shadow:var(--shadow-md); flex:0 0 84px; position:relative; border:1px solid var(--divider);
+  }
+  /* Brazil flag, hand-drawn SVG-ish via CSS */
+  .flag.br { background:#009C3B; }
+  .flag.br::before { content:""; position:absolute; inset:8px 8px; background:#FFDF00; clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%); }
+  .flag.br::after { content:""; position:absolute; left:50%; top:50%; width:22px; height:22px; transform:translate(-50%,-50%); background:#002776; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(255,255,255,.4); }
+  .country-title-block { display:flex; flex-direction:column; gap:6px; flex:1; }
+  .country-eyebrow { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.18em; color:var(--pewter); }
+  .country-title { font-family:var(--serif); font-size:48px; font-weight:400; line-height:1; letter-spacing:-0.025em; margin:0; }
+  .country-sub { font-family:var(--mono); font-size:12px; color:var(--stone); display:flex; gap:14px; flex-wrap:wrap; }
+  .country-sub b { color:var(--ink); font-weight:600; }
+  .country-actions { display:flex; gap:8px; }
+  .btn-ghost {
+    font-family:var(--mono); font-size:11px; padding:8px 12px; border:1px solid var(--divider); background:var(--canvas); color:var(--slate);
+    border-radius:var(--r-sm); cursor:pointer; transition:border-color .15s, background .15s;
+  }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--ink); }
+
+  /* ============ TAB STRIP ============ */
+  .tabs { display:flex; gap:0; border-bottom:1px solid var(--divider); margin-top:8px; }
+  .tab { font-family:var(--sans); font-size:13px; padding:11px 16px; color:var(--pewter); border-bottom:1px solid transparent; cursor:pointer; transition:color .15s; }
+  .tab:hover { color:var(--stone); }
+  .tab.on { color:var(--ink); border-bottom-color:var(--accent); font-weight:500; }
+  .tab .ct { color:var(--pewter); font-family:var(--mono); font-size:10px; margin-left:5px; }
+
+  /* ============ SECTION HEAD ============ */
+  .sec-head { display:flex; align-items:baseline; justify-content:space-between; gap:18px; flex-wrap:wrap; margin:30px 0 14px; }
+  .sec-title { font-family:var(--serif); font-size:24px; font-weight:400; letter-spacing:-0.015em; margin:0; }
+  .sec-desc { font-family:var(--serif); font-style:italic; font-size:14px; color:var(--muted); margin:4px 0 0; max-width:62ch; line-height:1.55; }
+  .sec-controls { display:flex; gap:8px; align-items:center; }
+
+  /* segmented toggle */
+  .seg { display:inline-flex; border:1px solid var(--divider); border-radius:var(--r-sm); overflow:hidden; background:var(--canvas); }
+  .seg button {
+    font:inherit; font-family:var(--mono); font-size:11px; padding:7px 12px; background:transparent; border:0; cursor:pointer;
+    color:var(--stone); border-right:1px solid var(--divider); letter-spacing:.04em;
+  }
+  .seg button:last-child { border-right:0; }
+  .seg button.on { background:var(--ink); color:var(--paper); }
+  .seg button:hover:not(.on) { color:var(--ink); background:var(--alt); }
+
+  /* compare toggle */
+  .compare-toggle { display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; color:var(--slate); padding:7px 11px; background:var(--canvas); border:1px solid var(--divider); border-radius:var(--r-sm); cursor:pointer; transition:border-color .15s; }
+  .compare-toggle:hover { border-color:var(--accent); }
+  .compare-toggle .sw {
+    width:26px; height:14px; border-radius:8px; background:var(--alt); position:relative; transition:background .2s;
+  }
+  .compare-toggle .sw::after { content:""; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:var(--canvas); box-shadow:0 1px 2px rgba(0,0,0,.18); transition:transform .2s; }
+  .compare-toggle.on .sw { background:var(--accent); }
+  .compare-toggle.on .sw::after { transform:translateX(12px); }
+
+  /* ============ HEADLINE CIVICA INDEX TREND ============ */
+  .headline {
+    background:var(--canvas); border:1px solid var(--divider); border-radius:var(--r-md);
+    padding:24px 26px; box-shadow:var(--shadow-md); margin-bottom:24px;
+  }
+  .headline-grid { display:grid; grid-template-columns: 260px 1fr; gap:32px; align-items:stretch; }
+  .headline-stat { display:flex; flex-direction:column; gap:10px; border-right:1px solid var(--divider); padding-right:24px; }
+  .headline-label { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.16em; color:var(--pewter); }
+  .headline-value { font-family:var(--serif); font-size:64px; font-weight:400; line-height:1; letter-spacing:-0.03em; color:var(--ink); display:flex; align-items:baseline; gap:8px; }
+  .headline-value .unit { font-size:18px; color:var(--pewter); letter-spacing:0; }
+  .headline-tier {
+    display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:11px;
+    letter-spacing:.05em; color:var(--ink); padding:4px 9px; border:1px solid var(--divider); border-radius:3px;
+    background:var(--paper); align-self:flex-start;
+  }
+  .tier-dot { width:7px; height:7px; border-radius:50%; }
+  .headline-delta { font-family:var(--mono); font-size:12.5px; color:var(--danger); display:flex; align-items:center; gap:7px; }
+  .headline-delta .arr { font-size:14px; line-height:1; }
+  .headline-delta .since { color:var(--pewter); }
+  .headline-chart { position:relative; min-height:200px; }
+
+  .headline-chart svg { width:100%; height:240px; display:block; }
+  .chart-axis-label { font-family:var(--mono); font-size:10px; fill:var(--pewter); letter-spacing:.04em; }
+  .chart-grid { stroke:var(--divider); stroke-width:0.5; stroke-dasharray:2 3; }
+  .chart-baseline { stroke:var(--stone); stroke-width:0.6; }
+
+  /* ============ METRIC ROWS (sub-indices) ============ */
+  .metric-list { display:flex; flex-direction:column; gap:1px; background:var(--divider); border:1px solid var(--divider); border-radius:var(--r-md); overflow:hidden; box-shadow:var(--shadow-md); }
+  .metric-row { background:var(--canvas); padding:18px 22px; display:grid; grid-template-columns: 1fr 64px 220px 110px 90px; gap:20px; align-items:center; cursor:pointer; transition:background .15s; }
+  .metric-row:hover { background:var(--paper); }
+  .metric-row.open { background:var(--paper); }
+
+  .metric-name { display:flex; align-items:center; gap:12px; min-width:0; }
+  .metric-color { width:3px; height:30px; border-radius:2px; flex:0 0 3px; }
+  .metric-name .lbl { display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .metric-name .lbl .ttl { font-family:var(--serif); font-size:17px; font-weight:500; color:var(--ink); letter-spacing:-0.01em; line-height:1.1; }
+  .metric-name .lbl .src { font-family:var(--mono); font-size:10.5px; color:var(--pewter); letter-spacing:.02em; }
+
+  .metric-value { font-family:var(--serif); font-size:22px; font-weight:500; color:var(--ink); text-align:right; line-height:1; letter-spacing:-0.01em; }
+
+  .metric-spark { width:100%; height:36px; display:block; }
+
+  .metric-delta { font-family:var(--mono); font-size:12px; text-align:right; display:flex; flex-direction:column; gap:2px; align-items:flex-end; }
+  .metric-delta .num { color:var(--ink); }
+  .metric-delta.up .num { color:var(--success); }
+  .metric-delta.down .num { color:var(--danger); }
+  .metric-delta .since { color:var(--pewter); font-size:10px; text-transform:uppercase; letter-spacing:.08em; }
+
+  .metric-expand {
+    font-family:var(--mono); font-size:11px; color:var(--accent); text-align:right;
+    display:inline-flex; align-items:center; gap:5px; justify-content:flex-end;
+  }
+  .metric-expand .chev { transition:transform .2s; display:inline-block; }
+  .metric-row.open .metric-expand .chev { transform:rotate(180deg); }
+
+  /* Expanded chart panel */
+  .metric-detail { display:none; background:var(--canvas); padding:0 22px 24px; border-top:1px dashed var(--divider); }
+  .metric-row.open + .metric-detail { display:block; }
+  .metric-detail-inner { padding-top:18px; display:grid; grid-template-columns: 1fr 280px; gap:28px; }
+  .metric-detail svg { width:100%; height:280px; display:block; }
+  .events-list { display:flex; flex-direction:column; gap:0; }
+  .events-head { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.14em; color:var(--pewter); margin-bottom:10px; }
+  .event {
+    display:grid; grid-template-columns:46px 1fr; gap:12px; padding:9px 0; border-top:1px solid var(--divider);
+    align-items:start;
+  }
+  .event:first-of-type { border-top:0; padding-top:2px; }
+  .event-year { font-family:var(--serif); font-size:17px; font-weight:500; color:var(--accent); line-height:1.1; }
+  .event-body { display:flex; flex-direction:column; gap:3px; }
+  .event-title { font-family:var(--sans); font-size:13px; color:var(--ink); line-height:1.35; font-weight:500; }
+  .event-kind { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--pewter); }
+
+  /* Tooltip pinned in chart area */
+  .chart-tip {
+    position:absolute; background:var(--canvas); border:1px solid var(--divider); border-radius:var(--r-sm);
+    box-shadow:var(--shadow-soft); padding:9px 12px; font-family:var(--mono); font-size:11px; color:var(--slate);
+    pointer-events:none;
+    transition:opacity .15s, transform .15s;
+  }
+  .chart-tip .year { color:var(--ink); font-weight:600; margin-right:8px; }
+  .chart-tip .val  { color:var(--ink); font-weight:600; }
+  .chart-tip .region { color:var(--accent); display:block; margin-top:3px; }
+
+  /* Series legend (in expanded view, when compare is on) */
+  .series-legend { display:flex; gap:14px; flex-wrap:wrap; margin-top:10px; font-family:var(--mono); font-size:11px; color:var(--stone); }
+  .series-legend span { display:inline-flex; align-items:center; gap:6px; }
+  .series-legend .swatch { width:14px; height:3px; border-radius:1px; }
+  .series-legend .swatch.dash { background:repeating-linear-gradient(90deg, var(--accent) 0 4px, transparent 4px 7px); height:2px; }
+
+  /* annotation marker dot on charts */
+  .evt-dot { fill:var(--canvas); stroke:var(--accent); stroke-width:1.6; }
+  .evt-label { font-family:var(--mono); font-size:10px; fill:var(--accent); }
+
+  /* ============ NARRATIVE STRIP ============ */
+  .narrative {
+    margin-top:30px; padding:22px 24px; background:var(--paper); border-left:3px solid var(--accent);
+    border-radius:0 var(--r-sm) var(--r-sm) 0;
+  }
+  .narrative h4 { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.16em; color:var(--accent); margin:0 0 8px; font-weight:500; }
+  .narrative p { font-family:var(--serif); font-size:16px; line-height:1.55; color:var(--ink-85); margin:0; max-width:78ch; }
+
+  /* ============ FOOTER ============ */
+  .footer { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-top:48px; padding-top:18px; border-top:1px solid var(--divider); font-family:var(--mono); font-size:11px; color:var(--pewter); flex-wrap:wrap; }
+  .footer .legend { display:flex; gap:14px; flex-wrap:wrap; }
+  .footer .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .footer .legend .dot { width:6px; height:6px; border-radius:50%; }
+
+  /* responsive */
+  @media (max-width:980px) {
+    .headline-grid { grid-template-columns:1fr; }
+    .headline-stat { border-right:0; border-bottom:1px solid var(--divider); padding:0 0 18px; }
+    .metric-row { grid-template-columns: 1fr 60px 90px; row-gap:8px; }
+    .metric-spark { grid-column:1 / -1; height:30px; }
+    .metric-delta { grid-column:1 / 3; align-items:flex-start; }
+    .metric-detail-inner { grid-template-columns:1fr; }
+    .country-title { font-size:34px; }
+    .country-head { gap:14px; }
+    .flag { width:62px; height:44px; flex-basis:62px; }
+    .topnav { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ===== APP CHROME ===== -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">Civica</div>
+    </div>
+    <nav class="topnav">
+      <a href="#">Atlas</a>
+      <a href="#" class="on">Countries</a>
+      <a href="#">Civica Index</a>
+      <a href="#">Government Types</a>
+      <a href="#">The Record</a>
+      <a href="#">Methodology</a>
+    </nav>
+    <div class="topbar-meta">
+      <span><span class="pulse-dot"></span>Pulse · synced 2 min ago</span>
+    </div>
+  </div>
+
+  <div class="mockribbon">
+    <span><b>Mockup</b></span>
+    <span>Historical Trend Charts on Country Detail Pages</span>
+    <span>Post-Q2 Tier-1 opportunity · CIV-214 Session 9 follow-up</span>
+    <span>2026-05-24</span>
+  </div>
+
+  <!-- ===== BREADCRUMB ===== -->
+  <div class="crumb">Atlas <span class="sep">/</span> South America <span class="sep">/</span> <span>Brazil</span></div>
+
+  <!-- ===== COUNTRY HEADER ===== -->
+  <div class="country-head">
+    <div class="flag br" aria-label="Brazil flag"></div>
+    <div class="country-title-block">
+      <div class="country-eyebrow">Federative Republic · South America</div>
+      <h1 class="country-title">Brazil</h1>
+      <div class="country-sub">
+        <span>Capital · <b>Brasília</b></span>
+        <span>Pop · <b>216M</b></span>
+        <span>Gov · <b>Federal presidential republic</b></span>
+        <span>Independence · <b>1822</b></span>
+      </div>
+    </div>
+    <div class="country-actions">
+      <button class="btn-ghost">Compare</button>
+      <button class="btn-ghost">Embed</button>
+      <button class="btn-ghost">Download CSV</button>
+    </div>
+  </div>
+
+  <!-- ===== TAB STRIP ===== -->
+  <div class="tabs">
+    <div class="tab">Overview</div>
+    <div class="tab">Government</div>
+    <div class="tab on">Democracy <span class="ct">7</span></div>
+    <div class="tab">Elections</div>
+    <div class="tab">Leadership</div>
+    <div class="tab">Constitution</div>
+    <div class="tab">The Record</div>
+  </div>
+
+  <!-- ===== SECTION HEAD ===== -->
+  <div class="sec-head">
+    <div>
+      <h2 class="sec-title">Democratic trajectory, 2000–2025</h2>
+      <p class="sec-desc">A snapshot is a number; a trajectory is a story. The headline Civica Index sits on top, with V-Dem's five sub-indices and two outcome measures (press freedom, corruption perceptions) below — each with its own spark, annotated events, and an optional comparison against the South America regional average.</p>
+    </div>
+    <div class="sec-controls">
+      <div class="seg" role="group" aria-label="Time range">
+        <button>10y</button>
+        <button class="on">25y</button>
+        <button>All</button>
+      </div>
+      <button id="compareBtn" class="compare-toggle on" type="button" aria-pressed="true">
+        <span class="sw"></span>
+        <span>Compare · South America avg</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== HEADLINE CIVICA INDEX TREND ===== -->
+  <div class="headline">
+    <div class="headline-grid">
+      <div class="headline-stat">
+        <div class="headline-label">Civica Index · 2025</div>
+        <div class="headline-value">68 <span class="unit">/ 100</span></div>
+        <div class="headline-tier"><span class="tier-dot" style="background:var(--tier-mixed)"></span>Mixed democracy</div>
+        <div class="headline-delta">
+          <span class="arr">▾</span>
+          <span class="num">−9.4 since 2014 peak</span>
+        </div>
+        <div class="headline-delta" style="color:var(--stone)">
+          <span class="arr" style="color:var(--success)">▴</span>
+          <span class="num" style="color:var(--success)">+2.1 vs 2022</span>
+          <span class="since">recovery year</span>
+        </div>
+      </div>
+
+      <div class="headline-chart" id="headlineChart">
+        <!-- main civica index trend, rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== METRIC LIST ===== -->
+  <div class="metric-list" id="metricList">
+    <!-- rendered by JS -->
+  </div>
+
+  <!-- ===== NARRATIVE ===== -->
+  <div class="narrative">
+    <h4>What the trajectory tells us</h4>
+    <p>Brazil's democratic indices climbed steadily from 2003 through the 2014 peak, then fell sharply through impeachment, Operation Car Wash, and the 2018–2022 administration. The 2023 transition produced a partial recovery in liberal and electoral components — but the egalitarian and press-freedom scores remain well below their decade highs. Every sub-index now sits beneath the South America regional average.</p>
+  </div>
+
+  <div class="footer">
+    <div class="legend">
+      <span><span class="dot" style="background:var(--success)"></span>Live source</span>
+      <span><span class="dot" style="background:var(--warn)"></span>Frozen snapshot</span>
+      <span>V-Dem v14 · RSF 2026 · TI CPI 2024</span>
+    </div>
+    <div>Mockup · self-contained · sample data illustrative only · ~3 engineer-days, frontend-only, no schema changes (pulse/CI series already in DB per CIV-214 Session 9)</div>
+  </div>
+
+</div>
+
+<script>
+/* ==========================================================
+   Sample annual series 2000–2025 (illustrative, hand-tuned)
+   Each value is on its own native scale; we normalize to 0–100
+   for sparklines so they read consistently.
+   ========================================================== */
+
+const YEARS = Array.from({length:26}, (_,i)=>2000+i);
+
+const METRICS = [
+  {
+    id:'civica',
+    name:'Civica Index',
+    src:'Composite · V-Dem v14 + RSF + TI CPI',
+    color:'var(--tier-exceptional)',
+    scale:[0,100], unit:'/100',
+    series:[58,60,62,65,68,71,73,75,76,76,77,77,77,77,77.4,76.5,73,70,67,64,63,62,65.9,67,67.6,68],
+    region:[55,56,57,58,60,62,63,64,65,65,66,66,66,67,67,66,65,64,63,62,62,63,64,65,65.4,66],
+    events:[
+      {year:2014, kind:'Peak', text:'V-Dem and CI hit decade high (77.4)'},
+      {year:2016, kind:'Impeachment', text:'Dilma Rousseff removed from office'},
+      {year:2018, kind:'Election', text:'Bolsonaro elected president'},
+      {year:2022, kind:'Election', text:'Lula returns; peaceful transition Jan 2023'},
+    ],
+  },
+  {
+    id:'electoral',
+    name:'Electoral democracy',
+    src:'V-Dem · polyarchy index',
+    color:'var(--vd-electoral)',
+    scale:[0,1], unit:'',
+    series:[0.66,0.68,0.70,0.72,0.74,0.76,0.78,0.79,0.80,0.80,0.81,0.81,0.81,0.81,0.815,0.81,0.79,0.76,0.72,0.69,0.68,0.67,0.71,0.73,0.74,0.745],
+    region:[0.62,0.63,0.64,0.65,0.67,0.69,0.70,0.71,0.72,0.72,0.73,0.73,0.73,0.74,0.74,0.73,0.72,0.71,0.70,0.69,0.69,0.70,0.71,0.72,0.725,0.73],
+    events:[
+      {year:2014, kind:'Peak', text:'Highest polyarchy score on record (0.815)'},
+      {year:2018, kind:'Election integrity', text:'Disinformation surge during campaign'},
+      {year:2022, kind:'Transition', text:'Free, fair election; institutions held'},
+    ],
+  },
+  {
+    id:'liberal',
+    name:'Liberal component',
+    src:'V-Dem · constraints on the executive',
+    color:'var(--vd-liberal)',
+    scale:[0,1], unit:'',
+    series:[0.68,0.70,0.72,0.74,0.76,0.77,0.78,0.79,0.80,0.80,0.80,0.80,0.80,0.79,0.79,0.78,0.74,0.70,0.65,0.61,0.59,0.58,0.62,0.65,0.66,0.67],
+    region:[0.63,0.64,0.65,0.66,0.68,0.70,0.71,0.72,0.72,0.73,0.73,0.73,0.73,0.73,0.73,0.72,0.71,0.70,0.69,0.68,0.68,0.69,0.70,0.71,0.72,0.72],
+    events:[
+      {year:2017, kind:'Court ruling', text:'STF curbs presidential decree authority'},
+      {year:2020, kind:'Backsliding', text:'Conflicts between executive and judiciary'},
+      {year:2023, kind:'Recovery', text:'New AG restores prosecutorial independence'},
+    ],
+  },
+  {
+    id:'participatory',
+    name:'Participatory component',
+    src:'V-Dem · civil society participation',
+    color:'var(--vd-participatory)',
+    scale:[0,1], unit:'',
+    series:[0.58,0.59,0.61,0.63,0.65,0.66,0.67,0.68,0.69,0.69,0.70,0.70,0.70,0.69,0.69,0.68,0.66,0.64,0.61,0.58,0.57,0.57,0.60,0.62,0.63,0.64],
+    region:[0.55,0.56,0.57,0.58,0.59,0.60,0.61,0.62,0.62,0.63,0.63,0.63,0.63,0.63,0.62,0.62,0.61,0.60,0.60,0.59,0.59,0.60,0.61,0.62,0.62,0.63],
+    events:[
+      {year:2013, kind:'Movement', text:'June 2013 protests; engagement spike'},
+      {year:2019, kind:'CSO contraction', text:'NGO funding restrictions enacted'},
+    ],
+  },
+  {
+    id:'deliberative',
+    name:'Deliberative component',
+    src:'V-Dem · reasoned public debate',
+    color:'var(--vd-deliberative)',
+    scale:[0,1], unit:'',
+    series:[0.62,0.63,0.65,0.67,0.69,0.71,0.72,0.73,0.74,0.74,0.74,0.74,0.74,0.73,0.72,0.71,0.68,0.65,0.61,0.58,0.56,0.56,0.59,0.62,0.63,0.64],
+    region:[0.58,0.59,0.60,0.61,0.63,0.64,0.65,0.66,0.67,0.67,0.67,0.67,0.67,0.67,0.66,0.66,0.65,0.64,0.63,0.62,0.62,0.63,0.64,0.65,0.65,0.66],
+    events:[
+      {year:2018, kind:'Polarization', text:'Sharp decline in deliberative quality'},
+      {year:2021, kind:'Disinformation', text:'Coordinated disinformation networks identified'},
+    ],
+  },
+  {
+    id:'egalitarian',
+    name:'Egalitarian component',
+    src:'V-Dem · equal protection & access',
+    color:'var(--vd-egalitarian)',
+    scale:[0,1], unit:'',
+    series:[0.45,0.46,0.48,0.50,0.53,0.55,0.57,0.59,0.61,0.62,0.63,0.63,0.63,0.63,0.62,0.61,0.58,0.55,0.51,0.48,0.46,0.45,0.48,0.50,0.51,0.52],
+    region:[0.42,0.43,0.44,0.45,0.47,0.49,0.50,0.51,0.52,0.53,0.54,0.54,0.54,0.54,0.54,0.53,0.52,0.51,0.50,0.49,0.49,0.50,0.51,0.52,0.53,0.53],
+    events:[
+      {year:2003, kind:'Policy', text:'Bolsa Família launched'},
+      {year:2016, kind:'Austerity', text:'Constitutional spending cap enacted'},
+      {year:2020, kind:'Pandemic', text:'COVID widened access gaps'},
+    ],
+  },
+  {
+    id:'press',
+    name:'Press freedom',
+    src:'RSF World Press Freedom Index',
+    color:'var(--rsf-press)',
+    scale:[0,100], unit:'/100',
+    series:[70,69,68,67,66,65,64,64,63,62,62,62,62,61,61,60,58,56,54,52,52,54,55,57,58,58.6],
+    region:[68,67,66,66,65,64,64,63,63,62,62,62,61,61,61,60,60,59,58,57,57,58,59,60,61,62],
+    events:[
+      {year:2018, kind:'Hostility', text:'Public hostility toward journalists rises'},
+      {year:2022, kind:'Recovery', text:'Attacks on press decline post-election'},
+    ],
+  },
+  {
+    id:'cpi',
+    name:'Corruption perceptions',
+    src:'Transparency International CPI',
+    color:'var(--cpi-corruption)',
+    scale:[0,100], unit:'/100',
+    series:[39,40,40,39,38,37,33,35,35,37,37,38,43,42,43,38,40,37,35,35,38,38,38,36,36,36],
+    region:[35,35,36,36,36,36,36,36,36,37,37,37,38,38,38,37,37,37,37,37,38,38,38,38,38,38],
+    events:[
+      {year:2014, kind:'Investigation', text:'Operation Car Wash begins'},
+      {year:2016, kind:'Scandal', text:'Petrobras corruption exposed at scale'},
+      {year:2023, kind:'Reform', text:'New transparency measures introduced'},
+    ],
+  },
+];
+
+/* ==========================================================
+   Chart rendering helpers
+   ========================================================== */
+
+let compareOn = true;
+
+function resolveColor(cssVar){
+  // accept either a color string or a CSS variable like 'var(--vd-electoral)'
+  if(!cssVar.startsWith('var(')) return cssVar;
+  const name = cssVar.slice(4, -1);
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function scaleY(v, [min,max], h, pad){
+  const usable = h - pad*2;
+  const t = (v - min) / (max - min);
+  return pad + (1 - t) * usable;
+}
+
+function buildPath(points){
+  if(!points.length) return '';
+  return points.map((p,i)=>(i===0?'M':'L') + p.x.toFixed(2) + ' ' + p.y.toFixed(2)).join(' ');
+}
+
+function buildSmoothPath(points){
+  if(points.length < 2) return buildPath(points);
+  let d = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
+  for(let i=1; i<points.length; i++){
+    const p0 = points[i-1], p1 = points[i];
+    const cx = (p0.x + p1.x) / 2;
+    d += ` C ${cx.toFixed(2)} ${p0.y.toFixed(2)}, ${cx.toFixed(2)} ${p1.y.toFixed(2)}, ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}`;
+  }
+  return d;
+}
+
+/* ---- SPARKLINE (small inline, no axes) ---- */
+function renderSpark(metric){
+  const w = 220, h = 36, padX = 2, padY = 4;
+  const ys = metric.series;
+  const min = Math.min(...ys), max = Math.max(...ys);
+  // pad scale by 8% so spark is not flush with edges
+  const span = Math.max(max - min, 1e-6);
+  const lo = min - span*0.10, hi = max + span*0.10;
+  const points = ys.map((v,i)=>({
+    x: padX + (i/(ys.length-1)) * (w - padX*2),
+    y: scaleY(v, [lo,hi], h, padY),
+  }));
+  const area = buildSmoothPath(points)
+    + ` L ${points[points.length-1].x.toFixed(2)} ${h-padY} L ${points[0].x.toFixed(2)} ${h-padY} Z`;
+  const stroke = resolveColor(metric.color);
+  // current point dot
+  const last = points[points.length-1];
+  // baseline (region avg endpoint) as tiny dashed
+  let regionPath = '';
+  if(compareOn){
+    const rpts = metric.region.map((v,i)=>({
+      x: padX + (i/(metric.region.length-1)) * (w - padX*2),
+      y: scaleY(v, [lo,hi], h, padY),
+    }));
+    regionPath = `<path d="${buildSmoothPath(rpts)}" fill="none" stroke="${resolveColor('var(--accent)')}" stroke-width="1" stroke-dasharray="2 2" opacity="0.55"/>`;
+  }
+  return `
+    <svg class="metric-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="sg-${metric.id}" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="${stroke}" stop-opacity="0.18"/>
+          <stop offset="100%" stop-color="${stroke}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${area}" fill="url(#sg-${metric.id})" stroke="none"/>
+      <path d="${buildSmoothPath(points)}" fill="none" stroke="${stroke}" stroke-width="1.6"/>
+      ${regionPath}
+      <circle cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="2.4" fill="${stroke}"/>
+    </svg>
+  `;
+}
+
+/* ---- BIG CHART (axes, gridlines, annotations) ---- */
+function renderBigChart(metric, {height=280, headline=false}={}){
+  const w = 880;
+  const h = height;
+  const padL = 36, padR = headline?20:24, padT = headline?16:18, padB = 30;
+  const ys = metric.series;
+  // For the headline we use the metric's own [scale]. For sub-indices we
+  // also use [scale], not the data min/max, so the scale's meaning is
+  // visible (e.g. 0–1 for V-Dem components).
+  const [smin,smax] = metric.scale;
+  const innerW = w - padL - padR;
+  const innerH = h - padT - padB;
+
+  // x positions per year
+  const xAt = i => padL + (i/(YEARS.length-1)) * innerW;
+  // y from value
+  const yAt = v => padT + (1 - (v-smin)/(smax-smin)) * innerH;
+
+  const points  = ys.map((v,i)=>({x:xAt(i), y:yAt(v), v, year:YEARS[i]}));
+  const rpoints = metric.region.map((v,i)=>({x:xAt(i), y:yAt(v), v, year:YEARS[i]}));
+
+  // y-axis ticks (4)
+  const ticks = 4;
+  const tickVals = Array.from({length:ticks+1}, (_,k)=> smin + (smax-smin) * (k/ticks));
+  const tickLines = tickVals.map(tv => {
+    const y = yAt(tv).toFixed(2);
+    const label = (smax<=1) ? tv.toFixed(2) : Math.round(tv);
+    return `
+      <line class="chart-grid" x1="${padL}" x2="${w-padR}" y1="${y}" y2="${y}"/>
+      <text class="chart-axis-label" x="${padL-8}" y="${y}" text-anchor="end" dominant-baseline="middle">${label}</text>
+    `;
+  }).join('');
+
+  // x-axis years (every 5)
+  const xTicks = YEARS.map((yr,i)=>{
+    if(yr%5!==0) return '';
+    const x = xAt(i).toFixed(2);
+    return `<text class="chart-axis-label" x="${x}" y="${h-8}" text-anchor="middle">${yr}</text>`;
+  }).join('');
+
+  const stroke = resolveColor(metric.color);
+
+  // Area under line
+  const area = buildSmoothPath(points)
+    + ` L ${points[points.length-1].x.toFixed(2)} ${h-padB} L ${points[0].x.toFixed(2)} ${h-padB} Z`;
+
+  // Compare region (dashed)
+  const regionPath = compareOn
+    ? `<path d="${buildSmoothPath(rpoints)}" fill="none" stroke="${resolveColor('var(--accent)')}" stroke-width="1.4" stroke-dasharray="4 3" opacity="0.75"/>`
+    : '';
+
+  // Annotations: marker dot + vertical guide + tiny label
+  const evtMarkers = (metric.events||[]).map(ev=>{
+    const i = YEARS.indexOf(ev.year); if(i<0) return '';
+    const x = xAt(i).toFixed(2);
+    const y = yAt(ys[i]).toFixed(2);
+    return `
+      <line class="chart-grid" x1="${x}" x2="${x}" y1="${padT}" y2="${h-padB}" stroke-dasharray="1 4" stroke="${resolveColor('var(--accent)')}" opacity="0.45"/>
+      <circle class="evt-dot" cx="${x}" cy="${y}" r="4"/>
+      <text class="evt-label" x="${x}" y="${padT-4}" text-anchor="middle">${ev.year}</text>
+    `;
+  }).join('');
+
+  // Current value marker
+  const last = points[points.length-1];
+  const lastVal = (smax<=1) ? last.v.toFixed(2) : last.v.toFixed(1);
+
+  return `
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="big-${metric.id}" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="${stroke}" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="${stroke}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${tickLines}
+      ${xTicks}
+      <path d="${area}" fill="url(#big-${metric.id})" stroke="none"/>
+      ${regionPath}
+      <path d="${buildSmoothPath(points)}" fill="none" stroke="${stroke}" stroke-width="2"/>
+      ${evtMarkers}
+      <circle cx="${last.x.toFixed(2)}" cy="${last.y.toFixed(2)}" r="4" fill="${stroke}" stroke="${resolveColor('var(--canvas)')}" stroke-width="1.5"/>
+      <text x="${(last.x-10).toFixed(2)}" y="${(last.y-10).toFixed(2)}" text-anchor="end" font-family="ui-monospace" font-size="11" fill="${stroke}" font-weight="600">${lastVal}</text>
+    </svg>
+  `;
+}
+
+/* ==========================================================
+   Render metric list
+   ========================================================== */
+
+function delta(metric){
+  const ys = metric.series;
+  const cur = ys[ys.length-1], yago = ys[ys.length-2];
+  const d = cur - yago;
+  const isPct = metric.scale[1]<=1;
+  const fmt = isPct ? d.toFixed(3) : d.toFixed(1);
+  return {value:d, label:(d>=0?'+':'')+fmt, dir:d>0?'up':d<0?'down':'flat'};
+}
+
+function fmtVal(metric){
+  const v = metric.series[metric.series.length-1];
+  return metric.scale[1]<=1 ? v.toFixed(3) : v.toFixed(1);
+}
+
+function renderHeadline(){
+  const m = METRICS[0];
+  document.getElementById('headlineChart').innerHTML = renderBigChart(m, {height:240, headline:true});
+}
+
+function renderMetricList(){
+  const list = document.getElementById('metricList');
+  // sub-indices = everything except the headline
+  const subs = METRICS.slice(1);
+  list.innerHTML = subs.map(m => {
+    const d = delta(m);
+    return `
+      <div class="metric-row" data-id="${m.id}">
+        <div class="metric-name">
+          <div class="metric-color" style="background:${resolveColor(m.color)}"></div>
+          <div class="lbl">
+            <div class="ttl">${m.name}</div>
+            <div class="src">${m.src}</div>
+          </div>
+        </div>
+        <div class="metric-value">${fmtVal(m)}</div>
+        ${renderSpark(m)}
+        <div class="metric-delta ${d.dir}">
+          <span class="num">${d.label}</span>
+          <span class="since">vs 2024</span>
+        </div>
+        <div class="metric-expand"><span>Expand</span><span class="chev">▾</span></div>
+      </div>
+      <div class="metric-detail" data-detail="${m.id}">
+        <div class="metric-detail-inner">
+          <div>
+            <div style="position:relative">${renderBigChart(m)}</div>
+            <div class="series-legend">
+              <span><span class="swatch" style="background:${resolveColor(m.color)}"></span>Brazil</span>
+              ${compareOn?`<span><span class="swatch dash"></span>South America avg</span>`:''}
+              <span><span class="swatch" style="background:var(--canvas);border:1.6px solid var(--accent);width:10px;height:10px;border-radius:50%"></span>Annotated event</span>
+            </div>
+          </div>
+          <div class="events-list">
+            <div class="events-head">Key events</div>
+            ${(m.events||[]).slice().reverse().map(ev=>`
+              <div class="event">
+                <div class="event-year">${ev.year}</div>
+                <div class="event-body">
+                  <div class="event-kind">${ev.kind}</div>
+                  <div class="event-title">${ev.text}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // wire up click-to-expand (one open at a time, but allow toggle off)
+  list.querySelectorAll('.metric-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const wasOpen = row.classList.contains('open');
+      list.querySelectorAll('.metric-row.open').forEach(r => r.classList.remove('open'));
+      if(!wasOpen) row.classList.add('open');
+    });
+  });
+
+  // open the first sub-metric by default so reviewers see the expanded view immediately
+  const first = list.querySelector('.metric-row');
+  if(first) first.classList.add('open');
+}
+
+/* compare toggle */
+document.getElementById('compareBtn').addEventListener('click', (e) => {
+  compareOn = !compareOn;
+  const btn = e.currentTarget;
+  btn.classList.toggle('on', compareOn);
+  btn.setAttribute('aria-pressed', String(compareOn));
+  renderHeadline();
+  renderMetricList();
+});
+
+/* time-range segmented (visual only — sample data is fixed) */
+document.querySelectorAll('.seg button').forEach(b => {
+  b.addEventListener('click', () => {
+    b.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+  });
+});
+
+renderHeadline();
+renderMetricList();
+</script>
+</body>
+</html>

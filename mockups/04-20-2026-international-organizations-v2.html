@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica — Atlas International Mode (v2)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #16140f;
+    --surface: #221e16;
+    --surface2: #2b2619;
+    --card-border: #3d382d;
+    --hover-border: #8a8370;
+    --divider: #3d382d;
+    --text: #ebe6d6;
+    --text-85: rgba(235,230,214,0.88);
+    --text-60: #c4bdae;
+    --text-40: #8a8370;
+    --accent: #D4A04A;
+    --exec: #D4764E;
+    --legis: #4E8BD4;
+    --judic: #5CAA6E;
+    --purple: #9B6DC6;
+    --radius: 4px;
+    --font: 'Inter', -apple-system, sans-serif;
+    --serif: 'Fraunces', Georgia, serif;
+    --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    --shadow: 4px 4px 0 #000;
+  }
+  .light {
+    --bg: #f4f1ea;
+    --surface: #ebe6d6;
+    --surface2: #e2dcc8;
+    --card-border: #c4bdae;
+    --hover-border: #8a8370;
+    --divider: #c4bdae;
+    --text: #1a1a1a;
+    --text-85: rgba(26,26,26,0.82);
+    --text-60: #3d382d;
+    --text-40: #8a8370;
+    --shadow: 4px 4px 0 #1a1a1a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.55; }
+
+  /* NAV */
+  nav {
+    background: color-mix(in oklab, var(--bg) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--divider);
+    padding: 0 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 48px; position: sticky; top: 0; z-index: 200;
+  }
+  .nav-logo { font-family: var(--serif); font-size: 17px; font-weight: 400; color: var(--text); letter-spacing: -0.02em; }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 24px; list-style: none; }
+  .nav-links a { color: var(--text-40); text-decoration: none; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .nav-links a.active { color: var(--text); }
+  .nav-links a.page-active { color: var(--accent); font-weight: 600; }
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+  .theme-btn {
+    background: var(--surface); border: 1px solid var(--card-border); border-radius: var(--radius);
+    padding: 4px 9px; color: var(--text-60); cursor: pointer; font-size: 11px; font-family: var(--mono);
+  }
+  .theme-btn:hover { border-color: var(--hover-border); color: var(--text); }
+
+  /* DEMO TOGGLE BAR */
+  /* ========================
+     PAGE-LEVEL SWITCHER
+     ======================== */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ========================
+     CORRECT ATLAS LAYOUT (v2)
+     Left = countries/orgs
+     Center = tab content (chamber, bills, etc.)
+     Right = Ask Civica chatbot
+     ======================== */
+  .atlas-correct {
+    display: grid;
+    grid-template-columns: 280px 1fr 360px;
+    height: calc(100vh - 48px);
+    overflow: hidden;
+  }
+
+  /* ---- Left pane (same as existing) ---- */
+  .ac-left {
+    background: var(--surface);
+    border-right: 1px solid var(--divider);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ---- Center pane: Explore panel ---- */
+  .ac-center {
+    background: var(--bg);
+    display: flex; flex-direction: column; overflow: hidden;
+    border-right: 1px solid var(--divider);
+  }
+
+  /* Mode bar (Atlas / Explore / Compare) */
+  .ac-mode-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; height: 40px; border-bottom: 1px solid var(--divider);
+    flex-shrink: 0; background: var(--surface);
+  }
+  .ac-mode-btns { display: flex; gap: 2px; }
+  .ac-mode-btn {
+    padding: 4px 12px; border-radius: var(--radius); font-size: 12px; font-weight: 500;
+    border: 1px solid transparent; background: transparent; color: var(--text-40);
+    cursor: pointer; font-family: var(--font); transition: all 0.1s;
+  }
+  .ac-mode-btn.on { border-color: var(--card-border); background: var(--surface2); color: var(--text); }
+  .ac-mode-btn:hover:not(.on) { color: var(--text-60); }
+  .ac-region-select {
+    background: var(--surface2); border: 1px solid var(--card-border); border-radius: var(--radius);
+    padding: 4px 8px; color: var(--text-60); font-size: 12px; font-family: var(--font); outline: none;
+  }
+
+  /* Country header */
+  .ac-country-hdr {
+    padding: 12px 18px 0; border-bottom: 1px solid var(--divider); flex-shrink: 0;
+    background: var(--surface);
+  }
+  .ac-country-title { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
+  .ac-country-title .cflag { font-size: 24px; line-height: 1; }
+  .ac-country-title h2 { font-family: var(--serif); font-size: 20px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; }
+  .ac-gov-tag {
+    font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 2px 6px; border-radius: 2px; background: rgba(78,139,212,0.12); border: 1px solid rgba(78,139,212,0.3); color: #4E8BD4;
+  }
+  .ac-house-toggle {
+    display: flex; gap: 4px; margin-left: auto;
+  }
+  .ac-house-btn {
+    font-family: var(--mono); font-size: 10px; padding: 3px 8px; border-radius: var(--radius);
+    border: 1px solid var(--card-border); background: transparent; color: var(--text-40); cursor: pointer;
+  }
+  .ac-house-btn.on { border-color: var(--legis); color: var(--legis); background: rgba(78,139,212,0.08); }
+
+  /* Tab bar */
+  .ac-tabs { display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-shrink: 0; }
+  .ac-tabs::-webkit-scrollbar { display: none; }
+  .ac-tab {
+    padding: 9px 14px; font-size: 12px; color: var(--text-40); cursor: pointer; background: none; border: none;
+    border-bottom: 2px solid transparent; font-family: var(--font); white-space: nowrap;
+    transition: all 0.1s; margin-bottom: -1px; font-weight: 500;
+  }
+  .ac-tab:hover { color: var(--text-60); }
+  .ac-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .ac-tab.new-tab { position: relative; }
+  .ac-tab.new-tab::after {
+    content: 'NEW'; font-family: var(--mono); font-size: 7px; letter-spacing: 0.1em;
+    background: var(--accent); color: var(--bg); border-radius: 2px;
+    padding: 1px 3px; position: absolute; top: 5px; right: 4px;
+  }
+
+  /* Center body */
+  .ac-body { flex: 1; overflow-y: auto; padding: 20px 20px; }
+  .ac-body::-webkit-scrollbar { width: 4px; }
+  .ac-body::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 2px; }
+
+  /* Empty/map state (when no country selected or Chamber tab) */
+  .ac-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-40); text-align: center; gap: 12px; }
+  .ac-empty-icon { font-size: 36px; opacity: 0.4; }
+  .ac-empty-msg { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; }
+  .ac-empty-sub { font-size: 12px; color: var(--text-40); max-width: 260px; line-height: 1.5; }
+
+  /* Inline mini-map for International tab (inside center body) */
+  .intl-mini-map {
+    background: var(--surface); border: 1px solid var(--card-border); border-radius: var(--radius);
+    padding: 14px; margin-bottom: 16px;
+  }
+  .intl-mini-map-title { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-40); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+  .intl-mini-map-title span { color: var(--text-60); font-size: 11px; text-transform: none; letter-spacing: 0; }
+
+  /* Summary stats row */
+  .intl-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
+  .intl-stat-sm { background: var(--surface); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 10px 12px; }
+  .intl-stat-sm-val { font-family: var(--mono); font-size: 20px; font-weight: 500; color: var(--text); line-height: 1; margin-bottom: 2px; }
+  .intl-stat-sm-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-40); }
+
+  /* ---- Right pane: Ask Civica chatbot ---- */
+  .ac-right {
+    background: var(--surface);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .ac-chat-header {
+    padding: 0 16px; height: 40px; border-bottom: 1px solid var(--divider);
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  }
+  .ac-chat-title { font-family: var(--serif); font-size: 15px; font-weight: 400; letter-spacing: -0.01em; }
+  .ac-chat-badge {
+    font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em;
+    padding: 2px 6px; border-radius: 2px; border: 1px solid var(--judic); color: var(--judic);
+    background: rgba(92,170,110,0.08);
+  }
+  .ac-chat-messages { flex: 1; overflow-y: auto; padding: 14px 14px; display: flex; flex-direction: column; gap: 12px; }
+  .ac-chat-messages::-webkit-scrollbar { width: 4px; }
+  .ac-chat-messages::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 2px; }
+  .ac-msg { max-width: 88%; }
+  .ac-msg.ai { align-self: flex-start; }
+  .ac-msg.user { align-self: flex-end; }
+  .ac-msg-bubble {
+    padding: 9px 12px; border-radius: var(--radius); font-size: 13px; line-height: 1.5;
+    border: 1px solid var(--card-border);
+  }
+  .ac-msg.ai .ac-msg-bubble { background: var(--bg); border-color: var(--card-border); }
+  .ac-msg.user .ac-msg-bubble { background: rgba(212,160,74,0.1); border-color: rgba(212,160,74,0.25); color: var(--text-85); }
+  .ac-msg-cite { font-family: var(--mono); font-size: 10px; color: var(--text-40); margin-top: 4px; padding-left: 2px; }
+  .ac-chat-input-wrap {
+    padding: 10px 12px; border-top: 1px solid var(--divider); display: flex; gap: 8px; flex-shrink: 0;
+  }
+  .ac-chat-input {
+    flex: 1; background: var(--bg); border: 1px solid var(--card-border); border-radius: var(--radius);
+    padding: 8px 10px; color: var(--text); font-size: 13px; font-family: var(--font); outline: none; resize: none;
+    min-height: 36px; max-height: 80px;
+  }
+  .ac-chat-input:focus { border-color: var(--hover-border); }
+  .ac-chat-send {
+    background: var(--accent); border: none; border-radius: var(--radius); padding: 8px 12px;
+    color: var(--bg); font-size: 13px; cursor: pointer; font-weight: 600; flex-shrink: 0;
+    box-shadow: var(--shadow);
+  }
+  .ac-chat-send:hover { opacity: 0.9; }
+
+  /* ========================
+     DEMO TOGGLE BAR (existing)
+     ======================== */
+  .demo-bar {
+    background: var(--surface2); border-bottom: 1px solid var(--divider);
+    padding: 0 16px; display: flex; align-items: center; gap: 4px; height: 38px;
+  }
+  .demo-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-40); margin-right: 8px; }
+  .demo-btn {
+    padding: 4px 12px; border-radius: var(--radius); font-size: 12px; font-weight: 500;
+    border: 1px solid var(--card-border); background: transparent; color: var(--text-60);
+    cursor: pointer; font-family: var(--font); transition: all 0.1s;
+  }
+  .demo-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(212,160,74,0.08); }
+  .demo-btn:hover:not(.active) { border-color: var(--hover-border); color: var(--text); }
+
+  /* ATLAS LAYOUT */
+  .atlas {
+    display: grid;
+    grid-template-columns: 270px 1fr 380px;
+    height: calc(100vh - 86px);
+    overflow: hidden;
+  }
+
+  /* ========================
+     LEFT PANE
+     ======================== */
+  .left-pane {
+    background: var(--surface);
+    border-right: 1px solid var(--divider);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Mode toggle at top of left pane */
+  .left-mode-toggle {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--divider);
+    flex-shrink: 0;
+  }
+  .mode-btn {
+    padding: 10px 0; text-align: center; font-size: 12px; font-weight: 500;
+    color: var(--text-40); cursor: pointer; border: none; background: none;
+    font-family: var(--font); border-bottom: 2px solid transparent; transition: all 0.12s;
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+  }
+  .mode-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(212,160,74,0.04); }
+  .mode-btn:hover:not(.active) { color: var(--text-60); background: var(--surface2); }
+  .mode-icon { font-size: 13px; }
+
+  /* Search */
+  .left-search { padding: 10px 12px; flex-shrink: 0; border-bottom: 1px solid var(--divider); }
+  .left-search input {
+    width: 100%; background: var(--bg); border: 1px solid var(--card-border);
+    border-radius: var(--radius); padding: 7px 10px; color: var(--text); font-size: 13px;
+    font-family: var(--font); outline: none;
+  }
+  .left-search input::placeholder { color: var(--text-40); }
+  .left-search input:focus { border-color: var(--hover-border); }
+
+  /* Left pane scroll areas */
+  .left-scroll { flex: 1; overflow-y: auto; padding: 8px 6px; }
+  .left-scroll::-webkit-scrollbar { width: 4px; }
+  .left-scroll::-webkit-scrollbar-track { background: transparent; }
+  .left-scroll::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 2px; }
+
+  .left-section-label {
+    font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--text-40); padding: 6px 6px 4px; margin-top: 4px;
+  }
+
+  /* Country rows */
+  .country-row {
+    display: flex; align-items: center; gap: 8px; padding: 7px 8px;
+    border-radius: var(--radius); cursor: pointer; transition: all 0.1s; border: 1px solid transparent;
+  }
+  .country-row:hover { background: var(--surface2); }
+  .country-row.active { background: rgba(212,160,74,0.08); border-color: rgba(212,160,74,0.2); }
+  .country-row.active .country-name { color: var(--accent); }
+  .country-flag { font-size: 18px; line-height: 1; flex-shrink: 0; }
+  .country-info { flex: 1; min-width: 0; }
+  .country-name { font-size: 13px; font-weight: 500; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .country-sub { font-size: 10px; color: var(--text-40); font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .country-intl-count { font-family: var(--mono); font-size: 10px; color: var(--text-40); flex-shrink: 0; }
+
+  /* Organization rows */
+  .org-row {
+    display: flex; align-items: center; gap: 8px; padding: 7px 8px;
+    border-radius: var(--radius); cursor: pointer; transition: all 0.1s; border: 1px solid transparent;
+  }
+  .org-row:hover { background: var(--surface2); }
+  .org-row.active { background: rgba(212,160,74,0.08); border-color: rgba(212,160,74,0.2); }
+  .org-row.active .org-row-name { color: var(--accent); }
+  .org-badge {
+    width: 30px; height: 30px; border-radius: var(--radius); display: flex; align-items: center;
+    justify-content: center; font-family: var(--mono); font-size: 8px; font-weight: 500;
+    text-transform: uppercase; flex-shrink: 0; letter-spacing: 0.02em;
+  }
+  .org-row-info { flex: 1; min-width: 0; }
+  .org-row-name { font-size: 13px; font-weight: 500; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .org-row-sub { font-size: 10px; color: var(--text-40); font-family: var(--mono); }
+  .org-row-count { font-family: var(--mono); font-size: 10px; color: var(--text-40); flex-shrink: 0; }
+
+  /* Type colors */
+  .t-security { background: rgba(212,118,78,0.18); color: #D4764E; border: 1px solid rgba(212,118,78,0.25); }
+  .t-regional  { background: rgba(78,139,212,0.18); color: #4E8BD4; border: 1px solid rgba(78,139,212,0.25); }
+  .t-trade     { background: rgba(92,170,110,0.18); color: #5CAA6E; border: 1px solid rgba(92,170,110,0.25); }
+  .t-un        { background: rgba(155,109,198,0.18); color: #9B6DC6; border: 1px solid rgba(155,109,198,0.25); }
+  .t-finance   { background: rgba(212,160,74,0.18); color: #D4A04A; border: 1px solid rgba(212,160,74,0.25); }
+  .t-cultural  { background: rgba(138,131,112,0.18); color: #8a8370; border: 1px solid rgba(138,131,112,0.25); }
+
+  /* ========================
+     CENTER PANE — MAP
+     ======================== */
+  .center-pane {
+    background: var(--bg);
+    border-right: 1px solid var(--divider);
+    display: flex; flex-direction: column; overflow: hidden; position: relative;
+  }
+
+  /* Map context bar */
+  .map-context-bar {
+    position: absolute; top: 12px; left: 12px; right: 12px; z-index: 10;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .map-context-chip {
+    background: var(--surface); border: 1px solid var(--card-border); border-radius: var(--radius);
+    padding: 6px 12px; font-size: 12px; font-family: var(--mono); color: var(--text-60);
+    display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow);
+  }
+  .map-context-chip strong { color: var(--text); }
+  .map-legend {
+    display: flex; align-items: center; gap: 6px; margin-left: auto;
+    background: var(--surface); border: 1px solid var(--card-border); border-radius: var(--radius);
+    padding: 6px 10px; font-family: var(--mono); font-size: 10px; color: var(--text-40);
+    box-shadow: var(--shadow);
+  }
+  .legend-dot { width: 8px; height: 8px; border-radius: 1px; display: inline-block; }
+
+  .map-svg-wrap { flex: 1; display: flex; align-items: center; justify-content: center; padding: 60px 20px 20px; }
+  .map-svg-wrap svg { width: 100%; height: 100%; max-height: 500px; }
+
+  /* ========================
+     RIGHT PANE — DETAIL
+     ======================== */
+  .right-pane {
+    background: var(--surface);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* Right pane states */
+  .rp-state { display: none; flex-direction: column; height: 100%; overflow: hidden; }
+  .rp-state.active { display: flex; }
+
+  /* ---- COUNTRY STATE ---- */
+  .rp-country-header { padding: 14px 18px 0; border-bottom: 1px solid var(--divider); flex-shrink: 0; }
+  .rp-country-title { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .rp-country-title .flag { font-size: 26px; }
+  .rp-country-title h2 { font-family: var(--serif); font-size: 21px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; }
+  .rp-country-title .gov-tag {
+    font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 2px 6px; border-radius: 2px; background: rgba(78,139,212,0.12); border: 1px solid rgba(78,139,212,0.3); color: #4E8BD4;
+  }
+  .rp-tabs { display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .rp-tabs::-webkit-scrollbar { display: none; }
+  .rp-tab {
+    padding: 8px 12px; font-size: 11px; color: var(--text-40); cursor: pointer; background: none; border: none;
+    border-bottom: 2px solid transparent; font-family: var(--font); white-space: nowrap;
+    transition: all 0.1s; margin-bottom: -1px; font-weight: 500;
+  }
+  .rp-tab:hover { color: var(--text-60); }
+  .rp-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .rp-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+  .rp-body::-webkit-scrollbar { width: 4px; }
+  .rp-body::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 2px; }
+
+  /* International tab content */
+  .intl-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 16px; }
+  .intl-stat { background: var(--bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 10px 12px; }
+  .intl-stat-val { font-family: var(--mono); font-size: 20px; font-weight: 500; color: var(--text); line-height: 1; margin-bottom: 2px; }
+  .intl-stat-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-40); }
+
+  /* Network mini */
+  .mini-network { background: var(--bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 12px; margin-bottom: 16px; }
+  .mini-network-title { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-40); margin-bottom: 10px; }
+
+  .intl-group { margin-bottom: 16px; }
+  .intl-group-hd {
+    font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--text-40); padding-bottom: 5px; border-bottom: 1px solid var(--divider);
+    margin-bottom: 6px; display: flex; justify-content: space-between;
+  }
+  .intl-row {
+    display: flex; align-items: center; gap: 8px; padding: 6px 0;
+    border-bottom: 1px solid var(--divider); cursor: pointer; transition: padding 0.1s;
+    text-decoration: none; color: var(--text);
+  }
+  .intl-row:last-child { border-bottom: none; }
+  .intl-row:hover { padding-left: 4px; }
+  .intl-row-dot { width: 7px; height: 7px; border-radius: 1px; flex-shrink: 0; }
+  .intl-row-name { font-size: 12px; font-weight: 500; flex: 1; }
+  .intl-row-badge {
+    font-family: var(--mono); font-size: 8px; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 1px 4px; border-radius: 2px;
+  }
+  .badge-founding { background: rgba(212,160,74,0.15); color: var(--accent); border: 1px solid rgba(212,160,74,0.3); }
+  .badge-p5 { background: rgba(212,118,78,0.15); color: #D4764E; border: 1px solid rgba(212,118,78,0.3); }
+  .badge-obs { background: rgba(138,131,112,0.12); color: #8a8370; border: 1px solid rgba(138,131,112,0.3); }
+  .intl-row-year { font-family: var(--mono); font-size: 10px; color: var(--text-40); flex-shrink: 0; }
+
+  /* ---- ORG STATE ---- */
+  .rp-org-header { padding: 14px 18px 14px; border-bottom: 1px solid var(--divider); flex-shrink: 0; }
+  .rp-org-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .rp-org-badge-lg {
+    width: 44px; height: 44px; border-radius: var(--radius); display: flex; align-items: center;
+    justify-content: center; font-family: var(--mono); font-size: 10px; font-weight: 500;
+    flex-shrink: 0; letter-spacing: 0.02em;
+  }
+  .rp-org-name { font-family: var(--serif); font-size: 22px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.0; margin-bottom: 2px; }
+  .rp-org-fullname { font-size: 11px; color: var(--text-40); line-height: 1.4; }
+  .rp-org-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rp-org-chip {
+    font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 2px 7px; border-radius: 2px; border: 1px solid;
+  }
+
+  .rp-org-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--card-border); border: 1px solid var(--card-border); border-radius: var(--radius); overflow: hidden; }
+  .rp-org-stat { background: var(--bg); padding: 10px 12px; }
+  .rp-org-stat-val { font-family: var(--mono); font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+  .rp-org-stat-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-40); }
+
+  .rp-org-body { flex: 1; overflow-y: auto; padding: 14px 18px; }
+  .rp-org-body::-webkit-scrollbar { width: 4px; }
+  .rp-org-body::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 2px; }
+
+  .member-section-title {
+    font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--text-40); margin-bottom: 8px; display: flex; justify-content: space-between;
+  }
+  .member-item {
+    display: flex; align-items: center; gap: 8px; padding: 6px 0;
+    border-bottom: 1px solid var(--divider); cursor: pointer; transition: padding 0.1s;
+    text-decoration: none; color: var(--text);
+  }
+  .member-item:last-child { border-bottom: none; }
+  .member-item:hover { padding-left: 4px; }
+  .member-flag { font-size: 16px; line-height: 1; flex-shrink: 0; }
+  .member-name { font-size: 12px; font-weight: 500; flex: 1; }
+  .member-since { font-family: var(--mono); font-size: 10px; color: var(--text-40); }
+  .member-new { color: var(--accent); font-weight: 600; }
+
+  .rp-hint {
+    padding: 10px 12px; background: rgba(212,160,74,0.06); border: 1px solid rgba(212,160,74,0.15);
+    border-radius: var(--radius); margin-bottom: 12px;
+    font-size: 11px; color: var(--text-60); font-family: var(--mono);
+    display: flex; align-items: flex-start; gap: 6px;
+  }
+  .rp-hint-icon { color: var(--accent); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Civi<span>ca</span></div>
+  <ul class="nav-links">
+    <li><a onclick="showPage('v1')" id="nav-v1" class="page-active">Atlas</a></li>
+    <li><a onclick="showPage('v2')" id="nav-v2">Atlas v2 — Correct Layout</a></li>
+    <li><a href="#">Countries</a></li>
+    <li><a href="#">Elections</a></li>
+    <li><a href="#">Rankings</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-btn" onclick="document.body.classList.toggle('light')">◐</button>
+  </div>
+</nav>
+
+<div id="page-v1" class="page active">
+<!-- DEMO TOGGLE -->
+<div class="demo-bar">
+  <span class="demo-label">Demo state</span>
+  <button class="demo-btn active" onclick="setDemo('org-nato')">Org selected — NATO</button>
+  <button class="demo-btn" onclick="setDemo('country-france')">Country selected — France · International tab</button>
+  <button class="demo-btn" onclick="setDemo('country-france-chamber')">Country selected — France · Chamber tab</button>
+</div>
+
+<!-- ATLAS THREE-PANE -->
+<div class="atlas">
+
+  <!-- ======================== LEFT PANE ======================== -->
+  <div class="left-pane">
+
+    <!-- Mode toggle -->
+    <div class="left-mode-toggle">
+      <button class="mode-btn" id="mode-countries" onclick="setMode('countries')">
+        <span class="mode-icon">🌐</span> Countries
+      </button>
+      <button class="mode-btn active" id="mode-orgs" onclick="setMode('orgs')">
+        <span class="mode-icon">🏛</span> Organizations
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="left-search">
+      <input type="text" id="search-input" placeholder="Search organizations…">
+    </div>
+
+    <!-- Countries list (hidden when org mode) -->
+    <div class="left-scroll" id="list-countries" style="display:none;">
+      <div class="left-section-label">All Countries</div>
+      <div class="country-row" onclick="selectCountry('brazil')">
+        <span class="country-flag">🇧🇷</span>
+        <div class="country-info"><div class="country-name">Brazil</div><div class="country-sub">Presidential Republic</div></div>
+        <span class="country-intl-count">34</span>
+      </div>
+      <div class="country-row" onclick="selectCountry('china')">
+        <span class="country-flag">🇨🇳</span>
+        <div class="country-info"><div class="country-name">China</div><div class="country-sub">One-party Republic</div></div>
+        <span class="country-intl-count">71</span>
+      </div>
+      <div class="country-row" onclick="selectCountry('france')" id="country-row-france">
+        <span class="country-flag">🇫🇷</span>
+        <div class="country-info"><div class="country-name">France</div><div class="country-sub">Semi-Presidential Republic</div></div>
+        <span class="country-intl-count">47</span>
+      </div>
+      <div class="country-row" onclick="selectCountry('germany')">
+        <span class="country-flag">🇩🇪</span>
+        <div class="country-info"><div class="country-name">Germany</div><div class="country-sub">Federal Parliamentary Republic</div></div>
+        <span class="country-intl-count">63</span>
+      </div>
+      <div class="country-row" onclick="selectCountry('india')">
+        <span class="country-flag">🇮🇳</span>
+        <div class="country-info"><div class="country-name">India</div><div class="country-sub">Parliamentary Republic</div></div>
+        <span class="country-intl-count">48</span>
+      </div>
+      <div class="country-row" onclick="selectCountry('japan')">
+        <span class="country-flag">🇯🇵</span>
+        <div class="country-info"><div class="country-name">Japan</div><div class="country-sub">Constitutional Monarchy</div></div>
+        <span class="country-intl-count">39</span>
+      </div>
+      <div class="country-row" onclick="selectCountry('usa')">
+        <span class="country-flag">🇺🇸</span>
+        <div class="country-info"><div class="country-name">United States</div><div class="country-sub">Federal Presidential Republic</div></div>
+        <span class="country-intl-count">82</span>
+      </div>
+    </div>
+
+    <!-- Organizations list (shown when org mode) -->
+    <div class="left-scroll" id="list-orgs">
+      <div class="left-section-label">Security &amp; Defense</div>
+
+      <div class="org-row active" id="org-row-nato" onclick="selectOrg('nato')">
+        <div class="org-badge t-security">NATO</div>
+        <div class="org-row-info">
+          <div class="org-row-name">NATO</div>
+          <div class="org-row-sub">North Atlantic Treaty Org.</div>
+        </div>
+        <span class="org-row-count">32</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('osce')">
+        <div class="org-badge t-security">OSCE</div>
+        <div class="org-row-info">
+          <div class="org-row-name">OSCE</div>
+          <div class="org-row-sub">Security &amp; Co-operation</div>
+        </div>
+        <span class="org-row-count">57</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('au')">
+        <div class="org-badge t-security">AU</div>
+        <div class="org-row-info">
+          <div class="org-row-name">African Union</div>
+          <div class="org-row-sub">African continental body</div>
+        </div>
+        <span class="org-row-count">55</span>
+      </div>
+
+      <div class="left-section-label">Regional Blocs</div>
+
+      <div class="org-row" onclick="selectOrg('eu')">
+        <div class="org-badge t-regional">EU</div>
+        <div class="org-row-info">
+          <div class="org-row-name">European Union</div>
+          <div class="org-row-sub">European integration body</div>
+        </div>
+        <span class="org-row-count">27</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('asean')">
+        <div class="org-badge t-regional">ASEAN</div>
+        <div class="org-row-info">
+          <div class="org-row-name">ASEAN</div>
+          <div class="org-row-sub">SE Asian Nations</div>
+        </div>
+        <span class="org-row-count">10</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('gcc')">
+        <div class="org-badge t-regional">GCC</div>
+        <div class="org-row-info">
+          <div class="org-row-name">Gulf Cooperation Council</div>
+          <div class="org-row-sub">Arab Gulf states</div>
+        </div>
+        <span class="org-row-count">6</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('ecowas')">
+        <div class="org-badge t-regional">ECOW</div>
+        <div class="org-row-info">
+          <div class="org-row-name">ECOWAS</div>
+          <div class="org-row-sub">W. African Economic Community</div>
+        </div>
+        <span class="org-row-count">15</span>
+      </div>
+
+      <div class="left-section-label">Trade &amp; Finance</div>
+
+      <div class="org-row" onclick="selectOrg('wto')">
+        <div class="org-badge t-trade">WTO</div>
+        <div class="org-row-info">
+          <div class="org-row-name">WTO</div>
+          <div class="org-row-sub">World Trade Organization</div>
+        </div>
+        <span class="org-row-count">164</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('oecd')">
+        <div class="org-badge t-trade">OECD</div>
+        <div class="org-row-info">
+          <div class="org-row-name">OECD</div>
+          <div class="org-row-sub">Econ. Co-operation &amp; Dev.</div>
+        </div>
+        <span class="org-row-count">38</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('g20')">
+        <div class="org-badge t-finance">G20</div>
+        <div class="org-row-info">
+          <div class="org-row-name">G20</div>
+          <div class="org-row-sub">Group of Twenty</div>
+        </div>
+        <span class="org-row-count">20</span>
+      </div>
+
+      <div class="left-section-label">UN System</div>
+
+      <div class="org-row" onclick="selectOrg('un')">
+        <div class="org-badge t-un">UN</div>
+        <div class="org-row-info">
+          <div class="org-row-name">United Nations</div>
+          <div class="org-row-sub">General Assembly</div>
+        </div>
+        <span class="org-row-count">193</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('unsc')">
+        <div class="org-badge t-un">UNSC</div>
+        <div class="org-row-info">
+          <div class="org-row-name">UN Security Council</div>
+          <div class="org-row-sub">Permanent 5 members</div>
+        </div>
+        <span class="org-row-count">15</span>
+      </div>
+      <div class="org-row" onclick="selectOrg('imf')">
+        <div class="org-badge t-un">IMF</div>
+        <div class="org-row-info">
+          <div class="org-row-name">IMF</div>
+          <div class="org-row-sub">Intl. Monetary Fund</div>
+        </div>
+        <span class="org-row-count">190</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ======================== CENTER PANE — MAP ======================== -->
+  <div class="center-pane">
+
+    <!-- Context bar (changes based on selection) -->
+    <div class="map-context-bar">
+      <div class="map-context-chip" id="map-ctx-chip">
+        <strong id="map-ctx-name">NATO</strong>
+        <span id="map-ctx-sub">32 member states highlighted</span>
+      </div>
+      <div class="map-legend">
+        <span class="legend-dot" id="legend-dot" style="background:#D4764E;"></span>
+        <span id="legend-label">NATO member</span>
+      </div>
+    </div>
+
+    <!-- SVG World Map -->
+    <div class="map-svg-wrap">
+      <svg viewBox="0 0 900 480" xmlns="http://www.w3.org/2000/svg" id="world-map">
+        <defs>
+          <!-- NATO member highlight gradient -->
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- Ocean background -->
+        <rect width="900" height="480" fill="rgba(78,139,212,0.04)" rx="4"/>
+
+        <!-- Grid lines subtle -->
+        <line x1="0" y1="240" x2="900" y2="240" stroke="var(--divider)" stroke-width="0.5" opacity="0.4"/>
+        <line x1="450" y1="0" x2="450" y2="480" stroke="var(--divider)" stroke-width="0.5" opacity="0.4"/>
+
+        <!-- ====== CONTINENTS ====== -->
+
+        <!-- NORTH AMERICA (simplified) -->
+        <!-- Canada + USA non-highlighted base -->
+        <path d="M75,60 L250,50 L270,90 L280,150 L260,200 L240,230 L210,240 L180,230 L150,220 L120,210 L95,190 L75,160 L65,110 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.5"/>
+        <!-- Canada highlighted (NATO) -->
+        <path d="M77,62 L248,52 L262,88 L252,130 L220,115 L175,110 L130,115 L95,110 L78,90 Z" fill="rgba(212,118,78,0.35)" stroke="#D4764E" stroke-width="1.2" class="nato-member"/>
+        <!-- USA highlighted (NATO) -->
+        <path d="M85,130 L255,122 L268,148 L258,198 L238,228 L208,238 L180,228 L150,218 L122,208 L97,188 L83,162 Z" fill="rgba(212,118,78,0.35)" stroke="#D4764E" stroke-width="1.2" class="nato-member"/>
+        <!-- Mexico non-NATO -->
+        <path d="M110,245 L210,242 L230,280 L210,310 L170,320 L140,300 L120,270 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.5"/>
+        <!-- Caribbean islands -->
+        <circle cx="260" cy="265" r="5" fill="var(--card-border)" opacity="0.4"/>
+        <circle cx="275" cy="272" r="4" fill="var(--card-border)" opacity="0.4"/>
+
+        <!-- SOUTH AMERICA -->
+        <path d="M185,330 L280,318 L310,360 L320,420 L295,450 L250,460 L210,440 L188,400 L175,360 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.5"/>
+
+        <!-- EUROPE (NATO members highlighted) -->
+        <!-- UK -->
+        <path d="M368,82 L390,78 L394,108 L380,115 L365,108 Z" fill="rgba(212,118,78,0.45)" stroke="#D4764E" stroke-width="1.2" class="nato-member"/>
+        <!-- Ireland (non-NATO) -->
+        <path d="M352,88 L365,85 L366,104 L353,107 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.5"/>
+        <!-- Iceland (NATO) -->
+        <path d="M302,48 L328,44 L330,62 L312,66 Z" fill="rgba(212,118,78,0.35)" stroke="#D4764E" stroke-width="1.2" class="nato-member"/>
+        <!-- Norway+Denmark+Sweden+Finland (NATO) -->
+        <path d="M388,48 L420,42 L428,75 L415,88 L400,78 Z" fill="rgba(212,118,78,0.45)" stroke="#D4764E" stroke-width="1.5" class="nato-member"/>
+        <!-- Main Europe block (NATO) -->
+        <path d="M370,115 L445,105 L468,130 L465,165 L440,175 L410,170 L385,160 L368,140 Z" fill="rgba(212,118,78,0.35)" stroke="#D4764E" stroke-width="1.2" class="nato-member"/>
+        <!-- Turkey (NATO) -->
+        <path d="M470,155 L540,148 L548,172 L470,178 Z" fill="rgba(212,118,78,0.4)" stroke="#D4764E" stroke-width="1.2" class="nato-member"/>
+        <!-- Spain+Portugal (NATO) -->
+        <path d="M340,148 L380,145 L384,175 L355,178 Z" fill="rgba(212,118,78,0.35)" stroke="#D4764E" stroke-width="1.2" class="nato-member"/>
+
+        <!-- RUSSIA / Eastern Europe (non-NATO) -->
+        <path d="M468,60 L700,50 L720,130 L700,170 L640,185 L560,175 L500,165 L470,140 L462,90 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.4"/>
+        <!-- Ukraine, Belarus (non-NATO) -->
+        <path d="M470,140 L550,130 L560,160 L510,168 L472,162 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.45"/>
+
+        <!-- AFRICA -->
+        <path d="M350,195 L490,185 L510,260 L500,340 L460,380 L400,395 L360,370 L340,300 L342,235 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.45"/>
+        <!-- Madagascar -->
+        <path d="M508,315 L520,308 L524,345 L512,348 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="0.5" opacity="0.4"/>
+
+        <!-- MIDDLE EAST -->
+        <path d="M530,175 L620,168 L635,215 L600,235 L555,228 L530,205 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.45"/>
+
+        <!-- ASIA -->
+        <path d="M560,80 L760,65 L790,150 L770,200 L700,220 L620,210 L575,180 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.4"/>
+        <!-- India sub-continent -->
+        <path d="M600,190 L655,185 L665,250 L635,280 L600,265 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.45"/>
+        <!-- SE Asia -->
+        <path d="M680,220 L760,205 L775,255 L730,270 L688,250 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.4"/>
+        <!-- Japan / Korea -->
+        <path d="M770,130 L800,125 L805,160 L785,165 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.45"/>
+        <!-- Japan islands -->
+        <path d="M795,145 L818,138 L822,170 L805,174 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="0.5" opacity="0.4"/>
+
+        <!-- OCEANIA -->
+        <path d="M730,330 L820,318 L835,370 L800,385 L745,375 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="1" opacity="0.4"/>
+        <path d="M840,315 L862,310 L864,330 L842,332 Z" fill="var(--card-border)" stroke="var(--surface)" stroke-width="0.5" opacity="0.35"/>
+
+        <!-- LABELS -->
+        <text x="170" y="175" fill="var(--text-40)" font-size="9" font-family="ui-monospace" text-anchor="middle" opacity="0.7">N. AMERICA</text>
+        <text x="240" y="400" fill="var(--text-40)" font-size="9" font-family="ui-monospace" text-anchor="middle" opacity="0.6">S. AMERICA</text>
+        <text x="415" y="145" fill="var(--text-40)" font-size="9" font-family="ui-monospace" text-anchor="middle" opacity="0.7">EUROPE</text>
+        <text x="420" y="295" fill="var(--text-40)" font-size="9" font-family="ui-monospace" text-anchor="middle" opacity="0.6">AFRICA</text>
+        <text x="660" y="140" fill="var(--text-40)" font-size="9" font-family="ui-monospace" text-anchor="middle" opacity="0.6">ASIA</text>
+        <text x="780" y="360" fill="var(--text-40)" font-size="9" font-family="ui-monospace" text-anchor="middle" opacity="0.6">OCEANIA</text>
+
+        <!-- FRANCE SELECTED INDICATOR (shown in country mode) -->
+        <circle cx="382" cy="138" r="6" fill="var(--accent)" stroke="var(--bg)" stroke-width="2" id="france-pin" style="display:none;" filter="url(#glow)"/>
+        <text x="382" y="132" fill="var(--accent)" font-size="9" text-anchor="middle" font-family="ui-monospace" id="france-label" style="display:none;">🇫🇷</text>
+
+        <!-- SCALE BAR -->
+        <line x1="30" y1="455" x2="110" y2="455" stroke="var(--text-40)" stroke-width="1"/>
+        <text x="70" y="468" fill="var(--text-40)" font-size="8" text-anchor="middle" font-family="ui-monospace">3,000 km</text>
+      </svg>
+    </div>
+
+  </div>
+
+  <!-- ======================== RIGHT PANE ======================== -->
+  <div class="right-pane">
+
+    <!-- STATE A: Organization selected (NATO) -->
+    <div class="rp-state active" id="rp-org">
+      <div class="rp-org-header">
+        <div class="rp-org-top">
+          <div class="rp-org-badge-lg t-security">NATO</div>
+          <div>
+            <div class="rp-org-name">NATO</div>
+            <div class="rp-org-fullname">North Atlantic Treaty Organization</div>
+          </div>
+        </div>
+        <div class="rp-org-chips" style="margin-bottom:12px;">
+          <span class="rp-org-chip" style="border-color:#D4764E;color:#D4764E;">Security</span>
+          <span class="rp-org-chip" style="border-color:#4E8BD4;color:#4E8BD4;">Regional</span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--text-40);display:flex;align-items:center;">Est. 4 Apr 1949</span>
+        </div>
+        <div class="rp-org-stats">
+          <div class="rp-org-stat"><div class="rp-org-stat-val">32</div><div class="rp-org-stat-label">Members</div></div>
+          <div class="rp-org-stat"><div class="rp-org-stat-val">2024</div><div class="rp-org-stat-label">Last joined</div></div>
+          <div class="rp-org-stat"><div class="rp-org-stat-val">2%</div><div class="rp-org-stat-label">GDP target</div></div>
+        </div>
+      </div>
+      <div class="rp-org-body">
+        <div class="rp-hint">
+          <span class="rp-hint-icon">→</span>
+          Click any country on the map to see its International tab
+        </div>
+
+        <div class="member-section-title">
+          <span>32 Member States</span>
+          <span style="color:var(--text-60);cursor:pointer;">joined ↑</span>
+        </div>
+        <a class="member-item" href="#"><span class="member-flag">🇧🇪</span><span class="member-name">Belgium</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇨🇦</span><span class="member-name">Canada</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇩🇰</span><span class="member-name">Denmark</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇫🇷</span><span class="member-name">France</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇩🇪</span><span class="member-name">Germany</span><span class="member-since">1955</span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇬🇷</span><span class="member-name">Greece</span><span class="member-since">1952</span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇮🇹</span><span class="member-name">Italy</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇳🇱</span><span class="member-name">Netherlands</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇳🇴</span><span class="member-name">Norway</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇵🇱</span><span class="member-name">Poland</span><span class="member-since">1999</span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇷🇴</span><span class="member-name">Romania</span><span class="member-since">2004</span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇸🇪</span><span class="member-name">Sweden</span><span class="member-since member-new">2024 ↑ new</span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇹🇷</span><span class="member-name">Turkey</span><span class="member-since">1952</span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇬🇧</span><span class="member-name">United Kingdom</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <a class="member-item" href="#"><span class="member-flag">🇺🇸</span><span class="member-name">United States</span><span class="member-since">1949 <span style="color:var(--text-40);">Founding</span></span></a>
+        <div style="padding:8px 0;font-family:var(--mono);font-size:10px;color:var(--text-40);text-align:center;">+ 17 more → view all</div>
+      </div>
+    </div>
+
+    <!-- STATE B: Country selected — International tab -->
+    <div class="rp-state" id="rp-country">
+      <div class="rp-country-header">
+        <div class="rp-country-title">
+          <span class="flag">🇫🇷</span>
+          <h2>France</h2>
+          <span class="gov-tag">Semi-Presidential</span>
+        </div>
+        <div class="rp-tabs">
+          <button class="rp-tab" id="tab-chamber">Chamber</button>
+          <button class="rp-tab">Bills</button>
+          <button class="rp-tab">Structure</button>
+          <button class="rp-tab">Elections</button>
+          <button class="rp-tab">Democracy</button>
+          <button class="rp-tab">Leaders</button>
+          <button class="rp-tab">Constitution</button>
+          <button class="rp-tab active" id="tab-intl">International</button>
+        </div>
+      </div>
+
+      <!-- Tab body: International -->
+      <div class="rp-body" id="body-intl">
+        <div class="intl-summary-grid">
+          <div class="intl-stat"><div class="intl-stat-val">47</div><div class="intl-stat-label">Memberships</div></div>
+          <div class="intl-stat"><div class="intl-stat-val">1944</div><div class="intl-stat-label">Earliest member</div></div>
+        </div>
+
+        <!-- Mini network -->
+        <div class="mini-network">
+          <div class="mini-network-title">Most-connected countries via shared org memberships</div>
+          <svg viewBox="0 0 340 160" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-height:160px;">
+            <circle cx="170" cy="80" r="20" fill="rgba(212,160,74,0.18)" stroke="#D4A04A" stroke-width="1.5"/>
+            <text x="170" y="77" fill="#D4A04A" font-size="11" text-anchor="middle">🇫🇷</text>
+            <text x="170" y="90" fill="#D4A04A" font-size="7" text-anchor="middle" font-family="ui-monospace">France</text>
+
+            <line x1="170" y1="80" x2="75" y2="42" stroke="var(--card-border)" stroke-width="1.5"/>
+            <circle cx="72" cy="38" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+            <text x="72" y="35" fill="var(--text-60)" font-size="10" text-anchor="middle">🇩🇪</text>
+            <text x="72" y="48" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">43</text>
+
+            <line x1="170" y1="80" x2="55" y2="98" stroke="var(--card-border)" stroke-width="1.5"/>
+            <circle cx="50" cy="96" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+            <text x="50" y="93" fill="var(--text-60)" font-size="10" text-anchor="middle">🇬🇧</text>
+            <text x="50" y="106" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">41</text>
+
+            <line x1="170" y1="80" x2="110" y2="140" stroke="var(--card-border)" stroke-width="1"/>
+            <circle cx="110" cy="143" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+            <text x="110" y="140" fill="var(--text-60)" font-size="10" text-anchor="middle">🇮🇹</text>
+            <text x="110" y="153" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">38</text>
+
+            <line x1="170" y1="80" x2="272" y2="38" stroke="var(--card-border)" stroke-width="1.5"/>
+            <circle cx="275" cy="35" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+            <text x="275" y="32" fill="var(--text-60)" font-size="10" text-anchor="middle">🇺🇸</text>
+            <text x="275" y="45" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">37</text>
+
+            <line x1="170" y1="80" x2="290" y2="108" stroke="var(--card-border)" stroke-width="1"/>
+            <circle cx="294" cy="110" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+            <text x="294" y="107" fill="var(--text-60)" font-size="10" text-anchor="middle">🇯🇵</text>
+            <text x="294" y="120" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">28</text>
+
+            <line x1="170" y1="80" x2="228" y2="143" stroke="var(--card-border)" stroke-width="1"/>
+            <circle cx="231" cy="146" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+            <text x="231" y="143" fill="var(--text-60)" font-size="10" text-anchor="middle">🇧🇷</text>
+            <text x="231" y="156" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">21</text>
+          </svg>
+        </div>
+
+        <div class="intl-group">
+          <div class="intl-group-hd"><span>Security &amp; Defense</span><span>4</span></div>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#D4764E;"></div><span class="intl-row-name">NATO</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1949</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#D4764E;"></div><span class="intl-row-name">UN Security Council</span><span class="intl-row-badge badge-p5">P5</span><span class="intl-row-year">1945</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#D4764E;"></div><span class="intl-row-name">OSCE</span><span class="intl-row-year">1975</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#D4764E;"></div><span class="intl-row-name">WEU</span><span class="intl-row-badge badge-obs">Observer</span><span class="intl-row-year">1954</span></a>
+        </div>
+        <div class="intl-group">
+          <div class="intl-group-hd"><span>Regional Blocs</span><span>3</span></div>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#4E8BD4;"></div><span class="intl-row-name">European Union</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1957</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#4E8BD4;"></div><span class="intl-row-name">Council of Europe</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1949</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#4E8BD4;"></div><span class="intl-row-name">Eurozone</span><span class="intl-row-year">1999</span></a>
+        </div>
+        <div class="intl-group">
+          <div class="intl-group-hd"><span>Trade &amp; Finance</span><span>5</span></div>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">G7</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1975</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">G20</span><span class="intl-row-year">1999</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">WTO</span><span class="intl-row-year">1995</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">OECD</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1961</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">IMF</span><span class="intl-row-year">1945</span></a>
+        </div>
+        <div class="intl-group">
+          <div class="intl-group-hd"><span>Cultural &amp; Language</span><span>2</span></div>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#8a8370;"></div><span class="intl-row-name">Organisation Internationale de la Francophonie</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1970</span></a>
+          <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#8a8370;"></div><span class="intl-row-name">UNESCO</span><span class="intl-row-year">HQ Paris</span></a>
+        </div>
+      </div>
+
+      <!-- Tab body: Chamber (placeholder, hidden) -->
+      <div class="rp-body" id="body-chamber" style="display:none;">
+        <div style="padding:24px 0;text-align:center;color:var(--text-40);">
+          <div style="font-size:28px;margin-bottom:8px;">🏛</div>
+          <div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.15em;">Chamber view</div>
+          <div style="font-size:12px;margin-top:6px;">Hemicycle diagram loads here</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /right-pane -->
+
+</div><!-- /atlas -->
+
+</div><!-- /page-v1 -->
+
+<!-- ========================
+     PAGE V2: CORRECT ATLAS LAYOUT
+     Left=Countries/Orgs | Center=Explore tabs | Right=Ask Civica
+     ======================== -->
+<div id="page-v2" class="page">
+<div class="atlas-correct">
+
+  <!-- LEFT PANE -->
+  <div class="ac-left">
+    <!-- Countries / Organizations toggle -->
+    <div class="left-mode-toggle">
+      <button class="mode-btn active" id="ac-mode-countries" onclick="acSetMode('countries')">
+        <span class="mode-icon">🌐</span> Countries
+      </button>
+      <button class="mode-btn" id="ac-mode-orgs" onclick="acSetMode('orgs')">
+        <span class="mode-icon">🏛</span> Organizations
+      </button>
+    </div>
+    <!-- Search -->
+    <div class="left-search">
+      <input type="text" id="ac-search" placeholder="Search countries…">
+    </div>
+
+    <!-- Countries list -->
+    <div class="left-scroll" id="ac-list-countries">
+      <div class="left-section-label">All Countries</div>
+      <div class="country-row" onclick="acSelectCountry(this,'brazil','🇧🇷','Brazil','Presidential Republic')">
+        <span class="country-flag">🇧🇷</span>
+        <div class="country-info"><div class="country-name">Brazil</div><div class="country-sub">Presidential Republic</div></div>
+        <span class="country-intl-count">34</span>
+      </div>
+      <div class="country-row" onclick="acSelectCountry(this,'china','🇨🇳','China','One-party Republic')">
+        <span class="country-flag">🇨🇳</span>
+        <div class="country-info"><div class="country-name">China</div><div class="country-sub">One-party Republic</div></div>
+        <span class="country-intl-count">71</span>
+      </div>
+      <div class="country-row active" id="ac-crow-france" onclick="acSelectCountry(this,'france','🇫🇷','France','Semi-Presidential Republic')">
+        <span class="country-flag">🇫🇷</span>
+        <div class="country-info"><div class="country-name">France</div><div class="country-sub">Semi-Presidential Republic</div></div>
+        <span class="country-intl-count">47</span>
+      </div>
+      <div class="country-row" onclick="acSelectCountry(this,'germany','🇩🇪','Germany','Federal Parliamentary Republic')">
+        <span class="country-flag">🇩🇪</span>
+        <div class="country-info"><div class="country-name">Germany</div><div class="country-sub">Federal Parliamentary Republic</div></div>
+        <span class="country-intl-count">63</span>
+      </div>
+      <div class="country-row" onclick="acSelectCountry(this,'india','🇮🇳','India','Parliamentary Republic')">
+        <span class="country-flag">🇮🇳</span>
+        <div class="country-info"><div class="country-name">India</div><div class="country-sub">Parliamentary Republic</div></div>
+        <span class="country-intl-count">48</span>
+      </div>
+      <div class="country-row" onclick="acSelectCountry(this,'japan','🇯🇵','Japan','Constitutional Monarchy')">
+        <span class="country-flag">🇯🇵</span>
+        <div class="country-info"><div class="country-name">Japan</div><div class="country-sub">Constitutional Monarchy</div></div>
+        <span class="country-intl-count">39</span>
+      </div>
+      <div class="country-row" onclick="acSelectCountry(this,'uk','🇬🇧','United Kingdom','Constitutional Monarchy')">
+        <span class="country-flag">🇬🇧</span>
+        <div class="country-info"><div class="country-name">United Kingdom</div><div class="country-sub">Constitutional Monarchy</div></div>
+        <span class="country-intl-count">74</span>
+      </div>
+      <div class="country-row" onclick="acSelectCountry(this,'usa','🇺🇸','United States','Federal Presidential Republic')">
+        <span class="country-flag">🇺🇸</span>
+        <div class="country-info"><div class="country-name">United States</div><div class="country-sub">Federal Presidential Republic</div></div>
+        <span class="country-intl-count">82</span>
+      </div>
+    </div>
+
+    <!-- Organizations list (hidden by default) -->
+    <div class="left-scroll" id="ac-list-orgs" style="display:none;">
+      <div class="left-section-label">Security &amp; Defense</div>
+      <div class="org-row" onclick="acSelectOrg(this,'NATO','North Atlantic Treaty Organization','t-security')">
+        <div class="org-badge t-security">NATO</div>
+        <div class="org-row-info"><div class="org-row-name">NATO</div><div class="org-row-sub">Security Alliance · 1949</div></div>
+        <span class="org-row-count">32</span>
+      </div>
+      <div class="org-row" onclick="acSelectOrg(this,'OSCE','Organisation for Security &amp; Cooperation','t-security')">
+        <div class="org-badge t-security">OSCE</div>
+        <div class="org-row-info"><div class="org-row-name">OSCE</div><div class="org-row-sub">Security &amp; Co-operation · 1975</div></div>
+        <span class="org-row-count">57</span>
+      </div>
+      <div class="left-section-label">Regional Blocs</div>
+      <div class="org-row" onclick="acSelectOrg(this,'EU','European Union','t-regional')">
+        <div class="org-badge t-regional">EU</div>
+        <div class="org-row-info"><div class="org-row-name">European Union</div><div class="org-row-sub">Regional integration · 1993</div></div>
+        <span class="org-row-count">27</span>
+      </div>
+      <div class="org-row" onclick="acSelectOrg(this,'ASEAN','Association of SE Asian Nations','t-regional')">
+        <div class="org-badge t-regional">ASEAN</div>
+        <div class="org-row-info"><div class="org-row-name">ASEAN</div><div class="org-row-sub">SE Asian Nations · 1967</div></div>
+        <span class="org-row-count">10</span>
+      </div>
+      <div class="left-section-label">Trade &amp; Finance</div>
+      <div class="org-row" onclick="acSelectOrg(this,'WTO','World Trade Organization','t-trade')">
+        <div class="org-badge t-trade">WTO</div>
+        <div class="org-row-info"><div class="org-row-name">WTO</div><div class="org-row-sub">Trade · 1995</div></div>
+        <span class="org-row-count">164</span>
+      </div>
+      <div class="org-row" onclick="acSelectOrg(this,'G20','Group of Twenty','t-finance')">
+        <div class="org-badge t-finance">G20</div>
+        <div class="org-row-info"><div class="org-row-name">G20</div><div class="org-row-sub">Finance · 1999</div></div>
+        <span class="org-row-count">20</span>
+      </div>
+      <div class="left-section-label">UN System</div>
+      <div class="org-row" onclick="acSelectOrg(this,'UN','United Nations General Assembly','t-un')">
+        <div class="org-badge t-un">UN</div>
+        <div class="org-row-info"><div class="org-row-name">United Nations</div><div class="org-row-sub">General Assembly · 1945</div></div>
+        <span class="org-row-count">193</span>
+      </div>
+      <div class="org-row" onclick="acSelectOrg(this,'IMF','International Monetary Fund','t-un')">
+        <div class="org-badge t-un">IMF</div>
+        <div class="org-row-info"><div class="org-row-name">IMF</div><div class="org-row-sub">Finance · 1945</div></div>
+        <span class="org-row-count">190</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER PANE: Explore / Tab content -->
+  <div class="ac-center">
+
+    <!-- Mode bar (Atlas / Explore / Compare) — matches real AtlasApp -->
+    <div class="ac-mode-bar">
+      <div class="ac-mode-btns">
+        <button class="ac-mode-btn">Atlas</button>
+        <button class="ac-mode-btn on">Explore</button>
+        <button class="ac-mode-btn">Compare</button>
+      </div>
+      <select class="ac-region-select"><option>All Regions</option><option>Americas</option><option>Europe</option><option>Africa</option><option>Asia</option><option>Oceania</option></select>
+    </div>
+
+    <!-- Country header (shown when country selected) -->
+    <div class="ac-country-hdr" id="ac-country-hdr">
+      <div class="ac-country-title">
+        <span class="cflag" id="ac-flag">🇫🇷</span>
+        <h2 id="ac-cname">France</h2>
+        <span class="ac-gov-tag" id="ac-govtag">Semi-Presidential</span>
+        <div class="ac-house-toggle">
+          <button class="ac-house-btn on">Lower</button>
+          <button class="ac-house-btn">Upper</button>
+        </div>
+      </div>
+      <!-- Tab bar — 7 existing + 1 new -->
+      <div class="ac-tabs">
+        <button class="ac-tab" id="act-chamber">Chamber</button>
+        <button class="ac-tab" id="act-bills">Bills</button>
+        <button class="ac-tab" id="act-structure">Structure</button>
+        <button class="ac-tab" id="act-elections">Elections</button>
+        <button class="ac-tab" id="act-democracy">Democracy</button>
+        <button class="ac-tab" id="act-leaders">Leaders</button>
+        <button class="ac-tab" id="act-constitution">Constitution</button>
+        <button class="ac-tab new-tab active" id="act-international">International</button>
+      </div>
+    </div>
+
+    <!-- Tab bodies -->
+    <div class="ac-body" id="ac-body-international">
+
+      <!-- Summary stats -->
+      <div class="intl-stats-row">
+        <div class="intl-stat-sm"><div class="intl-stat-sm-val">47</div><div class="intl-stat-sm-label">Memberships</div></div>
+        <div class="intl-stat-sm"><div class="intl-stat-sm-val">8</div><div class="intl-stat-sm-label">Categories</div></div>
+        <div class="intl-stat-sm"><div class="intl-stat-sm-val">1944</div><div class="intl-stat-sm-label">Earliest member</div></div>
+      </div>
+
+      <!-- Inline mini-map (org memberships shown on world map) -->
+      <div class="intl-mini-map">
+        <div class="intl-mini-map-title">
+          France's memberships — countries sharing at least one org
+          <span>47 orgs · 190 co-members</span>
+        </div>
+        <svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-height:200px;">
+          <rect width="680" height="260" fill="rgba(78,139,212,0.04)" rx="3"/>
+          <!-- N America -->
+          <path d="M50,40 L185,32 L200,65 L210,110 L195,145 L175,160 L145,155 L115,148 L88,135 L62,115 L50,80 Z" fill="rgba(212,160,74,0.25)" stroke="#D4A04A" stroke-width="1"/>
+          <!-- S America -->
+          <path d="M135,175 L210,168 L232,200 L240,240 L218,252 L188,255 L160,240 L142,215 Z" fill="rgba(212,160,74,0.18)" stroke="#D4A04A" stroke-width="0.8"/>
+          <!-- Europe -->
+          <path d="M278,30 L340,25 L355,55 L348,90 L322,98 L298,92 L278,75 Z" fill="rgba(212,160,74,0.4)" stroke="#D4A04A" stroke-width="1.2"/>
+          <!-- Scandinavia -->
+          <path d="M298,10 L322,6 L326,28 L308,32 Z" fill="rgba(212,160,74,0.35)" stroke="#D4A04A" stroke-width="1"/>
+          <!-- UK -->
+          <path d="M268,28 L282,25 L284,48 L270,52 Z" fill="rgba(212,160,74,0.4)" stroke="#D4A04A" stroke-width="1"/>
+          <!-- Turkey -->
+          <path d="M352,88 L400,83 L405,102 L352,106 Z" fill="rgba(212,160,74,0.3)" stroke="#D4A04A" stroke-width="0.8"/>
+          <!-- Middle East partial -->
+          <path d="M400,102 L460,98 L468,128 L430,140 L400,132 Z" fill="rgba(212,160,74,0.15)" stroke="#D4A04A" stroke-width="0.6"/>
+          <!-- Africa (many UN members) -->
+          <path d="M268,115 L372,108 L388,158 L378,212 L340,228 L296,220 L268,196 Z" fill="rgba(212,160,74,0.18)" stroke="#D4A04A" stroke-width="0.8"/>
+          <!-- Russia/CIS -->
+          <path d="M355,22 L535,14 L550,72 L530,102 L470,110 L390,100 L357,75 Z" fill="rgba(212,160,74,0.12)" stroke="#D4A04A" stroke-width="0.6"/>
+          <!-- Asia -->
+          <path d="M425,20 L575,10 L592,72 L568,105 L470,112 L430,85 Z" fill="rgba(212,160,74,0.12)" stroke="#D4A04A" stroke-width="0.6"/>
+          <!-- India -->
+          <path d="M458,115 L500,110 L508,158 L484,175 L455,162 Z" fill="rgba(212,160,74,0.2)" stroke="#D4A04A" stroke-width="0.8"/>
+          <!-- SE Asia -->
+          <path d="M520,130 L582,118 L590,155 L555,165 Z" fill="rgba(212,160,74,0.15)" stroke="#D4A04A" stroke-width="0.6"/>
+          <!-- Japan -->
+          <path d="M580,52 L600,48 L604,75 L586,78 Z" fill="rgba(212,160,74,0.2)" stroke="#D4A04A" stroke-width="0.8"/>
+          <!-- Oceania -->
+          <path d="M550,190 L632,180 L642,220 L610,228 L556,222 Z" fill="rgba(212,160,74,0.15)" stroke="#D4A04A" stroke-width="0.6"/>
+          <!-- France pin -->
+          <circle cx="305" cy="62" r="5" fill="#D4A04A" stroke="var(--bg)" stroke-width="1.5"/>
+          <!-- Legend -->
+          <rect x="12" y="238" width="10" height="10" fill="rgba(212,160,74,0.3)" stroke="#D4A04A" stroke-width="1" rx="1"/>
+          <text x="26" y="247" fill="var(--text-40)" font-size="8" font-family="ui-monospace">Shares ≥1 org with France</text>
+          <circle cx="162" cy="243" r="4" fill="#D4A04A" stroke="var(--bg)" stroke-width="1"/>
+          <text x="170" y="247" fill="var(--text-40)" font-size="8" font-family="ui-monospace">France</text>
+        </svg>
+      </div>
+
+      <!-- Network graph -->
+      <div class="mini-network" style="margin-bottom:16px;">
+        <div class="mini-network-title">Most-connected countries via shared org memberships</div>
+        <svg viewBox="0 0 480 150" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-height:150px;">
+          <circle cx="240" cy="75" r="18" fill="rgba(212,160,74,0.18)" stroke="#D4A04A" stroke-width="1.5"/>
+          <text x="240" y="72" fill="#D4A04A" font-size="11" text-anchor="middle">🇫🇷</text>
+          <text x="240" y="84" fill="#D4A04A" font-size="7" text-anchor="middle" font-family="ui-monospace">France</text>
+
+          <line x1="240" y1="75" x2="108" y2="35" stroke="var(--card-border)" stroke-width="1.5"/>
+          <circle cx="104" cy="31" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+          <text x="104" y="28" fill="var(--text-60)" font-size="10" text-anchor="middle">🇩🇪</text>
+          <text x="104" y="41" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">43 shared</text>
+
+          <line x1="240" y1="75" x2="80" y2="88" stroke="var(--card-border)" stroke-width="1.5"/>
+          <circle cx="75" cy="87" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+          <text x="75" y="84" fill="var(--text-60)" font-size="10" text-anchor="middle">🇬🇧</text>
+          <text x="75" y="97" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">41 shared</text>
+
+          <line x1="240" y1="75" x2="155" y2="135" stroke="var(--card-border)" stroke-width="1"/>
+          <circle cx="155" cy="138" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+          <text x="155" y="135" fill="var(--text-60)" font-size="10" text-anchor="middle">🇮🇹</text>
+          <text x="155" y="148" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">38 shared</text>
+
+          <line x1="240" y1="75" x2="373" y2="32" stroke="var(--card-border)" stroke-width="1.5"/>
+          <circle cx="377" cy="28" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+          <text x="377" y="25" fill="var(--text-60)" font-size="10" text-anchor="middle">🇺🇸</text>
+          <text x="377" y="38" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">37 shared</text>
+
+          <line x1="240" y1="75" x2="396" y2="98" stroke="var(--card-border)" stroke-width="1"/>
+          <circle cx="400" cy="100" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+          <text x="400" y="97" fill="var(--text-60)" font-size="10" text-anchor="middle">🇯🇵</text>
+          <text x="400" y="110" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">28 shared</text>
+
+          <line x1="240" y1="75" x2="330" y2="138" stroke="var(--card-border)" stroke-width="1"/>
+          <circle cx="333" cy="141" r="13" fill="var(--surface2)" stroke="var(--card-border)" stroke-width="1"/>
+          <text x="333" y="138" fill="var(--text-60)" font-size="10" text-anchor="middle">🇧🇷</text>
+          <text x="333" y="151" fill="var(--text-40)" font-size="7" text-anchor="middle" font-family="ui-monospace">21 shared</text>
+        </svg>
+      </div>
+
+      <!-- Grouped membership list -->
+      <div class="intl-group">
+        <div class="intl-group-hd"><span>Security &amp; Defense</span><span>4</span></div>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#D4764E;"></div><span class="intl-row-name">NATO</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1949</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#D4764E;"></div><span class="intl-row-name">UN Security Council</span><span class="intl-row-badge badge-p5">P5</span><span class="intl-row-year">1945</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#D4764E;"></div><span class="intl-row-name">OSCE</span><span class="intl-row-year">1975</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#D4764E;"></div><span class="intl-row-name">WEU</span><span class="intl-row-badge badge-obs">Observer</span><span class="intl-row-year">1954</span></a>
+      </div>
+      <div class="intl-group">
+        <div class="intl-group-hd"><span>Regional Blocs</span><span>3</span></div>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#4E8BD4;"></div><span class="intl-row-name">European Union</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1957</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#4E8BD4;"></div><span class="intl-row-name">Council of Europe</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1949</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#4E8BD4;"></div><span class="intl-row-name">Eurozone</span><span class="intl-row-year">1999</span></a>
+      </div>
+      <div class="intl-group">
+        <div class="intl-group-hd"><span>Trade &amp; Finance</span><span>5</span></div>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">G7</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1975</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">G20</span><span class="intl-row-year">1999</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">WTO</span><span class="intl-row-year">1995</span></div></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">OECD</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1961</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#5CAA6E;"></div><span class="intl-row-name">IMF</span><span class="intl-row-year">1945</span></a>
+      </div>
+      <div class="intl-group">
+        <div class="intl-group-hd"><span>Cultural &amp; Language</span><span>2</span></div>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#8a8370;"></div><span class="intl-row-name">Organisation Internationale de la Francophonie</span><span class="intl-row-badge badge-founding">Founding</span><span class="intl-row-year">1970</span></a>
+        <a class="intl-row" href="#"><div class="intl-row-dot" style="background:#8a8370;"></div><span class="intl-row-name">UNESCO</span><span class="intl-row-year">HQ Paris · 1945</span></a>
+      </div>
+    </div><!-- /ac-body-international -->
+
+    <!-- Other tab bodies (placeholders, hidden) -->
+    <div class="ac-body" id="ac-body-chamber" style="display:none;">
+      <div class="ac-empty">
+        <div class="ac-empty-icon">🏛</div>
+        <div class="ac-empty-msg">Chamber view</div>
+        <div class="ac-empty-sub">Hemicycle diagram for Assemblée nationale (577 seats) renders here — party breakdown, coalition shading, seat tooltip on hover.</div>
+      </div>
+    </div>
+    <div class="ac-body" id="ac-body-other" style="display:none;">
+      <div class="ac-empty">
+        <div class="ac-empty-icon">📋</div>
+        <div class="ac-empty-msg">Tab content</div>
+        <div class="ac-empty-sub">This tab's content renders in the center panel — same as today.</div>
+      </div>
+    </div>
+
+  </div><!-- /ac-center -->
+
+  <!-- RIGHT PANE: Ask Civica chatbot -->
+  <div class="ac-right">
+    <div class="ac-chat-header">
+      <span class="ac-chat-title">Ask Civica</span>
+      <span class="ac-chat-badge">AI</span>
+    </div>
+    <div class="ac-chat-messages">
+      <div class="ac-msg ai">
+        <div class="ac-msg-bubble">I'm <strong>Civica</strong>. I can explain bills in plain language, compare countries, or walk you through any chamber. What do you want to know?</div>
+      </div>
+      <div class="ac-msg user">
+        <div class="ac-msg-bubble">What international organizations does France belong to that Germany doesn't?</div>
+      </div>
+      <div class="ac-msg ai">
+        <div class="ac-msg-bubble">France belongs to <strong>8 organizations Germany doesn't</strong>, most notably:<br><br>• <strong>Organisation Internationale de la Francophonie (OIF)</strong> — France is a founding member; Germany has no official role.<br>• <strong>UN Security Council P5</strong> — France holds a permanent seat; Germany has only served as an elected member.<br>• <strong>Franc Zone (CFA)</strong> — France maintains currency ties with 14 African states; Germany has no equivalent.</div>
+        <div class="ac-msg-cite">↗ Wikidata P463 · France memberships · updated today</div>
+      </div>
+      <div class="ac-msg user">
+        <div class="ac-msg-bubble">When did France join NATO?</div>
+      </div>
+      <div class="ac-msg ai">
+        <div class="ac-msg-bubble">France was a <strong>founding member of NATO in 1949</strong>. However, in 1966, President de Gaulle withdrew France from NATO's integrated military command (while remaining a political member). France fully rejoined the military command under President Sarkozy in <strong>2009</strong>.</div>
+        <div class="ac-msg-cite">↗ NATO membership records · Civica database</div>
+      </div>
+    </div>
+    <div class="ac-chat-input-wrap">
+      <textarea class="ac-chat-input" placeholder="Ask about France's government, laws, or international role…" rows="1"></textarea>
+      <button class="ac-chat-send">↑</button>
+    </div>
+  </div>
+
+</div><!-- /atlas-correct -->
+</div><!-- /page-v2 -->
+
+<script>
+// ---- PAGE SWITCHER ----
+function showPage(id) {
+  document.getElementById('page-v1').classList.toggle('active', id === 'v1');
+  document.getElementById('page-v2').classList.toggle('active', id === 'v2');
+  document.getElementById('nav-v1').classList.toggle('page-active', id === 'v1');
+  document.getElementById('nav-v2').classList.toggle('page-active', id === 'v2');
+}
+
+// ---- CORRECT ATLAS (v2) INTERACTIONS ----
+function acSetMode(mode) {
+  document.getElementById('ac-mode-countries').classList.toggle('active', mode === 'countries');
+  document.getElementById('ac-mode-orgs').classList.toggle('active', mode === 'orgs');
+  document.getElementById('ac-list-countries').style.display = mode === 'countries' ? '' : 'none';
+  document.getElementById('ac-list-orgs').style.display = mode === 'orgs' ? '' : 'none';
+  document.getElementById('ac-search').placeholder = mode === 'countries' ? 'Search countries…' : 'Search organizations…';
+}
+
+function acSelectCountry(el, id, flag, name, gov) {
+  // Highlight row
+  document.querySelectorAll('#ac-list-countries .country-row').forEach(r => r.classList.remove('active'));
+  el.classList.add('active');
+  // Update header
+  document.getElementById('ac-flag').textContent = flag;
+  document.getElementById('ac-cname').textContent = name;
+  document.getElementById('ac-govtag').textContent = gov.replace(' Republic','').replace(' Monarchy','');
+  // Show International tab content (default when selecting a country for this demo)
+  acShowTab('international');
+}
+
+function acSelectOrg(el, name, fullname, typeClass) {
+  document.querySelectorAll('#ac-list-orgs .org-row').forEach(r => r.classList.remove('active'));
+  el.classList.add('active');
+  // Show org detail in center (reuse International body as org detail placeholder)
+  const hdr = document.getElementById('ac-country-hdr');
+  hdr.querySelector('.cflag').textContent = '';
+  hdr.querySelector('h2').textContent = name;
+  hdr.querySelector('.ac-gov-tag').textContent = typeClass.replace('t-','').replace('-',' ');
+  acShowTab('international');
+}
+
+function acShowTab(tabId) {
+  document.querySelectorAll('.ac-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('ac-body-international').style.display = 'none';
+  document.getElementById('ac-body-chamber').style.display = 'none';
+  document.getElementById('ac-body-other').style.display = 'none';
+  if (tabId === 'international') {
+    document.getElementById('act-international').classList.add('active');
+    document.getElementById('ac-body-international').style.display = '';
+  } else if (tabId === 'chamber') {
+    document.getElementById('act-chamber').classList.add('active');
+    document.getElementById('ac-body-chamber').style.display = '';
+  } else {
+    document.getElementById('ac-body-other').style.display = '';
+  }
+}
+
+// Wire up center tab bar clicks
+document.querySelectorAll('.ac-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const id = tab.id.replace('act-','');
+    acShowTab(id in {international:1, chamber:1} ? id : 'other');
+    // Re-set active on the clicked tab (acShowTab sets it only for known tabs)
+    if (!(id in {international:1, chamber:1})) {
+      document.querySelectorAll('.ac-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    }
+  });
+});
+
+// ---- DEMO STATE MACHINE ----
+function setDemo(state) {
+  document.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const mapNato = document.querySelectorAll('.nato-member');
+  const francePin = document.getElementById('france-pin');
+  const franceLabel = document.getElementById('france-label');
+  const rpOrg = document.getElementById('rp-org');
+  const rpCountry = document.getElementById('rp-country');
+  const bodyIntl = document.getElementById('body-intl');
+  const bodyChamber = document.getElementById('body-chamber');
+  const tabIntl = document.getElementById('tab-intl');
+  const tabChamber = document.getElementById('tab-chamber');
+  const mapCtxName = document.getElementById('map-ctx-name');
+  const mapCtxSub = document.getElementById('map-ctx-sub');
+  const legendDot = document.getElementById('legend-dot');
+  const legendLabel = document.getElementById('legend-label');
+
+  if (state === 'org-nato') {
+    // Show org mode: org left list, NATO highlighted on map, org detail in right
+    setMode('orgs');
+    mapNato.forEach(el => { el.style.opacity = '1'; });
+    francePin.style.display = 'none';
+    franceLabel.style.display = 'none';
+    rpOrg.classList.add('active');
+    rpCountry.classList.remove('active');
+    mapCtxName.textContent = 'NATO';
+    mapCtxSub.textContent = '32 member states highlighted';
+    legendDot.style.background = '#D4764E';
+    legendLabel.textContent = 'NATO member';
+    // Highlight NATO row in list
+    document.querySelectorAll('.org-row').forEach(r => r.classList.remove('active'));
+    document.getElementById('org-row-nato').classList.add('active');
+
+  } else if (state === 'country-france') {
+    // Show country mode: country left list, France pinned on map, country right pane with International tab
+    setMode('countries');
+    mapNato.forEach(el => { el.style.opacity = '0.08'; });
+    francePin.style.display = 'block';
+    franceLabel.style.display = 'block';
+    rpOrg.classList.remove('active');
+    rpCountry.classList.add('active');
+    // International tab active
+    document.querySelectorAll('.rp-tab').forEach(t => t.classList.remove('active'));
+    tabIntl.classList.add('active');
+    bodyIntl.style.display = '';
+    bodyChamber.style.display = 'none';
+    mapCtxName.textContent = 'France';
+    mapCtxSub.textContent = '47 org memberships shown on map';
+    legendDot.style.background = '#D4A04A';
+    legendLabel.textContent = 'France selected';
+    // Highlight France in list
+    document.querySelectorAll('.country-row').forEach(r => r.classList.remove('active'));
+    document.getElementById('country-row-france').classList.add('active');
+
+  } else if (state === 'country-france-chamber') {
+    // Country mode, Chamber tab
+    setMode('countries');
+    mapNato.forEach(el => { el.style.opacity = '0.08'; });
+    francePin.style.display = 'block';
+    franceLabel.style.display = 'block';
+    rpOrg.classList.remove('active');
+    rpCountry.classList.add('active');
+    document.querySelectorAll('.rp-tab').forEach(t => t.classList.remove('active'));
+    tabChamber.classList.add('active');
+    bodyIntl.style.display = 'none';
+    bodyChamber.style.display = '';
+    mapCtxName.textContent = 'France';
+    mapCtxSub.textContent = 'Assemblée nationale · 577 seats';
+    legendDot.style.background = '#4E8BD4';
+    legendLabel.textContent = 'Lower house';
+    document.querySelectorAll('.country-row').forEach(r => r.classList.remove('active'));
+    document.getElementById('country-row-france').classList.add('active');
+  }
+}
+
+function setMode(mode) {
+  document.getElementById('mode-countries').classList.toggle('active', mode === 'countries');
+  document.getElementById('mode-orgs').classList.toggle('active', mode === 'orgs');
+  document.getElementById('list-countries').style.display = mode === 'countries' ? '' : 'none';
+  document.getElementById('list-orgs').style.display = mode === 'orgs' ? '' : 'none';
+  document.getElementById('search-input').placeholder = mode === 'countries' ? 'Search countries…' : 'Search organizations…';
+}
+
+function selectOrg(id) {
+  document.querySelectorAll('.org-row').forEach(r => r.classList.remove('active'));
+  document.getElementById('org-row-' + id)?.classList.add('active');
+}
+function selectCountry(id) {
+  document.querySelectorAll('.country-row').forEach(r => r.classList.remove('active'));
+  document.getElementById('country-row-' + id)?.classList.add('active');
+}
+
+// Tab switching on right pane
+document.querySelectorAll('.rp-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.rp-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    // Show/hide body
+    const bodyIntl = document.getElementById('body-intl');
+    const bodyChamber = document.getElementById('body-chamber');
+    if (tab.id === 'tab-intl') { bodyIntl.style.display = ''; bodyChamber.style.display = 'none'; }
+    else if (tab.id === 'tab-chamber') { bodyIntl.style.display = 'none'; bodyChamber.style.display = ''; }
+    else { bodyIntl.style.display = 'none'; bodyChamber.style.display = 'none'; }
+  });
+});
+
+// Init
+setDemo('org-nato');
+</script>
+</body>
+</html>

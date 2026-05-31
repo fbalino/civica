@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Advanced Country Filters — Civica mockup</title>
+<style>
+  :root {
+    --paper:  #FAF7F2;
+    --canvas: #FFFCF8;
+    --alt:    #F2F4F7;
+    --ink:    #0B1220;
+    --ink-85: rgba(11,18,32,.88);
+    --slate:  #334155;
+    --muted:  #475569;
+    --pewter: #94A3B8;
+    --rule:   #c4bdae;
+    --accent: #A87241;
+
+    /* government-type ramp (mirrors src/lib/data/government-category.ts) */
+    --gov-pres: #C25D3A;  /* Presidential — terracotta */
+    --gov-parl: #2D6CDF;  /* Parliamentary — blue */
+    --gov-fed:  #2E7D59;  /* Federal — green */
+    --gov-semi: #7C59C9;  /* Semi-presidential — violet */
+    --gov-cmon: #C9A24B;  /* Constitutional monarchy — gold */
+    --gov-amon: #8B5A2B;  /* Absolute monarchy — bronze */
+    --gov-comm: #E44040;  /* Communist — red */
+    --gov-one:  #B03030;  /* One-party — deep red */
+
+    --serif: Fraunces, Georgia, "Times New Roman", serif;
+    --sans:  Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono:  ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  [data-theme="dark"] {
+    --paper:  #14110d;
+    --canvas: #1a1612;
+    --alt:    #221d18;
+    --ink:    #f4f1ea;
+    --ink-85: rgba(244,241,234,.88);
+    --slate:  #cdc6b6;
+    --muted:  #8a8370;
+    --pewter: #6a6357;
+    --rule:   #3a342a;
+    --accent: #d39466;
+    --gov-pres: #d97a55;
+    --gov-parl: #5b8de8;
+    --gov-fed:  #3e9d72;
+    --gov-semi: #9b7fd6;
+    --gov-cmon: #d4b665;
+    --gov-amon: #b3814d;
+    --gov-comm: #ec6a6a;
+    --gov-one:  #cf5757;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:15px; }
+  .shell { max-width:1320px; margin:0 auto; padding:32px 24px 96px; }
+  a { color:inherit; }
+
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding-bottom:20px; border-bottom:1px solid var(--rule); margin-bottom:32px; }
+  .brand { font-family:var(--serif); font-weight:600; font-size:22px; letter-spacing:-0.01em; }
+  .topbar-right { display:flex; gap:12px; align-items:center; font-size:12px; color:var(--muted); }
+  button.theme { background:none; border:1px solid var(--rule); padding:6px 10px; border-radius:4px; font:inherit; color:inherit; cursor:pointer; }
+
+  /* MOCKUP META */
+  .mockmeta { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:26px; }
+  .mockmeta b { color:var(--ink); }
+
+  /* HEADER */
+  h1 { font-family:var(--serif); font-weight:500; font-size:50px; line-height:1.05; letter-spacing:-0.02em; margin:0 0 12px; }
+  .lede { font-family:var(--serif); font-size:19px; line-height:1.5; color:var(--ink-85); max-width:680px; margin:0 0 26px; }
+
+  /* AGGREGATE STATS */
+  .aggrow { display:flex; gap:0; align-items:center; margin-bottom:30px; flex-wrap:wrap; }
+  .aggstat { display:flex; flex-direction:column; gap:3px; padding-right:26px; }
+  .aggstat + .aggdiv { margin-right:26px; }
+  .aggdiv { width:1px; align-self:stretch; background:var(--rule); }
+  .aggstat .v { font-family:var(--serif); font-size:30px; font-weight:500; line-height:1; }
+  .aggstat .l { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+
+  /* ===== FILTER BAR ===== */
+  .filterbar { background:var(--canvas); border:1px solid var(--rule); box-shadow:5px 5px 0 var(--ink); padding:20px 22px; margin-bottom:8px; }
+  .facet { display:flex; align-items:flex-start; gap:14px; padding:11px 0; border-bottom:1px dashed var(--rule); }
+  .facet:last-child { border-bottom:none; }
+  .facet-label { flex:0 0 132px; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); padding-top:7px; }
+  .facet-label .hint { display:block; font-size:9px; letter-spacing:.04em; color:var(--pewter); margin-top:2px; text-transform:none; }
+  .chips { display:flex; gap:7px; flex-wrap:wrap; flex:1; }
+
+  /* CHIP */
+  .chip {
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.02em;
+    padding:5px 11px; border-radius:999px; cursor:pointer; user-select:none;
+    border:1px solid var(--rule); background:var(--paper); color:var(--slate);
+    transition:background .12s, border-color .12s, color .12s;
+  }
+  .chip:hover { border-color:var(--accent); }
+  .chip .swatch { width:9px; height:9px; border-radius:50%; flex:0 0 9px; }
+  .chip .ct { color:var(--pewter); font-size:10px; }
+  .chip[aria-pressed="true"] {
+    background:var(--ink); color:var(--paper); border-color:var(--ink);
+  }
+  .chip[aria-pressed="true"] .ct { color:rgba(255,255,255,.6); }
+  [data-theme="dark"] .chip[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:#1a1612; }
+  [data-theme="dark"] .chip[aria-pressed="true"] .ct { color:rgba(26,22,18,.6); }
+  /* government chips keep their hue when selected */
+  .chip.gov[aria-pressed="true"] { background:var(--gc); border-color:var(--gc); color:#fff; }
+  .chip.gov[aria-pressed="true"] .swatch { background:#fff !important; }
+
+  /* ===== ACTIVE FILTER ROW ===== */
+  .activebar {
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:13px 22px; background:var(--alt); border:1px solid var(--rule); border-top:none;
+    margin-bottom:26px;
+  }
+  .activebar .rescount { font-family:var(--serif); font-size:16px; font-weight:500; }
+  .activebar .rescount b { color:var(--accent); }
+  .activebar .sep { width:1px; height:18px; background:var(--rule); }
+  .activebar .applied-label { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+  .pill {
+    display:inline-flex; align-items:center; gap:7px;
+    font-family:var(--mono); font-size:11px;
+    background:var(--canvas); border:1px solid var(--rule); border-radius:999px;
+    padding:4px 6px 4px 10px;
+  }
+  .pill .x {
+    width:16px; height:16px; border-radius:50%; display:inline-flex;
+    align-items:center; justify-content:center; cursor:pointer;
+    background:var(--rule); color:var(--canvas); font-size:11px; line-height:1;
+  }
+  .pill .x:hover { background:var(--gov-comm); }
+  .pill .facet-tag { color:var(--pewter); }
+  .clear-all {
+    font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.07em;
+    color:var(--accent); cursor:pointer; background:none; border:none; padding:4px 2px;
+    text-decoration:underline; text-underline-offset:3px;
+  }
+  .no-filters { font-family:var(--mono); font-size:11px; color:var(--pewter); }
+
+  /* ===== COUNTRY GRID ===== */
+  .section-head { display:flex; align-items:baseline; gap:10px; margin:24px 0 12px; }
+  .section-head h2 { font-family:var(--serif); font-weight:500; font-size:20px; margin:0; }
+  .section-head .meta { font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .card {
+    background:var(--canvas); border:1px solid var(--rule); padding:14px;
+    display:flex; flex-direction:column; gap:11px; box-shadow:3px 3px 0 var(--ink);
+    transition:transform .1s;
+  }
+  .card:hover { transform:translate(-1px,-1px); }
+  .card-top { display:flex; align-items:center; gap:10px; }
+  .flag { font-size:26px; line-height:1; }
+  .card-name { font-family:var(--serif); font-size:16px; font-weight:500; }
+  .card-cap { font-family:var(--mono); font-size:10.5px; color:var(--muted); }
+  .card-bot { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .gov-badge {
+    font-family:var(--mono); font-size:10px; padding:3px 8px; border-radius:3px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:122px;
+  }
+  .card-data { display:flex; gap:8px; font-family:var(--mono); font-size:10.5px; color:var(--muted); }
+  .card-data .dim { color:var(--pewter); }
+  .empty {
+    grid-column:1/-1; text-align:center; padding:48px 20px;
+    font-family:var(--mono); font-size:12px; color:var(--muted);
+    border:1px dashed var(--rule);
+  }
+
+  /* ===== SIDE NOTES ===== */
+  .notes { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:42px; }
+  .note { border:1px solid var(--rule); background:var(--canvas); padding:18px 20px; }
+  .note h3 { font-family:var(--serif); font-weight:500; font-size:16px; margin:0 0 10px; }
+  .note p, .note li { font-size:13px; line-height:1.6; color:var(--ink-85); }
+  .note ul { margin:0; padding-left:18px; }
+  .urlbox {
+    font-family:var(--mono); font-size:11.5px; background:var(--alt);
+    border:1px solid var(--rule); padding:10px 12px; margin-top:8px;
+    word-break:break-all; line-height:1.7; color:var(--slate);
+  }
+  .urlbox .k { color:var(--accent); }
+  .urlbox .v { color:var(--ink); font-weight:600; }
+
+  /* ===== MOBILE PREVIEW ===== */
+  .mobile-wrap { margin-top:42px; }
+  .mobile-wrap h3 { font-family:var(--serif); font-weight:500; font-size:16px; margin:0 0 14px; }
+  .phone {
+    width:300px; border:1px solid var(--rule); background:var(--canvas);
+    box-shadow:6px 6px 0 var(--ink); padding:16px;
+  }
+  .phone .ph-h1 { font-family:var(--serif); font-size:24px; font-weight:500; margin:0 0 12px; }
+  .filter-trigger {
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%; padding:11px 14px; border:1px solid var(--ink); background:var(--paper);
+    font-family:var(--mono); font-size:12px; cursor:pointer; margin-bottom:12px;
+  }
+  .filter-trigger .badge {
+    background:var(--accent); color:#fff; font-size:10px;
+    border-radius:999px; padding:2px 8px;
+  }
+  .ph-card {
+    border:1px solid var(--rule); padding:10px; margin-bottom:8px;
+    display:flex; align-items:center; gap:9px;
+  }
+  .ph-card .flag { font-size:20px; }
+  .ph-card .nm { font-family:var(--serif); font-size:14px; }
+  .ph-card .gb { font-family:var(--mono); font-size:9px; padding:2px 6px; border-radius:3px; margin-left:auto; }
+
+  .footer-note { margin-top:46px; padding-top:18px; border-top:1px solid var(--rule); font-family:var(--mono); font-size:11px; color:var(--muted); line-height:1.7; }
+
+  @media (max-width:980px) {
+    .grid { grid-template-columns:repeat(2,1fr); }
+    .notes { grid-template-columns:1fr; }
+    .facet-label { flex-basis:100%; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="topbar">
+    <div class="brand">Civica Atlas</div>
+    <div class="topbar-right">
+      <span>/countries</span>
+      <button class="theme" onclick="toggleTheme()">◐ Theme</button>
+    </div>
+  </div>
+
+  <div class="mockmeta">
+    Mockup · <b>Advanced Country Filters</b> · Q2 Tier-1 Sprint item #3 (CIV-211) ·
+    2026-05-20 · Product Discovery Session 9 (CIV-214)
+  </div>
+
+  <h1>Countries &amp; Territories</h1>
+  <p class="lede">
+    A comprehensive index of sovereign states — their governments, populations,
+    and political systems. Narrow the list by any combination of facets.
+  </p>
+
+  <div class="aggrow">
+    <div class="aggstat"><span class="v">250</span><span class="l">Countries</span></div>
+    <div class="aggdiv"></div>
+    <div class="aggstat"><span class="v">6</span><span class="l">Continents</span></div>
+    <div class="aggdiv"></div>
+    <div class="aggstat"><span class="v">8.12B</span><span class="l">Total population</span></div>
+  </div>
+
+  <!-- ===== FILTER BAR ===== -->
+  <div class="filterbar" id="filterbar">
+    <div class="facet" data-facet="continent">
+      <div class="facet-label">Continent<span class="hint">match any</span></div>
+      <div class="chips" id="chips-continent"></div>
+    </div>
+    <div class="facet" data-facet="gov">
+      <div class="facet-label">Government<span class="hint">match any</span></div>
+      <div class="chips" id="chips-gov"></div>
+    </div>
+    <div class="facet" data-facet="pop">
+      <div class="facet-label">Population<span class="hint">match any band</span></div>
+      <div class="chips" id="chips-pop"></div>
+    </div>
+    <div class="facet" data-facet="di">
+      <div class="facet-label">Democracy Index<span class="hint">match any band</span></div>
+      <div class="chips" id="chips-di"></div>
+    </div>
+  </div>
+
+  <!-- ===== ACTIVE FILTER ROW ===== -->
+  <div class="activebar" id="activebar"></div>
+
+  <!-- ===== RESULT GRID ===== -->
+  <div class="section-head">
+    <h2 id="grid-title">All countries</h2>
+    <span class="meta" id="grid-meta"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+
+  <!-- ===== DESIGN NOTES ===== -->
+  <div class="notes">
+    <div class="note">
+      <h3>Lightweight URL state</h3>
+      <p>
+        Every selection is serialised into the query string as comma-joined
+        slugs — one key per facet. The page stays a server component; filtering
+        re-runs on the server from <span style="font-family:var(--mono);font-size:11px">searchParams</span>,
+        no client store, no schema change.
+      </p>
+      <div class="urlbox" id="urlbox">/countries</div>
+      <p style="margin-bottom:0">
+        Shareable, bookmarkable, and back-button safe. Empty facets are simply
+        absent from the URL.
+      </p>
+    </div>
+    <div class="note">
+      <h3>What changed vs. today</h3>
+      <ul>
+        <li><b>Continent</b> goes from single-select tabs → multi-select chips.</li>
+        <li><b>Three new facets</b> reuse fields already on the country row —
+            government category, population, democracy index. No new columns.</li>
+        <li>Chips show a <b>live count</b> of how many countries match each
+            value, so dead-end filters are visible before you click.</li>
+        <li>An <b>applied-filters row</b> summarises state and gives one-click
+            removal + “clear all”.</li>
+        <li>Logic: <b>OR within a facet, AND across facets</b> — the predictable
+            default for faceted browse.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== MOBILE PREVIEW ===== -->
+  <div class="mobile-wrap">
+    <h3>Mobile — filters collapse into a drawer trigger</h3>
+    <div class="phone">
+      <div class="ph-h1">Countries</div>
+      <div class="filter-trigger">
+        <span>⚙ Filters</span>
+        <span class="badge">3 active</span>
+      </div>
+      <div class="ph-card">
+        <span class="flag">🇧🇷</span><span class="nm">Brazil</span>
+        <span class="gb" style="background:color-mix(in srgb,var(--gov-pres) 14%,transparent);color:var(--gov-pres)">Presidential</span>
+      </div>
+      <div class="ph-card">
+        <span class="flag">🇦🇷</span><span class="nm">Argentina</span>
+        <span class="gb" style="background:color-mix(in srgb,var(--gov-pres) 14%,transparent);color:var(--gov-pres)">Presidential</span>
+      </div>
+      <div class="ph-card">
+        <span class="flag">🇨🇱</span><span class="nm">Chile</span>
+        <span class="gb" style="background:color-mix(in srgb,var(--gov-pres) 14%,transparent);color:var(--gov-pres)">Presidential</span>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center;padding-top:6px">
+        tap a country to open its dossier
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Self-contained mockup — interactive: click chips to filter, remove pills, toggle theme.
+    Demonstrates Q2 Tier-1 sprint item #3 (Advanced Country Filters) from CIV-211.
+    Sample set = 24 representative countries; production renders the full ~250-row index.
+    Estimate from sprint plan: 2 engineer-days, frontend-only, no schema additions.
+  </div>
+
+</div>
+
+<script>
+  function toggleTheme(){
+    const h=document.documentElement;
+    h.dataset.theme = h.dataset.theme==='dark'?'light':'dark';
+  }
+
+  /* ---- sample dataset (24 representative countries) ---- */
+  const GOV = {
+    presidential:        {label:'Presidential',           color:'var(--gov-pres)'},
+    parliamentary:       {label:'Parliamentary',          color:'var(--gov-parl)'},
+    federal:             {label:'Federal',                color:'var(--gov-fed)'},
+    'semi-presidential': {label:'Semi-presidential',      color:'var(--gov-semi)'},
+    'constitutional-monarchy':{label:'Constitutional monarchy',color:'var(--gov-cmon)'},
+    'absolute-monarchy': {label:'Absolute monarchy',      color:'var(--gov-amon)'},
+    communist:           {label:'Communist',              color:'var(--gov-comm)'},
+    'one-party':         {label:'One-party',              color:'var(--gov-one)'},
+  };
+  const COUNTRIES = [
+    {n:'Nigeria',      cap:'Abuja',        f:'🇳🇬', cont:'Africa',        gov:'presidential',            pop:223800000, di:4.2},
+    {n:'South Africa', cap:'Pretoria',     f:'🇿🇦', cont:'Africa',        gov:'parliamentary',           pop:60410000,  di:7.0},
+    {n:'Egypt',        cap:'Cairo',        f:'🇪🇬', cont:'Africa',        gov:'presidential',            pop:111000000, di:2.9},
+    {n:'Kenya',        cap:'Nairobi',      f:'🇰🇪', cont:'Africa',        gov:'presidential',            pop:55100000,  di:5.0},
+    {n:'China',        cap:'Beijing',      f:'🇨🇳', cont:'Asia',          gov:'one-party',               pop:1410000000,di:1.9},
+    {n:'India',        cap:'New Delhi',    f:'🇮🇳', cont:'Asia',          gov:'parliamentary',           pop:1430000000,di:7.0},
+    {n:'Japan',        cap:'Tokyo',        f:'🇯🇵', cont:'Asia',          gov:'constitutional-monarchy', pop:124000000, di:8.4},
+    {n:'Saudi Arabia', cap:'Riyadh',       f:'🇸🇦', cont:'Asia',          gov:'absolute-monarchy',       pop:36900000,  di:2.1},
+    {n:'Germany',      cap:'Berlin',       f:'🇩🇪', cont:'Europe',        gov:'federal',                 pop:84000000,  di:8.6},
+    {n:'France',       cap:'Paris',        f:'🇫🇷', cont:'Europe',        gov:'semi-presidential',       pop:68200000,  di:8.1},
+    {n:'United Kingdom',cap:'London',      f:'🇬🇧', cont:'Europe',        gov:'constitutional-monarchy', pop:67700000,  di:8.3},
+    {n:'Hungary',      cap:'Budapest',     f:'🇭🇺', cont:'Europe',        gov:'parliamentary',           pop:9600000,   di:6.5},
+    {n:'United States',cap:'Washington',   f:'🇺🇸', cont:'North America', gov:'presidential',            pop:335000000, di:7.8},
+    {n:'Mexico',       cap:'Mexico City',  f:'🇲🇽', cont:'North America', gov:'presidential',            pop:129000000, di:5.1},
+    {n:'Canada',       cap:'Ottawa',       f:'🇨🇦', cont:'North America', gov:'constitutional-monarchy', pop:39000000,  di:8.7},
+    {n:'Cuba',         cap:'Havana',       f:'🇨🇺', cont:'North America', gov:'communist',               pop:11000000,  di:2.6},
+    {n:'Brazil',       cap:'Brasília',     f:'🇧🇷', cont:'South America', gov:'presidential',            pop:216000000, di:6.8},
+    {n:'Argentina',    cap:'Buenos Aires', f:'🇦🇷', cont:'South America', gov:'presidential',            pop:46000000,  di:6.6},
+    {n:'Chile',        cap:'Santiago',     f:'🇨🇱', cont:'South America', gov:'presidential',            pop:19600000,  di:7.9},
+    {n:'Colombia',     cap:'Bogotá',       f:'🇨🇴', cont:'South America', gov:'presidential',            pop:52000000,  di:6.5},
+    {n:'Australia',    cap:'Canberra',     f:'🇦🇺', cont:'Oceania',       gov:'constitutional-monarchy', pop:26000000,  di:8.7},
+    {n:'New Zealand',  cap:'Wellington',   f:'🇳🇿', cont:'Oceania',       gov:'constitutional-monarchy', pop:5200000,   di:9.6},
+    {n:'Papua New Guinea',cap:'Port Moresby',f:'🇵🇬',cont:'Oceania',      gov:'parliamentary',           pop:10300000,  di:6.0},
+    {n:'Fiji',         cap:'Suva',         f:'🇫🇯', cont:'Oceania',       gov:'parliamentary',           pop:930000,    di:5.6},
+  ];
+
+  const CONTINENTS = ['Africa','Asia','Europe','North America','South America','Oceania'];
+  const POP_BANDS = [
+    {id:'lt1m',  label:'< 1M',     test:p=>p<1e6},
+    {id:'1-10m', label:'1–10M',    test:p=>p>=1e6&&p<1e7},
+    {id:'10-50m',label:'10–50M',   test:p=>p>=1e7&&p<5e7},
+    {id:'50-100m',label:'50–100M', test:p=>p>=5e7&&p<1e8},
+    {id:'100m+', label:'100M+',    test:p=>p>=1e8},
+  ];
+  const DI_BANDS = [
+    {id:'full',  label:'Full democracy',  sub:'8.0–10', test:d=>d>=8},
+    {id:'flawed',label:'Flawed democracy',sub:'6.0–7.9',test:d=>d>=6&&d<8},
+    {id:'hybrid',label:'Hybrid regime',   sub:'4.0–5.9',test:d=>d>=4&&d<6},
+    {id:'auth',  label:'Authoritarian',   sub:'0–3.9',  test:d=>d<4},
+  ];
+
+  /* selected state */
+  const sel = {continent:new Set(), gov:new Set(), pop:new Set(), di:new Set()};
+
+  function fmtPop(p){
+    if(p>=1e9) return (p/1e9).toFixed(2)+'B';
+    if(p>=1e6) return (p/1e6).toFixed(1)+'M';
+    if(p>=1e3) return Math.round(p/1e3)+'K';
+    return ''+p;
+  }
+  function diBand(d){ return DI_BANDS.find(b=>b.test(d)); }
+  function popBand(p){ return POP_BANDS.find(b=>b.test(p)); }
+
+  /* count helper — how many countries match a candidate value,
+     respecting *other* facets but not this one (classic facet count) */
+  function countFor(facet, value){
+    return COUNTRIES.filter(c=>{
+      if(facet!=='continent' && sel.continent.size && !sel.continent.has(c.cont)) return false;
+      if(facet!=='gov' && sel.gov.size && !sel.gov.has(c.gov)) return false;
+      if(facet!=='pop' && sel.pop.size && !sel.pop.has(popBand(c.pop).id)) return false;
+      if(facet!=='di'  && sel.di.size  && !sel.di.has(diBand(c.di).id)) return false;
+      if(facet==='continent') return c.cont===value;
+      if(facet==='gov')       return c.gov===value;
+      if(facet==='pop')       return popBand(c.pop).id===value;
+      if(facet==='di')        return diBand(c.di).id===value;
+    }).length;
+  }
+
+  function matches(c){
+    if(sel.continent.size && !sel.continent.has(c.cont)) return false;
+    if(sel.gov.size && !sel.gov.has(c.gov)) return false;
+    if(sel.pop.size && !sel.pop.has(popBand(c.pop).id)) return false;
+    if(sel.di.size && !sel.di.has(diBand(c.di).id)) return false;
+    return true;
+  }
+
+  function chip(facet,value,label,opts){
+    opts=opts||{};
+    const pressed=sel[facet].has(value);
+    const ct=countFor(facet,value);
+    const el=document.createElement('button');
+    el.className='chip'+(opts.gov?' gov':'');
+    el.setAttribute('aria-pressed',pressed);
+    if(opts.gov){ el.style.setProperty('--gc',opts.color); }
+    let inner='';
+    if(opts.gov) inner+='<span class="swatch" style="background:'+opts.color+'"></span>';
+    inner+='<span>'+label+'</span><span class="ct">'+ct+'</span>';
+    el.innerHTML=inner;
+    if(ct===0 && !pressed){ el.style.opacity=.4; }
+    el.onclick=()=>{ pressed?sel[facet].delete(value):sel[facet].add(value); render(); };
+    return el;
+  }
+
+  function render(){
+    /* facet chip rows */
+    const cc=document.getElementById('chips-continent'); cc.innerHTML='';
+    CONTINENTS.forEach(x=>cc.appendChild(chip('continent',x,x)));
+    const cg=document.getElementById('chips-gov'); cg.innerHTML='';
+    Object.keys(GOV).forEach(k=>cg.appendChild(chip('gov',k,GOV[k].label,{gov:true,color:GOV[k].color})));
+    const cp=document.getElementById('chips-pop'); cp.innerHTML='';
+    POP_BANDS.forEach(b=>cp.appendChild(chip('pop',b.id,b.label)));
+    const cd=document.getElementById('chips-di'); cd.innerHTML='';
+    DI_BANDS.forEach(b=>cd.appendChild(chip('di',b.id,b.label)));
+
+    /* active bar */
+    const ab=document.getElementById('activebar'); ab.innerHTML='';
+    const results=COUNTRIES.filter(matches);
+    const rc=document.createElement('span');
+    rc.className='rescount';
+    rc.innerHTML='<b>'+results.length+'</b> of '+COUNTRIES.length+' countries';
+    ab.appendChild(rc);
+
+    const totalSel=sel.continent.size+sel.gov.size+sel.pop.size+sel.di.size;
+    if(totalSel){
+      const sep=document.createElement('span'); sep.className='sep'; ab.appendChild(sep);
+      const lbl=document.createElement('span'); lbl.className='applied-label'; lbl.textContent='Applied'; ab.appendChild(lbl);
+      const addPill=(facet,value,tag,label)=>{
+        const p=document.createElement('span'); p.className='pill';
+        p.innerHTML='<span class="facet-tag">'+tag+'</span><span>'+label+'</span>';
+        const x=document.createElement('span'); x.className='x'; x.textContent='×';
+        x.onclick=()=>{ sel[facet].delete(value); render(); };
+        p.appendChild(x); ab.appendChild(p);
+      };
+      sel.continent.forEach(v=>addPill('continent',v,'continent',v));
+      sel.gov.forEach(v=>addPill('gov',v,'gov',GOV[v].label));
+      sel.pop.forEach(v=>addPill('pop',v,'pop',POP_BANDS.find(b=>b.id===v).label));
+      sel.di.forEach(v=>addPill('di',v,'index',DI_BANDS.find(b=>b.id===v).label));
+      const ca=document.createElement('button'); ca.className='clear-all'; ca.textContent='Clear all';
+      ca.onclick=()=>{ Object.values(sel).forEach(s=>s.clear()); render(); };
+      ab.appendChild(ca);
+    } else {
+      const nf=document.createElement('span'); nf.className='no-filters';
+      nf.textContent='— no filters applied, showing everything';
+      ab.appendChild(nf);
+    }
+
+    /* grid */
+    document.getElementById('grid-title').textContent = totalSel?'Filtered results':'All countries';
+    document.getElementById('grid-meta').textContent = results.length+(results.length===1?' country':' countries');
+    const g=document.getElementById('grid'); g.innerHTML='';
+    if(!results.length){
+      g.innerHTML='<div class="empty">No countries match this combination of filters.<br>Try removing a facet above.</div>';
+    }
+    results.sort((a,b)=>b.pop-a.pop).forEach(c=>{
+      const gv=GOV[c.gov];
+      const card=document.createElement('a');
+      card.className='card'; card.href='#';
+      card.innerHTML=
+        '<div class="card-top"><span class="flag">'+c.f+'</span>'+
+        '<div><div class="card-name">'+c.n+'</div>'+
+        '<div class="card-cap">'+c.cap+'</div></div></div>'+
+        '<div class="card-bot">'+
+        '<span class="gov-badge" style="color:'+gv.color+';background:color-mix(in srgb,'+gv.color+' 12%,transparent);border:1px solid color-mix(in srgb,'+gv.color+' 28%,transparent)">'+gv.label+'</span>'+
+        '<div class="card-data"><span>'+fmtPop(c.pop)+'</span>'+
+        '<span class="dim">DI '+c.di.toFixed(1)+'</span></div></div>';
+      g.appendChild(card);
+    });
+
+    /* url preview */
+    const parts=[];
+    if(sel.continent.size) parts.push('continent='+[...sel.continent].map(encodeURIComponent).join(','));
+    if(sel.gov.size) parts.push('gov='+[...sel.gov].join(','));
+    if(sel.pop.size) parts.push('pop='+[...sel.pop].join(','));
+    if(sel.di.size) parts.push('di='+[...sel.di].join(','));
+    const box=document.getElementById('urlbox');
+    if(parts.length){
+      box.innerHTML='/countries?'+parts.map(p=>{
+        const [k,v]=p.split('=');
+        return '<span class="k">'+k+'</span>=<span class="v">'+v+'</span>';
+      }).join('<span class="k">&amp;</span>');
+    } else {
+      box.textContent='/countries';
+    }
+  }
+
+  render();
+</script>
+</body>
+</html>

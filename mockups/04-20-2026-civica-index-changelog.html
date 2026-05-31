@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica Pulse — Global Changelog (Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    --color-bg: #16140f;
+    --color-bg-nav: rgba(22,20,15,0.92);
+    --color-surface-elevated: #221e16;
+    --color-text-primary: #ebe6d6;
+    --color-text-60: #c4bdae;
+    --color-text-50: rgba(235,230,214,0.64);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(235,230,214,0.50);
+    --color-text-25: rgba(235,230,214,0.48);
+    --color-text-20: rgba(235,230,214,0.40);
+    --color-accent: oklch(68% 0.15 35);
+    --color-card-bg: #221e16;
+    --color-card-border: #3d382d;
+    --color-card-hover-bg: #2b2619;
+    --color-divider: #3d382d;
+    --color-grid-bg: #221e16;
+    --color-grid-cell: #16140f;
+    --color-grid-cell-hover: #2b2619;
+    --color-source-live: #5CAA6E;
+    --color-source-frozen: #D4A04A;
+    --tier-exceptional: oklch(68% 0.14 145);
+    --tier-strong: oklch(60% 0.11 155);
+    --tier-mixed: oklch(75% 0.14 75);
+    --tier-weak: oklch(62% 0.15 45);
+    --tier-failed: oklch(55% 0.18 25);
+  }
+  html[data-theme="light"] {
+    --color-bg: #f4f1ea;
+    --color-bg-nav: rgba(244,241,234,0.92);
+    --color-surface-elevated: #ebe6d6;
+    --color-text-primary: #1a1a1a;
+    --color-text-60: #3d382d;
+    --color-text-50: rgba(26,26,26,0.62);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(26,26,26,0.53);
+    --color-text-25: rgba(26,26,26,0.48);
+    --color-text-20: rgba(26,26,26,0.38);
+    --color-accent: oklch(58% 0.14 35);
+    --color-card-bg: #ebe6d6;
+    --color-card-border: #c4bdae;
+    --color-card-hover-bg: #e2dcc8;
+    --color-divider: #c4bdae;
+    --color-grid-bg: #ebe6d6;
+    --color-grid-cell: #f4f1ea;
+    --color-grid-cell-hover: #e2dcc8;
+    --tier-exceptional: oklch(55% 0.12 145);
+    --tier-strong: oklch(48% 0.10 155);
+    --tier-mixed: oklch(65% 0.14 75);
+    --tier-weak: oklch(55% 0.15 45);
+    --tier-failed: oklch(52% 0.18 25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--color-bg); color: var(--color-text-primary); line-height: 1.65; -webkit-font-smoothing: antialiased; transition: background-color .3s, color .2s; }
+
+  .nav { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(10px); background: var(--color-bg-nav); border-bottom: 1px solid var(--color-divider); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .nav-brand { font-family: var(--font-heading); font-size: 22px; letter-spacing: -0.02em; color: var(--color-text-primary); text-decoration: none; }
+  .nav-brand em { font-style: normal; color: var(--color-accent); }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-40); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
+  .nav-links a.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+  .theme-toggle { background: transparent; color: var(--color-text-50); border: 1px solid var(--color-card-border); padding: 6px 10px; border-radius: 4px; cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+  .breadcrumb { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-30); padding: 32px 0 14px; }
+  .breadcrumb a { color: var(--color-text-30); text-decoration: none; }
+
+  .hero {
+    padding: 8px 0 40px;
+    display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: end;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--color-text-30); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-source-live); animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(92,170,110,0.6); }
+    70% { box-shadow: 0 0 0 10px rgba(92,170,110,0); }
+    100% { box-shadow: 0 0 0 0 rgba(92,170,110,0); }
+  }
+  .hero-title { font-family: var(--font-heading); font-size: 56px; font-weight: 400; letter-spacing: -0.04em; line-height: 1.02; }
+  .hero-lede { font-family: var(--font-body); font-size: 16px; color: var(--color-text-60); line-height: 1.6; max-width: 520px; }
+
+  /* filter bar */
+  .filter-bar {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    padding: 16px 20px;
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    background: var(--color-grid-cell);
+    margin-bottom: 8px;
+  }
+  .chip {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 12px; padding: 7px 14px;
+    background: transparent; color: var(--color-text-40);
+    border: 1px solid var(--color-card-border);
+    border-radius: 4px; cursor: pointer;
+    transition: all .15s;
+  }
+  .chip:hover { color: var(--color-text-primary); border-color: var(--color-text-40); }
+  .chip--active { background: var(--color-accent); color: var(--color-bg); border-color: var(--color-accent); }
+  .filter-spacer { flex: 1; }
+  .search-input {
+    background: transparent; border: 1px solid var(--color-card-border);
+    color: var(--color-text-primary); padding: 8px 12px; border-radius: 4px;
+    font-family: var(--font-mono); font-size: 12px;
+    min-width: 180px;
+  }
+
+  /* daily summary sparkline */
+  .pulse-global {
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    background: var(--color-grid-cell); padding: 24px 28px; margin-bottom: 32px;
+  }
+  .pulse-global-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; flex-wrap: wrap; gap: 12px; }
+  .pulse-global-title { font-family: var(--font-heading); font-size: 22px; font-weight: 400; letter-spacing: -0.02em; }
+  .pulse-global-legend {
+    font-family: var(--font-mono); font-weight: 500; font-size: 11px;
+    color: var(--color-text-40); display: flex; gap: 18px;
+  }
+  .legend-swatch { display: inline-block; width: 12px; height: 3px; margin-right: 6px; vertical-align: middle; }
+
+  /* feed */
+  .feed-wrap { display: grid; grid-template-columns: 180px 1fr; gap: 40px; margin-bottom: 64px; }
+  .feed-day-col { position: sticky; top: 80px; align-self: start; padding-top: 8px; }
+  .feed-date-stamp {
+    font-family: var(--font-heading); font-size: 28px; font-weight: 400;
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .feed-date-sub {
+    font-family: var(--font-mono); font-weight: 500; font-size: 11px;
+    letter-spacing: 0.08em; color: var(--color-text-30); text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .feed-date-count {
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px;
+    color: var(--color-text-50);
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--color-divider);
+  }
+
+  .feed-events {
+    display: grid; gap: 1px;
+    background: var(--color-grid-bg);
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    overflow: hidden;
+  }
+  .event-row {
+    background: var(--color-grid-cell);
+    padding: 18px 24px;
+    display: grid;
+    grid-template-columns: 64px 160px minmax(0, 1fr) 120px 100px;
+    gap: 18px; align-items: center;
+    text-decoration: none; color: inherit;
+    transition: background-color .15s;
+  }
+  .event-row:hover { background: var(--color-grid-cell-hover); }
+
+  .event-sev {
+    font-family: var(--font-heading); font-size: 22px; font-weight: 500;
+    letter-spacing: -0.02em; text-align: center; padding: 6px 0;
+    border-radius: 2px; line-height: 1;
+  }
+  .sev-cat { background: rgba(198,90,55,0.14); color: var(--tier-failed); }
+  .sev-sev { background: rgba(230,140,65,0.14); color: var(--tier-weak); }
+  .sev-sig { background: rgba(230,180,70,0.14); color: var(--tier-mixed); }
+  .sev-mod { background: rgba(196,189,174,0.08); color: var(--color-text-50); }
+  .sev-pos { background: rgba(92,170,110,0.14); color: var(--tier-exceptional); }
+  .sev-pos-big { background: rgba(92,170,110,0.2); color: var(--tier-exceptional); }
+
+  .event-country {
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  }
+  .event-country-name {
+    font-family: var(--font-heading); font-size: 17px; line-height: 1.1;
+    color: var(--color-text-primary);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .event-country-meta {
+    font-family: var(--font-mono); font-weight: 500; font-size: 10px;
+    color: var(--color-text-30); letter-spacing: 0.03em;
+  }
+  .event-body { min-width: 0; }
+  .event-cat {
+    font-family: var(--font-mono); font-weight: 500; font-size: 10px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-30);
+    margin-bottom: 4px;
+  }
+  .event-head {
+    font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--color-text-primary);
+    line-height: 1.4;
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .event-impact {
+    font-family: var(--font-heading); font-size: 18px; font-weight: 500;
+    letter-spacing: -0.01em; text-align: right;
+  }
+  .impact-pos { color: var(--color-source-live); }
+  .impact-neg { color: var(--tier-failed); }
+  .event-score-after {
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px;
+    text-align: right; color: var(--color-text-40);
+  }
+  .event-score-after strong { color: var(--color-text-primary); font-weight: 500; }
+
+  /* summary strip */
+  .summary-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--color-grid-bg); border: 1px solid var(--color-card-border);
+    border-radius: 4px; overflow: hidden; margin-bottom: 32px;
+  }
+  .summary-cell { background: var(--color-grid-cell); padding: 18px 22px; }
+  .summary-label { font-family: var(--font-mono); font-weight: 500; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-30); margin-bottom: 4px; }
+  .summary-value { font-family: var(--font-heading); font-size: 24px; letter-spacing: -0.02em; font-weight: 400; line-height: 1; }
+
+  footer { margin-top: 40px; padding: 40px 0; border-top: 1px solid var(--color-divider); }
+  .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: 0.08em; color: var(--color-text-30); }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 24px; }
+    .hero-title { font-size: 40px; }
+    .feed-wrap { grid-template-columns: 1fr; gap: 8px; }
+    .feed-day-col { position: static; padding: 16px 0 8px; border-bottom: 1px solid var(--color-divider); display: flex; gap: 20px; align-items: baseline; flex-wrap: wrap; }
+    .feed-date-count { border-top: none; padding-top: 0; margin-top: 0; }
+    .event-row { grid-template-columns: 48px 1fr; padding: 14px 18px; }
+    .event-row > :nth-child(2) { grid-column: 1 / -1; }
+    .event-row > :nth-child(4), .event-row > :nth-child(5) { grid-column: 1 / -1; text-align: left; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .container, .nav-inner { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">Civica <em>Atlas</em></a>
+    <div class="nav-links">
+      <a href="#">Countries</a>
+      <a href="#" class="active">Index</a>
+      <a href="#">Rankings</a>
+      <a href="#">Blog</a>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle theme</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+
+  <nav class="breadcrumb"><a href="#">← Index</a> / Changelog</nav>
+
+  <section class="hero">
+    <div>
+      <div class="hero-eyebrow">
+        <span class="pulse-dot"></span>
+        Live · refreshed daily
+      </div>
+      <h1 class="hero-title">Every Pulse movement, every country, every day.</h1>
+    </div>
+    <p class="hero-lede">
+      The Civica Pulse moves with the news. This feed shows every event that has altered any country's score in the last 30 days — with category, severity, confidence, and the one-sentence justification from the scoring model.
+    </p>
+  </section>
+
+  <!-- daily summary sparkline -->
+  <div class="pulse-global">
+    <div class="pulse-global-head">
+      <div class="pulse-global-title">Global Pulse · 30-day movement index</div>
+      <div class="pulse-global-legend">
+        <span><span class="legend-swatch" style="background: var(--color-source-live);"></span>Positive impact</span>
+        <span><span class="legend-swatch" style="background: var(--tier-failed);"></span>Negative impact</span>
+        <span><span class="legend-swatch" style="background: var(--color-text-40);"></span>Net shift</span>
+      </div>
+    </div>
+    <svg viewBox="0 0 1120 120" preserveAspectRatio="none" style="width:100%; height:120px;">
+      <!-- baseline -->
+      <line x1="0" y1="60" x2="1120" y2="60" stroke="var(--color-divider)" stroke-width="1"/>
+      <!-- positive bars -->
+      <g fill="var(--color-source-live)" opacity="0.9">
+        <rect x="8" y="36" width="24" height="24"/>
+        <rect x="40" y="44" width="24" height="16"/>
+        <rect x="72" y="28" width="24" height="32"/>
+        <rect x="104" y="40" width="24" height="20"/>
+        <rect x="136" y="30" width="24" height="30"/>
+        <rect x="168" y="48" width="24" height="12"/>
+        <rect x="200" y="20" width="24" height="40"/>
+        <rect x="232" y="36" width="24" height="24"/>
+        <rect x="264" y="42" width="24" height="18"/>
+        <rect x="296" y="32" width="24" height="28"/>
+        <rect x="328" y="46" width="24" height="14"/>
+        <rect x="360" y="30" width="24" height="30"/>
+        <rect x="392" y="40" width="24" height="20"/>
+        <rect x="424" y="22" width="24" height="38"/>
+        <rect x="456" y="36" width="24" height="24"/>
+        <rect x="488" y="42" width="24" height="18"/>
+        <rect x="520" y="26" width="24" height="34"/>
+        <rect x="552" y="40" width="24" height="20"/>
+        <rect x="584" y="34" width="24" height="26"/>
+        <rect x="616" y="44" width="24" height="16"/>
+        <rect x="648" y="30" width="24" height="30"/>
+        <rect x="680" y="38" width="24" height="22"/>
+        <rect x="712" y="32" width="24" height="28"/>
+        <rect x="744" y="40" width="24" height="20"/>
+        <rect x="776" y="24" width="24" height="36"/>
+        <rect x="808" y="36" width="24" height="24"/>
+        <rect x="840" y="42" width="24" height="18"/>
+        <rect x="872" y="26" width="24" height="34"/>
+        <rect x="904" y="18" width="24" height="42"/>
+        <rect x="936" y="14" width="24" height="46"/>
+      </g>
+      <!-- negative bars -->
+      <g fill="var(--tier-failed)" opacity="0.85">
+        <rect x="8" y="60" width="24" height="28"/>
+        <rect x="40" y="60" width="24" height="34"/>
+        <rect x="72" y="60" width="24" height="20"/>
+        <rect x="104" y="60" width="24" height="26"/>
+        <rect x="136" y="60" width="24" height="34"/>
+        <rect x="168" y="60" width="24" height="22"/>
+        <rect x="200" y="60" width="24" height="28"/>
+        <rect x="232" y="60" width="24" height="40"/>
+        <rect x="264" y="60" width="24" height="18"/>
+        <rect x="296" y="60" width="24" height="24"/>
+        <rect x="328" y="60" width="24" height="44"/>
+        <rect x="360" y="60" width="24" height="26"/>
+        <rect x="392" y="60" width="24" height="22"/>
+        <rect x="424" y="60" width="24" height="32"/>
+        <rect x="456" y="60" width="24" height="50"/>
+        <rect x="488" y="60" width="24" height="26"/>
+        <rect x="520" y="60" width="24" height="20"/>
+        <rect x="552" y="60" width="24" height="40"/>
+        <rect x="584" y="60" width="24" height="30"/>
+        <rect x="616" y="60" width="24" height="38"/>
+        <rect x="648" y="60" width="24" height="22"/>
+        <rect x="680" y="60" width="24" height="26"/>
+        <rect x="712" y="60" width="24" height="34"/>
+        <rect x="744" y="60" width="24" height="18"/>
+        <rect x="776" y="60" width="24" height="22"/>
+        <rect x="808" y="60" width="24" height="44"/>
+        <rect x="840" y="60" width="24" height="28"/>
+        <rect x="872" y="60" width="24" height="22"/>
+        <rect x="904" y="60" width="24" height="16"/>
+        <rect x="936" y="60" width="24" height="14"/>
+      </g>
+      <!-- net line -->
+      <path d="M20 58 L52 64 L84 56 L116 62 L148 64 L180 60 L212 56 L244 66 L276 58 L308 54 L340 68 L372 58 L404 56 L436 60 L468 62 L500 56 L532 54 L564 64 L596 60 L628 62 L660 54 L692 58 L724 60 L756 54 L788 50 L820 62 L852 56 L884 50 L916 44 L948 40"
+            fill="none" stroke="var(--color-text-40)" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- filters -->
+  <div class="filter-bar" role="group" aria-label="Filter events">
+    <span class="chip chip--active">All events</span>
+    <span class="chip">Negative only</span>
+    <span class="chip">Positive only</span>
+    <span class="chip">|</span>
+    <span class="chip">Global</span>
+    <span class="chip">Africa</span>
+    <span class="chip">Americas</span>
+    <span class="chip">Asia</span>
+    <span class="chip">Europe</span>
+    <div class="filter-spacer"></div>
+    <input class="search-input" placeholder="Search country or keyword…" />
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-cell"><div class="summary-label">Events scored · 30d</div><div class="summary-value">2,418</div></div>
+    <div class="summary-cell"><div class="summary-label">Countries with movement</div><div class="summary-value">184 / 197</div></div>
+    <div class="summary-cell"><div class="summary-label">Biggest drop</div><div class="summary-value" style="color: var(--tier-failed);">Sudan −7.8</div></div>
+    <div class="summary-cell"><div class="summary-label">Biggest gain</div><div class="summary-value" style="color: var(--tier-exceptional);">Poland +3.4</div></div>
+  </div>
+
+  <!-- Today -->
+  <section class="feed-wrap">
+    <div class="feed-day-col">
+      <div class="feed-date-stamp">Today</div>
+      <div class="feed-date-sub">Apr 21 · Mon</div>
+      <div class="feed-date-count">142 events · 67 countries</div>
+    </div>
+    <div class="feed-events">
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-cat">−10</div>
+        <div class="event-country">
+          <div class="event-country-name">Sudan</div>
+          <div class="event-country-meta">Khartoum · Africa</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Armed conflict · 12:04 UTC</div>
+          <div class="event-head">RSF advance on El-Fasher triggers mass civilian displacement; WHO reports hospital bombing with 40+ casualties.</div>
+        </div>
+        <div class="event-impact impact-neg">−1.82</div>
+        <div class="event-score-after">CP now <strong>8.4</strong></div>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-pos-big">+8</div>
+        <div class="event-country">
+          <div class="event-country-name">Poland</div>
+          <div class="event-country-meta">Warsaw · Europe</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Constitutional reform · 09:22 UTC</div>
+          <div class="event-head">Sejm passes judicial-council reform restoring independence of Supreme Court review panels; presidential signature expected.</div>
+        </div>
+        <div class="event-impact impact-pos">+1.14</div>
+        <div class="event-score-after">CP now <strong>74.3</strong></div>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-sig">−5</div>
+        <div class="event-country">
+          <div class="event-country-name">Turkey</div>
+          <div class="event-country-meta">Ankara · Asia</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Authoritarian action · 08:47 UTC</div>
+          <div class="event-head">Istanbul mayor's office raided; opposition party leadership detained for questioning on alleged terrorism charges.</div>
+        </div>
+        <div class="event-impact impact-neg">−0.62</div>
+        <div class="event-score-after">CP now <strong>38.2</strong></div>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-pos">+4</div>
+        <div class="event-country">
+          <div class="event-country-name">Kenya</div>
+          <div class="event-country-meta">Nairobi · Africa</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Institutional strengthening · 07:30 UTC</div>
+          <div class="event-head">Independent Electoral Commission publishes full audit of 2025 general election; donors extend support package.</div>
+        </div>
+        <div class="event-impact impact-pos">+0.38</div>
+        <div class="event-score-after">CP now <strong>54.8</strong></div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Yesterday -->
+  <section class="feed-wrap">
+    <div class="feed-day-col">
+      <div class="feed-date-stamp">Yesterday</div>
+      <div class="feed-date-sub">Apr 20 · Sun</div>
+      <div class="feed-date-count">98 events · 54 countries</div>
+    </div>
+    <div class="feed-events">
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-sev">−7</div>
+        <div class="event-country">
+          <div class="event-country-name">Venezuela</div>
+          <div class="event-country-meta">Caracas · Americas</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Human rights violation · 18:12 UTC</div>
+          <div class="event-head">Mass detention of 60+ opposition activists ahead of scheduled primaries; UN human rights office issues statement.</div>
+        </div>
+        <div class="event-impact impact-neg">−1.04</div>
+        <div class="event-score-after">CP now <strong>21.7</strong></div>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-mod">−3</div>
+        <div class="event-country">
+          <div class="event-country-name">India</div>
+          <div class="event-country-meta">New Delhi · Asia</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Freedom & rights · 15:08 UTC</div>
+          <div class="event-head">Editor of independent news outlet sentenced to 3 months; EFF cites "chilling effect" on digital press freedom.</div>
+        </div>
+        <div class="event-impact impact-neg">−0.21</div>
+        <div class="event-score-after">CP now <strong>58.1</strong></div>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-pos">+5</div>
+        <div class="event-country">
+          <div class="event-country-name">Colombia</div>
+          <div class="event-country-meta">Bogotá · Americas</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Peace agreement · 11:45 UTC</div>
+          <div class="event-head">ELN negotiators agree to ceasefire extension through Q3; humanitarian corridor operational in Catatumbo region.</div>
+        </div>
+        <div class="event-impact impact-pos">+0.62</div>
+        <div class="event-score-after">CP now <strong>60.4</strong></div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Apr 19 -->
+  <section class="feed-wrap">
+    <div class="feed-day-col">
+      <div class="feed-date-stamp">Apr 19</div>
+      <div class="feed-date-sub">Sat</div>
+      <div class="feed-date-count">76 events · 48 countries</div>
+    </div>
+    <div class="feed-events">
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-sev">−8</div>
+        <div class="event-country">
+          <div class="event-country-name">Haiti</div>
+          <div class="event-country-meta">Port-au-Prince · Americas</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Institutional failure · 21:05 UTC</div>
+          <div class="event-head">Transitional council resigns en masse following gang takeover of National Palace district; international mission stalled.</div>
+        </div>
+        <div class="event-impact impact-neg">−1.28</div>
+        <div class="event-score-after">CP now <strong>12.1</strong></div>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-pos-big">+7</div>
+        <div class="event-country">
+          <div class="event-country-name">South Africa</div>
+          <div class="event-country-meta">Pretoria · Africa</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Institutional strengthening · 13:20 UTC</div>
+          <div class="event-head">Zondo commission recommendations adopted into binding corruption-prosecution protocol; first arrests announced.</div>
+        </div>
+        <div class="event-impact impact-pos">+0.94</div>
+        <div class="event-score-after">CP now <strong>61.7</strong></div>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-sig">−4</div>
+        <div class="event-country">
+          <div class="event-country-name">Russia</div>
+          <div class="event-country-meta">Moscow · Europe</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Authoritarian action · 08:55 UTC</div>
+          <div class="event-head">Duma passes expanded "foreign agent" law covering social-media influencers and podcasters with international audiences.</div>
+        </div>
+        <div class="event-impact impact-neg">−0.52</div>
+        <div class="event-score-after">CP now <strong>18.4</strong></div>
+      </a>
+
+      <a class="event-row" href="#">
+        <div class="event-sev sev-mod">−2</div>
+        <div class="event-country">
+          <div class="event-country-name">Spain</div>
+          <div class="event-country-meta">Madrid · Europe</div>
+        </div>
+        <div class="event-body">
+          <div class="event-cat">Economic crisis · 06:40 UTC</div>
+          <div class="event-head">Banking regulator flags two mid-sized lenders for liquidity stress; ECB reassures market; minor credibility impact pending outcome.</div>
+        </div>
+        <div class="event-impact impact-neg">−0.14</div>
+        <div class="event-score-after">CP now <strong>81.2</strong></div>
+      </a>
+
+    </div>
+  </section>
+
+  <div style="text-align: center; padding: 24px 0 8px;">
+    <button class="chip" style="padding: 10px 20px;">Load next 7 days →</button>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>Civica Pulse v1.0 · every event logged · every score auditable</div>
+    <div>RSS · <a href="#" style="color: var(--color-accent); text-decoration: none;">API · /api/v1/pulse/changelog →</a></div>
+  </div>
+</footer>
+
+<script>
+  function toggleTheme() {
+    const root = document.documentElement;
+    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,694 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Press Freedom Integration — Civica mockup</title>
+<style>
+  :root {
+    --paper:  #FAF7F2;
+    --canvas: #FFFCF8;
+    --alt:    #F2F4F7;
+    --ink:    #0B1220;
+    --ink-85: rgba(11,18,32,.88);
+    --slate:  #334155;
+    --muted:  #475569;
+    --pewter: #94A3B8;
+    --rule:   #c4bdae;
+    --accent: #A87241;
+
+    /* RSF categories (Civica press-freedom ramp) */
+    --pf-good:   #2E7D59;  /* Good 85-100 — same green as v2 success */
+    --pf-sat:    #6B9F77;  /* Satisfactory 70-85 */
+    --pf-prob:   #C9A24B;  /* Problematic 55-70 — Gold */
+    --pf-diff:   #C25D3A;  /* Difficult 40-55 — Terracotta */
+    --pf-vser:   #8B1A1A;  /* Very serious 0-40 — deep crimson */
+
+    --gov-parl: #2D6CDF;
+    --gov-pres: #C25D3A;
+    --gov-semi: #7C59C9;
+    --gov-mon:  #C9A24B;
+    --gov-theo: #4C9F6E;
+    --gov-other:#64748B;
+
+    --serif: Fraunces, Georgia, "Times New Roman", serif;
+    --sans:  Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono:  ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  [data-theme="dark"] {
+    --paper:  #14110d;
+    --canvas: #1a1612;
+    --alt:    #221d18;
+    --ink:    #f4f1ea;
+    --ink-85: rgba(244,241,234,.88);
+    --slate:  #cdc6b6;
+    --muted:  #8a8370;
+    --pewter: #6a6357;
+    --rule:   #3a342a;
+    --accent: #d39466;
+    --pf-good:   #3e9d72;
+    --pf-sat:    #7eb085;
+    --pf-prob:   #d4b665;
+    --pf-diff:   #d97a55;
+    --pf-vser:   #b94545;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:15px; }
+  .shell { max-width:1320px; margin:0 auto; padding:32px 24px 80px; }
+
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding-bottom:20px; border-bottom:1px solid var(--rule); margin-bottom:32px; }
+  .brand { font-family:var(--serif); font-weight:600; font-size:22px; letter-spacing:-0.01em; }
+  .topbar-right { display:flex; gap:12px; align-items:center; font-size:12px; color:var(--muted); }
+  button.theme { background:none; border:1px solid var(--rule); padding:6px 10px; border-radius:4px; font:inherit; color:inherit; cursor:pointer; }
+
+  /* HEADER */
+  h1 { font-family:var(--serif); font-weight:500; font-size:52px; line-height:1.04; letter-spacing:-0.02em; margin:0 0 12px; }
+  .lede { font-family:var(--serif); font-size:20px; line-height:1.5; color:var(--ink-85); max-width:820px; margin:0 0 28px; }
+
+  /* SOURCE STRIP */
+  .source { display:flex; gap:18px; flex-wrap:wrap; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid var(--rule); }
+  .source b { color:var(--ink); font-weight:600; }
+  .source .dot-live { width:8px; height:8px; border-radius:50%; background:var(--pf-good); display:inline-block; margin-right:6px; vertical-align:middle; }
+
+  /* HERO STATS */
+  .stats { display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; margin-bottom:28px; }
+  .stat { background:var(--canvas); border:1px solid var(--rule); padding:16px; box-shadow:4px 4px 0 var(--ink); }
+  .stat .lbl { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:8px; }
+  .stat .v { font-family:var(--serif); font-size:36px; font-weight:500; line-height:1; letter-spacing:-0.01em; }
+  .stat .sub { font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:6px; }
+  .stat.cat-good   .v { color:var(--pf-good); }
+  .stat.cat-sat    .v { color:var(--pf-sat); }
+  .stat.cat-prob   .v { color:var(--pf-prob); }
+  .stat.cat-diff   .v { color:var(--pf-diff); }
+  .stat.cat-vser   .v { color:var(--pf-vser); }
+
+  /* LEGEND */
+  .legend { display:flex; gap:18px; flex-wrap:wrap; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:24px; }
+  .legend .sw { width:14px; height:14px; display:inline-block; margin-right:6px; vertical-align:middle; border:1px solid rgba(0,0,0,.08); }
+
+  /* LAYOUT */
+  .grid { display:grid; grid-template-columns: 1.4fr 1fr; gap:24px; align-items:start; }
+
+  /* MAP CARD */
+  .map-card { background:var(--canvas); border:1px solid var(--rule); box-shadow:4px 4px 0 var(--ink); padding:18px; }
+  .map-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .map-title { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); }
+  .map-toggle { display:flex; gap:0; border:1px solid var(--rule); }
+  .map-toggle span { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:4px 10px; cursor:pointer; color:var(--muted); border-right:1px solid var(--rule); }
+  .map-toggle span:last-child { border-right:0; }
+  .map-toggle span.on { background:var(--ink); color:var(--paper); }
+  .map-canvas { background:var(--alt); height:420px; position:relative; border:1px solid var(--rule); overflow:hidden; }
+  .map-canvas svg { width:100%; height:100%; display:block; }
+
+  /* MOVERS LIST */
+  .movers-card { background:var(--canvas); border:1px solid var(--rule); box-shadow:4px 4px 0 var(--ink); padding:18px; }
+  .movers-head { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:14px; display:flex; justify-content:space-between; }
+  .movers-head select { font:inherit; background:transparent; color:var(--ink); border:0; cursor:pointer; }
+  .mover { display:grid; grid-template-columns: 32px 1fr auto auto; gap:12px; align-items:center; padding:10px 0; border-top:1px solid var(--rule); }
+  .mover:first-of-type { border-top:0; padding-top:0; }
+  .mover .flg { width:32px; height:22px; background:#ddd; border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:10px; font-weight:600; color:var(--ink); }
+  .mover .ctry { font-family:var(--serif); font-size:15px; font-weight:500; }
+  .mover .ctry .rk { font-family:var(--mono); font-size:11px; color:var(--muted); margin-left:6px; }
+  .mover .score { font-family:var(--mono); font-size:13px; color:var(--ink); font-weight:500; min-width:48px; text-align:right; }
+  .mover .delta { font-family:var(--mono); font-size:12px; min-width:54px; text-align:right; }
+  .delta.up   { color:var(--pf-good); }
+  .delta.down { color:var(--pf-vser); }
+  .delta.flat { color:var(--pewter); }
+
+  /* COUNTRY TABLE */
+  .ctry-table { background:var(--canvas); border:1px solid var(--rule); box-shadow:4px 4px 0 var(--ink); margin-top:28px; }
+  .ctry-head { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--rule); }
+  .ctry-head h3 { font-family:var(--serif); font-size:20px; font-weight:500; margin:0; letter-spacing:-0.01em; }
+  .ctry-tools { display:flex; gap:8px; align-items:center; }
+  .ctry-tools .ipt { font-family:var(--sans); font-size:13px; border:1px solid var(--rule); background:var(--paper); padding:6px 10px; min-width:200px; }
+  .ctry-tools .chip { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; padding:5px 9px; border:1px solid var(--rule); background:var(--canvas); cursor:pointer; color:var(--ink); }
+  .ctry-tools .chip.on { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead th { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); text-align:left; padding:10px 14px; border-bottom:1px solid var(--rule); font-weight:500; background:var(--paper); }
+  thead th.num { text-align:right; }
+  tbody td { padding:11px 14px; border-bottom:1px solid var(--rule); vertical-align:middle; }
+  tbody tr:last-child td { border-bottom:0; }
+  tbody tr:hover { background:var(--alt); cursor:pointer; }
+  td.rk { font-family:var(--mono); font-size:12px; color:var(--muted); width:36px; }
+  td.flag-c { width:42px; }
+  td.flag-c .fg { width:32px; height:22px; background:#ddd; border:1px solid var(--rule); display:inline-flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:10px; font-weight:600; color:var(--ink); }
+  td.name { font-family:var(--serif); font-size:14px; font-weight:500; }
+  td.num { font-family:var(--mono); font-size:12px; text-align:right; color:var(--ink); }
+  .badge { display:inline-block; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; padding:3px 7px; color:var(--paper); border-radius:2px; }
+  .badge.good { background:var(--pf-good); }
+  .badge.sat  { background:var(--pf-sat); }
+  .badge.prob { background:var(--pf-prob); color:var(--ink); }
+  .badge.diff { background:var(--pf-diff); }
+  .badge.vser { background:var(--pf-vser); }
+  .bar { display:inline-block; width:120px; height:8px; background:var(--alt); position:relative; vertical-align:middle; border:1px solid var(--rule); }
+  .bar > i { display:block; height:100%; }
+  .bar.good  > i { background:var(--pf-good); }
+  .bar.sat   > i { background:var(--pf-sat); }
+  .bar.prob  > i { background:var(--pf-prob); }
+  .bar.diff  > i { background:var(--pf-diff); }
+  .bar.vser  > i { background:var(--pf-vser); }
+  .yoy { font-family:var(--mono); font-size:11px; min-width:48px; text-align:right; display:inline-block; }
+  .yoy.up   { color:var(--pf-good); }
+  .yoy.down { color:var(--pf-vser); }
+  .yoy.flat { color:var(--pewter); }
+
+  /* INTEGRATION CARD (Democracy-tab indicator preview) */
+  .integration { margin-top:48px; }
+  .integration h3 { font-family:var(--serif); font-size:24px; font-weight:500; margin:0 0 6px; letter-spacing:-0.01em; }
+  .integration .sub { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-bottom:18px; }
+  .preview-frame { background:var(--canvas); border:1px solid var(--rule); box-shadow:4px 4px 0 var(--ink); padding:24px; max-width:760px; }
+  .preview-crumb { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px; }
+  .preview-crumb b { color:var(--ink); }
+  .preview-country { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .preview-country .flg { width:40px; height:28px; background:#ddd; border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; font-weight:600; color:var(--ink); }
+  .preview-country h4 { font-family:var(--serif); font-size:28px; font-weight:500; margin:0; letter-spacing:-0.01em; }
+  .preview-tabs { display:flex; gap:0; border-bottom:1px solid var(--rule); margin-bottom:18px; }
+  .preview-tabs span { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:8px 14px; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; }
+  .preview-tabs span.on { color:var(--ink); border-bottom-color:var(--accent); }
+
+  .indicator-row { display:grid; grid-template-columns: 1fr auto; gap:24px; padding:14px 0; border-top:1px solid var(--rule); align-items:center; }
+  .indicator-row:first-of-type { border-top:0; }
+  .indicator-row .ind-label { font-family:var(--serif); font-size:16px; color:var(--ink); }
+  .indicator-row .ind-label small { display:block; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-top:4px; }
+  .indicator-row .ind-val { font-family:var(--mono); font-size:14px; color:var(--ink); text-align:right; }
+  .indicator-row .ind-val .meta { display:block; font-size:11px; color:var(--muted); margin-top:3px; }
+
+  .pf-block { background:var(--paper); border:1px dashed var(--accent); padding:14px; margin:8px 0; }
+  .pf-block .row { display:grid; grid-template-columns: 1fr auto; gap:18px; align-items:center; }
+  .pf-block .pf-score { font-family:var(--serif); font-size:32px; font-weight:500; line-height:1; }
+  .pf-block .pf-mini { display:flex; gap:6px; margin-top:10px; }
+  .pf-block .pf-mini .seg { flex:1; }
+  .pf-block .pf-mini .seg .seg-lbl { font-family:var(--mono); font-size:9px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:3px; text-align:center; }
+  .pf-block .pf-mini .seg .seg-val { font-family:var(--mono); font-size:12px; color:var(--ink); text-align:center; }
+  .pf-block .pf-mini .seg .seg-bar { height:4px; background:var(--alt); margin-top:4px; border:1px solid var(--rule); }
+  .pf-block .pf-mini .seg .seg-bar i { display:block; height:100%; }
+  .pf-block .src { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-top:10px; }
+  .pf-block .src a { color:var(--accent); text-decoration:underline; }
+
+  /* METHOD CARD */
+  .method { margin-top:36px; background:var(--canvas); border:1px solid var(--rule); padding:20px; }
+  .method h4 { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.15em; color:var(--muted); margin:0 0 12px; font-weight:500; }
+  .method .grid5 { display:grid; grid-template-columns: repeat(5,1fr); gap:12px; }
+  .method .pillar { padding:10px; border:1px solid var(--rule); background:var(--paper); }
+  .method .pillar .nm { font-family:var(--serif); font-size:15px; font-weight:500; margin-bottom:4px; }
+  .method .pillar .ds { font-size:12px; line-height:1.45; color:var(--ink-85); }
+
+  .footnote { font-size:12px; color:var(--muted); margin-top:24px; font-family:var(--mono); line-height:1.6; }
+
+  @media (max-width: 980px) {
+    h1 { font-size:36px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .grid { grid-template-columns:1fr; }
+    .method .grid5 { grid-template-columns: 1fr 1fr; }
+    .ctry-tools .ipt { min-width:0; flex:1; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">Civica · Mockup</div>
+    <div class="topbar-right">
+      <span>Tier-1 sprint · CIV-213 Session 8 · 2026-05-18</span>
+      <button class="theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'">Toggle theme</button>
+    </div>
+  </header>
+
+  <h1>Press Freedom</h1>
+  <p class="lede">How freely can journalists report in each country? Civica overlays the Reporters Without Borders <em>World Press Freedom Index</em> on every country, every government type, and the Democracy tab — so backsliding is visible alongside the institutions that allow it.</p>
+
+  <div class="source">
+    <span><span class="dot-live"></span>Source · <b>RSF World Press Freedom Index 2026</b></span>
+    <span>Snapshot ingested <b>2026-05-03</b></span>
+    <span>180 countries · 5 sub-pillars</span>
+    <span>Next refresh · <b>May 2027</b></span>
+    <span>Methodology · <a href="#" style="color:var(--accent); text-decoration:underline;">rsf.org/en/index-methodology</a></span>
+  </div>
+
+  <!-- HERO STATS -->
+  <div class="stats">
+    <div class="stat cat-good">
+      <div class="lbl">Good (85–100)</div>
+      <div class="v">7</div>
+      <div class="sub">countries · −1 YoY</div>
+    </div>
+    <div class="stat cat-sat">
+      <div class="lbl">Satisfactory (70–85)</div>
+      <div class="v">35</div>
+      <div class="sub">countries · −2 YoY</div>
+    </div>
+    <div class="stat cat-prob">
+      <div class="lbl">Problematic (55–70)</div>
+      <div class="v">52</div>
+      <div class="sub">countries · +1 YoY</div>
+    </div>
+    <div class="stat cat-diff">
+      <div class="lbl">Difficult (40–55)</div>
+      <div class="v">44</div>
+      <div class="sub">countries · +3 YoY</div>
+    </div>
+    <div class="stat cat-vser">
+      <div class="lbl">Very serious (0–40)</div>
+      <div class="v">42</div>
+      <div class="sub">countries · −1 YoY</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span><span class="sw" style="background:var(--pf-good)"></span>Good</span>
+    <span><span class="sw" style="background:var(--pf-sat)"></span>Satisfactory</span>
+    <span><span class="sw" style="background:var(--pf-prob)"></span>Problematic</span>
+    <span><span class="sw" style="background:var(--pf-diff)"></span>Difficult</span>
+    <span><span class="sw" style="background:var(--pf-vser)"></span>Very serious</span>
+    <span><span class="sw" style="background:var(--alt); border-style:dashed;"></span>No data</span>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- LEFT: MAP -->
+    <div class="map-card">
+      <div class="map-head">
+        <div class="map-title">Press Freedom Choropleth · 2026 score</div>
+        <div class="map-toggle">
+          <span class="on">Score</span>
+          <span>YoY Δ</span>
+          <span>5-yr Δ</span>
+        </div>
+      </div>
+      <div class="map-canvas">
+        <svg viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+          <!-- crude continental shapes — purely illustrative -->
+          <defs>
+            <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+              <rect width="6" height="6" fill="#F2F4F7"/>
+              <line x1="0" y1="0" x2="0" y2="6" stroke="#c4bdae" stroke-width="0.7"/>
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="800" height="420" fill="url(#hatch)" opacity="0.15"/>
+          <!-- North America -->
+          <path d="M70 60 Q120 30 200 50 L260 70 L255 130 L240 180 L180 220 L140 200 L90 170 Z" fill="#C9A24B" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="160" y="140" font-family="ui-monospace" font-size="11" fill="#0B1220" font-weight="600">US 56.7</text>
+          <path d="M60 240 L100 220 L130 250 L120 290 L80 280 Z" fill="#2E7D59" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="80" y="260" font-family="ui-monospace" font-size="9" fill="#FFFCF8" font-weight="600">CA 84.7</text>
+          <!-- South America -->
+          <path d="M210 220 L270 230 L290 290 L260 360 L230 380 L210 340 L195 280 Z" fill="#C9A24B" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="230" y="290" font-family="ui-monospace" font-size="10" fill="#0B1220" font-weight="600">BR 58.6</text>
+          <!-- Europe -->
+          <path d="M380 70 L450 60 L460 110 L420 140 L380 130 Z" fill="#2E7D59" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="395" y="100" font-family="ui-monospace" font-size="10" fill="#FFFCF8" font-weight="600">EU 78–92</text>
+          <!-- Russia -->
+          <path d="M470 60 L640 50 L660 110 L600 130 L520 130 L470 110 Z" fill="#8B1A1A" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="540" y="95" font-family="ui-monospace" font-size="11" fill="#FFFCF8" font-weight="600">RU 29.9</text>
+          <!-- China -->
+          <path d="M580 150 L680 150 L700 220 L640 260 L580 240 L560 200 Z" fill="#8B1A1A" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="620" y="210" font-family="ui-monospace" font-size="11" fill="#FFFCF8" font-weight="600">CN 23.4</text>
+          <!-- India -->
+          <path d="M520 220 L570 240 L590 290 L550 320 L510 290 Z" fill="#C25D3A" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="535" y="280" font-family="ui-monospace" font-size="10" fill="#FFFCF8" font-weight="600">IN 31.3</text>
+          <!-- MENA -->
+          <path d="M430 150 L520 160 L510 220 L450 230 L410 200 Z" fill="#8B1A1A" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="450" y="195" font-family="ui-monospace" font-size="10" fill="#FFFCF8" font-weight="600">MENA 30s</text>
+          <!-- Africa -->
+          <path d="M400 240 L470 250 L490 320 L460 380 L410 380 L390 320 Z" fill="#C25D3A" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="420" y="320" font-family="ui-monospace" font-size="10" fill="#FFFCF8" font-weight="600">SSA 42–55</text>
+          <!-- Australia -->
+          <path d="M650 290 L720 290 L730 340 L680 350 L640 330 Z" fill="#6B9F77" stroke="#FAF7F2" stroke-width="1.5"/>
+          <text x="665" y="320" font-family="ui-monospace" font-size="10" fill="#FFFCF8" font-weight="600">AU 81.6</text>
+
+          <!-- color scale -->
+          <g transform="translate(20,400)">
+            <text x="0" y="-4" font-family="ui-monospace" font-size="9" fill="#475569" text-transform="uppercase" letter-spacing="0.1em">0</text>
+            <rect x="20" y="-9" width="30" height="8" fill="#8B1A1A"/>
+            <rect x="50" y="-9" width="30" height="8" fill="#C25D3A"/>
+            <rect x="80" y="-9" width="30" height="8" fill="#C9A24B"/>
+            <rect x="110" y="-9" width="30" height="8" fill="#6B9F77"/>
+            <rect x="140" y="-9" width="30" height="8" fill="#2E7D59"/>
+            <text x="178" y="-4" font-family="ui-monospace" font-size="9" fill="#475569" text-transform="uppercase" letter-spacing="0.1em">100</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- RIGHT: MOVERS -->
+    <div class="movers-card">
+      <div class="movers-head">
+        <span>Biggest movers · 2025 → 2026</span>
+        <select>
+          <option>Both directions</option>
+          <option>Decliners</option>
+          <option>Improvers</option>
+        </select>
+      </div>
+
+      <div class="mover">
+        <div class="flg">AR</div>
+        <div class="ctry">Argentina<span class="rk">#87</span></div>
+        <div class="score">53.4</div>
+        <div class="delta down">−13 ↓</div>
+      </div>
+      <div class="mover">
+        <div class="flg">TR</div>
+        <div class="ctry">Türkiye<span class="rk">#159</span></div>
+        <div class="score">31.6</div>
+        <div class="delta down">−9 ↓</div>
+      </div>
+      <div class="mover">
+        <div class="flg">SK</div>
+        <div class="ctry">Slovakia<span class="rk">#38</span></div>
+        <div class="score">71.0</div>
+        <div class="delta down">−8 ↓</div>
+      </div>
+      <div class="mover">
+        <div class="flg">US</div>
+        <div class="ctry">United States<span class="rk">#57</span></div>
+        <div class="score">66.4</div>
+        <div class="delta down">−6 ↓</div>
+      </div>
+      <div class="mover">
+        <div class="flg">PL</div>
+        <div class="ctry">Poland<span class="rk">#47</span></div>
+        <div class="score">68.0</div>
+        <div class="delta up">+11 ↑</div>
+      </div>
+      <div class="mover">
+        <div class="flg">BR</div>
+        <div class="ctry">Brazil<span class="rk">#82</span></div>
+        <div class="score">58.6</div>
+        <div class="delta up">+7 ↑</div>
+      </div>
+      <div class="mover">
+        <div class="flg">UA</div>
+        <div class="ctry">Ukraine<span class="rk">#61</span></div>
+        <div class="score">65.0</div>
+        <div class="delta up">+4 ↑</div>
+      </div>
+      <div class="mover">
+        <div class="flg">DE</div>
+        <div class="ctry">Germany<span class="rk">#11</span></div>
+        <div class="score">84.6</div>
+        <div class="delta flat">±0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COUNTRY TABLE -->
+  <div class="ctry-table">
+    <div class="ctry-head">
+      <h3>All countries · 2026 ranking</h3>
+      <div class="ctry-tools">
+        <input class="ipt" placeholder="Filter — type a country, region, or category…" />
+        <span class="chip on">All 180</span>
+        <span class="chip">G20</span>
+        <span class="chip">EU</span>
+        <span class="chip">Africa</span>
+        <span class="chip">Asia</span>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th class="num">#</th>
+          <th></th>
+          <th>Country</th>
+          <th>Government</th>
+          <th>Category</th>
+          <th class="num">Score</th>
+          <th>Bar</th>
+          <th class="num">YoY Δ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rk">1</td>
+          <td class="flag-c"><span class="fg">NO</span></td>
+          <td class="name">Norway</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-parl);">Parliamentary monarchy</span></td>
+          <td><span class="badge good">Good</span></td>
+          <td class="num">92.3</td>
+          <td><span class="bar good"><i style="width:92%"></i></span></td>
+          <td class="num"><span class="yoy flat">±0</span></td>
+        </tr>
+        <tr>
+          <td class="rk">2</td>
+          <td class="flag-c"><span class="fg">EE</span></td>
+          <td class="name">Estonia</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-parl);">Parliamentary republic</span></td>
+          <td><span class="badge good">Good</span></td>
+          <td class="num">89.5</td>
+          <td><span class="bar good"><i style="width:89%"></i></span></td>
+          <td class="num"><span class="yoy up">+1</span></td>
+        </tr>
+        <tr>
+          <td class="rk">3</td>
+          <td class="flag-c"><span class="fg">NL</span></td>
+          <td class="name">Netherlands</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-parl);">Parliamentary monarchy</span></td>
+          <td><span class="badge good">Good</span></td>
+          <td class="num">88.1</td>
+          <td><span class="bar good"><i style="width:88%"></i></span></td>
+          <td class="num"><span class="yoy flat">±0</span></td>
+        </tr>
+        <tr>
+          <td class="rk">11</td>
+          <td class="flag-c"><span class="fg">DE</span></td>
+          <td class="name">Germany</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-parl);">Parliamentary republic</span></td>
+          <td><span class="badge sat">Satisfactory</span></td>
+          <td class="num">84.6</td>
+          <td><span class="bar sat"><i style="width:85%"></i></span></td>
+          <td class="num"><span class="yoy flat">±0</span></td>
+        </tr>
+        <tr>
+          <td class="rk">23</td>
+          <td class="flag-c"><span class="fg">GB</span></td>
+          <td class="name">United Kingdom</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-parl);">Parliamentary monarchy</span></td>
+          <td><span class="badge sat">Satisfactory</span></td>
+          <td class="num">76.2</td>
+          <td><span class="bar sat"><i style="width:76%"></i></span></td>
+          <td class="num"><span class="yoy up">+2</span></td>
+        </tr>
+        <tr>
+          <td class="rk">25</td>
+          <td class="flag-c"><span class="fg">FR</span></td>
+          <td class="name">France</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-semi);">Semi-presidential</span></td>
+          <td><span class="badge sat">Satisfactory</span></td>
+          <td class="num">75.6</td>
+          <td><span class="bar sat"><i style="width:76%"></i></span></td>
+          <td class="num"><span class="yoy up">+1</span></td>
+        </tr>
+        <tr>
+          <td class="rk">38</td>
+          <td class="flag-c"><span class="fg">SK</span></td>
+          <td class="name">Slovakia</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-parl);">Parliamentary republic</span></td>
+          <td><span class="badge sat">Satisfactory</span></td>
+          <td class="num">71.0</td>
+          <td><span class="bar sat"><i style="width:71%"></i></span></td>
+          <td class="num"><span class="yoy down">−8</span></td>
+        </tr>
+        <tr>
+          <td class="rk">47</td>
+          <td class="flag-c"><span class="fg">PL</span></td>
+          <td class="name">Poland</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-parl);">Parliamentary republic</span></td>
+          <td><span class="badge prob">Problematic</span></td>
+          <td class="num">68.0</td>
+          <td><span class="bar prob"><i style="width:68%"></i></span></td>
+          <td class="num"><span class="yoy up">+11</span></td>
+        </tr>
+        <tr>
+          <td class="rk">57</td>
+          <td class="flag-c"><span class="fg">US</span></td>
+          <td class="name">United States</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-pres);">Presidential republic</span></td>
+          <td><span class="badge prob">Problematic</span></td>
+          <td class="num">66.4</td>
+          <td><span class="bar prob"><i style="width:66%"></i></span></td>
+          <td class="num"><span class="yoy down">−6</span></td>
+        </tr>
+        <tr>
+          <td class="rk">82</td>
+          <td class="flag-c"><span class="fg">BR</span></td>
+          <td class="name">Brazil</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-pres);">Presidential federal</span></td>
+          <td><span class="badge prob">Problematic</span></td>
+          <td class="num">58.6</td>
+          <td><span class="bar prob"><i style="width:59%"></i></span></td>
+          <td class="num"><span class="yoy up">+7</span></td>
+        </tr>
+        <tr>
+          <td class="rk">87</td>
+          <td class="flag-c"><span class="fg">AR</span></td>
+          <td class="name">Argentina</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-pres);">Presidential federal</span></td>
+          <td><span class="badge diff">Difficult</span></td>
+          <td class="num">53.4</td>
+          <td><span class="bar diff"><i style="width:53%"></i></span></td>
+          <td class="num"><span class="yoy down">−13</span></td>
+        </tr>
+        <tr>
+          <td class="rk">159</td>
+          <td class="flag-c"><span class="fg">IN</span></td>
+          <td class="name">India</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-parl);">Parliamentary federal</span></td>
+          <td><span class="badge vser">Very serious</span></td>
+          <td class="num">31.3</td>
+          <td><span class="bar vser"><i style="width:31%"></i></span></td>
+          <td class="num"><span class="yoy down">−2</span></td>
+        </tr>
+        <tr>
+          <td class="rk">162</td>
+          <td class="flag-c"><span class="fg">RU</span></td>
+          <td class="name">Russia</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-semi);">Semi-presidential</span></td>
+          <td><span class="badge vser">Very serious</span></td>
+          <td class="num">29.9</td>
+          <td><span class="bar vser"><i style="width:30%"></i></span></td>
+          <td class="num"><span class="yoy down">−3</span></td>
+        </tr>
+        <tr>
+          <td class="rk">178</td>
+          <td class="flag-c"><span class="fg">CN</span></td>
+          <td class="name">China</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-other);">One-party state</span></td>
+          <td><span class="badge vser">Very serious</span></td>
+          <td class="num">23.4</td>
+          <td><span class="bar vser"><i style="width:23%"></i></span></td>
+          <td class="num"><span class="yoy down">−1</span></td>
+        </tr>
+        <tr>
+          <td class="rk">180</td>
+          <td class="flag-c"><span class="fg">ER</span></td>
+          <td class="name">Eritrea</td>
+          <td><span class="badge" style="background:transparent; color:var(--ink); border:1px solid var(--gov-other);">One-party state</span></td>
+          <td><span class="badge vser">Very serious</span></td>
+          <td class="num">16.6</td>
+          <td><span class="bar vser"><i style="width:17%"></i></span></td>
+          <td class="num"><span class="yoy down">−1</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- DEMOCRACY-TAB INTEGRATION PREVIEW -->
+  <div class="integration">
+    <h3>Democracy-tab integration · indicator block</h3>
+    <div class="sub">How the same RSF score appears on a country's Democracy tab (Pane 3) — no new tab, no extra navigation. One indicator row, one expandable detail block.</div>
+
+    <div class="preview-frame">
+      <div class="preview-crumb">Civica · Countries · <b>United States</b> · Democracy tab</div>
+      <div class="preview-country">
+        <div class="flg">US</div>
+        <h4>United States</h4>
+      </div>
+      <div class="preview-tabs">
+        <span>Overview</span>
+        <span>Government</span>
+        <span>Legislature</span>
+        <span class="on">Democracy</span>
+        <span>Elections</span>
+        <span>Constitution</span>
+        <span>Pulse</span>
+      </div>
+
+      <!-- Existing rows (peer indicators) -->
+      <div class="indicator-row">
+        <div class="ind-label">V-Dem Liberal Democracy Index <small>Varieties of Democracy · 2025</small></div>
+        <div class="ind-val">0.61 / 1.00<span class="meta">Rank 45 · ↓ 5 yr</span></div>
+      </div>
+      <div class="indicator-row">
+        <div class="ind-label">Freedom House — Freedom in the World <small>Freedom House · 2026</small></div>
+        <div class="ind-val">83 / 100<span class="meta">Status · Free · ↓ −1 YoY</span></div>
+      </div>
+
+      <!-- NEW indicator block: Press Freedom -->
+      <div class="indicator-row" style="border-top:1px solid var(--rule);">
+        <div class="ind-label" style="grid-column:1 / span 2; margin:0;">
+          <div class="pf-block">
+            <div class="row">
+              <div>
+                <div style="font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:6px;">Press Freedom · RSF World Index 2026 · NEW</div>
+                <div style="font-family:var(--serif); font-size:16px; color:var(--ink); margin-bottom:4px;">United States ranks <b>57th of 180</b> — &ldquo;Problematic&rdquo;</div>
+                <div style="font-size:13px; color:var(--ink-85); line-height:1.55;">Score down 6 points YoY. The biggest drag is the political-context pillar; legal framework remains the strongest US sub-score.</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="pf-score" style="color:var(--pf-prob);">66.4</div>
+                <div><span class="badge prob">Problematic</span></div>
+              </div>
+            </div>
+            <div class="pf-mini">
+              <div class="seg">
+                <div class="seg-lbl">Political</div>
+                <div class="seg-val">52.1</div>
+                <div class="seg-bar"><i style="width:52%; background:var(--pf-diff);"></i></div>
+              </div>
+              <div class="seg">
+                <div class="seg-lbl">Legal</div>
+                <div class="seg-val">79.4</div>
+                <div class="seg-bar"><i style="width:79%; background:var(--pf-sat);"></i></div>
+              </div>
+              <div class="seg">
+                <div class="seg-lbl">Economic</div>
+                <div class="seg-val">61.3</div>
+                <div class="seg-bar"><i style="width:61%; background:var(--pf-prob);"></i></div>
+              </div>
+              <div class="seg">
+                <div class="seg-lbl">Sociocultural</div>
+                <div class="seg-val">68.0</div>
+                <div class="seg-bar"><i style="width:68%; background:var(--pf-prob);"></i></div>
+              </div>
+              <div class="seg">
+                <div class="seg-lbl">Safety</div>
+                <div class="seg-val">71.2</div>
+                <div class="seg-bar"><i style="width:71%; background:var(--pf-sat);"></i></div>
+              </div>
+            </div>
+            <div class="src">Source · <a href="#">RSF World Press Freedom Index 2026</a> · clause-id <b>rsf:us:2026</b> · ingested 2026-05-03 · <a href="#">view raw row</a> · <a href="#">all countries →</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="indicator-row">
+        <div class="ind-label">Corruption Perceptions Index <small>Transparency International · 2025</small></div>
+        <div class="ind-val">69 / 100<span class="meta">Rank 24 · ↓ −2 YoY</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- METHOD CARD -->
+  <div class="method">
+    <h4>RSF Index · five pillars (single CSV, ingested annually)</h4>
+    <div class="grid5">
+      <div class="pillar">
+        <div class="nm">Political context</div>
+        <div class="ds">Independence of media from political control; pluralism; editorial independence.</div>
+      </div>
+      <div class="pillar">
+        <div class="nm">Legal framework</div>
+        <div class="ds">Statutory protection for journalism; criminal-libel statutes; censorship laws.</div>
+      </div>
+      <div class="pillar">
+        <div class="nm">Economic context</div>
+        <div class="ds">Ownership concentration; advertising-market pressure; viability of independent outlets.</div>
+      </div>
+      <div class="pillar">
+        <div class="nm">Sociocultural context</div>
+        <div class="ds">Social pressure on journalists (gender, religion, ethnicity); cultural taboos.</div>
+      </div>
+      <div class="pillar">
+        <div class="nm">Safety</div>
+        <div class="ds">Killings, imprisonments, harassment, surveillance — physical and digital threats.</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="footnote">
+    Data: Reporters Without Borders, <em>World Press Freedom Index 2026</em>. Civica ingests one CSV per year and joins it to the existing <code>countries</code> table on ISO-3166 alpha-2. No new schema, no scraping, no scheduled refresh beyond the annual snapshot. Sample scores in this mockup are illustrative; production ingest will use the canonical RSF release. Spec source · <a href="#" style="color:var(--accent); text-decoration:underline;">CIV-211 · Tier-1 item #2</a>.
+  </p>
+</div>
+</body>
+</html>

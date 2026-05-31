@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica Index — Governance Outcomes by Government Type (Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    --color-bg: #16140f;
+    --color-bg-nav: rgba(22,20,15,0.92);
+    --color-surface-elevated: #221e16;
+    --color-text-primary: #ebe6d6;
+    --color-text-60: #c4bdae;
+    --color-text-50: rgba(235,230,214,0.64);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(235,230,214,0.50);
+    --color-text-25: rgba(235,230,214,0.48);
+    --color-text-20: rgba(235,230,214,0.40);
+    --color-accent: oklch(68% 0.15 35);
+    --color-card-bg: #221e16;
+    --color-card-border: #3d382d;
+    --color-card-hover-bg: #2b2619;
+    --color-divider: #3d382d;
+    --color-grid-bg: #221e16;
+    --color-grid-cell: #16140f;
+    --color-grid-cell-hover: #2b2619;
+    --tier-exceptional: oklch(68% 0.14 145);
+    --tier-strong: oklch(60% 0.11 155);
+    --tier-mixed: oklch(75% 0.14 75);
+    --tier-weak: oklch(62% 0.15 45);
+    --tier-failed: oklch(55% 0.18 25);
+    --gov-parl: #4E8BD4;
+    --gov-pres: #D4764E;
+    --gov-semi: #9B6DC6;
+    --gov-mon:  #C4A44E;
+    --gov-abs:  #C4A44E;
+    --gov-theo: #5CAA6E;
+    --gov-one:  #D4764E;
+    --gov-mil:  #C65A37;
+    --gov-other:#8899AA;
+  }
+  html[data-theme="light"] {
+    --color-bg: #f4f1ea;
+    --color-bg-nav: rgba(244,241,234,0.92);
+    --color-surface-elevated: #ebe6d6;
+    --color-text-primary: #1a1a1a;
+    --color-text-60: #3d382d;
+    --color-text-50: rgba(26,26,26,0.62);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(26,26,26,0.53);
+    --color-text-25: rgba(26,26,26,0.48);
+    --color-text-20: rgba(26,26,26,0.38);
+    --color-accent: oklch(58% 0.14 35);
+    --color-card-bg: #ebe6d6;
+    --color-card-border: #c4bdae;
+    --color-card-hover-bg: #e2dcc8;
+    --color-divider: #c4bdae;
+    --color-grid-bg: #ebe6d6;
+    --color-grid-cell: #f4f1ea;
+    --color-grid-cell-hover: #e2dcc8;
+    --tier-exceptional: oklch(55% 0.12 145);
+    --tier-strong: oklch(48% 0.10 155);
+    --tier-mixed: oklch(65% 0.14 75);
+    --tier-weak: oklch(55% 0.15 45);
+    --tier-failed: oklch(52% 0.18 25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--color-bg); color: var(--color-text-primary); line-height: 1.65; -webkit-font-smoothing: antialiased; transition: background-color .3s, color .2s; }
+
+  .nav { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(10px); background: var(--color-bg-nav); border-bottom: 1px solid var(--color-divider); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .nav-brand { font-family: var(--font-heading); font-size: 22px; letter-spacing: -0.02em; color: var(--color-text-primary); text-decoration: none; }
+  .nav-brand em { font-style: normal; color: var(--color-accent); }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-40); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
+  .nav-links a.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+  .theme-toggle { background: transparent; color: var(--color-text-50); border: 1px solid var(--color-card-border); padding: 6px 10px; border-radius: 4px; cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+  .page-hero { padding: 72px 0 32px; }
+  .breadcrumb { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-30); margin-bottom: 18px; }
+  .breadcrumb a { color: var(--color-text-30); text-decoration: none; }
+  .page-eyebrow {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--color-text-30); margin-bottom: 14px;
+  }
+  .page-title { font-family: var(--font-heading); font-size: 56px; font-weight: 400; letter-spacing: -0.04em; line-height: 1.02; margin-bottom: 16px; max-width: 900px; }
+  .page-lede { font-size: 17px; color: var(--color-text-60); max-width: 720px; line-height: 1.6; }
+
+  /* big callout strip */
+  .callout-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--color-grid-bg); border: 1px solid var(--color-card-border);
+    border-radius: 4px; overflow: hidden; margin: 40px 0 48px;
+  }
+  .callout {
+    background: var(--color-grid-cell); padding: 24px 26px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .callout-label {
+    font-family: var(--font-mono); font-weight: 500; font-size: 10px;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-30);
+  }
+  .callout-value {
+    font-family: var(--font-heading); font-size: 34px; font-weight: 400;
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .callout-hint { font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--color-text-40); margin-top: 4px; }
+
+  /* section heads */
+  .section-eyebrow { font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-30); margin-bottom: 14px; }
+  .section-title { font-family: var(--font-heading); font-size: 32px; font-weight: 400; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 28px; }
+
+  /* distribution plot */
+  .dist-plot-wrap {
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    background: var(--color-grid-cell); padding: 32px 40px 28px;
+    margin-bottom: 48px;
+  }
+  .dist-plot-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .dist-plot { width: 100%; height: 360px; }
+
+  /* govtype rows table */
+  .gov-list {
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    background: var(--color-grid-bg); overflow: hidden;
+    display: grid; gap: 1px; margin-bottom: 48px;
+  }
+  .gov-list-header, .gov-list-row {
+    background: var(--color-grid-cell); padding: 20px 28px;
+    display: grid;
+    grid-template-columns: 6px minmax(0, 1.6fr) 120px minmax(0, 1.5fr) 120px 100px;
+    gap: 18px; align-items: center;
+  }
+  .gov-list-header { font-family: var(--font-mono); font-weight: 500; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-30); padding: 14px 28px; }
+  .gov-list-row { cursor: pointer; transition: background-color .15s; text-decoration: none; color: inherit; }
+  .gov-list-row:hover { background: var(--color-grid-cell-hover); }
+  .gov-stripe { width: 6px; height: 56px; border-radius: 1px; }
+  .gov-name-block { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .gov-name { font-family: var(--font-heading); font-size: 20px; line-height: 1.1; }
+  .gov-examples { font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--color-text-30); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gov-count {
+    font-family: var(--font-heading); font-size: 20px; font-weight: 500;
+    letter-spacing: -0.01em; line-height: 1;
+  }
+  .gov-count small { font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--color-text-25); display: block; margin-top: 2px; }
+  .gov-spread-bar {
+    position: relative; height: 20px;
+    background: var(--color-divider); border-radius: 2px;
+    overflow: visible;
+  }
+  .gov-spread-fill {
+    position: absolute; top: 0; bottom: 0; border-radius: 1px;
+  }
+  .gov-spread-avg {
+    position: absolute; top: -3px; bottom: -3px; width: 2px;
+    background: var(--color-text-primary);
+  }
+  .gov-spread-label {
+    font-family: var(--font-mono); font-weight: 500; font-size: 10px;
+    color: var(--color-text-30); margin-top: 6px;
+    display: flex; justify-content: space-between;
+  }
+  .gov-avg {
+    font-family: var(--font-heading); font-size: 22px; font-weight: 500;
+    letter-spacing: -0.01em; line-height: 1;
+  }
+  .gov-trajectory { width: 100%; height: 36px; }
+
+  /* detail panel */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 60px; }
+  .panel {
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    background: var(--color-grid-cell); padding: 28px 32px;
+  }
+  .panel h3 {
+    font-family: var(--font-heading); font-size: 24px; font-weight: 400;
+    letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 8px;
+  }
+  .panel-lede { color: var(--color-text-60); margin-bottom: 18px; font-size: 14px; }
+
+  /* histogram */
+  .hist { width: 100%; height: 200px; }
+
+  footer { margin-top: 60px; padding: 40px 0; border-top: 1px solid var(--color-divider); }
+  .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: 0.08em; color: var(--color-text-30); }
+
+  @media (max-width: 900px) {
+    .page-title { font-size: 40px; }
+    .callout-strip { grid-template-columns: 1fr 1fr; }
+    .gov-list-row, .gov-list-header { grid-template-columns: 6px 1fr 80px; gap: 14px; padding: 16px 20px; }
+    .gov-list-row > :nth-child(4), .gov-list-row > :nth-child(6),
+    .gov-list-header > :nth-child(4), .gov-list-header > :nth-child(6) { display: none; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .container, .nav-inner { padding: 0 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">Civica <em>Atlas</em></a>
+    <div class="nav-links">
+      <a href="#">Countries</a>
+      <a href="#" class="active">Index</a>
+      <a href="#">Rankings</a>
+      <a href="#">Blog</a>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle theme</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+
+  <section class="page-hero">
+    <div class="breadcrumb"><a href="#">← Index</a> / Government types</div>
+    <div class="page-eyebrow">Empirical observation · not a ranking</div>
+    <h1 class="page-title">How does government type actually correlate with governance outcomes?</h1>
+    <p class="page-lede">The Civica Index does not bake bonuses or penalties into government types. Instead, we publish what the data says: average CI, distribution spread, and 20-year trajectory per category — so you can see whether any government type <em>systematically</em> produces better outcomes, or whether individual countries matter more than their system.</p>
+  </section>
+
+  <section class="callout-strip">
+    <div class="callout">
+      <div class="callout-label">Highest avg. CI</div>
+      <div class="callout-value" style="color: var(--gov-parl);">79.4</div>
+      <div class="callout-hint">Parliamentary democracies (n=38)</div>
+    </div>
+    <div class="callout">
+      <div class="callout-label">Widest spread</div>
+      <div class="callout-value" style="color: var(--gov-pres);">68 pt</div>
+      <div class="callout-hint">Presidential republics (12 → 85)</div>
+    </div>
+    <div class="callout">
+      <div class="callout-label">Most improved (10y)</div>
+      <div class="callout-value" style="color: var(--gov-mon);">+5.2</div>
+      <div class="callout-hint">Constitutional monarchies</div>
+    </div>
+    <div class="callout">
+      <div class="callout-label">Most declined (10y)</div>
+      <div class="callout-value" style="color: var(--tier-failed);">−11.8</div>
+      <div class="callout-hint">Military juntas</div>
+    </div>
+  </section>
+
+  <!-- distribution plot -->
+  <section>
+    <div class="section-eyebrow">The full distribution · every country placed by CI</div>
+    <h2 class="section-title">Each dot is a country.</h2>
+
+    <div class="dist-plot-wrap">
+      <div class="dist-plot-head">
+        <div style="font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--color-text-30); letter-spacing: 0.1em; text-transform: uppercase;">Y-AXIS: GOVERNMENT TYPE · X-AXIS: CIVICA INDEX 0–100 · WHITE BAR: AVG</div>
+        <div style="display:flex; gap:12px;">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-40); display: flex; align-items: center; gap: 6px;"><span style="width:10px; height:10px; border-radius:50%; background: var(--gov-parl);"></span>Parliamentary</div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-40); display: flex; align-items: center; gap: 6px;"><span style="width:10px; height:10px; border-radius:50%; background: var(--gov-pres);"></span>Presidential</div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-40); display: flex; align-items: center; gap: 6px;"><span style="width:10px; height:10px; border-radius:50%; background: var(--gov-semi);"></span>Semi</div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-40); display: flex; align-items: center; gap: 6px;"><span style="width:10px; height:10px; border-radius:50%; background: var(--gov-mon);"></span>Monarchy</div>
+        </div>
+      </div>
+
+      <svg class="dist-plot" viewBox="0 0 1120 360" preserveAspectRatio="none">
+        <!-- x grid -->
+        <g stroke="var(--color-divider)" stroke-width="1">
+          <line x1="160" y1="0" x2="160" y2="330"/>
+          <line x1="340" y1="0" x2="340" y2="330"/>
+          <line x1="520" y1="0" x2="520" y2="330"/>
+          <line x1="700" y1="0" x2="700" y2="330"/>
+          <line x1="880" y1="0" x2="880" y2="330"/>
+          <line x1="1060" y1="0" x2="1060" y2="330"/>
+        </g>
+        <g font-family="ui-monospace" font-size="10" fill="var(--color-text-30)" font-weight="500">
+          <text x="155" y="350">0</text>
+          <text x="335" y="350">20</text>
+          <text x="515" y="350">40</text>
+          <text x="695" y="350">60</text>
+          <text x="875" y="350">80</text>
+          <text x="1055" y="350">100</text>
+        </g>
+
+        <!-- y labels -->
+        <g font-family="'Fraunces', serif" font-size="14" fill="var(--color-text-primary)">
+          <text x="10" y="38">Parliamentary</text>
+          <text x="10" y="90">Presidential</text>
+          <text x="10" y="142">Semi-presidential</text>
+          <text x="10" y="194">Const. monarchy</text>
+          <text x="10" y="246">One-party</text>
+          <text x="10" y="298">Military junta</text>
+        </g>
+
+        <!-- Parliamentary row (avg 79.4) -->
+        <line x1="160" y1="30" x2="1060" y2="30" stroke="var(--color-divider)" stroke-dasharray="2 4"/>
+        <rect x="875" y="22" width="3" height="16" fill="var(--color-text-primary)"/>
+        <g fill="var(--gov-parl)">
+          <circle cx="1000" cy="30" r="5"/><circle cx="985" cy="30" r="5"/><circle cx="970" cy="30" r="5"/>
+          <circle cx="945" cy="30" r="5"/><circle cx="920" cy="30" r="5"/><circle cx="905" cy="30" r="5"/>
+          <circle cx="875" cy="30" r="5"/><circle cx="860" cy="30" r="5"/><circle cx="850" cy="30" r="5"/>
+          <circle cx="830" cy="30" r="5"/><circle cx="810" cy="30" r="5"/><circle cx="790" cy="30" r="5"/>
+          <circle cx="780" cy="30" r="5"/><circle cx="770" cy="30" r="5"/><circle cx="740" cy="30" r="5"/>
+          <circle cx="720" cy="30" r="5"/><circle cx="705" cy="30" r="5"/><circle cx="680" cy="30" r="5"/>
+        </g>
+
+        <!-- Presidential row (avg 61.2) wide spread -->
+        <line x1="160" y1="82" x2="1060" y2="82" stroke="var(--color-divider)" stroke-dasharray="2 4"/>
+        <rect x="710" y="74" width="3" height="16" fill="var(--color-text-primary)"/>
+        <g fill="var(--gov-pres)">
+          <circle cx="245" cy="82" r="5"/><circle cx="285" cy="82" r="5"/><circle cx="320" cy="82" r="5"/>
+          <circle cx="370" cy="82" r="5"/><circle cx="420" cy="82" r="5"/><circle cx="470" cy="82" r="5"/>
+          <circle cx="520" cy="82" r="5"/><circle cx="560" cy="82" r="5"/><circle cx="590" cy="82" r="5"/>
+          <circle cx="620" cy="82" r="5"/><circle cx="660" cy="82" r="5"/><circle cx="680" cy="82" r="5"/>
+          <circle cx="700" cy="82" r="5"/><circle cx="720" cy="82" r="5"/><circle cx="750" cy="82" r="5"/>
+          <circle cx="770" cy="82" r="5"/><circle cx="810" cy="82" r="5"/><circle cx="855" cy="82" r="5"/>
+          <circle cx="900" cy="82" r="5"/>
+        </g>
+
+        <!-- Semi-presidential -->
+        <line x1="160" y1="134" x2="1060" y2="134" stroke="var(--color-divider)" stroke-dasharray="2 4"/>
+        <rect x="780" y="126" width="3" height="16" fill="var(--color-text-primary)"/>
+        <g fill="var(--gov-semi)">
+          <circle cx="485" cy="134" r="5"/><circle cx="560" cy="134" r="5"/><circle cx="620" cy="134" r="5"/>
+          <circle cx="680" cy="134" r="5"/><circle cx="740" cy="134" r="5"/><circle cx="780" cy="134" r="5"/>
+          <circle cx="820" cy="134" r="5"/><circle cx="860" cy="134" r="5"/><circle cx="910" cy="134" r="5"/>
+        </g>
+
+        <!-- Constitutional monarchy -->
+        <line x1="160" y1="186" x2="1060" y2="186" stroke="var(--color-divider)" stroke-dasharray="2 4"/>
+        <rect x="900" y="178" width="3" height="16" fill="var(--color-text-primary)"/>
+        <g fill="var(--gov-mon)">
+          <circle cx="560" cy="186" r="5"/><circle cx="720" cy="186" r="5"/><circle cx="780" cy="186" r="5"/>
+          <circle cx="820" cy="186" r="5"/><circle cx="870" cy="186" r="5"/><circle cx="910" cy="186" r="5"/>
+          <circle cx="950" cy="186" r="5"/><circle cx="980" cy="186" r="5"/>
+        </g>
+
+        <!-- One-party -->
+        <line x1="160" y1="238" x2="1060" y2="238" stroke="var(--color-divider)" stroke-dasharray="2 4"/>
+        <rect x="320" y="230" width="3" height="16" fill="var(--color-text-primary)"/>
+        <g fill="var(--gov-one)">
+          <circle cx="200" cy="238" r="5"/><circle cx="240" cy="238" r="5"/><circle cx="290" cy="238" r="5"/>
+          <circle cx="320" cy="238" r="5"/><circle cx="360" cy="238" r="5"/><circle cx="400" cy="238" r="5"/>
+          <circle cx="450" cy="238" r="5"/>
+        </g>
+
+        <!-- Military junta -->
+        <line x1="160" y1="290" x2="1060" y2="290" stroke="var(--color-divider)" stroke-dasharray="2 4"/>
+        <rect x="245" y="282" width="3" height="16" fill="var(--color-text-primary)"/>
+        <g fill="var(--gov-mil)">
+          <circle cx="180" cy="290" r="5"/><circle cx="210" cy="290" r="5"/><circle cx="240" cy="290" r="5"/>
+          <circle cx="260" cy="290" r="5"/><circle cx="300" cy="290" r="5"/>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Per-govtype table -->
+  <section>
+    <div class="section-eyebrow">By the numbers · every government type</div>
+    <h2 class="section-title">Average, spread, and trajectory.</h2>
+
+    <div class="gov-list">
+      <div class="gov-list-header">
+        <div></div>
+        <div>Government type</div>
+        <div style="text-align:right;">Countries</div>
+        <div>Spread (min–max) · avg</div>
+        <div style="text-align:right;">Avg CI</div>
+        <div>10y trend</div>
+      </div>
+
+      <a class="gov-list-row" href="#">
+        <div class="gov-stripe" style="background: var(--gov-parl);"></div>
+        <div class="gov-name-block">
+          <div class="gov-name">Parliamentary democracies</div>
+          <div class="gov-examples">Denmark · Norway · Germany · Japan · Australia · Canada · 33 more</div>
+        </div>
+        <div class="gov-count" style="text-align:right;">38<small>countries</small></div>
+        <div>
+          <div class="gov-spread-bar">
+            <div class="gov-spread-fill" style="left: 68%; width: 26%; background: color-mix(in oklab, var(--gov-parl) 30%, transparent);"></div>
+            <div class="gov-spread-avg" style="left: 79%;"></div>
+          </div>
+          <div class="gov-spread-label"><span>68</span><span>avg 79.4</span><span>94</span></div>
+        </div>
+        <div class="gov-avg" style="text-align:right; color: var(--gov-parl);">79.4</div>
+        <div>
+          <svg class="gov-trajectory" viewBox="0 0 120 36" preserveAspectRatio="none"><path d="M0 22 L20 20 L40 18 L60 17 L80 15 L100 14 L120 12" stroke="var(--gov-parl)" stroke-width="1.5" fill="none"/></svg>
+        </div>
+      </a>
+
+      <a class="gov-list-row" href="#">
+        <div class="gov-stripe" style="background: var(--gov-pres);"></div>
+        <div class="gov-name-block">
+          <div class="gov-name">Presidential republics</div>
+          <div class="gov-examples">USA · Brazil · Mexico · Indonesia · South Korea · Nigeria · 42 more</div>
+        </div>
+        <div class="gov-count" style="text-align:right;">48<small>countries</small></div>
+        <div>
+          <div class="gov-spread-bar">
+            <div class="gov-spread-fill" style="left: 12%; width: 74%; background: color-mix(in oklab, var(--gov-pres) 30%, transparent);"></div>
+            <div class="gov-spread-avg" style="left: 61%;"></div>
+          </div>
+          <div class="gov-spread-label"><span>12</span><span>avg 61.2</span><span>85</span></div>
+        </div>
+        <div class="gov-avg" style="text-align:right; color: var(--gov-pres);">61.2</div>
+        <div>
+          <svg class="gov-trajectory" viewBox="0 0 120 36" preserveAspectRatio="none"><path d="M0 14 L20 15 L40 15 L60 17 L80 16 L100 18 L120 17" stroke="var(--gov-pres)" stroke-width="1.5" fill="none"/></svg>
+        </div>
+      </a>
+
+      <a class="gov-list-row" href="#">
+        <div class="gov-stripe" style="background: var(--gov-semi);"></div>
+        <div class="gov-name-block">
+          <div class="gov-name">Semi-presidential</div>
+          <div class="gov-examples">France · Portugal · Poland · Taiwan · Romania · 16 more</div>
+        </div>
+        <div class="gov-count" style="text-align:right;">21<small>countries</small></div>
+        <div>
+          <div class="gov-spread-bar">
+            <div class="gov-spread-fill" style="left: 31%; width: 51%; background: color-mix(in oklab, var(--gov-semi) 30%, transparent);"></div>
+            <div class="gov-spread-avg" style="left: 69%;"></div>
+          </div>
+          <div class="gov-spread-label"><span>31</span><span>avg 69.1</span><span>82</span></div>
+        </div>
+        <div class="gov-avg" style="text-align:right; color: var(--gov-semi);">69.1</div>
+        <div>
+          <svg class="gov-trajectory" viewBox="0 0 120 36" preserveAspectRatio="none"><path d="M0 18 L20 17 L40 19 L60 17 L80 18 L100 16 L120 17" stroke="var(--gov-semi)" stroke-width="1.5" fill="none"/></svg>
+        </div>
+      </a>
+
+      <a class="gov-list-row" href="#">
+        <div class="gov-stripe" style="background: var(--gov-mon);"></div>
+        <div class="gov-name-block">
+          <div class="gov-name">Constitutional monarchies</div>
+          <div class="gov-examples">UK · Spain · Netherlands · Sweden · Belgium · Thailand · 12 more</div>
+        </div>
+        <div class="gov-count" style="text-align:right;">18<small>countries</small></div>
+        <div>
+          <div class="gov-spread-bar">
+            <div class="gov-spread-fill" style="left: 48%; width: 40%; background: color-mix(in oklab, var(--gov-mon) 30%, transparent);"></div>
+            <div class="gov-spread-avg" style="left: 78%;"></div>
+          </div>
+          <div class="gov-spread-label"><span>48</span><span>avg 78.4</span><span>88</span></div>
+        </div>
+        <div class="gov-avg" style="text-align:right; color: var(--gov-mon);">78.4</div>
+        <div>
+          <svg class="gov-trajectory" viewBox="0 0 120 36" preserveAspectRatio="none"><path d="M0 20 L20 18 L40 17 L60 15 L80 14 L100 13 L120 12" stroke="var(--gov-mon)" stroke-width="1.5" fill="none"/></svg>
+        </div>
+      </a>
+
+      <a class="gov-list-row" href="#">
+        <div class="gov-stripe" style="background: var(--gov-one);"></div>
+        <div class="gov-name-block">
+          <div class="gov-name">One-party states</div>
+          <div class="gov-examples">China · Vietnam · Cuba · Laos · Eritrea</div>
+        </div>
+        <div class="gov-count" style="text-align:right;">7<small>countries</small></div>
+        <div>
+          <div class="gov-spread-bar">
+            <div class="gov-spread-fill" style="left: 10%; width: 35%; background: color-mix(in oklab, var(--gov-one) 30%, transparent);"></div>
+            <div class="gov-spread-avg" style="left: 27%;"></div>
+          </div>
+          <div class="gov-spread-label"><span>10</span><span>avg 27.3</span><span>45</span></div>
+        </div>
+        <div class="gov-avg" style="text-align:right; color: var(--gov-one);">27.3</div>
+        <div>
+          <svg class="gov-trajectory" viewBox="0 0 120 36" preserveAspectRatio="none"><path d="M0 14 L20 15 L40 17 L60 18 L80 20 L100 21 L120 23" stroke="var(--gov-one)" stroke-width="1.5" fill="none"/></svg>
+        </div>
+      </a>
+
+      <a class="gov-list-row" href="#">
+        <div class="gov-stripe" style="background: var(--gov-mil);"></div>
+        <div class="gov-name-block">
+          <div class="gov-name">Military juntas</div>
+          <div class="gov-examples">Myanmar · Sudan · Mali · Burkina Faso · Niger</div>
+        </div>
+        <div class="gov-count" style="text-align:right;">5<small>countries</small></div>
+        <div>
+          <div class="gov-spread-bar">
+            <div class="gov-spread-fill" style="left: 8%; width: 16%; background: color-mix(in oklab, var(--gov-mil) 30%, transparent);"></div>
+            <div class="gov-spread-avg" style="left: 16%;"></div>
+          </div>
+          <div class="gov-spread-label"><span>8</span><span>avg 16.2</span><span>24</span></div>
+        </div>
+        <div class="gov-avg" style="text-align:right; color: var(--gov-mil);">16.2</div>
+        <div>
+          <svg class="gov-trajectory" viewBox="0 0 120 36" preserveAspectRatio="none"><path d="M0 12 L20 14 L40 16 L60 19 L80 22 L100 24 L120 26" stroke="var(--gov-mil)" stroke-width="1.5" fill="none"/></svg>
+        </div>
+      </a>
+
+      <a class="gov-list-row" href="#">
+        <div class="gov-stripe" style="background: var(--gov-theo);"></div>
+        <div class="gov-name-block">
+          <div class="gov-name">Theocracies</div>
+          <div class="gov-examples">Iran · Vatican City · Saudi Arabia</div>
+        </div>
+        <div class="gov-count" style="text-align:right;">3<small>countries</small></div>
+        <div>
+          <div class="gov-spread-bar">
+            <div class="gov-spread-fill" style="left: 18%; width: 26%; background: color-mix(in oklab, var(--gov-theo) 30%, transparent);"></div>
+            <div class="gov-spread-avg" style="left: 31%;"></div>
+          </div>
+          <div class="gov-spread-label"><span>18</span><span>avg 31.5</span><span>44</span></div>
+        </div>
+        <div class="gov-avg" style="text-align:right; color: var(--gov-theo);">31.5</div>
+        <div>
+          <svg class="gov-trajectory" viewBox="0 0 120 36" preserveAspectRatio="none"><path d="M0 18 L20 18 L40 19 L60 19 L80 18 L100 19 L120 18" stroke="var(--gov-theo)" stroke-width="1.5" fill="none"/></svg>
+        </div>
+      </a>
+
+      <a class="gov-list-row" href="#">
+        <div class="gov-stripe" style="background: var(--gov-abs);"></div>
+        <div class="gov-name-block">
+          <div class="gov-name">Absolute monarchies</div>
+          <div class="gov-examples">Saudi Arabia · Brunei · Oman · Eswatini</div>
+        </div>
+        <div class="gov-count" style="text-align:right;">4<small>countries</small></div>
+        <div>
+          <div class="gov-spread-bar">
+            <div class="gov-spread-fill" style="left: 22%; width: 22%; background: color-mix(in oklab, var(--gov-abs) 30%, transparent);"></div>
+            <div class="gov-spread-avg" style="left: 34%;"></div>
+          </div>
+          <div class="gov-spread-label"><span>22</span><span>avg 34.0</span><span>44</span></div>
+        </div>
+        <div class="gov-avg" style="text-align:right; color: var(--gov-abs);">34.0</div>
+        <div>
+          <svg class="gov-trajectory" viewBox="0 0 120 36" preserveAspectRatio="none"><path d="M0 19 L20 18 L40 18 L60 17 L80 16 L100 16 L120 15" stroke="var(--gov-abs)" stroke-width="1.5" fill="none"/></svg>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- editorial panel -->
+  <section class="detail-grid">
+    <div class="panel">
+      <div class="section-eyebrow" style="margin-bottom: 6px;">What the data says</div>
+      <h3>Parliamentary systems cluster at the top. Presidential republics do not cluster at all.</h3>
+      <p class="panel-lede">The narrowest high-performing band (avg 79.4, min 68) belongs to parliamentary democracies. Presidential republics span 73 points, from Haiti to Switzerland. System type predicts outcomes only at the extremes.</p>
+      <svg class="hist" viewBox="0 0 400 200" preserveAspectRatio="none">
+        <g fill="var(--gov-parl)" opacity="0.8">
+          <rect x="200" y="130" width="20" height="70"/>
+          <rect x="224" y="90" width="20" height="110"/>
+          <rect x="248" y="40" width="20" height="160"/>
+          <rect x="272" y="60" width="20" height="140"/>
+          <rect x="296" y="80" width="20" height="120"/>
+          <rect x="320" y="140" width="20" height="60"/>
+        </g>
+        <g fill="var(--gov-pres)" opacity="0.5">
+          <rect x="20" y="160" width="20" height="40"/>
+          <rect x="44" y="140" width="20" height="60"/>
+          <rect x="68" y="110" width="20" height="90"/>
+          <rect x="92" y="90" width="20" height="110"/>
+          <rect x="116" y="100" width="20" height="100"/>
+          <rect x="140" y="120" width="20" height="80"/>
+          <rect x="164" y="140" width="20" height="60"/>
+          <rect x="188" y="150" width="20" height="50"/>
+          <rect x="212" y="140" width="20" height="60"/>
+          <rect x="236" y="130" width="20" height="70"/>
+          <rect x="260" y="150" width="20" height="50"/>
+          <rect x="284" y="170" width="20" height="30"/>
+        </g>
+      </svg>
+    </div>
+    <div class="panel">
+      <div class="section-eyebrow" style="margin-bottom: 6px;">What the data does not say</div>
+      <h3>"Parliamentary systems are better." The data says parliamentary systems <em>cluster at the top in 2026</em> — which may reflect where they exist (Europe, Oceania) more than what they are.</h3>
+      <p class="panel-lede">The Civica Index does not argue that any single government type is best. Correlation is shown; causation is left to researchers and historians who can control for confounders that the Index cannot.</p>
+      <p style="font-family: var(--font-mono); font-weight: 500; font-size: 12px; color: var(--color-text-40); letter-spacing: 0.04em; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-divider);">Read this chart with caution. <a href="#" style="color: var(--color-accent);">Methodology §5 →</a></p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>Civica Index v1.0 · n=197 · last recalc Apr 2026 Q1</div>
+    <div><a href="#" style="color: var(--color-accent); text-decoration: none;">Download this analysis as CSV →</a></div>
+  </div>
+</footer>
+
+<script>
+  function toggleTheme() {
+    const root = document.documentElement;
+    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+  }
+</script>
+
+</body>
+</html>

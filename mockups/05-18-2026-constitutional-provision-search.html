@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Constitutional Provision Search — Civica mockup</title>
+<style>
+  :root {
+    --paper:  #FAF7F2;
+    --canvas: #FFFCF8;
+    --alt:    #F2F4F7;
+    --ink:    #0B1220;
+    --ink-85: rgba(11,18,32,.88);
+    --slate:  #334155;
+    --muted:  #475569;
+    --rule:   #c4bdae;
+    --accent: #A87241;
+    --mark-bg: rgba(168,114,65,.18);
+    --mark-fg: #6e4520;
+
+    --gov-parl: #2D6CDF;
+    --gov-pres: #C25D3A;
+    --gov-semi: #7C59C9;
+    --gov-mon:  #C9A24B;
+    --gov-theo: #4C9F6E;
+    --gov-other:#64748B;
+
+    --serif: Fraunces, Georgia, "Times New Roman", serif;
+    --sans:  Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono:  ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  [data-theme="dark"] {
+    --paper:  #14110d;
+    --canvas: #1a1612;
+    --alt:    #221d18;
+    --ink:    #f4f1ea;
+    --ink-85: rgba(244,241,234,.88);
+    --slate:  #cdc6b6;
+    --muted:  #8a8370;
+    --rule:   #3a342a;
+    --accent: #d39466;
+    --mark-bg: rgba(211,148,102,.22);
+    --mark-fg: #f4d8b9;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:15px; }
+  .shell { max-width:1280px; margin:0 auto; padding:32px 24px 80px; }
+
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding-bottom:20px; border-bottom:1px solid var(--rule); margin-bottom:32px; }
+  .brand { font-family:var(--serif); font-weight:600; font-size:22px; letter-spacing:-0.01em; }
+  .topbar-right { display:flex; gap:12px; align-items:center; font-size:12px; color:var(--muted); }
+  button.theme { background:none; border:1px solid var(--rule); padding:6px 10px; border-radius:4px; font:inherit; color:inherit; cursor:pointer; }
+
+  /* HEADER */
+  h1 { font-family:var(--serif); font-weight:500; font-size:52px; line-height:1.04; letter-spacing:-0.02em; margin:0 0 12px; }
+  .lede { font-family:var(--serif); font-size:20px; line-height:1.5; color:var(--ink-85); max-width:780px; margin:0 0 28px; }
+
+  /* SEARCH BOX */
+  .search-card { background:var(--canvas); border:1px solid var(--rule); box-shadow:4px 4px 0 var(--ink); padding:18px; margin-bottom:24px; }
+  .search-row { display:flex; gap:10px; align-items:stretch; }
+  .search-input {
+    flex:1; display:flex; align-items:center; gap:10px;
+    border:1px solid var(--rule); background:var(--paper);
+    padding:0 14px; height:52px;
+  }
+  .search-input svg { color:var(--muted); flex-shrink:0; }
+  .search-input input {
+    border:0; background:transparent; outline:none; flex:1;
+    font-family:var(--serif); font-size:20px; color:var(--ink);
+  }
+  .search-input input::placeholder { color:var(--muted); font-style:italic; }
+  .search-input .kbd { font-family:var(--mono); font-size:11px; color:var(--muted); border:1px solid var(--rule); padding:2px 6px; border-radius:3px; }
+  .search-btn {
+    background:var(--ink); color:var(--paper); border:1px solid var(--ink);
+    font-family:var(--mono); font-size:12px; text-transform:uppercase; letter-spacing:.06em;
+    padding:0 18px; cursor:pointer;
+  }
+  .search-meta { display:flex; gap:18px; flex-wrap:wrap; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-top:14px; }
+  .search-meta b { color:var(--ink); font-weight:600; }
+
+  /* TOOLBAR */
+  .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+  .label { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.15em; color:var(--muted); margin-right:6px; }
+  .chip {
+    font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    padding:6px 10px; border:1px solid var(--rule); background:var(--canvas); cursor:pointer; color:var(--ink);
+  }
+  .chip.on { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .chip .ct { color:var(--muted); margin-left:4px; }
+  .chip.on .ct { color:var(--paper); opacity:.7; }
+
+  /* LAYOUT */
+  .grid { display:grid; grid-template-columns: 1.2fr 1.4fr; gap:20px; margin-top:20px; align-items:start; }
+
+  /* RESULT CARDS */
+  .results { display:flex; flex-direction:column; gap:0; background:var(--canvas); border:1px solid var(--rule); box-shadow:4px 4px 0 var(--ink); }
+  .res-head { display:flex; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--rule); font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+  .res-head select { font:inherit; background:transparent; color:var(--ink); border:0; cursor:pointer; }
+  .res {
+    display:grid; grid-template-columns:48px 1fr; gap:14px;
+    padding:16px; border-top:1px solid var(--rule); cursor:pointer;
+  }
+  .res:first-of-type { border-top:0; }
+  .res:hover { background:var(--alt); }
+  .res.active { background:var(--alt); border-left:3px solid var(--accent); padding-left:13px; }
+  .res .flag {
+    width:48px; height:32px; background:#ddd; border:1px solid var(--rule);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-size:11px; font-weight:600; color:var(--ink);
+  }
+  .res-meta { display:flex; gap:10px; flex-wrap:wrap; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px; }
+  .res-meta b { color:var(--ink); font-weight:600; }
+  .res-title { font-family:var(--serif); font-size:18px; line-height:1.3; margin:0 0 6px; color:var(--ink); }
+  .res-snip { font-size:14px; line-height:1.55; color:var(--ink-85); }
+  .res-snip mark { background:var(--mark-bg); color:var(--mark-fg); padding:0 2px; border-radius:1px; }
+  .res-footer { display:flex; gap:14px; margin-top:10px; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .dot { width:8px; height:8px; border-radius:50%; display:inline-block; vertical-align:middle; margin-right:5px; }
+
+  /* DETAIL PANEL */
+  .detail { background:var(--canvas); border:1px solid var(--rule); box-shadow:4px 4px 0 var(--ink); padding:24px; position:sticky; top:20px; }
+  .detail .crumb { font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:8px; }
+  .detail .crumb b { color:var(--ink); }
+  .detail h2 { font-family:var(--serif); font-weight:500; font-size:28px; line-height:1.15; margin:0 0 8px; letter-spacing:-0.01em; }
+  .detail .ctxbar { display:flex; gap:16px; align-items:center; padding:10px 0; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); margin:14px 0 18px; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); }
+  .detail .ctxbar .flag { width:32px; height:22px; background:#ddd; border:1px solid var(--rule); display:inline-flex; align-items:center; justify-content:center; font-size:10px; color:var(--ink); }
+  .detail .ctxbar b { color:var(--ink); }
+  .detail .quote {
+    font-family:var(--serif); font-size:17px; line-height:1.7; color:var(--ink);
+    border-left:3px solid var(--accent); padding:6px 0 6px 18px; margin:0 0 18px;
+  }
+  .detail .quote mark { background:var(--mark-bg); color:var(--mark-fg); padding:0 2px; border-radius:1px; }
+  .detail .src { font-family:var(--mono); font-size:11px; color:var(--muted); margin-bottom:18px; }
+  .detail .src a { color:var(--accent); text-decoration:underline; }
+
+  /* COMPARE STRIP */
+  .compare-head { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.15em; color:var(--muted); margin:18px 0 10px; display:flex; justify-content:space-between; align-items:center; }
+  .compare-head a { color:var(--accent); text-decoration:none; text-transform:none; letter-spacing:0; font-family:var(--sans); font-size:12px; }
+  .compare-row { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-top:1px dashed var(--rule); }
+  .compare-row:first-of-type { border-top:1px solid var(--rule); }
+  .compare-row .cf { width:28px; height:20px; background:#ddd; border:1px solid var(--rule); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:9px; font-weight:600; color:var(--ink); flex-shrink:0; }
+  .compare-row .cbody { flex:1; }
+  .compare-row .ctitle { font-family:var(--serif); font-size:14px; font-weight:500; color:var(--ink); margin-bottom:2px; }
+  .compare-row .ctitle .cart { font-family:var(--mono); font-size:10px; color:var(--muted); margin-left:6px; text-transform:uppercase; letter-spacing:.05em; }
+  .compare-row .csnip { font-size:13px; color:var(--ink-85); line-height:1.5; }
+  .compare-row .csnip mark { background:var(--mark-bg); color:var(--mark-fg); padding:0 2px; }
+  .compare-row .ctag { display:inline-block; font-family:var(--mono); font-size:10px; text-transform:uppercase; padding:2px 6px; border:1px solid var(--rule); margin-top:6px; color:var(--muted); }
+
+  /* TOPIC FACET */
+  .facet-card { background:var(--canvas); border:1px solid var(--rule); padding:14px 16px; margin-bottom:16px; }
+  .facet-card h4 { font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.15em; color:var(--muted); margin:0 0 10px; font-weight:500; }
+  .facet-list { display:flex; flex-direction:column; gap:6px; }
+  .facet-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; cursor:pointer; }
+  .facet-row .name { font-size:13px; color:var(--ink); }
+  .facet-row .ct { font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .facet-row:hover .name { color:var(--accent); }
+
+  .footnote { font-size:12px; color:var(--muted); margin-top:24px; font-family:var(--mono); }
+
+  @media (max-width: 900px) {
+    h1 { font-size:36px; }
+    .grid { grid-template-columns:1fr; }
+    .detail { position:static; }
+    .search-input input { font-size:16px; }
+    .search-row { flex-direction:column; }
+    .search-btn { padding:14px 18px; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">Civica · Mockup</div>
+    <div class="topbar-right">
+      <span>Tier-1 sprint · CIV-212 Session 7 · 2026-05-18</span>
+      <button class="theme" onclick="document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'">Toggle theme</button>
+    </div>
+  </header>
+
+  <h1>Constitutional Provision Search</h1>
+  <p class="lede">Search the full text of every constitution in Civica. Compare how 195 nations write the same right, the same office, the same limit — side by side, with citations to the source clause.</p>
+
+  <!-- SEARCH -->
+  <div class="search-card">
+    <div class="search-row">
+      <div class="search-input">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="text" value="presidential term limits" placeholder="Search constitutional text — e.g. &ldquo;freedom of religion&rdquo;, &ldquo;impeachment&rdquo;, &ldquo;right to housing&rdquo;" />
+        <span class="kbd">⌘ K</span>
+      </div>
+      <button class="search-btn">Search</button>
+    </div>
+    <div class="search-meta">
+      <span><b>184</b> matches</span>
+      <span>in <b>71</b> constitutions</span>
+      <span>across <b>112</b> articles</span>
+      <span>0.08 s</span>
+    </div>
+  </div>
+
+  <!-- FACET CHIPS -->
+  <div class="toolbar">
+    <span class="label">Topic</span>
+    <span class="chip on">All<span class="ct">184</span></span>
+    <span class="chip">Executive<span class="ct">61</span></span>
+    <span class="chip">Legislature<span class="ct">28</span></span>
+    <span class="chip">Rights<span class="ct">42</span></span>
+    <span class="chip">Judiciary<span class="ct">17</span></span>
+    <span class="chip">Emergency powers<span class="ct">22</span></span>
+    <span class="chip">Amendment process<span class="ct">14</span></span>
+  </div>
+  <div class="toolbar" style="margin-bottom:6px;">
+    <span class="label">Govt type</span>
+    <span class="chip on">All</span>
+    <span class="chip"><span class="dot" style="background:var(--gov-pres)"></span>Presidential</span>
+    <span class="chip"><span class="dot" style="background:var(--gov-parl)"></span>Parliamentary</span>
+    <span class="chip"><span class="dot" style="background:var(--gov-semi)"></span>Semi-presidential</span>
+    <span class="chip"><span class="dot" style="background:var(--gov-mon)"></span>Monarchical</span>
+    <span class="chip"><span class="dot" style="background:var(--gov-theo)"></span>Theocratic</span>
+  </div>
+  <div class="toolbar">
+    <span class="label">Adopted</span>
+    <span class="chip on">Any era</span>
+    <span class="chip">Pre-1945</span>
+    <span class="chip">1945–1989</span>
+    <span class="chip">1990–2010</span>
+    <span class="chip">2010–present</span>
+    <span class="chip" style="margin-left:auto; border-style:dashed;">Reset filters</span>
+  </div>
+
+  <!-- GRID: RESULTS + DETAIL -->
+  <div class="grid">
+
+    <!-- LEFT: RESULTS -->
+    <div class="results">
+      <div class="res-head">
+        <span>184 results · sorted by</span>
+        <select>
+          <option>Relevance</option>
+          <option>Country A–Z</option>
+          <option>Year adopted</option>
+          <option>Severity of limit (longest → shortest)</option>
+        </select>
+      </div>
+
+      <div class="res active">
+        <div class="flag">MX</div>
+        <div>
+          <div class="res-meta">
+            <b>Mexico</b><span>·</span><span>Constitution of 1917</span><span>·</span><span>Art. 83</span><span>·</span><span><span class="dot" style="background:var(--gov-pres)"></span>Presidential</span>
+          </div>
+          <div class="res-title">Article 83 — Single six-year term, no re-election</div>
+          <div class="res-snip">&ldquo;The citizen who has occupied the office of <mark>President of the Republic</mark>, popularly elected, or by the function of law, on no occasion and for no reason whatsoever may again hold that office.&rdquo;</div>
+          <div class="res-footer">
+            <span>Cited by 4 Civica articles</span>
+            <span>· Compared 41×</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="res">
+        <div class="flag">US</div>
+        <div>
+          <div class="res-meta">
+            <b>United States</b><span>·</span><span>Constitution · Amend. XXII (1951)</span><span>·</span><span><span class="dot" style="background:var(--gov-pres)"></span>Presidential</span>
+          </div>
+          <div class="res-title">22nd Amendment — Two-term limit</div>
+          <div class="res-snip">&ldquo;No person shall be elected to the office of the <mark>President</mark> more than twice, and no person who has held the office of President, or acted as President, for more than two years of a <mark>term</mark> to which some other person was elected President shall be elected to the office of the President more than once.&rdquo;</div>
+          <div class="res-footer">
+            <span>Cited by 6 Civica articles</span>
+            <span>· Compared 78×</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="res">
+        <div class="flag">FR</div>
+        <div>
+          <div class="res-meta">
+            <b>France</b><span>·</span><span>1958 Constitution · Art. 6 (amended 2008)</span><span>·</span><span><span class="dot" style="background:var(--gov-semi)"></span>Semi-presidential</span>
+          </div>
+          <div class="res-title">Article 6 — Two consecutive five-year terms</div>
+          <div class="res-snip">&ldquo;The <mark>President</mark> of the Republic shall be elected for five years by direct universal suffrage. No one may hold office for more than two consecutive <mark>terms</mark>.&rdquo;</div>
+          <div class="res-footer">
+            <span>Cited by 3 Civica articles</span>
+            <span>· Compared 22×</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="res">
+        <div class="flag">BR</div>
+        <div>
+          <div class="res-meta">
+            <b>Brazil</b><span>·</span><span>1988 Constitution · Art. 14 §5</span><span>·</span><span><span class="dot" style="background:var(--gov-pres)"></span>Presidential</span>
+          </div>
+          <div class="res-title">Article 14 §5 — One immediate re-election</div>
+          <div class="res-snip">&ldquo;The <mark>President</mark> of the Republic, State Governors, the Federal District Governor, Mayors and those who have succeeded them or replaced them during the course of their <mark>terms</mark> may be re-elected for a single subsequent <mark>term</mark>.&rdquo;</div>
+          <div class="res-footer">
+            <span>Cited by 2 Civica articles</span>
+            <span>· Compared 19×</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="res">
+        <div class="flag">RU</div>
+        <div>
+          <div class="res-meta">
+            <b>Russia</b><span>·</span><span>1993 Constitution · Art. 81 §3 (amended 2020)</span><span>·</span><span><span class="dot" style="background:var(--gov-semi)"></span>Semi-presidential</span>
+          </div>
+          <div class="res-title">Article 81 §3 — Two-term limit, 2020 reset clause</div>
+          <div class="res-snip">&ldquo;One and the same person may not hold the office of the <mark>President</mark> of the Russian Federation for more than two <mark>terms</mark>. The number of <mark>terms</mark> served by a person prior to the adoption of the 2020 amendment shall not be counted.&rdquo;</div>
+          <div class="res-footer">
+            <span>Cited by 5 Civica articles</span>
+            <span>· Compared 33×</span>
+            <span style="color:var(--accent);">· Pulse-flagged</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="res">
+        <div class="flag">CN</div>
+        <div>
+          <div class="res-meta">
+            <b>China</b><span>·</span><span>1982 Constitution · Art. 79 (amended 2018)</span><span>·</span><span><span class="dot" style="background:var(--gov-other)"></span>Other</span>
+          </div>
+          <div class="res-title">Article 79 — Term limit removed (2018)</div>
+          <div class="res-snip">&ldquo;The <mark>President</mark> and Vice-President of the People&rsquo;s Republic of China shall serve for the same <mark>term</mark> as that of the National People&rsquo;s Congress.&rdquo; <span style="color:var(--muted);">[The two-term limit was deleted in the 2018 amendment.]</span></div>
+          <div class="res-footer">
+            <span>Cited by 4 Civica articles</span>
+            <span>· Compared 28×</span>
+            <span style="color:var(--accent);">· Pulse-flagged</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="res">
+        <div class="flag">RW</div>
+        <div>
+          <div class="res-meta">
+            <b>Rwanda</b><span>·</span><span>2003 Constitution · Art. 101 (amended 2015)</span><span>·</span><span><span class="dot" style="background:var(--gov-pres)"></span>Presidential</span>
+          </div>
+          <div class="res-title">Article 101 — Term extension via referendum (2015)</div>
+          <div class="res-snip">&ldquo;The <mark>President</mark> of the Republic is elected for a <mark>term</mark> of seven years and may be re-elected once. The 2015 amendment introduced a transitional seven-year <mark>term</mark> followed by two five-year <mark>terms</mark>.&rdquo;</div>
+          <div class="res-footer">
+            <span>Cited by 3 Civica articles</span>
+            <span>· Compared 14×</span>
+            <span style="color:var(--accent);">· Pulse-flagged</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:14px 16px; border-top:1px solid var(--rule); text-align:center; font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted);">
+        <a href="#" style="color:var(--accent); text-decoration:none;">Load 177 more results →</a>
+      </div>
+    </div>
+
+    <!-- RIGHT: DETAIL -->
+    <div class="detail">
+      <div class="crumb">Civica Atlas · <b>Mexico</b> · Constitution · Article 83</div>
+      <h2>Single six-year term, no re-election</h2>
+      <div class="ctxbar">
+        <span class="flag">MX</span>
+        <span><b>Mexico</b></span>
+        <span>·</span>
+        <span><span class="dot" style="background:var(--gov-pres)"></span>Presidential</span>
+        <span>·</span>
+        <span>Adopted <b>1917</b></span>
+        <span>·</span>
+        <span>Last amended <b>2014</b></span>
+      </div>
+
+      <p style="font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.15em; color:var(--muted); margin:0 0 6px;">Article 83 — full text</p>
+      <blockquote class="quote">
+        The President shall begin his charge on October 1st and shall last in it six years. The citizen who has occupied the office of <mark>President of the Republic</mark>, popularly elected, or by the function of law, on no occasion and for no reason whatsoever may again hold that office.
+      </blockquote>
+      <div class="src">
+        Source: <a href="#">Constitute Project · MX-1917 · clause-id 83.1</a> · last verified 2026-04-03
+      </div>
+
+      <div class="compare-head">
+        <span>Comparable provisions · 6 of 41</span>
+        <a href="#">Open full comparison →</a>
+      </div>
+
+      <div class="compare-row">
+        <span class="cf">CL</span>
+        <div class="cbody">
+          <div class="ctitle">Chile <span class="cart">Art. 25 — 1980 constitution</span></div>
+          <div class="csnip">&ldquo;The President of the Republic shall hold office for a <mark>term</mark> of four years and may not be re-elected for the following period.&rdquo;</div>
+          <span class="ctag">Non-consecutive only</span>
+        </div>
+      </div>
+
+      <div class="compare-row">
+        <span class="cf">KR</span>
+        <div class="cbody">
+          <div class="ctitle">South Korea <span class="cart">Art. 70 — 1987 constitution</span></div>
+          <div class="csnip">&ldquo;The <mark>term</mark> of office of the <mark>President</mark> shall be five years, and the President shall not be re-elected.&rdquo;</div>
+          <span class="ctag">Single term, no re-election</span>
+        </div>
+      </div>
+
+      <div class="compare-row">
+        <span class="cf">PH</span>
+        <div class="cbody">
+          <div class="ctitle">Philippines <span class="cart">Art. VII §4 — 1987 constitution</span></div>
+          <div class="csnip">&ldquo;The President shall not be eligible for any re-election. No person who has succeeded as President and has served as such for more than four years shall be qualified for election to the same office at any time.&rdquo;</div>
+          <span class="ctag">Single term, no re-election</span>
+        </div>
+      </div>
+
+      <div class="compare-row">
+        <span class="cf">CR</span>
+        <div class="cbody">
+          <div class="ctitle">Costa Rica <span class="cart">Art. 132 — 1949 constitution</span></div>
+          <div class="csnip">&ldquo;A citizen who has held the Presidency may not be re-elected to the same office for two periods after the one in which he served.&rdquo;</div>
+          <span class="ctag">Non-consecutive only</span>
+        </div>
+      </div>
+
+      <div class="compare-row">
+        <span class="cf">PY</span>
+        <div class="cbody">
+          <div class="ctitle">Paraguay <span class="cart">Art. 229 — 1992 constitution</span></div>
+          <div class="csnip">&ldquo;The President of the Republic and the Vice President shall last five years in office. They may not be re-elected for the same office for a subsequent period under any circumstances.&rdquo;</div>
+          <span class="ctag">Single term, no re-election</span>
+        </div>
+      </div>
+
+      <div class="compare-row">
+        <span class="cf">UY</span>
+        <div class="cbody">
+          <div class="ctitle">Uruguay <span class="cart">Art. 152 — 1967 constitution</span></div>
+          <div class="csnip">&ldquo;The President of the Republic shall last five years in office and may not be re-elected for the immediately following period.&rdquo;</div>
+          <span class="ctag">Non-consecutive only</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="footnote">
+    Mockup for proposed Tier-1 feature · CIV-211 item #1 — Constitutional Provision Search · Civica · 2026-05-18
+    <br />Data shape: <code>tsvector</code> index on <code>constitutions.text</code> + <code>article_id</code> + <code>jurisdiction_id</code>. No new schema. Snippets generated server-side via <code>ts_headline()</code>.
+  </p>
+</div>
+
+<script>
+  document.querySelectorAll('.res').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.res').forEach(e => e.classList.remove('active'));
+      el.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.chip').forEach(el => {
+    el.addEventListener('click', () => {
+      const group = el.parentElement;
+      if (!group) return;
+      group.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+      el.classList.add('on');
+    });
+  });
+</script>
+</body>
+</html>

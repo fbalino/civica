@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica — Constitution Explorer (Mockup)</title>
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --color-bg: #0e0e10;
+    --color-card-bg: #18181b;
+    --color-card-border: #27272a;
+    --color-text-primary: #fafafa;
+    --color-text-85: rgba(250,250,250,0.85);
+    --color-text-50: rgba(250,250,250,0.50);
+    --color-text-30: rgba(250,250,250,0.30);
+    --color-text-20: rgba(250,250,250,0.20);
+    --color-accent: #a78bfa;
+    --color-accent-dim: rgba(167,139,250,0.15);
+    --color-highlight: rgba(250,204,21,0.25);
+    --color-highlight-border: rgba(250,204,21,0.5);
+    --color-branch-executive: #f59e0b;
+    --color-branch-legislative: #3b82f6;
+    --color-branch-judicial: #ef4444;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+  }
+
+  [data-theme="light"] {
+    --color-bg: #fafaf9;
+    --color-card-bg: #ffffff;
+    --color-card-border: #e4e4e7;
+    --color-text-primary: #18181b;
+    --color-text-85: rgba(24,24,27,0.85);
+    --color-text-50: rgba(24,24,27,0.50);
+    --color-text-30: rgba(24,24,27,0.30);
+    --color-text-20: rgba(24,24,27,0.15);
+    --color-accent: #7c3aed;
+    --color-accent-dim: rgba(124,58,237,0.1);
+    --color-highlight: rgba(250,204,21,0.35);
+    --color-highlight-border: rgba(202,138,4,0.6);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--color-card-border);
+    background: var(--color-card-bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+  .topbar-nav {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .topbar-nav a {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-30);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .topbar-nav a:hover, .topbar-nav a.active {
+    color: var(--color-accent);
+  }
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--color-card-border);
+    color: var(--color-text-50);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  /* Layout */
+  .page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Page header */
+  .page-heading {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+  .page-subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    margin-bottom: 32px;
+  }
+
+  /* Search + filters */
+  .search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .search-input {
+    flex: 1;
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 450;
+    color: var(--color-text-primary);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input::placeholder {
+    color: var(--color-text-20);
+  }
+  .search-input:focus {
+    border-color: var(--color-accent);
+  }
+  .search-btn {
+    background: var(--color-accent);
+    color: var(--color-bg);
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* Topic chips */
+  .topic-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .topic-chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--color-card-border);
+    background: var(--color-card-bg);
+    color: var(--color-text-50);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+  .topic-chip:hover, .topic-chip.active {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: var(--color-accent-dim);
+  }
+
+  /* Three-column layout */
+  .explorer-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr 280px;
+    gap: 1px;
+    background: var(--color-card-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    min-height: 600px;
+  }
+
+  /* Left: country list */
+  .country-sidebar {
+    background: var(--color-card-bg);
+    padding: 16px;
+    overflow-y: auto;
+    max-height: 700px;
+  }
+  .sidebar-heading {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-20);
+    margin-bottom: 12px;
+  }
+  .country-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.1s;
+    text-decoration: none;
+    color: inherit;
+  }
+  .country-item:hover {
+    background: var(--color-accent-dim);
+  }
+  .country-item.selected {
+    background: var(--color-accent-dim);
+    border-left: 2px solid var(--color-accent);
+  }
+  .country-item .flag {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .country-item .name {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--color-text-85);
+  }
+  .country-item .year {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-20);
+    margin-left: auto;
+  }
+
+  /* Center: constitution text */
+  .constitution-main {
+    background: var(--color-card-bg);
+    padding: 32px;
+    overflow-y: auto;
+    max-height: 700px;
+  }
+  .const-country-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .const-country-flag {
+    font-size: 32px;
+  }
+  .const-country-name {
+    font-family: var(--font-heading);
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .const-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    margin-bottom: 24px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .const-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Article sections */
+  .article-nav {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-card-border);
+  }
+  .article-nav-item {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-30);
+    border: none;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .article-nav-item:hover {
+    color: var(--color-text-50);
+    background: var(--color-accent-dim);
+  }
+  .article-nav-item.active {
+    background: var(--color-accent-dim);
+    color: var(--color-accent);
+  }
+
+  .article-section {
+    margin-bottom: 32px;
+  }
+  .article-title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    color: var(--color-text-primary);
+  }
+  .article-text {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--color-text-85);
+  }
+  .article-text p {
+    margin-bottom: 12px;
+  }
+  .article-clause {
+    padding-left: 20px;
+    border-left: 2px solid var(--color-card-border);
+    margin: 12px 0;
+  }
+  mark {
+    background: var(--color-highlight);
+    border-bottom: 2px solid var(--color-highlight-border);
+    color: inherit;
+    padding: 1px 2px;
+    border-radius: 2px;
+  }
+
+  /* Right: cross-reference / compare panel */
+  .compare-sidebar {
+    background: var(--color-card-bg);
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 700px;
+  }
+  .compare-heading {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-20);
+    margin-bottom: 16px;
+  }
+  .compare-card {
+    background: var(--color-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .compare-card-country {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 400;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .compare-card-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .compare-card-text {
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-text-50);
+  }
+
+  /* Stats strip */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--color-card-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .stat-cell {
+    background: var(--color-card-bg);
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-cell-value {
+    font-family: var(--font-heading);
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--color-accent);
+    display: block;
+  }
+  .stat-cell-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Add compare button */
+  .add-compare-btn {
+    width: 100%;
+    padding: 10px;
+    border: 1px dashed var(--color-card-border);
+    background: transparent;
+    color: var(--color-text-30);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .add-compare-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: var(--color-accent-dim);
+  }
+
+  /* Annotation badge */
+  .source-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 450;
+    color: var(--color-text-20);
+    vertical-align: super;
+    margin-left: 2px;
+  }
+  .source-dot::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    opacity: 0.5;
+  }
+
+  /* Breadcrumb */
+  .breadcrumb {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    text-decoration: none;
+    margin-bottom: 24px;
+  }
+  .breadcrumb:hover {
+    color: var(--color-accent);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .explorer-grid {
+      grid-template-columns: 1fr;
+    }
+    .country-sidebar, .compare-sidebar {
+      max-height: 300px;
+    }
+    .stats-strip {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Mockup badge */
+  .mockup-badge {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--color-accent);
+    color: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    z-index: 200;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+  <!-- Top bar -->
+  <header class="topbar">
+    <a href="#" class="topbar-logo">Civica</a>
+    <nav class="topbar-nav">
+      <a href="#">Atlas</a>
+      <a href="#">Countries</a>
+      <a href="#" class="active">Constitutions</a>
+      <a href="#">Compare</a>
+      <a href="#">Rankings</a>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle dark/light mode">&#9681;</button>
+    </nav>
+  </header>
+
+  <div class="page-container">
+    <a href="#" class="breadcrumb">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12L6 8l4-4"/></svg>
+      All countries
+    </a>
+
+    <h1 class="page-heading">Constitutions</h1>
+    <p class="page-subtitle">Search and compare constitutional texts across 190+ countries. Data from the Constitute Project.</p>
+
+    <!-- Stats strip -->
+    <div class="stats-strip">
+      <div class="stat-cell">
+        <span class="stat-cell-value">194</span>
+        <span class="stat-cell-label">Constitutions</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-value">2024</span>
+        <span class="stat-cell-label">Most Recent</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-value">1789</span>
+        <span class="stat-cell-label">Oldest Active</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-cell-value">97</span>
+        <span class="stat-cell-label">Topics Indexed</span>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-bar">
+      <input type="text" class="search-input" placeholder="Search constitutional text... (e.g. &quot;freedom of expression&quot;, &quot;right to privacy&quot;)" id="searchInput">
+      <button class="search-btn" onclick="doSearch()">Search All</button>
+    </div>
+
+    <!-- Topic chips -->
+    <div class="topic-bar">
+      <span class="topic-chip active">All Topics</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Executive Powers</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Legislative Structure</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Judicial Independence</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Rights &amp; Freedoms</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Electoral System</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Federalism</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Emergency Powers</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Amendment Process</span>
+      <span class="topic-chip" onclick="filterTopic(this)">Term Limits</span>
+    </div>
+
+    <!-- Three-column explorer -->
+    <div class="explorer-grid">
+      <!-- Left: country list -->
+      <div class="country-sidebar">
+        <div class="sidebar-heading">Countries</div>
+        <div class="country-item selected">
+          <span class="flag">&#127467;&#127479;</span>
+          <span class="name">France</span>
+          <span class="year">1958</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127465;&#127466;</span>
+          <span class="name">Germany</span>
+          <span class="year">1949</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127468;&#127463;</span>
+          <span class="name">United Kingdom</span>
+          <span class="year">uncodified</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127482;&#127480;</span>
+          <span class="name">United States</span>
+          <span class="year">1789</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127463;&#127479;</span>
+          <span class="name">Brazil</span>
+          <span class="year">1988</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127470;&#127475;</span>
+          <span class="name">India</span>
+          <span class="year">1950</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127471;&#127477;</span>
+          <span class="name">Japan</span>
+          <span class="year">1947</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127487;&#127462;</span>
+          <span class="name">South Africa</span>
+          <span class="year">1996</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127472;&#127479;</span>
+          <span class="name">South Korea</span>
+          <span class="year">1948</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127474;&#127485;</span>
+          <span class="name">Mexico</span>
+          <span class="year">1917</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127462;&#127479;</span>
+          <span class="name">Argentina</span>
+          <span class="year">1853</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127466;&#127468;</span>
+          <span class="name">Egypt</span>
+          <span class="year">2014</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127475;&#127468;</span>
+          <span class="name">Nigeria</span>
+          <span class="year">1999</span>
+        </div>
+        <div class="country-item" onclick="selectCountry(this)">
+          <span class="flag">&#127472;&#127466;</span>
+          <span class="name">Kenya</span>
+          <span class="year">2010</span>
+        </div>
+      </div>
+
+      <!-- Center: constitution text -->
+      <div class="constitution-main">
+        <div class="const-country-header">
+          <span class="const-country-flag">&#127467;&#127479;</span>
+          <span class="const-country-name">Constitution of France</span>
+        </div>
+        <div class="const-meta">
+          <span>Adopted: 4 October 1958</span>
+          <span>Last amended: 2024</span>
+          <span>System: Semi-presidential republic</span>
+          <span class="source-dot">Constitute Project</span>
+        </div>
+
+        <!-- Article nav -->
+        <div class="article-nav">
+          <button class="article-nav-item active">Preamble</button>
+          <button class="article-nav-item" onclick="showArticle(this)">Title I &mdash; Sovereignty</button>
+          <button class="article-nav-item" onclick="showArticle(this)">Title II &mdash; President</button>
+          <button class="article-nav-item" onclick="showArticle(this)">Title III &mdash; Government</button>
+          <button class="article-nav-item" onclick="showArticle(this)">Title IV &mdash; Parliament</button>
+          <button class="article-nav-item" onclick="showArticle(this)">Title V &mdash; Relations</button>
+          <button class="article-nav-item" onclick="showArticle(this)">Title VIII &mdash; Judiciary</button>
+          <button class="article-nav-item" onclick="showArticle(this)">Title XVI &mdash; Amendment</button>
+        </div>
+
+        <!-- Preamble content -->
+        <div class="article-section" id="section-preamble">
+          <h2 class="article-title">Preamble</h2>
+          <div class="article-text">
+            <p>The French people solemnly proclaim their attachment to the <mark>Rights of Man</mark> and the principles of national sovereignty as defined by the Declaration of 1789, confirmed and complemented by the Preamble to the Constitution of 1946, and to the rights and duties as defined in the Charter for the Environment of 2004.</p>
+            <p>By virtue of these principles and that of the self-determination of peoples, the Republic offers to the overseas territories which have expressed the will to adhere to them new institutions founded on the common ideal of liberty, equality and fraternity and conceived for the purpose of their democratic development.</p>
+          </div>
+        </div>
+
+        <div class="article-section" id="section-sovereignty">
+          <h2 class="article-title">Title I &mdash; On Sovereignty</h2>
+          <div class="article-text">
+            <div class="article-clause">
+              <p><strong>Article 1.</strong> France shall be an indivisible, secular, democratic and social Republic. It shall ensure the <mark>equality</mark> of all citizens before the law, without distinction of origin, race or religion. It shall respect all beliefs. It shall be organised on a decentralised basis.</p>
+              <p>Statutes shall promote equal access by women and men to elective offices and posts as well as to professional and social positions.</p>
+            </div>
+            <div class="article-clause">
+              <p><strong>Article 2.</strong> The language of the Republic shall be French. The national emblem shall be the blue, white and red tricolour flag. The national anthem shall be the Marseillaise. The motto of the Republic shall be "Liberty, Equality, Fraternity". Its principle shall be: government of the people, by the people and for the people.</p>
+            </div>
+            <div class="article-clause">
+              <p><strong>Article 3.</strong> National sovereignty shall vest in the people, who shall exercise it through their representatives and by means of referendum. No section of the people nor any individual may arrogate to itself, or to himself, the exercise thereof.</p>
+            </div>
+            <div class="article-clause">
+              <p><strong>Article 4.</strong> Political parties and groups shall contribute to the exercise of suffrage. They shall be formed and carry on their activities freely. They shall respect the principles of national sovereignty and democracy.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="article-section">
+          <h2 class="article-title">Title II &mdash; The President of the Republic</h2>
+          <div class="article-text">
+            <div class="article-clause">
+              <p><strong>Article 5.</strong> The President of the Republic shall see that the Constitution is observed. He shall ensure, by his arbitration, the proper functioning of the public authorities and the continuity of the State. He shall be the guarantor of national independence, territorial integrity and due respect for Treaties.</p>
+            </div>
+            <div class="article-clause">
+              <p><strong>Article 6.</strong> The President of the Republic shall be elected for a <mark>term of five years</mark> by direct universal suffrage. No person may hold office for more than two consecutive terms.</p>
+            </div>
+            <div class="article-clause">
+              <p><strong>Article 7.</strong> The President of the Republic shall be elected by an absolute majority of votes cast. If such a majority is not obtained on the first ballot, a second ballot shall take place on the fourteenth day thereafter. Only the two candidates polling the greatest number of votes in the first ballot, after any withdrawal of better placed candidates, may stand in the second ballot.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: cross-reference panel -->
+      <div class="compare-sidebar">
+        <div class="compare-heading">Cross-Reference</div>
+
+        <div class="compare-card">
+          <div class="compare-card-label">Same topic in:</div>
+          <div class="compare-card-country">&#127465;&#127466; Germany</div>
+          <div class="compare-card-text">
+            <strong>Art. 1 GG:</strong> "Human dignity shall be inviolable. To respect and protect it shall be the duty of all state authority."
+          </div>
+        </div>
+
+        <div class="compare-card">
+          <div class="compare-card-country">&#127482;&#127480; United States</div>
+          <div class="compare-card-text">
+            <strong>Preamble:</strong> "We the People of the United States, in Order to form a more perfect Union, establish Justice, insure domestic Tranquility..."
+          </div>
+        </div>
+
+        <div class="compare-card">
+          <div class="compare-card-country">&#127487;&#127462; South Africa</div>
+          <div class="compare-card-text">
+            <strong>Ch. 1 &sect;1:</strong> "The Republic of South Africa is one, sovereign, democratic state founded on the following values: Human dignity, the achievement of equality..."
+          </div>
+        </div>
+
+        <button class="add-compare-btn">+ Add country to compare</button>
+
+        <div style="margin-top: 24px">
+          <div class="compare-heading">Related Topics</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <span class="topic-chip" style="font-size: 10px; padding: 3px 8px;">Sovereignty</span>
+            <span class="topic-chip" style="font-size: 10px; padding: 3px 8px;">Rights &amp; Freedoms</span>
+            <span class="topic-chip" style="font-size: 10px; padding: 3px 8px;">Secularism</span>
+            <span class="topic-chip" style="font-size: 10px; padding: 3px 8px;">Decentralization</span>
+            <span class="topic-chip" style="font-size: 10px; padding: 3px 8px;">Gender Equality</span>
+            <span class="topic-chip" style="font-size: 10px; padding: 3px 8px;">Official Language</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 24px">
+          <div class="compare-heading">Amendment History</div>
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--color-text-30); line-height: 2;">
+            <div style="display: flex; justify-content: space-between;"><span>2024</span><span style="color: var(--color-accent);">Environmental charter</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>2008</span><span style="color: var(--color-accent);">Major modernization</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>2003</span><span style="color: var(--color-accent);">Decentralization</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>2000</span><span style="color: var(--color-accent);">5-year term (quinquennat)</span></div>
+            <div style="display: flex; justify-content: space-between;"><span>1962</span><span style="color: var(--color-accent);">Direct election</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup-badge">PM Mockup &mdash; Not Production</div>
+
+  <script>
+    // Theme toggle
+    function toggleTheme() {
+      const body = document.body;
+      const current = body.getAttribute('data-theme');
+      body.setAttribute('data-theme', current === 'light' ? '' : 'light');
+      if (current === 'light') body.removeAttribute('data-theme');
+    }
+
+    // Country selection
+    function selectCountry(el) {
+      document.querySelectorAll('.country-item').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    // Topic filter
+    function filterTopic(el) {
+      document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // Article nav
+    function showArticle(el) {
+      document.querySelectorAll('.article-nav-item').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // Search highlighting demo
+    function doSearch() {
+      const term = document.getElementById('searchInput').value.trim();
+      if (!term) return;
+      // Remove existing highlights
+      document.querySelectorAll('.article-text mark').forEach(m => {
+        m.replaceWith(m.textContent);
+      });
+      // Highlight matches
+      document.querySelectorAll('.article-text p').forEach(p => {
+        const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        if (regex.test(p.innerHTML)) {
+          p.innerHTML = p.innerHTML.replace(regex, '<mark>$1</mark>');
+        }
+      });
+    }
+
+    // Keyboard search
+    document.getElementById('searchInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doSearch();
+    });
+  </script>
+</body>
+</html>

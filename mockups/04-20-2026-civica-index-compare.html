@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica Index — Compare (Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    --color-bg: #16140f;
+    --color-bg-nav: rgba(22,20,15,0.92);
+    --color-surface-elevated: #221e16;
+    --color-text-primary: #ebe6d6;
+    --color-text-60: #c4bdae;
+    --color-text-50: rgba(235,230,214,0.64);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(235,230,214,0.50);
+    --color-text-25: rgba(235,230,214,0.48);
+    --color-text-20: rgba(235,230,214,0.40);
+    --color-accent: oklch(68% 0.15 35);
+    --color-card-bg: #221e16;
+    --color-card-border: #3d382d;
+    --color-card-hover-bg: #2b2619;
+    --color-card-hover-border: #8a8370;
+    --color-divider: #3d382d;
+    --color-grid-bg: #221e16;
+    --color-grid-cell: #16140f;
+    --color-grid-cell-hover: #2b2619;
+    --color-source-live: #5CAA6E;
+    --color-source-frozen: #D4A04A;
+    --tier-exceptional: oklch(68% 0.14 145);
+    --tier-strong: oklch(60% 0.11 155);
+    --tier-mixed: oklch(75% 0.14 75);
+    --tier-weak: oklch(62% 0.15 45);
+    --tier-failed: oklch(55% 0.18 25);
+    /* comparison series colors */
+    --series-a: oklch(72% 0.15 35);     /* cinnabar */
+    --series-b: oklch(68% 0.13 220);    /* atlas blue */
+    --series-c: oklch(72% 0.14 150);    /* moss green */
+  }
+  html[data-theme="light"] {
+    --color-bg: #f4f1ea;
+    --color-bg-nav: rgba(244,241,234,0.92);
+    --color-surface-elevated: #ebe6d6;
+    --color-text-primary: #1a1a1a;
+    --color-text-60: #3d382d;
+    --color-text-50: rgba(26,26,26,0.62);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(26,26,26,0.53);
+    --color-text-25: rgba(26,26,26,0.48);
+    --color-text-20: rgba(26,26,26,0.38);
+    --color-accent: oklch(58% 0.14 35);
+    --color-card-bg: #ebe6d6;
+    --color-card-border: #c4bdae;
+    --color-card-hover-bg: #e2dcc8;
+    --color-card-hover-border: #8a8370;
+    --color-divider: #c4bdae;
+    --color-grid-bg: #ebe6d6;
+    --color-grid-cell: #f4f1ea;
+    --color-grid-cell-hover: #e2dcc8;
+    --tier-exceptional: oklch(55% 0.12 145);
+    --tier-strong: oklch(48% 0.10 155);
+    --tier-mixed: oklch(65% 0.14 75);
+    --tier-weak: oklch(55% 0.15 45);
+    --tier-failed: oklch(52% 0.18 25);
+    --series-a: oklch(55% 0.16 35);
+    --series-b: oklch(48% 0.13 220);
+    --series-c: oklch(55% 0.14 150);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--color-bg); color: var(--color-text-primary); line-height: 1.65; -webkit-font-smoothing: antialiased; transition: background-color .3s, color .2s; }
+  .nav { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(10px); background: var(--color-bg-nav); border-bottom: 1px solid var(--color-divider); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .nav-brand { font-family: var(--font-heading); font-size: 22px; letter-spacing: -0.02em; color: var(--color-text-primary); text-decoration: none; }
+  .nav-brand em { font-style: normal; color: var(--color-accent); }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-40); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
+  .nav-links a.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+  .theme-toggle { background: transparent; color: var(--color-text-50); border: 1px solid var(--color-card-border); padding: 6px 10px; border-radius: 4px; cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+  .page-hero { padding: 64px 0 32px; }
+  .breadcrumb { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-30); margin-bottom: 20px; }
+  .breadcrumb a { color: var(--color-text-30); text-decoration: none; }
+  .page-title { font-family: var(--font-heading); font-size: 56px; font-weight: 400; letter-spacing: -0.04em; line-height: 1.02; margin-bottom: 12px; }
+  .page-lede { font-size: 17px; color: var(--color-text-60); max-width: 700px; }
+
+  /* picker row */
+  .picker-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    margin: 40px 0 24px;
+  }
+  .picker-card {
+    background: var(--color-grid-cell);
+    border: 1px solid var(--color-card-border);
+    border-radius: 4px;
+    padding: 20px 22px;
+    display: flex; flex-direction: column; gap: 10px;
+    border-top: 3px solid;
+  }
+  .picker-card:nth-child(1) { border-top-color: var(--series-a); }
+  .picker-card:nth-child(2) { border-top-color: var(--series-b); }
+  .picker-card:nth-child(3) { border-top-color: var(--series-c); }
+  .picker-slot {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--color-text-30);
+  }
+  .picker-search {
+    width: 100%; background: var(--color-bg); color: var(--color-text-primary);
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    padding: 10px 12px; font-family: var(--font-mono); font-size: 13px;
+  }
+  .picker-name {
+    font-family: var(--font-heading); font-size: 28px; font-weight: 400;
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .picker-score {
+    display: flex; align-items: baseline; gap: 8px;
+    font-family: var(--font-heading);
+  }
+  .picker-score-ci { font-size: 32px; font-weight: 500; letter-spacing: -0.02em; }
+  .picker-score-label {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-text-30);
+  }
+  .picker-meta { font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--color-text-30); }
+  .picker-remove {
+    margin-top: 4px;
+    background: transparent; border: 1px solid var(--color-card-border);
+    font-family: var(--font-mono); font-weight: 500; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--color-text-40); padding: 6px 10px; border-radius: 2px;
+    cursor: pointer; width: fit-content;
+  }
+  .picker-empty {
+    background: var(--color-grid-cell); border: 1px dashed var(--color-card-border);
+    border-radius: 4px; padding: 40px 22px; text-align: center;
+    color: var(--color-text-30);
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px;
+    letter-spacing: 0.04em; border-top: 3px dashed var(--series-c);
+  }
+
+  /* chart block */
+  .chart-block {
+    border: 1px solid var(--color-card-border);
+    border-radius: 4px;
+    background: var(--color-grid-cell);
+    padding: 32px 36px;
+    margin-bottom: 40px;
+  }
+  .chart-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 24px; flex-wrap: wrap; margin-bottom: 20px;
+  }
+  .chart-title {
+    font-family: var(--font-heading); font-size: 26px; font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .chart-sub { font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--color-text-30); letter-spacing: 0.08em; }
+  .chart-tabs { display: inline-flex; border: 1px solid var(--color-card-border); border-radius: 4px; overflow: hidden; }
+  .chart-tabs button { font-family: var(--font-mono); font-weight: 500; font-size: 11px; padding: 6px 12px; background: transparent; border: none; color: var(--color-text-40); cursor: pointer; }
+  .chart-tabs button.active { background: var(--color-accent); color: var(--color-bg); }
+
+  .chart-legend { display: flex; gap: 24px; flex-wrap: wrap; font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--color-text-40); margin-top: 18px; }
+  .legend-swatch { display: inline-block; width: 14px; height: 3px; margin-right: 6px; vertical-align: middle; }
+
+  .overlay-toggle {
+    display: inline-flex; gap: 0;
+    border: 1px solid var(--color-card-border); border-radius: 4px; overflow: hidden;
+  }
+  .overlay-toggle button {
+    font-family: var(--font-mono); font-weight: 500; font-size: 11px;
+    padding: 6px 12px; background: transparent; border: none;
+    color: var(--color-text-40); cursor: pointer;
+  }
+  .overlay-toggle button.active { background: var(--color-accent); color: var(--color-bg); }
+
+  /* dimension compare */
+  .dim-compare {
+    border: 1px solid var(--color-card-border); border-radius: 4px;
+    background: var(--color-grid-bg); overflow: hidden;
+    display: grid; gap: 1px; margin-bottom: 40px;
+  }
+  .dim-compare-header, .dim-compare-row {
+    background: var(--color-grid-cell);
+    padding: 18px 28px;
+    display: grid; grid-template-columns: minmax(200px, 1.3fr) repeat(3, 1fr) 80px;
+    gap: 18px; align-items: center;
+  }
+  .dim-compare-header {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--color-text-30);
+  }
+  .dim-compare-row .dim-name {
+    font-family: var(--font-heading); font-size: 17px; color: var(--color-text-primary);
+  }
+  .dim-compare-row .dim-wt {
+    font-family: var(--font-mono); font-weight: 500; font-size: 12px;
+    color: var(--color-text-30); text-align: right;
+  }
+  .dim-compare-cell {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .dim-compare-cell .val {
+    font-family: var(--font-heading); font-size: 20px; font-weight: 500;
+    letter-spacing: -0.01em; line-height: 1;
+  }
+  .dim-compare-cell .bar {
+    height: 3px; background: var(--color-divider); border-radius: 1px; overflow: hidden;
+  }
+  .dim-compare-cell .bar > span {
+    display: block; height: 100%;
+  }
+  .val-a { color: var(--series-a); }
+  .val-b { color: var(--series-b); }
+  .val-c { color: var(--series-c); }
+
+  /* head-to-head */
+  .h2h {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-bottom: 60px;
+  }
+  .h2h-card {
+    background: var(--color-grid-cell); border: 1px solid var(--color-card-border);
+    border-radius: 4px; padding: 28px 32px;
+  }
+  .h2h-eyebrow {
+    font-family: var(--font-mono); font-weight: 500; font-size: 10px;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-30);
+    margin-bottom: 8px;
+  }
+  .h2h-body {
+    font-family: var(--font-heading); font-size: 22px; font-weight: 400;
+    line-height: 1.35; letter-spacing: -0.01em;
+  }
+  .h2h-body strong { font-weight: 500; }
+
+  footer { margin-top: 60px; padding: 40px 0; border-top: 1px solid var(--color-divider); }
+  .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: 0.08em; color: var(--color-text-30); }
+
+  @media (max-width: 900px) {
+    .page-title { font-size: 40px; }
+    .picker-row { grid-template-columns: 1fr; }
+    .container, .nav-inner { padding: 0 20px; }
+    .dim-compare-header, .dim-compare-row { grid-template-columns: 1fr; padding: 14px 20px; }
+    .dim-compare-header > :not(:first-child) { display: none; }
+    .h2h { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">Civica <em>Atlas</em></a>
+    <div class="nav-links">
+      <a href="#">Countries</a>
+      <a href="#" class="active">Index</a>
+      <a href="#">Rankings</a>
+      <a href="#">Blog</a>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle theme</button>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+
+  <section class="page-hero">
+    <div class="breadcrumb"><a href="#">← Index</a> / Compare</div>
+    <h1 class="page-title">Compare two or three countries, side by side.</h1>
+    <p class="page-lede">Overlay CI or Pulse on a shared timeline. Then drill into each of the six weighted dimensions to see where countries actually differ — not just what their headline score says.</p>
+  </section>
+
+  <section class="picker-row" aria-label="Country slots">
+    <div class="picker-card">
+      <div class="picker-slot">Country A</div>
+      <div class="picker-name">Brazil</div>
+      <div class="picker-score">
+        <span class="picker-score-ci val-a">62.8</span>
+        <span class="picker-score-label">CI · rank 58</span>
+      </div>
+      <div class="picker-meta">Presidential · South America · 214M</div>
+      <button class="picker-remove">× Remove</button>
+    </div>
+    <div class="picker-card">
+      <div class="picker-slot">Country B</div>
+      <div class="picker-name">Argentina</div>
+      <div class="picker-score">
+        <span class="picker-score-ci val-b">66.1</span>
+        <span class="picker-score-label">CI · rank 51</span>
+      </div>
+      <div class="picker-meta">Presidential · South America · 46M</div>
+      <button class="picker-remove">× Remove</button>
+    </div>
+    <div class="picker-card">
+      <div class="picker-slot">Country C</div>
+      <input class="picker-search" placeholder="Search a country…" />
+      <div class="picker-meta" style="margin-top: 8px;">Suggestions: Chile · Uruguay · Colombia · South Africa</div>
+    </div>
+  </section>
+
+  <section class="chart-block" aria-label="Timeline overlay">
+    <div class="chart-header">
+      <div>
+        <div class="chart-sub" style="margin-bottom: 6px;">TIMELINE OVERLAY · 2016 → 2026</div>
+        <div class="chart-title">Brazil vs. Argentina · CI and Pulse</div>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="overlay-toggle" role="group" aria-label="Score type">
+          <button class="active">CI</button>
+          <button>Pulse</button>
+          <button>Both</button>
+        </div>
+        <div class="chart-tabs" role="group" aria-label="Range">
+          <button>1Y</button>
+          <button>5Y</button>
+          <button class="active">10Y</button>
+          <button>Max</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="position: relative; height: 340px;">
+      <svg viewBox="0 0 1120 340" preserveAspectRatio="none" style="width:100%; height:100%;">
+        <!-- tier bands -->
+        <rect x="0" y="0"   width="1120" height="34" fill="var(--tier-exceptional)" opacity="0.06"/>
+        <rect x="0" y="34"  width="1120" height="51" fill="var(--tier-strong)" opacity="0.05"/>
+        <rect x="0" y="85"  width="1120" height="85" fill="var(--tier-mixed)" opacity="0.06"/>
+        <rect x="0" y="170" width="1120" height="85" fill="var(--tier-weak)" opacity="0.05"/>
+        <rect x="0" y="255" width="1120" height="85" fill="var(--tier-failed)" opacity="0.06"/>
+        <!-- grid x -->
+        <g stroke="var(--color-divider)" stroke-width="1" opacity="0.6">
+          <line x1="0" y1="34" x2="1120" y2="34"/>
+          <line x1="0" y1="85" x2="1120" y2="85"/>
+          <line x1="0" y1="170" x2="1120" y2="170"/>
+          <line x1="0" y1="255" x2="1120" y2="255"/>
+          <line x1="112" y1="0" x2="112" y2="340" stroke-dasharray="2 4"/>
+          <line x1="336" y1="0" x2="336" y2="340" stroke-dasharray="2 4"/>
+          <line x1="560" y1="0" x2="560" y2="340" stroke-dasharray="2 4"/>
+          <line x1="784" y1="0" x2="784" y2="340" stroke-dasharray="2 4"/>
+          <line x1="1008" y1="0" x2="1008" y2="340" stroke-dasharray="2 4"/>
+        </g>
+        <!-- Brazil line -->
+        <path d="M0 120 L112 115 L224 118 L336 125 L448 130 L560 122 L672 115 L784 120 L896 128 L1008 132 L1120 126"
+              fill="none" stroke="var(--series-a)" stroke-width="2"/>
+        <!-- Argentina line -->
+        <path d="M0 100 L112 105 L224 128 L336 140 L448 148 L560 135 L672 118 L784 108 L896 118 L1008 128 L1120 116"
+              fill="none" stroke="var(--series-b)" stroke-width="2"/>
+        <!-- x-axis labels -->
+        <g font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="10" fill="var(--color-text-30)" font-weight="500">
+          <text x="0"    y="335">2016</text>
+          <text x="112"  y="335">2017</text>
+          <text x="224"  y="335">2018</text>
+          <text x="336"  y="335">2019</text>
+          <text x="448"  y="335">2020</text>
+          <text x="560"  y="335">2021</text>
+          <text x="672"  y="335">2022</text>
+          <text x="784"  y="335">2023</text>
+          <text x="896"  y="335">2024</text>
+          <text x="1008" y="335">2025</text>
+          <text x="1080" y="335">2026</text>
+        </g>
+        <g font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="10" fill="var(--color-text-30)" font-weight="500">
+          <text x="4" y="12">100</text>
+          <text x="4" y="44">90</text>
+          <text x="4" y="95">75</text>
+          <text x="4" y="180">50</text>
+          <text x="4" y="265">25</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="chart-legend">
+      <span><span class="legend-swatch" style="background: var(--series-a);"></span>Brazil · CI 62.8 / Pulse 62.0</span>
+      <span><span class="legend-swatch" style="background: var(--series-b);"></span>Argentina · CI 66.1 / Pulse 67.8</span>
+      <span style="color: var(--color-text-20);">Tier bands shown in background · hover a point for event annotations</span>
+    </div>
+  </section>
+
+  <!-- dimension comparison -->
+  <section>
+    <div class="chart-sub" style="margin-bottom: 12px;">DIMENSION-BY-DIMENSION · LATEST CI COMPONENTS</div>
+    <h2 class="chart-title" style="margin-bottom: 24px;">Where they diverge.</h2>
+
+    <div class="dim-compare">
+      <div class="dim-compare-header">
+        <div>Dimension</div>
+        <div>Brazil</div>
+        <div>Argentina</div>
+        <div>Country C —</div>
+        <div style="text-align:right;">Weight</div>
+      </div>
+
+      <div class="dim-compare-row">
+        <div class="dim-name">Democratic quality</div>
+        <div class="dim-compare-cell">
+          <div class="val val-a">67.2</div>
+          <div class="bar"><span style="width:67%; background: var(--series-a)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val val-b">72.4</div>
+          <div class="bar"><span style="width:72%; background: var(--series-b)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val" style="color: var(--color-text-20);">—</div>
+        </div>
+        <div class="dim-wt">30%</div>
+      </div>
+
+      <div class="dim-compare-row">
+        <div class="dim-name">Rule of law & institutions</div>
+        <div class="dim-compare-cell">
+          <div class="val val-a">58.4</div>
+          <div class="bar"><span style="width:58%; background: var(--series-a)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val val-b">52.1</div>
+          <div class="bar"><span style="width:52%; background: var(--series-b)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val" style="color: var(--color-text-20);">—</div>
+        </div>
+        <div class="dim-wt">20%</div>
+      </div>
+
+      <div class="dim-compare-row">
+        <div class="dim-name">Human development</div>
+        <div class="dim-compare-cell">
+          <div class="val val-a">76.5</div>
+          <div class="bar"><span style="width:76%; background: var(--series-a)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val val-b">82.3</div>
+          <div class="bar"><span style="width:82%; background: var(--series-b)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val" style="color: var(--color-text-20);">—</div>
+        </div>
+        <div class="dim-wt">15%</div>
+      </div>
+
+      <div class="dim-compare-row">
+        <div class="dim-name">Freedom & rights</div>
+        <div class="dim-compare-cell">
+          <div class="val val-a">63.9</div>
+          <div class="bar"><span style="width:64%; background: var(--series-a)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val val-b">68.5</div>
+          <div class="bar"><span style="width:68%; background: var(--series-b)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val" style="color: var(--color-text-20);">—</div>
+        </div>
+        <div class="dim-wt">15%</div>
+      </div>
+
+      <div class="dim-compare-row">
+        <div class="dim-name">Corruption control</div>
+        <div class="dim-compare-cell">
+          <div class="val val-a">44.2</div>
+          <div class="bar"><span style="width:44%; background: var(--series-a)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val val-b">39.7</div>
+          <div class="bar"><span style="width:40%; background: var(--series-b)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val" style="color: var(--color-text-20);">—</div>
+        </div>
+        <div class="dim-wt">10%</div>
+      </div>
+
+      <div class="dim-compare-row">
+        <div class="dim-name">Stability & security</div>
+        <div class="dim-compare-cell">
+          <div class="val val-a">54.3</div>
+          <div class="bar"><span style="width:54%; background: var(--series-a)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val val-b">71.8</div>
+          <div class="bar"><span style="width:72%; background: var(--series-b)"></span></div>
+        </div>
+        <div class="dim-compare-cell">
+          <div class="val" style="color: var(--color-text-20);">—</div>
+        </div>
+        <div class="dim-wt">10%</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h2h">
+      <div class="h2h-card">
+        <div class="h2h-eyebrow">▲ ARGENTINA LEADS</div>
+        <div class="h2h-body">Argentina scores <strong>17.5 points</strong> higher on <em>stability &amp; security</em>, its largest advantage — explaining most of the 3.3-point CI gap.</div>
+      </div>
+      <div class="h2h-card">
+        <div class="h2h-eyebrow">▲ BRAZIL LEADS</div>
+        <div class="h2h-body">Brazil leads on <em>rule of law &amp; institutions</em> by <strong>6.3 points</strong> and on <em>corruption control</em> by <strong>4.5</strong> — the only dimensions where it outranks Argentina.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>Civica Index v1.0 · Methodology published April 2026</div>
+    <div>Share this comparison: civicaatlas.org/index/compare?a=brazil&b=argentina</div>
+  </div>
+</footer>
+
+<script>
+  function toggleTheme() {
+    const root = document.documentElement;
+    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+  }
+</script>
+
+</body>
+</html>

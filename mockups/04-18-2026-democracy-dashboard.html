@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica — Democracy & Freedom Scores Dashboard (Mockup)</title>
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --color-bg: #0e0e10;
+    --color-card-bg: #18181b;
+    --color-card-border: #27272a;
+    --color-text-primary: #fafafa;
+    --color-text-85: rgba(250,250,250,0.85);
+    --color-text-50: rgba(250,250,250,0.50);
+    --color-text-30: rgba(250,250,250,0.30);
+    --color-text-20: rgba(250,250,250,0.20);
+    --color-accent: #a78bfa;
+    --color-accent-dim: rgba(167,139,250,0.15);
+    --color-free: #22c55e;
+    --color-partly: #eab308;
+    --color-not-free: #ef4444;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+  }
+
+  [data-theme="light"] {
+    --color-bg: #fafaf9;
+    --color-card-bg: #ffffff;
+    --color-card-border: #e4e4e7;
+    --color-text-primary: #18181b;
+    --color-text-85: rgba(24,24,27,0.85);
+    --color-text-50: rgba(24,24,27,0.50);
+    --color-text-30: rgba(24,24,27,0.30);
+    --color-text-20: rgba(24,24,27,0.15);
+    --color-accent: #7c3aed;
+    --color-accent-dim: rgba(124,58,237,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--color-card-border);
+    background: var(--color-card-bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-decoration: none;
+  }
+  .topbar-nav {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  .topbar-nav a {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-30);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .topbar-nav a:hover, .topbar-nav a.active {
+    color: var(--color-accent);
+  }
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--color-card-border);
+    color: var(--color-text-50);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  .page-heading {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+  .page-subtitle {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    margin-bottom: 32px;
+  }
+
+  /* Global freedom overview */
+  .freedom-overview {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--color-card-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .freedom-bucket {
+    background: var(--color-card-bg);
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .freedom-bucket:hover {
+    background: var(--color-accent-dim);
+  }
+  .freedom-bucket-count {
+    font-family: var(--font-heading);
+    font-size: 48px;
+    font-weight: 300;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .freedom-bucket-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .freedom-bucket-change {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-30);
+    display: block;
+  }
+
+  /* Trend chart placeholder */
+  .trend-section {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-bottom: 32px;
+  }
+  .trend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .trend-title {
+    font-family: var(--font-heading);
+    font-size: 22px;
+    font-weight: 400;
+  }
+  .trend-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .trend-tab {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-30);
+    border: none;
+    cursor: pointer;
+    transition: all 0.1s;
+  }
+  .trend-tab:hover { color: var(--color-text-50); background: var(--color-accent-dim); }
+  .trend-tab.active { background: var(--color-accent-dim); color: var(--color-accent); }
+
+  /* SVG chart area */
+  .chart-area {
+    position: relative;
+    height: 240px;
+    margin-bottom: 12px;
+  }
+  .chart-area svg {
+    width: 100%;
+    height: 100%;
+  }
+  .chart-y-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--color-text-20);
+    font-weight: 450;
+  }
+  .chart-x-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    fill: var(--color-text-20);
+    font-weight: 450;
+  }
+  .chart-grid-line {
+    stroke: var(--color-card-border);
+    stroke-width: 0.5;
+    stroke-dasharray: 4 4;
+  }
+  .chart-legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+  }
+  .chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-30);
+  }
+  .chart-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* Two-column layout for biggest movers + distribution */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+    .freedom-overview {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .card {
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-md);
+    padding: 24px;
+  }
+  .card-title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 400;
+    margin-bottom: 16px;
+  }
+
+  /* Biggest movers list */
+  .mover-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-card-border);
+  }
+  .mover-row:last-child { border-bottom: none; }
+  .mover-flag { font-size: 20px; line-height: 1; }
+  .mover-name {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-text-85);
+    flex: 1;
+  }
+  .mover-score {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 450;
+    color: var(--color-text-primary);
+    text-align: right;
+  }
+  .mover-delta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    width: 48px;
+    text-align: right;
+  }
+  .mover-delta.up { color: var(--color-free); }
+  .mover-delta.down { color: var(--color-not-free); }
+
+  /* Region distribution */
+  .region-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .region-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 450;
+    color: var(--color-text-50);
+    width: 100px;
+    flex-shrink: 0;
+  }
+  .region-bar-container {
+    flex: 1;
+    display: flex;
+    height: 20px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .region-bar-segment {
+    height: 100%;
+    transition: width 0.6s ease;
+  }
+
+  /* Country score table */
+  .score-table-section {
+    margin-top: 32px;
+  }
+  .section-heading {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-20);
+    margin-bottom: 12px;
+  }
+  .score-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 1px;
+  }
+  .score-table th {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-20);
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--color-card-bg);
+    border-bottom: 1px solid var(--color-card-border);
+    position: sticky;
+    top: 52px;
+    z-index: 10;
+  }
+  .score-table th:last-child { text-align: right; }
+  .score-table td {
+    padding: 10px 12px;
+    background: var(--color-card-bg);
+    font-size: 13px;
+    border-bottom: 1px solid var(--color-card-border);
+  }
+  .score-table tr:hover td {
+    background: var(--color-accent-dim);
+  }
+  .score-table td:last-child {
+    text-align: right;
+  }
+  .score-table .country-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .score-table .country-cell a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-family: var(--font-body);
+  }
+  .score-table .country-cell a:hover {
+    color: var(--color-accent);
+  }
+  .score-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+  }
+  .score-badge.free { background: rgba(34,197,94,0.15); color: var(--color-free); }
+  .score-badge.partly { background: rgba(234,179,8,0.15); color: var(--color-partly); }
+  .score-badge.not-free { background: rgba(239,68,68,0.15); color: var(--color-not-free); }
+
+  .score-bar-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .score-bar-bg {
+    width: 80px;
+    height: 6px;
+    background: var(--color-card-border);
+    border-radius: 3px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+  .score-value {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 450;
+    color: var(--color-text-primary);
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  .mockup-badge {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: var(--color-accent);
+    color: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    z-index: 200;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+
+  /* Source attribution */
+  .source-footer {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 450;
+    color: var(--color-text-20);
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-card-border);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .source-footer span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .source-footer span::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    opacity: 0.4;
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <a href="#" class="topbar-logo">Civica</a>
+    <nav class="topbar-nav">
+      <a href="#">Atlas</a>
+      <a href="#">Countries</a>
+      <a href="#">Elections</a>
+      <a href="#" class="active">Democracy</a>
+      <a href="#">Rankings</a>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">&#9681;</button>
+    </nav>
+  </header>
+
+  <div class="page-container">
+    <h1 class="page-heading">Democracy & Freedom</h1>
+    <p class="page-subtitle">Global freedom scores from Freedom House (2026) and V-Dem democracy indices. 20 consecutive years of decline.</p>
+
+    <!-- Freedom status overview -->
+    <div class="freedom-overview">
+      <div class="freedom-bucket" onclick="filterStatus('free')">
+        <span class="freedom-bucket-count" style="color: var(--color-free)">83</span>
+        <span class="freedom-bucket-label" style="color: var(--color-free)">Free</span>
+        <span class="freedom-bucket-change">-2 from 2024</span>
+      </div>
+      <div class="freedom-bucket" onclick="filterStatus('partly')">
+        <span class="freedom-bucket-count" style="color: var(--color-partly)">56</span>
+        <span class="freedom-bucket-label" style="color: var(--color-partly)">Partly Free</span>
+        <span class="freedom-bucket-change">+1 from 2024</span>
+      </div>
+      <div class="freedom-bucket" onclick="filterStatus('not-free')">
+        <span class="freedom-bucket-count" style="color: var(--color-not-free)">56</span>
+        <span class="freedom-bucket-label" style="color: var(--color-not-free)">Not Free</span>
+        <span class="freedom-bucket-change">+1 from 2024</span>
+      </div>
+    </div>
+
+    <!-- 20-Year Trend Chart -->
+    <div class="trend-section">
+      <div class="trend-header">
+        <h2 class="trend-title">Global Freedom Trend</h2>
+        <div class="trend-tabs">
+          <button class="trend-tab active">Country Count</button>
+          <button class="trend-tab" onclick="this.parentElement.querySelectorAll('.trend-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">Avg Score</button>
+          <button class="trend-tab" onclick="this.parentElement.querySelectorAll('.trend-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">Population</button>
+        </div>
+      </div>
+      <div class="chart-area">
+        <svg viewBox="0 0 800 200" preserveAspectRatio="none">
+          <!-- Grid lines -->
+          <line x1="40" y1="10" x2="780" y2="10" class="chart-grid-line"/>
+          <line x1="40" y1="60" x2="780" y2="60" class="chart-grid-line"/>
+          <line x1="40" y1="110" x2="780" y2="110" class="chart-grid-line"/>
+          <line x1="40" y1="160" x2="780" y2="160" class="chart-grid-line"/>
+
+          <!-- Y-axis labels -->
+          <text x="35" y="14" text-anchor="end" class="chart-y-label">100</text>
+          <text x="35" y="64" text-anchor="end" class="chart-y-label">80</text>
+          <text x="35" y="114" text-anchor="end" class="chart-y-label">60</text>
+          <text x="35" y="164" text-anchor="end" class="chart-y-label">40</text>
+
+          <!-- X-axis labels -->
+          <text x="80" y="195" text-anchor="middle" class="chart-x-label">2006</text>
+          <text x="190" y="195" text-anchor="middle" class="chart-x-label">2010</text>
+          <text x="320" y="195" text-anchor="middle" class="chart-x-label">2014</text>
+          <text x="450" y="195" text-anchor="middle" class="chart-x-label">2018</text>
+          <text x="580" y="195" text-anchor="middle" class="chart-x-label">2022</text>
+          <text x="750" y="195" text-anchor="middle" class="chart-x-label">2026</text>
+
+          <!-- Free line (declining from ~92 to ~83) -->
+          <polyline
+            fill="none"
+            stroke="#22c55e"
+            stroke-width="2"
+            points="80,17 117,16 154,18 190,19 227,22 264,25 301,28 338,30 375,33 412,35 450,38 487,40 524,42 560,44 597,46 634,48 671,50 708,52 745,55"
+          />
+
+          <!-- Partly Free line (stable ~55-56) -->
+          <polyline
+            fill="none"
+            stroke="#eab308"
+            stroke-width="2"
+            points="80,82 117,80 154,82 190,84 227,83 264,81 301,82 338,83 375,82 412,80 450,81 487,80 524,82 560,83 597,82 634,83 671,82 708,83 745,82"
+          />
+
+          <!-- Not Free line (rising from ~45 to ~56) -->
+          <polyline
+            fill="none"
+            stroke="#ef4444"
+            stroke-width="2"
+            points="80,100 117,98 154,96 190,94 227,92 264,90 301,88 338,86 375,84 412,83 450,82 487,81 524,82 560,83 597,82 634,82 671,82 708,82 745,82"
+          />
+
+          <!-- Dots for current year -->
+          <circle cx="745" cy="55" r="4" fill="#22c55e"/>
+          <circle cx="745" cy="82" r="4" fill="#eab308"/>
+          <circle cx="745" cy="82" r="4" fill="#ef4444"/>
+        </svg>
+      </div>
+      <div class="chart-legend">
+        <div class="chart-legend-item">
+          <span class="chart-legend-dot" style="background: #22c55e"></span>
+          Free
+        </div>
+        <div class="chart-legend-item">
+          <span class="chart-legend-dot" style="background: #eab308"></span>
+          Partly Free
+        </div>
+        <div class="chart-legend-item">
+          <span class="chart-legend-dot" style="background: #ef4444"></span>
+          Not Free
+        </div>
+      </div>
+    </div>
+
+    <!-- Two-column: Biggest Movers + Regional Distribution -->
+    <div class="dashboard-grid">
+      <div class="card">
+        <h3 class="card-title">Biggest Declines (2025)</h3>
+        <div class="mover-row">
+          <span class="mover-flag">&#127468;&#127466;</span>
+          <span class="mover-name">Georgia</span>
+          <span class="mover-score">36</span>
+          <span class="mover-delta down">-12</span>
+        </div>
+        <div class="mover-row">
+          <span class="mover-flag">&#127463;&#127465;</span>
+          <span class="mover-name">Bangladesh</span>
+          <span class="mover-score">28</span>
+          <span class="mover-delta down">-9</span>
+        </div>
+        <div class="mover-row">
+          <span class="mover-flag">&#127474;&#127487;</span>
+          <span class="mover-name">Mozambique</span>
+          <span class="mover-score">22</span>
+          <span class="mover-delta down">-8</span>
+        </div>
+        <div class="mover-row">
+          <span class="mover-flag">&#127480;&#127486;</span>
+          <span class="mover-name">Syria</span>
+          <span class="mover-score">3</span>
+          <span class="mover-delta down">-5</span>
+        </div>
+        <div class="mover-row">
+          <span class="mover-flag">&#127477;&#127472;</span>
+          <span class="mover-name">Pakistan</span>
+          <span class="mover-score">30</span>
+          <span class="mover-delta down">-4</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Regional Freedom Status</h3>
+        <div style="margin-top: 8px;">
+          <div class="region-row">
+            <span class="region-label">Europe</span>
+            <div class="region-bar-container">
+              <div class="region-bar-segment" style="width: 78%; background: var(--color-free)"></div>
+              <div class="region-bar-segment" style="width: 12%; background: var(--color-partly)"></div>
+              <div class="region-bar-segment" style="width: 10%; background: var(--color-not-free)"></div>
+            </div>
+          </div>
+          <div class="region-row">
+            <span class="region-label">Americas</span>
+            <div class="region-bar-container">
+              <div class="region-bar-segment" style="width: 54%; background: var(--color-free)"></div>
+              <div class="region-bar-segment" style="width: 31%; background: var(--color-partly)"></div>
+              <div class="region-bar-segment" style="width: 15%; background: var(--color-not-free)"></div>
+            </div>
+          </div>
+          <div class="region-row">
+            <span class="region-label">Asia-Pacific</span>
+            <div class="region-bar-container">
+              <div class="region-bar-segment" style="width: 30%; background: var(--color-free)"></div>
+              <div class="region-bar-segment" style="width: 35%; background: var(--color-partly)"></div>
+              <div class="region-bar-segment" style="width: 35%; background: var(--color-not-free)"></div>
+            </div>
+          </div>
+          <div class="region-row">
+            <span class="region-label">Sub-Saharan</span>
+            <div class="region-bar-container">
+              <div class="region-bar-segment" style="width: 18%; background: var(--color-free)"></div>
+              <div class="region-bar-segment" style="width: 42%; background: var(--color-partly)"></div>
+              <div class="region-bar-segment" style="width: 40%; background: var(--color-not-free)"></div>
+            </div>
+          </div>
+          <div class="region-row">
+            <span class="region-label">MENA</span>
+            <div class="region-bar-container">
+              <div class="region-bar-segment" style="width: 6%; background: var(--color-free)"></div>
+              <div class="region-bar-segment" style="width: 22%; background: var(--color-partly)"></div>
+              <div class="region-bar-segment" style="width: 72%; background: var(--color-not-free)"></div>
+            </div>
+          </div>
+          <div class="region-row">
+            <span class="region-label">Eurasia</span>
+            <div class="region-bar-container">
+              <div class="region-bar-segment" style="width: 0%; background: var(--color-free)"></div>
+              <div class="region-bar-segment" style="width: 17%; background: var(--color-partly)"></div>
+              <div class="region-bar-segment" style="width: 83%; background: var(--color-not-free)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-legend" style="margin-top: 16px; justify-content: flex-start;">
+          <div class="chart-legend-item"><span class="chart-legend-dot" style="background: var(--color-free)"></span> Free</div>
+          <div class="chart-legend-item"><span class="chart-legend-dot" style="background: var(--color-partly)"></span> Partly Free</div>
+          <div class="chart-legend-item"><span class="chart-legend-dot" style="background: var(--color-not-free)"></span> Not Free</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Country Score Table -->
+    <div class="score-table-section">
+      <div class="section-heading">All Countries by Freedom Score</div>
+      <table class="score-table">
+        <thead>
+          <tr>
+            <th style="width: 50px">#</th>
+            <th>Country</th>
+            <th>Status</th>
+            <th style="width: 180px">Freedom Score</th>
+            <th style="width: 120px">V-Dem Index</th>
+            <th style="width: 80px">Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">1</td>
+            <td><div class="country-cell"><span>&#127467;&#127470;</span><a href="#">Finland</a></div></td>
+            <td><span class="score-badge free">Free</span></td>
+            <td>
+              <div class="score-bar-cell">
+                <span class="score-value">100</span>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width: 100%; background: var(--color-free)"></div></div>
+              </div>
+            </td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-50)">0.93</td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">0</td>
+          </tr>
+          <tr>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">2</td>
+            <td><div class="country-cell"><span>&#127475;&#127476;</span><a href="#">Norway</a></div></td>
+            <td><span class="score-badge free">Free</span></td>
+            <td>
+              <div class="score-bar-cell">
+                <span class="score-value">100</span>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width: 100%; background: var(--color-free)"></div></div>
+              </div>
+            </td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-50)">0.92</td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">0</td>
+          </tr>
+          <tr>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">3</td>
+            <td><div class="country-cell"><span>&#127480;&#127466;</span><a href="#">Sweden</a></div></td>
+            <td><span class="score-badge free">Free</span></td>
+            <td>
+              <div class="score-bar-cell">
+                <span class="score-value">100</span>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width: 100%; background: var(--color-free)"></div></div>
+              </div>
+            </td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-50)">0.90</td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">0</td>
+          </tr>
+          <tr>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">88</td>
+            <td><div class="country-cell"><span>&#127468;&#127466;</span><a href="#">Georgia</a></div></td>
+            <td><span class="score-badge partly">Partly Free</span></td>
+            <td>
+              <div class="score-bar-cell">
+                <span class="score-value">36</span>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width: 36%; background: var(--color-partly)"></div></div>
+              </div>
+            </td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-50)">0.42</td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-not-free)">-12</td>
+          </tr>
+          <tr>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">145</td>
+            <td><div class="country-cell"><span>&#127464;&#127475;</span><a href="#">China</a></div></td>
+            <td><span class="score-badge not-free">Not Free</span></td>
+            <td>
+              <div class="score-bar-cell">
+                <span class="score-value">9</span>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width: 9%; background: var(--color-not-free)"></div></div>
+              </div>
+            </td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-50)">0.08</td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-not-free)">-1</td>
+          </tr>
+          <tr>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-30)">195</td>
+            <td><div class="country-cell"><span>&#127480;&#127486;</span><a href="#">Syria</a></div></td>
+            <td><span class="score-badge not-free">Not Free</span></td>
+            <td>
+              <div class="score-bar-cell">
+                <span class="score-value">3</span>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width: 3%; background: var(--color-not-free)"></div></div>
+              </div>
+            </td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-text-50)">0.03</td>
+            <td style="font-family: var(--font-mono); font-size: 12px; color: var(--color-not-free)">-5</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="source-footer">
+      <span>Freedom House Freedom in the World 2026</span>
+      <span>V-Dem Institute Democracy Index v14</span>
+      <span>World Bank Governance Indicators</span>
+    </div>
+  </div>
+
+  <div class="mockup-badge">PM Mockup &mdash; Not Production</div>
+
+  <script>
+    function toggleTheme() {
+      const body = document.body;
+      const current = body.getAttribute('data-theme');
+      body.setAttribute('data-theme', current === 'light' ? '' : 'light');
+      if (current === 'light') body.removeAttribute('data-theme');
+    }
+    function filterStatus(status) {
+      document.querySelectorAll('.freedom-bucket').forEach(b => b.style.outline = 'none');
+      event.currentTarget.style.outline = '2px solid var(--color-accent)';
+    }
+  </script>
+</body>
+</html>

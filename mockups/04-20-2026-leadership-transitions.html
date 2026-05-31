@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Civica — Leadership Transitions (mockup)</title>
+<style>
+  :root {
+    --color-bg: #16140f;
+    --color-surface: #221e16;
+    --color-card-bg: rgba(255,255,255,0.03);
+    --color-card-border: #3d382d;
+    --color-text-primary: #ebe6d6;
+    --color-text-60: #c4bdae;
+    --color-text-30: rgba(235,230,214,0.50);
+    --color-divider: #3d382d;
+    --color-accent: #D4A04A;
+    --font-heading: Georgia, "Times New Roman", serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --color-urgent: #D4764E;
+    --color-soon: #C4A44E;
+    --color-safe: #5CAA6E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--color-bg); color: var(--color-text-primary); font-family: var(--font-body); min-height: 100vh; }
+
+  /* NAV */
+  .nav { border-bottom: 1px solid var(--color-divider); padding: 0 40px; display: flex; align-items: center; gap: 32px; height: 52px; position: sticky; top: 0; background: rgba(22,20,15,0.95); z-index: 20; }
+  .nav-logo { font-family: var(--font-heading); font-size: 18px; color: var(--color-accent); letter-spacing: -0.01em; }
+  .nav-link { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-text-30); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
+  .nav-link.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+
+  /* HERO */
+  .hero { padding: 48px 40px 32px; max-width: 1200px; margin: 0 auto; }
+  .hero h1 { font-family: var(--font-heading); font-size: 44px; font-weight: 400; letter-spacing: -0.03em; line-height: 1.1; }
+  .hero p { color: var(--color-text-60); font-size: 15px; line-height: 1.65; margin-top: 12px; max-width: 560px; }
+  .hero-meta { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-30); margin-top: 8px; }
+
+  /* STATS ROW */
+  .stats-row { display: flex; gap: 1px; max-width: 1200px; margin: 0 auto; padding: 0 40px 32px; }
+  .stat-pill { flex: 1; background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: 4px; padding: 16px; text-align: center; }
+  .stat-pill-value { font-family: var(--font-heading); font-size: 32px; color: var(--color-text-primary); }
+  .stat-pill-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-30); margin-top: 4px; }
+
+  /* TABS */
+  .tab-row { max-width: 1200px; margin: 0 auto; padding: 0 40px; display: flex; gap: 2px; border-bottom: 1px solid var(--color-divider); margin-bottom: 32px; }
+  .tab { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; padding: 10px 16px; border: none; background: transparent; color: var(--color-text-30); cursor: pointer; border-bottom: 2px solid transparent; transition: all 120ms; }
+  .tab.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+  .tab-count { background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: 99px; padding: 1px 6px; font-size: 10px; margin-left: 6px; }
+
+  /* CONTENT */
+  .content { max-width: 1200px; margin: 0 auto; padding: 0 40px 80px; }
+
+  /* SECTION HEADER */
+  .section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .section-head h2 { font-family: var(--font-heading); font-size: 22px; font-weight: 400; }
+  .urgency-badge { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; padding: 3px 8px; border-radius: 3px; }
+  .urgency-badge.critical { background: rgba(212,118,78,0.15); color: var(--color-urgent); border: 1px solid rgba(212,118,78,0.3); }
+  .urgency-badge.soon { background: rgba(196,164,78,0.15); color: var(--color-soon); border: 1px solid rgba(196,164,78,0.3); }
+
+  /* TRANSITION CARDS */
+  .transition-grid { display: flex; flex-direction: column; gap: 1px; margin-bottom: 40px; }
+  .transition-card { background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: 4px; padding: 16px 20px; display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center; cursor: pointer; transition: all 120ms; }
+  .transition-card:hover { border-color: rgba(212,160,74,0.3); background: rgba(212,160,74,0.04); }
+  .transition-card.critical { border-left: 3px solid var(--color-urgent); }
+  .transition-card.soon { border-left: 3px solid var(--color-soon); }
+  .transition-card.safe { border-left: 3px solid var(--color-safe); }
+
+  .flag-block { width: 44px; height: 30px; border-radius: 3px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); background: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .tc-main { display: flex; flex-direction: column; gap: 2px; }
+  .tc-country { font-size: 13px; font-family: var(--font-mono); color: var(--color-text-30); text-transform: uppercase; letter-spacing: 0.08em; }
+  .tc-leader { font-size: 16px; color: var(--color-text-primary); font-weight: 500; }
+  .tc-office { font-size: 12px; color: var(--color-text-30); }
+  .tc-meta { display: flex; gap: 12px; margin-top: 4px; }
+  .tc-meta span { font-family: var(--font-mono); font-size: 11px; color: var(--color-text-30); display: flex; align-items: center; gap: 4px; }
+  .tc-right { text-align: right; flex-shrink: 0; }
+  .tc-days { font-family: var(--font-heading); font-size: 28px; font-weight: 400; }
+  .tc-days.critical { color: var(--color-urgent); }
+  .tc-days.soon { color: var(--color-soon); }
+  .tc-days.safe { color: var(--color-safe); }
+  .tc-days-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-text-30); margin-top: 2px; }
+  .tc-term { font-size: 11px; color: var(--color-text-30); margin-top: 4px; }
+
+  /* RECENT INAUGURATIONS */
+  .inaug-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 40px; }
+  .inaug-card { background: var(--color-card-bg); border: 1px solid var(--color-card-border); border-radius: 4px; padding: 16px; }
+  .inaug-flag { font-size: 28px; margin-bottom: 8px; }
+  .inaug-country { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-text-30); }
+  .inaug-leader { font-size: 15px; color: var(--color-text-primary); margin-top: 4px; font-weight: 500; }
+  .inaug-office { font-size: 12px; color: var(--color-text-30); margin-top: 2px; }
+  .inaug-date { font-family: var(--font-mono); font-size: 11px; color: var(--color-safe); margin-top: 8px; }
+  .inaug-party { font-size: 11px; color: var(--color-text-30); margin-top: 2px; }
+
+  /* LONGEST SERVING */
+  .longest-table { width: 100%; border-collapse: collapse; }
+  .longest-table th { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--color-text-30); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--color-divider); }
+  .longest-table td { padding: 12px 12px; border-bottom: 1px solid rgba(61,56,45,0.4); font-size: 13px; color: var(--color-text-60); }
+  .longest-table tr:hover td { background: rgba(212,160,74,0.04); }
+  .longest-table .leader-cell { color: var(--color-text-primary); font-weight: 500; }
+  .year-bar { height: 4px; background: var(--color-card-border); border-radius: 2px; margin-top: 4px; }
+  .year-bar-fill { height: 100%; border-radius: 2px; background: var(--color-accent); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-logo">Civica</span>
+  <a href="#" class="nav-link">Atlas</a>
+  <a href="#" class="nav-link">Countries</a>
+  <a href="#" class="nav-link">Elections</a>
+  <a href="#" class="nav-link active">Leaders</a>
+  <a href="#" class="nav-link">Rankings</a>
+</nav>
+
+<div class="hero">
+  <h1>Leadership Transitions</h1>
+  <p>Track heads of state whose terms are ending, leaders recently inaugurated, and the world's longest-serving rulers. Updated from Wikidata and IPU Parline.</p>
+  <div class="hero-meta">Sources: Wikidata · IPU Parline · Constitute Project &nbsp;·&nbsp; Updated April 2026</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-pill"><div class="stat-pill-value" style="color:var(--color-urgent)">11</div><div class="stat-pill-label">Terms ending &lt; 90 days</div></div>
+  <div class="stat-pill"><div class="stat-pill-value" style="color:var(--color-soon)">28</div><div class="stat-pill-label">Terms ending &lt; 12 months</div></div>
+  <div class="stat-pill"><div class="stat-pill-value" style="color:var(--color-safe)">19</div><div class="stat-pill-label">Inaugurated last 90 days</div></div>
+  <div class="stat-pill"><div class="stat-pill-value">4</div><div class="stat-pill-label">Leaders in power 30+ years</div></div>
+</div>
+
+<div class="tab-row">
+  <button class="tab active" onclick="showTab('ending', this)">Ending Soon <span class="tab-count">28</span></button>
+  <button class="tab" onclick="showTab('recent', this)">Recent Inaugurations <span class="tab-count">19</span></button>
+  <button class="tab" onclick="showTab('longest', this)">Longest Serving <span class="tab-count">20</span></button>
+</div>
+
+<div class="content">
+
+  <!-- ENDING SOON -->
+  <div id="tab-ending">
+    <div class="section-head">
+      <h2>Terms Ending Within 90 Days</h2>
+      <span class="urgency-badge critical">11 Critical</span>
+    </div>
+    <div class="transition-grid">
+
+      <div class="transition-card critical">
+        <div class="flag-block">🇵🇱</div>
+        <div class="tc-main">
+          <div class="tc-country">Poland</div>
+          <div class="tc-leader">Andrzej Duda</div>
+          <div class="tc-office">President</div>
+          <div class="tc-meta">
+            <span>⬤ PiS (Law and Justice)</span>
+            <span>In office since 2015</span>
+          </div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-days critical">18</div>
+          <div class="tc-days-label">Days remaining</div>
+          <div class="tc-term">Term ends May 6, 2025</div>
+        </div>
+      </div>
+
+      <div class="transition-card critical">
+        <div class="flag-block">🇱🇧</div>
+        <div class="tc-main">
+          <div class="tc-country">Lebanon</div>
+          <div class="tc-leader">Joseph Aoun</div>
+          <div class="tc-office">President</div>
+          <div class="tc-meta">
+            <span>⬤ Independent (military)</span>
+            <span>In office since Jan 2025</span>
+          </div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-days critical">42</div>
+          <div class="tc-days-label">Days remaining</div>
+          <div class="tc-term">Constitutional deadline June 1</div>
+        </div>
+      </div>
+
+      <div class="transition-card critical">
+        <div class="flag-block">🇪🇨</div>
+        <div class="tc-main">
+          <div class="tc-country">Ecuador</div>
+          <div class="tc-leader">Daniel Noboa</div>
+          <div class="tc-office">President</div>
+          <div class="tc-meta">
+            <span>⬤ ADN (center-right)</span>
+            <span>In office since Nov 2023</span>
+          </div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-days critical">71</div>
+          <div class="tc-days-label">Days remaining</div>
+          <div class="tc-term">Term ends May 24, 2025</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-head" style="margin-top:8px">
+      <h2>Terms Ending Within 12 Months</h2>
+      <span class="urgency-badge soon">17 More</span>
+    </div>
+    <div class="transition-grid">
+
+      <div class="transition-card soon">
+        <div class="flag-block">🇩🇪</div>
+        <div class="tc-main">
+          <div class="tc-country">Germany</div>
+          <div class="tc-leader">Frank-Walter Steinmeier</div>
+          <div class="tc-office">President</div>
+          <div class="tc-meta">
+            <span>⬤ SPD</span>
+            <span>In office since 2017</span>
+          </div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-days soon">112</div>
+          <div class="tc-days-label">Days remaining</div>
+          <div class="tc-term">Term ends Aug 12, 2026</div>
+        </div>
+      </div>
+
+      <div class="transition-card soon">
+        <div class="flag-block">🇿🇦</div>
+        <div class="tc-main">
+          <div class="tc-country">South Africa</div>
+          <div class="tc-leader">Cyril Ramaphosa</div>
+          <div class="tc-office">President</div>
+          <div class="tc-meta">
+            <span>⬤ ANC</span>
+            <span>In office since 2018</span>
+          </div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-days soon">195</div>
+          <div class="tc-days-label">Days remaining</div>
+          <div class="tc-term">Term ends Oct 2026</div>
+        </div>
+      </div>
+
+      <div class="transition-card soon">
+        <div class="flag-block">🇲🇽</div>
+        <div class="tc-main">
+          <div class="tc-country">Mexico</div>
+          <div class="tc-leader">Claudia Sheinbaum</div>
+          <div class="tc-office">President</div>
+          <div class="tc-meta">
+            <span>⬤ Morena (left)</span>
+            <span>In office since Oct 2024</span>
+          </div>
+        </div>
+        <div class="tc-right">
+          <div class="tc-days soon">320</div>
+          <div class="tc-days-label">Days remaining</div>
+          <div class="tc-term">Term ends Oct 2030</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RECENT INAUGURATIONS -->
+  <div id="tab-recent" style="display:none">
+    <div class="section-head">
+      <h2>Inaugurated in the Last 90 Days</h2>
+      <span class="urgency-badge soon">19 Leaders</span>
+    </div>
+    <div class="inaug-grid">
+
+      <div class="inaug-card">
+        <div class="inaug-flag">🇩🇪</div>
+        <div class="inaug-country">Germany</div>
+        <div class="inaug-leader">Friedrich Merz</div>
+        <div class="inaug-office">Federal Chancellor</div>
+        <div class="inaug-date">⬤ Inaugurated March 18, 2025</div>
+        <div class="inaug-party">CDU/CSU · Center-right</div>
+      </div>
+
+      <div class="inaug-card">
+        <div class="inaug-flag">🇦🇹</div>
+        <div class="inaug-country">Austria</div>
+        <div class="inaug-leader">Herbert Kickl</div>
+        <div class="inaug-office">Federal Chancellor</div>
+        <div class="inaug-date">⬤ Inaugurated March 3, 2025</div>
+        <div class="inaug-party">FPÖ · Right-wing populist</div>
+      </div>
+
+      <div class="inaug-card">
+        <div class="inaug-flag">🇱🇧</div>
+        <div class="inaug-country">Lebanon</div>
+        <div class="inaug-leader">Joseph Aoun</div>
+        <div class="inaug-office">President</div>
+        <div class="inaug-date">⬤ Inaugurated Jan 9, 2025</div>
+        <div class="inaug-party">Independent · Military</div>
+      </div>
+
+      <div class="inaug-card">
+        <div class="inaug-flag">🇺🇸</div>
+        <div class="inaug-country">United States</div>
+        <div class="inaug-leader">Donald Trump</div>
+        <div class="inaug-office">President</div>
+        <div class="inaug-date">⬤ Inaugurated Jan 20, 2025</div>
+        <div class="inaug-party">Republican · Right</div>
+      </div>
+
+      <div class="inaug-card">
+        <div class="inaug-flag">🇮🇱</div>
+        <div class="inaug-country">Israel</div>
+        <div class="inaug-leader">Yitzhak Herzog</div>
+        <div class="inaug-office">President</div>
+        <div class="inaug-date">⬤ Re-inaugurated Feb 2025</div>
+        <div class="inaug-party">Independent</div>
+      </div>
+
+      <div class="inaug-card">
+        <div class="inaug-flag">🇸🇱</div>
+        <div class="inaug-country">Sri Lanka</div>
+        <div class="inaug-leader">Anura Kumara Dissanayake</div>
+        <div class="inaug-office">President</div>
+        <div class="inaug-date">⬤ Inaugurated Feb 2025</div>
+        <div class="inaug-party">NPP · Left</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LONGEST SERVING -->
+  <div id="tab-longest" style="display:none">
+    <div class="section-head">
+      <h2>Longest-Serving Heads of State</h2>
+    </div>
+    <table class="longest-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Leader</th>
+          <th>Country</th>
+          <th>Office</th>
+          <th>Since</th>
+          <th>Years</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${[
+          [1,"🇨🇲","Paul Biya","Cameroon","President","1982",43],
+          [2,"🇷🇼","Paul Kagame","Rwanda","President","1994",31],
+          [3,"🇩🇿","Tebboune","Algeria","President","2019",6],
+          [4,"🇺🇦","Zelensky","Ukraine","President","2019",6],
+          [5,"🇨🇺","Miguel Díaz-Canel","Cuba","President","2018",7],
+          [6,"🇨🇳","Xi Jinping","China","President","2013",12],
+          [7,"🇷🇺","Vladimir Putin","Russia","President","2000",25],
+          [8,"🇹🇩","Déby Jr.","Chad","President","2021",4],
+          [9,"🇸🇦","Salman bin Abdulaziz","Saudi Arabia","King","2015",10],
+          [10,"🇻🇪","Maduro","Venezuela","President","2013",12],
+        ].map(([rank,flag,name,country,office,since,years]) => `
+          <tr>
+            <td style="color:var(--color-text-30);font-family:var(--font-mono);font-size:12px">${rank}</td>
+            <td class="leader-cell">${flag} ${name}</td>
+            <td>${country}</td>
+            <td style="color:var(--color-text-30)">${office}</td>
+            <td style="font-family:var(--font-mono);font-size:12px">${since}</td>
+            <td>
+              <span style="font-family:var(--font-heading);font-size:18px">${years}</span>
+              <span style="color:var(--color-text-30);font-family:var(--font-mono);font-size:10px;margin-left:4px">yrs</span>
+              <div class="year-bar"><div class="year-bar-fill" style="width:${(years/43)*100}%"></div></div>
+            </td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = "none");
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById("tab-" + id).style.display = "";
+  btn.classList.add("active");
+}
+</script>
+</body>
+</html>

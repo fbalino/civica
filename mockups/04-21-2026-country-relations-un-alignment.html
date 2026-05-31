@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Civica Atlas — Country Relations · UN Alignment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* =====================================================
+   DESIGN TOKENS — atlas.css authoritative mirror
+   ===================================================== */
+:root,
+[data-theme="light"] {
+  --atlas-paper:   #f4f1ea;
+  --atlas-paper-2: #ebe6d6;
+  --atlas-paper-3: #e2dcc8;
+  --atlas-ink:     #1a1a1a;
+  --atlas-ink-2:   #3d382d;
+  --atlas-muted:   #8a8370;
+  --atlas-rule:    #c4bdae;
+  --atlas-rule-2:  #d9d2c1;
+  --atlas-accent:  oklch(58% 0.14 35);
+  --atlas-accent-soft: oklch(92% 0.04 35);
+  --shadow-hard:   4px 4px 0 #1a1a1a;
+  /* map colors */
+  --map-recognize: #5CAA6E;
+  --map-nonrecog:  #D4764E;
+  --map-neutral:   #c4bdae;
+  --map-subject:   oklch(58% 0.14 35);
+}
+[data-theme="dark"] {
+  --atlas-paper:   #16140f;
+  --atlas-paper-2: #221e16;
+  --atlas-paper-3: #2b2619;
+  --atlas-ink:     #ebe6d6;
+  --atlas-ink-2:   #c4bdae;
+  --atlas-muted:   #8a8370;
+  --atlas-rule:    #3d382d;
+  --atlas-rule-2:  #2d2a22;
+  --atlas-accent:  oklch(68% 0.15 35);
+  --atlas-accent-soft: oklch(30% 0.06 35);
+  --shadow-hard:   4px 4px 0 #000;
+  --map-recognize: #4a9960;
+  --map-nonrecog:  #c06540;
+  --map-neutral:   #3d382d;
+  --map-subject:   oklch(68% 0.15 35);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px; line-height: 1.55;
+  color: var(--atlas-ink); background: var(--atlas-paper);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =====================================================
+   HANDOFF BAR
+   ===================================================== */
+.handoff-bar {
+  position: sticky; top: 0; z-index: 500;
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 18px;
+  background: var(--atlas-paper);
+  border-bottom: 1px solid var(--atlas-rule);
+  height: 44px;
+}
+.handoff-bar .brand {
+  font-family: "Fraunces", serif; font-size: 16px; font-weight: 400;
+  letter-spacing: -0.02em; color: var(--atlas-ink);
+}
+.handoff-bar .brand em { font-style: normal; color: var(--atlas-accent); }
+.handoff-bar .tag {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--atlas-muted);
+  border: 1px solid var(--atlas-rule); padding: 3px 7px;
+}
+.handoff-bar .sp { flex: 1; }
+.state-btn {
+  font-family: ui-monospace, monospace; font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 5px 10px; cursor: pointer; color: var(--atlas-ink-2);
+  border: 1px solid var(--atlas-rule); background: var(--atlas-paper);
+  border-radius: 2px; transition: background 120ms, color 120ms;
+}
+.state-btn:hover { background: var(--atlas-paper-2); color: var(--atlas-ink); }
+.state-btn.on { background: var(--atlas-ink); color: var(--atlas-paper); border-color: var(--atlas-ink); }
+.theme-btn {
+  font-family: ui-monospace, monospace; font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 5px 10px; cursor: pointer; color: var(--atlas-ink-2);
+  border: 1px solid var(--atlas-rule); background: var(--atlas-paper);
+  border-radius: 2px; transition: background 120ms;
+}
+.theme-btn:hover { background: var(--atlas-paper-2); }
+
+/* =====================================================
+   THREE-PANE SHELL
+   ===================================================== */
+.app {
+  height: calc(100vh - 44px);
+  display: grid;
+  grid-template-columns: 280px 1fr 360px;
+}
+.pane { overflow: hidden auto; background: var(--atlas-paper); }
+.pane.left  { border-right: 1px solid var(--atlas-rule); }
+.pane.right { border-left:  1px solid var(--atlas-rule); }
+
+/* =====================================================
+   LEFT PANE — country list
+   ===================================================== */
+.left-head {
+  padding: 16px 18px 12px; border-bottom: 1px solid var(--atlas-rule);
+  position: sticky; top: 0; background: var(--atlas-paper); z-index: 10;
+}
+.left-head .kicker {
+  font-family: ui-monospace, monospace; font-size: 9px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--atlas-muted);
+}
+.left-head h2 {
+  font-family: "Fraunces", serif; font-weight: 400; font-size: 20px;
+  letter-spacing: -0.01em; margin-top: 3px;
+}
+.left-search { padding: 10px 16px 8px; }
+.left-search input {
+  width: 100%; background: var(--atlas-paper); color: var(--atlas-ink);
+  border: 1px solid var(--atlas-rule); border-radius: 2px;
+  padding: 7px 10px; font-family: "Inter", sans-serif; font-size: 12px;
+  outline: none; transition: border-color 120ms;
+}
+.left-search input:focus { border-color: var(--atlas-ink); }
+.left-search input::placeholder { color: var(--atlas-muted); }
+.country-list { padding: 0 12px 20px; }
+.country-list .region-label {
+  font-family: ui-monospace, monospace; font-size: 9px; color: var(--atlas-muted);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 10px 6px 4px; border-bottom: 1px dashed var(--atlas-rule-2); margin-bottom: 2px;
+}
+.country-row {
+  padding: 6px 8px; cursor: pointer; display: flex;
+  align-items: center; gap: 8px; color: var(--atlas-ink-2); border-radius: 2px;
+  transition: background 100ms;
+}
+.country-row:hover { background: var(--atlas-paper-2); }
+.country-row.on { background: var(--atlas-ink); color: var(--atlas-paper); }
+.country-row .flag { font-size: 16px; line-height: 1; flex-shrink: 0; }
+.country-row .name { font-size: 13px; flex: 1; }
+.country-row .code {
+  font-family: ui-monospace, monospace; font-size: 10px; color: var(--atlas-muted);
+}
+.country-row.on .code { color: var(--atlas-paper-2); }
+.country-row .status-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.dot-partial { background: var(--map-nonrecog); }
+.dot-member  { background: var(--map-recognize); }
+
+/* =====================================================
+   CENTER PANE — map
+   ===================================================== */
+.center-pane {
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.map-header {
+  padding: 14px 20px 12px; border-bottom: 1px solid var(--atlas-rule);
+  display: flex; align-items: baseline; gap: 12px;
+  position: sticky; top: 0; background: var(--atlas-paper); z-index: 10;
+}
+.map-header .eyebrow {
+  font-family: ui-monospace, monospace; font-size: 9px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--atlas-accent);
+}
+.map-header h1 {
+  font-family: "Fraunces", serif; font-weight: 400; font-size: 28px;
+  letter-spacing: -0.02em; line-height: 1;
+}
+.map-header .sp { flex: 1; }
+.map-legend {
+  display: flex; gap: 12px; align-items: center;
+  font-family: ui-monospace, monospace; font-size: 10px;
+  color: var(--atlas-ink-2); letter-spacing: 0.06em;
+}
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-swatch {
+  width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0;
+}
+.map-wrap {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 10px 16px 16px; overflow: hidden;
+}
+#worldMap {
+  width: 100%; height: auto; max-height: calc(100vh - 140px);
+}
+
+/* =====================================================
+   RIGHT PANE — tabs + Relations content
+   ===================================================== */
+.right-pane {
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.right-tabs {
+  display: flex; overflow-x: auto; gap: 0;
+  border-bottom: 1px solid var(--atlas-rule);
+  padding: 0 14px;
+  position: sticky; top: 0; background: var(--atlas-paper); z-index: 10;
+  scrollbar-width: none;
+}
+.right-tabs::-webkit-scrollbar { display: none; }
+.right-tabs button {
+  background: transparent; border: 0;
+  padding: 11px 0; margin-right: 16px;
+  font-family: ui-monospace, monospace; font-size: 10px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--atlas-muted);
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  white-space: nowrap; transition: color 120ms;
+  flex-shrink: 0;
+}
+.right-tabs button.on {
+  color: var(--atlas-ink); border-bottom-color: var(--atlas-ink);
+}
+.right-tabs button:hover { color: var(--atlas-ink-2); }
+
+.right-body { overflow-y: auto; padding: 18px 18px 40px; flex: 1; }
+
+/* Relations: recognition header */
+.recog-header {
+  padding: 14px 0 12px;
+  border-bottom: 1px solid var(--atlas-rule);
+  margin-bottom: 14px;
+}
+.recog-title {
+  font-family: "Fraunces", serif; font-size: 17px;
+  letter-spacing: -0.01em; font-weight: 400;
+  margin-bottom: 6px; color: var(--atlas-ink);
+}
+.recog-sub {
+  font-family: ui-monospace, monospace; font-size: 10px;
+  color: var(--atlas-muted); letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* Stat chips */
+.stat-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.stat-chip {
+  padding: 6px 11px; border-radius: 2px;
+  font-family: ui-monospace, monospace; font-size: 11px;
+  letter-spacing: 0.06em; font-weight: 500;
+  border: 1px solid transparent;
+  display: flex; align-items: center; gap: 6px;
+}
+.chip-green {
+  background: rgba(92,170,110,0.12); color: #3d8a52;
+  border-color: rgba(92,170,110,0.3);
+}
+[data-theme="dark"] .chip-green {
+  background: rgba(92,170,110,0.18); color: #6abf7e; border-color: rgba(92,170,110,0.3);
+}
+.chip-red {
+  background: rgba(212,118,78,0.12); color: #b05030;
+  border-color: rgba(212,118,78,0.3);
+}
+[data-theme="dark"] .chip-red {
+  background: rgba(212,118,78,0.18); color: #e0804c; border-color: rgba(212,118,78,0.3);
+}
+.chip-muted {
+  background: var(--atlas-paper-2); color: var(--atlas-muted);
+  border-color: var(--atlas-rule);
+}
+.chip-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: currentColor; opacity: 0.7; flex-shrink: 0;
+}
+
+/* Section headers */
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 20px 0 10px; border-bottom: 1px solid var(--atlas-rule); padding-bottom: 6px;
+}
+.section-head .stitle {
+  font-family: "Fraunces", serif; font-size: 15px; letter-spacing: -0.01em;
+  font-weight: 400;
+}
+.section-head .smeta {
+  font-family: ui-monospace, monospace; font-size: 9px;
+  color: var(--atlas-muted); letter-spacing: 0.12em; text-transform: uppercase;
+}
+
+/* Non-recognition list */
+.nonrecog-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 4px; }
+.nonrecog-row {
+  padding: 8px 10px; border-radius: 2px;
+  display: grid; grid-template-columns: auto 1fr;
+  gap: 10px; align-items: start;
+  border: 1px solid transparent;
+  transition: background 100ms;
+}
+.nonrecog-row:hover { background: var(--atlas-paper-2); border-color: var(--atlas-rule-2); }
+.nonrecog-flag { font-size: 18px; line-height: 1.2; }
+.nonrecog-info .country-name {
+  font-size: 13px; font-weight: 500; color: var(--atlas-ink); margin-bottom: 2px;
+}
+.nonrecog-info .reason {
+  font-size: 12px; color: var(--atlas-muted); font-style: italic; line-height: 1.4;
+}
+
+/* UN Vote Alignment bars */
+.align-chart { display: flex; flex-direction: column; gap: 7px; }
+.align-row { display: grid; grid-template-columns: 28px 92px 1fr 36px; gap: 8px; align-items: center; }
+.align-flag { font-size: 15px; text-align: center; }
+.align-name {
+  font-family: ui-monospace, monospace; font-size: 10px; color: var(--atlas-ink-2);
+  letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.align-bar-wrap {
+  height: 10px; background: var(--atlas-paper-3); border-radius: 2px; overflow: hidden;
+}
+.align-bar {
+  height: 100%; background: var(--map-recognize); border-radius: 2px;
+  transition: width 600ms cubic-bezier(.4,0,.2,1);
+}
+.align-pct {
+  font-family: ui-monospace, monospace; font-size: 10px;
+  color: var(--atlas-muted); text-align: right; letter-spacing: 0.04em;
+}
+
+/* Diplomatic status grid */
+.diplo-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1px; background: var(--atlas-rule);
+  border: 1px solid var(--atlas-rule); margin-top: 2px;
+}
+.diplo-cell {
+  background: var(--atlas-paper); padding: 10px 12px;
+}
+.diplo-cell .dk {
+  font-family: ui-monospace, monospace; font-size: 9px;
+  color: var(--atlas-muted); letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 3px;
+}
+.diplo-cell .dv {
+  font-size: 13px; color: var(--atlas-ink); font-weight: 500;
+}
+.diplo-cell .dv.yes { color: #3d8a52; }
+.diplo-cell .dv.no  { color: #b05030; }
+.diplo-cell .dv.partial { color: oklch(58% 0.14 35); }
+[data-theme="dark"] .diplo-cell .dv.yes { color: #6abf7e; }
+[data-theme="dark"] .diplo-cell .dv.no  { color: #e0804c; }
+[data-theme="dark"] .diplo-cell .dv.partial { color: oklch(68% 0.15 35); }
+
+/* Taiwan note */
+.taiwan-note {
+  background: var(--atlas-accent-soft);
+  border: 1px solid var(--atlas-rule);
+  border-left: 3px solid var(--atlas-accent);
+  padding: 10px 12px; margin-bottom: 10px; border-radius: 0 2px 2px 0;
+  font-size: 12px; color: var(--atlas-ink-2); font-style: italic;
+}
+
+/* Scrollbar styling */
+.right-body::-webkit-scrollbar { width: 5px; }
+.right-body::-webkit-scrollbar-track { background: transparent; }
+.right-body::-webkit-scrollbar-thumb { background: var(--atlas-rule); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HANDOFF BAR
+     ============================================================ -->
+<div class="handoff-bar">
+  <div class="brand">Civi<em>ca</em></div>
+  <div class="tag">MOCKUP · SESSION 5</div>
+  <div class="sp"></div>
+  <button class="state-btn on" id="btnKosovo" onclick="setState('kosovo')">Kosovo</button>
+  <button class="state-btn" id="btnTaiwan" onclick="setState('taiwan')">Taiwan</button>
+  <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">Dark</button>
+</div>
+
+<!-- ============================================================
+     THREE-PANE APP
+     ============================================================ -->
+<div class="app">
+
+  <!-- LEFT PANE: countries list -->
+  <div class="pane left">
+    <div class="left-head">
+      <div class="kicker">Countries</div>
+      <h2>Atlas Index</h2>
+    </div>
+    <div class="left-search">
+      <input type="text" placeholder="Search countries…" />
+    </div>
+    <div class="country-list">
+      <div class="region-label">Europe</div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇩🇪</span>
+        <span class="name">Germany</span>
+        <span class="status-dot dot-member"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇫🇷</span>
+        <span class="name">France</span>
+        <span class="status-dot dot-member"></span>
+      </div>
+      <div class="country-row on" id="kosovoRow" onclick="selectCountry(this)">
+        <span class="flag">🇽🇰</span>
+        <span class="name">Kosovo</span>
+        <span class="code" style="display:none">XK</span>
+      </div>
+      <div class="country-row" id="taiwanRow" onclick="selectCountry(this)" style="display:none">
+        <span class="flag">🇹🇼</span>
+        <span class="name">Taiwan</span>
+        <span class="code" style="display:none">TW</span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇪🇸</span>
+        <span class="name">Spain</span>
+        <span class="status-dot dot-partial"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇷🇸</span>
+        <span class="name">Serbia</span>
+        <span class="status-dot dot-partial"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇷🇴</span>
+        <span class="name">Romania</span>
+        <span class="status-dot dot-partial"></span>
+      </div>
+      <div class="region-label">Americas</div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇺🇸</span>
+        <span class="name">United States</span>
+        <span class="status-dot dot-member"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇧🇷</span>
+        <span class="name">Brazil</span>
+        <span class="status-dot dot-partial"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇨🇦</span>
+        <span class="name">Canada</span>
+        <span class="status-dot dot-member"></span>
+      </div>
+      <div class="region-label">Asia–Pacific</div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇨🇳</span>
+        <span class="name">China</span>
+        <span class="status-dot dot-partial"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇯🇵</span>
+        <span class="name">Japan</span>
+        <span class="status-dot dot-member"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇮🇳</span>
+        <span class="name">India</span>
+        <span class="status-dot dot-partial"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇦🇺</span>
+        <span class="name">Australia</span>
+        <span class="status-dot dot-member"></span>
+      </div>
+      <div class="region-label">Middle East &amp; Africa</div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇷🇺</span>
+        <span class="name">Russia</span>
+        <span class="status-dot dot-partial"></span>
+      </div>
+      <div class="country-row" onclick="selectCountry(this)">
+        <span class="flag">🇸🇦</span>
+        <span class="name">Saudi Arabia</span>
+        <span class="status-dot dot-member"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER PANE: world map -->
+  <div class="pane center-pane">
+    <div class="map-header">
+      <div>
+        <div class="eyebrow" id="mapEyebrow">Recognition Status</div>
+        <h1 id="mapTitle">Kosovo</h1>
+      </div>
+      <div class="sp"></div>
+      <div class="map-legend">
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:var(--map-recognize)"></div>
+          <span id="legendRecog">Recognize</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:var(--map-nonrecog)"></div>
+          <span id="legendNonrecog">Non-recognition</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:var(--map-neutral)"></div>
+          <span>No position</span>
+        </div>
+      </div>
+    </div>
+    <div class="map-wrap">
+      <!-- Simplified SVG World Map -->
+      <svg id="worldMap" viewBox="0 0 960 500" xmlns="http://www.w3.org/2000/svg">
+        <!-- Ocean background -->
+        <rect width="960" height="500" fill="var(--atlas-paper-2)" rx="4"/>
+        <!-- Grid lines (lat/lon) -->
+        <g stroke="var(--atlas-rule-2)" stroke-width="0.5" opacity="0.5">
+          <!-- Horizontal (lat) -->
+          <line x1="0" y1="83" x2="960" y2="83"/>
+          <line x1="0" y1="166" x2="960" y2="166"/>
+          <line x1="0" y1="250" x2="960" y2="250"/>
+          <line x1="0" y1="333" x2="960" y2="333"/>
+          <line x1="0" y1="416" x2="960" y2="416"/>
+          <!-- Vertical (lon) -->
+          <line x1="120" y1="0" x2="120" y2="500"/>
+          <line x1="240" y1="0" x2="240" y2="500"/>
+          <line x1="360" y1="0" x2="360" y2="500"/>
+          <line x1="480" y1="0" x2="480" y2="500"/>
+          <line x1="600" y1="0" x2="600" y2="500"/>
+          <line x1="720" y1="0" x2="720" y2="500"/>
+          <line x1="840" y1="0" x2="840" y2="500"/>
+        </g>
+
+        <!-- ===== NORTH AMERICA ===== -->
+        <!-- Canada (recognizes Kosovo) -->
+        <path class="map-country map-recognize" id="canada"
+          d="M 75 60 L 200 55 L 240 70 L 260 90 L 250 110 L 280 120 L 270 140 L 230 145 L 200 135 L 175 150 L 150 140 L 130 145 L 110 130 L 85 135 L 60 125 L 40 105 L 45 80 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- USA (recognizes Kosovo) -->
+        <path class="map-country map-recognize" id="usa"
+          d="M 75 155 L 265 148 L 268 175 L 255 195 L 235 210 L 200 215 L 165 210 L 130 215 L 100 205 L 75 195 L 68 175 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Mexico -->
+        <path class="map-country map-neutral" id="mexico"
+          d="M 80 215 L 185 212 L 195 225 L 185 245 L 165 255 L 145 248 L 125 255 L 110 242 L 90 235 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- Central America / Caribbean -->
+        <ellipse class="map-country map-neutral" cx="175" cy="265" rx="20" ry="10" stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== SOUTH AMERICA ===== -->
+        <!-- Brazil (non-recognition) -->
+        <path class="map-country map-nonrecog" id="brazil"
+          d="M 185 275 L 240 265 L 275 270 L 295 290 L 295 330 L 280 360 L 255 380 L 225 370 L 200 350 L 185 320 L 175 295 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Argentina -->
+        <path class="map-country map-neutral" id="argentina"
+          d="M 215 375 L 250 370 L 260 390 L 255 415 L 245 435 L 230 445 L 215 440 L 205 420 L 205 395 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Colombia/Venezuela -->
+        <path class="map-country map-neutral"
+          d="M 170 265 L 210 260 L 225 270 L 220 285 L 200 290 L 175 285 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Peru/Chile etc -->
+        <path class="map-country map-neutral"
+          d="M 165 290 L 185 285 L 195 305 L 185 330 L 175 355 L 165 375 L 155 370 L 150 345 L 155 310 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== EUROPE ===== -->
+        <!-- UK (recognizes Kosovo) -->
+        <path class="map-country map-recognize" id="uk"
+          d="M 392 92 L 400 88 L 408 96 L 405 106 L 396 108 L 390 100 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- France (recognizes Kosovo) -->
+        <path class="map-country map-recognize" id="france"
+          d="M 400 108 L 418 104 L 430 112 L 428 126 L 415 132 L 402 126 L 397 116 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Spain (NON-recognition) -->
+        <path class="map-country map-nonrecog" id="spain"
+          d="M 388 128 L 415 125 L 420 140 L 410 150 L 390 148 L 382 138 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Portugal -->
+        <path class="map-country map-recognize"
+          d="M 381 128 L 390 126 L 390 148 L 382 148 L 378 138 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Germany (recognizes Kosovo) -->
+        <path class="map-country map-recognize" id="germany"
+          d="M 428 97 L 446 94 L 452 106 L 448 118 L 435 120 L 426 112 L 424 102 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Italy (recognizes Kosovo) -->
+        <path class="map-country map-recognize" id="italy"
+          d="M 428 122 L 442 118 L 450 128 L 448 142 L 440 152 L 432 156 L 426 148 L 424 136 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Poland (recognizes Kosovo) -->
+        <path class="map-country map-recognize" id="poland"
+          d="M 452 92 L 472 90 L 480 100 L 476 114 L 460 116 L 450 108 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Slovakia (NON-recognition) -->
+        <path class="map-country map-nonrecog" id="slovakia"
+          d="M 452 116 L 468 113 L 475 120 L 470 127 L 454 126 L 450 120 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Romania (NON-recognition) -->
+        <path class="map-country map-nonrecog" id="romania"
+          d="M 470 120 L 492 116 L 500 126 L 498 140 L 482 144 L 468 136 L 466 126 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Greece (NON-recognition) -->
+        <path class="map-country map-nonrecog" id="greece"
+          d="M 456 145 L 472 142 L 478 154 L 470 164 L 456 162 L 450 152 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Serbia (NON-recognition) -->
+        <path class="map-country map-nonrecog" id="serbia"
+          d="M 450 130 L 464 126 L 470 134 L 468 144 L 456 146 L 447 140 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Kosovo (subject) -->
+        <path class="map-country map-subject" id="kosovo"
+          d="M 456 140 L 465 137 L 469 143 L 465 150 L 457 150 L 452 144 Z"
+          stroke="var(--atlas-ink)" stroke-width="1.2"/>
+        <!-- Czech/Hungary/Austria area -->
+        <path class="map-country map-recognize"
+          d="M 434 114 L 453 112 L 453 126 L 435 128 L 428 120 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Scandinavia (recognizes) -->
+        <path class="map-country map-recognize" id="scandinavia"
+          d="M 425 60 L 450 55 L 460 70 L 455 88 L 440 90 L 428 85 L 420 75 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Netherlands/Belgium -->
+        <path class="map-country map-recognize"
+          d="M 418 100 L 428 97 L 430 108 L 420 110 L 415 104 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Switzerland -->
+        <path class="map-country map-recognize"
+          d="M 420 120 L 432 118 L 434 128 L 422 130 L 418 124 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Bulgaria -->
+        <path class="map-country map-neutral"
+          d="M 468 140 L 482 138 L 486 148 L 475 154 L 464 150 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Balkans (recognizes) -->
+        <path class="map-country map-recognize"
+          d="M 444 145 L 456 143 L 458 154 L 448 158 L 440 152 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Finland/Baltics -->
+        <path class="map-country map-recognize"
+          d="M 462 58 L 490 52 L 498 68 L 485 80 L 468 78 L 458 68 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== RUSSIA ===== -->
+        <path class="map-country map-nonrecog" id="russia"
+          d="M 496 45 L 720 35 L 740 55 L 730 80 L 700 90 L 660 88 L 620 95 L 590 88 L 560 95 L 530 90 L 510 80 L 500 65 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Siberia extension -->
+        <path class="map-country map-nonrecog"
+          d="M 700 55 L 800 40 L 850 50 L 870 70 L 840 80 L 800 78 L 750 72 L 720 75 L 700 65 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== MIDDLE EAST ===== -->
+        <!-- Turkey -->
+        <path class="map-country map-recognize"
+          d="M 490 155 L 530 148 L 545 155 L 538 168 L 510 172 L 492 166 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Iran -->
+        <path class="map-country map-neutral"
+          d="M 545 155 L 585 148 L 598 158 L 595 178 L 575 188 L 548 182 L 540 168 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Iraq/Syria/Saudi area -->
+        <path class="map-country map-neutral"
+          d="M 500 170 L 555 165 L 560 185 L 548 210 L 520 220 L 495 215 L 488 195 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Saudi Arabia (recognizes Kosovo) -->
+        <path class="map-country map-recognize"
+          d="M 525 215 L 570 210 L 575 235 L 560 250 L 530 252 L 510 240 L 515 222 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== AFRICA ===== -->
+        <!-- North Africa -->
+        <path class="map-country map-recognize"
+          d="M 390 165 L 490 158 L 495 195 L 480 220 L 430 228 L 390 222 L 378 200 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- West Africa -->
+        <path class="map-country map-neutral"
+          d="M 375 225 L 430 222 L 435 255 L 415 270 L 380 268 L 365 248 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Central Africa -->
+        <path class="map-country map-neutral"
+          d="M 430 225 L 490 218 L 500 250 L 495 280 L 460 290 L 430 282 L 425 258 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- East Africa -->
+        <path class="map-country map-neutral"
+          d="M 495 230 L 540 225 L 548 250 L 540 280 L 515 290 L 495 278 L 490 255 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- South Africa (recognizes Kosovo) -->
+        <path class="map-country map-recognize"
+          d="M 440 300 L 490 295 L 500 320 L 490 348 L 465 355 L 440 345 L 428 322 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Horn of Africa -->
+        <path class="map-country map-neutral"
+          d="M 540 250 L 570 244 L 580 258 L 565 272 L 545 270 L 538 258 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== CENTRAL & SOUTH ASIA ===== -->
+        <!-- Kazakhstan / C. Asia -->
+        <path class="map-country map-neutral"
+          d="M 600 90 L 680 85 L 700 102 L 695 120 L 660 128 L 620 125 L 598 110 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- India (NON-recognition) -->
+        <path class="map-country map-nonrecog" id="india"
+          d="M 628 148 L 680 142 L 698 158 L 695 195 L 678 218 L 650 228 L 628 215 L 615 190 L 615 165 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Pakistan -->
+        <path class="map-country map-neutral"
+          d="M 600 148 L 630 142 L 638 160 L 625 178 L 600 175 L 590 162 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Afghanistan -->
+        <path class="map-country map-neutral"
+          d="M 600 122 L 628 118 L 640 130 L 636 148 L 610 152 L 598 140 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== EAST ASIA ===== -->
+        <!-- China (NON-recognition — main territory) -->
+        <path class="map-country map-nonrecog" id="china"
+          d="M 700 102 L 790 88 L 820 100 L 818 130 L 800 150 L 770 162 L 740 158 L 710 148 L 695 128 L 698 108 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Mongolia -->
+        <path class="map-country map-neutral"
+          d="M 710 80 L 790 72 L 800 88 L 780 98 L 740 100 L 712 92 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Japan (recognizes Kosovo) -->
+        <path class="map-country map-recognize" id="japan"
+          d="M 826 110 L 842 104 L 850 114 L 844 126 L 830 128 L 822 118 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Korea -->
+        <path class="map-country map-recognize"
+          d="M 812 118 L 826 112 L 828 126 L 816 130 L 808 124 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Southeast Asia -->
+        <path class="map-country map-neutral"
+          d="M 755 165 L 800 158 L 810 178 L 800 200 L 770 205 L 748 190 L 745 172 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Indonesia/Malaysia -->
+        <path class="map-country map-neutral"
+          d="M 750 210 L 830 205 L 850 218 L 840 232 L 800 236 L 760 230 L 745 220 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- Taiwan (small dot — highlighted in Kosovo view as neutral) -->
+        <circle class="map-country" id="taiwan-dot" cx="820" cy="155" r="6"
+          fill="var(--map-neutral)" stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== AUSTRALIA ===== -->
+        <path class="map-country map-recognize" id="australia"
+          d="M 790 290 L 860 280 L 890 300 L 900 330 L 880 358 L 845 365 L 810 355 L 788 330 L 782 305 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+        <!-- New Zealand -->
+        <path class="map-country map-recognize"
+          d="M 910 360 L 924 352 L 930 364 L 922 374 L 910 370 Z"
+          stroke="var(--atlas-paper)" stroke-width="0.8"/>
+
+        <!-- ===== LABELS ===== -->
+        <g font-family="ui-monospace, monospace" fill="var(--atlas-ink-2)" opacity="0.6">
+          <text x="155" y="185" font-size="8" text-anchor="middle" letter-spacing="0.1em">USA</text>
+          <text x="238" y="320" font-size="7" text-anchor="middle" letter-spacing="0.1em">BRAZIL</text>
+          <text x="458" y="100" font-size="7" text-anchor="middle" letter-spacing="0.08em">EU</text>
+          <text x="620" y="65" font-size="7" text-anchor="middle" letter-spacing="0.1em">RUSSIA</text>
+          <text x="657" y="185" font-size="7" text-anchor="middle" letter-spacing="0.08em">INDIA</text>
+          <text x="750" y="130" font-size="7" text-anchor="middle" letter-spacing="0.08em">CHINA</text>
+          <text x="838" y="322" font-size="7" text-anchor="middle" letter-spacing="0.08em">AUSTRALIA</text>
+          <text x="459" y="146" font-size="6" fill="var(--atlas-ink)" opacity="1" font-weight="600" id="subjectLabel">XK</text>
+        </g>
+
+        <!-- Equator line -->
+        <line x1="0" y1="270" x2="960" y2="270" stroke="var(--atlas-rule)" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>
+        <text x="8" y="268" font-family="ui-monospace, monospace" font-size="7" fill="var(--atlas-muted)" opacity="0.7">Equator</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- RIGHT PANE: tabs + Relations -->
+  <div class="pane right-pane">
+    <div class="right-tabs">
+      <button>Chamber</button>
+      <button>Bills</button>
+      <button>Structure</button>
+      <button>Elections</button>
+      <button>Democracy</button>
+      <button>Leaders</button>
+      <button>Constitution</button>
+      <button>International</button>
+      <button class="on">Relations</button>
+    </div>
+
+    <!-- RELATIONS TAB BODY -->
+    <div class="right-body" id="relationsBody">
+      <!-- content injected by JS -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =====================================================
+   DATA
+   ===================================================== */
+const DATA = {
+  kosovo: {
+    mapTitle: "Kosovo",
+    mapEyebrow: "Recognition Status",
+    recognizeCount: 111,
+    nonrecogCount: 15,
+    noPositionCount: "~74",
+    subjectId: "kosovo",
+    subjectLabel: "XK",
+    taiwanDotFill: "var(--map-neutral)",
+    legendRecog: "Recognize",
+    legendNonrecog: "Non-recognition",
+    recognitionHeader: "Kosovo · Disputed State · Declared Independence 2008",
+    recognitionSub: "111 countries recognize · 15 non-recognition · UN member candidate",
+    nonrecogList: [
+      { flag: "🇷🇸", name: "Serbia",  reason: "Claims Kosovo as sovereign territory — core constitutional issue" },
+      { flag: "🇷🇺", name: "Russia",  reason: "Opposed 2010 ICJ advisory opinion; strategic posture vs. West" },
+      { flag: "🇨🇳", name: "China",   reason: "Precedent concern re: Taiwan & Tibet — territorial integrity norm" },
+      { flag: "🇪🇸", name: "Spain",   reason: "Domestic concern: Catalonia & Basque separatist movements" },
+      { flag: "🇮🇳", name: "India",   reason: "Opposes unilateral secession; Kashmir parallel" },
+      { flag: "🇧🇷", name: "Brazil",  reason: "Non-intervention principle; South-South solidarity with Serbia" },
+      { flag: "🇸🇰", name: "Slovakia", reason: "Hungarian minority concerns; EU outlier alongside Spain/Romania/Greece" },
+      { flag: "🇬🇷", name: "Greece",  reason: "Orthodox ties with Serbia; Macedonian name dispute precedent" },
+    ],
+    alignTitle: "UN Vote Alignment — Top Backers",
+    alignSub: "UNGA alignment with Kosovo's major recognisers",
+    alignData: [
+      { flag: "🇺🇸", name: "United States", pct: 94 },
+      { flag: "🇩🇪", name: "Germany",       pct: 91 },
+      { flag: "🇫🇷", name: "France",        pct: 89 },
+      { flag: "🇬🇧", name: "United Kingdom",pct: 88 },
+      { flag: "🇯🇵", name: "Japan",         pct: 76 },
+      { flag: "🇨🇦", name: "Canada",        pct: 74 },
+      { flag: "🇦🇺", name: "Australia",     pct: 72 },
+      { flag: "🇮🇹", name: "Italy",         pct: 70 },
+    ],
+    diploTitle: "Diplomatic Status",
+    diploData: [
+      { k: "UN Status",         v: "Observer candidate", cls: "partial" },
+      { k: "ICC Signatory",     v: "Yes (2000)",         cls: "yes" },
+      { k: "Council of Europe", v: "Applicant",          cls: "partial" },
+      { k: "NATO Partnership",  v: "Yes (PfP)",          cls: "yes" },
+      { k: "EU Candidate",      v: "Yes (2022)",         cls: "yes" },
+      { k: "OSCE Member",       v: "No",                 cls: "no" },
+    ],
+    taiwanNote: null,
+  },
+  taiwan: {
+    mapTitle: "Taiwan",
+    mapEyebrow: "Recognition Status",
+    recognizeCount: 12,
+    nonrecogCount: 181,
+    noPositionCount: "1 China Policy",
+    subjectId: "taiwan-dot",
+    subjectLabel: "TW",
+    taiwanDotFill: "var(--map-subject)",
+    legendRecog: "Recognize Taiwan",
+    legendNonrecog: "One China Policy",
+    recognitionHeader: "Taiwan · Claimed by PRC · Separate governance since 1949",
+    recognitionSub: "12 recognize · 181 don't · Universal \"One China Policy\" pressure",
+    nonrecogList: [
+      { flag: "🇺🇸", name: "United States", reason: "One China Policy — strategic ambiguity since 1979 Shanghai Communiqué" },
+      { flag: "🇬🇧", name: "United Kingdom", reason: "Diplomatic relations with PRC; acknowledges PRC position on Taiwan" },
+      { flag: "🇪🇺", name: "European Union", reason: "All 27 EU members maintain official ties with PRC, not ROC" },
+      { flag: "🇯🇵", name: "Japan",          reason: "Normalized with PRC in 1972; maintains unofficial Taiwan Relations" },
+      { flag: "🇦🇺", name: "Australia",      reason: "Recognizes PRC; unofficial ties via AUSTRADE offices" },
+      { flag: "🇨🇦", name: "Canada",         reason: "Recognizes PRC since 1970; unofficial representative offices" },
+      { flag: "🇮🇳", name: "India",          reason: "Recognizes PRC; geo-strategic calculus vs. China border tensions" },
+      { flag: "🇸🇦", name: "Saudi Arabia",   reason: "Recognizes PRC; economic and diplomatic alignment" },
+    ],
+    alignTitle: "Formal Allies — Recognition Vote History",
+    alignSub: "Countries that still maintain official recognition of ROC (Taiwan)",
+    alignData: [
+      { flag: "🇵🇾", name: "Paraguay",     pct: 95 },
+      { flag: "🇬🇹", name: "Guatemala",    pct: 90 },
+      { flag: "🇧🇿", name: "Belize",       pct: 88 },
+      { flag: "🇸🇿", name: "Eswatini",     pct: 85 },
+      { flag: "🇭🇹", name: "Haiti",        pct: 80 },
+      { flag: "🇵🇼", name: "Palau",        pct: 78 },
+      { flag: "🇲🇭", name: "Marshall Is.", pct: 75 },
+      { flag: "🇹🇻", name: "Tuvalu",       pct: 72 },
+    ],
+    diploTitle: "Diplomatic Status",
+    diploData: [
+      { k: "UN Status",       v: "Not a member",           cls: "no" },
+      { k: "WTO",             v: "Yes (Chinese Taipei)",   cls: "partial" },
+      { k: "WHO Observer",    v: "Disputed (denied 2017)", cls: "no" },
+      { k: "ICAO",            v: "No",                     cls: "no" },
+      { k: "Olympic Games",   v: "Yes (Chinese Taipei)",   cls: "partial" },
+      { k: "APEC Member",     v: "Yes (Chinese Taipei)",   cls: "yes" },
+    ],
+    taiwanNote: "Taiwan participates in many international bodies under the name \"Chinese Taipei\" or similar formulas, avoiding direct PRC veto.",
+  }
+};
+
+/* =====================================================
+   MAP COUNTRY CLASSES
+   ===================================================== */
+// Countries that recognize Kosovo (green)
+const KOSOVO_RECOG = ["canada","usa","uk","france","germany","italy","poland",
+  "scandinavia","australia","japan","korea"];
+// Countries that do NOT recognize Kosovo (terracotta)
+const KOSOVO_NONRECOG = ["serbia","russia","spain","slovakia","romania","greece",
+  "india","brazil","china"];
+
+// Countries that recognize Taiwan (green — just their elements)
+// In our simplified map, Taiwan allies are small nations not drawn as major shapes
+// So we flip the logic: most are nonrecog (PRC), a few small shapes can be recog
+const TAIWAN_NONRECOG = ["canada","usa","uk","france","germany","italy","poland",
+  "scandinavia","australia","japan","korea","india","russia","china","spain","brazil"];
+
+function applyMapState(state) {
+  const d = DATA[state];
+
+  // Reset all country paths to neutral
+  document.querySelectorAll(".map-country").forEach(el => {
+    el.style.fill = "";
+    el.className.baseVal = el.className.baseVal
+      .replace(/\bmap-recognize\b|\bmap-nonrecog\b|\bmap-subject\b/g, "")
+      .trim() + " map-country";
+  });
+
+  // For Kosovo state
+  if (state === "kosovo") {
+    // Recognize countries
+    KOSOVO_RECOG.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.fill = "var(--map-recognize)";
+    });
+    // Non-recog countries
+    KOSOVO_NONRECOG.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.fill = "var(--map-nonrecog)";
+    });
+    // Kosovo itself as subject
+    const sub = document.getElementById("kosovo");
+    if (sub) sub.style.fill = "var(--map-subject)";
+    // Taiwan as neutral
+    const tw = document.getElementById("taiwan-dot");
+    if (tw) tw.style.fill = "var(--map-neutral)";
+    // EU block — all map-recognize except listed
+    document.querySelectorAll("path[class*='map-country']").forEach(el => {
+      if (!el.style.fill) el.style.fill = "var(--map-neutral)";
+    });
+  } else {
+    // Taiwan state
+    // Most countries use PRC = nonrecog for Taiwan
+    TAIWAN_NONRECOG.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.fill = "var(--map-nonrecog)";
+    });
+    // Taiwan dot = subject
+    const tw = document.getElementById("taiwan-dot");
+    if (tw) tw.style.fill = "var(--map-subject)";
+    // Kosovo itself as neutral
+    const kos = document.getElementById("kosovo");
+    if (kos) kos.style.fill = "var(--map-neutral)";
+    // China = PRC = non-recognition
+    const cn = document.getElementById("china");
+    if (cn) cn.style.fill = "var(--map-nonrecog)";
+    // Everything else neutral
+    document.querySelectorAll("path[class*='map-country'], circle[class*='map-country']").forEach(el => {
+      if (!el.style.fill) el.style.fill = "var(--map-neutral)";
+    });
+  }
+}
+
+/* =====================================================
+   RENDER RIGHT PANE
+   ===================================================== */
+function renderRelations(state) {
+  const d = DATA[state];
+  const body = document.getElementById("relationsBody");
+
+  // Build HTML
+  let html = "";
+
+  // Taiwan note
+  if (d.taiwanNote) {
+    html += `<div class="taiwan-note">${d.taiwanNote}</div>`;
+  }
+
+  // Section 1: Recognition Status
+  html += `
+    <div class="recog-header">
+      <div class="recog-title">${d.recognitionHeader}</div>
+      <div class="recog-sub">${d.recognitionSub}</div>
+    </div>
+    <div class="stat-chips">
+      <div class="stat-chip chip-green">
+        <span class="chip-dot"></span>${d.recognizeCount} recognize
+      </div>
+      <div class="stat-chip chip-red">
+        <span class="chip-dot"></span>${d.nonrecogCount} non-recognize
+      </div>
+      <div class="stat-chip chip-muted">
+        <span class="chip-dot"></span>${d.noPositionCount} no position
+      </div>
+    </div>
+  `;
+
+  // Section 2: Notable Non-Recognition
+  html += `
+    <div class="section-head">
+      <span class="stitle">Notable Non-Recognition</span>
+      <span class="smeta">${d.nonrecogList.length} countries</span>
+    </div>
+    <div class="nonrecog-list">
+  `;
+  d.nonrecogList.forEach(item => {
+    html += `
+      <div class="nonrecog-row">
+        <div class="nonrecog-flag">${item.flag}</div>
+        <div class="nonrecog-info">
+          <div class="country-name">${item.name}</div>
+          <div class="reason">${item.reason}</div>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+
+  // Section 3: UN Vote Alignment
+  html += `
+    <div class="section-head">
+      <span class="stitle">${d.alignTitle}</span>
+      <span class="smeta">Top 8</span>
+    </div>
+    <div class="align-chart">
+  `;
+  d.alignData.forEach(item => {
+    html += `
+      <div class="align-row">
+        <div class="align-flag">${item.flag}</div>
+        <div class="align-name">${item.name}</div>
+        <div class="align-bar-wrap">
+          <div class="align-bar" style="width:${item.pct}%"></div>
+        </div>
+        <div class="align-pct">${item.pct}%</div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+
+  // Section 4: Diplomatic Status
+  html += `
+    <div class="section-head">
+      <span class="stitle">${d.diploTitle}</span>
+      <span class="smeta">Key memberships</span>
+    </div>
+    <div class="diplo-grid">
+  `;
+  d.diploData.forEach(item => {
+    html += `
+      <div class="diplo-cell">
+        <div class="dk">${item.k}</div>
+        <div class="dv ${item.cls}">${item.v}</div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+
+  body.innerHTML = html;
+
+  // Animate bars in
+  requestAnimationFrame(() => {
+    document.querySelectorAll(".align-bar").forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = "0";
+      requestAnimationFrame(() => { bar.style.width = w; });
+    });
+  });
+}
+
+/* =====================================================
+   STATE MANAGEMENT
+   ===================================================== */
+let currentState = "kosovo";
+
+function setState(state) {
+  currentState = state;
+
+  // Update handoff buttons
+  document.getElementById("btnKosovo").classList.toggle("on", state === "kosovo");
+  document.getElementById("btnTaiwan").classList.toggle("on", state === "taiwan");
+
+  // Show/hide left pane rows
+  document.getElementById("kosovoRow").style.display = state === "kosovo" ? "" : "none";
+  document.getElementById("taiwanRow").style.display = state === "taiwan" ? "" : "none";
+
+  // Update map header
+  const d = DATA[state];
+  document.getElementById("mapTitle").textContent = d.mapTitle;
+  document.getElementById("mapEyebrow").textContent = d.mapEyebrow;
+  document.getElementById("legendRecog").textContent = d.legendRecog;
+  document.getElementById("legendNonrecog").textContent = d.legendNonrecog;
+
+  // Update subject label
+  document.getElementById("subjectLabel").textContent = state === "taiwan" ? "" : "XK";
+
+  // Apply map colors
+  applyMapState(state);
+
+  // Render right pane
+  renderRelations(state);
+}
+
+function selectCountry(row) {
+  document.querySelectorAll(".country-row").forEach(r => r.classList.remove("on"));
+  row.classList.add("on");
+}
+
+/* =====================================================
+   THEME TOGGLE
+   ===================================================== */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute("data-theme") === "dark";
+  html.setAttribute("data-theme", isDark ? "light" : "dark");
+  document.getElementById("themeBtn").textContent = isDark ? "Dark" : "Light";
+  // Re-apply map to pick up new CSS variables
+  applyMapState(currentState);
+}
+
+/* =====================================================
+   INIT
+   ===================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+  applyMapState("kosovo");
+  renderRelations("kosovo");
+});
+</script>
+</body>
+</html>

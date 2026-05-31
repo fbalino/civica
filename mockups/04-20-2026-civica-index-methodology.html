@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica Index — Methodology (Mockup)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-heading: 'Fraunces', Georgia, serif;
+    --font-body: 'Inter', -apple-system, sans-serif;
+    --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    --color-bg: #16140f;
+    --color-bg-nav: rgba(22,20,15,0.92);
+    --color-surface-elevated: #221e16;
+    --color-text-primary: #ebe6d6;
+    --color-text-60: #c4bdae;
+    --color-text-50: rgba(235,230,214,0.64);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(235,230,214,0.50);
+    --color-text-25: rgba(235,230,214,0.48);
+    --color-text-20: rgba(235,230,214,0.40);
+    --color-accent: oklch(68% 0.15 35);
+    --color-card-bg: #221e16;
+    --color-card-border: #3d382d;
+    --color-card-hover-bg: #2b2619;
+    --color-divider: #3d382d;
+    --color-grid-bg: #221e16;
+    --color-grid-cell: #16140f;
+    --tier-exceptional: oklch(68% 0.14 145);
+    --tier-strong: oklch(60% 0.11 155);
+    --tier-mixed: oklch(75% 0.14 75);
+    --tier-weak: oklch(62% 0.15 45);
+    --tier-failed: oklch(55% 0.18 25);
+  }
+  html[data-theme="light"] {
+    --color-bg: #f4f1ea;
+    --color-bg-nav: rgba(244,241,234,0.92);
+    --color-surface-elevated: #ebe6d6;
+    --color-text-primary: #1a1a1a;
+    --color-text-60: #3d382d;
+    --color-text-50: rgba(26,26,26,0.62);
+    --color-text-40: #8a8370;
+    --color-text-30: rgba(26,26,26,0.53);
+    --color-text-25: rgba(26,26,26,0.48);
+    --color-text-20: rgba(26,26,26,0.38);
+    --color-accent: oklch(58% 0.14 35);
+    --color-card-bg: #ebe6d6;
+    --color-card-border: #c4bdae;
+    --color-card-hover-bg: #e2dcc8;
+    --color-divider: #c4bdae;
+    --color-grid-bg: #ebe6d6;
+    --color-grid-cell: #f4f1ea;
+    --tier-exceptional: oklch(55% 0.12 145);
+    --tier-strong: oklch(48% 0.10 155);
+    --tier-mixed: oklch(65% 0.14 75);
+    --tier-weak: oklch(55% 0.15 45);
+    --tier-failed: oklch(52% 0.18 25);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-body); background: var(--color-bg); color: var(--color-text-primary); line-height: 1.7; -webkit-font-smoothing: antialiased; transition: background-color .3s, color .2s; }
+
+  .nav { position: sticky; top: 0; z-index: 40; backdrop-filter: blur(10px); background: var(--color-bg-nav); border-bottom: 1px solid var(--color-divider); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .nav-brand { font-family: var(--font-heading); font-size: 22px; letter-spacing: -0.02em; color: var(--color-text-primary); text-decoration: none; }
+  .nav-brand em { font-style: normal; color: var(--color-accent); }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-40); text-decoration: none; padding: 4px 0; border-bottom: 1px solid transparent; }
+  .nav-links a.active { color: var(--color-text-primary); border-bottom-color: var(--color-accent); }
+  .theme-toggle { background: transparent; color: var(--color-text-50); border: 1px solid var(--color-card-border); padding: 6px 10px; border-radius: 4px; cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .meth-layout {
+    max-width: 1200px; margin: 0 auto; padding: 0 40px;
+    display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 64px;
+  }
+
+  /* TOC sidebar */
+  aside.toc {
+    position: sticky; top: 80px; align-self: start;
+    padding: 60px 0 40px;
+  }
+  .toc-label {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--color-text-30); margin-bottom: 14px;
+  }
+  .toc-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .toc-list a {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 12px; color: var(--color-text-40); text-decoration: none;
+    letter-spacing: 0.03em; padding-left: 10px;
+    border-left: 2px solid var(--color-divider);
+    line-height: 1.4;
+  }
+  .toc-list a:hover { color: var(--color-text-primary); border-left-color: var(--color-text-40); }
+  .toc-list a.active { color: var(--color-text-primary); border-left-color: var(--color-accent); }
+
+  /* article */
+  article { padding: 60px 0 80px; max-width: 760px; }
+  .breadcrumb { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-30); margin-bottom: 16px; }
+  .breadcrumb a { color: var(--color-text-30); text-decoration: none; }
+
+  .page-title {
+    font-family: var(--font-heading); font-size: 56px; font-weight: 400;
+    letter-spacing: -0.04em; line-height: 1.02;
+    margin-bottom: 12px;
+  }
+  .page-meta {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 12px; letter-spacing: 0.03em; color: var(--color-text-30);
+    margin-bottom: 48px; display: flex; gap: 12px; flex-wrap: wrap;
+  }
+  .page-meta span { color: var(--color-text-20); }
+
+  .abstract {
+    font-family: var(--font-heading); font-size: 22px; line-height: 1.5;
+    color: var(--color-text-60); letter-spacing: -0.01em;
+    border-left: 3px solid var(--color-accent);
+    padding: 4px 0 4px 24px; margin-bottom: 56px;
+  }
+
+  h2 {
+    font-family: var(--font-heading); font-size: 36px; font-weight: 400;
+    letter-spacing: -0.03em; line-height: 1.1;
+    margin: 56px 0 20px; scroll-margin-top: 80px;
+  }
+  h2 .num {
+    font-family: var(--font-mono); font-weight: 500;
+    font-size: 14px; letter-spacing: 0.12em; color: var(--color-text-30);
+    display: block; margin-bottom: 8px; text-transform: uppercase;
+  }
+  h3 {
+    font-family: var(--font-heading); font-size: 22px; font-weight: 500;
+    letter-spacing: -0.01em; line-height: 1.25;
+    margin: 32px 0 12px;
+  }
+  p { color: var(--color-text-60); margin-bottom: 16px; font-size: 16px; }
+  p strong { color: var(--color-text-primary); font-weight: 500; }
+  a { color: var(--color-accent); }
+
+  .formula {
+    background: var(--color-grid-cell);
+    border: 1px solid var(--color-card-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 4px; padding: 20px 24px;
+    font-family: var(--font-mono); font-weight: 500; font-size: 13px;
+    color: var(--color-text-primary); line-height: 1.7;
+    margin: 20px 0 24px; white-space: pre; overflow-x: auto;
+  }
+
+  table {
+    width: 100%; border-collapse: collapse; margin: 16px 0 28px;
+    font-size: 14px; font-family: var(--font-mono); font-weight: 500;
+  }
+  thead th {
+    text-align: left; padding: 12px 14px; background: var(--color-grid-cell);
+    border-top: 1px solid var(--color-card-border);
+    border-bottom: 1px solid var(--color-card-border);
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--color-text-30); font-weight: 500;
+  }
+  tbody td { padding: 14px; border-bottom: 1px solid var(--color-divider); color: var(--color-text-60); vertical-align: top; line-height: 1.5; }
+  tbody tr:hover { background: var(--color-grid-cell); }
+  .weight-cell {
+    font-family: var(--font-heading); font-size: 16px; font-weight: 500;
+    color: var(--color-text-primary); letter-spacing: -0.01em;
+  }
+
+  /* dimension weights visualization */
+  .weights-bar {
+    display: flex; margin: 8px 0 36px; height: 44px;
+    border-radius: 2px; overflow: hidden; border: 1px solid var(--color-card-border);
+  }
+  .weight-slice {
+    display: flex; flex-direction: column; justify-content: center; padding: 0 14px;
+    font-family: var(--font-mono); font-weight: 500; font-size: 11px;
+    color: #16140f; min-width: 80px;
+    border-right: 1px solid rgba(0,0,0,0.2);
+  }
+  .weight-slice:last-child { border-right: none; }
+  .weight-slice strong { font-family: var(--font-heading); font-size: 15px; font-weight: 500; letter-spacing: -0.01em; display: block; }
+  .weight-slice small { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+
+  .tier-scale-viz {
+    display: flex; height: 52px; margin: 10px 0 32px;
+    border-radius: 2px; overflow: hidden; border: 1px solid var(--color-card-border);
+  }
+  .tier-scale-cell {
+    flex: 1; padding: 8px 12px; display: flex; flex-direction: column; justify-content: center;
+    font-family: var(--font-mono); font-weight: 500; font-size: 10px; letter-spacing: 0.08em;
+    color: #16140f;
+  }
+  .tier-scale-cell strong { font-family: var(--font-heading); font-size: 14px; font-weight: 500; }
+
+  /* version strip */
+  .version-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    background: var(--color-grid-bg); border: 1px solid var(--color-card-border);
+    border-radius: 4px; overflow: hidden; margin: 24px 0 48px;
+  }
+  .version-cell { background: var(--color-grid-cell); padding: 18px 20px; }
+  .version-label { font-family: var(--font-mono); font-weight: 500; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--color-text-30); margin-bottom: 6px; }
+  .version-value { font-family: var(--font-heading); font-size: 20px; letter-spacing: -0.02em; }
+
+  @media (max-width: 900px) {
+    .meth-layout { grid-template-columns: 1fr; gap: 0; padding: 0 20px; }
+    aside.toc { position: static; padding: 32px 0 0; }
+    .toc-list { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+    .toc-list a { padding: 4px 10px; border-left: none; border: 1px solid var(--color-card-border); border-radius: 2px; }
+    .page-title { font-size: 40px; }
+    h2 { font-size: 28px; }
+    .version-strip { grid-template-columns: 1fr 1fr; }
+    .weights-bar, .tier-scale-viz { flex-wrap: wrap; height: auto; }
+    .weight-slice, .tier-scale-cell { flex: 1 1 50%; padding: 10px; }
+    .nav-inner { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">Civica <em>Atlas</em></a>
+    <div class="nav-links">
+      <a href="#">Countries</a>
+      <a href="#" class="active">Index</a>
+      <a href="#">Rankings</a>
+      <a href="#">Blog</a>
+      <button class="theme-toggle" onclick="toggleTheme()">Toggle theme</button>
+    </div>
+  </div>
+</nav>
+
+<div class="meth-layout">
+
+  <aside class="toc" aria-label="On this page">
+    <div class="toc-label">On this page</div>
+    <ol class="toc-list">
+      <li><a href="#purpose" class="active">1 · Purpose</a></li>
+      <li><a href="#scale">2 · Scale</a></li>
+      <li><a href="#ci">3 · Civica Index (CI)</a></li>
+      <li><a href="#cp">4 · Civica Pulse (CP)</a></li>
+      <li><a href="#gov-modifier">5 · Government modifier</a></li>
+      <li><a href="#limitations">6 · Limitations</a></li>
+      <li><a href="#citation">7 · Publication & citation</a></li>
+      <li><a href="#site">8 · Site integration</a></li>
+      <li><a href="#versioning">9 · Versioning</a></li>
+    </ol>
+  </aside>
+
+  <article>
+    <div class="breadcrumb"><a href="#">← Index</a> / Methodology</div>
+    <h1 class="page-title">The Civica Index methodology.</h1>
+    <div class="page-meta">
+      <span>Version 1.0</span><span>·</span>
+      <span>April 2026</span><span>·</span>
+      <span>DOI pending</span><span>·</span>
+      <a href="#" style="text-decoration: none;">Download PDF →</a>
+    </div>
+
+    <p class="abstract">
+      The Civica Index is a composite governance score assigned to every sovereign state — a structural score (CI) updated quarterly, and a real-time Pulse (CP) updated daily from classified events. Transparent sources. Fixed weights. Reproducible. Citable.
+    </p>
+
+    <section id="purpose">
+      <h2><span class="num">Section 1</span>Purpose</h2>
+      <p>The Civica Index measures overall quality of governance — democratic participation, institutional strength, rule of law, human development, freedom, and security — through two complementary scores:</p>
+      <ul style="color: var(--color-text-60); padding-left: 20px; margin-bottom: 24px;">
+        <li style="margin-bottom: 8px;"><strong>Civica Index (CI)</strong> — structural, updated quarterly, answers "how well-governed over time?"</li>
+        <li><strong>Civica Pulse (CP)</strong> — event-sensitive, updated daily, answers "what's the state <em>right now</em>?"</li>
+      </ul>
+      <p>The Index is transparent (every component traces to a public source), reproducible (methodology fully documented), and citable (structured for academic, journalistic, and institutional use).</p>
+    </section>
+
+    <section id="scale">
+      <h2><span class="num">Section 2</span>The 0–100 scale</h2>
+      <p>Both CI and CP are expressed on a 0–100 scale, where higher is better. Five interpretive tiers:</p>
+
+      <div class="tier-scale-viz" role="img" aria-label="Five-tier interpretation scale">
+        <div class="tier-scale-cell" style="background: var(--tier-failed);"><strong>0–24</strong>Failed / authoritarian</div>
+        <div class="tier-scale-cell" style="background: var(--tier-weak);"><strong>25–49</strong>Weak</div>
+        <div class="tier-scale-cell" style="background: var(--tier-mixed);"><strong>50–74</strong>Mixed</div>
+        <div class="tier-scale-cell" style="background: var(--tier-strong);"><strong>75–89</strong>Strong</div>
+        <div class="tier-scale-cell" style="background: var(--tier-exceptional);"><strong>90–100</strong>Exceptional</div>
+      </div>
+    </section>
+
+    <section id="ci">
+      <h2><span class="num">Section 3</span>Civica Index — structural</h2>
+      <h3>3.1 · The six dimensions</h3>
+      <p>The CI is a weighted composite of six dimensions, each sourced from established, peer-reviewed or institutionally maintained open datasets. Raw values are normalized to 0–100 before weighting:</p>
+
+      <div class="weights-bar" role="img" aria-label="Dimension weights visualization">
+        <div class="weight-slice" style="background: var(--tier-exceptional); flex: 30;"><strong>30%</strong><small>Democratic quality</small></div>
+        <div class="weight-slice" style="background: var(--tier-strong); flex: 20;"><strong>20%</strong><small>Rule of law</small></div>
+        <div class="weight-slice" style="background: var(--tier-mixed); flex: 15;"><strong>15%</strong><small>Human dev.</small></div>
+        <div class="weight-slice" style="background: oklch(70% 0.13 35); flex: 15;"><strong>15%</strong><small>Freedom</small></div>
+        <div class="weight-slice" style="background: var(--tier-weak); flex: 10;"><strong>10%</strong><small>Corruption</small></div>
+        <div class="weight-slice" style="background: var(--tier-failed); flex: 10;"><strong>10%</strong><small>Stability</small></div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Dimension</th><th>Weight</th><th>Primary source</th><th>Secondary source</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Democratic quality</td><td class="weight-cell">30%</td><td>V-Dem Liberal Democracy</td><td>V-Dem Polyarchy</td></tr>
+          <tr><td>Rule of law & institutions</td><td class="weight-cell">20%</td><td>World Bank WGI</td><td>V-Dem Rule of Law</td></tr>
+          <tr><td>Human development</td><td class="weight-cell">15%</td><td>UNDP HDI</td><td>WB income/edu/health</td></tr>
+          <tr><td>Freedom & rights</td><td class="weight-cell">15%</td><td>Freedom in the World</td><td>RSF Press Freedom</td></tr>
+          <tr><td>Corruption control</td><td class="weight-cell">10%</td><td>Transparency Int'l CPI</td><td>WGI Control of Corruption</td></tr>
+          <tr><td>Stability & security</td><td class="weight-cell">10%</td><td>Global Peace Index</td><td>Fragile States Index</td></tr>
+        </tbody>
+      </table>
+
+      <h3>3.2 · Normalization</h3>
+      <p>Each source uses a different native scale. All are normalized to 0–100 using min-max normalization across the full dataset of countries:</p>
+      <div class="formula">normalized_score = ((raw_value − global_min) / (global_max − global_min)) × 100</div>
+
+      <p>For inverted scales (where lower = better, such as GPI and Freedom House), the normalization is reversed.</p>
+
+      <h3>3.3 · Composite</h3>
+      <div class="formula">CI = (0.30 × democratic_quality)
+   + (0.20 × rule_of_law)
+   + (0.15 × human_development)
+   + (0.15 × freedom_rights)
+   + (0.10 × corruption_control)
+   + (0.10 × stability_security)</div>
+
+      <h3>3.4 · Update frequency</h3>
+      <p>The CI updates <strong>quarterly</strong>. Between publications, the CI carries forward the most recent available value per source. The CI never moves between quarterly recalculations — that's what the Pulse is for.</p>
+
+      <h3>3.5 · Missing data</h3>
+      <p>If a country has no data for a dimension, that dimension is excluded and remaining weights are re-proportioned to sum to 100%. The CI is flagged <strong>"partial"</strong>. If fewer than three of the six dimensions have data, no CI is calculated.</p>
+    </section>
+
+    <section id="cp">
+      <h2><span class="num">Section 4</span>Civica Pulse — real-time</h2>
+      <h3>4.1 · Concept</h3>
+      <p>The Pulse starts at the country's current CI and is modified by a real-time event impact layer:</p>
+      <div class="formula">CP = CI + EventImpact</div>
+
+      <h3>4.2 · Event ingestion</h3>
+      <p>An automated pipeline monitors global news sources daily (GDELT, Google News, Reuters/AP, country gazettes). It filters for events tagged to a specific country that fall within governance-relevant categories.</p>
+
+      <h3>4.3 · Event classification</h3>
+      <p>Each qualifying event is classified by an LLM agent (Claude API) into one of twelve directional categories — from <em>armed conflict</em> (negative) to <em>democratic election</em> (positive). Every score is logged with category, severity, confidence, and a one-sentence justification. All are published in the Pulse changelog for audit.</p>
+
+      <h3>4.4 · Severity scale (−10 to +10)</h3>
+      <table>
+        <thead><tr><th>Score</th><th>Meaning</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td class="weight-cell" style="color: var(--tier-failed)">−10</td><td>Catastrophic governance failure</td><td>Full-scale war, genocide, state collapse</td></tr>
+          <tr><td class="weight-cell" style="color: var(--tier-weak)">−7 to −9</td><td>Severe</td><td>Military coup, mass civilian casualties, total media blackout</td></tr>
+          <tr><td class="weight-cell" style="color: var(--tier-mixed)">−4 to −6</td><td>Significant</td><td>Major protest crackdown, opposition leader imprisoned</td></tr>
+          <tr><td class="weight-cell" style="color: var(--color-text-40)">−1 to −3</td><td>Moderate</td><td>Journalist arrested, minor corruption scandal</td></tr>
+          <tr><td class="weight-cell" style="color: var(--color-text-40)">0</td><td>Neutral</td><td>Routine diplomatic event, sports, weather</td></tr>
+          <tr><td class="weight-cell" style="color: var(--tier-strong)">+1 to +3</td><td>Moderate positive</td><td>Minor reform, transparency improvement</td></tr>
+          <tr><td class="weight-cell" style="color: var(--tier-exceptional)">+4 to +6</td><td>Significant positive</td><td>Anti-corruption conviction, rights expansion</td></tr>
+          <tr><td class="weight-cell" style="color: var(--tier-exceptional)">+7 to +10</td><td>Transformative positive</td><td>Peaceful democratic transition, comprehensive peace agreement</td></tr>
+        </tbody>
+      </table>
+
+      <h3>4.5 · Temporal decay</h3>
+      <p>Events lose influence over time. The decay is exponential with a <strong>30-day half-life</strong>:</p>
+      <div class="formula">decayed_impact = severity × confidence × e^(−0.693 × days / 30)</div>
+      <p>An event from today counts 100%. From 30 days ago, 50%. From 60 days, 25%. From 90 days, 12.5%. From 120+ days, negligible (&lt;6%).</p>
+
+      <h3>4.6 · Aggregation and clamp</h3>
+      <div class="formula">EventImpact = Σ (severity × confidence × e^(−0.693 × days / 30))
+CP          = clamp(CI + clamp(EventImpact, −30, +30), 0, 100)</div>
+      <p>The ±30-point cap on EventImpact prevents a single catastrophic event from completely overriding years of structural data.</p>
+
+      <h3>4.7 · Update frequency</h3>
+      <p>The Pulse recomputes <strong>daily</strong>. Every Pulse movement comes with a public changelog entry showing every contributing event, its category, severity, confidence, and justification.</p>
+    </section>
+
+    <section id="gov-modifier">
+      <h2><span class="num">Section 5</span>Government-type modifier</h2>
+      <p>The CI does <strong>not</strong> apply a fixed bonus or penalty per government type. Instead, the site publishes an empirical observation layer — <a href="#">Governance Outcomes by Government Type</a> — showing average CI, distribution spread, and 20-year trajectories for each category. The data speaks for itself.</p>
+    </section>
+
+    <section id="limitations">
+      <h2><span class="num">Section 6</span>Data quality & limitations</h2>
+      <p><strong>Known limitations.</strong> The CI is only as current as its slowest-updating source (some indices publish 12–18 months behind). Pulse event scoring relies on LLM judgment, which may exhibit biases in event selection or severity. Countries with limited media coverage will have fewer detected events, potentially making their Pulse artificially stable. The ±30-point cap prevents extreme scores but may understate truly catastrophic situations.</p>
+      <p><strong>Mitigations.</strong> All LLM event scores are logged with justifications for audit. A quarterly human review samples 5% of scored events. The methodology is versioned; weight/source/formula changes publish with a changelog. Countries with fewer than 3 events in 90 days are flagged <em>low-confidence</em>.</p>
+    </section>
+
+    <section id="citation">
+      <h2><span class="num">Section 7</span>Publication & citation</h2>
+      <div class="formula">Civica Index 2026. Civica Atlas. https://civicaatlas.org/index
+Civica Pulse for [Country], [Date]. Civica Atlas. https://civicaatlas.org/index/[slug]</div>
+      <h3>API access</h3>
+      <div class="formula">GET https://civicaatlas.org/api/v1/index/{country_slug}
+GET https://civicaatlas.org/api/v1/pulse/{country_slug}
+GET https://civicaatlas.org/api/v1/index/rankings
+GET https://civicaatlas.org/api/v1/pulse/changelog/{country_slug}</div>
+      <p>A small <a href="#">embeddable badge</a> showing a country's CI and CP is available for news organizations, blogs, and other platforms to embed with attribution.</p>
+    </section>
+
+    <section id="site">
+      <h2><span class="num">Section 8</span>Site integration</h2>
+      <table>
+        <thead><tr><th>Page</th><th>What it shows</th></tr></thead>
+        <tbody>
+          <tr><td>/index</td><td>Global leaderboard · all countries ranked by CI or CP, filterable</td></tr>
+          <tr><td>/index/[slug]</td><td>Country detail · dimension breakdown, Pulse changelog, history</td></tr>
+          <tr><td>/index/compare</td><td>Overlay two or three countries on a timeline</td></tr>
+          <tr><td>/index/methodology</td><td>This document</td></tr>
+          <tr><td>/index/government-types</td><td>Governance outcomes by government type</td></tr>
+          <tr><td>/index/changelog</td><td>Global feed of all Pulse movements across all countries</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="versioning">
+      <h2><span class="num">Section 9</span>Versioning</h2>
+      <div class="version-strip">
+        <div class="version-cell"><div class="version-label">Version</div><div class="version-value">1.0</div></div>
+        <div class="version-cell"><div class="version-label">Published</div><div class="version-value">Apr 2026</div></div>
+        <div class="version-cell"><div class="version-label">Countries covered</div><div class="version-value">197</div></div>
+        <div class="version-cell"><div class="version-label">Open-source datasets</div><div class="version-value">9</div></div>
+      </div>
+      <p>Changes to weights, sources, formulas, or the event-scoring framework will be documented in a public changelog and assigned a new version number. Historical CI/CP values are never retroactively recalculated; they're preserved as-is with their methodology version recorded. This way, cited values remain stable forever.</p>
+
+      <p style="margin-top: 40px; font-family: var(--font-mono); font-weight: 500; font-size: 12px; color: var(--color-text-30); letter-spacing: 0.03em;">
+        Contact: <a href="mailto:methodology@civicaatlas.org" style="color: var(--color-accent);">methodology@civicaatlas.org</a>
+      </p>
+    </section>
+
+  </article>
+
+</div>
+
+<script>
+  function toggleTheme() {
+    const root = document.documentElement;
+    root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+  }
+  /* TOC scrollspy */
+  const sections = document.querySelectorAll('article section[id]');
+  const links = document.querySelectorAll('.toc-list a');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.hash === '#' + e.target.id));
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  sections.forEach(s => obs.observe(s));
+</script>
+
+</body>
+</html>

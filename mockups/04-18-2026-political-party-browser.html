@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Civica — Political Party Browser</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: #2a2a3a;
+    --accent: #4f8ef7;
+    --accent2: #7c5ef7;
+    --text: #e8e8f0;
+    --text2: #9090a8;
+    --text3: #5a5a72;
+    --green: #34c77a;
+    --amber: #f5a623;
+    --red: #f54d4d;
+    --radius: 10px;
+    --font: 'IBM Plex Sans', system-ui, sans-serif;
+    --serif: 'Fraunces', Georgia, serif;
+  }
+  [data-theme="light"] {
+    --bg: #f5f5f7;
+    --surface: #ffffff;
+    --surface2: #f0f0f5;
+    --border: #dcdce8;
+    --text: #0a0a1a;
+    --text2: #4a4a6a;
+    --text3: #9090a8;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); }
+
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo { font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--accent); }
+  .nav-links { display: flex; gap: 24px; list-style: none; }
+  .nav-links a { color: var(--text2); text-decoration: none; font-size: 14px; }
+  .nav-links a.active { color: var(--text); }
+  .theme-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .layout { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 56px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px 0;
+    overflow-y: auto;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+  }
+  .sidebar-section { padding: 0 16px; margin-bottom: 24px; }
+  .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); font-weight: 600; margin-bottom: 10px; padding: 0 8px; }
+  .sidebar-search {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-size: 13px;
+    margin-bottom: 16px;
+    outline: none;
+    font-family: var(--font);
+  }
+  .sidebar-search:focus { border-color: var(--accent); }
+  .ideology-filters { display: flex; flex-direction: column; gap: 4px; }
+  .ideology-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text2);
+    transition: background 0.1s;
+    border: none;
+    background: transparent;
+    text-align: left;
+    width: 100%;
+  }
+  .ideology-item:hover, .ideology-item.active { background: var(--surface2); color: var(--text); }
+  .ideology-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .ideology-count { margin-left: auto; font-size: 11px; color: var(--text3); }
+
+  /* COMPASS */
+  .compass-section { padding: 0 16px 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .compass-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text3); font-weight: 600; margin-bottom: 12px; }
+  .compass {
+    position: relative;
+    width: 248px;
+    height: 140px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .compass-axis {
+    position: absolute;
+    background: var(--border);
+  }
+  .compass-axis.h { width: 100%; height: 1px; top: 50%; left: 0; }
+  .compass-axis.v { width: 1px; height: 100%; left: 50%; top: 0; }
+  .compass-label {
+    position: absolute;
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .compass-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .compass-dot:hover { transform: translate(-50%, -50%) scale(1.5); }
+  .compass-tooltip {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.1s;
+    z-index: 10;
+  }
+
+  /* MAIN */
+  .main { padding: 24px; }
+  .main-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+  }
+  .main-header h1 { font-family: var(--serif); font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  .main-header p { font-size: 14px; color: var(--text2); max-width: 480px; }
+  .sort-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .result-count { font-size: 13px; color: var(--text3); }
+  .view-toggle { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .view-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text2);
+    border-right: 1px solid var(--border);
+  }
+  .view-btn:last-child { border-right: none; }
+  .view-btn.active { background: var(--surface2); color: var(--text); }
+
+  /* PARTY CARDS */
+  .party-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .party-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .party-card:hover { border-color: var(--accent); }
+  .party-card-top {
+    padding: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border);
+  }
+  .party-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+  }
+  .party-meta { flex: 1; min-width: 0; }
+  .party-name { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
+  .party-fullname { font-size: 12px; color: var(--text3); margin-bottom: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .party-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .party-card-stats {
+    padding: 14px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .mini-stat { text-align: center; }
+  .mini-stat-val { font-size: 16px; font-weight: 700; }
+  .mini-stat-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+  .seat-bar { height: 3px; background: var(--border); border-radius: 2px; margin: 12px 20px; overflow: hidden; }
+  .seat-fill { height: 100%; border-radius: 2px; }
+  .party-countries {
+    padding: 12px 20px;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+  }
+  .country-flag { font-size: 18px; cursor: pointer; }
+  .country-flag:hover { transform: scale(1.2); }
+
+  /* FEATURED PARTY */
+  .featured {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .featured-left h2 { font-family: var(--serif); font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .featured-subtitle { font-size: 13px; color: var(--text3); margin-bottom: 16px; }
+  .featured-desc { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 16px; }
+  .featured-actions { display: flex; gap: 10px; }
+  .btn-primary {
+    padding: 8px 16px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--font);
+  }
+  .btn-ghost {
+    padding: 8px 16px;
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: var(--font);
+  }
+  .chart-container { position: relative; }
+  .chart-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 12px; }
+  .seat-history { display: flex; flex-direction: column; gap: 6px; }
+  .sh-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .sh-year { color: var(--text3); width: 36px; }
+  .sh-bar-wrap { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .sh-bar { height: 100%; border-radius: 3px; }
+  .sh-pct { color: var(--text2); width: 32px; text-align: right; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+    .featured { grid-template-columns: 1fr; }
+    .party-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">Civica</span>
+  <ul class="nav-links">
+    <li><a href="#">Atlas</a></li>
+    <li><a href="#">Countries</a></li>
+    <li><a href="#" class="active">Parties</a></li>
+    <li><a href="#">Rankings</a></li>
+    <li><a href="#">Compare</a></li>
+  </ul>
+  <button class="theme-btn" onclick="toggleTheme()">☀ Light</button>
+</nav>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <input class="sidebar-search" placeholder="Search parties…" oninput="filterParties(this.value)">
+
+      <div class="sidebar-title">Political Compass</div>
+      <div class="compass-section">
+        <div class="compass" id="compass">
+          <div class="compass-axis h"></div>
+          <div class="compass-axis v"></div>
+          <div class="compass-label" style="top:4px; left:50%; transform:translateX(-50%)">Authoritarian</div>
+          <div class="compass-label" style="bottom:4px; left:50%; transform:translateX(-50%)">Libertarian</div>
+          <div class="compass-label" style="left:4px; top:50%; transform:translateY(-50%); writing-mode:vertical-rl; transform:rotate(180deg) translateX(50%)">Left</div>
+          <div class="compass-label" style="right:4px; top:50%; transform:translateY(-50%); writing-mode:vertical-rl;">Right</div>
+
+          <!-- Party dots plotted on compass: x=left-right, y=auth-lib -->
+          <div class="compass-dot" style="left:35%;top:38%;background:#dd3366;" title="Labour (UK)"></div>
+          <div class="compass-dot" style="left:55%;top:35%;background:#0057a8;" title="CDU (Germany)"></div>
+          <div class="compass-dot" style="left:52%;top:32%;background:#4f8ef7;" title="Renaissance (France)"></div>
+          <div class="compass-dot" style="left:72%;top:25%;background:#c0392b;" title="Fratelli d'Italia"></div>
+          <div class="compass-dot" style="left:60%;top:30%;background:#c0392b;" title="Republican (US)"></div>
+          <div class="compass-dot" style="left:42%;top:55%;background:#2ecc71;" title="Greens (DE)"></div>
+          <div class="compass-dot" style="left:28%;top:48%;background:#e74c3c;" title="Workers Party (BR)"></div>
+          <div class="compass-dot" style="left:65%;top:22%;background:#ff9933;" title="BJP (India)"></div>
+        </div>
+        <div style="font-size:11px; color: var(--text3); margin-top:8px;">Source: V-Party Dataset · 163 countries</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Filter by Ideology</div>
+      <div class="ideology-filters">
+        <button class="ideology-item active" onclick="filterIdeology(this, 'all')">
+          <span class="ideology-dot" style="background: var(--text3)"></span>
+          All parties
+          <span class="ideology-count">1,043</span>
+        </button>
+        <button class="ideology-item" onclick="filterIdeology(this, 'far-left')">
+          <span class="ideology-dot" style="background:#e74c3c"></span>
+          Far Left
+          <span class="ideology-count">89</span>
+        </button>
+        <button class="ideology-item" onclick="filterIdeology(this, 'left')">
+          <span class="ideology-dot" style="background:#e98d8d"></span>
+          Left
+          <span class="ideology-count">187</span>
+        </button>
+        <button class="ideology-item" onclick="filterIdeology(this, 'center-left')">
+          <span class="ideology-dot" style="background:#f0b8b8"></span>
+          Centre-Left
+          <span class="ideology-count">214</span>
+        </button>
+        <button class="ideology-item" onclick="filterIdeology(this, 'center')">
+          <span class="ideology-dot" style="background:#a0a0c0"></span>
+          Centre
+          <span class="ideology-count">156</span>
+        </button>
+        <button class="ideology-item" onclick="filterIdeology(this, 'center-right')">
+          <span class="ideology-dot" style="background:#6ab4ff"></span>
+          Centre-Right
+          <span class="ideology-count">198</span>
+        </button>
+        <button class="ideology-item" onclick="filterIdeology(this, 'right')">
+          <span class="ideology-dot" style="background:#4488cc"></span>
+          Right
+          <span class="ideology-count">122</span>
+        </button>
+        <button class="ideology-item" onclick="filterIdeology(this, 'far-right')">
+          <span class="ideology-dot" style="background:#1a5599"></span>
+          Far Right
+          <span class="ideology-count">77</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Filter by Region</div>
+      <div class="ideology-filters">
+        <button class="ideology-item" onclick="filterIdeology(this,'eu')">🌍 Europe</button>
+        <button class="ideology-item" onclick="filterIdeology(this,'am')">🌎 Americas</button>
+        <button class="ideology-item" onclick="filterIdeology(this,'ap')">🌏 Asia-Pacific</button>
+        <button class="ideology-item" onclick="filterIdeology(this,'mena')">🌍 Middle East & Africa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <h1>Political Parties</h1>
+        <p>Browse 1,043 parties across 163 countries. Ideology data from the V-Party Dataset (2026) and Global Party Survey.</p>
+      </div>
+      <button class="theme-btn" style="flex-shrink:0">↗ Export data</button>
+    </div>
+
+    <!-- FEATURED: Social Democrats family -->
+    <div class="featured">
+      <div class="featured-left">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+          <div style="background:#dd3366; color:white; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:700;">FEATURED</div>
+          <span style="font-size:12px; color:var(--text3)">Party family · April 2026</span>
+        </div>
+        <h2>Social Democratic Party Family</h2>
+        <div class="featured-subtitle">Centre-left · 187 member parties in 89 countries</div>
+        <p class="featured-desc">Social democratic parties share a commitment to social justice, regulated capitalism, and a strong welfare state. The family includes Labour parties in Commonwealth nations, Socialist parties in Europe, and Workers' parties in Latin America. Most are members of the Socialist International.</p>
+        <div class="featured-actions">
+          <button class="btn-primary">Explore family</button>
+          <button class="btn-ghost">Compare parties</button>
+        </div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-title">Seat share trend — top 5 social-dem parties</div>
+        <div class="seat-history">
+          <div class="sh-row">
+            <span class="sh-year" style="width:90px; font-size:11px;">🇬🇧 Labour</span>
+            <div class="sh-bar-wrap"><div class="sh-bar" style="width:63%; background:#dd3366;"></div></div>
+            <span class="sh-pct">63%</span>
+          </div>
+          <div class="sh-row">
+            <span class="sh-year" style="width:90px; font-size:11px;">🇩🇪 SPD</span>
+            <div class="sh-bar-wrap"><div class="sh-bar" style="width:26%; background:#dd3366;"></div></div>
+            <span class="sh-pct">26%</span>
+          </div>
+          <div class="sh-row">
+            <span class="sh-year" style="width:90px; font-size:11px;">🇸🇪 SAP</span>
+            <div class="sh-bar-wrap"><div class="sh-bar" style="width:31%; background:#dd3366;"></div></div>
+            <span class="sh-pct">31%</span>
+          </div>
+          <div class="sh-row">
+            <span class="sh-year" style="width:90px; font-size:11px;">🇧🇷 PT</span>
+            <div class="sh-bar-wrap"><div class="sh-bar" style="width:13%; background:#dd3366;"></div></div>
+            <span class="sh-pct">13%</span>
+          </div>
+          <div class="sh-row">
+            <span class="sh-year" style="width:90px; font-size:11px;">🇦🇺 ALP</span>
+            <div class="sh-bar-wrap"><div class="sh-bar" style="width:52%; background:#dd3366;"></div></div>
+            <span class="sh-pct">52%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARTY GRID -->
+    <div class="sort-row">
+      <span class="result-count" id="result-count">Showing 6 parties</span>
+      <div style="margin-left: auto; display:flex; gap:8px;">
+        <select class="theme-btn" style="cursor:pointer;">
+          <option>Sort: Countries (most)</option>
+          <option>Sort: Name A–Z</option>
+          <option>Sort: Founded (newest)</option>
+          <option>Sort: Seat % (highest)</option>
+        </select>
+        <div class="view-toggle">
+          <button class="view-btn active">⊞ Grid</button>
+          <button class="view-btn">☰ List</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="party-grid" id="party-grid">
+
+      <!-- LABOUR UK -->
+      <div class="party-card">
+        <div class="party-card-top">
+          <div class="party-logo" style="background: #dd3366;">Lab</div>
+          <div class="party-meta">
+            <div class="party-name">Labour Party</div>
+            <div class="party-fullname">United Kingdom · Founded 1900</div>
+            <div class="party-tags">
+              <span class="tag" style="background:#2a0a1a; color:#dd3366;">Social Democracy</span>
+              <span class="tag" style="background:#1a1a2a; color:#9090a8;">Centre-Left</span>
+              <span class="tag" style="background:#0a1a0a; color:#34c77a;">↑ In gov.</span>
+            </div>
+          </div>
+        </div>
+        <div class="party-card-stats">
+          <div class="mini-stat">
+            <div class="mini-stat-val">412</div>
+            <div class="mini-stat-label">MPs</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">63%</div>
+            <div class="mini-stat-label">Seats</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">124yr</div>
+            <div class="mini-stat-label">Age</div>
+          </div>
+        </div>
+        <div class="seat-bar"><div class="seat-fill" style="width:63%; background:#dd3366;"></div></div>
+        <div class="party-countries" style="font-size:12px; color:var(--text3);">
+          <span class="country-flag">🇬🇧</span>
+          <span style="margin-left:6px; color:var(--text2);">1 country · Keir Starmer leads gov.</span>
+        </div>
+      </div>
+
+      <!-- CDU GERMANY -->
+      <div class="party-card">
+        <div class="party-card-top">
+          <div class="party-logo" style="background: #0057a8;">CDU</div>
+          <div class="party-meta">
+            <div class="party-name">Christian Democratic Union</div>
+            <div class="party-fullname">Germany · Founded 1945</div>
+            <div class="party-tags">
+              <span class="tag" style="background:#0a1a2a; color:#4f8ef7;">Christian Democracy</span>
+              <span class="tag" style="background:#1a1a2a; color:#9090a8;">Centre-Right</span>
+              <span class="tag" style="background:#0a1a0a; color:#34c77a;">↑ In gov.</span>
+            </div>
+          </div>
+        </div>
+        <div class="party-card-stats">
+          <div class="mini-stat">
+            <div class="mini-stat-val">208</div>
+            <div class="mini-stat-label">MPs</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">30%</div>
+            <div class="mini-stat-label">Seats</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">79yr</div>
+            <div class="mini-stat-label">Age</div>
+          </div>
+        </div>
+        <div class="seat-bar"><div class="seat-fill" style="width:30%; background:#0057a8;"></div></div>
+        <div class="party-countries" style="font-size:12px; color:var(--text3);">
+          <span class="country-flag">🇩🇪</span>
+          <span style="margin-left:6px; color:var(--text2);">Germany · Friedrich Merz leads gov.</span>
+        </div>
+      </div>
+
+      <!-- BJP INDIA -->
+      <div class="party-card">
+        <div class="party-card-top">
+          <div class="party-logo" style="background: linear-gradient(135deg, #ff9933, #e67e22);">BJP</div>
+          <div class="party-meta">
+            <div class="party-name">Bharatiya Janata Party</div>
+            <div class="party-fullname">India · Founded 1980</div>
+            <div class="party-tags">
+              <span class="tag" style="background:#2a1a0a; color:#ff9933;">Hindu Nationalism</span>
+              <span class="tag" style="background:#1a1a2a; color:#9090a8;">Right</span>
+              <span class="tag" style="background:#0a1a0a; color:#34c77a;">↑ In gov.</span>
+            </div>
+          </div>
+        </div>
+        <div class="party-card-stats">
+          <div class="mini-stat">
+            <div class="mini-stat-val">240</div>
+            <div class="mini-stat-label">MPs</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">44%</div>
+            <div class="mini-stat-label">Seats</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">44yr</div>
+            <div class="mini-stat-label">Age</div>
+          </div>
+        </div>
+        <div class="seat-bar"><div class="seat-fill" style="width:44%; background:#ff9933;"></div></div>
+        <div class="party-countries" style="font-size:12px; color:var(--text3);">
+          <span class="country-flag">🇮🇳</span>
+          <span style="margin-left:6px; color:var(--text2);">India · Narendra Modi leads gov.</span>
+        </div>
+      </div>
+
+      <!-- REPUBLICAN US -->
+      <div class="party-card">
+        <div class="party-card-top">
+          <div class="party-logo" style="background: #c0392b;">GOP</div>
+          <div class="party-meta">
+            <div class="party-name">Republican Party</div>
+            <div class="party-fullname">United States · Founded 1854</div>
+            <div class="party-tags">
+              <span class="tag" style="background:#2a0a0a; color:#ff6b6b;">National Conservatism</span>
+              <span class="tag" style="background:#1a1a2a; color:#9090a8;">Right</span>
+              <span class="tag" style="background:#0a1a0a; color:#34c77a;">↑ In gov.</span>
+            </div>
+          </div>
+        </div>
+        <div class="party-card-stats">
+          <div class="mini-stat">
+            <div class="mini-stat-val">220</div>
+            <div class="mini-stat-label">House seats</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">53</div>
+            <div class="mini-stat-label">Senate</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">170yr</div>
+            <div class="mini-stat-label">Age</div>
+          </div>
+        </div>
+        <div class="seat-bar"><div class="seat-fill" style="width:51%; background:#c0392b;"></div></div>
+        <div class="party-countries" style="font-size:12px; color:var(--text3);">
+          <span class="country-flag">🇺🇸</span>
+          <span style="margin-left:6px; color:var(--text2);">United States · Donald Trump leads gov.</span>
+        </div>
+      </div>
+
+      <!-- FIDESZ HUNGARY -->
+      <div class="party-card">
+        <div class="party-card-top">
+          <div class="party-logo" style="background: linear-gradient(135deg, #f39c12, #e67e22);">Fid</div>
+          <div class="party-meta">
+            <div class="party-name">Fidesz</div>
+            <div class="party-fullname">Hungary · Founded 1988</div>
+            <div class="party-tags">
+              <span class="tag" style="background:#2a1a0a; color:#f39c12;">National Conservatism</span>
+              <span class="tag" style="background:#2a0a0a; color:#ff6b6b;">Far Right</span>
+              <span class="tag" style="background:#0a1a0a; color:#34c77a;">↑ In gov.</span>
+            </div>
+          </div>
+        </div>
+        <div class="party-card-stats">
+          <div class="mini-stat">
+            <div class="mini-stat-val">135</div>
+            <div class="mini-stat-label">MPs</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">54%</div>
+            <div class="mini-stat-label">Seats</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">36yr</div>
+            <div class="mini-stat-label">Age</div>
+          </div>
+        </div>
+        <div class="seat-bar"><div class="seat-fill" style="width:54%; background:#f39c12;"></div></div>
+        <div class="party-countries" style="font-size:12px; color:var(--text3);">
+          <span class="country-flag">🇭🇺</span>
+          <span style="margin-left:6px; color:var(--text2);">Hungary · Viktor Orbán leads gov.</span>
+        </div>
+      </div>
+
+      <!-- PT BRAZIL -->
+      <div class="party-card">
+        <div class="party-card-top">
+          <div class="party-logo" style="background: #27ae60;">PT</div>
+          <div class="party-meta">
+            <div class="party-name">Partido dos Trabalhadores</div>
+            <div class="party-fullname">Brazil · Founded 1980</div>
+            <div class="party-tags">
+              <span class="tag" style="background:#0a2a1a; color:#34c77a;">Democratic Socialism</span>
+              <span class="tag" style="background:#1a1a2a; color:#9090a8;">Left</span>
+              <span class="tag" style="background:#0a1a0a; color:#34c77a;">↑ In gov.</span>
+            </div>
+          </div>
+        </div>
+        <div class="party-card-stats">
+          <div class="mini-stat">
+            <div class="mini-stat-val">68</div>
+            <div class="mini-stat-label">MPs</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">13%</div>
+            <div class="mini-stat-label">Seats</div>
+          </div>
+          <div class="mini-stat">
+            <div class="mini-stat-val">44yr</div>
+            <div class="mini-stat-label">Age</div>
+          </div>
+        </div>
+        <div class="seat-bar"><div class="seat-fill" style="width:13%; background:#27ae60;"></div></div>
+        <div class="party-countries" style="font-size:12px; color:var(--text3);">
+          <span class="country-flag">🇧🇷</span>
+          <span style="margin-left:6px; color:var(--text2);">Brazil · Lula leads gov.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding: 32px 0; text-align:center; color:var(--text3); font-size:13px;">
+      Showing 6 of 1,043 parties · <button class="btn-ghost" style="padding:6px 14px; margin-left:8px;">Load more</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleTheme() {
+    const d = document.documentElement;
+    const isLight = d.getAttribute('data-theme') === 'light';
+    d.setAttribute('data-theme', isLight ? '' : 'light');
+    document.querySelectorAll('.theme-btn')[0].textContent = isLight ? '☀ Light' : '🌙 Dark';
+  }
+
+  function filterIdeology(btn, type) {
+    document.querySelectorAll('.ideology-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  function filterParties(q) {
+    const cards = document.querySelectorAll('.party-card');
+    const lq = q.toLowerCase();
+    cards.forEach(c => {
+      c.style.display = c.textContent.toLowerCase().includes(lq) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>
