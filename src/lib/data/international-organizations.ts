@@ -137,6 +137,17 @@ export const ORGANIZATIONS: Organization[] = [
     hqCountry: "fra",
     memberCount: 194,
   },
+  {
+    id: "iaea",
+    slug: "iaea",
+    name: "IAEA",
+    fullName: "International Atomic Energy Agency",
+    type: "un",
+    foundedYear: 1957,
+    hqCountry: "aut",
+    memberCount: 178,
+    description: "UN-affiliated agency promoting peaceful use of nuclear energy and inhibiting its weaponization.",
+  },
 
   // Security & Defense
   {
@@ -213,6 +224,28 @@ export const ORGANIZATIONS: Organization[] = [
     foundedYear: 1948,
     hqCountry: "usa",
     memberCount: 35,
+  },
+  {
+    id: "ecowas",
+    slug: "ecowas",
+    name: "ECOWAS",
+    fullName: "Economic Community of West African States",
+    type: "regional",
+    foundedYear: 1975,
+    hqCountry: "nga",
+    memberCount: 15,
+    description: "Regional economic and political bloc of West African states.",
+  },
+  {
+    id: "gcc",
+    slug: "gcc",
+    name: "GCC",
+    fullName: "Gulf Cooperation Council",
+    type: "regional",
+    foundedYear: 1981,
+    hqCountry: "sau",
+    memberCount: 6,
+    description: "Regional union of Arab states bordering the Persian Gulf.",
   },
 
   // Trade & finance
@@ -492,6 +525,27 @@ export const MEMBERSHIPS: Membership[] = [
   ...[["gbr",1931,"founding"],["can",1931,"founding"],["aus",1931,"founding"],["nzl",1931,"founding"],["ind",1947,null],["zaf",1931,"founding"],["nga",1960,null],["ken",1963,null]].map(([c,y,r]) => ({
     orgId: "commonwealth", countryId: c as string, joinYear: y as number, role: r as MemberRole,
   })),
+
+  // IAEA — 178 members; Atlas subset mirrors the WHO/UNESCO highlight pattern.
+  ...["usa","can","mex","bra","arg","gbr","fra","deu","esp","ita","rus","egy","nga","zaf","ken","chn","ind","jpn","kor","sau","idn","aus","nzl"].map((c) => ({
+    orgId: "iaea", countryId: c, joinYear: 1957, role: null as MemberRole,
+  })),
+
+  // GCC — 6 founding members.
+  ...orgMemberEntries("gcc", [
+    ["sau", 1981, "founding"], ["kwt", 1981, "founding"], ["are", 1981, "founding"],
+    ["qat", 1981, "founding"], ["bhr", 1981, "founding"], ["omn", 1981, "founding"],
+  ]),
+
+  // ECOWAS — 15 West African states. Note: Burkina Faso, Mali, and Niger
+  // announced withdrawal in 2024; retained here as historical members.
+  ...orgMemberEntries("ecowas", [
+    ["nga", 1975, "founding"], ["civ", 1975, "founding"], ["sen", 1975, "founding"],
+    ["gha", 1975, "founding"], ["mli", 1975, "founding"], ["bfa", 1975, "founding"],
+    ["ner", 1975, "founding"], ["ben", 1975, "founding"], ["tgo", 1975, "founding"],
+    ["gin", 1975, "founding"], ["sle", 1975, "founding"], ["lbr", 1975, "founding"],
+    ["gmb", 1975, "founding"], ["gnb", 1977], ["cpv", 1976],
+  ]),
 
   // OIF — Atlas Francophone subset (observers + full)
   { orgId: "oif", countryId: "fra", joinYear: 1970, role: "founding" },
