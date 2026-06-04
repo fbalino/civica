@@ -27,6 +27,8 @@ import { SourceDot } from "@/components/SourceDot";
 import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
 import { FactbookSection } from "@/components/FactbookSection";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
+import { sectionDataHasNormalizableGeographicName } from "@/lib/data/geographic-name-normalization";
+import { Banner } from "@/components/editorial/Banner";
 import { CountryTabs } from "./tabs";
 import { CountryFlag } from "@/components/CountryFlag";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
@@ -926,14 +928,30 @@ export default async function CountryPage({
           if (!data) return <div key={sectionName} />;
           const fields = jsonbToFields(data);
           return (
-            <FactbookSection
-              key={sectionName}
-              sectionName={sectionName}
-              fields={fields}
-              source="cia_factbook"
-              retrievedAt="2026-01-23"
-              resolverFacts={reconciledFacts}
-            />
+            <div key={sectionName}>
+              {/* Geographic-name provenance note — shown only when this
+               *  section's raw CIA prose contains a phrase we normalize
+               *  for display (today: "Gulf of America" → "Gulf of
+               *  Mexico"). Mirrors the /factbook/[slug] note. See
+               *  `src/lib/data/geographic-name-normalization.ts`. */}
+              {sectionDataHasNormalizableGeographicName(data) && (
+                <Banner variant="info">
+                  <strong>Naming:</strong>{" "}
+                  Civica uses &ldquo;Gulf of Mexico,&rdquo; the name recognized
+                  by the International Hydrographic Organization and the United
+                  Nations. The source data (CIA World Factbook) adopted
+                  &ldquo;Gulf of America&rdquo; following a U.S. executive order
+                  in January 2025.
+                </Banner>
+              )}
+              <FactbookSection
+                sectionName={sectionName}
+                fields={fields}
+                source="cia_factbook"
+                retrievedAt="2026-01-23"
+                resolverFacts={reconciledFacts}
+              />
+            </div>
           );
         })}
       </FactbookSectionTabs>

@@ -14,7 +14,9 @@ import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 import { reconciliation } from "@/lib/content/site-state";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
+import { sectionDataHasNormalizableGeographicName } from "@/lib/data/geographic-name-normalization";
 import { FactbookSection } from "@/components/FactbookSection";
+import { Banner } from "@/components/editorial/Banner";
 import { FactbookHeaderStrip } from "@/components/factbook/FactbookHeaderStrip";
 import {
   FactbookSidebar,
@@ -459,6 +461,26 @@ export default async function FactbookCountryPage({
                 <header className="factbook-section-header">
                   <h2 className="factbook-section-title">{section.label}</h2>
                 </header>
+
+                {/* Geographic-name provenance note. Shown ONLY when this
+                 *  section's raw CIA prose actually contains a phrase we
+                 *  normalize for display (today: "Gulf of America" →
+                 *  "Gulf of Mexico", which appears in the Geography
+                 *  sections of the US, Mexico, and Canada). Quiet on every
+                 *  other section and country. The stored CIA JSONB is left
+                 *  verbatim; this discloses the house naming convention.
+                 *  See `src/lib/data/geographic-name-normalization.ts`. */}
+                {data != null &&
+                  sectionDataHasNormalizableGeographicName(data) && (
+                    <Banner variant="info">
+                      <strong>Naming:</strong>{" "}
+                      Civica uses &ldquo;Gulf of Mexico,&rdquo; the name
+                      recognized by the International Hydrographic Organization
+                      and the United Nations. The source data (CIA World
+                      Factbook) adopted &ldquo;Gulf of America&rdquo; following
+                      a U.S. executive order in January 2025.
+                    </Banner>
+                  )}
 
                 {section.kind === "factbook+civica-gov" && (() => {
                   const orgChart = buildOrgChartFromGovernmentStructure(

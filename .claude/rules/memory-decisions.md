@@ -231,3 +231,55 @@ currency, trade, identifiers, literacy, medals, memberships, or other fact slots
 GDP in the masthead is CIA Factbook real GDP PPP and must be labeled `GDP (PPP)`.
 If a future task switches to nominal GDP, update the label and source at the same
 time.
+
+## 2026-06-04 — "Gulf of Mexico" adopted as the displayed primary name (render-time normalization)
+
+Civica displays "Gulf of Mexico" as the primary name for the body of water,
+with a short, neutral provenance note, on the Geography sections of the United
+States, Mexico, and Canada (the only countries whose CIA prose references it).
+
+### The editorial decision
+- Primary displayed name: **"Gulf of Mexico."**
+- A transparent provenance note appears ONLY on sections where the rename
+  actually occurred:
+  > "Naming: Civica uses 'Gulf of Mexico,' the name recognized by the
+  > International Hydrographic Organization and the United Nations. The source
+  > data (CIA World Factbook) adopted 'Gulf of America' following a U.S.
+  > executive order in January 2025."
+- The note uses the canonical `<Banner variant="info">` primitive (no
+  per-page styling, fully tokenized).
+
+### Rationale
+For an international, academically-citable reference work, "Gulf of Mexico" is
+the defensible primary name — it is used by the International Hydrographic
+Organization, the United Nations, Wikipedia, Britannica, AP, Reuters, and the
+BBC. The January 2025 U.S. executive order renaming the gulf "Gulf of America"
+binds only U.S. federal agencies and carries no international standing; the
+United States borders under half of the gulf's coastline. The CIA World
+Factbook is itself a U.S. federal publication and adopted the executive order's
+wording, which is why our public-domain import surfaced "Gulf of America."
+
+### How it's implemented — render-time only, stored source kept verbatim
+- The CIA JSONB in `country_factbook_sections.section_data` is **left
+  untouched**. We store the source as-is and display our house naming
+  convention with a note — the cleanest provenance posture. No DB mutation,
+  and the importer (`scripts/seed-from-factbook.ts`) is unchanged.
+- Helper: `src/lib/data/geographic-name-normalization.ts` — a targeted,
+  documented phrase map (`normalizeGeographicNames`,
+  `geographicNameWasNormalized`, `sectionDataHasNormalizableGeographicName`).
+- Applied at the single leaf-text extraction seam: `extractText()` in
+  `src/lib/data/factbook-fields.ts`. This covers every nested leaf at every
+  depth — including the depth-3 "Major watersheds → Atlantic ocean drainage"
+  entry — and both render paths (`/factbook/[slug]` and `/countries/[slug]`),
+  since both call `jsonbToFields()`.
+- The note is rendered conditionally in both page files using the helper's
+  "changed" signal so it never appears on a country/section with no Gulf
+  reference (verified: Honduras still shows "Gulf of Fonseca" and the note is
+  absent; "Persian Gulf" untouched across 17 sections).
+
+### Scope discipline for future renames
+This is intentionally a single, targeted rename. Future U.S.-federal
+geographic renames (e.g. Denali/Mt. McKinley) must be evaluated case-by-case
+against the same international-reference standard (IHO / UN / major
+encyclopedias and wire services) before being added to the phrase map — they
+must NOT be auto-applied just because a U.S. executive order changed them.
