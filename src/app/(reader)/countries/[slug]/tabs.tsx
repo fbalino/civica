@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface Tab {
   id: string;
@@ -9,7 +10,25 @@ interface Tab {
 }
 
 export function CountryTabs({ tabs }: { tabs: Tab[] }) {
-  const [active, setActive] = useState(tabs[0]?.id ?? "");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const tabIds = useMemo(() => new Set(tabs.map((tab) => tab.id)), [tabs]);
+  const requestedTab = searchParams.get("tab");
+  const active =
+    requestedTab && tabIds.has(requestedTab) ? requestedTab : tabs[0]?.id ?? "";
+
+  function activateTab(tabId: string) {
+    const params = new URLSearchParams(searchParams);
+    if (tabId === tabs[0]?.id) {
+      params.delete("tab");
+    } else {
+      params.set("tab", tabId);
+    }
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }
+
   const activeTab = tabs.find((t) => t.id === active) ?? tabs[0];
 
   return (
@@ -26,7 +45,7 @@ export function CountryTabs({ tabs }: { tabs: Tab[] }) {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => setActive(tab.id)}
+            onClick={() => activateTab(tab.id)}
             className={`tab-nav ${tab.id === active ? "tab-nav--active" : ""}`}
             role="tab"
             aria-selected={tab.id === active}

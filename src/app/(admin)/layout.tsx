@@ -46,31 +46,31 @@ export default async function AdminLayout({
               textDecoration: "none",
             }}
           >
-            Admin
-          </Link>
-          <span aria-hidden style={{ color: "var(--color-text-40)" }}>
-            ·
-          </span>
-          <Link
-            href="/admin/pulse-review"
-            style={{
-              color: "var(--color-status-warning)",
-              textDecoration: "none",
-            }}
-          >
             Pulse review
           </Link>
           <span aria-hidden style={{ color: "var(--color-text-40)" }}>
             ·
           </span>
           <Link
-            href="/admin/pulse-review"
+            href="/admin/data-disputes"
             style={{
               color: "var(--color-text-60)",
               textDecoration: "none",
             }}
           >
-            Queue
+            Data disputes
+          </Link>
+          <span aria-hidden style={{ color: "var(--color-text-40)" }}>
+            ·
+          </span>
+          <Link
+            href="/admin/data-disputes/audit"
+            style={{
+              color: "var(--color-text-60)",
+              textDecoration: "none",
+            }}
+          >
+            Audit log
           </Link>
         </div>
         <div

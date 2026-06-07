@@ -4,6 +4,7 @@ config({ path: ".env.local" });
 import { eq, sql } from "drizzle-orm";
 import { db } from "../src/lib/db";
 import { governmentTaxonomies, jurisdictions, sources } from "../src/lib/db/schema";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
 import {
   BJORNKSKOV_RODE_DATASET_VERSION,
   BJORNKSKOV_RODE_SOURCE_ID,
@@ -118,7 +119,11 @@ async function fetchLatestBjornskovRodeRows() {
   return latestByIso3;
 }
 
-async function ensureSource(syncTime: Date) {
+// Creating/ensuring the source row must NOT stamp freshness: that's the
+// job of markSourcesSynced(), called from main() only after rows are
+// actually ingested (AGENTS.md provenance invariant). This upsert keeps
+// the source metadata current but leaves last_sync_at untouched.
+async function ensureSource() {
   await db
     .insert(sources)
     .values({
@@ -127,7 +132,6 @@ async function ensureSource(syncTime: Date) {
       baseUrl: "https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset",
       license: "academic_noncommercial",
       isCommercialUseAllowed: false,
-      lastSyncAt: syncTime,
     })
     .onConflictDoUpdate({
       target: sources.id,
@@ -136,7 +140,6 @@ async function ensureSource(syncTime: Date) {
         baseUrl: "https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset",
         license: "academic_noncommercial",
         isCommercialUseAllowed: false,
-        lastSyncAt: syncTime,
       },
     });
 }
@@ -149,7 +152,7 @@ async function main() {
     `Fetched ${latestByIso3.size} latest country rows from the QoG Jan26 cross-section.`,
   );
 
-  await ensureSource(syncTime);
+  await ensureSource();
 
   const jurisdictionRows = await db
     .select({
@@ -253,6 +256,16 @@ async function main() {
   if (skipped > 0) {
     console.log(`Skipped ${skipped} QoG rows with no matching ISO3 in jurisdictions.`);
   }
+
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually ingested taxonomy rows (AGENTS.md provenance
+  // invariant). Previously ensureSource() stamped last_sync_at
+  // unconditionally before any data was written. `at: syncTime` aligns the
+  // stamp with the row `updatedAt` values written in the loop above.
+  await markSourcesSynced(BJORNKSKOV_RODE_SOURCE_ID, {
+    rowsWritten: matched,
+    at: syncTime,
+  });
 }
 
 main().catch((error) => {

@@ -378,49 +378,6 @@ export const NE_ID_TO_OURS: Record<string, string> = {
   "036": "aus", "554": "nzl",
 };
 
-const MEMBER_POOL: Record<string, string[]> = {
-  nfp: ["Mathilde Laurent", "Julien Moreau", "Claire Bernard", "Antoine Garnier", "Sophie Petit"],
-  ens: ["Lea Dubois", "Marc Fontaine", "Celine Renard", "Hugo Lefevre", "Ines Martin"],
-  rn: ["Pierre Lambert", "Nathalie Vidal", "Olivier Roche", "Camille Durand", "Thomas Girard"],
-  lr: ["Jean Moreau", "Anne Fabre", "Yves Caron", "Brigitte Noel"],
-  ind: ["Franck Barbier", "Laurent Riviere", "Valerie Henry"],
-  rep: ["J. Whitaker", "K. Morales", "D. Holloway", "L. Park", "P. Castellano", "R. Nakamura"],
-  dem: ["M. Thornton", "S. Banerjee", "T. Reyes", "A. O'Connor", "J. Kim", "B. Adeyemi"],
-  lab: ["Sam Patel", "Rachel Oyelaran", "David Armstrong", "Priya Bose", "Louise McKenna"],
-  con: ["Henry Wainwright", "Emma Fletcher", "Charles Bennett", "Olivia Redgrave"],
-  ld: ["Martin Clarke", "Esther Yip", "Nigel Trevelyan"],
-  snp: ["Fiona MacLeod", "Iain Stewart"],
-  oth: ["Independent member A", "Independent member B", "Independent member C"],
-  spd: ["Jonas Becker", "Maren Hoffmann", "Friedrich Keller", "Ines Voss"],
-  cdu: ["Klaus Brandt", "Annika Fischer", "Stefan Richter", "Hanna Weiss"],
-  grn: ["Lea Grun", "Tobias Vogel", "Marion Pfeiffer"],
-  fdp: ["Sebastian Lang", "Johanna Hummel"],
-  afd: ["Dirk Konig", "Ulrike Berger"],
-  ldp: ["Hiroshi Tanaka", "Yuki Sato", "Akira Nakamura", "Kenji Ito"],
-  cdp: ["Mika Kobayashi", "Ryo Watanabe", "Aiko Mori"],
-  ish: ["Takashi Fujita", "Emi Kimura"],
-  kom: ["Daisuke Honda"],
-  app: ["Abdullah Al-Farsi", "Fahad Al-Rashid", "Noura Al-Saud", "Yusuf Al-Qahtani", "Khalid Al-Harbi"],
-  soc: ["Bernard Levy", "Helene Roux"],
-  cen: ["Philippe Martel", "Dominique Aubry"],
-  cb: ["Lord Ashworth", "Baroness Whitby", "Lord Kensington"],
-  pt: ["Joao Silva", "Maria Oliveira", "Ricardo Alves"],
-  pl: ["Pedro Costa", "Lucas Ramos"],
-  uni: ["Fernanda Souza", "Paulo Cardoso"],
-  pp: ["Ana Lima"],
-  mdb: ["Carlos Ribeiro"],
-};
-
-const DISTRICTS = ["District 12", "District 3", "Region 7", "County Ward", "Mountain Prov.", "Coastal Dist.", "Capital Zone", "North Circuit", "West Borough", "Central"];
-
-export function getMember(partyId: string, seatIndex: number) {
-  const pool = MEMBER_POOL[partyId] || MEMBER_POOL.oth;
-  return {
-    name: pool[seatIndex % pool.length],
-    district: DISTRICTS[seatIndex % DISTRICTS.length],
-  };
-}
-
 export function getDefaultChamberData(countryId: string): ChamberData {
   return CHAMBERS[countryId] || {
     lower: {

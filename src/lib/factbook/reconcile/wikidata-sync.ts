@@ -12,14 +12,14 @@
  * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §3
  */
 import { createHash } from "node:crypto";
-import { eq, isNotNull, sql } from "drizzle-orm";
+import { isNotNull, sql } from "drizzle-orm";
 
 import {
   countryFacts,
   factSnapshots,
   jurisdictions,
-  sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import {
   getClaimsForEntity,
   groupClaimsByStatement,
@@ -508,12 +508,11 @@ export async function syncFactbookWikidata(
     }
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "wikidata"));
-  }
+  await markSourcesSynced("wikidata", {
+    rowsWritten: touchedPairs.size,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   // Phase F.6.1 — persist resolver-proposed disputes for every pair
   // we touched. Same dedup contract as the WB WDI sync.

@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
+  type Bill,
   type ChamberData,
   type Country,
   getDefaultChamberData as getFallbackChamberData,
@@ -13,7 +14,6 @@ import { Hemicycle, PartyLegend } from "./Hemicycle";
 type House = "lower" | "upper";
 
 interface SeatTip {
-  member: { name: string; district: string };
   party: { name: string };
   index: number;
   x: number;
@@ -25,6 +25,8 @@ export interface CompareInAtlasClientProps {
   dbChambers: Record<string, AtlasChamberData>;
   initialA: string;
   initialB: string;
+  initialHouseA: House;
+  initialHouseB: House;
 }
 
 /**
@@ -42,14 +44,17 @@ export function CompareInAtlasClient({
   dbChambers,
   initialA,
   initialB,
+  initialHouseA,
+  initialHouseB,
 }: CompareInAtlasClientProps) {
   const router = useRouter();
   const [a, setA] = useState(initialA);
   const [b, setB] = useState(initialB);
-  const [houseA, setHouseA] = useState<House>("lower");
-  const [houseB, setHouseB] = useState<House>("lower");
+  const [houseA, setHouseA] = useState<House>(initialHouseA);
+  const [houseB, setHouseB] = useState<House>(initialHouseB);
   const [dimmed] = useState<Set<string>>(new Set());
   const [seatTip, setSeatTip] = useState<SeatTip | null>(null);
+  const [billsByCountry, setBillsByCountry] = useState<Record<string, Bill[]>>({});
 
   const updateUrl = useCallback(
     (next: { a?: string; b?: string; ah?: House; bh?: House }) => {
@@ -62,6 +67,37 @@ export function CompareInAtlasClient({
     },
     [router],
   );
+
+  useEffect(() => {
+    const targetIds = Array.from(new Set([a, b])).filter(
+      (id) => !(id in billsByCountry),
+    );
+    if (targetIds.length === 0) return;
+
+    let cancelled = false;
+    for (const id of targetIds) {
+      const country = countries.find((x) => x.id === id);
+      const slug = country?.slug ?? id;
+      fetch(`/api/countries/${slug}/bills`)
+        .then((res) => (res.ok ? res.json() : { bills: [] }))
+        .then((json) => {
+          if (cancelled) return;
+          setBillsByCountry((prev) =>
+            id in prev ? prev : { ...prev, [id]: json.bills ?? [] },
+          );
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setBillsByCountry((prev) =>
+            id in prev ? prev : { ...prev, [id]: [] },
+          );
+        });
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [a, b, billsByCountry, countries]);
 
   function getChamberData(id: string): ChamberData {
     const dc = dbChambers[id];
@@ -100,22 +136,24 @@ export function CompareInAtlasClient({
         branches: dc.branches,
         coalition: undefined,
         next: undefined,
-        bills: [],
+        bills: billsByCountry[id] ?? [],
       };
     }
-    return getFallbackChamberData(id);
+    const fallback = getFallbackChamberData(id);
+    return {
+      ...fallback,
+      bills: billsByCountry[id] ?? fallback.bills,
+    };
   }
 
   const onSeatHover = (
     info: {
-      member: { name: string; district: string };
       party: { name: string; id: string };
       index: number;
     },
     e: React.MouseEvent,
   ) =>
     setSeatTip({
-      member: info.member,
       party: info.party,
       index: info.index,
       x: e.clientX + 14,
@@ -170,11 +208,8 @@ export function CompareInAtlasClient({
           className="atlas-seat-tip"
           style={{ left: seatTip.x, top: seatTip.y }}
         >
-          <div className="nm">{seatTip.member.name}</div>
-          <div className="pty">{seatTip.party.name}</div>
-          <div className="dis">
-            {seatTip.member.district} &middot; Seat {seatTip.index + 1}
-          </div>
+          <div className="nm">{seatTip.party.name}</div>
+          <div className="dis">Seat {seatTip.index + 1}</div>
         </div>
       ) : null}
     </div>
@@ -201,7 +236,6 @@ function ComparePane({
   dimmed: Set<string>;
   onSeatHover: (
     info: {
-      member: { name: string; district: string };
       party: { name: string; id: string };
       index: number;
     },

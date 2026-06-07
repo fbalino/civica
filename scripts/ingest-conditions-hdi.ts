@@ -16,6 +16,7 @@ config({ path: ".env.local", override: true });
 import { db } from "../src/lib/db";
 import { civicaConditionsScores, ciDimensionScores } from "../src/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const METHODOLOGY_VERSION = "beta";
 const SOURCE_ID = "undp_hdi";
@@ -39,7 +40,6 @@ async function main() {
   console.log(`Found ${ciRows.length} HDI rows in ci_dimension_scores.`);
 
   let inserted = 0;
-  let updated = 0;
 
   for (const row of ciRows) {
     // spec §2.3 fixed bound: HDI is 0–1, so score × 100 = normalized score
@@ -50,19 +50,6 @@ async function main() {
 
     const quarter = row.quarter;
     const datasetYear = parseInt(quarter.split("-")[0], 10);
-
-    const existing = await db
-      .select({ id: civicaConditionsScores.id })
-      .from(civicaConditionsScores)
-      .where(
-        eq(civicaConditionsScores.jurisdictionId, row.jurisdictionId)
-      )
-      .then((rows) =>
-        rows.find(
-          () =>
-            true // we'll rely on ON CONFLICT for idempotency
-        )
-      );
 
     await db
       .insert(civicaConditionsScores)
@@ -92,6 +79,11 @@ async function main() {
 
     inserted++;
   }
+
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually upserted rows (AGENTS.md provenance invariant). The
+  // helper applies the same `inserted > 0` gate internally.
+  await markSourcesSynced(SOURCE_ID, { rowsWritten: inserted });
 
   console.log(`Done: ${inserted} rows upserted into civica_conditions_scores.`);
   console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);

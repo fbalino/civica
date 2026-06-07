@@ -1,5 +1,5 @@
 // Pure projection + geometry helpers for the Atlas world map.
-// Shared by AtlasWorldMap and the mini-map inside AtlasCountryLeft.
+// Shared by AtlasWorldMap and the shell rail mini-map.
 
 import type { Country } from "./data";
 

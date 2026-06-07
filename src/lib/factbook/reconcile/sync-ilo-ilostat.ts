@@ -68,14 +68,14 @@
  *              imputation vs. modelled projection)
  */
 import { createHash } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import {
   countryFacts,
   factSnapshots,
   jurisdictions,
-  sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -856,12 +856,11 @@ export async function syncIloIlostat(
     );
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "ilo_ilostat"));
-  }
+  await markSourcesSynced("ilo_ilostat", {
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:

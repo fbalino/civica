@@ -73,7 +73,6 @@ function TrajectorySparkline({
   if (samples.length === 0) return null;
 
   const xs = samples.map((s) => s.dayOffset);
-  const ys = samples.map((s) => s.delta);
   const xMin = Math.min(...xs);
   const xMax = Math.max(...xs);
   // Domain: [-15, +10] is the spec clamping range; fix axis so all
@@ -349,10 +348,24 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
 }
 
 export default async function BacktestReportPage() {
-  const [snapshot, stats] = await Promise.all([
-    getBacktestSnapshot(),
-    getBacktestStats(),
-  ]);
+  let snapshot: BacktestSnapshotCase[] = [];
+  let stats: Awaited<ReturnType<typeof getBacktestStats>> = {
+    totalCases: 0,
+    passCount: 0,
+    partialCount: 0,
+    failCount: 0,
+    unrunCount: 0,
+    lastRunAt: null,
+  };
+
+  try {
+    [snapshot, stats] = await Promise.all([
+      getBacktestSnapshot(),
+      getBacktestStats(),
+    ]);
+  } catch {
+    // Keep methodology readable when Neon is unavailable.
+  }
 
   const passingCases = stats.passCount;
   const totalRunCases =

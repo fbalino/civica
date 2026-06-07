@@ -75,15 +75,15 @@
  * Resolution:  ~/civica/plan/fao-faostat-resolution-v1.md
  */
 import { createHash } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import AdmZip from "adm-zip";
 
 import {
   countryFacts,
   factSnapshots,
   jurisdictions,
-  sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -862,12 +862,11 @@ export async function syncFaoFaostat(
     );
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "fao_faostat"));
-  }
+  await markSourcesSynced("fao_faostat", {
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:

@@ -11,9 +11,8 @@ export interface ShellOrgRailProps {
 }
 
 /**
- * Phase A.5 — Left rail used by /atlas/organizations/[slug]. Mirrors the
- * legacy AtlasCountryLeft "organizations" branch (deleted in df32da9):
- * categorized list of orgs, each row links to /atlas/organizations/<slug>.
+ * Phase A.5 — Left rail used by /atlas/organizations/[slug]: categorized
+ * list of orgs, each row links to /atlas/organizations/<slug>.
  * Header includes the Countries ⇄ Organizations toggle.
  */
 export function ShellOrgRail({ groups, selectedSlug }: ShellOrgRailProps) {

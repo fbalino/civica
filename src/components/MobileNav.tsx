@@ -72,8 +72,8 @@ const REFERENCE: NavItem[] = [
 ];
 
 const LEGAL: NavItem[] = [
-  { href: "/privacy", label: "Privacy", descriptor: "How we handle data", glyph: "⊙" },
-  { href: "/terms", label: "Terms", descriptor: "Usage & licensing", glyph: "§" },
+  { href: "/licensing", label: "Licensing", descriptor: "Reuse & source terms", glyph: "§" },
+  { href: "/about#sources", label: "Sources", descriptor: "Source licenses", glyph: "⊙" },
 ];
 
 function useIsActive(pathname: string) {
@@ -551,7 +551,7 @@ function OverlayFooter() {
 function SystemStatus() {
   return (
     <Link
-      href="/about#status"
+      href="https://statuspage.incident.io/civica-atlas"
       style={{
         display: "flex",
         alignItems: "center",

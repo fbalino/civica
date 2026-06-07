@@ -51,6 +51,11 @@ function formatDefault(n: number): string {
   return n.toLocaleString();
 }
 
+function formatRetrievedAt(value: Date | string | null): string | undefined {
+  if (!value) return undefined;
+  return typeof value === "string" ? value : value.toISOString();
+}
+
 export default async function RankingsPage({
   searchParams,
 }: {
@@ -79,8 +84,8 @@ export default async function RankingsPage({
       : r.fact.factValue ?? "",
     numericValue: r.fact.factValueNumeric ?? undefined,
     iso2: r.jurisdiction.iso2 ?? undefined,
-    source: "cia_factbook",
-    retrievedAt: "2026-01-23",
+    source: r.fact.sourceId,
+    retrievedAt: formatRetrievedAt(r.fact.retrievedAt ?? r.fact.asOf),
   }));
 
   return (

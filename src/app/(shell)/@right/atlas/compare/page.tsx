@@ -12,7 +12,7 @@ export const revalidate = 3600;
 export default async function AtlasCompareRightSlot({
   searchParams,
 }: {
-  searchParams: Promise<{ a?: string; b?: string }>;
+  searchParams: Promise<{ a?: string; b?: string; ah?: string; bh?: string }>;
 }) {
   const sp = await searchParams;
   const { countries } = await loadAtlasData();
@@ -22,6 +22,8 @@ export default async function AtlasCompareRightSlot({
   const bId = sp.b && countries.find((c) => c.id === sp.b || c.slug === sp.b)
     ? countries.find((c) => c.id === sp.b || c.slug === sp.b)!.id
     : "usa";
+  const houseA = sp.ah === "upper" ? "upper" : "lower";
+  const houseB = sp.bh === "upper" ? "upper" : "lower";
   const aName = countries.find((c) => c.id === aId)?.name ?? aId;
   const bName = countries.find((c) => c.id === bId)?.name ?? bId;
 
@@ -34,8 +36,10 @@ export default async function AtlasCompareRightSlot({
         mode: "atlas-compare",
         countryA: aName,
         countryB: bName,
+        houseA,
+        houseB,
       }}
-      threadKey={`atlas:compare:${aId}:${bId}`}
+      threadKey={`atlas:compare:${aId}:${houseA}:${bId}:${houseB}`}
     />
   );
 }

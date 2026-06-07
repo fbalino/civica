@@ -652,8 +652,11 @@ export function OutcomesExplorer({
       if (newRegions.length > 0) {
         params.set("regions", newRegions.join(","));
       }
+      // `/outcomes` was removed (it now 308-redirects to /civica-conditions),
+      // so this page always lives at /civica-conditions.
+      const basePath = "/civica-conditions";
       startTransition(() => {
-        router.replace(`/outcomes?${params.toString()}`, { scroll: false });
+        router.replace(`${basePath}?${params.toString()}`, { scroll: false });
       });
     },
     [router]

@@ -5,12 +5,12 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, sql } from "drizzle-orm";
 import {
-  jurisdictions,
   governmentBodies,
   legislatureParties,
   statements,
 } from "../src/lib/db/schema";
 import { sparqlQuery, extractQid } from "../src/lib/data/wikidata";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
@@ -203,6 +203,15 @@ SELECT ?state ?stateLabel ?leg ?legLabel WHERE {
   console.log(`\n=== Wikidata Party Sync Complete ===`);
   console.log(`  Synced: ${synced}`);
   console.log(`  Failed/skipped: ${failed}`);
+
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually synced rows (AGENTS.md provenance invariant). The
+  // helper applies the same `synced > 0` gate internally. `at: RETRIEVED_AT`
+  // keeps the stamp aligned with the provenance statements written above.
+  await markSourcesSynced("wikidata", {
+    rowsWritten: synced,
+    at: RETRIEVED_AT,
+  });
 }
 
 main().catch((err) => {

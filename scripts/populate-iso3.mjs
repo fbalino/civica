@@ -1,3 +1,6 @@
+import { config } from "dotenv";
+config({ path: ".env.local", override: true });
+
 import { neon } from "@neondatabase/serverless";
 
 const DATABASE_URL = process.env.DATABASE_URL;

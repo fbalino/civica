@@ -9,8 +9,8 @@ import {
   governmentBodies,
   legislatureParties,
   statements,
-  sources,
 } from "../src/lib/db/schema";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
@@ -333,11 +333,15 @@ async function main() {
     await sleep(200);
   }
 
-  // Update source sync timestamp
-  await db
-    .update(sources)
-    .set({ lastSyncAt: RETRIEVED_AT })
-    .where(eq(sources.id, SOURCE_ID));
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually processed chambers (AGENTS.md provenance invariant).
+  // Was previously an unconditional stamp that faked freshness on an
+  // empty/failed run. `at: RETRIEVED_AT` keeps the stamp aligned with the
+  // provenance statements written during this run.
+  await markSourcesSynced(SOURCE_ID, {
+    rowsWritten: chambersProcessed,
+    at: RETRIEVED_AT,
+  });
 
   console.log(`\n=== IPU Parline Sync Complete ===`);
   console.log(`  Chambers processed: ${chambersProcessed}`);

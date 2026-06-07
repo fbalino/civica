@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { correctionLog, jurisdictions } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
 
 const VALID_CATEGORIES = [
   "ci_data_error",
@@ -23,7 +24,23 @@ const VALID_DIMENSIONS = [
   "stability_security",
 ];
 
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX = 5;
+
 export async function POST(request: NextRequest) {
+  const rateLimit = checkInMemoryRateLimit({
+    scope: "corrections",
+    key: getRequestIp(request),
+    max: RATE_LIMIT_MAX,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+  });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Too many correction submissions. Please wait before trying again." },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
+    );
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();

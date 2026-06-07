@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CivicaChatMessage } from "@/components/civica-chat/CivicaChatMessage";
+import { onCivicaAsk } from "@/lib/shell/events";
 
 interface Message {
   id: string;
@@ -84,7 +85,7 @@ export function CivicaAIDrawer({
     }
   }, [messages]);
 
-  async function send(text: string) {
+  const send = useCallback(async (text: string) => {
     const t = text.trim();
     if (!t || streaming) return;
     setDraft("");
@@ -168,7 +169,15 @@ export function CivicaAIDrawer({
     } finally {
       setStreaming(false);
     }
-  }
+  }, [apiTab, countryName, streaming]);
+
+  useEffect(() => {
+    return onCivicaAsk(({ question, autoSend }) => {
+      setDraft(question);
+      setCollapsed(false);
+      if (autoSend !== false) void send(question);
+    });
+  }, [send]);
 
   const isEmpty = messages.length === 0;
   const showBody = !isEmpty && !collapsed;

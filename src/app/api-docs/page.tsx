@@ -27,6 +27,11 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "government-types", label: "Government types" },
   { id: "peer-groupings", label: "Peer groupings" },
   { id: "peer-groupings-migration", label: "Migration table" },
+  { id: "index-rankings", label: "Index rankings" },
+  { id: "index-country", label: "Index country" },
+  { id: "index-compare", label: "Index compare" },
+  { id: "pulse-dimensions", label: "Pulse dimensions" },
+  { id: "pulse-changelog-v2", label: "Pulse changelog" },
   { id: "usage-examples", label: "Usage examples" },
   { id: "data-sources", label: "Data sources" },
   { id: "widget-embed", label: "Widget embed" },
@@ -94,7 +99,8 @@ const EMBED_PARAMS = [
   {
     name: "dims",
     type: "0 | 1",
-    description: "Show 6 dimension mini-bars in large widget. Default: 0",
+    description:
+      "Show available Civica Index dimension mini-bars in the large widget when real dimension scores are present. Default: 0",
   },
 ];
 
@@ -118,8 +124,8 @@ export default function ApiDocsPage() {
           <div className="api-info-card__row">
             <h3 className="api-section-label">Rate Limits</h3>
             <p className="api-info-card__body">
-              60 requests per minute per IP address. Exceeding the limit returns a
-              429 status with a Retry-After header.
+              Public endpoints apply a best-effort per-IP abuse throttle. Exceeding
+              it returns a 429 status with a Retry-After header.
             </p>
           </div>
           <div className="api-info-card__row">
@@ -419,6 +425,197 @@ export default function ApiDocsPage() {
   }
 }`}
         />
+
+        <EndpointSection
+          id="index-rankings"
+          method="GET"
+          path="/api/v1/index/rankings"
+          description="Returns Civica Index rankings for the latest available quarter, or a requested quarter. Use sort=ci for the structural Index ranking and sort=cp for Pulse-sensitive ordering when Pulse rows are available."
+          parameters={[
+            {
+              name: "quarter",
+              type: "string",
+              description: 'Optional quarter label such as "2026-Q1". Defaults to latest available.',
+            },
+            {
+              name: "methodology",
+              type: "string",
+              description: 'Methodology version. Defaults to "beta".',
+            },
+            {
+              name: "sort",
+              type: "ci | cp",
+              description: "Sort by Civica Index rank or Pulse score.",
+            },
+            {
+              name: "limit / offset",
+              type: "integer",
+              description: "Pagination controls. limit defaults to 50 and caps at 250.",
+            },
+          ]}
+          exampleResponse={`{
+  "data": [
+    {
+      "rank": 1,
+      "score": 91.4,
+      "band": "A",
+      "vintageLabel": "Civica Index 2026 Q1 (Beta)",
+      "slug": "norway",
+      "name": "Norway",
+      "governmentClassification": { "regimeType": "parliamentary_democracy" }
+    }
+  ],
+  "meta": {
+    "total": 195,
+    "limit": 50,
+    "offset": 0,
+    "quarter": "2026-Q1",
+    "methodology": { "status": "beta", "reference": "https://civicaatlas.org/civica-index/methodology" }
+  }
+}`}
+        />
+
+        <EndpointSection
+          id="index-country"
+          method="GET"
+          path="/api/v1/index/:country_slug"
+          description="Returns the latest Civica Index composite, uncertainty interval, rank, completeness fields, and available dimension rows for one country."
+          parameters={[
+            {
+              name: ":country_slug",
+              type: "string",
+              description: 'Country slug, e.g. "france" or "united-states".',
+            },
+            {
+              name: "methodology",
+              type: "string",
+              description: 'Optional methodology version. Defaults to "beta".',
+            },
+          ]}
+          exampleResponse={`{
+  "data": {
+    "slug": "france",
+    "name": "France",
+    "quarter": "2026-Q1",
+    "score": 83.2,
+    "scoreLower": 79.1,
+    "scoreUpper": 86.4,
+    "band": "B",
+    "rank": 18,
+    "dimensions": [
+      { "dimension": "democratic_quality", "normalizedScore": 82.4, "sourceId": "vdem" }
+    ]
+  },
+  "meta": { "methodology": { "status": "beta" } }
+}`}
+        />
+
+        <EndpointSection
+          id="index-compare"
+          method="GET"
+          path="/api/v1/index/compare"
+          description="Compares up to 10 countries on the Civica Index for a given quarter. Repeat the slug query parameter for each country."
+          parameters={[
+            {
+              name: "slug",
+              type: "string[]",
+              description: 'Repeatable country slug, e.g. "?slug=france&slug=germany". Required.',
+            },
+            {
+              name: "quarter",
+              type: "string",
+              description: "Optional quarter. Defaults to each country's latest available comparison data.",
+            },
+          ]}
+          exampleResponse={`{
+  "data": [
+    {
+      "jurisdiction": { "slug": "france", "name": "France" },
+      "composite": { "score": 83.2, "rank": 18, "quarter": "2026-Q1" },
+      "dimensions": []
+    }
+  ],
+  "meta": { "quarter": null, "count": 2 }
+}`}
+        />
+
+        <EndpointSection
+          id="pulse-dimensions"
+          method="GET"
+          path="/api/v1/pulse/:country_slug/dimensions"
+          description="Returns the dimensional Civica Pulse view for one country, including per-dimension deltas and the driving events used by the Pulse v2 scoring pipeline."
+          parameters={[
+            {
+              name: ":country_slug",
+              type: "string",
+              description: 'Country slug, e.g. "brazil".',
+            },
+          ]}
+          exampleResponse={`{
+  "data": {
+    "country": { "slug": "brazil", "name": "Brazil" },
+    "dimensions": [
+      {
+        "dimension": "rule_of_law",
+        "delta": -1.2,
+        "events": [{ "headline": "Court ruling", "published": true }]
+      }
+    ]
+  },
+  "meta": { "methodology": { "status": "beta" } }
+}`}
+        />
+
+        <EndpointSection
+          id="pulse-changelog-v2"
+          method="GET"
+          path="/api/v1/pulse/changelog/v2"
+          description="Returns the v2 dimensional Pulse changelog. The legacy /api/v1/pulse/changelog endpoint remains for old clients and advertises this successor with deprecation headers."
+          parameters={[
+            {
+              name: "country",
+              type: "string",
+              description: "Optional country slug filter.",
+            },
+            {
+              name: "dimension",
+              type: "string",
+              description: "Optional Pulse dimension filter.",
+            },
+            {
+              name: "severity",
+              type: "string",
+              description: "Optional severity tier filter.",
+            },
+            {
+              name: "since",
+              type: "YYYY-MM-DD",
+              description: "Only events on or after this date.",
+            },
+            {
+              name: "published_only",
+              type: "0 | 1",
+              description: "Set to 1 to exclude events still queued for human review.",
+            },
+          ]}
+          exampleResponse={`{
+  "data": [
+    {
+      "id": "evt_...",
+      "country": { "slug": "brazil", "name": "Brazil" },
+      "dimension": "democratic_quality",
+      "severityTier": "moderate_neg",
+      "published": true
+    }
+  ],
+  "meta": {
+    "limit": 50,
+    "offset": 0,
+    "hasMore": false,
+    "methodology": { "status": "beta" }
+  }
+}`}
+        />
       </section>
 
       <hr className="api-section-divider" />
@@ -468,7 +665,8 @@ for country in resp.json()["data"]:
           <code>&lt;iframe&gt;</code>. Widgets update every 5 minutes and respect
           the visitor&rsquo;s system color scheme by default. Override with{" "}
           <code>?theme=light</code> or <code>?theme=dark</code>. Add{" "}
-          <code>?dims=1</code> to the large widget to show dimension mini-bars.
+          <code>?dims=1</code> to the large widget to show available Civica
+          Index dimension mini-bars when real dimension scores are present.
         </p>
 
         <div className="api-embed-block">
@@ -486,7 +684,7 @@ for country in resp.json()["data"]:
         </div>
 
         <div className="api-embed-block">
-          <p className="api-embed-size-label">Large — 400 × 260 (with dimensions)</p>
+          <p className="api-embed-size-label">Large — 400 × 260 (optional CI dimensions)</p>
           <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=lg&dims=1"
         width="400" height="260" loading="lazy"
         title="Civica Index — Brazil"></iframe>`}</CodeBlock>

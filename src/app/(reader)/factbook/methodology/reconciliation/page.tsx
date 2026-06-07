@@ -17,7 +17,6 @@ import {
 export const revalidate = 3600;
 
 const tier1Shipped = tier1Publishers.filter((p) => p.shipped);
-const tier1Scrapped = tier1Publishers.filter((p) => p.scrapped);
 const nsoActive = nsoWave1.filter((n) => n.status === "in-progress");
 const nsoDeferred = nsoWave1.filter(
   (n) => n.status === "deferred" || n.status === "deferred-permanently",
@@ -305,7 +304,7 @@ export default async function ReconciliationMethodologyPage() {
           the <code>P854</code> reference URL — point to an entry on
           the allowlist. Allowlist entries are organised in four
           tiers; the full list lives in{" "}
-          <Link href="https://github.com/civicaatlas/civica/blob/main/src/lib/factbook/reconcile/source-allowlist.ts">
+          <Link href="https://github.com/fbalino/civica/blob/main/src/lib/factbook/reconcile/source-allowlist.ts">
             <code>src/lib/factbook/reconcile/source-allowlist.ts</code>
           </Link>{" "}
           and is the single source of truth — both the schema and the
@@ -1058,14 +1057,9 @@ export default async function ReconciliationMethodologyPage() {
           value that does not move. If the upstream World Bank
           revises a 2024 GDP figure six months later, that revision
           lands in a new vintage; the prior snapshot is unchanged.
-          The {""}
-          <Link href="/factbook/methodology/reconciliation/changelog">
-            changelog
-          </Link>{" "}
-          page filters vintages so quarters where nothing materially
-          changed are not shown — readers do not need to scroll past
-          silent vintages. Non-filtered storage is uniform; only the
-          display is filtered.
+          Civica stores vintages uniformly, while displays can filter
+          quarters where nothing materially changed so readers do not
+          need to scroll past silent vintages.
         </p>
       </section>
 
@@ -1567,9 +1561,6 @@ export default async function ReconciliationMethodologyPage() {
         <Link href="/factbook">Factbook</Link>
         <Link href="/factbook/methodology/reconciliation/disputes">
           Disputes log
-        </Link>
-        <Link href="/factbook/methodology/reconciliation/changelog">
-          Changelog
         </Link>
         <Link href="/civica-index/methodology">
           Civica Index methodology

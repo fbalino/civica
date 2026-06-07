@@ -4,7 +4,10 @@ import { Suspense } from "react";
 import { db } from "@/lib/db";
 import { jurisdictions } from "@/lib/db/schema";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
-import { getPulseV2Changelog } from "@/lib/db/queries-pulse-v2";
+import {
+  getPulseV2Changelog,
+  type PulseV2ChangelogRow,
+} from "@/lib/db/queries-pulse-v2";
 import { pulse } from "@/lib/content/site-state";
 import { PulseChangelogFilterClient } from "./PulseChangelogFilterClient";
 
@@ -20,21 +23,29 @@ export const metadata: Metadata = {
 };
 
 export default async function PulseChangelogPage() {
-  const [countries, published, review] = await Promise.all([
-    db
-      .select({ slug: jurisdictions.slug, name: jurisdictions.name })
-      .from(jurisdictions)
-      .orderBy(jurisdictions.name),
-    getPulseV2Changelog({ publishedOnly: true, limit: 2500 }),
-    getPulseV2Changelog({ publishedOnly: false, limit: 2500 }),
-  ]);
+  let countries: Array<{ slug: string; name: string }> = [];
+  let events: PulseV2ChangelogRow[] = [];
 
-  const seen = new Set<string>();
-  const events = [...published.rows, ...review.rows].filter((row) => {
-    if (seen.has(row.id)) return false;
-    seen.add(row.id);
-    return true;
-  });
+  try {
+    const [countryRows, published, review] = await Promise.all([
+      db
+        .select({ slug: jurisdictions.slug, name: jurisdictions.name })
+        .from(jurisdictions)
+        .orderBy(jurisdictions.name),
+      getPulseV2Changelog({ publishedOnly: true, limit: 2500 }),
+      getPulseV2Changelog({ publishedOnly: false, limit: 2500 }),
+    ]);
+
+    countries = countryRows;
+    const seen = new Set<string>();
+    events = [...published.rows, ...review.rows].filter((row) => {
+      if (seen.has(row.id)) return false;
+      seen.add(row.id);
+      return true;
+    });
+  } catch {
+    // Keep the public changelog shell renderable during DB outages.
+  }
 
   return (
     <EditorialPage width="wide">

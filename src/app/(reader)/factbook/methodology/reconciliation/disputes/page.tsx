@@ -7,6 +7,7 @@ import { FACTBOOK_RECONCILIATION_META } from "@/lib/factbook/reconcile/api";
 import {
   getPublicDisputeFeed,
   getPublicDisputeFilterDistributions,
+  type DisputeFilterDistributions,
 } from "@/lib/db/queries-data-disputes";
 import { reconciliation } from "@/lib/content/site-state";
 import { DisputesFilterClient } from "./DisputesFilterClient";
@@ -25,10 +26,24 @@ export const metadata: Metadata = {
 };
 
 export default async function PublicDisputesPage() {
-  const [{ rows, totalAll }, distributions] = await Promise.all([
-    getPublicDisputeFeed({ limit: 2000 }),
-    getPublicDisputeFilterDistributions({ topN: 8 }),
-  ]);
+  let rows: Awaited<ReturnType<typeof getPublicDisputeFeed>>["rows"] = [];
+  let totalAll = 0;
+  let distributions: DisputeFilterDistributions = {
+    sourcePairs: [],
+    factKeys: [],
+  };
+
+  try {
+    const [feed, distributionRows] = await Promise.all([
+      getPublicDisputeFeed({ limit: 2000 }),
+      getPublicDisputeFilterDistributions({ topN: 8 }),
+    ]);
+    rows = feed.rows;
+    totalAll = feed.totalAll;
+    distributions = distributionRows;
+  } catch {
+    // Keep the public methodology page renderable during DB outages.
+  }
 
   return (
     <EditorialPage width="wide">

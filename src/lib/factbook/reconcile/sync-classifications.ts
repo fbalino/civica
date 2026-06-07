@@ -20,14 +20,13 @@
  * Resolution:  ~/Downloads/resolution\ \(2\).md
  */
 import { createHash } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
 
 import {
   countryFacts,
   factSnapshots,
   jurisdictions,
-  sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 
 type Db = typeof import("@/lib/db").db;
@@ -338,12 +337,11 @@ export async function syncWorldBankClassifications(
     }
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "world_bank"));
-  }
+  await markSourcesSynced("world_bank", {
+    rowsWritten: regionWritten + incomeWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   return {
     startedAt,
@@ -665,12 +663,11 @@ export async function syncVdemRow(
     }
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "vdem"));
-  }
+  await markSourcesSynced("vdem", {
+    rowsWritten: written,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   return {
     startedAt,
@@ -1007,12 +1004,11 @@ export async function syncMonarchyAndGovernmentForm(
     }
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "cia_factbook"));
-  }
+  await markSourcesSynced("cia_factbook", {
+    rowsWritten: monarchyWritten + formWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   return {
     startedAt,

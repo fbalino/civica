@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 import { classifyGovernment } from "@/lib/data/government-category";
 import styles from "./CountryOutcomeBars.module.css";
 
@@ -35,6 +35,31 @@ interface OutcomesPayload {
   govType: string | null;
   year: number;
   metrics: MetricRow[];
+}
+
+type OutcomesState = {
+  data: OutcomesPayload | null;
+  loading: boolean;
+  error: string | null;
+};
+
+type OutcomesAction =
+  | { type: "start" }
+  | { type: "success"; payload: OutcomesPayload }
+  | { type: "error"; message: string };
+
+function outcomesReducer(
+  state: OutcomesState,
+  action: OutcomesAction,
+): OutcomesState {
+  switch (action.type) {
+    case "start":
+      return { ...state, loading: true, error: null };
+    case "success":
+      return { data: action.payload, loading: false, error: null };
+    case "error":
+      return { ...state, loading: false, error: action.message };
+  }
 }
 
 export interface CountryOutcomeBarsProps {
@@ -485,14 +510,16 @@ export function CountryOutcomeBars({
   year,
   showTrend = true,
 }: CountryOutcomeBarsProps) {
-  const [data, setData] = useState<OutcomesPayload | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [{ data, loading, error }, dispatch] = useReducer(outcomesReducer, {
+    data: null,
+    loading: true,
+    error: null,
+  });
 
   useEffect(() => {
     if (!slug) return;
-    setLoading(true);
-    setError(null);
+    let cancelled = false;
+    dispatch({ type: "start" });
 
     const currentYear = year ?? new Date().getFullYear();
     fetch(`/api/countries/${slug}/outcomes?year=${currentYear}`)
@@ -501,13 +528,22 @@ export function CountryOutcomeBars({
         return res.json() as Promise<OutcomesPayload>;
       })
       .then((payload) => {
-        setData(payload);
-        setLoading(false);
+        if (!cancelled) {
+          dispatch({ type: "success", payload });
+        }
       })
       .catch((err: unknown) => {
-        setError(err instanceof Error ? err.message : "Unknown error");
-        setLoading(false);
+        if (!cancelled) {
+          dispatch({
+            type: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+          });
+        }
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [slug, year]);
 
   const govLabel = data
@@ -687,7 +723,7 @@ export function CountryOutcomeBars({
           ))}
 
       <footer className={styles.cob__footer}>
-        <a href={`/outcomes${firstMetricId ? `?metric=${firstMetricId}` : ""}`}>
+        <a href={`/civica-conditions${firstMetricId ? `?metric=${firstMetricId}` : ""}`}>
           Compare across all countries →
         </a>
       </footer>

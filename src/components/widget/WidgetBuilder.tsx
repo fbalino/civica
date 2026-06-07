@@ -8,14 +8,11 @@ const PUBLIC_ORIGIN = "https://civicaatlas.org";
 
 const DATAPOINTS: Array<{ key: string; label: string; hint?: string }> = [
   { key: "ci", label: "Civica Index" },
-  { key: "cp", label: "Civica Pulse" },
   { key: "capital", label: "Capital" },
   { key: "gov", label: "Government type" },
   { key: "pop", label: "Population" },
   { key: "gdp", label: "GDP" },
   { key: "area", label: "Area" },
-  { key: "hos", label: "Head of state", hint: "Demo only" },
-  { key: "hog", label: "Head of govt.", hint: "Demo only" },
 ];
 
 const THEMES: Array<{ key: "auto" | "light" | "dark"; label: string }> = [
@@ -54,7 +51,7 @@ export function WidgetBuilder({ countries, initialSlug }: WidgetBuilderProps) {
   const [slug, setSlug] = useState(initialSlug);
   const [query, setQuery] = useState("");
   const [includeKeys, setIncludeKeys] = useState<Set<string>>(
-    () => new Set(["ci", "cp", "capital", "gov"]),
+    () => new Set(["ci", "capital", "gov"]),
   );
   const [theme, setTheme] = useState<"auto" | "light" | "dark">("auto");
   const [width, setWidth] = useState<number>(360);

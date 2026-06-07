@@ -135,9 +135,8 @@ export function AtlasCountryShellClient({
     setDimmed(new Set());
   }, [country.id]);
 
-  // Phase C — Elections retired at the country level (route redirects to
-  // global /elections). The unconditional /api/countries/<slug>/elections
-  // fetch that used to live here is gone with it.
+  // Phase C — elections retired at the country level. Use the global
+  // /elections surface instead.
 
   // Shared fetch effect for bills / scores / leaders / constitution /
   // structure / international. Mirrors AtlasApp.tsx's consolidated loader.
@@ -266,7 +265,7 @@ export function AtlasCountryShellClient({
         onSeatHover={() => {}}
         onSeatLeave={() => setSeatTip(null)}
         onAskBill={(text) => dispatchCivicaAsk(text)}
-        onPickOrg={(slug) => router.push(`/atlas#org=${slug}`)}
+        onPickOrg={(slug) => router.push(`/atlas/organizations/${slug}`)}
         onPickCountry={(slug) => {
           const match = dbCountries.find(
             (x) => x.slug === slug || x.id === slug,

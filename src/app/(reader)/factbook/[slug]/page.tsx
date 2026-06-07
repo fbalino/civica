@@ -8,6 +8,7 @@ import {
   getCICountryDetail,
   getGovernmentStructure,
   getLeaderTimeline,
+  getSource,
   getBillsForJurisdiction,
 } from "@/lib/db/queries";
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
@@ -171,6 +172,7 @@ export default async function FactbookCountryPage({
     countryOptions,
     headerFacts,
     citeSources,
+    wikidataSource,
   ] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -238,6 +240,7 @@ export default async function FactbookCountryPage({
     getDistinctActiveSourcesForJurisdiction(jurisdiction.id).catch(
       () => [] as Array<{ id: string; name: string }>
     ),
+    getSource("wikidata").catch(() => null),
   ]);
 
   const hasLegislature = !!legislatureData;
@@ -540,6 +543,11 @@ export default async function FactbookCountryPage({
                   <FactbookLeaders
                     jurisdictionId={jurisdiction.id}
                     countryName={jurisdiction.name}
+                    retrievedAt={
+                      wikidataSource?.lastSyncAt
+                        ? wikidataSource.lastSyncAt.toISOString()
+                        : null
+                    }
                   />
                 )}
                 {section.kind === "civica" && section.id === "bills" && (

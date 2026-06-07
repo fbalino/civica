@@ -1,6 +1,7 @@
 import { eq, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { bills, sources } from "@/lib/db/schema";
+import { bills } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import type * as schema from "@/lib/db/schema";
 import type { BillIngest } from "./types";
 
@@ -102,15 +103,15 @@ export async function upsertBills(
     }
   }
 
-  // Stamp lastSyncAt on every distinct source we just touched. AGENTS.md:
+  // Stamp lastSyncAt on every distinct source we just touched — but only
+  // when at least one row was written. markSourcesSynced
+  // (src/lib/db/source-freshness.ts) is the one sanctioned path: it stamps
+  // iff rowsWritten > 0 and returns the ids it actually stamped. AGENTS.md:
   // "Sync scripts MUST stamp `sources.last_sync_at = NOW()` on success."
-  const sourcesStamped = Array.from(new Set(rows.map((r) => r.sourceId)));
-  for (const sourceId of sourcesStamped) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, sourceId));
-  }
+  const sourcesStamped = await markSourcesSynced(
+    Array.from(new Set(rows.map((r) => r.sourceId))),
+    { rowsWritten: inserted + updated },
+  );
 
   return { inserted, updated, sourcesStamped };
 }

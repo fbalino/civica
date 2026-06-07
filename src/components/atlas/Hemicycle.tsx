@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { type Chamber, type Party, PARTY_COLORS, getMember } from "./data";
+import { type Chamber, type Party, PARTY_COLORS } from "./data";
 
 function resolveColor(color: string): string {
   if (color.startsWith("#") || color.startsWith("oklch") || color.startsWith("rgb")) return color;
@@ -54,7 +54,7 @@ function seatLayout(total: number): SeatPos[] {
 interface HemicycleProps {
   chamber: Chamber;
   dimmed: Set<string>;
-  onSeatHover?: (info: { member: { name: string; district: string }; party: Party; index: number }, e: React.MouseEvent) => void;
+  onSeatHover?: (info: { party: Party; index: number }, e: React.MouseEvent) => void;
   onSeatLeave?: () => void;
 }
 
@@ -72,8 +72,7 @@ export function Hemicycle({ chamber, dimmed, onSeatHover, onSeatLeave }: Hemicyc
 
   const handleMouseEnter = useCallback(
     (i: number, p: Party, e: React.MouseEvent) => {
-      const m = getMember(p.id, i);
-      onSeatHover?.({ member: m, party: p, index: i }, e);
+      onSeatHover?.({ party: p, index: i }, e);
     },
     [onSeatHover],
   );
@@ -142,7 +141,7 @@ export function PartyLegend({ chamber, dimmed, onToggle }: PartyLegendProps) {
               </span>
             </div>
             <div className="bar">
-              <div className="fill" style={{ width: `${pct}%`, background: PARTY_COLORS[p.color] }} />
+              <div className="fill" style={{ width: `${pct}%`, background: resolveColor(p.color) }} />
             </div>
           </div>
         );

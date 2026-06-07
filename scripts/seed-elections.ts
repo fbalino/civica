@@ -1,3 +1,6 @@
+import { config } from "dotenv";
+config({ path: ".env.local", override: true });
+
 import { db } from "../src/lib/db/index";
 import { elections, electionResults, jurisdictions } from "../src/lib/db/schema";
 import { eq, sql } from "drizzle-orm";

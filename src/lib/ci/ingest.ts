@@ -7,6 +7,7 @@ import {
   ciDimensionScores,
   ciMethodologyVersions,
 } from "../db/schema";
+import { markSourcesSynced } from "../db/source-freshness";
 import { normalize, yearToQuarter } from "./normalize";
 import type { IngestionResult } from "./types";
 
@@ -126,6 +127,11 @@ export async function runIngestion(
 
     ingested++;
   }
+
+  // Stamp source freshness only when this run actually wrote rows.
+  // markSourcesSynced (src/lib/db/source-freshness.ts) is the one
+  // sanctioned path and applies the stamp iff rowsWritten > 0.
+  await markSourcesSynced(result.sourceId, { rowsWritten: ingested });
 
   return { ingested, skipped };
 }

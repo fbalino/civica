@@ -21,17 +21,13 @@ import {
   constitutions,
   elections,
   electionResults,
-  countryMetrics,
-  metricDefinitions,
   ciCompositeScores,
   ciDimensionScores,
   ciMethodologyVersions,
-  pulseEvents,
   pulseDailyScores,
   bills,
   organizations,
   organizationMemberships,
-  civicaConditionsScores,
 } from "./schema";
 
 export async function getJurisdictionBySlug(slug: string) {
@@ -82,28 +78,6 @@ export async function getFactbookCountryOptions() {
       sql`${jurisdictions.type} = 'sovereign_state' AND LOWER(${jurisdictions.name}) <> 'none'`
     )
     .orderBy(asc(jurisdictions.name));
-}
-
-// Non-territory sovereign states with population data. Used for the homepage
-// featured grid so we never surface Akrotiri / Antarctica / Bouvet Island first.
-export async function getFeaturedCountries(limit = 24) {
-  const rows = await db
-    .select()
-    .from(jurisdictions)
-    .where(
-      sql`${jurisdictions.type} = 'sovereign_state'
-        AND ${jurisdictions.population} IS NOT NULL
-        AND ${jurisdictions.population} > 0
-        AND ${jurisdictions.iso2} IS NOT NULL
-        AND LOWER(${jurisdictions.name}) <> 'none'`
-    )
-    .orderBy(desc(jurisdictions.population), asc(jurisdictions.name))
-    .limit(limit);
-  const classificationMap = await buildGovernmentClassificationMap(rows);
-  return rows.map((row) => ({
-    ...row,
-    governmentClassification: classificationMap.get(row.id) ?? null,
-  }));
 }
 
 export async function getFactbookSections(jurisdictionId: string) {
@@ -354,77 +328,6 @@ export async function getAllSources() {
   return db.select().from(sources).orderBy(sources.name);
 }
 
-export async function getDistinctGovernmentTypes() {
-  const results = await db
-    .select({
-      governmentType: jurisdictions.governmentType,
-    })
-    .from(jurisdictions)
-    .where(
-      sql`${jurisdictions.type} = 'sovereign_state' AND ${jurisdictions.governmentType} IS NOT NULL`
-    )
-    .groupBy(jurisdictions.governmentType)
-    .orderBy(asc(jurisdictions.governmentType));
-  return results.map((r) => r.governmentType!);
-}
-
-/**
- * Returns clean structural family options (from the Bjornskov-Rode / CGV
- * taxonomy layer) for use as Civica Index filter chips. Each option includes
- * both the total number of sovereign states in that family and the number of
- * those that have a CI composite score for the given quarter, so the UI can
- * warn users when a filter combination would empty out.
- */
-export async function getStructuralFamilyDistribution(quarter?: string) {
-  const q = quarter ?? (await getLatestAvailableQuarter());
-  const result = await db.execute(sql`
-    SELECT
-      gt.structural_family AS key,
-      COUNT(DISTINCT gt.jurisdiction_id)::int AS "totalCount",
-      COUNT(DISTINCT cs.jurisdiction_id) FILTER (
-        WHERE cs.quarter = ${q} AND cs.score IS NOT NULL
-      )::int AS "scoredCount"
-    FROM government_taxonomies gt
-    JOIN jurisdictions j ON j.id = gt.jurisdiction_id AND j.type = 'sovereign_state'
-    LEFT JOIN ci_composite_scores cs ON cs.jurisdiction_id = gt.jurisdiction_id
-    WHERE gt.taxonomy_version = '2026_v1'
-      AND gt.structural_family IS NOT NULL
-    GROUP BY gt.structural_family
-    ORDER BY "totalCount" DESC
-  `);
-  const rows = Array.isArray(result) ? result : (result as { rows?: unknown[] }).rows ?? [];
-  return (rows as Array<{ key: string; totalCount: number; scoredCount: number }>).map((row) => ({
-    key: row.key,
-    totalCount: Number(row.totalCount ?? 0),
-    scoredCount: Number(row.scoredCount ?? 0),
-  }));
-}
-
-export async function getJurisdictionsByGovernmentTypePattern(
-  patterns: string[]
-) {
-  if (patterns.length === 0) return [];
-  const conditions = patterns.map(
-    (p) => sql`(LOWER(${jurisdictions.governmentTypeDetail}) LIKE ${`%${p.toLowerCase()}%`} OR LOWER(${jurisdictions.governmentType}) LIKE ${`%${p.toLowerCase()}%`})`
-  );
-  const combined =
-    conditions.length === 1
-      ? conditions[0]
-      : sql.join(conditions, sql` OR `);
-  const rows = await db
-    .select()
-    .from(jurisdictions)
-    .where(
-      sql`${jurisdictions.type} = 'sovereign_state' AND (${combined})`
-    )
-    .orderBy(desc(jurisdictions.population), asc(jurisdictions.name));
-  const classificationMap = await buildGovernmentClassificationMap(rows);
-  return rows.map((row) => ({
-    ...row,
-    governmentClassification: classificationMap.get(row.id) ?? null,
-  }));
-}
-
 export async function getDemocracyScores(jurisdictionId: string) {
   const jurisdiction = await db
     .select({
@@ -592,24 +495,6 @@ export async function getUpcomingElections(limit = 20) {
     .limit(limit);
 }
 
-export async function getRecentElections(limit = 20) {
-  return db
-    .select({
-      election: elections,
-      jurisdiction: {
-        slug: jurisdictions.slug,
-        name: jurisdictions.name,
-        iso2: jurisdictions.iso2,
-        continent: jurisdictions.continent,
-      },
-    })
-    .from(elections)
-    .innerJoin(jurisdictions, eq(elections.jurisdictionId, jurisdictions.id))
-    .where(sql`${elections.electionDate} < CURRENT_DATE`)
-    .orderBy(desc(elections.electionDate))
-    .limit(limit);
-}
-
 export async function getRecentElectionsWithResults(limit = 40) {
   const rows = await db
     .select({
@@ -640,96 +525,6 @@ export async function getRecentElectionsWithResults(limit = 40) {
     ...r,
     results: allResults.filter((res) => res.electionId === r.election.id),
   }));
-}
-
-export async function getCountryMetrics(
-  jurisdictionId: string,
-  metricId?: string
-) {
-  return db
-    .select({
-      metric: countryMetrics,
-      definition: metricDefinitions,
-    })
-    .from(countryMetrics)
-    .innerJoin(
-      metricDefinitions,
-      eq(countryMetrics.metricId, metricDefinitions.id)
-    )
-    .where(
-      metricId
-        ? sql`${countryMetrics.jurisdictionId} = ${jurisdictionId} AND ${countryMetrics.metricId} = ${metricId}`
-        : eq(countryMetrics.jurisdictionId, jurisdictionId)
-    )
-    .orderBy(asc(countryMetrics.metricId), desc(countryMetrics.year));
-}
-
-export async function getLatestMetricsForCountry(jurisdictionId: string) {
-  return db.execute(sql`
-    SELECT DISTINCT ON (cm.metric_id)
-      cm.metric_id, cm.year, cm.value, cm.rank, cm.total_ranked,
-      cm.source_id, cm.source_url,
-      md.name, md.description, md.category, md.unit,
-      md.higher_is_better, md.value_min, md.value_max
-    FROM country_metrics cm
-    JOIN metric_definitions md ON cm.metric_id = md.id
-    WHERE cm.jurisdiction_id = ${jurisdictionId}
-    ORDER BY cm.metric_id, cm.year DESC
-  `);
-}
-
-export async function getMetricRankings(
-  metricId: string,
-  year?: number,
-  limit = 20
-) {
-  const yearFilter = year
-    ? sql`AND cm.year = ${year}`
-    : sql`AND cm.year = (SELECT MAX(year) FROM country_metrics WHERE metric_id = ${metricId})`;
-
-  return db.execute(sql`
-    SELECT
-      cm.value, cm.year, cm.rank, cm.total_ranked,
-      j.id AS jurisdiction_id, j.slug, j.name, j.iso2, j.iso3,
-      j.government_type, j.continent,
-      RANK() OVER (ORDER BY cm.value DESC) AS computed_rank
-    FROM country_metrics cm
-    JOIN jurisdictions j ON cm.jurisdiction_id = j.id
-    WHERE cm.metric_id = ${metricId} ${yearFilter}
-    ORDER BY cm.value DESC
-    LIMIT ${limit}
-  `);
-}
-
-export async function getMetricsByGovernmentType(
-  metricId: string,
-  year?: number
-) {
-  const yearFilter = year
-    ? sql`AND cm.year = ${year}`
-    : sql`AND cm.year = (SELECT MAX(year) FROM country_metrics WHERE metric_id = ${metricId})`;
-
-  return db.execute(sql`
-    SELECT
-      j.government_type,
-      COUNT(*) AS country_count,
-      AVG(cm.value) AS avg_value,
-      MIN(cm.value) AS min_value,
-      MAX(cm.value) AS max_value,
-      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY cm.value) AS median_value
-    FROM country_metrics cm
-    JOIN jurisdictions j ON cm.jurisdiction_id = j.id
-    WHERE cm.metric_id = ${metricId}
-      AND j.government_type IS NOT NULL
-      ${yearFilter}
-    GROUP BY j.government_type
-    HAVING COUNT(*) >= 3
-    ORDER BY avg_value DESC
-  `);
-}
-
-export async function getAllMetricDefinitions() {
-  return db.select().from(metricDefinitions).orderBy(asc(metricDefinitions.category), asc(metricDefinitions.name));
 }
 
 export async function getAllMetricDefinitionsWithCoverage(year?: number) {
@@ -945,31 +740,6 @@ export async function getCountryOutcomes(jurisdictionId: string, year: number) {
   `);
 
   return { metrics: countryData, peerBands, govType };
-}
-
-export async function getMetricCoverage(metricId: string, year: number) {
-  return db.execute(sql`
-    WITH sovereign AS (
-      SELECT id FROM jurisdictions WHERE type = 'sovereign_state'
-    ),
-    latest_data AS (
-      SELECT DISTINCT ON (cm.jurisdiction_id)
-        cm.jurisdiction_id,
-        cm.year AS data_year
-      FROM country_metrics cm
-      WHERE cm.metric_id = ${metricId}
-        AND cm.year <= ${year}
-      ORDER BY cm.jurisdiction_id, cm.year DESC
-    )
-    SELECT
-      (SELECT COUNT(*) FROM sovereign)::int                                            AS "totalCountries",
-      COUNT(ld.jurisdiction_id)::int                                                   AS "countriesWithData",
-      ((SELECT COUNT(*) FROM sovereign) - COUNT(ld.jurisdiction_id))::int              AS "countriesWithoutData",
-      COUNT(CASE WHEN ld.data_year >= ${year - 5} THEN 1 END)::int                    AS "countriesWithFreshData",
-      COUNT(CASE WHEN ld.data_year IS NOT NULL AND ld.data_year < ${year - 5} THEN 1 END)::int AS "countriesWithStaleData"
-    FROM sovereign s
-    LEFT JOIN latest_data ld ON s.id = ld.jurisdiction_id
-  `);
 }
 
 // --- Civica Index queries ---
@@ -1223,30 +993,6 @@ export async function compareCICountries(slugs: string[], quarter?: string) {
   }));
 }
 
-export async function getCIByGovernmentType(quarter?: string) {
-  const q = quarter ?? await getLatestAvailableQuarter();
-
-  return db.execute(sql`
-    SELECT
-      j.government_type                                                     AS "governmentType",
-      COUNT(*)::int                                                         AS "countryCount",
-      AVG(cs.score)                                                         AS "avgScore",
-      MIN(cs.score)                                                         AS "minScore",
-      MAX(cs.score)                                                         AS "maxScore",
-      PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY cs.score)                AS "medianScore",
-      PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY cs.score)               AS "q1",
-      PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY cs.score)               AS "q3"
-    FROM ci_composite_scores cs
-    JOIN jurisdictions j ON cs.jurisdiction_id = j.id
-    WHERE cs.quarter = ${q}
-      AND j.government_type IS NOT NULL
-      AND j.type = 'sovereign_state'
-    GROUP BY j.government_type
-    HAVING COUNT(*) >= 3
-    ORDER BY AVG(cs.score) DESC
-  `);
-}
-
 export async function getCIByGovernmentTypeDots(quarter?: string) {
   const q = quarter ?? await getLatestAvailableQuarter();
   const result = await db.execute(sql`
@@ -1404,57 +1150,6 @@ export async function getPulseChangelog(
     ORDER BY pe.event_date DESC, pe.created_at DESC
     LIMIT ${limit}
     OFFSET ${offset}
-  `);
-}
-
-export async function getPulseChangelogSummary(days = 30) {
-  return db.execute(sql`
-    WITH scoped AS (
-      SELECT pe.*, j.name AS country_name, j.continent
-      FROM pulse_events pe
-      JOIN jurisdictions j ON pe.jurisdiction_id = j.id
-      WHERE j.type = 'sovereign_state'
-        AND pe.event_date >= CURRENT_DATE - ${days}
-    ),
-    biggest_drop AS (
-      SELECT country_name, SUM(severity * confidence / 10.0) AS total
-      FROM scoped
-      GROUP BY country_name
-      ORDER BY total ASC
-      LIMIT 1
-    ),
-    biggest_gain AS (
-      SELECT country_name, SUM(severity * confidence / 10.0) AS total
-      FROM scoped
-      GROUP BY country_name
-      ORDER BY total DESC
-      LIMIT 1
-    )
-    SELECT
-      (SELECT COUNT(*)::int FROM scoped)                                 AS "totalEvents",
-      (SELECT COUNT(DISTINCT country_name)::int FROM scoped)             AS "countriesMoved",
-      (SELECT COUNT(*)::int FROM jurisdictions WHERE type = 'sovereign_state') AS "totalCountries",
-      (SELECT country_name FROM biggest_drop)                            AS "biggestDropCountry",
-      (SELECT total        FROM biggest_drop)                            AS "biggestDropValue",
-      (SELECT country_name FROM biggest_gain)                            AS "biggestGainCountry",
-      (SELECT total        FROM biggest_gain)                            AS "biggestGainValue"
-  `);
-}
-
-export async function getPulseChangelogDailyGlobal(days = 30) {
-  return db.execute(sql`
-    SELECT
-      pe.event_date                                                           AS "eventDate",
-      SUM(CASE WHEN pe.severity > 0 THEN pe.severity * pe.confidence ELSE 0 END)::float AS "positiveImpact",
-      SUM(CASE WHEN pe.severity < 0 THEN pe.severity * pe.confidence ELSE 0 END)::float AS "negativeImpact",
-      SUM(pe.severity * pe.confidence)::float                                 AS "netImpact",
-      COUNT(*)::int                                                           AS "eventCount"
-    FROM pulse_events pe
-    JOIN jurisdictions j ON pe.jurisdiction_id = j.id
-    WHERE j.type = 'sovereign_state'
-      AND pe.event_date >= CURRENT_DATE - ${days}
-    GROUP BY pe.event_date
-    ORDER BY pe.event_date ASC
   `);
 }
 

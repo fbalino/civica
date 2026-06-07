@@ -3,12 +3,12 @@ config({ path: ".env.local" });
 
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { eq, sql as dsql } from "drizzle-orm";
+import { sql as dsql } from "drizzle-orm";
 import {
   jurisdictions,
   countryMetrics,
-  sources,
 } from "../src/lib/db/schema";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const sqlClient = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: sqlClient });
@@ -130,10 +130,11 @@ async function main() {
     totalSkipped += skipped;
   }
 
-  await db
-    .update(sources)
-    .set({ lastSyncAt: new Date() })
-    .where(eq(sources.id, SOURCE_ID));
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually upserted rows (AGENTS.md provenance invariant). Was
+  // previously an unconditional stamp that faked freshness on an
+  // empty/failed run.
+  await markSourcesSynced(SOURCE_ID, { rowsWritten: totalInserted });
 
   console.log(`\nDone. Total inserted: ${totalInserted}, skipped: ${totalSkipped}`);
 }

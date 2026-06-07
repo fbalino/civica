@@ -461,3 +461,18 @@ Known issues parked:
 Up next: Phase 5.6 — Pulse scoring + dimensional delta UI on
 country pages + public Pulse changelog page. The whole pipeline
 stands up to 5.6's needs without further backend changes.
+
+## 2026-06-06 — Codebase health audit (multi-agent workflow)
+
+Ran a 23-agent discovery + independent-verification + synthesis workflow
+auditing the whole repo for dead code, DRY violations (code + styling),
+deprecated patterns, complexity, and broken/mis-wired features. 53 total
+agents. Report saved to `~/civica/plan/codebase-health-audit-2026-06-06.md`.
+132 findings (10 high / 63 medium / 59 low); 4 refuted in verification.
+Headline themes: provenance/credibility bugs (syncs stamping last_sync_at
+on total failure, citation snapshot republishing rejected facts, fabricated
+sources on rankings/embed/factbook-leaders/CI hero, public HomeWiki variant
+rendering fake data), missing footer Licensing/GitHub links + no /licensing
+page, Pulse "daily" signal lacking a cron schedule, ~18 near-identical
+factbook sync adapters (largest DRY surface), and per-page style blocks +
+shipped v2/v3 prototype CSS violating the design system.

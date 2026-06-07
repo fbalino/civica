@@ -11,9 +11,9 @@ import {
   persons,
   terms,
   statements,
-  sources,
 } from "../src/lib/db/schema";
 import { sparqlQuery, extractQid } from "../src/lib/data/wikidata";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
@@ -426,10 +426,11 @@ async function main() {
     console.log(`  ✓ ${stateName}`);
   }
 
-  await db
-    .update(sources)
-    .set({ lastSyncAt: new Date() })
-    .where(eq(sources.id, "wikidata"));
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually synced rows (AGENTS.md provenance invariant). Was
+  // previously an unconditional stamp that faked freshness on an
+  // empty/failed run.
+  await markSourcesSynced("wikidata", { rowsWritten: synced });
 
   console.log(`\n=== Sync Complete ===`);
   console.log(`Synced:  ${synced}`);

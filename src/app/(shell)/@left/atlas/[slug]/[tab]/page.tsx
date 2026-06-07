@@ -5,7 +5,7 @@ import { AtlasLeftModeToggle } from "@/components/shell/AtlasLeftModeToggle";
 
 export const revalidate = 3600;
 
-export default async function AtlasCountryLeftSlot({
+export default async function AtlasCountryRailSlot({
   params,
 }: {
   params: Promise<{ slug: string; tab: string }>;

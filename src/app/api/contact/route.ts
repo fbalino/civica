@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
+import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
 
 // Per-IP rate limit: max 5 submissions per 10 minutes
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX = 5;
 
@@ -11,23 +11,6 @@ const MAX_NAME_LEN = 100;
 const MAX_EMAIL_LEN = 254;
 const MAX_SUBJECT_LEN = 200;
 const MAX_MESSAGE_LEN = 5000;
-
-function getIp(req: NextRequest): string {
-  return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown"
-  );
-}
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  entry.count++;
-  return entry.count <= RATE_LIMIT_MAX;
-}
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -41,12 +24,18 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: NextRequest) {
-  const ip = getIp(req);
+  const ip = getRequestIp(req);
 
-  if (!checkRateLimit(ip)) {
+  const rateLimit = checkInMemoryRateLimit({
+    scope: "contact",
+    key: ip,
+    max: RATE_LIMIT_MAX,
+    windowMs: RATE_LIMIT_WINDOW_MS,
+  });
+  if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: "Too many submissions. Please wait before trying again." },
-      { status: 429, headers: { "Retry-After": "600" } }
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
     );
   }
 

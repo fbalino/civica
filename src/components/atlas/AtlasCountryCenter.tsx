@@ -132,7 +132,6 @@ export interface AtlasCountryCenterProps {
   onDimToggle: (partyId: string) => void;
   onSeatHover: (
     info: {
-      member: { name: string; district: string };
       party: { name: string };
       index: number;
     },

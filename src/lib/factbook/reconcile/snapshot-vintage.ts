@@ -306,7 +306,8 @@ function dbRowToFactRow(row: FactRowDb): FactRow {
     status:
       row.status === "active" ||
       row.status === "rejected" ||
-      row.status === "superseded"
+      row.status === "superseded" ||
+      row.status === "demoted"
         ? row.status
         : "active",
     statusReason: row.statusReason,

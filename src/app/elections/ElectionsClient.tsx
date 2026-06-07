@@ -40,6 +40,15 @@ interface Stats {
 
 const REGIONS = ["All Regions", "Africa", "Americas", "Asia", "Europe", "Oceania"];
 const TYPES = ["All Types", "Presidential", "Legislative", "Referendum", "Local"];
+const REGION_CONTINENTS: Record<string, string[]> = {
+  Americas: ["North America", "South America"],
+};
+
+function matchesRegion(continent: string | null, regionFilter: string): boolean {
+  if (regionFilter === "All Regions") return true;
+  const acceptedContinents = REGION_CONTINENTS[regionFilter] ?? [regionFilter];
+  return continent !== null && acceptedContinents.includes(continent);
+}
 
 function daysUntil(dateStr: string): number {
   const target = new Date(dateStr + "T00:00:00Z");
@@ -72,7 +81,7 @@ export default function ElectionsClient({
 
   const filteredUpcoming = useMemo(() => {
     return upcoming.filter((e) => {
-      if (regionFilter !== "All Regions" && e.jurisdiction.continent !== regionFilter) return false;
+      if (!matchesRegion(e.jurisdiction.continent, regionFilter)) return false;
       if (typeFilter !== "All Types" && e.election.electionType?.toLowerCase() !== typeFilter.toLowerCase()) return false;
       return true;
     });
@@ -80,7 +89,7 @@ export default function ElectionsClient({
 
   const filteredRecent = useMemo(() => {
     return recent.filter((e) => {
-      if (regionFilter !== "All Regions" && e.jurisdiction.continent !== regionFilter) return false;
+      if (!matchesRegion(e.jurisdiction.continent, regionFilter)) return false;
       if (typeFilter !== "All Types" && e.election.electionType?.toLowerCase() !== typeFilter.toLowerCase()) return false;
       return true;
     });

@@ -71,7 +71,8 @@
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts",
     "regenerate:readme": "tsx scripts/regenerate-readme.ts",
-    "validate:content-templates": "tsx scripts/validate-content-templates.ts"
+    "validate:content-templates": "tsx scripts/validate-content-templates.ts",
+    "validate:sync-freshness": "tsx scripts/validate-sync-freshness.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

@@ -144,7 +144,17 @@ export default function RootLayout({
                   Status Page
                 </a>
                 <span>&middot;</span>
+                <Link href="/licensing">Licensing</Link>
+                <span>&middot;</span>
                 <Link href="/contact">Contact</Link>
+                <span>&middot;</span>
+                <a
+                  href="https://github.com/fbalino/civica"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  GitHub
+                </a>
                 <span>&middot;</span>
                 <Link href="/about">About</Link>
                 <span>&middot;</span>

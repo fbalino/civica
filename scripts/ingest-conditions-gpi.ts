@@ -18,6 +18,7 @@ config({ path: ".env.local", override: true });
 import { db } from "../src/lib/db";
 import { civicaConditionsScores, ciDimensionScores } from "../src/lib/db/schema";
 import { and, eq } from "drizzle-orm";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const METHODOLOGY_VERSION = "beta";
 const SOURCE_ID = "global_peace_index";
@@ -94,6 +95,11 @@ async function main() {
 
     upserted++;
   }
+
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually upserted rows (AGENTS.md provenance invariant). The
+  // helper applies the same `upserted > 0` gate internally.
+  await markSourcesSynced(SOURCE_ID, { rowsWritten: upserted });
 
   console.log(`Done: ${upserted} rows upserted into civica_conditions_scores.`);
   console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);

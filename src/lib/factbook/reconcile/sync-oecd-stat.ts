@@ -65,14 +65,14 @@
  * Resolution:  ~/civica/plan/oecd-stat-resolution-v1.md
  */
 import { createHash } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import {
   countryFacts,
   factSnapshots,
   jurisdictions,
-  sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -363,11 +363,7 @@ export const OECD_STAT_INDICATORS: readonly OecdStatIndicatorConfig[] = [
  * Only the first element is the numeric value; the rest are
  * attribute references we don't use today.
  */
-interface OecdSdmxObservationValue {
-  value: number | null;
-}
-
-interface OecdSdmxResponse {
+  interface OecdSdmxResponse {
   data: {
     dataSets: Array<{
       observations?: Record<string, Array<number | null>>;
@@ -937,12 +933,11 @@ export async function syncOecdStat(
     );
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "oecd_stat"));
-  }
+  await markSourcesSynced("oecd_stat", {
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:

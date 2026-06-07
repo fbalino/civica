@@ -41,6 +41,7 @@ import {
   jurisdictions,
   dataDisputes,
 } from "../src/lib/db/schema";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const sqlClient = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: sqlClient });
@@ -388,13 +389,20 @@ async function run() {
   // Step 9: Stamp source last_sync_at — the seed script does this
   // at end of full re-seed; targeted re-seed similarly stamps.
   console.log("\n[8] Stamping cia_factbook source.last_sync_at...");
-  if (!DRY_RUN) {
-    await sqlClient`
-      UPDATE sources SET last_sync_at = NOW() WHERE id = 'cia_factbook'
-    `;
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually rewrote rows (AGENTS.md provenance invariant), and
+  // never on a dry run. Was previously a raw SQL stamp gated only on
+  // !DRY_RUN, which faked freshness even when zero rows were rewritten.
+  const stamped = await markSourcesSynced("cia_factbook", {
+    rowsWritten: writes,
+    dryRun: DRY_RUN,
+  });
+  if (stamped.length > 0) {
     console.log("    Stamped.");
-  } else {
+  } else if (DRY_RUN) {
     console.log("    [dry] would stamp cia_factbook last_sync_at.");
+  } else {
+    console.log("    Not stamped (no rows rewritten).");
   }
 
   console.log("\n=== Re-seed complete ===");

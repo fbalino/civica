@@ -1,8 +1,8 @@
 /**
  * Peer-grouping distribution queries.
  *
- * Replaces `getStructuralFamilyDistribution()` with per-lens variants
- * that the civica-index left rail consumes during Phase 3. These
+ * Provides per-lens variants that the civica-index left rail consumes
+ * during Phase 3. These
  * queries do NOT yet plug into any rendered surface — Phase 3 wires
  * them into `(shell)/@left/civica-index/page.tsx`.
  *

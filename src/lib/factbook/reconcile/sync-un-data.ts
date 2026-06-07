@@ -57,15 +57,15 @@
  * Resolution:  ~/civica/plan/un-data-resolution-v1.md
  */
 import { createHash } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import AdmZip from "adm-zip";
 
 import {
   countryFacts,
   factSnapshots,
   jurisdictions,
-  sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -105,7 +105,6 @@ const UN_WPP_VINTAGE = "UN WPP 2024 Revision";
  *       available; we fetch the most recent year's timeID.
  */
 const UN_WPP_TIME_ID = 75;
-const UN_WPP_REFERENCE_YEAR = 2024;
 
 /**
  * Civica's editorial role for a given (source, fact-key) pair.
@@ -768,12 +767,11 @@ export async function syncUnData(
     );
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "un_data"));
-  }
+  await markSourcesSynced("un_data", {
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:

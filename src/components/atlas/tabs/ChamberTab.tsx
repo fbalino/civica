@@ -13,7 +13,6 @@ export interface ChamberTabProps {
   onDimToggle: (partyId: string) => void;
   onSeatHover: (
     info: {
-      member: { name: string; district: string };
       party: { name: string };
       index: number;
     },
@@ -95,8 +94,8 @@ export function ChamberTab({
           <div className="atlas-chamber-stage">
             {/* Compact hint replaces the old internal heading. */}
             <div className="atlas-chamber-hint">
-              {currentHouse.total} seats &middot; hover a seat for the
-              member&apos;s name
+              {currentHouse.total} seats &middot; hover a seat for party and
+              seat position
             </div>
             <Hemicycle
               chamber={currentHouse}

@@ -1,5 +1,11 @@
 import { type NextRequest } from "next/server";
-import { getCICountryDetail, getCountryFacts } from "@/lib/db/queries";
+import { getCICountryDetail } from "@/lib/db/queries";
+import {
+  V2_DIMENSIONS,
+  V2_DIMENSION_LABELS,
+  isV2Dimension,
+  type CIDimensionV2,
+} from "@/lib/ci/dimensions-v2";
 import {
   getCanonicalFactsForJurisdiction,
   FACTBOOK_RECONCILIATION_META,
@@ -25,6 +31,13 @@ const WIDGET_FACT_KEYS = [
   "gdp_ppp_usd_billions",
   "area_total_km2",
 ] as const;
+
+const DIMENSION_SHORT_LABELS: Record<CIDimensionV2, string> = {
+  democratic_quality: "Dem",
+  rule_of_law: "Rule",
+  freedom_rights: "Free",
+  corruption_control: "Corr",
+};
 
 function corsHeaders() {
   return {
@@ -55,7 +68,7 @@ export async function GET(
     : null) as "light" | "dark" | null;
   const dims = searchParams.get("dims") === "1";
 
-  // Phase G — custom builder. ?include=ci,cp,hos,hog,capital,gov,pop,gdp,area
+  // Phase G — custom builder. ?include=ci,cp,capital,gov,pop,gdp,area
   // controls which datapoints render inside the size=custom widget.
   // ?w= and ?h= are user-tunable dimensions. Defaults give a tall card
   // sized for a sidebar.
@@ -70,7 +83,6 @@ export async function GET(
   const customH = clampInt(searchParams.get("h"), 120, 800, 320);
 
   let detail: Awaited<ReturnType<typeof getCICountryDetail>> = null;
-  let facts: Awaited<ReturnType<typeof getCountryFacts>> = [];
   let canonicalFacts: Awaited<
     ReturnType<typeof getCanonicalFactsForJurisdiction>
   > = {};
@@ -85,13 +97,6 @@ export async function GET(
           canonicalFacts = r;
         }),
       ];
-      if (size === "lg" && dims) {
-        tasks.push(
-          getCountryFacts(detail.jurisdiction.id).then((r) => {
-            facts = r;
-          })
-        );
-      }
       await Promise.all(tasks);
     }
   } catch {
@@ -146,21 +151,39 @@ export async function GET(
   const ciInt = ciScore !== null ? Math.round(ciScore) : null;
   const ciDisplay = ciInt !== null ? String(ciInt) : "—";
   const ciMeta = ciScore !== null ? ciScore.toFixed(1) : "—";
-  const cpScore = ciScore !== null ? ciScore.toFixed(1) : "—";
+  const pulseScore =
+    typeof detail.pulse?.pulseScore === "number"
+      ? detail.pulse.pulseScore
+      : null;
+  const pulseDisplay = pulseScore !== null ? pulseScore.toFixed(1) : null;
 
   const tier =
     ciInt !== null ? getTier(ciInt) : { label: "N/A", cssVar: "--t-mixed" };
   const rank = composite?.rank ?? null;
   const totalRanked = composite?.totalRanked ?? null;
 
-  const dimScores = buildDimScores(facts, ciScore);
+  const dimScores = buildDimScores(detail.dimensions);
+  const showDims = size === "lg" && dims && dimScores.length > 0;
 
-  const now = new Date();
-  const qNum = Math.ceil((now.getMonth() + 1) / 3);
-  const quarterLabel = `Q${qNum} · ${now.getFullYear()}`;
-  const updatedDate = now
-    .toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-    .toUpperCase();
+  // Real data vintage + as-of — never clock-derived. This widget is a
+  // public, screenshot-able, citation-meant card, so a fabricated
+  // "today" date would misrepresent the data's freshness (the same
+  // fabrication already fixed on the Civica Index hero). The CI
+  // composite is a quarterly, frozen vintage: surface its real period
+  // label (`quarter`) and its real computed-at timestamp
+  // (`calculated_at`). When no composite exists there is no honest date
+  // to show, so `updatedDate` falls back to "" and the consuming markup
+  // omits the "UPDATED" line entirely rather than inventing one.
+  const quarterLabel = formatQuarterLabel(composite?.quarter ?? null);
+  const updatedDate = composite?.calculatedAt
+    ? new Date(composite.calculatedAt)
+        .toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        })
+        .toUpperCase()
+    : "";
 
   const { width, height } =
     size === "custom"
@@ -170,7 +193,7 @@ export async function GET(
   const html = buildHtml({
     size,
     themeParam,
-    dims,
+    dims: showDims,
     jurisdiction: {
       ...jurisdiction,
       // Override cache with resolver canonical for any field the
@@ -183,7 +206,7 @@ export async function GET(
     },
     ciDisplay,
     ciMeta,
-    cpScore,
+    pulseDisplay,
     tier,
     rank,
     totalRanked,
@@ -222,46 +245,27 @@ function getTier(score: number): { label: string; cssVar: string } {
   return { label: "Failed", cssVar: "--t-failed" };
 }
 
-type FactRow = { factKey: string; factValueNumeric: number | null };
+type DimensionRow = { dimension: string; normalizedScore: number | null };
 
-function buildDimScores(facts: FactRow[], ciScore: number | null) {
-  const m: Record<string, number | null> = {};
-  for (const f of facts) {
-    m[f.factKey] = f.factValueNumeric;
+function buildDimScores(dimensions: DimensionRow[]) {
+  const byDimension = new Map<CIDimensionV2, number>();
+
+  for (const row of dimensions) {
+    if (!isV2Dimension(row.dimension) || row.normalizedScore === null) continue;
+    if (!byDimension.has(row.dimension)) {
+      byDimension.set(row.dimension, row.normalizedScore);
+    }
   }
 
-  const dem = ciScore;
-
-  const leRaw = m["life_expectancy"];
-  const live =
-    leRaw != null ? Math.min(100, Math.max(0, ((leRaw - 40) / 50) * 100)) : null;
-
-  const gdpRaw = m["gdp_per_capita_ppp"];
-  const rule =
-    gdpRaw != null
-      ? Math.min(100, Math.max(0, (Math.log(Math.max(1, gdpRaw)) / Math.log(120000)) * 100))
-      : null;
-
-  const growthRaw = m["gdp_growth_rate"];
-  const econ =
-    growthRaw != null
-      ? Math.min(100, Math.max(0, 50 + (growthRaw - 3) * 5))
-      : null;
-
-  const ecol = m["electricity_access"] ?? null;
-
-  const milRaw = m["military_expenditure_pct_gdp"];
-  const stab =
-    milRaw != null ? Math.min(100, Math.max(0, 100 - milRaw * 5)) : null;
-
-  return [
-    { label: "Dem", title: "Democratic", score: dem !== null ? Math.round(dem) : null },
-    { label: "Livh", title: "Livelihoods", score: live !== null ? Math.round(live) : null },
-    { label: "Rule", title: "Rule of law", score: rule !== null ? Math.round(rule) : null },
-    { label: "Econ", title: "Economic", score: econ !== null ? Math.round(econ) : null },
-    { label: "Ecol", title: "Ecological", score: ecol !== null ? Math.round(ecol) : null },
-    { label: "Stab", title: "Stability", score: stab !== null ? Math.round(stab) : null },
-  ];
+  return V2_DIMENSIONS.flatMap((dimension) => {
+    const score = byDimension.get(dimension);
+    if (score === undefined) return [];
+    return {
+      label: DIMENSION_SHORT_LABELS[dimension],
+      title: V2_DIMENSION_LABELS[dimension],
+      score: Math.min(100, Math.max(0, Math.round(score))),
+    };
+  });
 }
 
 function esc(str: string): string {
@@ -295,6 +299,19 @@ function formatNumber(n: number): string {
   return n.toLocaleString("en-US");
 }
 
+/**
+ * Format the real CI composite quarter (`YYYY-QN`, e.g. "2026-Q3")
+ * into the compact dotlabel form ("Q3 · 2026"). Returns "" when no
+ * quarter is available, and echoes any unrecognized value verbatim —
+ * the widget never fabricates a period from the wall clock.
+ */
+function formatQuarterLabel(quarter: string | null): string {
+  if (!quarter) return "";
+  const match = /^(\d{4})-Q([1-4])$/.exec(quarter);
+  if (!match) return quarter;
+  return `Q${match[2]} · ${match[1]}`;
+}
+
 // ─── HTML builder ────────────────────────────────────────────────────────────
 
 interface BuildHtmlArgs {
@@ -312,7 +329,7 @@ interface BuildHtmlArgs {
   };
   ciDisplay: string;
   ciMeta: string;
-  cpScore: string;
+  pulseDisplay: string | null;
   tier: { label: string; cssVar: string };
   rank: number | null;
   totalRanked: number | null;
@@ -334,7 +351,7 @@ interface BuildHtmlArgs {
 function buildHtml(args: BuildHtmlArgs): string {
   const {
     size, themeParam, dims, jurisdiction,
-    ciDisplay, ciMeta, cpScore,
+    ciDisplay, ciMeta, pulseDisplay,
     tier, rank, totalRanked, quarterLabel, updatedDate,
     dimScores, width, height, include, attributionLabel,
   } = args;
@@ -348,6 +365,9 @@ function buildHtml(args: BuildHtmlArgs): string {
       ? `Rank ${rank} of ${totalRanked}`
       : "";
   const tierPct = ciDisplay !== "—" ? Math.round(Number(ciDisplay)) : 0;
+  // Pulse is intentionally NOT on a live cron schedule, so a "· LIVE"
+  // suffix here would misrepresent the cadence. Render the score plainly.
+  const pulseMeta = pulseDisplay !== null ? `CP ${pulseDisplay}` : "CP unavailable";
 
   // Phase F.4 — read-only attribution line that lists the canonical
   // sources backing the visible reconciled facts (population, GDP,
@@ -370,7 +390,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="mark serif">C</div>
   <div class="body">
     <div class="country">${esc(jurisdiction.name)}</div>
-    <div class="meta mono">CI ${esc(ciMeta)} &middot; CP ${esc(cpScore)} &middot; ${esc(tier.label.toUpperCase())}</div>
+    <div class="meta mono">CI ${esc(ciMeta)} &middot; ${esc(pulseMeta)} &middot; ${esc(tier.label.toUpperCase())}</div>
   </div>
   <div class="score serif">${esc(ciDisplay)}</div>
 </a>`;
@@ -385,13 +405,13 @@ function buildHtml(args: BuildHtmlArgs): string {
     <div class="num serif">${esc(ciDisplay)}</div>
   </div>
   <div class="tier-row">
-    <span>${esc(tier.label)}</span><span class="mono">CP ${esc(cpScore)} &middot; LIVE</span>
+    <span>${esc(tier.label)}</span><span class="mono">${esc(pulseMeta)}</span>
   </div>
   <div class="tier-bar"><span style="width:${tierPct}%"></span></div>
   ${attributionHtml}
   <div class="foot mono">
     <span>civicaatlas.org/countries/${esc(jurisdiction.slug)}</span>
-    <span>LIVE</span>
+    ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
 
@@ -408,23 +428,24 @@ function buildHtml(args: BuildHtmlArgs): string {
     <div class="num serif">${esc(ciDisplay)}<small class="mono">/ 100</small></div>
   </div>
   <div class="tier-label">
-    <span>${esc(tier.label)}</span><span class="mono">CP ${esc(cpScore)} &middot; LIVE</span>
+    <span>${esc(tier.label)}</span><span class="mono">${esc(pulseMeta)}</span>
   </div>
   <div class="tier-bar"><span style="width:${tierPct}%"></span></div>
   ${dims ? `<div class="dims">${dimBarsHtml}</div>` : ""}
   ${attributionHtml}
   <div class="foot mono">
     <span>civicaatlas.org/countries/${esc(jurisdiction.slug)}</span>
-    <span>UPDATED &middot; ${esc(updatedDate)}</span>
+    ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
 
   // Phase G — custom widget. Stacks rows for whichever datapoints the
-  // builder selected. CI/CP show as score chips; everything else shows
+  // builder selected. CI/CP show as score chips when real values exist;
+  // everything else shows
   // as a label/value row. If `include` is empty, fall back to a sensible
   // default (CI + capital + government type).
   const includeSet =
-    include.size > 0 ? include : new Set(["ci", "cp", "capital", "gov"]);
+    include.size > 0 ? include : new Set(["ci", "capital", "gov"]);
   const factRow = (label: string, value: string | null | undefined) =>
     value
       ? `<div class="cf-row"><span class="cf-k mono">${esc(label)}</span><span class="cf-v">${esc(value)}</span></div>`
@@ -446,13 +467,9 @@ function buildHtml(args: BuildHtmlArgs): string {
       ? `<div class="cf-score-row"><span class="cf-score-label mono">CI</span><span class="cf-score-val serif" style="color:var(${tier.cssVar})">${esc(ciDisplay)}</span><span class="cf-score-meta mono">${esc(tier.label)}</span></div>`
       : "",
     includeSet.has("cp")
-      ? `<div class="cf-score-row"><span class="cf-score-label mono">CP</span><span class="cf-score-val serif">${esc(cpScore)}</span><span class="cf-score-meta mono">PULSE</span></div>`
-      : "",
-    includeSet.has("hos")
-      ? factRow("Head of state", "—")
-      : "",
-    includeSet.has("hog")
-      ? factRow("Head of govt.", "—")
+      ? pulseDisplay !== null
+        ? `<div class="cf-score-row"><span class="cf-score-label mono">CP</span><span class="cf-score-val serif">${esc(pulseDisplay)}</span><span class="cf-score-meta mono">PULSE</span></div>`
+        : factRow("Civica Pulse", "Unavailable")
       : "",
     includeSet.has("capital") ? factRow("Capital", jurisdiction.capital) : "",
     includeSet.has("gov") ? factRow("Government", govType || null) : "",
@@ -472,7 +489,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   ${attributionHtml}
   <div class="cf-foot mono">
     <span>civicaatlas.org/atlas/${esc(jurisdiction.slug)}</span>
-    <span>UPDATED &middot; ${esc(updatedDate)}</span>
+    ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
 

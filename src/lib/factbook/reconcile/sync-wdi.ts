@@ -37,14 +37,14 @@
  * Resolution:  ~/civica/plan/wb-wdi-expansion-resolution-v1.md
  */
 import { createHash } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import {
   countryFacts,
   factSnapshots,
   jurisdictions,
-  sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -696,7 +696,7 @@ export async function syncWorldBankWdi(
             target: [factSnapshots.sourceId, factSnapshots.payloadHash],
           });
 
-        let snapshotIdRow = await db
+        const snapshotIdRow = await db
           .select({ id: factSnapshots.id })
           .from(factSnapshots)
           .where(
@@ -773,12 +773,11 @@ export async function syncWorldBankWdi(
     );
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "world_bank"));
-  }
+  await markSourcesSynced("world_bank", {
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:

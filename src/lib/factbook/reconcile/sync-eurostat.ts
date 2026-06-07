@@ -80,14 +80,14 @@
  * Bug 1:       ~/civica/plan/forecast-vs-measurement-v1.md
  */
 import { createHash } from "node:crypto";
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import {
   countryFacts,
   factSnapshots,
   jurisdictions,
-  sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -155,7 +155,6 @@ export const EU_EFTA_ISO3: readonly string[] = [
   // EFTA-4
   "ISL", "LIE", "NOR", "CHE",
 ];
-const EU_EFTA_SET = new Set(EU_EFTA_ISO3);
 
 /**
  * Eurostat ISO2 → ISO3-standard ISO2 anomaly translation. Two
@@ -1006,12 +1005,11 @@ export async function syncEurostat(
     );
   }
 
-  if (!options.dryRun) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, "eurostat"));
-  }
+  await markSourcesSynced("eurostat", {
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:

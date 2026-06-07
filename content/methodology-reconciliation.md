@@ -60,7 +60,7 @@ For Palestine, two parallel records exist: territory-level CIA Factbook entries 
 
 ## Sources
 
-A Wikidata claim is accepted only if its references — via the `P248` "stated in" property or the `P854` reference URL — point to an entry on the allowlist. Allowlist entries are organised in four tiers; the full list lives in [`src/lib/factbook/reconcile/source-allowlist.ts`](https://github.com/civicaatlas/civica/blob/main/src/lib/factbook/reconcile/source-allowlist.ts) and is the single source of truth — both the schema and the resolver import from it.
+A Wikidata claim is accepted only if its references — via the `P248` "stated in" property or the `P854` reference URL — point to an entry on the allowlist. Allowlist entries are organised in four tiers; the full list lives in [`src/lib/factbook/reconcile/source-allowlist.ts`](https://github.com/fbalino/civica/blob/main/src/lib/factbook/reconcile/source-allowlist.ts) and is the single source of truth — both the schema and the resolver import from it.
 
 ### Tier 1 — Multilateral statistical agencies (11 active)
 
@@ -242,7 +242,7 @@ The vintage label format is:
 
 The first frozen v1 vintage is **`Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1`**, cut on 5 May 2026 over 17 active sources writing through the resolver. The methodology version is embedded in the label so any cited vintage value carries the rules that produced it. When methodology revises to `v0.3-beta`, the next vintage label embeds that version, and the v0.2-beta vintages remain stable as historical citations.
 
-Pinning a citation to a specific vintage gives the reader a value that does not move. If the upstream World Bank revises a 2024 GDP figure six months later, that revision lands in a new vintage; the prior snapshot is unchanged. The [changelog](https://civicaatlas.org/factbook/methodology/reconciliation/changelog) page filters vintages so quarters where nothing materially changed are not shown — readers do not need to scroll past silent vintages. Non-filtered storage is uniform; only the display is filtered.
+Pinning a citation to a specific vintage gives the reader a value that does not move. If the upstream World Bank revises a 2024 GDP figure six months later, that revision lands in a new vintage; the prior snapshot is unchanged. Civica stores vintages uniformly, while displays can filter quarters where nothing materially changed so readers do not need to scroll past silent vintages.
 
 ---
 
@@ -369,4 +369,4 @@ The interactive `<CiteAccordion>` widget on the live page generates APA, BibTeX,
 
 ---
 
-*Related pages: [Methodology hub](https://civicaatlas.org/methodology) · [How we approach data](https://civicaatlas.org/methodology/approach) · [Factbook](https://civicaatlas.org/factbook) · [Disputes log](https://civicaatlas.org/factbook/methodology/reconciliation/disputes) · [Changelog](https://civicaatlas.org/factbook/methodology/reconciliation/changelog) · [Civica Index methodology](https://civicaatlas.org/civica-index/methodology) · [Pulse methodology](https://civicaatlas.org/civica-index/methodology/pulse) · [Corrections form](https://civicaatlas.org/civica-index/corrections)*
+*Related pages: [Methodology hub](https://civicaatlas.org/methodology) · [How we approach data](https://civicaatlas.org/methodology/approach) · [Factbook](https://civicaatlas.org/factbook) · [Disputes log](https://civicaatlas.org/factbook/methodology/reconciliation/disputes) · [Civica Index methodology](https://civicaatlas.org/civica-index/methodology) · [Pulse methodology](https://civicaatlas.org/civica-index/methodology/pulse) · [Corrections form](https://civicaatlas.org/civica-index/corrections)*

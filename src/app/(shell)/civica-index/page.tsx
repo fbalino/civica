@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Civica Index — Global Governance Rankings | Civica Atlas",
     description:
-      "The governance health of every country, updated in real time. Composite scores across 190+ sovereign states.",
+      "The governance health of every country. Quarterly structural scores across 190+ sovereign states.",
     url: "https://civicaatlas.org/civica-index",
   },
 };
@@ -53,14 +53,6 @@ function formatPop(n: number | null): string {
   if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
   if (n >= 1e3) return `${(n / 1e3).toFixed(0)}K`;
   return n.toString();
-}
-
-function formatToday(): string {
-  return new Date().toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
 }
 
 interface CIRankingRow {
@@ -137,6 +129,9 @@ export default async function CivicaIndexShellPage({
     rawRows.length > 0
       ? rawRows.reduce((s, r) => s + (r.score ?? 0), 0) / rawRows.length
       : 0;
+  const currentVintage =
+    rawRows.find((row) => row.vintageLabel)?.vintageLabel ??
+    "Quarterly structural score";
 
   return (
     <div className="civica-index-page">
@@ -144,7 +139,7 @@ export default async function CivicaIndexShellPage({
         <section className="ci-hero">
           <div className="ci-hero-eyebrow">
             <span className="dot live" aria-hidden="true" />
-            Civica Index · Updated daily
+            Civica Index · {currentVintage}
             <span
               className="ci-beta-pill"
               aria-label="Beta — methodology under active revision"
@@ -154,7 +149,7 @@ export default async function CivicaIndexShellPage({
             </span>
           </div>
           <h1 className="ci-hero-title">
-            The governance health of every country, updated in real time.
+            The governance health of every country.
           </h1>
           <p className="ci-hero-rework-note">
             Methodology under active revision —{" "}
@@ -191,8 +186,8 @@ export default async function CivicaIndexShellPage({
               <div className="ci-stat-label">Rank bands</div>
             </div>
             <div className="ci-stat">
-              <div className="ci-stat-value">{formatToday()}</div>
-              <div className="ci-stat-label">Last recalculation</div>
+              <div className="ci-stat-value">{currentVintage}</div>
+              <div className="ci-stat-label">Current vintage</div>
             </div>
           </div>
         </section>

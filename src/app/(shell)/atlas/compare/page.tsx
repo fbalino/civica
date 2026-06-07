@@ -12,7 +12,13 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  searchParams: Promise<{ a?: string; b?: string }>;
+  searchParams: Promise<{ a?: string; b?: string; ah?: string; bh?: string }>;
+}
+
+type House = "lower" | "upper";
+
+function parseHouse(value: string | undefined): House {
+  return value === "upper" ? "upper" : "lower";
 }
 
 export default async function AtlasComparePage({ searchParams }: PageProps) {
@@ -51,6 +57,8 @@ export default async function AtlasComparePage({ searchParams }: PageProps) {
       dbChambers={dbChambers}
       initialA={a}
       initialB={b}
+      initialHouseA={parseHouse(sp.ah)}
+      initialHouseB={parseHouse(sp.bh)}
     />
   );
 }

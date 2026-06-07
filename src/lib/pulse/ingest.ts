@@ -58,11 +58,11 @@ async function buildJurisdictionMap(db: Db): Promise<Map<string, string>> {
     "NORTH KOREA": "KOREA, NORTH",
     "CZECH REPUBLIC": "CZECHIA",
     "MYANMAR (BURMA)": "BURMA",
+    "MYANMAR": "BURMA",
     "CONGO (KINSHASA)": "DEMOCRATIC REPUBLIC OF THE CONGO",
     "CONGO (BRAZZAVILLE)": "REPUBLIC OF THE CONGO",
     "IVORY COAST": "COTE D'IVOIRE",
     "CAPE VERDE": "CABO VERDE",
-    "BURMA": "MYANMAR",
   };
   for (const [alias, canonical] of Object.entries(aliases)) {
     if (!canonical) continue;

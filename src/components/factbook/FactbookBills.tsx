@@ -22,8 +22,7 @@ import { FactbookBillAskButton } from "./FactbookBillAskButton";
  * `sourceId` plus the matching `sources.last_sync_at` timestamp.
  *
  * Civica AI: the per-bill "Ask Civica" button dispatches a `civica:ask`
- * CustomEvent on `window`. The factbook drawer doesn't currently listen
- * for it — the wiring is in place for when we add it.
+ * CustomEvent on `window`; the factbook drawer listens and sends it.
  */
 
 const SOURCE_TAG: Record<string, string> = {

@@ -353,7 +353,7 @@ export default function ContactClient() {
           body={
             <>
               <a
-                href="https://github.com/civicaatlas/civica/issues"
+                href="https://github.com/fbalino/civica/issues"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "var(--color-accent)" }}

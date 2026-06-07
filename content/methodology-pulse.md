@@ -67,7 +67,7 @@ An event detected only in news without specialist corroboration is held at lower
 
 ## Event categories — the {{state.pulse.taxonomy.version}} taxonomy {#event-categories}
 
-The Pulse classifies every event into exactly one category drawn from a fixed taxonomy. {{state.pulse.taxonomy.version}} ships **{{state.pulse.taxonomy.categoryCount}} categories** across the five dimensions, derived from a top-down completeness review against five established political-science frameworks (V-Dem, ACLED, the Comparative Constitutions Project, the Polity Project, and Freedom House). Full derivation lives in [the gap-analysis document](https://github.com/civicaatlas/civica/blob/main/docs/taxonomy-v2-gap-analysis.md).
+The Pulse classifies every event into exactly one category drawn from a fixed taxonomy. {{state.pulse.taxonomy.version}} ships **{{state.pulse.taxonomy.categoryCount}} categories** across the five dimensions, derived from a top-down completeness review against five established political-science frameworks (V-Dem, ACLED, the Comparative Constitutions Project, the Polity Project, and Freedom House). Full derivation lives in [the gap-analysis document](https://github.com/fbalino/civica/blob/main/docs/taxonomy-v2-gap-analysis.md).
 
 ### Democratic Quality ({{state.pulse.taxonomy.categoriesPerDimension.democratic_quality}} categories)
 

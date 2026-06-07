@@ -91,6 +91,7 @@ import {
   jurisdictions,
   sources,
 } from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
 import {
   persistProposedDisputes,
@@ -793,17 +794,22 @@ export async function syncUnescoUis(
   }
 
   if (!options.dryRun) {
-    // Stamp last_sync_at AND correct the seeded license string
-    // (CC-BY-3.0-IGO → CC-BY-SA-4.0) per resolution Q1. Idempotent —
-    // re-running the sync after the correction is a no-op.
+    // Correct the seeded license string (CC-BY-3.0-IGO → CC-BY-SA-4.0)
+    // per resolution Q1. This correction is applied on every non-dry
+    // run regardless of whether rows were written — it is NOT a
+    // freshness stamp, so it stays a direct `sources` update.
     await db
       .update(sources)
-      .set({
-        lastSyncAt: new Date(),
-        license: "CC-BY-SA-4.0",
-      })
+      .set({ license: "CC-BY-SA-4.0" })
       .where(eq(sources.id, "unesco_uis"));
   }
+  // Freshness stamp routed through the sole sanctioned helper, which
+  // stamps `last_sync_at` only when the run actually wrote rows.
+  await markSourcesSynced("unesco_uis", {
+    rowsWritten: totalWritten,
+    dryRun: options.dryRun,
+    executor: db,
+  });
 
   // Phase F.6.1 — re-run the resolver on every (jurisdictionId,
   // factKey) we touched and persist any new disputes. Idempotent:

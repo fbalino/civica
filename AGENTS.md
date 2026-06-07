@@ -113,3 +113,4 @@ These links MUST survive any header/footer refactor:
 ## Committing
 - Civica currently tolerates a pre-existing repo-wide lint failure unrelated to normal work (old React effect/hook warnings). Do not fix unrelated lint just to make a commit green; focus on what you touched.
 - Do NOT ship `npm run sync:*` changes that drop `last_sync_at` updates. If you add a new sync script, stamp the source.
+- `sources.last_sync_at` must be stamped ONLY via `markSourcesSynced()` from `src/lib/db/source-freshness.ts` — the single sanctioned path. It stamps exclusively when a run actually wrote rows (`!dryRun && rowsWritten > 0`), so a failed or empty sync never fakes freshness. Never write `last_sync_at` directly (no inline `.set({ lastSyncAt })`, `onConflictDoUpdate` set blocks, or raw `SET last_sync_at` UPDATEs). Enforced by `npm run validate:sync-freshness`.
