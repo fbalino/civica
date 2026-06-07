@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run validate:sync-freshness && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
