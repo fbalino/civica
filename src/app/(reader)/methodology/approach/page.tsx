@@ -119,6 +119,7 @@ export default async function ApproachPage() {
             subject="Civica Atlas Methodology — How we approach data"
             pageTitle="How we approach data"
             url="https://civicaatlas.org/methodology/approach"
+            dataVintage={civicaIndex.lastRevisionIso}
           />
         </section>
       </article>

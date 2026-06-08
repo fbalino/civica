@@ -287,6 +287,7 @@ export default function MethodologyHubPage() {
             subject="Civica Atlas Methodology — Methodology hub"
             pageTitle="Methodology hub"
             url="https://civicaatlas.org/methodology"
+            dataVintage={civicaIndex.lastRevisionIso}
           />
         </section>
       </article>

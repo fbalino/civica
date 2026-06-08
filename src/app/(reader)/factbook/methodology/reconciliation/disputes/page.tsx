@@ -92,6 +92,7 @@ export default async function PublicDisputesPage() {
           subject={FACTBOOK_RECONCILIATION_META.vintage}
           pageTitle="Data disputes log"
           url="https://civicaatlas.org/factbook/methodology/reconciliation/disputes"
+          dataVintage={reconciliation.firstVintageCutDate}
         />
       </section>
 

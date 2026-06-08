@@ -1431,3 +1431,38 @@ export const pulseCorrections = pgTable("pulse_corrections", {
   isPublic: boolean("is_public").notNull().default(true),
   internalNotes: text("internal_notes"),
 });
+
+// --- Durable (cross-instance) rate limiter ---
+
+/**
+ * Fixed-window rate-limit counters, backed by the existing Neon
+ * Postgres so a per-IP limit survives serverless cold starts and
+ * coordinates across instances (the in-memory limiter in
+ * `src/lib/api/rate-limit.ts` cannot — audit 2026-06-07 Security #9).
+ *
+ * One row per (scope, key, window-start). The window start is baked
+ * into the primary `key` (e.g. `chat-durable:1.2.3.4:1717848000000`)
+ * so a new window opens a fresh row at count 1; the previous row goes
+ * stale and is reaped opportunistically via the `expires_at` index.
+ * No row is ever read to decide allow/deny — the count is incremented
+ * and returned atomically by a single `INSERT … ON CONFLICT DO UPDATE
+ * … RETURNING count`.
+ *
+ * Purely operational/ephemeral: holds no provenance and no user data
+ * beyond the request IP for the duration of one window. Safe to
+ * truncate at any time (worst case: counters reset for the current
+ * window). Written ONLY by `checkDurableRateLimit()`.
+ */
+export const rateLimits = pgTable(
+  "rate_limits",
+  {
+    /** `${scope}:${key}:${windowStartMs}` — encodes the window. */
+    key: text("key").primaryKey(),
+    /** Requests seen in this window so far. */
+    count: integer("count").notNull().default(0),
+    /** Wall-clock end of the window (windowStart + windowMs). Only
+     *  used by the lazy reaper; never consulted on the hot path. */
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [index("idx_rate_limits_expires_at").on(table.expiresAt)]
+);

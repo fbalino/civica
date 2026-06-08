@@ -8,7 +8,7 @@ import {
   getPeerGroupingMigrationTable,
   type PeerGroupingMigrationRow,
 } from "@/lib/db/queries-peer-grouping";
-import { currentVintage } from "@/lib/content/site-state";
+import { currentVintage, peerGrouping } from "@/lib/content/site-state";
 import { STRUCTURAL_FAMILY_SUNSET_DATE_ISO } from "@/lib/api/deprecation";
 
 export const revalidate = 3600;
@@ -159,6 +159,7 @@ export default async function PeerGroupingMigrationPage() {
           subject="Civica Atlas Methodology — Peer-grouping migration table"
           pageTitle="Peer-grouping migration table"
           url="https://civicaatlas.org/civica-index/methodology/peer-grouping/migration"
+          dataVintage={peerGrouping.adoptedAt}
         />
       </section>
 

@@ -329,6 +329,7 @@ export default async function MethodologyPage() {
           subject="Civica Atlas Methodology — Civica Index methodology (Beta)"
           pageTitle="Civica Index methodology"
           url="https://civicaatlas.org/civica-index/methodology"
+          dataVintage={civicaIndex.lastRevisionIso}
         />
       </section>
 

@@ -23,6 +23,7 @@ import {
 } from "@/lib/factbook/reconcile/api";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { withOg } from "@/lib/og";
+import { peerGrouping } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
 
@@ -455,6 +456,7 @@ export default async function GovernmentTypesPage({
           subject={`Civica Atlas — Government Types Explorer — ${FACTBOOK_RECONCILIATION_META.vintage}`}
           pageTitle="Government Types Explorer"
           url="https://civicaatlas.org/civica-index/government-types"
+          dataVintage={peerGrouping.adoptedAt}
         />
       </section>
     </>

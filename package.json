@@ -70,6 +70,7 @@
     "backfill:upstream-vintage-labels": "tsx scripts/backfill-upstream-vintage-labels.ts",
     "bridge:cia-canonical": "tsx scripts/bridge-cia-legacy-to-canonical.ts",
     "refresh:jurisdiction-cache": "tsx scripts/refresh-jurisdiction-cache.ts",
+    "migrate:rate-limits": "tsx scripts/create-rate-limits-table.ts",
     "regenerate:readme": "tsx scripts/regenerate-readme.ts",
     "validate:content-templates": "tsx scripts/validate-content-templates.ts",
     "validate:sync-freshness": "tsx scripts/validate-sync-freshness.ts",

@@ -457,6 +457,7 @@ export default function PcaAppendixPage() {
             subject="Civica Atlas Methodology — PCA appendix"
             pageTitle="PCA appendix"
             url="https://civicaatlas.org/civica-index/methodology/pca-appendix"
+            dataVintage={civicaIndex.lastRevisionIso}
           />
         </section>
 

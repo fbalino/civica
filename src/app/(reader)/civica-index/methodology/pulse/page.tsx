@@ -110,6 +110,11 @@ export default function PulseMethodologyPage() {
             subject="Civica Atlas Methodology — Pulse methodology (Beta)"
             pageTitle="Pulse methodology"
             url="https://civicaatlas.org/civica-index/methodology/pulse"
+            dataVintage={
+              pulse.taxonomy.versionHistory.find(
+                (v) => v.version === pulse.taxonomy.version,
+              )?.ranAt
+            }
           />
         </section>
 

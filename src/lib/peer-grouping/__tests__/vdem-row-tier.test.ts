@@ -5,9 +5,10 @@
  *
  * Where the contract lives:
  *   - The exact 1-4 ordinal map `mapVdemRowToOrdinal()` is in
- *     `src/lib/factbook/reconcile/cache.ts`, but it is MODULE-PRIVATE
- *     (not exported), so it cannot be imported without modifying product
- *     code. (Closed Autocracy = 1 ... Liberal Democracy = 4.)
+ *     `src/lib/factbook/reconcile/cache.ts`. It is now exported and
+ *     covered directly by
+ *     `src/lib/factbook/reconcile/__tests__/cache-vdem.test.ts`
+ *     (Closed Autocracy = 1 ... Liberal Democracy = 4).
  *   - The "Tier N of 4" label helpers (`vdemRowTier`, `vdemRowLabel`,
  *     `VDEM_ROW_TIER_LABELS`) live route-locally in
  *     `src/app/(reader)/countries/[slug]/page.tsx` — a Next.js route

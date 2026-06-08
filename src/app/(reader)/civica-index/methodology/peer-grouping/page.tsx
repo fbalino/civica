@@ -104,6 +104,7 @@ export default function PeerGroupingMethodologyPage() {
             subject="Civica Atlas Methodology — Peer grouping"
             pageTitle="Peer grouping"
             url="https://civicaatlas.org/civica-index/methodology/peer-grouping"
+            dataVintage={peerGrouping.adoptedAt}
           />
         </section>
 

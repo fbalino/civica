@@ -208,7 +208,7 @@ export async function refreshJurisdictionCache(
  * Closed Autocracy = 1, Electoral Autocracy = 2,
  * Electoral Democracy = 3, Liberal Democracy = 4.
  */
-function mapVdemRowToOrdinal(label: string): number | null {
+export function mapVdemRowToOrdinal(label: string): number | null {
   const norm = label.toLowerCase();
   if (norm.includes("liberal democracy")) return 4;
   if (norm.includes("electoral democracy")) return 3;

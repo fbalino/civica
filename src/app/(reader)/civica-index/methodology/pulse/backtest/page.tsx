@@ -485,6 +485,11 @@ export default async function BacktestReportPage() {
           subject="Civica Atlas Methodology — Pulse backtest report (Beta)"
           pageTitle="Pulse backtest report"
           url="https://civicaatlas.org/civica-index/methodology/pulse/backtest"
+          dataVintage={
+            pulse.taxonomy.versionHistory.find(
+              (v) => v.version === pulse.taxonomy.version,
+            )?.ranAt
+          }
         />
       </section>
 

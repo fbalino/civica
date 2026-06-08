@@ -1,6 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
-import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
+import {
+  checkDurableRateLimit,
+  checkInMemoryRateLimit,
+  getRequestIp,
+} from "@/lib/api/rate-limit";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 
@@ -21,9 +25,16 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_CHAT });
 // time (≈100 completions/hr/IP worst case instead of the ≈900 the minute cap
 // alone would allow) and is still far above any real reading session.
 //
-// Note: like every other limiter on the site this is in-memory/per-instance,
-// so on serverless it is best-effort (audit Security #9). It is the right
-// first-line control; a durable shared store is the documented follow-up.
+// Two-layer enforcement (audit Security #9). The in-memory checks above are
+// per-serverless-instance: fast, free, and a good first-line pre-filter, but
+// they reset on cold start and a flood spread across instances can evade them.
+// We therefore mirror BOTH windows in a durable, cross-instance limiter backed
+// by Neon Postgres (`checkDurableRateLimit`), keyed by IP. A single normal
+// reader (well under 15/min and 100/hr) passes every layer unchanged; an
+// abuser is held to the same 15/min + 100/hr cross ALL instances, capping
+// worst-case Anthropic spend per IP regardless of how the load is distributed.
+// If the limiter's DB has a blip, the durable check degrades to the in-memory
+// limiter internally, so a database hiccup never fails a legitimate request.
 const BURST_MAX = 15;
 const BURST_WINDOW_MS = 60_000;
 const HOURLY_MAX = 100;
@@ -87,6 +98,36 @@ export async function POST(req: NextRequest) {
   if (!hourly.allowed) {
     return jsonError("Hourly chat limit reached. Please try again later.", 429, {
       "Retry-After": String(hourly.retryAfterSeconds),
+    });
+  }
+
+  // 1b) Durable, cross-instance enforcement of the SAME two windows. The
+  //     in-memory checks above are per-instance; these mirror them in Neon
+  //     Postgres so a flood distributed across serverless instances is still
+  //     held to 15/min + 100/hr per IP. On a DB blip these degrade to the
+  //     in-memory limiter internally (they never throw), so a hiccup can't
+  //     fail a legitimate request.
+  const durableBurst = await checkDurableRateLimit({
+    scope: "chat-durable",
+    key: ip,
+    limit: BURST_MAX,
+    windowMs: BURST_WINDOW_MS,
+  });
+  if (!durableBurst.allowed) {
+    return jsonError("Too many requests. Please wait a moment and try again.", 429, {
+      "Retry-After": String(Math.max(1, Math.ceil(durableBurst.retryAfterMs / 1000))),
+    });
+  }
+
+  const durableHourly = await checkDurableRateLimit({
+    scope: "chat-durable-hourly",
+    key: ip,
+    limit: HOURLY_MAX,
+    windowMs: HOURLY_WINDOW_MS,
+  });
+  if (!durableHourly.allowed) {
+    return jsonError("Hourly chat limit reached. Please try again later.", 429, {
+      "Retry-After": String(Math.max(1, Math.ceil(durableHourly.retryAfterMs / 1000))),
     });
   }
 
