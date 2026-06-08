@@ -188,6 +188,10 @@
   --color-warn:    #E0A800;
   --color-danger:  #C62828;
   --color-info:    #1565C0;
+  /* Darkened warn tone for small beta-pill text/border on the light
+     surface — pushes 12px label past the WCAG AA 4.5:1 floor where the
+     default --color-warn lands ~3.5:1. Light-theme only; dark uses --color-warn. */
+  --color-beta-pill-fg: oklch(50% 0.14 75);
   --color-status-success: var(--color-success);
   --color-status-warning: var(--color-warn);
   --color-status-danger:  var(--color-danger);
@@ -3433,9 +3437,9 @@ a {
   animation: civica-pulse 2s infinite;
 }
 @keyframes civica-pulse {
-  0%   { box-shadow: 0 0 0 0   rgba(92, 170, 110, 0.6); }
-  70%  { box-shadow: 0 0 0 10px rgba(92, 170, 110, 0); }
-  100% { box-shadow: 0 0 0 0   rgba(92, 170, 110, 0); }
+  0%   { box-shadow: 0 0 0 0   color-mix(in oklab, var(--color-source-live) 60%, transparent); }
+  70%  { box-shadow: 0 0 0 10px transparent; }
+  100% { box-shadow: 0 0 0 0   transparent; }
 }
 
 /* ============================================================

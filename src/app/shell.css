@@ -88,7 +88,7 @@
   color: var(--atlas-muted);
   cursor: pointer;
   z-index: 25;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow-hard-sm);
   /* Color/hover-only transition. Position changes (left/right) snap
    * immediately so the handle moves with the pane without lagging. */
   transition: color 120ms, border-color 120ms, background 120ms;

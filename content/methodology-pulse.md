@@ -58,6 +58,8 @@ An event detected only in news without specialist corroboration is held at lower
 
 ## Daily pipeline {#daily-pipeline}
 
+The steps below describe the Pulse's intended daily cadence. That automated daily refresh is currently paused, so published Pulse values reflect the most recent completed run rather than a live feed — the per-country panels and the [Pulse changelog](/civica-index/pulse-changelog) show data as of that last computation.
+
 1. **Ingest.** Pull the trailing 24 hours of records from every primary and secondary feed. Resolve country names to jurisdiction ids. Write to a staging table.
 2. **Cluster.** Embed each record with a sentence transformer (all-MiniLM-L6-v2, 384-dim). Group records by country and ±48-hour window using cosine similarity ≥ 0.75. Each cluster represents one real-world event regardless of how many sources covered it.
 3. **Classify.** For each cluster, run an LLM classifier **three times** at temperatures 0.0, 0.4, and 0.8. Compare the resulting (category, severity tier) tuples for agreement.

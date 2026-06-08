@@ -230,7 +230,7 @@ export function CivicaAIDrawer({
               borderRadius: "50%",
               background: streaming
                 ? "var(--color-warn)"
-                : "var(--color-source-live, #5CAA6E)",
+                : "var(--color-source-live)",
               boxShadow: streaming
                 ? "0 0 0 3px color-mix(in srgb, var(--color-warn) 30%, transparent)"
                 : "0 0 0 3px color-mix(in oklab, var(--color-success) 20%, transparent)",

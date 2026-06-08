@@ -1,5 +1,21 @@
 # Project Memory Sessions
 
+## 2026-06-07 — Deep audit (live app, data, security, styling, code)
+
+Ran a 40-agent workflow auditing the DEPLOYED site (civicaatlas.org) + API
++ repo across 5 lenses. Report: `~/civica/plan/deep-audit-live-data-security-styling-code-2026-06-07.md`.
+81 findings (12 high / 37 medium / 32 low), 0 refuted. Headline themes:
+flagship over-promise (Pulse advertised "real-time/daily" but cron paused
++ data ~5 weeks stale + scores from misattributed/duplicated/opinion-source
+events; CI per-dimension breakdown doesn't sum to headline or match
+methodology); credibility cuts (cite stamps today's date not data vintage;
+green "live" dot over frozen quarterly data; cross-surface value drift;
+missing OG image; apex/www canonical mismatch; junk country URLs 200 not
+404); security quick-wins (unauthenticated unthrottled /api/chat LLM
+endpoint = cost-abuse risk; Next.js 16.2.3 has high-sev advisories ->
+16.2.7); 13 test files exist but no runner/CI ever executes them; plus
+large styling-token drift + sync-layer duplication (mechanical, later).
+
 ## 2026-05-09 — V3 visual-language prototype
 
 Added an isolated `/v3` design-system prototype based only on the user's

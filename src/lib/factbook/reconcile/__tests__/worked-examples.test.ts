@@ -247,6 +247,22 @@ function relDiff(actual: number, expected: number): number {
 // ────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
+  // TODO(test-runner — 2026-06-07 deep audit, Code Quality & Tests):
+  // This is a *live-DB contract test* — it resolves the 8 worked examples
+  // against the real `DATABASE_URL` (production Neon), so it needs network
+  // + a populated database. It is therefore skipped by the default
+  // `npm test` run, which must stay deterministic, offline, and CI-safe.
+  // Run it on demand with `npm run test:db` (sets RUN_DB_TESTS=1).
+  // Follow-up: seed a fixture database so this can rejoin the default
+  // suite without touching production.
+  if (!process.env.RUN_DB_TESTS) {
+    console.log(
+      "Worked-example contract test SKIPPED — requires a live DATABASE_URL.\n" +
+        "Run it with: npm run test:db  (RUN_DB_TESTS=1)",
+    );
+    return;
+  }
+
   console.log("Worked-example contract tests — v1.0 §1.4\n");
 
   const slugs = Array.from(new Set(WORKED_EXAMPLES.map((e) => e.countrySlug)));

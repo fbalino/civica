@@ -6,6 +6,7 @@ import {
   isV2Dimension,
   type CIDimensionV2,
 } from "@/lib/ci/dimensions-v2";
+import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import {
   getCanonicalFactsForJurisdiction,
   FACTBOOK_RECONCILIATION_META,
@@ -245,15 +246,26 @@ function getTier(score: number): { label: string; cssVar: string } {
   return { label: "Failed", cssVar: "--t-failed" };
 }
 
-type DimensionRow = { dimension: string; normalizedScore: number | null };
+type DimensionRow = {
+  dimension: string;
+  normalizedScore: number | null;
+  rawValue: number | null;
+  sourceId: string;
+};
 
 function buildDimScores(dimensions: DimensionRow[]) {
   const byDimension = new Map<CIDimensionV2, number>();
 
   for (const row of dimensions) {
-    if (!isV2Dimension(row.dimension) || row.normalizedScore === null) continue;
+    if (!isV2Dimension(row.dimension)) continue;
+    // Recompute on the v2 fixed-bound scale so the embed card matches
+    // the country page + public API. Fall back to the stored legacy
+    // normalized_score only when raw value / source is unavailable.
+    const score =
+      displayDimensionScore(row.rawValue, row.sourceId) ?? row.normalizedScore;
+    if (score === null) continue;
     if (!byDimension.has(row.dimension)) {
-      byDimension.set(row.dimension, row.normalizedScore);
+      byDimension.set(row.dimension, score);
     }
   }
 

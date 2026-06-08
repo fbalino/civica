@@ -41,7 +41,7 @@ Civica integrates {{stats.activeSources | "multiple"}} source orchestrators — 
 - **Knowledge spine:** Wikidata.
 - **National statistics offices:** rolling out in waves — {{ctx.nsoActiveNamesProse}} in the first in-progress wave of {{ctx.nsoActiveCount}}.
 
-Each source has a dedicated sync orchestrator that pulls fresh data on a documented cadence (quarterly for most Tier-1 publishers, annually for some classification sources, daily for the Pulse event ingest). Each sync writes into a single canonical table called `country_facts`, with statement-level provenance: which source, which date the source measured the value, which license the data is shared under, which fact-key it corresponds to, and whether the row is a measurement or a forecast.
+Each source has a dedicated sync orchestrator that pulls fresh data on a documented cadence (quarterly for most Tier-1 publishers, annually for some classification sources, and a daily cadence for the Pulse event ingest when active — that automated refresh is currently paused). Each sync writes into a single canonical table called `country_facts`, with statement-level provenance: which source, which date the source measured the value, which license the data is shared under, which fact-key it corresponds to, and whether the row is a measurement or a forecast.
 
 For a live count of facts, fact-keys, and multi-sourced coverage, see the [about page](/about#sources). The dataset is growing as new sources land and existing sources publish new vintages.
 

@@ -276,13 +276,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           margin-bottom: 8px;
         }
 
-        /* Log */
-        .corr-log-empty {
-          font-family: var(--font-body);
-          font-size: 14px;
-          color: var(--color-text-40);
-          padding: 32px 0;
-        }
+        /* Log (empty state uses the canonical .editorial-empty primitive) */
         .corr-log-row {
           border-top: 1px solid var(--color-card-border);
           padding: 20px 0;
@@ -330,20 +324,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           font-weight: 500;
           color: var(--color-text-primary);
         }
-        .corr-pagination {
-          display: flex;
-          gap: 12px;
-          align-items: center;
-          padding-top: 24px;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          color: var(--color-text-40);
-        }
-        .corr-pagination a {
-          color: var(--color-accent);
-          text-decoration: none;
-        }
-        .corr-pagination a:hover { text-decoration: underline; }
+        /* Pagination uses the canonical .editorial-pagination primitive */
         .corr-resolution-note {
           font-family: var(--font-body);
           font-size: 13px;
@@ -391,7 +372,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         </p>
 
         {logRows.length === 0 ? (
-          <div className="corr-log-empty">No public corrections yet. Be the first.</div>
+          <div className="editorial-empty">No public corrections yet. Be the first.</div>
         ) : (
           <>
             {logRows.map((row) => {
@@ -420,7 +401,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
             })}
 
             {totalPages > 1 && (
-              <div className="corr-pagination">
+              <div className="editorial-pagination">
                 {page > 1 && (
                   <Link href={`/civica-index/corrections?page=${page - 1}`}>← Previous</Link>
                 )}

@@ -1520,14 +1520,15 @@ export default async function ReconciliationMethodologyPage() {
         <p>
           The interactive citation widget below generates APA,
           BibTeX, and Chicago citations for this page in one click,
-          and offers a JSON download of the underlying reconciled
-          data for replication.
+          each stamped with the reconciled vintage&rsquo;s cut date
+          ({reconciliation.firstVintageCutDate}) as the data date.
         </p>
 
         <CiteAccordion
           subject={`Civica Atlas Reconciled ${reconciliation.version} — vintage ${reconciliation.firstVintage}`}
           pageTitle="Factbook Reconciliation Methodology"
           url="https://civicaatlas.org/factbook/methodology/reconciliation"
+          dataVintage={reconciliation.firstVintageCutDate}
           sourceNames={[
             "World Bank Open Data",
             "International Monetary Fund WEO",

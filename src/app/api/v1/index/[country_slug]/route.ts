@@ -5,6 +5,7 @@ import {
   ciCompositeScores,
   ciDimensionScores,
 } from "@/lib/db/schema";
+import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { and, eq, sql, desc } from "drizzle-orm";
 
 /**
@@ -55,7 +56,7 @@ export async function GET(
       );
     }
 
-    const dimensions = await db
+    const dimensionRows = await db
       .select({
         dimension: ciDimensionScores.dimension,
         normalizedScore: ciDimensionScores.normalizedScore,
@@ -67,6 +68,20 @@ export async function GET(
         sql`${ciDimensionScores.jurisdictionId} = ${jurisdiction.id}
           AND ${ciDimensionScores.quarter} = ${composite.quarter}`,
       );
+
+    // Emit the per-dimension DISPLAY score on the SAME v2 fixed-bound
+    // scale as the headline composite (see normalize-v2.ts), so this
+    // endpoint reconciles with the country page, /compare, the embed
+    // card, and /api/v1/countries. The stored `normalized_score` column
+    // is the legacy v1 observed-min-max value and does NOT sum to the v2
+    // headline; fall back to it only when raw value / source is missing.
+    const dimensions = dimensionRows.map((d) => ({
+      dimension: d.dimension,
+      normalizedScore:
+        displayDimensionScore(d.rawValue, d.sourceId) ?? d.normalizedScore,
+      rawValue: d.rawValue,
+      sourceId: d.sourceId,
+    }));
 
     return apiResponse({
       data: {

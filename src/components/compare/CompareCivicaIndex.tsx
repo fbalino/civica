@@ -7,6 +7,26 @@ import {
 import { CompareTimelineOverlay } from "./CompareTimelineOverlay";
 import type { compareCICountries, getCICountryHistory } from "@/lib/db/queries";
 import { ciTier } from "@/lib/ci/tiers";
+import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+
+/**
+ * Per-dimension DISPLAY score on the v2 fixed-bound scale so /compare
+ * reconciles with the country page, the public API, and the embed card.
+ * Falls back to the stored legacy normalized_score only when raw value /
+ * source is unavailable (then the dimension didn't reach the headline
+ * either). See src/lib/ci/normalize-v2.ts.
+ */
+function dimDisplayScore(d: {
+  normalizedScore: number | null;
+  rawValue: number | null;
+  sourceId: string;
+}): number | null {
+  const v2 = displayDimensionScore(d.rawValue, d.sourceId);
+  if (v2 !== null) return v2;
+  return d.normalizedScore !== null && d.normalizedScore !== undefined
+    ? Number(d.normalizedScore)
+    : null;
+}
 
 type CompareRow = Awaited<ReturnType<typeof compareCICountries>>[number];
 type HistoryRow = Awaited<ReturnType<typeof getCICountryHistory>>;
@@ -49,9 +69,7 @@ export function CompareCivicaIndex({
   const dimRows: DimRow[] = V2_DIMENSIONS.map((dim) => {
     const values = ordered.map((country) => {
       const d = country.dimensions.find((x) => x.dimension === dim);
-      return d && d.normalizedScore !== null && d.normalizedScore !== undefined
-        ? Number(d.normalizedScore)
-        : null;
+      return d ? dimDisplayScore(d) : null;
     });
     return { dim, values };
   });
@@ -191,12 +209,7 @@ export function CompareCivicaIndex({
                   const d = country.dimensions.find(
                     (x) => x.dimension === dim
                   );
-                  const val =
-                    d &&
-                    d.normalizedScore !== null &&
-                    d.normalizedScore !== undefined
-                      ? Number(d.normalizedScore)
-                      : null;
+                  const val = d ? dimDisplayScore(d) : null;
                   const color = seriesColors[i] ?? seriesColors[0];
                   return (
                     <div

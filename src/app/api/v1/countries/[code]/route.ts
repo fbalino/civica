@@ -22,6 +22,7 @@ import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
+import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 
 /**
  * Phase F.4 — public-API provenance map.
@@ -290,7 +291,13 @@ export async function GET(
                 : null,
               dimensions: ciDetail.dimensions.map((d) => ({
                 dimension: d.dimension,
-                normalizedScore: d.normalizedScore,
+                // v2 fixed-bound display score so this snapshot matches
+                // the country page + /api/v1/index; the stored
+                // normalized_score is the legacy v1 value and doesn't
+                // reconcile with the v2 headline.
+                normalizedScore:
+                  displayDimensionScore(d.rawValue, d.sourceId) ??
+                  d.normalizedScore,
                 rawValue: d.rawValue,
               })),
             }

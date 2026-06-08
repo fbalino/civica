@@ -92,15 +92,15 @@ type RegimeMetaWithUnknown = {
 
 const UNKNOWN_REGIME_META: RegimeMetaWithUnknown = {
   label: "Not yet coded",
-  colorVar: "var(--gov-other, #8899AA)",
-  fallback: "#8899AA",
+  colorVar: "var(--gov-other)",
+  fallback: "var(--gov-other)",
   order: 999,
 };
 
 const UNKNOWN_VDEM_META = {
   label: "No V-Dem coverage",
-  colorVar: "var(--gov-other, #8899AA)",
-  fallback: "#8899AA",
+  colorVar: "var(--gov-other)",
+  fallback: "var(--gov-other)",
   order: 999,
 };
 

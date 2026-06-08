@@ -23,6 +23,7 @@ import {
   getGovernancePeerSet,
 } from "@/lib/peer-grouping";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
+import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { civicaIndex } from "@/lib/content/site-state";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
@@ -265,7 +266,12 @@ function HistoryChart({
 function DimensionScoreTable({
   dimensions,
 }: {
-  dimensions: { dimension: string; normalizedScore: number; sourceId: string }[];
+  dimensions: {
+    dimension: string;
+    normalizedScore: number;
+    rawValue: number | null;
+    sourceId: string;
+  }[];
 }) {
   const sorted = DIMENSION_ORDER.map((dim) =>
     dimensions.find((d) => d.dimension === dim)
@@ -274,7 +280,15 @@ function DimensionScoreTable({
   return (
     <div className="ci-country-dimensions">
       {sorted.map((d) => {
-        const score = Number(d.normalizedScore);
+        // Normalize on the SAME v2 fixed-bound scale as the headline
+        // composite (calculate-v2.ts + published methodology §3). The
+        // stored normalizedScore is the legacy v1 observed-min-max value
+        // and does NOT reconcile with the headline, so we recompute from
+        // rawValue. Fall back to the stored value only when raw value /
+        // source is unavailable (then it didn't reach the headline either).
+        const score =
+          displayDimensionScore(d.rawValue, d.sourceId) ??
+          Number(d.normalizedScore);
         const color = dimensionColor(score);
         const weight = DIMENSION_WEIGHTS[d.dimension] ?? 0;
         const contribution = (score * weight) / 100;
@@ -584,10 +598,19 @@ export default async function CICountryDetailPage({
     composite?.rank && composite?.totalRanked
       ? `Rank ${composite.rank} / ${composite.totalRanked}`
       : "Rank pending";
-  const citationDate = pulse?.scoreDate
-    ? new Date(String(pulse.scoreDate)).toISOString().slice(0, 10)
-    : new Date().toISOString().slice(0, 10);
-  const citationText = `Civica Index for ${jurisdiction.name}, ${citationDate}. Civica Atlas. https://civicaatlas.org/civica-index/${slug}`;
+  // Citation as-of date = the real Civica Index quarterly vintage, NOT
+  // today's clock and NOT the daily Pulse date. The CI composite is a
+  // frozen quarterly vintage, so cite its real computed-at timestamp
+  // (`composite.calculatedAt`), mirroring the embed widget's real as-of
+  // (src/app/embed/[slug]/route.ts). When no composite exists there is
+  // no honest vintage to show, so the date is omitted rather than
+  // fabricated as "today".
+  const citationDate = composite?.calculatedAt
+    ? new Date(composite.calculatedAt).toISOString().slice(0, 10)
+    : "";
+  const citationText = citationDate
+    ? `Civica Index for ${jurisdiction.name}, ${citationDate}. Civica Atlas. https://civicaatlas.org/civica-index/${slug}`
+    : `Civica Index for ${jurisdiction.name}. Civica Atlas. https://civicaatlas.org/civica-index/${slug}`;
   const regionalRank =
     jurisdiction.continent && regionalRankings.length > 0
       ? findRankInList(

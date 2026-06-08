@@ -89,7 +89,7 @@ const SECTIONS: MethodologySection[] = [
     id: "pulse",
     heading: "Event-driven scoring — the Civica Pulse",
     intro:
-      "The Pulse is a daily directional signal layered on the Index. It ingests governance-relevant events from multiple source feeds, classifies each via a multi-run LLM consensus, applies asymmetric corroboration rules, and decays impacts over time.",
+      "The Pulse is an event-driven directional signal layered on the Index. It ingests governance-relevant events from multiple source feeds, classifies each via a multi-run LLM consensus, applies asymmetric corroboration rules, and decays impacts over time. Its automated daily refresh is currently paused, so published values reflect the most recent computation rather than a live feed.",
     entries: [
       {
         href: "/civica-index/methodology/pulse",

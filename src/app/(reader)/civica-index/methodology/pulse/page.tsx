@@ -74,8 +74,10 @@ export default function PulseMethodologyPage() {
           ) : null}
         </h1>
         <p className="editorial-page-subtitle">
-          A real-time governance shock monitor layered on top of the quarterly
-          Civica Index. Beta — methodology under active validation.
+          An event-sensitive governance shock monitor layered on top of the
+          quarterly Civica Index. Its automated daily refresh is currently
+          paused, so published values reflect the most recent computation rather
+          than a live feed. Beta — methodology under active validation.
         </p>
 
         <div className="editorial-warning">

@@ -140,18 +140,17 @@
 .v2-country-card {
   width: 100%;
   max-width: 460px;
-  /* Slight transparency so the parchment + texture show through */
-  background-color: rgba(255, 252, 248, 0.95);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  border: 1px solid var(--v2-border);
-  border-radius: var(--v2-radius-sm);
-  box-shadow: var(--v2-shadow-lg);
+  /* Theme-aware surface so the card reads correctly in light + dark.
+     Opaque (no backdrop blur) to honor the print-inspired aesthetic. */
+  background-color: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hard);
   padding: 22px;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  font-family: var(--v2-font-body);
+  font-family: var(--font-body);
 }
 
 .v2-country-card__header {
@@ -163,10 +162,10 @@
 .v2-country-card__flag {
   width: 86px;
   height: 56px;
-  border-radius: 5px;
-  background-color: var(--v2-canvas);
-  border: 1px solid var(--v2-divider);
-  box-shadow: var(--v2-shadow-sm);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-elevated);
+  border: 1px solid var(--color-card-border);
+  box-shadow: var(--shadow-hard-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -188,20 +187,20 @@
 }
 
 .v2-country-card__name {
-  font-family: var(--v2-font-display);
+  font-family: var(--font-heading);
   font-size: 30px;
   font-weight: 500;
   line-height: 1.05;
-  color: var(--v2-text);
+  color: var(--color-text-primary);
   letter-spacing: -0.01em;
   margin: 0;
 }
 
 .v2-country-card__official {
-  font-family: var(--v2-font-body);
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 400;
-  color: var(--v2-text-muted);
+  color: var(--color-text-secondary);
   line-height: 1.3;
   margin: 0;
 }
@@ -209,9 +208,9 @@
 .v2-country-card__hero {
   width: 100%;
   aspect-ratio: 16 / 7;
-  border-radius: var(--v2-radius-lg);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  background-color: var(--v2-surface-alt);
+  background-color: var(--color-surface-secondary);
 }
 
 .v2-country-card__hero img {
@@ -226,7 +225,7 @@
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0;
   padding-bottom: 16px;
-  border-bottom: 1px solid var(--v2-divider);
+  border-bottom: 1px solid var(--color-card-border);
 }
 
 .v2-country-card__stat {
@@ -242,39 +241,39 @@
 }
 
 .v2-country-card__stat + .v2-country-card__stat {
-  border-left: 1px solid var(--v2-divider);
+  border-left: 1px solid var(--color-card-border);
 }
 
 .v2-country-card__stat-label {
-  font-family: var(--v2-font-body);
+  font-family: var(--font-body);
   font-size: 12px;
   font-weight: 400;
-  color: var(--v2-text-muted);
+  color: var(--color-text-secondary);
   margin-bottom: 6px;
   letter-spacing: 0.01em;
 }
 
 .v2-country-card__stat-value {
-  font-family: var(--v2-font-body);
+  font-family: var(--font-body);
   font-size: 16px;
   font-weight: 700;
-  color: var(--v2-text);
+  color: var(--color-text-primary);
   line-height: 1.25;
 }
 
 .v2-country-card__stat-year {
-  font-family: var(--v2-font-body);
+  font-family: var(--font-body);
   font-size: 12px;
   font-weight: 400;
-  color: var(--v2-text-muted);
+  color: var(--color-text-secondary);
   margin-top: 2px;
 }
 
 .v2-country-card__cta {
-  font-family: var(--v2-font-body);
+  font-family: var(--font-body);
   font-size: 15px;
   font-weight: 600;
-  color: var(--v2-bronze);
+  color: var(--color-accent);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -289,7 +288,7 @@
 
 .v2-country-card__cta:hover,
 .v2-country-card__cta:focus-visible {
-  color: var(--v2-bronze-hover);
+  color: color-mix(in oklab, var(--color-accent) 80%, #000);
 }
 
 .v2-country-card__cta-arrow {

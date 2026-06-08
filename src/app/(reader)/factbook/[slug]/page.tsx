@@ -137,6 +137,10 @@ export async function generateMetadata({
       description,
       url,
       type: "website",
+      // openGraph here replaces (not merges) the root layout default, so
+      // repeat the shared social image. (twitter is not overridden on this
+      // route, so it still inherits the layout's twitter image.)
+      images: ["/og-default.png"],
     },
   };
 }
@@ -610,6 +614,7 @@ export default async function FactbookCountryPage({
               pageTitle={`${jurisdiction.name} factbook`}
               url={`https://civicaatlas.org/factbook/${slug}`}
               downloadSlug={slug}
+              dataVintage={reconciliation.firstVintageCutDate}
               sourceNames={citeSources.map((s) => s.name)}
             />
           </section>

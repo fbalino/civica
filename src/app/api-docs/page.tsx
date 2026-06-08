@@ -503,7 +503,7 @@ export default function ApiDocsPage() {
     "band": "B",
     "rank": 18,
     "dimensions": [
-      { "dimension": "democratic_quality", "normalizedScore": 82.4, "sourceId": "vdem" }
+      { "dimension": "democratic_quality", "normalizedScore": 82.4, "rawValue": 0.824, "sourceId": "vdem" }
     ]
   },
   "meta": { "methodology": { "status": "beta" } }

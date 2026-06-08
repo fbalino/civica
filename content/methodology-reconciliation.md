@@ -365,7 +365,7 @@ Worked example, the Argentina inflation case (Worked Example 1 above):
 
 *Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1. Civica Atlas, 2026. [https://civicaatlas.org/factbook/methodology/reconciliation](https://civicaatlas.org/factbook/methodology/reconciliation). Cut date: 5 May 2026. Methodology version v0.2-beta.*
 
-The interactive `<CiteAccordion>` widget on the live page generates APA, BibTeX, and Chicago citations for this page in one click, and offers a JSON download of the underlying reconciled data for replication.
+The interactive `<CiteAccordion>` widget on the live page generates APA, BibTeX, and Chicago citations for this page in one click, each stamped with the reconciled vintage's cut date as the data date.
 
 ---
 

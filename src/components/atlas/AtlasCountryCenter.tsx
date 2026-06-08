@@ -24,6 +24,7 @@ import {
   ATLAS_TAB_ORDER,
 } from "@/lib/atlas/ids";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
+import { reconciliation } from "@/lib/content/site-state";
 
 type Tab = AtlasTab;
 type House = "upper" | "lower";
@@ -430,6 +431,7 @@ export function AtlasCountryCenter({
           subject={country.name}
           pageTitle={ATLAS_TAB_LABELS[tab]}
           downloadSlug={country.slug ?? country.id}
+          dataVintage={reconciliation.firstVintageCutDate}
           sourceNames={CIVICA_DATA_SOURCES}
         />
       </div>

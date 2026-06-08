@@ -126,7 +126,7 @@ export function CompareElections({ countries }: CompareElectionsProps) {
                                   <span
                                     style={{
                                       width: `${widthPct}%`,
-                                      background: r.partyColor ?? "#888",
+                                      background: r.partyColor ?? "var(--color-text-muted)",
                                     }}
                                   />
                                 </div>

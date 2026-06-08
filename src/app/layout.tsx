@@ -52,7 +52,19 @@ const inter = Inter({
   weight: ["400", "500", "600"],
 });
 
+// Canonical host. The apex `civicaatlas.org` is the production domain and is
+// what every other surface already declares — sitemap.ts, robots.ts,
+// api-docs, and every per-page `alternates.canonical`. Keeping the apex here
+// keeps all of those consistent. (Making the apex serve 200 instead of
+// 307-redirecting to www is a hosting/next.config concern handled separately.)
 const SITE_URL = "https://civicaatlas.org";
+
+// Default social-share image (1200x630). Resolved against `metadataBase`
+// to an absolute apex URL. Colors are baked into the asset from the live
+// design tokens (parchment / ink / bronze) — no hex lives in code.
+const OG_IMAGE = "/og-default.png";
+const OG_IMAGE_ALT =
+  "Civica — an interactive atlas of world government structures and the Civica Index, with governance data for 250+ nations.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -62,13 +74,25 @@ export const metadata: Metadata = {
   },
   description:
     "Explore how every country in the world is governed. Interactive visualizations of government structures, branches of power, and political systems for 250+ nations. The modern successor to the CIA World Factbook.",
+  // Default self-referencing canonical on the apex host. The relative "./"
+  // resolves to the CURRENT route against `metadataBase` (Next runs it through
+  // `path.posix.resolve(pathname, "./")`), so every page that doesn't set its
+  // own `alternates.canonical` — most importantly the atlas country pages,
+  // which previously emitted no canonical at all — gets a correct
+  // `https://civicaatlas.org/<route>` canonical instead of an inconsistent or
+  // missing one. Pages that declare an absolute canonical override this.
+  alternates: {
+    canonical: "./",
+  },
   openGraph: {
     type: "website",
     siteName: "Civica",
     locale: "en_US",
+    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: OG_IMAGE_ALT }],
   },
   twitter: {
     card: "summary_large_image",
+    images: [OG_IMAGE],
   },
   robots: {
     index: true,

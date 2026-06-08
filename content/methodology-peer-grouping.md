@@ -123,7 +123,7 @@ Future maintainers, external reviewers, or readers who want to challenge the met
 
 ## Limitations {#limitations}
 
-- **V-Dem cadence.** V-Dem updates annually. Intra-year regime transitions (a coup; a successful democratic transition) are not reflected in the peer-set classification until the next V-Dem release. Civica Pulse captures these events at daily cadence and presents them separately, but the peer-set tier itself lags by months.
+- **V-Dem cadence.** V-Dem updates annually. Intra-year regime transitions (a coup; a successful democratic transition) are not reflected in the peer-set classification until the next V-Dem release. Civica Pulse is intended to capture these events at a daily cadence and present them separately, but its automated daily refresh is currently paused and the peer-set tier itself lags by months regardless.
 - **Non-sovereign jurisdictions.** Coverage gaps (Taiwan, Kosovo, Palestine, Western Sahara, Vatican City) are documented above. Civica falls back to global comparison or marks the lens unavailable rather than silently mapping to a near-peer.
 - **government_form_description currency.** CIA Factbook is frozen January 2026. Constitutional changes after that date are not reflected in the description until an alternative source pipeline is wired up. The field is descriptive metadata, not analytical taxonomy, so this staleness is bounded in impact.
 - **Single-lens defaults.** Each domain has one default peer lens. Power users may want to compose lenses ("electoral democracies in Sub-Saharan Africa") for finer-grained comparisons. Compound peer sets are not in v1.0; they are an explicit deferred enhancement.

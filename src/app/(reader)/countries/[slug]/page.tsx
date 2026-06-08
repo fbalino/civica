@@ -108,14 +108,46 @@ function formatPop(n: number | null): string {
   return n.toLocaleString();
 }
 
+// `jurisdictions.democracy_index` is NOT a continuous 0–1 score — it is a
+// V-Dem "Regimes of the World" tier (1–4) written by `mapVdemRowToOrdinal`
+// in src/lib/factbook/reconcile/cache.ts (Closed Autocracy = 1 …
+// Liberal Democracy = 4). Render it as its RoW label / "tier N of 4", never
+// as `toFixed(2)` against a fake "/ 1.00" maximum.
+const VDEM_ROW_TIER_LABELS: Record<number, string> = {
+  1: "Closed Autocracy",
+  2: "Electoral Autocracy",
+  3: "Electoral Democracy",
+  4: "Liberal Democracy",
+};
+const VDEM_ROW_MAX_TIER = 4;
+const VDEM_ROW_SOURCE = "V-Dem (Regimes of the World)";
+
+function vdemRowTier(value: number | null | undefined): number | null {
+  if (value == null) return null;
+  const tier = Math.round(value);
+  return tier >= 1 && tier <= VDEM_ROW_MAX_TIER ? tier : null;
+}
+
+function vdemRowLabel(value: number | null | undefined): string | null {
+  const tier = vdemRowTier(value);
+  return tier == null ? null : VDEM_ROW_TIER_LABELS[tier];
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const jurisdiction = await getJurisdictionBySlug(slug);
-  if (!jurisdiction) return { title: "Country Not Found" };
+  // Resolve the jurisdiction inside generateMetadata and call notFound()
+  // for unknown slugs. generateMetadata runs BEFORE the page's Suspense
+  // boundary (loading.tsx) streams its 200, so this is what commits the
+  // real 404 status for junk URLs. The page body's notFound() at the
+  // bottom would otherwise run after a 200 had already been streamed
+  // (the loading.tsx soft-404 bug). `.catch(() => null)` collapses both
+  // "no match" and DB-down to a 404, mirroring the factbook route.
+  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  if (!jurisdiction) notFound();
   const govLabel = formatGovernmentType(jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType) || "sovereign state";
   const title = `${jurisdiction.name} Government Structure — Executive, Legislative & Judicial`;
   const popStr = jurisdiction.population ? ` Population: ${formatPop(jurisdiction.population)}.` : "";
@@ -131,11 +163,16 @@ export async function generateMetadata({
       description,
       url,
       type: "website",
+      // This page overrides openGraph, which replaces (not merges) the
+      // root layout's default, so the shared social image must be repeated
+      // here or the share preview would be imageless.
+      images: ["/og-default.png"],
     },
     twitter: {
       card: "summary_large_image",
       title: `${title} | Civica`,
       description,
+      images: ["/og-default.png"],
     },
   };
 }
@@ -314,11 +351,12 @@ export default async function CountryPage({
       factKey: "currency_code",
       resolverFact: currencyResolver,
     });
-  if (jurisdiction.democracyIndex)
+  const profileDemocracyLabel = vdemRowLabel(jurisdiction.democracyIndex);
+  if (profileDemocracyLabel)
     profileRows.push({
       label: "Democracy",
-      value: jurisdiction.democracyIndex.toFixed(2),
-      source: "V-Dem Institute",
+      value: profileDemocracyLabel,
+      source: VDEM_ROW_SOURCE,
       date: "2025",
     });
 
@@ -999,33 +1037,40 @@ export default async function CountryPage({
   const democracyTab = (
     <div>
       <div className="cv-card" style={{ marginBottom: 16 }}>
-        <h3 className="section-header">Democracy Index</h3>
-        {democracyData.democracyIndex != null ? (
-          <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 16 }}>
-            <span
+        <h3 className="section-header">Regime Type</h3>
+        {vdemRowLabel(democracyData.democracyIndex) != null ? (
+          <div style={{ marginBottom: 16 }}>
+            <div
               style={{
                 fontFamily: "var(--font-heading)",
                 fontSize: "var(--text-44)",
+                lineHeight: 1.1,
                 color: "var(--color-text-primary)",
               }}
             >
-              {democracyData.democracyIndex.toFixed(2)}
-            </span>
-            <span
+              {vdemRowLabel(democracyData.democracyIndex)}
+            </div>
+            <div
               style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                marginTop: 6,
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)",
                 fontSize: "var(--text-11)",
                 color: "var(--color-text-30)",
               }}
             >
-              / 1.00
-              <SourceDot source="V-Dem Institute" retrievedAt="2025" />
-            </span>
+              <span>
+                Tier {vdemRowTier(democracyData.democracyIndex)} of {VDEM_ROW_MAX_TIER} · V-Dem Regimes of the World
+              </span>
+              <SourceDot source={VDEM_ROW_SOURCE} retrievedAt="2025" />
+            </div>
           </div>
         ) : (
           <p style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)", color: "var(--color-text-50)", margin: 0 }}>
-            No democracy index data available.
+            No regime classification available.
           </p>
         )}
       </div>
@@ -1074,8 +1119,13 @@ export default async function CountryPage({
                   </span>
                   {rc.name}
                 </span>
-                <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-40)" }}>
-                  {rc.democracyIndex?.toFixed(2) ?? "—"}
+                <span
+                  title={vdemRowLabel(rc.democracyIndex) ?? undefined}
+                  style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-40)" }}
+                >
+                  {vdemRowTier(rc.democracyIndex) != null
+                    ? `${vdemRowTier(rc.democracyIndex)}/${VDEM_ROW_MAX_TIER}`
+                    : "—"}
                 </span>
               </a>
             ))}

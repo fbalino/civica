@@ -136,6 +136,38 @@ export function normalizeV2(
 }
 
 /**
+ * Compute the per-dimension DISPLAY score (0–100) for the Civica Index
+ * breakdown, using the SAME v2 fixed-bound normalization as the headline
+ * composite (see `calculate-v2.ts` and published methodology §3).
+ *
+ * This is the single source of truth for every surface that renders the
+ * dimension breakdown — the country page, the public API
+ * (`/api/v1/index/[slug]`, `/api/v1/countries/[code]`), the embed card,
+ * and `/compare` — so that the sum of (score × weight) reconciles with
+ * the published headline.
+ *
+ * IMPORTANT: do NOT use the stored `ci_dimension_scores.normalized_score`
+ * column for v2 display. That column is the legacy v1 observed-min-max
+ * value written by `ingest.ts` and still consumed by the v1 composite in
+ * `calculate.ts`; it neither sums to the v2 headline nor matches the
+ * published transform table.
+ *
+ * Returns null only when the raw value is missing/NaN or its source isn't
+ * in the v2 bounds table — in which case the dimension did not contribute
+ * to the headline either, and the caller should hide the row or fall back
+ * to the stored value.
+ */
+export function displayDimensionScore(
+  rawValue: number | null | undefined,
+  sourceId: string,
+): number | null {
+  if (rawValue === null || rawValue === undefined || Number.isNaN(rawValue)) {
+    return null;
+  }
+  return normalizeV2(rawValue, sourceId);
+}
+
+/**
  * Look up the default uncertainty (in normalized 0–100 points) for a
  * given source. Used by the Monte Carlo simulator when a per-country
  * uncertainty isn't published.

@@ -138,7 +138,7 @@ export default async function CivicaIndexShellPage({
       <div className="ci-container">
         <section className="ci-hero">
           <div className="ci-hero-eyebrow">
-            <span className="dot live" aria-hidden="true" />
+            <span className="dot frozen" aria-hidden="true" />
             Civica Index · {currentVintage}
             <span
               className="ci-beta-pill"
@@ -161,7 +161,7 @@ export default async function CivicaIndexShellPage({
             sovereign state and territory. {civicaIndex.dimensionCount}{" "}
             governance dimensions, empirically-derived weights, fixed-bound
             normalization, and published 90% confidence intervals. The Civica
-            Pulse layers real-time event sensitivity on top.
+            Pulse layers event sensitivity on top.
           </p>
 
           <div className="ci-stats-strip" role="group" aria-label="Index coverage">

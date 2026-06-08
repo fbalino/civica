@@ -55,6 +55,20 @@ const LABEL_TO_FACT_KEY: Record<string, string> = {
  * Doc: `~/civica/plan/factbook-multi-year-rendering-v1.md`
  */
 const MULTI_YEAR_GROUP_TO_FACT_KEY: Record<string, string> = {
+  // People & Society — the CIA nests population as a "Population" GROUP
+  // with a single "Total" child leaf, so neither LABEL_TO_FACT_KEY (keyed
+  // on the leaf label "Total") nor the rest of this map matched it, and
+  // the section rendered the verbatim CIA figure with no link to the
+  // reconciled canonical. For countries where a national-statistics
+  // source overrides the CIA (Brazil/IBGE, France/INSEE, UK/ONS,
+  // Canada/StatCan, US/Census) that left two different populations on one
+  // page — the masthead's reconciled value vs. the section's CIA value —
+  // with no explanation. Prepending the "Civica canonical (reconciled)"
+  // row here surfaces the same figure the masthead shows, with a
+  // FactValueDot alternates panel disclosing the CIA figure beneath it.
+  // (Single-value group, not multi-year, but it reuses the same
+  // canonical-row mechanism.)
+  Population: "population_total",
   // Economy — multi-year CIA prose sets reconciled against Tier-1
   // measurements (WB / IMF / Eurostat / OECD / WTO).
   "Real GDP (purchasing power parity)": "gdp_ppp_usd_billions",

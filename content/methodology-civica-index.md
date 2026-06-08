@@ -115,13 +115,13 @@ How Civica chooses peer sets for ranking comparisons — different lenses for ma
 
 ## Section 10 · Civica Pulse (Beta) {#pulse}
 
-The Civica Pulse is the real-time, event-sensitive layer that sits on top of the structural CI. It publishes **dimensional deltas** — separate impact values on each CI dimension — driven by classified events from specialist feeds (ACLED, CIVICUS, RSF alerts, V-Dem pulse, HRW / Amnesty) corroborated by general news. Decay is category-specific: a coup persists for a year; a journalist arrest decays in two months. Positive events require stronger corroboration than negative events to resist gaming.
+The Civica Pulse is the event-sensitive layer that sits on top of the structural CI. It publishes **dimensional deltas** — separate impact values on each CI dimension — driven by classified events from specialist feeds (ACLED, CIVICUS, RSF alerts, V-Dem pulse, HRW / Amnesty) corroborated by general news. Decay is category-specific: a coup persists for a year; a journalist arrest decays in two months. Positive events require stronger corroboration than negative events to resist gaming.
 
 The Pulse is currently a clearly labelled *Beta* — experimental, not yet citable as authoritative. Its methodology is documented in detail at [/civica-index/methodology/pulse](/civica-index/methodology/pulse). That page is the sister document to this one and should be read alongside. The full event feed is at [/civica-index/pulse-changelog](/civica-index/pulse-changelog).
 
 ## Section 11 · Update frequency & vintages {#vintages}
 
-The Civica Index updates **quarterly** — March, June, September, December — to align with source publication cycles and to avoid spurious between-quarter movement. Mid-quarter source releases are staged for the next quarterly publication. Only the Pulse moves daily.
+The Civica Index updates **quarterly** — March, June, September, December — to align with source publication cycles and to avoid spurious between-quarter movement. Mid-quarter source releases are staged for the next quarterly publication. The Pulse is the only layer designed to move daily, but its automated daily refresh is currently paused, so it reflects the most recent computation rather than a live feed.
 
 To reconcile citation stability with longitudinal comparability, every score is preserved in two parallel historical series:
 

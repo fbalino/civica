@@ -44,8 +44,8 @@
    WCAG AA 4.5:1 floor at 12px without disturbing other warn-coloured
    UI. */
 [data-theme="light"] .ci-beta-pill {
-  color: oklch(50% 0.14 75);
-  border-color: oklch(50% 0.14 75);
+  color: var(--color-beta-pill-fg);
+  border-color: var(--color-beta-pill-fg);
 }
 .ci-hero-rework-note {
   font-family: var(--font-mono);

@@ -22,6 +22,20 @@ export const metadata: Metadata = {
   },
 };
 
+/** Format an event date string as an editorial "3 May 2026" label.
+ *  UTC-pinned so the rendered value is deterministic regardless of
+ *  server timezone, and never drifts to today's clock date. */
+function formatAsOfDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
 export default async function PulseChangelogPage() {
   let countries: Array<{ slug: string; name: string }> = [];
   let events: PulseV2ChangelogRow[] = [];
@@ -47,6 +61,18 @@ export default async function PulseChangelogPage() {
     // Keep the public changelog shell renderable during DB outages.
   }
 
+  // Honest freshness label. The automated daily Pulse refresh is
+  // currently paused, so surface the date of the most recent classified
+  // event (the real as-of value) instead of implying a live daily feed.
+  // Falls back to neutral phrasing when no events are loaded (DB outage).
+  const mostRecentEventDate = events.reduce<string | null>((latest, e) => {
+    if (!e.eventDate) return latest;
+    return !latest || e.eventDate > latest ? e.eventDate : latest;
+  }, null);
+  const freshnessNote = mostRecentEventDate
+    ? `The automated daily refresh is currently paused; the most recent classified event is dated ${formatAsOfDate(mostRecentEventDate)}.`
+    : "The automated daily refresh is currently paused; showing the latest available data.";
+
   return (
     <EditorialPage width="wide">
       <nav className="editorial-breadcrumbs">
@@ -63,12 +89,14 @@ export default async function PulseChangelogPage() {
       </h1>
       <p className="editorial-page-subtitle">
         Every governance event classified by the Civica Pulse Beta pipeline.
-        Updated daily.
+        {freshnessNote}
       </p>
 
       <div className="editorial-warning">
-        The Civica Pulse Beta is a real-time governance shock monitor under
-        active validation. Events queued for human review (
+        The Civica Pulse Beta is an event-sensitive governance shock monitor
+        under active validation. Its automated daily refresh is currently
+        paused, so the events below reflect the most recent computation rather
+        than a live feed. Events queued for human review (
         <strong>severe and catastrophic severity tiers</strong>, plus events
         where the classifier didn&apos;t reach consensus) do{" "}
         <strong>not</strong> drive published Pulse scores until a reviewer
