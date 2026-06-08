@@ -6,6 +6,7 @@ import { getAllSlugs, getAllPosts, getPostBySlug } from "@/lib/blog";
 import { BlogCover } from "@/components/blog/BlogCover";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareButtons } from "@/components/blog/ShareButtons";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -28,7 +29,7 @@ export async function generateMetadata({
     title: post.title,
     description: post.description,
     alternates: { canonical: `${SITE_URL}/blog/${post.slug}` },
-    openGraph: {
+    openGraph: withOg({
       type: "article",
       title: `${post.title} | The Record`,
       description: post.description,
@@ -36,6 +37,8 @@ export async function generateMetadata({
       publishedTime: post.date,
       authors: [post.author],
       tags: post.tags,
+      // Use the post's own cover image when it has one; withOg falls back to
+      // the site default social image when `coverUrl` is undefined.
       images: coverUrl
         ? [
             {
@@ -46,7 +49,7 @@ export async function generateMetadata({
             },
           ]
         : undefined,
-    },
+    }),
   };
 }
 

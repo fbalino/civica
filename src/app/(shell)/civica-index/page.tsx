@@ -6,6 +6,7 @@ import { CountryFlag } from "@/components/CountryFlag";
 import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import { civicaIndex } from "@/lib/content/site-state";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -14,12 +15,12 @@ export const metadata: Metadata = {
   description:
     `Composite governance score for every sovereign state and territory. ${civicaIndex.dimensionCount} governance dimensions, empirically-derived weights, fixed-bound normalization, 90% confidence intervals.${civicaIndex.status === "beta" ? " Beta methodology" : ""} — see /civica-index/methodology.`,
   alternates: { canonical: "https://civicaatlas.org/civica-index" },
-  openGraph: {
+  openGraph: withOg({
     title: "Civica Index — Global Governance Rankings | Civica Atlas",
     description:
       "The governance health of every country. Quarterly structural scores across 190+ sovereign states.",
     url: "https://civicaatlas.org/civica-index",
-  },
+  }),
 };
 
 function govBadgeClass(gov: string | null): string {

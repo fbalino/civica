@@ -4,6 +4,7 @@ import { getAllJurisdictions } from "@/lib/db/queries";
 import { CountrySearch } from "./search";
 import { CountryFlag } from "@/components/CountryFlag";
 import { classifyGovernment } from "@/lib/data/government-category";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -12,12 +13,12 @@ export const metadata: Metadata = {
   description:
     "Browse all 250+ countries and territories. Filter by continent, government type, and political system. Complete index of world governance data.",
   alternates: { canonical: "https://civicaatlas.org/countries" },
-  openGraph: {
+  openGraph: withOg({
     title: "All Countries & Territories — Government Structure Index | Civica",
     description:
       "Browse all 250+ countries and territories. Filter by continent, government type, and political system. Complete index of world governance data.",
     url: "https://civicaatlas.org/countries",
-  },
+  }),
 };
 
 function formatPopulation(pop: number | null): string {

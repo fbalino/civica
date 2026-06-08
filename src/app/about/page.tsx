@@ -5,6 +5,7 @@ import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -13,12 +14,12 @@ export const metadata: Metadata = {
   description:
     "Civica Atlas is an academic-grade reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.",
   alternates: { canonical: "https://civicaatlas.org/about" },
-  openGraph: {
+  openGraph: withOg({
     title: "About Civica Atlas — Open Reference Atlas of World Governments",
     description:
       "An academic-grade reference atlas of the world's countries, governments, and governance outcomes — multi-source reconciliation, statement-level provenance, and published methodology.",
     url: "https://civicaatlas.org/about",
-  },
+  }),
 };
 
 const SOURCE_DESCRIPTIONS: Record<string, string> = {

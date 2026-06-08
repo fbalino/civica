@@ -27,6 +27,7 @@ import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { civicaIndex } from "@/lib/content/site-state";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -425,7 +426,7 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: url },
-    openGraph: { title: `${title} | Civica`, description, url },
+    openGraph: withOg({ title: `${title} | Civica`, description, url }),
   };
 }
 

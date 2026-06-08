@@ -4,6 +4,7 @@ import { db } from "@/lib/db/index";
 import { elections, jurisdictions } from "@/lib/db/schema";
 import { sql } from "drizzle-orm";
 import ElectionsClient from "./ElectionsClient";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -12,12 +13,12 @@ export const metadata: Metadata = {
   description:
     "Track upcoming and past elections worldwide. Voter turnout data, party-colored results, electoral system labels, and historical timelines for 200+ countries.",
   alternates: { canonical: "https://civicaatlas.org/elections" },
-  openGraph: {
+  openGraph: withOg({
     title: "Election Timeline & Results | Civica",
     description:
       "Track upcoming and past elections worldwide with turnout visualization and party-colored results.",
     url: "https://civicaatlas.org/elections",
-  },
+  }),
 };
 
 export default async function ElectionsPage() {

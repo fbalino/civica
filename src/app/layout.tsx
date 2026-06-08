@@ -7,6 +7,7 @@ import { CivicaLogo } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { DevDesignMount } from "@/components/dev/DevDesignMount";
 import { tier1Publishers } from "@/lib/content/site-state";
+import { OG_IMAGES, OG_DEFAULT_IMAGE } from "@/lib/og";
 import "./globals.css";
 import "./editorial.css";
 import "./atlas.css";
@@ -59,12 +60,10 @@ const inter = Inter({
 // 307-redirecting to www is a hosting/next.config concern handled separately.)
 const SITE_URL = "https://civicaatlas.org";
 
-// Default social-share image (1200x630). Resolved against `metadataBase`
-// to an absolute apex URL. Colors are baked into the asset from the live
-// design tokens (parchment / ink / bronze) — no hex lives in code.
-const OG_IMAGE = "/og-default.png";
-const OG_IMAGE_ALT =
-  "Civica — an interactive atlas of world government structures and the Civica Index, with governance data for 250+ nations.";
+// The default social-share image (1200x630) and its alt text now live in
+// `@/lib/og` so the ~17 pages that override `openGraph` can share one source
+// of truth. Resolved against `metadataBase` to an absolute apex URL; colours
+// are baked into the asset from the live design tokens — no hex lives in code.
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -88,11 +87,11 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Civica",
     locale: "en_US",
-    images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: OG_IMAGE_ALT }],
+    images: OG_IMAGES,
   },
   twitter: {
     card: "summary_large_image",
-    images: [OG_IMAGE],
+    images: [OG_DEFAULT_IMAGE],
   },
   robots: {
     index: true,

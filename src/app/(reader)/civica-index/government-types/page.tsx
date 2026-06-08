@@ -22,6 +22,7 @@ import {
   FACTBOOK_RECONCILIATION_META,
 } from "@/lib/factbook/reconcile/api";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -32,12 +33,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/government-types",
   },
-  openGraph: {
+  openGraph: withOg({
     title: "Civica Index by peer lens | Civica Index",
     description:
       "V-Dem Regimes of the World by default; BR/CGV regime type on demand. Distribution, spread, and trajectory for every lens cohort.",
     url: "https://civicaatlas.org/civica-index/government-types",
-  },
+  }),
 };
 
 type DotRow = {

@@ -4,6 +4,7 @@ import { Banner } from "@/components/editorial/Banner";
 import { DataTable } from "@/components/editorial/DataTable";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -12,12 +13,12 @@ export const metadata: Metadata = {
   description:
     "Licensing and reuse notes for Civica Atlas data, sources, public API responses, and code.",
   alternates: { canonical: "https://civicaatlas.org/licensing" },
-  openGraph: {
+  openGraph: withOg({
     title: "Licensing | Civica Atlas",
     description:
       "Licensing and reuse notes for Civica Atlas data, sources, public API responses, and code.",
     url: "https://civicaatlas.org/licensing",
-  },
+  }),
 };
 
 const SOURCE_ROWS = [

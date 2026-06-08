@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getAllMetricDefinitionsWithCoverage } from "@/lib/db/queries";
 import { OutcomesExplorer } from "@/components/outcomes/OutcomesExplorer";
 import type { MetricOption } from "@/components/outcomes/OutcomesExplorer";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -11,12 +12,12 @@ export const metadata: Metadata = {
   description:
     "Explore how material conditions like human development, peace & security, and economic stability vary across countries and government types. Compare 195 countries.",
   alternates: { canonical: "https://civicaatlas.org/civica-conditions" },
-  openGraph: {
+  openGraph: withOg({
     title: "Civica Conditions — Material Conditions Across Countries",
     description:
       "Explore how material conditions like human development, peace & security, and economic stability vary across countries and government types. Compare 195 countries.",
     url: "https://civicaatlas.org/civica-conditions",
-  },
+  }),
 };
 
 // Shape returned by getAllMetricDefinitionsWithCoverage rows

@@ -1,6 +1,7 @@
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import type { Country } from "@/components/atlas/data";
 import { AtlasMapShellClient } from "@/components/atlas/AtlasMapShellClient";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -9,10 +10,10 @@ export async function generateMetadata() {
     title: "Atlas — Civica",
     description:
       "Every government, every chamber, one interactive world map. Pan, zoom, and click any country to walk into its legislature.",
-    openGraph: {
+    openGraph: withOg({
       title: "Atlas — Civica",
       url: "https://civicaatlas.org/atlas",
-    },
+    }),
   };
 }
 

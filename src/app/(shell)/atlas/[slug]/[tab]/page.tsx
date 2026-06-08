@@ -13,6 +13,7 @@ import { db } from "@/lib/db";
 import { jurisdictions } from "@/lib/db/schema";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -28,10 +29,10 @@ export async function generateMetadata({
   return {
     title: `${slug} · ${tabLabel} — Civica Atlas`,
     // Canonical OG URL points at the reader view for clean social previews.
-    openGraph: {
+    openGraph: withOg({
       title: `${slug} · ${tabLabel} — Civica Atlas`,
       url: `https://civicaatlas.org/countries/${slug}`,
-    },
+    }),
   };
 }
 

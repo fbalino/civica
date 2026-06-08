@@ -23,6 +23,7 @@ import {
 } from "@/components/ci/CIPulseScoreDisplay";
 import { PulseDimensionalDeltas } from "@/components/pulse/PulseDimensionalDeltas";
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
+import { withOg, OG_DEFAULT_IMAGE } from "@/lib/og";
 import { SourceDot } from "@/components/SourceDot";
 import { FactbookSectionTabs } from "@/components/FactbookSectionNav";
 import { FactbookSection } from "@/components/FactbookSection";
@@ -158,21 +159,20 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: url },
-    openGraph: {
+    // withOg injects the shared default social image, because Next replaces
+    // (not merges) the root layout's openGraph when a page sets its own.
+    openGraph: withOg({
       title: `${title} | Civica`,
       description,
       url,
       type: "website",
-      // This page overrides openGraph, which replaces (not merges) the
-      // root layout's default, so the shared social image must be repeated
-      // here or the share preview would be imageless.
-      images: ["/og-default.png"],
-    },
+    }),
+    // This page overrides twitter too, so re-declare the shared image here.
     twitter: {
       card: "summary_large_image",
       title: `${title} | Civica`,
       description,
-      images: ["/og-default.png"],
+      images: [OG_DEFAULT_IMAGE],
     },
   };
 }

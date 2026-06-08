@@ -18,6 +18,7 @@ import { CompareCivicaIndex } from "@/components/compare/CompareCivicaIndex";
 import { CompareChambers } from "@/components/compare/CompareChambers";
 import { CompareElections } from "@/components/compare/CompareElections";
 import { CompareInternational } from "@/components/compare/CompareInternational";
+import { withOg } from "@/lib/og";
 import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { civicaIndex } from "@/lib/content/site-state";
@@ -93,12 +94,12 @@ export async function generateMetadata({
     description:
       "Side-by-side country comparison: factbook overview, Civica Index scores, parliamentary chambers, recent elections, and international organization memberships.",
     alternates: { canonical },
-    openGraph: {
+    openGraph: withOg({
       title,
       description:
         "Compare the governance, scoring, chambers, elections, and global memberships of any two or three countries.",
       url: canonical,
-    },
+    }),
   };
 }
 

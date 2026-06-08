@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { rankCountriesByFact } from "@/lib/db/queries";
 import { RankingTable } from "@/components/RankingTable";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -9,12 +10,12 @@ export const metadata: Metadata = {
   description:
     "Explore global rankings for 250+ countries by GDP, population, area, life expectancy, and more. Data from Wikidata, World Bank, and archived CIA World Factbook.",
   alternates: { canonical: "https://civicaatlas.org/rankings" },
-  openGraph: {
+  openGraph: withOg({
     title: "World Government Rankings — GDP, Population, Democracy Index | Civica",
     description:
       "Explore global rankings for 250+ countries by GDP, population, area, life expectancy, and more.",
     url: "https://civicaatlas.org/rankings",
-  },
+  }),
 };
 
 const RANKING_METRICS = [

@@ -16,6 +16,7 @@ import { reconciliation } from "@/lib/content/site-state";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
 import { sectionDataHasNormalizableGeographicName } from "@/lib/data/geographic-name-normalization";
+import { withOg } from "@/lib/og";
 import { FactbookSection } from "@/components/FactbookSection";
 import { Banner } from "@/components/editorial/Banner";
 import { FactbookHeaderStrip } from "@/components/factbook/FactbookHeaderStrip";
@@ -132,16 +133,15 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: url },
-    openGraph: {
+    // withOg injects the shared default social image, because Next replaces
+    // (not merges) the root layout's openGraph when a page sets its own.
+    // (twitter is not overridden here, so it still inherits the layout's.)
+    openGraph: withOg({
       title: `${title} | Civica`,
       description,
       url,
       type: "website",
-      // openGraph here replaces (not merges) the root layout default, so
-      // repeat the shared social image. (twitter is not overridden on this
-      // route, so it still inherits the layout's twitter image.)
-      images: ["/og-default.png"],
-    },
+    }),
   };
 }
 

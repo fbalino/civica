@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
 import { BlogCover } from "@/components/blog/BlogCover";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
 
@@ -12,12 +13,12 @@ export const metadata: Metadata = {
   description:
     "Notes from the chambers — articles on governance, political systems, and the architecture of public life from the Civica desk.",
   alternates: { canonical: `${SITE_URL}/blog` },
-  openGraph: {
+  openGraph: withOg({
     title: "The Record | Civica",
     description:
       "Notes from the chambers — articles on governance, political systems, and the architecture of public life from the Civica desk.",
     url: `${SITE_URL}/blog`,
-  },
+  }),
 };
 
 function formatDate(dateStr: string) {
