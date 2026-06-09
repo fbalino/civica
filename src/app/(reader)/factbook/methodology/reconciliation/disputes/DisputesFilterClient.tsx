@@ -550,7 +550,7 @@ function DisputeCard({
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
               letterSpacing: "0.05em",
             }}
@@ -560,7 +560,7 @@ function DisputeCard({
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
               letterSpacing: "0.05em",
             }}
@@ -602,7 +602,7 @@ function DisputeCard({
           gridTemplateColumns: "1fr 1fr",
           gap: "var(--space-5)",
           fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-12)",
+          fontSize: "var(--text-13)",
           color: "var(--color-text-60)",
         }}
       >
@@ -655,7 +655,7 @@ function DisputeCard({
             paddingTop: "var(--space-3)",
             borderTop: "1px solid var(--color-card-border)",
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-13)",
+            fontSize: "var(--text-14)",
             color: "var(--color-text-60)",
             display: "flex",
             gap: "var(--space-3)",
@@ -666,7 +666,7 @@ function DisputeCard({
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
@@ -690,7 +690,7 @@ function DisputeCard({
           style={{
             marginTop: "var(--space-3)",
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-13)",
+            fontSize: "var(--text-14)",
             color: "var(--color-text-60)",
             lineHeight: 1.55,
           }}
@@ -698,7 +698,7 @@ function DisputeCard({
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
@@ -749,7 +749,7 @@ function DisputeCard({
           <div
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
@@ -762,7 +762,7 @@ function DisputeCard({
             <p
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "var(--text-13)",
+                fontSize: "var(--text-14)",
                 color: "var(--color-text-60)",
                 margin: 0,
               }}
@@ -773,7 +773,7 @@ function DisputeCard({
             <p
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "var(--text-13)",
+                fontSize: "var(--text-14)",
                 color: "var(--color-text-60)",
                 margin: 0,
               }}
@@ -804,7 +804,7 @@ function DisputeCard({
                   <div
                     style={{
                       fontFamily: "var(--font-mono)",
-                      fontSize: "var(--text-11)",
+                      fontSize: "var(--text-12)",
                       color: "var(--color-text-40)",
                       letterSpacing: "0.05em",
                     }}
@@ -814,7 +814,7 @@ function DisputeCard({
                   <div
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontSize: "var(--text-13)",
+                      fontSize: "var(--text-14)",
                       color: "var(--color-text-primary)",
                       marginTop: "var(--space-1, 4px)",
                     }}
@@ -828,7 +828,7 @@ function DisputeCard({
                     <div
                       style={{
                         fontFamily: "var(--font-body)",
-                        fontSize: "var(--text-13)",
+                        fontSize: "var(--text-14)",
                         color: "var(--color-text-60)",
                         marginTop: "var(--space-1, 4px)",
                       }}

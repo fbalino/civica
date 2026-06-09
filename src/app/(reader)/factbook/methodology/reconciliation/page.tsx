@@ -526,7 +526,7 @@ export default async function ReconciliationMethodologyPage() {
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-12)",
+            fontSize: "var(--text-13)",
             color: "var(--color-text-40)",
             fontStyle: "italic",
             margin: "var(--space-2) 0 var(--space-5)",

@@ -465,7 +465,7 @@ export default async function DataDisputesQueuePage({
                     <span
                       style={{
                         fontFamily: "var(--font-mono)",
-                        fontSize: "var(--text-11)",
+                        fontSize: "var(--text-12)",
                         color: "var(--color-text-40)",
                         letterSpacing: "0.05em",
                       }}
@@ -475,7 +475,7 @@ export default async function DataDisputesQueuePage({
                     <span
                       style={{
                         fontFamily: "var(--font-mono)",
-                        fontSize: "var(--text-11)",
+                        fontSize: "var(--text-12)",
                         color: "var(--color-text-40)",
                         letterSpacing: "0.05em",
                       }}
@@ -524,7 +524,7 @@ export default async function DataDisputesQueuePage({
                     gridTemplateColumns: "1fr 1fr",
                     gap: 16,
                     fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-12)",
+                    fontSize: "var(--text-13)",
                     color: "var(--color-text-60)",
                   }}
                 >

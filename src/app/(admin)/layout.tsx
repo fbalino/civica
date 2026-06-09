@@ -31,7 +31,7 @@ export default async function AdminLayout({
           gap: 16,
           flexWrap: "wrap",
           fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-11)",
+          fontSize: "var(--text-12)",
           fontWeight: "var(--font-weight-mono)",
           letterSpacing: "0.06em",
           textTransform: "uppercase",
@@ -87,7 +87,7 @@ export default async function AdminLayout({
               style={{
                 padding: "4px 10px",
                 fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-11)",
+                fontSize: "var(--text-12)",
                 fontWeight: "var(--font-weight-mono)",
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",

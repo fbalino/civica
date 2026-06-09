@@ -35,7 +35,7 @@
 .editorial-breadcrumbs {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   letter-spacing: var(--tracking-wide);
   color: var(--color-text-muted);
   margin-bottom: var(--space-5);
@@ -122,7 +122,7 @@
 .editorial-page-meta {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   letter-spacing: var(--tracking-wide);
   color: var(--color-text-30);
   margin: 0 0 28px; /* 28px — no exact token */
@@ -136,7 +136,7 @@
 
 .editorial-beta-tag {
   font-family: var(--font-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   font-weight: var(--font-weight-mono, 500);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
@@ -171,7 +171,7 @@
   padding: 14px 18px; /* 14px/18px — no exact tokens */
   margin-bottom: var(--space-7);
   font-family: var(--font-body);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   line-height: 1.55;
   color: var(--color-text-primary);
 }
@@ -237,7 +237,7 @@
 }
 .editorial-section p {
   font-family: var(--font-body);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   line-height: 1.7;
   color: var(--color-text-60);
   margin: 0 0 var(--space-4);
@@ -245,7 +245,7 @@
 .editorial-section ul,
 .editorial-section ol {
   font-family: var(--font-body);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   line-height: 1.7;
   color: var(--color-text-60);
   padding-left: 22px; /* 22px — no exact token */
@@ -267,7 +267,7 @@
 }
 .editorial-section code {
   font-family: var(--font-mono);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   background: var(--color-card-bg);
   padding: 1px 6px;
   border-radius: var(--radius-sm);
@@ -280,7 +280,7 @@
   border-collapse: collapse;
   margin: var(--space-5) 0 var(--space-3);
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
 }
 
 /* Horizontally-scrollable wrapper for wide editorial tables. Body
@@ -303,7 +303,7 @@
   padding: var(--space-3) var(--space-4);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.06em; /* 0.06em — no exact token; between --tracking-wide(0.03) and --tracking-wider(0.08) */
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -350,7 +350,7 @@
   border-top: 1px solid var(--color-card-border);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-60);
   display: flex;
   gap: var(--space-6);
@@ -385,7 +385,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 
 .reader-sidebar-title {
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   text-transform: uppercase;
   letter-spacing: var(--tracking-wider);
   color: var(--color-text-40);
@@ -407,7 +407,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   border-left: 2px solid transparent;
   color: var(--color-text-60);
   font-family: var(--font-body);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   line-height: var(--leading-normal);
   text-decoration: none;
 }
@@ -425,7 +425,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 
 .reader-sidebar-num {
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-30);
   align-self: center;
   min-width: 20px;
@@ -529,7 +529,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .editorial-filter-label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: 0.06em; /* 0.06em — no exact token */
   text-transform: uppercase;
@@ -548,7 +548,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   background: var(--color-page-bg);
   color: var(--color-text-60);
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   font-weight: 500;
   letter-spacing: 0;
   text-transform: none;
@@ -577,7 +577,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .editorial-filter-form select {
   padding: 5px 9px;
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-card-border);
   background: var(--color-page-bg);
@@ -586,7 +586,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .editorial-filter-form button {
   padding: 5px 11px;
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
@@ -640,7 +640,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .editorial-card-desc {
   margin: 0 0 var(--space-4);
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   line-height: 1.55;
   color: var(--color-text-60);
 }
@@ -653,7 +653,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   padding-top: 10px; /* 10px — no exact token */
   border-top: 1px solid var(--color-card-border);
   font-family: var(--font-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: 0.04em; /* 0.04em — no exact token; between --tracking-wide(0.03) and --tracking-wider(0.08) */
 }
@@ -717,7 +717,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   gap: var(--space-3);
   align-items: baseline;
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-60);
 }
 
@@ -729,7 +729,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 
 .pulse-event-kicker span:last-child {
   font-family: var(--font-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wide);
   color: var(--color-text-40);
 }
@@ -756,7 +756,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   flex-wrap: wrap;
   margin-bottom: var(--space-4);
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
 }
 
 .pulse-event-actions a {
@@ -776,7 +776,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   padding: var(--space-4);
   margin: 0 0 var(--space-4);
   font-family: var(--font-body);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   line-height: var(--leading-relaxed);
   color: var(--color-text-primary);
 }
@@ -785,7 +785,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .pulse-event-nested-details summary,
 .pulse-event-source-chip span {
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -811,7 +811,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   padding-left: var(--space-4);
   border-left: 2px solid var(--color-card-border);
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   line-height: var(--leading-relaxed);
   color: var(--color-text-60);
 }
@@ -836,7 +836,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
 }
 
 .pulse-event-source-chip strong {
@@ -846,7 +846,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .pulse-event-source-chip a {
   color: var(--color-accent);
   font-family: var(--font-body);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   text-decoration: none;
 }
 
@@ -866,7 +866,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 
 .pulse-event-classifier-category {
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   font-weight: 500;
   color: var(--color-text-primary);
   margin-bottom: var(--space-2);
@@ -881,7 +881,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 
 .pulse-event-rationale {
   font-family: var(--font-body);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-60);
   line-height: var(--leading-relaxed);
 }
@@ -906,7 +906,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   padding-top: var(--space-5);
   border-top: 1px solid var(--color-card-border);
   font-family: var(--font-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
 }
 .editorial-pagination a {
@@ -926,7 +926,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .editorial-eyebrow {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -945,7 +945,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .editorial-section-header p,
 .editorial-results-dek {
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-60);
   margin: 0 0 20px; /* 20px — no exact token; between --space-5(16) and --space-6(24) */
 }
@@ -955,7 +955,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .editorial-empty {
   margin: var(--space-5) 0 var(--space-6);
   font-family: var(--font-body);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   color: var(--color-text-60);
   line-height: 1.5;
 }
@@ -1091,7 +1091,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 .fact-value-panel-fact-key {
   font-family: var(--font-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -1104,7 +1104,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   background: color-mix(in oklab, var(--color-status-warning) 8%, transparent);
   border-left: 3px solid var(--color-status-warning);
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-primary);
   line-height: 1.4;
 }
@@ -1154,7 +1154,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 .fact-value-row-source {
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   font-weight: 600;
   color: var(--color-text-primary);
   min-width: 0;
@@ -1164,7 +1164,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .fact-value-row-canonical-tag,
 .fact-value-row-projected-tag {
   font-family: var(--font-mono);
-  font-size: var(--text-9);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   font-weight: var(--font-weight-medium);
@@ -1180,7 +1180,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   min-width: 0;
   max-width: 100%;
   font-family: var(--font-body);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   font-weight: 500;
   color: var(--color-text-primary);
   text-align: right;
@@ -1201,7 +1201,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .fact-value-row-meta {
   grid-column: 1 / -1;
   font-family: var(--font-body);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
   line-height: 1.4;
   min-width: 0;
@@ -1237,7 +1237,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   flex-wrap: wrap;
   gap: 4px 12px;
   font-family: var(--font-body);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
   line-height: 1.4;
 }
@@ -1313,7 +1313,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   display: inline-block;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-badge-text);
@@ -1330,14 +1330,14 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-endpoint-path {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   color: var(--color-text-primary);
 }
 
 .api-endpoint-desc {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-50);
   line-height: var(--leading-relaxed);
   margin: 0 0 var(--space-5);
@@ -1346,7 +1346,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-section-label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-30);
@@ -1356,7 +1356,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-code-block {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   background: var(--color-card-bg);
   border: 1px solid var(--color-divider);
   border-radius: 6px; /* 6px — no exact token; preserves visual weight */
@@ -1382,7 +1382,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-info-card__body {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-50);
   line-height: var(--leading-relaxed);
   margin: 0;
@@ -1394,13 +1394,13 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-info-card__value {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-primary);
 }
 .api-info-card__link {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-50);
   text-decoration: none;
   display: inline-flex;
@@ -1430,21 +1430,21 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-params__name {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-primary);
   min-width: 140px; /* 140px — no exact token; column rhythm */
 }
 .api-params__type {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-30);
   min-width: 60px; /* 60px — no exact token; column rhythm */
 }
 .api-params__desc {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-50);
 }
 .api-params--embed .api-params__name { min-width: 80px;  /* 80px — no exact token */ }
@@ -1462,7 +1462,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-embed-size-label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-30);
   text-transform: uppercase;
   letter-spacing: var(--tracking-caps);
@@ -1476,7 +1476,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-example-heading {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-primary);
   margin: var(--space-6) 0 var(--space-3);
 }
@@ -1487,7 +1487,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-intro {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-50);
   line-height: var(--leading-relaxed);
   margin: 0 0 var(--space-5);
@@ -1545,7 +1545,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .meth-num {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   letter-spacing: 0.12em;
   color: var(--color-text-30);
   display: block;
@@ -1561,7 +1561,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   padding: 20px 24px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-primary);
   line-height: 1.7;
   margin: 20px 0 24px;
@@ -1585,7 +1585,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   padding: 0 14px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-primary);
   min-width: 80px;
   border-right: 1px solid color-mix(in oklab, var(--color-text-primary) 20%, transparent);
@@ -1597,14 +1597,14 @@ html:has(.factbook-sticky-country-search:focus-within)
 
 .meth-weight-slice strong {
   font-family: var(--font-heading);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   font-weight: 500;
   letter-spacing: -0.01em;
   display: block;
 }
 
 .meth-weight-slice small {
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.8;
@@ -1639,7 +1639,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 
 .meth-band-cell small {
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   opacity: 0.8;
@@ -1664,7 +1664,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .meth-version-label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-text-30);
@@ -1734,7 +1734,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .meth-figure-caption {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
   line-height: 1.5;
   margin-top: var(--space-3);

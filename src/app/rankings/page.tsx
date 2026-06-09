@@ -104,7 +104,7 @@ export default async function RankingsPage({
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-12)",
+          fontSize: "var(--text-13)",
           color: "var(--color-text-30)",
           marginBottom: 40,
         }}
@@ -120,7 +120,7 @@ export default async function RankingsPage({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-12)",
+              fontSize: "var(--text-13)",
               padding: "6px 12px",
               borderRadius: "var(--radius-sm)",
               textDecoration: "none",
@@ -142,7 +142,7 @@ export default async function RankingsPage({
             textAlign: "center",
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             color: "var(--color-text-40)",
             padding: "48px 0",
           }}

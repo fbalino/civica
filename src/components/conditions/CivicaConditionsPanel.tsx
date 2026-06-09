@@ -89,7 +89,7 @@ function DimensionCard({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-10)",
+            fontSize: "var(--text-12)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "var(--color-text-30)",
@@ -118,7 +118,7 @@ function DimensionCard({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
               letterSpacing: "0.06em",
               textTransform: "uppercase",
@@ -143,7 +143,7 @@ function DimensionCard({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.06em",
               textTransform: "uppercase",
               color,
@@ -156,7 +156,7 @@ function DimensionCard({
               style={{
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 color: "var(--color-text-30)",
                 padding: "2px 6px",
                 border: "1px solid var(--color-card-border)",
@@ -192,7 +192,7 @@ function DimensionCard({
           margin: 0,
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-11)",
+          fontSize: "var(--text-12)",
           color: "var(--color-text-30)",
           lineHeight: 1.4,
         }}
@@ -243,7 +243,7 @@ export async function CivicaConditionsPanel({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "var(--color-text-30)",
@@ -257,7 +257,7 @@ export async function CivicaConditionsPanel({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             color: "var(--color-accent)",
             textDecoration: "none",
             letterSpacing: "0.06em",
@@ -271,7 +271,7 @@ export async function CivicaConditionsPanel({
       <p
         style={{
           fontFamily: "var(--font-body-sans, var(--font-body))",
-          fontSize: "var(--text-13)",
+          fontSize: "var(--text-14)",
           color: "var(--color-text-55)",
           lineHeight: "var(--leading-relaxed)",
           margin: "0 0 16px",

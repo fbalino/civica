@@ -424,7 +424,7 @@ export default async function CountryPage({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-10)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
               letterSpacing: "var(--tracking-wider)",
               textTransform: "uppercase",
@@ -451,7 +451,7 @@ export default async function CountryPage({
           <span
             style={{
               fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-13)",
+              fontSize: "var(--text-14)",
               color: "var(--color-text-60)",
               display: "block",
               lineHeight: "var(--leading-relaxed)",
@@ -465,7 +465,7 @@ export default async function CountryPage({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             color: "var(--color-text-40)",
             display: "flex",
             alignItems: "center",
@@ -504,7 +504,7 @@ export default async function CountryPage({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-25)",
               margin: 0,
             }}
@@ -518,7 +518,7 @@ export default async function CountryPage({
           <p
             style={{
               fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-14)",
+              fontSize: "var(--text-15)",
               color: "var(--color-text-50)",
               margin: 0,
               lineHeight: "var(--leading-relaxed)",
@@ -535,7 +535,7 @@ export default async function CountryPage({
             <p
               style={{
                 fontFamily: "var(--font-body-sans)",
-                fontSize: "var(--text-14)",
+                fontSize: "var(--text-15)",
                 color: "var(--color-text-50)",
                 margin: 0,
                 lineHeight: "var(--leading-relaxed)",
@@ -619,7 +619,7 @@ export default async function CountryPage({
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-30)",
                     letterSpacing: "var(--tracking-wider)",
                     textTransform: "uppercase",
@@ -644,7 +644,7 @@ export default async function CountryPage({
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontWeight: "var(--font-weight-mono)",
-                      fontSize: "var(--text-11)",
+                      fontSize: "var(--text-12)",
                       color: "var(--color-text-30)",
                       margin: "4px 0 0",
                       display: "flex",
@@ -674,7 +674,7 @@ export default async function CountryPage({
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-30)",
                     letterSpacing: "var(--tracking-wider)",
                     textTransform: "uppercase",
@@ -699,7 +699,7 @@ export default async function CountryPage({
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontWeight: "var(--font-weight-mono)",
-                      fontSize: "var(--text-11)",
+                      fontSize: "var(--text-12)",
                       color: "var(--color-text-30)",
                       margin: "4px 0 0",
                       display: "flex",
@@ -736,7 +736,7 @@ export default async function CountryPage({
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-30)",
                     textTransform: "uppercase",
                   }}
@@ -763,7 +763,7 @@ export default async function CountryPage({
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-30)",
                     textTransform: "uppercase",
                   }}
@@ -822,7 +822,7 @@ export default async function CountryPage({
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-30)",
                     letterSpacing: "var(--tracking-wide)",
                     textTransform: "uppercase",
@@ -834,7 +834,7 @@ export default async function CountryPage({
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-25)",
                     display: "block",
                     marginTop: 2,
@@ -877,7 +877,7 @@ export default async function CountryPage({
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-13)",
+          fontSize: "var(--text-14)",
           color: "var(--color-text-50)",
           lineHeight: "var(--leading-relaxed)",
           marginTop: 0,
@@ -901,7 +901,7 @@ export default async function CountryPage({
               style={{
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
                 color: bColor,
@@ -923,7 +923,7 @@ export default async function CountryPage({
                     <span style={{ color: "var(--color-text-40)" }}>
                       {" — "}{currentHolder.person.name}
                       {currentHolder.term.partyName && (
-                        <span style={{ color: "var(--color-text-25)", fontSize: "var(--text-11)" }}>
+                        <span style={{ color: "var(--color-text-25)", fontSize: "var(--text-12)" }}>
                           {" ("}
                           {currentHolder.term.partyColor && (
                             <span style={{ display: "inline-block", width: 5, height: 5, borderRadius: "50%", background: currentHolder.term.partyColor, marginRight: 3, verticalAlign: "middle" }} />
@@ -1058,7 +1058,7 @@ export default async function CountryPage({
                 marginTop: 6,
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-11)",
+                fontSize: "var(--text-12)",
                 color: "var(--color-text-30)",
               }}
             >
@@ -1069,7 +1069,7 @@ export default async function CountryPage({
             </div>
           </div>
         ) : (
-          <p style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)", color: "var(--color-text-50)", margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-15)", color: "var(--color-text-50)", margin: 0 }}>
             No regime classification available.
           </p>
         )}
@@ -1113,15 +1113,15 @@ export default async function CountryPage({
                   paddingRight: rc.id === jurisdiction.id ? 8 : 0,
                 }}
               >
-                <span style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)" }}>
-                  <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-25)", marginRight: 8, minWidth: 20, display: "inline-block" }}>
+                <span style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-15)" }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-25)", marginRight: 8, minWidth: 20, display: "inline-block" }}>
                     {i + 1}.
                   </span>
                   {rc.name}
                 </span>
                 <span
                   title={vdemRowLabel(rc.democracyIndex) ?? undefined}
-                  style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-40)" }}
+                  style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-13)", color: "var(--color-text-40)" }}
                 >
                   {vdemRowTier(rc.democracyIndex) != null
                     ? `${vdemRowTier(rc.democracyIndex)}/${VDEM_ROW_MAX_TIER}`
@@ -1166,7 +1166,7 @@ export default async function CountryPage({
                 <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-18)", color: "var(--color-text-primary)", display: "block" }}>
                   {leader.personName}
                 </span>
-                <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-40)", display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+                <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-40)", display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
                   {leader.officeName}
                   {leader.partyName && (
                     <>
@@ -1202,10 +1202,10 @@ export default async function CountryPage({
                 borderBottom: i < Math.min(pastLeaders.length, 20) - 1 ? "1px solid var(--color-stat-border)" : "none",
               }}
             >
-              <span style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)", color: "var(--color-text-primary)" }}>
+              <span style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-15)", color: "var(--color-text-primary)" }}>
                 {leader.personName}
               </span>
-              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-30)", display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)", display: "flex", alignItems: "center", gap: 6, marginTop: 2 }}>
                 {leader.officeName}
                 {leader.startDate && (
                   <>
@@ -1229,7 +1229,7 @@ export default async function CountryPage({
             </div>
           ))}
           {pastLeaders.length > 20 && (
-            <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-25)", marginTop: 12 }}>
+            <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-25)", marginTop: 12 }}>
               Showing 20 of {pastLeaders.length} past leaders.
             </p>
           )}
@@ -1246,7 +1246,7 @@ export default async function CountryPage({
         <div style={{ display: "flex", gap: 24, flexWrap: "wrap", marginBottom: 16 }}>
           {constitution.year && (
             <div>
-              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-30)", textTransform: "uppercase", display: "block" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)", textTransform: "uppercase", display: "block" }}>
                 Enacted
               </span>
               <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-22)", color: "var(--color-text-primary)" }}>
@@ -1256,7 +1256,7 @@ export default async function CountryPage({
           )}
           {constitution.yearUpdated && (
             <div>
-              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-30)", textTransform: "uppercase", display: "block" }}>
+              <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)", textTransform: "uppercase", display: "block" }}>
                 Last Amended
               </span>
               <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-22)", color: "var(--color-text-primary)" }}>
@@ -1266,7 +1266,7 @@ export default async function CountryPage({
           )}
         </div>
         {constitution.constituteProjectId && (
-          <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-30)", margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)", margin: 0 }}>
             Source: Constitute Project
             <SourceDot source="Constitute Project" retrievedAt="2026-04-13" />
           </p>
@@ -1279,7 +1279,7 @@ export default async function CountryPage({
           <div
             style={{
               fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-14)",
+              fontSize: "var(--text-15)",
               lineHeight: "var(--leading-relaxed)",
               color: "var(--color-text-85)",
               maxHeight: 600,
@@ -1295,7 +1295,7 @@ export default async function CountryPage({
   const constitutionTabContent = constitutionTab ?? (
     <div className="cv-card">
       <h3 className="section-header">Constitution</h3>
-      <p style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-14)", color: "var(--color-text-50)", margin: 0, lineHeight: "var(--leading-relaxed)" }}>
+      <p style={{ fontFamily: "var(--font-body-sans)", fontSize: "var(--text-15)", color: "var(--color-text-50)", margin: 0, lineHeight: "var(--leading-relaxed)" }}>
         Constitution data for {jurisdiction.name} has not yet been added to Civica.
       </p>
     </div>
@@ -1373,7 +1373,7 @@ export default async function CountryPage({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-12)",
+              fontSize: "var(--text-13)",
               color,
               margin: "6px 0 0",
             }}
@@ -1388,7 +1388,7 @@ export default async function CountryPage({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-10)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
               textDecoration: "none",
               padding: "6px 10px",
@@ -1406,7 +1406,7 @@ export default async function CountryPage({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-10)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
               textDecoration: "none",
               padding: "6px 10px",
@@ -1436,7 +1436,7 @@ export default async function CountryPage({
               marginBottom: 32,
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "var(--tracking-wider)",
               color: "var(--color-text-30)",
               display: "flex",
@@ -1479,7 +1479,7 @@ export default async function CountryPage({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "var(--tracking-caps)",
               textTransform: "uppercase",
               color: "var(--color-text-30)",
@@ -1531,7 +1531,7 @@ export default async function CountryPage({
                     style={{
                       fontFamily: "var(--font-mono)",
                       fontWeight: "var(--font-weight-mono)",
-                      fontSize: "var(--text-10)",
+                      fontSize: "var(--text-12)",
                       color: "var(--color-text-25)",
                     }}
                   >

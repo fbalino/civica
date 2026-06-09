@@ -127,7 +127,7 @@ export function FactbookRightRail({
         <h4
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-10)",
+            fontSize: "var(--text-12)",
             textTransform: "uppercase",
             letterSpacing: "var(--tracking-wider)",
             color: "var(--color-text-40)",
@@ -149,7 +149,7 @@ export function FactbookRightRail({
                     style={{
                       display: "block",
                       padding: "var(--space-2) var(--space-3)",
-                      fontSize: "var(--text-12)",
+                      fontSize: "var(--text-13)",
                       color: isActive
                         ? "var(--color-text-primary)"
                         : "var(--color-text-60)",
@@ -173,7 +173,7 @@ export function FactbookRightRail({
         ) : (
           <p
             style={{
-              fontSize: "var(--text-12)",
+              fontSize: "var(--text-13)",
               color: "var(--color-text-40)",
               margin: 0,
             }}
@@ -187,7 +187,7 @@ export function FactbookRightRail({
         <h4
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-10)",
+            fontSize: "var(--text-12)",
             textTransform: "uppercase",
             letterSpacing: "var(--tracking-wider)",
             color: "var(--color-text-40)",
@@ -214,7 +214,7 @@ export function FactbookRightRail({
                   i < sources.length - 1
                     ? "1px solid var(--color-stat-border)"
                     : "none",
-                fontSize: "var(--text-12)",
+                fontSize: "var(--text-13)",
               }}
             >
               <span style={{ color: "var(--color-text-85)" }}>{src.name}</span>

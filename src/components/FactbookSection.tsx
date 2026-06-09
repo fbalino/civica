@@ -307,7 +307,7 @@ function LeafRow({
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-12)",
+          fontSize: "var(--text-13)",
           color: "var(--color-text-40)",
           marginBottom: 4,
         }}
@@ -317,7 +317,7 @@ function LeafRow({
       <dd
         style={{
           fontFamily: "var(--font-body)",
-          fontSize: "var(--text-14)",
+          fontSize: "var(--text-15)",
           lineHeight: "var(--leading-relaxed)",
           color: "var(--color-text-85)",
           margin: 0,
@@ -378,7 +378,7 @@ function CanonicalLeafRow({
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-12)",
+          fontSize: "var(--text-13)",
           color: "var(--color-text-40)",
           marginBottom: 4,
         }}
@@ -388,7 +388,7 @@ function CanonicalLeafRow({
       <dd
         style={{
           fontFamily: "var(--font-body)",
-          fontSize: "var(--text-14)",
+          fontSize: "var(--text-15)",
           lineHeight: "var(--leading-relaxed)",
           color: "var(--color-text-85)",
           margin: 0,
@@ -598,7 +598,7 @@ export function FactbookSection({
           padding: "var(--spacing-content-top) 0",
           textAlign: "center",
           fontFamily: "var(--font-body)",
-          fontSize: "var(--text-14)",
+          fontSize: "var(--text-15)",
           color: "var(--color-text-40)",
         }}
       >

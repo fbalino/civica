@@ -212,7 +212,7 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
                     <span
                       style={{
                         fontFamily: "var(--font-mono)",
-                        fontSize: "var(--text-11)",
+                        fontSize: "var(--text-12)",
                         color: "var(--color-text-40)",
                         letterSpacing: "0.05em",
                       }}

@@ -451,7 +451,7 @@ export function MetricStripPlot({
                   dominantBaseline="middle"
                   style={{
                     fill: govCat.color,
-                    fontSize: "var(--text-12)",
+                    fontSize: "var(--text-13)",
                     fontFamily: "var(--font-body-sans)",
                     fontWeight: 500,
                   }}
@@ -468,7 +468,7 @@ export function MetricStripPlot({
                     dominantBaseline="middle"
                     style={{
                       fill: "var(--color-text-30)",
-                      fontSize: "var(--text-10)",
+                      fontSize: "var(--text-12)",
                       fontFamily: "var(--font-body-sans)",
                     }}
                   >
@@ -549,7 +549,7 @@ export function MetricStripPlot({
                     textAnchor="middle"
                     style={{
                       fill: "var(--color-text-40)",
-                      fontSize: "var(--text-10)",
+                      fontSize: "var(--text-12)",
                       fontFamily: "var(--font-mono)",
                       fontWeight: "var(--font-weight-mono)",
                     }}
@@ -569,7 +569,7 @@ export function MetricStripPlot({
                 textAnchor="middle"
                 style={{
                   fill: "var(--color-text-30)",
-                  fontSize: "var(--text-10)",
+                  fontSize: "var(--text-12)",
                   fontFamily: "var(--font-body-sans)",
                   letterSpacing: "0.08em",
                 }}
@@ -673,7 +673,7 @@ export function MetricStripPlot({
           <div
             style={{
               fill: "var(--color-text-25)",
-              fontSize: "var(--text-10)",
+              fontSize: "var(--text-12)",
               fontFamily: "var(--font-body-sans)",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
@@ -687,7 +687,7 @@ export function MetricStripPlot({
           {coverage && coveragePct != null ? (
             <div
               style={{
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 fontFamily: "var(--font-body-sans)",
                 letterSpacing: "0.1em",
                 textTransform: "uppercase",
@@ -732,7 +732,7 @@ export function MetricStripPlot({
                 style={{
                   fontFamily: "var(--font-body-sans)",
                   fontWeight: 600,
-                  fontSize: "var(--text-13)",
+                  fontSize: "var(--text-14)",
                   color: "var(--color-text-primary)",
                   marginBottom: 2,
                 }}
@@ -743,7 +743,7 @@ export function MetricStripPlot({
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                  fontSize: "var(--text-14)",
+                  fontSize: "var(--text-15)",
                   color: "var(--color-accent)",
                   marginBottom: 4,
                 }}
@@ -755,7 +755,7 @@ export function MetricStripPlot({
                   display: "flex",
                   gap: 8,
                   flexWrap: "wrap",
-                  fontSize: "var(--text-11)",
+                  fontSize: "var(--text-12)",
                   color: "var(--color-text-40)",
                   fontFamily: "var(--font-body-sans)",
                 }}
@@ -775,7 +775,7 @@ export function MetricStripPlot({
               <div
                 style={{
                   marginTop: 4,
-                  fontSize: "var(--text-10)",
+                  fontSize: "var(--text-12)",
                   color: "var(--color-text-30)",
                   fontFamily: "var(--font-body-sans)",
                 }}
@@ -792,7 +792,7 @@ export function MetricStripPlot({
         <p
           style={{
             marginTop: 8,
-            fontSize: "var(--text-12)",
+            fontSize: "var(--text-13)",
             color: "var(--color-text-40)",
             fontFamily: "var(--font-body-sans)",
             fontStyle: "italic",

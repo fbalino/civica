@@ -40,7 +40,7 @@
   padding: 0 var(--space-3) var(--space-2);
   border-bottom: 1px solid var(--color-border-default);
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -49,7 +49,7 @@
 .scores-rankings__row {
   padding: var(--row-padding-y) var(--space-3);
   border-bottom: 1px solid var(--color-border-default);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   line-height: 1.35;
 }
 
@@ -69,7 +69,7 @@
 
 .scores-rankings__value {
   font-family: var(--font-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-primary);
   display: flex;
   flex-direction: column;
@@ -79,7 +79,7 @@
 
 .scores-rankings__rank {
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-40);
 }
 
@@ -88,7 +88,7 @@
   align-items: baseline;
   gap: 4px;
   font-family: var(--font-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
 }
 
 .scores-rankings__trend--up {
@@ -109,7 +109,7 @@
   justify-content: space-between;
   gap: var(--space-2);
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-40);
 }
 
@@ -123,7 +123,7 @@
 .scores-rankings__empty {
   padding: var(--space-5) var(--space-3);
   font-family: var(--font-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
   text-align: center;
   letter-spacing: var(--tracking-wider);
@@ -160,8 +160,8 @@
 /* Atlas variant: tighter typographic scale to keep ~7 rows in ≈280px.
  * Atlas role tokens already adapt via [data-theme]. */
 .scores-rankings--atlas .scores-rankings__row {
-  font-size: var(--text-12);
+  font-size: var(--text-13);
 }
 .scores-rankings--atlas .scores-rankings__value {
-  font-size: var(--text-10);
+  font-size: var(--text-12);
 }

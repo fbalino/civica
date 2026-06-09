@@ -168,7 +168,7 @@ function ScorePane({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--color-text-30)",
@@ -190,7 +190,7 @@ function ScorePane({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-10)",
+            fontSize: "var(--text-12)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             color: "var(--color-text-30)",
@@ -222,7 +222,7 @@ function ScorePane({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-12)",
+            fontSize: "var(--text-13)",
             color: "var(--color-text-40)",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
@@ -238,7 +238,7 @@ function ScorePane({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-12)",
+            fontSize: "var(--text-13)",
             color: "var(--color-text-50)",
             letterSpacing: "0.05em",
             marginTop: -4,
@@ -262,7 +262,7 @@ function ScorePane({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.08em",
               textTransform: "uppercase",
               color: bandColorVar,
@@ -274,7 +274,7 @@ function ScorePane({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
             }}
           >
@@ -304,7 +304,7 @@ function ScorePane({
         style={{
           margin: 0,
           fontFamily: "var(--font-body-sans, var(--font-body))",
-          fontSize: "var(--text-13)",
+          fontSize: "var(--text-14)",
           lineHeight: "var(--leading-relaxed)",
           color: "var(--color-text-55)",
         }}

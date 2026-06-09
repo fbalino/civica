@@ -115,7 +115,7 @@ export function FactbookAdditionalIndicators({
               style={{
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)",
-                fontSize: "var(--text-12)",
+                fontSize: "var(--text-13)",
                 color: "var(--color-text-40)",
                 marginBottom: 4,
               }}
@@ -125,7 +125,7 @@ export function FactbookAdditionalIndicators({
             <dd
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "var(--text-14)",
+                fontSize: "var(--text-15)",
                 lineHeight: "var(--leading-relaxed)",
                 color: "var(--color-text-85)",
                 margin: 0,

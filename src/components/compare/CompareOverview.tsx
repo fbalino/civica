@@ -228,7 +228,7 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-11)",
+                  fontSize: "var(--text-12)",
                   color: "var(--color-text-30)",
                   textTransform: "uppercase",
                   letterSpacing: "var(--tracking-wide)",
@@ -256,7 +256,7 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
                   <span
                     style={{
                       fontFamily: "var(--font-mono)",
-                      fontSize: "var(--text-13)",
+                      fontSize: "var(--text-14)",
                       color:
                         maxIdx === i && row.numericValues
                           ? "var(--color-accent)"
@@ -299,7 +299,7 @@ export function CompareOverview({ countries }: CompareOverviewProps) {
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
               textTransform: "uppercase",
               letterSpacing: "var(--tracking-wide)",

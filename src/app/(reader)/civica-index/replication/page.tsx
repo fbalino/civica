@@ -132,7 +132,7 @@ export default async function ReplicationPage() {
             <Link href="/civica-index/corrections">
               Report a data issue or methodology concern
             </Link>
-            <p style={{ margin: "4px 0 0", fontSize: "var(--text-13)", color: "var(--color-text-30)", fontFamily: "var(--font-body)" }}>
+            <p style={{ margin: "4px 0 0", fontSize: "var(--text-14)", color: "var(--color-text-30)", fontFamily: "var(--font-body)" }}>
               Found a problem before the replication package is live? Submit it
               via the corrections form.
             </p>

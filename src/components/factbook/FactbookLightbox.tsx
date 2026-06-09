@@ -210,7 +210,7 @@ export function FactbookLightbox({
           left: "50%",
           transform: "translateX(-50%)",
           color: OVERLAY_FG,
-          fontSize: "var(--text-14)",
+          fontSize: "var(--text-15)",
           maxWidth: "80vw",
           textAlign: "center",
           background: OVERLAY_CAPTION_BG,

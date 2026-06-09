@@ -121,7 +121,7 @@ function DimensionRowView({
         className="pulse-dimension-label"
         style={{
           fontFamily: "var(--font-body)",
-          fontSize: "var(--text-14)",
+          fontSize: "var(--text-15)",
           color: "var(--color-text-primary)",
           fontWeight: 500,
         }}
@@ -162,7 +162,7 @@ function DimensionRowView({
                 className="pulse-dimension-event"
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-13)",
+                  fontSize: "var(--text-14)",
                   color: "var(--color-text-55)",
                   lineHeight: 1.4,
                   display: "flex",
@@ -176,7 +176,7 @@ function DimensionRowView({
                   className="pulse-dimension-event-date"
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-10)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-40)",
                     flexShrink: 0,
                     minWidth: 60,
@@ -206,7 +206,7 @@ function DimensionRowView({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.06em",
               textTransform: "uppercase",
               color: "var(--color-text-40)",
@@ -265,7 +265,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--color-text-30)",
@@ -278,7 +278,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-10)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--color-text-30)",
@@ -293,7 +293,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
             color: "var(--color-accent)",
@@ -333,7 +333,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
           style={{
             margin: "8px 0 12px",
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             color: "var(--color-text-55)",
             lineHeight: 1.5,
           }}
@@ -380,7 +380,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
           flexWrap: "wrap",
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-11)",
+          fontSize: "var(--text-12)",
           letterSpacing: "0.06em",
           color: "var(--color-text-40)",
         }}

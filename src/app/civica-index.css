@@ -17,7 +17,7 @@
 .ci-hero-eyebrow {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-30);
@@ -28,7 +28,7 @@
 .ci-beta-pill {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-warn);
@@ -50,7 +50,7 @@
 .ci-hero-rework-note {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   color: var(--color-warn);
   margin: 0 0 20px;
@@ -75,7 +75,7 @@
   text-wrap: balance;
 }
 .ci-hero-lede {
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   color: var(--color-text-60);
   max-width: 720px;
   line-height: 1.55;
@@ -108,7 +108,7 @@
 .ci-stat-label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-25);
@@ -117,7 +117,7 @@
 .ci-section-eyebrow {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-30);
@@ -147,7 +147,7 @@
 .ci-tier-cell-range {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   color: var(--color-text-60);
   display: flex; align-items: center; gap: 6px;
@@ -155,7 +155,7 @@
 }
 .ci-tier-cell-label {
   font-family: var(--font-heading);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   color: var(--color-text-primary);
 }
 .ci-tier-dot {
@@ -182,7 +182,7 @@
   background: var(--atlas-paper);
   color: var(--atlas-ink);
   font-family: var(--font-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   padding: var(--space-2) var(--space-3);
@@ -208,7 +208,7 @@
   gap: 16px; align-items: center;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-30);
@@ -262,7 +262,7 @@
 .ci-lb-country-meta {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-25);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   display: flex; align-items: center; gap: 6px;
@@ -271,7 +271,7 @@
   display: inline-block;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   padding: 2px 6px;
   border-radius: 2px;
 }
@@ -294,21 +294,21 @@
 .ci-lb-score-interval {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: 0.02em;
 }
 .ci-lb-tier {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
 }
 .ci-lb-dims {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-30);
   text-align: right;
   display: flex; align-items: center; justify-content: flex-end; gap: 6px;
@@ -328,7 +328,7 @@
   margin-top: 16px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
 }
 .ci-footer a {
@@ -350,7 +350,7 @@
 .ci-empty-sub {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-25);
 }
 .ci-empty code {

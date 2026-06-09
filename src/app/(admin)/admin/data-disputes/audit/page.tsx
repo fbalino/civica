@@ -192,7 +192,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
               defaultValue={country ?? ""}
               style={{
                 fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-12)",
+                fontSize: "var(--text-13)",
                 padding: "6px 10px",
                 border: "1px solid var(--color-card-border)",
                 borderRadius: "var(--radius-sm)",
@@ -207,7 +207,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
               defaultValue={since ?? ""}
               style={{
                 fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-12)",
+                fontSize: "var(--text-13)",
                 padding: "6px 10px",
                 border: "1px solid var(--color-card-border)",
                 borderRadius: "var(--radius-sm)",
@@ -222,7 +222,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
               defaultValue={until ?? ""}
               style={{
                 fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-12)",
+                fontSize: "var(--text-13)",
                 padding: "6px 10px",
                 border: "1px solid var(--color-card-border)",
                 borderRadius: "var(--radius-sm)",
@@ -247,7 +247,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
                 href={buildHref({ action }, {})}
                 style={{
                   fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-12)",
+                  fontSize: "var(--text-13)",
                   color: "var(--color-text-40)",
                 }}
               >
@@ -293,7 +293,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-12)",
+                    fontSize: "var(--text-13)",
                     color: "var(--color-text-40)",
                     letterSpacing: "0.05em",
                   }}
@@ -316,7 +316,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
               <div
                 style={{
                   fontFamily: "var(--font-heading)",
-                  fontSize: "var(--text-14)",
+                  fontSize: "var(--text-15)",
                   color: "var(--color-text-primary)",
                   marginTop: 6,
                 }}
@@ -330,7 +330,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-12)",
+                    fontSize: "var(--text-13)",
                     color: "var(--color-text-60)",
                     marginTop: 4,
                   }}
@@ -343,7 +343,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
                 <div
                   style={{
                     fontFamily: "var(--font-body)",
-                    fontSize: "var(--text-13)",
+                    fontSize: "var(--text-14)",
                     color: "var(--color-text-60)",
                     marginTop: 6,
                   }}
@@ -358,7 +358,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
                     href={`/admin/data-disputes/${row.disputeId}`}
                     style={{
                       fontFamily: "var(--font-mono)",
-                      fontSize: "var(--text-12)",
+                      fontSize: "var(--text-13)",
                       color: "var(--color-accent)",
                     }}
                   >

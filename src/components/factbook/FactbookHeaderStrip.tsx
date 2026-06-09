@@ -31,7 +31,7 @@ function MetaPill({
         display: "inline-flex",
         alignItems: "center",
         gap: 6,
-        fontSize: "var(--text-14)",
+        fontSize: "var(--text-15)",
         lineHeight: 1,
         color: "var(--color-text-60)",
         whiteSpace: "nowrap",
@@ -49,7 +49,7 @@ function MetaPill({
         }}
       />
       {label && (
-        <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-14)" }}>
+        <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}>
           {label}
         </span>
       )}
@@ -233,7 +233,7 @@ export function FactbookHeaderStrip({
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 6,
-                    fontSize: "var(--text-14)",
+                    fontSize: "var(--text-15)",
                     lineHeight: 1,
                     whiteSpace: "nowrap",
                   }}
@@ -241,7 +241,7 @@ export function FactbookHeaderStrip({
                   <span
                     style={{
                       color: "var(--color-text-40)",
-                      fontSize: "var(--text-14)",
+                      fontSize: "var(--text-15)",
                     }}
                   >
                     Pop
@@ -269,7 +269,7 @@ export function FactbookHeaderStrip({
                     display: "inline-flex",
                     alignItems: "center",
                     gap: 6,
-                    fontSize: "var(--text-14)",
+                    fontSize: "var(--text-15)",
                     lineHeight: 1,
                     whiteSpace: "nowrap",
                   }}
@@ -277,7 +277,7 @@ export function FactbookHeaderStrip({
                   <span
                     style={{
                       color: "var(--color-text-40)",
-                      fontSize: "var(--text-14)",
+                      fontSize: "var(--text-15)",
                     }}
                   >
                     GDP (PPP)
@@ -305,7 +305,7 @@ export function FactbookHeaderStrip({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 6,
-                  fontSize: "var(--text-14)",
+                  fontSize: "var(--text-15)",
                   lineHeight: 1,
                   color: "var(--color-text-60)",
                   textDecoration: "none",
@@ -313,11 +313,11 @@ export function FactbookHeaderStrip({
                 }}
                 title="View Civica Index detail"
               >
-                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-14)" }}>CI</span>
+                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}>CI</span>
                 <span
                   style={{
                     fontFamily: "var(--font-heading)",
-                    fontSize: "var(--text-14)",
+                    fontSize: "var(--text-15)",
                     fontWeight: 400,
                     lineHeight: 1,
                     color: ciScoreColor,
@@ -335,7 +335,7 @@ export function FactbookHeaderStrip({
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 6,
-                  fontSize: "var(--text-14)",
+                  fontSize: "var(--text-15)",
                   lineHeight: 1,
                   color: "var(--color-text-60)",
                   textDecoration: "none",
@@ -343,14 +343,14 @@ export function FactbookHeaderStrip({
                 }}
                 title="View Civica Pulse detail"
               >
-                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-14)" }}>CP</span>
+                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}>CP</span>
                 <span style={{ color: "var(--color-text-primary)", lineHeight: 1 }}>{cpDisplay}</span>
                 {trendArrow && (
                   <span
                     aria-label={`trending ${cpTrend}`}
                     style={{
                       fontFamily: "var(--font-mono)",
-                      fontSize: "var(--text-12)",
+                      fontSize: "var(--text-13)",
                       lineHeight: 1,
                       marginLeft: 2,
                       color: trendColor,
@@ -402,7 +402,7 @@ export function FactbookHeaderStrip({
                   display: "grid",
                   placeItems: "center",
                   fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-10)",
+                  fontSize: "var(--text-12)",
                   color: "var(--color-text-40)",
                   letterSpacing: "var(--tracking-wider)",
                   textTransform: "uppercase",
@@ -422,7 +422,7 @@ export function FactbookHeaderStrip({
                   color: "var(--color-bg)",
                   padding: "var(--space-1) var(--space-3)",
                   fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-10)",
+                  fontSize: "var(--text-12)",
                   letterSpacing: "var(--tracking-wider)",
                   textTransform: "uppercase",
                 }}
@@ -463,7 +463,7 @@ export function FactbookHeaderStrip({
                   display: "grid",
                   placeItems: "center",
                   fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-10)",
+                  fontSize: "var(--text-12)",
                   color: "var(--color-text-40)",
                   letterSpacing: "var(--tracking-wider)",
                   textTransform: "uppercase",
@@ -483,7 +483,7 @@ export function FactbookHeaderStrip({
                   color: "var(--color-bg)",
                   padding: "var(--space-1) var(--space-3)",
                   fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-10)",
+                  fontSize: "var(--text-12)",
                   letterSpacing: "var(--tracking-wider)",
                   textTransform: "uppercase",
                 }}

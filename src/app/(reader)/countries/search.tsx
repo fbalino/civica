@@ -40,7 +40,7 @@ export function CountrySearch({
           padding: "10px 16px",
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-13)",
+          fontSize: "var(--text-14)",
           borderRadius: "var(--radius-sm)",
           border: "1px solid var(--color-card-border)",
           background: "var(--color-select-bg)",

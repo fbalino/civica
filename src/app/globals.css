@@ -16,13 +16,11 @@
   --font-sans: var(--font-body);
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* --- Typography scale (readability-first — 12 px floor) --- */
-  --text-9:  12px;
-  --text-10: 12px;
-  --text-11: 12px;
-  --text-12: 13px;
-  --text-13: 14px;
-  --text-14: 15px;
+  /* --- Typography scale (readability-first — 12px floor; names == px) --- */
+  --text-12: 12px;
+  --text-13: 13px;
+  --text-14: 14px;
+  --text-15: 15px;
   --text-16: 16px;
   --text-18: 18px;
   --text-20: 20px;
@@ -370,11 +368,14 @@
   --color-badge-post: oklch(52% 0.10 240);
   --color-badge-text: #ebe6d6;
 
-  --shadow-hard: 4px 4px 0 #000;
-  --shadow-hard-sm: 3px 3px 0 #000;
-  --shadow-hard-md: 5px 5px 0 #000;
-  --shadow-hard-lg: 6px 6px 0 #000;
-  --shadow-dark: 4px 4px 0 #000;
+  /* Soft elevation (matches the light-theme style); pure black at higher
+     opacity so it reads on dark surfaces. The `--shadow-hard-*` names are
+     legacy — the style is intentionally soft in both themes. */
+  --shadow-hard: 0 1px 2px rgba(0, 0, 0, 0.35), 0 8px 18px rgba(0, 0, 0, 0.5);
+  --shadow-hard-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-hard-md: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.45);
+  --shadow-hard-lg: 0 1px 2px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.55);
+  --shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.55);
 
   --logo-fg: var(--color-text-primary);
   --logo-bg: var(--color-bg);
@@ -492,7 +493,7 @@ a {
   color: var(--color-tooltip-text);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   line-height: 1.4;
   padding: 6px 10px;
   border-radius: var(--radius-sm);
@@ -543,7 +544,7 @@ a {
 .tab-nav {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   background: none;
   border: none;
   padding: 10px 14px;
@@ -632,7 +633,7 @@ a {
   padding: 0 var(--space-3) var(--space-1);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   line-height: 1.2;
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
@@ -643,7 +644,7 @@ a {
 .nav-dropdown-item {
   display: block;
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   line-height: 1.25;
   color: var(--color-text-60);
   text-decoration: none;
@@ -700,7 +701,7 @@ a {
   max-width: 56rem;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-25);
   margin-top: var(--space-2);
 }
@@ -716,7 +717,7 @@ a {
 
 .site-footer__legend {
   margin-top: var(--space-3);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-30);
 }
 
@@ -743,7 +744,7 @@ a {
 .site-footer__links {
   justify-content: flex-end;
   max-width: 32rem;
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-25);
   text-align: right;
 }
@@ -781,7 +782,7 @@ a {
 .gov-badge {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   padding: 2px 8px;
   border-radius: 2px;
   white-space: nowrap;
@@ -829,7 +830,7 @@ a {
 .stat-row__label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
   letter-spacing: var(--tracking-wide);
   flex: 0 0 auto;
@@ -838,7 +839,7 @@ a {
 .stat-row__value {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-85);
   display: flex;
   align-items: center;
@@ -856,7 +857,7 @@ a {
 .section-header {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-30);
@@ -872,7 +873,7 @@ a {
   border-left: 2px solid;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-60);
   margin: 3px 0;
 }
@@ -959,7 +960,7 @@ a {
   fill: var(--color-hemi-seat-text);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
 }
 
 /* ============================================================
@@ -1082,7 +1083,7 @@ a {
   text-decoration: none;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   letter-spacing: var(--tracking-wide);
   color: var(--color-text-30);
   margin-bottom: 32px;
@@ -1123,7 +1124,7 @@ a {
 .compare-btn {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   background: var(--color-accent);
   color: var(--color-bg);
   border: none;
@@ -1189,7 +1190,7 @@ a {
 .cv-select {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   padding: 12px 16px;
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-sm);
@@ -1232,7 +1233,7 @@ a {
 .index-stat__label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-25);
@@ -1259,7 +1260,7 @@ a {
 .index-continent-chip {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   padding: 6px 14px;
   border-radius: var(--radius-sm);
   text-decoration: none;
@@ -1320,7 +1321,7 @@ a {
 .index-continent-meta {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-25);
   display: flex;
   gap: 6px;
@@ -1381,7 +1382,7 @@ a {
 .index-card-capital {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-30);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1404,7 +1405,7 @@ a {
 .index-card-datum {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
 }
 
@@ -1420,7 +1421,7 @@ a {
 .index-empty p {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   color: var(--color-text-40);
 }
 
@@ -1519,14 +1520,14 @@ a {
 .govtypes-legend-label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-40);
 }
 
 .govtypes-legend-count {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-25);
 }
 
@@ -1578,7 +1579,7 @@ a {
 .govtype-card__excerpt {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-30);
   line-height: var(--leading-relaxed);
   margin: 0;
@@ -1626,7 +1627,7 @@ a {
 .govtype-card__pop {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-25);
 }
 
@@ -1640,7 +1641,7 @@ a {
 .govtype-card__more {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-25);
   margin-left: 4px;
 }
@@ -1679,7 +1680,7 @@ a {
 .govtype-char-item {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-50);
   padding: 7px 0;
   border-bottom: 1px solid var(--color-stat-border);
@@ -1713,7 +1714,7 @@ a {
 .govtype-region-name {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
   min-width: 100px;
   flex-shrink: 0;
@@ -1736,7 +1737,7 @@ a {
 .govtype-region-count {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-25);
   min-width: 24px;
   text-align: right;
@@ -1774,7 +1775,7 @@ a {
 .govtype-nav__dir {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-25);
@@ -1815,7 +1816,7 @@ a {
 .record-masthead-vol {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -1860,7 +1861,7 @@ a {
   border-bottom: 1px solid var(--color-divider);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-60);
@@ -1894,7 +1895,7 @@ a {
 .record-empty {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-40);
 }
 
@@ -1933,7 +1934,7 @@ a {
 .record-kicker {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -1965,7 +1966,7 @@ a {
 .record-read-link {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-accent);
@@ -1981,7 +1982,7 @@ a {
 .record-byline {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2022,7 +2023,7 @@ a {
 .record-sec-ey {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -2062,7 +2063,7 @@ a {
 .record-story-kicker {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -2098,7 +2099,7 @@ a {
 .record-story-meta {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2155,7 +2156,7 @@ a {
 .record-list-kicker {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2175,7 +2176,7 @@ a {
 .record-list-by {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-60);
@@ -2199,7 +2200,7 @@ a {
 .record-sidebar-heading {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -2229,7 +2230,7 @@ a {
 .record-tag-chip {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border: 1px solid var(--color-divider);
@@ -2334,7 +2335,7 @@ a {
 .post-crumbs {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -2381,7 +2382,7 @@ a {
   margin-top: 26px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2425,7 +2426,7 @@ a {
   padding: 10px 16px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2443,7 +2444,7 @@ a {
 .post-rail {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2488,7 +2489,7 @@ a {
   border-bottom: 1px dashed var(--color-divider);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -2514,7 +2515,7 @@ a {
   background: transparent;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
@@ -2562,7 +2563,7 @@ a {
 .post-prose h2 .section-num {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.2em;
   color: var(--color-accent);
   display: block;
@@ -2623,7 +2624,7 @@ a {
   min-width: 560px;
   border-collapse: collapse;
   font-family: var(--font-body);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   line-height: 1.45;
   color: var(--color-text-primary);
 }
@@ -2649,7 +2650,7 @@ a {
 .post-table thead th {
   background: var(--color-surface-secondary);
   font-family: var(--font-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   font-weight: var(--font-weight-mono);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
@@ -2685,7 +2686,7 @@ a {
   margin-top: 14px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2710,7 +2711,7 @@ a {
   border-top: 1px solid var(--color-divider);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2735,7 +2736,7 @@ a {
 .post-callout h4 {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -2761,7 +2762,7 @@ a {
 .post-endnotes h3 {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -2842,7 +2843,7 @@ a {
 .post-more-ey {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -2881,7 +2882,7 @@ a {
 .post-more-card-kicker {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-accent);
@@ -2905,7 +2906,7 @@ a {
 .post-more-card-by {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2962,7 +2963,7 @@ a {
   margin-bottom: 16px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -2985,7 +2986,7 @@ a {
   border-radius: 5px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   cursor: pointer;
@@ -3054,7 +3055,7 @@ a {
 .ghc-branch-title {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 600;
@@ -3068,7 +3069,7 @@ a {
 .ghc-branch-count {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: 0.12em;
 }
@@ -3180,7 +3181,7 @@ a {
 .ghc-node-office {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.04em;
   color: var(--color-text-60);
   text-transform: uppercase;
@@ -3207,7 +3208,7 @@ a {
   gap: 5px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-40);
   margin-left: 6px;
 }
@@ -3275,7 +3276,7 @@ a {
   margin-top: 6px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: 0.04em;
 }
@@ -3334,7 +3335,7 @@ a {
 .ghc-hover-role {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -3347,7 +3348,7 @@ a {
   gap: 4px 12px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   margin: 0;
 }
 
@@ -3373,7 +3374,7 @@ a {
   border-radius: 8px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -3469,7 +3470,7 @@ a {
 .peer-lens-panel__lens-label {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-30);
@@ -3487,7 +3488,7 @@ a {
 }
 .peer-lens-panel__cohort-label--muted {
   color: var(--color-text-40);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
 }
 .peer-lens-panel__cohort-swatch {
   display: inline-block;
@@ -3511,20 +3512,20 @@ a {
 .peer-lens-panel__rank-of {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-30);
 }
 .peer-lens-panel__rank--no-score {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   color: var(--color-text-40);
 }
 
 .peer-lens-panel__fallback-note {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   letter-spacing: 0.02em;
   color: var(--color-text-40);
   line-height: 1.45;
@@ -3550,14 +3551,14 @@ a {
   width: max-content;
   min-width: 100%;
   font-family: var(--font-body);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
 }
 .peer-migration-table th {
   text-align: left;
   padding: 8px 10px;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono, 500);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -3576,7 +3577,7 @@ a {
 }
 .peer-migration-table td code {
   font-family: var(--font-mono);
-  font-size: var(--text-11);
+  font-size: var(--text-12);
   color: var(--color-text-60);
   background: transparent;
   padding: 0;
@@ -3630,7 +3631,7 @@ a {
   color: var(--color-text-primary);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   letter-spacing: var(--tracking-wide);
   line-height: var(--leading-tight);
 }
@@ -3645,7 +3646,7 @@ a {
   color: var(--color-text-muted);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   line-height: var(--leading-none);
   background: color-mix(in oklab, var(--color-text-primary) 3%, transparent);
 }
@@ -3700,7 +3701,7 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-heading);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   line-height: var(--leading-tight);
 }
 .country-search__result-meta {
@@ -3710,7 +3711,7 @@ a {
   white-space: nowrap;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wide);
   color: var(--color-text-muted);
   text-transform: uppercase;

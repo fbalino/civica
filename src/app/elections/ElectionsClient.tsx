@@ -140,7 +140,7 @@ export default function ElectionsClient({
           value={regionFilter}
           onChange={(e) => setRegionFilter(e.target.value)}
           className="cv-select"
-          style={{ minWidth: 140, padding: "8px 32px 8px 14px", fontSize: "var(--text-11)" }}
+          style={{ minWidth: 140, padding: "8px 32px 8px 14px", fontSize: "var(--text-12)" }}
         >
           {REGIONS.map((r) => <option key={r}>{r}</option>)}
         </select>
@@ -233,7 +233,7 @@ export default function ElectionsClient({
           ))}
 
           {recentByYear.length === 0 && (
-            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", color: "var(--color-text-25)", padding: "40px 0", textAlign: "center" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", color: "var(--color-text-25)", padding: "40px 0", textAlign: "center" }}>
               No election results match the current filters.
             </p>
           )}
@@ -278,12 +278,12 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
         </div>
 
         {/* Meta */}
-        <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", color: "var(--color-text-40)", display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", color: "var(--color-text-40)", display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
           <span>{formatDate(e.election.electionDate)}</span>
           {e.election.electoralSystem && (
             <span style={{
               fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-10)", color: "var(--color-text-25)",
+              fontSize: "var(--text-12)", color: "var(--color-text-25)",
               padding: "3px 8px", border: "1px solid var(--color-card-border)",
               borderRadius: "var(--radius-sm)",
             }}>
@@ -295,7 +295,7 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
         {/* Turnout */}
         {e.election.turnoutPercent && (
           <div style={{ marginTop: 12 }}>
-            <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-25)", textTransform: "uppercase", letterSpacing: "var(--tracking-wide)", marginBottom: 6, display: "flex", justifyContent: "space-between" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-25)", textTransform: "uppercase", letterSpacing: "var(--tracking-wide)", marginBottom: 6, display: "flex", justifyContent: "space-between" }}>
               <span>Voter Turnout</span>
               <span style={{ color: "var(--color-accent)" }}>{e.election.turnoutPercent}%</span>
             </div>
@@ -335,7 +335,7 @@ function ResultsBar({ results }: {
       {results.map((r, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           <span style={{
-            fontFamily: "var(--font-body)", fontSize: "var(--text-13)",
+            fontFamily: "var(--font-body)", fontSize: "var(--text-14)",
             color: "var(--color-text-85)", width: 140, overflow: "hidden", textOverflow: "ellipsis",
             whiteSpace: "nowrap", flexShrink: 0,
           }}>
@@ -348,10 +348,10 @@ function ResultsBar({ results }: {
               background: r.partyColor || "var(--color-accent)",
             }} />
           </div>
-          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-11)", color: "var(--color-text-40)", width: 44, textAlign: "right", flexShrink: 0 }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-40)", width: 44, textAlign: "right", flexShrink: 0 }}>
             {r.votesPercent != null ? `${r.votesPercent}%` : "—"}
           </span>
-          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-10)", color: "var(--color-text-25)", width: 50, textAlign: "right", flexShrink: 0 }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-25)", width: 50, textAlign: "right", flexShrink: 0 }}>
             {r.seatsWon != null ? `${r.seatsWon} seats` : ""}
           </span>
         </div>

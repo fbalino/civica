@@ -48,7 +48,7 @@ function validate(values: FormValues): FieldErrors {
 const monoLabel: React.CSSProperties = {
   fontFamily: "var(--font-mono)",
   fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-  fontSize: "var(--text-10)",
+  fontSize: "var(--text-12)",
   letterSpacing: "var(--tracking-caps)",
   textTransform: "uppercase",
   color: "var(--color-text-30)",
@@ -56,7 +56,7 @@ const monoLabel: React.CSSProperties = {
 
 const bodyText: React.CSSProperties = {
   fontFamily: "var(--font-body)",
-  fontSize: "var(--text-14)",
+  fontSize: "var(--text-15)",
   color: "var(--color-text-50)",
   lineHeight: "var(--leading-relaxed)",
 };
@@ -69,14 +69,14 @@ const fieldBase: React.CSSProperties = {
   padding: "10px 12px",
   color: "var(--color-text-primary)",
   fontFamily: "var(--font-body)",
-  fontSize: "var(--text-14)",
+  fontSize: "var(--text-15)",
   lineHeight: "var(--leading-normal)",
   outline: "none",
 };
 
 const errorText: React.CSSProperties = {
   fontFamily: "var(--font-body)",
-  fontSize: "var(--text-13)",
+  fontSize: "var(--text-14)",
   color: "var(--color-danger)",
   marginTop: 6,
 };
@@ -84,7 +84,7 @@ const errorText: React.CSSProperties = {
 const buttonPrimary: React.CSSProperties = {
   fontFamily: "var(--font-mono)",
   fontWeight: 600,
-  fontSize: "var(--text-12)",
+  fontSize: "var(--text-13)",
   letterSpacing: "var(--tracking-caps)",
   textTransform: "uppercase",
   padding: "12px 20px",
@@ -151,7 +151,7 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
           padding: "8px 14px",
           borderRadius: "var(--radius-sm)",
           fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-11)",
+          fontSize: "var(--text-12)",
           letterSpacing: "var(--tracking-caps)",
           textTransform: "uppercase",
           cursor: "pointer",
@@ -245,7 +245,7 @@ export default function ContactClient() {
         style={{
           fontFamily: "var(--font-body)",
           fontWeight: 500,
-          fontSize: "var(--text-13)",
+          fontSize: "var(--text-14)",
           padding: "8px 14px",
           borderRadius: 999,
           border: `1px solid ${active ? "var(--color-accent)" : "var(--color-card-border)"}`,

@@ -100,7 +100,7 @@ const mdxComponents = {
       {...props}
       style={{
         fontFamily: "var(--font-mono)",
-        fontSize: "var(--text-12)",
+        fontSize: "var(--text-13)",
         background: "var(--color-surface-elevated)",
         border: "1px solid var(--color-divider)",
         padding: "2px 6px",

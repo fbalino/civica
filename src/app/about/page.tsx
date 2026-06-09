@@ -133,7 +133,7 @@ export default async function AboutPage() {
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             color: "var(--color-text-50)",
             lineHeight: "var(--leading-normal)",
             marginBottom: 24,
@@ -183,7 +183,7 @@ export default async function AboutPage() {
             <p
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "var(--text-14)",
+                fontSize: "var(--text-15)",
                 color: "var(--color-text-50)",
                 lineHeight: "var(--leading-normal)",
                 margin: 0,
@@ -225,7 +225,7 @@ export default async function AboutPage() {
             <p
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "var(--text-14)",
+                fontSize: "var(--text-15)",
                 color: "var(--color-text-50)",
                 lineHeight: "var(--leading-normal)",
                 margin: 0,
@@ -274,7 +274,7 @@ export default async function AboutPage() {
             <p
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "var(--text-14)",
+                fontSize: "var(--text-15)",
                 color: "var(--color-text-50)",
                 lineHeight: "var(--leading-normal)",
                 margin: 0,
@@ -325,7 +325,7 @@ export default async function AboutPage() {
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             color: "var(--color-text-40)",
             lineHeight: "var(--leading-normal)",
             marginBottom: 24,
@@ -375,7 +375,7 @@ export default async function AboutPage() {
               <p
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-14)",
+                  fontSize: "var(--text-15)",
                   color: "var(--color-text-50)",
                   lineHeight: "var(--leading-normal)",
                   margin: 0,
@@ -387,7 +387,7 @@ export default async function AboutPage() {
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontWeight: "var(--font-weight-mono)",
-                  fontSize: "var(--text-11)",
+                  fontSize: "var(--text-12)",
                   color: "var(--color-text-25)",
                   letterSpacing: "var(--tracking-wide)",
                 }}
@@ -414,7 +414,7 @@ export default async function AboutPage() {
         <p
           style={{
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             color: "var(--color-text-50)",
             lineHeight: "var(--leading-normal)",
             marginBottom: 20,
@@ -435,7 +435,7 @@ export default async function AboutPage() {
             <span
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "var(--text-14)",
+                fontSize: "var(--text-15)",
                 color: "var(--color-text-50)",
               }}
             >
@@ -451,7 +451,7 @@ export default async function AboutPage() {
             <span
               style={{
                 fontFamily: "var(--font-body)",
-                fontSize: "var(--text-14)",
+                fontSize: "var(--text-15)",
                 color: "var(--color-text-50)",
               }}
             >
@@ -462,7 +462,7 @@ export default async function AboutPage() {
           <div
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: "var(--text-13)",
+              fontSize: "var(--text-14)",
               color: "var(--color-text-40)",
               marginTop: 8,
               maxWidth: 720,

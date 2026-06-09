@@ -59,7 +59,7 @@ export default function NotFound() {
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-11)",
+          fontSize: "var(--text-12)",
           letterSpacing: "var(--tracking-caps)",
           textTransform: "uppercase",
           color: "var(--color-text-30)",
@@ -125,7 +125,7 @@ export default function NotFound() {
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             letterSpacing: "var(--tracking-caps)",
             textTransform: "uppercase",
             color: "var(--color-text-40)",
@@ -175,7 +175,7 @@ export default function NotFound() {
                 <div
                   style={{
                     fontFamily: "var(--font-body)",
-                    fontSize: "var(--text-13)",
+                    fontSize: "var(--text-14)",
                     lineHeight: "var(--leading-normal)",
                     color: "var(--color-text-50)",
                   }}

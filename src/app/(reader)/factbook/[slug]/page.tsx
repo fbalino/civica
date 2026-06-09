@@ -507,7 +507,7 @@ export default async function FactbookCountryPage({
                       <p
                         style={{
                           fontFamily: "var(--font-mono)",
-                          fontSize: "var(--text-10)",
+                          fontSize: "var(--text-12)",
                           letterSpacing: "var(--tracking-wider)",
                           textTransform: "uppercase",
                           color: "var(--color-accent)",
@@ -586,7 +586,7 @@ export default async function FactbookCountryPage({
                   <p
                     style={{
                       color: "var(--color-text-40)",
-                      fontSize: "var(--text-14)",
+                      fontSize: "var(--text-15)",
                     }}
                   >
                     No data available for this section.

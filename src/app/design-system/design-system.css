@@ -167,7 +167,7 @@ h3.ds-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); lett
 .ds-input .kbd { border: 1px solid var(--rule); padding: 1px 5px; border-radius: var(--r-1); color: var(--muted); font-family: var(--mono); font-size: 10px; }
 
 /* Tabs */
-.ds-tabs { display: flex; flex-wrap: wrap; gap: 0 28px; border-bottom: 1px solid var(--rule); font-family: var(--sans); font-size: var(--text-14); letter-spacing: 0; text-transform: none; }
+.ds-tabs { display: flex; flex-wrap: wrap; gap: 0 28px; border-bottom: 1px solid var(--rule); font-family: var(--sans); font-size: var(--text-15); letter-spacing: 0; text-transform: none; }
 .ds-tabs button {
   background: transparent; border: 0; padding: 9px 0; cursor: pointer; color: var(--muted);
   border-bottom: 2px solid transparent; margin-bottom: -1px;

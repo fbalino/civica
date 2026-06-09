@@ -185,7 +185,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               borderLeft: "3px solid var(--color-accent)",
               borderRadius: "var(--radius-md)",
               padding: "16px 20px",
-              fontSize: "var(--text-14)",
+              fontSize: "var(--text-15)",
               lineHeight: 1.6,
               color: "var(--color-text-primary)",
             }}
@@ -196,7 +196,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
             style={{
               marginTop: 8,
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.06em",
               textTransform: "uppercase",
               color: "var(--color-text-40)",
@@ -212,7 +212,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
         <p
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
             color: "var(--color-text-40)",
@@ -225,7 +225,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
           style={{
             display: "grid",
             gap: 12,
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             lineHeight: 1.65,
             color: "var(--color-text-primary)",
           }}
@@ -267,7 +267,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
                 border: "1px solid var(--color-card-border)",
                 borderRadius: "var(--radius-md)",
                 padding: "10px 14px",
-                fontSize: "var(--text-14)",
+                fontSize: "var(--text-15)",
               }}
             >
               <SourceDot source={src.sourceId} retrievedAt={null} />
@@ -285,7 +285,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
                   style={{
                     marginLeft: "auto",
                     fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-12)",
+                    fontSize: "var(--text-13)",
                     letterSpacing: "0.04em",
                     color: "var(--color-accent)",
                   }}
@@ -325,7 +325,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               <div
                 style={{
                   fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-11)",
+                  fontSize: "var(--text-12)",
                   color: "var(--color-text-40)",
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
@@ -337,7 +337,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               <div
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-14)",
+                  fontSize: "var(--text-15)",
                   color: "var(--color-text-primary)",
                   marginBottom: 4,
                   fontWeight: 500,
@@ -370,7 +370,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               <div
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-13)",
+                  fontSize: "var(--text-14)",
                   color: "var(--color-text-60)",
                   lineHeight: 1.55,
                 }}
@@ -486,7 +486,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               ...inputStyle,
               resize: "vertical",
               fontFamily: "var(--font-body)",
-              fontSize: "var(--text-13)",
+              fontSize: "var(--text-14)",
             }}
           />
 
@@ -564,7 +564,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
                     gap: 8,
                     flexWrap: "wrap",
                     fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-11)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-40)",
                     letterSpacing: "0.05em",
                     marginBottom: 4,
@@ -583,7 +583,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
                     style={{
                       margin: "4px 0",
                       fontFamily: "var(--font-body)",
-                      fontSize: "var(--text-13)",
+                      fontSize: "var(--text-14)",
                       color: "var(--color-text-60)",
                       lineHeight: 1.5,
                     }}
@@ -602,7 +602,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
 
 const labelStyle: React.CSSProperties = {
   fontFamily: "var(--font-mono)",
-  fontSize: "var(--text-11)",
+  fontSize: "var(--text-12)",
   fontWeight: 500,
   letterSpacing: "0.06em",
   textTransform: "uppercase",
@@ -612,7 +612,7 @@ const labelStyle: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   padding: "6px 10px",
   fontFamily: "var(--font-mono)",
-  fontSize: "var(--text-12)",
+  fontSize: "var(--text-13)",
   border: "1px solid var(--color-card-border)",
   borderRadius: "var(--radius-sm)",
   background: "var(--color-page-bg)",
@@ -622,7 +622,7 @@ const inputStyle: React.CSSProperties = {
 const buttonBase: React.CSSProperties = {
   padding: "8px 14px",
   fontFamily: "var(--font-mono)",
-  fontSize: "var(--text-12)",
+  fontSize: "var(--text-13)",
   fontWeight: 500,
   letterSpacing: "0.06em",
   textTransform: "uppercase",

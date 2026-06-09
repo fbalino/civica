@@ -239,7 +239,7 @@ export function CivicaAIDrawer({
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-10)",
+              fontSize: "var(--text-12)",
               textTransform: "uppercase",
               letterSpacing: "var(--tracking-wider)",
               color: "var(--color-text-40)",
@@ -249,7 +249,7 @@ export function CivicaAIDrawer({
           </span>
           <span
             style={{
-              fontSize: "var(--text-12)",
+              fontSize: "var(--text-13)",
               color: "var(--color-text-60)",
               flex: 1,
             }}
@@ -271,7 +271,7 @@ export function CivicaAIDrawer({
               cursor: "pointer",
               padding: "var(--space-2)",
               color: "var(--color-text-60)",
-              fontSize: "var(--text-14)",
+              fontSize: "var(--text-15)",
               lineHeight: 1,
             }}
           >
@@ -291,7 +291,7 @@ export function CivicaAIDrawer({
               cursor: "pointer",
               padding: "var(--space-2)",
               color: "var(--color-text-60)",
-              fontSize: "var(--text-14)",
+              fontSize: "var(--text-15)",
               lineHeight: 1,
             }}
           >
@@ -345,7 +345,7 @@ export function CivicaAIDrawer({
                   background: "none",
                   border: "1px solid var(--color-stat-border)",
                   padding: "var(--space-2) var(--space-4)",
-                  fontSize: "var(--text-12)",
+                  fontSize: "var(--text-13)",
                   cursor: streaming ? "default" : "pointer",
                   color: "var(--color-text-60)",
                   fontFamily: "inherit",
@@ -396,7 +396,7 @@ export function CivicaAIDrawer({
             background: "transparent",
             outline: "none",
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             color: "var(--color-text-primary)",
           }}
         />
@@ -414,7 +414,7 @@ export function CivicaAIDrawer({
             display: "grid",
             placeItems: "center",
             flexShrink: 0,
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             color: "var(--color-text-primary)",
             opacity: draft.trim() && !streaming ? 1 : 0.4,
             fontFamily: "inherit",

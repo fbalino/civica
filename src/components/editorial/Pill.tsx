@@ -48,7 +48,7 @@ export function Pill({
         borderRadius: "var(--radius-sm)",
         padding: size === "sm" ? "2px 7px" : "4px 10px",
         fontFamily: "var(--font-mono)",
-        fontSize: size === "sm" ? "var(--text-10)" : "var(--text-12)",
+        fontSize: size === "sm" ? "var(--text-12)" : "var(--text-13)",
         fontWeight: "var(--font-weight-mono)",
         letterSpacing: "0.08em",
         textTransform: "uppercase",

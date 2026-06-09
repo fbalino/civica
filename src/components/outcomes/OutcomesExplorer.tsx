@@ -123,7 +123,7 @@ function FilterMenu({
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-          fontSize: "var(--text-10)",
+          fontSize: "var(--text-12)",
           letterSpacing: "var(--tracking-caps)",
           textTransform: "uppercase",
           color: "var(--color-text-30)",
@@ -148,7 +148,7 @@ function FilterMenu({
           background: "var(--color-select-bg, var(--color-surface-elevated))",
           color: "var(--color-text-primary)",
           fontFamily: "var(--font-body-sans)",
-          fontSize: "var(--text-13)",
+          fontSize: "var(--text-14)",
           cursor: "pointer",
           textAlign: "left",
         }}
@@ -202,7 +202,7 @@ function FilterMenu({
               style={{
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
                 color: "var(--color-text-30)",
@@ -220,7 +220,7 @@ function FilterMenu({
                 cursor: "pointer",
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
                 color: "var(--color-accent)",
@@ -240,7 +240,7 @@ function FilterMenu({
                   cursor: "pointer",
                   padding: "4px 0",
                   fontFamily: "var(--font-body-sans)",
-                  fontSize: "var(--text-13)",
+                  fontSize: "var(--text-14)",
                   color: "var(--color-text-60)",
                 }}
               >
@@ -281,7 +281,7 @@ function TaxonomyGlossaryCard({
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-          fontSize: "var(--text-10)",
+          fontSize: "var(--text-12)",
           letterSpacing: "var(--tracking-caps)",
           textTransform: "uppercase",
           color: "var(--color-accent)",
@@ -294,7 +294,7 @@ function TaxonomyGlossaryCard({
         style={{
           margin: 0,
           fontFamily: "var(--font-body-sans)",
-          fontSize: "var(--text-13)",
+          fontSize: "var(--text-14)",
           color: "var(--color-text-50)",
           lineHeight: 1.55,
         }}
@@ -425,7 +425,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
             border: "1px solid var(--color-stat-border)",
             background: "var(--color-surface-elevated)",
             fontFamily: "var(--font-body-sans)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             color: "var(--color-text-50)",
             marginBottom: 20,
           }}
@@ -448,7 +448,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
             {detail.unit && (
               <span
                 style={{
-                  fontSize: "var(--text-13)",
+                  fontSize: "var(--text-14)",
                   color: "var(--color-text-40)",
                   marginLeft: 6,
                 }}
@@ -460,7 +460,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
           <div
             style={{
               fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-12)",
+              fontSize: "var(--text-13)",
               color: "var(--color-text-40)",
             }}
           >
@@ -480,7 +480,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
               border: "1px solid var(--color-stat-border)",
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-              fontSize: "var(--text-12)",
+              fontSize: "var(--text-13)",
               color: "var(--color-text-60)",
               marginBottom: 20,
             }}
@@ -502,7 +502,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
             color: "var(--color-bg)",
             borderRadius: "var(--radius-sm)",
             fontFamily: "var(--font-body-sans)",
-            fontSize: "var(--text-13)",
+            fontSize: "var(--text-14)",
             fontWeight: 600,
             textDecoration: "none",
             textAlign: "center",
@@ -911,7 +911,7 @@ export function OutcomesExplorer({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             color: "var(--color-text-30)",
             letterSpacing: "var(--tracking-caps)",
             textTransform: "uppercase",
@@ -988,7 +988,7 @@ export function OutcomesExplorer({
             style={{
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-              fontSize: "var(--text-10)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--color-text-30)",
@@ -1024,7 +1024,7 @@ export function OutcomesExplorer({
             style={{
               margin: "12px 0 0",
               fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-13)",
+              fontSize: "var(--text-14)",
               color: "var(--color-text-50)",
               lineHeight: 1.55,
             }}
@@ -1049,7 +1049,7 @@ export function OutcomesExplorer({
               style={{
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
                 color: "var(--color-text-30)",
@@ -1087,7 +1087,7 @@ export function OutcomesExplorer({
                       border: "none",
                       borderRight: "1px solid var(--color-card-border)",
                       fontFamily: "var(--font-body-sans)",
-                      fontSize: "var(--text-13)",
+                      fontSize: "var(--text-14)",
                       fontWeight: metricId === m.id ? 600 : 400,
                       cursor: "pointer",
                       whiteSpace: "nowrap",
@@ -1109,7 +1109,7 @@ export function OutcomesExplorer({
                   border: "1px solid var(--color-card-border)",
                   borderRadius: "var(--radius-sm)",
                   fontFamily: "var(--font-body-sans)",
-                  fontSize: "var(--text-13)",
+                  fontSize: "var(--text-14)",
                   cursor: "pointer",
                   minWidth: 180,
                 }}
@@ -1132,7 +1132,7 @@ export function OutcomesExplorer({
               style={{
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
                 color: "var(--color-text-30)",
@@ -1153,7 +1153,7 @@ export function OutcomesExplorer({
                 borderRadius: "var(--radius-sm)",
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-13)",
+                fontSize: "var(--text-14)",
                 cursor: "pointer",
               }}
             >
@@ -1174,7 +1174,7 @@ export function OutcomesExplorer({
               style={{
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
                 color: "var(--color-text-30)",
@@ -1196,7 +1196,7 @@ export function OutcomesExplorer({
                 border: "1px solid var(--color-card-border)",
                 borderRadius: "var(--radius-sm)",
                 fontFamily: "var(--font-body-sans)",
-                fontSize: "var(--text-13)",
+                fontSize: "var(--text-14)",
                 cursor: "pointer",
                 width: "100%",
               }}
@@ -1256,7 +1256,7 @@ export function OutcomesExplorer({
               gap: 8,
               cursor: "pointer",
               fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-13)",
+              fontSize: "var(--text-14)",
               color: "var(--color-text-50)",
               padding: "7px 0",
             }}
@@ -1312,7 +1312,7 @@ export function OutcomesExplorer({
                       <div
                         style={{
                           fontFamily: "var(--font-body-sans)",
-                          fontSize: "var(--text-12)",
+                          fontSize: "var(--text-13)",
                           fontWeight: 600,
                           color: "var(--color-text-50)",
                           letterSpacing: "var(--tracking-caps)",
@@ -1388,7 +1388,7 @@ export function OutcomesExplorer({
             <p
               style={{
                 fontFamily: "var(--font-body-sans)",
-                fontSize: "var(--text-12)",
+                fontSize: "var(--text-13)",
                 color: "var(--color-text-40)",
                 lineHeight: "var(--leading-relaxed)",
                 maxWidth: 560,
@@ -1402,7 +1402,7 @@ export function OutcomesExplorer({
               style={{
                 fontFamily: "var(--font-mono)",
                 fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-10)",
+                fontSize: "var(--text-12)",
                 color: "var(--color-text-25)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
@@ -1432,7 +1432,7 @@ export function OutcomesExplorer({
               border: "none",
               cursor: "pointer",
               fontFamily: "var(--font-body-sans)",
-              fontSize: "var(--text-13)",
+              fontSize: "var(--text-14)",
               color: "var(--color-text-40)",
               padding: 0,
               display: "flex",
@@ -1460,7 +1460,7 @@ export function OutcomesExplorer({
                 marginTop: 16,
                 paddingLeft: 20,
                 fontFamily: "var(--font-body-sans)",
-                fontSize: "var(--text-13)",
+                fontSize: "var(--text-14)",
                 color: "var(--color-text-50)",
                 lineHeight: "var(--leading-relaxed)",
                 maxWidth: 680,

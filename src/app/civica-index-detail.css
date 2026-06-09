@@ -557,7 +557,7 @@
   padding-top: var(--space-6);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
 }
 
 .ci-country-footer-links a {
@@ -570,7 +570,7 @@
  * ---------------------------------------------------------------- */
 .ci-country-empty-copy {
   font-family: var(--font-body-sans, var(--font-body));
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   color: var(--color-text-50);
   margin: 0;
   line-height: var(--leading-relaxed);

@@ -202,7 +202,7 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-14)",
+              fontSize: "var(--text-15)",
               color: "var(--color-text-40)",
               letterSpacing: "0.04em",
             }}
@@ -297,7 +297,7 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-11)",
+                    fontSize: "var(--text-12)",
                     fontWeight: "var(--font-weight-mono)",
                     letterSpacing: "0.06em",
                     textTransform: "uppercase",
@@ -334,7 +334,7 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
         <p
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             color: "var(--color-text-40)",
             letterSpacing: "0.04em",
             marginTop: 8,

@@ -154,7 +154,7 @@ function FactColumn({
           <span
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "var(--color-text-30)",
@@ -180,7 +180,7 @@ function FactColumn({
         <div
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-12)",
+            fontSize: "var(--text-13)",
             color: "var(--color-text-40)",
           }}
         >
@@ -193,7 +193,7 @@ function FactColumn({
         <div
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-11)",
+            fontSize: "var(--text-12)",
             color: "var(--color-text-30)",
             marginTop: 8,
             wordBreak: "break-word",
@@ -277,7 +277,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
             padding: "10px 14px",
             marginBottom: 24,
             fontFamily: "var(--font-body)",
-            fontSize: "var(--text-13)",
+            fontSize: "var(--text-14)",
             color: "var(--color-text-60)",
           }}
         >
@@ -367,7 +367,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
             style={{
               marginTop: 8,
               fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
             }}
           >
@@ -409,7 +409,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
               <span
                 style={{
                   fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-12)",
+                  fontSize: "var(--text-13)",
                   color: "var(--color-text-40)",
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
@@ -423,7 +423,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 placeholder="Optional — e.g. 'Wikidata 2024 figure preferred; CIA prose appears to be 2017-vintage.'"
                 style={{
                   fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-14)",
+                  fontSize: "var(--text-15)",
                   padding: "10px 12px",
                   border: "1px solid var(--color-card-border)",
                   borderRadius: "var(--radius-sm, 4px)",
@@ -519,7 +519,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 <div
                   style={{
                     fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-12)",
+                    fontSize: "var(--text-13)",
                     color: "var(--color-text-40)",
                     letterSpacing: "0.05em",
                   }}
@@ -529,7 +529,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 <div
                   style={{
                     fontFamily: "var(--font-body)",
-                    fontSize: "var(--text-14)",
+                    fontSize: "var(--text-15)",
                     color: "var(--color-text-primary)",
                   }}
                 >
@@ -544,7 +544,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                   <div
                     style={{
                       fontFamily: "var(--font-body)",
-                      fontSize: "var(--text-13)",
+                      fontSize: "var(--text-14)",
                       color: "var(--color-text-60)",
                       marginTop: 2,
                     }}

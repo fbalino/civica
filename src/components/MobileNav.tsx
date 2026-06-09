@@ -288,7 +288,7 @@ function PanelRow({
         <span
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-14)",
+            fontSize: "var(--text-15)",
             color: active ? "var(--color-accent)" : "var(--color-text-primary)",
             textAlign: "center",
           }}
@@ -314,7 +314,7 @@ function PanelRow({
               marginTop: 2,
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-11)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
             }}
           >
@@ -324,7 +324,7 @@ function PanelRow({
         <span
           style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-12)",
+            fontSize: "var(--text-13)",
             color: "var(--color-text-25)",
           }}
         >
@@ -362,7 +362,7 @@ function PanelRow({
                 <span
                   style={{
                     fontFamily: "var(--font-body)",
-                    fontSize: "var(--text-14)",
+                    fontSize: "var(--text-15)",
                     fontWeight: 500,
                     color: childActive ? "var(--color-accent)" : "var(--color-text-primary)",
                   }}
@@ -373,7 +373,7 @@ function PanelRow({
                   style={{
                     fontFamily: "var(--font-mono)",
                     fontWeight: "var(--font-weight-mono)",
-                    fontSize: "var(--text-10)",
+                    fontSize: "var(--text-12)",
                     color: "var(--color-text-30)",
                     textTransform: "uppercase",
                   }}
@@ -421,7 +421,7 @@ function OverlayHeader({ onClose, logoSlot }: { onClose: () => void; logoSlot?: 
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-10)",
+            fontSize: "var(--text-12)",
             letterSpacing: "var(--tracking-caps)",
             color: "var(--color-text-30)",
             textTransform: "uppercase",
@@ -460,7 +460,7 @@ function Eyebrow({ children }: { children: ReactNode }) {
       style={{
         fontFamily: "var(--font-mono)",
         fontWeight: "var(--font-weight-mono)",
-        fontSize: "var(--text-10)",
+        fontSize: "var(--text-12)",
         letterSpacing: "var(--tracking-caps)",
         color: "var(--color-text-30)",
         textTransform: "uppercase",
@@ -500,7 +500,7 @@ function OverlayFooter() {
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-11)",
+          fontSize: "var(--text-12)",
           color: "var(--color-text-30)",
           lineHeight: 1.5,
           margin: 0,
@@ -523,7 +523,7 @@ function OverlayFooter() {
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-10)",
+            fontSize: "var(--text-12)",
             color: "var(--color-text-25)",
             letterSpacing: "var(--tracking-caps)",
             textTransform: "uppercase",
@@ -535,7 +535,7 @@ function OverlayFooter() {
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-10)",
+            fontSize: "var(--text-12)",
             color: "var(--color-text-25)",
             letterSpacing: "var(--tracking-caps)",
             textTransform: "uppercase",
@@ -606,7 +606,7 @@ function SystemStatus() {
           <span
             style={{
               fontFamily: "var(--font-body)",
-              fontSize: "var(--text-14)",
+              fontSize: "var(--text-15)",
               fontWeight: 500,
               color: "var(--color-text-primary)",
               lineHeight: 1.2,
@@ -619,7 +619,7 @@ function SystemStatus() {
               marginTop: 2,
               fontFamily: "var(--font-mono)",
               fontWeight: "var(--font-weight-mono)",
-              fontSize: "var(--text-10)",
+              fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
               letterSpacing: "var(--tracking-wide)",
             }}
@@ -632,7 +632,7 @@ function SystemStatus() {
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-10)",
+          fontSize: "var(--text-12)",
           letterSpacing: "var(--tracking-caps)",
           color: "var(--color-text-25)",
           textTransform: "uppercase",
@@ -653,7 +653,7 @@ function LegendDot({ color, label }: { color: string; label: string }) {
         gap: 6,
         fontFamily: "var(--font-mono)",
         fontWeight: "var(--font-weight-mono)",
-        fontSize: "var(--text-10)",
+        fontSize: "var(--text-12)",
         color: "var(--color-text-30)",
       }}
     >

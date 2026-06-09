@@ -220,7 +220,7 @@ export default function MethodologyHubPage() {
                           <span
                             style={{
                               fontFamily: "var(--font-mono)",
-                              fontSize: "var(--text-10)",
+                              fontSize: "var(--text-12)",
                               letterSpacing: "var(--tracking-wider)",
                               padding: "2px 6px",
                               background:
@@ -237,7 +237,7 @@ export default function MethodologyHubPage() {
                       <p
                         style={{
                           fontFamily: "var(--font-body)",
-                          fontSize: "var(--text-14)",
+                          fontSize: "var(--text-15)",
                           color: "var(--color-text-50)",
                           lineHeight: "var(--leading-normal)",
                           margin: 0,

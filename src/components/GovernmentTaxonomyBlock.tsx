@@ -29,7 +29,7 @@ function TaxonomyRow({
         style={{
           fontFamily: "var(--font-mono)",
           fontWeight: "var(--font-weight-mono)",
-          fontSize: compact ? "var(--text-10)" : "var(--text-11)",
+          fontSize: compact ? "var(--text-12)" : "var(--text-12)",
           color: "var(--color-text-30)",
           letterSpacing: "0.08em",
           textTransform: "uppercase",
@@ -40,7 +40,7 @@ function TaxonomyRow({
       <div
         style={{
           fontFamily: "var(--font-body-sans)",
-          fontSize: compact ? "var(--text-12)" : "var(--text-13)",
+          fontSize: compact ? "var(--text-13)" : "var(--text-14)",
           lineHeight: 1.45,
           color: "var(--color-text-primary)",
         }}
@@ -99,7 +99,7 @@ export function GovernmentTaxonomyBlock({
           style={{
             fontFamily: "var(--font-mono)",
             fontWeight: "var(--font-weight-mono)",
-            fontSize: compact ? "var(--text-10)" : "var(--text-11)",
+            fontSize: compact ? "var(--text-12)" : "var(--text-12)",
             color: "var(--color-text-30)",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
@@ -126,7 +126,7 @@ export function GovernmentTaxonomyBlock({
           style={{
             margin: compact ? "10px 0 0" : "12px 0 0",
             fontFamily: "var(--font-body-sans)",
-            fontSize: compact ? "var(--text-11)" : "var(--text-12)",
+            fontSize: compact ? "var(--text-12)" : "var(--text-13)",
             lineHeight: 1.45,
             color: "var(--color-text-50)",
           }}

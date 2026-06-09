@@ -72,7 +72,7 @@
   display: grid;
   place-items: center;
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   flex-shrink: 0;
   text-transform: uppercase;
   background: transparent;
@@ -86,7 +86,7 @@
 /* === Role label (drawer only — replaces the avatar) ====================== */
 .civica-chat-msg-role {
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-40);
@@ -96,7 +96,7 @@
 /* === Bubble (the actual content container) =============================== */
 .civica-chat-msg-bub {
   font-family: var(--font-body);
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   line-height: var(--leading-normal);
   color: var(--color-text-85);
   min-width: 0; /* allow long words/URLs to wrap inside flex children */
@@ -118,14 +118,14 @@
 
 /* Atlas bubbles are flat (no border, no fill) */
 .civica-chat-msg--atlas .civica-chat-msg-bub {
-  font-size: var(--text-13);
+  font-size: var(--text-14);
   color: var(--color-text-primary);
 }
 
 /* === Eyebrow lead ("About Nigeria · Lower house") ======================== */
 .civica-chat-msg-lead {
   font-family: var(--font-heading);
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   color: var(--color-text-40);
   font-style: italic;
   margin-bottom: var(--space-2);
@@ -134,7 +134,7 @@
 /* === Citation chip (after bubble) ======================================== */
 .civica-chat-msg-cite {
   font-family: var(--font-mono);
-  font-size: var(--text-10);
+  font-size: var(--text-12);
   color: var(--color-text-40);
   border-left: 2px solid var(--color-accent);
   padding-left: var(--space-3);
@@ -186,7 +186,7 @@
 .civica-chat-msg-md h3 { font-size: var(--text-16); }
 .civica-chat-msg-md h4,
 .civica-chat-msg-md h5,
-.civica-chat-msg-md h6 { font-size: var(--text-14); }
+.civica-chat-msg-md h6 { font-size: var(--text-15); }
 
 .civica-chat-msg-md ul,
 .civica-chat-msg-md ol {
@@ -225,14 +225,14 @@
 
 .civica-chat-msg-md code {
   font-family: var(--font-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   background: color-mix(in oklab, var(--color-text-primary) 6%, transparent);
   padding: 1px 4px;
   border-radius: 2px;
 }
 .civica-chat-msg-md pre {
   font-family: var(--font-mono);
-  font-size: var(--text-12);
+  font-size: var(--text-13);
   background: color-mix(in oklab, var(--color-text-primary) 6%, transparent);
   padding: var(--space-3) var(--space-4);
   margin: var(--space-3) 0;
