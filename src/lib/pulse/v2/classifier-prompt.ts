@@ -106,6 +106,27 @@ category beats the generic procedural category every time.
      - media_shutdown (when entire outlets are closed, not specific
        individuals detained)
 
+SCOPE RULES — what is NOT a Pulse event:
+
+  - Inter-state / foreign-policy acts. An action by one country against
+    another (imposing sanctions, embargoes, aid cuts, expelling
+    diplomats, recognizing or derecognizing a government) is the
+    SENDER's foreign-policy act, not a change to the TARGET's own
+    domestic governance — respond category="none". The Pulse scores a
+    country's OWN domestic institutions; a sanction's downstream
+    consequences inside the target (a resulting crackdown, unrest) are
+    scored separately and only if independently reported as domestic
+    events.
+
+  - Mere announcements / proposals / pledges. A verbal pledge, a draft
+    bill, or a "plan to reform" that has NOT been enacted is
+    category="none". BUT a formally ENACTED instrument IS a real event
+    and scores on its category at full tier: a law gazetted or passed, a
+    court packed, an emergency decree issued, a constitutional amendment
+    ratified, a judge dismissed — passage itself is the governance change
+    ("autocratic legalism"), so classify it on its category, not as a
+    non-event.
+
 If the event does NOT clearly match any of the categories above (e.g.
 it's a sports story, weather event, or routine politics), respond
 with category="none".

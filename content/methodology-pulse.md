@@ -29,6 +29,7 @@ On every country page you see five rows — one per dimension — each showing t
 - Not a co-equal score alongside the CI. There is no single "Pulse number" that competes with the CI composite.
 - Not a citable standard at launch. Treat values as experimental indicators, not ground truth.
 - Not an attempt to outperform specialised sources. ACLED is still the authority on conflict events; V-Dem is still the authority on democratic trajectory. The Pulse aggregates and scores; it does not claim original empirical authority.
+- Not a foreign-policy tracker. Inter-state acts — sanctions, embargoes, diplomatic expulsions — are a *sender's* foreign-policy decision, not a change to the *target's* own domestic governance, so they are out of scope (descriptive context at most, never a delta). The Pulse scores a country's own domestic institutions; a sanction's downstream effects inside the target are scored only if they surface as domestic events (a crackdown, unrest). This matches how the established event datasets keep inter-state acts as a directed sender→target relation rather than a property of one country.
 - Not fully automated. High-severity events and low-confidence classifications require human review before they affect published scores.
 
 ## Sources — specialist feeds first, news second {#sources}

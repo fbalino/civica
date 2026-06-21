@@ -42,7 +42,18 @@ set `isGovernanceEvent: false` (skip them — don't force a country).
    - `isGovernanceEvent` (boolean): is this a governance/politics/rights/rule-of-
      law/corruption/stability event about a specific country? If not (sports,
      business, weather, pure international-body news with no single subject
-     country), set `false`.
+     country), set `false`. Two scope rules:
+       - **Inter-state / foreign-policy acts are out of scope.** One country
+         sanctioning, embargoing, cutting aid to, or expelling diplomats from
+         another is the *sender's* foreign-policy act, not a change to the
+         *target's* own domestic governance → `false`. (A sanction's downstream
+         domestic effects inside the target — a crackdown, unrest — are scored
+         only if separately reported as domestic events.)
+       - **Announcements vs. enactment.** A verbal pledge, draft bill, or
+         "plan to reform" that is NOT yet enacted → `false`. But a formally
+         *enacted* instrument IS the event and scores at full tier: a law
+         passed/gazetted, a court packed, an emergency decree issued, an
+         amendment ratified, a judge dismissed — passage itself is the change.
    - `category`: one of the EVENT_CATEGORIES slugs (must match exactly).
    - `severityTier`: one of the category's `allowedTiers`
      (`low_pos|moderate_pos|high_pos|low_neg|moderate_neg|severe_neg|catastrophic_neg`).
