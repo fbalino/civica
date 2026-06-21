@@ -112,12 +112,12 @@ export default function ElectionsClient({
     <div className="cv-container" style={{ paddingTop: "var(--spacing-hero-top)", paddingBottom: "var(--spacing-section-y)" }}>
       {/* Hero */}
       <h1 className="hero-heading">Elections</h1>
-      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-16)", color: "var(--color-text-40)", marginBottom: 32 }}>
+      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-16)", color: "var(--color-text-40)", marginBottom: "var(--space-7)" }}>
         Track upcoming and past elections worldwide. Turnout data from IDEA. Results from Wikidata and official sources.
       </p>
 
       {/* Stats — matching Index page pattern */}
-      <div className="index-stats-row" style={{ marginBottom: 32 }}>
+      <div className="index-stats-row" style={{ marginBottom: "var(--space-7)" }}>
         {[
           { value: stats.electionsThisYear ?? "—", label: `Elections in ${new Date().getFullYear()}` },
           { value: stats.upcomingCount ?? "—", label: "Upcoming" },
@@ -135,7 +135,7 @@ export default function ElectionsClient({
       </div>
 
       {/* Filters */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 32, flexWrap: "wrap", alignItems: "center", paddingTop: 24, borderTop: "1px solid var(--color-divider)" }}>
+      <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-7)", flexWrap: "wrap", alignItems: "center", paddingTop: "var(--space-6)", borderTop: "1px solid var(--color-divider)" }}>
         <select
           value={regionFilter}
           onChange={(e) => setRegionFilter(e.target.value)}
@@ -164,7 +164,7 @@ export default function ElectionsClient({
 
       {/* Upcoming Elections */}
       {filteredUpcoming.length > 0 && (
-        <section style={{ marginBottom: 48 }}>
+        <section style={{ marginBottom: "var(--space-8)" }}>
           <div className="index-continent-header">
             <h2 className="index-continent-title">Upcoming Elections</h2>
             <div className="index-continent-meta">
@@ -218,12 +218,12 @@ export default function ElectionsClient({
           </div>
         </div>
 
-        <div style={{ position: "relative", marginTop: 8 }}>
+        <div style={{ position: "relative", marginTop: "var(--space-3)" }}>
           <div style={{ position: "absolute", left: 20, top: 0, bottom: 0, width: 2, background: "var(--color-divider)" }} />
 
           {recentByYear.map(({ year, items }) => (
             <div key={year}>
-              <div style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-28)", fontWeight: 400, color: "var(--color-text-20)", paddingLeft: 52, marginBottom: 16, marginTop: 8 }}>
+              <div style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-28)", fontWeight: 400, color: "var(--color-text-20)", paddingLeft: 52, marginBottom: "var(--space-5)", marginTop: "var(--space-3)" }}>
                 {year}
               </div>
               {items.map((e) => (
@@ -249,7 +249,7 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
   const dotColor = isLegislative ? "var(--color-branch-legislative)" : "var(--color-branch-executive)";
 
   return (
-    <div style={{ position: "relative", paddingLeft: 52, paddingBottom: 32 }}>
+    <div style={{ position: "relative", paddingLeft: 52, paddingBottom: "var(--space-7)" }}>
       <div style={{
         position: "absolute", left: 14, top: 6, width: 14, height: 14,
         borderRadius: "50%", border: `2px solid ${dotColor}`, background: "var(--color-bg)", zIndex: 1,
@@ -260,8 +260,8 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
         className="cv-card cv-card--interactive"
       >
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "var(--space-4)", flexWrap: "wrap", gap: "var(--space-3)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
             <CountryFlag iso2={e.jurisdiction.iso2} size={24} />
             <span style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-20)", fontWeight: 400 }}>
               {e.jurisdiction.name}
@@ -278,7 +278,7 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
         </div>
 
         {/* Meta */}
-        <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", color: "var(--color-text-40)", display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", color: "var(--color-text-40)", display: "flex", gap: "var(--space-5)", flexWrap: "wrap", alignItems: "center" }}>
           <span>{formatDate(e.election.electionDate)}</span>
           {e.election.electoralSystem && (
             <span style={{
@@ -294,8 +294,8 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
 
         {/* Turnout */}
         {e.election.turnoutPercent && (
-          <div style={{ marginTop: 12 }}>
-            <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-25)", textTransform: "uppercase", letterSpacing: "var(--tracking-wide)", marginBottom: 6, display: "flex", justifyContent: "space-between" }}>
+          <div style={{ marginTop: "var(--space-4)" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-25)", textTransform: "uppercase", letterSpacing: "var(--tracking-wide)", marginBottom: "var(--space-2)", display: "flex", justifyContent: "space-between" }}>
               <span>Voter Turnout</span>
               <span style={{ color: "var(--color-accent)" }}>{e.election.turnoutPercent}%</span>
             </div>
@@ -331,9 +331,9 @@ function ResultsBar({ results }: {
   const maxPct = Math.max(...results.map((r) => r.votesPercent ?? 0), 1);
 
   return (
-    <div style={{ marginTop: 16 }}>
+    <div style={{ marginTop: "var(--space-5)" }}>
       {results.map((r, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", marginBottom: "var(--space-2)" }}>
           <span style={{
             fontFamily: "var(--font-body)", fontSize: "var(--text-14)",
             color: "var(--color-text-85)", width: 140, overflow: "hidden", textOverflow: "ellipsis",

@@ -113,13 +113,13 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
         border: "1px solid var(--color-card-border)",
         background: "var(--color-card-bg)",
         borderRadius: "var(--radius-sm)",
-        padding: 28,
+        padding: "var(--space-6)",
         display: "flex",
         flexDirection: "column",
-        gap: 12,
+        gap: "var(--space-4)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
         <StatusDot state="active" label="Editors are responding" />
         <span style={monoLabel}>Message received</span>
       </div>
@@ -144,7 +144,7 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
         onClick={onReset}
         style={{
           alignSelf: "flex-start",
-          marginTop: 6,
+          marginTop: "var(--space-2)",
           background: "transparent",
           border: "1px solid var(--color-card-border)",
           color: "var(--color-text-60)",
@@ -167,7 +167,7 @@ function InfoTile({ label, body }: { label: string; body: React.ReactNode }) {
   return (
     <div className="cv-card">
       <div style={monoLabel}>{label}</div>
-      <p style={{ ...bodyText, margin: "10px 0 0" }}>{body}</p>
+      <p style={{ ...bodyText, margin: "var(--space-3) 0 0" }}>{body}</p>
     </div>
   );
 }
@@ -264,19 +264,19 @@ export default function ContactClient() {
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "var(--spacing-section-y) var(--spacing-page-x)" }}>
       <div style={{ textAlign: "center" }}>
         <div style={monoLabel}>Contact</div>
-        <h1 className="page-heading" style={{ marginTop: 16, fontSize: "var(--text-52)" }}>Dispatch desk</h1>
-        <p style={{ ...bodyText, margin: "16px auto 0", maxWidth: 560 }}>
+        <h1 className="page-heading" style={{ marginTop: "var(--space-5)", fontSize: "var(--text-52)" }}>Dispatch desk</h1>
+        <p style={{ ...bodyText, margin: "var(--space-5) auto 0", maxWidth: 560 }}>
           Story tips, data corrections, partnerships, press. Pick a category, send a note — a human on the editorial team will read it.
         </p>
       </div>
 
       <div
         style={{
-          marginTop: 48,
+          marginTop: "var(--space-8)",
           border: "1px solid var(--color-card-border)",
           background: "var(--color-card-bg)",
           borderRadius: "var(--radius-sm)",
-          padding: 32,
+          padding: "var(--space-7)",
         }}
       >
         {state === "success" ? (
@@ -285,13 +285,13 @@ export default function ContactClient() {
           <form onSubmit={submit} noValidate>
             <div>
               <div style={monoLabel}>Category</div>
-              <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: "var(--space-3)", marginTop: "var(--space-3)", flexWrap: "wrap" }}>
                 {SUBJECTS.map((s) => subjectChip(s.value, s.label))}
               </div>
               {errors.subject && <div style={errorText}>{errors.subject}</div>}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 24 }} className="contact-b__row">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)", marginTop: "var(--space-6)" }} className="contact-b__row">
               <div>
                 <FieldLabel htmlFor={nameId} required>Name</FieldLabel>
                 <input id={nameId} type="text" value={values.name} onChange={handleChange("name")} style={fieldBase} aria-invalid={!!errors.name} />
@@ -304,7 +304,7 @@ export default function ContactClient() {
               </div>
             </div>
 
-            <div style={{ marginTop: 20 }}>
+            <div style={{ marginTop: "var(--space-5)" }}>
               <FieldLabel htmlFor={messageId} required>Message</FieldLabel>
               <textarea id={messageId} value={values.message} onChange={handleChange("message")} style={{ ...fieldBase, minHeight: 160, resize: "vertical" }} aria-invalid={!!errors.message} />
               {errors.message && <div style={errorText}>{errors.message}</div>}
@@ -314,8 +314,8 @@ export default function ContactClient() {
               <div
                 role="alert"
                 style={{
-                  marginTop: 20,
-                  padding: "10px 12px",
+                  marginTop: "var(--space-5)",
+                  padding: "var(--space-3) var(--space-4)",
                   borderLeft: "2px solid var(--color-danger)",
                   background: "color-mix(in oklab, var(--color-danger) 10%, transparent)",
                   ...bodyText,
@@ -326,7 +326,7 @@ export default function ContactClient() {
               </div>
             )}
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 28, flexWrap: "wrap", gap: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "var(--space-6)", flexWrap: "wrap", gap: "var(--space-4)" }}>
               <span style={{ ...monoLabel, color: "var(--color-text-25)" }}>* required</span>
               <button type="submit" disabled={state === "submitting"} style={buttonPrimary}>
                 {state === "submitting" ? "Sending…" : "Send message"}
@@ -337,7 +337,7 @@ export default function ContactClient() {
       </div>
 
       <div
-        style={{ marginTop: 48, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
+        style={{ marginTop: "var(--space-8)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}
         className="contact-b__tiles"
       >
         <InfoTile

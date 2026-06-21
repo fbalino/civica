@@ -367,7 +367,7 @@ export default async function ComparePage({
       <style>{`
         .compare-page-hero { padding: 32px 0 32px; }
         .compare-page-lede {
-          font-size: 17px;
+          font-size: var(--text-16);
           color: var(--color-text-60);
           max-width: 700px;
           line-height: 1.55;
@@ -393,14 +393,14 @@ export default async function ComparePage({
         .ci-compare-picker-slot {
           font-family: var(--font-mono);
           font-weight: var(--font-weight-mono, 500);
-          font-size: 10px;
+          font-size: var(--text-12);
           letter-spacing: 0.15em;
           text-transform: uppercase;
           color: var(--color-text-30);
         }
         .ci-compare-picker-name {
           font-family: var(--font-heading);
-          font-size: 22px;
+          font-size: var(--text-22);
           line-height: 1.15;
           color: var(--color-text-primary);
           display: flex; align-items: center; gap: 10px;
@@ -410,20 +410,20 @@ export default async function ComparePage({
         }
         .ci-compare-picker-score-val {
           font-family: var(--font-heading);
-          font-size: 32px;
+          font-size: var(--text-32);
           line-height: 1;
           font-weight: 500;
         }
         .ci-compare-picker-score-label {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.08em;
           text-transform: uppercase;
           color: var(--color-text-30);
         }
         .ci-compare-picker-meta {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-30);
           letter-spacing: 0.04em;
         }
@@ -434,7 +434,7 @@ export default async function ComparePage({
           border: 1px solid var(--color-card-border);
           color: var(--color-text-30);
           font-family: var(--font-mono);
-          font-size: 10px;
+          font-size: var(--text-12);
           letter-spacing: 0.12em;
           text-transform: uppercase;
           padding: 6px 10px;
@@ -444,7 +444,7 @@ export default async function ComparePage({
         .ci-compare-picker-remove:hover { color: var(--color-text-primary); }
         .ci-compare-picker-empty {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-25);
           letter-spacing: 0.08em;
         }
@@ -467,7 +467,7 @@ export default async function ComparePage({
         }
         .compare-section-nav-countries {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.08em;
           color: var(--color-text-30);
         }
@@ -478,7 +478,7 @@ export default async function ComparePage({
         }
         .compare-section-nav-link {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: var(--color-text-30);
@@ -502,7 +502,7 @@ export default async function ComparePage({
         .compare-section-eyebrow {
           font-family: var(--font-mono);
           font-weight: var(--font-weight-mono, 500);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.12em;
           text-transform: uppercase;
           color: var(--color-text-30);
@@ -510,7 +510,7 @@ export default async function ComparePage({
         }
         .compare-section-heading {
           font-family: var(--font-heading);
-          font-size: 28px;
+          font-size: var(--text-28);
           font-weight: 400;
           letter-spacing: -0.02em;
           line-height: 1.15;
@@ -524,13 +524,13 @@ export default async function ComparePage({
         }
         .compare-empty-title {
           font-family: var(--font-heading);
-          font-size: 24px;
+          font-size: var(--text-24);
           color: var(--color-text-primary);
           margin-bottom: 8px;
         }
         .compare-empty-sub {
           font-family: var(--font-body);
-          font-size: 14px;
+          font-size: var(--text-14);
           color: var(--color-text-40);
           max-width: 560px;
           margin: 0 auto;
@@ -548,7 +548,7 @@ export default async function ComparePage({
         }
         .compare-col-header-name {
           font-family: var(--font-heading);
-          font-size: 18px;
+          font-size: var(--text-18);
           color: var(--color-text-primary);
           text-decoration: none;
           line-height: 1.2;
@@ -573,25 +573,25 @@ export default async function ComparePage({
         }
         .compare-ci-card-country {
           font-family: var(--font-heading);
-          font-size: 22px;
+          font-size: var(--text-22);
           color: var(--color-text-primary);
         }
         .compare-ci-card-score {
           font-family: var(--font-heading);
-          font-size: 44px;
+          font-size: var(--text-44);
           font-weight: 500;
           line-height: 1;
         }
         .compare-ci-card-meta {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.08em;
           text-transform: uppercase;
           color: var(--color-text-30);
         }
         .compare-ci-card-placeholder {
           font-family: var(--font-body);
-          font-size: 14px;
+          font-size: var(--text-14);
           color: var(--color-text-40);
           line-height: 1.4;
         }
@@ -604,7 +604,7 @@ export default async function ComparePage({
         }
         .compare-ci-eyebrow {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.12em;
           text-transform: uppercase;
           color: var(--color-text-30);
@@ -612,7 +612,7 @@ export default async function ComparePage({
         }
         .compare-ci-heading {
           font-family: var(--font-heading);
-          font-size: 22px;
+          font-size: var(--text-22);
           font-weight: 400;
           letter-spacing: -0.01em;
           margin: 0 0 16px 0;
@@ -622,7 +622,7 @@ export default async function ComparePage({
           gap: 24px;
           flex-wrap: wrap;
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-40);
           margin-top: 12px;
           letter-spacing: 0.04em;
@@ -648,7 +648,7 @@ export default async function ComparePage({
           align-items: center;
           padding: 14px 18px;
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: var(--text-12);
           color: var(--color-text-40);
         }
         .dim-compare-header {
@@ -656,7 +656,7 @@ export default async function ComparePage({
           color: var(--color-text-30);
           letter-spacing: 0.08em;
           text-transform: uppercase;
-          font-size: 10px;
+          font-size: var(--text-12);
           border-bottom: 1px solid var(--color-card-border);
         }
         .dim-compare-header .hdr-dot {
@@ -668,7 +668,7 @@ export default async function ComparePage({
         .dim-compare-row:last-child { border-bottom: none; }
         .dim-compare-row .dim-name {
           font-family: var(--font-body);
-          font-size: 13px;
+          font-size: var(--text-13);
           color: var(--color-text-primary);
         }
         .dim-compare-cell {
@@ -676,7 +676,7 @@ export default async function ComparePage({
         }
         .dim-compare-cell .val {
           font-family: var(--font-heading);
-          font-size: 16px;
+          font-size: var(--text-16);
           line-height: 1;
         }
         .dim-compare-cell .bar {
@@ -692,7 +692,7 @@ export default async function ComparePage({
         }
         .dim-wt {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-30);
           text-align: right;
         }
@@ -711,14 +711,14 @@ export default async function ComparePage({
         }
         .h2h-eyebrow {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.1em;
           color: var(--color-accent);
           margin-bottom: 8px;
         }
         .h2h-body {
           font-family: var(--font-body);
-          font-size: 15px;
+          font-size: var(--text-15);
           color: var(--color-text-primary);
           line-height: 1.55;
         }
@@ -740,7 +740,7 @@ export default async function ComparePage({
         }
         .compare-chamber-eyebrow {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: var(--color-text-30);
@@ -751,7 +751,7 @@ export default async function ComparePage({
           gap: 16px;
           flex-wrap: wrap;
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-40);
         }
         .compare-chamber-placeholder {
@@ -760,7 +760,7 @@ export default async function ComparePage({
           border: 1px dashed var(--color-card-border);
           border-radius: var(--radius-md);
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: var(--text-12);
           color: var(--color-text-30);
           text-align: center;
         }
@@ -783,7 +783,7 @@ export default async function ComparePage({
         .compare-elections-block { display: flex; flex-direction: column; gap: 8px; }
         .compare-elections-eyebrow {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: var(--color-text-30);
@@ -800,18 +800,18 @@ export default async function ComparePage({
         }
         .compare-election-title {
           font-family: var(--font-heading);
-          font-size: 16px;
+          font-size: var(--text-16);
           color: var(--color-text-primary);
         }
         .compare-election-sub {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-30);
           letter-spacing: 0.04em;
         }
         .compare-election-system {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-40);
         }
         .compare-election-results { display: flex; flex-direction: column; gap: 6px; }
@@ -821,7 +821,7 @@ export default async function ComparePage({
           gap: 10px;
           align-items: center;
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
         }
         .compare-election-result-name {
           color: var(--color-text-primary);
@@ -849,7 +849,7 @@ export default async function ComparePage({
         }
         .compare-election-noresults {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-25);
           font-style: italic;
         }
@@ -859,7 +859,7 @@ export default async function ComparePage({
           border: 1px dashed var(--color-card-border);
           border-radius: var(--radius-md);
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: var(--text-12);
           color: var(--color-text-30);
           text-align: center;
         }
@@ -871,7 +871,7 @@ export default async function ComparePage({
           border: 1px dashed var(--color-card-border);
           border-radius: var(--radius-md);
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: var(--text-12);
           color: var(--color-text-30);
           text-align: center;
         }
@@ -882,7 +882,7 @@ export default async function ComparePage({
         .compare-intl-headcell { background: var(--color-card-bg); }
         .compare-intl-section-label {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: var(--color-accent);
@@ -892,7 +892,7 @@ export default async function ComparePage({
         }
         .compare-intl-orgname {
           font-family: var(--font-heading);
-          font-size: 15px;
+          font-size: var(--text-15);
           color: var(--color-text-primary);
         }
         .compare-intl-org-primary { display: inline; }
@@ -900,7 +900,7 @@ export default async function ComparePage({
           display: inline-block;
           margin-left: 8px;
           font-family: var(--font-mono);
-          font-size: 10px;
+          font-size: var(--text-12);
           letter-spacing: 0.08em;
           text-transform: uppercase;
           color: var(--color-accent);
@@ -911,7 +911,7 @@ export default async function ComparePage({
         }
         .compare-intl-member {
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: var(--text-12);
           color: var(--color-text-primary);
         }
         .compare-intl-nonmember {
@@ -927,7 +927,7 @@ export default async function ComparePage({
           margin-top: 40px;
           border-top: 1px solid var(--color-card-border);
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: var(--text-12);
           color: var(--color-text-40);
           align-items: center;
         }
@@ -954,7 +954,7 @@ export default async function ComparePage({
           }
         }
         @media (max-width: 640px) {
-          .editorial-page-title { font-size: 36px; }
+          .editorial-page-title { font-size: var(--text-36); }
           .dim-compare-header, .dim-compare-row {
             grid-template-columns: 1fr;
             gap: 8px;

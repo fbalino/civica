@@ -168,7 +168,7 @@ function FactColumn({
       <div
         style={{
           fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-32, 28px)",
+          fontSize: "var(--text-32)",
           color: "var(--color-text-primary)",
           margin: "12px 0 8px",
           lineHeight: 1.1,
@@ -453,7 +453,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 value="resolve_a"
                 disabled={!dispute.factA}
                 className="editorial-button"
-                style={{ background: "var(--color-success, #2c8f3f)" }}
+                style={{ background: "var(--color-success)" }}
               >
                 Resolve · A wins
               </button>
@@ -463,7 +463,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 value="resolve_b"
                 disabled={!dispute.factB}
                 className="editorial-button"
-                style={{ background: "var(--color-success, #2c8f3f)" }}
+                style={{ background: "var(--color-success)" }}
               >
                 Resolve · B wins
               </button>
@@ -480,7 +480,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 name="action"
                 value="reject"
                 className="editorial-button"
-                style={{ background: "var(--color-danger, #b94328)" }}
+                style={{ background: "var(--color-danger)" }}
               >
                 Reject as invalid
               </button>

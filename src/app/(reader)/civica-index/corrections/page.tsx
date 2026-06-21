@@ -139,45 +139,45 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
       <style>{`
         /* Explainer callout (padding/typography only; background+border from Banner) */
         .corr-explainer {
-          padding: 20px 24px;
-          margin-bottom: 40px;
+          padding: var(--space-5) var(--space-6);
+          margin-bottom: var(--space-8);
           font-family: var(--font-body);
-          font-size: 14px;
+          font-size: var(--text-14);
           line-height: 1.65;
         }
         .corr-explainer strong { color: var(--color-text-primary); font-weight: 500; }
-        .corr-explainer ul { margin: 10px 0 0 20px; padding: 0; }
-        .corr-explainer li { margin-bottom: 4px; }
+        .corr-explainer ul { margin: var(--space-3) 0 0 var(--space-5); padding: 0; }
+        .corr-explainer li { margin-bottom: var(--space-2); }
 
         /* Form */
-        .corr-form { display: flex; flex-direction: column; gap: 20px; }
-        .corr-field { display: flex; flex-direction: column; gap: 6px; }
+        .corr-form { display: flex; flex-direction: column; gap: var(--space-5); }
+        .corr-field { display: flex; flex-direction: column; gap: var(--space-2); }
         .corr-label {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           font-weight: var(--font-weight-mono, 500);
           letter-spacing: 0.06em;
           text-transform: uppercase;
           color: var(--color-text-60);
         }
-        .corr-required { color: var(--color-accent); margin-left: 2px; }
+        .corr-required { color: var(--color-accent); margin-left: var(--space-1); }
         .corr-hint {
           font-family: var(--font-body);
-          font-size: 11px;
+          font-size: var(--text-12);
           font-style: italic;
           color: var(--color-text-40);
           text-transform: none;
           letter-spacing: 0;
-          margin-left: 4px;
+          margin-left: var(--space-2);
         }
         .corr-select, .corr-input {
           font-family: var(--font-body);
-          font-size: 14px;
+          font-size: var(--text-14);
           color: var(--color-text-primary);
           background: var(--color-page-bg);
           border: 1px solid var(--color-card-border);
-          border-radius: 4px;
-          padding: 10px 12px;
+          border-radius: var(--radius-sm);
+          padding: var(--space-3) var(--space-4);
           width: 100%;
           box-sizing: border-box;
           outline: none;
@@ -189,12 +189,12 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         }
         .corr-textarea {
           font-family: var(--font-body);
-          font-size: 14px;
+          font-size: var(--text-14);
           color: var(--color-text-primary);
           background: var(--color-page-bg);
           border: 1px solid var(--color-card-border);
-          border-radius: 4px;
-          padding: 10px 12px;
+          border-radius: var(--radius-sm);
+          padding: var(--space-3) var(--space-4);
           width: 100%;
           box-sizing: border-box;
           resize: vertical;
@@ -204,35 +204,35 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         }
         .corr-char-count {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           color: var(--color-text-30);
           text-align: right;
         }
         .corr-fieldset {
           border: 1px solid var(--color-card-border);
-          border-radius: 4px;
-          padding: 20px 20px 8px;
+          border-radius: var(--radius-sm);
+          padding: var(--space-5) var(--space-5) var(--space-3);
           margin: 0;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: var(--space-5);
         }
         .corr-legend {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           font-weight: var(--font-weight-mono, 500);
           letter-spacing: 0.06em;
           text-transform: uppercase;
           color: var(--color-text-60);
-          padding: 0 6px;
+          padding: 0 var(--space-2);
         }
-        .corr-privacy-field { margin-top: 4px; }
+        .corr-privacy-field { margin-top: var(--space-2); }
         .corr-privacy-label {
           display: flex;
           align-items: flex-start;
-          gap: 10px;
+          gap: var(--space-3);
           font-family: var(--font-body);
-          font-size: 13px;
+          font-size: var(--text-13);
           line-height: 1.55;
           color: var(--color-text-60);
           cursor: pointer;
@@ -240,15 +240,15 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         .corr-checkbox { margin-top: 3px; flex-shrink: 0; accent-color: var(--color-accent); }
         .corr-submit {
           font-family: var(--font-mono);
-          font-size: 12px;
+          font-size: var(--text-12);
           font-weight: var(--font-weight-mono, 500);
           letter-spacing: 0.06em;
           text-transform: uppercase;
           color: var(--color-page-bg);
           background: var(--color-text-primary);
           border: none;
-          border-radius: 4px;
-          padding: 12px 28px;
+          border-radius: var(--radius-sm);
+          padding: var(--space-4) 28px;
           cursor: pointer;
           align-self: flex-start;
           transition: opacity 0.1s;
@@ -258,44 +258,44 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         .corr-field-error {
           background: color-mix(in oklch, var(--tier-failed) 10%, var(--color-page-bg) 90%);
           border: 1px solid var(--tier-failed);
-          border-radius: 4px;
-          padding: 12px 16px;
+          border-radius: var(--radius-sm);
+          padding: var(--space-4) var(--space-5);
           font-family: var(--font-body);
-          font-size: 13px;
+          font-size: var(--text-13);
           color: var(--color-text-primary);
         }
         .corr-success-banner {
           background: color-mix(in oklch, var(--tier-exceptional) 10%, var(--color-page-bg) 90%);
           border: 1px solid var(--tier-exceptional);
-          border-radius: 4px;
+          border-radius: var(--radius-sm);
           padding: 18px 22px;
           font-family: var(--font-body);
-          font-size: 14px;
+          font-size: var(--text-14);
           line-height: 1.6;
           color: var(--color-text-primary);
-          margin-bottom: 8px;
+          margin-bottom: var(--space-3);
         }
 
         /* Log (empty state uses the canonical .editorial-empty primitive) */
         .corr-log-row {
           border-top: 1px solid var(--color-card-border);
-          padding: 20px 0;
+          padding: var(--space-5) 0;
         }
         .corr-log-row:last-child { border-bottom: 1px solid var(--color-card-border); }
         .corr-log-meta {
           font-family: var(--font-mono);
-          font-size: 11px;
+          font-size: var(--text-12);
           letter-spacing: 0.03em;
           color: var(--color-text-30);
           display: flex;
           flex-wrap: wrap;
-          gap: 12px;
+          gap: var(--space-4);
           align-items: center;
-          margin-bottom: 8px;
+          margin-bottom: var(--space-3);
         }
         .corr-status-badge {
           font-family: var(--font-mono);
-          font-size: 10px;
+          font-size: var(--text-12);
           font-weight: var(--font-weight-mono, 500);
           letter-spacing: 0.06em;
           text-transform: uppercase;
@@ -305,20 +305,20 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         }
         .corr-log-desc {
           font-family: var(--font-body);
-          font-size: 14px;
+          font-size: var(--text-14);
           line-height: 1.6;
           color: var(--color-text-60);
-          margin: 0 0 8px;
+          margin: 0 0 var(--space-3);
         }
         .corr-log-disposition {
           font-family: var(--font-body);
-          font-size: 13px;
+          font-size: var(--text-13);
           line-height: 1.55;
           color: var(--color-text-primary);
           background: var(--color-grid-cell);
           border-left: 3px solid var(--color-card-border);
-          padding: 8px 14px;
-          margin-top: 8px;
+          padding: var(--space-3) 14px;
+          margin-top: var(--space-3);
         }
         .corr-log-disposition strong {
           font-weight: 500;
@@ -327,10 +327,10 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         /* Pagination uses the canonical .editorial-pagination primitive */
         .corr-resolution-note {
           font-family: var(--font-body);
-          font-size: 13px;
+          font-size: var(--text-13);
           color: var(--color-text-40);
-          margin-top: 32px;
-          padding-top: 16px;
+          margin-top: var(--space-7);
+          padding-top: var(--space-5);
           border-top: 1px solid var(--color-card-border);
         }
       `}</style>
@@ -349,7 +349,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           <li><strong>CI methodology disagreements</strong> — you believe a dimension weight, normalization choice, or composite formula is wrong.</li>
           <li><strong>Pulse event issues</strong> — an event was misclassified, its severity score is too high or low, it does not belong in the index, it is a duplicate, or a significant event is missing entirely.</li>
         </ul>
-        <p style={{ marginTop: 10, marginBottom: 0 }}>
+        <p style={{ marginTop: "var(--space-3)", marginBottom: 0 }}>
           Governments, researchers, NGOs, journalists, and any affected party may submit.
           You do not need to provide your name or email.
         </p>
@@ -361,7 +361,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         <CorrectionsForm countries={countries} submitted={submitted} />
       </section>
 
-      <hr style={{ border: "none", borderTop: "1px solid var(--color-card-border)", margin: "48px 0" }} />
+      <hr style={{ border: "none", borderTop: "1px solid var(--color-card-border)", margin: "var(--space-8) 0" }} />
 
       {/* Public log */}
       <section className="editorial-section">
