@@ -211,8 +211,14 @@ export async function calculateCompositeV2(
     results.push(result);
   }
 
-  // Rank within the Beta result set.
-  results.sort((a, b) => b.scoreInteger - a.scoreInteger);
+  // Rank within the Beta result set. Tie-break on jurisdictionId
+  // ascending so equal-score countries get stable, reproducible ranks
+  // across recomputes (a raw score sort alone reshuffles ties each run).
+  results.sort(
+    (a, b) =>
+      b.scoreInteger - a.scoreInteger ||
+      a.jurisdictionId.localeCompare(b.jurisdictionId),
+  );
   const totalRanked = results.length;
 
   for (let i = 0; i < results.length; i++) {

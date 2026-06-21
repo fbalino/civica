@@ -279,6 +279,14 @@ export async function getJurisdictionsBySlugs(slugs: string[]) {
 
 export async function getCountryRankings(jurisdictionId: string) {
   const keys = ["population", "gdp_ppp", "total_area", "life_expectancy", "gdp_per_capita_ppp"];
+  // `country_facts` carries one row per (jurisdiction, fact_key, source).
+  // Rank/count over a deduplicated set — one canonical row per
+  // (jurisdiction, fact_key) — so a second source row can never inflate a
+  // country's rank/total or let a country rank against its own duplicate.
+  // The DISTINCT ON canonical-selection rule mirrors `rankCountriesByFact`
+  // above: prefer status='active' (NULL treated as active for legacy rows),
+  // then the most recent vintage (as_of, then retrieved_at). No-op today
+  // (single source per fact) but correct once a second source appears.
   const result = await db.execute(sql`
     SELECT fact_key, rank, total
     FROM (
@@ -287,8 +295,20 @@ export async function getCountryRankings(jurisdictionId: string) {
         jurisdiction_id,
         RANK() OVER (PARTITION BY fact_key ORDER BY fact_value_numeric DESC) AS rank,
         COUNT(*) OVER (PARTITION BY fact_key) AS total
-      FROM country_facts
-      WHERE fact_key IN ${keys} AND fact_value_numeric IS NOT NULL
+      FROM (
+        SELECT DISTINCT ON (jurisdiction_id, fact_key)
+          jurisdiction_id,
+          fact_key,
+          fact_value_numeric
+        FROM country_facts
+        WHERE fact_key IN ${keys} AND fact_value_numeric IS NOT NULL
+        ORDER BY
+          jurisdiction_id,
+          fact_key,
+          (status = 'active' OR status IS NULL) DESC,
+          as_of DESC NULLS LAST,
+          retrieved_at DESC
+      ) canonical_facts
     ) ranked
     WHERE jurisdiction_id = ${jurisdictionId}
   `);

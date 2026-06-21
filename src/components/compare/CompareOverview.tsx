@@ -7,7 +7,13 @@ import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { CompareColumnHeader } from "./CompareColumnHeader";
 
-function formatNumber(n: number): string {
+/**
+ * Shared population/large-number formatter. Exported so the /compare
+ * picker cards and the overview row format the same resolver-canonical
+ * value identically — otherwise the picker and the table below it
+ * disagree on a country's population.
+ */
+export function formatNumber(n: number): string {
   if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(2)}B`;
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;

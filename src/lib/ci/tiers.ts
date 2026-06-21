@@ -10,13 +10,20 @@ export interface TierInfo {
   description: string;
 }
 
+// Tier cutoffs are aligned to the canonical A–F band scheme in
+// `src/lib/ci/bands.ts` (the primary public presentation) so a score's
+// tier and band never disagree about which bucket it falls in. The band
+// scheme has six letters (A–F); the tier ramp has five colors, so the two
+// lowest bands (E "Very weak" 25–39 and F "Failed" 0–24) both render with
+// the "failed" tier color — consistent, since they are the two lowest
+// bands. Band boundaries (85 / 70 / 55 / 40) are the tier boundaries.
 const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
   {
-    min: 90,
+    min: 85,
     info: {
       key: "exceptional",
       label: "Exceptional",
-      range: "90-100",
+      range: "85-100",
       className: "tier-90",
       bgClassName: "tier-90-bg",
       cssVar: "var(--tier-exceptional)",
@@ -24,11 +31,11 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     },
   },
   {
-    min: 75,
+    min: 70,
     info: {
       key: "strong",
       label: "Strong",
-      range: "75-89",
+      range: "70-84",
       className: "tier-75",
       bgClassName: "tier-75-bg",
       cssVar: "var(--tier-strong)",
@@ -36,11 +43,11 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     },
   },
   {
-    min: 50,
+    min: 55,
     info: {
       key: "mixed",
       label: "Mixed",
-      range: "50-74",
+      range: "55-69",
       className: "tier-50",
       bgClassName: "tier-50-bg",
       cssVar: "var(--tier-mixed)",
@@ -48,11 +55,11 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     },
   },
   {
-    min: 25,
+    min: 40,
     info: {
       key: "weak",
       label: "Weak",
-      range: "25-49",
+      range: "40-54",
       className: "tier-25",
       bgClassName: "tier-25-bg",
       cssVar: "var(--tier-weak)",
@@ -64,7 +71,7 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
     info: {
       key: "failed",
       label: "Failed",
-      range: "0-24",
+      range: "0-39",
       className: "tier-0",
       bgClassName: "tier-0-bg",
       cssVar: "var(--tier-failed)",

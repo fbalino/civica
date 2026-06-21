@@ -13,7 +13,7 @@ import {
 } from "@/lib/db/queries";
 import { CompareCountrySelector, type SelectedCountryCard } from "./CompareCountrySelector";
 import { CompareSectionNav } from "./CompareSectionNav";
-import { CompareOverview } from "@/components/compare/CompareOverview";
+import { CompareOverview, formatNumber } from "@/components/compare/CompareOverview";
 import { CompareCivicaIndex } from "@/components/compare/CompareCivicaIndex";
 import { CompareChambers } from "@/components/compare/CompareChambers";
 import { CompareElections } from "@/components/compare/CompareElections";
@@ -38,14 +38,6 @@ function parseSlugs(
 ): string[] {
   const arr: string[] = Array.isArray(raw) ? raw : raw ? [raw] : [];
   return arr.filter((s): s is string => typeof s === "string" && s.length > 0).slice(0, 3);
-}
-
-function fmtPop(pop: number | null): string | null {
-  if (!pop || pop <= 0) return null;
-  if (pop >= 1_000_000_000) return `${(pop / 1_000_000_000).toFixed(1)}B`;
-  if (pop >= 1_000_000) return `${Math.round(pop / 1_000_000)}M`;
-  if (pop >= 1_000) return `${Math.round(pop / 1_000)}K`;
-  return `${pop}`;
 }
 
 function govShort(g: string | null): string | null {
@@ -167,38 +159,11 @@ export default async function ComparePage({
     .map((slug) => compareCI.find((c) => c.jurisdiction.slug === slug))
     .filter(Boolean) as typeof compareCI;
 
-  const selectedCards: Array<SelectedCountryCard | null> = [0, 1, 2].map((i) => {
-    const ciRow = orderedCI[i];
-    if (!ciRow) return null;
-    // Phase 3e (structural_family removal) — prefer the pretty-printed
-    // BR/CGV regime type label from the taxonomy layer (e.g.
-    // "Parliamentary democracy", "Civilian dictatorship") over the raw
-    // DB `government_type` factbook string. The legacy
-    // `structuralFamilyLabel` was retired with the heuristic taxonomy
-    // per the 2026-05-02 peer-grouping resolution.
-    const classification = ciRow.jurisdiction.governmentClassification;
-    const prettyGov =
-      classification?.regimeTypeLabel ??
-      govShort(ciRow.jurisdiction.governmentType);
-    return {
-      slug: ciRow.jurisdiction.slug,
-      name: ciRow.jurisdiction.name,
-      iso2: ciRow.jurisdiction.iso2 ?? null,
-      score: ciRow.composite?.score != null ? Number(ciRow.composite.score) : null,
-      rank: ciRow.composite?.rank ?? null,
-      governmentType: prettyGov,
-      continent: ciRow.jurisdiction.continent ?? null,
-      populationLabel: fmtPop(ciRow.jurisdiction.population),
-    };
-  });
-
-  const seriesColorFor = (index: number) =>
-    SERIES_VARS[index] ?? SERIES_VARS[0];
-
-  // Phase F.4 — multi-country resolver fetch for the overview row.
-  // Pulls every in-scope reconciled fact-key for every selected country
-  // in a single batch query. The component renders `<FactValueDot>`
-  // inline next to each value when the resolver has a canonical row.
+  // Phase F.4 — multi-country resolver fetch. Pulls every in-scope
+  // reconciled fact-key for every selected country in a single batch
+  // query. The overview row renders `<FactValueDot>` inline when the
+  // resolver has a canonical row; the picker cards above read the same
+  // resolver-canonical population so the two never disagree on a value.
   let factsByJurisdiction: Awaited<
     ReturnType<typeof getCanonicalFactsForJurisdictions>
   > = {};
@@ -212,6 +177,45 @@ export default async function ComparePage({
       "currency_code",
     ]).catch(() => ({}));
   }
+
+  // Resolver-canonical population (canonical → legacy cache fallback),
+  // mirroring CompareOverview's precedence so picker + row agree.
+  const resolvedPopulation = (
+    jurisdiction: (typeof selectedJurisdictions)[number],
+  ): number | null =>
+    factsByJurisdiction[jurisdiction.id]?.["population_total"]?.canonical
+      ?.factValueNumeric ??
+    jurisdiction.population ??
+    null;
+
+  const selectedCards: Array<SelectedCountryCard | null> = [0, 1, 2].map((i) => {
+    const ciRow = orderedCI[i];
+    if (!ciRow) return null;
+    // Phase 3e (structural_family removal) — prefer the pretty-printed
+    // BR/CGV regime type label from the taxonomy layer (e.g.
+    // "Parliamentary democracy", "Civilian dictatorship") over the raw
+    // DB `government_type` factbook string. The legacy
+    // `structuralFamilyLabel` was retired with the heuristic taxonomy
+    // per the 2026-05-02 peer-grouping resolution.
+    const classification = ciRow.jurisdiction.governmentClassification;
+    const prettyGov =
+      classification?.regimeTypeLabel ??
+      govShort(ciRow.jurisdiction.governmentType);
+    const popN = resolvedPopulation(ciRow.jurisdiction);
+    return {
+      slug: ciRow.jurisdiction.slug,
+      name: ciRow.jurisdiction.name,
+      iso2: ciRow.jurisdiction.iso2 ?? null,
+      score: ciRow.composite?.score != null ? Number(ciRow.composite.score) : null,
+      rank: ciRow.composite?.rank ?? null,
+      governmentType: prettyGov,
+      continent: ciRow.jurisdiction.continent ?? null,
+      populationLabel: popN != null && popN > 0 ? formatNumber(popN) : null,
+    };
+  });
+
+  const seriesColorFor = (index: number) =>
+    SERIES_VARS[index] ?? SERIES_VARS[0];
 
   const overviewCountries = selectedJurisdictions.map((jurisdiction, i) => ({
     jurisdiction,

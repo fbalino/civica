@@ -20,22 +20,6 @@ import {
 } from "@/lib/db/schema";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
 
-const SEVERITY_RANK: Record<string, number> = {
-  catastrophic_neg: 0,
-  severe_neg: 1,
-  high_pos: 2,
-  moderate_neg: 3,
-  moderate_pos: 4,
-  low_neg: 5,
-  low_pos: 6,
-};
-
-const AGREEMENT_RANK: Record<string, number> = {
-  none: 0,
-  two_of_three: 1,
-  all: 2,
-};
-
 export interface ReviewQueueRow {
   id: string;
   eventDate: string;
@@ -74,6 +58,34 @@ export async function getPulseReviewQueue(opts: {
   if (opts.severity) wheres.push(sql`p.severity_tier = ${opts.severity}`);
   const whereClause = sql.join(wheres, sql` AND `);
 
+  // Deterministic ordering MUST happen in SQL, before LIMIT/OFFSET —
+  // otherwise pagination is arbitrary across pages and rows can
+  // duplicate or skip. Urgency first (severity rank, then classifier
+  // agreement), then event_date DESC, then id as a stable final
+  // tiebreaker. The CASE expressions encode the queue's intended urgency
+  // contract: catastrophic_neg first, then severe_neg, etc.; and among
+  // ties, classifier "none" agreement first (those need the most help).
+  const severityOrder = sql`
+    CASE p.severity_tier
+      WHEN 'catastrophic_neg' THEN 0
+      WHEN 'severe_neg' THEN 1
+      WHEN 'high_pos' THEN 2
+      WHEN 'moderate_neg' THEN 3
+      WHEN 'moderate_pos' THEN 4
+      WHEN 'low_neg' THEN 5
+      WHEN 'low_pos' THEN 6
+      ELSE 99
+    END
+  `;
+  const agreementOrder = sql`
+    CASE p.classifier_agreement
+      WHEN 'none' THEN 0
+      WHEN 'two_of_three' THEN 1
+      WHEN 'all' THEN 2
+      ELSE 99
+    END
+  `;
+
   const rowsResult = await db.execute(sql`
     SELECT
       p.id,
@@ -97,25 +109,17 @@ export async function getPulseReviewQueue(opts: {
     FROM pulse_events_v2 p
     JOIN jurisdictions j ON j.id = p.jurisdiction_id
     WHERE ${whereClause}
-    LIMIT ${limit + 1}
+    ORDER BY
+      ${severityOrder} ASC,
+      ${agreementOrder} ASC,
+      p.event_date DESC,
+      p.id ASC
+    LIMIT ${limit}
     OFFSET ${offset}
   `);
 
-  const raw = ((rowsResult as unknown as { rows?: unknown[] }).rows ??
+  const trimmed = ((rowsResult as unknown as { rows?: unknown[] }).rows ??
     rowsResult) as Array<Record<string, unknown>>;
-
-  // Sort in JS — preserves urgency-first ordering without complex SQL
-  raw.sort((a, b) => {
-    const sa = SEVERITY_RANK[String(a.severity_tier)] ?? 99;
-    const sb = SEVERITY_RANK[String(b.severity_tier)] ?? 99;
-    if (sa !== sb) return sa - sb;
-    const aa = AGREEMENT_RANK[String(a.classifier_agreement)] ?? 99;
-    const ab = AGREEMENT_RANK[String(b.classifier_agreement)] ?? 99;
-    if (aa !== ab) return aa - ab;
-    return String(b.event_date).localeCompare(String(a.event_date));
-  });
-
-  const trimmed = raw.slice(0, limit);
 
   const rows: ReviewQueueRow[] = trimmed.map((r) => ({
     id: String(r.id),

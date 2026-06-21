@@ -131,7 +131,7 @@ export function CompareCivicaIndex({
                     className="compare-ci-card-score"
                     style={{ color: seriesColor }}
                   >
-                    {score.toFixed(1)}
+                    {Math.round(score)}
                   </div>
                   <div className="compare-ci-card-meta">
                     {tier ? tier.label : "—"}
@@ -219,7 +219,7 @@ export function CompareCivicaIndex({
                       {val !== null ? (
                         <>
                           <div className="val" style={{ color }}>
-                            {val.toFixed(1)}
+                            {Math.round(val)}
                           </div>
                           <div className="bar">
                             <span
@@ -268,7 +268,7 @@ export function CompareCivicaIndex({
               </div>
               <div className="h2h-body">
                 {insightA.country} scores{" "}
-                <strong>{insightA.delta.toFixed(1)} points</strong> higher on{" "}
+                <strong>{Math.round(insightA.delta)} points</strong> higher on{" "}
                 <em>{V2_DIMENSION_LABELS[insightA.dim]}</em>, its largest advantage
                 in this matchup.
               </div>
@@ -282,7 +282,7 @@ export function CompareCivicaIndex({
               <div className="h2h-body">
                 {insightB.country} leads on{" "}
                 <em>{V2_DIMENSION_LABELS[insightB.dim]}</em> by{" "}
-                <strong>{insightB.delta.toFixed(1)} points</strong> — its
+                <strong>{Math.round(insightB.delta)} points</strong> — its
                 biggest win across the {V2_DIMENSIONS.length} dimensions.
               </div>
             </article>
