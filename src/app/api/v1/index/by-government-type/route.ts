@@ -5,6 +5,10 @@ import {
   getGovernmentTaxonomyGroupingLabel,
   type GovernmentTaxonomyLens,
 } from "@/lib/government-taxonomy";
+import {
+  STRUCTURAL_FAMILY_DEPRECATION_META,
+  withStructuralFamilyDeprecation,
+} from "@/lib/api/deprecation";
 
 function quantile(sortedValues: number[], percentile: number): number {
   if (sortedValues.length === 0) return 0;
@@ -66,10 +70,13 @@ export async function GET(request: Request) {
       })
       .sort((a, b) => b.avgScore - a.avgScore || a.governmentType.localeCompare(b.governmentType));
 
-    return apiResponse({
-      data,
-      meta: { quarter: quarter ?? null, taxonomy },
-    });
+    const isDeprecatedTaxonomy = taxonomy === "structural" || taxonomy === "regime";
+    const meta = isDeprecatedTaxonomy
+      ? { quarter: quarter ?? null, taxonomy, ...STRUCTURAL_FAMILY_DEPRECATION_META }
+      : { quarter: quarter ?? null, taxonomy };
+
+    const response = apiResponse({ data, meta });
+    return isDeprecatedTaxonomy ? withStructuralFamilyDeprecation(response) : response;
   } catch (e) {
     console.error("API /v1/index/by-government-type error:", e);
     return apiError("Internal server error", 500);

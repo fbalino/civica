@@ -15,6 +15,7 @@ import {
   getConstitution,
   getLeaderTimeline,
   getCICountryDetail,
+  getSource,
 } from "@/lib/db/queries";
 import {
   CIPulseScoreDisplay,
@@ -192,7 +193,7 @@ export default async function CountryPage({
   }
   if (!jurisdiction) notFound();
 
-  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline, ciDetail, pulseV2, reconciledFacts] = await Promise.all([
+  const [sections, facts, govStructure, introSection, rankings, relatedCountries, legislatureData, parliamentBills, democracyData, constitution, leaderTimeline, ciDetail, pulseV2, reconciledFacts, wikidataSource, constituteSource] = await Promise.all([
     getFactbookSections(jurisdiction.id),
     getCountryFacts(jurisdiction.id),
     getGovernmentStructure(jurisdiction.id),
@@ -218,6 +219,9 @@ export default async function CountryPage({
       "official_languages",
       "currency_code",
     ]).catch(() => ({}) as Record<string, ResolverOutput>),
+    // Live source freshness — avoids hardcoding retrieval dates.
+    getSource("wikidata").catch(() => null),
+    getSource("constitute_project").catch(() => null),
   ]);
   const ciScore: CIScoreData | null = ciDetail?.composite
     ? {
@@ -637,7 +641,7 @@ export default async function CountryPage({
                   }}
                 >
                   {headOfState.person.name}
-                  <SourceDot source="wikidata" retrievedAt="2026-04-13" />
+                  <SourceDot source="wikidata" retrievedAt={wikidataSource?.lastSyncAt?.toISOString() ?? null} />
                 </p>
                 {(headOfState.term.partyName || headOfState.term.startDate) && (
                   <p
@@ -692,7 +696,7 @@ export default async function CountryPage({
                   }}
                 >
                   {headOfGov.person.name}
-                  <SourceDot source="wikidata" retrievedAt="2026-04-13" />
+                  <SourceDot source="wikidata" retrievedAt={wikidataSource?.lastSyncAt?.toISOString() ?? null} />
                 </p>
                 {(headOfGov.term.partyName || headOfGov.term.startDate) && (
                   <p
@@ -1183,7 +1187,7 @@ export default async function CountryPage({
                       <span>Since {new Date(leader.startDate).getFullYear()}</span>
                     </>
                   )}
-                  <SourceDot source="wikidata" retrievedAt="2026-04-13" />
+                  <SourceDot source="wikidata" retrievedAt={wikidataSource?.lastSyncAt?.toISOString() ?? null} />
                 </span>
               </div>
             </div>
@@ -1268,7 +1272,7 @@ export default async function CountryPage({
         {constitution.constituteProjectId && (
           <p style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", color: "var(--color-text-30)", margin: 0 }}>
             Source: Constitute Project
-            <SourceDot source="Constitute Project" retrievedAt="2026-04-13" />
+            <SourceDot source="Constitute Project" retrievedAt={constituteSource?.lastSyncAt?.toISOString() ?? null} />
           </p>
         )}
       </div>

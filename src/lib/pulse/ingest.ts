@@ -8,6 +8,7 @@ import {
   extractSourceName,
   type GdeltArticle,
 } from "./gdelt";
+import { markSourcesSynced } from "../db/source-freshness";
 
 export function createDb() {
   const sql = neon(process.env.DATABASE_URL!);
@@ -160,5 +161,12 @@ export async function ingestPulseEvents(
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([country, count]) => ({ country, count }));
+
+  // Stamp the gdelt source freshness when rows were actually written.
+  // Uses the sanctioned markSourcesSynced path so last_sync_at advances
+  // only on a successful, non-empty pull (rowsWritten > 0 gate is inside
+  // markSourcesSynced).
+  await markSourcesSynced("gdelt", { rowsWritten: summary.inserted });
+
   return summary;
 }

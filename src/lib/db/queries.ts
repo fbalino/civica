@@ -122,20 +122,51 @@ export async function rankCountriesByFact(
   direction: "asc" | "desc" = "desc",
   limit = 20
 ) {
-  return db
-    .select({
-      jurisdiction: jurisdictions,
-      fact: countryFacts,
-    })
+  // `country_facts` carries one row per (jurisdiction, fact_key, source).
+  // Rank over a deduplicated set — one row per (jurisdiction, fact_key) —
+  // so a country can never repeat or inflate the ordering once a second
+  // source row exists. DISTINCT ON picks the canonical row per country by
+  // preferring status='active' (NULL treated as active for legacy rows),
+  // then the most recent vintage (as_of, then retrieved_at). This is a
+  // no-op today (single source per fact) but correct once a second source
+  // appears.
+  const canonicalFact = db
+    .selectDistinctOn([countryFacts.jurisdictionId, countryFacts.factKey])
     .from(countryFacts)
-    .innerJoin(jurisdictions, eq(countryFacts.jurisdictionId, jurisdictions.id))
     .where(
       sql`${countryFacts.factKey} = ${factKey} AND ${countryFacts.factValueNumeric} IS NOT NULL`
     )
     .orderBy(
+      countryFacts.jurisdictionId,
+      countryFacts.factKey,
+      sql`(${countryFacts.status} = 'active' OR ${countryFacts.status} IS NULL) DESC`,
+      sql`${countryFacts.asOf} DESC NULLS LAST`,
+      desc(countryFacts.retrievedAt)
+    )
+    .as("canonical_fact");
+
+  return db
+    .select({
+      jurisdiction: jurisdictions,
+      // Select the specific fact columns the consumers use (rankings page)
+      // — Drizzle cannot select a whole multi-column subquery as one field.
+      fact: {
+        factValueNumeric: canonicalFact.factValueNumeric,
+        factValue: canonicalFact.factValue,
+        sourceId: canonicalFact.sourceId,
+        retrievedAt: canonicalFact.retrievedAt,
+        asOf: canonicalFact.asOf,
+      },
+    })
+    .from(canonicalFact)
+    .innerJoin(
+      jurisdictions,
+      eq(canonicalFact.jurisdictionId, jurisdictions.id)
+    )
+    .orderBy(
       direction === "desc"
-        ? desc(countryFacts.factValueNumeric)
-        : asc(countryFacts.factValueNumeric)
+        ? desc(canonicalFact.factValueNumeric)
+        : asc(canonicalFact.factValueNumeric)
     )
     .limit(limit);
 }

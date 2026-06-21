@@ -46,7 +46,17 @@ export async function getLatestMethodologyVersion(db: Db): Promise<string> {
 
 export async function runIngestion(
   db: Db,
-  result: IngestionResult
+  result: IngestionResult,
+  opts?: {
+    /**
+     * Explicit timestamp to stamp on `sources.last_sync_at`. When the
+     * seeder feeds frozen reference data (rather than a live pull) pass
+     * the data vintage here (e.g. `new Date("2023-12-31")`) so the
+     * freshness stamp reflects when the data was collected, not when the
+     * seed script ran. Defaults to NOW() when omitted.
+     */
+    vintageAt?: Date;
+  }
 ): Promise<{ ingested: number; skipped: number }> {
   const iso3Map = await buildIso3Map(db);
   const methodologyVersion = await getLatestMethodologyVersion(db);
@@ -131,7 +141,12 @@ export async function runIngestion(
   // Stamp source freshness only when this run actually wrote rows.
   // markSourcesSynced (src/lib/db/source-freshness.ts) is the one
   // sanctioned path and applies the stamp iff rowsWritten > 0.
-  await markSourcesSynced(result.sourceId, { rowsWritten: ingested });
+  // Pass vintageAt when the data is a frozen snapshot so the stamp
+  // reflects the data vintage rather than today's run date.
+  await markSourcesSynced(result.sourceId, {
+    rowsWritten: ingested,
+    ...(opts?.vintageAt ? { at: opts.vintageAt } : {}),
+  });
 
   return { ingested, skipped };
 }

@@ -54,7 +54,11 @@ async function main() {
     globalMaxObserved: Math.max(...values),
   };
 
-  const { ingested, skipped } = await runIngestion(db, result);
+  // Pass vintageAt so sources.last_sync_at reflects the data vintage
+  // (2023), not the date this seed script was run.
+  const { ingested, skipped } = await runIngestion(db, result, {
+    vintageAt: new Date(`${result.datasetYear}-12-31`),
+  });
   console.log(`Done: ${ingested} countries ingested, ${skipped} skipped (no jurisdiction match)`);
 }
 

@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import { getJurisdictionBySlug, getCountryFacts } from "@/lib/db/queries";
+import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
 import {
   getCanonicalFactsForJurisdiction,
   buildApiProvenanceEntry,
   FACTBOOK_RECONCILIATION_META,
   type ApiProvenanceEntry,
 } from "@/lib/factbook/reconcile/api";
+
+// Abuse control: this endpoint streams a full per-country dump and was
+// previously unthrottled — a cheap scraping / DoS vector across all 260+
+// countries. We bound it with the same per-IP in-memory limiter the public
+// /api/v1 routes use. 30 exports / minute / IP sits well above any normal
+// "download this country's data" click while stopping a tight scrape loop.
+const EXPORT_RATE_LIMIT_MAX = 30;
+const EXPORT_RATE_LIMIT_WINDOW_MS = 60_000;
 
 /**
  * Phase F.4 — provenance map for the bulk export.

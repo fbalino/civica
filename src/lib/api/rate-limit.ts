@@ -37,9 +37,38 @@ const SWEEP_INTERVAL_MS = 60_000;
 const MAX_KEYS_PER_SCOPE = 10_000;
 let lastSweepAt = 0;
 
+/**
+ * Resolve the client IP for rate-limit bucketing.
+ *
+ * Security (2026-06 hardening): the FIRST `x-forwarded-for` hop is
+ * fully client-controlled — an attacker can spoof it to mint a fresh
+ * bucket on every request and defeat the /api/chat caps. On Vercel the
+ * trustworthy value is `x-real-ip` (set by the platform to the true
+ * client IP), so we prefer that. We only fall back to `x-forwarded-for`
+ * when `x-real-ip` is absent, and then take the RIGHT-MOST hop (the one
+ * appended by the closest trusted proxy) rather than the spoofable
+ * left-most client-supplied value.
+ *
+ * When no IP can be determined we fail CLOSED for limiting purposes by
+ * returning a single shared "unknown" bucket: all such requests share
+ * one counter, so they get throttled together rather than each escaping
+ * with its own fresh limit.
+ */
 export function getRequestIp(request: Request): string {
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp;
+
   const forwarded = request.headers.get("x-forwarded-for");
-  return forwarded?.split(",")[0]?.trim() ?? "unknown";
+  if (forwarded) {
+    const hops = forwarded
+      .split(",")
+      .map((h) => h.trim())
+      .filter(Boolean);
+    const lastHop = hops[hops.length - 1];
+    if (lastHop) return lastHop;
+  }
+
+  return "unknown";
 }
 
 function sweepExpired(now: number) {
