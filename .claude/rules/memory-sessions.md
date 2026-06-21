@@ -84,6 +84,40 @@ design-system v2-fork reconciliation (needs owner decision), Pulse
 corroboration-as-gate + announcement/state-media rules (part of owner's planned
 Pulse methodology rework), admin-cookie-raw-key / XFF security.
 
+### Follow-up same session — pipeline wiring + subscription daily routine (committed + deployed)
+Owner asked to wire the attribution fix into the pipeline (but keep it paused —
+no more API spend) and to run the daily re-classification on his $200 Claude Max
+SUBSCRIPTION (not API credits) via a Claude Code routine. Done:
+- DURABLE pipeline fix: src/lib/pulse/v2/country-attribution.ts (shared subject-
+  attribution brain) wired into classify.ts so the live pipeline self-corrects
+  attribution. reattribute-pulse-country.ts refactored to share it (DRY).
+- SUBSCRIPTION daily routine: the only API-billed pipeline stage is classify, so
+  the routine moves that work to the AGENT (subscription). New scripts:
+  pulse-export-clusters.ts (ingest+cluster+export unclassified clusters → JSON,
+  no paid API) and pulse-apply-classifications.ts (apply agent decisions via the
+  EXISTING validated writeEvent + corroborate + score, no paid API). Skill
+  `.claude/skills/pulse-daily` orchestrates: export → agent classifies by
+  category/severity/SUBJECT-country → apply. classify.ts now exports
+  loadUnclassifiedClusters/writeEvent/types for reuse.
+- Scheduled task `civica-pulse-daily` created via scheduled-tasks MCP: daily
+  07:09 local, notifyOnCompletion. It's a DESKTOP scheduled task (runs while the
+  Claude app is open; catches up on next launch if closed) → bills the Max
+  subscription (verified no bare ANTHROPIC_API_KEY in env/rc files; the suffixed
+  ANTHROPIC_API_KEY_* keys only feed project scripts, not Claude Code auth).
+  Backlog: export found 186 unclassified clusters (ingested-but-never-classified
+  from the mid-run pause) — first routine run clears them. Owner advised to click
+  "Run now" once to pre-approve Bash/tsx tools for unattended runs.
+- Research (cited) saved via the routines-research agent: subscription billing
+  requires NO bare ANTHROPIC_API_KEY in env, and the LLM work must be the agent's
+  (a script calling the SDK still bills API). Cloud Routines (claude.ai/code,
+  laptop-closed) are the more-reliable alternative if the desktop-app-open
+  caveat becomes a problem; would need Neon host on the routine env network
+  allowlist + DATABASE_URL env var.
+- Everything pushed to main (commits 63fe0ab fixes, 1023756 routine) → Vercel
+  auto-deploy. The Pulse country re-attribution data fix is already live in the DB.
+DEFERRED still: design-system v2 fork (memory-decisions 2026-06-20, owner will
+review later), rankings dedup (latent).
+
 ## 2026-06-07 — Deep-audit remediation + domain fix (shipped to prod)
 
 Implemented the deep-audit high/medium fixes across many delegated agents,
