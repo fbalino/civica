@@ -22,7 +22,8 @@ import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
 import { readFile } from "node:fs/promises";
-import { sql } from "drizzle-orm";
+import { sql, and, inArray } from "drizzle-orm";
+import { rawEvents } from "../src/lib/db/schema";
 import { createDb } from "../src/lib/pulse/v2/ingest";
 import {
   writeEvent,
@@ -45,6 +46,10 @@ interface Decision {
   severityTier: SeverityTier;
   severityValue: number;
   subjectIso3: string | null;
+  /** high | medium | low — low routes to human review instead of
+   *  auto-publishing (replaces the old same-prompt-different-temperature
+   *  "agreement" signal with a classify→verify confidence). */
+  confidence?: "high" | "medium" | "low";
 }
 
 const arg = (k: string) => process.argv.find((a) => a.startsWith(k))?.slice(k.length);
@@ -117,7 +122,10 @@ async function main() {
     };
     const ok: ClassifyOneResult = {
       classified,
-      autoPublished: !HUMAN_REVIEW_TIERS.has(d.severityTier),
+      // Auto-publish only when the tier is not review-gated AND the agent's
+      // classify→verify confidence is not low. Low-confidence events go to
+      // the human review queue (published=false) instead of scoring silently.
+      autoPublished: !HUMAN_REVIEW_TIERS.has(d.severityTier) && d.confidence !== "low",
     };
     await writeEvent(db, cluster, ok);
     written++;
@@ -131,6 +139,24 @@ async function main() {
   console.log(
     `  scoring: ${score.eventsConsidered} events × ${score.countriesScored} countries → ${score.significantDeltas} significant deltas`
   );
+
+  // Self-clean: drop staging rows for examined clusters that produced no
+  // event (non-governance / dropped), so the daily routine doesn't keep
+  // re-classifying the same noise. Written events keep their raw_events
+  // (they are referenced by pulse_sources, which the NOT EXISTS guards).
+  const examinedIds = Array.from(new Set(decisions.map((d) => d.clusterId)));
+  if (examinedIds.length) {
+    const cleaned = await db
+      .delete(rawEvents)
+      .where(
+        and(
+          inArray(rawEvents.clusterId, examinedIds),
+          sql`NOT EXISTS (SELECT 1 FROM pulse_sources ps WHERE ps.raw_event_id = ${rawEvents.id})`
+        )
+      )
+      .returning({ id: rawEvents.id });
+    console.log(`  cleaned ${cleaned.length} dropped staging cluster row(s).`);
+  }
   console.log("DONE.");
   process.exit(0);
 }

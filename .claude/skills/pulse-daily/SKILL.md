@@ -50,12 +50,25 @@ set `isGovernanceEvent: false` (skip them — don't force a country).
      improvements, negative for deteriorations).
    - `subjectIso3`: the ISO3 of the country the event is about (the rule above),
      or null if `isGovernanceEvent` is false.
+   - `confidence`: `high` | `medium` | `low`. **This replaces the old
+     same-prompt-different-temperature "agreement" signal** (which was
+     meaningless and isn't available on the subscription anyway). Use a
+     **classify → verify** method instead: after you classify a cluster,
+     re-read the source and try to REFUTE your own call — is the category
+     right vs. a close alternative? is the severity justified? is the subject
+     country the one the event is *about* (not the source language/outlet)?
+     Set `confidence: low` whenever it's a genuine close call or you can't
+     fully confirm it. Be strict: most raw news is commentary / partisan
+     opinion / business / un-enacted announcements — mark those
+     `isGovernanceEvent: false`, not low-confidence events.
 
    Write the array to `/tmp/pulse-decisions.json`:
    ```json
-   [{"clusterId":"...","isGovernanceEvent":true,"category":"judicial_purge","severityTier":"severe_neg","severityValue":-7,"subjectIso3":"USA"}]
+   [{"clusterId":"...","isGovernanceEvent":true,"category":"judicial_purge","severityTier":"severe_neg","severityValue":-7,"subjectIso3":"USA","confidence":"high"}]
    ```
    Include one object per cluster (use `isGovernanceEvent:false` to drop one).
+   **Low-confidence events are written to the human review queue, not
+   auto-published** — so reserve `high`/`medium` for events you're sure of.
 
 4. **Apply (free — write + corroborate + score):**
    ```
