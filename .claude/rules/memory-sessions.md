@@ -1,5 +1,47 @@
 # Project Memory Sessions
 
+## 2026-06-21 — Autonomous audit-remediation wave (4 packs shipped) + Pulse methodology
+
+Owner: "do as much as you can without my input … not the atlas design token
+cleanup (atlas has atlas-specific things)." Delegated to file-disjoint
+subagents, verified + committed in the main session. All live on `main`
+(commits d7556ef, e562a32) — Vercel auto-deploys.
+
+- **Security** — admin session cookie no longer stores raw ADMIN_API_KEY
+  (opaque `nonce.sha256(KEY:nonce)` token, constant-time, Bearer path
+  unchanged); cron-auth timingSafeEqual + generic errors; rate-limit uses
+  x-real-ip / right-most XFF (not spoofable first hop); /export throttled.
+- **API polish** — v1 Pulse changelog/history deprecation headers; by-government-type
+  structural_family deprecation.
+- **Provenance** — /countries reads real sources.last_sync_at (wikidata/constitute);
+  CI seeders stamp at data vintage (runIngestion gains vintageAt); v1 GDELT stamps.
+- **Correctness** — rankCountriesByFact + getCountryRankings DISTINCT ON
+  (jurisdiction,fact_key) canonical dedup (no double-count once a fact gets a
+  2nd source; no-op today); tiers.ts cutoffs aligned to bands.ts; calculate-v2
+  deterministic rank tiebreak; getPulseReviewQueue SQL ORDER BY before
+  LIMIT/OFFSET; /compare Math.round + resolver-canonical picker population;
+  /api/v1/countries list batch-resolves display facts via resolver (was cache).
+
+Pulse methodology (earlier same session): rewrote content/methodology-pulse.md
+to current reality (classify→verify replaces 3-temperature; subject-country
+attribution; honest sources/cadence; removed unimplemented anti-gaming claims).
+v2.1 research resolution (cited): sanctions/inter-state acts OUT of scope
+(guardrail added to classifier-prompt + pulse-daily skill + methodology page);
+announcement-vs-enacted sharpened; state-media discount / graded-announcement
+lifecycle / single-source hard-gate / self_coup category all DEFERRED.
+Docs: ~/civica/plan/pulse-classification-confidence-methodology-v1.md,
+pulse-methodology-v2.1-resolution.md, audit-remediation-status-2026-06-21.md.
+
+STILL NOT DONE (deliberate later pass): ~18-adapter factbook sync DRY refactor;
+dead-code cleanup (~11 findings); design-system v2-fork (owner-deferred,
+memory-decisions 2026-06-20); non-atlas low design-token literals
+(design-system/dev-panel). Atlas design tokens intentionally left alone per owner.
+Note: one stray mockup (06-21-2026-democracy-backsliding-tracker.html) got
+swept into commit 109ae73 by git add -A — harmless, follows the convention.
+A transient server-side rate limit (not usage limit) cut off 2 subagents
+mid-run; work was re-driven cleanly.
+
+
 ## 2026-06-20 — Blind audit + architecture sweep + feature research (read-only; no code changed)
 
 Ran a blind multi-agent audit (124 agents across 2 workflows: 6 architecture
