@@ -11,9 +11,7 @@
   Substitution markers:
     {{state.X}}                 typed config from site-state.ts
     {{ctx.X}}                   pre-computed helpers from the TSX shell
-                                (ctx.graduationPct, ctx.graduationCount,
-                                 ctx.v1Version, ctx.v1CategoryCount,
-                                 ctx.currentVersion, ctx.currentCategoryCount)
+                                (ctx.graduationPct, ctx.graduationCount)
 
   Heading anchors via `## Heading {#anchor}`.
 
@@ -31,41 +29,40 @@ On every country page you see five rows — one per dimension — each showing t
 - Not a co-equal score alongside the CI. There is no single "Pulse number" that competes with the CI composite.
 - Not a citable standard at launch. Treat values as experimental indicators, not ground truth.
 - Not an attempt to outperform specialised sources. ACLED is still the authority on conflict events; V-Dem is still the authority on democratic trajectory. The Pulse aggregates and scores; it does not claim original empirical authority.
-- Not fully automated. High-severity events require human review before they affect published scores.
+- Not fully automated. High-severity events and low-confidence classifications require human review before they affect published scores.
 
 ## Sources — specialist feeds first, news second {#sources}
 
-The first version of the Pulse relied on general news ingestion (GDELT + Google News). This produced the **media asymmetry problem**: closed regimes produce few detectable events because journalists are restricted, while free-press democracies produce many. The naive aggregation ended up rewarding censorship. Fatal if unaddressed.
-
-Pulse Beta uses **stacked source integration**: specialised structured feeds are the primary signal; general news augments but does not dominate.
+A governance monitor built on general news alone hits the **media-asymmetry problem**: closed regimes produce few detectable stories because journalists are restricted, while free-press democracies produce many. Naive aggregation would end up rewarding censorship. To counter this, the Pulse is designed to stack **specialist structured feeds as the primary signal**, with general news as corroboration rather than the driver.
 
 ### Primary (specialist)
 
-- **ACLED** — Armed Conflict Location & Event Data Project. Real-time structured records of conflict, protest, political violence, and riots.
 - **CIVICUS Monitor** — civic-space alerts: restrictions on assembly, expression, association.
-- **RSF** — Reporters Without Borders press-freedom alerts: journalist arrests, media shutdowns, attacks on press.
-- **V-Dem early warning** — democratic backsliding signals.
-- **HRW + Amnesty International** — human rights violations, mass detentions.
+- **Human Rights Watch & Amnesty International** — human-rights violations, mass detentions, crackdowns.
+- **ACLED** — structured records of conflict, protest, and political violence.
+- **RSF** — Reporters Without Borders press-freedom alerts: journalist arrests, media shutdowns.
 - **IPU Parline** — legislative actions, constitutional events, cabinet changes.
+- **V-Dem early warning** — democratic-backsliding signals.
 
-### Secondary (news, corroboration only)
+### Secondary (news, corroboration)
 
-- **GDELT** — global structured event records from news.
+- **GDELT** — global structured event records drawn from news.
 - **Reuters and AP wire** — authoritative breaking news.
-- **Google News** — broad aggregation.
 
-An event detected only in news without specialist corroboration is held at lower confidence. In countries where the press freedom score is low, news-only signals do not trigger classification on their own — see the press-freedom rule below.
+**Current coverage (Beta).** Not every connector is active yet. The feeds running today are CIVICUS Monitor, Human Rights Watch, Amnesty International, and GDELT; the ACLED, RSF, wire-service, and V-Dem connectors are built but depend on access (paid APIs or feeds) that is not currently enabled, and IPU coverage is sparse. Until the specialist stack is fully wired, news (GDELT) carries more of the signal than the specialist-first design intends — which makes the corroboration and press-freedom weightings below (they discount news-only signal, heavily so in closed regimes) load-bearing, and the [coverage limitations](#coverage-limitations) correspondingly larger.
+
+An event seen only in news, without specialist corroboration, is scored at reduced confidence; in low-press-freedom countries that discount is severe — see the press-freedom rule below.
 
 ## Daily pipeline {#daily-pipeline}
 
-The steps below describe the Pulse's intended daily cadence. That automated daily refresh is currently paused, so published Pulse values reflect the most recent completed run rather than a live feed — the per-country panels and the [Pulse changelog](/civica-index/pulse-changelog) show data as of that last computation.
+The Pulse runs on a daily cadence (Beta). Because it runs as a scheduled job rather than a live stream, published values always reflect the most recent completed run — the per-country panels and the [Pulse changelog](/civica-index/pulse-changelog) show data as of that last computation.
 
-1. **Ingest.** Pull the trailing 24 hours of records from every primary and secondary feed. Resolve country names to jurisdiction ids. Write to a staging table.
-2. **Cluster.** Embed each record with a sentence transformer (all-MiniLM-L6-v2, 384-dim). Group records by country and ±48-hour window using cosine similarity ≥ 0.75. Each cluster represents one real-world event regardless of how many sources covered it.
-3. **Classify.** For each cluster, run an LLM classifier **three times** at temperatures 0.0, 0.4, and 0.8. Compare the resulting (category, severity tier) tuples for agreement.
-4. **Corroborate.** Count distinct specialist sources, distinct news sources, and source diversity. Apply the asymmetric and press-freedom rules below to compute a corroboration confidence in [0, 1].
-5. **Human review.** Severe and catastrophic severity events, plus events where the classifier didn't reach consensus, route to a review queue and do not affect published scores until reviewed.
-6. **Score.** Multiply each event's severity by its corroboration confidence and decay it by event-type-specific half-life. Sum per (country, dimension), clamp to [−15, +10], and write to the dimensional-deltas table.
+1. **Ingest.** Pull the trailing window of records from every active feed and write them to a staging table.
+2. **Cluster.** Embed each record with a sentence transformer (all-MiniLM-L6-v2, 384-dim). Group records by country and ±48-hour window using cosine similarity ≥ 0.75, so one real-world event covered by many sources collapses to a single cluster.
+3. **Classify and verify.** For each cluster an LLM reads the underlying reports and assigns one taxonomy category, a severity tier and value, and the **subject country** — the country whose governance the event is actually about, judged from the substance of the event and *not* from the language of the article or the country of the outlet (a Portuguese-outlet story about U.S. politics is a United States event, not a Brazilian one). It then runs an independent **verification pass** that tries to refute its own classification. See [classification confidence](#classification-confidence).
+4. **Corroborate.** Count distinct specialist and news sources and compute a source-diversity score, then apply the asymmetric and press-freedom weightings below to produce a corroboration confidence in [0, 1].
+5. **Human review.** Severe- and catastrophic-severity events, and any low-confidence classification, route to a review queue and do **not** affect published scores until a human approves them.
+6. **Score.** Multiply each published event's severity by its corroboration confidence, decay it by an event-type-specific half-life, sum per (country, dimension), clamp to [−15, +10], and write the dimensional deltas.
 
 ## Event categories — the {{state.pulse.taxonomy.version}} taxonomy {#event-categories}
 
@@ -147,7 +144,7 @@ Each category in the taxonomy ships with: an inline theoretical citation, an all
 
 ## Disambiguation — when an event could fit multiple categories {#disambiguation}
 
-{{ctx.currentVersion}} expanded the taxonomy from {{ctx.v1CategoryCount}} to {{ctx.currentCategoryCount}} categories. Several of the new fine-grained categories overlap at the prompt level with {{ctx.v1Version}} categories — an event could plausibly fit either. The classifier prompt enforces a single rule for these cases:
+Several fine-grained categories overlap — an event could plausibly fit more than one. The classifier applies a single rule:
 
 **The more dimension-specific category wins over the more generic procedural one.**
 
@@ -158,7 +155,7 @@ Concrete precedence:
 - `mass_detention` loses to `opposition_prosecution` when the detained are named figures with formal charges.
 - `coup` wins over `government_collapse` and `constitutional_crisis` when there is an unconstitutional seizure of power.
 
-The disambiguation rules live in `src/lib/pulse/v2/classifier-prompt.ts` as part of the system prompt sent to Claude. The same prompt drives both production classification and backtesting — they cannot drift apart.
+These precedence rules are part of the classifier's instructions, so they are applied consistently to every event.
 
 ## How coups are classified — the cascade model {#cascade-model}
 
@@ -175,42 +172,42 @@ The Pulse models a coup as the **stability rupture**. The democratic damage that
 
 This mirrors how political scientists model regime breakdown: the coup is the rupture event, the consolidation is what kills democratic institutions over the following weeks and months. Each cascade event is independently classifiable; their dimensional impacts accumulate naturally on the right rows. A reader looking at the country page sees Stability plummet on day one and Democratic Quality, Rule of Law, and Rights & Freedoms degrade over the following months as the new regime consolidates power.
 
-## Multi-run classifier — agreement is the confidence signal {#multi-run-classifier}
+## Classification confidence — classify, then verify {#classification-confidence}
 
-LLM self-reported confidence is not calibrated. The Pulse ignores it. Instead, each cluster is classified three times with different temperature settings, and **agreement across runs** drives the confidence signal:
+LLM self-reported confidence is not calibrated, so the Pulse does not trust a model that merely says it is sure. It also does not rely on sampling the same prompt repeatedly: re-running one prompt only measures the randomness of the model's decoding, not whether the answer is correct — confidently-wrong answers tend to recur. Confidence instead comes from **two genuinely independent reasoning passes, plus real-world corroboration**:
 
-- All three runs agree on category and tier → confidence boost +0.2.
-- Two of three agree → neutral.
-- No agreement → confidence penalty −0.3 and the event routes to human review.
+1. **Classify with reasoning.** The classifier reads the clustered reports and assigns a category, severity, and subject country, and names the **runner-up category** it considered. A clear winner is a stronger signal than a close call.
+2. **Verify (refute).** A second, independent pass re-reads the source and actively tries to *refute* the first: is the category right rather than the runner-up? is the severity justified? is the subject country the one the event is about (not the source's language or outlet)? is it even a discrete governance event at all?
+3. **Confidence.** An event is **high** or **medium** confidence only when it survives that verification and the call is unambiguous; otherwise it is **low**.
 
-The full per-run output (category, tier, severity, rationale) is stored on every event row for audit. Disputes can reference the exact classifier outputs that produced the published value.
+What this drives:
+
+- **Low-confidence events are not auto-published.** They go to the human review queue and do not affect scores until a person approves them. Only events that are both confidently classified and below the severe-severity threshold publish automatically; severe and catastrophic events always route to review regardless of confidence.
+- **Most raw news is dropped.** The classifier is deliberately strict about what qualifies as an event: opinion columns, partisan commentary, market and business stories, and un-enacted announcements are not governance events and are discarded rather than scored.
+- **Corroboration is the primary weight on the events that do score** — see the next two sections. Source diversity and press-freedom context determine how heavily a published event moves the dimensional deltas.
+
+Every event stores its classification rationale, runner-up, and verification result, so any published value traces back to the reasoning that produced it and can be challenged via the [corrections process](#corrections).
 
 ## Asymmetric scoring — anti-gaming {#asymmetric-scoring}
 
-Authoritarian regimes can manufacture positive-seeming events (sham elections, symbolic anti-corruption prosecutions, announced reforms without implementation) more easily than they can manufacture negative ones. Symmetric scoring invites gaming.
+Authoritarian regimes can manufacture positive-seeming events — sham elections, symbolic anti-corruption prosecutions, announced-but-unimplemented reforms — more easily than negative ones. Scoring positives and negatives identically would invite gaming, so positive events face a higher corroboration bar, applied as a **confidence discount** rather than a hard block:
 
-### For positive events:
+- A positive event with **no specialist-source corroboration** has its corroboration confidence reduced (currently ×0.6), so a state-announced "reform" that no independent specialist documents barely moves the score.
+- In **low-press-freedom** countries, a positive event with fewer than two independent non-state sources is discounted further (currently ×0.5).
 
-- Require independent corroboration from at least one non-state source (international observer, opposition media, international NGO, foreign government).
-- Distinguish announcement vs. implementation. Announcement alone receives 30% of the severity value; full severity unlocks only after evidence of implementation 30–90 days post-announcement.
-- In low-press-freedom environments, require ≥2 non-state corroborating sources.
-- Discount severity by 50% if the only sources are state media.
+(The strict classify-and-verify step is the other half of this defence: un-enacted announcements and symbolic claims are typically dropped at classification, so they never reach scoring in the first place.)
 
-### For negative events:
-
-- Standard corroboration: one specialist source plus one news source, or two independent news sources.
-- No announcement vs. implementation distinction.
-- No discount based on source type.
+Negative events use standard corroboration — one specialist plus one news source, or two independent news sources — with no source-type discount. The media-asymmetry problem cuts the other way for negatives: closed regimes suppress *bad* news, so demanding extra corroboration for negatives would compound the censorship advantage.
 
 ## Press-freedom rule {#press-freedom-rule}
 
-A country's current RSF Press Freedom score modulates how much weight news-only signals carry:
+A country's RSF Press Freedom score modulates how much weight **news-only** signals carry, applied as a multiplier on corroboration confidence:
 
-- **Score ≥ 70 (free press).** News-only signals trigger classification with full confidence.
-- **Score 50–69 (partially free).** News-only signals trigger classification with 20% reduced confidence; specialist corroboration preferred.
-- **Score < 50 (restricted press).** News-only signals do not trigger classification on their own. They are held in pending review state until a specialist source corroborates.
+- **Score ≥ 70 (free press).** News-only signals carry full weight.
+- **Score 50–69 (partially free).** News-only signals are discounted (currently ×0.8); specialist corroboration is preferred.
+- **Score < 50 (restricted press).** News-only signals are heavily discounted (currently ×0.3) — on their own they barely move the score, so a published event in a closed-press country effectively needs a specialist source to register.
 
-This addresses the media asymmetry problem directly. In closed regimes the primary signal comes from specialist feeds (ACLED, CIVICUS, RSF, HRW) that actively work to document events despite media restrictions. In free-press environments, news coverage itself is a reliable signal.
+This addresses the media-asymmetry problem directly: in closed regimes the reliable signal comes from specialist feeds (CIVICUS, ACLED, RSF, HRW) that work to document events despite media restrictions; in free-press environments, news coverage is itself a reliable signal.
 
 ## Decay — different events fade at different rates {#decay}
 
@@ -251,8 +248,9 @@ Country pages where the country's RSF score falls below 30 surface this caveat d
 
 ## Known limitations {#known-limitations}
 
-- Coverage is uneven. Countries with rich specialist feed coverage (Sub-Saharan Africa via ACLED, etc.) will have richer Pulse signals than countries with sparse coverage. Sparse-coverage countries may show more stable deltas, which can understate real events.
-- LLM classification is imperfect. Every classification decision is logged with the per-run outputs and is subject to correction via the disputes process below.
+- Coverage is uneven and currently leans on news plus a few specialist feeds. Until the full specialist stack is active, closed-regime detection is weaker than the design intends, and sparse-coverage countries may show artificially stable deltas that understate real events.
+- The classifier is deliberately strict — the large majority of ingested news is commentary, business, or un-enacted announcements rather than discrete governance events, and is dropped. This keeps noise out of the scores, but a genuine event can occasionally be discarded; missing-event disputes are welcomed.
+- LLM classification is imperfect. Every classification is logged with its rationale, runner-up, and verification result, and is subject to correction via the disputes process below.
 - Positive events require stronger corroboration than negative events. This is intentional anti-gaming. In free-press environments it has minimal effect; in closed regimes it means state-originated positive claims are discounted unless independently verified.
 - Dimensional deltas are bounded. A single event cannot produce more than −15 or +10 points of movement on any single dimension. This prevents extremes from distorting comparisons but may understate truly catastrophic situations.
 - The Pulse is not yet peer-reviewed and should not be cited as authoritative.

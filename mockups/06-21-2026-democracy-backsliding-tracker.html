@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Democracy Backsliding Tracker — Civica mockup</title>
+<style>
+  :root {
+    --bg: #FAF7F2;
+    --surface: #FFFCF8;
+    --ink: #0B1220;
+    --ink-60: #334155;
+    --ink-40: #64748B;
+    --ink-25: rgba(11,18,32,0.42);
+    --divider: rgba(11,18,32,0.10);
+    --divider-strong: rgba(11,18,32,0.22);
+    --accent: #A87241;            /* Bronze */
+    --accent-soft: rgba(168,114,65,0.10);
+    --decline-warn: #B5612A;      /* amber-bronze */
+    --decline-severe: #8C2E2E;    /* deep claret */
+    --decline-mild: #C9A24B;      /* gold */
+    --improve: #2E7D59;           /* green */
+    --neutral: #6B7566;           /* sage */
+    --radius-sm: 4px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ------ Page chrome (Civica nav stub) ------ */
+  .topbar {
+    border-bottom: 1px solid var(--divider);
+    background: color-mix(in oklab, var(--bg) 92%, transparent);
+    backdrop-filter: blur(8px);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-inner {
+    max-width: 1280px; margin: 0 auto; padding: 14px 28px;
+    display: flex; align-items: center; gap: 24px;
+  }
+  .brand { font-family: var(--font-serif); font-weight: 600; font-size: 22px; letter-spacing: -0.02em; }
+  .brand-mark { color: var(--accent); }
+  .nav-links { display: flex; gap: 22px; font-size: 13px; color: var(--ink-60); margin-left: auto; }
+  .nav-links a { color: var(--ink-60); }
+  .nav-links a.active { color: var(--ink); font-weight: 600; }
+
+  /* ------ Hero ------ */
+  .hero {
+    max-width: 1280px; margin: 0 auto; padding: 40px 28px 12px;
+    display: grid; grid-template-columns: 1fr 360px; gap: 48px; align-items: end;
+  }
+  .crumb { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-40); margin-bottom: 12px; }
+  h1 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: 56px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin: 0 0 16px;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .hero-lede { font-size: 17px; line-height: 1.55; color: var(--ink-60); max-width: 56ch; }
+  .hero-meta {
+    font-size: 12px; color: var(--ink-40);
+    border-left: 2px solid var(--accent);
+    padding: 6px 0 6px 14px;
+    font-family: var(--font-mono);
+  }
+  .hero-meta div { line-height: 1.7; }
+  .hero-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* ------ Headline counter strip ------ */
+  .counters {
+    max-width: 1280px; margin: 32px auto 0; padding: 0 28px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    border-top: 1px solid var(--divider);
+    border-bottom: 1px solid var(--divider);
+  }
+  .counter { padding: 22px 24px; border-right: 1px solid var(--divider); }
+  .counter:last-child { border-right: 0; }
+  .counter-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-40); margin-bottom: 8px; }
+  .counter-value { font-family: var(--font-serif); font-size: 38px; font-weight: 500; letter-spacing: -0.02em; line-height: 1; }
+  .counter-value.severe { color: var(--decline-severe); }
+  .counter-value.warn { color: var(--decline-warn); }
+  .counter-value.improve { color: var(--improve); }
+  .counter-foot { font-size: 12px; color: var(--ink-60); margin-top: 6px; }
+
+  /* ------ Controls bar ------ */
+  .controls {
+    max-width: 1280px; margin: 24px auto 0; padding: 0 28px;
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  }
+  .control-group { display: flex; align-items: center; gap: 8px; }
+  .control-label { font-size: 12px; color: var(--ink-60); font-weight: 500; }
+  .pill {
+    border: 1px solid var(--divider-strong);
+    background: transparent;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: var(--ink);
+    font-family: inherit;
+    cursor: pointer;
+  }
+  .pill.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .pill:hover:not(.active) { background: var(--accent-soft); border-color: var(--accent); }
+  .select {
+    appearance: none; -webkit-appearance: none;
+    border: 1px solid var(--divider-strong);
+    background: transparent;
+    padding: 6px 28px 6px 10px;
+    border-radius: 4px;
+    font-size: 13px; color: var(--ink); font-family: inherit;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path d='M0 2 L4 6 L8 2' stroke='%2364748B' stroke-width='1.2' fill='none'/></svg>");
+    background-repeat: no-repeat; background-position: right 8px center; background-size: 8px;
+  }
+
+  /* ------ Main grid: list + detail ------ */
+  .main {
+    max-width: 1280px; margin: 28px auto 80px; padding: 0 28px;
+    display: grid; grid-template-columns: 520px 1fr; gap: 28px;
+  }
+  .section-label {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-40);
+    margin: 0 0 12px;
+  }
+
+  /* ------ Decline list ------ */
+  .decline-list { display: flex; flex-direction: column; gap: 0; }
+  .decline-row {
+    display: grid; grid-template-columns: 28px 1fr 76px 72px 48px; gap: 14px;
+    align-items: center;
+    padding: 14px 6px;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+  }
+  .decline-row:hover { background: var(--accent-soft); }
+  .decline-row.selected { background: var(--surface); border-left: 2px solid var(--accent); padding-left: 12px; }
+  .rank { font-family: var(--font-mono); font-size: 12px; color: var(--ink-40); text-align: right; }
+  .country-cell { display: flex; align-items: center; gap: 10px; }
+  .flag { width: 20px; height: 14px; border-radius: 2px; border: 1px solid var(--divider); display: inline-block; }
+  .country-name { font-family: var(--font-serif); font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
+  .country-sub { font-size: 11px; color: var(--ink-40); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; }
+  .sparkline { width: 76px; height: 22px; display: block; }
+  .delta {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 600; text-align: right;
+  }
+  .delta.severe { color: var(--decline-severe); }
+  .delta.warn { color: var(--decline-warn); }
+  .delta.mild { color: var(--decline-mild); }
+  .delta.improve { color: var(--improve); }
+  .badge {
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 6px; border-radius: 3px; font-weight: 600;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
+    text-align: center;
+  }
+  .badge.severe { background: rgba(140,46,46,0.10); color: var(--decline-severe); border-color: rgba(140,46,46,0.30); }
+  .badge.warn { background: rgba(181,97,42,0.12); color: var(--decline-warn); border-color: rgba(181,97,42,0.30); }
+
+  /* ------ Detail panel ------ */
+  .detail {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: var(--radius-lg);
+    padding: 28px 30px;
+  }
+  .detail h2 {
+    font-family: var(--font-serif); font-weight: 500; font-size: 32px; letter-spacing: -0.02em;
+    margin: 0 0 4px;
+  }
+  .detail-sub { font-size: 13px; color: var(--ink-60); margin-bottom: 22px; }
+  .detail-sub strong { color: var(--decline-severe); }
+
+  /* ------ Big trend chart ------ */
+  .trend-card {
+    border: 1px solid var(--divider);
+    border-radius: var(--radius-md);
+    padding: 18px 18px 8px;
+    background: var(--bg);
+  }
+  .trend-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .trend-title { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .trend-scale { font-size: 11px; color: var(--ink-40); font-family: var(--font-mono); }
+  .trend-svg { width: 100%; height: 220px; display: block; }
+  .legend { display: flex; gap: 18px; font-size: 12px; color: var(--ink-60); margin-top: 8px; padding-bottom: 6px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 14px; height: 3px; border-radius: 2px; }
+
+  /* ------ Indicator grid ------ */
+  .indicators { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 20px; }
+  .indicator {
+    border: 1px solid var(--divider);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    background: var(--bg);
+  }
+  .ind-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-40); margin-bottom: 6px; }
+  .ind-value { display: flex; align-items: baseline; gap: 8px; }
+  .ind-now { font-family: var(--font-serif); font-size: 26px; font-weight: 500; letter-spacing: -0.02em; }
+  .ind-was { font-size: 12px; color: var(--ink-40); font-family: var(--font-mono); }
+  .ind-arrow { font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
+  .ind-arrow.down { color: var(--decline-severe); }
+  .ind-arrow.up { color: var(--improve); }
+  .ind-source { font-size: 10px; color: var(--ink-40); margin-top: 8px; letter-spacing: 0.04em; }
+  .src-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--improve); margin-right: 5px; vertical-align: middle; }
+  .src-dot.frozen { background: var(--decline-mild); }
+
+  /* ------ Annotations ------ */
+  .events { margin-top: 20px; border-top: 1px solid var(--divider); padding-top: 18px; }
+  .event {
+    display: grid; grid-template-columns: 64px 1fr; gap: 14px;
+    padding: 10px 0; border-bottom: 1px dashed var(--divider);
+  }
+  .event:last-child { border-bottom: 0; }
+  .event-year { font-family: var(--font-mono); font-size: 12px; color: var(--accent); font-weight: 600; }
+  .event-body { font-size: 13px; line-height: 1.5; color: var(--ink); }
+  .event-body small { color: var(--ink-40); display: block; margin-top: 2px; font-size: 11px; }
+
+  /* ------ Footer methodology ------ */
+  .method {
+    max-width: 1280px; margin: 0 auto; padding: 0 28px 80px;
+    font-size: 13px; color: var(--ink-60); line-height: 1.6;
+  }
+  .method h3 { font-family: var(--font-serif); font-weight: 500; font-size: 22px; color: var(--ink); margin: 24px 0 8px; }
+  .method code { font-family: var(--font-mono); font-size: 12px; background: var(--accent-soft); padding: 1px 5px; border-radius: 3px; color: var(--accent); }
+
+  @media (max-width: 1080px) {
+    .hero { grid-template-columns: 1fr; }
+    .counters { grid-template-columns: repeat(2, 1fr); }
+    .counter:nth-child(2) { border-right: 0; }
+    .main { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Civica<span class="brand-mark">.</span></div>
+    <nav class="nav-links">
+      <a>Atlas</a>
+      <a>Index</a>
+      <a class="active">Pulse</a>
+      <a>Elections</a>
+      <a>Compare</a>
+      <a>Methodology</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="crumb">Pulse · Trend signals</div>
+    <h1>Democracy is <em>backsliding</em> in 24 countries.</h1>
+    <p class="hero-lede">
+      Civica's backsliding tracker scans the rolling 60-month window of every Civica Index
+      country score and flags material declines on the three constituent dimensions —
+      institutional integrity, rights & freedoms, and political accountability — against
+      each country's own five-year baseline.
+    </p>
+  </div>
+  <aside class="hero-meta">
+    <div><strong>Window</strong>  2021-06 → 2026-06</div>
+    <div><strong>Coverage</strong> 193 UN members</div>
+    <div><strong>Threshold</strong> ≥ 4.0 pt drop on any axis</div>
+    <div><strong>Updated</strong>  2026-06-19 (T-2 days)</div>
+    <div><strong>Source</strong>   V-Dem v15 + Freedom House FIW 2026</div>
+  </aside>
+</section>
+
+<section class="counters">
+  <div class="counter">
+    <div class="counter-label">Severe backsliders</div>
+    <div class="counter-value severe">7</div>
+    <div class="counter-foot">≥ 8.0 pt drop</div>
+  </div>
+  <div class="counter">
+    <div class="counter-label">Moderate backsliders</div>
+    <div class="counter-value warn">17</div>
+    <div class="counter-foot">4.0 – 7.9 pt drop</div>
+  </div>
+  <div class="counter">
+    <div class="counter-label">Net improvers</div>
+    <div class="counter-value improve">9</div>
+    <div class="counter-foot">≥ 4.0 pt gain</div>
+  </div>
+  <div class="counter">
+    <div class="counter-label">Stable</div>
+    <div class="counter-value">160</div>
+    <div class="counter-foot">change within ±4.0 pt</div>
+  </div>
+</section>
+
+<div class="controls">
+  <div class="control-group">
+    <span class="control-label">Show</span>
+    <button class="pill active">All declining</button>
+    <button class="pill">Severe only</button>
+    <button class="pill">Improving</button>
+  </div>
+  <div class="control-group" style="margin-left:auto;">
+    <span class="control-label">Region</span>
+    <select class="select">
+      <option>All regions</option>
+      <option>Sub-Saharan Africa</option>
+      <option>Asia-Pacific</option>
+      <option>Europe</option>
+      <option>Americas</option>
+      <option>MENA</option>
+    </select>
+    <span class="control-label">Window</span>
+    <select class="select">
+      <option>5 years</option>
+      <option>10 years</option>
+      <option>Since 2000</option>
+    </select>
+  </div>
+</div>
+
+<section class="main">
+  <!-- ===== Decline list ===== -->
+  <div>
+    <h2 class="section-label">Backsliders, ranked by 5-year delta</h2>
+    <div class="decline-list">
+
+      <!-- selected row -->
+      <div class="decline-row selected">
+        <span class="rank">1</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to bottom, #008751 33%, #fcd116 33% 66%, #ce1126 66%);"></span>
+          <div>
+            <div class="country-name">El Salvador</div>
+            <div class="country-sub">SLV · Americas</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#8C2E2E" stroke-width="1.5" points="0,4 12,5 24,7 36,10 48,14 60,17 76,20"/></svg>
+        <span class="delta severe">−11.4</span>
+        <span class="badge severe">SEV</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">2</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to right, #006a4e 50%, #f42a41 50%);"></span>
+          <div>
+            <div class="country-name">Tunisia</div>
+            <div class="country-sub">TUN · MENA</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#8C2E2E" stroke-width="1.5" points="0,3 12,4 24,5 36,8 48,12 60,16 76,19"/></svg>
+        <span class="delta severe">−10.2</span>
+        <span class="badge severe">SEV</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">3</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to bottom, #ce1126 33%, #ffffff 33% 66%, #008751 66%);"></span>
+          <div>
+            <div class="country-name">Niger</div>
+            <div class="country-sub">NER · Africa</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#8C2E2E" stroke-width="1.5" points="0,6 12,7 24,7 36,8 48,11 60,16 76,20"/></svg>
+        <span class="delta severe">−9.8</span>
+        <span class="badge severe">SEV</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">4</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to bottom, #cc092f 50%, #ffffff 50%);"></span>
+          <div>
+            <div class="country-name">Tanzania</div>
+            <div class="country-sub">TZA · Africa</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#B5612A" stroke-width="1.5" points="0,5 12,6 24,8 36,10 48,12 60,15 76,17"/></svg>
+        <span class="delta severe">−8.6</span>
+        <span class="badge severe">SEV</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">5</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to bottom, #c8102e 50%, #ffffff 50%);"></span>
+          <div>
+            <div class="country-name">Türkiye</div>
+            <div class="country-sub">TUR · Europe</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#B5612A" stroke-width="1.5" points="0,7 12,8 24,9 36,11 48,12 60,14 76,16"/></svg>
+        <span class="delta warn">−7.1</span>
+        <span class="badge warn">MOD</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">6</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to bottom, #00247d 33%, #ffffff 33% 66%, #cf142b 66%);"></span>
+          <div>
+            <div class="country-name">India</div>
+            <div class="country-sub">IND · Asia-Pacific</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#B5612A" stroke-width="1.5" points="0,8 12,9 24,10 36,11 48,13 60,15 76,16"/></svg>
+        <span class="delta warn">−6.4</span>
+        <span class="badge warn">MOD</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">7</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to bottom, #009639 50%, #ffffff 50%);"></span>
+          <div>
+            <div class="country-name">Hungary</div>
+            <div class="country-sub">HUN · Europe</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#B5612A" stroke-width="1.5" points="0,9 12,10 24,11 36,12 48,13 60,14 76,15"/></svg>
+        <span class="delta warn">−5.8</span>
+        <span class="badge warn">MOD</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">8</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to right, #16183f 33%, #ffffff 33% 66%, #d52b1e 66%);"></span>
+          <div>
+            <div class="country-name">Serbia</div>
+            <div class="country-sub">SRB · Europe</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#C9A24B" stroke-width="1.5" points="0,9 12,10 24,11 36,12 48,12 60,13 76,14"/></svg>
+        <span class="delta warn">−5.0</span>
+        <span class="badge warn">MOD</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">9</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to bottom, #ed1c24 33%, #ffffff 33% 66%, #0072bb 66%);"></span>
+          <div>
+            <div class="country-name">Philippines</div>
+            <div class="country-sub">PHL · Asia-Pacific</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#C9A24B" stroke-width="1.5" points="0,10 12,11 24,12 36,12 48,13 60,13 76,14"/></svg>
+        <span class="delta mild">−4.6</span>
+        <span class="badge warn">MOD</span>
+      </div>
+
+      <div class="decline-row">
+        <span class="rank">10</span>
+        <div class="country-cell">
+          <span class="flag" style="background: linear-gradient(to bottom, #00247d 33%, #ffffff 33% 66%, #cf142b 66%);"></span>
+          <div>
+            <div class="country-name">Thailand</div>
+            <div class="country-sub">THA · Asia-Pacific</div>
+          </div>
+        </div>
+        <svg class="sparkline" viewBox="0 0 76 22"><polyline fill="none" stroke="#C9A24B" stroke-width="1.5" points="0,10 12,11 24,11 36,12 48,12 60,13 76,13"/></svg>
+        <span class="delta mild">−4.1</span>
+        <span class="badge warn">MOD</span>
+      </div>
+
+      <div class="decline-row" style="opacity:0.55;">
+        <span class="rank">…</span>
+        <div class="country-cell">
+          <div>
+            <div class="country-name" style="color:var(--ink-40);">+14 more moderate backsliders</div>
+            <div class="country-sub">expand to view full list</div>
+          </div>
+        </div>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== Detail panel ===== -->
+  <aside class="detail">
+    <div class="crumb" style="margin-bottom:8px;">El Salvador · Pulse profile</div>
+    <h2>From hybrid democracy to one-party rule, in five years.</h2>
+    <p class="detail-sub">
+      Civica Index dropped from <strong>62.1</strong> (Jun 2021) to <strong>50.7</strong> (Jun 2026),
+      a five-year delta of <strong>−11.4</strong> — the steepest sustained decline in the Americas
+      since Venezuela's 2014–2019 collapse. Decline is concentrated in
+      <strong>institutional integrity</strong> (judicial independence, term-limit erosion)
+      rather than rights or services.
+    </p>
+
+    <!-- Big trend chart -->
+    <div class="trend-card">
+      <div class="trend-head">
+        <span class="trend-title">Civica Index — El Salvador, 2018 – 2026</span>
+        <span class="trend-scale">Index 0 – 100</span>
+      </div>
+
+      <svg class="trend-svg" viewBox="0 0 720 220" preserveAspectRatio="none">
+        <!-- gridlines -->
+        <g stroke="rgba(11,18,32,0.06)" stroke-width="1">
+          <line x1="0" y1="40" x2="720" y2="40"/>
+          <line x1="0" y1="90" x2="720" y2="90"/>
+          <line x1="0" y1="140" x2="720" y2="140"/>
+          <line x1="0" y1="190" x2="720" y2="190"/>
+        </g>
+        <!-- y labels -->
+        <g font-family="ui-monospace, Menlo, monospace" font-size="9" fill="#64748B">
+          <text x="6" y="44">80</text>
+          <text x="6" y="94">70</text>
+          <text x="6" y="144">60</text>
+          <text x="6" y="194">50</text>
+        </g>
+        <!-- baseline shaded zone (own 2018-2020 baseline) -->
+        <rect x="0" y="35" width="720" height="40" fill="#A87241" fill-opacity="0.06"/>
+        <text x="710" y="48" text-anchor="end" font-family="ui-monospace, Menlo, monospace" font-size="9" fill="#A87241">2018–20 baseline</text>
+
+        <!-- Civica Index line (overall) -->
+        <polyline fill="none" stroke="#0B1220" stroke-width="2.2"
+          points="20,55 110,52 200,60 290,82 380,118 470,148 560,170 650,182 700,190"/>
+
+        <!-- Institutional integrity (sub-line, steep drop) -->
+        <polyline fill="none" stroke="#8C2E2E" stroke-width="1.8" stroke-dasharray="4 3"
+          points="20,60 110,58 200,72 290,108 380,148 470,176 560,194 650,200 700,202"/>
+
+        <!-- Rights & freedoms (sub-line, milder) -->
+        <polyline fill="none" stroke="#B5612A" stroke-width="1.8" stroke-dasharray="4 3"
+          points="20,52 110,50 200,55 290,72 380,98 470,120 560,138 650,150 700,156"/>
+
+        <!-- Event markers -->
+        <g>
+          <line x1="290" y1="20" x2="290" y2="210" stroke="#A87241" stroke-width="0.8" stroke-dasharray="2 3"/>
+          <circle cx="290" cy="82" r="3.5" fill="#A87241"/>
+          <text x="293" y="22" font-family="Inter, sans-serif" font-size="10" fill="#A87241" font-weight="600">Feb 2021 · Supreme Court purge</text>
+
+          <line x1="430" y1="20" x2="430" y2="210" stroke="#A87241" stroke-width="0.8" stroke-dasharray="2 3"/>
+          <circle cx="430" cy="135" r="3.5" fill="#A87241"/>
+          <text x="433" y="22" font-family="Inter, sans-serif" font-size="10" fill="#A87241" font-weight="600">Mar 2022 · State of exception</text>
+
+          <line x1="600" y1="20" x2="600" y2="210" stroke="#A87241" stroke-width="0.8" stroke-dasharray="2 3"/>
+          <circle cx="600" cy="178" r="3.5" fill="#A87241"/>
+          <text x="603" y="22" font-family="Inter, sans-serif" font-size="10" fill="#A87241" font-weight="600">Feb 2024 · Re-election (banned by const.)</text>
+        </g>
+
+        <!-- x labels -->
+        <g font-family="ui-monospace, Menlo, monospace" font-size="9" fill="#64748B" text-anchor="middle">
+          <text x="20" y="215">2018</text>
+          <text x="110" y="215">2019</text>
+          <text x="200" y="215">2020</text>
+          <text x="290" y="215">2021</text>
+          <text x="380" y="215">2022</text>
+          <text x="470" y="215">2023</text>
+          <text x="560" y="215">2024</text>
+          <text x="650" y="215">2025</text>
+          <text x="700" y="215">'26</text>
+        </g>
+      </svg>
+
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#0B1220;"></span> Civica Index (overall)</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#8C2E2E;"></span> Institutional integrity</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#B5612A;"></span> Rights &amp; freedoms</div>
+      </div>
+    </div>
+
+    <!-- Indicator grid -->
+    <div class="indicators">
+      <div class="indicator">
+        <div class="ind-label">Judicial independence</div>
+        <div class="ind-value">
+          <span class="ind-now">0.21</span>
+          <span class="ind-was">was 0.74</span>
+          <span class="ind-arrow down">▼ −0.53</span>
+        </div>
+        <div class="ind-source"><span class="src-dot"></span>V-Dem v15 · live</div>
+      </div>
+      <div class="indicator">
+        <div class="ind-label">Press freedom (RSF score)</div>
+        <div class="ind-value">
+          <span class="ind-now">52.4</span>
+          <span class="ind-was">was 67.1</span>
+          <span class="ind-arrow down">▼ −14.7</span>
+        </div>
+        <div class="ind-source"><span class="src-dot"></span>RSF 2026 · live</div>
+      </div>
+      <div class="indicator">
+        <div class="ind-label">Civil-liberties (FIW)</div>
+        <div class="ind-value">
+          <span class="ind-now">29 / 60</span>
+          <span class="ind-was">was 43 / 60</span>
+          <span class="ind-arrow down">▼ −14</span>
+        </div>
+        <div class="ind-source"><span class="src-dot"></span>Freedom House 2026 · live</div>
+      </div>
+      <div class="indicator">
+        <div class="ind-label">Term-limit compliance</div>
+        <div class="ind-value">
+          <span class="ind-now">No</span>
+          <span class="ind-was">was Yes</span>
+          <span class="ind-arrow down">▼</span>
+        </div>
+        <div class="ind-source"><span class="src-dot frozen"></span>Civica research · 2024-Q1</div>
+      </div>
+    </div>
+
+    <!-- Events -->
+    <div class="events">
+      <div class="event">
+        <div class="event-year">2021-02</div>
+        <div class="event-body">
+          Legislative Assembly summarily removed 5 Constitutional Chamber judges and the Attorney General; replacements appointed within hours.
+          <small>Source: OAS communiqué (May 2021) · Civica event log</small>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-year">2022-03</div>
+        <div class="event-body">
+          Indefinite state of exception begins; due-process suspensions affect &gt;75,000 detentions through 2025.
+          <small>Source: Cristosal report · Civica event log</small>
+        </div>
+      </div>
+      <div class="event">
+        <div class="event-year">2024-02</div>
+        <div class="event-body">
+          Incumbent re-elected to a second consecutive term despite constitutional prohibition (Art. 152) ruled inapplicable by the post-2021 court.
+          <small>Source: TSE official results · Constitute Project (SLV constitution)</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+</section>
+
+<section class="method">
+  <h3>How "backsliding" is computed</h3>
+  <p>
+    For each country and each Civica Index axis (institutional integrity, rights &amp; freedoms,
+    political accountability), Civica computes a rolling Δ between the latest score and that country's
+    own <em>baseline</em> (mean of the first 24 months of the configurable window — default 5 years).
+    A country is flagged when any axis delta is ≤ −4.0 points and the change is sustained for
+    ≥ 6 consecutive monthly observations (smoothing out single-event noise).
+    Severity bands use the largest of the three axis deltas: <code>severe ≥ 8.0</code>,
+    <code>moderate 4.0 – 7.9</code>, <code>mild 2.0 – 3.9</code>.
+  </p>
+  <p>
+    Indicator inputs are the same sources already wired into Civica Index v2:
+    V-Dem v15 (live), Freedom House FIW 2026 (live), RSF Press Freedom 2026 (live),
+    plus internal Civica research for non-quantitative events (term-limit compliance, court purges,
+    state-of-exception status). Live vs frozen provenance is rendered with the standard Civica
+    source-dot convention.
+  </p>
+  <p style="color:var(--ink-40); font-size:12px; margin-top:18px;">
+    Throwaway mockup — Product Manager, Session 11 · CIV-218 · 2026-06-21. Data is illustrative for layout review,
+    not for citation.
+  </p>
+</section>
+
+</body>
+</html>

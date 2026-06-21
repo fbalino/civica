@@ -12,7 +12,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Pulse methodology (Beta) — Civica Index",
   description:
-    "How the Civica Pulse Beta detects, classifies, and scores governance events between quarterly index updates. Source taxonomy, multi-run classifier, asymmetric scoring, decay model, and known limitations.",
+    "How the Civica Pulse Beta detects, classifies, and scores governance events between quarterly index updates. Source taxonomy, classify-and-verify confidence, asymmetric scoring, decay model, and known limitations.",
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/methodology/pulse",
   },
@@ -26,7 +26,7 @@ const SECTIONS = [
   { id: "event-categories", label: "Event categories" },
   { id: "disambiguation", label: "Disambiguation" },
   { id: "cascade-model", label: "Cascade model" },
-  { id: "multi-run-classifier", label: "Multi-run classifier" },
+  { id: "classification-confidence", label: "Classification confidence" },
   { id: "asymmetric-scoring", label: "Asymmetric scoring" },
   { id: "press-freedom-rule", label: "Press-freedom rule" },
   { id: "decay", label: "Decay" },
@@ -43,10 +43,6 @@ export default function PulseMethodologyPage() {
   const graduationRatio = pulse.backtest.graduationThresholdRatio;
   const graduationPct = Math.round(graduationRatio * 100);
   const graduationCount = Math.ceil(backtestCount * graduationRatio);
-  // v1 → v2 evolution from versionHistory (first vs current entry).
-  const v1Entry = taxonomy.versionHistory[0];
-  const currentEntry =
-    taxonomy.versionHistory[taxonomy.versionHistory.length - 1];
 
   // Pre-computed helpers materialised at the call site (Phase 5
   // §3.2). Keys must match the validator's per-file allowlist in
@@ -54,10 +50,6 @@ export default function PulseMethodologyPage() {
   const ctx = {
     graduationPct,
     graduationCount,
-    v1Version: v1Entry.version,
-    v1CategoryCount: v1Entry.categoryCount,
-    currentVersion: currentEntry.version,
-    currentCategoryCount: currentEntry.categoryCount,
   };
 
   const state = { pulse, disputeSla };
@@ -75,9 +67,10 @@ export default function PulseMethodologyPage() {
         </h1>
         <p className="editorial-page-subtitle">
           An event-sensitive governance shock monitor layered on top of the
-          quarterly Civica Index. Its automated daily refresh is currently
-          paused, so published values reflect the most recent computation rather
-          than a live feed. Beta — methodology under active validation.
+          quarterly Civica Index. It refreshes on a daily cadence; because it
+          runs as a scheduled job, published values reflect the most recent
+          completed run rather than a live feed. Beta — methodology under active
+          validation.
         </p>
 
         <div className="editorial-warning">
