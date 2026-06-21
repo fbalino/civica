@@ -52,27 +52,6 @@ export async function sparqlQuery(query: string): Promise<SparqlBinding[]> {
   throw lastError ?? new Error("SPARQL query failed after retries");
 }
 
-export async function getHeadsOfState(): Promise<SparqlBinding[]> {
-  return sparqlQuery(`
-    SELECT ?state ?stateLabel ?headOfState ?headOfStateLabel ?headOfGov ?headOfGovLabel WHERE {
-      ?state wdt:P31 wd:Q3624078 .
-      OPTIONAL { ?state wdt:P35 ?headOfState . }
-      OPTIONAL { ?state wdt:P6  ?headOfGov . }
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-    }
-  `);
-}
-
-export async function getLegislatures(): Promise<SparqlBinding[]> {
-  return sparqlQuery(`
-    SELECT ?state ?stateLabel ?leg ?legLabel WHERE {
-      ?state wdt:P31 wd:Q3624078 .
-      ?state wdt:P194 ?leg .
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-    }
-  `);
-}
-
 export function extractQid(uri: string): string {
   const match = uri.match(/Q\d+$/);
   return match ? match[0] : uri;

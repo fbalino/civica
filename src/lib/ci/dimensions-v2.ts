@@ -60,13 +60,6 @@ export const V2_MANDATORY: readonly CIDimensionV2[] = [
   "rule_of_law",
 ] as const;
 
-/** Optional dimensions — if one is missing, partial CI; if both are
- * missing AND mandatory dimensions are present, also partial. */
-export const V2_OPTIONAL: readonly CIDimensionV2[] = [
-  "freedom_rights",
-  "corruption_control",
-] as const;
-
 /** Display labels for the Beta-era dimensions. */
 export const V2_DIMENSION_LABELS: Record<CIDimensionV2, string> = {
   democratic_quality: "Democratic quality",

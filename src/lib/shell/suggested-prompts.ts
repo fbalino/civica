@@ -7,12 +7,6 @@ export const LANDING_PROMPTS: AskCivicaSuggestion[] = [
   { q: "Show me the countries that improved most last year", label: "Most-improved" },
 ];
 
-export const ATLAS_MAP_PROMPTS: AskCivicaSuggestion[] = [
-  { q: "Give me a quick tour of the Atlas.", label: "How to use the Atlas" },
-  { q: "Which countries are marked as strong democracies?", label: "Strong democracies" },
-  { q: "Show me the most unstable regions right now.", label: "Unstable regions" },
-];
-
 export const ATLAS_COUNTRY_PROMPTS: AskCivicaSuggestion[] = [
   { q: "Who has the majority and how stable is the coalition?", label: "Majority stability" },
   { q: "What's the most controversial bill in motion right now?", label: "Controversial bill" },
@@ -25,13 +19,6 @@ export const COMPARE_PROMPTS: AskCivicaSuggestion[] = [
   { q: "Compare their electoral systems.", label: "Electoral systems" },
   { q: "Which has the stronger executive?", label: "Stronger executive" },
   { q: "How do their governance scores differ and why?", label: "Score differences" },
-];
-
-export const CI_INDEX_PROMPTS: AskCivicaSuggestion[] = [
-  { q: "Why do Nordic countries score so high?", label: "Why Nordics score high" },
-  { q: "What drives the gap between parliamentary and presidential systems?", label: "Parliamentary vs Presidential" },
-  { q: "Explain the Pulse dimension — how does it work?", label: "What is Pulse?" },
-  { q: "Which country has improved most in the last year?", label: "Most-improved" },
 ];
 
 export const ATLAS_ORG_PROMPTS: AskCivicaSuggestion[] = [

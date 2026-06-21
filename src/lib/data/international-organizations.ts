@@ -592,10 +592,6 @@ export function getMemberCount(orgId: string): number {
   );
 }
 
-export function getHighlightedMemberCount(orgId: string): number {
-  return MEMBERSHIPS.filter((m) => m.orgId === orgId).length;
-}
-
 export function getCoMembers(countryId: string): Array<{ countryId: string; sharedCount: number }> {
   const myOrgs = new Set(MEMBERSHIPS.filter((m) => m.countryId === countryId).map((m) => m.orgId));
   const counts = new Map<string, number>();

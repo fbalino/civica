@@ -31,13 +31,6 @@ function getAnthropic(): Anthropic {
   return _anthropic;
 }
 
-export interface SummarizeInput {
-  /** Stable cache key — typically `${iso2}::${title.slice(0, 120)}`. */
-  cacheKey: string;
-  /** Title (or longTitle if available) used in the prompt to Claude. */
-  promptTitle: string;
-}
-
 /** Builds the same `${iso2}::${title}` cache key the route used to use. */
 export function makeCacheKey(iso2: string, billTitle: string): string {
   return `${iso2}::${billTitle.slice(0, 120)}`;
@@ -160,37 +153,3 @@ export async function writeCachedSummary(
   }
 }
 
-/**
- * Convenience wrapper used by sync scripts. For each input, look up
- * cached summary; for cache misses, batch-generate via Claude and
- * write back. Returns parallel array of summaries (possibly `""`).
- */
-export async function summarizeBills(
-  db: Db,
-  items: Array<SummarizeInput>,
-): Promise<string[]> {
-  if (items.length === 0) return [];
-  const cached = await readCachedSummaries(
-    db,
-    items.map((i) => i.cacheKey),
-  );
-  const missingIdx = cached
-    .map((s, i) => (s === null ? i : -1))
-    .filter((i) => i >= 0);
-  if (missingIdx.length === 0) return cached.map((s) => s ?? "");
-
-  const generated = await generateSummariesBatch(
-    missingIdx.map((i) => ({ promptTitle: items[i].promptTitle })),
-  );
-
-  await Promise.all(
-    missingIdx.map(async (origIdx, genIdx) => {
-      const summary = generated[genIdx];
-      if (summary) {
-        cached[origIdx] = summary;
-        await writeCachedSummary(db, items[origIdx].cacheKey, summary);
-      }
-    }),
-  );
-  return cached.map((s) => s ?? "");
-}

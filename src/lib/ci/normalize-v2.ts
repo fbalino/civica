@@ -175,8 +175,3 @@ export function displayDimensionScore(
 export function defaultUncertaintyV2(sourceId: string): number {
   return BOUNDS[sourceId as CISourceId]?.defaultUncertainty ?? 5;
 }
-
-/** Type guard / discoverability for tests. */
-export function knownSource(sourceId: string): sourceId is CISourceId {
-  return sourceId in BOUNDS;
-}

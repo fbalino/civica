@@ -47,5 +47,3 @@ export const TERRITORY_ISO2_BY_SLUG: Record<string, string> = {
   "wallis-and-futuna": "WF",
   "western-sahara": "EH",
 };
-
-export const ISO2_ONLY_TERRITORY_SLUGS = Object.keys(TERRITORY_ISO2_BY_SLUG);

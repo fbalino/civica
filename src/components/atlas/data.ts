@@ -370,14 +370,6 @@ export const WORLD_PATHS: Record<string, { label: [number, number]; d: string }>
   nzl: { label: [1680, 790], d: "M1650,770 L1690,775 L1695,805 L1665,815 L1645,795 Z" },
 };
 
-export const NE_ID_TO_OURS: Record<string, string> = {
-  "840": "usa", "124": "can", "484": "mex", "076": "bra", "032": "arg",
-  "826": "gbr", "250": "fra", "724": "esp", "276": "deu", "380": "ita", "643": "rus",
-  "818": "egy", "566": "nga", "710": "zaf", "404": "ken",
-  "156": "chn", "356": "ind", "392": "jpn", "410": "kor", "682": "sau", "360": "idn",
-  "036": "aus", "554": "nzl",
-};
-
 export function getDefaultChamberData(countryId: string): ChamberData {
   return CHAMBERS[countryId] || {
     lower: {
@@ -390,14 +382,3 @@ export function getDefaultChamberData(countryId: string): ChamberData {
   };
 }
 
-export function govDescription(country: Country): string {
-  const g = country.gov.toLowerCase();
-  if (g.includes("monarchy") && g.includes("absolute")) return "an absolute monarchy";
-  if (g.includes("semi-presidential")) return "a semi-presidential republic";
-  if (g.includes("parliamentary monarchy")) return "a parliamentary monarchy";
-  if (g.includes("parliamentary")) return "a parliamentary democracy";
-  if (g.includes("federal")) return "a federal republic";
-  if (g.includes("presidential")) return "a presidential republic";
-  if (g.includes("one-party")) return "a one-party state";
-  return `a ${country.gov.toLowerCase()}`;
-}

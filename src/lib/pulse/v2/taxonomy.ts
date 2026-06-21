@@ -855,10 +855,6 @@ export const EVENT_CATEGORIES: EventCategory[] = [
 export const EVENT_CATEGORY_INDEX: Record<string, EventCategory> =
   Object.fromEntries(EVENT_CATEGORIES.map((c) => [c.id, c]));
 
-export function getCategory(id: string): EventCategory | null {
-  return EVENT_CATEGORY_INDEX[id] ?? null;
-}
-
 export function halfLifeFor(categoryId: string): number {
   return EVENT_CATEGORY_INDEX[categoryId]?.halfLifeDays ?? 90;
 }

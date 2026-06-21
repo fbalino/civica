@@ -22,8 +22,6 @@
  * pairs into the map below, bump LAST_UPDATED.
  */
 
-export const RSF_LAST_UPDATED = "2024-05";
-
 /** Approximate RSF 2024 World Press Freedom Index scores by country
  *  ISO3 code. Higher = freer press. Range 0-100. */
 export const RSF_SCORES_2024: Record<string, number> = {

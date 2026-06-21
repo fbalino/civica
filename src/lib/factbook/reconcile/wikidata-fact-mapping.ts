@@ -137,13 +137,6 @@ export const WIKIDATA_FACT_MAPPING: WikidataFactConfig[] = [
   },
 ];
 
-/** Reverse lookup: fact_key → config, for quick membership check. */
-export function getWikidataConfigForFactKey(
-  factKey: string
-): WikidataFactConfig | undefined {
-  return WIKIDATA_FACT_MAPPING.find((c) => c.factKey === factKey);
-}
-
 /**
  * Apply the unit multiplier to a raw Wikidata numeric value,
  * returning the value in the Civica fact's expected unit.

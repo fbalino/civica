@@ -630,8 +630,3 @@ export function getGovernmentTaxonomyColor(
   }
   return STRUCTURAL_FAMILY_META.other;
 }
-
-export function getStructuralSubtypeLabel(subtype: string | null | undefined) {
-  if (!subtype) return null;
-  return structuralLabelForSubtype(subtype);
-}

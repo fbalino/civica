@@ -38,16 +38,6 @@ export function atlasIdToSlug<T extends HasIdAndSlug>(
   return match?.slug ?? id.toLowerCase();
 }
 
-export function slugToAtlasId<T extends HasIdAndSlug>(
-  slug: string,
-  countries: readonly T[],
-): string | null {
-  const match = countries.find(
-    (c) => c.slug === slug || c.id === slug,
-  );
-  return match?.id ?? null;
-}
-
 export function slugToCountry<T extends HasIdAndSlug>(
   slugOrId: string,
   countries: readonly T[],

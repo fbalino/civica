@@ -4,8 +4,7 @@
  * Defines the canonical shapes used across the v2 pulse pipeline:
  * connectors return `RawEventInput[]`, the orchestrator writes them
  * to the `raw_events` staging table, clustering produces `EventCluster`
- * groupings, the multi-run classifier produces `ClassifierRun[]`, and
- * the scoring step emits `DimensionDelta` rows.
+ * groupings, and the multi-run classifier produces `ClassifierRun[]`.
  */
 
 /** CI-aligned dimensions the Pulse can affect. Stability is published
@@ -91,26 +90,3 @@ export interface ClassifiedEvent {
   description: string;
 }
 
-/** Output of the corroboration step. */
-export interface CorroborationResult {
-  specialistSourceCount: number;
-  newsSourceCount: number;
-  diversityScore: number;
-  pressFreedomScore: number;
-  /** Composite confidence in [0, 1]. Drives whether the event is
-   *  published and how heavily it weights into the dimensional sum. */
-  corroborationConfidence: number;
-  /** True if this event must wait for human review before scoring per
-   *  spec §5.1. */
-  requiresHumanReview: boolean;
-  reviewReason?: string;
-}
-
-/** Final dimensional delta upserted into `pulse_dimensional_deltas`. */
-export interface DimensionDelta {
-  jurisdictionId: string;
-  dimension: PulseDimension;
-  /** Clamped [-15, +10] per spec §4.3 */
-  deltaValue: number;
-  contributingEventIds: string[];
-}

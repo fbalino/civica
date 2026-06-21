@@ -10,7 +10,7 @@
  * Pattern mirrors `src/lib/bills/upsert.ts`.
  */
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { rawEvents } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
@@ -106,26 +106,4 @@ export async function upsertRawEvents(
   );
 
   return { inserted, skippedDuplicate, sourcesStamped };
-}
-
-/**
- * Garbage-collect raw_events rows that have already been clustered and
- * are older than `olderThanDays` (default 7). Run from a maintenance
- * script — not in the daily ingest loop. Returns count of rows deleted.
- */
-export async function gcClusteredRawEvents(
-  db: Db,
-  olderThanDays = 7
-): Promise<number> {
-  const cutoff = new Date(Date.now() - olderThanDays * 24 * 60 * 60 * 1000);
-  const result = await db
-    .delete(rawEvents)
-    .where(
-      and(
-        sql`${rawEvents.clusteredAt} IS NOT NULL`,
-        sql`${rawEvents.clusteredAt} < ${cutoff.toISOString()}`
-      )
-    )
-    .returning({ id: rawEvents.id });
-  return result.length;
 }

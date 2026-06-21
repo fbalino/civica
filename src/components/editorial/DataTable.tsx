@@ -11,16 +11,3 @@ export function DataTable({
   );
 }
 
-export function TableHeader({
-  children,
-  ...props
-}: HTMLAttributes<HTMLTableSectionElement> & { children: ReactNode }) {
-  return <thead {...props}>{children}</thead>;
-}
-
-export function TableRow({
-  children,
-  ...props
-}: HTMLAttributes<HTMLTableRowElement> & { children: ReactNode }) {
-  return <tr {...props}>{children}</tr>;
-}

@@ -60,6 +60,3 @@ export const GOVERNMENT_TAXONOMY_OVERRIDES = {
       "Liechtenstein retains an unusually strong princely executive inside a constitutional monarchy.",
   },
 } as const;
-
-export type GovernmentTaxonomyOverrideKey =
-  keyof typeof GOVERNMENT_TAXONOMY_OVERRIDES;

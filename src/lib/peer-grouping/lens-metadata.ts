@@ -263,7 +263,6 @@ export const MONARCHY_STATUS_META: Record<
 export {
   REGIME_TYPE_META as CGV_REGIME_TYPE_META,
   type RegimeTypeKey as CGVRegimeTypeKey,
-  type RegimeTypeMeta as CGVRegimeTypeMeta,
 };
 
 /* ────────────────────────────────────────────────────────────────

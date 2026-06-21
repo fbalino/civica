@@ -40,13 +40,6 @@ async function loadPipeline(): Promise<Pipeline> {
   return loadingPromise;
 }
 
-/** Embed a single text into a 384-dim vector. */
-export async function embed(text: string): Promise<number[]> {
-  const pipe = await loadPipeline();
-  const result = await pipe(text, { pooling: POOLING, normalize: NORMALIZE });
-  return Array.from(result.data);
-}
-
 /** Embed multiple texts in one call — much faster than embedding
  *  one-at-a-time. */
 export async function embedBatch(texts: string[]): Promise<number[][]> {

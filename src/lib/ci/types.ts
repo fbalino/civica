@@ -26,11 +26,3 @@ export interface IngestionResult {
   globalMaxObserved: number;
 }
 
-export interface SourceAdapterConfig {
-  sourceId: string;
-  dimension: CIDimension;
-  indicator: string;
-  nativeMin: number;
-  nativeMax: number;
-  isInverted: boolean;
-}

@@ -20,8 +20,6 @@
 //   - offices.officeType               → tier inference (head_of_state at top)
 //   - terms (current)                  → who currently occupies each office
 
-import type { db } from "@/lib/db";
-
 // ─── Public data shape (what the renderer consumes) ─────────────────────────
 
 export interface OrgNode {
@@ -315,8 +313,3 @@ export function buildOrgChartFromGovernmentStructure(
 ): OrgChart | null {
   return buildOrgChart({ bodies, offices, currentTerms });
 }
-
-// Imported just to surface the symbol in the type — actual DB usage lives
-// in queries.ts. Keep the TS dependency so a future query-layer move is
-// trivial.
-export type DB = typeof db;

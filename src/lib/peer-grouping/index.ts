@@ -22,7 +22,8 @@
  *       + monarchy_status (small enum)
  *
  * Minimum-n rule: peer bands render only when n ≥ 8. Below that,
- * `getMinimumNFallbackChain()` walks a documented fallback ladder.
+ * each peer-set helper walks a documented fallback ladder and returns
+ * the `fallbackChain` it took as part of its result.
  *
  * Phase F coordination: every read goes through Phase F's resolver
  * via `getCanonicalFactsForJurisdictions()` (F.3.5 batch API). When
@@ -41,7 +42,6 @@ import type {
   WorldBankIncomeGroupKey,
   WorldBankRegionKey,
   VDemRowKey,
-  MonarchyStatusKey,
 } from "@/lib/peer-grouping/lens-metadata";
 
 /* ────────────────────────────────────────────────────────────────
@@ -524,102 +524,3 @@ export async function getRegimeAlternateLens(
   };
 }
 
-/* ────────────────────────────────────────────────────────────────
- * Constitutional form (descriptive metadata, not a peer set)
- * ──────────────────────────────────────────────────────────────── */
-
-export interface ConstitutionalForm {
-  /** Free-text description from CIA Factbook. */
-  description: string | null;
-  /** 6-value enum from the implementation plan §C-Q2. May be `null`
-   *  when Phase F hasn't backfilled `monarchy_status` for this jurisdiction. */
-  monarchyStatus: MonarchyStatusKey | string | null;
-  /** Provenance for the description (CIA Factbook is frozen Jan 2026). */
-  descriptionSourceId: string | null;
-  descriptionRetrievedAt: string | null;
-  /** Provenance for the monarchy_status enum value. */
-  monarchyStatusSourceId: string | null;
-  monarchyStatusRetrievedAt: string | null;
-}
-
-export async function getConstitutionalForm(
-  jurisdictionId: string,
-): Promise<ConstitutionalForm> {
-  const resolved = await getCanonicalFactsForJurisdictions(
-    [jurisdictionId],
-    [
-      PEER_GROUPING_FACT_KEYS.governmentFormDescription,
-      PEER_GROUPING_FACT_KEYS.governmentType,
-      PEER_GROUPING_FACT_KEYS.monarchyStatus,
-    ],
-  );
-  const perJur = resolved[jurisdictionId] ?? {};
-
-  // Prefer the explicit `government_form_description` fact-key when
-  // populated; fall back to the legacy `government_type` descriptor.
-  const descRow =
-    perJur[PEER_GROUPING_FACT_KEYS.governmentFormDescription]?.canonical ??
-    perJur[PEER_GROUPING_FACT_KEYS.governmentType]?.canonical ??
-    null;
-  const monarchyRow =
-    perJur[PEER_GROUPING_FACT_KEYS.monarchyStatus]?.canonical ?? null;
-
-  return {
-    description: descRow?.factValue ?? null,
-    monarchyStatus: monarchyRow?.factValue ?? null,
-    descriptionSourceId: descRow?.sourceId ?? null,
-    descriptionRetrievedAt: descRow?.retrievedAt ?? null,
-    monarchyStatusSourceId: monarchyRow?.sourceId ?? null,
-    monarchyStatusRetrievedAt: monarchyRow?.retrievedAt ?? null,
-  };
-}
-
-/* ────────────────────────────────────────────────────────────────
- * Programmatic fallback-chain helper
- * ──────────────────────────────────────────────────────────────── */
-
-/**
- * Compute the fallback chain for a (jurisdiction, lens) pair without
- * running the full peer-set computation. Useful for the methodology
- * page's "fallback indicator" UX preview and for tests that want to
- * assert behavior across the chain.
- *
- * For surfaces that need the actual peer set, call
- * `getMaterialPeerSet()` / `getGovernancePeerSet()` /
- * `getRegimeAlternateLens()` directly — they return the same
- * `fallbackChain` field as part of their result.
- */
-export async function getMinimumNFallbackChain(
-  jurisdictionId: string,
-  lens: PeerLensName,
-  threshold: number = DEFAULT_MIN_N,
-): Promise<{
-  used: PeerLensName | "global";
-  reasons: PeerSetFallbackReason[];
-}> {
-  switch (lens) {
-    case "world_bank_region":
-    case "world_bank_income_group": {
-      const result = await getMaterialPeerSet(jurisdictionId, {
-        minN: threshold,
-      });
-      return { used: result.lensUsed, reasons: result.fallbackChain };
-    }
-    case "vdem_row": {
-      const result = await getGovernancePeerSet(jurisdictionId, {
-        minN: threshold,
-      });
-      return { used: result.lensUsed, reasons: result.fallbackChain };
-    }
-    case "cgv_regime": {
-      const result = await getRegimeAlternateLens(jurisdictionId, {
-        minN: threshold,
-      });
-      return { used: result.lensUsed, reasons: result.fallbackChain };
-    }
-    case "monarchy_status":
-      // monarchy_status is descriptive metadata, not a peer-grouping
-      // primitive — there's no fallback chain to walk.
-      return { used: "global", reasons: ["no_classification"] };
-  }
-}

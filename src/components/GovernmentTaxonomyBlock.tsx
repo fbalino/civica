@@ -78,11 +78,10 @@ export function GovernmentTaxonomyBlock({
     // Phase 3e (structural_family removal) — the structural-family
     // and structural-subtype labels were retired with the heuristic
     // taxonomy on 2026-05-02. The `government_form_description` slot
-    // now lives on Phase F's canonical fact layer; surfaces that need
-    // the descriptive constitutional-form sentence should call
-    // `getConstitutionalForm()` from `@/lib/peer-grouping`. This block
-    // is no longer the canonical home for that fact and stops
-    // emitting a "Structure" row.
+    // now lives on Phase F's canonical fact layer (read it via the
+    // resolver in `@/lib/factbook/reconcile/api`). This block is no
+    // longer the canonical home for that fact and stops emitting a
+    // "Structure" row.
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 
   return (

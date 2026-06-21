@@ -167,7 +167,3 @@ export const STRUCTURAL_GOVERNMENT_TYPES: StructuralGovernmentTypeInfo[] = [
     color: STRUCTURAL_FAMILY_META.directorial_republic.fallback,
   },
 ];
-
-export function getStructuralGovernmentTypeBySlug(slug: string) {
-  return STRUCTURAL_GOVERNMENT_TYPES.find((item) => item.slug === slug);
-}
