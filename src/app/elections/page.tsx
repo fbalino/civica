@@ -11,7 +11,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Election Timeline & Results — Upcoming and Past Elections Worldwide",
   description:
-    "Track upcoming and past elections worldwide. Voter turnout data, party-colored results, electoral system labels, and historical timelines for 200+ countries.",
+    "Track upcoming and past elections worldwide. Voter turnout data, party-colored results, electoral system labels, and historical timelines for a growing set of countries.",
   alternates: { canonical: "https://civicaatlas.org/elections" },
   openGraph: withOg({
     title: "Election Timeline & Results | Civica",

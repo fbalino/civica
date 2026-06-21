@@ -280,7 +280,9 @@ export default async function AboutPage() {
                 margin: 0,
               }}
             >
-              A daily, event-driven directional signal layered on the Index.
+              An event-driven directional signal layered on the Index. Its
+              automated daily refresh is currently paused, so published values
+              reflect the most recent completed run rather than a live feed.
               Multi-run LLM classifier with three-temperature agreement scoring,
               asymmetric corroboration rules, severity-tier human review.
               Backtested against {pulse.backtest.cases.length} named historical

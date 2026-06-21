@@ -1,5 +1,89 @@
 # Project Memory Sessions
 
+## 2026-06-20 — Blind audit + architecture sweep + feature research (read-only; no code changed)
+
+Ran a blind multi-agent audit (124 agents across 2 workflows: 6 architecture
+maps + 15 blind finders + adversarial skeptic per finding; then a 3-piece
+gap-fill re-run for the CI map, Pulse map, and Pulse-calc finder that died
+mid-response). In parallel, a research track (OWID/V-Dem/World Bank/etc.)
+produced a cited architecture+features report. Two deliverables in
+`~/civica/plan/`:
+- `civica-blind-audit-2026-06-20.md` — architecture explainer (6 subsystems),
+  86 verified findings (~15 high / ~26 med / ~45 low), 13 refuted, root-cause
+  rollup, sequencing.
+- `civica-architecture-and-features-research-2026-06-20.md` — peer benchmarking
+  + citability gaps + top-10 feature roadmap (111 cited URLs).
+
+Headline confirmed bugs (NOT yet fixed — read-only audit):
+- CI Freedom & Rights dimension computed on wrong scale (ingest feeds FH 1-7
+  avg; normalize-v2 expects 2-14 sum) → autocracies flattered (SAU 58 not 0).
+  Verified by hand: scripts/ingest-ci-freedom-house.ts:42 vs normalize-v2.ts:83.
+- ~4 CI query helpers omit `methodology_version` → v1.0/beta mix (zig-zag
+  history, double-counted gov-type avgs). queries.ts:936-1014.
+- Rankings double-count countries (no active/canonical dedup). queries.ts:251.
+- Pulse upsert.ts:98 + classify.ts:478 fake last_sync_at on zero-insert/non-fetch
+  passes (validator allowlists them → false green).
+- SourceDot.tsx:42 treats only cia_factbook as frozen → green "live" dot over
+  all frozen quarterly sources incl. CI itself (contradicts /about legend).
+- Pulse published methodology advertises anti-gaming rules (announcement-30%,
+  state-media-50%, press-freedom hold-for-review) not enforced in code
+  (corroborate.ts is a multiplier, not a gate).
+- Undocumented "v2" visual migration: live site = Bronze/Parchment + SOFT
+  shadows; DESIGN.md/CLAUDE.md still say cinnabar/paper + HARD; embed = 3rd
+  divergent look; `--shadow-hard` token is now soft.
+Root causes (fix once → many findings): methodology_version filter, SourceDot
+frozen-map, read-path fact dedup, corroboration-as-gate, the v2 visual-migration
+doc reconciliation, and the 18x copy-pasted factbook sync adapters.
+Next.js 16 compliance verified clean. Owner can supply a private known-examples
+list for a recall check (blind-audit step 3) — not done this session.
+
+### Remediation applied same session (code changes uncommitted in working tree)
+- **CI methodology_version filters**: getCICountryHistory, compareCICountries
+  (composites+dimensions), getCIByGovernmentTypeDots, getGovTypeTrajectory now
+  pin `methodology_version='beta'` (queries.ts). Fixes zig-zag history +
+  double-counted gov-type aggregates.
+- **SourceDot frozen set** expanded from just cia_factbook to all frozen
+  academic/quarterly vintages incl. civica_curated (SourceDot.tsx) → green now
+  reserved for genuinely live feeds.
+- **Bills tab**: stopped stamping today's date (retrievedAt={null}); replaced
+  false "Data refreshes hourly" with "fetched live from the official feed".
+- **Freedom House scale**: ingest-ci-freedom-house.ts now emits the 2–14 SUM
+  (avg×2) matching normalize-v2 + methodology. IMPORTANT: the live displayed
+  beta data (2024-Q4) was ALREADY on the correct 2–14 scale (SAU raw 14→0,
+  USA 4→83.3), so this was a latent re-run landmine — NO prod recompute was
+  needed. The buggy 1–7 values only ever existed under 2023-Q4 v1.0 (retired).
+- **Pulse freshness faking** fixed: upsert.ts now stamps via markSourcesSynced
+  gated on inserted>0; classify.ts no longer stamps during the non-fetch
+  classifier pass. Removed both from validate-sync-freshness ALLOWLIST → now
+  only source-freshness.ts is allowlisted (validator passes: 1 allowlisted, 0
+  offenders).
+- **Honesty copy**: /about Pulse "daily" → paused-caveat wording; /elections
+  "200+ countries" → "a growing set of countries" (DB had 22); data-approach.md
+  CI "published and stable" → "published but still in active development".
+- Verified: `tsc --noEmit` exit 0, validate:sync-freshness + content-templates
+  green, browser-checked /civica-index/burma (CI breakdown reconciles, FH 8/100
+  for the junta, frozen "Quarterly cadence" dot).
+
+### Pulse country re-attribution (DATA FIX applied to prod)
+Owner reported events attributed to wrong country (source-language/outlet, not
+subject — e.g. a Portuguese story about US politics → Brazil). Built
+`scripts/reattribute-pulse-country.ts`: an LLM pass (claude-sonnet-4-6,
+ANTHROPIC_API_KEY_PULSE_CLASSIFIER) that classifies each pulse_events_v2 row by
+its SUBJECT country, ignoring text language/outlet. Dry-run then --apply.
+Result: of 135 v2 events, **64 (47%) were misattributed and corrected**, 70
+already correct, 1 flagged. Then cleared pulse_dimensional_deltas and recomputed
+(calculateDimensionalDeltas): 103 published events, 49 countries, 45 significant
+deltas. E.g. Myanmar/Burma went from scattered (Suu Kyi events tagged
+DNK/MYS/IND/CAN/DEU/IT) to 27 events, rule_of_law delta −15; Ukraine, Hungary,
+Antigua, Cuba all corrected. Report: ~/civica/plan/pulse-reattribution-2026-06-20.md.
+NOT done (deferred / needs owner call): the DURABLE fix — wiring this LLM
+subject-attribution step into the v2 ingest/classify pipeline before un-pausing
+Pulse (owner said "for now" just fix existing). v1 pulse_events (462, deprecated,
+not displayed) left unchanged. Did NOT touch: rankings dedup (latent),
+design-system v2-fork reconciliation (needs owner decision), Pulse
+corroboration-as-gate + announcement/state-media rules (part of owner's planned
+Pulse methodology rework), admin-cookie-raw-key / XFF security.
+
 ## 2026-06-07 — Deep-audit remediation + domain fix (shipped to prod)
 
 Implemented the deep-audit high/medium fixes across many delegated agents,

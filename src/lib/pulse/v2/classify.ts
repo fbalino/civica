@@ -66,6 +66,7 @@ function getAnthropic(): Anthropic {
 // Single source of truth for the classifier prompt — shared with
 // backtest.ts so both paths classify identically.
 import { CLASSIFIER_SYSTEM_PROMPT } from "./classifier-prompt";
+import { resolveSubjectJurisdiction } from "./country-attribution";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
@@ -146,6 +147,17 @@ export async function classifyClusters(
       }
       // Narrowed: result is ClassifyOneResult here
       const ok = result as ClassifyOneResult;
+      // Correct the country attribution to the event's SUBJECT country.
+      // The cluster's jurisdiction came from the cheap mention/source-
+      // language resolver, which mis-files e.g. a Chinese-language story
+      // about US redistricting under Taiwan. Re-attribute by subject so
+      // the scored/displayed event lands on the right country.
+      const subject = await resolveSubjectJurisdiction(
+        db,
+        ok.classified.headline,
+        ok.classified.description
+      );
+      if (subject) ok.classified.jurisdictionId = subject.jurisdictionId;
       await writeEvent(db, cluster, ok);
       summary.classified++;
       if (ok.autoPublished) summary.publishedAuto++;
@@ -475,19 +487,15 @@ async function writeEvent(
     });
   }
 
-  // Stamp the sources we touched (already done at ingest, but stamp
-  // again for the classifier pass — useful for debugging "when was
-  // this event first classified?").
-  const distinctSources = Array.from(new Set(cluster.attributions.map((a) => a.sourceId)));
-  for (const sourceId of distinctSources) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, sourceId));
-  }
+  // NOTE: freshness is stamped ONLY at ingest time (upsert.ts), gated on
+  // rows actually written. The classifier pass performs no upstream fetch,
+  // so it must NOT advance sources.last_sync_at — doing so overstates how
+  // fresh the underlying source data is (a load-bearing provenance signal).
 }
 
 // Suppress unused imports the build doesn't strip:
 void rawEvents;
 void and;
+void sources;
+void eq;
 void isNull;

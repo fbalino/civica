@@ -52,8 +52,6 @@ import path from "node:path";
 
 const ALLOWLIST = new Set<string>([
   "src/lib/db/source-freshness.ts",
-  "src/lib/pulse/v2/upsert.ts",
-  "src/lib/pulse/v2/classify.ts",
 ]);
 
 /** Directories scanned for sync code. */

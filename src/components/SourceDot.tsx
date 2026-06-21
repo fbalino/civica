@@ -39,7 +39,31 @@ const SOURCE_NAMES: Record<string, string> = {
   google_news: "Google News",
 };
 
-const FROZEN_SOURCES = new Set(["cia_factbook"]);
+// Sources whose data is a frozen annual/quarterly vintage (not a live feed).
+// The /about + data-approach legend defines green = "live or regularly updated"
+// and amber = "frozen archive", so every academic reference vintage and the
+// quarterly Civica Index composite itself must read amber — not just the CIA
+// Factbook. Genuinely live/cron-synced feeds (wikidata, parliament/bills,
+// World Bank WDI, Pulse news wires) stay green by omission.
+const FROZEN_SOURCES = new Set([
+  "cia_factbook",
+  "vdem",
+  "vdem_pulse",
+  "worldbank_wgi",
+  "worldbank_wgi_corruption",
+  "undp_hdi",
+  "freedom_house",
+  "transparency_intl",
+  "global_peace_index",
+  "fragile_states_index",
+  "rsf_press_freedom",
+  "rsf_alerts",
+  "world_happiness",
+  "bjornskov_rode",
+  "constitute_project",
+  "unodc",
+  "civica_curated",
+]);
 
 function formatDate(value: string | null | undefined): string {
   if (!value) return "Not yet synced";

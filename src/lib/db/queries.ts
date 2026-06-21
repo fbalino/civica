@@ -1,4 +1,4 @@
-import { eq, desc, asc, sql } from "drizzle-orm";
+import { eq, and, desc, asc, sql } from "drizzle-orm";
 import { db } from "./index";
 import {
   buildGovernmentClassificationMap,
@@ -933,7 +933,10 @@ export async function getCICountryDetail(
   };
 }
 
-export async function getCICountryHistory(slug: string) {
+export async function getCICountryHistory(
+  slug: string,
+  methodologyVersion: string = "beta",
+) {
   const jurisdiction = await db
     .select({ id: jurisdictions.id })
     .from(jurisdictions)
@@ -942,6 +945,9 @@ export async function getCICountryHistory(slug: string) {
 
   if (!jurisdiction[0]) return [];
 
+  // Filter to a single methodology version — without this the chart mixes
+  // retired v1.0 and live beta rows for the same quarter, producing a
+  // duplicate-quarter zig-zag timeline.
   return db
     .select({
       quarter: ciCompositeScores.quarter,
@@ -951,7 +957,12 @@ export async function getCICountryHistory(slug: string) {
       isPartial: ciCompositeScores.isPartial,
     })
     .from(ciCompositeScores)
-    .where(eq(ciCompositeScores.jurisdictionId, jurisdiction[0].id))
+    .where(
+      and(
+        eq(ciCompositeScores.jurisdictionId, jurisdiction[0].id),
+        eq(ciCompositeScores.methodologyVersion, methodologyVersion),
+      ),
+    )
     .orderBy(asc(ciCompositeScores.quarter));
 }
 
@@ -967,18 +978,21 @@ export async function compareCICountries(slugs: string[], quarter?: string) {
   const jIds = countries.map((c) => c.id);
   if (jIds.length === 0) return [];
 
+  // Pin the methodology version (beta) so /compare and /api/v1/index/compare
+  // never surface a legacy v1.0 score that disagrees with the country page,
+  // leaderboard, and detail API (all beta-only).
   const composites = await db
     .select()
     .from(ciCompositeScores)
     .where(
-      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q}`
+      sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q} AND ${ciCompositeScores.methodologyVersion} = ${"beta"}`
     );
 
   const dimensions = await db
     .select()
     .from(ciDimensionScores)
     .where(
-      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q}`
+      sql`${ciDimensionScores.jurisdictionId} IN ${jIds} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${"beta"}`
     );
 
   const classificationMap = await buildGovernmentClassificationMap(countries);
@@ -1008,6 +1022,7 @@ export async function getCIByGovernmentTypeDots(quarter?: string) {
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
     WHERE cs.quarter = ${q}
+      AND cs.methodology_version = ${"beta"}
       AND j.government_type IS NOT NULL
       AND j.type = 'sovereign_state'
     ORDER BY j.government_type, cs.score DESC
@@ -1053,7 +1068,8 @@ export async function getGovTypeTrajectory() {
       cs.score
     FROM ci_composite_scores cs
     JOIN jurisdictions j ON cs.jurisdiction_id = j.id
-    WHERE j.government_type IS NOT NULL
+    WHERE cs.methodology_version = ${"beta"}
+      AND j.government_type IS NOT NULL
       AND j.type = 'sovereign_state'
     ORDER BY cs.quarter ASC, j.government_type ASC, cs.score DESC
   `);

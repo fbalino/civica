@@ -30,15 +30,22 @@ const FH_2023: Record<string, number> = {
 async function main() {
   console.log("Ingesting Freedom House Freedom in the World ratings...\n");
 
+  // FH_2023 holds the 1–7 Freedom Rating (the AVERAGE of Political Rights and
+  // Civil Liberties). The Civica normalization (src/lib/ci/normalize-v2.ts) and
+  // the published methodology both use the 2–14 SUM scale:
+  // ((14 − score) / 12) × 100. Convert avg → sum here (sum = avg × 2 exactly)
+  // so the stored raw_value matches the normalizer's freedom_house bounds.
+  // Without this, freedom_rights is computed on the wrong scale and flatters
+  // autocracies (e.g. SAU 7.0 → 58/100 instead of the correct 0/100).
   const records: SourceDataRecord[] = Object.entries(FH_2023).map(
-    ([iso3, rawValue]) => ({
+    ([iso3, avgRating]) => ({
       iso3,
       year: 2023,
       dimension: DIMENSION,
       indicator: INDICATOR,
-      rawValue,
-      nativeMin: 1,
-      nativeMax: 7,
+      rawValue: avgRating * 2,
+      nativeMin: 2,
+      nativeMax: 14,
       isInverted: true,
     })
   );

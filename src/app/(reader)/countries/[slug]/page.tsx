@@ -480,7 +480,7 @@ export default async function CountryPage({
               <span>{formatBillDate(bill.date)}</span>
             </>
           )}
-          <SourceDot source={bill.source} retrievedAt={new Date().toISOString().slice(0, 10)} />
+          <SourceDot source={bill.source} retrievedAt={null} />
         </span>
       </a>
     );
@@ -509,7 +509,7 @@ export default async function CountryPage({
               margin: 0,
             }}
           >
-            Showing recent bills. Data refreshes hourly.
+            Showing recent bills, fetched live from the official parliamentary feed.
           </p>
         </>
       ) : parliamentSource ? (
@@ -525,7 +525,7 @@ export default async function CountryPage({
             }}
           >
             Legislative feed temporarily unavailable. Data is sourced from{" "}
-            <SourceDot source={parliamentSource} retrievedAt={new Date().toISOString().slice(0, 10)} />
+            <SourceDot source={parliamentSource} retrievedAt={null} />
           </p>
         </div>
       ) : (

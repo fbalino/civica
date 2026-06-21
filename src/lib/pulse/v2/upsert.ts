@@ -3,16 +3,18 @@
  *
  * Idempotent insert into `raw_events`, keyed by `(sourceId, externalId)`
  * when externalId is non-null, and by `(sourceId, sourceUrl, eventDate)`
- * otherwise. After a successful pass, stamps `sources.last_sync_at =
- * NOW()` for every distinct source — required by AGENTS.md.
+ * otherwise. Freshness (`sources.last_sync_at`) is stamped via the
+ * sanctioned `markSourcesSynced()` helper, and ONLY when this run actually
+ * inserted new rows — a duplicate-only pass must never fake freshness.
  *
  * Pattern mirrors `src/lib/bills/upsert.ts`.
  */
 
 import { and, eq, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
-import { rawEvents, sources } from "@/lib/db/schema";
+import { rawEvents } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
+import { markSourcesSynced } from "@/lib/db/source-freshness";
 import type { RawEventInput } from "./types";
 
 type Db = NeonHttpDatabase<typeof schema>;
@@ -95,14 +97,13 @@ export async function upsertRawEvents(
     inserted++;
   }
 
-  // Stamp lastSyncAt on every distinct source we just touched.
-  const sourcesStamped = Array.from(new Set(rows.map((r) => r.sourceId)));
-  for (const sourceId of sourcesStamped) {
-    await db
-      .update(sources)
-      .set({ lastSyncAt: new Date() })
-      .where(eq(sources.id, sourceId));
-  }
+  // Stamp lastSyncAt via the sanctioned helper — ONLY when this run
+  // actually inserted new rows. A duplicate-only daily run (inserted === 0)
+  // must not advance freshness on every source it merely re-checked.
+  const sourcesStamped = await markSourcesSynced(
+    Array.from(new Set(rows.map((r) => r.sourceId))),
+    { rowsWritten: inserted, executor: db }
+  );
 
   return { inserted, skippedDuplicate, sourcesStamped };
 }
