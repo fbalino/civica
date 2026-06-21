@@ -19,8 +19,6 @@
  * Plan:        ~/civica/plan/phase-f-implementation-plan.md F.2.1
  * Resolution:  ~/Downloads/resolution\ \(2\).md
  */
-import { createHash } from "node:crypto";
-
 import {
   countryFacts,
   factSnapshots,
@@ -28,12 +26,9 @@ import {
 } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 import { getFactKey } from "./fact-keys";
+import { payloadHash } from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
-
-function payloadHash(payload: object): string {
-  return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
-}
 
 /* ────────────────────────────────────────────────────────────────
  * 1. World Bank classifications

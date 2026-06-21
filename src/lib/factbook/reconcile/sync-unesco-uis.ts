@@ -82,7 +82,6 @@
  * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.5
  * Resolution:  ~/civica/plan/unesco-uis-resolution-v1.md
  */
-import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 
 import {
@@ -97,7 +96,7 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
-import type { CivicaSourceRole } from "./sync-wdi";
+import { payloadHash, type CivicaSourceRole } from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -374,12 +373,6 @@ function freshCounters(
     rejected_no_value: 0,
     uis_estimates: 0,
   };
-}
-
-function payloadHash(payload: object): string {
-  return createHash("sha256")
-    .update(JSON.stringify(payload))
-    .digest("hex");
 }
 
 /**

@@ -56,7 +56,6 @@
  * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.3
  * Resolution:  ~/civica/plan/un-data-resolution-v1.md
  */
-import { createHash } from "node:crypto";
 import { sql } from "drizzle-orm";
 import AdmZip from "adm-zip";
 
@@ -71,6 +70,7 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
+import { payloadHash, type CivicaSourceRole } from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -105,14 +105,6 @@ const UN_WPP_VINTAGE = "UN WPP 2024 Revision";
  *       available; we fetch the most recent year's timeID.
  */
 const UN_WPP_TIME_ID = 75;
-
-/**
- * Civica's editorial role for a given (source, fact-key) pair.
- *
- * Same convention as `sync-wdi.ts` and `sync-imf-weo.ts`. Per
- * `~/civica/plan/un-data-resolution-v1.md` §2d.
- */
-export type CivicaSourceRole = "canonical" | "alternate";
 
 /**
  * One UNData PopDiv indicator we care about.
@@ -372,12 +364,6 @@ function freshCounters(
     rejected_no_value: 0,
     skipped_non_medium: 0,
   };
-}
-
-function payloadHash(payload: object): string {
-  return createHash("sha256")
-    .update(JSON.stringify(payload))
-    .digest("hex");
 }
 
 /**

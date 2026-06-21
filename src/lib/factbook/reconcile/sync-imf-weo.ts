@@ -44,7 +44,6 @@
  * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.2
  * Resolution:  ~/civica/plan/imf-weo-resolution-v1.md
  */
-import { createHash } from "node:crypto";
 import { sql } from "drizzle-orm";
 
 import {
@@ -58,6 +57,7 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
+import { payloadHash, type CivicaSourceRole } from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -77,14 +77,6 @@ const IMF_USER_AGENT =
  * match the WB WDI vintage shape ("World Bank WDI 2026Q3").
  */
 const IMF_WEO_VINTAGE_FALLBACK = "IMF WEO 2026 April";
-
-/**
- * Civica's editorial role for a given (source, fact-key) pair.
- *
- * Same convention as `sync-wdi.ts`. Per
- * `~/civica/plan/imf-weo-resolution-v1.md` §2d.
- */
-export type CivicaSourceRole = "canonical" | "alternate";
 
 /**
  * One WEO indicator we care about. Each entry maps an upstream IMF
@@ -327,12 +319,6 @@ function freshCounters(
     rejected_no_value: 0,
     forecast_rows: 0,
   };
-}
-
-function payloadHash(payload: object): string {
-  return createHash("sha256")
-    .update(JSON.stringify(payload))
-    .digest("hex");
 }
 
 /**

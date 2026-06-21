@@ -67,7 +67,6 @@
  *              Q4 — year-based discriminator for ILO modelled
  *              imputation vs. modelled projection)
  */
-import { createHash } from "node:crypto";
 import { sql } from "drizzle-orm";
 
 import {
@@ -81,6 +80,7 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
+import { payloadHash, type CivicaSourceRole } from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -101,15 +101,6 @@ const ILO_USER_AGENT =
  */
 const ILOEST_VINTAGE_FALLBACK = "ILO ILOEST Nov 2025";
 const ILOSDG_VINTAGE_FALLBACK = "ILO SDG Labour Market Indicators 2026";
-
-/**
- * Civica's editorial role for a given (source, fact-key) pair.
- *
- * Same convention as `sync-wdi.ts` / `sync-imf-weo.ts` /
- * `sync-un-data.ts`. Per
- * `~/civica/plan/ilo-ilostat-resolution-v1.md` §2d.
- */
-export type CivicaSourceRole = "canonical" | "alternate";
 
 /**
  * One ILO indicator we care about. Each entry maps an upstream ILOSTAT
@@ -297,12 +288,6 @@ function freshCounters(factKey: string, iloCode: string): PerIloCounters {
     projection_rows: 0,
     imputation_rows: 0,
   };
-}
-
-function payloadHash(payload: object): string {
-  return createHash("sha256")
-    .update(JSON.stringify(payload))
-    .digest("hex");
 }
 
 /**

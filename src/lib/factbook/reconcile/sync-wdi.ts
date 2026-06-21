@@ -36,7 +36,6 @@
  * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.1
  * Resolution:  ~/civica/plan/wb-wdi-expansion-resolution-v1.md
  */
-import { createHash } from "node:crypto";
 import { sql } from "drizzle-orm";
 
 import {
@@ -50,6 +49,12 @@ import {
   persistProposedDisputes,
   type PersistDisputeSummary,
 } from "./dispute-persistence";
+import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+
+// Re-exported for backward compatibility: this type historically lived
+// in this module and is imported as `from "./sync-wdi"` by sibling
+// adapters. Canonical definition now lives in `./_sync-common`.
+export type { CivicaSourceRole };
 
 type Db = typeof import("@/lib/db").db;
 
@@ -63,25 +68,6 @@ const WB_PER_PAGE = 1000;
 const WB_LOOKBACK_YEARS = 10;
 
 const WDI_VINTAGE = "World Bank WDI 2026Q3";
-
-/**
- * Civica's editorial role for a given (source, fact-key) pair.
- *
- * - `canonical` — Civica regards this source as the authoritative
- *   reference for this fact-key (e.g. WB nominal GDP). The Phase F
- *   resolver does NOT use this field for runtime selection (the
- *   resolver is freshness-driven per methodology §3.3); the field
- *   is informational metadata for the methodology page rewrite at
- *   Phase R.23 and for downstream phases (R.3 UN WPP, R.4 WHO,
- *   R.5 UNESCO, R.10 ILO, R.12 WTO) so they inherit the
- *   canonical/alternate assignment without re-deciding.
- * - `alternate` — Civica regards this source as a corroborating
- *   reference; another Tier-1 publisher is or will be canonical.
- *   This is the default when omitted.
- *
- * Per `~/civica/plan/wb-wdi-expansion-resolution-v1.md` §2d.
- */
-export type CivicaSourceRole = "canonical" | "alternate";
 
 /**
  * One WDI indicator we care about. Each entry maps an upstream WB
@@ -429,12 +415,6 @@ function freshCounters(
     rejected_envelope: 0,
     rejected_no_value: 0,
   };
-}
-
-function payloadHash(payload: object): string {
-  return createHash("sha256")
-    .update(JSON.stringify(payload))
-    .digest("hex");
 }
 
 /**
