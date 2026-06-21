@@ -78,7 +78,7 @@ interface ClassifierResultLite {
   rationale: string;
 }
 
-interface ClusterToClassify {
+export interface ClusterToClassify {
   clusterId: string;
   jurisdictionId: string;
   eventDate: string;
@@ -171,7 +171,7 @@ export async function classifyClusters(
   return summary;
 }
 
-interface ClassifyOneResult {
+export interface ClassifyOneResult {
   classified: ClassifiedEvent;
   autoPublished: boolean;
 }
@@ -350,7 +350,7 @@ Body / context:
 ${cluster.body}`;
 }
 
-async function loadUnclassifiedClusters(
+export async function loadUnclassifiedClusters(
   db: Db,
   limit: number
 ): Promise<ClusterToClassify[]> {
@@ -438,7 +438,7 @@ async function loadUnclassifiedClusters(
   });
 }
 
-async function writeEvent(
+export async function writeEvent(
   db: Db,
   cluster: ClusterToClassify,
   result: ClassifyOneResult
