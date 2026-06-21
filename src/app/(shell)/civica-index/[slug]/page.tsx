@@ -24,6 +24,7 @@ import {
 } from "@/lib/peer-grouping";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { V2_WEIGHTS } from "@/lib/ci/dimensions-v2";
 import { civicaIndex } from "@/lib/content/site-state";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
@@ -36,8 +37,9 @@ export const revalidate = 3600;
  * Beta methodology. Human Development and Stability & Security have
  * moved to the Civica Conditions companion layer (rendered separately).
  *
- * Weights here MUST mirror src/lib/ci/dimensions-v2.ts; expressed as
- * integer percentages for display.
+ * Weights come from the canonical source (src/lib/ci/dimensions-v2.ts),
+ * derived to integer percentages for display so the page can never
+ * drift from the methodology.
  */
 const DIMENSION_LABELS: Record<string, string> = {
   democratic_quality: "Democratic Quality",
@@ -53,12 +55,11 @@ const DIMENSION_ORDER = [
   "corruption_control",
 ];
 
-const DIMENSION_WEIGHTS: Record<string, number> = {
-  democratic_quality: 27,
-  rule_of_law: 26,
-  freedom_rights: 23,
-  corruption_control: 24,
-};
+/** Canonical V2 weights (fractional, sum to 1.00) expressed as integer
+ *  percentages for display. Single source of truth: dimensions-v2.ts. */
+const DIMENSION_WEIGHT_PCT: Record<string, number> = Object.fromEntries(
+  Object.entries(V2_WEIGHTS).map(([dim, w]) => [dim, Math.round(w * 100)])
+);
 
 const DIMENSION_SOURCE_LABELS: Record<string, string> = {
   vdem: "V-Dem · Liberal Democracy Index",
@@ -291,7 +292,7 @@ function DimensionScoreTable({
           displayDimensionScore(d.rawValue, d.sourceId) ??
           Number(d.normalizedScore);
         const color = dimensionColor(score);
-        const weight = DIMENSION_WEIGHTS[d.dimension] ?? 0;
+        const weight = DIMENSION_WEIGHT_PCT[d.dimension] ?? 0;
         const contribution = (score * weight) / 100;
         return (
           <div key={d.dimension} className="ci-country-dim-row">
@@ -576,7 +577,10 @@ export default async function CICountryDetailPage({
     factKey?: "capital" | "population_total";
   };
   const heroMeta: HeroMetaItem[] = [
-    taxonomy?.structuralSubtypeLabel ?? taxonomy?.rawLabel ?? jurisdiction.governmentType ?? null,
+    // structural_family taxonomy is retired (2026-05-02). Use the
+    // externally-attested regime-type label as the descriptive form,
+    // falling back to the raw source label / government type.
+    taxonomy?.regimeTypeLabel ?? taxonomy?.rawLabel ?? jurisdiction.governmentType ?? null,
     resolvedCapital,
     formatPopulationCompact(resolvedPopulation),
     jurisdiction.continent ?? null,

@@ -123,6 +123,7 @@ export default async function ReplicationPage() {
             subject="Civica Atlas Methodology — Civica Index replication package"
             pageTitle="Civica Index replication package"
             url="https://civicaatlas.org/civica-index/replication"
+            dataVintage={civicaIndex.lastRevisionIso}
           />
         </section>
 

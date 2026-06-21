@@ -24,10 +24,30 @@ export function decayedImpact(
   return severityValue * corroborationConfidence * Math.exp(-lambda * daysSinceEvent);
 }
 
-/** Days between the event date and today, floored at 0. */
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+/** Floor a Date to UTC midnight (epoch ms). */
+function utcMidnight(date: Date): number {
+  return Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate()
+  );
+}
+
+/**
+ * Days between the event date and today, floored at 0.
+ *
+ * Both sides are normalized to UTC date-only before differencing so the
+ * day count is deterministic regardless of run time or server timezone.
+ * A date-only `eventDate` ("YYYY-MM-DD") parses as UTC midnight; `today`
+ * is likewise floored to UTC midnight, removing the previous off-by-one
+ * drift at day boundaries.
+ */
 export function daysSince(eventDate: string, today = new Date()): number {
-  const d = new Date(eventDate).getTime();
-  if (Number.isNaN(d)) return 0;
-  const t = today.getTime();
-  return Math.max(0, Math.floor((t - d) / (1000 * 60 * 60 * 24)));
+  const parsed = new Date(eventDate);
+  if (Number.isNaN(parsed.getTime())) return 0;
+  const d = utcMidnight(parsed);
+  const t = utcMidnight(today);
+  return Math.max(0, Math.floor((t - d) / MS_PER_DAY));
 }

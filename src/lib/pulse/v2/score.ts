@@ -145,6 +145,7 @@ async function loadPublishedEvents(
     FROM pulse_events_v2
     WHERE published = true
       AND event_date >= ${sinceDate}
+      AND event_date <= CURRENT_DATE
   `);
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
   return (rows as Array<Record<string, unknown>>).map((r) => ({

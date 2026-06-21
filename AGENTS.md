@@ -39,7 +39,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 <!-- END:nextjs-agent-rules -->
 
 ## Database
-- Schema: `src/lib/db/schema.ts` — **26 tables** across government structure, factbook, Civica Index scoring, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **45 tables** across government structure, factbook, Civica Index scoring, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
@@ -80,7 +80,7 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 ## Scripts
 Canonical npm scripts (in `package.json`):
 - `npm run seed:sources` — seed the sources table
-- `npm run seed:factbook` — import CIA World Factbook (clones repo, imports 260+ countries)
+- `npm run seed:factbook` — import CIA World Factbook (clones repo, imports 250+ countries)
 - `npm run sync:wikidata` — sync heads of state/government from Wikidata SPARQL
 - `npm run sync:ipu` — sync IPU Parline legislature data
 - `npm run sync:wikidata-parties` — Wikidata party-seat fallback

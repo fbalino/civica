@@ -136,8 +136,13 @@ export async function decoupleAbsorbedEvents(
   const byDimension: Record<string, number> = {};
   let eventsZeroed = 0;
 
-  // Quarter-start date for the cutoff: assume YYYY-Q[1-4] format.
-  const cutoffDate = quarterStartDate(newQuarter);
+  // Cutoff for the absorbed-event window. A CI vintage is labelled
+  // `${dataYear}-Q4` (see ci/normalize.ts `yearToQuarter`) but absorbs
+  // the FULL calendar data year, not just Q4. So we zero every Pulse
+  // event dated within that data year (and earlier), using an exclusive
+  // cutoff of the first day of the FOLLOWING year — not the quarter
+  // start, which would leave Jan–Sep in-year events to be double-counted.
+  const cutoffDate = absorbedYearCutoffDate(newQuarter);
 
   for (const pair of pairs) {
     byDimension[pair.dimension] = (byDimension[pair.dimension] ?? 0) + 1;
@@ -207,12 +212,27 @@ async function findPreviousQuarter(
   return row ? String(row.quarter) : null;
 }
 
-/** YYYY-Q[1-4] → YYYY-MM-DD of the first day of that quarter. */
-function quarterStartDate(quarter: string): string {
-  const match = quarter.match(/^(\d{4})-Q([1-4])$/);
-  if (!match) return `${quarter}-01-01`;
-  const year = match[1];
-  const q = parseInt(match[2], 10);
-  const month = String((q - 1) * 3 + 1).padStart(2, "0");
-  return `${year}-${month}-01`;
+/**
+ * Exclusive cutoff for the data year a CI vintage absorbs.
+ *
+ * CI vintages are labelled `${dataYear}-Q4` but each represents a full
+ * calendar data year (see ci/normalize.ts `yearToQuarter`). To zero
+ * every Pulse event the new CI release already absorbed, the exclusive
+ * cutoff (used with `event_date < cutoff`) is the first day of the year
+ * AFTER the data year, so the entire absorbed year — Jan through Dec —
+ * is covered. Falls back conservatively to the year after the parsed
+ * year for any non-standard quarter label.
+ */
+function absorbedYearCutoffDate(quarter: string): string {
+  const match = quarter.match(/^(\d{4})-Q[1-4]$/);
+  const dataYear = match ? parseInt(match[1], 10) : NaN;
+  if (Number.isNaN(dataYear)) {
+    // Unparseable label — fall back to the leading 4-digit year if any,
+    // else a far-future cutoff so we err toward zeroing more (the
+    // conservative double-count-prevention choice).
+    const yearMatch = quarter.match(/^(\d{4})/);
+    const year = yearMatch ? parseInt(yearMatch[1], 10) : 9999;
+    return `${year + 1}-01-01`;
+  }
+  return `${dataYear + 1}-01-01`;
 }

@@ -30,7 +30,7 @@ const SOURCE_DESCRIPTIONS: Record<string, string> = {
   ipu_parline:
     "Inter-Parliamentary Union database on national parliaments. Provides chamber composition, electoral systems, and parliamentary structure for legislatures worldwide.",
   constitute_project:
-    "Full-text constitution database covering 200+ countries. Searchable constitutional texts, amendment histories, and comparative constitutional data.",
+    "Full-text constitution database. Civica draws on a growing set of constitutional texts, amendment histories, and comparative constitutional data for selected jurisdictions.",
   parlgov:
     "Political party and election data for established democracies. Covers party positions, election results, and cabinet composition across parliamentary systems.",
   congress_gov:
