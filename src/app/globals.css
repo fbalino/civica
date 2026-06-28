@@ -2,14 +2,15 @@
 
 
 /* ============================================================
-   Civica Design System v2 — editorial / cartographic palette
-   Fonts: Fraunces (headings) + Inter (body) + ui-monospace (data)
-   Light-only. Dark mode is deferred to a later workstream.
+   Civica Design System — almanac / antique-atlas language
+   Fonts: Source Serif 4 (display) + Inter (UI/body)
+   Light + dark both implemented. Palette extracted from the
+   canonical mockups (see plan/design-language-extraction-v1.md).
    ============================================================ */
 
 @theme inline {
   /* --- Typography families --- */
-  --font-heading: var(--font-fraunces), "Georgia", "Times New Roman", serif;
+  --font-heading: var(--font-source-serif), "Georgia", "Times New Roman", serif;
   --font-body: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --font-body-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --font-serif: var(--font-heading);
@@ -62,34 +63,34 @@
   --tracking-caps: 0.15em;
   --tracking-widest: 0.2em;
 
-  /* --- Source provenance dots (v2 success / warning) --- */
-  --color-source-live: #2E7D59;
-  --color-source-frozen: #E0A800;
+  /* --- Source provenance dots --- */
+  --color-source-live: #2E7D55;
+  --color-source-frozen: #C08F3E;
 
-  /* --- Government type colors (v2 brand foundation) --- */
-  --color-gov-presidential: #C25D3A;        /* Terracotta */
-  --color-gov-parliamentary: #2D6CDF;       /* Azure */
-  --color-gov-semi-presidential: #7C59C9;   /* Violet */
-  --color-gov-theocratic: #4C9F6E;          /* Leaf */
-  --color-gov-absolute: #C9A24B;            /* Gold */
-  --color-gov-other: #64748B;               /* Stone */
+  /* --- Government type colors (almanac foundation, DS-3 §02/§04) --- */
+  --color-gov-presidential: #B7512B;        /* Terracotta */
+  --color-gov-parliamentary: #1C5BC3;       /* Azure */
+  --color-gov-semi-presidential: #6749AB;   /* Violet */
+  --color-gov-theocratic: #418460;          /* Leaf */
+  --color-gov-absolute: #C08F3E;            /* Gold */
+  --color-gov-other: #6A7688;               /* Steel */
 
   /* Short aliases used by /civica-index/government-types */
-  --gov-parl: #2D6CDF;   /* Azure */
-  --gov-pres: #C25D3A;   /* Terracotta */
-  --gov-semi: #7C59C9;   /* Violet */
-  --gov-mon:  #C9A24B;   /* Gold */
-  --gov-abs:  #CC4C7A;   /* Rose */
-  --gov-theo: #4C9F6E;   /* Leaf */
-  --gov-one:  #334155;   /* Slate */
-  --gov-mil:  #1F2937;   /* Charcoal */
-  --gov-other:#64748B;   /* Stone */
+  --gov-parl: #1C5BC3;   /* Azure */
+  --gov-pres: #B7512B;   /* Terracotta */
+  --gov-semi: #6749AB;   /* Violet */
+  --gov-mon:  #C08F3E;   /* Gold */
+  --gov-abs:  #B93D67;   /* Rose */
+  --gov-theo: #418460;   /* Leaf */
+  --gov-one:  #4D4C71;   /* Indigo */
+  --gov-mil:  #2A3648;   /* Slate */
+  --gov-other:#6A7688;   /* Steel */
 
-  /* --- Government branch colors (v2 mapping) --- */
-  --color-branch-executive: #C25D3A;     /* Terracotta */
-  --color-branch-legislative: #2D6CDF;   /* Azure */
-  --color-branch-judicial: #6B7566;      /* Sage */
-  --color-branch-monarchy: #7C59C9;      /* Violet */
+  /* --- Government branch colors --- */
+  --color-branch-executive: #B7512B;     /* Terracotta */
+  --color-branch-legislative: #1C5BC3;   /* Azure */
+  --color-branch-judicial: #686F5F;      /* Sage */
+  --color-branch-monarchy: #6749AB;      /* Violet */
 
   /* --- Peer-grouping lens tokens (peer-grouping-resolution-v1) ---
      Material lenses (World Bank region + income) get their own
@@ -130,37 +131,39 @@
   --space-8: 48px;
   --space-9: 64px;
 
-  /* --- Radii (v2 — softer, rounded controls + cards) --- */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  /* --- Radii (DS-4 §04 radius scale) --- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
 
-  /* --- Surface palette (v2 light) --- */
-  --color-bg: #FAF7F2;                 /* Parchment */
+  /* --- Surface palette (almanac light) --- */
+  --color-bg: #FAF7F2;                 /* Ivory paper */
   --color-bg-nav: color-mix(in oklab, #FAF7F2 92%, transparent);
-  --color-surface-elevated: #FFFCF8;   /* Canvas */
-  --color-select-bg: #F2F4F7;          /* alt surface */
+  --color-surface-elevated: #FFFFFF;   /* Elevated card */
+  --color-select-bg: #F3EFE6;          /* Well / alt surface */
 
-  --color-text-primary: #0B1220;       /* Ink */
-  --color-text-85: rgba(11, 18, 32, 0.88);
-  --color-text-60: #334155;            /* Slate */
-  --color-text-50: #475569;
-  --color-text-40: #64748B;            /* Stone */
-  --color-text-30: #94A3B8;            /* Pewter */
-  --color-text-25: rgba(11, 18, 32, 0.42);
-  --color-text-20: rgba(11, 18, 32, 0.32);
+  --color-text-primary: #0B1B2D;       /* Ink navy */
+  --color-text-85: rgba(11, 27, 45, 0.88);
+  --color-text-60: #2A3648;            /* Slate */
+  --color-text-50: #44505F;
+  --color-text-40: #6A7688;            /* Steel */
+  --color-text-30: #A7AFBC;            /* Mist */
+  --color-text-25: rgba(11, 27, 45, 0.42);
+  --color-text-20: rgba(11, 27, 45, 0.32);
 
-  --color-accent: #A87241;             /* Bronze — replaces v1 cinnabar */
+  --color-accent: #B7512B;             /* Terracotta — editorial signal */
 
-  --color-card-bg: #FFFCF8;
-  --color-card-border: #E4E7EC;
-  --color-card-hover-bg: #F6F2EB;
-  --color-card-hover-border: #94A3B8;
-  --color-divider: #E4E7EC;
+  --color-card-bg: #FFFFFF;
+  --color-card-border: #E4E1DC;
+  --color-card-hover-bg: #F6F2EA;
+  --color-card-hover-border: #D2CEC5;
+  --color-divider: #E4E1DC;
   --color-branch-border-alpha: 44;
-  --color-stat-border: #ECEFF3;
-  --color-selection: rgba(168, 114, 65, 0.18);
+  --color-stat-border: #EDE9E2;
+  --color-selection: rgba(183, 81, 43, 0.16);
   --color-surface-primary: var(--color-bg);
   --color-surface-secondary: var(--color-surface-elevated);
   --color-surface-tertiary: var(--color-select-bg);
@@ -170,22 +173,22 @@
   --color-border-strong: var(--color-text-primary);
   --color-page-bg: var(--color-bg);
 
-  --color-grid-bg: #FFFCF8;
+  --color-grid-bg: #FFFFFF;
   --color-grid-cell: #FAF7F2;
-  --color-grid-cell-hover: #F2F4F7;
-  --color-grid-row-hover: #F6F2EB;
+  --color-grid-cell-hover: #F3EFE6;
+  --color-grid-row-hover: #F6F2EA;
 
-  --color-tooltip-bg: #FFFCF8;
-  --color-tooltip-text: #334155;
-  --color-tooltip-border: #E4E7EC;
+  --color-tooltip-bg: #FFFFFF;
+  --color-tooltip-text: #2A3648;
+  --color-tooltip-border: #E4E1DC;
 
-  --color-hemi-seat-text: rgba(11, 18, 32, 0.32);
+  --color-hemi-seat-text: rgba(11, 27, 45, 0.32);
 
-  /* --- Signal colors (v2) --- */
-  --color-success: #2E7D59;
-  --color-warn:    #E0A800;
-  --color-danger:  #C62828;
-  --color-info:    #1565C0;
+  /* --- Signal colors (almanac, DS-3 §06) --- */
+  --color-success: #2E7D55;
+  --color-warn:    #C08F3E;
+  --color-danger:  #B71413;
+  --color-info:    #1C5BC3;
   /* Darkened warn tone for small beta-pill text/border on the light
      surface — pushes 12px label past the WCAG AA 4.5:1 floor where the
      default --color-warn lands ~3.5:1. Light-theme only; dark uses --color-warn. */
@@ -196,49 +199,51 @@
   --color-status-info:    var(--color-info);
 
   /* --- StatusDot role tokens --- */
-  --color-status-active: #2E7D59;     /* same green as --color-success / source-live */
-  --color-status-idle:   #94A3B8;     /* Pewter */
-  --color-status-warn:   #E0A800;     /* same amber as --color-source-frozen */
-  --color-status-down:   #C62828;     /* same as --color-danger */
-  --color-on-warning: #0B1220;
-  --color-on-accent:  #FFFCF8;
+  --color-status-active: #2E7D55;     /* same green as --color-success / source-live */
+  --color-status-idle:   #A7AFBC;     /* Mist */
+  --color-status-warn:   #C08F3E;     /* Gold */
+  --color-status-down:   #B71413;     /* same as --color-danger */
+  --color-on-warning: #0B1B2D;
+  --color-on-accent:  #FFFFFF;
 
-  /* --- Civica Index tier tokens (0–100 scale, v2 brand foundation) --- */
-  --tier-exceptional: #0B3D4E;   /* Deep Teal */
-  --tier-strong:      #6B7566;   /* Sage */
-  --tier-mixed:       #C9A24B;   /* Gold */
-  --tier-weak:        #A87241;   /* Bronze */
-  --tier-failed:      #C25D3A;   /* Terracotta */
+  /* --- Civica Index tier tokens (0–100; almanac ramp, verify vs DS-9) --- */
+  --tier-exceptional: #0B4250;   /* Deep Teal */
+  --tier-strong:      #2E7D55;   /* Green */
+  --tier-mixed:       #C08F3E;   /* Gold */
+  --tier-weak:        #BD7A4A;   /* Ochre */
+  --tier-failed:      #B7512B;   /* Terracotta */
 
   /* --- Comparison series colors (used on /civica-index/compare) --- */
-  --series-a: #C25D3A;   /* Terracotta */
-  --series-b: #2D6CDF;   /* Azure */
-  --series-c: #6B7566;   /* Sage */
+  --series-a: #BE5830;   /* Terracotta */
+  --series-b: #2468CD;   /* Azure */
+  --series-c: #458A65;   /* Green */
 
-  /* --- Indicator ramp (choropleth — warm sand → deep navy) --- */
-  --ramp-indicator-1: #EDE4D5;
-  --ramp-indicator-2: #D2D6DC;
-  --ramp-indicator-3: #ACC1D2;
-  --ramp-indicator-4: #6086A8;
-  --ramp-indicator-5: #1A4970;
-  --ramp-no-data:     #E6E1D4;
+  /* --- Indicator ramp (choropleth — light blue → deep navy, DS-3 §07) --- */
+  --ramp-indicator-1: #D3E0F0;
+  --ramp-indicator-2: #B0CAE3;
+  --ramp-indicator-3: #6686A0;
+  --ramp-indicator-4: #41688A;
+  --ramp-indicator-5: #1C4A75;
+  --ramp-no-data:     #E6DED4;
 
-  /* --- Branch backgrounds (alpha, v2 hues) --- */
-  --color-branch-executive-bg: rgba(194, 93, 58, 0.12);
-  --color-branch-legislative-bg: rgba(45, 108, 223, 0.12);
-  --color-branch-monarchy-bg: rgba(124, 89, 201, 0.12);
+  /* --- Branch backgrounds (alpha, almanac hues) --- */
+  --color-branch-executive-bg: rgba(183, 81, 43, 0.12);
+  --color-branch-legislative-bg: rgba(28, 91, 195, 0.12);
+  --color-branch-monarchy-bg: rgba(103, 73, 171, 0.12);
 
   /* --- Badge colors --- */
-  --color-badge-get:  #2E7D59;
-  --color-badge-post: #1565C0;
-  --color-badge-text: #FFFCF8;
+  --color-badge-get:  #2E7D55;
+  --color-badge-post: #1C5BC3;
+  --color-badge-text: #FFFFFF;
 
-  /* --- Shadows (v2 — soft layered, replacing v1 hard-offset) --- */
-  --shadow-hard:    0 1px 2px rgba(11, 18, 32, 0.04), 0 8px 18px rgba(11, 18, 32, 0.07);
-  --shadow-hard-sm: 0 1px 2px rgba(11, 18, 32, 0.05);
-  --shadow-hard-md: 0 1px 2px rgba(11, 18, 32, 0.04), 0 4px 10px rgba(11, 18, 32, 0.05);
-  --shadow-hard-lg: 0 1px 2px rgba(11, 18, 32, 0.04), 0 12px 28px rgba(11, 18, 32, 0.08);
-  --shadow-dark:    0 4px 12px rgba(11, 18, 32, 0.10);
+  /* --- Shadows (almanac — soft & subtle, navy-tinted; DS-4 §07).
+         Names retain `hard` for now to avoid touching ~all consumers;
+         rename to --shadow-subtle/raised in the full rollout. --- */
+  --shadow-hard:    0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-hard-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-hard-md: 0 2px 6px rgba(15, 23, 42, 0.08);
+  --shadow-hard-lg: 0 4px 12px rgba(15, 23, 42, 0.10);
+  --shadow-dark:    0 4px 16px rgba(15, 23, 42, 0.16);
 
   /* --- Stacking order --- */
   --z-base:    1;
@@ -298,7 +303,7 @@
   --color-text-25: rgba(235, 230, 214, 0.48);
   --color-text-20: rgba(235, 230, 214, 0.40);
 
-  --color-accent: oklch(68% 0.15 35);
+  --color-accent: oklch(67% 0.13 45);   /* Terracotta, lightened for dark */
 
   --color-card-bg: #221e16;
   --color-card-border: #3d382d;
@@ -306,7 +311,7 @@
   --color-card-hover-border: #8a8370;
   --color-divider: #3d382d;
   --color-stat-border: #3d382d;
-  --color-selection: oklch(30% 0.06 35);
+  --color-selection: oklch(34% 0.07 45);
   --color-surface-primary: var(--color-bg);
   --color-surface-secondary: var(--color-surface-elevated);
   --color-surface-tertiary: var(--color-select-bg);
@@ -343,21 +348,22 @@
   --color-on-warning: #1a1a1a;
   --color-on-accent: #ffffff;
 
-  --tier-exceptional: oklch(68% 0.14 145);
-  --tier-strong: oklch(60% 0.11 155);
-  --tier-mixed: oklch(75% 0.14 75);
-  --tier-weak: oklch(62% 0.15 45);
-  --tier-failed: oklch(55% 0.18 25);
+  --tier-exceptional: oklch(66% 0.09 215);  /* Deep Teal */
+  --tier-strong: oklch(64% 0.11 155);       /* Green */
+  --tier-mixed: oklch(77% 0.12 78);         /* Gold */
+  --tier-weak: oklch(66% 0.10 55);          /* Ochre */
+  --tier-failed: oklch(62% 0.14 40);        /* Terracotta */
 
-  --series-a: oklch(72% 0.15 35);
-  --series-b: oklch(68% 0.13 220);
-  --series-c: oklch(72% 0.14 150);
+  --series-a: oklch(70% 0.13 45);   /* Terracotta */
+  --series-b: oklch(68% 0.12 245);  /* Azure */
+  --series-c: oklch(66% 0.11 155);  /* Green */
 
-  --ramp-indicator-1: var(--color-card-bg);
-  --ramp-indicator-2: var(--color-surface-elevated);
-  --ramp-indicator-3: var(--color-text-40);
-  --ramp-indicator-4: var(--color-text-60);
-  --ramp-indicator-5: var(--color-accent);
+  /* Choropleth ramp — deep navy → light blue (reads on the dark field) */
+  --ramp-indicator-1: #1c2733;
+  --ramp-indicator-2: #2c4257;
+  --ramp-indicator-3: #43657f;
+  --ramp-indicator-4: #6e93ad;
+  --ramp-indicator-5: #a9c6dd;
   --ramp-no-data: var(--color-select-bg);
 
   --color-branch-executive-bg: rgba(212, 118, 78, 0.15);

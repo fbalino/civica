@@ -20,6 +20,8 @@ import { withOg } from "@/lib/og";
 import { FactbookSection } from "@/components/FactbookSection";
 import { Banner } from "@/components/editorial/Banner";
 import { FactbookHeaderStrip } from "@/components/factbook/FactbookHeaderStrip";
+import { existsSync } from "fs";
+import { join } from "path";
 import {
   FactbookSidebar,
   type FactbookSidebarItem,
@@ -383,6 +385,18 @@ export default async function FactbookCountryPage({
     subsectionsBySection[section.id] = subs.slice(0, 12);
   }
 
+  const engravingCode = jurisdiction.iso3 ? jurisdiction.iso3.toLowerCase() : null;
+  // Prefer the optimized .webp; fall back to a raw .png drop (so new Codex
+  // exports saved to public/engravings/countries/ appear before conversion).
+  const engravingDir = join(process.cwd(), "public", "engravings", "countries");
+  const countryEngravingSrc = engravingCode
+    ? existsSync(join(engravingDir, `${engravingCode}.webp`))
+      ? `/engravings/countries/${engravingCode}.webp`
+      : existsSync(join(engravingDir, `${engravingCode}.png`))
+        ? `/engravings/countries/${engravingCode}.png`
+        : null
+    : null;
+
   return (
     <>
       <FactbookHeaderStrip
@@ -404,6 +418,7 @@ export default async function FactbookCountryPage({
         mapImages={mapImages}
         photos={photos}
         inAtlas={jurisdiction.type === "sovereign_state"}
+        engravingSrc={countryEngravingSrc}
       />
 
       {/* Phase F.4 — show a one-line reconciliation disclosure

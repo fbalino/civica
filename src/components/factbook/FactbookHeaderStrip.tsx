@@ -103,6 +103,10 @@ interface FactbookHeaderStripProps {
   /** Whether this jurisdiction is covered by the Atlas (sovereign states only).
    *  Hides the "Open in Atlas" chip for non-sovereign territories. */
   inAtlas?: boolean;
+  /** When present, the country's landmark engraving renders as the masthead
+   *  backdrop (full 3:2, uncropped) with the header overlaid on top. Resolved
+   *  server-side, so it's only set when the art file actually exists. */
+  engravingSrc?: string | null;
 }
 
 function formatPop(n: number | null): string | null {
@@ -148,6 +152,7 @@ export function FactbookHeaderStrip({
   populationResolver,
   gdpResolver,
   inAtlas = true,
+  engravingSrc = null,
 }: FactbookHeaderStripProps) {
   const [lbOpen, setLbOpen] = useState(false);
   const [lbMode, setLbMode] = useState<"map" | "photos">("photos");
@@ -209,7 +214,19 @@ export function FactbookHeaderStrip({
 
   return (
     <>
-      <section aria-label="Country header" className="factbook-hero">
+      <section
+        aria-label="Country header"
+        className={`factbook-hero${engravingSrc ? " factbook-hero--art" : ""}`}
+      >
+        {engravingSrc && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className="factbook-hero-art-img"
+            src={engravingSrc}
+            alt=""
+            aria-hidden="true"
+          />
+        )}
         <div className="factbook-hero-left">
           <div className="factbook-hero-title-row">
             <div className="factbook-hero-flag">

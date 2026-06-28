@@ -48,12 +48,12 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 ## Design System (authoritative)
 **See `https://www.civicaatlas.org/design-system` for the live reference.** Code lives in `src/app/globals.css`, `src/app/atlas.css`, and `src/app/design-system/page.tsx`.
 
-- **Typography**: Fraunces (serif, display + country cards), Inter (sans, body/interface), `ui-monospace` (labels, source/meta rows, IDs, code, dense numeric UI only). Do NOT substitute IBM Plex or other fonts. Do NOT use mono for tabs or readable facts like government type, region, capital, population, or GDP.
-- **Color palette** (light): paper `#f4f1ea`, ink `#1a1a1a`, muted `#8a8370`, rule `#c4bdae`, accent (cinnabar) `oklch(58% 0.14 35)`. Dark mode flips via `data-theme="dark"`.
+- **Typography**: Source Serif 4 (serif, display + country cards), Inter (sans, body/interface), `ui-monospace` (labels, source/meta rows, IDs, code, dense numeric UI only). Do NOT substitute Fraunces, IBM Plex, or other fonts. Do NOT use mono for tabs or readable facts like government type, region, capital, population, or GDP.
+- **Color palette** (light): paper `#FAF7F2` (ivory), ink `#0B1B2D` (navy), muted `#6A7688`, rule `#E4E1DC`, accent (terracotta) `#B7512B`. Foundation hues: navy/deep-teal/sage/terracotta/gold/sand. Dark mode flips via `data-theme="dark"`.
 - **Signal colors**: olive (success), amber (warn/frozen), brick (danger), slate (info).
 - **Government-type palette**: parliamentary blue, presidential rust, semi-presidential purple, monarchy gold, theocracy green — always use the CSS vars (`--gov-parl`, `--gov-pres`, etc.).
 - **Tier palette** (CI 0-100): exceptional → strong → mixed → weak → failed, mapped via `var(--tier-*)`.
-- **Shadows**: hard-offset, no blur (`4px 4px 0 var(--ink)`). Print-inspired.
+- **Shadows**: soft, subtle, navy-tinted (e.g. `0 1px 2px rgba(15,23,42,.06)`). Elevation is restrained — hairline borders + at most a subtle shadow. (The `--shadow-hard*` token names are legacy; their values are soft, not hard-offset.)
 - **Layout containers**: `.editorial-page` (760px narrow reading column), `.editorial-page--wide` (960px), `.editorial-page--full` (1200px standard page width). Most pages should target 1200px; 1280px is reserved for factbook-style pages with two sidebars. Methodology pages and subpages use `.methodology-layout` (1200px with left `ReaderSidebar`, no country search input).
 - **Headings**: canonical page H1 is 56px (`var(--text-56)`) except `/blog`, which can keep its separate editorial nameplate.
 - **Tabs**: use Inter/body text with normal casing, matching Atlas (`Structure`, `Bills`, etc.). No Roman-numeral monospace tab labels.

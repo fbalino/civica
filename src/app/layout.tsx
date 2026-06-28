@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Fraunces, Inter } from "next/font/google";
+import { Source_Serif_4, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo } from "@/components/CivicaLogo";
@@ -38,12 +38,12 @@ const NON_TIER1_FOOTER_SOURCES = [
   "GDELT",
 ] as const;
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
   subsets: ["latin"],
   display: "swap",
-  axes: ["opsz"],
   weight: "variable",
+  style: ["normal", "italic"],
 });
 
 const inter = Inter({
@@ -115,7 +115,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable}`}
+      className={`${sourceSerif.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
       <head>

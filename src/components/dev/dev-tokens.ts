@@ -55,7 +55,7 @@ export const DEV_TOKEN_GROUPS: DevTokenGroup[] = [
     id: "typography",
     title: "Typography",
     tokens: [
-      ft("--font-heading", "Heading family", 'var(--font-fraunces), "Georgia", "Times New Roman", serif'),
+      ft("--font-heading", "Heading family", 'var(--font-source-serif), "Georgia", "Times New Roman", serif'),
       ft("--font-body", "Body family", 'var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'),
       ft("--font-mono", "Mono family", 'ui-monospace, "SF Mono", Menlo, monospace'),
       sz("--text-12", "text-12", "12px"),

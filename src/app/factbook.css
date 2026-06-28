@@ -18,6 +18,55 @@
   align-items: stretch;
   border-bottom: 1px solid var(--color-stat-border);
 }
+
+/* Country landmark engraving as the masthead backdrop — full-bleed (edge to
+   edge), with the header overlaid at the bottom over an ivory scrim. Content
+   stays in a centered 1280 column via padding-inline. In dark mode the engraving
+   is inverted so its light paper reads as a luminous engraving on the dark page
+   rather than a bright panel. */
+.factbook-hero--art {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  max-width: none;
+  aspect-ratio: 3 / 2;
+  max-height: 80vh;
+  align-items: end;
+  border-bottom: none;
+  overflow: hidden;
+  padding-block: var(--space-8) var(--space-6);
+  padding-inline: max(var(--space-6), calc((100vw - 1280px) / 2));
+}
+.factbook-hero-art-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  z-index: 0;
+}
+.factbook-hero--art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    var(--color-bg) 0%,
+    color-mix(in oklab, var(--color-bg) 76%, transparent) 26%,
+    transparent 52%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+.factbook-hero--art > .factbook-hero-left,
+.factbook-hero--art > .factbook-hero-boxes {
+  position: relative;
+  z-index: 2;
+}
+[data-theme="dark"] .factbook-hero-art-img {
+  filter: invert(1) hue-rotate(180deg) brightness(1.04);
+}
 .factbook-hero-left {
   min-width: 0;
   display: flex;

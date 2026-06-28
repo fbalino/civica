@@ -521,56 +521,56 @@ function buildHtml(args: BuildHtmlArgs): string {
 <meta name="viewport" content="width=${width},initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:${width}px;height:${height}px;overflow:hidden;-webkit-font-smoothing:antialiased}
 
 /* Light tokens (default) */
 :root{
-  --paper:#f4f1ea;--paper-2:#ebe6d6;--paper-3:#ddd6c2;
-  --ink:#16140f;--ink-2:#3a362c;--ink-3:#6a6354;
-  --rule:#cdc6b2;--rule-soft:#ddd6c2;
-  --live:oklch(62% 0.14 155);--frozen:oklch(72% 0.14 70);
-  --t-failed:oklch(45% 0.16 25);--t-weak:oklch(65% 0.15 45);
-  --t-mixed:oklch(75% 0.12 85);--t-strong:oklch(62% 0.12 155);--t-excep:oklch(52% 0.14 195);
+  --paper:#FAF7F2;--paper-2:#F3EFE6;--paper-3:#EDE9E2;
+  --ink:#0B1B2D;--ink-2:#2A3648;--ink-3:#6A7688;
+  --rule:#E4E1DC;--rule-soft:#EDE9E2;
+  --live:#2E7D55;--frozen:#C08F3E;
+  --t-failed:#B7512B;--t-weak:#BD7A4A;
+  --t-mixed:#C08F3E;--t-strong:#2E7D55;--t-excep:#0B4250;
   --shadow-hard:3px 3px 0 var(--ink);--shadow-hard-lg:6px 6px 0 var(--ink);
 }
 /* System dark override */
 @media(prefers-color-scheme:dark){
   :root{
-    --paper:#16140f;--paper-2:#1f1c15;--paper-3:#2a261d;
-    --ink:#f4f1ea;--ink-2:#d9d2c0;--ink-3:#9d9684;
-    --rule:#3a362c;--rule-soft:#2a261d;
-    --live:oklch(72% 0.15 155);--frozen:oklch(78% 0.15 70);
-    --t-failed:oklch(58% 0.17 25);--t-weak:oklch(72% 0.15 45);
-    --t-mixed:oklch(82% 0.12 85);--t-strong:oklch(70% 0.13 155);--t-excep:oklch(62% 0.14 195);
+    --paper:#16140f;--paper-2:#221e16;--paper-3:#2b2619;
+    --ink:#ebe6d6;--ink-2:#c4bdae;--ink-3:#8a8370;
+    --rule:#3d382d;--rule-soft:#2b2619;
+    --live:#5BA77E;--frozen:#D6AE63;
+    --t-failed:oklch(62% 0.14 40);--t-weak:oklch(66% 0.10 55);
+    --t-mixed:oklch(77% 0.12 78);--t-strong:oklch(64% 0.11 155);--t-excep:oklch(66% 0.09 215);
     --shadow-hard:3px 3px 0 #000;--shadow-hard-lg:6px 6px 0 #000;
   }
 }
 /* Explicit param overrides */
 [data-theme="light"]{
-  --paper:#f4f1ea;--paper-2:#ebe6d6;--paper-3:#ddd6c2;
-  --ink:#16140f;--ink-2:#3a362c;--ink-3:#6a6354;
-  --rule:#cdc6b2;--rule-soft:#ddd6c2;
-  --live:oklch(62% 0.14 155);--frozen:oklch(72% 0.14 70);
-  --t-failed:oklch(45% 0.16 25);--t-weak:oklch(65% 0.15 45);
-  --t-mixed:oklch(75% 0.12 85);--t-strong:oklch(62% 0.12 155);--t-excep:oklch(52% 0.14 195);
+  --paper:#FAF7F2;--paper-2:#F3EFE6;--paper-3:#EDE9E2;
+  --ink:#0B1B2D;--ink-2:#2A3648;--ink-3:#6A7688;
+  --rule:#E4E1DC;--rule-soft:#EDE9E2;
+  --live:#2E7D55;--frozen:#C08F3E;
+  --t-failed:#B7512B;--t-weak:#BD7A4A;
+  --t-mixed:#C08F3E;--t-strong:#2E7D55;--t-excep:#0B4250;
   --shadow-hard:3px 3px 0 var(--ink);--shadow-hard-lg:6px 6px 0 var(--ink);
 }
 [data-theme="dark"]{
-  --paper:#16140f;--paper-2:#1f1c15;--paper-3:#2a261d;
-  --ink:#f4f1ea;--ink-2:#d9d2c0;--ink-3:#9d9684;
-  --rule:#3a362c;--rule-soft:#2a261d;
-  --live:oklch(72% 0.15 155);--frozen:oklch(78% 0.15 70);
-  --t-failed:oklch(58% 0.17 25);--t-weak:oklch(72% 0.15 45);
-  --t-mixed:oklch(82% 0.12 85);--t-strong:oklch(70% 0.13 155);--t-excep:oklch(62% 0.14 195);
+  --paper:#16140f;--paper-2:#221e16;--paper-3:#2b2619;
+  --ink:#ebe6d6;--ink-2:#c4bdae;--ink-3:#8a8370;
+  --rule:#3d382d;--rule-soft:#2b2619;
+  --live:#5BA77E;--frozen:#D6AE63;
+  --t-failed:oklch(62% 0.14 40);--t-weak:oklch(66% 0.10 55);
+  --t-mixed:oklch(77% 0.12 78);--t-strong:oklch(64% 0.11 155);--t-excep:oklch(66% 0.09 215);
   --shadow-hard:3px 3px 0 #000;--shadow-hard-lg:6px 6px 0 #000;
 }
 
 body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif}
 
-.serif{font-family:'Fraunces',Georgia,serif;font-optical-sizing:auto}
+.serif{font-family:'Source Serif 4',Georgia,serif;font-optical-sizing:auto}
 .mono{font-family:ui-monospace,'SF Mono',Menlo,monospace}
 
 /* Provenance dots */
@@ -608,14 +608,14 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
   width:32px;height:32px;
   display:grid;place-items:center;
   background:var(--ink);color:var(--paper);
-  font-family:'Fraunces',serif;font-weight:600;font-size:16px;
+  font-family:'Source Serif 4',serif;font-weight:600;font-size:16px;
   flex-shrink:0;
 }
 .civica-widget.small .body{display:flex;flex-direction:column;gap:2px;min-width:0}
 .civica-widget.small .country{font-size:13px;font-weight:600;letter-spacing:-0.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .civica-widget.small .meta{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:var(--ink-3);letter-spacing:0.03em}
 .civica-widget.small .score{
-  font-family:'Fraunces',serif;font-weight:500;font-size:32px;line-height:1;letter-spacing:-0.02em;
+  font-family:'Source Serif 4',serif;font-weight:500;font-size:32px;line-height:1;letter-spacing:-0.02em;
   padding-left:12px;border-left:1px solid var(--rule);
 }
 
@@ -625,12 +625,12 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
   display:flex;flex-direction:column;gap:10px;
 }
 .civica-widget.medium .top{display:flex;justify-content:space-between;align-items:center}
-.civica-widget.medium .brand{font-family:'Fraunces',serif;font-weight:600;font-size:13px;letter-spacing:-0.005em}
+.civica-widget.medium .brand{font-family:'Source Serif 4',serif;font-weight:600;font-size:13px;letter-spacing:-0.005em}
 .civica-widget.medium .dotlabel{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:400;font-size:10px;color:var(--ink-3);margin-left:6px;text-transform:uppercase;letter-spacing:0.1em}
 .civica-widget.medium .gov{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em}
 .civica-widget.medium .country-row{display:flex;justify-content:space-between;align-items:baseline}
-.civica-widget.medium .name{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-0.015em}
-.civica-widget.medium .num{font-family:'Fraunces',serif;font-weight:500;font-size:46px;line-height:0.95;letter-spacing:-0.025em}
+.civica-widget.medium .name{font-family:'Source Serif 4',serif;font-weight:500;font-size:22px;letter-spacing:-0.015em}
+.civica-widget.medium .num{font-family:'Source Serif 4',serif;font-weight:500;font-size:46px;line-height:0.95;letter-spacing:-0.025em}
 .civica-widget.medium .tier-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-2)}
 .civica-widget.medium .tier-bar{position:relative;height:4px;background:var(--rule-soft)}
 .civica-widget.medium .tier-bar>span{position:absolute;inset:0 auto 0 0;background:var(--tier,var(--t-mixed))}
@@ -642,13 +642,13 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
   display:flex;flex-direction:column;gap:14px;
 }
 .civica-widget.large .top{display:flex;justify-content:space-between;align-items:center}
-.civica-widget.large .brand{font-family:'Fraunces',serif;font-weight:600;font-size:14px}
+.civica-widget.large .brand{font-family:'Source Serif 4',serif;font-weight:600;font-size:14px}
 .civica-widget.large .dotlabel{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:400;font-size:10px;color:var(--ink-3);margin-left:6px;text-transform:uppercase;letter-spacing:0.1em}
 .civica-widget.large .gov{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em}
 .civica-widget.large .headline{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end}
-.civica-widget.large .name{font-family:'Fraunces',serif;font-weight:500;font-size:26px;letter-spacing:-0.018em;margin:0 0 2px}
+.civica-widget.large .name{font-family:'Source Serif 4',serif;font-weight:500;font-size:26px;letter-spacing:-0.018em;margin:0 0 2px}
 .civica-widget.large .sub{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em}
-.civica-widget.large .num{font-family:'Fraunces',serif;font-weight:500;font-size:58px;line-height:0.9;letter-spacing:-0.03em}
+.civica-widget.large .num{font-family:'Source Serif 4',serif;font-weight:500;font-size:58px;line-height:0.9;letter-spacing:-0.03em}
 .civica-widget.large .num small{font-size:15px;color:var(--ink-3);font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:400;letter-spacing:0;display:block;margin-top:4px}
 .civica-widget.large .tier-label{display:flex;justify-content:space-between;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-2)}
 .civica-widget.large .tier-bar{position:relative;height:4px;background:var(--rule-soft)}
@@ -667,9 +667,9 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
   height:${height}px;
 }
 .civica-widget.custom .cf-top{display:flex;justify-content:space-between;align-items:center}
-.civica-widget.custom .cf-brand{font-family:'Fraunces',serif;font-weight:600;font-size:13px;letter-spacing:-0.005em}
+.civica-widget.custom .cf-brand{font-family:'Source Serif 4',serif;font-weight:600;font-size:13px;letter-spacing:-0.005em}
 .civica-widget.custom .dotlabel{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:400;font-size:10px;color:var(--ink-3);margin-left:6px;text-transform:uppercase;letter-spacing:0.1em}
-.civica-widget.custom .cf-name{font-family:'Fraunces',serif;font-weight:500;font-size:22px;letter-spacing:-0.015em;line-height:1.05}
+.civica-widget.custom .cf-name{font-family:'Source Serif 4',serif;font-weight:500;font-size:22px;letter-spacing:-0.015em;line-height:1.05}
 .civica-widget.custom .cf-rows{display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;overflow:hidden}
 .civica-widget.custom .cf-score-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--rule-soft)}
 .civica-widget.custom .cf-score-label{font-size:10px;color:var(--ink-3);letter-spacing:0.12em;text-transform:uppercase}

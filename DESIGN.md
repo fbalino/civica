@@ -1,7 +1,7 @@
 ---
 name: Civica Design System
-version: 0.1
-updated: 2026-04-29
+version: 0.2
+updated: 2026-06-28
 source: src/app/globals.css
 canonical_preview: /design-system
 tokens:
@@ -22,6 +22,8 @@ tokens:
   radius:
     sm: var(--radius-sm)
     md: var(--radius-md)
+    lg: var(--radius-lg)
+    xl: var(--radius-xl)
   elevation:
     hard: var(--shadow-hard)
     dark: var(--shadow-dark)
@@ -31,7 +33,7 @@ tokens:
 
 ## Overview
 
-Civica uses a print-inspired civic editorial system: warm paper, inky type, one cinnabar accent, hard rules, and provenance-first data display. The canonical implementation lives in `src/app/globals.css`; the canonical visual preview is `/design-system`.
+Civica uses a fine-press almanac system: warm ivory paper, ink-navy type, a terracotta editorial accent, hairline rules, antique engraved illustration, and provenance-first data display. The canonical implementation lives in `src/app/globals.css`; the canonical visual preview is `/design-system`.
 
 Any page that does not feel like an extension of `/design-system` is off-system.
 
@@ -45,7 +47,7 @@ Text colors use **semantic role tokens**: `var(--color-text-primary)`, `var(--co
 
 ## Typography
 
-Use Fraunces for display and country/editorial headings through **`var(--font-heading)`**. (`--font-serif` is a deprecated alias preserved for backwards compatibility — new code uses `--font-heading`.) The canonical page H1 is 56px (`var(--text-56)`) except for `/blog`, which is allowed to keep its heavier editorial nameplate. Use Inter for body/interface text through **`var(--font-body)`**. (`--font-body-sans` and `--font-sans` are deprecated aliases preserved for backwards compatibility — new code uses `--font-body`.) Use `var(--font-mono)` only for labels, IDs, source/meta rows, code, and dense numeric UI. Do not use mono for readable facts such as government type, region, capital, population, GDP, or tab labels.
+Use Source Serif 4 for display and country/editorial headings through **`var(--font-heading)`**. (`--font-serif` is a deprecated alias preserved for backwards compatibility — new code uses `--font-heading`.) The canonical page H1 is 56px (`var(--text-56)`) except for `/blog`, which is allowed to keep its heavier editorial nameplate. Use Inter for body/interface text through **`var(--font-body)`**. (`--font-body-sans` and `--font-sans` are deprecated aliases preserved for backwards compatibility — new code uses `--font-body`.) Use `var(--font-mono)` only for labels, IDs, source/meta rows, code, and dense numeric UI. Do not use mono for readable facts such as government type, region, capital, population, GDP, or tab labels.
 
 Use `var(--text-*)` tokens for font sizes. Do not add new pixel font sizes in page-level CSS.
 
@@ -67,13 +69,13 @@ Use `var(--space-*)` for new spacing decisions unless an existing component cont
 
 ## Elevation
 
-Use hard offset shadows only. `var(--shadow-hard)` follows the theme ink color. `var(--shadow-dark)` is the always-black variant for overlays that need stable depth.
+Use soft, subtle, navy-tinted shadows. `var(--shadow-hard)` is the default low elevation (`0 1px 2px rgba(15,23,42,.06)`), `var(--shadow-hard-lg)` is the raised level, and `var(--shadow-dark)` is a deeper variant for overlays. (The token names still read `--shadow-hard*` for backwards compatibility; the values are soft, not hard-offset — a rename is pending in a later pass.)
 
-Do not add blurred decorative shadows unless the component already has that behavior.
+Elevation is restrained: most surfaces use a 1px hairline (`var(--color-border-default)`) plus at most a subtle shadow. Avoid heavy or decorative blur.
 
 ## Shapes
 
-Use small, print-like radii: `var(--radius-sm)` and `var(--radius-md)`. Pills are allowed for status chips and badges only.
+Use the small radius scale: `var(--radius-sm)` (4px), `var(--radius-md)` (8px — the default for cards and controls), `var(--radius-lg)` (12px), `var(--radius-xl)` (16px), plus `var(--radius-2xl)` (24px) and `var(--radius-full)`. Pills are allowed for status chips and badges only.
 
 ## Stacking, motion, breakpoints, and header
 
