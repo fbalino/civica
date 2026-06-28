@@ -1,57 +1,42 @@
 import Link from "next/link";
-import { DesignSystemSwatch } from "@/components/DesignSystemSwatch";
 import { FactbookLegislatureChart } from "@/components/factbook/FactbookLegislatureChart";
+import { SectionHeader } from "@/components/editorial/SectionHeader";
+import { Banner } from "@/components/editorial/Banner";
+import { Pill } from "@/components/editorial/Pill";
+import { StatusDot } from "@/components/editorial/StatusDot";
+import { SourceDot } from "@/components/SourceDot";
 import { ATLAS_TAB_LABELS, ATLAS_TAB_ORDER } from "@/lib/atlas/ids";
-
-export const revalidate = 3600;
+import { DEV_TOKEN_GROUPS, type DevTokenGroup } from "@/components/dev/dev-tokens";
 
 import "./design-system.css";
 
-const SURFACE_TOKENS = [
-  { var: "--color-surface-primary", use: "Base field. Everything sits on it." },
-  { var: "--color-surface-secondary", use: "Quiet hover & zebra." },
-  { var: "--color-surface-tertiary", use: "Well / mini-map ground." },
-  { var: "--color-text-primary", use: "Body type, rules, heavy UI." },
-  { var: "--color-text-secondary", use: "Secondary type, soft buttons." },
-  { var: "--color-text-muted", use: "Captions, eyebrows, meta." },
-  { var: "--color-border-default", use: "Hairlines, borders." },
-  { var: "--color-card-border", use: "Graticules, dashed rules." },
-];
+export const revalidate = 3600;
 
-const SIGNAL_TOKENS = [
-  { var: "--color-accent", hex: "cinnabar", use: "The one live color: selection, CTAs, eyebrows." },
-  { var: "--color-selection", hex: "accent wash", use: "Pinned banners, accent wash." },
-  { var: "--color-status-success", hex: "olive", use: "Passed · yes votes · stable." },
-  { var: "--color-status-warning", hex: "amber", use: "In committee · deadline near." },
-  { var: "--color-status-danger", hex: "brick", use: "Failed · nay votes · contested." },
-  { var: "--color-status-info", hex: "slate", use: "Procedural · abstentions." },
-];
+const groupById = (id: string): DevTokenGroup | undefined =>
+  DEV_TOKEN_GROUPS.find((g) => g.id === id);
 
-const MAP_TOKENS = [
-  { var: "--atlas-ocean", use: "Water & atlas ground." },
-  { var: "--atlas-land", use: "Featured countries." },
-  { var: "--atlas-land-dim", use: "Non-featured countries." },
-  { var: "--atlas-land-selected", hex: "accent", use: "Current country." },
-];
+/** Color groups rendered as live swatch grids (in display order). */
+const COLOR_GROUP_IDS = [
+  "surface",
+  "accent",
+  "signal",
+  "tier",
+  "gov",
+  "branch",
+  "peer",
+  "source",
+  "atlas",
+] as const;
 
-const SPACING = [
-  { name: "--space-1", px: 2 },
-  { name: "--space-2", px: 4 },
-  { name: "--space-3", px: 8 },
-  { name: "--space-4", px: 12 },
-  { name: "--space-5", px: 16 },
-  { name: "--space-6", px: 24 },
-  { name: "--space-7", px: 32 },
-  { name: "--space-8", px: 48 },
-  { name: "--space-9", px: 64 },
-];
-
-const SAMPLE_PARTIES = [
-  { id: "civic-alliance", name: "Civic Alliance", seats: 46, color: "var(--gov-parl)" },
-  { id: "national-union", name: "National Union", seats: 38, color: "var(--gov-pres)" },
-  { id: "green-list", name: "Green List", seats: 25, color: "var(--gov-theo)" },
-  { id: "liberal-forum", name: "Liberal Forum", seats: 22, color: "var(--gov-semi)" },
-  { id: "independents", name: "Independents", seats: 19, color: "var(--color-text-40)" },
+const TYPE_SCALE = [
+  { lab: "Display / H1", text: "Every government.", family: "var(--font-heading)", size: "var(--text-56)", weight: 600, lh: 1.05, tr: "var(--tracking-tight)", spec: "Source Serif 4 · 600 · 56/64" },
+  { lab: "H2", text: "The governance health of every country.", family: "var(--font-heading)", size: "var(--text-40)", weight: 600, lh: 1.1, tr: "var(--tracking-tight)", spec: "Source Serif 4 · 600 · 40/48" },
+  { lab: "H3", text: "Parliament, live.", family: "var(--font-heading)", size: "var(--text-28)", weight: 600, lh: 1.2, tr: "var(--tracking-snug)", spec: "Source Serif 4 · 600 · 28/36" },
+  { lab: "Lead / dek", text: "A semi-presidential republic in Western Europe.", family: "var(--font-heading)", size: "var(--text-22)", weight: 400, lh: 1.36, tr: "0", spec: "Source Serif 4 · 400 · 22/30" },
+  { lab: "Body", text: "Hover any seat to meet the member. Compare two countries side by side.", family: "var(--font-body)", size: "var(--text-16)", weight: 400, lh: 1.625, tr: "0", spec: "Inter · 400 · 16/26" },
+  { lab: "Caption", text: "577 seats · elected by a two-round system", family: "var(--font-body)", size: "var(--text-13)", weight: 400, lh: 1.5, tr: "0", spec: "Inter · 400 · 13" },
+  { lab: "Label / eyebrow", text: "WELCOME · ATLAS", family: "var(--font-body)", size: "var(--text-12)", weight: 600, lh: 1.45, tr: "var(--tracking-caps)", spec: "Inter · 600 · 11 · +0.8% · caps", caps: true },
+  { lab: "Meta / mono", text: "FRA · 48.8° N, 2.3° E · GMT+1", family: "var(--font-mono)", size: "var(--text-12)", weight: 500, lh: 1.4, tr: "0", spec: "ui-monospace · 12" },
 ];
 
 const SAMPLE_CHAMBER = {
@@ -60,229 +45,218 @@ const SAMPLE_CHAMBER = {
   name: "Sample Country · National Assembly",
   total: 150,
   sub: "150 seats",
-  parties: SAMPLE_PARTIES,
+  parties: [
+    { id: "civic-alliance", name: "Civic Alliance", seats: 46, color: "var(--gov-parl)" },
+    { id: "national-union", name: "National Union", seats: 38, color: "var(--gov-pres)" },
+    { id: "green-list", name: "Green List", seats: 25, color: "var(--gov-theo)" },
+    { id: "liberal-forum", name: "Liberal Forum", seats: 22, color: "var(--gov-semi)" },
+    { id: "independents", name: "Independents", seats: 19, color: "var(--color-text-40)" },
+  ],
 };
 
-export default function DesignSystemPage() {
+function SwatchGrid({ group }: { group: DevTokenGroup }) {
   return (
-    <div className="ds-page atlas-root">
+    <>
+      <h3 className="ds-sub">{group.title}</h3>
+      <div className="ds-swatches">
+        {group.tokens.map((t) => (
+          <div key={t.cssVar} className="ds-swatch">
+            <div className="chip" style={{ background: `var(${t.cssVar})` }} />
+            <div className="meta">
+              <div className="var">{t.cssVar}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+export default function DesignSystemPage() {
+  const ramp = groupById("indicator-ramp");
+  const spacing = groupById("spacing");
+  const radii = groupById("radii");
+  const shadows = groupById("shadows");
+  const motion = groupById("motion");
+
+  return (
+    <div className="ds-page">
       <header className="ds-top">
-        <div className="ds-brand">Civica<span className="d">.</span></div>
-        <div className="ds-eyebrow">Design System · v0.1 · April 2026</div>
-        <div className="ds-grow" />
+        <span className="ds-brand">
+          Civica Atlas<span className="d">.</span>
+        </span>
+        <span className="ds-eyebrow">Design System · v0.2 · June 2026</span>
+        <span className="ds-grow" />
       </header>
 
       <main className="ds-main">
-        <div className="ds-directive-banner">
-          <strong>This is the canonical look.</strong>{" "}
-          Every page on civicaatlas.org should match these tokens. See{" "}
-          <Link href="https://github.com/fbalino/civica/blob/main/DESIGN.md">DESIGN.md</Link>. No hardcoded colors, fonts, or sizes elsewhere.
+        <div className="ds-directive">
+          <strong>This page is the canonical reference.</strong> Every swatch and
+          component below renders live from the design tokens in{" "}
+          <code>globals.css</code> — change a token and it changes here and across the
+          site. If a page doesn&rsquo;t look like an extension of this one, it&rsquo;s
+          off-system. See{" "}
+          <Link href="https://github.com/fbalino/civica/blob/main/DESIGN.md">
+            DESIGN.md
+          </Link>
+          . No hardcoded colors, fonts, or sizes elsewhere.
         </div>
 
         {/* 00 Foundation */}
         <section className="ds-section">
-          <div className="ds-section-header">
+          <div className="ds-section-head">
             <span className="num">00 · Foundation</span>
-            <h2>An editorial civic atlas.</h2>
-            <span className="dek">Warm newsprint paper, inky type, a cinnabar accent for anything live. Dark mode is the same vocabulary under a starless sky.</span>
+            <h2>A fine-press almanac.</h2>
+            <span className="dek">
+              Warm ivory paper, ink-navy type, a terracotta accent, hairline rules, and
+              antique engraved illustration. Dark mode is the same vocabulary at night.
+            </span>
           </div>
-          <p style={{ fontFamily: "var(--sans)", fontSize: 14, color: "var(--ink-2)", maxWidth: 640, lineHeight: 1.6, margin: "0 0 10px" }}>
-            Civica is an interactive civic-education atlas: one world map, every chamber, every bill.
-            The system is built on four moves — a warm paper field, ink-black structure, a single signal color,
-            and a hairline rule. Dark mode inverts the field, keeps the ink, and warms the signal.
-          </p>
-          <p style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: 14, color: "var(--muted)", maxWidth: 640 }}>
-            No gradients. No drop shadows (except the occasional blocky offset). Color is reserved for meaning,
-            not decoration.
+          <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-16)", color: "var(--color-text-secondary)", maxWidth: "64ch", lineHeight: "var(--leading-normal)", margin: 0 }}>
+            Civica is a visual successor to the CIA World Factbook: an atlas of the
+            world&rsquo;s governments with an original governance index. The system is
+            built on a warm paper field, navy ink, a single editorial accent, hairline
+            rules, and provenance on every fact. Color is reserved for meaning.
           </p>
         </section>
 
         {/* 01 Color */}
         <section className="ds-section">
-          <div className="ds-section-header">
+          <div className="ds-section-head">
             <span className="num">01 · Color</span>
-            <h2>Paper, ink, cinnabar.</h2>
-            <span className="dek">Every token is defined in both themes. Signals hold the same role across modes.</span>
+            <h2>Ivory, ink-navy, terracotta.</h2>
+            <span className="dek">Every color token, live from both themes. Toggle the site theme to see dark.</span>
           </div>
 
-          <h3 className="ds-sub">Surface — paper &amp; ink</h3>
-          <div className="ds-swatches">
-            {SURFACE_TOKENS.map((t) => (
-              <div key={t.var} className="ds-swatch">
-                <div className="chip" style={{ background: `var(${t.var})` }} />
-                <div className="meta">
-                  <div className="nm">{t.var}</div>
-                <div className="hex">{t.var}</div>
-                  <div className="use">{t.use}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {COLOR_GROUP_IDS.map((id) => {
+            const g = groupById(id);
+            return g ? <SwatchGrid key={id} group={g} /> : null;
+          })}
 
-          <h3 className="ds-sub">Signal</h3>
-          <div className="ds-swatches">
-            {SIGNAL_TOKENS.map((t) => (
-              <div key={t.var} className="ds-swatch">
-                <div className="chip" style={{ background: `var(${t.var})` }} />
-                <div className="meta">
-                  <div className="nm">{t.var}</div>
-                  <div className="hex">{t.hex}</div>
-                  <div className="use">{t.use}</div>
-                </div>
+          {ramp ? (
+            <>
+              <h3 className="ds-sub">{ramp.title}</h3>
+              <div className="ds-ramp">
+                {ramp.tokens.map((t) => (
+                  <div key={t.cssVar} className="ds-ramp-cell" style={{ background: `var(${t.cssVar})` }} title={t.cssVar} />
+                ))}
               </div>
-            ))}
-          </div>
-
-          <h3 className="ds-sub">Map</h3>
-          <div className="ds-swatches">
-            {MAP_TOKENS.map((t) => (
-              <div key={t.var} className="ds-swatch">
-                <div className="chip" style={{ background: `var(${t.var})` }} />
-                <div className="meta">
-                  <div className="nm">{t.var}</div>
-                  <div className="hex">{t.hex || t.var}</div>
-                  <div className="use">{t.use}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <h3 className="ds-sub">Both modes, side by side</h3>
-          <div className="ds-pair-grid">
-            <div className="ds-pair-card">
-              <div className="hd">Light — default</div>
-              <div className="body" style={{ background: "#f4f1ea", color: "#1a1a1a" }}>
-                <DesignSystemSwatch label="paper" bg="#f4f1ea" />
-                <DesignSystemSwatch label="paper-2" bg="#ebe6d6" />
-                <DesignSystemSwatch label="paper-3" bg="#e2dcc8" />
-                <DesignSystemSwatch label="ink" bg="#1a1a1a" fg="#f4f1ea" />
-                <DesignSystemSwatch label="accent" bg="oklch(58% 0.14 35)" fg="#ffffff" />
-              </div>
-            </div>
-            <div className="ds-pair-card">
-              <div className="hd">Dark</div>
-              <div className="body" style={{ background: "#16140f", color: "#ebe6d6" }}>
-                <DesignSystemSwatch label="paper" bg="#16140f" />
-                <DesignSystemSwatch label="paper-2" bg="#221e16" />
-                <DesignSystemSwatch label="paper-3" bg="#2b2619" />
-                <DesignSystemSwatch label="ink" bg="#ebe6d6" fg="#16140f" />
-                <DesignSystemSwatch label="accent" bg="oklch(68% 0.15 35)" fg="#16140f" />
-              </div>
-            </div>
-          </div>
+            </>
+          ) : null}
         </section>
 
-        {/* 02 Type */}
+        {/* 02 Typography */}
         <section className="ds-section">
-          <div className="ds-section-header">
-            <span className="num">02 · Type</span>
-            <h2>Fraunces, Inter, Mono.</h2>
-            <span className="dek">A contemporary serif for voice. A precise sans for data. A mono for labels and codes.</span>
+          <div className="ds-section-head">
+            <span className="num">02 · Typography</span>
+            <h2>Source Serif 4, Inter, mono.</h2>
+            <span className="dek">A high-contrast serif for voice, a precise sans for data, mono for labels and codes.</span>
           </div>
-
-          <div className="ds-type-row">
-            <span className="lab">Display / H1</span>
-            <span style={{ fontFamily: "var(--font-heading)", fontWeight: 400, fontSize: "var(--text-56)", lineHeight: 1.02, letterSpacing: "-0.04em" }}>Every chamber.</span>
-            <span className="spec">Fraunces · 400 · 56/1.02 · -4%</span>
-          </div>
-          <div className="ds-type-row">
-            <span className="lab">H2 / Section</span>
-            <span style={{ fontFamily: "var(--font-heading)", fontWeight: 400, fontSize: "var(--text-44)", letterSpacing: "-0.03em" }}>Parliament, live.</span>
-            <span className="spec">Fraunces · 400 · 44 · -3%</span>
-          </div>
-          <div className="ds-type-row">
-            <span className="lab">H3 / Subhead</span>
-            <span style={{ fontFamily: "var(--serif)", fontWeight: 400, fontSize: 22, letterSpacing: "-0.01em" }}>The Chamber</span>
-            <span className="spec">Fraunces · 400 · 22</span>
-          </div>
-          <div className="ds-type-row">
-            <span className="lab">Dek / Lede</span>
-            <span style={{ fontFamily: "var(--serif)", fontStyle: "italic", fontSize: 17, color: "var(--ink-2)" }}>A semi-presidential republic in Western Europe.</span>
-            <span className="spec">Fraunces · italic · 17</span>
-          </div>
-          <div className="ds-type-row">
-            <span className="lab">Body</span>
-            <span style={{ fontFamily: "var(--sans)", fontSize: 14, lineHeight: 1.55, color: "var(--ink-2)" }}>Hover any seat to meet the member. Hold Shift and click two countries to compare them side-by-side.</span>
-            <span className="spec">Inter · 400 · 14/1.55</span>
-          </div>
-          <div className="ds-type-row">
-            <span className="lab">Caption</span>
-            <span style={{ fontFamily: "var(--sans)", fontSize: 12, color: "var(--muted)" }}>577 seats · elected by two-round system</span>
-            <span className="spec">Inter · 400 · 12</span>
-          </div>
-          <div className="ds-type-row">
-            <span className="lab">Eyebrow</span>
-            <span style={{ fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" as const, color: "var(--accent)" }}>Welcome · Atlas</span>
-            <span className="spec">Mono · 10 · 16% track</span>
-          </div>
-          <div className="ds-type-row">
-            <span className="lab">Meta / Code</span>
-            <span style={{ fontFamily: "var(--mono)", fontSize: 11, color: "var(--ink-2)" }}>FRA · 48.8° N, 2.3° E · GMT+1</span>
-            <span className="spec">Mono · 11</span>
-          </div>
+          {TYPE_SCALE.map((t) => (
+            <div key={t.lab} className="ds-type-row">
+              <span className="lab">{t.lab}</span>
+              <span
+                style={{
+                  fontFamily: t.family,
+                  fontSize: t.size,
+                  fontWeight: t.weight,
+                  lineHeight: t.lh,
+                  letterSpacing: t.tr,
+                  color: "var(--color-text-primary)",
+                  textTransform: t.caps ? "uppercase" : "none",
+                }}
+              >
+                {t.text}
+              </span>
+              <span className="spec">{t.spec}</span>
+            </div>
+          ))}
         </section>
 
-        {/* 03 Spacing & Shape */}
+        {/* 03 Spacing & shape */}
         <section className="ds-section">
-          <div className="ds-section-header">
+          <div className="ds-section-head">
             <span className="num">03 · Spacing &amp; Shape</span>
-            <h2>Tight grid, hard edges.</h2>
-            <span className="dek">A 4-pt scale, near-zero radii, and blocky offset shadows for anything that wants to float.</span>
+            <h2>4-pt grid, small radii, soft shadows.</h2>
+            <span className="dek">A tight spacing scale, print-like radii, and restrained navy-tinted elevation.</span>
           </div>
 
-          <h3 className="ds-sub">Scale</h3>
-          <div style={{ maxWidth: 520 }}>
-            {SPACING.map((s) => (
-              <div key={s.name} className="ds-space-row">
-                <span className="label">{s.name}</span>
-                <span className="px">{s.px}</span>
-                <div className="bar" style={{ width: s.px }} />
-              </div>
-            ))}
+          <h3 className="ds-sub">Spacing</h3>
+          <div style={{ maxWidth: 560 }}>
+            {spacing?.tokens
+              .filter((t) => t.cssVar.startsWith("--space-"))
+              .map((t) => (
+                <div key={t.cssVar} className="ds-space-row">
+                  <span className="label">{t.cssVar.replace("--space-", "space-")}</span>
+                  <span className="bar" style={{ width: `var(${t.cssVar})` }} />
+                </div>
+              ))}
           </div>
 
           <h3 className="ds-sub">Radii</h3>
-          <div className="ds-radii">
-            <div className="r" style={{ borderRadius: 0 }}>r-0 · 0</div>
-            <div className="r" style={{ borderRadius: 2 }}>r-1 · 2px</div>
-            <div className="r" style={{ borderRadius: 6 }}>r-2 · 6px</div>
+          <div className="ds-tiles">
+            {radii?.tokens.map((t) => (
+              <div key={t.cssVar} className="ds-tile" style={{ borderRadius: `var(${t.cssVar})` }}>
+                {t.cssVar.replace("--radius-", "r-")}
+              </div>
+            ))}
           </div>
 
           <h3 className="ds-sub">Elevation</h3>
-          <div style={{ display: "flex", gap: 28, marginTop: 10 }}>
-            <div style={{ width: 180, height: 100, background: "var(--paper)", border: "1px solid var(--ink)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--mono)", fontSize: 11 }}>flat</div>
-            <div style={{ width: 180, height: 100, background: "var(--paper)", border: "1px solid var(--ink)", boxShadow: "var(--shadow-hard)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--mono)", fontSize: 11 }}>shadow-hard</div>
-            <div style={{ width: 180, height: 100, background: "var(--paper)", border: "1px solid var(--ink)", boxShadow: "var(--shadow-hard-lg)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--mono)", fontSize: 11 }}>shadow-hard-lg</div>
+          <div className="ds-tiles">
+            {shadows?.tokens.map((t) => (
+              <div key={t.cssVar} className="ds-tile" style={{ boxShadow: `var(${t.cssVar})`, borderRadius: "var(--radius-md)" }}>
+                {t.cssVar.replace("--shadow-", "")}
+              </div>
+            ))}
+          </div>
+
+          <h3 className="ds-sub">Motion</h3>
+          <div className="ds-row" style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-13)", color: "var(--color-text-secondary)" }}>
+            {motion?.tokens.map((t) => (
+              <span key={t.cssVar}>
+                {t.cssVar.replace("--motion-", "")} {t.defaultValue}
+              </span>
+            ))}
           </div>
         </section>
 
         {/* 04 Components */}
         <section className="ds-section">
-          <div className="ds-section-header">
+          <div className="ds-section-head">
             <span className="num">04 · Components</span>
             <h2>The building blocks.</h2>
-            <span className="dek">Patterns used across Atlas, Chamber, and Compare.</span>
+            <span className="dek">Real primitives — the same components the site renders.</span>
           </div>
 
           <div className="ds-comp-grid">
             <div className="ds-comp">
               <h4>Buttons</h4>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <div className="ds-row">
                 <button className="ds-btn">Default</button>
                 <button className="ds-btn primary">Primary</button>
                 <button className="ds-btn accent">Accent</button>
                 <button className="ds-btn ghost">Ghost</button>
-                <button className="ds-btn primary hard">Primary · hard</button>
               </div>
             </div>
 
             <div className="ds-comp">
-              <h4>Chips / Filters</h4>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <h4>Pills (real)</h4>
+              <div className="ds-row">
+                <Pill>Default</Pill>
+                <Pill variant="accent">Accent</Pill>
+                <Pill variant="success">Passed</Pill>
+                <Pill variant="warn">In committee</Pill>
+                <Pill variant="danger">Failed</Pill>
+                <Pill variant="info">Procedural</Pill>
+              </div>
+            </div>
+
+            <div className="ds-comp">
+              <h4>Filter chips</h4>
+              <div className="ds-row">
                 <button className="ds-chip on">All</button>
                 <button className="ds-chip">Europe</button>
-                <button className="ds-chip">Americas</button>
-                <button className="ds-chip">Federal</button>
                 <button className="ds-chip">Parliamentary</button>
                 <button className="ds-chip">Monarchy</button>
               </div>
@@ -291,13 +265,13 @@ export default function DesignSystemPage() {
             <div className="ds-comp">
               <h4>Search input</h4>
               <div className="ds-input">
-                <span style={{ color: "var(--muted)", fontFamily: "var(--mono)", fontSize: 11 }}>&#x2315;</span>
-                <input type="text" placeholder="Find a country, leader, bill..." readOnly />
-                <span className="kbd">&#x2318;K</span>
+                <span style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-mono)", fontSize: "var(--text-13)" }}>⌕</span>
+                <input type="text" placeholder="Find a country, leader, bill…" readOnly />
+                <span className="kbd">⌘K</span>
               </div>
             </div>
 
-            <div className="ds-comp">
+            <div className="ds-comp ds-comp--wide">
               <h4>Tabs</h4>
               <div className="ds-tabs">
                 {ATLAS_TAB_ORDER.map((tab) => (
@@ -309,42 +283,84 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="ds-comp">
-              <h4>Country hover card</h4>
-              <div className="ds-hov">
-                <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 4 }}>
-                  <span className="code">FRA</span>
+              <h4>Provenance — SourceDot (real)</h4>
+              <div className="ds-row" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", color: "var(--color-text-secondary)" }}>
+                <span>Live <SourceDot source="wikidata" retrievedAt="2026-06-01" /></span>
+                <span>Frozen <SourceDot source="cia_factbook" retrievedAt="2026-01-15" /></span>
+              </div>
+            </div>
+
+            <div className="ds-comp">
+              <h4>StatusDot (real)</h4>
+              <div className="ds-row" style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-14)", color: "var(--color-text-secondary)" }}>
+                <span><StatusDot state="active" /> Active</span>
+                <span><StatusDot state="idle" /> Idle</span>
+                <span><StatusDot state="warn" /> Warn</span>
+                <span><StatusDot state="down" /> Down</span>
+              </div>
+            </div>
+
+            <div className="ds-comp">
+              <h4>Gov-type badges</h4>
+              <div className="ds-row">
+                {[
+                  ["Parliamentary", "--gov-parl"],
+                  ["Presidential", "--gov-pres"],
+                  ["Semi-presidential", "--gov-semi"],
+                  ["Monarchy", "--gov-mon"],
+                  ["Theocracy", "--gov-theo"],
+                ].map(([label, v]) => (
+                  <span
+                    key={v}
+                    style={{
+                      fontFamily: "var(--font-body)", fontSize: "var(--text-12)", fontWeight: 600,
+                      color: `var(${v})`,
+                      background: `color-mix(in oklab, var(${v}) 14%, transparent)`,
+                      border: `1px solid color-mix(in oklab, var(${v}) 34%, transparent)`,
+                      padding: "2px 8px", borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="ds-comp">
+              <h4>Country card + Index score</h4>
+              <div className="ds-card">
+                <div className="nm">Denmark</div>
+                <div className="meta">Parliamentary · Europe · 5.9M</div>
+                <div className="foot">
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-muted)" }}>
+                    CIVICA INDEX
+                  </span>
+                  <span className="ds-score" style={{ color: "var(--tier-exceptional)" }}>91</span>
                 </div>
-                <h3>France</h3>
-                <div className="row"><span>Semi-Presidential</span><b>Europe</b></div>
-                <div className="row"><span>Paris · 68M</span><b>$3.0T</b></div>
-                <div className="cta">Click to enter chamber &#x2197;</div>
-              </div>
-            </div>
-
-            <div className="ds-comp">
-              <h4>Status badges</h4>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase" as const }}>
-                <span style={{ background: "var(--success)", color: "var(--color-on-accent)", padding: "3px 8px" }}>Passed</span>
-                <span style={{ background: "var(--warn)", color: "var(--color-on-warning)", padding: "3px 8px" }}>In committee</span>
-                <span style={{ background: "var(--danger)", color: "var(--color-on-accent)", padding: "3px 8px" }}>Failed</span>
-                <span style={{ background: "var(--info)", color: "var(--color-on-accent)", padding: "3px 8px" }}>Procedural</span>
-                <span style={{ border: "1px solid var(--rule)", color: "var(--ink-2)", padding: "3px 8px" }}>Draft</span>
-              </div>
-            </div>
-
-            <div className="ds-comp">
-              <h4>Party seats</h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, fontFamily: "var(--sans)", fontSize: 12 }}>
-                <div className="ds-seat"><span className="d" style={{ background: "oklch(55% 0.15 25)" }} />National Rally · 89</div>
-                <div className="ds-seat"><span className="d" style={{ background: "oklch(60% 0.14 270)" }} />Renaissance · 171</div>
-                <div className="ds-seat"><span className="d" style={{ background: "oklch(58% 0.13 145)" }} />Ecologists · 23</div>
-                <div className="ds-seat"><span className="d" style={{ background: "oklch(55% 0.18 15)" }} />Socialists · 66</div>
-                <div className="ds-seat"><span className="d" style={{ background: "var(--muted)" }} />Independent · 12</div>
               </div>
             </div>
 
             <div className="ds-comp ds-comp--wide">
-              <h4>Hemicycle</h4>
+              <h4>Banners (real)</h4>
+              <div style={{ display: "grid", gap: "var(--space-3)" }}>
+                <Banner variant="info">Methodology in active development.</Banner>
+                <Banner variant="success">All sources synced this quarter.</Banner>
+                <Banner variant="warn">Pulse is paused — scores may be stale.</Banner>
+                <Banner variant="danger">This figure failed reconciliation.</Banner>
+              </div>
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4>Section header (real)</h4>
+              <SectionHeader
+                eyebrow="Evidence"
+                title="Readable structure."
+                dek="The same SectionHeader primitive used across reader and methodology pages."
+              />
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4>Hemicycle (canonical FactbookLegislatureChart)</h4>
               <FactbookLegislatureChart
                 chamber={SAMPLE_CHAMBER}
                 houseLabel="Lower house"
@@ -352,111 +368,35 @@ export default function DesignSystemPage() {
               />
             </div>
           </div>
-
-          <h3 className="ds-sub" style={{ marginTop: 48 }}>Editorial primitives</h3>
-          <div className="ds-comp-grid">
-            <div className="ds-comp">
-              <h4>SourceDot</h4>
-              <p style={{ fontFamily: "var(--sans)", fontSize: 14, color: "var(--ink-2)", margin: 0 }}>
-                Every data point carries live or frozen provenance.
-              </p>
-            </div>
-            <div className="ds-comp">
-              <h4>Pill / Badge</h4>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <span className="ds-chip on">Exceptional</span>
-                <span className="ds-chip">Warning</span>
-                <span className="ds-chip">Live</span>
-              </div>
-            </div>
-            <div className="ds-comp">
-              <h4>Banner / Alert</h4>
-              <div className="ds-directive-banner" style={{ margin: 0, boxShadow: "none" }}>
-                Methodology in active development.
-              </div>
-            </div>
-            <div className="ds-comp">
-              <h4>Section header</h4>
-              <div className="ds-section-header" style={{ margin: 0 }}>
-                <span className="num">Evidence</span>
-                <h2 style={{ fontSize: "var(--text-28)" }}>Readable structure.</h2>
-              </div>
-            </div>
-            <div className="ds-comp ds-comp--wide">
-              <h4>Blog table</h4>
-              <div className="post-table-scroll">
-                <table className="post-table">
-                  <thead>
-                    <tr>
-                      <th>Feature</th>
-                      <th>CIA World Factbook</th>
-                      <th>Civica</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Data freshness</td>
-                      <td>Annual updates</td>
-                      <td>Live from reconciled sources</td>
-                    </tr>
-                    <tr>
-                      <td>Comparisons</td>
-                      <td>Separate country pages</td>
-                      <td>Side-by-side country views</td>
-                    </tr>
-                    <tr>
-                      <td>Reader mode</td>
-                      <td>Static reference</td>
-                      <td>Responsive, cited, dark/light</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <h3 className="ds-sub" style={{ marginTop: 48 }}>Country masthead</h3>
-          <div className="ds-comp" style={{ padding: "28px 32px" }}>
-            <div className="ds-mast">
-              <div>
-                <div className="ey">FRA · Western Europe</div>
-                <h1>France</h1>
-                <div className="dek">A semi-presidential republic of 68 million.</div>
-              </div>
-              <div className="qf">
-                <div className="r"><b>Leader</b><span>Pres. L. Dubois</span></div>
-                <div className="r"><b>Gov</b><span>Semi-Presidential</span></div>
-                <div className="r"><b>Capital</b><span>Paris</span></div>
-                <div className="r"><b>Pop</b><span>68M</span></div>
-                <div className="r"><b>GDP</b><span>$3.0T</span></div>
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* 05 Voice */}
         <section className="ds-section">
-          <div className="ds-section-header">
+          <div className="ds-section-head">
             <span className="num">05 · Voice</span>
             <h2>Clear, civic, dry.</h2>
             <span className="dek">Like a textbook written by a journalist. Factual, spare, a little warm.</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
-            <div style={{ borderLeft: "2px solid var(--success)", padding: "8px 18px" }}>
-              <div style={{ fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--success)" }}>Do</div>
-              <p style={{ fontFamily: "var(--serif)", fontSize: 16, color: "var(--ink)", margin: "8px 0 0" }}>&ldquo;France is a semi-presidential republic. The President and Prime Minister share executive power.&rdquo;</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-7)" }}>
+            <div style={{ borderLeft: "2px solid var(--color-success)", padding: "var(--space-3) var(--space-5)" }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-success)" }}>Do</div>
+              <p style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-18)", color: "var(--color-text-primary)", margin: "var(--space-3) 0 0" }}>
+                &ldquo;France is a semi-presidential republic. The President and Prime Minister share executive power.&rdquo;
+              </p>
             </div>
-            <div style={{ borderLeft: "2px solid var(--danger)", padding: "8px 18px" }}>
-              <div style={{ fontFamily: "var(--mono)", fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--danger)" }}>Don&apos;t</div>
-              <p style={{ fontFamily: "var(--serif)", fontSize: 16, color: "var(--ink)", margin: "8px 0 0" }}>&ldquo;Dive into France&apos;s fascinating governmental landscape, where dual executives share the stage in an exciting political dance!&rdquo;</p>
+            <div style={{ borderLeft: "2px solid var(--color-danger)", padding: "var(--space-3) var(--space-5)" }}>
+              <div style={{ fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)", fontSize: "var(--text-12)", letterSpacing: "var(--tracking-caps)", textTransform: "uppercase", color: "var(--color-danger)" }}>Don&apos;t</div>
+              <p style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-18)", color: "var(--color-text-primary)", margin: "var(--space-3) 0 0" }}>
+                &ldquo;Dive into France&apos;s fascinating governmental landscape, where dual executives share the stage in an exciting political dance!&rdquo;
+              </p>
             </div>
           </div>
         </section>
       </main>
 
       <footer className="ds-foot">
-        <span>Civica Design System · v0.1</span>
-        <span>April 2026</span>
+        <span>Civica Design System · v0.2</span>
+        <span>June 2026</span>
       </footer>
     </div>
   );
