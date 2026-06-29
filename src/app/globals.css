@@ -667,11 +667,12 @@ a {
   box-shadow: var(--shadow-hard-sm);
 }
 
-/* Site-header primary CTA ("Explore Countries") — desktop only. Hidden at/below
-   the md breakpoint (--bp-md: 768px) so it doesn't duplicate the mobile
-   hamburger menu. Compound `.btn.site-header__cta` beats `.btn`'s unlayered
-   `display`, which a layered Tailwind `hidden` utility could not. */
-@media (max-width: 768px) {
+/* Site-header primary CTA ("Explore Countries") — wide-desktop only. Hidden
+   below the xl breakpoint (--bp-xl: 1200px): between md and xl the full nav (6
+   items + 2 dropdowns) already fills the bar, so showing the CTA there crowds
+   the wordmark and wraps "The Record". Compound `.btn.site-header__cta` beats
+   `.btn`'s unlayered `display`, which a layered Tailwind `hidden` utility could not. */
+@media (max-width: 1199px) {
   .btn.site-header__cta {
     display: none;
   }
