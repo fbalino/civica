@@ -1,5 +1,43 @@
 # Project Memory Sessions
 
+## 2026-06-29 (pt3) — Editorial build wave + canonical search shape, shipped to prod
+
+Owner picked from the pt2 mockups + new asks. All live on `main`
+(9fbca6f→eedc405) → civicaatlas.org, verified (incl. mobile).
+
+- **Canonical search shape = rounded RECTANGLE (radius-lg), NOT pill** (owner
+  decision). Changed `.country-search__field` + `.country-search__results` +
+  `.factbook-index-search-field` radius-full→radius-lg. DESIGN.md/AGENTS.md
+  updated (radius-full is now circular-controls-only). NOTE for future work:
+  search boxes are rounded rectangles site-wide, never pills.
+- **Factbook landing rebuilt = mockup Option C**: full-bleed engraving hero
+  (homepage idiom) + canonical rounded-rect search (CountrySearchCombobox) +
+  region filter chips + dense A–Z "almanac index" (SVG flags, terracotta
+  drop-letters, 253 countries). New src/components/factbook/FactbookAlmanac.tsx;
+  deleted dead FactbookIndexSearchList.tsx.
+- **The Record (/blog) restyled** to the updates-index mockup (masthead, lead
+  story, card grid) — PRESERVED "In the margins", "Editor's note", "Topics"
+  (now tinted chips), Colophon, per owner.
+- **Longform (/blog/[slug]) restyled** to the longform mockup (scrim engraving
+  hero, terracotta drop cap, pull-quote) — PRESERVED .post-rail sidebar,
+  .post-author box, .post-more "More from The Record" (already existed; kept +
+  restyled), per owner. Fixed latent mobile overflow (min-width:0 on .post-prose).
+- **NEW /glossary page** (didn't exist): 31 curated governance terms
+  (src/lib/data/glossary.ts), sticky A–Z scroll-spy strip (GlossaryNav.tsx),
+  two-column terms + tinted category tags + See-also methodology links. Scoped
+  src/app/glossary.css. Footer link added (between Licensing & Contact) + sitemap.
+- **About page hero**: full-bleed engraving masthead (.about-hero in editorial.css),
+  PLACEHOLDER /engravings/hero.webp — owner will swap a bespoke Codex engraving
+  later (src + comment flag where).
+- **Factbook mobile country header** fixed to "gorgeous": on ≤768px the
+  `.factbook-hero--art` overlay stacks vertically (engraving banner 5:4 → caption
+  → masthead on paper → 2-up MAP/IMAGES tiles); was hidden-engraving + overflowing
+  tiles. Desktop overlay unchanged (scoped to mobile media block).
+- Engravings now 92 countries (added kgz/kwt; jor/kaz/kir/xkx earlier in pt2).
+
+MISSING engravings still (for Codex): esp nor swe che nld mex per pol prt tur sau
+zaf nga rus ukr vnm tha phl (graceful fallback meanwhile).
+
 ## 2026-06-29 (pt2) — Almanac polish wave: SVG flags, captions, drift sweep shipped
 
 Owner request batch (went to gym, "make a lot of progress"). Shipped to `main`
