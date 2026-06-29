@@ -1,5 +1,43 @@
 # Project Memory Sessions
 
+## 2026-06-29 (pt2) — Almanac polish wave: SVG flags, captions, drift sweep shipped
+
+Owner request batch (went to gym, "make a lot of progress"). Shipped to `main`
+(bba2964→de5c3f5) → civicaatlas.org, verified live. Orchestrated via subagents +
+a 2nd drift Workflow.
+
+SHIPPED & LIVE:
+- **SVG flags sitewide**: CountryFlag now uses flagcdn `<iso2>.svg` (vector) + hairline
+  ring; every emoji flag replaced with <CountryFlag> (HomeGrid cards + Index table,
+  CountrySearchCombobox, Compare picker). Only remaining emoji is CountryFlag's onError fallback.
+- **Factbook hero captions**: per-country landmark caption on the engraving hero, from a
+  committed data module `src/lib/data/engraving-captions.ts` (generated from Codex's
+  manifest `~/civica/plan/country-engraving-manifest-2026-06-28.json`, 197 rows iso3→landmark).
+  Wired in FactbookHeaderStrip (heroCaption prop) + factbook/[slug]/page.tsx.
+- **Visual-consistency sweep** (Workflow: 4 finders + adversarial verify, 13 confirmed
+  low/med findings) — all fixed: 'Sources on this page' box, MAP/IMAGES tiles, factbook
+  bill/index/leaders cards, Civica AI drawer, search-results dropdown all had ink-navy
+  (--color-text-primary) HARD borders → now soft hairline (--color-card-border) + radius +
+  soft shadow. Civica AI drawer 'Beta' mono-uppercase pill → mixed-case sand Chip.
+  Hemicycle tooltip (4px 4px 0) + embed widget (3px 3px 0 / 6px 6px 0) hard-offset shadows
+  → soft tokens; embed widget square→rounded, ink border→hairline, hard-lift hover→subtle.
+- **Atlas country-hover card** redesigned to the new country-card language (CountryHoverCard
+  + .v2-country-card in atlas.css): SVG flag, soft shadow-hard-lg, radius-lg, tonal Chip,
+  tabular-nums. Atlas --atlas-* tokens + map untouched (owner asked for the hover card specifically).
+- Engravings now 90 countries (added jor/kaz/kir/xkx).
+
+MOCKUPS DELIVERED for owner to pick (in mockups/, 06-29-2026- prefix):
+- factbook-landing-A/B/C (3 country-picker concepts: Region Grid [recommended] / Featured+RegionTabs / Typeahead+AlmanacIndex)
+- editorial-longform (DS-6 "Inside Democratic Resilience" longform) / editorial-updates-index ("The Record") / editorial-glossary (NEW — no glossary exists yet)
+
+STILL TODO (gated on owner's mockup pick — do NOT build until he chooses):
+- Build the chosen /factbook landing redesign.
+- Build the chosen editorial/longform template + the Glossary (new page, needs term content).
+- About-page hero image + editorial hero images (needs asset choice: reuse an existing
+  engraving e.g. hero.webp, or new Codex art).
+- MISSING engravings for Codex: esp nor swe che nld mex per pol prt tur sau zaf nga rus ukr vnm tha phl
+  (those countries' factbook heroes fall back gracefully meanwhile).
+
 ## 2026-06-29 — Almanac redesign: component reconciliation shipped to prod
 
 Continued the "fine-press almanac" redesign (mockups at ~/Downloads/Civica/,
