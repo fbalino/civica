@@ -15,7 +15,7 @@ import {
  * each path to a Country by NE_ID lookup. Falls back to the curated
  * WORLD_PATHS set in ./data if the CDN fetch fails offline.
  *
- * Used by both AtlasApp (legacy /) and the (shell)/atlas route pages.
+ * Used by both AtlasApp (legacy /) and the standalone (reader)/atlas pages.
  */
 export function useMapPaths(
   countries: Country[],

@@ -1,14 +1,12 @@
-// Cross-component events for the three-pane shell.
+// Cross-component "Ask Civica" event bus.
 //
-// Problem: in the legacy Atlas, clicking "Ask AI" on a bill card writes
-// directly into the chat textarea via a shared React ref (chatInputRef).
-// When chat moves into its own route slot under (shell)/*/@right, refs can
-// no longer cross the pane boundary. Passing a callback down also doesn't
-// work — the triggers (bill cards, future structure-diagram tooltips, etc.)
-// live in different route segments from the chat.
+// Problem: clicking "Ask AI" on a bill card needs to drive the Civica AI
+// chat, but the trigger (a bill card deep in the atlas/factbook tree) and
+// the chat surface live in different component subtrees, so a shared React
+// ref or a passed-down callback can't reliably cross the boundary.
 //
-// Solution: a tiny typed CustomEvent bus on `window`. AskCivicaPanel
-// listens (gated by `listenForExternalAsk`); triggers dispatch.
+// Solution: a tiny typed CustomEvent bus on `window`. The chat surface
+// (factbook's CivicaAIDrawer) listens; triggers dispatch.
 
 export const CIVICA_ASK_EVENT = "civica:ask";
 

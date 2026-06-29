@@ -25,9 +25,9 @@ export interface AtlasUrlState {
  * param, with defaults (`chamber` / `lower`). Writes via `router.replace`
  * with `{ scroll: false }` so tab and house toggles don't jump to the top.
  *
- * Used by the shell route wrappers under `(shell)/atlas/*`. The legacy
- * `/` route does NOT use this hook — it keeps its own React state since
- * it never writes to the URL.
+ * Used by the standalone atlas country view under `(reader)/atlas/*`. The
+ * legacy `/` route does NOT use this hook — it keeps its own React state
+ * since it never writes to the URL.
  */
 export function useAtlasUrlState(): AtlasUrlState {
   const params = useParams<{ slug?: string; tab?: string }>();

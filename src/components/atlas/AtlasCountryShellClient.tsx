@@ -45,9 +45,9 @@ export interface AtlasCountryShellClientProps {
 }
 
 /**
- * Client wrapper for the (shell)/atlas/[slug]/[tab] country view. Owns
- * per-tab data fetches and passes them into AtlasCountryCenter, which is
- * presentational.
+ * Client wrapper for the standalone (reader)/atlas/[slug]/[tab] country
+ * view. Owns per-tab data fetches and passes them into AtlasCountryCenter,
+ * which is presentational.
  *
  * Tab and house come from the URL via useAtlasUrlState — toggling either
  * does a shallow `router.replace` without a full page reload, so tab
