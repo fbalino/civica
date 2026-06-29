@@ -45,7 +45,17 @@ function shortGovLabel(gov: string | null): string {
   if (g.includes("one-party") || g.includes("single-party")) return "One-party";
   if (g.includes("military")) return "Military";
   if (g.includes("theocra")) return "Theocratic";
-  return gov;
+  if (g.includes("communist")) return "Communist state";
+  if (g.includes("dictatorship")) return "Dictatorship";
+  if (g.includes("authoritarian")) return "Authoritarian";
+  if (g.includes("transition")) return "In transition";
+  if (g.includes("federal") && g.includes("republic")) return "Federal republic";
+  if (g.includes("confederation")) return "Confederation";
+  if (g.includes("republic")) return "Republic";
+  // Humanize any remaining raw/slug value (e.g. "federal_republic_formally_a_
+  // confederation") so a snake_case label never leaks into the UI.
+  const cleaned = gov.replace(/[_-]+/g, " ").replace(/\s+/g, " ").trim();
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
 }
 
 function formatPop(n: number | null): string {
