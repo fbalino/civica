@@ -12,6 +12,9 @@ export interface BlogPost {
   coverImage: string | null;
   coverAlt: string | null;
   coverCaption: string | null;
+  /** Draft posts (frontmatter `draft: true`) are excluded from the site —
+      used for articles awaiting their final artwork before publishing. */
+  draft: boolean;
   content: string;
 }
 
@@ -33,10 +36,14 @@ export function getAllPosts(): BlogPost[] {
       coverImage: data.coverImage ?? null,
       coverAlt: data.coverAlt ?? null,
       coverCaption: data.coverCaption ?? null,
+      draft: data.draft === true,
       content,
     };
   });
-  return posts.sort((a, b) => (a.date > b.date ? -1 : 1));
+  // Drafts never render on the site; remove the `draft: true` flag to publish.
+  return posts
+    .filter((p) => !p.draft)
+    .sort((a, b) => (a.date > b.date ? -1 : 1));
 }
 
 export function getPostBySlug(slug: string): BlogPost | null {

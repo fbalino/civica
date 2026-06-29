@@ -1045,20 +1045,25 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: radial-gradient(
-    120% 90% at 50% 30%,
-    color-mix(in oklab, var(--color-bg) 28%, transparent) 0%,
-    color-mix(in oklab, var(--color-bg) 70%, transparent) 60%,
-    color-mix(in oklab, var(--color-bg) 96%, transparent) 100%
+  /* Left-protecting wash so the left-aligned content stays legible while the
+     engraving reads through on the right. */
+  background: linear-gradient(
+    to right,
+    color-mix(in oklab, var(--color-bg) 90%, transparent) 0%,
+    color-mix(in oklab, var(--color-bg) 72%, transparent) 38%,
+    color-mix(in oklab, var(--color-bg) 32%, transparent) 72%,
+    transparent 100%
   );
 }
 .factbook-hero-inner {
   position: relative;
   z-index: 2;
-  max-width: 760px;
+  /* Left-aligned content (homepage idiom) aligned to the index container below;
+     the engraving's landmark falls on the right, so left content balances it. */
+  max-width: 1200px;
   margin: 0 auto;
   padding: var(--space-9) var(--space-6) var(--space-8);
-  text-align: center;
+  text-align: left;
 }
 .factbook-hero-eyebrow {
   display: inline-flex;
@@ -1094,13 +1099,13 @@
   font-size: var(--text-18);
   line-height: var(--leading-normal);
   color: var(--color-text-secondary);
-  max-width: 36rem;
-  margin: 0 auto var(--space-6);
+  max-width: 38rem;
+  margin: 0 0 var(--space-6);
 }
-/* Center the canonical combobox inside the hero. */
+/* Left-aligned canonical combobox inside the hero. */
 .factbook-hero-search {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 34rem;
+  margin: 0;
   text-align: left;
 }
 .factbook-hero-search .country-search__field {
@@ -1110,7 +1115,7 @@
 /* ── Region quick-filter chips ── */
 .factbook-hero-chips {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: var(--space-2);
   margin-top: var(--space-6);
