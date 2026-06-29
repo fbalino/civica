@@ -98,17 +98,36 @@ export default async function AboutPage() {
   const state = { civicaIndex, pulse };
 
   return (
-    <div
-      className="cv-container"
-      style={{
-        paddingTop: "var(--spacing-hero-top)",
-        paddingBottom: "var(--spacing-section-y)",
-      }}
-    >
-      <h1 className="hero-heading">About Civica Atlas</h1>
+    <>
+      {/* Engraving masthead. Placeholder art (/engravings/hero.webp) — swap
+          `src` for a bespoke About engraving when available. */}
+      <section className="about-hero">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className="about-hero-img"
+          src="/engravings/hero.webp"
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="about-hero-inner">
+          <h1 className="about-hero-title">About Civica Atlas</h1>
+          <p className="about-hero-dek">
+            An open reference atlas of the world&rsquo;s countries, governments,
+            and governance outcomes &mdash; built on multi-source reconciliation,
+            statement-level provenance, and published methodology.
+          </p>
+        </div>
+      </section>
 
-      {/* Intro paragraphs — markdown body, sliced to everything
-          BEFORE the "How it works" section. */}
+      <div
+        className="cv-container"
+        style={{
+          paddingTop: "var(--spacing-section-y)",
+          paddingBottom: "var(--spacing-section-y)",
+        }}
+      >
+        {/* Intro paragraphs — markdown body, sliced to everything
+            BEFORE the "How it works" section. */}
       <section className="editorial-section about-prose-intro">
         <MarkdownContent
           file="content/about.md"
@@ -496,6 +515,7 @@ export default async function AboutPage() {
           slice={{ from: "standing-posture" }}
         />
       </section>
-    </div>
+      </div>
+    </>
   );
 }
