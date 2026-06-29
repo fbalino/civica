@@ -557,29 +557,223 @@ a {
 .tab-nav {
   font-family: var(--font-body);
   font-weight: 500;
-  font-size: var(--text-14);
+  font-size: var(--text-15);
   background: none;
   border: none;
   padding: 10px 14px;
   cursor: pointer;
   transition: color 0.15s ease;
   letter-spacing: 0;
-  color: var(--color-text-30);
-  border-bottom: 1px solid transparent;
-  text-transform: capitalize;
+  color: var(--color-text-60);
+  border-bottom: 2px solid transparent;
+  text-transform: none;
 }
 
 .tab-nav:hover {
-  color: var(--color-text-40);
+  color: var(--color-text-primary);
 }
 
 .tab-nav--active {
   color: var(--color-text-primary);
+  font-weight: 600;
   border-bottom-color: var(--color-accent);
 }
 
 .tab-nav:focus-visible {
   outline-offset: -2px;
+}
+
+/* ============================================================
+   Button system (component spec v1 §3)
+   Base + variants (primary/secondary/tertiary/text), sizes, states,
+   focus-visible ring, optional trailing arrow. Token-only.
+   PRIMARY auto-inverts by theme: it fills with --color-text-primary
+   (navy in light, cream in dark) and uses --color-page-bg for the
+   label (ivory in light, dark in dark) — so contrast holds in both.
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 10px 18px;
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--motion-ease-out),
+    border-color var(--motion-fast) var(--motion-ease-out),
+    box-shadow var(--motion-fast) var(--motion-ease-out),
+    color var(--motion-fast) var(--motion-ease-out);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"],
+.btn.is-loading {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Trailing arrow glyph — nudges right on hover for the canonical CTA feel. */
+.btn__arrow {
+  display: inline-flex;
+  line-height: 1;
+  transition: transform var(--motion-fast) var(--motion-ease-out);
+}
+.btn:hover .btn__arrow {
+  transform: translateX(2px);
+}
+
+/* Inline loading spinner (replaces the arrow position visually). */
+.btn__spinner {
+  width: 1em;
+  height: 1em;
+  border-radius: var(--radius-full);
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  animation: btn-spin 0.6s linear infinite;
+}
+@keyframes btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Primary — navy fill (auto-inverts to cream in dark), paper-colored label. */
+.btn--primary {
+  background: var(--color-text-primary);
+  color: var(--color-page-bg);
+  box-shadow: var(--shadow-hard-sm);
+}
+.btn--primary:hover {
+  background: color-mix(in oklab, var(--color-text-primary), white 12%);
+  box-shadow: var(--shadow-hard-md);
+}
+.btn--primary:active {
+  background: color-mix(in oklab, var(--color-text-primary), black 8%);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+/* Secondary — outline, navy label. */
+.btn--secondary {
+  background: transparent;
+  border-color: var(--color-card-border);
+  color: var(--color-text-primary);
+}
+.btn--secondary:hover {
+  background: color-mix(in oklab, var(--color-text-primary) 6%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-text-primary) 24%, var(--color-card-border));
+}
+.btn--secondary:active {
+  background: color-mix(in oklab, var(--color-text-primary) 10%, var(--color-page-bg));
+}
+
+/* Tertiary — borderless, muted label. */
+.btn--tertiary {
+  background: transparent;
+  color: var(--color-text-60);
+}
+.btn--tertiary:hover {
+  background: color-mix(in oklab, var(--color-text-primary) 5%, var(--color-page-bg));
+  color: var(--color-text-primary);
+}
+.btn--tertiary:active {
+  background: color-mix(in oklab, var(--color-text-primary) 9%, var(--color-page-bg));
+}
+
+/* Text — link-style CTA (the "Explore Factbook →" homepage feature link). */
+.btn--text {
+  background: transparent;
+  border-color: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  color: var(--color-accent);
+}
+.btn--text:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Sizes. */
+.btn--sm {
+  padding: 8px 14px;
+  font-size: var(--text-14);
+}
+.btn--sm.btn--text {
+  padding-left: 0;
+  padding-right: 0;
+}
+.btn--lg {
+  padding: 13px 24px;
+  font-size: var(--text-16);
+}
+.btn--lg.btn--text {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ============================================================
+   SegmentedControl (component spec v1 §5) — NEW
+   Container well + navy active segment with a soft shadow.
+   ============================================================ */
+
+.segmented {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--color-page-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+}
+
+.segmented__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  border: none;
+  border-radius: calc(var(--radius-md) - 3px);
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-text-60);
+  cursor: pointer;
+  transition:
+    background var(--motion-fast) var(--motion-ease-out),
+    color var(--motion-fast) var(--motion-ease-out),
+    box-shadow var(--motion-fast) var(--motion-ease-out);
+}
+
+.segmented__item:hover {
+  color: var(--color-text-primary);
+}
+
+.segmented__item--active,
+.segmented__item--active:hover {
+  background: var(--color-text-primary);
+  color: var(--color-page-bg);
+  box-shadow: var(--shadow-hard-sm);
+}
+
+.segmented__item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .nav-dropdown {
@@ -3615,26 +3809,35 @@ a {
   min-width: 0;
   width: 100%;
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-card-bg);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-elevated);
   color: var(--color-text-primary);
   min-height: calc(var(--space-8) - var(--space-1));
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  box-shadow: var(--shadow-hard-sm);
   cursor: text;
   transition:
     border-color var(--motion-fast) var(--motion-ease-out),
-    background var(--motion-fast) var(--motion-ease-out);
+    background var(--motion-fast) var(--motion-ease-out),
+    box-shadow var(--motion-fast) var(--motion-ease-out);
 }
 .country-search__field:focus-within {
-  border-color: var(--color-text-primary);
+  border-color: var(--color-accent);
   background: var(--color-surface-elevated);
-  box-shadow: var(--shadow-hard);
+  box-shadow: var(--shadow-hard-md);
 }
 .country-search__icon {
   width: var(--space-5);
   height: var(--space-5);
   flex: 0 0 auto;
   color: var(--color-text-muted);
+  stroke-width: 1.6;
+}
+.country-search__filter-icon {
+  width: var(--space-5);
+  height: var(--space-5);
+  flex: 0 0 auto;
+  color: var(--color-text-40);
   stroke-width: 1.6;
 }
 .country-search input {
@@ -3644,14 +3847,15 @@ a {
   outline: 0;
   background: transparent;
   color: var(--color-text-primary);
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-13);
-  letter-spacing: var(--tracking-wide);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--text-15);
+  letter-spacing: 0;
   line-height: var(--leading-tight);
 }
 .country-search input::placeholder {
-  color: var(--color-text-muted);
+  color: var(--color-text-40);
+  font-family: var(--font-body);
 }
 .country-search__shortcut {
   flex: 0 0 auto;

@@ -9,7 +9,7 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export interface CountrySearchOption {
@@ -31,6 +31,8 @@ interface CountrySearchComboboxProps {
   compact?: boolean;
   showShortcut?: boolean;
   enableShortcut?: boolean;
+  /** Optional trailing sliders/filter affordance (component spec §4). */
+  showFilterIcon?: boolean;
   className?: string;
 }
 
@@ -52,6 +54,7 @@ export function CountrySearchCombobox({
   compact = false,
   showShortcut = false,
   enableShortcut = false,
+  showFilterIcon = false,
   className,
 }: CountrySearchComboboxProps) {
   const router = useRouter();
@@ -184,6 +187,12 @@ export function CountrySearchCombobox({
           autoComplete="off"
         />
         {showShortcut ? <kbd className="country-search__shortcut">⌘K</kbd> : null}
+        {showFilterIcon ? (
+          <SlidersHorizontal
+            className="country-search__filter-icon"
+            aria-hidden="true"
+          />
+        ) : null}
       </div>
 
       {open && filtered.length > 0 ? (

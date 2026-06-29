@@ -5,7 +5,8 @@ import { Banner } from "@/components/editorial/Banner";
 import { Pill } from "@/components/editorial/Pill";
 import { StatusDot } from "@/components/editorial/StatusDot";
 import { SourceDot } from "@/components/SourceDot";
-import { ATLAS_TAB_LABELS, ATLAS_TAB_ORDER } from "@/lib/atlas/ids";
+import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
+import { SegmentedControlDemo } from "./SegmentedControlDemo";
 import { DEV_TOKEN_GROUPS, type DevTokenGroup } from "@/components/dev/dev-tokens";
 
 import "./design-system.css";
@@ -230,13 +231,45 @@ export default function DesignSystemPage() {
           </div>
 
           <div className="ds-comp-grid">
-            <div className="ds-comp">
-              <h4>Buttons</h4>
+            <div className="ds-comp ds-comp--wide">
+              <h4>Buttons (real .btn system)</h4>
               <div className="ds-row">
-                <button className="ds-btn">Default</button>
-                <button className="ds-btn primary">Primary</button>
-                <button className="ds-btn accent">Accent</button>
-                <button className="ds-btn ghost">Ghost</button>
+                <button type="button" className="btn btn--primary">
+                  <span>Primary Button</span>
+                  <span className="btn__arrow" aria-hidden="true">
+                    &rarr;
+                  </span>
+                </button>
+                <button type="button" className="btn btn--secondary">
+                  Secondary Button
+                </button>
+                <button type="button" className="btn btn--tertiary">
+                  Tertiary
+                </button>
+                <button type="button" className="btn btn--text">
+                  <span>Text link</span>
+                  <span className="btn__arrow" aria-hidden="true">
+                    &rarr;
+                  </span>
+                </button>
+              </div>
+              <div className="ds-row" style={{ marginTop: "var(--space-4)" }}>
+                <button type="button" className="btn btn--primary btn--sm">
+                  Small
+                </button>
+                <button type="button" className="btn btn--primary">
+                  Default
+                </button>
+                <button type="button" className="btn btn--primary btn--lg">
+                  Large
+                </button>
+                <button type="button" className="btn btn--secondary" disabled>
+                  Disabled
+                </button>
+                <button type="button" className="btn btn--primary is-loading">
+                  <span>Loading</span>
+                  <span className="btn__spinner" aria-hidden="true" />
+                </button>
               </div>
             </div>
 
@@ -262,21 +295,38 @@ export default function DesignSystemPage() {
               </div>
             </div>
 
+            <div className="ds-comp ds-comp--wide">
+              <h4>Search field (real, pill)</h4>
+              <CountrySearchCombobox
+                countries={[]}
+                placeholder="Search countries, regions, institutions…"
+                ariaLabel="Search"
+                showShortcut
+                showFilterIcon
+              />
+            </div>
+
             <div className="ds-comp">
-              <h4>Search input</h4>
-              <div className="ds-input">
-                <span style={{ color: "var(--color-text-muted)", fontFamily: "var(--font-mono)", fontSize: "var(--text-13)" }}>⌕</span>
-                <input type="text" placeholder="Find a country, leader, bill…" readOnly />
-                <span className="kbd">⌘K</span>
-              </div>
+              <h4>Segmented control (real)</h4>
+              <SegmentedControlDemo />
             </div>
 
             <div className="ds-comp ds-comp--wide">
-              <h4>Tabs</h4>
-              <div className="ds-tabs">
-                {ATLAS_TAB_ORDER.map((tab) => (
-                  <button key={tab} className={tab === "structure" ? "on" : ""}>
-                    {ATLAS_TAB_LABELS[tab]}
+              <h4>Tabs (real .tab-nav)</h4>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "var(--space-5)",
+                  borderBottom: "1px solid var(--color-card-border)",
+                }}
+              >
+                {["Overview", "Data", "Compare", "Methodology"].map((label) => (
+                  <button
+                    key={label}
+                    type="button"
+                    className={`tab-nav${label === "Overview" ? " tab-nav--active" : ""}`}
+                  >
+                    {label}
                   </button>
                 ))}
               </div>

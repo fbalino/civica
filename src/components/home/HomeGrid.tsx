@@ -95,8 +95,11 @@ export async function HomeGrid() {
             Every country&rsquo;s government, leaders, legislature, economy, and society
             &mdash; documented with provenance you can trace to its source.
           </p>
-          <Link href="/factbook" className="home-feature-link">
-            Explore Factbook &rarr;
+          <Link href="/factbook" className="btn btn--text">
+            <span>Explore Factbook</span>
+            <span className="btn__arrow" aria-hidden="true">
+              &rarr;
+            </span>
           </Link>
         </div>
         <div className="home-feature-visual">
@@ -117,8 +120,11 @@ export async function HomeGrid() {
             A connected atlas of legislatures, chambers, political systems, and the
             institutions that hold power around the world.
           </p>
-          <Link href="/atlas" className="home-feature-link">
-            Explore Atlas &rarr;
+          <Link href="/atlas" className="btn btn--text">
+            <span>Explore Atlas</span>
+            <span className="btn__arrow" aria-hidden="true">
+              &rarr;
+            </span>
           </Link>
         </div>
         <div className="home-feature-visual">
@@ -140,8 +146,11 @@ export async function HomeGrid() {
             {civicaIndex.dimensionCount} dimensions, with the Civica Pulse layering
             event sensitivity on top.
           </p>
-          <Link href="/civica-index" className="home-feature-link">
-            Explore the Index &rarr;
+          <Link href="/civica-index" className="btn btn--text">
+            <span>Explore the Index</span>
+            <span className="btn__arrow" aria-hidden="true">
+              &rarr;
+            </span>
           </Link>
         </div>
         <div className="home-feature-visual">
