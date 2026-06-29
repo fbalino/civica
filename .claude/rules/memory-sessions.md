@@ -1,5 +1,44 @@
 # Project Memory Sessions
 
+## 2026-06-30 (pt6) — Option B SHIPPED (three-pane shell retired) + hero parallax
+
+Executed Option B end-to-end via sequential subagents (one per phase, verified +
+committed between each) + a parallel parallax agent. All live on `main` → civicaatlas.org.
+
+OPTION B — the three-pane `(shell)` is GONE. New architecture is reader-first:
+- **Phase 1**: Civica Index moved `(shell)/civica-index/*` → `(reader)/civica-index/*`
+  (URLs identical). Left-rail filters → a top filter bar (`CivicaIndexFilterBar`:
+  region SegmentedControl + V-Dem/WB/income/CGV selects + country search). Right-rail
+  Ask-Civica dropped (global drawer is a deferred follow-up). [slug] + widget are reader pages.
+- **Phase 2**: atlas map → standalone `(reader)/atlas` (`AtlasStandaloneClient`, decoupled
+  from ShellContext; click → /factbook/[slug]). The DUPLICATE atlas country/compare pages
+  retired via 308 redirects in next.config.ts: `/atlas/:slug(/:tab)` → `/factbook/:slug`,
+  `/atlas/compare` → `/compare`. Organizations → standalone `(reader)/organizations`
+  (`/atlas/organizations*` → `/organizations*`). Embed/sitemap/switcher links repointed.
+- **Phase 3**: DELETED the entire `(shell)` group + all 8 shell components (ThreePaneShell,
+  ShellContext, ShellCountryRail, ShellOrgRail, AskCivicaPanel, PaneHandle, ShellRouteFrame,
+  AtlasLeftModeToggle) + dead lib/shell/suggested-prompts. KEPT `lib/shell/events.ts` (the
+  civica:ask bus — still used by factbook CivicaAIDrawer/bills/atlas) + shell.css
+  (.atlas-resizer used by /compare). Production build clean: 47 routes, zero (shell).
+  Plan doc: ~/civica/plan/atlas-shell-retire-option-b-v1.md.
+
+PARALLAX — `src/components/motion/ParallaxImage.tsx` (Motion useScroll/useTransform): every
+hero engraving (homepage, factbook landing, factbook COUNTRY masthead, about) drifts ~12%
+slower than scroll. Over-scan (inset:-10%; height:120%) so no edge gap; tracks each hero
+SECTION; dark-invert preserved; mobile country masthead opts out; useReducedMotion + SSR fail-safe.
+
+Also fixed: FactbookLegislatureChart hydration (round seat cos/sin cx/cy to 2 decimals) —
+country pages now console-clean.
+
+IN PROGRESS (agent running): wiring Codex's blog engravings into the 10 Record articles.
+Codex saves them to public/blog/<slug>/ named by the slugified CAPTION (16:9, full color,
+plan at plan/record-image-generation-plan.md). The article renderer (blog/[slug]/page.tsx
+mdxComponents factory) auto-upgrades each "Image placeholder" blockquote to a <figure> +
+<figcaption> when public/blog/<slug>/<captionSlug>.{webp,png} exists (re-runnable — new
+images appear as they land); the FIRST placeholder = the hero cover. PNGs → webp.
+NOTE: owner is actively generating both blog images AND more country engravings (keep
+converting public/engravings/countries/*.png → webp).
+
 ## 2026-06-29 (pt5) — Hero-height token, articles published, Motion animations, hydration fix
 
 Shipped to `main` (76b8348→ef065b4) → civicaatlas.org, verified live.
