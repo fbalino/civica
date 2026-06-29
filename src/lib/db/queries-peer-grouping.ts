@@ -1,10 +1,10 @@
 /**
  * Peer-grouping distribution queries.
  *
- * Provides per-lens variants that the civica-index left rail consumes
- * during Phase 3. These
- * queries do NOT yet plug into any rendered surface — Phase 3 wires
- * them into `(shell)/@left/civica-index/page.tsx`.
+ * Provides per-lens variants that the civica-index filter bar consumes
+ * to populate its V-Dem / World Bank region / income / CGV selects.
+ * Read by `src/app/(reader)/civica-index/page.tsx`, which passes the
+ * decorated options into `<CivicaIndexFilterBar>`.
  *
  *   ~/civica/plan/peer-grouping-resolution-v1.md
  *   ~/civica/plan/structural-family-removal-implementation-plan.md

@@ -2,6 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCIRankings } from "@/lib/db/queries";
+import {
+  getWorldBankRegionDistribution,
+  getWorldBankIncomeGroupDistribution,
+  getVDemRowDistribution,
+  getCgvRegimeDistribution,
+} from "@/lib/db/queries-peer-grouping";
+import {
+  WORLD_BANK_REGION_META,
+  WORLD_BANK_INCOME_GROUP_META,
+  VDEM_ROW_META,
+  CGV_REGIME_TYPE_META,
+  type WorldBankRegionKey,
+  type WorldBankIncomeGroupKey,
+  type VDemRowKey,
+  type CGVRegimeTypeKey,
+} from "@/lib/peer-grouping/lens-metadata";
+import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
+import { CivicaIndexFilterBar } from "@/components/civica-index/CivicaIndexFilterBar";
 import { CountryFlag } from "@/components/CountryFlag";
 import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
@@ -9,6 +27,41 @@ import { civicaIndex } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
+
+const CONTINENTS = [
+  "Africa",
+  "North America",
+  "South America",
+  "Asia",
+  "Europe",
+  "Oceania",
+];
+
+interface RawDistRow {
+  key: string;
+  totalCount: number;
+  scoredCount: number;
+}
+
+/** Decorate raw lens-distribution rows with human labels + lens order. */
+function decorateOptions<K extends string>(
+  raw: RawDistRow[],
+  meta: Record<K, { label: string; order: number }>,
+): Array<{ key: string; label: string; totalCount: number; scoredCount: number }> {
+  return [...raw]
+    .sort((a, b) => {
+      const orderA = meta[a.key as K]?.order ?? 999;
+      const orderB = meta[b.key as K]?.order ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return b.totalCount - a.totalCount;
+    })
+    .map((r) => ({
+      key: r.key,
+      label: meta[r.key as K]?.label ?? r.key,
+      totalCount: r.totalCount,
+      scoredCount: r.scoredCount,
+    }));
+}
 
 export const metadata: Metadata = {
   title: "Civica Index — Global Governance Rankings",
@@ -90,7 +143,7 @@ interface CIRankingRow {
   flagUrl: string | null;
 }
 
-export default async function CivicaIndexShellPage({
+export default async function CivicaIndexPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -133,6 +186,58 @@ export default async function CivicaIndexShellPage({
       : ((result as { rows?: CIRankingRow[] }).rows ?? []);
   } catch {
     // DB not yet seeded
+  }
+
+  // Peer-lens distributions (formerly fetched by the @left shell slot)
+  // feed the top filter bar's V-Dem / WB region / income / CGV selects.
+  let vdemRaw: RawDistRow[] = [];
+  let regionRaw: RawDistRow[] = [];
+  let incomeRaw: RawDistRow[] = [];
+  let cgvRaw: RawDistRow[] = [];
+  try {
+    [vdemRaw, regionRaw, incomeRaw, cgvRaw] = await Promise.all([
+      getVDemRowDistribution(),
+      getWorldBankRegionDistribution(),
+      getWorldBankIncomeGroupDistribution(),
+      getCgvRegimeDistribution(),
+    ]);
+  } catch {
+    // DB not seeded
+  }
+
+  const vdemOptions = decorateOptions<VDemRowKey>(vdemRaw, VDEM_ROW_META);
+  const worldBankRegionOptions = decorateOptions<WorldBankRegionKey>(
+    regionRaw,
+    WORLD_BANK_REGION_META,
+  );
+  const worldBankIncomeOptions = decorateOptions<WorldBankIncomeGroupKey>(
+    incomeRaw,
+    WORLD_BANK_INCOME_GROUP_META,
+  );
+  const cgvOptions = decorateOptions<CGVRegimeTypeKey>(
+    cgvRaw,
+    CGV_REGIME_TYPE_META,
+  );
+
+  // Atlas country list powers the "Jump to a country" search → scorecard.
+  let searchCountries: Array<{
+    slug: string;
+    name: string;
+    iso2: string | null;
+    iso3: string | null;
+    capital: string | null;
+  }> = [];
+  try {
+    const { countries } = await loadAtlasData();
+    searchCountries = countries.map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      iso2: c.iso2 ?? null,
+      iso3: c.iso3 ?? null,
+      capital: c.capital ?? null,
+    }));
+  } catch {
+    // DB not seeded
   }
 
   const totalCountries = rawRows[0]?.totalRanked ?? rawRows.length;
@@ -220,6 +325,24 @@ export default async function CivicaIndexShellPage({
               </div>
             ))}
           </div>
+        </section>
+
+        <section aria-label="Filter and search">
+          <div className="ci-section-eyebrow">Filter the index</div>
+          <CivicaIndexFilterBar
+            continents={CONTINENTS}
+            vdemOptions={vdemOptions}
+            worldBankRegionOptions={worldBankRegionOptions}
+            worldBankIncomeOptions={worldBankIncomeOptions}
+            cgvOptions={cgvOptions}
+            activeContinent={continent}
+            activeVdem={vdemRow}
+            activeWorldBankRegion={worldBankRegion}
+            activeWorldBankIncome={worldBankIncomeGroup}
+            activeCgv={cgvRegime}
+            searchCountries={searchCountries}
+            hasFilter={hasFilter}
+          />
         </section>
 
         {rawRows.length > 0 ? (
@@ -345,8 +468,8 @@ export default async function CivicaIndexShellPage({
               No Civica Index data available for this filter.
             </p>
             <p className="ci-empty-sub">
-              Try a different region or government family in the left rail,
-              or <Link href="/civica-index">see all scored countries</Link>.
+              Try a different region or peer lens above, or{" "}
+              <Link href="/civica-index">see all scored countries</Link>.
             </p>
           </section>
         )}

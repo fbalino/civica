@@ -73,7 +73,7 @@ export const currentVintage =
  *  Beta scores produced by `src/lib/ci/calculate-v2.ts` use FOUR
  *  dimensions with PCA-derived weights 27/26/23/24. Verified
  *  2026-05-05 against `src/lib/ci/dimensions-v2.ts`,
- *  `src/app/(shell)/civica-index/[slug]/page.tsx` (line 51), and
+ *  `src/app/(reader)/civica-index/[slug]/page.tsx`, and
  *  `getCIRankings()` defaulting to `methodologyVersion: "beta"`. */
 export const civicaIndex = {
   status: "beta" as const,
