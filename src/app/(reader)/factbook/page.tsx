@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
-import { FactbookIndexSearchList } from "@/components/factbook/FactbookIndexSearchList";
+import {
+  FactbookAlmanac,
+  type FactbookAlmanacCountry,
+} from "@/components/factbook/FactbookAlmanac";
 
-// Minimal Phase C landing for /factbook. Uses the shared `.editorial-page`
-// container + `.factbook-index-*` classes from factbook.css so it picks up
-// the same mobile breakpoints as the rest of the site.
+// /factbook landing — Option C ("Typeahead + Almanac Index"). A full-bleed
+// engraving hero (homepage style) with a centered typeahead + region quick-
+// filter chips, over a dense alphabetical "almanac" index of every country.
+// All layout/styling lives in `.factbook-landing-*` classes in factbook.css.
 
 export const metadata: Metadata = {
-  title: "Factbook — All Countries",
+  title: "Factbook — Every Country",
   description:
     "Reference dossiers for every country and territory. Sourced from the CIA World Factbook with Civica governance overlays.",
   alternates: { canonical: "https://civicaatlas.org/factbook" },
@@ -16,26 +20,21 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function FactbookIndexPage() {
-  let countries: Awaited<ReturnType<typeof getAllJurisdictions>> = [];
+  let countries: FactbookAlmanacCountry[] = [];
   try {
-    countries = await getAllJurisdictions();
+    const rows = await getAllJurisdictions();
+    countries = rows.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      name: row.name,
+      iso2: row.iso2,
+      iso3: row.iso3,
+      capital: row.capital,
+      continent: row.continent,
+    }));
   } catch {
-    // DB not connected
+    // DB not connected — render the shell; the almanac degrades to empty.
   }
 
-  const sorted = [...countries].sort((a, b) => a.name.localeCompare(b.name));
-
-  return (
-    <div className="editorial-page editorial-page--full">
-      <header className="editorial-page-header">
-        <h1 className="editorial-page-title">All countries</h1>
-        <p className="editorial-page-subtitle">
-          Reference dossiers for every country. Each page combines the CIA
-          World Factbook with Civica's governance overlays.
-        </p>
-      </header>
-
-      <FactbookIndexSearchList countries={sorted} />
-    </div>
-  );
+  return <FactbookAlmanac countries={countries} />;
 }

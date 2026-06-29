@@ -949,84 +949,272 @@
   .factbook-bill-btn { flex: 1; min-width: 120px; }
 }
 
-/* === Index page list grid ================================================= */
-.factbook-index-search {
-  display: grid;
-  gap: var(--space-3);
+/* === /factbook landing — Option C (typeahead + almanac index) ============
+   Full-bleed engraving hero (homepage idiom) with a centered typeahead and
+   region quick-filter chips, over a dense alphabetical almanac index. Token-
+   only; soft hairlines + soft shadows; works light + dark. */
+
+.factbook-landing {
+  color: var(--color-text-primary);
 }
-.factbook-index-search-field {
+
+/* ── Full-bleed hero ── */
+.factbook-hero {
+  position: relative;
+  overflow: hidden;
+  /* Break out of any centered page container to the viewport edges. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  border-bottom: 1px solid var(--color-border-default);
+}
+.factbook-hero-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  opacity: 0.85;
+  z-index: 0;
+}
+[data-theme="dark"] .factbook-hero-art {
+  opacity: 0.42;
+  filter: invert(1) hue-rotate(180deg) brightness(1.04);
+}
+.factbook-hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(
+    120% 90% at 50% 30%,
+    color-mix(in oklab, var(--color-bg) 28%, transparent) 0%,
+    color-mix(in oklab, var(--color-bg) 70%, transparent) 60%,
+    color-mix(in oklab, var(--color-bg) 96%, transparent) 100%
+  );
+}
+.factbook-hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--space-9) var(--space-6) var(--space-8);
+  text-align: center;
+}
+.factbook-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin-bottom: var(--space-5);
+}
+.factbook-hero-eyebrow::before,
+.factbook-hero-eyebrow::after {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: var(--color-accent);
+  opacity: 0.5;
+}
+.factbook-hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(var(--text-36), 6vw, var(--text-56));
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4);
+}
+.factbook-hero-dek {
+  font-family: var(--font-body);
+  font-size: var(--text-18);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+  max-width: 36rem;
+  margin: 0 auto var(--space-6);
+}
+/* Center the canonical combobox inside the hero. */
+.factbook-hero-search {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: left;
+}
+.factbook-hero-search .country-search__field {
+  box-shadow: var(--shadow-hard-lg);
+}
+
+/* ── Region quick-filter chips ── */
+.factbook-hero-chips {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+.factbook-region-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-hard-sm);
+  transition: color 120ms ease, border-color 120ms ease, transform 120ms ease,
+    background 120ms ease;
+}
+.factbook-region-chip:hover {
+  transform: translateY(-1px);
+  border-color: var(--color-text-30);
+}
+.factbook-region-chip__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* ── Almanac index ── */
+.factbook-almanac {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-9);
+}
+.factbook-almanac-head {
+  text-align: center;
+  margin-bottom: var(--space-3);
+}
+.factbook-almanac-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.factbook-almanac-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-muted);
+  margin: var(--space-2) 0 0;
+}
+.factbook-almanac-empty {
+  text-align: center;
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  padding: var(--space-8) 0;
+}
+
+/* Alpha jump rail */
+.factbook-alpha-rail {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: var(--space-5) 0 var(--space-7);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border-default);
+}
+.factbook-alpha {
+  font-family: var(--font-heading);
+  font-size: var(--text-14);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  border: 1px solid var(--color-card-border);
-  /* Canonical rounded-rectangle search shape (owner decision 2026-06-29). */
-  border-radius: var(--radius-lg);
-  background: var(--color-card-bg);
-  padding: var(--space-3) var(--space-4);
-  max-width: 32rem;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: background 120ms ease, color 120ms ease;
 }
-.factbook-index-search-field svg {
-  width: var(--space-5);
-  height: var(--space-5);
-  color: var(--color-text-30);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-}
-.factbook-index-search-field input {
-  min-width: 0;
-  width: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
+a.factbook-alpha:hover {
+  background: var(--color-select-bg);
   color: var(--color-text-primary);
-  font-family: var(--font-body);
-  font-size: var(--text-16);
 }
-.factbook-index-search-field input::placeholder {
+.factbook-alpha--empty {
   color: var(--color-text-30);
+  opacity: 0.45;
+  pointer-events: none;
 }
-.factbook-index-search-count {
-  margin: 0;
+
+/* Multi-column masonry-style index */
+.factbook-index-cols {
+  column-count: 4;
+  column-gap: var(--space-7);
+}
+.factbook-letter-group {
+  break-inside: avoid;
+  margin-bottom: var(--space-6);
+}
+.factbook-letter-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border-default);
+}
+.factbook-letter-drop {
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent);
+  line-height: 1;
+}
+.factbook-letter-count {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
   font-size: var(--text-12);
-  color: var(--color-text-30);
+  color: var(--color-text-muted);
 }
-.factbook-index-grid {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-3);
-}
-.factbook-index-card {
+.factbook-idx-item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
+  padding: 5px var(--space-1);
+  border-radius: var(--radius-sm);
   text-decoration: none;
   color: inherit;
-  font-size: var(--text-15);
-  transition: box-shadow 120ms ease, border-color 120ms ease;
+  transition: background 120ms ease;
 }
-.factbook-index-card:hover {
-  border-color: color-mix(in oklab, var(--color-text-primary) 22%, var(--color-card-border));
-  box-shadow: var(--shadow-hard);
+.factbook-idx-item:hover {
+  background: var(--color-select-bg);
+}
+.factbook-idx-flag {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.factbook-idx-name {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-15);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.factbook-idx-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+@media (max-width: 1080px) {
+  .factbook-index-cols { column-count: 3; }
 }
 @media (max-width: 768px) {
-  .factbook-index-search-field {
-    max-width: none;
-  }
-  .factbook-index-grid {
-    grid-template-columns: 1fr;
-  }
-  .factbook-index-card {
-    min-height: var(--space-9);
-    font-size: var(--text-16);
-  }
+  .factbook-index-cols { column-count: 2; column-gap: var(--space-5); }
+  .factbook-almanac { padding: var(--space-7) var(--space-5) var(--space-8); }
+  .factbook-hero-inner { padding: var(--space-8) var(--space-5) var(--space-7); }
+}
+@media (max-width: 480px) {
+  .factbook-index-cols { column-count: 1; }
 }
 
 /* === Leaders section =====================================================
