@@ -494,6 +494,66 @@
   .factbook-hero-name {
     font-size: var(--text-32);
   }
+
+  /* --- Country masthead engraving: STACK vertically instead of overlaying ---
+     On mobile the desktop full-bleed overlay (3:2 art with the masthead +
+     cover tiles floated on top of an ivory scrim) breaks — the engraving is
+     hidden behind the scrim and the cover tiles overflow. Here we drop the
+     overlay entirely and lay the hero out as a clean vertical stack:
+       engraving banner → caption → masthead → MAP/IMAGES tiles.
+     The engraving stays full-bleed (edge to edge) but the masthead and tiles
+     get their own side gutters since they're no longer inside the
+     padding-inline overlay column. */
+  .factbook-hero--art {
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: auto;
+    max-height: none;
+    align-items: stretch;
+    gap: var(--space-5);
+    padding-block: 0 var(--space-5);
+    padding-inline: 0;
+  }
+  .factbook-hero--art .factbook-hero-art-img {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 5 / 4;
+    object-position: center 30%;
+    order: 0;
+  }
+  /* Neutralize the desktop ivory scrim — the engraving is its own banner now. */
+  .factbook-hero--art::after {
+    display: none;
+  }
+  /* Caption becomes a small muted line directly under the banner. */
+  .factbook-hero--art .factbook-hero-caption {
+    position: static;
+    order: 1;
+    inset: auto;
+    max-width: none;
+    margin: calc(var(--space-3) * -1) var(--space-5) 0;
+    padding: 0;
+    justify-content: flex-start;
+    text-align: left;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+  /* Masthead + tiles regain side gutters and join the vertical stack. */
+  .factbook-hero--art > .factbook-hero-left {
+    order: 2;
+    padding-inline: var(--space-5);
+  }
+  .factbook-hero--art > .factbook-hero-boxes {
+    order: 3;
+    padding-inline: var(--space-5);
+  }
+  .factbook-hero--art .factbook-hero-switcher-wrap {
+    margin-top: var(--space-4);
+  }
+
   .factbook-hero-boxes {
     width: 100%;
     gap: var(--space-3);
@@ -1212,6 +1272,14 @@ a.factbook-alpha:hover {
   .factbook-index-cols { column-count: 2; column-gap: var(--space-5); }
   .factbook-almanac { padding: var(--space-7) var(--space-5) var(--space-8); }
   .factbook-hero-inner { padding: var(--space-8) var(--space-5) var(--space-7); }
+  /* Keep the landing H1 inside the viewport on the narrowest phones —
+     wrap long/unbreakable strings and hold the clamp at its small end so the
+     title can never push past the right gutter. */
+  .factbook-hero-title {
+    font-size: clamp(var(--text-32), 7vw, var(--text-44));
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
 }
 @media (max-width: 480px) {
   .factbook-index-cols { column-count: 1; }
