@@ -30,7 +30,7 @@ const PRIORITY_COMPARISONS: Array<[string, string]> = [
 const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/", changeFrequency: "weekly", priority: 1.0 },
   { path: "/atlas", changeFrequency: "weekly", priority: 0.95 },
-  { path: "/atlas/compare", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/organizations", changeFrequency: "monthly", priority: 0.5 },
   { path: "/factbook", changeFrequency: "weekly", priority: 0.9 },
   { path: "/countries", changeFrequency: "weekly", priority: 0.9 },
   { path: "/compare", changeFrequency: "monthly", priority: 0.6 },
@@ -104,13 +104,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  const atlasCountryPages: MetadataRoute.Sitemap = countries.map((country) => ({
-    url: `${SITE_URL}/atlas/${country.slug}/structure`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
-
   const civicaIndexCountryPages: MetadataRoute.Sitemap = countries.map((country) => ({
     url: `${SITE_URL}/civica-index/${country.slug}`,
     lastModified: new Date(),
@@ -119,7 +112,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const organizationPages: MetadataRoute.Sitemap = ORGANIZATIONS.map((org) => ({
-    url: `${SITE_URL}/atlas/organizations/${org.slug}`,
+    url: `${SITE_URL}/organizations/${org.slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.5,
@@ -147,7 +140,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...comparisonPages,
     ...factbookPages,
     ...countryPages,
-    ...atlasCountryPages,
     ...civicaIndexCountryPages,
     ...organizationPages,
     ...blogPages,

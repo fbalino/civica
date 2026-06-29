@@ -1,6 +1,6 @@
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import type { Country } from "@/components/atlas/data";
-import { AtlasMapShellClient } from "@/components/atlas/AtlasMapShellClient";
+import { AtlasStandaloneClient } from "@/components/atlas/AtlasStandaloneClient";
 import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
@@ -9,7 +9,7 @@ export async function generateMetadata() {
   return {
     title: "Atlas — Civica",
     description:
-      "Every government, every chamber, one interactive world map. Pan, zoom, and click any country to walk into its legislature.",
+      "Every government, every chamber, one interactive world map. Pan, zoom, and click any country to open its factbook entry.",
     openGraph: withOg({
       title: "Atlas — Civica",
       url: "https://civicaatlas.org/atlas",
@@ -17,6 +17,10 @@ export async function generateMetadata() {
   };
 }
 
+// Standalone /atlas (Option B, Phase 2): the choropleth world map rendered
+// directly inside the root layout (SiteHeader + main + footer), with NO
+// three-pane shell, no left/right rails, no ShellContext. The map fills the
+// viewport below the header; clicking a country opens its factbook entry.
 export default async function AtlasMapPage() {
   const { countries: dbCountries } = await loadAtlasData();
   const countries: Country[] = dbCountries.map((c) => ({
@@ -35,5 +39,5 @@ export default async function AtlasMapPage() {
     masthead: c.masthead,
   }));
 
-  return <AtlasMapShellClient countries={countries} />;
+  return <AtlasStandaloneClient countries={countries} />;
 }

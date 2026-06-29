@@ -87,24 +87,46 @@ const nextConfig: NextConfig = {
         destination: "/civica-conditions",
         permanent: true,
       },
-      // Phase C — tab consolidation 8 → 6.
-      // Chamber folded into Structure (the house toggle now lives there).
+      // Option B (Phase 2) — the duplicate atlas country + compare +
+      // organizations experiences are retired. The factbook is the
+      // canonical per-country reader, /compare is the canonical compare,
+      // and the org explorer moved to a standalone /organizations page.
+      // These redirects must precede the (now-removed) per-tab routes so
+      // external links keep resolving. Order matters: the more-specific
+      // /atlas/compare + /atlas/organizations rules come before the
+      // catch-all /atlas/:slug/:tab.
       {
-        source: "/atlas/:slug/chamber",
-        destination: "/atlas/:slug/structure",
+        source: "/atlas/compare",
+        destination: "/compare",
         permanent: true,
       },
-      // Democracy folded into Scores & Rankings.
       {
-        source: "/atlas/:slug/democracy",
-        destination: "/atlas/:slug/scores",
+        source: "/atlas/organizations",
+        destination: "/organizations",
         permanent: true,
       },
-      // Elections at the country level retired; the global /elections
-      // page is the canonical home for the elections directory.
+      {
+        source: "/atlas/organizations/:slug",
+        destination: "/organizations/:slug",
+        permanent: true,
+      },
+      // Country tabs → the factbook country reader (covers hemicycle,
+      // bills, leaders, scores, structure, sections). The global
+      // /elections page remains the canonical home for elections, so
+      // keep that earlier, more-specific rule winning below.
       {
         source: "/atlas/:slug/elections",
         destination: "/elections",
+        permanent: true,
+      },
+      {
+        source: "/atlas/:slug/:tab",
+        destination: "/factbook/:slug",
+        permanent: true,
+      },
+      {
+        source: "/atlas/:slug",
+        destination: "/factbook/:slug",
         permanent: true,
       },
       // Phase 5.10 polish — the legacy v1 changelog page reads from
@@ -135,7 +157,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/countries/:slug/constitution",
-        destination: "/atlas/:slug/constitution",
+        destination: "/factbook/:slug",
         permanent: true,
       },
       // Phase 3d (structural_family removal) — top-level

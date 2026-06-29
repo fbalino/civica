@@ -131,6 +131,19 @@
   color: var(--color-text-primary);
 }
 
+/* ===== ATLAS STANDALONE PAGE (Option B, Phase 2) ===== */
+/* Full-bleed wrapper for the standalone /atlas map page. The map lives
+   directly inside the root layout (SiteHeader + main + footer) with no
+   three-pane shell, so this wrapper supplies the height the shell's
+   .chamber-grid used to provide (viewport minus the 56px sticky header). */
+.atlas-standalone {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
+  overflow: hidden;
+}
+
 /* ===== ATLAS VIEW (world map) ===== */
 .atlas-view { background: var(--atlas-ocean); position: relative; width: 100%; height: 100%; }
 
@@ -1279,7 +1292,11 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 /* ============================================
    INTERNATIONAL — category tokens
    ============================================ */
-.atlas-root {
+/* Also defined on .org-standalone so the moved-out /organizations reader
+   page (Option B, Phase 2) resolves the org-type colours without the
+   three-pane .atlas-root wrapper. */
+.atlas-root,
+.org-standalone {
   --cat-security: #C25D3A;   /* Terracotta */
   --cat-regional: #2D6CDF;   /* Azure */
   --cat-trade:    #4C9F6E;   /* Leaf */
@@ -1693,6 +1710,88 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 .intl-empty p, .org-empty p {
   max-width: 420px; font-family: var(--font-body);
   font-size: var(--text-14); color: var(--atlas-ink-2);
+}
+
+/* =============================================================
+   STANDALONE /organizations PAGE (Option B, Phase 2)
+   Two-column reader layout: org picker (left) + OrgDetailPanel (right),
+   rendered directly in the root layout — no three-pane shell.
+   ============================================================= */
+.org-standalone {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  align-items: start;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+}
+.org-standalone__sidebar {
+  position: sticky;
+  top: var(--header-height);
+  align-self: start;
+  max-height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+  border-right: 1px solid var(--atlas-rule);
+  padding: 18px 0 24px;
+}
+.org-standalone__sidebar-head {
+  padding: 0 16px 6px;
+}
+.org-standalone__sidebar-head .kicker {
+  font-family: var(--font-body); font-size: var(--text-12);
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--atlas-muted);
+}
+.org-standalone__sidebar-head .title {
+  font-family: var(--font-heading); font-weight: 400;
+  font-size: var(--text-22); letter-spacing: -0.02em;
+  margin-top: 2px;
+}
+.org-standalone__detail {
+  min-width: 0;
+}
+.org-standalone-nav {
+  padding: 6px 16px 0;
+  font-family: var(--font-body); font-size: var(--text-14);
+}
+.org-standalone-nav .type-group { margin-top: 14px; }
+.org-standalone-nav .type-label {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-body); font-size: var(--text-12);
+  color: var(--atlas-muted); text-transform: uppercase;
+  letter-spacing: 0.14em; margin-bottom: 6px; font-weight: 600;
+}
+.org-standalone-nav .org-row {
+  display: grid; grid-template-columns: 28px 1fr auto;
+  gap: 10px; align-items: center; padding: 5px 6px; border-radius: var(--radius-sm);
+  cursor: pointer; color: var(--atlas-ink-2);
+  text-decoration: none;
+}
+.org-standalone-nav .org-row:hover { background: var(--atlas-paper-2); }
+.org-standalone-nav .org-row.on { background: var(--atlas-ink); color: var(--atlas-paper); }
+.org-standalone-nav .org-row.on .count { color: var(--atlas-paper-2); }
+.org-standalone-nav .org-row .initials {
+  width: 26px; height: 26px; display: grid; place-items: center;
+  font-family: var(--font-body); font-size: var(--text-12); font-weight: 600;
+  color: var(--color-on-accent); letter-spacing: 0.04em; border-radius: var(--radius-sm);
+}
+.org-standalone-nav .org-row .nm {
+  font-size: var(--text-14); line-height: 1.25; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.org-standalone-nav .org-row .count {
+  font-family: var(--font-body); font-size: var(--text-12);
+  color: var(--atlas-muted); letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .org-standalone { grid-template-columns: 1fr; }
+  .org-standalone__sidebar {
+    position: static; max-height: none; overflow: visible;
+    border-right: 0; border-bottom: 1px solid var(--atlas-rule);
+    padding: 14px 0 16px;
+  }
 }
 
 @media (max-width: 768px) {

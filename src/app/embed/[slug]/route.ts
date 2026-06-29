@@ -492,7 +492,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     .filter(Boolean)
     .join("");
 
-  const customBody = `<a class="civica-widget custom" href="https://civicaatlas.org/atlas/${esc(jurisdiction.slug)}/structure" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const customBody = `<a class="civica-widget custom" href="https://civicaatlas.org/factbook/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="cf-top">
     <div class="cf-brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
   </div>
@@ -500,7 +500,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="cf-rows">${customRowsHtml}</div>
   ${attributionHtml}
   <div class="cf-foot mono">
-    <span>civicaatlas.org/atlas/${esc(jurisdiction.slug)}</span>
+    <span>civicaatlas.org/factbook/${esc(jurisdiction.slug)}</span>
     ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
