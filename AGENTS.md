@@ -9,7 +9,7 @@ Domain: `civicaatlas.org`.
 - Read [DESIGN.md](DESIGN.md) before any UI work.
 - No hardcoded hex / rgb / rgba / oklch in component code or page CSS — use `var(--color-*)`. Hex literals are only allowed inside `:root` token-definition blocks and inside `<DesignSystemSwatch>`.
 - No hardcoded `font-family`, `font-size` in px, or padding/margin magic numbers in new UI — use `--font-*`, `--text-*`, and `--space-*`.
-- New pages must build on shared primitives: `<EditorialPage>`, `<SectionHeader>`, `<Banner>`, `<Pill>`, `<DataTable>`, and `<SourceDot>`.
+- New pages must build on shared primitives: `<EditorialPage>`, `<SectionHeader>`, `<Banner>`, `<Chip>` (the tinted sans chip; `<Pill>` is a legacy alias), `<Button>`, `<SegmentedControl>`, `<DataTable>`, and `<SourceDot>`.
 - **Reader-style pages compose `editorial.css` classes — no per-page `<style>` blocks.** If you find yourself reaching for a `<style>` block to set max-width, padding, breadcrumb typography, section heading sizes, filter chips, or list-card layout, the class already exists in `src/app/editorial.css`. If the pattern truly is missing, add it there once and reuse it everywhere.
 - The `/design-system` page is the only source of canonical visuals. If your page does not look like a piece of `/design-system`, it is wrong.
 
@@ -48,7 +48,8 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 ## Design System (authoritative)
 **See `https://www.civicaatlas.org/design-system` for the live reference.** Code lives in `src/app/globals.css`, `src/app/atlas.css`, and `src/app/design-system/page.tsx`.
 
-- **Typography**: Source Serif 4 (serif, display + country cards), Inter (sans, body/interface), `ui-monospace` (labels, source/meta rows, IDs, code, dense numeric UI only). Do NOT substitute Fraunces, IBM Plex, or other fonts. Do NOT use mono for tabs or readable facts like government type, region, capital, population, or GDP.
+- **Typography**: Source Serif 4 (serif, display + country cards) via `--font-heading`, Inter (sans — body/interface/labels/eyebrows/numeric) via `--font-body`. **Monospace (`--font-code`) is reserved for literal code/API snippets only** — never for labels, IDs, meta rows, eyebrows, tabs, or readable facts. (The legacy `--font-mono` token is repointed to Inter so stragglers can't render monospace.) Small-caps labels = Inter + uppercase + letter-spacing; aligned numeric columns = Inter + `font-variant-numeric: tabular-nums`. Do NOT substitute Fraunces, IBM Plex, or other fonts.
+- **Components**: build on the canonical primitives — `Chip` (tinted, rounded, mixed-case sans; tonal `neutral/sage/sand/rose/blue/accent`; replaces all old badges/filters/status-pills AND the Beta tag), the `.btn` system / `Button` (primary navy+arrow, secondary outline, tertiary, text), `SegmentedControl`, and pill search fields. No ad-hoc buttons, no uppercase-mono pills.
 - **Color palette** (light): paper `#FAF7F2` (ivory), ink `#0B1B2D` (navy), muted `#6A7688`, rule `#E4E1DC`, accent (terracotta) `#B7512B`. Foundation hues: navy/deep-teal/sage/terracotta/gold/sand. Dark mode flips via `data-theme="dark"`.
 - **Signal colors**: olive (success), amber (warn/frozen), brick (danger), slate (info).
 - **Government-type palette**: parliamentary blue, presidential rust, semi-presidential purple, monarchy gold, theocracy green — always use the CSS vars (`--gov-parl`, `--gov-pres`, etc.).

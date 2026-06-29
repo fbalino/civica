@@ -47,11 +47,13 @@ Text colors use **semantic role tokens**: `var(--color-text-primary)`, `var(--co
 
 ## Typography
 
-Use Source Serif 4 for display and country/editorial headings through **`var(--font-heading)`**. (`--font-serif` is a deprecated alias preserved for backwards compatibility — new code uses `--font-heading`.) The canonical page H1 is 56px (`var(--text-56)`) except for `/blog`, which is allowed to keep its heavier editorial nameplate. Use Inter for body/interface text through **`var(--font-body)`**. (`--font-body-sans` and `--font-sans` are deprecated aliases preserved for backwards compatibility — new code uses `--font-body`.) Use `var(--font-mono)` only for labels, IDs, source/meta rows, code, and dense numeric UI. Do not use mono for readable facts such as government type, region, capital, population, GDP, or tab labels.
+Use Source Serif 4 for display and country/editorial headings through **`var(--font-heading)`**. (`--font-serif` is a deprecated alias preserved for backwards compatibility — new code uses `--font-heading`.) The canonical page H1 is 56px (`var(--text-56)`) except for `/blog`, which is allowed to keep its heavier editorial nameplate. Use Inter for body/interface text through **`var(--font-body)`**. (`--font-body-sans` and `--font-sans` are deprecated aliases preserved for backwards compatibility — new code uses `--font-body`.)
+
+**Monospace is reserved for literal code/API snippets only.** Use **`var(--font-code)`** for code blocks, curl examples, endpoint paths, and cssVar display chips. Do NOT use monospace for labels, IDs, source/meta rows, eyebrows, numeric UI, or any readable fact — those are Inter. (The legacy `var(--font-mono)` token is now repointed to the Inter stack as a safety net, so any straggler renders Inter, not monospace.) Small-caps "eyebrow" labels use Inter with `text-transform: uppercase` + letter-spacing — not a monospace font. For numeric columns that need to align (tables, scores, stat values), use Inter with `font-variant-numeric: tabular-nums`.
 
 Use `var(--text-*)` tokens for font sizes. Do not add new pixel font sizes in page-level CSS.
 
-Font weight tokens: `--font-weight-regular` (400), `--font-weight-medium` (500), `--font-weight-semibold` (600), `--font-weight-bold` (700). Plus `--font-weight-mono` (alias of medium, for monospace UI labels). Avoid hardcoded `font-weight: 400` etc. in new code.
+Font weight tokens: `--font-weight-regular` (400), `--font-weight-medium` (500), `--font-weight-semibold` (600), `--font-weight-bold` (700). (`--font-weight-mono` is a legacy alias of medium kept for backwards compatibility — new code uses the named weights directly.) Avoid hardcoded `font-weight: 400` etc. in new code.
 
 Letter-spacing uses `--tracking-*` tokens: `--tracking-tighter` (-0.04em), `--tracking-tight` (-0.03em), `--tracking-snug` (-0.02em), `--tracking-normal` (0), `--tracking-wide` (0.03em), `--tracking-wider` (0.08em), `--tracking-caps` (0.15em), `--tracking-widest` (0.2em). Avoid hardcoded em values in new code.
 
@@ -75,7 +77,7 @@ Elevation is restrained: most surfaces use a 1px hairline (`var(--color-border-d
 
 ## Shapes
 
-Use the small radius scale: `var(--radius-sm)` (4px), `var(--radius-md)` (8px — the default for cards and controls), `var(--radius-lg)` (12px), `var(--radius-xl)` (16px), plus `var(--radius-2xl)` (24px) and `var(--radius-full)`. Pills are allowed for status chips and badges only.
+Use the small radius scale: `var(--radius-sm)` (4px — chips/badges), `var(--radius-md)` (8px — the default for buttons, cards, and controls), `var(--radius-lg)` (12px — country/data cards), `var(--radius-xl)` (16px), plus `var(--radius-2xl)` (24px) and `var(--radius-full)` (pill — search fields and circular controls).
 
 ## Stacking, motion, breakpoints, and header
 
@@ -91,7 +93,10 @@ Prefer shared primitives for new editorial UI:
 - `EditorialPage`
 - `SectionHeader`
 - `Banner`
-- `Pill`
+- `Chip` (`src/components/editorial/Pill.tsx`, exported as both `Chip` and the legacy `Pill` alias) — the single tinted, rounded (`--radius-sm`), mixed-case, **sans** chip. Tonal variants `neutral / sage / sand / rose / blue / accent` (via `color-mix`). This replaces every old badge/filter/status pill AND the "Beta" tag. Never uppercase-mono. CSS filter chips use `.editorial-chip` + the `.editorial-chip--{sage,sand,rose,blue,accent}` tonal modifiers.
+- `Button` (`src/components/editorial/Button.tsx`) + the `.btn` system: `.btn--primary` (navy fill, white text, auto-inverts in dark via `color: var(--color-page-bg)`, optional trailing `.btn__arrow`), `.btn--secondary` (hairline outline), `.btn--tertiary`, `.btn--text`; sizes `.btn--sm`/`.btn--lg`; states (hover/active/disabled/loading) + focus-visible ring. Use this for all CTAs — no ad-hoc button styling.
+- `SegmentedControl` (`src/components/editorial/SegmentedControl.tsx`) — pill/well container with a navy active segment; for mutually-exclusive view toggles.
+- Search fields are pill-shaped (`--radius-full`) with a leading magnifier + Inter placeholder (see `CountrySearchCombobox` / `GlobalSearch`).
 - `DataTable`
 - `SourceDot`
 
@@ -131,10 +136,10 @@ Container classes:
 
 Header chrome:
 
-- `.editorial-breadcrumbs` — mono breadcrumb row with separators.
+- `.editorial-breadcrumbs` — small-caps Inter breadcrumb row with separators.
 - `.editorial-page-title` (or default `<h1>` inside `.editorial-page`) — display heading at 56px desktop.
 - `.editorial-page-subtitle` — serif subtitle / dek.
-- `.editorial-page-meta` — mono meta strip.
+- `.editorial-page-meta` — small-caps Inter meta strip.
 - `.editorial-beta-tag` — inline Beta pill for use next to a heading.
 - `.editorial-warning` — full-width warning callout (companion to `<Banner variant="warn">` for inline content).
 
@@ -158,7 +163,7 @@ Methodology presentation primitives (extracted from inline `<style>` blocks duri
 - `.meth-weights-bar` + `.meth-weight-slice` — colored horizontal bar visualizing dimension weights (currently used at `/civica-index/methodology` §2).
 - `.meth-band-scale` + `.meth-band-cell` — colored vertical ladder visualizing rank bands A–F (`/civica-index/methodology` §6).
 - `.meth-version-strip` + `.meth-version-cell` + `.meth-version-label` + `.meth-version-value` — 4-column metadata grid for status/revision/cutover/cadence (`/civica-index/methodology` §14).
-- `.meth-figure` + `.meth-figure-caption` — wrapper for inline-SVG methodology charts (e.g. `<EigenvalueChart>` on the PCA appendix §4). Print-inspired card aesthetic: grid-cell background, card-border, mono caption.
+- `.meth-figure` + `.meth-figure-caption` — wrapper for inline-SVG methodology charts (e.g. `<EigenvalueChart>` on the PCA appendix §4). Print-inspired card aesthetic: grid-cell background, card-border, small-caps Inter caption.
 
 Methodology charts:
 
