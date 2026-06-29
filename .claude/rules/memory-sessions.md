@@ -1,5 +1,64 @@
 # Project Memory Sessions
 
+## 2026-06-29 — Almanac redesign: component reconciliation shipped to prod
+
+Continued the "fine-press almanac" redesign (mockups at ~/Downloads/Civica/,
+spec at ~/civica/plan/component-spec-v1.md + almanac-redesign-plan-v1.md).
+Owner asleep, said "continue until done." Orchestrated via Opus subagents +
+a drift-audit Workflow; verified + committed + merged + deployed in the main
+session. All live on `main` (97fe78f..47e8b1c) → civicaatlas.org (verified:
+homepage renders Japan/Estonia data cards, Explore Countries CTA, pill search).
+
+What shipped (10 commits):
+- **Phase 0** — measured a real per-component spec from the 10 DS sheets + OG
+  homepage (pixel crops in ~/civica/plan/mockup-crops/) → component-spec-v1.md.
+- **Phase 1 components**: killed monospace sitewide — `--font-mono` repointed to
+  Inter, new `--font-code` for genuine code/API surfaces only (.api-code-block/
+  .meth-formula/markdown/cssVar chips); tabular-nums on numeric tables. Rewrote
+  Pill.tsx → tinted rounded mixed-case **Chip** (neutral/sage/sand/rose/blue/
+  accent; Beta is now a sand chip) + `.editorial-chip--*` tonal modifiers. New
+  `.btn` system + Button.tsx (primary navy+arrow auto-inverts via
+  color:var(--color-page-bg); secondary/tertiary/text; sizes/states). Pill
+  SearchField (CountrySearchCombobox showFilterIcon). New SegmentedControl.tsx.
+  Reconciled `.tab-nav` to mixed-case Inter + underline. `/design-system`
+  reflects all of them.
+- **Phase 2 homepage** (src/components/home/HomeGrid.tsx + new home.css +
+  CountryCard.tsx): rebuilt to the OG mockup — Japan + Estonia country data
+  cards (flag + serif name + income Chip + stat row + per-country engraving,
+  dark-inverted) + a real multi-column Civica Index table (rank/flag/name/score/
+  tier swatch + Beta chip) + "Data from World Bank·IMF·UN·V-Dem·Freedom House"
+  footer band, all from live getCIRankings/getCanonicalFactsForJurisdictions.
+  Extracted the `.home*` CSS out of atlas.css (pure 220-line deletion → home.css;
+  /atlas verified unchanged). Header: "Explore Countries →" btn--primary CTA
+  (shows ≥1200px only — below that the 6-item nav fills the bar).
+- Factbook country page + /civica-index leaderboard were ALREADY reconciled by
+  the global Phase 1 changes + the prior engraving-hero work (no rebuild needed).
+- **Drift audit** (Workflow: 4 parallel finders + per-finding adversarial verify,
+  17 agents): 10 confirmed low/med findings, 0 high — confirms Phase 1 propagated
+  cleanly. Fixed all: CI vintage pill + gov-types lens tabs → mixed-case; compare
+  section tabs + Remove button → mixed-case/btn; blog Topics + factbook switcher
+  chips → rounded; factbook search → pill; beeswarm SVG labels → var(--font-heading)
+  (was unloaded 'Fraunces'); blog colophon copy. Plus a separate fix: shortGovLabel
+  on the index leaderboard was leaking raw snake_case (e.g.
+  "federal_republic_formally_a_confederation") — added branches + humanizing fallback.
+- Engravings: Codex dropped re-renders; converted to WebP, now **86 countries**
+  in public/engravings/countries/ (jpn/est etc. refreshed).
+- Docs: DESIGN.md + AGENTS.md synced to the almanac component system (mono policy,
+  Chip/Button/SegmentedControl/pill-search, radius roles).
+
+OWNER DECISIONS / DEFERRED (surface when he's back):
+- Nav naming: mockup says "Updates" + reorders About/Methodology; we kept
+  "The Record" + current order/dropdowns (richer than the flat mockup nav). Not
+  renamed — his call. Mockup also shows a search-magnifier icon where we have the
+  mobile-nav hamburger (≡) on desktop (pre-existing); could become a search trigger.
+- Homepage Index table shows Overall + Tier only; per-dimension columns (Political
+  Rights/Rule of Law/…) in the mockup need a new query (not in getCIRankings) — deferred.
+- Country cards use the engraving stacked below the data (vs mockup's photo-on-right) —
+  intended substitution (we use engravings, not photos).
+- Left atlas-shell ShellCountryRail mono empty-state (owner-protected boundary) and
+  FactbookLightbox #000/#fff image scrim (documented theme-independent exception) untouched.
+- Wordmark kept "Civica Atlas" title-case (mockup shows "CIVICA ATLAS" caps).
+
 ## 2026-06-21 — Autonomous audit-remediation wave (4 packs shipped) + Pulse methodology
 
 Owner: "do as much as you can without my input … not the atlas design token
