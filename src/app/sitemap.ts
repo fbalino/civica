@@ -60,6 +60,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/about/advisory-board", changeFrequency: "monthly", priority: 0.4 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.4 },
   { path: "/licensing", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/glossary", changeFrequency: "monthly", priority: 0.5 },
 ];
 
 function urlForPath(path: string) {

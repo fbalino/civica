@@ -1,0 +1,239 @@
+/* Glossary page — scoped styles.
+ *
+ * Custom layout for /glossary: a serif title block, a sticky A–Z index strip
+ * with scroll-spy, and alphabetically grouped term entries in a two-column grid
+ * that collapses to one column on mobile.
+ *
+ * Token-only: colours via var(--color-*), spacing via var(--space-*), radii via
+ * var(--radius-*), shadows via var(--shadow-hard*), serif via var(--font-heading),
+ * body via var(--font-body). No hardcoded hex/rgb/px magic numbers in component
+ * code. Light + dark safe (all tokens flip with data-theme="dark").
+ */
+
+.glossary-page {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+/* ── Title block ─────────────────────────────────────────────── */
+.glossary-titleblock {
+  padding: var(--space-8) 0 var(--space-6);
+}
+.glossary-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.glossary-title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: var(--text-56);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: var(--space-4) 0;
+  color: var(--color-text-primary);
+}
+.glossary-dek {
+  font-family: var(--font-heading);
+  font-weight: 300;
+  font-size: var(--text-20);
+  line-height: 1.55;
+  color: var(--color-text-60);
+  max-width: 62ch;
+  margin: 0;
+}
+
+/* ── Sticky A–Z index strip ──────────────────────────────────── */
+.glossary-azbar {
+  position: sticky;
+  /* sits just under the global sticky site header */
+  top: var(--header-height, 0px);
+  z-index: 20;
+  background: color-mix(in oklab, var(--color-page-bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid var(--color-card-border);
+  border-bottom: 1px solid var(--color-card-border);
+  margin-bottom: var(--space-3);
+}
+.glossary-azbar-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.glossary-azbar a {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 600;
+  color: var(--color-text-40);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition:
+    color 0.12s ease,
+    background-color 0.12s ease;
+}
+.glossary-azbar a:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+  background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+}
+.glossary-azbar a.is-active {
+  color: var(--color-bg);
+  background: var(--color-accent);
+}
+.glossary-azbar a.is-off {
+  color: color-mix(in oklab, var(--color-text-40) 55%, transparent);
+  pointer-events: none;
+}
+
+/* ── Glossary body ───────────────────────────────────────────── */
+.glossary-body {
+  padding: var(--space-6) 0 var(--space-9);
+}
+.glossary-lettergroup {
+  margin-bottom: var(--space-5);
+  /* offset anchor scroll so the sticky bars don't cover the heading */
+  scroll-margin-top: calc(var(--header-height, 0px) + 64px);
+}
+.glossary-letterhead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-5);
+  padding: var(--space-6) 0 var(--space-4);
+  border-bottom: 1px solid var(--color-card-border);
+  margin-bottom: var(--space-2);
+}
+.glossary-letterhead-big {
+  font-family: var(--font-heading);
+  font-weight: 300;
+  font-size: var(--text-44);
+  line-height: 1;
+  color: var(--color-accent);
+}
+.glossary-letterhead-count {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  letter-spacing: 0.04em;
+}
+
+.glossary-terms {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-8);
+  padding-top: var(--space-4);
+}
+.glossary-term {
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--color-card-border);
+  scroll-margin-top: calc(var(--header-height, 0px) + 80px);
+}
+/* The first row (two columns) sits flush under the letterhead rule. */
+.glossary-term:nth-child(1),
+.glossary-term:nth-child(2) {
+  border-top: 0;
+}
+.glossary-term h3 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: var(--text-22);
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-primary);
+}
+.glossary-term p {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: 1.6;
+  color: var(--color-text-60);
+  margin: 0 0 var(--space-4);
+}
+.glossary-seealso {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  margin: 0;
+}
+.glossary-seealso a {
+  font-weight: 500;
+}
+
+/* ── Tinted category tag (the .editorial-chip tonal recipe, inline) ── */
+.glossary-tag {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: var(--text-11, 11px);
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  padding: 1px 8px;
+  margin-left: var(--space-3);
+  vertical-align: middle;
+  background: color-mix(in oklab, var(--color-accent) 14%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--color-accent) 30%, transparent);
+  color: color-mix(in oklab, var(--color-accent), black 26%);
+}
+.glossary-tag--sage {
+  background: color-mix(in oklab, var(--color-status-success) 14%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-status-success) 30%, transparent);
+  color: color-mix(in oklab, var(--color-status-success), black 30%);
+}
+.glossary-tag--blue {
+  background: color-mix(in oklab, var(--color-status-info) 14%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-status-info) 30%, transparent);
+  color: color-mix(in oklab, var(--color-status-info), black 28%);
+}
+.glossary-tag--sand {
+  background: color-mix(in oklab, var(--color-status-warning) 14%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-status-warning) 30%, transparent);
+  color: color-mix(in oklab, var(--color-status-warning), black 30%);
+}
+
+/* In dark mode the darkened-hue text on tags would go too muddy; lift it. */
+[data-theme="dark"] .glossary-tag {
+  color: color-mix(in oklab, var(--color-accent), white 14%);
+}
+[data-theme="dark"] .glossary-tag--sage {
+  color: color-mix(in oklab, var(--color-status-success), white 14%);
+}
+[data-theme="dark"] .glossary-tag--blue {
+  color: color-mix(in oklab, var(--color-status-info), white 14%);
+}
+[data-theme="dark"] .glossary-tag--sand {
+  color: color-mix(in oklab, var(--color-status-warning), white 14%);
+}
+
+/* ── Mobile ──────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .glossary-page {
+    padding: 0 var(--space-5);
+  }
+  .glossary-azbar-inner {
+    padding: var(--space-3) var(--space-5);
+  }
+  .glossary-terms {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  /* one column: only the very first term sits flush; the rest get a rule */
+  .glossary-term:nth-child(2) {
+    border-top: 1px solid var(--color-card-border);
+  }
+  .glossary-term:nth-child(1) {
+    border-top: 0;
+  }
+  .glossary-title {
+    font-size: var(--text-40);
+  }
+}

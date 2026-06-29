@@ -169,6 +169,8 @@ export default function RootLayout({
                 <span>&middot;</span>
                 <Link href="/licensing">Licensing</Link>
                 <span>&middot;</span>
+                <Link href="/glossary">Glossary</Link>
+                <span>&middot;</span>
                 <Link href="/contact">Contact</Link>
                 <span>&middot;</span>
                 <a
