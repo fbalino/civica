@@ -1,5 +1,40 @@
 # Project Memory Sessions
 
+## 2026-06-29 (pt5) — Hero-height token, articles published, Motion animations, hydration fix
+
+Shipped to `main` (76b8348→ef065b4) → civicaatlas.org, verified live.
+- **Factbook landing hero full-bleed fix**: root cause was a CSS CLASS COLLISION —
+  the landing reused `.factbook-hero`, inheriting the country-page masthead's
+  `max-width:1280px` + `display:grid`, so on wide screens the hero capped at 1280px
+  (big white gap right). Gave the landing its own `.factbook-landing-hero` class
+  (full-bleed, max-width:none). LESSON: the country masthead `.factbook-hero` and the
+  landing `.factbook-landing-hero` are DISTINCT — don't merge.
+- **Canonical `--hero-height` token** (`clamp(460px, 44vw, 640px)`): hero sections now
+  share one height (`.home-hero`, `.factbook-landing-hero` [now flex-centered], `.about-hero`);
+  measured equal (595px @ 1352vw). Mobile relaxes to content height. Documented in DESIGN.md.
+- **10 Record articles PUBLISHED**: un-drafted (removed draft:true + the not-yet-existing
+  coverImage) so they show on /blog; covers fall back to the generated HemicycleCover.
+  blog.ts supports `draft:true` (filtered) for future drafts. The article blockquote
+  renderer (blog/[slug]/page.tsx) now detects "Image placeholder/Codex prompt" blocks and
+  renders a dashed "Illustration pending" figure (label + muted prompt/caption) instead of
+  the pull-quote style. (Owner generates art from the in-body Codex prompts, then adds the
+  image + coverImage.) NOTE: blog/[slug] had no runtime React import (only the global type
+  namespace) — used `isValidElement` named import, not `React.isValidElement`.
+- **Motion animation layer** (taste-skill, Leonxlnx/taste-skill, MOTION dial ~3): added
+  `motion` ^12.42.0 + src/components/motion/Reveal.tsx (Reveal / Stagger / HeroReveal).
+  Restrained entrance + scroll reveals (ease cubic-bezier(0.16,1,0.3,1), 0.55s, 0.08s
+  stagger). Applied to homepage (hero entrance + feature/card/index-row reveals), factbook
+  landing hero, glossary letter groups, The Record. CRITICAL: useReducedMotion + a no-JS
+  fail-safe (SSR has zero opacity:0) so content is NEVER trapped invisible. No GSAP/marquees/
+  pinning (wrong register for the almanac).
+- **HemicycleCover hydration bug fixed** (~24 console errors on blog pages, surfaced because
+  the new articles use the hemicycle FALLBACK cover): rounded cos/sin cx/cy/opacity to 2
+  decimals (`r2()`) so SSR (Node) + browser serialize identical SVG attrs. (An agent spawned
+  a spawn_task chip for this; fixed in main session instead — chip is moot, owner can dismiss.)
+- Engravings now 115 (Codex dropped ~20 new incl. mex/lux/mys/lie/mco/mda/mli/mlt/mus/mys).
+  Still missing for the picker/heroes: esp nor swe che nld per pol prt tur sau zaf nga rus
+  ukr vnm tha phl.
+
 ## 2026-06-29 (pt4) — Hero rebalance, 10 Record drafts, sourced glossary; Option B chosen for atlas/shell
 
 Shipped to `main` (28d1c67→e73dbd8) → civicaatlas.org, verified live.
