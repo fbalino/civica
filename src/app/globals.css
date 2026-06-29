@@ -667,6 +667,16 @@ a {
   box-shadow: var(--shadow-hard-sm);
 }
 
+/* Site-header primary CTA ("Explore Countries") — desktop only. Hidden at/below
+   the md breakpoint (--bp-md: 768px) so it doesn't duplicate the mobile
+   hamburger menu. Compound `.btn.site-header__cta` beats `.btn`'s unlayered
+   `display`, which a layered Tailwind `hidden` utility could not. */
+@media (max-width: 768px) {
+  .btn.site-header__cta {
+    display: none;
+  }
+}
+
 /* Secondary — outline, navy label. */
 .btn--secondary {
   background: transparent;

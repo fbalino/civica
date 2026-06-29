@@ -1,0 +1,485 @@
+/* ============================================================
+   Homepage — almanac hero (OG layout). Canonical tokens only.
+
+   Moved out of atlas.css so the homepage owns its own stylesheet.
+   Uses only canonical color, space, and text tokens (never atlas
+   tokens). CountryCard and Index-table classes (Phase 2 rebuild)
+   are appended at the bottom.
+   ============================================================ */
+.home {
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-page-x) var(--space-9);
+}
+
+/* Hero */
+.home-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* full-bleed: break out of the .home container to the viewport edges */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-top: 0;
+  margin-bottom: var(--space-7);
+  min-height: clamp(460px, 44vw, 640px);
+  padding: var(--space-8) 0;
+  overflow: hidden;
+}
+.home-hero-art-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 0;
+}
+[data-theme="dark"] .home-hero-art-img,
+[data-theme="dark"] .home-engraving img,
+[data-theme="dark"] .country-card-img {
+  filter: invert(1) hue-rotate(180deg) brightness(1.04);
+}
+.home-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    var(--color-bg) 0%,
+    var(--color-bg) 20%,
+    color-mix(in oklab, var(--color-bg) 78%, transparent) 42%,
+    color-mix(in oklab, var(--color-bg) 25%, transparent) 60%,
+    transparent 75%
+  );
+  z-index: 1;
+}
+.home-hero-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-page-x);
+}
+.home-hero-main {
+  max-width: 33rem;
+}
+.home-hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(var(--text-44), 6vw, var(--text-64));
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.home-hero-dek {
+  font-family: var(--font-body);
+  font-size: var(--text-20);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+  margin: var(--space-5) 0 var(--space-6);
+  max-width: 34ch;
+}
+.home-hero-search { max-width: 30rem; }
+.home-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6) var(--space-7);
+  margin-top: var(--space-7);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border-default);
+}
+.home-stat { display: flex; flex-direction: column; gap: var(--space-2); }
+.home-stat-value {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+.home-stat-mark { color: var(--color-accent); font-size: var(--text-18); line-height: 1; }
+.home-stat-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+/* The hero engraving is now the section background (.home-hero background-image). */
+
+/* Feature rows */
+.home-feature {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--space-7);
+  align-items: start;
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--color-border-default);
+}
+.home-feature-num {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+}
+.home-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+.home-feature-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-snug);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4);
+}
+.home-feature-desc {
+  font-family: var(--font-body);
+  font-size: var(--text-16);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-5);
+  max-width: 46ch;
+}
+.home-feature-link {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.home-feature-link:hover { text-decoration: underline; }
+
+/* Feature visual slot — holds a CountryCard / Index table (which bring
+   their own surface) or the .home-feature-visual fallback box. */
+.home-feature-visual-slot {
+  min-width: 0;
+}
+
+/* Feature visual card */
+.home-feature-visual {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+  box-shadow: var(--shadow-hard);
+  padding: var(--space-6);
+}
+.home-engraving {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 170px;
+}
+.home-engraving img { width: 60%; height: auto; opacity: 0.8; }
+
+/* Index leaderboard preview (legacy 3-col list — superseded by the
+   full Index table below, kept for the empty/DB-error fallback) */
+.home-rank { display: flex; flex-direction: column; }
+.home-rank-row {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-stat-border);
+  text-decoration: none;
+  color: var(--color-text-primary);
+  transition: color 140ms ease;
+}
+.home-rank-row:last-child { border-bottom: 0; }
+.home-rank-row:hover { color: var(--color-accent); }
+.home-rank-num { font-family: var(--font-body); font-size: var(--text-13); color: var(--color-accent); }
+.home-rank-name { font-family: var(--font-heading); font-size: var(--text-18); color: inherit; }
+.home-rank-score {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  color: var(--color-text-60);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Closing line */
+.home-closing {
+  text-align: center;
+  padding: var(--space-8) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Data-provenance wordmark row (the real Civica sources) */
+.home-sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+}
+.home-sources-label {
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+.home-sources-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2) var(--space-3);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-60);
+}
+.home-sources-list span { white-space: nowrap; }
+.home-sources-sep { color: var(--color-text-40); }
+
+@media (max-width: 60rem) {
+  .home-hero { min-height: auto; padding: var(--space-7) 0; background-position: 72% center; }
+  .home-hero::before {
+    background: linear-gradient(
+      to right,
+      var(--color-bg) 0%,
+      color-mix(in oklab, var(--color-bg) 80%, transparent) 58%,
+      color-mix(in oklab, var(--color-bg) 48%, transparent) 100%
+    );
+  }
+  .home-hero-main { max-width: none; }
+  .home-feature { grid-template-columns: auto 1fr; }
+  .home-feature-visual,
+  .home-feature-visual-slot { grid-column: 1 / -1; }
+}
+@media (max-width: 38.75rem) {
+  .home-feature { grid-template-columns: 1fr; gap: var(--space-5); }
+  .home-feature-num { font-size: var(--text-22); }
+}
+
+/* ============================================================
+   CountryCard — homepage feature-row data card (spec §7).
+   White elevated surface, hairline border, engraving image,
+   flag + serif name + tonal income Chip + stat row + footer link.
+   ============================================================ */
+.country-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
+  overflow: hidden;
+  font-family: var(--font-body);
+}
+.country-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6);
+}
+.country-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.country-card-flag {
+  font-size: var(--text-32);
+  line-height: 1;
+  flex-shrink: 0;
+}
+.country-card-titles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  flex: 1;
+}
+.country-card-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.country-card-native {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  line-height: var(--leading-snug);
+  margin: 0;
+}
+.country-card-chip {
+  margin-top: var(--space-2);
+}
+.country-card-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: var(--space-5) var(--space-4);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-stat-border);
+}
+.country-card-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.country-card-stat-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  line-height: 1.2;
+}
+.country-card-stat-value {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.country-card-img-wrap {
+  background: var(--color-surface-secondary);
+  border-top: 1px solid var(--color-card-border);
+  overflow: hidden;
+}
+.country-card-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  object-position: center;
+}
+.country-card-footer {
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-stat-border);
+}
+
+/* ============================================================
+   Index table — homepage feature 03 (replaces the 3-col list).
+   Real multi-column ranking table: Rank · Country · Index · Tier.
+   ============================================================ */
+.home-index {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.home-index-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+.home-index-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.home-index-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-60);
+  margin: 0;
+  flex-basis: 100%;
+}
+.home-index-link {
+  margin-left: auto;
+}
+.home-index-table-wrap {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-hard);
+  overflow: hidden;
+}
+.home-index-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+}
+.home-index-table thead th {
+  text-align: left;
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-card-border);
+  background: var(--color-page-bg);
+}
+.home-index-table th.home-index-col-rank,
+.home-index-table td.home-index-col-rank {
+  text-align: right;
+  width: 3.5rem;
+  font-variant-numeric: tabular-nums;
+}
+.home-index-table th.home-index-col-score,
+.home-index-table td.home-index-col-score {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.home-index-table tbody tr {
+  border-bottom: 1px solid var(--color-stat-border);
+  transition: background 140ms ease;
+}
+.home-index-table tbody tr:last-child { border-bottom: 0; }
+.home-index-table tbody tr:hover {
+  background: color-mix(in oklab, var(--color-text-primary) 4%, transparent);
+}
+.home-index-table td {
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-15);
+  color: var(--color-text-primary);
+  vertical-align: middle;
+}
+.home-index-rank {
+  color: var(--color-text-40);
+  font-size: var(--text-14);
+}
+.home-index-country {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+}
+.home-index-country:hover { color: var(--color-accent); }
+.home-index-flag { font-size: var(--text-18); line-height: 1; }
+.home-index-score {
+  font-weight: var(--font-weight-semibold);
+}
+.home-index-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+}
+.home-index-tier-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+@media (max-width: 38.75rem) {
+  .home-index-table th.home-index-col-tier,
+  .home-index-table td.home-index-col-tier { display: none; }
+  .home-index-table thead th,
+  .home-index-table td { padding: var(--space-3) var(--space-4); }
+}

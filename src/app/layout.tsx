@@ -11,6 +11,7 @@ import { OG_IMAGES, OG_DEFAULT_IMAGE } from "@/lib/og";
 import "./globals.css";
 import "./editorial.css";
 import "./atlas.css";
+import "./home.css";
 import "./shell.css";
 import "./civica-index.css";
 import "./civica-index-detail.css";

@@ -3,6 +3,7 @@ import { type ReactNode } from "react";
 import { NavLinks } from "@/components/NavLinks";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileNav } from "@/components/MobileNav";
+import { Button } from "@/components/editorial/Button";
 
 export function SiteHeader({
   searchSlot,
@@ -75,9 +76,15 @@ export function SiteHeader({
         <NavLinks />
       </div>
 
-      {/* Right: Theme toggle + hamburger */}
+      {/* Right: Theme toggle + Explore CTA (desktop) + hamburger (mobile) */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
         <ThemeToggle />
+        {/* Primary CTA — desktop only; mobile users get the hamburger menu instead.
+            Uses a dedicated class (not Tailwind `hidden`) because `.btn`'s own
+            `display` is unlayered and would override a layered utility. */}
+        <Button variant="primary" arrow href="/factbook" className="site-header__cta">
+          Explore Countries
+        </Button>
         <MobileNav searchSlot={searchSlot} logoSlot={logoSlotSmall} />
       </div>
     </nav>
