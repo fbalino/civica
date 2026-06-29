@@ -126,7 +126,7 @@ export function FactbookAlmanac({
   return (
     <div className="factbook-landing">
       {/* ── Full-bleed engraving hero with centered typeahead ── */}
-      <section className="factbook-hero" aria-labelledby="factbook-hero-title">
+      <section className="factbook-landing-hero" aria-labelledby="factbook-hero-title">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className="factbook-hero-art"

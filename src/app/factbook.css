@@ -1018,10 +1018,14 @@
   color: var(--color-text-primary);
 }
 
-/* ── Full-bleed hero ── */
-.factbook-hero {
+/* ── Full-bleed hero ──
+   Own class (NOT .factbook-hero — that's the country-page masthead, which sets
+   max-width:1280px + display:grid and would cap this full-bleed band). */
+.factbook-landing-hero {
   position: relative;
   overflow: hidden;
+  display: block;
+  max-width: none;
   /* Break out of any centered page container to the viewport edges. */
   width: 100vw;
   margin-left: calc(50% - 50vw);
