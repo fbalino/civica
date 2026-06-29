@@ -56,8 +56,10 @@ function seatLayout(total: number): SeatPos[] {
     for (let s = 0; s < n; s++) {
       const t = n === 1 ? 0.5 : s / (n - 1);
       const angle = Math.PI * (1 - t);
-      const x = Math.cos(angle) * radius;
-      const y = -Math.sin(angle) * radius;
+      // Round to 2 decimals so SSR (Node) + browser serialize identical cx/cy
+      // SVG attrs — avoids React hydration mismatch from cos/sin float drift.
+      const x = Math.round(Math.cos(angle) * radius * 100) / 100;
+      const y = Math.round(-Math.sin(angle) * radius * 100) / 100;
       seats.push({ x, y, angle, row: r });
     }
   }
