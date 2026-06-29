@@ -10,6 +10,13 @@ import { CountryCard, type CountryCardStat } from "@/components/home/CountryCard
 import { Chip } from "@/components/editorial/Pill";
 import { ciTier } from "@/lib/ci/tiers";
 import { civicaIndex } from "@/lib/content/site-state";
+import {
+  Reveal,
+  Stagger,
+  StaggerItem,
+  HeroReveal,
+  HeroRevealItem,
+} from "@/components/motion/Reveal";
 
 /* A single Civica Index ranking row as returned by getCIRankings. */
 interface RankRow {
@@ -114,18 +121,18 @@ export async function HomeGrid() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="home-hero-art-img" src="/engravings/hero.webp" alt="" aria-hidden="true" />
         <div className="home-hero-inner">
-          <div className="home-hero-main">
-            <h1 id="home-title" className="home-hero-title">
+          <HeroReveal className="home-hero-main">
+            <HeroRevealItem as="h1" id="home-title" className="home-hero-title">
               Civica Atlas
-            </h1>
-            <p className="home-hero-dek">
+            </HeroRevealItem>
+            <HeroRevealItem as="p" className="home-hero-dek">
               An open reference atlas of the world&rsquo;s countries, governments, and
               governance outcomes.
-            </p>
-            <div className="home-hero-search">
+            </HeroRevealItem>
+            <HeroRevealItem className="home-hero-search">
               <GlobalSearch countries={countries} />
-            </div>
-            <div className="home-stats" role="group" aria-label="Coverage">
+            </HeroRevealItem>
+            <HeroRevealItem className="home-stats" role="group" aria-label="Coverage">
               <div className="home-stat">
                 <span className="home-stat-value">{countriesCount}</span>
                 <span className="home-stat-label">Countries</span>
@@ -146,13 +153,13 @@ export async function HomeGrid() {
                 </span>
                 <span className="home-stat-label">Independent &amp; nonpartisan</span>
               </div>
-            </div>
-          </div>
+            </HeroRevealItem>
+          </HeroReveal>
         </div>
       </section>
 
       {/* 01 — Factbook */}
-      <section className="home-feature">
+      <Reveal as="section" className="home-feature">
         <div className="home-feature-num">01</div>
         <div className="home-feature-main">
           <div className="home-eyebrow">Factbook</div>
@@ -189,10 +196,10 @@ export async function HomeGrid() {
             </div>
           )}
         </div>
-      </section>
+      </Reveal>
 
       {/* 02 — Atlas */}
-      <section className="home-feature">
+      <Reveal as="section" className="home-feature">
         <div className="home-feature-num">02</div>
         <div className="home-feature-main">
           <div className="home-eyebrow">Atlas</div>
@@ -227,10 +234,10 @@ export async function HomeGrid() {
             </div>
           )}
         </div>
-      </section>
+      </Reveal>
 
       {/* 03 — Civica Index */}
-      <section className="home-feature">
+      <Reveal as="section" className="home-feature">
         <div className="home-feature-num">03</div>
         <div className="home-feature-main">
           <div className="home-eyebrow">Civica Index</div>
@@ -281,11 +288,11 @@ export async function HomeGrid() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <Stagger as="tbody" amount={0.1}>
                     {top.map((r) => {
                       const tier = ciTier(r.score);
                       return (
-                        <tr key={r.slug}>
+                        <StaggerItem as="tr" key={r.slug}>
                           <td className="home-index-col-rank">
                             <span className="home-index-rank">{r.rank}</span>
                           </td>
@@ -313,10 +320,10 @@ export async function HomeGrid() {
                               {tier.label}
                             </span>
                           </td>
-                        </tr>
+                        </StaggerItem>
                       );
                     })}
-                  </tbody>
+                  </Stagger>
                 </table>
               </div>
             </div>
@@ -329,7 +336,7 @@ export async function HomeGrid() {
             </div>
           )}
         </div>
-      </section>
+      </Reveal>
 
       <div className="home-closing">Open &middot; Transparent &middot; Nonpartisan</div>
       <div className="home-sources">

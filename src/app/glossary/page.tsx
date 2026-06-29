@@ -8,6 +8,7 @@ import {
   type GlossarySeeAlso,
 } from "@/lib/data/glossary";
 import { GlossaryNav } from "./GlossaryNav";
+import { Stagger, StaggerItem } from "@/components/motion/Reveal";
 import "../glossary.css";
 
 export const revalidate = 86400;
@@ -78,9 +79,10 @@ export default function GlossaryPage() {
       <GlossaryNav activeLetters={activeLetters} />
 
       <div className="glossary-page">
-        <div className="glossary-body">
+        <Stagger className="glossary-body" amount={0.05}>
           {groups.map((group) => (
-            <section
+            <StaggerItem
+              as="section"
               key={group.letter}
               id={`letter-${group.letter}`}
               className="glossary-lettergroup"
@@ -140,16 +142,20 @@ export default function GlossaryPage() {
                   </article>
                 ))}
               </div>
-            </section>
+            </StaggerItem>
           ))}
 
-          <p className="glossary-seealso" style={{ marginTop: "var(--space-7)" }}>
+          <StaggerItem
+            as="p"
+            className="glossary-seealso"
+            style={{ marginTop: "var(--space-7)" }}
+          >
             {termCount} terms. Definitions are written for general readers in our
             own words and paraphrase the cited reference for each entry; for the
             precise measures behind the Civica Index, see the{" "}
             <Link href="/civica-index/methodology">Index methodology</Link>.
-          </p>
-        </div>
+          </StaggerItem>
+        </Stagger>
       </div>
     </>
   );

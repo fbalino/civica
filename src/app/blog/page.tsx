@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAllPosts } from "@/lib/blog";
 import { BlogCover } from "@/components/blog/BlogCover";
 import { withOg } from "@/lib/og";
+import { Reveal } from "@/components/motion/Reveal";
 
 export const revalidate = 3600;
 
@@ -130,7 +131,7 @@ export default function BlogIndex() {
 
       <main className="record-main">
         {/* Lead story */}
-        <article className="record-lead">
+        <Reveal as="article" className="record-lead" amount={0.2}>
           <Link
             href={`/blog/${featured.slug}`}
             className="record-lead-cover"
@@ -170,16 +171,16 @@ export default function BlogIndex() {
               <span>{formatDate(featured.date)}</span>
             </div>
           </div>
-        </article>
+        </Reveal>
 
         {/* Stories grid */}
         {rest.length > 0 && (
           <>
-            <div className="record-sec-head">
+            <Reveal className="record-sec-head" amount={0.4}>
               <span className="record-sec-ey">&sect; 01</span>
               <h2 className="record-sec-title">More from the desk</h2>
-            </div>
-            <div className="record-stories">
+            </Reveal>
+            <Reveal className="record-stories" amount={0.12}>
               {rest.map((post) => (
                 <article key={post.slug} className="record-story">
                   <Link
@@ -216,7 +217,7 @@ export default function BlogIndex() {
                   </div>
                 </article>
               ))}
-            </div>
+            </Reveal>
           </>
         )}
 

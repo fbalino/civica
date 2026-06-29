@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { CountryFlag } from "@/components/CountryFlag";
+import { Reveal, HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 
 /** One country row as fed to the almanac. */
 export interface FactbookAlmanacCountry {
@@ -135,26 +136,28 @@ export function FactbookAlmanac({
           aria-hidden="true"
         />
         <div className="factbook-hero-scrim" aria-hidden="true" />
-        <div className="factbook-hero-inner">
-          <div className="factbook-hero-eyebrow">The Civica Factbook</div>
-          <h1 id="factbook-hero-title" className="factbook-hero-title">
+        <HeroReveal className="factbook-hero-inner">
+          <HeroRevealItem className="factbook-hero-eyebrow">
+            The Civica Factbook
+          </HeroRevealItem>
+          <HeroRevealItem as="h1" id="factbook-hero-title" className="factbook-hero-title">
             Every country, in full.
-          </h1>
-          <p className="factbook-hero-dek">
+          </HeroRevealItem>
+          <HeroRevealItem as="p" className="factbook-hero-dek">
             Start typing &mdash; or browse the complete index below. Every entry is
             sourced, structured, and ready to cite.
-          </p>
+          </HeroRevealItem>
 
-          <div className="factbook-hero-search">
+          <HeroRevealItem className="factbook-hero-search">
             <CountrySearchCombobox
               countries={searchOptions}
               countryPathPrefix="/factbook"
               placeholder="Search any country&hellip;"
               ariaLabel="Search countries"
             />
-          </div>
+          </HeroRevealItem>
 
-          <div className="factbook-hero-chips" role="group" aria-label="Filter by region">
+          <HeroRevealItem className="factbook-hero-chips" role="group" aria-label="Filter by region">
             {REGIONS.map((r) => {
               const active = region === r.key;
               return (
@@ -182,8 +185,8 @@ export function FactbookAlmanac({
                 </button>
               );
             })}
-          </div>
-        </div>
+          </HeroRevealItem>
+        </HeroReveal>
       </section>
 
       {/* ── Almanac index ── */}
@@ -221,7 +224,11 @@ export function FactbookAlmanac({
         {groups.length === 0 ? (
           <p className="factbook-almanac-empty">No countries in this region.</p>
         ) : (
-          <div className="factbook-index-cols">
+          // NB: this is a CSS multi-column masonry (`column-count`). A transform
+          // on each .factbook-letter-group would yank it out of the column flow
+          // and glitch the masonry, so we reveal the whole index as one block
+          // rather than per-letter stagger.
+          <Reveal className="factbook-index-cols" amount={0.05}>
             {groups.map(({ letter, items }) => (
               <section
                 key={letter}
@@ -255,7 +262,7 @@ export function FactbookAlmanac({
                 ))}
               </section>
             ))}
-          </div>
+          </Reveal>
         )}
       </div>
     </div>

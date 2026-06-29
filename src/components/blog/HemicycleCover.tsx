@@ -16,6 +16,11 @@ function seededRandom(seed: number) {
   };
 }
 
+/** Round to 2 decimals so SSR (Node) and client (browser) Math.cos/sin results
+    serialize to identical SVG attribute strings — otherwise last-digit float
+    drift between JS engines causes React hydration mismatches. */
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
 const PARTY_COLORS = [
   "var(--gov-parl)",  // blue — parliamentary
   "var(--gov-pres)",  // rust/red — presidential
@@ -48,8 +53,8 @@ function generateSeats(
     const rad = startRadius + r * spacing;
     for (let i = 0; i < perRow; i++) {
       const t = Math.PI - (i / (perRow - 1)) * Math.PI;
-      const x = Math.cos(t) * rad;
-      const y = -Math.sin(t) * rad;
+      const x = r2(Math.cos(t) * rad);
+      const y = r2(-Math.sin(t) * rad);
       seats.push(
         <circle
           key={`s${r}-${i}`}
@@ -75,8 +80,8 @@ function generateCardHemicycle(rand: () => number): React.ReactElement[] {
     const rad = 50 + r * 25;
     for (let i = 0; i < perRow; i++) {
       const t = Math.PI - (i / (perRow - 1)) * Math.PI;
-      const x = Math.cos(t) * rad;
-      const y = -Math.sin(t) * rad;
+      const x = r2(Math.cos(t) * rad);
+      const y = r2(-Math.sin(t) * rad);
       seats.push(
         <circle
           key={`cs${r}-${i}`}
@@ -84,7 +89,7 @@ function generateCardHemicycle(rand: () => number): React.ReactElement[] {
           cy={y}
           r={3}
           fill={parties[Math.floor((i / perRow) * parties.length)]}
-          opacity={0.7 + rand() * 0.3}
+          opacity={r2(0.7 + rand() * 0.3)}
         />
       );
     }
@@ -134,8 +139,8 @@ function generateCardRound(rand: () => number): React.ReactElement[] {
     const radius = 30 + rand() * 60;
     elements.push(
       <circle key={`dot${i}`}
-        cx={Math.cos(angle) * radius}
-        cy={Math.sin(angle) * radius}
+        cx={r2(Math.cos(angle) * radius)}
+        cy={r2(Math.sin(angle) * radius)}
         r={4} fill="var(--color-accent)" />
     );
   }
