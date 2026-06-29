@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Record — Updates & Analysis · Civica Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet" />
+<style>
+:root{--paper:#FAF7F2;--surface:#FFFFFF;--well:#F3EFE6;--ink:#0B1B2D;--ink-60:#2A3648;--ink-40:#6A7688;--ink-30:#A7AFBC;--rule:#E4E1DC;--accent:#B7512B;--sage:#2E7D55;--sand:#C08F3E;--rose:#B7512B;--blue:#2468CD;--serif:'Source Serif 4',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--shadow:0 1px 2px rgba(15,23,42,.06);--shadow-md:0 2px 6px rgba(15,23,42,.08);--shadow-lg:0 4px 12px rgba(15,23,42,.10);--r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-full:9999px}
+[data-theme=dark]{--paper:#0E1822;--surface:#16222E;--well:#1B2A38;--ink:#EDE8DF;--ink-60:#C3CAD2;--ink-40:#8A97A6;--ink-30:#5C6b78;--rule:#27333F;--accent:#D97A4E}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{max-width:100%;display:block}
+[data-theme=dark] .engr{filter:invert(1) hue-rotate(180deg) brightness(1.04)}
+a{color:inherit;text-decoration:none}
+
+/* ---- header ---- */
+.masthead{border-bottom:1px solid var(--rule);background:color-mix(in oklab,var(--paper) 90%,transparent);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
+.masthead-inner{max-width:1200px;margin:0 auto;padding:13px 28px;display:flex;align-items:center;gap:26px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:-.01em;color:var(--ink)}
+.compass{width:22px;height:22px;color:var(--accent);flex:none}
+.nav{display:flex;gap:20px;margin-left:auto;font-size:13.5px;color:var(--ink-60)}
+.nav a{color:var(--ink-60)}
+.nav a.active{color:var(--ink);font-weight:600}
+
+.toggle{position:fixed;top:13px;right:20px;z-index:40;width:38px;height:38px;border-radius:var(--r-full);border:1px solid var(--rule);background:var(--surface);color:var(--ink-60);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.toggle:hover{color:var(--accent);border-color:var(--accent)}
+.toggle svg{width:18px;height:18px}.toggle .moon{display:none}
+[data-theme=dark] .toggle .sun{display:none}[data-theme=dark] .toggle .moon{display:block}
+
+.page{max-width:1200px;margin:0 auto;padding:0 28px}
+
+/* ---- title block ---- */
+.titleblock{padding:54px 0 8px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.titleblock h1{font-family:var(--serif);font-weight:400;font-size:56px;line-height:1.02;letter-spacing:-.02em;margin:14px 0 14px;color:var(--ink)}
+.titleblock h1 em{font-style:italic;color:var(--accent)}
+.dek{font-family:var(--serif);font-weight:300;font-size:20px;line-height:1.55;color:var(--ink-60);max-width:60ch;margin:0 0 28px}
+
+/* ---- filter strip ---- */
+.filters{display:flex;gap:9px;flex-wrap:wrap;padding:18px 0 4px}
+.chip{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ink-60);background:transparent;border:1px solid var(--rule);border-radius:var(--r-full);padding:6px 14px;cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* ---- featured lead ---- */
+.lead{display:grid;grid-template-columns:1.15fr 1fr;gap:40px;align-items:center;padding:42px 0}
+.lead-art{border:1px solid var(--rule);border-radius:var(--r-lg);overflow:hidden;background:var(--well);box-shadow:var(--shadow-md)}
+.lead-art img{width:100%;height:380px;object-fit:cover}
+.cat{display:inline-block;font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.07em;color:var(--accent);background:color-mix(in oklab,var(--accent) 13%,transparent);border-radius:var(--r-sm);padding:3px 10px}
+.cat.sage{color:var(--sage);background:color-mix(in oklab,var(--sage) 13%,transparent)}
+.cat.sand{color:var(--sand);background:color-mix(in oklab,var(--sand) 16%,transparent)}
+.cat.blue{color:var(--blue);background:color-mix(in oklab,var(--blue) 12%,transparent)}
+.lead-copy .cat{margin-bottom:16px}
+.lead-copy h2{font-family:var(--serif);font-weight:400;font-size:40px;line-height:1.08;letter-spacing:-.02em;margin:0 0 16px;color:var(--ink)}
+.lead-copy h2 a:hover{color:var(--accent)}
+.lead-copy .ldek{font-family:var(--serif);font-weight:300;font-size:18.5px;line-height:1.6;color:var(--ink-60);margin:0 0 18px}
+.meta{font-family:var(--sans);font-size:13px;color:var(--ink-40);display:flex;align-items:center;gap:12px}
+.meta .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-30)}
+.readlink{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--accent);margin-top:18px;display:inline-block}
+.readlink:hover{text-decoration:underline}
+
+/* ---- section label ---- */
+.seclabel{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-40);display:flex;align-items:center;gap:14px;margin:18px 0 26px}
+.seclabel::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+/* ---- article grid ---- */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;padding-bottom:30px}
+.card{border:1px solid var(--rule);border-radius:var(--r-lg);background:var(--surface);overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:box-shadow .18s,transform .18s}
+.card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.card .thumb{height:186px;overflow:hidden;background:var(--well);border-bottom:1px solid var(--rule)}
+.card .thumb img{width:100%;height:100%;object-fit:cover}
+.card .body{padding:20px 22px 22px;display:flex;flex-direction:column;flex:1}
+.card .cat{margin-bottom:13px;align-self:flex-start}
+.card h3{font-family:var(--serif);font-weight:600;font-size:22px;line-height:1.22;letter-spacing:-.01em;margin:0 0 10px;color:var(--ink)}
+.card h3 a:hover{color:var(--accent)}
+.card .cdek{font-family:var(--serif);font-weight:300;font-size:16px;line-height:1.5;color:var(--ink-60);margin:0 0 18px;flex:1}
+.card .cmeta{font-family:var(--sans);font-size:12.5px;color:var(--ink-40);display:flex;align-items:center;gap:10px;padding-top:14px;border-top:1px solid var(--rule)}
+.card .cmeta .dot{width:3px;height:3px;border-radius:50%;background:var(--ink-30)}
+
+.loadmore{text-align:center;padding:14px 0 80px}
+.loadmore button{font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);background:transparent;border:1px solid var(--rule);border-radius:var(--r-full);padding:11px 26px;cursor:pointer}
+.loadmore button:hover{border-color:var(--accent);color:var(--accent)}
+
+footer.foot{border-top:1px solid var(--rule);padding:26px 28px;text-align:center}
+footer.foot .links{font-family:var(--sans);font-size:13px;color:var(--ink-40);display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+footer.foot .links a{color:var(--ink-40)}
+
+@media(max-width:980px){.lead{grid-template-columns:1fr;gap:24px}.lead-art img{height:300px}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){.grid{grid-template-columns:1fr}.titleblock h1{font-size:40px}.nav{display:none}.lead-copy h2{font-size:30px}}
+</style>
+</head>
+<body>
+
+<button class="toggle" id="themeToggle" aria-label="Toggle dark mode">
+  <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/></svg>
+  <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4 8.3 8.3 0 1 0 20 14.6Z"/></svg>
+</button>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="#">
+      <svg class="compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.2"/><path d="M12 12 15.4 8.6 13.4 13.4 8.6 15.4 10.6 10.6Z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.1" fill="var(--paper)" stroke="none"/></svg>
+      Civica Atlas
+    </a>
+    <nav class="nav">
+      <a href="#">Factbook</a><a href="#">Atlas</a><a href="#">Index</a><a href="#">Methodology</a><a href="#" class="active">The Record</a><a href="#">About</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+  <div class="titleblock">
+    <div class="eyebrow">Updates · Analysis · Methodology Notes</div>
+    <h1>The <em>Record</em></h1>
+    <p class="dek">Dispatches from the Civica desk: what changed in the data, how we measure it, and what the world's governments are doing this week. Every entry is dated, sourced, and revisable.</p>
+    <div class="filters">
+      <button class="chip active">All</button>
+      <button class="chip">Analysis</button>
+      <button class="chip">Data Updates</button>
+      <button class="chip">Methodology</button>
+      <button class="chip">Pulse Briefings</button>
+      <button class="chip">Releases</button>
+    </div>
+  </div>
+
+  <!-- Featured lead -->
+  <article class="lead">
+    <div class="lead-art">
+      <img class="engr" src="https://civicaatlas.org/engravings/hero.webp" alt="Engraving of an assembly hall" />
+    </div>
+    <div class="lead-copy">
+      <span class="cat">Analysis</span>
+      <h2><a href="06-29-2026-editorial-longform.html">Inside Democratic Resilience</a></h2>
+      <p class="ldek">When institutions bend rather than break, the story is rarely told in a single headline. A reading of eighteen months of Civica Index and Pulse data on the quiet machinery that lets some democracies absorb the shocks that topple others.</p>
+      <div class="meta"><span>The Civica Editorial Desk</span><span class="dot"></span><span>June 29, 2026</span><span class="dot"></span><span>14 min read</span></div>
+      <a class="readlink" href="06-29-2026-editorial-longform.html">Read the full piece →</a>
+    </div>
+  </article>
+
+  <div class="seclabel">Latest entries</div>
+
+  <div class="grid">
+    <article class="card">
+      <div class="thumb"><img class="engr" src="https://civicaatlas.org/engravings/countries/dnk.webp" alt="Denmark engraving"/></div>
+      <div class="body">
+        <span class="cat sage">Data Updates</span>
+        <h3><a href="#">Nordic states hold the top tier in the Q2 Index refresh</a></h3>
+        <p class="cdek">The latest quarterly composite leaves the Scandinavian bloc largely unmoved at the top, with one notable shift in rule-of-law sub-scores.</p>
+        <div class="cmeta"><span>Data Desk</span><span class="dot"></span><span>Jun 27, 2026</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="thumb"><img class="engr" src="https://civicaatlas.org/engravings/spot-globe.webp" alt="Globe engraving"/></div>
+      <div class="body">
+        <span class="cat blue">Methodology</span>
+        <h3><a href="#">Why we switched to V-Dem Regimes of the World for peer grouping</a></h3>
+        <p class="cdek">Retiring an in-house taxonomy in favor of an externally attested classification — what changes for readers, and what does not.</p>
+        <div class="cmeta"><span>Methodology Desk</span><span class="dot"></span><span>Jun 24, 2026</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="thumb"><img class="engr" src="https://civicaatlas.org/engravings/countries/ken.webp" alt="Kenya engraving"/></div>
+      <div class="body">
+        <span class="cat">Pulse Briefings</span>
+        <h3><a href="#">East Africa: a week of contested appointments and a court that held</a></h3>
+        <p class="cdek">This week's Pulse log, read as a story: where the daily governance signals moved, and which adverse events were met with countervailing ones.</p>
+        <div class="cmeta"><span>Pulse Desk</span><span class="dot"></span><span>Jun 23, 2026</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="thumb"><img class="engr" src="https://civicaatlas.org/engravings/spot-column.webp" alt="Column engraving"/></div>
+      <div class="body">
+        <span class="cat sand">Releases</span>
+        <h3><a href="#">A glossary arrives: 60 governance terms, plainly defined</a></h3>
+        <p class="cdek">Every term we use in the Index and the Factbook now has a one-paragraph definition and a link to the methodology that uses it.</p>
+        <div class="cmeta"><span>Product</span><span class="dot"></span><span>Jun 21, 2026</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="thumb"><img class="engr" src="https://civicaatlas.org/engravings/countries/bra.webp" alt="Brazil engraving"/></div>
+      <div class="body">
+        <span class="cat">Analysis</span>
+        <h3><a href="#">The federalism dividend: when subnational government absorbs the shock</a></h3>
+        <p class="cdek">Strong states and provinces can act as a buffer against capture at the center. A look at where the buffer holds and where it has thinned.</p>
+        <div class="cmeta"><span>The Civica Editorial Desk</span><span class="dot"></span><span>Jun 18, 2026</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="thumb"><img class="engr" src="https://civicaatlas.org/engravings/countries/jpn.webp" alt="Japan engraving"/></div>
+      <div class="body">
+        <span class="cat sage">Data Updates</span>
+        <h3><a href="#">Corruption-control signals revised after a new CPI vintage lands</a></h3>
+        <p class="cdek">The Transparency International release shifts the corruption-control dimension for fourteen countries. Here is the reconciliation.</p>
+        <div class="cmeta"><span>Data Desk</span><span class="dot"></span><span>Jun 15, 2026</span></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="loadmore"><button>Load more entries</button></div>
+</div>
+
+<footer class="foot">
+  <div class="links">
+    <a href="#">Blog</a><a href="#">API Docs</a><a href="#">Design System</a><a href="#">Status Page</a><a href="#">Licensing</a><a href="#">Contact</a><a href="#">GitHub</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  t.addEventListener('click',function(){
+    var d=document.documentElement;
+    d.setAttribute('data-theme', d.getAttribute('data-theme')==='dark'?'':'dark');
+  });
+  document.querySelectorAll('.chip').forEach(function(c){
+    c.addEventListener('click',function(){
+      document.querySelectorAll('.chip').forEach(function(x){x.classList.remove('active')});
+      c.classList.add('active');
+    });
+  });
+})();
+</script>
+</body>
+</html>

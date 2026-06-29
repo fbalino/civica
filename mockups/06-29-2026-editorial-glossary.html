@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Glossary — Governance Terms · Civica Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet" />
+<style>
+:root{--paper:#FAF7F2;--surface:#FFFFFF;--well:#F3EFE6;--ink:#0B1B2D;--ink-60:#2A3648;--ink-40:#6A7688;--ink-30:#A7AFBC;--rule:#E4E1DC;--accent:#B7512B;--sage:#2E7D55;--sand:#C08F3E;--rose:#B7512B;--blue:#2468CD;--serif:'Source Serif 4',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--shadow:0 1px 2px rgba(15,23,42,.06);--shadow-md:0 2px 6px rgba(15,23,42,.08);--shadow-lg:0 4px 12px rgba(15,23,42,.10);--r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-full:9999px}
+[data-theme=dark]{--paper:#0E1822;--surface:#16222E;--well:#1B2A38;--ink:#EDE8DF;--ink-60:#C3CAD2;--ink-40:#8A97A6;--ink-30:#5C6b78;--rule:#27333F;--accent:#D97A4E}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{max-width:100%;display:block}
+[data-theme=dark] .engr{filter:invert(1) hue-rotate(180deg) brightness(1.04)}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+html{scroll-behavior:smooth}
+
+.masthead{border-bottom:1px solid var(--rule);background:color-mix(in oklab,var(--paper) 90%,transparent);backdrop-filter:blur(8px);position:sticky;top:0;z-index:30}
+.masthead-inner{max-width:1200px;margin:0 auto;padding:13px 28px;display:flex;align-items:center;gap:26px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:-.01em;color:var(--ink)}
+.compass{width:22px;height:22px;color:var(--accent);flex:none}
+.nav{display:flex;gap:20px;margin-left:auto;font-size:13.5px;color:var(--ink-60)}
+.nav a{color:var(--ink-60)}
+.nav a.active{color:var(--ink);font-weight:600}
+
+.toggle{position:fixed;top:13px;right:20px;z-index:40;width:38px;height:38px;border-radius:var(--r-full);border:1px solid var(--rule);background:var(--surface);color:var(--ink-60);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.toggle:hover{color:var(--accent);border-color:var(--accent)}
+.toggle svg{width:18px;height:18px}.toggle .moon{display:none}
+[data-theme=dark] .toggle .sun{display:none}[data-theme=dark] .toggle .moon{display:block}
+
+.page{max-width:1040px;margin:0 auto;padding:0 28px}
+
+/* ---- title ---- */
+.titleblock{padding:54px 0 26px}
+.eyebrow{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.titleblock h1{font-family:var(--serif);font-weight:400;font-size:56px;line-height:1.02;letter-spacing:-.02em;margin:14px 0 14px;color:var(--ink)}
+.dek{font-family:var(--serif);font-weight:300;font-size:20px;line-height:1.55;color:var(--ink-60);max-width:62ch;margin:0}
+
+/* ---- sticky A-Z strip ---- */
+.azbar{position:sticky;top:53px;z-index:20;background:color-mix(in oklab,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);margin-bottom:8px}
+.azbar-inner{max-width:1040px;margin:0 auto;padding:12px 28px;display:flex;flex-wrap:wrap;gap:3px}
+.azbar a{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink-40);width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-sm)}
+.azbar a:hover{color:var(--accent);text-decoration:none;background:color-mix(in oklab,var(--accent) 10%,transparent)}
+.azbar a.active{color:var(--paper);background:var(--accent)}
+.azbar a.off{color:var(--ink-30);pointer-events:none;opacity:.55}
+
+/* ---- glossary body ---- */
+.glossary{padding:24px 0 80px}
+.lettergroup{margin-bottom:18px}
+.letterhead{display:flex;align-items:baseline;gap:16px;padding:26px 0 14px;border-bottom:1px solid var(--rule);margin-bottom:6px}
+.letterhead .big{font-family:var(--serif);font-weight:300;font-size:46px;line-height:1;color:var(--accent)}
+.letterhead .count{font-family:var(--sans);font-size:12px;color:var(--ink-40);letter-spacing:.04em}
+
+.terms{display:grid;grid-template-columns:1fr 1fr;gap:8px 44px;padding-top:10px}
+.term{padding:18px 0;border-top:1px solid var(--rule)}
+.term:first-child,.terms .term:nth-child(2){border-top:0}
+.term h3{font-family:var(--serif);font-weight:600;font-size:21px;letter-spacing:-.01em;margin:0 0 7px;color:var(--ink)}
+.term p{font-family:var(--sans);font-size:14.5px;line-height:1.6;color:var(--ink-60);margin:0 0 10px}
+.seealso{font-family:var(--sans);font-size:12.5px;color:var(--ink-40)}
+.seealso a{font-weight:500}
+.tag{display:inline-block;font-family:var(--sans);font-size:11px;font-weight:500;color:var(--accent);background:color-mix(in oklab,var(--accent) 12%,transparent);border-radius:var(--r-sm);padding:1px 8px;margin-left:8px;vertical-align:middle}
+.tag.sage{color:var(--sage);background:color-mix(in oklab,var(--sage) 13%,transparent)}
+.tag.blue{color:var(--blue);background:color-mix(in oklab,var(--blue) 12%,transparent)}
+
+footer.foot{border-top:1px solid var(--rule);padding:26px 28px;text-align:center}
+footer.foot .links{font-family:var(--sans);font-size:13px;color:var(--ink-40);display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+footer.foot .links a{color:var(--ink-40)}
+
+@media(max-width:760px){
+  .terms{grid-template-columns:1fr;gap:0}
+  .term:nth-child(2){border-top:1px solid var(--rule)}
+  .term:first-child{border-top:0}
+  .titleblock h1{font-size:40px}
+  .nav{display:none}
+}
+</style>
+</head>
+<body>
+
+<button class="toggle" id="themeToggle" aria-label="Toggle dark mode">
+  <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/></svg>
+  <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4 8.3 8.3 0 1 0 20 14.6Z"/></svg>
+</button>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="#">
+      <svg class="compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.2"/><path d="M12 12 15.4 8.6 13.4 13.4 8.6 15.4 10.6 10.6Z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.1" fill="var(--paper)" stroke="none"/></svg>
+      Civica Atlas
+    </a>
+    <nav class="nav">
+      <a href="#">Factbook</a><a href="#">Atlas</a><a href="#">Index</a><a href="#">Methodology</a><a href="#">The Record</a><a href="#" class="active">About</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page">
+  <div class="titleblock">
+    <div class="eyebrow">Reference</div>
+    <h1>Glossary</h1>
+    <p class="dek">The vocabulary of governance, plainly defined. Every term Civica uses across the Index, the Pulse, and the Factbook — with a one-paragraph definition and, where relevant, a link to the methodology that puts it to work.</p>
+  </div>
+</div>
+
+<nav class="azbar" aria-label="Alphabetical index">
+  <div class="azbar-inner">
+    <a href="#A" class="active">A</a><a href="#C">C</a><a href="#D">D</a>
+    <a href="#" class="off">E</a><a href="#" class="off">F</a><a href="#G">G</a>
+    <a href="#H">H</a><a href="#I">I</a><a href="#" class="off">J</a>
+    <a href="#" class="off">K</a><a href="#" class="off">L</a><a href="#" class="off">M</a>
+    <a href="#" class="off">N</a><a href="#" class="off">O</a><a href="#" class="off">P</a>
+    <a href="#" class="off">Q</a><a href="#R">R</a><a href="#S">S</a>
+    <a href="#" class="off">T</a><a href="#" class="off">U</a><a href="#" class="off">V</a>
+    <a href="#" class="off">W</a><a href="#" class="off">X</a><a href="#" class="off">Y</a>
+    <a href="#" class="off">Z</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="glossary">
+
+    <!-- A -->
+    <section class="lettergroup" id="A">
+      <div class="letterhead"><span class="big">A</span><span class="count">2 terms</span></div>
+      <div class="terms">
+        <div class="term">
+          <h3>Accountability</h3>
+          <p>The obligation of officials and institutions to answer for the exercise of power — to explain decisions, justify the use of public resources, and face consequences when conduct falls short. Civica treats horizontal accountability (between branches of government) and vertical accountability (to the electorate) as distinct strands.</p>
+          <p class="seealso">See also: <a href="#">Rule of Law</a> · <a href="#">Institutional Quality methodology →</a></p>
+        </div>
+        <div class="term">
+          <h3>Authoritarianism <span class="tag">regime type</span></h3>
+          <p>A form of government in which political power is concentrated and not subject to meaningful, contestable elections or independent checks. In the V-Dem framework Civica uses, it spans closed and electoral autocracies — the latter holding elections that are real but not free or fair.</p>
+          <p class="seealso">See also: <a href="#">Democracy</a> · <a href="#">Regimes of the World →</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- C -->
+    <section class="lettergroup" id="C">
+      <div class="letterhead"><span class="big">C</span><span class="count">2 terms</span></div>
+      <div class="terms">
+        <div class="term">
+          <h3>Civil Liberties</h3>
+          <p>The protections that shield individuals from undue interference by the state — freedom of expression, assembly, association, belief, and movement, together with due-process guarantees. They are a core input to the Freedom &amp; Rights dimension of the Civica Index.</p>
+          <p class="seealso">See also: <a href="#">Rule of Law</a> · <a href="#">Index dimensions →</a></p>
+        </div>
+        <div class="term">
+          <h3>Corruption Control <span class="tag blue">CI dimension</span></h3>
+          <p>The degree to which public power is exercised for private gain is constrained. Measured in the Index primarily through Transparency International's Corruption Perceptions Index and World Bank governance indicators, refreshed on a quarterly reference period.</p>
+          <p class="seealso">See also: <a href="#">Accountability</a> · <a href="#">Methodology →</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- D -->
+    <section class="lettergroup" id="D">
+      <div class="letterhead"><span class="big">D</span><span class="count">1 term</span></div>
+      <div class="terms">
+        <div class="term">
+          <h3>Democracy <span class="tag">regime type</span></h3>
+          <p>A system of government in which rulers are selected through free, fair, and regularly contested elections, and in which civil liberties and the rule of law constrain the use of power. Civica distinguishes electoral democracies from liberal democracies, following the Regimes of the World classification.</p>
+          <p class="seealso">See also: <a href="#">Authoritarianism</a> · <a href="#">Civil Liberties</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- G -->
+    <section class="lettergroup" id="G">
+      <div class="letterhead"><span class="big">G</span><span class="count">1 term</span></div>
+      <div class="terms">
+        <div class="term">
+          <h3>Governance</h3>
+          <p>The traditions and institutions by which authority is exercised in a country — how governments are selected and replaced, their capacity to formulate and implement policy, and the respect of citizens and the state for the institutions that govern them. The organising concept behind the entire Civica Index.</p>
+          <p class="seealso">See also: <a href="#">Institutional Quality</a> · <a href="#">The Civica Index →</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- H -->
+    <section class="lettergroup" id="H">
+      <div class="letterhead"><span class="big">H</span><span class="count">1 term</span></div>
+      <div class="terms">
+        <div class="term">
+          <h3>Human Development <span class="tag sage">outcome</span></h3>
+          <p>A measure of well-being that combines health, education, and living standards rather than income alone. Civica draws on the UNDP Human Development Index as an outcome indicator — evidence of what governance produces, kept analytically separate from governance itself.</p>
+          <p class="seealso">See also: <a href="#">Governance</a> · <a href="#">Outcomes →</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- I -->
+    <section class="lettergroup" id="I">
+      <div class="letterhead"><span class="big">I</span><span class="count">1 term</span></div>
+      <div class="terms">
+        <div class="term">
+          <h3>Institutional Quality</h3>
+          <p>The capacity of a state's formal institutions — courts, bureaucracy, electoral administration, oversight bodies — to function impartially, predictably, and free of capture. High institutional quality is what lets a democracy absorb shocks without bending its rules.</p>
+          <p class="seealso">See also: <a href="#">Accountability</a> · <a href="#">Rule of Law</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- R -->
+    <section class="lettergroup" id="R">
+      <div class="letterhead"><span class="big">R</span><span class="count">1 term</span></div>
+      <div class="terms">
+        <div class="term">
+          <h3>Rule of Law <span class="tag blue">CI dimension</span></h3>
+          <p>The principle that everyone — including the government — is bound by, and entitled to the benefit of, laws that are publicly known, applied equally, and adjudicated by an independent judiciary. A foundational dimension of the Civica Index and a precondition for the others.</p>
+          <p class="seealso">See also: <a href="#">Accountability</a> · <a href="#">Civil Liberties</a> · <a href="#">Methodology →</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- S -->
+    <section class="lettergroup" id="S">
+      <div class="letterhead"><span class="big">S</span><span class="count">1 term</span></div>
+      <div class="terms">
+        <div class="term">
+          <h3>Separation of Powers</h3>
+          <p>The division of government authority among legislative, executive, and judicial branches so that no single branch may act without check from the others. The overlapping nature of these checks — their redundancy — is what makes capture costly and slow.</p>
+          <p class="seealso">See also: <a href="#">Institutional Quality</a> · <a href="#">Governance</a></p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="links">
+    <a href="#">Blog</a><a href="#">API Docs</a><a href="#">Design System</a><a href="#">Status Page</a><a href="#">Licensing</a><a href="#">Contact</a><a href="#">GitHub</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  t.addEventListener('click',function(){
+    var d=document.documentElement;
+    d.setAttribute('data-theme', d.getAttribute('data-theme')==='dark'?'':'dark');
+  });
+  // active-letter tracking on scroll
+  var links=[].slice.call(document.querySelectorAll('.azbar a:not(.off)'));
+  var groups=[].slice.call(document.querySelectorAll('.lettergroup'));
+  function onScroll(){
+    var y=window.scrollY+160, cur=groups[0];
+    groups.forEach(function(g){ if(g.offsetTop<=y) cur=g; });
+    links.forEach(function(l){ l.classList.toggle('active', l.getAttribute('href')==='#'+cur.id); });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
+})();
+</script>
+</body>
+</html>

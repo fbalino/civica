@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Civica Factbook — Mockup A · Region Grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{--paper:#FAF7F2;--surface:#FFFFFF;--well:#F3EFE6;--ink:#0B1B2D;--ink-60:#2A3648;--ink-40:#6A7688;--ink-30:#A7AFBC;--rule:#E4E1DC;--accent:#B7512B;--sage:#2E7D55;--sand:#C08F3E;--rose:#B7512B;--blue:#2468CD;--serif:'Source Serif 4',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--shadow:0 1px 2px rgba(15,23,42,.06);--shadow-md:0 2px 6px rgba(15,23,42,.08);--shadow-lg:0 4px 12px rgba(15,23,42,.10);--r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-full:9999px}
+[data-theme=dark]{--paper:#0E1822;--surface:#16222E;--well:#1B2A38;--ink:#EDE8DF;--ink-60:#C3CAD2;--ink-40:#8A97A6;--ink-30:#5C6b78;--rule:#27333F;--accent:#D97A4E}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased;transition:background .25s ease,color .25s ease}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+[data-theme=dark] .engraving{filter:invert(1) hue-rotate(180deg) brightness(1.04)}
+
+/* ---------- theme toggle ---------- */
+.theme-toggle{position:fixed;top:14px;right:18px;z-index:200;width:38px;height:38px;border-radius:var(--r-full);border:1px solid var(--rule);background:var(--surface);color:var(--ink-60);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);transition:transform .15s ease,color .2s ease}
+.theme-toggle:hover{transform:translateY(-1px);color:var(--ink)}
+.theme-toggle svg{width:18px;height:18px}
+
+/* ---------- header ---------- */
+.site-header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.nav{max-width:1520px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;gap:28px}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.brand-mark{width:30px;height:30px;color:var(--accent)}
+.brand-name{font-family:var(--serif);font-size:21px;font-weight:600;letter-spacing:-.01em}
+.nav-links{display:flex;align-items:center;gap:22px;margin-left:8px;flex:1}
+.nav-links a{font-size:14.5px;color:var(--ink-60);font-weight:500;transition:color .15s ease;padding:4px 0;border-bottom:2px solid transparent}
+.nav-links a:hover{color:var(--ink)}
+.nav-links a.active{color:var(--ink);border-bottom-color:var(--accent)}
+.nav-cta{flex-shrink:0;display:inline-flex;align-items:center;gap:7px;background:var(--ink);color:var(--paper);font-size:14px;font-weight:500;padding:9px 16px;border-radius:var(--r-md);transition:opacity .15s ease}
+.nav-cta:hover{opacity:.88}
+[data-theme=dark] .nav-cta{color:var(--ink);background:var(--accent)}
+[data-theme=dark] .nav-cta{color:#0E1822}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--rule)}
+.hero-img-wrap{position:absolute;inset:0;z-index:0}
+.hero-img{width:100%;height:100%;object-fit:cover;object-position:center 38%;opacity:.9}
+[data-theme=dark] .hero-img{opacity:.5}
+.hero-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,color-mix(in srgb,var(--paper) 30%,transparent) 0%,color-mix(in srgb,var(--paper) 55%,transparent) 45%,color-mix(in srgb,var(--paper) 92%,transparent) 100%)}
+.hero-inner{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:96px 32px 84px;text-align:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:22px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:"";width:26px;height:1px;background:var(--accent);opacity:.5}
+.hero h1{font-family:var(--serif);font-size:56px;line-height:1.04;font-weight:400;letter-spacing:-.02em;margin-bottom:20px}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-dek{font-size:18.5px;line-height:1.55;color:var(--ink-60);max-width:640px;margin:0 auto 36px;font-weight:400}
+.hero-search{max-width:600px;margin:0 auto;position:relative}
+.hero-search input{width:100%;font-family:var(--sans);font-size:17px;color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-full);padding:18px 22px 18px 56px;box-shadow:var(--shadow-lg);transition:border-color .15s ease,box-shadow .15s ease}
+.hero-search input::placeholder{color:var(--ink-40)}
+.hero-search input:focus{outline:none;border-color:var(--accent);box-shadow:var(--shadow-lg),0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.hero-search .mag{position:absolute;left:22px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--ink-40)}
+.hero-search .kbd{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--ink-40);border:1px solid var(--rule);border-radius:var(--r-sm);padding:3px 8px;background:var(--well)}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:30px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat b{display:block;font-family:var(--serif);font-size:26px;font-weight:600;color:var(--ink)}
+.hero-stat span{font-size:12.5px;color:var(--ink-40);letter-spacing:.04em}
+
+/* ---------- main / picker ---------- */
+.main{max-width:1520px;margin:0 auto;padding:56px 32px 90px}
+.picker-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:8px}
+.section-title{font-family:var(--serif);font-size:30px;font-weight:600;letter-spacing:-.01em}
+.section-sub{font-size:15px;color:var(--ink-40);margin-top:6px}
+
+/* alpha + region quick-jump bar */
+.jump-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:26px 0 34px;padding:14px 18px;background:var(--well);border:1px solid var(--rule);border-radius:var(--r-lg)}
+.jump-label{font-size:12.5px;font-weight:600;color:var(--ink-40);letter-spacing:.05em;text-transform:uppercase;margin-right:6px}
+.jump-pill{font-size:13.5px;font-weight:500;color:var(--ink-60);padding:6px 13px;border-radius:var(--r-full);border:1px solid transparent;cursor:pointer;transition:all .15s ease}
+.jump-pill:hover{background:var(--surface);color:var(--ink)}
+.jump-pill.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+[data-theme=dark] .jump-pill.active{background:var(--accent);color:#0E1822;border-color:var(--accent)}
+
+/* region group */
+.region-block{margin-bottom:48px}
+.region-title{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.region-title h3{font-family:var(--serif);font-size:21px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+.region-title .count{font-size:13px;color:var(--ink-40);font-weight:500;background:var(--well);padding:2px 10px;border-radius:var(--r-full)}
+.region-title .line{flex:1;height:1px;background:var(--rule)}
+
+/* country grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:16px}
+.card{position:relative;display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-lg);padding:14px 16px;box-shadow:var(--shadow);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;cursor:pointer;overflow:hidden}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:color-mix(in srgb,var(--accent) 40%,var(--rule))}
+.card-thumb{position:relative;width:54px;height:54px;flex-shrink:0;border-radius:var(--r-md);background:var(--well);overflow:hidden;border:1px solid var(--rule);display:flex;align-items:center;justify-content:center}
+.card-thumb .engraving{width:100%;height:100%;object-fit:cover;opacity:.92;mix-blend-mode:multiply}
+[data-theme=dark] .card-thumb .engraving{mix-blend-mode:normal}
+.card-flag{position:absolute;bottom:-1px;right:-1px;width:22px;height:16px;border-radius:2px;box-shadow:0 0 0 2px var(--surface);object-fit:cover}
+.card-body{min-width:0;flex:1}
+.card-name{font-family:var(--serif);font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-cap{font-size:12.5px;color:var(--ink-40);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:var(--r-sm);line-height:1.3}
+.chip-parl{background:color-mix(in srgb,var(--blue) 13%,transparent);color:var(--blue)}
+.chip-pres{background:color-mix(in srgb,var(--rose) 13%,transparent);color:var(--rose)}
+.chip-semi{background:color-mix(in srgb,#7A4FB7 14%,transparent);color:#7A4FB7}
+.chip-mon{background:color-mix(in srgb,var(--sand) 16%,transparent);color:var(--sand)}
+[data-theme=dark] .chip-parl{color:#7FB0F0}
+[data-theme=dark] .chip-pres{color:#E89B78}
+[data-theme=dark] .chip-semi{color:#B79BE0}
+[data-theme=dark] .chip-mon{color:#E0BC74}
+.card-go{position:absolute;top:14px;right:14px;color:var(--ink-30);opacity:0;transform:translateX(-4px);transition:all .16s ease}
+.card:hover .card-go{opacity:1;transform:translateX(0);color:var(--accent)}
+.card-go svg{width:16px;height:16px}
+
+/* footer */
+.site-footer{border-top:1px solid var(--rule);background:var(--well)}
+.footer-inner{max-width:1520px;margin:0 auto;padding:34px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px;font-size:13.5px;color:var(--ink-40)}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a:hover{color:var(--ink)}
+
+@media(max-width:760px){
+.nav-links{display:none}
+.hero h1{font-size:38px}
+.hero-inner{padding:64px 22px 56px}
+.main{padding:40px 20px 70px}
+}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode">
+  <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+</button>
+
+<!-- HEADER -->
+<header class="site-header">
+  <nav class="nav">
+    <a class="brand" href="#">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18" stroke-width="1"/><path d="M12 6l2.2 4.6L19 12l-4.8 1.4L12 18l-2.2-4.6L5 12l4.8-1.4z" fill="currentColor" stroke="none"/></svg>
+      <span class="brand-name">Civica Atlas</span>
+    </a>
+    <div class="nav-links">
+      <a href="#" class="active">Factbook</a>
+      <a href="#">Atlas</a>
+      <a href="#">Index</a>
+      <a href="#">Methodology</a>
+      <a href="#">The Record</a>
+      <a href="#">About</a>
+    </div>
+    <a class="nav-cta" href="#">Explore Countries
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-img-wrap">
+    <img class="hero-img engraving" src="https://civicaatlas.org/engravings/hero.webp" alt="Antique engraving of the world" />
+  </div>
+  <div class="hero-scrim"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow">The Civica Factbook</div>
+    <h1>Every country, <em>rendered</em> in full.</h1>
+    <p class="hero-dek">A modern, source-traced reference on the government, geography, and society of every state on earth — built for citation, made to be read.</p>
+    <div class="hero-search">
+      <svg class="mag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Search 250 countries and territories…" />
+      <span class="kbd">⌘K</span>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><b>250</b><span>Countries &amp; territories</span></div>
+      <div class="hero-stat"><b>45</b><span>Structured data tables</span></div>
+      <div class="hero-stat"><b>12</b><span>Cited source corpora</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PICKER -->
+<main class="main">
+  <div class="picker-head">
+    <div>
+      <h2 class="section-title">Browse the archive</h2>
+      <p class="section-sub">Grouped by region. Jump to a letter, or open any country card.</p>
+    </div>
+  </div>
+
+  <div class="jump-bar">
+    <span class="jump-label">Region</span>
+    <span class="jump-pill active">All</span>
+    <span class="jump-pill">Africa</span>
+    <span class="jump-pill">Americas</span>
+    <span class="jump-pill">Asia</span>
+    <span class="jump-pill">Europe</span>
+    <span class="jump-pill">Oceania</span>
+    <span style="width:1px;height:20px;background:var(--rule);margin:0 8px"></span>
+    <span class="jump-label">A–Z</span>
+    <span class="jump-pill">A</span><span class="jump-pill">B</span><span class="jump-pill">C</span><span class="jump-pill">D</span><span class="jump-pill">E</span><span class="jump-pill">F</span><span class="jump-pill">…</span>
+  </div>
+
+  <!-- EUROPE -->
+  <div class="region-block">
+    <div class="region-title"><h3>Europe</h3><span class="count">44</span><span class="line"></span></div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/deu.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/de.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Germany</div><div class="card-cap">Berlin</div><span class="chip chip-parl">Parliamentary</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/fra.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/fr.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">France</div><div class="card-cap">Paris</div><span class="chip chip-semi">Semi-presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/gbr.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/gb.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">United Kingdom</div><div class="card-cap">London</div><span class="chip chip-mon">Const. monarchy</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/ita.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/it.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Italy</div><div class="card-cap">Rome</div><span class="chip chip-parl">Parliamentary</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/dnk.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/dk.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Denmark</div><div class="card-cap">Copenhagen</div><span class="chip chip-mon">Const. monarchy</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/est.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/ee.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Estonia</div><div class="card-cap">Tallinn</div><span class="chip chip-parl">Parliamentary</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/irl.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/ie.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Ireland</div><div class="card-cap">Dublin</div><span class="chip chip-parl">Parliamentary</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/isl.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/is.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Iceland</div><div class="card-cap">Reykjavík</div><span class="chip chip-parl">Parliamentary</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASIA -->
+  <div class="region-block">
+    <div class="region-title"><h3>Asia</h3><span class="count">48</span><span class="line"></span></div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/jpn.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/jp.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Japan</div><div class="card-cap">Tokyo</div><span class="chip chip-mon">Const. monarchy</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/ind.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/in.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">India</div><div class="card-cap">New Delhi</div><span class="chip chip-parl">Parliamentary</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/chn.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/cn.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">China</div><div class="card-cap">Beijing</div><span class="chip chip-pres">One-party state</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/idn.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/id.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Indonesia</div><div class="card-cap">Jakarta</div><span class="chip chip-pres">Presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AMERICAS -->
+  <div class="region-block">
+    <div class="region-title"><h3>Americas</h3><span class="count">35</span><span class="line"></span></div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/usa.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/us.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">United States</div><div class="card-cap">Washington, D.C.</div><span class="chip chip-pres">Presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/can.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/ca.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Canada</div><div class="card-cap">Ottawa</div><span class="chip chip-mon">Const. monarchy</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/bra.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/br.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Brazil</div><div class="card-cap">Brasília</div><span class="chip chip-pres">Presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/arg.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/ar.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Argentina</div><div class="card-cap">Buenos Aires</div><span class="chip chip-pres">Presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/chl.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/cl.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Chile</div><div class="card-cap">Santiago</div><span class="chip chip-pres">Presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/col.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/co.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Colombia</div><div class="card-cap">Bogotá</div><span class="chip chip-pres">Presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFRICA -->
+  <div class="region-block">
+    <div class="region-title"><h3>Africa</h3><span class="count">54</span><span class="line"></span></div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/ken.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/ke.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Kenya</div><div class="card-cap">Nairobi</div><span class="chip chip-pres">Presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+      <div class="card">
+        <div class="card-thumb"><img class="engraving" src="https://civicaatlas.org/engravings/countries/egy.webp" alt=""/><img class="card-flag" src="https://flagcdn.com/eg.svg" alt=""/></div>
+        <div class="card-body"><div class="card-name">Egypt</div><div class="card-cap">Cairo</div><span class="chip chip-semi">Semi-presidential</span></div>
+        <span class="card-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>© 2026 Civica Atlas · civicaatlas.org</span>
+    <div class="footer-links">
+      <a href="#">Blog</a><a href="#">API Docs</a><a href="#">Design System</a><a href="#">Status</a><a href="#">Licensing</a><a href="#">Contact</a><a href="#">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const moon='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+const sun=document.getElementById('iconSun').outerHTML;
+const btn=document.getElementById('themeToggle');
+btn.addEventListener('click',()=>{
+  const r=document.documentElement;
+  const dark=r.getAttribute('data-theme')==='dark';
+  r.setAttribute('data-theme',dark?'light':'dark');
+  btn.innerHTML=dark?sun:moon;
+});
+document.querySelectorAll('.jump-pill').forEach(p=>p.addEventListener('click',()=>{
+  const sib=p.parentElement.querySelectorAll('.jump-pill');
+  p.classList.toggle('active');
+}));
+</script>
+</body>
+</html>

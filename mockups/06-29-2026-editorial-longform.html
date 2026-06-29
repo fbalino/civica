@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Inside Democratic Resilience — The Record · Civica Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet" />
+<style>
+:root{--paper:#FAF7F2;--surface:#FFFFFF;--well:#F3EFE6;--ink:#0B1B2D;--ink-60:#2A3648;--ink-40:#6A7688;--ink-30:#A7AFBC;--rule:#E4E1DC;--accent:#B7512B;--sage:#2E7D55;--sand:#C08F3E;--rose:#B7512B;--blue:#2468CD;--serif:'Source Serif 4',Georgia,serif;--sans:'Inter',system-ui,sans-serif;--shadow:0 1px 2px rgba(15,23,42,.06);--shadow-md:0 2px 6px rgba(15,23,42,.08);--shadow-lg:0 4px 12px rgba(15,23,42,.10);--r-sm:4px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-full:9999px}
+[data-theme=dark]{--paper:#0E1822;--surface:#16222E;--well:#1B2A38;--ink:#EDE8DF;--ink-60:#C3CAD2;--ink-40:#8A97A6;--ink-30:#5C6b78;--rule:#27333F;--accent:#D97A4E}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{max-width:100%;display:block}
+[data-theme=dark] .engr{filter:invert(1) hue-rotate(180deg) brightness(1.04)}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ---- Almanac header ---- */
+.masthead{border-bottom:1px solid var(--rule);background:color-mix(in oklab,var(--paper) 90%,transparent);backdrop-filter:blur(8px);position:sticky;top:0;z-index:20}
+.masthead-inner{max-width:1200px;margin:0 auto;padding:13px 28px;display:flex;align-items:center;gap:26px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:20px;letter-spacing:-.01em;color:var(--ink)}
+.compass{width:22px;height:22px;color:var(--accent);flex:none}
+.nav{display:flex;gap:20px;margin-left:auto;font-size:13.5px;color:var(--ink-60)}
+.nav a{color:var(--ink-60)}
+.nav a.active{color:var(--ink);font-weight:600}
+
+/* ---- theme toggle ---- */
+.toggle{position:fixed;top:13px;right:20px;z-index:40;width:38px;height:38px;border-radius:var(--r-full);border:1px solid var(--rule);background:var(--surface);color:var(--ink-60);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.toggle:hover{color:var(--accent);border-color:var(--accent)}
+.toggle svg{width:18px;height:18px}
+.toggle .moon{display:none}
+[data-theme=dark] .toggle .sun{display:none}
+[data-theme=dark] .toggle .moon{display:block}
+
+/* ---- Hero ---- */
+.hero{position:relative;max-width:1200px;margin:0 auto;padding:0 28px}
+.hero-frame{position:relative;margin-top:28px;border:1px solid var(--rule);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-md);background:var(--well)}
+.hero-frame img{width:100%;height:440px;object-fit:cover;object-position:center 38%}
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(to top,rgba(11,27,45,.78) 0%,rgba(11,27,45,.34) 46%,rgba(11,27,45,.08) 100%)}
+.hero-copy{position:absolute;left:0;right:0;bottom:0;padding:42px 48px 38px;max-width:860px}
+.eyebrow{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:#E7BFA6}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:54px;line-height:1.04;letter-spacing:-.02em;color:#FBF8F3;margin:14px 0 16px}
+.hero h1 em{font-style:italic;color:#F0CDB6}
+.byline{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13.5px;color:#D9D2C8}
+.byline .dot{width:3px;height:3px;border-radius:50%;background:#9aa7b4}
+.byline strong{color:#FBF8F3;font-weight:600}
+
+/* ---- Reading column ---- */
+.article{max-width:720px;margin:0 auto;padding:54px 28px 40px}
+.lede{font-family:var(--serif);font-size:21px;line-height:1.6;color:var(--ink-60);font-weight:300;margin:0 0 8px}
+.prose{font-family:var(--serif);font-size:19px;line-height:1.74;color:var(--ink)}
+.prose p{margin:0 0 26px}
+.prose p.first::first-letter{float:left;font-family:var(--serif);font-weight:600;color:var(--accent);font-size:78px;line-height:.78;padding:8px 14px 0 0;margin-top:4px}
+
+.subhead{font-family:var(--serif);font-weight:600;font-size:27px;line-height:1.2;letter-spacing:-.01em;color:var(--ink);margin:46px 0 18px}
+.kicker{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin:0 0 30px;display:flex;align-items:center;gap:12px}
+.kicker::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+/* ---- Pull quote ---- */
+.pullquote{margin:40px 0;padding:6px 0 6px 28px;border-left:2px solid var(--accent)}
+.pullquote p{font-family:var(--serif);font-style:italic;font-weight:300;font-size:27px;line-height:1.35;color:var(--ink);margin:0 0 12px}
+.pullquote cite{font-family:var(--sans);font-style:normal;font-size:13px;color:var(--ink-40);letter-spacing:.02em}
+
+/* ---- Inline figure ---- */
+figure{margin:40px 0}
+figure .figframe{border:1px solid var(--rule);border-radius:var(--r-md);overflow:hidden;background:var(--well);box-shadow:var(--shadow)}
+figure img{width:100%;height:auto}
+figcaption{font-family:var(--sans);font-size:12.5px;line-height:1.5;color:var(--ink-40);margin-top:10px;padding-left:2px}
+figcaption b{color:var(--ink-60);font-weight:600}
+
+/* drop note / inline chip */
+.note-chip{display:inline-block;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--accent);background:color-mix(in oklab,var(--accent) 12%,transparent);border-radius:var(--r-sm);padding:2px 9px;letter-spacing:.01em;vertical-align:middle}
+
+/* ---- Sources footer ---- */
+.sources{max-width:720px;margin:24px auto 0;padding:30px 28px 80px}
+.sources-card{border:1px solid var(--rule);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--shadow);padding:30px 34px}
+.sources h3{font-family:var(--serif);font-weight:600;font-size:19px;margin:0 0 6px;color:var(--ink)}
+.sources .sub{font-family:var(--sans);font-size:13px;color:var(--ink-40);margin:0 0 20px}
+.sources ol{margin:0;padding:0;list-style:none;counter-reset:src}
+.sources li{counter-increment:src;font-family:var(--sans);font-size:14px;line-height:1.55;color:var(--ink-60);padding:11px 0 11px 34px;position:relative;border-top:1px solid var(--rule)}
+.sources li:first-child{border-top:0}
+.sources li::before{content:counter(src);position:absolute;left:0;top:11px;width:22px;height:22px;border-radius:var(--r-full);background:var(--well);color:var(--ink-40);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.sources li b{color:var(--ink);font-weight:600}
+.sources .lic{display:inline-block;margin-left:8px;font-size:11px;color:var(--ink-40);background:var(--well);border-radius:var(--r-sm);padding:1px 7px}
+.further{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px}
+.further a{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--accent);border:1px solid color-mix(in oklab,var(--accent) 40%,var(--rule));border-radius:var(--r-full);padding:6px 14px}
+.further a:hover{text-decoration:none;background:color-mix(in oklab,var(--accent) 10%,transparent)}
+
+footer.foot{border-top:1px solid var(--rule);padding:26px 28px;text-align:center}
+footer.foot .links{font-family:var(--sans);font-size:13px;color:var(--ink-40);display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+footer.foot .links a{color:var(--ink-40)}
+
+@media(max-width:720px){
+  .hero-frame img{height:320px}
+  .hero h1{font-size:36px}
+  .hero-copy{padding:28px 24px 26px}
+  .article{padding:36px 22px 30px;font-size:18px}
+  .prose{font-size:18px}
+  .nav{display:none}
+}
+</style>
+</head>
+<body>
+
+<button class="toggle" id="themeToggle" aria-label="Toggle dark mode">
+  <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/></svg>
+  <svg class="moon" viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4 8.3 8.3 0 1 0 20 14.6Z"/></svg>
+</button>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <a class="brand" href="#">
+      <svg class="compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9.2"/><path d="M12 12 15.4 8.6 13.4 13.4 8.6 15.4 10.6 10.6Z" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.1" fill="var(--paper)" stroke="none"/></svg>
+      Civica Atlas
+    </a>
+    <nav class="nav">
+      <a href="#">Factbook</a><a href="#">Atlas</a><a href="#">Index</a><a href="#">Methodology</a><a href="#" class="active">The Record</a><a href="#">About</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-frame">
+    <img class="engr" src="https://civicaatlas.org/engravings/hero.webp" alt="Antique engraving of an assembly hall" />
+    <div class="hero-scrim"></div>
+    <div class="hero-copy">
+      <div class="eyebrow">The Record · Analysis</div>
+      <h1>Inside <em>Democratic Resilience</em></h1>
+      <div class="byline">
+        <span>By <strong>The Civica Editorial Desk</strong></span>
+        <span class="dot"></span><span>June 29, 2026</span>
+        <span class="dot"></span><span>14 min read</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<article class="article">
+  <p class="lede">When institutions bend rather than break, the story is rarely told in a single headline. It accumulates — in courts that hold, in elections that proceed, in a press that keeps printing. This is an account of the quieter machinery that lets some democracies absorb shocks that would topple others.</p>
+
+  <div class="prose">
+    <p class="first">Resilience is an unfashionable word in the study of government. It promises neither the drama of collapse nor the triumph of reform, and it resists the neat scoring that rankings demand. Yet across the eighteen months we have tracked through the Civica Index and the daily Civica Pulse, no single quality has separated the steady from the slipping more reliably than the capacity of a state's institutions to take a blow and keep functioning.</p>
+
+    <p>Consider the ordinary week of a constitutional court. It hears a case challenging an emergency decree; it rules; the ruling is obeyed. Nothing about this is guaranteed. In the countries where our governance signals have deteriorated most sharply, it is precisely this last step — the obeying — that quietly stops happening. The decree stands. The court is ignored, then reorganized, then staffed with the compliant. By the time the decline registers in an annual democracy score, the institution that might have arrested it has already been hollowed out.</p>
+
+    <div class="pullquote">
+      <p>“Backsliding is rarely a single act. It is the steady substitution of loyalty for competence, one appointment at a time.”</p>
+      <cite>— from the Civica Index methodology notes</cite>
+    </div>
+
+    <p>What, then, makes an institution hard to hollow? Our reading of the evidence points to three reinforcing properties, and the strongest democracies tend to hold all three at once. The first is <span class="note-chip">redundancy</span> — overlapping checks so that no single capture is decisive. The second is professional independence: a civil service, judiciary, and electoral administration whose careers do not depend on pleasing the executive of the day. The third, and most fragile, is public expectation — the widely shared sense that the rules are not optional.</p>
+
+    <h2 class="subhead">The arithmetic of overlapping checks</h2>
+
+    <p>Redundancy sounds inefficient, and in a narrow sense it is. Why fund an ombudsman, an auditor-general, a constitutional court, and an independent electoral commission when their mandates partly overlap? The answer is that overlap is the point. An aspiring strongman who can capture one body still faces three more, each able to sound an alarm the others amplify.</p>
+
+    <figure>
+      <div class="figframe">
+        <img class="engr" src="https://civicaatlas.org/engravings/spot-column.webp" alt="Engraving of a classical column" />
+      </div>
+      <figcaption><b>Figure 1.</b> The colonnade as a metaphor for institutional redundancy — load shared across many supports, so the failure of one does not bring down the roof. Spot illustration from the Civica almanac engraving set.</figcaption>
+    </figure>
+
+    <p>The Pulse data bears this out at the level of the daily event. In states with dense, overlapping oversight, a single adverse event — a contested appointment, a leaked surveillance program — tends to be met within days by a countervailing one: a court injunction, a parliamentary inquiry, a regulator's refusal. In states where oversight has thinned, the same adverse event drifts, uncontested, into the new normal.</p>
+
+    <h2 class="subhead">Independence is a career, not a clause</h2>
+
+    <p>Constitutions are generous with the word “independent.” The harder question is whether independence is something a person can actually afford. A judge who can be transferred to a remote posting, an auditor whose budget is set by the audited, an election official serving at the pleasure of a partisan minister — each is independent on paper and dependent in practice.</p>
+
+    <p>This is why the most durable systems invest in dull-sounding guarantees: fixed terms, staggered appointments, security of tenure, salaries that cannot be cut as punishment. They convert independence from an aspiration into an incentive. The countries that have climbed in our governance signals over the past year did not, for the most part, pass sweeping reforms. They defended these undramatic protections when they came under pressure.</p>
+
+    <h2 class="subhead">What resilience cannot do</h2>
+
+    <p>It would be a mistake to read resilience as a guarantee. Institutions that absorb shocks can still be ground down by a patient, sustained assault — and a public that has come to expect the rules can, over a generation, be taught to expect less. Resilience buys time and raises the cost of capture; it does not abolish the threat. The value of tracking it daily, as the Pulse attempts to, is not prophecy but early warning: a way to see the substitution of loyalty for competence while it is still one appointment at a time.</p>
+  </div>
+</article>
+
+<section class="sources">
+  <div class="sources-card">
+    <h3>Sources &amp; further reading</h3>
+    <p class="sub">Every claim in this piece traces to a dated source row. Governance signals are drawn from the Civica Index (beta) and Civica Pulse.</p>
+    <ol>
+      <li><b>Civica Index, governance dimensions.</b> Composite of V-Dem, World Bank WGI, Freedom House, and Transparency CPI, frozen quarterly reference period. <span class="lic">CC-BY 4.0</span></li>
+      <li><b>Civica Pulse event log.</b> Daily event-sensitive signals classified from open news sources. <span class="lic">beta</span></li>
+      <li><b>Lührmann, A. &amp; Lindberg, S. (2019).</b> “A third wave of autocratization is here.” <i>Democratization</i>, 26(7). <span class="lic">external</span></li>
+      <li><b>V-Dem Institute (2026).</b> Regimes of the World classification, QoG Standard. <span class="lic">CC-BY-SA</span></li>
+    </ol>
+    <div class="further">
+      <a href="#">Civica Index methodology →</a>
+      <a href="#">How the Pulse works →</a>
+      <a href="#">Browse the Atlas →</a>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="links">
+    <a href="#">Blog</a><a href="#">API Docs</a><a href="#">Design System</a><a href="#">Status Page</a><a href="#">Licensing</a><a href="#">Contact</a><a href="#">GitHub</a>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var t=document.getElementById('themeToggle');
+  t.addEventListener('click',function(){
+    var d=document.documentElement;
+    d.setAttribute('data-theme', d.getAttribute('data-theme')==='dark'?'':'dark');
+  });
+})();
+</script>
+</body>
+</html>
