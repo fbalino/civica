@@ -2570,6 +2570,9 @@ a {
 }
 
 .post-hero-img {
+  /* Explicit full width so the aspect-ratio can't shrink the width to honor
+     max-height on wide screens (that left a white gap on the right). */
+  width: 100%;
   aspect-ratio: 16 / 9;
   max-height: 480px;
   background: var(--color-surface-elevated);
@@ -2813,6 +2816,28 @@ a {
 
 .post-prose p {
   margin: 0 0 26px;
+}
+
+/* Inline article engraving (Codex art wired in from an "Image placeholder").
+   Full-color illustration — NO dark-invert filter. */
+.post-figure {
+  margin: var(--space-7) 0;
+}
+.post-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-card-border);
+  box-shadow: var(--shadow-hard);
+}
+.post-figure figcaption {
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-style: italic;
+  color: var(--color-text-40);
+  text-align: center;
 }
 
 .post-prose h2 {
