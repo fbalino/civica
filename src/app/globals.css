@@ -2012,16 +2012,17 @@ a {
 }
 
 /* ============================================================
-   The Record — Blog index page (editorial newspaper aesthetic)
+   The Record — Blog index page (editorial card aesthetic)
    ============================================================ */
 
 .record-page {
   background: var(--color-bg);
 }
 
+/* ---- Masthead: refined title block (hairline rule, serif nameplate) ---- */
 .record-masthead {
-  border-bottom: 2px solid var(--color-text-primary);
-  padding: 28px var(--spacing-page-x) 20px;
+  border-bottom: 1px solid var(--color-divider);
+  padding: 28px var(--spacing-page-x) 22px;
   text-align: center;
 }
 
@@ -2067,9 +2068,9 @@ a {
   text-align: center;
   font-family: var(--font-heading);
   font-style: italic;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--color-text-60);
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   letter-spacing: 0.02em;
 }
 
@@ -2107,7 +2108,7 @@ a {
 }
 
 .record-main {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 48px var(--spacing-page-x) 120px;
 }
@@ -2119,29 +2120,33 @@ a {
   color: var(--color-text-40);
 }
 
-/* Lead story */
+/* ---- Featured lead story ---- */
 .record-lead {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
-  gap: 56px;
-  align-items: start;
-  padding-bottom: 56px;
+  gap: 48px;
+  align-items: center;
+  padding-bottom: 52px;
   border-bottom: 1px solid var(--color-divider);
-  margin-bottom: 48px;
+  margin-bottom: 44px;
 }
 
 .record-lead-cover {
   display: block;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 11;
   background: var(--color-surface-elevated);
   position: relative;
   overflow: hidden;
   border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard-md);
   text-decoration: none;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .record-lead-cover:hover {
-  border-color: var(--color-card-hover-border);
+  box-shadow: var(--shadow-hard-lg);
+  transform: translateY(-2px);
 }
 
 .blog-cover-image {
@@ -2151,151 +2156,163 @@ a {
   object-fit: cover;
 }
 
-.record-kicker {
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--text-12);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-  display: inline-block;
-  border-bottom: 1px solid var(--color-accent);
-  padding-bottom: 3px;
+/* Tinted category chip for the lead (sits above the headline). */
+.record-lead-cat {
+  margin-bottom: 16px;
 }
 
 .record-lead-title {
   font-family: var(--font-heading);
-  font-weight: 300;
-  font-size: 56px;
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  margin: 14px 0 12px;
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  margin: 0 0 14px;
   color: var(--color-text-primary);
 }
 
 .record-lead-dek {
   font-family: var(--font-heading);
-  font-style: italic;
-  font-size: 20px;
-  line-height: 1.4;
+  font-weight: 300;
+  font-size: 19px;
+  line-height: 1.55;
   color: var(--color-text-60);
-  margin: 0 0 22px;
-  max-width: 36ch;
+  margin: 0 0 20px;
+  max-width: 42ch;
 }
 
 .record-read-link {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-14);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--color-accent);
   text-decoration: none;
-  border-bottom: 1px solid var(--color-accent);
-  padding-bottom: 2px;
 }
 
 .record-read-link:hover {
-  opacity: 0.8;
+  text-decoration: underline;
 }
 
 .record-byline {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--color-text-40);
   display: flex;
-  gap: 14px;
+  gap: 12px;
   align-items: center;
   flex-wrap: wrap;
   border-top: 1px solid var(--color-divider);
-  padding-top: 14px;
-  margin-top: 16px;
+  padding-top: 16px;
+  margin-top: 18px;
 }
 
 .record-byline strong {
   color: var(--color-text-primary);
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .record-byline-dot {
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   background: var(--color-text-40);
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-/* Section head */
+/* ---- Section head (hairline label rule) ---- */
 .record-sec-head {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 20px;
-  align-items: baseline;
-  border-bottom: 2px solid var(--color-text-primary);
-  padding-bottom: 10px;
-  margin: 56px 0 36px;
+  gap: 14px;
+  align-items: center;
+  margin: 44px 0 28px;
+}
+
+.record-sec-head::after {
+  content: "";
+  grid-column: 2;
+  height: 1px;
+  background: var(--color-divider);
 }
 
 .record-sec-ey {
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-accent);
+  grid-row: 1;
 }
 
 .record-sec-title {
+  grid-row: 1;
   font-family: var(--font-heading);
   font-weight: 400;
-  font-size: 36px;
+  font-size: 30px;
   letter-spacing: -0.02em;
   margin: 0;
   color: var(--color-text-primary);
+  white-space: nowrap;
 }
 
-/* Stories grid */
+/* ---- Stories card grid ---- */
 .record-stories {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px 32px;
+  gap: 30px;
+}
+
+.record-story {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-hard);
+  overflow: hidden;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.record-story:hover {
+  box-shadow: var(--shadow-hard-lg);
+  transform: translateY(-2px);
 }
 
 .record-story-cover {
   display: block;
   aspect-ratio: 16 / 9;
   background: var(--color-surface-elevated);
-  margin-bottom: 14px;
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--color-divider);
+  border-bottom: 1px solid var(--color-divider);
   text-decoration: none;
 }
 
-.record-story-cover:hover {
-  border-color: var(--color-card-hover-border);
+.record-story-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px 22px 22px;
 }
 
-.record-story-kicker {
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--text-12);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-accent);
+.record-story-cat {
+  align-self: flex-start;
+  margin-bottom: 13px;
 }
 
 .record-story-title {
   font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: 26px;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  margin: 8px 0 10px;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.22;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
   color: var(--color-text-primary);
 }
 
@@ -2309,31 +2326,34 @@ a {
 }
 
 .record-story-dek {
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.55;
+  font-family: var(--font-heading);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.5;
   color: var(--color-text-60);
-  margin: 0 0 14px;
+  margin: 0 0 18px;
+  flex: 1;
 }
 
 .record-story-meta {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--color-text-40);
   display: flex;
   gap: 10px;
   align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-divider);
 }
 
 .record-story-meta strong {
   color: var(--color-text-primary);
-  font-weight: 500;
+  font-weight: 600;
 }
 
-/* Two-col: list + sidebar */
+/* ---- Two-col: "In the margins" list + sidebar ---- */
 .record-two-col {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
@@ -2343,7 +2363,7 @@ a {
 
 .record-list {
   display: grid;
-  gap: 26px;
+  gap: 24px;
 }
 
 .record-list-row {
@@ -2351,7 +2371,7 @@ a {
   grid-template-columns: 44px 1fr;
   gap: 18px;
   padding-bottom: 22px;
-  border-bottom: 1px dashed var(--color-divider);
+  border-bottom: 1px solid var(--color-divider);
   text-decoration: none;
   color: inherit;
 }
@@ -2373,103 +2393,89 @@ a {
   letter-spacing: -0.02em;
 }
 
-.record-list-kicker {
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
+.record-list-cat {
+  margin-bottom: 8px;
   font-size: var(--text-12);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--color-text-40);
+  padding: 3px 9px;
 }
 
 .record-list-title {
   font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: 22px;
-  line-height: 1.15;
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.2;
   letter-spacing: -0.01em;
-  margin: 4px 0 6px;
+  margin: 0 0 6px;
   color: var(--color-text-primary);
   transition: color 0.15s;
 }
 
 .record-list-by {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-text-60);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-40);
 }
 
 .record-list-by strong {
   color: var(--color-text-primary);
-  font-weight: 500;
+  font-weight: 600;
 }
 
-/* Sidebar */
+/* ---- Sidebar (Editor's note / Topics / Colophon) ---- */
 .record-sidebar {
   border-left: 1px solid var(--color-divider);
   padding-left: 40px;
 }
 
 .record-sidebar-block {
-  margin-bottom: 44px;
+  margin-bottom: 40px;
 }
 
 .record-sidebar-heading {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-accent);
   margin: 0 0 14px;
   padding-bottom: 8px;
-  border-bottom: 1px solid var(--color-text-primary);
+  border-bottom: 1px solid var(--color-divider);
 }
 
 .record-sidebar-quote {
   font-family: var(--font-heading);
   font-style: italic;
-  font-size: 18px;
-  line-height: 1.4;
+  font-weight: 300;
+  font-size: 19px;
+  line-height: 1.45;
   color: var(--color-text-primary);
-  padding: 8px 0 12px;
-  border-top: 2px solid var(--color-text-primary);
-  border-bottom: 1px solid var(--color-divider);
+  padding: 4px 0 4px 18px;
+  border-left: 2px solid var(--color-accent);
   margin: 0;
 }
 
 .record-tag-cloud {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
+/* Topics chips ride the shared tinted .editorial-chip pattern; the modifier
+   below just relaxes the cursor + sizing for a non-interactive tag cloud. */
 .record-tag-chip {
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: var(--text-12);
-  letter-spacing: 0;
-  text-transform: none;
-  border: 1px solid var(--color-divider);
-  border-radius: var(--radius-sm);
-  background: color-mix(in oklab, var(--color-text-40) 8%, var(--color-page-bg));
-  padding: 4px 10px;
-  color: var(--color-text-60);
   cursor: default;
-}
-
-.record-tag-chip:hover {
-  background: var(--color-surface-elevated);
-  color: var(--color-text-primary);
+  font-size: var(--text-13);
+  padding: 4px 11px;
 }
 
 .record-sidebar-colophon {
   font-family: var(--font-heading);
   font-style: italic;
-  font-size: 14px;
+  font-weight: 300;
+  font-size: 15px;
   line-height: 1.5;
   color: var(--color-text-60);
   margin: 0;
@@ -2478,12 +2484,14 @@ a {
 .record-sidebar-colophon strong {
   font-style: normal;
   color: var(--color-text-primary);
+  font-weight: 600;
 }
 
-/* Responsive */
+/* ---- Responsive ---- */
 @media (max-width: 960px) {
   .record-lead {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
   .record-stories {
     grid-template-columns: 1fr 1fr;
@@ -2500,7 +2508,7 @@ a {
     font-size: 52px;
   }
   .record-lead-title {
-    font-size: 44px;
+    font-size: 36px;
   }
   .record-masthead-grid {
     grid-template-columns: 1fr;
@@ -2517,7 +2525,7 @@ a {
     grid-template-columns: 1fr;
   }
   .record-sec-title {
-    font-size: 28px;
+    font-size: 26px;
   }
 }
 
@@ -2540,119 +2548,133 @@ a {
 .post-article {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 40px var(--spacing-page-x) 120px;
+  padding: 32px var(--spacing-page-x) 120px;
 }
 
-/* Article header */
+/* ---- Article header = scrim hero with overlaid copy ---- */
 .post-head {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
-  padding-bottom: 40px;
-  border-bottom: 1px solid var(--color-divider);
-  margin-bottom: 40px;
-  text-align: center;
+  margin: 0 0 8px;
 }
 
-.post-crumbs {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-}
-
-.post-crumbs-dot {
-  width: 3px;
-  height: 3px;
-  background: var(--color-accent);
-  border-radius: 50%;
-}
-
-.post-title {
-  font-family: var(--font-heading);
-  font-weight: 300;
-  font-size: 72px;
-  line-height: 1.05;
-  letter-spacing: -0.035em;
-  margin: 18px auto 28px;
-  max-width: 18ch;
-  color: var(--color-text-primary);
-}
-
-.post-title em {
-  font-style: italic;
-  font-weight: 400;
-}
-
-.post-dek {
-  font-family: var(--font-heading);
-  font-style: italic;
-  font-size: 22px;
-  line-height: 1.4;
-  color: var(--color-text-60);
-  max-width: 56ch;
-  margin: 0 auto;
-}
-
-.post-byline {
-  margin-top: 26px;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--color-text-40);
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.post-byline strong {
-  color: var(--color-text-primary);
-  font-weight: 500;
-  letter-spacing: 0.08em;
-}
-
-.post-byline-dot {
-  width: 3px;
-  height: 3px;
-  background: var(--color-text-40);
-  border-radius: 50%;
-}
-
-/* Hero figure */
 .post-hero-fig {
-  margin: 0 0 56px;
+  position: relative;
+  margin: 0;
   border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-hard-md);
+  background: var(--color-surface-elevated);
 }
 
 .post-hero-img {
   aspect-ratio: 16 / 9;
+  max-height: 480px;
   background: var(--color-surface-elevated);
   position: relative;
   overflow: hidden;
 }
 
+/* Dark gradient scrim so the overlaid serif headline + byline read over
+   both photographic covers and the light hemicycle SVG fallback. */
+.post-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, black 80%, transparent) 0%,
+    color-mix(in oklab, black 42%, transparent) 46%,
+    color-mix(in oklab, black 8%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
+.post-hero-copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 42px clamp(24px, 5vw, 48px) 36px;
+  max-width: 900px;
+}
+
+.post-crumbs {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--color-accent) 55%, #ffffff);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.post-crumbs a:hover {
+  color: #ffffff;
+}
+
+.post-crumbs-dot {
+  width: 3px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.post-title {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-size: 54px;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 14px 0 16px;
+  max-width: 20ch;
+  color: #fbf8f3;
+}
+
+.post-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: color-mix(in oklab, var(--color-accent) 40%, #ffffff);
+}
+
+.post-byline {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  letter-spacing: 0;
+  text-transform: none;
+  color: color-mix(in oklab, #ffffff 80%, transparent);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.post-byline strong {
+  color: #fbf8f3;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.post-byline-dot {
+  width: 3px;
+  height: 3px;
+  background: color-mix(in oklab, #ffffff 55%, transparent);
+  border-radius: 50%;
+}
+
+/* Caption strip below the hero (provenance / wordcount / tags). */
 .post-hero-cap {
   display: flex;
   justify-content: space-between;
   gap: 20px;
-  padding: 10px 16px;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  flex-wrap: wrap;
+  padding: 12px 2px 0;
+  font-family: var(--font-body);
   font-size: var(--text-12);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--color-text-40);
-  border-top: 1px solid var(--color-divider);
 }
 
 /* Body grid: rail + column */
@@ -2752,32 +2774,51 @@ a {
 /* Prose */
 .post-prose {
   font-family: var(--font-heading);
-  font-size: 20px;
-  line-height: 1.58;
+  font-size: 19px;
+  line-height: 1.74;
   color: var(--color-text-primary);
+  /* Allow this grid track to shrink below its min-content (e.g. a wide
+     .post-table whose own scroll wrapper handles overflow), so the
+     reading column never blows out the page width on mobile. */
+  min-width: 0;
 }
 
-.post-prose > p:first-of-type::first-letter {
+/* Lede — light italic intro that opens the reading column (no drop cap). */
+.post-lede {
   font-family: var(--font-heading);
-  font-weight: 400;
+  font-weight: 300;
+  font-size: 21px;
+  line-height: 1.6;
+  color: var(--color-text-60);
+  margin: 0 0 26px;
+}
+
+/* Drop cap on the first body paragraph. The lede paragraph (.post-lede)
+   is skipped — the cap lands on the paragraph that follows it, or on the
+   first paragraph when there is no lede. */
+.post-prose > .post-lede + p::first-letter,
+.post-prose > p:first-child:not(.post-lede)::first-letter {
+  font-family: var(--font-heading);
+  font-weight: 600;
   float: left;
-  font-size: 110px;
-  line-height: 0.85;
-  padding: 6px 10px 0 0;
+  font-size: 78px;
+  line-height: 0.78;
+  padding: 8px 14px 0 0;
+  margin-top: 4px;
   color: var(--color-accent);
 }
 
 .post-prose p {
-  margin: 0 0 1.2em;
+  margin: 0 0 26px;
 }
 
 .post-prose h2 {
   font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: 36px;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  margin: 56px 0 14px;
+  font-weight: 600;
+  font-size: 27px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 46px 0 18px;
   scroll-margin-top: 80px;
   color: var(--color-text-primary);
 }
@@ -2915,27 +2956,29 @@ a {
   font-style: normal;
 }
 
-/* Figure */
+/* Figure — soft rounded frame, sans figcaption beneath. */
 .post-figure {
-  margin: 40px -40px;
-  border: 1px solid var(--color-divider);
-  background: var(--color-surface-elevated);
+  margin: 40px 0;
 }
 
 .post-figure-img {
   aspect-ratio: 16 / 9;
   position: relative;
   overflow: hidden;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-hard);
 }
 
 .post-figure-cap {
-  padding: 12px 20px;
-  border-top: 1px solid var(--color-divider);
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  margin-top: 10px;
+  padding-left: 2px;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.5;
   color: var(--color-text-40);
   display: flex;
   justify-content: space-between;
@@ -2943,35 +2986,52 @@ a {
 }
 
 .post-figure-cap strong {
-  color: var(--color-text-primary);
-  font-weight: 500;
+  color: var(--color-text-60);
+  font-weight: 600;
 }
 
-/* Callout */
+/* Pull quote — MDX blockquotes render as .post-callout. Large serif italic
+   on a terracotta hairline, per the longform mockup. */
 .post-callout {
-  margin: 36px 0;
-  padding: 22px 28px;
-  border-left: 3px solid var(--color-accent);
-  background: var(--color-surface-elevated);
+  margin: 40px 0;
+  padding: 6px 0 6px 28px;
+  border-left: 2px solid var(--color-accent);
+  background: transparent;
 }
 
 .post-callout h4 {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-accent);
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 }
 
 .post-callout p {
   font-family: var(--font-heading);
   font-style: italic;
-  font-size: 18px;
-  line-height: 1.45;
-  color: var(--color-text-60);
-  margin: 0;
+  font-weight: 300;
+  font-size: 27px;
+  line-height: 1.35;
+  color: var(--color-text-primary);
+  margin: 0 0 12px;
+}
+
+.post-callout p:last-child {
+  margin-bottom: 0;
+}
+
+/* A trailing attribution line in a pull-quote (often a short italic/em or a
+   final one-liner) reads as the citation. */
+.post-callout cite,
+.post-callout p em:only-child {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  letter-spacing: 0.02em;
 }
 
 /* Endnotes */
@@ -3005,36 +3065,39 @@ a {
   margin-bottom: 8px;
 }
 
-/* Author card */
+/* Author card — soft rounded surface card with avatar initials. */
 .post-author {
   display: grid;
-  grid-template-columns: 72px 1fr;
+  grid-template-columns: 64px 1fr;
   gap: 20px;
-  align-items: start;
-  margin-top: 60px;
-  padding: 28px 0;
-  border-top: 1px solid var(--color-divider);
-  border-bottom: 1px solid var(--color-divider);
+  align-items: center;
+  margin-top: 56px;
+  padding: 24px 28px;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-hard);
 }
 
 .post-author-avatar {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
   background: var(--color-accent);
-  color: var(--color-bg);
+  color: #fbf8f3;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: 32px;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: 26px;
+  letter-spacing: -0.01em;
 }
 
 .post-author h4 {
   font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: 22px;
+  font-weight: 600;
+  font-size: 20px;
   margin: 0 0 6px;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -3042,7 +3105,7 @@ a {
 
 .post-author p {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: var(--text-13);
   line-height: 1.55;
   color: var(--color-text-60);
   margin: 0;
@@ -3056,17 +3119,17 @@ a {
 .post-more-head {
   display: flex;
   align-items: baseline;
-  gap: 18px;
-  border-bottom: 2px solid var(--color-text-primary);
-  padding-bottom: 10px;
+  gap: 16px;
+  border-bottom: 1px solid var(--color-divider);
+  padding-bottom: 12px;
   margin-bottom: 28px;
 }
 
 .post-more-ey {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--color-accent);
 }
@@ -3074,7 +3137,7 @@ a {
 .post-more-head h2 {
   font-family: var(--font-heading);
   font-weight: 400;
-  font-size: 32px;
+  font-size: 30px;
   margin: 0;
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
@@ -3083,39 +3146,54 @@ a {
 .post-more-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  gap: 28px;
 }
 
 .post-more-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   color: inherit;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-hard);
+  overflow: hidden;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.post-more-card:hover {
+  box-shadow: var(--shadow-hard-lg);
+  transform: translateY(-2px);
 }
 
 .post-more-card-cover {
   aspect-ratio: 16 / 9;
   background: var(--color-surface-elevated);
-  border: 1px solid var(--color-divider);
-  margin-bottom: 12px;
+  border-bottom: 1px solid var(--color-divider);
   position: relative;
   overflow: hidden;
 }
 
-.post-more-card-kicker {
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
+.post-more-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 18px 20px 20px;
+}
+
+.post-more-card-cat {
+  margin-bottom: 11px;
   font-size: var(--text-12);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-accent);
+  padding: 3px 9px;
 }
 
 .post-more-card h4 {
   font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 1.15;
-  margin: 6px 0;
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.2;
+  margin: 0 0 8px;
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
   transition: color 0.15s;
@@ -3126,11 +3204,10 @@ a {
 }
 
 .post-more-card-by {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--color-text-40);
 }
 
@@ -3142,21 +3219,30 @@ a {
   .post-rail {
     display: none;
   }
-  .post-title {
-    font-size: 48px;
-  }
   .post-prose {
     font-size: 18px;
   }
-  .post-pull {
-    margin: 36px 0;
-    font-size: 24px;
+  .post-callout p {
+    font-size: 23px;
   }
   .post-figure {
     margin: 32px 0;
   }
   .post-more-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .post-hero-img {
+    aspect-ratio: auto;
+    height: 320px;
+  }
+  .post-hero-copy {
+    padding: 28px 22px 26px;
+  }
+  .post-title {
+    font-size: 34px;
   }
 }
 

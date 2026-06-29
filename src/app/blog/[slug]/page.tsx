@@ -58,6 +58,23 @@ function estimateReadTime(content: string): number {
   return Math.max(1, Math.ceil(words / 250));
 }
 
+/** Map a category/tag to a tonal `.editorial-chip` modifier (mirrors the
+ *  blog index). Deterministic so SSR/CSR agree. */
+function categoryTone(tag: string | undefined): string {
+  switch ((tag ?? "").toLowerCase()) {
+    case "data updates":
+    case "data":
+      return "editorial-chip--sage";
+    case "releases":
+      return "editorial-chip--sand";
+    case "methodology":
+    case "methodology notes":
+      return "editorial-chip--blue";
+    default:
+      return "editorial-chip--accent";
+  }
+}
+
 function formatDate(dateStr: string) {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
     day: "numeric",
@@ -235,47 +252,56 @@ export default async function BlogPostPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
-        {/* Header */}
+        {/* Hero — scrim over the cover with the eyebrow, headline + byline
+            overlaid (matches the longform mockup). Preserves the header
+            content (breadcrumb category, title, byline, cover, caption). */}
         <header className="post-head">
-          <div className="post-crumbs">
-            <Link href="/blog" style={{ color: "inherit", textDecoration: "none" }}>
-              The Record
-            </Link>
-            <span className="post-crumbs-dot" />
-            {post.tags[0] && <span>{post.tags[0]}</span>}
-          </div>
-          <h1 className="post-title">{post.title}</h1>
-          <p className="post-dek">{post.description}</p>
-          <div className="post-byline">
-            <span>
-              By <strong>{post.author}</strong>
-            </span>
-            <span className="post-byline-dot" />
-            <span>{formatDate(post.date)}</span>
-            <span className="post-byline-dot" />
+          <figure className="post-hero-fig">
+            <div className="post-hero-img">
+              <BlogCover
+                alt={post.coverAlt ?? post.title}
+                image={post.coverImage}
+                priority
+                slug={post.slug}
+                variant="hero"
+              />
+            </div>
+            <div className="post-hero-scrim" />
+            <div className="post-hero-copy">
+              <div className="post-crumbs">
+                <Link
+                  href="/blog"
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  The Record
+                </Link>
+                {post.tags[0] && (
+                  <>
+                    <span className="post-crumbs-dot" />
+                    <span>{post.tags[0]}</span>
+                  </>
+                )}
+              </div>
+              <h1 className="post-title">{post.title}</h1>
+              <div className="post-byline">
+                <span>
+                  By <strong>{post.author}</strong>
+                </span>
+                <span className="post-byline-dot" />
+                <span>{formatDate(post.date)}</span>
+                <span className="post-byline-dot" />
+                <span>{readTime} min read</span>
+              </div>
+            </div>
+          </figure>
+          <div className="post-hero-cap">
+            <span>{post.coverCaption ?? "Illustration · Civica Desk"}</span>
             <span>
               {post.content.split(/\s+/).length.toLocaleString()} words &middot;{" "}
-              {readTime} min read
+              {post.tags.join(" · ")}
             </span>
           </div>
         </header>
-
-        {/* Hero figure */}
-        <figure className="post-hero-fig">
-          <div className="post-hero-img">
-            <BlogCover
-              alt={post.coverAlt ?? post.title}
-              image={post.coverImage}
-              priority
-              slug={post.slug}
-              variant="hero"
-            />
-          </div>
-          <div className="post-hero-cap">
-            <span>{post.coverCaption ?? "Illustration · Civica Desk"}</span>
-            <span>{post.tags.join(" · ")}</span>
-          </div>
-        </figure>
 
         {/* Body grid */}
         <div className="post-body-grid">
@@ -302,6 +328,10 @@ export default async function BlogPostPage({
 
           {/* Prose */}
           <main className="post-prose">
+            {/* Lede — the dek opens the reading column. */}
+            {post.description && (
+              <p className="post-lede">{post.description}</p>
+            )}
             <MDXRemote
               source={renderBlogPipeTables(post.content)}
               components={mdxComponents}
@@ -346,12 +376,18 @@ export default async function BlogPostPage({
                       variant="card"
                     />
                   </div>
-                  <div className="post-more-card-kicker">
-                    {p.tags[0] ?? "Essay"}
-                  </div>
-                  <h4>{p.title}</h4>
-                  <div className="post-more-card-by">
-                    {p.author} &middot; {estimateReadTime(p.content)} min
+                  <div className="post-more-card-body">
+                    <span
+                      className={`editorial-chip post-more-card-cat ${categoryTone(
+                        p.tags[0]
+                      )}`}
+                    >
+                      {p.tags[0] ?? "Essay"}
+                    </span>
+                    <h4>{p.title}</h4>
+                    <div className="post-more-card-by">
+                      {p.author} &middot; {estimateReadTime(p.content)} min
+                    </div>
                   </div>
                 </Link>
               ))}

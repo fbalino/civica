@@ -41,6 +41,33 @@ function estimateReadTime(content: string): number {
   return Math.max(1, Math.ceil(words / 250));
 }
 
+/**
+ * Map a category/tag to one of the tonal `.editorial-chip` modifiers so each
+ * card carries a tinted rounded chip (per the approved Record mockups). The
+ * mapping keys on common Civica desk categories; anything else falls back to
+ * the terracotta accent tone. Deterministic so SSR/CSR agree.
+ */
+function categoryTone(tag: string | undefined): string {
+  switch ((tag ?? "").toLowerCase()) {
+    case "data updates":
+    case "data":
+    case "releases":
+      return tag?.toLowerCase() === "releases"
+        ? "editorial-chip--sand"
+        : "editorial-chip--sage";
+    case "methodology":
+    case "methodology notes":
+      return "editorial-chip--blue";
+    case "analysis":
+    case "essay":
+    case "pulse briefings":
+    case "pulse":
+      return "editorial-chip--accent";
+    default:
+      return "editorial-chip--accent";
+  }
+}
+
 export default function BlogIndex() {
   const posts = getAllPosts();
 
@@ -118,8 +145,12 @@ export default function BlogIndex() {
             />
           </Link>
           <div className="record-lead-copy">
-            <span className="record-kicker">
-              Latest &middot; {featured.tags[0] ?? "Essay"}
+            <span
+              className={`editorial-chip record-lead-cat ${categoryTone(
+                featured.tags[0]
+              )}`}
+            >
+              {featured.tags[0] ?? "Essay"}
             </span>
             <h2 className="record-lead-title">{featured.title}</h2>
             <p className="record-lead-dek">{featured.description}</p>
@@ -163,19 +194,25 @@ export default function BlogIndex() {
                       variant="card"
                     />
                   </Link>
-                  <div className="record-story-kicker">
-                    {post.tags[0] ?? "Essay"}
-                  </div>
-                  <h3 className="record-story-title">
-                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                  </h3>
-                  <p className="record-story-dek">{post.description}</p>
-                  <div className="record-story-meta">
-                    <strong>{post.author}</strong>
-                    <span>&middot;</span>
-                    <span>{estimateReadTime(post.content)} min</span>
-                    <span>&middot;</span>
-                    <span>{formatShortDate(post.date)}</span>
+                  <div className="record-story-body">
+                    <span
+                      className={`editorial-chip record-story-cat ${categoryTone(
+                        post.tags[0]
+                      )}`}
+                    >
+                      {post.tags[0] ?? "Essay"}
+                    </span>
+                    <h3 className="record-story-title">
+                      <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                    </h3>
+                    <p className="record-story-dek">{post.description}</p>
+                    <div className="record-story-meta">
+                      <strong>{post.author}</strong>
+                      <span className="record-byline-dot" />
+                      <span>{estimateReadTime(post.content)} min</span>
+                      <span className="record-byline-dot" />
+                      <span>{formatShortDate(post.date)}</span>
+                    </div>
                   </div>
                 </article>
               ))}
@@ -202,9 +239,13 @@ export default function BlogIndex() {
                       {String(i + 1).padStart(2, "0")}
                     </div>
                     <div>
-                      <div className="record-list-kicker">
+                      <span
+                        className={`editorial-chip record-list-cat ${categoryTone(
+                          post.tags[0]
+                        )}`}
+                      >
                         {post.tags[0] ?? "Essay"}
-                      </div>
+                      </span>
                       <h4 className="record-list-title">{post.title}</h4>
                       <div className="record-list-by">
                         <strong>{post.author}</strong> &middot;{" "}
@@ -236,7 +277,7 @@ export default function BlogIndex() {
                     )
                       .slice(0, 10)
                       .map((tag) => (
-                        <span key={tag} className="record-tag-chip">
+                        <span key={tag} className="editorial-chip record-tag-chip">
                           {tag}
                         </span>
                       ))}
