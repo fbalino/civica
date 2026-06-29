@@ -170,6 +170,27 @@
   font-weight: 500;
 }
 
+/* ── Source attribution line (muted, sits below the definition) ── */
+.glossary-source {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: 1.5;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-3);
+}
+.glossary-source a {
+  color: var(--color-text-40);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-color: var(--color-card-border);
+  transition: color 0.12s ease;
+}
+.glossary-source a:hover {
+  color: var(--color-accent);
+  text-decoration-color: currentColor;
+}
+
 /* ── Tinted category tag (the .editorial-chip tonal recipe, inline) ── */
 .glossary-tag {
   display: inline-block;
@@ -199,6 +220,11 @@
   border-color: color-mix(in oklab, var(--color-status-warning) 30%, transparent);
   color: color-mix(in oklab, var(--color-status-warning), black 30%);
 }
+.glossary-tag--rose {
+  background: color-mix(in oklab, var(--color-status-danger) 14%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-status-danger) 30%, transparent);
+  color: color-mix(in oklab, var(--color-status-danger), black 30%);
+}
 
 /* In dark mode the darkened-hue text on tags would go too muddy; lift it. */
 [data-theme="dark"] .glossary-tag {
@@ -212,6 +238,9 @@
 }
 [data-theme="dark"] .glossary-tag--sand {
   color: color-mix(in oklab, var(--color-status-warning), white 14%);
+}
+[data-theme="dark"] .glossary-tag--rose {
+  color: color-mix(in oklab, var(--color-status-danger), white 14%);
 }
 
 /* ── Mobile ──────────────────────────────────────────────────── */

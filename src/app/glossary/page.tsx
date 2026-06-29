@@ -38,6 +38,8 @@ function tagClass(tag: GlossaryTag): string {
       return "glossary-tag glossary-tag--blue";
     case "structure":
       return "glossary-tag glossary-tag--sand";
+    case "process":
+      return "glossary-tag glossary-tag--rose";
     case "regime type":
     case "provenance":
     default:
@@ -104,6 +106,26 @@ export default function GlossaryPage() {
                       ) : null}
                     </h3>
                     <p>{term.definition}</p>
+                    {term.source ? (
+                      <p className="glossary-source">
+                        Source:{" "}
+                        {term.source.url ? (
+                          term.source.url.startsWith("/") ? (
+                            <Link href={term.source.url}>{term.source.name}</Link>
+                          ) : (
+                            <a
+                              href={term.source.url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {term.source.name}
+                            </a>
+                          )
+                        ) : (
+                          term.source.name
+                        )}
+                      </p>
+                    ) : null}
                     {term.seeAlso && term.seeAlso.length > 0 ? (
                       <p className="glossary-seealso">
                         See also:{" "}
@@ -122,9 +144,9 @@ export default function GlossaryPage() {
           ))}
 
           <p className="glossary-seealso" style={{ marginTop: "var(--space-7)" }}>
-            {termCount} terms. Definitions are written for general readers and
-            kept neutral; for the precise measures behind the Civica Index, see
-            the{" "}
+            {termCount} terms. Definitions are written for general readers in our
+            own words and paraphrase the cited reference for each entry; for the
+            precise measures behind the Civica Index, see the{" "}
             <Link href="/civica-index/methodology">Index methodology</Link>.
           </p>
         </div>
