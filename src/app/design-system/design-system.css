@@ -30,8 +30,8 @@
 }
 .ds-brand .d { color: var(--color-accent); }
 .ds-eyebrow {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   color: var(--color-text-muted);
   letter-spacing: var(--tracking-caps);

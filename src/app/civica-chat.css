@@ -13,30 +13,9 @@
 
 /* === Pretty scrollbar (used on any chat scroll container) ================== */
 /* The atlas right-rail panel uses .atlas-chat-scroll; the factbook drawer
-   uses .civica-chat-scroll. Same treatment on both so they look unified. */
-.civica-chat-scroll,
-.atlas-chat-scroll {
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-}
-.civica-chat-scroll::-webkit-scrollbar,
-.atlas-chat-scroll::-webkit-scrollbar {
-  width: var(--scrollbar-size);
-  height: var(--scrollbar-size);
-}
-.civica-chat-scroll::-webkit-scrollbar-track,
-.atlas-chat-scroll::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-}
-.civica-chat-scroll::-webkit-scrollbar-thumb,
-.atlas-chat-scroll::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border-radius: var(--scrollbar-radius);
-}
-.civica-chat-scroll::-webkit-scrollbar-thumb:hover,
-.atlas-chat-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover);
-}
+   uses .civica-chat-scroll. Both already inherit the identical scrollbar
+   treatment from the global `*` rule in globals.css (same --scrollbar-*
+   tokens), so no per-class block is needed here. */
 
 /* === Message wrapper ====================================================== */
 .civica-chat-msg {

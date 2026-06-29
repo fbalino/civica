@@ -15,8 +15,8 @@
 }
 .ci-hero { padding: 40px 0 20px; }
 .ci-hero-eyebrow {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
@@ -106,8 +106,8 @@
   .ci-stat-value { font-size: var(--text-26); }
 }
 .ci-stat-label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
@@ -115,8 +115,8 @@
 }
 
 .ci-section-eyebrow {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;

@@ -861,8 +861,8 @@ a {
    ============================================================ */
 
 .section-header {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
@@ -1087,8 +1087,8 @@ a {
   align-items: center;
   gap: 6px;
   text-decoration: none;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-13);
   letter-spacing: var(--tracking-wide);
   color: var(--color-text-30);
@@ -1237,8 +1237,8 @@ a {
 }
 
 .index-stat__label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
@@ -1938,8 +1938,8 @@ a {
 }
 
 .record-kicker {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -2027,8 +2027,8 @@ a {
 }
 
 .record-sec-ey {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: 0.2em;
   text-transform: uppercase;
@@ -2067,8 +2067,8 @@ a {
 }
 
 .record-story-kicker {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -2160,8 +2160,8 @@ a {
 }
 
 .record-list-kicker {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
@@ -2886,8 +2886,8 @@ a {
 }
 
 .post-more-card-kicker {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: 0.18em;
   text-transform: uppercase;

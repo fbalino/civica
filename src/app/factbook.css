@@ -657,7 +657,8 @@
 .factbook-section:first-child { padding-top: 0; }
 .factbook-section-header { margin-bottom: var(--space-6); }
 .factbook-section-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
@@ -972,13 +973,13 @@
   gap: var(--space-4);
 }
 .factbook-leaders-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-40);
   margin: 0;
-  font-weight: 400;
+  font-weight: var(--font-weight-semibold);
 }
 .factbook-leaders-list {
   list-style: none;
@@ -1115,7 +1116,8 @@
   margin-bottom: 14px;
 }
 .factbook-legislature-eyebrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;

@@ -16,7 +16,6 @@ import "./civica-index.css";
 import "./civica-index-detail.css";
 import "./factbook.css";
 import "./civica-chat.css";
-import "./v2.css";
 import "@/components/dev/dev-design.css";
 
 // Sources NOT covered by `tier1Publishers` — supporting feeds,

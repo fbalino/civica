@@ -527,8 +527,8 @@ html:has(.factbook-sticky-country-search:focus-within)
   flex-wrap: wrap;
 }
 .editorial-filter-label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono, 500);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: 0.06em; /* 0.06em — no exact token */
@@ -924,8 +924,8 @@ html:has(.factbook-sticky-country-search:focus-within)
   margin-bottom: var(--space-5);
 }
 .editorial-eyebrow {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono, 500);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
@@ -1344,8 +1344,8 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 
 .api-section-label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono, 500);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
@@ -1460,8 +1460,8 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 
 .api-embed-size-label {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono, 500);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   color: var(--color-text-30);
   text-transform: uppercase;
@@ -1543,8 +1543,8 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 
 .meth-num {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono, 500);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-13);
   letter-spacing: 0.12em;
   color: var(--color-text-30);

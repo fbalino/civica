@@ -130,8 +130,8 @@
  * Section headers
  * ---------------------------------------------------------------- */
 .ci-country-section-eyebrow {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: 11px;
   letter-spacing: 0.15em;
   text-transform: uppercase;

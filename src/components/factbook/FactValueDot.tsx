@@ -24,12 +24,12 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { SquarePlus } from "lucide-react";
+import { isFrozenSource, sourceLabel } from "@/lib/data/sources";
 import {
   FactValuePanel,
   type FactValuePanelProps,
 } from "./FactValuePanel";
 
-const FROZEN_SOURCES = new Set(["cia_factbook"]);
 const HOVER_OPEN_DELAY_MS = 80;
 const HOVER_CLOSE_DELAY_MS = 200;
 
@@ -97,7 +97,7 @@ export function FactValueDot({
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isFrozen = canonicalSourceId
-    ? FROZEN_SOURCES.has(canonicalSourceId)
+    ? isFrozenSource(canonicalSourceId)
     : false;
   const isDisputed = disputed ?? resolverOutput.isDisputed;
   const portalRoot = typeof document === "undefined" ? null : document.body;
@@ -200,7 +200,9 @@ export function FactValueDot({
   const computedLabel =
     ariaLabel ??
     `${factLabel}, ${
-      canonicalSourceId ? "source: " + canonicalSourceId : "no source"
+      canonicalSourceId
+        ? "source: " + sourceLabel(canonicalSourceId)
+        : "no source"
     }`;
 
   return (
