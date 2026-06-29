@@ -188,14 +188,13 @@ function ScorePane({
         </div>
         <span
           style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
+            fontFamily: "var(--font-body)",
+            fontWeight: 500,
             fontSize: "var(--text-12)",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
+            letterSpacing: 0,
             color: "var(--color-text-30)",
             padding: "4px 8px",
-            borderRadius: "999px",
+            borderRadius: "var(--radius-sm)",
             border: "1px solid var(--color-card-border)",
             background: "var(--color-page-bg)",
             whiteSpace: "nowrap",

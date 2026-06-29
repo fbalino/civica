@@ -247,7 +247,7 @@ export default function BlogIndex() {
               <div className="record-sidebar-block">
                 <h5 className="record-sidebar-heading">Colophon</h5>
                 <p className="record-sidebar-colophon">
-                  Set in <strong>Fraunces</strong> and <strong>Inter</strong>.
+                  Set in <strong>Source Serif 4</strong> and <strong>Inter</strong>.
                   Published in warm paper and starless dark.
                   Letterpress-inspired, web-native.
                 </p>

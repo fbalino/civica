@@ -330,7 +330,7 @@ function BeeSwarm({
               x={labelX}
               y={rowY + 4}
               textAnchor="end"
-              fontFamily="'Fraunces', serif"
+              fontFamily="var(--font-heading)"
               fontSize={row.kind === "family" ? "14" : "13"}
               fill="var(--color-text-primary)"
             >
@@ -893,11 +893,10 @@ const CSS = `
     border-bottom: 1px solid var(--color-divider);
   }
   .civica-govtypes .lens-switch {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-weight: 500;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font-size: var(--text-13);
+    letter-spacing: 0;
     color: var(--color-text-40);
     background: transparent;
     border: none;

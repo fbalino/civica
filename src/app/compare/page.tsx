@@ -432,16 +432,16 @@ export default async function ComparePage({
           align-self: flex-start;
           background: transparent;
           border: 1px solid var(--color-card-border);
-          color: var(--color-text-30);
-          font-family: var(--font-mono);
-          font-size: var(--text-12);
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
+          color: var(--color-text-60);
+          font-family: var(--font-body);
+          font-weight: 600;
+          font-size: var(--text-13);
+          letter-spacing: 0;
           padding: 6px 10px;
           border-radius: var(--radius-sm);
           cursor: pointer;
         }
-        .ci-compare-picker-remove:hover { color: var(--color-text-primary); }
+        .ci-compare-picker-remove:hover { color: var(--color-accent); }
         .ci-compare-picker-empty {
           font-family: var(--font-mono);
           font-size: var(--text-12);
@@ -477,10 +477,9 @@ export default async function ComparePage({
           flex-wrap: wrap;
         }
         .compare-section-nav-link {
-          font-family: var(--font-mono);
-          font-size: var(--text-12);
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
+          font-family: var(--font-body);
+          font-size: var(--text-13);
+          letter-spacing: 0;
           color: var(--color-text-30);
           text-decoration: none;
           padding: 4px 0;
