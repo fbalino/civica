@@ -3822,7 +3822,9 @@ a {
   min-width: 0;
   width: 100%;
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-full);
+  /* Canonical search shape: rounded RECTANGLE (radius-lg), not a full pill.
+     Owner decision 2026-06-29 — applies to every search box site-wide. */
+  border-radius: var(--radius-lg);
   background: var(--color-surface-elevated);
   color: var(--color-text-primary);
   min-height: calc(var(--space-8) - var(--space-1));
@@ -3891,7 +3893,7 @@ a {
   min-width: min(22rem, calc(100vw - var(--space-6)));
   overflow: hidden;
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   background: var(--color-surface-elevated);
   box-shadow: var(--shadow-hard-md);
 }

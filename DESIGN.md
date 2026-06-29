@@ -77,7 +77,7 @@ Elevation is restrained: most surfaces use a 1px hairline (`var(--color-border-d
 
 ## Shapes
 
-Use the small radius scale: `var(--radius-sm)` (4px — chips/badges), `var(--radius-md)` (8px — the default for buttons, cards, and controls), `var(--radius-lg)` (12px — country/data cards), `var(--radius-xl)` (16px), plus `var(--radius-2xl)` (24px) and `var(--radius-full)` (pill — search fields and circular controls).
+Use the small radius scale: `var(--radius-sm)` (4px — chips/badges), `var(--radius-md)` (8px — controls), `var(--radius-lg)` (12px — the default for cards, country/data cards, **and search fields**), `var(--radius-xl)` (16px), plus `var(--radius-2xl)` (24px) and `var(--radius-full)` (circular controls only — avatars, dots, spinners).
 
 ## Stacking, motion, breakpoints, and header
 
@@ -96,7 +96,7 @@ Prefer shared primitives for new editorial UI:
 - `Chip` (`src/components/editorial/Pill.tsx`, exported as both `Chip` and the legacy `Pill` alias) — the single tinted, rounded (`--radius-sm`), mixed-case, **sans** chip. Tonal variants `neutral / sage / sand / rose / blue / accent` (via `color-mix`). This replaces every old badge/filter/status pill AND the "Beta" tag. Never uppercase-mono. CSS filter chips use `.editorial-chip` + the `.editorial-chip--{sage,sand,rose,blue,accent}` tonal modifiers.
 - `Button` (`src/components/editorial/Button.tsx`) + the `.btn` system: `.btn--primary` (navy fill, white text, auto-inverts in dark via `color: var(--color-page-bg)`, optional trailing `.btn__arrow`), `.btn--secondary` (hairline outline), `.btn--tertiary`, `.btn--text`; sizes `.btn--sm`/`.btn--lg`; states (hover/active/disabled/loading) + focus-visible ring. Use this for all CTAs — no ad-hoc button styling.
 - `SegmentedControl` (`src/components/editorial/SegmentedControl.tsx`) — pill/well container with a navy active segment; for mutually-exclusive view toggles.
-- Search fields are pill-shaped (`--radius-full`) with a leading magnifier + Inter placeholder (see `CountrySearchCombobox` / `GlobalSearch`).
+- Search fields are **rounded rectangles** (`--radius-lg`, NOT a full pill) with a leading magnifier + Inter placeholder (see `CountrySearchCombobox` / `GlobalSearch`). This is the canonical shape for every search box site-wide (owner decision 2026-06-29).
 - `DataTable`
 - `SourceDot`
 
