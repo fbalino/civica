@@ -67,6 +67,8 @@ Use the standard container widths:
 - `.methodology-layout` — 1200px methodology shell with a left `ReaderSidebar` and no country search input.
 - `.factbook-body` — 1280px is allowed only for the factbook surface because it carries two sidebars.
 
+**Hero sections** are full-bleed bands (`width: 100vw; margin-left: calc(50% - 50vw)`) and MUST share one canonical height via **`var(--hero-height)`** (`clamp(460px, 44vw, 640px)`) so every hero reads as one design language — the homepage (`.home-hero`), the factbook landing (`.factbook-landing-hero`), and the about page (`.about-hero`) all use it. On mobile they relax to content height. The per-country factbook masthead (`.factbook-hero--art`) is a distinct engraving-overlay pattern, not a section hero. Do NOT give a new hero a one-off height; use the token.
+
 Use `var(--space-*)` for new spacing decisions unless an existing component contract requires a fixed dimension.
 
 ## Elevation

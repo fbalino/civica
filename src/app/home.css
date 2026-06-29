@@ -22,7 +22,7 @@
   margin-left: calc(50% - 50vw);
   margin-top: 0;
   margin-bottom: var(--space-7);
-  min-height: clamp(460px, 44vw, 640px);
+  min-height: var(--hero-height);
   padding: var(--space-8) 0;
   overflow: hidden;
 }

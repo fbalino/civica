@@ -1024,7 +1024,11 @@
 .factbook-landing-hero {
   position: relative;
   overflow: hidden;
-  display: block;
+  /* Match the homepage hero: full-bleed band, content vertically centered,
+     shared --hero-height so every hero section reads the same. */
+  display: flex;
+  align-items: center;
+  min-height: var(--hero-height);
   max-width: none;
   /* Break out of any centered page container to the viewport edges. */
   width: 100vw;
@@ -1280,6 +1284,8 @@ a.factbook-alpha:hover {
 @media (max-width: 768px) {
   .factbook-index-cols { column-count: 2; column-gap: var(--space-5); }
   .factbook-almanac { padding: var(--space-7) var(--space-5) var(--space-8); }
+  /* Mobile: let the hero size to its content (matches the homepage hero). */
+  .factbook-landing-hero { min-height: auto; }
   .factbook-hero-inner { padding: var(--space-8) var(--space-5) var(--space-7); }
   /* Keep the landing H1 inside the viewport on the narrowest phones —
      wrap long/unbreakable strings and hold the clamp at its small end so the

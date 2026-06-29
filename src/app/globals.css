@@ -128,6 +128,9 @@
   --spacing-section-y: 60px;
   --spacing-content-top: 32px;
   --spacing-hero-top: 100px;
+  /* Canonical full-bleed hero band height — shared by every hero section
+     (homepage, factbook landing, about) so they read as one design language. */
+  --hero-height: clamp(460px, 44vw, 640px);
   --space-1: 2px;
   --space-2: 4px;
   --space-3: 8px;

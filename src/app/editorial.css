@@ -1806,9 +1806,8 @@ html:has(.factbook-sticky-country-search:focus-within)
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  aspect-ratio: 16 / 6;
-  max-height: 56vh;
-  min-height: 300px;
+  /* Shared canonical hero height (design system) — same as home + factbook. */
+  min-height: var(--hero-height);
   overflow: hidden;
   display: flex;
   align-items: flex-end;
