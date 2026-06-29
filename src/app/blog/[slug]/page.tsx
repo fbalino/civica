@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isValidElement } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
@@ -83,6 +84,16 @@ function formatDate(dateStr: string) {
   });
 }
 
+/** Flatten React children to plain text (for detecting placeholder blockquotes). */
+function nodeText(node: React.ReactNode): string {
+  if (node == null || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(nodeText).join(" ");
+  if (isValidElement(node))
+    return nodeText((node.props as { children?: React.ReactNode }).children);
+  return "";
+}
+
 const mdxComponents = {
   h1: (props: React.ComponentProps<"h1">) => (
     <h2 {...props} />
@@ -106,11 +117,56 @@ const mdxComponents = {
   a: (props: React.ComponentProps<"a">) => <a {...props} />,
   strong: (props: React.ComponentProps<"strong">) => <strong {...props} />,
   em: (props: React.ComponentProps<"em">) => <em {...props} />,
-  blockquote: ({ children }: React.ComponentProps<"blockquote">) => (
-    <div className="post-callout">
-      <div>{children}</div>
-    </div>
-  ),
+  blockquote: ({ children }: React.ComponentProps<"blockquote">) => {
+    // Image-placeholder blocks (draft articles, before bespoke art lands) are
+    // authored as blockquotes starting "Image placeholder / Codex prompt:".
+    // Render them as a clearly-marked dashed "illustration pending" figure —
+    // NOT the pull-quote style — so they read as intentional, not as a quote.
+    if (/image placeholder|codex prompt/i.test(nodeText(children))) {
+      return (
+        <figure
+          aria-label="Illustration pending"
+          style={{
+            margin: "2em 0",
+            padding: "var(--space-5) var(--space-6)",
+            border: "1px dashed var(--color-card-border)",
+            borderRadius: "var(--radius-lg)",
+            background:
+              "color-mix(in oklab, var(--color-text-40) 5%, var(--color-page-bg))",
+          }}
+        >
+          <span
+            style={{
+              display: "block",
+              marginBottom: "var(--space-3)",
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-12)",
+              letterSpacing: "var(--tracking-wider)",
+              textTransform: "uppercase",
+              color: "var(--color-accent)",
+            }}
+          >
+            Illustration pending
+          </span>
+          <div
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-13)",
+              lineHeight: "var(--leading-normal)",
+              color: "var(--color-text-40)",
+            }}
+          >
+            {children}
+          </div>
+        </figure>
+      );
+    }
+    return (
+      <div className="post-callout">
+        <div>{children}</div>
+      </div>
+    );
+  },
   hr: () => <hr />,
   code: (props: React.ComponentProps<"code">) => (
     <code
