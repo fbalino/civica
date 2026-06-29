@@ -36,7 +36,7 @@ const TYPE_SCALE = [
   { lab: "Body", text: "Hover any seat to meet the member. Compare two countries side by side.", family: "var(--font-body)", size: "var(--text-16)", weight: 400, lh: 1.625, tr: "0", spec: "Inter · 400 · 16/26" },
   { lab: "Caption", text: "577 seats · elected by a two-round system", family: "var(--font-body)", size: "var(--text-13)", weight: 400, lh: 1.5, tr: "0", spec: "Inter · 400 · 13" },
   { lab: "Label / eyebrow", text: "WELCOME · ATLAS", family: "var(--font-body)", size: "var(--text-12)", weight: 600, lh: 1.45, tr: "var(--tracking-caps)", spec: "Inter · 600 · 11 · +0.8% · caps", caps: true },
-  { lab: "Meta / mono", text: "FRA · 48.8° N, 2.3° E · GMT+1", family: "var(--font-mono)", size: "var(--text-12)", weight: 500, lh: 1.4, tr: "0", spec: "ui-monospace · 12" },
+  { lab: "Code", text: "var(--color-accent) · GET /api/v1/index", family: "var(--font-code)", size: "var(--text-12)", weight: 500, lh: 1.4, tr: "0", spec: "ui-monospace · 12 · code only" },
 ];
 
 const SAMPLE_CHAMBER = {
@@ -212,7 +212,7 @@ export default function DesignSystemPage() {
           </div>
 
           <h3 className="ds-sub">Motion</h3>
-          <div className="ds-row" style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-13)", color: "var(--color-text-secondary)" }}>
+          <div className="ds-row" style={{ fontFamily: "var(--font-code)", fontSize: "var(--text-13)", color: "var(--color-text-secondary)" }}>
             {motion?.tokens.map((t) => (
               <span key={t.cssVar}>
                 {t.cssVar.replace("--motion-", "")} {t.defaultValue}
@@ -241,14 +241,14 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="ds-comp">
-              <h4>Pills (real)</h4>
+              <h4>Chips (real)</h4>
               <div className="ds-row">
-                <Pill>Default</Pill>
+                <Pill>Neutral</Pill>
+                <Pill variant="sage">High income</Pill>
+                <Pill variant="sand">Beta</Pill>
+                <Pill variant="rose">Fragile</Pill>
+                <Pill variant="blue">EU Member</Pill>
                 <Pill variant="accent">Accent</Pill>
-                <Pill variant="success">Passed</Pill>
-                <Pill variant="warn">In committee</Pill>
-                <Pill variant="danger">Failed</Pill>
-                <Pill variant="info">Procedural</Pill>
               </div>
             </div>
 

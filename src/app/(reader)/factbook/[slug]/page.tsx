@@ -438,7 +438,7 @@ export default async function FactbookCountryPage({
               <>
                 {" "}
                 <span className="factbook-reconciliation-notice__beta">
-                  BETA
+                  Beta
                 </span>
               </>
             ) : null}

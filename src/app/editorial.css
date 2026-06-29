@@ -135,23 +135,21 @@
 /* ── Inline Beta tag for headlines ──────────────────────────────── */
 
 .editorial-beta-tag {
-  font-family: var(--font-mono);
-  font-size: var(--text-13);
-  font-weight: var(--font-weight-mono, 500);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  /* Bg is mostly page-bg with a hint of warning colour, so text reads
-     against the page palette. --color-text-primary keeps the tag
-     legible in both light and dark themes. */
-  color: var(--color-text-primary);
-  background: color-mix(
-    in oklch,
-    var(--color-status-warning) 18%,
-    var(--color-page-bg) 82%
-  );
-  border: 1px solid var(--color-status-warning);
+  /* The Beta tag is now the sand Chip (§2): sans, mixed-case "Beta", NOT mono,
+     NOT uppercase. Tonal sand wash on paper, same-hue low-alpha border,
+     darkened-hue text — the exact recipe used by .editorial-chip--sand. */
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-warning), black 32%);
   border-radius: var(--radius-sm);
-  padding: var(--space-1) var(--space-3);
+  padding: 3px 9px;
   white-space: nowrap;
   vertical-align: middle;
   margin-left: var(--space-3);
@@ -266,7 +264,7 @@
   text-decoration: underline;
 }
 .editorial-section code {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-size: var(--text-14);
   background: var(--color-card-bg);
   padding: 1px 6px;
@@ -316,6 +314,9 @@
   color: var(--color-text-primary);
   vertical-align: top;
   line-height: var(--leading-relaxed, 1.7);
+  /* Now that data tables render in Inter (mono retired, §1), keep numeric
+     columns aligned with tabular figures. */
+  font-variant-numeric: tabular-nums;
 }
 .editorial-data-table tbody tr:last-child td {
   border-bottom: 0;
@@ -326,7 +327,7 @@
 .editorial-section td.editorial-td-num,
 .editorial-data-table td.num,
 .editorial-data-table th.num {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-variant-numeric: tabular-nums;
   text-align: right;
   color: var(--color-text-60);
@@ -566,6 +567,53 @@ html:has(.factbook-sticky-country-search:focus-within)
     var(--color-page-bg) 86%
   );
   color: var(--color-text-primary);
+}
+
+/* ── Tonal chip modifiers (component spec v1 §2) ────────────────────
+   Subtle wash on the paper bg, same-hue low-alpha border, darkened-hue
+   text. Mirrors the <Chip> React component recipe so CSS-driven filter
+   chips can carry the same tones. Hover keeps the tint (no flat reset). */
+.editorial-chip--sage {
+  background: color-mix(in oklab, var(--color-status-success) 16%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-status-success) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-success), black 32%);
+}
+.editorial-chip--sand {
+  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-status-warning) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-warning), black 32%);
+}
+.editorial-chip--rose {
+  background: color-mix(in oklab, var(--color-status-danger) 16%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-status-danger) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-danger), black 32%);
+}
+.editorial-chip--blue {
+  background: color-mix(in oklab, var(--color-status-info) 16%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-status-info) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-info), black 32%);
+}
+.editorial-chip--accent {
+  background: color-mix(in oklab, var(--color-accent) 16%, var(--color-page-bg));
+  border-color: color-mix(in oklab, var(--color-accent) 32%, transparent);
+  color: color-mix(in oklab, var(--color-accent), black 32%);
+}
+/* Tonal chips keep their own darkened-hue text on hover (the neutral
+   .editorial-chip:hover would otherwise flip them to navy). */
+.editorial-chip--sage:hover {
+  color: color-mix(in oklab, var(--color-status-success), black 32%);
+}
+.editorial-chip--sand:hover {
+  color: color-mix(in oklab, var(--color-status-warning), black 32%);
+}
+.editorial-chip--rose:hover {
+  color: color-mix(in oklab, var(--color-status-danger), black 32%);
+}
+.editorial-chip--blue:hover {
+  color: color-mix(in oklab, var(--color-status-info), black 32%);
+}
+.editorial-chip--accent:hover {
+  color: color-mix(in oklab, var(--color-accent), black 32%);
 }
 
 /* Country/select submit form inside an editorial filter row */
@@ -1328,7 +1376,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-method-badge--patch  { background: var(--color-badge-post); }
 
 .api-endpoint-path {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-15);
   color: var(--color-text-primary);
@@ -1354,7 +1402,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 
 .api-code-block {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
   background: var(--color-card-bg);
@@ -1388,11 +1436,11 @@ html:has(.factbook-sticky-country-search:focus-within)
   margin: 0;
 }
 .api-info-card__body code {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
 }
 .api-info-card__value {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-14);
   color: var(--color-text-primary);
@@ -1428,14 +1476,14 @@ html:has(.factbook-sticky-country-search:focus-within)
   border-top: 0;
 }
 .api-params__name {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
   color: var(--color-text-primary);
   min-width: 140px; /* 140px — no exact token; column rhythm */
 }
 .api-params__type {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-12);
   color: var(--color-text-30);
@@ -1559,7 +1607,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   border-left: 3px solid var(--color-accent);
   border-radius: 4px;
   padding: 20px 24px;
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
   font-size: var(--text-14);
   color: var(--color-text-primary);
@@ -1741,7 +1789,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 
 .meth-figure-caption code {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
   background: var(--color-bg);
   padding: 1px 6px;
   border-radius: var(--radius-sm);

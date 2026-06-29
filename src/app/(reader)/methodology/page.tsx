@@ -219,15 +219,21 @@ export default function MethodologyHubPage() {
                         {entry.beta && (
                           <span
                             style={{
-                              fontFamily: "var(--font-mono)",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              fontFamily: "var(--font-body)",
                               fontSize: "var(--text-12)",
-                              letterSpacing: "var(--tracking-wider)",
-                              padding: "2px 6px",
+                              fontWeight: 500,
+                              letterSpacing: 0,
+                              textTransform: "none",
+                              padding: "3px 9px",
                               background:
-                                "color-mix(in oklab, var(--color-warn) 15%, transparent)",
-                              color: "var(--color-warn)",
-                              textTransform: "uppercase",
-                              borderRadius: "var(--radius-xs)",
+                                "color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg))",
+                              border:
+                                "1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent)",
+                              color:
+                                "color-mix(in oklab, var(--color-status-warning), black 32%)",
+                              borderRadius: "var(--radius-sm)",
                             }}
                           >
                             Beta

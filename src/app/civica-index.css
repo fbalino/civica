@@ -26,26 +26,23 @@
   flex-wrap: wrap;
 }
 .ci-beta-pill {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  /* The Beta tag is now the sand Chip (§2): sans, mixed-case "Beta", NOT mono,
+     NOT uppercase. Tonal sand wash on paper, same-hue low-alpha border,
+     darkened-hue text — matches .editorial-chip--sand. */
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-weight: 500;
   font-size: var(--text-12);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--color-warn);
-  padding: 2px 7px;
-  border: 1px solid var(--color-warn);
-  border-radius: 2px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: color-mix(in oklab, var(--color-status-warning), black 32%);
+  padding: 3px 9px;
+  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
+  border-radius: var(--radius-sm);
   line-height: 1.2;
-  background: transparent;
+  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
   white-space: nowrap;
-}
-/* Light-theme contrast: the default --color-warn lands ~3.5:1 against
-   the light surface. Override locally to push the pill text past the
-   WCAG AA 4.5:1 floor at 12px without disturbing other warn-coloured
-   UI. */
-[data-theme="light"] .ci-beta-pill {
-  color: var(--color-beta-pill-fg);
-  border-color: var(--color-beta-pill-fg);
 }
 .ci-hero-rework-note {
   font-family: var(--font-mono);
@@ -101,6 +98,7 @@
   letter-spacing: var(--tracking-snug);
   line-height: 1;
   color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 @container (min-width: 720px) {
   .ci-stat-value { font-size: var(--text-26); }
@@ -244,6 +242,7 @@
   font-size: var(--text-22);
   color: var(--color-text-60);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .ci-lb-rank--top3 { color: var(--color-accent); }
 .ci-lb-country {
@@ -290,6 +289,7 @@
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
 }
 .ci-lb-score-interval {
   font-family: var(--font-mono);
@@ -297,6 +297,7 @@
   font-size: var(--text-12);
   color: var(--color-text-40);
   letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
 }
 .ci-lb-tier {
   font-family: var(--font-mono);
@@ -312,6 +313,7 @@
   color: var(--color-text-30);
   text-align: right;
   display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+  font-variant-numeric: tabular-nums;
 }
 .ci-dim-ok, .ci-dim-warn {
   display: inline-block;

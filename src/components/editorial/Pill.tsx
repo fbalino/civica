@@ -1,61 +1,123 @@
 import type { ReactNode } from "react";
 
-type PillVariant = "default" | "accent" | "success" | "warn" | "danger" | "info";
-type PillSize = "sm" | "md";
-
 /*
- * v2 Pill — vivid, tonal. Each variant gets:
- *   - a tinted fill (22% of the variant color blended with transparent),
- *   - a same-hue border at 40% alpha,
- *   - darker variant-hue text (variant ↘ 30% black via color-mix),
+ * Chip (component spec v1 §2) — tinted, rounded, SANS, MIXED-CASE.
  *
- * which keeps Pills readable against the parchment page bg while
- * making each tone visually distinct. Replaces the v1 16%-blend +
- * `--color-text-primary` approach (which read flat).
+ * Replaces the old mono/uppercase Pill entirely. One component now backs every
+ * filter chip, status pill, income/tier tag, AND the Beta tag. Never uppercase,
+ * never mono.
+ *
+ * Tonal recipe (per spec): a subtle wash on the paper bg, a same-hue low-alpha
+ * border, and darkened-hue text for AA contrast. Computed with
+ * color-mix(in oklab, …) so every tone stays theme-safe (light + dark inherit
+ * the same tokens). On white card surfaces the same recipe reads fine.
+ *
+ *   background: color-mix(in oklab, <hue> 16%, var(--color-page-bg))
+ *   border:     1px solid color-mix(in oklab, <hue> 32%, transparent)
+ *   color:      color-mix(in oklab, <hue>, black 32%)
+ *
+ * `neutral` is the one exception: it uses the explicit hairline/page tokens
+ * rather than a tint, matching the spec's default chip.
  */
-const VARIANT_TOKEN: Record<PillVariant, string> = {
-  default: "var(--color-text-40)",
-  accent:  "var(--color-accent)",
-  success: "var(--color-status-success)",
-  warn:    "var(--color-status-warning)",
-  danger:  "var(--color-status-danger)",
-  info:    "var(--color-status-info)",
+
+/** Canonical tonal variants from the spec. */
+type ChipTone = "neutral" | "sage" | "sand" | "rose" | "blue" | "accent";
+
+/**
+ * Legacy Pill variants kept as a thin alias so existing
+ * `<Pill variant="success" />` call-sites keep working. Mapped onto the
+ * tonal set below.
+ */
+type LegacyVariant = "default" | "accent" | "success" | "warn" | "danger" | "info";
+
+type ChipVariant = ChipTone | LegacyVariant;
+type ChipSize = "sm" | "md";
+
+/** Map every accepted variant name onto the hue token that drives the tint. */
+const TONE_HUE: Record<ChipTone, string | null> = {
+  // neutral has no single hue — handled explicitly below.
+  neutral: null,
+  sage: "var(--color-status-success)",
+  sand: "var(--color-status-warning)",
+  rose: "var(--color-status-danger)",
+  blue: "var(--color-status-info)",
+  accent: "var(--color-accent)",
 };
 
-interface PillProps {
+/** Normalise legacy variant names to canonical tones. */
+const VARIANT_TONE: Record<ChipVariant, ChipTone> = {
+  // canonical tones map to themselves
+  neutral: "neutral",
+  sage: "sage",
+  sand: "sand",
+  rose: "rose",
+  blue: "blue",
+  accent: "accent",
+  // legacy aliases
+  default: "neutral",
+  success: "sage",
+  warn: "sand",
+  danger: "rose",
+  info: "blue",
+};
+
+interface ChipProps {
   children: ReactNode;
-  variant?: PillVariant;
-  size?: PillSize;
+  variant?: ChipVariant;
+  size?: ChipSize;
   className?: string;
 }
 
-export function Pill({
+function chipStyle(tone: ChipTone, size: ChipSize) {
+  const base = {
+    display: "inline-flex",
+    alignItems: "center",
+    borderRadius: "var(--radius-sm)",
+    padding: size === "sm" ? "3px 9px" : "4px 11px",
+    fontFamily: "var(--font-body)",
+    fontSize: size === "sm" ? "var(--text-12)" : "var(--text-13)",
+    fontWeight: 500,
+    letterSpacing: 0,
+    textTransform: "none" as const,
+    whiteSpace: "nowrap" as const,
+  };
+
+  if (tone === "neutral") {
+    return {
+      ...base,
+      background: "var(--color-page-bg)",
+      border: "1px solid var(--color-card-border)",
+      color: "var(--color-text-60)",
+    };
+  }
+
+  const hue = TONE_HUE[tone]!;
+  return {
+    ...base,
+    background: `color-mix(in oklab, ${hue} 16%, var(--color-page-bg))`,
+    border: `1px solid color-mix(in oklab, ${hue} 32%, transparent)`,
+    color: `color-mix(in oklab, ${hue}, black 32%)`,
+  };
+}
+
+/** The Chip — canonical export. */
+export function Chip({
   children,
-  variant = "default",
+  variant = "neutral",
   size = "sm",
   className,
-}: PillProps) {
-  const tone = VARIANT_TOKEN[variant];
+}: ChipProps) {
+  const tone = VARIANT_TONE[variant];
   return (
-    <span
-      className={className}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        background: `color-mix(in oklab, ${tone} 22%, transparent)`,
-        border: `1px solid color-mix(in oklab, ${tone} 40%, transparent)`,
-        color: `color-mix(in oklab, ${tone}, black 30%)`,
-        borderRadius: "var(--radius-sm)",
-        padding: size === "sm" ? "2px 7px" : "4px 10px",
-        fontFamily: "var(--font-mono)",
-        fontSize: size === "sm" ? "var(--text-12)" : "var(--text-13)",
-        fontWeight: "var(--font-weight-mono)",
-        letterSpacing: "0.08em",
-        textTransform: "uppercase",
-        whiteSpace: "nowrap",
-      }}
-    >
+    <span className={className} style={chipStyle(tone, size)}>
       {children}
     </span>
   );
 }
+
+/**
+ * `Pill` — backwards-compatible alias. Existing imports
+ * (`import { Pill } from "@/components/editorial/Pill"`) and the legacy variant
+ * names keep working; the rendered look is now the new mixed-case sans Chip.
+ */
+export const Pill = Chip;

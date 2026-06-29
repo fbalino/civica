@@ -247,7 +247,20 @@
   letter-spacing: var(--tracking-wide);
 }
 .factbook-reconciliation-notice__beta {
-  color: var(--color-status-warning);
+  /* Sand Chip (§2): sans, mixed-case "Beta", NOT mono/uppercase. */
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-warning), black 32%);
+  border-radius: var(--radius-sm);
+  padding: 1px 7px;
+  vertical-align: middle;
 }
 .factbook-reconciliation-notice__link {
   color: var(--color-text-60);
@@ -828,6 +841,7 @@
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   max-width: 640px;
+  font-variant-numeric: tabular-nums;
 }
 .factbook-bill-actions {
   display: flex;
@@ -1220,6 +1234,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   margin-top: 3px;
   color: var(--color-text-primary);
   overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
 }
 .factbook-legislature-stat-val--text {
   font-family: var(--font-body);

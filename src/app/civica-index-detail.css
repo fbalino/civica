@@ -229,6 +229,7 @@
   font-weight: 500;
   letter-spacing: -0.01em;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .ci-country-dim-contribution strong {
@@ -335,6 +336,7 @@
   font-weight: var(--font-weight-mono);
   font-size: 13px;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ----------------------------------------------------------------

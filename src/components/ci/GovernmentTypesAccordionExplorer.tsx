@@ -273,10 +273,11 @@ function BeeSwarm({
         ))}
       </g>
       <g
-        fontFamily="ui-monospace, monospace"
+        fontFamily="var(--font-body)"
         fontSize="10"
         fontWeight={500}
         fill="var(--color-text-30)"
+        style={{ fontVariantNumeric: "tabular-nums" }}
       >
         {[0, 20, 40, 60, 80, 100].map((tick) => (
           <text key={tick} x={xFor(tick) - 5} y={BOTTOM_AXIS_Y + 18}>

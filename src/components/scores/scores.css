@@ -75,12 +75,14 @@
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .scores-rankings__rank {
   font-family: var(--font-mono);
   font-size: var(--text-12);
   color: var(--color-text-40);
+  font-variant-numeric: tabular-nums;
 }
 
 .scores-rankings__trend {
@@ -89,6 +91,7 @@
   gap: 4px;
   font-family: var(--font-mono);
   font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
 }
 
 .scores-rankings__trend--up {

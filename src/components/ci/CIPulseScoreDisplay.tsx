@@ -214,6 +214,7 @@ function ScorePane({
             letterSpacing: "-0.03em",
             lineHeight: 0.88,
             color: bandColorVar,
+            fontVariantNumeric: "tabular-nums",
           }}
         >
           {scoreValue}

@@ -115,7 +115,7 @@
 .ds-swatch .chip { height: 64px; border-bottom: 1px solid var(--color-border-default); }
 .ds-swatch .meta { padding: var(--space-3) var(--space-4); }
 .ds-swatch .var {
-  font-family: var(--font-mono);
+  font-family: var(--font-code); /* literal token name (var(--color-…)) — code-like */
   font-weight: var(--font-weight-mono);
   font-size: var(--text-12);
   color: var(--color-text-primary);
@@ -143,7 +143,7 @@
 }
 .ds-type-row .lab,
 .ds-type-row .spec {
-  font-family: var(--font-mono);
+  font-family: var(--font-code); /* literal type spec (e.g. "ui-monospace · 12") — code-like */
   font-weight: var(--font-weight-mono);
   font-size: var(--text-12);
   color: var(--color-text-muted);
@@ -152,7 +152,7 @@
 
 /* Spacing / radii / shadows */
 .ds-space-row { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-2) 0; }
-.ds-space-row .label { font-family: var(--font-mono); font-weight: var(--font-weight-mono); font-size: var(--text-13); width: 86px; color: var(--color-text-secondary); }
+.ds-space-row .label { font-family: var(--font-code); font-weight: var(--font-weight-mono); font-size: var(--text-13); width: 86px; color: var(--color-text-secondary); }
 .ds-space-row .bar { height: 14px; background: var(--color-accent); border-radius: var(--radius-sm); }
 
 .ds-tiles { display: flex; flex-wrap: wrap; gap: var(--space-5); }
@@ -161,7 +161,7 @@
   background: var(--color-surface-elevated);
   border: 1px solid var(--color-border-default);
   display: flex; align-items: flex-end; padding: var(--space-3);
-  font-family: var(--font-mono); font-weight: var(--font-weight-mono);
+  font-family: var(--font-code); font-weight: var(--font-weight-mono); /* literal token (r-md, soft) */
   font-size: var(--text-12); color: var(--color-text-muted);
 }
 
@@ -200,7 +200,7 @@
   padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm);
 }
 .ds-input input { border: 0; background: transparent; outline: none; font-family: var(--font-body); font-size: var(--text-14); color: var(--color-text-primary); width: 100%; }
-.ds-input .kbd { border: 1px solid var(--color-border-default); padding: 0 var(--space-2); border-radius: var(--radius-sm); color: var(--color-text-muted); font-family: var(--font-mono); font-size: var(--text-12); }
+.ds-input .kbd { border: 1px solid var(--color-border-default); padding: 0 var(--space-2); border-radius: var(--radius-sm); color: var(--color-text-muted); font-family: var(--font-code); font-size: var(--text-12); }
 
 .ds-tabs { display: flex; flex-wrap: wrap; gap: 0 var(--space-6); border-bottom: 1px solid var(--color-border-default); }
 .ds-tabs button { background: transparent; border: 0; padding: var(--space-3) 0; cursor: pointer; color: var(--color-text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: var(--font-body); font-size: var(--text-14); }
