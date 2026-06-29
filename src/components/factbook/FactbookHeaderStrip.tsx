@@ -7,6 +7,7 @@ import { CountryFlag } from "@/components/CountryFlag";
 import { CountrySwitcherChips } from "./CountrySwitcherChips";
 import { FactbookLightbox, type LightboxImage } from "./FactbookLightbox";
 import { FactValueDot } from "./FactValueDot";
+import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import { ciTier } from "@/lib/ci/tiers";
 
@@ -224,8 +225,7 @@ export function FactbookHeaderStrip({
         className={`factbook-hero${engravingSrc ? " factbook-hero--art" : ""}`}
       >
         {engravingSrc && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <ParallaxImage
             className="factbook-hero-art-img"
             src={engravingSrc}
             alt=""

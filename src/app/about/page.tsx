@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SourceDot } from "@/components/SourceDot";
+import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
@@ -102,8 +103,7 @@ export default async function AboutPage() {
       {/* Engraving masthead. Placeholder art (/engravings/hero.webp) — swap
           `src` for a bespoke About engraving when available. */}
       <section className="about-hero">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <ParallaxImage
           className="about-hero-img"
           src="/engravings/hero.webp"
           alt=""

@@ -1814,12 +1814,15 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 .about-hero-img {
   position: absolute;
-  inset: 0;
+  /* Parallax over-scan (see .home-hero-art-img): 20% taller, pulled up 10% so
+     the translateY never reveals a blank edge under overflow:hidden. */
+  inset: -10% 0;
   width: 100%;
-  height: 100%;
+  height: 120%;
   object-fit: cover;
   object-position: center 42%;
   z-index: 0;
+  will-change: transform;
 }
 .about-hero::after {
   content: "";

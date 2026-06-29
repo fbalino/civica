@@ -17,6 +17,7 @@ import {
   HeroReveal,
   HeroRevealItem,
 } from "@/components/motion/Reveal";
+import { ParallaxImage } from "@/components/motion/ParallaxImage";
 
 /* A single Civica Index ranking row as returned by getCIRankings. */
 interface RankRow {
@@ -118,8 +119,12 @@ export async function HomeGrid() {
     <div className="home">
       {/* Hero */}
       <section className="home-hero" aria-labelledby="home-title">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="home-hero-art-img" src="/engravings/hero.webp" alt="" aria-hidden="true" />
+        <ParallaxImage
+          className="home-hero-art-img"
+          src="/engravings/hero.webp"
+          alt=""
+          aria-hidden="true"
+        />
         <div className="home-hero-inner">
           <HeroReveal className="home-hero-main">
             <HeroRevealItem as="h1" id="home-title" className="home-hero-title">

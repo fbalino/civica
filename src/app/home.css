@@ -28,12 +28,16 @@
 }
 .home-hero-art-img {
   position: absolute;
-  inset: 0;
+  /* Parallax over-scan: the image is 20% taller than the hero and pulled up by
+     10% so the parallax translateY (≤12%) never reveals a blank top/bottom edge
+     (the hero clips with overflow:hidden). */
+  inset: -10% 0;
   width: 100%;
-  height: 100%;
+  height: 120%;
   object-fit: cover;
   object-position: center center;
   z-index: 0;
+  will-change: transform;
 }
 [data-theme="dark"] .home-hero-art-img,
 [data-theme="dark"] .home-engraving img,

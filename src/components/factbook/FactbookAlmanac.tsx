@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Reveal, HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { ParallaxImage } from "@/components/motion/ParallaxImage";
 
 /** One country row as fed to the almanac. */
 export interface FactbookAlmanacCountry {
@@ -128,8 +129,7 @@ export function FactbookAlmanac({
     <div className="factbook-landing">
       {/* ── Full-bleed engraving hero with centered typeahead ── */}
       <section className="factbook-landing-hero" aria-labelledby="factbook-hero-title">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <ParallaxImage
           className="factbook-hero-art"
           src="/engravings/hero.webp"
           alt=""

@@ -39,12 +39,16 @@
 }
 .factbook-hero-art-img {
   position: absolute;
-  inset: 0;
+  /* Parallax over-scan (see .home-hero-art-img): 20% taller, pulled up 10% so
+     the translateY never reveals a blank edge under overflow:hidden. Reset on
+     mobile, where this img becomes an in-flow 5:4 banner (see media query). */
+  inset: -10% 0;
   width: 100%;
-  height: 100%;
+  height: 120%;
   object-fit: cover;
   object-position: center 28%;
   z-index: 0;
+  will-change: transform;
 }
 .factbook-hero--art::after {
   content: "";
@@ -522,6 +526,9 @@
     aspect-ratio: 5 / 4;
     object-position: center 30%;
     order: 0;
+    /* This img is an in-flow banner on mobile (not an absolute over-scan), so
+       the parallax translateY must NOT displace it out of the vertical stack. */
+    transform: none !important;
   }
   /* Neutralize the desktop ivory scrim — the engraving is its own banner now. */
   .factbook-hero--art::after {
@@ -1037,13 +1044,16 @@
 }
 .factbook-hero-art {
   position: absolute;
-  inset: 0;
+  /* Parallax over-scan (see .home-hero-art-img): 20% taller, pulled up 10% so
+     the translateY never reveals a blank edge under overflow:hidden. */
+  inset: -10% 0;
   width: 100%;
-  height: 100%;
+  height: 120%;
   object-fit: cover;
   object-position: center 42%;
   opacity: 0.85;
   z-index: 0;
+  will-change: transform;
 }
 [data-theme="dark"] .factbook-hero-art {
   opacity: 0.42;
