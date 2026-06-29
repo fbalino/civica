@@ -1,5 +1,47 @@
 # Project Memory Sessions
 
+## 2026-06-29 (pt4) — Hero rebalance, 10 Record drafts, sourced glossary; Option B chosen for atlas/shell
+
+Shipped to `main` (28d1c67→e73dbd8) → civicaatlas.org, verified live.
+- **Factbook landing hero rebalanced**: was centered-but-lopsided (engraving's
+  mountain right, empty left). Now homepage idiom — left-aligned content
+  (eyebrow/title/dek/search/chips) + left-protecting linear scrim, engraving
+  reads on the right. factbook.css `.factbook-hero-inner/-scrim/-dek/-search/-chips`.
+- **10 long-form Record articles** (content/blog/*.mdx, draft:true) via a Workflow
+  (research → write → independent no-AI-isms polish pass; used the /no-ai-isms skill
+  guidance). ~1100-1800 words each, grounded in real facts. Each has inline
+  "> **Image placeholder** / Codex prompt / Caption" blockquote blocks (engraving
+  house style) for the owner to generate art. Topics: modern coups, constitutional
+  longevity, second chambers, term limits, measuring democracy, absolute monarchies,
+  voting systems, backsliding, who runs a country, microstates.
+  - blog.ts now supports frontmatter `draft: true` → excluded from the site
+    (getAllPosts filters). Remove the flag + add cover/inline images to publish.
+- **Glossary expanded 31→58 terms, all sourced**: added GlossarySource type +
+  `source` field; renders a muted "Source: <name>" line per term (Britannica,
+  Stanford Encyclopedia, Merriam-Webster, V-Dem, World Bank WGI, Freedom House,
+  Transparency Intl, UNDP, etc. — PARAPHRASED, not verbatim, for copyright). +27
+  procedural/comparative terms. New "process" tag (rose). glossary.ts/page.tsx/glossary.css.
+- Engravings now 95 (added kgz/kwt earlier + lao/lbn/lva).
+
+### Owner DECISION — atlas + three-pane shell: OPTION B (locked 2026-06-29)
+Retire the three-pane `(shell)` entirely; keep a LIGHTWEIGHT standalone map.
+- Civica Index (`/civica-index`, `/[slug]`) → reader-style pages (full-width like
+  /factbook). Left-rail filters → a top filter bar (SegmentedControl + chips).
+  Right-rail "Ask Civica" → the global docked drawer (reuse CivicaAIDrawer pattern).
+- The duplicate atlas COUNTRY experience (`/atlas/[slug]`, `/[slug]/[tab]`) retires
+  to the factbook reader pages (which already cover hemicycle/bills/leaders):
+  redirect `/atlas/[slug]*` → `/factbook/[slug]`.
+- `/atlas/compare` → existing `/compare`. `atlas/organizations` → standalone
+  `/organizations` reader page (default; or fold in). Embed widget
+  (`civica-index/widget`) survives as a standalone route.
+- The choropleth MAP survives as ONE self-contained `/atlas` page (no panes, no
+  parallel routes): map + hover/click → small card linking to /factbook + /civica-index.
+- DELETE the whole `(shell)` group (@left/@right slots, layout) + shell components
+  (ThreePaneShell, ShellContext, PaneHandle, ShellRouteFrame, AskCivicaPanel,
+  ShellCountryRail, ShellOrgRail, AtlasLeftModeToggle). Atlas --atlas-* map tokens stay.
+- NOT STARTED — large/risky refactor; plan at ~/civica/plan/atlas-shell-retire-option-b-v1.md.
+  Execute as its own focused wave with careful per-surface verification.
+
 ## 2026-06-29 (pt3) — Editorial build wave + canonical search shape, shipped to prod
 
 Owner picked from the pt2 mockups + new asks. All live on `main`
