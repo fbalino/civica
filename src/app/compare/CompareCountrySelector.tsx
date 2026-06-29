@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
+import { CountryFlag } from "@/components/CountryFlag";
 
 interface Country {
   slug: string;
@@ -19,13 +20,6 @@ export interface SelectedCountryCard {
   governmentType: string | null;
   continent: string | null;
   populationLabel: string | null;
-}
-
-function countryFlag(iso2: string | null): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
-    .join("");
 }
 
 function CountryPicker({
@@ -62,7 +56,7 @@ function CountryPicker({
       <div className="ci-compare-picker-card" style={{ borderTopColor: seriesColor }}>
         <div className="ci-compare-picker-slot">{slotLabel}</div>
         <div className="ci-compare-picker-name">
-          <span style={{ fontSize: "var(--text-18)" }}>{countryFlag(selectedCountry.iso2)}</span>
+          <CountryFlag iso2={selectedCountry.iso2} size={20} />
           <span>{selectedCountry.name}</span>
         </div>
         <div className="ci-compare-picker-score">

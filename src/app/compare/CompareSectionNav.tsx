@@ -14,13 +14,6 @@ interface CompareSectionNavProps {
   countryLabels: string[];
 }
 
-function countryFlag(iso2: string | null | undefined): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
-    .join("");
-}
-
 export function CompareSectionNav({ countryLabels }: CompareSectionNavProps) {
   const [active, setActive] = useState<string>("overview");
 
@@ -73,5 +66,3 @@ export function CompareSectionNav({ countryLabels }: CompareSectionNavProps) {
     </nav>
   );
 }
-
-export { countryFlag };

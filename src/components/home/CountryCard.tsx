@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Chip } from "@/components/editorial/Pill";
+import { CountryFlag } from "@/components/CountryFlag";
 
 /*
  * CountryCard (component spec v1 §7) — the recurring rich country data
@@ -25,8 +26,8 @@ export interface CountryCardProps {
   name: string;
   /** Native / official name shown muted below the name. Omitted if absent. */
   nativeName?: string | null;
-  /** Flag emoji glyph (from iso2). Omitted if empty. */
-  flag?: string;
+  /** ISO-3166 alpha-2 code → real SVG flag image. Omitted if absent. */
+  iso2?: string | null;
   /** Income-group label for the tonal sage Chip. Omitted if absent. */
   incomeGroup?: string | null;
   /** Pre-formatted, REAL stat columns. Omit any stat with no data. */
@@ -42,7 +43,7 @@ export interface CountryCardProps {
 export function CountryCard({
   name,
   nativeName,
-  flag,
+  iso2,
   incomeGroup,
   stats,
   iso3,
@@ -55,9 +56,9 @@ export function CountryCard({
     <div className="country-card">
       <div className="country-card-body">
         <div className="country-card-header">
-          {flag ? (
+          {iso2 ? (
             <span className="country-card-flag" aria-hidden="true">
-              {flag}
+              <CountryFlag iso2={iso2} size={28} />
             </span>
           ) : null}
           <div className="country-card-titles">

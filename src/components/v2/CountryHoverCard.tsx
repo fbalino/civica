@@ -1,3 +1,6 @@
+import { Chip } from "@/components/editorial/Pill";
+import { CountryFlag } from "@/components/CountryFlag";
+
 export type CountryHoverCardStat = {
   label: string;
   value: string;
@@ -24,44 +27,46 @@ export function CountryHoverCard({
   heroImageAlt,
   stats,
 }: CountryHoverCardProps) {
-  const code = iso2.toLowerCase();
   return (
     <article className="v2-country-card" aria-label={name}>
-      <header className="v2-country-card__header">
-        <div className="v2-country-card__flag">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`https://flagcdn.com/w160/${code}.png`}
-            srcSet={`https://flagcdn.com/w160/${code}.png 1x, https://flagcdn.com/w320/${code}.png 2x`}
-            alt={`Flag of ${name}`}
-            width={56}
-            height={56}
-            loading="lazy"
-          />
-        </div>
-        <div className="v2-country-card__title-stack">
-          <h3 className="v2-country-card__name">{name}</h3>
-          <p className="v2-country-card__official">{officialName}</p>
-        </div>
-      </header>
-
-      {heroImageUrl && (
-        <div className="v2-country-card__hero">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={heroImageUrl} alt={heroImageAlt ?? name} loading="lazy" />
-        </div>
-      )}
-
-      <div className="v2-country-card__stats">
-        {stats.map((stat) => (
-          <div key={stat.label} className="v2-country-card__stat">
-            <div className="v2-country-card__stat-label">{stat.label}</div>
-            <div className="v2-country-card__stat-value">{stat.value}</div>
-            {stat.year && (
-              <div className="v2-country-card__stat-year">({stat.year})</div>
-            )}
+      <div className="v2-country-card__body">
+        <header className="v2-country-card__header">
+          <span className="v2-country-card__flag" aria-hidden="true">
+            <CountryFlag iso2={iso2} size={36} />
+          </span>
+          <div className="v2-country-card__title-stack">
+            <h3 className="v2-country-card__name">{name}</h3>
+            {officialName ? (
+              <span className="v2-country-card__chip">
+                <Chip variant="neutral">{officialName}</Chip>
+              </span>
+            ) : null}
           </div>
-        ))}
+        </header>
+
+        {heroImageUrl && (
+          <div className="v2-country-card__hero">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={heroImageUrl} alt={heroImageAlt ?? name} loading="lazy" />
+          </div>
+        )}
+
+        <div className="v2-country-card__stats">
+          {stats.map((stat) => (
+            <div key={stat.label} className="v2-country-card__stat">
+              <span className="v2-country-card__stat-label">{stat.label}</span>
+              <span className="v2-country-card__stat-value">
+                {stat.value}
+                {stat.year && (
+                  <span className="v2-country-card__stat-year">
+                    {" "}
+                    ({stat.year})
+                  </span>
+                )}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </article>
   );

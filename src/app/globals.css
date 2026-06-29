@@ -3890,10 +3890,10 @@ a {
   z-index: var(--z-popover);
   min-width: min(22rem, calc(100vw - var(--space-6)));
   overflow: hidden;
-  border: 1px solid var(--color-text-primary);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
   background: var(--color-surface-elevated);
-  box-shadow: var(--shadow-hard);
+  box-shadow: var(--shadow-hard-md);
 }
 .country-search__result {
   width: 100%;
@@ -3917,8 +3917,8 @@ a {
 }
 .country-search__flag {
   flex: 0 0 auto;
-  width: var(--space-5);
-  font-size: var(--text-18);
+  display: inline-flex;
+  align-items: center;
   line-height: var(--leading-none);
 }
 .country-search__result-main {

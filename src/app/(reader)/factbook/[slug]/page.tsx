@@ -16,6 +16,7 @@ import { reconciliation } from "@/lib/content/site-state";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
 import { sectionDataHasNormalizableGeographicName } from "@/lib/data/geographic-name-normalization";
+import { engravingCaption } from "@/lib/data/engraving-captions";
 import { withOg } from "@/lib/og";
 import { FactbookSection } from "@/components/FactbookSection";
 import { Banner } from "@/components/editorial/Banner";
@@ -396,6 +397,11 @@ export default async function FactbookCountryPage({
         ? `/engravings/countries/${engravingCode}.png`
         : null
     : null;
+  // Caption for the masthead engraving (e.g. "Mount Fuji with a five-storied
+  // pagoda…"). Only meaningful when the art actually renders.
+  const heroCaption = countryEngravingSrc
+    ? engravingCaption(jurisdiction.iso3)
+    : null;
 
   return (
     <>
@@ -419,6 +425,7 @@ export default async function FactbookCountryPage({
         photos={photos}
         inAtlas={jurisdiction.type === "sovereign_state"}
         engravingSrc={countryEngravingSrc}
+        heroCaption={heroCaption}
       />
 
       {/* Phase F.4 — show a one-line reconciliation disclosure

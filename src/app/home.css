@@ -291,7 +291,8 @@
   gap: var(--space-4);
 }
 .country-card-flag {
-  font-size: var(--text-32);
+  display: inline-flex;
+  align-items: center;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -459,7 +460,7 @@
   font-weight: var(--font-weight-medium);
 }
 .home-index-country:hover { color: var(--color-accent); }
-.home-index-flag { font-size: var(--text-18); line-height: 1; }
+.home-index-flag { display: inline-flex; align-items: center; line-height: 1; }
 .home-index-score {
   font-weight: var(--font-weight-semibold);
 }

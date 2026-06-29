@@ -534,7 +534,7 @@ html,body{width:${width}px;height:${height}px;overflow:hidden;-webkit-font-smoot
   --live:#2E7D55;--frozen:#C08F3E;
   --t-failed:#B7512B;--t-weak:#BD7A4A;
   --t-mixed:#C08F3E;--t-strong:#2E7D55;--t-excep:#0B4250;
-  --shadow-hard:3px 3px 0 var(--ink);--shadow-hard-lg:6px 6px 0 var(--ink);
+  --shadow-hard:0 1px 2px rgba(15,23,42,.06);--shadow-hard-lg:0 4px 12px rgba(15,23,42,.10);
 }
 /* System dark override */
 @media(prefers-color-scheme:dark){
@@ -545,7 +545,7 @@ html,body{width:${width}px;height:${height}px;overflow:hidden;-webkit-font-smoot
     --live:#5BA77E;--frozen:#D6AE63;
     --t-failed:oklch(62% 0.14 40);--t-weak:oklch(66% 0.10 55);
     --t-mixed:oklch(77% 0.12 78);--t-strong:oklch(64% 0.11 155);--t-excep:oklch(66% 0.09 215);
-    --shadow-hard:3px 3px 0 #000;--shadow-hard-lg:6px 6px 0 #000;
+    --shadow-hard:0 1px 2px rgba(0,0,0,.4);--shadow-hard-lg:0 6px 16px rgba(0,0,0,.5);
   }
 }
 /* Explicit param overrides */
@@ -556,7 +556,7 @@ html,body{width:${width}px;height:${height}px;overflow:hidden;-webkit-font-smoot
   --live:#2E7D55;--frozen:#C08F3E;
   --t-failed:#B7512B;--t-weak:#BD7A4A;
   --t-mixed:#C08F3E;--t-strong:#2E7D55;--t-excep:#0B4250;
-  --shadow-hard:3px 3px 0 var(--ink);--shadow-hard-lg:6px 6px 0 var(--ink);
+  --shadow-hard:0 1px 2px rgba(15,23,42,.06);--shadow-hard-lg:0 4px 12px rgba(15,23,42,.10);
 }
 [data-theme="dark"]{
   --paper:#16140f;--paper-2:#221e16;--paper-3:#2b2619;
@@ -565,7 +565,7 @@ html,body{width:${width}px;height:${height}px;overflow:hidden;-webkit-font-smoot
   --live:#5BA77E;--frozen:#D6AE63;
   --t-failed:oklch(62% 0.14 40);--t-weak:oklch(66% 0.10 55);
   --t-mixed:oklch(77% 0.12 78);--t-strong:oklch(64% 0.11 155);--t-excep:oklch(66% 0.09 215);
-  --shadow-hard:3px 3px 0 #000;--shadow-hard-lg:6px 6px 0 #000;
+  --shadow-hard:0 1px 2px rgba(0,0,0,.4);--shadow-hard-lg:0 6px 16px rgba(0,0,0,.5);
 }
 
 body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif}
@@ -584,14 +584,14 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
 .civica-widget{
   font-family:'Inter',system-ui,sans-serif;
   background:var(--paper);color:var(--ink);
-  border:1px solid var(--ink);
+  border:1px solid var(--rule);
   box-shadow:var(--shadow-hard);
-  border-radius:0;
+  border-radius:12px;
   display:block;
   text-decoration:none;
   transition:transform 120ms ease,box-shadow 120ms ease;
 }
-.civica-widget:hover{transform:translate(-1px,-1px);box-shadow:var(--shadow-hard-lg)}
+.civica-widget:hover{transform:translateY(-1px);box-shadow:var(--shadow-hard-lg)}
 .civica-widget:focus-visible{outline:2px solid var(--t-mixed);outline-offset:2px}
 
 /* Phase F.4 — read-only source attribution line. Sized to match the

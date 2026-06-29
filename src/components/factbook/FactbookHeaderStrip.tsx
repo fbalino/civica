@@ -107,6 +107,10 @@ interface FactbookHeaderStripProps {
    *  backdrop (full 3:2, uncropped) with the header overlaid on top. Resolved
    *  server-side, so it's only set when the art file actually exists. */
   engravingSrc?: string | null;
+  /** Short description of what the engraving depicts (e.g. "Mount Fuji with a
+   *  five-storied pagoda…"). Rendered as a subtle caption over the hero scrim.
+   *  Only passed when an engraving actually exists; null → no caption. */
+  heroCaption?: string | null;
 }
 
 function formatPop(n: number | null): string | null {
@@ -153,6 +157,7 @@ export function FactbookHeaderStrip({
   gdpResolver,
   inAtlas = true,
   engravingSrc = null,
+  heroCaption = null,
 }: FactbookHeaderStripProps) {
   const [lbOpen, setLbOpen] = useState(false);
   const [lbMode, setLbMode] = useState<"map" | "photos">("photos");
@@ -226,6 +231,12 @@ export function FactbookHeaderStrip({
             alt=""
             aria-hidden="true"
           />
+        )}
+        {engravingSrc && heroCaption && (
+          <figcaption className="factbook-hero-caption">
+            <span className="factbook-hero-caption-label">Engraving</span>
+            <span className="factbook-hero-caption-text">{heroCaption}</span>
+          </figcaption>
         )}
         <div className="factbook-hero-left">
           <div className="factbook-hero-title-row">

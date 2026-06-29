@@ -5,6 +5,7 @@ import {
   getCanonicalFactsForJurisdictions,
 } from "@/lib/factbook/reconcile/api";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { CountryFlag } from "@/components/CountryFlag";
 import { CountryCard, type CountryCardStat } from "@/components/home/CountryCard";
 import { Chip } from "@/components/editorial/Pill";
 import { ciTier } from "@/lib/ci/tiers";
@@ -25,14 +26,6 @@ interface RankRow {
   totalRanked?: number;
   jurisdictionId: string;
   governmentClassification: { regimeTypeLabel: string | null } | null;
-}
-
-/** Regional-indicator flag emoji from an ISO-3166 alpha-2 code. */
-function flagEmoji(iso2: string | null): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((char) => String.fromCodePoint(0x1f1e6 + char.charCodeAt(0) - 65))
-    .join("");
 }
 
 /** Human-readable population (e.g. "123.3M", "1.41B"). Null-safe. */
@@ -181,7 +174,7 @@ export async function HomeGrid() {
           {japan ? (
             <CountryCard
               name={japan.name}
-              flag={flagEmoji(japan.iso2)}
+              iso2={japan.iso2}
               incomeGroup={incomeByJur[japan.jurisdictionId] ?? null}
               stats={buildCardStats(japan)}
               iso3="jpn"
@@ -219,7 +212,7 @@ export async function HomeGrid() {
           {estonia ? (
             <CountryCard
               name={estonia.name}
-              flag={flagEmoji(estonia.iso2)}
+              iso2={estonia.iso2}
               incomeGroup={incomeByJur[estonia.jurisdictionId] ?? null}
               stats={buildCardStats(estonia)}
               iso3="est"
@@ -302,7 +295,7 @@ export async function HomeGrid() {
                               className="home-index-country"
                             >
                               <span className="home-index-flag" aria-hidden="true">
-                                {flagEmoji(r.iso2)}
+                                <CountryFlag iso2={r.iso2} size={20} />
                               </span>
                               <span>{r.name}</span>
                             </Link>

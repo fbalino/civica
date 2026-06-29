@@ -11,6 +11,7 @@ import {
 } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { CountryFlag } from "@/components/CountryFlag";
 
 export interface CountrySearchOption {
   slug: string;
@@ -34,13 +35,6 @@ interface CountrySearchComboboxProps {
   /** Optional trailing sliders/filter affordance (component spec §4). */
   showFilterIcon?: boolean;
   className?: string;
-}
-
-function flagEmoji(iso2: string | null): string {
-  if (!iso2) return "";
-  return [...iso2.toUpperCase()]
-    .map((char) => String.fromCodePoint(0x1f1e6 + char.charCodeAt(0) - 65))
-    .join("");
 }
 
 export function CountrySearchCombobox({
@@ -215,7 +209,7 @@ export function CountrySearchCombobox({
               onClick={() => selectCountry(country)}
             >
               <span className="country-search__flag" aria-hidden="true">
-                {flagEmoji(country.iso2)}
+                <CountryFlag iso2={country.iso2} size={20} />
               </span>
               <span className="country-search__result-main">
                 <span className="country-search__result-name">

@@ -199,7 +199,10 @@ export function FactbookRightRail({
         </h4>
         <div
           style={{
-            border: "1px solid var(--color-text-primary)",
+            background: "var(--color-card-bg)",
+            border: "1px solid var(--color-card-border)",
+            borderRadius: "var(--radius-lg)",
+            boxShadow: "var(--shadow-hard)",
             padding: "var(--space-5)",
           }}
         >

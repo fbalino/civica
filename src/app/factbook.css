@@ -67,6 +67,49 @@
 [data-theme="dark"] .factbook-hero-art-img {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
+
+/* Subtle caption naming the landmark depicted in the masthead engraving.
+   Sits bottom-right over the scrim (which has already faded the art into
+   --color-bg there), so it reads as muted page text in both themes — not a
+   headline. Only rendered on --art heroes that resolved a caption. */
+.factbook-hero-caption {
+  position: absolute;
+  right: max(var(--space-6), calc((100vw - 1280px) / 2));
+  bottom: var(--space-3);
+  z-index: 2;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  max-width: min(60ch, 55%);
+  margin: 0;
+  font-family: var(--font-sans);
+  text-align: right;
+  pointer-events: none;
+}
+.factbook-hero-caption-label {
+  flex: 0 0 auto;
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.factbook-hero-caption-text {
+  font-size: var(--text-13);
+  font-style: italic;
+  line-height: var(--leading-snug);
+  color: var(--color-text-50);
+}
+
+@media (max-width: 768px) {
+  .factbook-hero-caption {
+    left: var(--space-5);
+    right: var(--space-5);
+    bottom: var(--space-3);
+    max-width: none;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+}
 .factbook-hero-left {
   min-width: 0;
   display: flex;
@@ -200,7 +243,9 @@
   position: relative;
   width: 200px;
   height: 140px;
-  border: 1px solid var(--color-text-primary);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
   background: var(--color-surface, var(--color-bg));
   padding: 0;
   cursor: pointer;
@@ -387,8 +432,8 @@
   transform: translateX(-50%);
   width: min(720px, calc(100vw - var(--space-6)));
   background: var(--color-bg);
-  border: 1px solid var(--color-text-primary);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
   box-shadow:
     0 12px 32px color-mix(in oklab, var(--color-text-primary) 14%, transparent),
     0 4px 8px color-mix(in oklab, var(--color-text-primary) 6%, transparent);
@@ -405,18 +450,23 @@
   gap: var(--space-2);
   flex-shrink: 0;
   color: var(--color-text-60);
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   line-height: 1;
   text-transform: uppercase;
 }
 
+/* Mixed-case sand Chip (matches .ci-beta-pill / .factbook-reconciliation-notice__beta). */
 .factbook-drawer-beta__pill {
-  border: 1px solid var(--color-warn);
+  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
   border-radius: var(--radius-sm);
-  color: var(--color-warn);
+  color: color-mix(in oklab, var(--color-status-warning), black 32%);
   padding: var(--space-1) var(--space-2);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 .factbook-drawer-beta__copy {
@@ -721,10 +771,16 @@
   gap: var(--space-5);
   align-items: start;
   padding: var(--space-5) var(--space-6);
-  border: 1px solid var(--color-stat-border);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
   background: var(--color-surface, var(--color-bg));
+  transition: box-shadow 120ms ease, border-color 120ms ease;
 }
-.factbook-bill:hover { border-color: var(--color-text-primary); }
+.factbook-bill:hover {
+  border-color: color-mix(in oklab, var(--color-text-primary) 22%, var(--color-card-border));
+  box-shadow: var(--shadow-hard-md);
+}
 .factbook-bill-idx {
   font-family: var(--font-heading);
   font-size: var(--text-32);
@@ -948,12 +1004,17 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-stat-border);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
   text-decoration: none;
   color: inherit;
   font-size: var(--text-15);
+  transition: box-shadow 120ms ease, border-color 120ms ease;
 }
-.factbook-index-card:hover { border-color: var(--color-text-primary); }
+.factbook-index-card:hover {
+  border-color: color-mix(in oklab, var(--color-text-primary) 22%, var(--color-card-border));
+  box-shadow: var(--shadow-hard);
+}
 @media (max-width: 768px) {
   .factbook-index-search-field {
     max-width: none;
@@ -1011,7 +1072,9 @@
   gap: var(--space-5);
   align-items: start;
   padding: var(--space-5) var(--space-6);
-  border: 1px solid var(--color-stat-border);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
   background: var(--color-surface, var(--color-bg));
 }
 .factbook-leaders-avatar {
@@ -1194,10 +1257,11 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   color: var(--color-bg);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-text-primary);
+  border-radius: var(--radius-md);
   font-family: var(--font-body);
   font-size: var(--text-13);
   line-height: 1.25;
-  box-shadow: 4px 4px 0 color-mix(in oklab, var(--color-text-primary) 25%, transparent);
+  box-shadow: var(--shadow-hard-lg);
 }
 .factbook-legislature-tip-name { font-weight: 500; }
 .factbook-legislature-tip-seat {
