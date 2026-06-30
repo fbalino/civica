@@ -339,9 +339,10 @@
  * the standalone class with extras the descendant selector doesn't
  * need (last-child reset, hover row, numeric variant, compact modifier). */
 
-/* Compact density variant */
-.editorial-data-table--compact thead th { padding: 6px 10px; }
-.editorial-data-table--compact tbody td { padding: 6px 10px; }
+/* Compact density variant — 6px/10px have no exact token;
+   use --space-2(4px) × --space-3(8px) as the nearest bracket. */
+.editorial-data-table--compact thead th { padding: var(--space-2) var(--space-3); }
+.editorial-data-table--compact tbody td { padding: var(--space-2) var(--space-3); }
 
 /* ── Footer nav (link row at the bottom of an editorial page) ───── */
 
@@ -653,7 +654,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .editorial-card {
   background: var(--color-card-bg);
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-hard);
   padding: 20px var(--space-6); /* 20px — no exact token */
   margin-bottom: var(--space-5);
@@ -830,12 +831,19 @@ html:has(.factbook-sticky-country-search:focus-within)
 }
 
 .pulse-event-meta-label,
-.pulse-event-nested-details summary,
-.pulse-event-source-chip span {
-  font-family: var(--font-mono);
+.pulse-event-nested-details summary {
+  font-family: var(--font-body);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+/* Source-chip span is a label inside a chip — body font, no uppercase. */
+.pulse-event-source-chip span {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: 0;
   color: var(--color-text-40);
 }
 
@@ -879,7 +887,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  padding: 3px 9px; /* 3px/9px — canonical chip padding (matches editorial-beta-tag, no exact space token) */
   background: var(--color-card-bg);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-sm);
@@ -1177,7 +1185,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   padding: 8px 10px;
   border: 1px solid var(--color-border-default);
   background: var(--color-bg);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 .fact-value-row--canonical {
   border-color: var(--color-accent);
@@ -1265,8 +1273,8 @@ html:has(.factbook-sticky-country-search:focus-within)
   color: var(--color-accent);
 }
 .fact-value-row-status {
-  font-family: var(--font-mono);
-  font-size: 9px;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-status-warning);
@@ -1304,8 +1312,8 @@ html:has(.factbook-sticky-country-search:focus-within)
   color: var(--color-accent);
 }
 .fact-value-panel-foot-beta {
-  font-family: var(--font-mono);
-  font-size: 9px;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-status-warning);
@@ -1317,14 +1325,14 @@ html:has(.factbook-sticky-country-search:focus-within)
   display: inline-flex;
   align-items: center;
   margin-left: var(--space-1);
-  padding: 0 6px;
+  padding: 3px 9px;
   border: 1px solid var(--color-status-warning);
   color: var(--color-status-warning);
   background: color-mix(in oklab, var(--color-status-warning) 6%, transparent);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: 0;
+  text-transform: none;
   border-radius: var(--radius-sm);
   line-height: 1.6;
 }
@@ -1407,7 +1415,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   font-size: var(--text-12);
   background: var(--color-card-bg);
   border: 1px solid var(--color-divider);
-  border-radius: 6px; /* 6px — no exact token; preserves visual weight */
+  border-radius: var(--radius-md);
   padding: var(--space-5) var(--space-6);
   overflow-x: auto;
   color: var(--color-text-60);
@@ -1418,7 +1426,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 .api-info-card {
   background: var(--color-card-bg);
   border: 1px solid var(--color-divider);
-  border-radius: 6px; /* 6px — no exact token; matches .api-code-block */
+  border-radius: var(--radius-md);
   padding: var(--space-5) var(--space-6);
 }
 .api-info-card__row {
@@ -1461,7 +1469,7 @@ html:has(.factbook-sticky-country-search:focus-within)
 
 .api-params {
   border: 1px solid var(--color-divider);
-  border-radius: 6px; /* 6px — no exact token; matches .api-code-block */
+  border-radius: var(--radius-md);
   overflow: hidden;
   margin: 0 0 var(--space-5);
 }
@@ -1605,7 +1613,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   background: var(--color-grid-cell);
   border: 1px solid var(--color-card-border);
   border-left: 3px solid var(--color-accent);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 20px 24px;
   font-family: var(--font-code);
   font-weight: var(--font-weight-mono, 500);
@@ -1621,7 +1629,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   display: flex;
   margin: 8px 0 36px;
   height: 44px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--color-card-border);
 }
@@ -1663,7 +1671,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   flex-direction: column;
   gap: 1px;
   margin: 10px 0 32px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid var(--color-card-border);
 }
@@ -1699,7 +1707,7 @@ html:has(.factbook-sticky-country-search:focus-within)
   gap: 1px;
   background: var(--color-grid-bg);
   border: 1px solid var(--color-card-border);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   margin: 24px 0 48px;
 }

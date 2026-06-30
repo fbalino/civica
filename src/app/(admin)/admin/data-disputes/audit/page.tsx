@@ -233,12 +233,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
             />
             <button
               type="submit"
-              className="editorial-button"
-              style={{
-                background: "var(--color-card-bg)",
-                color: "var(--color-text-primary)",
-                border: "1px solid var(--color-card-border)",
-              }}
+              className="btn btn--secondary btn--sm"
             >
               Apply
             </button>
@@ -246,7 +241,7 @@ export default async function DisputesAuditPage({ searchParams }: PageProps) {
               <Link
                 href={buildHref({ action }, {})}
                 style={{
-                  fontFamily: "var(--font-mono)",
+                  fontFamily: "var(--font-body)",
                   fontSize: "var(--text-13)",
                   color: "var(--color-text-40)",
                 }}

@@ -146,13 +146,13 @@ export async function HomeGrid() {
                 <span className="home-stat-value">{civicaIndex.dimensionCount}</span>
                 <span className="home-stat-label">Index dimensions</span>
               </div>
-              <div className="home-stat">
+              <div className="home-stat home-stat--mark">
                 <span className="home-stat-mark" aria-hidden="true">
                   &#9670;
                 </span>
                 <span className="home-stat-label">Open data &amp; provenance</span>
               </div>
-              <div className="home-stat">
+              <div className="home-stat home-stat--mark">
                 <span className="home-stat-mark" aria-hidden="true">
                   &#9670;
                 </span>

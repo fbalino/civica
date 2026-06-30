@@ -299,9 +299,9 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
               <span>Voter Turnout</span>
               <span style={{ color: "var(--color-accent)" }}>{e.election.turnoutPercent}%</span>
             </div>
-            <div style={{ height: 8, background: "var(--color-card-border)", borderRadius: 4, overflow: "hidden" }}>
+            <div style={{ height: 8, background: "var(--color-card-border)", borderRadius: "var(--radius-sm)", overflow: "hidden" }}>
               <div style={{
-                height: "100%", borderRadius: 4, transition: "width 0.6s ease",
+                height: "100%", borderRadius: "var(--radius-sm)", transition: "width 0.6s ease",
                 width: `${e.election.turnoutPercent}%`,
                 background: `linear-gradient(90deg, var(--color-accent), ${dotColor})`,
               }} />
@@ -341,9 +341,9 @@ function ResultsBar({ results }: {
           }}>
             {r.candidateName || r.partyName || "Unknown"}
           </span>
-          <div style={{ flex: 1, height: 16, background: "var(--color-card-border)", borderRadius: 3, overflow: "hidden", position: "relative" }}>
+          <div style={{ flex: 1, height: 16, background: "var(--color-card-border)", borderRadius: "var(--radius-sm)", overflow: "hidden", position: "relative" }}>
             <div style={{
-              height: "100%", borderRadius: 3, transition: "width 0.6s ease",
+              height: "100%", borderRadius: "var(--radius-sm)", transition: "width 0.6s ease",
               width: `${((r.votesPercent ?? 0) / maxPct) * 100}%`,
               background: r.partyColor || "var(--color-accent)",
             }} />

@@ -63,7 +63,7 @@ export default async function AdvisoryBoardPage() {
         </p>
       </header>
 
-      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", lineHeight: 1.7, color: "var(--color-text-60)", margin: "0 0 32px", maxWidth: "640px" }}>
+      <p className="editorial-page-subtitle" style={{ margin: "0 0 32px" }}>
         Per the v2 methodology specification, the Civica Index will be reviewed
         by an independent academic advisory board of{" "}
         {advisoryBoard.targetSize.min}–{advisoryBoard.targetSize.max} scholars
@@ -74,7 +74,7 @@ export default async function AdvisoryBoardPage() {
       </p>
 
       <Banner variant="warn">
-        <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "12px 18px", fontFamily: "var(--font-mono)", fontSize: "var(--text-13)", fontWeight: "var(--font-weight-mono, 500)", letterSpacing: "0.04em" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "12px 18px", fontFamily: "var(--font-body)", fontSize: "var(--text-13)", letterSpacing: "var(--tracking-wide)" }}>
           <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--color-status-warning)", flexShrink: 0, display: "inline-block" }} />
           {ADVISORY_BOARD_STATUS_LABEL[advisoryBoard.status] ?? advisoryBoard.status}{" "}
           — recruitment opens {advisoryBoard.recruitmentTrigger} (target{" "}
@@ -105,7 +105,7 @@ export default async function AdvisoryBoardPage() {
           members.map((m) => (
             <div key={m.id} style={{ borderTop: "1px solid var(--color-card-border)", padding: "24px 0" }}>
               <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-22)", fontWeight: 400, letterSpacing: "-0.01em", color: "var(--color-text-primary)", margin: "0 0 4px" }}>{m.name}</h2>
-              <div style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", fontWeight: "var(--font-weight-mono, 500)", letterSpacing: "0.04em", color: "var(--color-text-40)", margin: "0 0 10px" }}>{m.affiliation}</div>
+              <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-12)", letterSpacing: "var(--tracking-wide)", textTransform: "uppercase", color: "var(--color-text-40)", margin: "0 0 10px" }}>{m.affiliation}</div>
               <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", lineHeight: 1.6, color: "var(--color-text-60)" }}>{m.expertise}</div>
             </div>
           ))

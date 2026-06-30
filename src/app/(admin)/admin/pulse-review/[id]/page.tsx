@@ -494,17 +494,17 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
             style={{
               gridColumn: "1 / -1",
               display: "flex",
-              gap: 10,
+              gap: "var(--space-2)",
               flexWrap: "wrap",
-              marginTop: 8,
+              marginTop: "var(--space-2)",
             }}
           >
             <button
               type="submit"
               name="action"
               value="approve"
+              className="btn btn--sm"
               style={{
-                ...buttonBase,
                 borderColor: "var(--tier-strong)",
                 background:
                   "color-mix(in oklch, var(--tier-strong) 16%, var(--color-page-bg) 84%)",
@@ -516,8 +516,8 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               type="submit"
               name="action"
               value="edit"
+              className="btn btn--sm"
               style={{
-                ...buttonBase,
                 borderColor: "var(--color-accent)",
                 background:
                   "color-mix(in oklch, var(--color-accent) 14%, var(--color-page-bg) 86%)",
@@ -529,8 +529,8 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
               type="submit"
               name="action"
               value="reject"
+              className="btn btn--sm"
               style={{
-                ...buttonBase,
                 borderColor: "var(--tier-failed)",
                 background:
                   "color-mix(in oklch, var(--tier-failed) 14%, var(--color-page-bg) 86%)",
@@ -601,33 +601,20 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "var(--font-mono)",
+  fontFamily: "var(--font-body)",
   fontSize: "var(--text-12)",
   fontWeight: 500,
-  letterSpacing: "0.06em",
+  letterSpacing: "var(--tracking-wider)",
   textTransform: "uppercase",
   color: "var(--color-text-40)",
 };
 
 const inputStyle: React.CSSProperties = {
   padding: "6px 10px",
-  fontFamily: "var(--font-mono)",
+  fontFamily: "var(--font-body)",
   fontSize: "var(--text-13)",
   border: "1px solid var(--color-card-border)",
   borderRadius: "var(--radius-sm)",
   background: "var(--color-page-bg)",
   color: "var(--color-text-primary)",
-};
-
-const buttonBase: React.CSSProperties = {
-  padding: "8px 14px",
-  fontFamily: "var(--font-mono)",
-  fontSize: "var(--text-13)",
-  fontWeight: 500,
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-  border: "1px solid",
-  borderRadius: "var(--radius-sm)",
-  color: "var(--color-text-primary)",
-  cursor: "pointer",
 };

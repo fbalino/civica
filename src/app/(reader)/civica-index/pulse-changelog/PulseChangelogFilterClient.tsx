@@ -241,7 +241,7 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
           .
         </p>
       ) : (
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: "var(--space-6)" }}>
           {slice.map((event) => (
             <PulseEventDetailCard key={event.id} event={event} />
           ))}

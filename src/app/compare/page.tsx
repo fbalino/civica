@@ -499,10 +499,9 @@ export default async function ComparePage({
           padding: 32px 0;
         }
         .compare-section-eyebrow {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono, 500);
+          font-family: var(--font-body);
           font-size: var(--text-12);
-          letter-spacing: 0.12em;
+          letter-spacing: var(--tracking-caps);
           text-transform: uppercase;
           color: var(--color-text-30);
           margin-bottom: 8px;

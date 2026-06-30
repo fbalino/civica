@@ -112,7 +112,7 @@ export default async function RankingsPage({
         Countries ranked by key indicators.
       </p>
 
-      <nav style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 32 }}>
+      <nav style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", marginBottom: "var(--space-8)" }}>
         {RANKING_METRICS.map((m) => (
           <a
             key={m.key}

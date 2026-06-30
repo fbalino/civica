@@ -515,6 +515,20 @@ export default async function AboutPage() {
           slice={{ from: "standing-posture" }}
         />
       </section>
+
+      <div
+        style={{
+          height: 1,
+          background: "var(--color-divider)",
+          margin: "var(--spacing-section-y) 0",
+        }}
+      />
+
+      <footer className="editorial-footer-nav">
+        <Link href="/about/advisory-board">Advisory board →</Link>
+        <Link href="/civica-index/methodology">Civica Index methodology →</Link>
+        <Link href="/methodology">Methodology overview →</Link>
+      </footer>
       </div>
     </>
   );

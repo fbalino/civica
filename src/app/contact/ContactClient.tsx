@@ -2,6 +2,9 @@
 
 import { useId, useState } from "react";
 import Link from "next/link";
+import { Banner } from "@/components/editorial/Banner";
+import { Button } from "@/components/editorial/Button";
+import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { StatusDot } from "@/components/editorial/StatusDot";
 
 const SUBJECTS = [
@@ -45,120 +48,38 @@ function validate(values: FormValues): FieldErrors {
   return errors;
 }
 
-const monoLabel: React.CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-  fontSize: "var(--text-12)",
-  letterSpacing: "var(--tracking-caps)",
-  textTransform: "uppercase",
-  color: "var(--color-text-30)",
-};
-
-const bodyText: React.CSSProperties = {
-  fontFamily: "var(--font-body)",
-  fontSize: "var(--text-15)",
-  color: "var(--color-text-50)",
-  lineHeight: "var(--leading-relaxed)",
-};
-
-const fieldBase: React.CSSProperties = {
-  width: "100%",
-  background: "var(--color-select-bg)",
-  border: "1px solid var(--color-card-border)",
-  borderRadius: "var(--radius-sm)",
-  padding: "10px 12px",
-  color: "var(--color-text-primary)",
-  fontFamily: "var(--font-body)",
-  fontSize: "var(--text-15)",
-  lineHeight: "var(--leading-normal)",
-  outline: "none",
-};
-
-const errorText: React.CSSProperties = {
-  fontFamily: "var(--font-body)",
-  fontSize: "var(--text-14)",
-  color: "var(--color-danger)",
-  marginTop: 6,
-};
-
-const buttonPrimary: React.CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontWeight: 600,
-  fontSize: "var(--text-13)",
-  letterSpacing: "var(--tracking-caps)",
-  textTransform: "uppercase",
-  padding: "12px 20px",
-  background: "var(--color-accent)",
-  color: "var(--color-bg)",
-  border: "none",
-  borderRadius: "var(--radius-sm)",
-  cursor: "pointer",
-};
-
-function FieldLabel({ htmlFor, children, required }: { htmlFor: string; children: React.ReactNode; required?: boolean }) {
+function FieldLabel({
+  htmlFor,
+  children,
+  required,
+}: {
+  htmlFor: string;
+  children: React.ReactNode;
+  required?: boolean;
+}) {
   return (
-    <label htmlFor={htmlFor} style={{ ...monoLabel, display: "block", marginBottom: 8 }}>
+    <label htmlFor={htmlFor} className="contact-label">
       {children}
-      {required ? <span style={{ color: "var(--color-accent)", marginLeft: 4 }}>*</span> : null}
+      {required ? <span className="contact-label__required">*</span> : null}
     </label>
   );
 }
 
 function SuccessPanel({ onReset }: { onReset: () => void }) {
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      style={{
-        border: "1px solid var(--color-card-border)",
-        background: "var(--color-card-bg)",
-        borderRadius: "var(--radius-sm)",
-        padding: "var(--space-6)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--space-4)",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)" }}>
+    <div className="contact-card" role="status" aria-live="polite">
+      <div className="contact-success-head">
         <StatusDot state="active" label="Editors are responding" />
-        <span style={monoLabel}>Message received</span>
+        <span className="contact-success-eyebrow">Message received</span>
       </div>
-      <h3
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-24)",
-          fontWeight: 400,
-          letterSpacing: "var(--tracking-tight)",
-          margin: 0,
-          color: "var(--color-text-primary)",
-        }}
-      >
-        Thanks — we&rsquo;ve got it.
-      </h3>
-      <p style={{ ...bodyText, margin: 0 }}>
-        The editors usually reply within <strong style={{ color: "var(--color-text-85)" }}>3 business days</strong>.
-        For urgent data corrections, open an issue on GitHub.
+      <h2 className="contact-success-title">Thanks &mdash; we&rsquo;ve got it.</h2>
+      <p className="contact-success-body">
+        The editors usually reply within <strong>3 business days</strong>. For
+        urgent data corrections, open an issue on GitHub.
       </p>
-      <button
-        type="button"
-        onClick={onReset}
-        style={{
-          alignSelf: "flex-start",
-          marginTop: "var(--space-2)",
-          background: "transparent",
-          border: "1px solid var(--color-card-border)",
-          color: "var(--color-text-60)",
-          padding: "8px 14px",
-          borderRadius: "var(--radius-sm)",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-12)",
-          letterSpacing: "var(--tracking-caps)",
-          textTransform: "uppercase",
-          cursor: "pointer",
-        }}
-      >
+      <Button variant="secondary" size="sm" onClick={onReset}>
         Send another
-      </button>
+      </Button>
     </div>
   );
 }
@@ -166,8 +87,8 @@ function SuccessPanel({ onReset }: { onReset: () => void }) {
 function InfoTile({ label, body }: { label: string; body: React.ReactNode }) {
   return (
     <div className="cv-card">
-      <div style={monoLabel}>{label}</div>
-      <p style={{ ...bodyText, margin: "var(--space-3) 0 0" }}>{body}</p>
+      <div className="contact-tile-label">{label}</div>
+      <p className="contact-tile-body">{body}</p>
     </div>
   );
 }
@@ -234,144 +155,158 @@ export default function ContactClient() {
     }
   };
 
-  const subjectChip = (value: string, label: string) => {
-    const active = values.subject === value;
-    return (
-      <button
-        key={value}
-        type="button"
-        onClick={() => setSubject(value)}
-        aria-pressed={active}
-        style={{
-          fontFamily: "var(--font-body)",
-          fontWeight: 500,
-          fontSize: "var(--text-14)",
-          padding: "8px 14px",
-          borderRadius: 999,
-          border: `1px solid ${active ? "var(--color-accent)" : "var(--color-card-border)"}`,
-          background: active ? "color-mix(in oklab, var(--color-accent) 14%, transparent)" : "transparent",
-          color: active ? "var(--color-accent)" : "var(--color-text-60)",
-          cursor: "pointer",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {label}
-      </button>
-    );
-  };
-
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: "var(--spacing-section-y) var(--spacing-page-x)" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={monoLabel}>Contact</div>
-        <h1 className="page-heading" style={{ marginTop: "var(--space-5)", fontSize: "var(--text-52)" }}>Dispatch desk</h1>
-        <p style={{ ...bodyText, margin: "var(--space-5) auto 0", maxWidth: 560 }}>
-          Story tips, data corrections, partnerships, press. Pick a category, send a note — a human on the editorial team will read it.
+    <EditorialPage
+      breadcrumbs={
+        <>
+          <Link href="/about">About</Link>
+          <span>/</span>
+          Contact
+        </>
+      }
+      title="Dispatch desk"
+    >
+      <section className="editorial-section">
+        <p className="editorial-page-subtitle">
+          Story tips, data corrections, partnerships, press. Pick a category and
+          send a note &mdash; a human on the editorial team will read it.
         </p>
-      </div>
+      </section>
 
-      <div
-        style={{
-          marginTop: "var(--space-8)",
-          border: "1px solid var(--color-card-border)",
-          background: "var(--color-card-bg)",
-          borderRadius: "var(--radius-sm)",
-          padding: "var(--space-7)",
-        }}
-      >
+      <section className="editorial-section">
         {state === "success" ? (
           <SuccessPanel onReset={reset} />
         ) : (
-          <form onSubmit={submit} noValidate>
-            <div>
-              <div style={monoLabel}>Category</div>
-              <div style={{ display: "flex", gap: "var(--space-3)", marginTop: "var(--space-3)", flexWrap: "wrap" }}>
-                {SUBJECTS.map((s) => subjectChip(s.value, s.label))}
+          <form className="contact-card" onSubmit={submit} noValidate>
+            <div className="contact-field">
+              <span className="contact-label" id="contact-category-label">
+                Category
+              </span>
+              <div
+                className="contact-chip-group"
+                role="group"
+                aria-labelledby="contact-category-label"
+              >
+                {SUBJECTS.map((s) => {
+                  const active = values.subject === s.value;
+                  return (
+                    <button
+                      key={s.value}
+                      type="button"
+                      onClick={() => setSubject(s.value)}
+                      aria-pressed={active}
+                      className={`editorial-chip contact-chip${active ? " editorial-chip--accent" : ""}`}
+                    >
+                      {s.label}
+                    </button>
+                  );
+                })}
               </div>
-              {errors.subject && <div style={errorText}>{errors.subject}</div>}
+              {errors.subject && <div className="contact-error">{errors.subject}</div>}
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)", marginTop: "var(--space-6)" }} className="contact-b__row">
+            <div className="contact-field contact-row">
               <div>
-                <FieldLabel htmlFor={nameId} required>Name</FieldLabel>
-                <input id={nameId} type="text" value={values.name} onChange={handleChange("name")} style={fieldBase} aria-invalid={!!errors.name} />
-                {errors.name && <div style={errorText}>{errors.name}</div>}
+                <FieldLabel htmlFor={nameId} required>
+                  Name
+                </FieldLabel>
+                <input
+                  id={nameId}
+                  type="text"
+                  value={values.name}
+                  onChange={handleChange("name")}
+                  className="contact-input"
+                  aria-invalid={!!errors.name}
+                />
+                {errors.name && <div className="contact-error">{errors.name}</div>}
               </div>
               <div>
-                <FieldLabel htmlFor={emailId} required>Email</FieldLabel>
-                <input id={emailId} type="email" value={values.email} onChange={handleChange("email")} style={fieldBase} aria-invalid={!!errors.email} />
-                {errors.email && <div style={errorText}>{errors.email}</div>}
+                <FieldLabel htmlFor={emailId} required>
+                  Email
+                </FieldLabel>
+                <input
+                  id={emailId}
+                  type="email"
+                  value={values.email}
+                  onChange={handleChange("email")}
+                  className="contact-input"
+                  aria-invalid={!!errors.email}
+                />
+                {errors.email && <div className="contact-error">{errors.email}</div>}
               </div>
             </div>
 
-            <div style={{ marginTop: "var(--space-5)" }}>
-              <FieldLabel htmlFor={messageId} required>Message</FieldLabel>
-              <textarea id={messageId} value={values.message} onChange={handleChange("message")} style={{ ...fieldBase, minHeight: 160, resize: "vertical" }} aria-invalid={!!errors.message} />
-              {errors.message && <div style={errorText}>{errors.message}</div>}
+            <div className="contact-field">
+              <FieldLabel htmlFor={messageId} required>
+                Message
+              </FieldLabel>
+              <textarea
+                id={messageId}
+                value={values.message}
+                onChange={handleChange("message")}
+                className="contact-textarea"
+                aria-invalid={!!errors.message}
+              />
+              {errors.message && <div className="contact-error">{errors.message}</div>}
             </div>
 
             {state === "error" && serverError && (
-              <div
-                role="alert"
-                style={{
-                  marginTop: "var(--space-5)",
-                  padding: "var(--space-3) var(--space-4)",
-                  borderLeft: "2px solid var(--color-danger)",
-                  background: "color-mix(in oklab, var(--color-danger) 10%, transparent)",
-                  ...bodyText,
-                  color: "var(--color-danger)",
-                }}
-              >
-                {serverError}
+              <div role="alert" className="contact-alert">
+                <Banner variant="danger">{serverError}</Banner>
               </div>
             )}
 
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "var(--space-6)", flexWrap: "wrap", gap: "var(--space-4)" }}>
-              <span style={{ ...monoLabel, color: "var(--color-text-25)" }}>* required</span>
-              <button type="submit" disabled={state === "submitting"} style={buttonPrimary}>
+            <div className="contact-form-foot">
+              <span className="contact-required-hint">* required</span>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={state === "submitting"}
+                disabled={state === "submitting"}
+              >
                 {state === "submitting" ? "Sending…" : "Send message"}
-              </button>
+              </Button>
             </div>
           </form>
         )}
-      </div>
+      </section>
 
-      <div
-        style={{ marginTop: "var(--space-8)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-5)" }}
-        className="contact-b__tiles"
-      >
-        <InfoTile
-          label="SLA · Response"
-          body={<>We usually reply within <strong style={{ color: "var(--color-text-85)" }}>3 business days</strong>.</>}
-        />
-        <InfoTile
-          label="Developers · API"
-          body={<>Use the open <Link href="/api-docs" style={{ color: "var(--color-accent)" }}>public API</Link> — no auth required.</>}
-        />
-        <InfoTile
-          label="Bugs · GitHub"
-          body={
-            <>
-              <a
-                href="https://github.com/fbalino/civica/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "var(--color-accent)" }}
-              >
-                Open a ticket on GitHub
-              </a>{" "}
-              with the URL and a screenshot.
-            </>
-          }
-        />
-      </div>
-
-      <style>{`
-        @media (max-width: 640px) {
-          .contact-b__row { grid-template-columns: 1fr !important; }
-          .contact-b__tiles { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-    </div>
+      <section className="editorial-section">
+        <div className="contact-tiles">
+          <InfoTile
+            label="SLA · Response"
+            body={
+              <>
+                We usually reply within <strong>3 business days</strong>.
+              </>
+            }
+          />
+          <InfoTile
+            label="Developers · API"
+            body={
+              <>
+                Use the open <Link href="/api-docs">public API</Link> &mdash; no auth
+                required.
+              </>
+            }
+          />
+          <InfoTile
+            label="Bugs · GitHub"
+            body={
+              <>
+                <a
+                  href="https://github.com/fbalino/civica/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open a ticket on GitHub
+                </a>{" "}
+                with the URL and a screenshot.
+              </>
+            }
+          />
+        </div>
+      </section>
+    </EditorialPage>
   );
 }

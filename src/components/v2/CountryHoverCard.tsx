@@ -47,7 +47,16 @@ export function CountryHoverCard({
         {heroImageUrl && (
           <div className="v2-country-card__hero">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={heroImageUrl} alt={heroImageAlt ?? name} loading="lazy" />
+            <img
+              src={heroImageUrl}
+              alt={heroImageAlt ?? name}
+              loading="lazy"
+              onError={(e) => {
+                // Gracefully hide the banner if the engraving 404s.
+                const wrap = e.currentTarget.parentElement;
+                if (wrap) wrap.style.display = "none";
+              }}
+            />
           </div>
         )}
 

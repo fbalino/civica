@@ -207,7 +207,7 @@
   font-size: var(--text-13);
   background: color-mix(in oklab, var(--color-text-primary) 6%, transparent);
   padding: 1px 4px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
 }
 .civica-chat-msg-md pre {
   font-family: var(--font-mono);
@@ -217,7 +217,7 @@
   margin: var(--space-3) 0;
   overflow-x: auto;
   border: 1px solid var(--color-stat-border);
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   white-space: pre;
 }
 .civica-chat-msg-md pre code {

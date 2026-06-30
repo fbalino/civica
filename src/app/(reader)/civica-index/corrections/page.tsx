@@ -153,10 +153,10 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         .corr-form { display: flex; flex-direction: column; gap: var(--space-5); }
         .corr-field { display: flex; flex-direction: column; gap: var(--space-2); }
         .corr-label {
-          font-family: var(--font-mono);
+          font-family: var(--font-body);
           font-size: var(--text-12);
-          font-weight: var(--font-weight-mono, 500);
-          letter-spacing: 0.06em;
+          font-weight: var(--font-weight-medium, 500);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
           color: var(--color-text-60);
         }
@@ -203,7 +203,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           line-height: 1.6;
         }
         .corr-char-count {
-          font-family: var(--font-mono);
+          font-family: var(--font-body);
           font-size: var(--text-12);
           color: var(--color-text-30);
           text-align: right;
@@ -218,10 +218,10 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           gap: var(--space-5);
         }
         .corr-legend {
-          font-family: var(--font-mono);
+          font-family: var(--font-body);
           font-size: var(--text-12);
-          font-weight: var(--font-weight-mono, 500);
-          letter-spacing: 0.06em;
+          font-weight: var(--font-weight-medium, 500);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
           color: var(--color-text-60);
           padding: 0 var(--space-2);
@@ -238,23 +238,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           cursor: pointer;
         }
         .corr-checkbox { margin-top: 3px; flex-shrink: 0; accent-color: var(--color-accent); }
-        .corr-submit {
-          font-family: var(--font-mono);
-          font-size: var(--text-12);
-          font-weight: var(--font-weight-mono, 500);
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          color: var(--color-page-bg);
-          background: var(--color-text-primary);
-          border: none;
-          border-radius: var(--radius-sm);
-          padding: var(--space-4) 28px;
-          cursor: pointer;
-          align-self: flex-start;
-          transition: opacity 0.1s;
-        }
-        .corr-submit:hover { opacity: 0.8; }
-        .corr-submit:disabled { opacity: 0.5; cursor: wait; }
+        /* Submit button uses .btn .btn--primary from the design system (see CorrectionsForm.tsx) */
         .corr-field-error {
           background: color-mix(in oklch, var(--tier-failed) 10%, var(--color-page-bg) 90%);
           border: 1px solid var(--tier-failed);
@@ -283,9 +267,9 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         }
         .corr-log-row:last-child { border-bottom: 1px solid var(--color-card-border); }
         .corr-log-meta {
-          font-family: var(--font-mono);
+          font-family: var(--font-body);
           font-size: var(--text-12);
-          letter-spacing: 0.03em;
+          letter-spacing: var(--tracking-wide);
           color: var(--color-text-30);
           display: flex;
           flex-wrap: wrap;
@@ -294,14 +278,14 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
           margin-bottom: var(--space-3);
         }
         .corr-status-badge {
-          font-family: var(--font-mono);
+          font-family: var(--font-body);
           font-size: var(--text-12);
-          font-weight: var(--font-weight-mono, 500);
-          letter-spacing: 0.06em;
+          font-weight: var(--font-weight-medium, 500);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
           color: var(--color-page-bg);
-          padding: 2px 7px;
-          border-radius: 3px;
+          padding: var(--space-1) var(--space-2);
+          border-radius: var(--radius-sm);
         }
         .corr-log-desc {
           font-family: var(--font-body);

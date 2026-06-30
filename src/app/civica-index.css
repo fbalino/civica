@@ -143,13 +143,14 @@
   .ci-tier-cell:last-child { border-bottom: none; }
 }
 .ci-tier-cell-range {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   color: var(--color-text-60);
   display: flex; align-items: center; gap: 6px;
   margin-bottom: 4px;
+  font-variant-numeric: tabular-nums;
 }
 .ci-tier-cell-label {
   font-family: var(--font-heading);
@@ -276,8 +277,8 @@
   display: grid;
   grid-template-columns: 56px minmax(0, 2.2fr) 120px 140px 100px;
   gap: 16px; align-items: center;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
   font-size: var(--text-12);
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
@@ -331,8 +332,8 @@
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .ci-lb-country-meta {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
   font-size: var(--text-12);
   color: var(--color-text-25);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

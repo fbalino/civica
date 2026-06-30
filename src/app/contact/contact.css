@@ -1,0 +1,204 @@
+/* ──────────────────────────────────────────────────────────────────
+ * Contact page — presentational rules only.
+ *
+ * Layout/typography/container width come from editorial.css
+ * (.editorial-page, .editorial-section, .editorial-page-subtitle, etc.).
+ * This file owns ONLY the form-specific surfaces (the card shell, field
+ * inputs, label treatment, the category chip row, and the info-tile grid).
+ * Token-only: no hardcoded hex / px font sizes / magic-number spacing.
+ * ────────────────────────────────────────────────────────────────── */
+
+/* The bordered card the form (and the success panel) sits inside. */
+.contact-card {
+  border: 1px solid var(--color-card-border);
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
+  padding: var(--space-7);
+}
+
+/* ── Field group + label ────────────────────────────────────────── */
+
+.contact-field {
+  display: block;
+}
+.contact-field + .contact-field {
+  margin-top: var(--space-5);
+}
+
+/* Canonical small-caps label: Inter + uppercase + letter-spacing. */
+.contact-label {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.contact-label__required {
+  color: var(--color-accent);
+  margin-left: var(--space-1);
+}
+
+/* ── Inputs ─────────────────────────────────────────────────────── */
+
+.contact-input,
+.contact-textarea {
+  width: 100%;
+  background: var(--color-select-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: var(--leading-normal);
+  outline: none;
+  transition:
+    border-color var(--motion-fast) var(--motion-ease-out),
+    box-shadow var(--motion-fast) var(--motion-ease-out);
+}
+.contact-textarea {
+  min-height: 160px; /* 160px — intentional minimum height, not spacing */
+  resize: vertical;
+}
+.contact-input::placeholder,
+.contact-textarea::placeholder {
+  color: var(--color-text-30);
+}
+.contact-input:focus,
+.contact-textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 18%, transparent);
+}
+.contact-input[aria-invalid="true"],
+.contact-textarea[aria-invalid="true"] {
+  border-color: var(--color-status-danger);
+}
+
+/* Inline per-field validation message. */
+.contact-error {
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-status-danger);
+}
+
+/* ── Category chip row ──────────────────────────────────────────── */
+
+.contact-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* A clickable variant of .editorial-chip (which is normally a link/static).
+   Resets the button chrome so the chip reads as the canonical tinted chip. */
+.contact-chip {
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+}
+
+/* Wrapper around the server-error Banner so it carries top spacing
+   without an inline style (the Banner primitive owns its own margins). */
+.contact-alert {
+  margin-top: var(--space-5);
+}
+
+/* ── Form footer (required hint + submit) ───────────────────────── */
+
+.contact-form-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+.contact-required-hint {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-25);
+}
+
+/* ── Success panel ──────────────────────────────────────────────── */
+
+.contact-success-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.contact-success-eyebrow {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.contact-success-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--tracking-tight);
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-primary);
+}
+.contact-success-body {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-60);
+  margin: 0 0 var(--space-5);
+}
+
+/* ── Info tiles ─────────────────────────────────────────────────── */
+
+.contact-tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  margin-top: var(--space-8);
+}
+.contact-tile-label {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.contact-tile-body {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-60);
+}
+.contact-tile-body strong {
+  color: var(--color-text-85);
+}
+
+/* ── Two-up name/email row ──────────────────────────────────────── */
+
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+@media (max-width: 640px) {
+  .contact-row,
+  .contact-tiles {
+    grid-template-columns: 1fr;
+  }
+  .contact-card {
+    padding: var(--space-6);
+  }
+}

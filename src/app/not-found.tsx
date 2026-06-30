@@ -63,10 +63,10 @@ export default function NotFound() {
           letterSpacing: "var(--tracking-caps)",
           textTransform: "uppercase",
           color: "var(--color-text-30)",
-          marginBottom: 24,
+          marginBottom: "var(--space-6)",
           display: "flex",
           alignItems: "center",
-          gap: 10,
+          gap: "var(--space-3)",
         }}
       >
         <span>Error 404</span>
@@ -82,7 +82,7 @@ export default function NotFound() {
         <span>Page not found</span>
       </div>
 
-      <h1 className="page-heading" style={{ marginBottom: 16 }}>
+      <h1 className="page-heading" style={{ marginBottom: "var(--space-4)" }}>
         This page isn&apos;t in the atlas.
       </h1>
 
@@ -91,8 +91,8 @@ export default function NotFound() {
           width: 40,
           height: 2,
           background: "var(--color-accent)",
-          borderRadius: 1,
-          marginBottom: 32,
+          borderRadius: "var(--radius-sm)",
+          marginBottom: "var(--space-8)",
         }}
       />
 
@@ -100,7 +100,7 @@ export default function NotFound() {
         className="cv-prose"
         style={{
           maxWidth: 640,
-          marginBottom: 12,
+          marginBottom: "var(--space-3)",
         }}
       >
         The page you requested either moved, was renamed, or never existed. Civica
@@ -112,7 +112,7 @@ export default function NotFound() {
         className="cv-prose cv-prose--muted"
         style={{
           maxWidth: 640,
-          marginBottom: 48,
+          marginBottom: "var(--space-9)",
         }}
       >
         Try one of the destinations below, or use search from the header to find a
@@ -129,7 +129,7 @@ export default function NotFound() {
             letterSpacing: "var(--tracking-caps)",
             textTransform: "uppercase",
             color: "var(--color-text-40)",
-            marginBottom: 20,
+            marginBottom: "var(--space-5)",
           }}
         >
           Go somewhere useful
@@ -142,7 +142,7 @@ export default function NotFound() {
             padding: 0,
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-            gap: 12,
+            gap: "var(--space-3)",
           }}
         >
           {DESTINATIONS.map((destination) => (
@@ -151,7 +151,7 @@ export default function NotFound() {
                 href={destination.href}
                 style={{
                   display: "block",
-                  padding: "16px 18px",
+                  padding: "var(--space-4) var(--space-5)",
                   background: "var(--color-card-bg)",
                   border: "1px solid var(--color-card-border)",
                   borderRadius: "var(--radius-md)",

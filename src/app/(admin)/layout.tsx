@@ -84,19 +84,7 @@ export default async function AdminLayout({
           <form action="/api/admin/sign-out" method="post">
             <button
               type="submit"
-              style={{
-                padding: "4px 10px",
-                fontFamily: "var(--font-mono)",
-                fontSize: "var(--text-12)",
-                fontWeight: "var(--font-weight-mono)",
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                border: "1px solid var(--color-card-border)",
-                borderRadius: "var(--radius-sm)",
-                background: "var(--color-page-bg)",
-                color: "var(--color-text-60)",
-                cursor: "pointer",
-              }}
+              className="btn btn--secondary btn--sm"
             >
               Sign out
             </button>

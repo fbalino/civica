@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import ContactClient from "./ContactClient";
 import { withOg } from "@/lib/og";
+import "./contact.css";
 
 export const revalidate = 3600;
 

@@ -153,9 +153,9 @@ function FactColumn({
         <div className="editorial-card-head-left">
           <span
             style={{
-              fontFamily: "var(--font-mono)",
+              fontFamily: "var(--font-body)",
               fontSize: "var(--text-12)",
-              letterSpacing: "0.12em",
+              letterSpacing: "var(--tracking-caps)",
               textTransform: "uppercase",
               color: "var(--color-text-30)",
             }}
@@ -353,20 +353,15 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
             />
             <button
               type="submit"
-              className="editorial-button"
-              style={{
-                background: "var(--color-card-bg)",
-                color: "var(--color-text-primary)",
-                border: "1px solid var(--color-card-border)",
-              }}
+              className="btn btn--secondary btn--sm"
             >
               Reopen this dispute
             </button>
           </form>
           <p
             style={{
-              marginTop: 8,
-              fontFamily: "var(--font-mono)",
+              marginTop: "var(--space-2)",
+              fontFamily: "var(--font-body)",
               fontSize: "var(--text-12)",
               color: "var(--color-text-40)",
             }}
@@ -408,11 +403,11 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
             >
               <span
                 style={{
-                  fontFamily: "var(--font-mono)",
+                  fontFamily: "var(--font-body)",
                   fontSize: "var(--text-13)",
                   color: "var(--color-text-40)",
                   textTransform: "uppercase",
-                  letterSpacing: "0.08em",
+                  letterSpacing: "var(--tracking-wider)",
                 }}
               >
                 Reviewer notes
@@ -443,7 +438,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
             <div
               style={{
                 display: "flex",
-                gap: 8,
+                gap: "var(--space-2)",
                 flexWrap: "wrap",
               }}
             >
@@ -452,7 +447,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 name="action"
                 value="resolve_a"
                 disabled={!dispute.factA}
-                className="editorial-button"
+                className="btn btn--sm"
                 style={{ background: "var(--color-success)" }}
               >
                 Resolve · A wins
@@ -462,7 +457,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 name="action"
                 value="resolve_b"
                 disabled={!dispute.factB}
-                className="editorial-button"
+                className="btn btn--sm"
                 style={{ background: "var(--color-success)" }}
               >
                 Resolve · B wins
@@ -471,7 +466,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 type="submit"
                 name="action"
                 value="hold"
-                className="editorial-button"
+                className="btn btn--secondary btn--sm"
               >
                 Hold (no change)
               </button>
@@ -479,7 +474,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 type="submit"
                 name="action"
                 value="reject"
-                className="editorial-button"
+                className="btn btn--sm"
                 style={{ background: "var(--color-danger)" }}
               >
                 Reject as invalid

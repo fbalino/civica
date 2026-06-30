@@ -284,7 +284,7 @@
 .atlas-indicator-legend__chip {
   width: 14px;
   height: 10px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--color-card-border);
   display: inline-block;
 }
@@ -300,7 +300,9 @@
  * "Every chamber, every bill, one map" welcome card. Desktop and mobile
  * variants are both rendered; CSS toggles which is visible. */
 .atlas-hints {
-  background: var(--atlas-paper); border: 1px solid var(--atlas-ink);
+  background: var(--atlas-paper);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
   padding: 10px 14px; max-width: 100%;
   box-shadow: var(--shadow-hard);
 }
@@ -460,6 +462,13 @@
   display: block;
 }
 
+/* Country engraving banner: engravings are ink-on-paper illustrations, so
+   they invert in dark mode the same way the homepage country-card images do
+   ([data-theme="dark"] .country-card-img in home.css). */
+[data-theme="dark"] .v2-country-card__hero img {
+  filter: invert(1) hue-rotate(180deg) brightness(1.04);
+}
+
 .v2-country-card__stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
@@ -499,19 +508,23 @@
 /* ===== COMPARE BANNER ===== */
 .atlas-compare-banner {
   position: absolute; top: 20px; right: 20px; z-index: 4;
-  background: var(--atlas-paper); border: 1px solid var(--atlas-ink);
+  background: var(--atlas-paper);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
   padding: 10px 12px; display: flex; gap: 8px; align-items: center;
   font-family: var(--font-mono); font-size: var(--text-12);
   letter-spacing: 0.1em; text-transform: uppercase;
   box-shadow: var(--shadow-hard);
 }
 .atlas-compare-banner .pill {
-  border: 1px solid var(--atlas-ink); padding: 3px 7px;
+  border: 1px solid var(--color-card-border); padding: 3px 7px;
+  border-radius: var(--radius-sm);
   background: var(--atlas-paper); color: var(--atlas-ink); cursor: pointer;
 }
 .atlas-compare-banner .pill .x { margin-left: 6px; color: var(--atlas-muted); cursor: pointer; }
 .atlas-compare-banner .go-btn {
   background: var(--atlas-ink); color: var(--atlas-paper); border: 0;
+  border-radius: var(--radius-sm);
   padding: 5px 10px; font-family: var(--font-mono); cursor: pointer;
   letter-spacing: 0.1em; text-transform: uppercase; font-size: var(--text-12);
 }
@@ -1541,10 +1554,11 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 }
 .org-masthead .type-chip {
   display: inline-flex; align-items: center; gap: 6px;
-  font-family: var(--font-mono); font-size: var(--text-12);
-  letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: var(--font-body); font-size: var(--text-12);
+  letter-spacing: 0.02em;
   border: 1px solid var(--org-color, var(--atlas-rule));
-  padding: 3px 8px; color: var(--org-color, var(--atlas-ink-2));
+  border-radius: var(--radius-sm);
+  padding: 3px 9px; color: var(--org-color, var(--atlas-ink-2));
 }
 .org-masthead .type-chip .dot {
   width: 7px; height: 7px; border-radius: 50%;
@@ -1680,11 +1694,11 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   color: var(--atlas-muted); letter-spacing: 0.06em;
 }
 .org-member-row .role-badge {
-  font-family: var(--font-mono); font-size: var(--text-12);
-  letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: var(--font-body); font-size: var(--text-12);
+  letter-spacing: 0.02em;
   color: var(--atlas-ink-2);
   border: 1px solid var(--atlas-rule);
-  padding: 2px 7px; border-radius: var(--radius-sm);
+  padding: 3px 9px; border-radius: var(--radius-sm);
 }
 .org-member-row .role-badge.founding {
   border-color: var(--atlas-accent); color: var(--atlas-accent);

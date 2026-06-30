@@ -27,7 +27,7 @@
 .ci-country-detail-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 40px var(--space-9);
+  padding: 0 var(--spacing-page-x) var(--space-9);
 }
 
 /* ----------------------------------------------------------------
@@ -42,16 +42,16 @@
  * Hero section
  * ---------------------------------------------------------------- */
 .ci-country-hero {
-  padding: var(--space-3) 0 40px;
+  padding: var(--space-3) 0 var(--space-8);
 }
 
 .ci-country-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 20px;
+  gap: var(--space-6);
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-3);
 }
 
 .ci-country-title-wrap {
@@ -74,10 +74,10 @@
 .ci-country-rank {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 13px;
-  letter-spacing: 0.08em;
+  font-size: var(--text-13);
+  letter-spacing: var(--tracking-wider);
   color: var(--color-text-40);
-  padding: 6px var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-sm);
 }
@@ -85,7 +85,7 @@
 .ci-country-meta {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--color-text-40);
   display: flex;
   gap: 0;
@@ -103,7 +103,7 @@
 .ci-country-subnav {
   display: flex;
   gap: 0;
-  margin-bottom: 40px;
+  margin-bottom: var(--space-8);
   border-bottom: 1px solid var(--color-divider);
   flex-wrap: wrap;
 }
@@ -111,9 +111,9 @@
 .ci-country-subnav a {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  padding: var(--space-4) 18px 14px;
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  padding: var(--space-4) var(--space-6) var(--space-4);
   background: transparent;
   color: var(--color-text-30);
   border-bottom: 1px solid transparent;
@@ -132,11 +132,11 @@
 .ci-country-section-eyebrow {
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
-  font-size: 11px;
-  letter-spacing: 0.15em;
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-30);
-  margin-bottom: 14px;
+  margin-bottom: var(--space-4);
   display: flex;
   align-items: baseline;
   gap: var(--space-4);
@@ -145,8 +145,8 @@
 
 .ci-country-section-eyebrow small {
   color: var(--color-text-20);
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
 }
 
 .ci-country-section-title {
@@ -163,7 +163,7 @@
  * ---------------------------------------------------------------- */
 .ci-country-dimensions {
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   display: grid;
   grid-template-columns: 1fr;
@@ -174,7 +174,7 @@
 
 .ci-country-dim-row {
   background: var(--color-grid-cell);
-  padding: 20px 28px;
+  padding: var(--space-6) var(--space-7);
   display: grid;
   grid-template-columns: 260px 80px minmax(0, 1fr) 80px 180px;
   gap: var(--space-6);
@@ -197,7 +197,7 @@
 .ci-country-dim-source {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 11px;
+  font-size: var(--text-12);
   color: var(--color-text-30);
 }
 
@@ -205,7 +205,7 @@
 .ci-country-dim-contribution {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 12px;
+  font-size: var(--text-12);
   color: var(--color-text-40);
   text-align: right;
 }
@@ -249,9 +249,9 @@
 
 .ci-country-panel {
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   background: var(--color-grid-cell);
-  padding: 28px var(--space-7);
+  padding: var(--space-7) var(--space-7);
 }
 
 .ci-country-panel-title {
@@ -259,12 +259,12 @@
   font-size: var(--text-24);
   font-weight: 400;
   line-height: 1.15;
-  margin: 0 0 20px;
+  margin: 0 0 var(--space-6);
   color: var(--color-text-primary);
 }
 
 .ci-country-panel-copy {
-  font-size: 14px;
+  font-size: var(--text-14);
   line-height: 1.6;
   color: var(--color-text-60);
   margin: 0;
@@ -280,11 +280,11 @@
 
 .ci-country-chart-legend {
   display: flex;
-  gap: 20px;
+  gap: var(--space-6);
   flex-wrap: wrap;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 11px;
+  font-size: var(--text-12);
   color: var(--color-text-40);
 }
 
@@ -327,14 +327,14 @@
   color: var(--color-text-60);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
 }
 
 .ci-country-rank-value {
   color: var(--color-text-primary);
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -350,8 +350,8 @@
 .ci-country-meta-row span {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 10px;
-  letter-spacing: 0.15em;
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-text-30);
 }
@@ -369,7 +369,7 @@
 .ci-country-compare-link {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 11px;
+  font-size: var(--text-12);
   color: var(--color-text-40);
   text-decoration: none;
   border: 1px solid var(--color-card-border);
@@ -382,9 +382,9 @@
  * ---------------------------------------------------------------- */
 .ci-country-meta-grid {
   border-top: 1px solid var(--color-divider);
-  padding-top: 18px;
+  padding-top: var(--space-5);
   display: grid;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 .ci-country-meta-row {
@@ -397,7 +397,7 @@
 .ci-country-meta-row strong {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--color-text-primary);
   text-align: right;
 }
@@ -432,10 +432,10 @@
 
 .ci-country-event-card {
   background: var(--color-grid-cell);
-  padding: 20px var(--space-6);
+  padding: var(--space-6);
   display: grid;
   grid-template-columns: 64px 1fr auto;
-  gap: 18px;
+  gap: var(--space-5);
   align-items: start;
   text-decoration: none;
   color: inherit;
@@ -489,8 +489,8 @@
 .ci-country-event-category {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-30);
   margin-bottom: var(--space-2);
@@ -498,14 +498,14 @@
 
 .ci-country-event-headline {
   font-family: var(--font-heading);
-  font-size: 17px;
+  font-size: var(--text-16);
   color: var(--color-text-primary);
   line-height: 1.3;
-  margin: 0 0 6px;
+  margin: 0 0 var(--space-2);
 }
 
 .ci-country-event-justification {
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--color-text-60);
   line-height: 1.55;
   margin: 0;
@@ -518,14 +518,14 @@
   align-items: flex-end;
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 11px;
+  font-size: var(--text-12);
   color: var(--color-text-30);
   white-space: nowrap;
 }
 
 .ci-country-event-confidence {
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
   color: var(--color-text-20);
 }
 
@@ -542,7 +542,7 @@
 .ci-country-citation {
   font-family: var(--font-mono);
   font-weight: var(--font-weight-mono);
-  font-size: 13px;
+  font-size: var(--text-13);
   color: var(--color-text-60);
   line-height: 1.7;
 }
@@ -551,7 +551,7 @@
  * Footer links
  * ---------------------------------------------------------------- */
 .ci-country-footer-links {
-  margin-top: 40px;
+  margin-top: var(--space-8);
   display: flex;
   gap: var(--space-5);
   flex-wrap: wrap;
@@ -583,17 +583,17 @@
  * ---------------------------------------------------------------- */
 @media (max-width: 900px) {
   .ci-country-detail-container {
-    padding: 0 20px var(--space-9);
+    padding: 0 var(--space-6) var(--space-9);
   }
 
   .ci-country-name {
-    font-size: 40px;
+    font-size: var(--text-40);
   }
 
   .ci-country-dim-row {
     grid-template-columns: 1fr;
-    gap: 10px;
-    padding: var(--space-5) 20px;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-6);
   }
 
   .ci-country-dim-weight,
@@ -626,7 +626,7 @@
     grid-column: 1 / -1;
     align-items: flex-start;
     flex-direction: row;
-    gap: 14px;
+    gap: var(--space-4);
     white-space: normal;
   }
 }
@@ -649,15 +649,15 @@
   }
 
   .ci-country-name {
-    font-size: 34px;
+    font-size: var(--text-32);
   }
 
   .ci-country-panel {
-    padding: 20px;
+    padding: var(--space-6);
   }
 
   .ci-country-subnav a {
-    padding: 10px var(--space-4) 12px;
+    padding: var(--space-3) var(--space-4) var(--space-4);
   }
 
   .ci-country-event-card {

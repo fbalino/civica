@@ -9,6 +9,7 @@ import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
 const LEADING_LINKS = [
   { href: "/factbook", label: "Factbook" },
   { href: "/atlas", label: "Atlas" },
+  { href: "/compare", label: "Compare" },
 ];
 
 const TRAILING_LINKS = [

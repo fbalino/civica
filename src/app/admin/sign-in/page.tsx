@@ -48,9 +48,9 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 16,
+          gap: "var(--space-4)",
           maxWidth: 480,
-          marginTop: 16,
+          marginTop: "var(--space-4)",
         }}
       >
         <input type="hidden" name="redirect" value={redirectAfter} />
@@ -121,21 +121,8 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
 
         <button
           type="submit"
-          style={{
-            padding: "8px 14px",
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-13)",
-            fontWeight: "var(--font-weight-mono)",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            border: "1px solid var(--color-accent)",
-            borderRadius: "var(--radius-sm)",
-            background:
-              "color-mix(in oklch, var(--color-accent) 14%, var(--color-page-bg) 86%)",
-            color: "var(--color-text-primary)",
-            cursor: "pointer",
-            alignSelf: "flex-start",
-          }}
+          className="btn btn--primary"
+          style={{ alignSelf: "flex-start" }}
         >
           Sign in
         </button>

@@ -20,7 +20,7 @@ export default function Loading() {
         {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} style={{ background: "var(--color-bg)", padding: "16px 24px", display: "flex", alignItems: "center", gap: 16 }}>
             <div className="skeleton" style={{ width: 28, height: 14 }} />
-            <div className="skeleton" style={{ width: 28, height: 21, borderRadius: 2 }} />
+            <div className="skeleton" style={{ width: 28, height: 21, borderRadius: "var(--radius-sm)" }} />
             <div className="skeleton" style={{ flex: 1, height: 16 }} />
             <div className="skeleton" style={{ width: 80, height: 14 }} />
           </div>

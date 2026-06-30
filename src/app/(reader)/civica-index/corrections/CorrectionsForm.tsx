@@ -220,7 +220,7 @@ export function CorrectionsForm({ countries, submitted }: Props) {
         </label>
       </div>
 
-      <button type="submit" disabled={isPending} className="corr-submit">
+      <button type="submit" disabled={isPending} className="btn btn--primary" style={{ alignSelf: "flex-start" }}>
         {isPending ? "Submitting…" : "Submit correction"}
       </button>
     </form>

@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { RotateCcw } from "lucide-react";
 import type { Country } from "./data";
 import { type MapPath, MAP_W, MAP_H } from "./map-geom";
 import { CountryHoverCard } from "@/components/v2/CountryHoverCard";
@@ -659,15 +660,16 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               &minus;
             </button>
             <button title="Reset" onClick={() => animateTo(0, 0, 1)}>
-              <span style={{ fontSize: 11 }}>&lceil;</span>
+              <RotateCcw size={15} aria-hidden />
             </button>
           </div>
         </div>
 
         {/* v2 hover card — pinned near the cursor.
-            Maps Country fields onto the v2 stat trio. Hero image is
-            omitted (compact mode) so the popup stays light during
-            cursor-tracking. */}
+            Maps Country fields onto the v2 stat trio. The country engraving
+            (/engravings/countries/<iso3>.webp) is shown as a small banner at
+            the top of the card; CountryHoverCard hides it on a 404. The card
+            stays light enough to track the cursor (plain lazy <img>). */}
         {hoverCard && (
           <div
             style={{
@@ -683,6 +685,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               name={hoverCard.country.name}
               officialName={hoverCard.country.govDetail || hoverCard.country.gov}
               iso2={hoverCard.country.iso2 ?? hoverCard.country.id.slice(0, 2)}
+              heroImageUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}.webp`}
               stats={[
                 { label: "Political System", value: hoverCard.country.gov },
                 { label: "Capital", value: hoverCard.country.capital },
