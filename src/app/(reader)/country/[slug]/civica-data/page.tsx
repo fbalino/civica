@@ -9,6 +9,7 @@ import {
   getAllSources,
   getBillsForJurisdiction,
   getInternationalMembershipsBySlugs,
+  getFactbookCountryOptions,
 } from "@/lib/db/queries";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
@@ -24,6 +25,7 @@ import {
   CivicaDataSections,
   type CivicaDataSectionItem,
 } from "@/components/country/CivicaDataSections";
+import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
 import "@/app/civica-data.css";
@@ -130,6 +132,7 @@ export default async function CountryCivicaDataTab({
     scoresRows,
     wikidataSource,
     allSources,
+    countryOptions,
   ] = await Promise.all([
     getCICountryDetail(slug).catch(() => null),
     getGovernmentStructure(jurisdiction.id).catch(
@@ -148,6 +151,11 @@ export default async function CountryCivicaDataTab({
     // dates, never the page.
     getAllSources().catch(
       () => [] as Awaited<ReturnType<typeof getAllSources>>
+    ),
+    // Country list for the "Jump to country…" search at the top of the
+    // section nav. Soft-fails to [] so a Neon hiccup just hides the search.
+    getFactbookCountryOptions().catch(
+      () => [] as Awaited<ReturnType<typeof getFactbookCountryOptions>>
     ),
   ]);
 
@@ -375,9 +383,49 @@ export default async function CountryCivicaDataTab({
     ? requestedDefault
     : visibleSections[0].id;
 
+  // --- Citation footer ----------------------------------------------------
+  // "Cite this page" box for the Civica Data tab. The data's vintage is the
+  // Civica Index composite's calculation date (this tab's headline dataset);
+  // fall back to null so the formatters emit "n.d." rather than fabricating
+  // today's date. Source names are deduped across every visible section's
+  // provenance so the citation lists exactly what the page renders.
+  const citeDataVintage = ciDetail?.composite?.calculatedAt ?? null;
+  const citeSourceNames = Array.from(
+    new Set(
+      [
+        ...civicaIndexSources,
+        ...governmentSources,
+        ...legislatureSources,
+        ...leadersSources,
+        ...billsSources,
+        ...organizationsSources,
+        ...rankingsSources,
+      ].map((s) => s.name)
+    )
+  );
+
   return (
     <div className="civica-data-body">
-      <CivicaDataSections items={items} defaultId={defaultId} />
+      <CivicaDataSections
+        items={items}
+        defaultId={defaultId}
+        countries={countryOptions}
+      />
+
+      {/* Per-tab citation footer — multi-format (APA · BibTeX · Chicago ·
+       *  JSON) with a structured-citation JSON tab and a raw-data download.
+       *  Mirrors the Factbook tab's footer; the URL is this tab's canonical
+       *  path. */}
+      <section className="civica-data-cite" aria-label="Cite this page">
+        <CiteAccordion
+          subject={`Civica Atlas — ${jurisdiction.name}`}
+          pageTitle="Civica Data"
+          url={`https://civicaatlas.org/country/${slug}/civica-data`}
+          downloadSlug={slug}
+          dataVintage={citeDataVintage}
+          sourceNames={citeSourceNames}
+        />
+      </section>
     </div>
   );
 }

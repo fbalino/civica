@@ -119,3 +119,36 @@ export function formatChicago(input: CiteInput): string {
   const yearSeg = input.dataDate ? `${input.dataDate.getFullYear()}.` : "n.d.";
   return `${PUBLISHER}. ${yearSeg} "${input.subject}: ${input.pageTitle}." ${SITE_TITLE}. Accessed ${formatLongDate(input.accessedAt)}. ${input.url}.`;
 }
+
+/**
+ * Structured / CSL-flavoured JSON citation — a machine-readable record a
+ * reader can paste into a reference manager (Zotero, Citeproc, custom
+ * pipelines). Field names follow CSL-JSON conventions (`type`, `title`,
+ * `publisher`, `URL`, `accessed`, `issued`) so it round-trips into common
+ * tooling, plus a couple of Civica-specific fields (`subject`, `source`).
+ *
+ * Dates are kept distinct, mirroring the string formatters: `issued` is the
+ * data's vintage (omitted entirely when unknown — never fabricated as today),
+ * `accessed` is the reader's access date. Emitted as pretty-printed JSON so
+ * the copied block is human-legible.
+ */
+export function formatJSON(input: CiteInput): string {
+  const record: Record<string, unknown> = {
+    type: "webpage",
+    title: `${input.subject}: ${input.pageTitle}`,
+    subject: input.subject,
+    "container-title": SITE_TITLE,
+    publisher: PUBLISHER,
+    URL: input.url,
+    accessed: formatShortDate(input.accessedAt),
+  };
+  // Only stamp an issued date when the data's vintage is actually known —
+  // never default to today on a citability-first reference work.
+  if (input.dataDate) {
+    record.issued = formatShortDate(input.dataDate);
+  }
+  if (input.sourceNames && input.sourceNames.length > 0) {
+    record.source = input.sourceNames;
+  }
+  return JSON.stringify(record, null, 2);
+}

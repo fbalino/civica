@@ -6,6 +6,7 @@ import {
   formatAPA,
   formatBibTeX,
   formatChicago,
+  formatJSON,
   type CiteInput,
 } from "@/lib/cite/format";
 
@@ -34,12 +35,13 @@ export interface CiteAccordionProps {
   sourceNames?: string[];
 }
 
-type Format = "apa" | "bibtex" | "chicago";
+type Format = "apa" | "bibtex" | "chicago" | "json";
 
 const FORMAT_LABEL: Record<Format, string> = {
   apa: "APA",
   bibtex: "BibTeX",
   chicago: "Chicago",
+  json: "JSON",
 };
 
 /**
@@ -47,10 +49,13 @@ const FORMAT_LABEL: Record<Format, string> = {
  *
  * Sits at the bottom of every country tab. Closed: a single "Cite this
  * page" affordance. Open: tabbed citation strings (APA / BibTeX /
- * Chicago) with a copy button per format. A "Download as JSON" link to
- * the v1 API is shown only when a `downloadSlug` is supplied (i.e. on
- * per-country pages where `/api/v1/countries/<slug>` actually serves
- * that page's data); the summary advertises "· JSON" only in that case.
+ * Chicago / JSON) with a copy button per format. The JSON tab emits a
+ * structured, CSL-flavoured citation record the reader can paste into a
+ * reference manager — it is always available. Separately, a "Download as
+ * JSON" link to the v1 API (the page's full underlying dataset, not the
+ * citation) is shown only when a `downloadSlug` is supplied (i.e. on
+ * per-country pages where `/api/v1/countries/<slug>` actually serves that
+ * page's data).
  *
  * Two dates, kept distinct: the citation's publication date is the
  * data's real `dataVintage` (or "n.d." when unknown — never today),
@@ -117,6 +122,7 @@ export function CiteAccordion({
     if (!resolvedUrl) return "";
     if (active === "apa") return formatAPA(input);
     if (active === "bibtex") return formatBibTeX(input);
+    if (active === "json") return formatJSON(input);
     return formatChicago(input);
   }, [active, input, resolvedUrl]);
 
@@ -136,7 +142,7 @@ export function CiteAccordion({
       <summary className="cite-accordion-summary">
         <span className="cite-accordion-title">Cite this page</span>
         <span className="cite-accordion-meta">
-          {downloadSlug ? "APA · BibTeX · Chicago · JSON" : "APA · BibTeX · Chicago"}
+          APA · BibTeX · Chicago · JSON
         </span>
         <span className="cite-accordion-chev" aria-hidden="true">
           ▾
