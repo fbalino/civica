@@ -19,6 +19,17 @@ export type CountryHoverCardProps = {
   ctaLabel?: string;
 };
 
+/**
+ * Route a local engraving through Next's built-in image optimizer so the hover
+ * banner loads a small, resized webp (~20-40KB) instead of the full ~600KB
+ * source. The optimized response is cached after the first request. Absolute
+ * URLs and already-optimized URLs are returned untouched.
+ */
+function optimizedHeroSrc(url: string): string {
+  if (!url.startsWith("/") || url.startsWith("/_next/image")) return url;
+  return `/_next/image?url=${encodeURIComponent(url)}&w=640&q=70`;
+}
+
 export function CountryHoverCard({
   name,
   officialName,
@@ -48,7 +59,7 @@ export function CountryHoverCard({
           <div className="v2-country-card__hero">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={heroImageUrl}
+              src={optimizedHeroSrc(heroImageUrl)}
               alt={heroImageAlt ?? name}
               loading="lazy"
               onError={(e) => {

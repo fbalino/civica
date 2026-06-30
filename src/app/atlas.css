@@ -156,8 +156,10 @@
 .map-labels[data-zoom-tier="2"] [data-tier="3"] { display: none; }
 
 .atlas-hud-bottom {
-  position: absolute; left: 20px; bottom: 20px; z-index: 3;
-  display: flex; gap: 10px; align-items: flex-end;
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 3;
+  display: flex; gap: var(--space-4); align-items: flex-end; justify-content: space-between;
+  padding: var(--space-5);
+  pointer-events: none; /* let map drag/click pass through the empty middle */
 }
 
 /* Indicator picker (top-left of the atlas map). Click the badge to
@@ -299,16 +301,21 @@
 /* Slim hint bar at the bottom of the Atlas map. Replaced the larger
  * "Every chamber, every bill, one map" welcome card. Desktop and mobile
  * variants are both rendered; CSS toggles which is visible. */
+/* Plain pinned hint text — NOT a card. No border/background/radius/shadow;
+   just muted text sitting over the map, with a faint text-shadow for
+   legibility against the choropleth. */
 .atlas-hints {
-  background: var(--atlas-paper);
+  pointer-events: auto;
+  background: color-mix(in oklab, var(--color-card-bg) 90%, transparent);
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  padding: 10px 14px; max-width: 100%;
-  box-shadow: var(--shadow-hard);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4); max-width: 100%;
+  box-shadow: var(--shadow-hard-md);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
 }
 .atlas-hints .cta {
-  font-family: var(--font-mono); font-size: var(--text-12);
-  letter-spacing: 0.15em; text-transform: uppercase;
+  font-family: var(--font-body); font-size: var(--text-12);
+  letter-spacing: 0.10em; text-transform: uppercase;
   color: var(--atlas-muted); white-space: nowrap;
 }
 .atlas-hints .cta .k {
@@ -318,11 +325,16 @@
 .atlas-hints .cta--mobile { display: none; }
 
 .atlas-zoombar {
+  pointer-events: auto;
   display: inline-flex; flex-direction: column;
-  background: var(--atlas-paper); border: 1px solid var(--atlas-ink);
-  box-shadow: var(--shadow-hard);
+  background: var(--atlas-paper);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard-md);
+  overflow: hidden;
 }
 .atlas-zoombar button {
+  display: inline-flex; align-items: center; justify-content: center;
   background: var(--atlas-paper); color: var(--atlas-ink); border: 0;
   width: 40px; height: 40px; font-family: var(--font-mono);
   font-size: var(--text-16); cursor: pointer; border-bottom: 1px solid var(--atlas-rule);
@@ -1204,8 +1216,8 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
     flex-direction: column; align-items: stretch;
   }
   .atlas-hints {
-    max-width: none; padding: 10px 12px;
-    box-shadow: var(--shadow-hard-sm);
+    max-width: none; padding: 0;
+    box-shadow: none;
   }
   .atlas-hints .cta { font-size: var(--text-12); white-space: normal; }
   .atlas-hints .cta--desktop { display: none; }
