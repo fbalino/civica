@@ -112,6 +112,12 @@ interface FactbookHeaderStripProps {
    *  five-storied pagoda…"). Rendered as a subtle caption over the hero scrim.
    *  Only passed when an engraving actually exists; null → no caption. */
   heroCaption?: string | null;
+  /** Optional replacement for the under-masthead navigation row. When
+   *  provided, it renders INSTEAD of the legacy <CountrySwitcherChips>
+   *  (e.g. the 3-tab <CountryTabBar> on the unified /country/[slug] page).
+   *  When absent, the masthead keeps its current Factbook · Civica Index
+   *  switcher chips, so /factbook/[slug] is unchanged. */
+  nav?: React.ReactNode;
 }
 
 function formatPop(n: number | null): string | null {
@@ -159,6 +165,7 @@ export function FactbookHeaderStrip({
   inAtlas = true,
   engravingSrc = null,
   heroCaption = null,
+  nav,
 }: FactbookHeaderStripProps) {
   const [lbOpen, setLbOpen] = useState(false);
   const [lbMode, setLbMode] = useState<"map" | "photos">("photos");
@@ -393,7 +400,9 @@ export function FactbookHeaderStrip({
           </div>
 
           <div className="factbook-hero-switcher-wrap">
-            <CountrySwitcherChips slug={slug} active="factbook" inAtlas={inAtlas} />
+            {nav ?? (
+              <CountrySwitcherChips slug={slug} active="factbook" inAtlas={inAtlas} />
+            )}
           </div>
         </div>
 

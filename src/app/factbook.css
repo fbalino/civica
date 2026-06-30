@@ -238,6 +238,24 @@
   margin-top: auto;
   padding-top: var(--space-5);
 }
+
+/* Three-tab strip (Factbook · Civica Data · Constitution) for the
+   unified /country/[slug] page. Sits under the masthead via the
+   FactbookHeaderStrip `nav` prop and reuses the canonical `.tab-nav`
+   link styling. Horizontal row + a bottom hairline rule so the active
+   tab's accent underline reads against a continuous baseline. */
+.country-tabbar {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--color-border-default);
+}
+.country-tabbar .tab-nav {
+  /* Pull each tab's 2px underline down onto the row's hairline so the
+     active accent line replaces the rule rather than floating above it. */
+  margin-bottom: -1px;
+}
 .factbook-hero-boxes {
   display: flex;
   gap: var(--space-4);
