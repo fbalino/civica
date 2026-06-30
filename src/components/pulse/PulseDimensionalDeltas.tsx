@@ -14,6 +14,7 @@ import { Pill } from "@/components/editorial/Pill";
 import type { PulseV2ForCountry, DimensionRow } from "@/lib/db/queries-pulse-v2";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
 import { pulse } from "@/lib/content/site-state";
+import "./PulseDimensionalDeltas.css";
 
 const DIMENSION_LABELS: Record<PulseDimension, string> = {
   democratic_quality: "Democratic Quality",
@@ -103,7 +104,12 @@ function DimensionRowView({
   countrySlug: string;
 }) {
   const significant = Math.abs(row.delta) >= SIGNIFICANCE_THRESHOLD;
-  const color = deltaColor(row.delta);
+  // A delta resting on thin evidence is shown de-emphasized — its
+  // magnitude is no longer treated as an authoritative score. The
+  // CSS class supplies the muted color + lighter weight, so we drop
+  // the confident tier color inline for limited rows.
+  const limited = row.limitedSignal;
+  const color = limited ? undefined : deltaColor(row.delta);
 
   return (
     <div
@@ -127,13 +133,26 @@ function DimensionRowView({
         }}
       >
         {DIMENSION_LABELS[row.dimension]}
+        {limited && row.limitedReason ? (
+          <span
+            className="pulse-dimension-limited-tag"
+            title="This delta rests on thin evidence — read it as a provisional signal, not a confident score."
+          >
+            <span className="pulse-dimension-limited-dot" aria-hidden="true" />
+            Limited signal · {row.limitedReason}
+          </span>
+        ) : null}
       </div>
 
       <div
-        className="pulse-dimension-value"
+        className={
+          limited
+            ? "pulse-dimension-value pulse-dimension-value--limited"
+            : "pulse-dimension-value"
+        }
         style={{
           fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
+          fontWeight: limited ? undefined : "var(--font-weight-mono)",
           fontSize: "var(--text-18)",
           color,
           minWidth: 56,

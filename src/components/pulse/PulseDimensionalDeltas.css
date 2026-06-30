@@ -1,0 +1,42 @@
+/**
+ * Scoped styles for <PulseDimensionalDeltas>.
+ *
+ * The component still carries its original inline styles (panel chrome,
+ * row grid, event chips). This file holds only the "limited signal"
+ * treatment — the de-emphasized rendering for a delta resting on thin
+ * evidence (one event, single-source, or low confidence). Tokens only:
+ * no hex, no px font sizes, no magic spacing.
+ */
+
+/* The delta number on a limited-signal row reads as provisional, not
+ * authoritative: muted color + lighter weight than a confident score. */
+.pulse-dimension-value--limited {
+  color: var(--color-text-40);
+  font-weight: var(--font-weight-regular);
+}
+
+/* Small qualifier label sitting under the dimension name. Inter,
+ * small-caps eyebrow treatment — never monospace. Block-level flex so
+ * it drops onto its own line beneath the dimension name. */
+.pulse-dimension-limited-tag {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+/* Hollow dot marking the qualifier as a provenance-weak signal. */
+.pulse-dimension-limited-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-text-30);
+  background: transparent;
+}

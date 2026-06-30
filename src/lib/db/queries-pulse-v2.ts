@@ -31,6 +31,33 @@ export interface DimensionRow {
     severityValue: number;
     sources: string[];
   }>;
+  /**
+   * Evidence basis for judging whether this delta rests on thin ground.
+   * Computed across the dimension's contributing PUBLISHED events.
+   */
+  evidence: {
+    /** Number of contributing published events behind this delta. */
+    nEvents: number;
+    /** Highest corroboration confidence ([0,1]) among contributing events. */
+    maxConfidence: number;
+    /** Fewest distinct sources on any single contributing event. */
+    minSources: number;
+    /** Most distinct sources on any single contributing event. */
+    maxSources: number;
+    /** Every contributing event is backed by a single source. */
+    allSingleSource: boolean;
+  };
+  /**
+   * True when the delta rests on thin evidence and should read as a
+   * provisional "limited signal" rather than an authoritative score:
+   * one event, all single-source, or low max confidence.
+   */
+  limitedSignal: boolean;
+  /**
+   * Most accurate qualifier for the thinness trigger, or null when the
+   * basis is adequate. "Single source" | "Single event" | "Low confidence".
+   */
+  limitedReason: string | null;
 }
 
 export interface PulseV2ForCountry {
@@ -88,6 +115,7 @@ export async function getPulseV2ForCountry(
       eventDate: pulseEventsV2.eventDate,
       severityTier: pulseEventsV2.severityTier,
       severityValue: pulseEventsV2.severityValue,
+      corroborationConfidence: pulseEventsV2.corroborationConfidence,
     })
     .from(pulseEventsV2)
     .where(
@@ -116,6 +144,19 @@ export async function getPulseV2ForCountry(
     }
   }
 
+  // Per-event lookups for evidence-basis (thinness) computation. Both
+  // maps are keyed only by PUBLISHED events — the rows that actually
+  // drive the score and that the panel can show.
+  const confidenceByEvent = new Map<string, number>();
+  const sourceCountByEvent = new Map<string, number>();
+  for (const e of eventRows) {
+    confidenceByEvent.set(e.id, e.corroborationConfidence ?? 0);
+    sourceCountByEvent.set(
+      e.id,
+      new Set(sourceMap.get(e.id) ?? []).size
+    );
+  }
+
   // Build the dimensions object — zero-fill any missing dimension
   const dimensions = {} as Record<PulseDimension, DimensionRow>;
   let lastComputedAt: string | null = null;
@@ -136,11 +177,59 @@ export async function getPulseV2ForCountry(
         severityValue: e.severityValue,
         sources: Array.from(new Set(sourceMap.get(e.id) ?? [])),
       }));
+
+    // Evidence basis: judge thinness across the dimension's contributing
+    // PUBLISHED events. We intersect the delta's contributing-event ids
+    // with the published set so unpublished/queued events never inflate
+    // (or deflate) the basis.
+    const contributingIds = deltaRow?.contributingEventIds ?? [];
+    const publishedContributing = contributingIds.filter((id) =>
+      sourceCountByEvent.has(id)
+    );
+    const nEvents = publishedContributing.length;
+    const confidences = publishedContributing.map(
+      (id) => confidenceByEvent.get(id) ?? 0
+    );
+    const sourceCounts = publishedContributing.map(
+      (id) => sourceCountByEvent.get(id) ?? 0
+    );
+    const maxConfidence = confidences.length ? Math.max(...confidences) : 0;
+    const minSources = sourceCounts.length ? Math.min(...sourceCounts) : 0;
+    const maxSources = sourceCounts.length ? Math.max(...sourceCounts) : 0;
+    const allSingleSource = nEvents > 0 && maxSources <= 1;
+
+    // Thinness triggers (per the methodology hedge): a single contributing
+    // event, every event single-sourced, or low max confidence. Only a
+    // delta that actually moved (|δ| ≥ 0.5) can read as a "limited" signal;
+    // a flat dimension has its own treatment and needs no qualifier.
+    const moved = Math.abs(deltaRow?.deltaValue ?? 0) >= 0.5;
+    const limitedSignal =
+      moved &&
+      nEvents > 0 &&
+      (nEvents <= 1 || allSingleSource || maxConfidence < 0.4);
+
+    // Pick the most accurate single qualifier for the trigger that fired.
+    let limitedReason: string | null = null;
+    if (limitedSignal) {
+      if (nEvents <= 1) limitedReason = "Single event";
+      else if (allSingleSource) limitedReason = "Single source";
+      else limitedReason = "Low confidence";
+    }
+
     dimensions[dim] = {
       dimension: dim,
       delta: deltaRow?.deltaValue ?? 0,
-      contributingEventIds: deltaRow?.contributingEventIds ?? [],
+      contributingEventIds: contributingIds,
       drivingEvents: driving,
+      evidence: {
+        nEvents,
+        maxConfidence,
+        minSources,
+        maxSources,
+        allSingleSource,
+      },
+      limitedSignal,
+      limitedReason,
     };
   }
 
