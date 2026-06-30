@@ -462,7 +462,7 @@ export default async function BlogPostPage({
                   <div className="post-more-card-cover">
                     <BlogCover
                       alt={p.coverAlt ?? ""}
-                      image={p.coverImage}
+                      image={resolvePostCover(p).image}
                       slug={p.slug}
                       variant="card"
                     />
