@@ -1,0 +1,233 @@
+/*
+ * Civica Data tab — /country/[slug]/civica-data
+ *
+ * Scoped styling for the Civica value-add tab. The page reuses the
+ * `.factbook-body` + `<FactbookSidebar>` + `<FactbookRightRail>` shell
+ * and the canonical `.factbook-section` chrome; this file only adds:
+ *   1. an embedded reset for the reused `.ci-country-detail-container`
+ *      so the Civica Index panel fills the factbook main column instead
+ *      of re-applying its own 1200px max-width + page padding,
+ *   2. the Government org-chart block's tokenized eyebrow/heading
+ *      (so the section avoids per-page inline `var(--font-mono)` styles), and
+ *   3. the Organizations (international footprint) section.
+ *
+ * Imported by the page directly (not globally) — it is the only surface
+ * that needs these overrides. Tokens only, no hardcoded values.
+ */
+
+/* ----------------------------------------------------------------
+ * 1. Embedded Civica Index panel
+ * The shared `.ci-country-detail-container` carries a 1200px max-width
+ * and horizontal page padding meant for the standalone /civica-index
+ * route. Inside `.factbook-main` (already a padded grid track) those
+ * fight the column, so neutralize them when embedded.
+ * ---------------------------------------------------------------- */
+.ci-country-detail-page--embedded {
+  background: transparent;
+}
+.ci-country-detail-page--embedded .ci-country-detail-container {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Rank pill that replaces the standalone page's hero header rank. Sits
+ * above the score block on the embedded tab. */
+.ci-country-rank-strip {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-4);
+}
+
+/* ----------------------------------------------------------------
+ * 2. Government — "How power is organised" org-chart block
+ * Tokenized replacement for the factbook page's inline-styled wrapper.
+ * ---------------------------------------------------------------- */
+.civica-data-gov-structure {
+  margin-bottom: var(--space-7);
+  scroll-margin-top: calc(56px + var(--space-5));
+}
+.civica-data-gov-eyebrow {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-3);
+}
+.civica-data-gov-heading {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: 400;
+  margin: 0 0 var(--space-4);
+}
+
+/* ----------------------------------------------------------------
+ * 3. Organizations — international footprint
+ * ---------------------------------------------------------------- */
+.civica-data-intl-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+}
+.civica-data-intl-stat {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+  padding: var(--space-4) var(--space-5);
+}
+.civica-data-intl-stat-k {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-11);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-2);
+}
+.civica-data-intl-stat-v {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.civica-data-intl-group {
+  margin-bottom: var(--space-6);
+}
+.civica-data-intl-group:last-child {
+  margin-bottom: 0;
+}
+.civica-data-intl-group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  margin: 0 0 var(--space-3);
+}
+.civica-data-intl-group-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  flex: none;
+}
+.civica-data-intl-group-count {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-40);
+  font-weight: var(--font-weight-regular);
+}
+
+.civica-data-intl-rows {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.civica-data-intl-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-card-bg);
+  text-decoration: none;
+  color: inherit;
+  border-top: 1px solid var(--color-stat-border);
+  transition: background var(--motion-fast) var(--motion-ease-out);
+}
+.civica-data-intl-row:first-child {
+  border-top: 0;
+}
+a.civica-data-intl-row:hover {
+  background: var(--color-bg-subtle, var(--color-card-bg));
+}
+.civica-data-intl-row-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  flex: none;
+}
+.civica-data-intl-row-name {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.civica-data-intl-row-abbr {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.civica-data-intl-row-full {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.civica-data-intl-row-year {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  font-variant-numeric: tabular-nums;
+}
+
+.civica-data-intl-comembers {
+  margin-top: var(--space-6);
+}
+.civica-data-intl-comembers-head {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-3);
+}
+.civica-data-intl-comembers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-2);
+}
+.civica-data-intl-comember {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-card-bg);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+.civica-data-intl-comember-shared {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-40);
+  font-size: var(--text-12);
+}
+
+@media (max-width: 600px) {
+  .civica-data-intl-stats {
+    grid-template-columns: 1fr;
+  }
+}
