@@ -210,6 +210,11 @@ export default async function CountryLayout({
         </div>
       ) : null}
 
+      {/* IntersectionObserver target for FactbookStickyCountrySearch: must
+       *  stay AFTER the full masthead (engraving + country name + pills +
+       *  CountryTabBar nav), so it's only out of view once the reader has
+       *  scrolled past the country name on both desktop and mobile. Do not
+       *  move this above any masthead content. */}
       <div id="factbook-header-sentinel" aria-hidden="true" />
 
       <FactbookStickyCountrySearch

@@ -24,21 +24,40 @@ export function FactbookStickyCountrySearch({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const sentinel = document.getElementById(sentinelId);
-    if (!sentinel) {
-      const id = window.setTimeout(() => setVisible(true), 0);
-      return () => window.clearTimeout(id);
-    }
+    let observer: IntersectionObserver | null = null;
+    let rafId: number | null = null;
+    let cancelled = false;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setVisible(!entry.isIntersecting);
-      },
-      { rootMargin: "-56px 0px 0px 0px", threshold: 0 }
-    );
+    // The sentinel is plain server-rendered markup, so it should already be
+    // in the DOM by the time this effect runs. But fail SAFE if it isn't
+    // found yet (e.g. a transient timing hiccup): poll across a few frames
+    // instead of giving up and forcing the bar visible. The bar must never
+    // default to visible — only a confirmed "sentinel scrolled out of view"
+    // from the observer should ever flip it on.
+    const tryAttach = () => {
+      if (cancelled) return;
+      const sentinel = document.getElementById(sentinelId);
+      if (!sentinel) {
+        rafId = window.requestAnimationFrame(tryAttach);
+        return;
+      }
 
-    observer.observe(sentinel);
-    return () => observer.disconnect();
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setVisible(!entry.isIntersecting);
+        },
+        { rootMargin: "-56px 0px 0px 0px", threshold: 0 }
+      );
+      observer.observe(sentinel);
+    };
+
+    tryAttach();
+
+    return () => {
+      cancelled = true;
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+      observer?.disconnect();
+    };
   }, [sentinelId]);
 
   useEffect(() => {
