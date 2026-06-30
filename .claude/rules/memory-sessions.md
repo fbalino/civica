@@ -30,14 +30,18 @@ SECTION; dark-invert preserved; mobile country masthead opts out; useReducedMoti
 Also fixed: FactbookLegislatureChart hydration (round seat cos/sin cx/cy to 2 decimals) —
 country pages now console-clean.
 
-IN PROGRESS (agent running): wiring Codex's blog engravings into the 10 Record articles.
-Codex saves them to public/blog/<slug>/ named by the slugified CAPTION (16:9, full color,
-plan at plan/record-image-generation-plan.md). The article renderer (blog/[slug]/page.tsx
-mdxComponents factory) auto-upgrades each "Image placeholder" blockquote to a <figure> +
-<figcaption> when public/blog/<slug>/<captionSlug>.{webp,png} exists (re-runnable — new
-images appear as they land); the FIRST placeholder = the hero cover. PNGs → webp.
-NOTE: owner is actively generating both blog images AND more country engravings (keep
-converting public/engravings/countries/*.png → webp).
+BLOG IMAGES — DONE + live. Codex saved each illustration to public/blog/<slug>/ named by
+the slugified CAPTION (full color). The article renderer (blog/[slug]/page.tsx mdxComponents
+factory) auto-upgrades each "Image placeholder" blockquote → <figure>+<figcaption> when the
+file exists (re-runnable). All 42 inline figures across the 10 articles are wired + live;
+190 country engravings live. COVER RESOLUTION (resolvePostCover in src/lib/blog.ts, used by
+BOTH /blog index cards AND the article hero): dedicated **public/blog/<slug>/cover.{webp,png}**
+→ first-placeholder engraving → frontmatter coverImage → HemicycleCover. The first placeholder
+is skipped inline ONLY when it's serving as the cover (a cover.webp lets it render inline).
+PENDING: owner is generating dedicated 16:9 hero covers (cover.png per slug) from the 10 hero
+prompts I gave; drop them in public/blog/<slug>/cover.png → convert to webp → they auto-become
+the hero (and the first placeholder reverts to an inline figure). Keep converting any new
+public/blog/*/*.png and public/engravings/countries/*.png → webp on each drop.
 
 ## 2026-06-29 (pt5) — Hero-height token, articles published, Motion animations, hydration fix
 
