@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import fs from "fs";
-import path from "path";
 import { isValidElement } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { getAllSlugs, getAllPosts, getPostBySlug } from "@/lib/blog";
+import {
+  getAllSlugs,
+  getAllPosts,
+  getPostBySlug,
+  slugifyCaption,
+  resolveBlogImage,
+  resolvePostCover,
+} from "@/lib/blog";
 import { BlogCover } from "@/components/blog/BlogCover";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareButtons } from "@/components/blog/ShareButtons";
@@ -94,42 +99,6 @@ function nodeText(node: React.ReactNode): string {
   if (isValidElement(node))
     return nodeText((node.props as { children?: React.ReactNode }).children);
   return "";
-}
-
-/** Slugify a caption to Codex's blog-image filename convention
-    (lowercase, drop apostrophes, non-alphanumeric runs -> single hyphen). */
-function slugifyCaption(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/['‘’]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-/** Resolve a public blog image URL for a caption (prefers .webp), or null. */
-function resolveBlogImage(slug: string, caption: string): string | null {
-  const base = slugifyCaption(caption);
-  if (!base) return null;
-  for (const ext of ["webp", "png"]) {
-    const rel = `/blog/${slug}/${base}.${ext}`;
-    if (fs.existsSync(path.join(process.cwd(), "public", rel))) return rel;
-  }
-  return null;
-}
-
-/** Caption of the FIRST "Image placeholder" block in the markdown (= the cover). */
-function firstPlaceholderCaption(content: string): string | null {
-  const pi = content.search(/\*\*Image placeholder\*\*/i);
-  if (pi === -1) return null;
-  const cap = content.toLowerCase().indexOf("caption:", pi);
-  if (cap === -1) return null;
-  const eol = content.indexOf("\n", cap);
-  return (
-    content
-      .slice(cap + "caption:".length, eol === -1 ? undefined : eol)
-      .replace(/[*>]/g, "")
-      .trim() || null
-  );
 }
 
 function makeMdxComponents(slug: string, coverSlug: string | null) {
@@ -334,13 +303,15 @@ export default async function BlogPostPage({
 
   const readTime = estimateReadTime(post.content);
 
-  // Cover = the first "Image placeholder" in the body. When its caption-named
-  // engraving exists, use it as the hero cover (and skip it inline); otherwise
-  // fall back to the post's own coverImage / the generated hemicycle cover.
-  const coverCaption = firstPlaceholderCaption(post.content);
-  const coverImg = coverCaption ? resolveBlogImage(post.slug, coverCaption) : null;
-  const coverSlug = coverCaption ? slugifyCaption(coverCaption) : null;
-  const heroCoverImage = coverImg ?? post.coverImage;
+  // Cover: dedicated cover.webp → first-placeholder engraving → frontmatter →
+  // generated hemicycle. Only skip the first placeholder inline when IT is the
+  // cover (a dedicated cover.webp lets that placeholder render inline normally).
+  const cover = resolvePostCover(post);
+  const heroCoverImage = cover.image;
+  const coverSlug =
+    cover.firstPlaceholderIsCover && cover.caption
+      ? slugifyCaption(cover.caption)
+      : null;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -415,11 +386,7 @@ export default async function BlogPostPage({
             </div>
           </figure>
           <div className="post-hero-cap">
-            <span>
-              {coverImg && coverCaption
-                ? coverCaption
-                : (post.coverCaption ?? "Illustration · Civica Desk")}
-            </span>
+            <span>{cover.caption ?? "Illustration · Civica Desk"}</span>
             <span>
               {post.content.split(/\s+/).length.toLocaleString()} words &middot;{" "}
               {post.tags.join(" · ")}

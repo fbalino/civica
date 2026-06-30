@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts, resolvePostCover } from "@/lib/blog";
 import { BlogCover } from "@/components/blog/BlogCover";
 import { withOg } from "@/lib/og";
 import { Reveal } from "@/components/motion/Reveal";
@@ -139,7 +139,7 @@ export default function BlogIndex() {
           >
             <BlogCover
               alt={featured.coverAlt ?? ""}
-              image={featured.coverImage}
+              image={resolvePostCover(featured).image}
               priority
               slug={featured.slug}
               variant="lead"
@@ -190,7 +190,7 @@ export default function BlogIndex() {
                   >
                     <BlogCover
                       alt={post.coverAlt ?? ""}
-                      image={post.coverImage}
+                      image={resolvePostCover(post).image}
                       slug={post.slug}
                       variant="card"
                     />
