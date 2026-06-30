@@ -429,6 +429,39 @@
   }
 }
 
+/* === Reusable country-jump search (in-content half of the handoff) =========
+ * <CountryJumpSearch> renders this field in NORMAL FLOW at the top of a tab's
+ * content, so it scrolls away; the sentinel that follows it drives the sticky
+ * bar's reveal. Because it's not inside any sticky region, a sticky sidebar /
+ * section nav below it can't trap it on screen — guaranteeing exactly one bar
+ * at a time. The base rule centers the field on the tab's reading width; the
+ * per-tab modifier classes only tune the max-width to match each tab's grid. */
+.country-jump-search {
+  width: 100%;
+  margin: 0 auto var(--space-6);
+}
+.country-jump-search .country-search {
+  width: 100%;
+}
+/* Factbook tab: align the field's right edge with the 3-column grid's content
+ * width. Sidebar (240) + gap (var(--space-7)) + main, capped to the body. */
+.factbook-tab {
+  min-width: 0;
+}
+.factbook-tab-search {
+  max-width: 520px;
+}
+/* Civica Data tab: the field sits above the master–detail shell. */
+.civica-data-tab-search {
+  max-width: 520px;
+}
+/* The reveal sentinel is a zero-height marker — never takes layout space. */
+.country-jump-sentinel {
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
 .factbook-main {
   min-width: 0;
 }

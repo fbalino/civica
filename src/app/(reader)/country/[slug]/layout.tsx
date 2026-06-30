@@ -5,7 +5,6 @@ import { existsSync } from "fs";
 import { join } from "path";
 import {
   getJurisdictionBySlug,
-  getFactbookCountryOptions,
   getCICountryDetail,
 } from "@/lib/db/queries";
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
@@ -13,7 +12,6 @@ import { reconciliation } from "@/lib/content/site-state";
 import { engravingCaption } from "@/lib/data/engraving-captions";
 import { withOg } from "@/lib/og";
 import { FactbookHeaderStrip } from "@/components/factbook/FactbookHeaderStrip";
-import { FactbookStickyCountrySearch } from "@/components/factbook/FactbookStickyCountrySearch";
 import { CivicaAIDrawer } from "@/components/factbook/CivicaAIDrawer";
 import { CountryTabBar } from "@/components/country/CountryTabBar";
 import type { LightboxImage } from "@/components/factbook/FactbookLightbox";
@@ -74,10 +72,9 @@ export default async function CountryLayout({
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) notFound();
 
-  const [ciDetail, pulseV2, countryOptions, headerFacts] = await Promise.all([
+  const [ciDetail, pulseV2, headerFacts] = await Promise.all([
     getCICountryDetail(slug).catch(() => null),
     getPulseV2ForCountry(slug).catch(() => null),
-    getFactbookCountryOptions().catch(() => []),
     // Resolver batch for the two masthead pills (Pop + GDP).
     getCanonicalFactsForJurisdiction(jurisdiction.id, [
       "population_total",
@@ -210,19 +207,13 @@ export default async function CountryLayout({
         </div>
       ) : null}
 
-      {/* IntersectionObserver target for FactbookStickyCountrySearch: must
-       *  stay AFTER the full masthead (engraving + country name + pills +
-       *  CountryTabBar nav), so it's only out of view once the reader has
-       *  scrolled past the country name on both desktop and mobile. Do not
-       *  move this above any masthead content. */}
-      <div id="factbook-header-sentinel" aria-hidden="true" />
-
-      <FactbookStickyCountrySearch
-        country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
-        countries={countryOptions}
-        sentinelId="factbook-header-sentinel"
-      />
-
+      {/* The "jump to another country" search + its sticky-bar handoff now
+       *  live INSIDE each tab via <CountryJumpSearch> (a normal-flow field at
+       *  the top of the tab content + a sentinel + the shared sticky bar). The
+       *  layout no longer owns the sentinel or the sticky bar, so the reveal
+       *  is driven by the in-content field's own position — identical on every
+       *  tab, and guaranteed one-at-a-time. Each tab fetches its own country
+       *  list and renders the component. */}
       {children}
 
       <CivicaAIDrawer

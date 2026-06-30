@@ -25,6 +25,7 @@ import {
   CivicaDataSections,
   type CivicaDataSectionItem,
 } from "@/components/country/CivicaDataSections";
+import { CountryJumpSearch } from "@/components/country/CountryJumpSearch";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
@@ -49,8 +50,10 @@ export const revalidate = 3600;
 // (<CivicaDataSections>). The old narrow main column + right rail are gone;
 // per-section provenance now lives in a compact "Sources" strip at the foot
 // of each section. Every section is visibility-gated upfront so the nav
-// never lists a phantom entry. The masthead, tab bar, sticky search,
-// reconciliation notice, and AI drawer live in the shared layout.
+// never lists a phantom entry. The masthead, tab bar, reconciliation notice,
+// and AI drawer live in the shared layout. The "jump to country" search + its
+// sticky-bar handoff render here via <CountryJumpSearch> — a normal-flow field
+// above the shell that scrolls away, so the sticky bar never shows alongside it.
 
 type SectionId =
   | "civica-index"
@@ -406,11 +409,17 @@ export default async function CountryCivicaDataTab({
 
   return (
     <div className="civica-data-body">
-      <CivicaDataSections
-        items={items}
-        defaultId={defaultId}
+      {/* In-content country search + sticky-bar handoff. A normal-flow field
+       *  ABOVE the master–detail shell, so it scrolls away; the shared sticky
+       *  bar reveals only once it's out of view (never both). The section nav
+       *  below stays sticky but no longer holds its own search. */}
+      <CountryJumpSearch
+        country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
         countries={countryOptions}
+        className="civica-data-tab-search"
       />
+
+      <CivicaDataSections items={items} defaultId={defaultId} />
 
       {/* Per-tab citation footer — multi-format (APA · BibTeX · Chicago ·
        *  JSON) with a structured-citation JSON tab and a raw-data download.

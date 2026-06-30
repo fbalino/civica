@@ -24,6 +24,13 @@ export default async function CountryConstitutionTab({
 
   // Soft-fail the constitution fetch so a Neon hiccup degrades to the empty
   // state rather than 500-ing the whole tab.
+  //
+  // NOTE: the Constitution tab intentionally omits the <CountryJumpSearch>
+  // handoff. The explorer (`ConstitutionExplorer`) owns a self-contained
+  // layout with its own sticky outline, so dropping the shared search would
+  // need explorer-internal placement. The component API makes it a one-line
+  // add here if that parity is ever wanted (see the Factbook / Civica Data
+  // tabs), but it is not required.
   const constitution = await getConstitution(jurisdiction.id).catch(() => null);
 
   const govLabel =

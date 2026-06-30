@@ -49,16 +49,6 @@
   margin: 0 0 var(--space-4);
   padding: 0 var(--space-4);
 }
-/* "Jump to country…" search at the top of the section nav. The field's
- * canonical rounded-rectangle styling comes from the shared `.country-search`
- * classes; this wrapper only owns placement + the hairline divider that
- * separates it from the section list below. */
-.civica-data-nav-search {
-  padding: 0 var(--space-4);
-  margin: 0 0 var(--space-4);
-  padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--color-border-default);
-}
 .civica-data-nav-list {
   list-style: none;
   padding: 0;
@@ -354,11 +344,6 @@
   }
   .civica-data-nav-eyebrow {
     padding: 0;
-  }
-  .civica-data-nav-search {
-    padding: 0;
-    margin: 0 0 var(--space-4);
-    border-bottom: 0;
   }
   .civica-data-nav-list {
     flex-direction: row;

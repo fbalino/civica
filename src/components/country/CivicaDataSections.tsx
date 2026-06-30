@@ -1,10 +1,6 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import {
-  FactbookCountrySearch,
-  type FactbookCountryOption,
-} from "@/components/factbook/FactbookCountrySearch";
 
 export interface CivicaDataSectionItem {
   /** Stable section id — also the URL hash / ?section= value. */
@@ -18,12 +14,6 @@ interface CivicaDataSectionsProps {
   items: CivicaDataSectionItem[];
   /** Section shown on first paint (SSR) — usually "civica-index". */
   defaultId: string;
-  /**
-   * Country list for the "Jump to country…" search at the top of the section
-   * nav. Selecting a country navigates to that country's page (`/country/<slug>`).
-   * Optional — when omitted/empty the search is hidden.
-   */
-  countries?: ReadonlyArray<FactbookCountryOption>;
 }
 
 /**
@@ -47,7 +37,6 @@ interface CivicaDataSectionsProps {
 export function CivicaDataSections({
   items,
   defaultId,
-  countries,
 }: CivicaDataSectionsProps) {
   const validIds = items.map((i) => i.id);
   const initialId = validIds.includes(defaultId) ? defaultId : validIds[0];
@@ -102,17 +91,10 @@ export function CivicaDataSections({
     <div className="civica-data-shell">
       <nav className="civica-data-nav" aria-label="Civica Data sections">
         <p className="civica-data-nav-eyebrow">Civica Data</p>
-        {countries && countries.length > 0 ? (
-          <div className="civica-data-nav-search">
-            <FactbookCountrySearch
-              countries={countries}
-              countryPathPrefix="/country"
-              placeholder="Jump to country..."
-              ariaLabel="Jump to a country"
-              compact
-            />
-          </div>
-        ) : null}
+        {/* The "jump to country" search now lives ABOVE this shell via
+         *  <CountryJumpSearch> — a normal-flow field that scrolls away and
+         *  hands off to the sticky top bar. Keeping it out of this STICKY nav
+         *  is what prevents two search bars showing at once. */}
         <ol className="civica-data-nav-list">
           {items.map((item, idx) => {
             const isActive = item.id === activeId;

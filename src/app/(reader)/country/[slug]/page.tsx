@@ -14,6 +14,7 @@ import {
   FactbookSidebar,
   type FactbookSidebarItem,
 } from "@/components/factbook/FactbookSidebar";
+import { CountryJumpSearch } from "@/components/country/CountryJumpSearch";
 import {
   FactbookRightRail,
   type SubsectionEntry,
@@ -34,8 +35,11 @@ export const revalidate = 3600;
 // CIA-sourced sections. The Government section here is the CIA prose
 // ONLY — the gov-structure org chart and every Civica governance
 // section (legislature, leaders, bills, scores, additional indicators)
-// move to the Civica Data tab. The masthead, tab bar, sticky search,
-// reconciliation notice, and AI drawer live in the shared layout.
+// move to the Civica Data tab. The masthead, tab bar, reconciliation notice,
+// and AI drawer live in the shared layout. The "jump to country" search +
+// its sticky-bar handoff render here via <CountryJumpSearch> — a normal-flow
+// field above the body that scrolls away, so the sticky bar never shows
+// alongside it.
 type SectionPlan = { id: string; label: string; sourceKey: string };
 
 const SECTION_PLAN: SectionPlan[] = [
@@ -181,10 +185,21 @@ export default async function CountryFactbookTab({
   }));
 
   return (
-    <div className="factbook-body">
-      <FactbookSidebar items={sidebarItems} countries={countryOptions} />
+    <div className="factbook-tab">
+      {/* In-content country search + sticky-bar handoff. Normal-flow element
+       *  at the top of the tab content, so it scrolls away; the shared sticky
+       *  bar reveals only once it's out of view (never both). The sticky
+       *  `.factbook-sidebar` below no longer carries its own search. */}
+      <CountryJumpSearch
+        country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
+        countries={countryOptions}
+        className="factbook-tab-search"
+      />
 
-      <div className="factbook-main">
+      <div className="factbook-body">
+        <FactbookSidebar items={sidebarItems} />
+
+        <div className="factbook-main">
         {visibleSections.map((section) => {
           const data = sectionDataMap.get(section.sourceKey);
           const fields = data ? jsonbToFields(data) : [];
@@ -250,10 +265,11 @@ export default async function CountryFactbookTab({
         </section>
       </div>
 
-      <FactbookRightRail
-        subsectionsBySection={subsectionsBySection}
-        sources={sources}
-      />
+        <FactbookRightRail
+          subsectionsBySection={subsectionsBySection}
+          sources={sources}
+        />
+      </div>
     </div>
   );
 }
