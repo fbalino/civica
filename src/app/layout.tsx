@@ -38,6 +38,14 @@ const NON_TIER1_FOOTER_SOURCES = [
   "GDELT",
 ] as const;
 
+const FOOTER_TRUST_MARKS = [
+  { label: "World Bank", shortLabel: "World Bank" },
+  { label: "International Monetary Fund", shortLabel: "IMF" },
+  { label: "United Nations", shortLabel: "United Nations" },
+  { label: "V-Dem Institute", shortLabel: "V-Dem Institute" },
+  { label: "Freedom House", shortLabel: "Freedom House" },
+] as const;
+
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
   subsets: ["latin"],
@@ -131,6 +139,34 @@ export default function RootLayout({
           <main style={{ flex: 1 }}>{children}</main>
 
           <footer className="site-footer">
+            <section className="site-footer__trust" aria-label="Civica commitments and trusted sources">
+              <div className="site-footer__trust-inner">
+                <div className="site-footer__trust-copy">
+                  <h2>Open. Transparent. Nonpartisan.</h2>
+                  <p>
+                    Civica Atlas is an open knowledge initiative. All data is
+                    free to use with proper attribution.
+                  </p>
+                </div>
+
+                <div className="site-footer__trust-rule" aria-hidden="true" />
+
+                <div className="site-footer__sources-feature">
+                  <p>Trusted sources include:</p>
+                  <ul className="site-footer__source-marks" aria-label="Featured trusted sources">
+                    {FOOTER_TRUST_MARKS.map((source) => (
+                      <li
+                        key={source.label}
+                        className="site-footer__source-mark"
+                      >
+                        <span className="site-footer__source-name">{source.shortLabel}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </section>
+
             <div className="site-footer__inner">
               <div className="site-footer__brand">
                 <div className="site-footer__mark">

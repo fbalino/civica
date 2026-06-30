@@ -378,13 +378,6 @@
   margin-bottom: var(--space-5);
 }
 
-html[data-factbook-sticky-search="visible"] .factbook-sidebar > .country-search,
-html:has(.factbook-sticky-country-search:focus-within)
-  .factbook-sidebar
-  > .country-search {
-  display: none;
-}
-
 .reader-sidebar-title {
   font-family: var(--font-mono);
   font-size: var(--text-12);
@@ -1807,8 +1800,6 @@ html:has(.factbook-sticky-country-search:focus-within)
    About page engraving hero
    Full-bleed engraving masthead (same technique as .factbook-hero--art),
    title overlaid over an ivory scrim; engraving inverts in dark mode.
-   NOTE: currently uses the shared /engravings/hero.webp as a placeholder —
-   swap `src` for a bespoke About engraving when available.
    ========================================================================== */
 .about-hero {
   position: relative;

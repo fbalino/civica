@@ -131,7 +131,7 @@ export function FactbookAlmanac({
       <section className="factbook-landing-hero" aria-labelledby="factbook-hero-title">
         <ParallaxImage
           className="factbook-hero-art"
-          src="/engravings/hero.webp"
+          src="/engravings/pages/countries.webp"
           alt=""
           aria-hidden="true"
         />

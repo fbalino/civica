@@ -3,6 +3,8 @@
 Antique-atlas illustration assets for the almanac design language.
 
 - `hero.webp` — homepage hero illustration (rendered as the `.home-hero` background).
+- `pages/*.webp` — top-level page hero/feature engravings (About, Countries,
+  Atlas, Compare, Index, Methodology, The Record).
 - `spot-*.webp` — reusable section/feature motifs (column, globe, compass, ship, laurel, mountains).
 - `countries/<iso3>.webp` — per-country landmark hero for the factbook masthead
   (e.g. `usa.webp`, `jpn.webp`). The country page renders it as a full-bleed backdrop

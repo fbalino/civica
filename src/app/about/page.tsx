@@ -100,12 +100,11 @@ export default async function AboutPage() {
 
   return (
     <>
-      {/* Engraving masthead. Placeholder art (/engravings/hero.webp) — swap
-          `src` for a bespoke About engraving when available. */}
+      {/* Engraving masthead. */}
       <section className="about-hero">
         <ParallaxImage
           className="about-hero-img"
-          src="/engravings/hero.webp"
+          src="/engravings/pages/about.webp"
           alt=""
           aria-hidden="true"
         />
