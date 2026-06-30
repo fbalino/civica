@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from "react";
 import type { LegislatureChamber } from "@/lib/factbook/legislature";
+import type { ChamberCoalition } from "@/lib/db/queries-legislature";
+import { ChamberComposition } from "./ChamberComposition";
+import { PartyBrowser } from "./PartyBrowser";
 
 /**
  * Client-side hemicycle chart for the factbook Legislature section.
@@ -22,6 +25,12 @@ interface FactbookLegislatureChartProps {
   /** "Lower house" | "Upper house" | "Legislature" — passed in by parent. */
   houseLabel: string;
   countryName: string;
+  /**
+   * Governing-coalition signal for this chamber, when the underlying body has
+   * `is_ruling_coalition` flags. Null for the vast majority of bodies — the
+   * composition balance bar + browser tags are simply omitted in that case.
+   */
+  coalition?: ChamberCoalition | null;
 }
 
 interface SeatPos {
@@ -71,6 +80,7 @@ export function FactbookLegislatureChart({
   chamber,
   houseLabel,
   countryName,
+  coalition = null,
 }: FactbookLegislatureChartProps) {
   const [dimmed, setDimmed] = useState<Set<string>>(new Set());
   const [hover, setHover] = useState<{
@@ -129,6 +139,8 @@ export function FactbookLegislatureChart({
           {" seats · hover a seat for the party"}
         </div>
       </div>
+
+      <ChamberComposition chamber={chamber} coalition={coalition} />
 
       <div className="factbook-legislature-stage">
         {seats.length > 0 ? (
@@ -261,67 +273,17 @@ export function FactbookLegislatureChart({
         </div>
       </div>
 
-      {/* All political parties */}
+      {/* Party browser — sortable, expandable per-party detail. Replaces the
+          old flat list; the hemicycle dim-on-click lives here now too. */}
       {sortedParties.length > 0 && (
-        <div className="factbook-legislature-parties">
-          <div className="factbook-legislature-parties-head">
-            <span className="factbook-legislature-parties-title">
-              All political parties
-            </span>
-            <span className="factbook-legislature-parties-meta">
-              {sortedParties.length}
-              {sortedParties.length === 1 ? " party" : " parties"}
-              {" · "}
-              {chamber.total}
-              {" seats · click to dim in hemicycle"}
-            </span>
-          </div>
-          <div className="factbook-legislature-parties-list">
-            {sortedParties.map((p) => {
-              const pct = chamber.total > 0 ? (p.seats / chamber.total) * 100 : 0;
-              const isDimmed = dimmed.has(p.id);
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  className={`factbook-legislature-row${isDimmed ? " is-dim" : ""}`}
-                  onClick={() => toggleDim(p.id)}
-                  aria-pressed={isDimmed}
-                  title={
-                    isDimmed
-                      ? `Click to show ${p.name} in the hemicycle`
-                      : `Click to dim ${p.name} in the hemicycle`
-                  }
-                >
-                  <span
-                    className="factbook-legislature-swatch"
-                    style={{ background: p.color }}
-                    aria-hidden="true"
-                  />
-                  <span className="factbook-legislature-party-name">
-                    {p.name}
-                  </span>
-                  <span className="factbook-legislature-bar">
-                    <span
-                      className="factbook-legislature-bar-fill"
-                      style={{
-                        width: `${pct.toFixed(1)}%`,
-                        background: p.color,
-                      }}
-                    />
-                  </span>
-                  <span className="factbook-legislature-seats">
-                    {p.seats}
-                    <span className="factbook-legislature-pct">
-                      {" "}
-                      &middot; {pct.toFixed(1)}%
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <PartyBrowser
+          parties={sortedParties}
+          chamberTotal={chamber.total}
+          coalitionPartyNames={coalition?.coalitionPartyNames ?? []}
+          scopeId={chamber.id}
+          dimmed={dimmed}
+          onToggleDim={toggleDim}
+        />
       )}
     </div>
   );

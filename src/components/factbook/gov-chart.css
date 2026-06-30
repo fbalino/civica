@@ -1,0 +1,316 @@
+/* ============================================================================
+ * Government structure — "How power is organised"
+ * Civica Data tab → Government section.
+ *
+ * Branch-columned hierarchy. Tokens only (no raw hex / px font-sizes /
+ * magic-number spacing / monospace on labels). Reads as a piece of the
+ * /design-system almanac language: warm paper, hairline rules, ink-navy
+ * type, branch-coloured accents, provenance-first.
+ * ========================================================================== */
+
+.govstruct {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ── Branch columns grid ─────────────────────────────────────────────────── */
+.govstruct-branches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.govstruct-branch {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+  box-shadow: var(--shadow-hard);
+  overflow: hidden;
+}
+
+/* Branch heading band — a thin coloured top rule + small-caps Inter label. */
+.govstruct-branch-head {
+  position: relative;
+  padding: var(--space-4) var(--space-4) var(--space-3);
+  border-bottom: 1px solid var(--color-stat-border);
+}
+.govstruct-branch-head::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--govstruct-accent, var(--color-text-40));
+}
+.govstruct-branch-label {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--govstruct-accent, var(--color-text-primary));
+}
+.govstruct-branch-summary {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.govstruct-branch-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-4);
+}
+
+/* ── Role / office card ──────────────────────────────────────────────────── */
+.govstruct-role {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--color-stat-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+}
+/* The principal head card carries the branch accent and a touch more weight. */
+.govstruct-role--rank0 {
+  border-color: color-mix(in oklab, var(--govstruct-accent) 40%, var(--color-stat-border));
+  background: color-mix(in oklab, var(--govstruct-accent) 5%, var(--color-bg));
+}
+/* Deputy / leadership cards are indented one notch. */
+.govstruct-role--rank1 {
+  margin-left: var(--space-3);
+}
+/* Member cards (cabinet ministers) are indented and slightly quieter. */
+.govstruct-role--rank2 {
+  margin-left: var(--space-3);
+  padding-block: var(--space-2);
+}
+
+/* Vertical branch-coloured tick on the left edge of each card. */
+.govstruct-role-tick {
+  flex: 0 0 auto;
+  width: 3px;
+  align-self: stretch;
+  min-height: 1.75rem;
+  border-radius: var(--radius-full);
+  background: var(--govstruct-accent, var(--color-text-40));
+}
+.govstruct-role--rank2 .govstruct-role-tick {
+  background: color-mix(in oklab, var(--govstruct-accent) 50%, transparent);
+}
+
+.govstruct-role-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.govstruct-role-title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-snug);
+  color: var(--color-text-primary);
+  line-height: 1.25;
+}
+.govstruct-role--rank0 .govstruct-role-title {
+  font-size: var(--text-14);
+}
+.govstruct-role-holder {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-16);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+.govstruct-role--rank2 .govstruct-role-holder {
+  font-size: var(--text-15);
+}
+.govstruct-role-vacant {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+/* Meta row under the holder: "since 2017" + party. */
+.govstruct-role-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  margin-top: var(--space-1);
+}
+.govstruct-role-since {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.govstruct-role-party {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+.govstruct-role-party-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-text-40);
+  flex: 0 0 auto;
+}
+
+/* ── Chamber / court block (legislative & judicial named bodies) ──────────── */
+.govstruct-chamber {
+  border: 1px solid var(--color-stat-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+.govstruct-chamber-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-bottom: 1px solid transparent;
+}
+.govstruct-chamber--has-roles .govstruct-chamber-head {
+  border-bottom-color: var(--color-stat-border);
+}
+.govstruct-chamber-headline {
+  min-width: 0;
+}
+.govstruct-chamber-name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+.govstruct-chamber-seats {
+  flex: 0 0 auto;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.govstruct-chamber-tag {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.govstruct-chamber-roles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+}
+.govstruct-chamber-role {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.govstruct-chamber-role-title {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-secondary);
+}
+.govstruct-chamber-role-holder {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  text-align: right;
+}
+
+/* ── Legend + footer note ────────────────────────────────────────────────── */
+.govstruct-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-stat-border);
+}
+.govstruct-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.govstruct-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.govstruct-legend-swatch {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: var(--radius-full);
+  flex: 0 0 auto;
+}
+.govstruct-note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+.govstruct--empty {
+  padding: var(--space-5);
+  border: 1px dashed var(--color-card-border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.govstruct-empty-note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .govstruct-branches {
+    grid-template-columns: 1fr;
+  }
+  .govstruct-role--rank1,
+  .govstruct-role--rank2 {
+    margin-left: var(--space-2);
+  }
+}

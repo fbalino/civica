@@ -1,88 +1,96 @@
-// Government org-chart data shape + builder.
+// Government structure model + builder for the Civica Data → Government
+// section ("How power is organised").
 //
-// Phase G renders an actual top-down org chart for the Government
-// section of /factbook/[slug], replacing the side-by-side
-// Executive/Legislative/Judicial card layout the user correctly
-// flagged as "horrible, no value."
+// This replaces the abstract top-down SVG org chart. An audit of the
+// underlying data showed the SVG read as 2–4 thin floating boxes for the
+// ~95% of countries that carry only a head of state, a head of government,
+// and one or two legislative chambers. The branch-grouped model below is
+// legible at that thin tier AND scales up for the data-rich cases
+// (United States: 4 bodies / 11 offices; United Kingdom: cabinet detail).
 //
-// Conservative principle (post-Outcomes-methodology lesson): we only
-// render relationships that are EXPLICITLY in the schema. We do NOT
-// infer cross-branch edges (e.g. "monarch appoints PM") from the
-// gov-type taxonomy. If we don't have the data, the chart shows fewer
-// edges — readers get less, but everything they DO see is sourced.
+// Honest-data principle (unchanged from the prior implementation): we only
+// surface relationships and facts that are EXPLICITLY in the schema. We do
+// NOT infer cross-branch edges, monarch-vs-president distinctions, or any
+// title the data does not give us. Sparse countries degrade to fewer cards,
+// never fabricated structure.
 //
-// Data sources used:
-//   - government_bodies.parentBodyId   → body→body edge
-//   - government_bodies.branch         → tier inference (monarchy/exec/legislative/judicial)
-//   - government_bodies.hierarchyLevel → tier ordering within branch
-//   - offices.bodyId                   → office→body containment
-//   - offices.reportsToOfficeId        → office→office edge
-//   - offices.officeType               → tier inference (head_of_state at top)
-//   - terms (current)                  → who currently occupies each office
+// Data sources used (per the existing `getGovernmentStructure` query):
+//   - government_bodies.branch        → which column (executive/legislative/judicial)
+//   - government_bodies.bodyType      → cabinet vs legislature vs judiciary
+//   - government_bodies.chamberType   → upper / lower chamber label
+//   - government_bodies.totalSeats    → chamber seat count
+//   - offices.officeType             → role grouping + ordering within a branch
+//   - offices.reportsToOfficeId      → "reports to" relation (rare; 8 of 389)
+//   - terms (current)                → current officeholder + start date
+//   - terms.partyName / partyColor   → holder party affiliation (sparse; 11 of 389)
 
-// ─── Public data shape (what the renderer consumes) ─────────────────────────
+// ─── Public model (what the renderer consumes) ─────────────────────────────
 
-export interface OrgNode {
+export type GovBranchKind = "executive" | "legislative" | "judicial" | "other";
+
+/** A single office card: a role + (optionally) who currently holds it. */
+export interface GovRole {
   id: string;
-  /** Display label, e.g. "Head of State", "House of Representatives" */
-  label: string;
-  /** Optional secondary line, e.g. "360 seats", "ceremonial" */
-  sublabel?: string;
-  /** Current officeholder name, when this is an office */
+  /** Role / office title, e.g. "Head of State", "Secretary of Defense". */
+  title: string;
+  /** Current officeholder name, when sourced. */
   holderName?: string;
-  /** Branch — drives the accent colour (--color-branch-*) */
-  branch?:
-    | "monarchy"
-    | "executive"
-    | "legislative"
-    | "judicial"
-    | "religious"
-    | "party"
-    | "other";
-  /** Visual hint — render with a smaller / dashed border */
-  isCeremonial?: boolean;
-  /** "office" boxes are smaller; "body" boxes are larger and may show seat counts */
-  kind: "office" | "body";
-  /** For body nodes — total seats, surfaces in the sublabel */
-  totalSeats?: number | null;
+  /** Year the current holder took office, when sourced (from term.startDate). */
+  sinceYear?: number;
+  /** Holder's party, when sourced (sparse). */
+  party?: string;
+  /** Party swatch colour, when sourced. Always a hex/string from the DB —
+   *  rendered as an inline style on a small dot, never on text. */
+  partyColor?: string;
+  /** Tier within the branch column: 0 = principal (head), 1 = deputy /
+   *  leadership, 2 = members (cabinet ministers, etc.). Drives indentation
+   *  and emphasis, not a separate row. */
+  rank: 0 | 1 | 2;
+  /** True when this card has no current holder (role exists, seat data thin). */
+  vacant: boolean;
 }
 
-export interface OrgEdge {
-  from: string; // node id
-  to: string; // node id
-  /** Edge semantics — drives the line style + label.
-   *  "contains" = body contains office (vertical, solid)
-   *  "reports_to" = office reports to office (vertical, solid)
-   *  "subordinates" = parent body contains sub-body (vertical, solid)
-   *  "appoints" / "confidence" / "elects" / "advises" / "reviews" reserved for
-   *  future curated cross-branch edges — NOT inferred. */
-  type:
-    | "contains"
-    | "reports_to"
-    | "subordinates"
-    | "appoints"
-    | "confidence"
-    | "elects"
-    | "advises"
-    | "reviews";
-  /** Optional label override; otherwise type-derived */
-  label?: string;
+/** A legislative chamber (or, generically, a named body within a branch). */
+export interface GovChamber {
+  id: string;
+  /** Real body name, e.g. "House of Representatives", "National Assembly". */
+  name: string;
+  /** "Upper" / "Lower" when chamberType is set. */
+  chamberLabel?: string;
+  /** Seat count, when sourced. */
+  totalSeats?: number;
+  /** Leadership roles attached to this chamber (speakers, majority leaders). */
+  roles: GovRole[];
 }
 
-export interface OrgChart {
-  /** Tiers (rows) of nodes, top → bottom */
-  tiers: OrgNode[][];
-  edges: OrgEdge[];
-  /** Source attribution string for the SourceDot */
+export interface GovBranch {
+  kind: GovBranchKind;
+  /** Column heading, e.g. "Executive", "Legislative", "Judicial". */
+  label: string;
+  /** Principal / cabinet roles (executive & judicial branches). */
+  roles: GovRole[];
+  /** Named chambers/courts within the branch (legislative & judicial). */
+  chambers: GovChamber[];
+  /** One-line descriptor under the heading, e.g. "Bicameral · 535 seats". */
+  summary?: string;
+}
+
+export interface GovStructure {
+  branches: GovBranch[];
+  /** Source attribution string for the SourceDot. */
   source: string;
-  /** Provenance note shown below the chart */
-  note?: string;
-  /** Number of nodes — when very low, the renderer shows a "limited
-   *  structural data" notice instead of the chart */
+  /** Total cards rendered — used by the caller's visibility gate. */
   nodeCount: number;
+  /** True when both head-of-state and head-of-government resolve to the same
+   *  person (presidential systems, absolute monarchies) and were merged. */
+  headsMerged: boolean;
+  /** Count of distinct named officeholders surfaced — drives the footer note. */
+  officeholderCount: number;
 }
 
-// ─── Inputs from the existing data layer ─────────────────────────────────────
+// ─── Inputs from the existing data layer ───────────────────────────────────
+// Shapes mirror what `getGovernmentStructure(jurisdictionId)` returns so the
+// existing call site passes its rows straight through.
 
 export interface GovBodyInput {
   id: string;
@@ -104,212 +112,326 @@ export interface GovOfficeInput {
 }
 
 export interface GovTermInput {
-  term: { officeId: string };
+  term: {
+    officeId: string;
+    startDate?: string | Date | null;
+    partyName?: string | null;
+    partyColor?: string | null;
+  };
   person: { name: string };
 }
 
-export interface BuildOrgChartInput {
+export interface BuildGovStructureInput {
   bodies: GovBodyInput[];
   offices: GovOfficeInput[];
   currentTerms: GovTermInput[];
-  /** Wikidata persons sometimes leak QIDs into person.name; filter them */
+  /** Wikidata persons sometimes leak QIDs into person.name; filter them. */
   isQid?: (name: string) => boolean;
 }
 
-// ─── Tier inference rules ────────────────────────────────────────────────────
+// ─── Helpers ───────────────────────────────────────────────────────────────
 
-/**
- * Tier number (lower = higher in the chart).
- *
- * 0  Head of state office (always at top)
- * 0  Monarchy bodies (when monarchy branch present and no head_of_state office)
- * 1  Head of government office
- * 1  Top-level executive/legislative/judicial bodies
- * 2  Sub-bodies (parented), deputy offices, individual chambers' speakers
- * 3+ further descendants
- */
-function tierOfOffice(o: GovOfficeInput): number {
-  switch (o.officeType) {
-    case "head_of_state":
-      return 0;
-    case "head_of_government":
-      return 1;
-    case "deputy_head":
-    case "cabinet":
-    case "legislative_leader":
-      return 2;
+function normaliseBranch(raw: string | null | undefined): GovBranchKind {
+  switch ((raw ?? "").toLowerCase()) {
+    case "executive":
+    case "monarchy":
+      return "executive";
+    case "legislative":
+      return "legislative";
     case "judicial":
+      return "judicial";
+    default:
+      return "other";
+  }
+}
+
+const BRANCH_LABEL: Record<GovBranchKind, string> = {
+  executive: "Executive",
+  legislative: "Legislative",
+  judicial: "Judicial",
+  other: "Other bodies",
+};
+
+/** Display order of branches in the layout. */
+const BRANCH_ORDER: GovBranchKind[] = [
+  "executive",
+  "legislative",
+  "judicial",
+  "other",
+];
+
+/** Office-type → rank within its branch column (0 highest). */
+function rankOfOffice(officeType: string): 0 | 1 | 2 {
+  switch (officeType) {
+    case "head_of_state":
+    case "head_of_government":
+    case "judicial_leader":
+      return 0;
+    case "deputy_head":
       return 1;
+    case "legislative_leader":
+      return 1;
+    case "cabinet":
     default:
       return 2;
   }
 }
 
-function tierOfBody(b: GovBodyInput, allBodies: GovBodyInput[]): number {
-  if (b.branch === "monarchy") return 0;
-  if (b.parentBodyId && allBodies.some((p) => p.id === b.parentBodyId)) {
-    return 2;
-  }
-  return 1;
+function yearOf(value: string | Date | null | undefined): number | undefined {
+  if (!value) return undefined;
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return undefined;
+  const y = d.getUTCFullYear();
+  return y > 1000 && y < 3000 ? y : undefined;
 }
 
-const BRANCH_NORMALISE: Record<string, OrgNode["branch"]> = {
-  monarchy: "monarchy",
-  executive: "executive",
-  legislative: "legislative",
-  judicial: "judicial",
-  religious: "religious",
-  party: "party",
-};
-
-function normalisedBranch(raw: string | null): OrgNode["branch"] {
-  if (!raw) return "other";
-  const k = raw.toLowerCase();
-  return BRANCH_NORMALISE[k] ?? "other";
+interface CurrentHolder {
+  name: string;
+  sinceYear?: number;
+  party?: string;
+  partyColor?: string;
 }
 
-// ─── Builder ────────────────────────────────────────────────────────────────
+// ─── Builder ─────────────────────────────────────────────────────────────────
 
 /**
- * Pure transform: takes the same inputs the legacy GovStructureDiagram
- * receives, returns a structured OrgChart.
- *
- * Returns `null` when there's effectively no structural data
- * (≤ 1 body AND ≤ 1 office) — caller should fall back to the CIA
- * reference data only.
+ * Pure transform: the same rows `getGovernmentStructure` returns →
+ * a branch-grouped `GovStructure`. Returns `null` when there is no
+ * meaningful structure (no offices and ≤1 body) so the caller can fall
+ * back to the CIA reference prose.
  */
-export function buildOrgChart(input: BuildOrgChartInput): OrgChart | null {
+export function buildGovStructure(
+  input: BuildGovStructureInput
+): GovStructure | null {
   const { bodies, offices, currentTerms } = input;
   const isQid = input.isQid ?? ((s: string) => /^Q\d+$/.test(s));
 
-  if (bodies.length <= 1 && offices.length <= 1) return null;
+  if (offices.length === 0 && bodies.length <= 1) return null;
 
-  const holderByOffice = new Map<string, string>();
+  // Current holder per office (first non-QID term wins).
+  const holderByOffice = new Map<string, CurrentHolder>();
   for (const t of currentTerms) {
-    if (isQid(t.person.name)) continue;
-    if (!holderByOffice.has(t.term.officeId)) {
-      holderByOffice.set(t.term.officeId, t.person.name);
-    }
-  }
-
-  // Build node list. Each node is either an office or a body.
-  const nodes: Array<{ node: OrgNode; tier: number }> = [];
-
-  for (const b of bodies) {
-    const tier = tierOfBody(b, bodies);
-    const totalSeats = b.totalSeats ?? null;
-    let sublabel: string | undefined;
-    if (b.chamberType) {
-      const chamberLabel = b.chamberType === "upper" ? "Upper" : b.chamberType === "lower" ? "Lower" : "";
-      sublabel = totalSeats
-        ? `${chamberLabel} chamber · ${totalSeats} seats`
-        : `${chamberLabel} chamber`;
-    } else if (totalSeats) {
-      sublabel = `${totalSeats} seats`;
-    } else if (b.bodyType) {
-      sublabel = b.bodyType.replace(/_/g, " ");
-    }
-    nodes.push({
-      node: {
-        id: `body:${b.id}`,
-        label: b.name,
-        sublabel,
-        branch: normalisedBranch(b.branch),
-        kind: "body",
-        totalSeats,
-      },
-      tier,
+    const name = t.person?.name;
+    if (!name || isQid(name)) continue;
+    if (holderByOffice.has(t.term.officeId)) continue;
+    holderByOffice.set(t.term.officeId, {
+      name,
+      sinceYear: yearOf(t.term.startDate),
+      party: t.term.partyName ?? undefined,
+      partyColor: t.term.partyColor ?? undefined,
     });
   }
 
-  for (const o of offices) {
-    const tier = tierOfOffice(o);
-    const parentBody = bodies.find((b) => b.id === o.bodyId);
-    nodes.push({
-      node: {
-        id: `office:${o.id}`,
-        label: o.name,
-        holderName: holderByOffice.get(o.id),
-        branch: normalisedBranch(parentBody?.branch ?? null),
-        kind: "office",
-      },
-      tier,
+  const bodyById = new Map(bodies.map((b) => [b.id, b]));
+
+  function roleFromOffice(o: GovOfficeInput, title?: string): GovRole {
+    const holder = holderByOffice.get(o.id);
+    return {
+      id: `office:${o.id}`,
+      title: title ?? o.name,
+      holderName: holder?.name,
+      sinceYear: holder?.sinceYear,
+      party: holder?.party,
+      partyColor: holder?.partyColor,
+      rank: rankOfOffice(o.officeType),
+      vacant: !holder,
+    };
+  }
+
+  // ── Detect a shared head (HoS === HoG, same person) ──────────────────────
+  // Presidential systems and absolute monarchies store two offices held by
+  // one person. Merge them into a single principal card so the chart doesn't
+  // show the same human twice.
+  const hosOffice = offices.find((o) => o.officeType === "head_of_state");
+  const hogOffice = offices.find((o) => o.officeType === "head_of_government");
+  const hosHolder = hosOffice ? holderByOffice.get(hosOffice.id) : undefined;
+  const hogHolder = hogOffice ? holderByOffice.get(hogOffice.id) : undefined;
+  const headsMerged =
+    !!hosOffice &&
+    !!hogOffice &&
+    !!hosHolder &&
+    !!hogHolder &&
+    hosHolder.name === hogHolder.name;
+
+  const mergedOfficeIds = new Set<string>();
+  const executiveRoles: GovRole[] = [];
+  if (headsMerged && hosOffice && hogOffice) {
+    mergedOfficeIds.add(hosOffice.id);
+    mergedOfficeIds.add(hogOffice.id);
+    const holder = hosHolder!;
+    executiveRoles.push({
+      id: `office:${hosOffice.id}`,
+      title: "Head of State and Government",
+      holderName: holder.name,
+      sinceYear: holder.sinceYear,
+      party: holder.party,
+      partyColor: holder.partyColor,
+      rank: 0,
+      vacant: false,
     });
   }
 
-  // Edges (only relationships explicitly in the schema).
-  const edges: OrgEdge[] = [];
+  // ── Assign offices to branches via their parent body ─────────────────────
+  // Group sub-offices (cabinet members, chamber leaders) by their target.
+  const branchRoles: Record<GovBranchKind, GovRole[]> = {
+    executive: [...executiveRoles],
+    legislative: [],
+    judicial: [],
+    other: [],
+  };
+  // Leadership offices attached to a specific legislative/judicial body.
+  const rolesByBody = new Map<string, GovRole[]>();
 
-  // body → sub-body
+  for (const o of offices) {
+    if (mergedOfficeIds.has(o.id)) continue;
+    const body = bodyById.get(o.bodyId);
+    const branchKind = normaliseBranch(body?.branch);
+
+    // Chamber/court leadership lands on the body card, not the branch column.
+    if (
+      (branchKind === "legislative" || branchKind === "judicial") &&
+      body &&
+      body.bodyType !== "cabinet"
+    ) {
+      const arr = rolesByBody.get(body.id) ?? [];
+      arr.push(roleFromOffice(o));
+      rolesByBody.set(body.id, arr);
+      continue;
+    }
+    branchRoles[branchKind].push(roleFromOffice(o));
+  }
+
+  // ── Build chambers (legislative & judicial named bodies) ─────────────────
+  const branchChambers: Record<GovBranchKind, GovChamber[]> = {
+    executive: [],
+    legislative: [],
+    judicial: [],
+    other: [],
+  };
+
+  // A unicameral legislature carries no meaningful upper/lower distinction,
+  // yet the source still tags its single chamber "lower". Suppress the
+  // chamber label in that case so we don't imply a missing upper house.
+  const legislativeBodyCount = bodies.filter(
+    (b) => normaliseBranch(b.branch) === "legislative" && b.bodyType !== "cabinet"
+  ).length;
+
   for (const b of bodies) {
-    if (b.parentBodyId && bodies.some((p) => p.id === b.parentBodyId)) {
-      edges.push({
-        from: `body:${b.parentBodyId}`,
-        to: `body:${b.id}`,
-        type: "subordinates",
-      });
-    }
+    const branchKind = normaliseBranch(b.branch);
+    // The executive "Executive of X" cabinet body is a container with a
+    // generic name; we surface its offices, not the body itself.
+    if (branchKind === "executive" || b.bodyType === "cabinet") continue;
+    if (branchKind === "other") continue;
+
+    const chamberLabel =
+      branchKind === "legislative" && legislativeBodyCount < 2
+        ? undefined
+        : b.chamberType === "upper"
+          ? "Upper chamber"
+          : b.chamberType === "lower"
+            ? "Lower chamber"
+            : undefined;
+
+    branchChambers[branchKind].push({
+      id: `body:${b.id}`,
+      name: b.name,
+      chamberLabel,
+      totalSeats: b.totalSeats ?? undefined,
+      roles: sortRoles(rolesByBody.get(b.id) ?? []),
+    });
   }
 
-  // office → office
-  for (const o of offices) {
-    if (o.reportsToOfficeId && offices.some((p) => p.id === o.reportsToOfficeId)) {
-      edges.push({
-        from: `office:${o.reportsToOfficeId}`,
-        to: `office:${o.id}`,
-        type: "reports_to",
-      });
-    }
+  // ── Assemble branches in canonical order, skipping empties ───────────────
+  const branches: GovBranch[] = [];
+  for (const kind of BRANCH_ORDER) {
+    const roles = sortRoles(branchRoles[kind]);
+    const chambers = sortChambers(branchChambers[kind], kind);
+    if (roles.length === 0 && chambers.length === 0) continue;
+    branches.push({
+      kind,
+      label: BRANCH_LABEL[kind],
+      roles,
+      chambers,
+      summary: summarise(kind, chambers),
+    });
   }
 
-  // body → office (containment) — only when the office has no parent
-  // office (otherwise the parent-office is a stronger relation).
-  for (const o of offices) {
-    if (!o.reportsToOfficeId && bodies.some((b) => b.id === o.bodyId)) {
-      // Promote head_of_state and head_of_government offices ABOVE their
-      // body in the tier — readers expect "Head of State" at the top
-      // even if the body it nominally belongs to is the cabinet.
-      // The tier is already set correctly via tierOfOffice; the edge
-      // direction here just signals containment.
-      edges.push({
-        from: `body:${o.bodyId}`,
-        to: `office:${o.id}`,
-        type: "contains",
-      });
-    }
-  }
+  if (branches.length === 0) return null;
 
-  // Group nodes into tiers (sparse → packed). If a tier is empty, skip it.
-  const maxTier = Math.max(...nodes.map((n) => n.tier), 0);
-  const tiers: OrgNode[][] = [];
-  for (let t = 0; t <= maxTier; t++) {
-    const row = nodes.filter((n) => n.tier === t).map((n) => n.node);
-    if (row.length > 0) tiers.push(row);
+  // ── Counts for the gate + footer note ────────────────────────────────────
+  const named = new Set<string>();
+  let nodeCount = 0;
+  for (const br of branches) {
+    for (const r of br.roles) {
+      nodeCount += 1;
+      if (r.holderName) named.add(r.holderName);
+    }
+    for (const ch of br.chambers) {
+      nodeCount += 1;
+      for (const r of ch.roles) {
+        nodeCount += 1;
+        if (r.holderName) named.add(r.holderName);
+      }
+    }
   }
 
   return {
-    tiers,
-    edges,
-    source: "Civica internal · derived from CIA Factbook + Wikidata officeholders",
-    nodeCount: nodes.length,
+    branches,
+    source: "Civica · CIA World Factbook + Wikidata officeholders",
+    nodeCount,
+    headsMerged,
+    officeholderCount: named.size,
   };
 }
 
-// ─── DB-backed helper (avoids re-implementing in page.tsx) ──────────────────
+// ─── Ordering helpers ────────────────────────────────────────────────────────
+
+function sortRoles(roles: GovRole[]): GovRole[] {
+  // Stable sort by rank, holders before vacant within the same rank.
+  return [...roles].sort((a, b) => {
+    if (a.rank !== b.rank) return a.rank - b.rank;
+    if (a.vacant !== b.vacant) return a.vacant ? 1 : -1;
+    return 0;
+  });
+}
+
+function sortChambers(
+  chambers: GovChamber[],
+  kind: GovBranchKind
+): GovChamber[] {
+  if (kind !== "legislative") return chambers;
+  // Upper chamber above lower chamber for a consistent bicameral reading.
+  const order = (c: GovChamber) =>
+    c.chamberLabel === "Upper chamber"
+      ? 0
+      : c.chamberLabel === "Lower chamber"
+        ? 1
+        : 2;
+  return [...chambers].sort((a, b) => order(a) - order(b));
+}
+
+function summarise(kind: GovBranchKind, chambers: GovChamber[]): string | undefined {
+  if (kind !== "legislative" || chambers.length === 0) return undefined;
+  const cameral = chambers.length >= 2 ? "Bicameral" : "Unicameral";
+  const seatTotal = chambers.reduce((s, c) => s + (c.totalSeats ?? 0), 0);
+  if (seatTotal > 0) {
+    return `${cameral} · ${seatTotal.toLocaleString("en-US")} seats`;
+  }
+  return cameral;
+}
+
+// ─── DB-backed convenience (preserves the existing call-site contract) ───────
 
 /**
- * Convenience: same inputs as the existing
- * `getGovernmentStructure(jurisdictionId)` query, but returns an
- * `OrgChart` ready to hand to the renderer.
- *
- * Designed so the existing call site in `(reader)/factbook/[slug]/page.tsx`
- * can pass `govStructure.bodies`, `govStructure.offices`,
- * `govStructure.currentTerms` straight through.
+ * Same inputs as `getGovernmentStructure(jurisdictionId)`; returns a
+ * `GovStructure` ready for the renderer, or `null` when structure is too
+ * thin. The name is retained for the existing call site in
+ * `(reader)/country/[slug]/civica-data/page.tsx`.
  */
 export function buildOrgChartFromGovernmentStructure(
   bodies: GovBodyInput[],
   offices: GovOfficeInput[],
   currentTerms: GovTermInput[]
-): OrgChart | null {
-  return buildOrgChart({ bodies, offices, currentTerms });
+): GovStructure | null {
+  return buildGovStructure({ bodies, offices, currentTerms });
 }

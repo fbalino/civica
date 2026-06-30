@@ -27,6 +27,7 @@ import { buildOrgChartFromGovernmentStructure } from "@/lib/factbook/gov-org-cha
 import { FactbookLegislature } from "@/components/factbook/FactbookLegislature";
 import { FactbookLeaders } from "@/components/factbook/FactbookLeaders";
 import { FactbookBills } from "@/components/factbook/FactbookBills";
+import { FactbookOrganizations } from "@/components/factbook/FactbookOrganizations";
 import { ScoresAndRankings } from "@/components/scores/ScoresAndRankings";
 import { CivicaIndexPanel } from "@/components/country/CivicaIndexPanel";
 import { sourceLabel } from "@/lib/data/sources";
@@ -71,33 +72,6 @@ const SECTION_PLAN: SectionPlan[] = [
   { id: "organizations", label: "Organizations" },
   { id: "rankings", label: "Rankings" },
 ];
-
-const ORG_TYPE_LABELS: Record<string, string> = {
-  un: "United Nations & Agencies",
-  security: "Security Alliances",
-  regional: "Regional Blocs",
-  trade: "Trade & Economic",
-  cultural: "Cultural & Linguistic",
-  other: "Other",
-};
-
-const ORG_TYPE_COLORS: Record<string, string> = {
-  un: "var(--cat-un)",
-  security: "var(--cat-security)",
-  regional: "var(--cat-regional)",
-  trade: "var(--cat-trade)",
-  cultural: "var(--cat-cultural)",
-  other: "var(--color-text-40)",
-};
-
-const ORG_TYPE_ORDER = ["un", "security", "regional", "trade", "cultural", "other"];
-
-function membershipYear(joinDate: string | Date | null): number | null {
-  if (!joinDate) return null;
-  const d = typeof joinDate === "string" ? new Date(joinDate) : joinDate;
-  if (Number.isNaN(d.getTime())) return null;
-  return d.getFullYear();
-}
 
 export default async function CountryCivicaDataTab({
   params,
@@ -237,25 +211,11 @@ export default async function CountryCivicaDataTab({
     ];
   }
 
-  // Group international memberships by org type for the Organizations
-  // section. Rows come from the DB pre-sorted by (type, name).
-  const membershipsByType = new Map<
-    string,
-    Awaited<ReturnType<typeof getInternationalMembershipsBySlugs>>
-  >();
-  for (const m of memberships) {
-    const type = ORG_TYPE_ORDER.includes(m.orgType) ? m.orgType : "other";
-    const list = membershipsByType.get(type) ?? [];
-    list.push(m);
-    membershipsByType.set(type, list);
-  }
-  const earliestAccession = memberships.reduce<number | null>((acc, m) => {
-    const y = membershipYear(m.joinDate);
-    return y != null && (acc == null || y < acc) ? y : acc;
-  }, null);
-  const foundingCount = memberships.filter(
-    (m) => (m.role ?? "").toLowerCase() === "founding"
-  ).length;
+  // The Organizations section's grouping, summary stats, and co-membership
+  // context are computed inside <FactbookOrganizations> from its own deepened
+  // fetch. The `memberships` array fetched above is retained only for the
+  // visibility gate (`hasOrganizations`) and the right-rail Wikidata source
+  // attribution below.
 
   // Right-rail "Sources on this page" — accurate to what THIS tab actually
   // renders. Each entry carries the real source id (so the <SourceDot> reads
@@ -424,120 +384,23 @@ export default async function CountryCivicaDataTab({
               </div>
             )}
 
-            {/* 6. Organizations — international footprint. */}
+            {/* 6. Organizations — international footprint. The enriched
+                Organizations section (grouped membership cards with role,
+                accession year, org scale, and co-membership context) lives
+                in <FactbookOrganizations>, which fetches its own deepened
+                data by jurisdictionId. The page keeps the lighter
+                `memberships` fetch above only for the visibility gate and
+                the right-rail source attribution. */}
             {section.id === "organizations" && (
-              <>
-                <div
-                  id="organizations--summary"
-                  className="civica-data-intl-stats"
-                >
-                  <div className="civica-data-intl-stat">
-                    <div className="civica-data-intl-stat-k">Memberships</div>
-                    <div className="civica-data-intl-stat-v">
-                      {memberships.length}
-                    </div>
-                  </div>
-                  <div className="civica-data-intl-stat">
-                    <div className="civica-data-intl-stat-k">
-                      Founding member of
-                    </div>
-                    <div className="civica-data-intl-stat-v">
-                      {foundingCount}
-                    </div>
-                  </div>
-                  <div className="civica-data-intl-stat">
-                    <div className="civica-data-intl-stat-k">
-                      Earliest accession
-                    </div>
-                    <div className="civica-data-intl-stat-v">
-                      {earliestAccession ?? "—"}
-                    </div>
-                  </div>
-                </div>
-
-                <div id="organizations--list" className="civica-data-anchor">
-                {ORG_TYPE_ORDER.map((type) => {
-                  const items = membershipsByType.get(type);
-                  if (!items || items.length === 0) return null;
-                  const color = ORG_TYPE_COLORS[type] ?? ORG_TYPE_COLORS.other;
-                  return (
-                    <div key={type} className="civica-data-intl-group">
-                      <div
-                        className="civica-data-intl-group-head"
-                        style={{ color }}
-                      >
-                        <span
-                          className="civica-data-intl-group-dot"
-                          style={{ background: color }}
-                        />
-                        {ORG_TYPE_LABELS[type] ?? type}
-                        <span className="civica-data-intl-group-count">
-                          {items.length}
-                        </span>
-                      </div>
-                      <div className="civica-data-intl-rows">
-                        {items.map((m) => {
-                          const year = membershipYear(m.joinDate);
-                          const role = (m.role ?? "").toLowerCase();
-                          const roleLabel =
-                            m.orgType === "un" && role === "permanent"
-                              ? "P5"
-                              : m.role
-                                ? m.role.charAt(0).toUpperCase() +
-                                  m.role.slice(1)
-                                : null;
-                          const rowInner = (
-                            <>
-                              <span
-                                className="civica-data-intl-row-dot"
-                                style={{ background: color }}
-                              />
-                              <span className="civica-data-intl-row-name">
-                                <span className="civica-data-intl-row-abbr">
-                                  {m.orgName}
-                                </span>
-                                {m.orgFullName &&
-                                m.orgFullName !== m.orgName ? (
-                                  <span className="civica-data-intl-row-full">
-                                    {m.orgFullName}
-                                  </span>
-                                ) : null}
-                              </span>
-                              {roleLabel ? (
-                                <span className="editorial-chip">
-                                  {roleLabel}
-                                </span>
-                              ) : (
-                                <span />
-                              )}
-                              <span className="civica-data-intl-row-year">
-                                {year ?? "—"}
-                              </span>
-                            </>
-                          );
-                          return m.orgSlug ? (
-                            <Link
-                              key={m.orgId}
-                              href={`/organizations/${m.orgSlug}`}
-                              className="civica-data-intl-row"
-                            >
-                              {rowInner}
-                            </Link>
-                          ) : (
-                            <div
-                              key={m.orgId}
-                              className="civica-data-intl-row"
-                            >
-                              {rowInner}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-                </div>
-              </>
+              <FactbookOrganizations
+                jurisdictionId={jurisdiction.id}
+                countryName={jurisdiction.name}
+                retrievedAt={
+                  wikidataSource?.lastSyncAt
+                    ? wikidataSource.lastSyncAt.toISOString()
+                    : null
+                }
+              />
             )}
 
             {/* 7. Rankings. */}

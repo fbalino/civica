@@ -1,0 +1,459 @@
+/*
+ * Leaders section — /country/[slug]/civica-data (Leaders).
+ *
+ * Co-located styling for the deepened FactbookLeaders component. Imported
+ * directly by FactbookLeaders.tsx (not globally) — the only surface that
+ * needs these rules. Tokens only; no hardcoded hex/px-font/magic spacing.
+ *
+ * Visual sibling to the Organizations block in civica-data.css (stat cards,
+ * branch dots, tabular numerics) so the Leaders section reads as one design
+ * language with the rest of the Civica Data tab.
+ *
+ * Naming: the `lead-*` namespace deliberately avoids the legacy
+ * `.factbook-leaders-*` classes in the shared factbook.css (which this
+ * component no longer uses) so the two cannot collide.
+ *
+ * Data honesty: every value rendered here is real Wikidata (officeholder
+ * name, office, party where present, term start date). There are no photos,
+ * no birth dates, and no historical (ended) terms in the source, so this
+ * section never renders a portrait, an age, or a "former officeholder"
+ * sequence — those degrade to monograms / tenure-from-start / current roster
+ * respectively. See the component header for the full audit.
+ */
+
+.lead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+
+/* ---- Section stat strip ------------------------------------------------- */
+.lead-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.lead-stat {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+  padding: var(--space-4) var(--space-5);
+  min-width: 0;
+}
+.lead-stat-k {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-2);
+}
+.lead-stat-v {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: 400;
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.lead-stat-unit {
+  font-family: var(--font-heading);
+  font-size: var(--text-15);
+  color: var(--color-text-60);
+}
+.lead-stat-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  margin-top: var(--space-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Subsection scaffolding -------------------------------------------- */
+.lead-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.lead-eyebrow {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0;
+}
+
+/* ---- Principal leadership cards (head of state / head of government) ----- */
+.lead-principals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+.lead-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
+  background: var(--color-card-bg);
+  overflow: hidden;
+}
+/* Branch accent rail — colored by the office's government-type hue. */
+.lead-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: var(--lead-accent, var(--color-accent));
+}
+
+.lead-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-stat-border);
+  background: color-mix(in oklab, var(--lead-accent, var(--color-accent)) 10%, var(--color-bg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.lead-avatar-monogram {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  letter-spacing: var(--tracking-tight);
+  color: color-mix(in oklab, var(--lead-accent, var(--color-accent)), black 18%);
+}
+
+.lead-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.lead-card-office {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--lead-accent, var(--color-accent));
+  margin: 0;
+}
+.lead-card-office-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--lead-accent, var(--color-accent));
+  flex: none;
+}
+.lead-card-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.lead-card-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-22);
+  font-weight: 400;
+  line-height: 1.1;
+  margin: 0;
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+.lead-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-1);
+}
+.lead-since {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-60);
+}
+.lead-since-date {
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+/* Tenure badge — derived from term start date (every current term). */
+.lead-tenure {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--lead-accent, var(--color-accent)) 12%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--lead-accent, var(--color-accent)) 30%, transparent);
+  color: color-mix(in oklab, var(--lead-accent, var(--color-accent)), black 28%);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.lead-tenure-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+}
+.lead-party {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-60);
+}
+.lead-party-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  flex: none;
+  border: 1px solid var(--color-stat-border);
+}
+.lead-card-source {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-5);
+}
+
+/* Note when one person holds both principal offices (presidential systems). */
+.lead-dual-note {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  margin: 0;
+}
+
+/* ---- Tenure timeline ---------------------------------------------------- */
+.lead-timeline {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.lead-timeline-caption {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+  margin: 0;
+}
+.lead-timeline-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.lead-tl-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+}
+.lead-tl-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.lead-tl-name {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lead-tl-office {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  margin-left: var(--space-2);
+  font-weight: var(--font-weight-regular);
+}
+.lead-tl-years {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex: none;
+}
+/* The track is the full span from the earliest start year to "now". A bar
+   grows from the leader's start to the right edge — wider = longer tenure. */
+.lead-tl-track {
+  position: relative;
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--color-text-primary) 6%, transparent);
+  overflow: hidden;
+}
+.lead-tl-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  border-radius: var(--radius-full);
+  background: var(--lead-accent, var(--color-accent));
+  min-width: 3px;
+}
+.lead-tl-axis {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Other offices (deputy / cabinet / legislature / judiciary) --------- */
+.lead-others {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.lead-branch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.lead-branch-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+.lead-branch-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  flex: none;
+  background: var(--lead-accent, var(--color-accent));
+}
+.lead-branch-count {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-40);
+  font-weight: var(--font-weight-regular);
+}
+.lead-rows {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.lead-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-card-bg);
+  border-top: 1px solid var(--color-stat-border);
+}
+.lead-row:first-child {
+  border-top: 0;
+}
+.lead-row-id {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.lead-row-name {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lead-row-office {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lead-row-party {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+  white-space: nowrap;
+}
+.lead-row-since {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- Footnote ----------------------------------------------------------- */
+.lead-foot {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* ---- Responsive --------------------------------------------------------- */
+@media (max-width: 600px) {
+  .lead-stats {
+    grid-template-columns: 1fr;
+  }
+  .lead-principals {
+    grid-template-columns: 1fr;
+  }
+  .lead-card {
+    padding: var(--space-4) var(--space-5);
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+  .lead-avatar {
+    width: 44px;
+    height: 44px;
+  }
+  .lead-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .lead-row-since {
+    display: none;
+  }
+}

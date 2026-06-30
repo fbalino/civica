@@ -1,0 +1,279 @@
+/*
+ * Organizations section — /country/[slug]/civica-data, "Organizations" block.
+ *
+ * Rendered by <FactbookOrganizations>. Co-located with that component and
+ * imported there (not globally). Tokens only — no hardcoded color/size/spacing.
+ *
+ * Visual contract: reuses the canonical Civica Data summary-stat band look,
+ * then deepens each membership into a print-card with a meta grid and real
+ * co-membership context. Category accent colours come from the shared
+ * --cat-* government/organization palette.
+ */
+
+/* Anchor scroll offsets — the right-rail scroll-spy jumps to these ids.
+   (#organizations--summary also gets this offset from civica-data.css; we
+   restate #organizations--list here since this block no longer wraps in
+   .civica-data-anchor.) */
+#organizations--list {
+  scroll-margin-top: calc(56px + var(--space-5));
+}
+
+/* ---------------------------------------------------------------------------
+ * Summary stat band
+ * ------------------------------------------------------------------------- */
+.org-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-7);
+}
+.org-stat {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+  padding: var(--space-4) var(--space-5);
+}
+.org-stat-k {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-2);
+}
+.org-stat-v {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.org-stat-note {
+  margin-top: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: 1.45;
+  color: var(--color-text-60);
+}
+.org-stat-note a {
+  color: var(--color-text-60);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-card-border);
+}
+.org-stat-note a:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+/* ---------------------------------------------------------------------------
+ * Grouped membership cards
+ * ------------------------------------------------------------------------- */
+.org-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+.org-group {
+  margin: 0;
+}
+.org-group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+}
+.org-group-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  flex: none;
+}
+.org-group-label {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+.org-group-count {
+  margin-left: auto;
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+}
+
+.org-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.org-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+  box-shadow: var(--shadow-hard);
+}
+
+.org-card-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-3);
+}
+.org-card-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  flex: none;
+  margin-top: calc(var(--space-2) - 1px);
+}
+.org-card-id {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.org-card-abbr {
+  font-family: var(--font-body);
+  font-size: var(--text-16);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-snug);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+a.org-card-abbr:hover {
+  color: var(--color-accent);
+}
+.org-card-full {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: 1.35;
+  color: var(--color-text-50);
+}
+
+.org-card-desc {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: 1.5;
+  color: var(--color-text-60);
+}
+
+/* Meta grid — Joined / Members / Founded / Headquarters */
+.org-card-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  margin: 0;
+  padding: var(--space-3) 0 0;
+  border-top: 1px solid var(--color-stat-border);
+}
+.org-card-meta-item {
+  min-width: 0;
+}
+.org-card-meta-item dt {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-1);
+}
+.org-card-meta-item dd {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Co-membership context */
+.org-card-co {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-stat-border);
+}
+.org-card-co-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.org-card-co-names {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+.org-card-co-names a {
+  color: var(--color-text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.org-card-co-names a:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+.org-card-co-more {
+  color: var(--color-text-40);
+  font-variant-numeric: tabular-nums;
+}
+
+/* External authority link */
+.org-card-wikidata {
+  margin-top: auto;
+  align-self: flex-start;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+}
+.org-card-wikidata:hover {
+  color: var(--color-accent);
+}
+
+/* Section provenance footer */
+.org-section-source {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-stat-border);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+}
+
+.org-section-empty {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  color: var(--color-text-60);
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .org-cards {
+    grid-template-columns: 1fr;
+  }
+}

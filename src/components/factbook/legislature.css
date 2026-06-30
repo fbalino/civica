@@ -1,0 +1,518 @@
+/* =========================================================================
+   Legislature — deepened Civica Data section.
+
+   Co-located CSS for the components that wrap the canonical hemicycle:
+     - <FactbookLegislature>   → .legislature-keyfacts*
+     - <ChamberComposition>    → .chamber-comp*
+     - <PartyBrowser>          → .party-browser*
+
+   Visual language matches the existing `.factbook-legislature-*` blocks in
+   factbook.css: 1px hairline grids on `--color-stat-border`, Inter uppercase
+   small-caps keys, Source-Serif values, tabular-nums on numerics. Labels use
+   var(--font-body) (Inter) per the design system — never monospace.
+   ========================================================================= */
+
+/* ---- Key-facts strip ---------------------------------------------------- */
+.legislature-keyfacts {
+  border: 1px solid var(--color-stat-border);
+  margin-bottom: var(--space-6);
+}
+.legislature-keyfacts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.legislature-keyfact {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 18px;
+  border-right: 1px solid var(--color-stat-border);
+  border-bottom: 1px solid var(--color-stat-border);
+  min-width: 0;
+}
+.legislature-keyfact-key {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.legislature-keyfact-val {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.15;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.legislature-keyfact-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-60);
+  line-height: 1.25;
+}
+.legislature-keyfacts-source {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 9px 18px;
+}
+.legislature-keyfacts-source-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+/* ---- Chamber composition (above the hemicycle) -------------------------- */
+.chamber-comp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+/* Government / opposition balance bar */
+.chamber-comp-balance {
+  border: 1px solid var(--color-stat-border);
+  padding: 14px 16px 16px;
+  background: var(--color-bg);
+}
+.chamber-comp-balance-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: 12px;
+}
+.chamber-comp-balance-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.chamber-comp-majority {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+.chamber-comp-majority.is-maj {
+  background: color-mix(in oklab, var(--color-status-success) 16%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--color-status-success) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-success), black 32%);
+}
+.chamber-comp-majority.is-min {
+  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-warning), black 32%);
+}
+.chamber-comp-bar {
+  position: relative;
+  height: 14px;
+  border: 1px solid var(--color-stat-border);
+  background: color-mix(in oklab, var(--color-text-primary) 8%, var(--color-bg));
+  overflow: hidden;
+}
+.chamber-comp-bar-gov {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: color-mix(in oklab, var(--color-status-success) 78%, var(--color-bg));
+}
+.chamber-comp-bar-maj {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 0;
+  border-left: 1.5px dashed var(--color-accent);
+}
+.chamber-comp-balance-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin-top: 11px;
+}
+.chamber-comp-leg {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-60);
+  position: relative;
+  padding-left: 16px;
+}
+.chamber-comp-leg::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-sm);
+}
+.chamber-comp-leg--gov::before {
+  background: color-mix(in oklab, var(--color-status-success) 78%, var(--color-bg));
+}
+.chamber-comp-leg--opp::before {
+  background: color-mix(in oklab, var(--color-text-primary) 8%, var(--color-bg));
+  border: 1px solid var(--color-stat-border);
+}
+.chamber-comp-leg strong {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.chamber-comp-leg-sub {
+  color: var(--color-text-40);
+  font-size: var(--text-12);
+}
+
+/* Concentration cells */
+.chamber-comp-concentration {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  border: 1px solid var(--color-stat-border);
+}
+.chamber-comp-conc-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 12px 16px;
+  border-right: 1px solid var(--color-stat-border);
+  min-width: 0;
+}
+.chamber-comp-conc-cell:last-child {
+  border-right: 0;
+}
+.chamber-comp-conc-key {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.chamber-comp-conc-val {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.2;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.chamber-comp-conc-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-60);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Party browser (below the hemicycle) -------------------------------- */
+.party-browser {
+  margin-top: 18px;
+  border: 1px solid var(--color-stat-border);
+  background: var(--color-bg);
+}
+.party-browser-empty {
+  margin-top: 18px;
+  border: 1px dashed var(--color-stat-border);
+  padding: 28px 16px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+}
+.party-browser-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-stat-border);
+}
+.party-browser-headings {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.party-browser-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-16);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+.party-browser-hint {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  line-height: 1.3;
+}
+.party-browser-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+.party-browser-count {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  white-space: nowrap;
+}
+.party-browser-sort {
+  display: inline-flex;
+  border: 1px solid var(--color-stat-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.party-browser-sort-btn {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  padding: 5px 11px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-60);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease);
+}
+.party-browser-sort-btn + .party-browser-sort-btn {
+  border-left: 1px solid var(--color-stat-border);
+}
+.party-browser-sort-btn:hover {
+  background: var(--color-surface-elevated);
+}
+.party-browser-sort-btn.is-active {
+  background: var(--color-text-primary);
+  color: var(--color-bg);
+}
+
+.party-browser-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+}
+.party-browser-item + .party-browser-item {
+  border-top: 1px solid var(--color-stat-border);
+}
+.party-browser-row {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+.party-browser-row.is-dim .party-browser-rowmain {
+  opacity: 0.42;
+}
+.party-browser-row.is-dim .party-browser-rowmain:hover {
+  opacity: 0.6;
+}
+.party-browser-rowmain {
+  display: grid;
+  grid-template-columns: 14px 1fr minmax(80px, 200px) auto;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding: 9px 6px 9px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: background var(--motion-fast) var(--motion-ease),
+    opacity var(--motion-fast) var(--motion-ease);
+}
+.party-browser-rowmain:hover {
+  background: var(--color-surface-elevated);
+}
+.party-browser-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+}
+.party-browser-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-primary);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.party-browser-tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.party-browser-tag--gov {
+  background: color-mix(in oklab, var(--color-status-success) 16%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--color-status-success) 32%, transparent);
+  color: color-mix(in oklab, var(--color-status-success), black 32%);
+}
+.party-browser-bar {
+  height: 4px;
+  background: var(--color-surface-elevated);
+  position: relative;
+  border: 1px solid var(--color-stat-border);
+}
+.party-browser-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+}
+.party-browser-figs {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+  justify-content: flex-end;
+}
+.party-browser-seats {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.party-browser-pct {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+  font-variant-numeric: tabular-nums;
+}
+.party-browser-expand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  flex-shrink: 0;
+  border: 0;
+  border-left: 1px solid var(--color-stat-border);
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--motion-ease);
+}
+.party-browser-expand:hover {
+  background: var(--color-surface-elevated);
+}
+.party-browser-chevron {
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid var(--color-text-60);
+  border-bottom: 1.5px solid var(--color-text-60);
+  transform: rotate(45deg);
+  transition: transform var(--motion-base) var(--motion-ease);
+  margin-top: -3px;
+}
+.party-browser-chevron[data-open="true"] {
+  transform: rotate(-135deg);
+  margin-top: 2px;
+}
+
+/* Expanded detail panel */
+.party-browser-detail {
+  padding: 0 16px 14px 42px;
+  background: color-mix(in oklab, var(--color-surface-elevated) 55%, var(--color-bg));
+  border-top: 1px solid var(--color-stat-border);
+}
+.party-browser-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-2) var(--space-5);
+  padding: 12px 0;
+}
+.party-browser-detail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.party-browser-detail-key {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.party-browser-detail-val {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.party-browser-detail-sub {
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-60);
+  font-size: var(--text-12);
+}
+.party-browser-detail-foot {
+  padding-top: 4px;
+}
+.party-browser-status {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-sm);
+  padding: 3px 10px;
+}
+.party-browser-status--gov {
+  background: color-mix(in oklab, var(--color-status-success) 14%, var(--color-page-bg));
+  border: 1px solid color-mix(in oklab, var(--color-status-success) 30%, transparent);
+  color: color-mix(in oklab, var(--color-status-success), black 32%);
+}
+.party-browser-status--opp {
+  background: var(--color-page-bg);
+  border: 1px solid var(--color-card-border);
+  color: var(--color-text-60);
+}
+
+/* ---- Responsive --------------------------------------------------------- */
+@media (max-width: 600px) {
+  .chamber-comp-concentration {
+    grid-template-columns: 1fr;
+  }
+  .chamber-comp-conc-cell {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-stat-border);
+  }
+  .chamber-comp-conc-cell:last-child {
+    border-bottom: 0;
+  }
+  .party-browser-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+  .party-browser-rowmain {
+    grid-template-columns: 12px 1fr auto;
+  }
+  .party-browser-bar {
+    display: none;
+  }
+}
