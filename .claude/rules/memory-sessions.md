@@ -12,10 +12,17 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   self-contained `/atlas` map page. Redirects in `next.config.ts` (308):
   `/atlas/:slug(/:tab)`→`/factbook/:slug`, `/atlas/compare`→`/compare`,
   `/atlas/organizations*`→`/organizations*`.
-- **Country page IA:** `/factbook/[slug]` is a single long-scroll page = left
-  `FactbookSidebar` (TOC) + main column (sections from `SECTION_PLAN`) + `FactbookRightRail`.
-  It already loads CI + Pulse data (for the masthead pills). The CI country detail still
-  lives at `/civica-index/[slug]`; the masthead `CountrySwitcherChips` toggles between them.
+- **Country page IA (Wave 1b, 2026-06-30):** the canonical country page is **`/country/[slug]`** — a
+  3-tab page. Shared `country/[slug]/layout.tsx` = masthead (`FactbookHeaderStrip`, which now takes an
+  optional `nav` prop) + `CountryTabBar`. Tabs: **Factbook** (`/country/[slug]`, CIA sections,
+  scroll+`FactbookSidebar`), **Civica Data** (`/country/[slug]/civica-data` — CI via the reusable
+  `CivicaIndexPanel` + Government org chart + Legislature + Leaders + Bills + Organizations + Rankings,
+  same scroll+sidebar), **Constitution** (`/country/[slug]/constitution` — the Constitution Explorer).
+  The old `/factbook/[slug]`, `/civica-index/[slug]`, and `/countries/*` pages are DELETED and 308-redirect
+  in (a negative-lookahead redirect keeps the `/civica-index` leaderboard + its sub-routes — methodology,
+  widget, pulse-changelog, etc. — live). The landing `/factbook` was renamed `/country` ("Countries");
+  nav label is "Countries". `CountrySwitcherChips` is gone. Engraving/`factbook.css`/`FactbookSection`
+  etc. are still named "factbook" (CIA-source naming) — that's intentional, not a route.
 - **Domain:** apex `civicaatlas.org` serves prod; `www`→apex (308). Canonical/sitemap/robots
   are apex.
 
