@@ -1,26 +1,124 @@
 /*
  * Civica Data tab — /country/[slug]/civica-data
  *
- * Scoped styling for the Civica value-add tab. The page reuses the
- * `.factbook-body` + `<FactbookSidebar>` + `<FactbookRightRail>` shell
- * and the canonical `.factbook-section` chrome; this file only adds:
- *   1. an embedded reset for the reused `.ci-country-detail-container`
- *      so the Civica Index panel fills the factbook main column instead
- *      of re-applying its own 1200px max-width + page padding,
- *   2. the Government org-chart block's tokenized eyebrow/heading
- *      (so the section avoids per-page inline `var(--font-mono)` styles), and
- *   3. the Organizations (international footprint) section.
+ * LAYOUT (rebuilt): a master–detail shell. A sticky left section nav
+ * (`.civica-data-nav`) + a full-width content pane (`.civica-data-pane`)
+ * that shows ONE section at a time. The old narrow `.factbook-main` column
+ * and the `<FactbookRightRail>` are gone, so each section now owns the full
+ * reading width and carries its own compact Sources strip at the foot.
  *
- * Imported by the page directly (not globally) — it is the only surface
- * that needs these overrides. Tokens only, no hardcoded values.
+ * Imported by the page directly (not globally) — it is the only surface that
+ * needs these rules. Tokens only, no hardcoded values.
  */
 
 /* ----------------------------------------------------------------
- * 1. Embedded Civica Index panel
- * The shared `.ci-country-detail-container` carries a 1200px max-width
- * and horizontal page padding meant for the standalone /civica-index
- * route. Inside `.factbook-main` (already a padded grid track) those
- * fight the column, so neutralize them when embedded.
+ * Outer container — full standard product width (matches
+ * `.editorial-page--full`), centered, with room for the docked AI drawer.
+ * ---------------------------------------------------------------- */
+.civica-data-body {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-6);
+  padding-bottom: 120px; /* clearance for the docked Civica AI drawer */
+}
+
+/* ----------------------------------------------------------------
+ * Master–detail shell — sticky nav (left) + content pane (right).
+ * ---------------------------------------------------------------- */
+.civica-data-shell {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+
+/* ── Left section nav ──────────────────────────────────────────── */
+.civica-data-nav {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-9) + var(--space-5));
+  align-self: start;
+  min-width: 0;
+}
+.civica-data-nav-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-4);
+  padding: 0 var(--space-4);
+}
+.civica-data-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.civica-data-nav-link {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  border-left: 2px solid transparent;
+  background: transparent;
+  color: var(--color-text-60);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: var(--leading-normal);
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--motion-fast) var(--motion-ease-out),
+    background var(--motion-fast) var(--motion-ease-out);
+}
+.civica-data-nav-link:hover {
+  color: var(--color-text-primary);
+  background: color-mix(in oklab, var(--color-text-primary) 3%, transparent);
+}
+.civica-data-nav-link.is-active {
+  border-left-color: var(--color-accent);
+  color: var(--color-text-primary);
+  background: color-mix(in oklab, var(--color-text-primary) 4%, transparent);
+  font-weight: var(--font-weight-medium);
+}
+.civica-data-nav-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+.civica-data-nav-num {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-12);
+  color: var(--color-text-30);
+  align-self: center;
+  min-width: 20px;
+}
+.civica-data-nav-link.is-active .civica-data-nav-num {
+  color: var(--color-accent);
+}
+.civica-data-nav-text {
+  min-width: 0;
+}
+
+/* ── Right content pane ────────────────────────────────────────── */
+.civica-data-pane {
+  min-width: 0;
+}
+.civica-data-panel {
+  min-width: 0;
+}
+.civica-data-panel[hidden] {
+  display: none;
+}
+
+/* ----------------------------------------------------------------
+ * Embedded Civica Index panel
+ * The shared `.ci-country-detail-container` carries a 1200px max-width and
+ * horizontal page padding meant for the standalone /civica-index route.
+ * Inside the pane it should fill the column, so neutralize those.
  * ---------------------------------------------------------------- */
 .ci-country-detail-page--embedded {
   background: transparent;
@@ -31,12 +129,8 @@
   padding: 0;
 }
 
-/* ----------------------------------------------------------------
- * Sub-anchor scroll offsets. The right-rail scroll-spy jumps to these
- * ids; give them the same sticky-header offset the section headers use
- * so a jump doesn't land under the fixed header. (Single-block sections
- * wrap their content in `.civica-data-anchor`.)
- * ---------------------------------------------------------------- */
+/* Anchor scroll offsets so an in-panel jump (e.g. #ci-score) doesn't land
+ * under the fixed header. */
 .ci-country-detail-page--embedded #ci-score,
 .ci-country-detail-page--embedded #ci-dimensions,
 .ci-country-detail-page--embedded #ci-history,
@@ -47,77 +141,14 @@
   scroll-margin-top: calc(56px + var(--space-5));
 }
 
-/* ----------------------------------------------------------------
- * Fix 3 — Dimension breakdown table fits the NARROW factbook-main column.
- * The base `.ci-country-dim-row` grid (260 80 1fr 80 180 + 24px gaps ≈
- * 696px of fixed track before the bar gets any width) was sized for the
- * old standalone 1200px CI page and clipped its right-most "contributes"
- * column inside `.factbook-main` (~584px of content). Restack into a
- * 3-column / 2-row grid that fits any column width using the SAME five
- * elements the markup already renders (label, weight, bar, score,
- * contribution) — no extra DOM. Scoped to the embedded tab so the base
- * rule is untouched for any other consumer.
- *
- *   Row 1:  [ label ............... ] [ score ]
- *   Row 2:  [ weight ] [ bar ...... ] [ contributes ]
- * ---------------------------------------------------------------- */
-.ci-country-detail-page--embedded .ci-country-dim-row {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  column-gap: var(--space-4);
-  row-gap: var(--space-4);
-  padding: var(--space-5) var(--space-6);
-  align-items: center;
-}
-/* Row 1 — name/source label spans the bar+weight columns; score sits right. */
-.ci-country-detail-page--embedded .ci-country-dim-label {
-  grid-column: 1 / 3;
-  grid-row: 1;
-  min-width: 0;
-}
-.ci-country-detail-page--embedded .ci-country-dim-score {
-  grid-column: 3;
-  grid-row: 1;
-  text-align: right;
-  align-self: baseline;
-}
-/* Row 2 — weight · progress bar · contribution, all on one fitting line. */
-.ci-country-detail-page--embedded .ci-country-dim-weight {
-  grid-column: 1;
-  grid-row: 2;
-  text-align: left;
-  white-space: nowrap;
-}
-.ci-country-detail-page--embedded .ci-country-dim-bar {
-  grid-column: 2;
-  grid-row: 2;
-  width: 100%;
-}
-.ci-country-detail-page--embedded .ci-country-dim-contribution {
-  grid-column: 3;
-  grid-row: 2;
-  text-align: right;
-  white-space: nowrap;
-}
-
-/* ----------------------------------------------------------------
- * Fix 4 — History + Regional-rank block stops being cramped.
- * The base `.ci-country-two-col` splits the row into 1.3fr / 1fr — fine on
- * the old 1200px page, but inside `.factbook-main` (~584px) it squeezes the
- * history chart and the rank/peer-lens panel into two thin columns. Stack
- * to a single column in the embedded tab and give the peer-lens cards +
- * compare chips comfortable spacing now that they own the full width.
- * ---------------------------------------------------------------- */
-.ci-country-detail-page--embedded .ci-country-two-col {
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-6);
-}
-/* Peer-lens cards: more air between the two lenses. */
+/* The panel now owns the full pane width, so the dimension table and the
+ * history/rank block get their roomy multi-column layouts back (the cramped
+ * single-column restacks were a workaround for the old ~584px column). Only
+ * collapse to a single column on genuinely narrow panes. */
 .ci-country-detail-page--embedded .ci-country-peer-lenses {
   gap: var(--space-5);
   margin-bottom: var(--space-7);
 }
-/* Compare chips: roomier gaps + a touch more padding so they don't feel
- * packed against each other in the now-wider panel. */
 .ci-country-detail-page--embedded .ci-country-compare-links {
   gap: var(--space-3);
 }
@@ -125,8 +156,68 @@
   padding: var(--space-3) var(--space-5);
 }
 
-/* Rank pill that replaces the standalone page's hero header rank. Sits
- * above the score block on the embedded tab. */
+@media (max-width: 760px) {
+  .ci-country-detail-page--embedded .ci-country-dim-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: var(--space-4);
+    row-gap: var(--space-4);
+    align-items: center;
+  }
+  .ci-country-detail-page--embedded .ci-country-dim-label {
+    grid-column: 1 / 3;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .ci-country-detail-page--embedded .ci-country-dim-score {
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
+    align-self: baseline;
+  }
+  .ci-country-detail-page--embedded .ci-country-dim-weight {
+    grid-column: 1;
+    grid-row: 2;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .ci-country-detail-page--embedded .ci-country-dim-bar {
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+  }
+  .ci-country-detail-page--embedded .ci-country-dim-contribution {
+    grid-column: 3;
+    grid-row: 2;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .ci-country-detail-page--embedded .ci-country-two-col {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+}
+
+/* ----------------------------------------------------------------
+ * Pulse changelog — low-confidence de-emphasis (Goal 2).
+ * A below-floor (corroboration < 0.4) classified event is still listed but
+ * visually recedes so it never reads as the headline driver. Scoped to the
+ * embedded CI panel that this tab renders.
+ * ---------------------------------------------------------------- */
+.ci-country-detail-page--embedded .ci-country-event-card.is-low-confidence {
+  opacity: 0.66;
+}
+.ci-country-detail-page--embedded
+  .ci-country-event-card.is-low-confidence
+  .ci-country-event-severity {
+  opacity: 0.7;
+}
+.ci-country-detail-page--embedded .ci-country-event-confidence.is-low {
+  color: var(--color-status-warning);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Rank pill that replaces the standalone page's hero-header rank. Sits above
+ * the score block on the embedded tab. */
 .ci-country-rank-strip {
   display: inline-block;
   font-family: var(--font-body);
@@ -139,8 +230,86 @@
 }
 
 /* ----------------------------------------------------------------
- * 2. Government — "How power is organised" org-chart block
- * Tokenized replacement for the factbook page's inline-styled wrapper.
+ * Per-section Sources strip (replaces the old right-rail block).
+ * A quiet, full-width provenance row at the foot of each section.
+ * ---------------------------------------------------------------- */
+.civica-data-sources {
+  margin-top: var(--space-8);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-stat-border);
+}
+.civica-data-sources-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-3);
+}
+.civica-data-sources-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+.civica-data-source {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  background: var(--color-card-bg);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+}
+.civica-data-source-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-primary);
+}
+.civica-data-source-date {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-40);
+  font-size: var(--text-12);
+}
+
+/* ----------------------------------------------------------------
+ * Empty state — country with a masthead but zero Civica overlays.
+ * ---------------------------------------------------------------- */
+.civica-data-empty-card {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+  padding: var(--space-7);
+}
+.civica-data-empty-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-24);
+  font-weight: 400;
+  margin: 0 0 var(--space-3);
+  color: var(--color-text-primary);
+}
+.civica-data-empty-copy {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: 1.6;
+  color: var(--color-text-60);
+  margin: 0;
+}
+.civica-data-empty-copy a {
+  color: var(--color-accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-accent) 40%, transparent);
+}
+
+/* ----------------------------------------------------------------
+ * Government — "How power is organised" org-chart block
  * ---------------------------------------------------------------- */
 .civica-data-gov-structure {
   margin-bottom: var(--space-7);
@@ -163,165 +332,40 @@
 }
 
 /* ----------------------------------------------------------------
- * 3. Organizations — international footprint
+ * Tablet / mobile — nav stacks above the pane as a horizontal scroller.
  * ---------------------------------------------------------------- */
-.civica-data-intl-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-7);
-}
-.civica-data-intl-stat {
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
-  background: var(--color-card-bg);
-  padding: var(--space-4) var(--space-5);
-}
-.civica-data-intl-stat-k {
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--text-11);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--color-text-40);
-  margin: 0 0 var(--space-2);
-}
-.civica-data-intl-stat-v {
-  font-family: var(--font-heading);
-  font-size: var(--text-28);
-  font-weight: 400;
-  line-height: 1;
-  color: var(--color-text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.civica-data-intl-group {
-  margin-bottom: var(--space-6);
-}
-.civica-data-intl-group:last-child {
-  margin-bottom: 0;
-}
-.civica-data-intl-group-head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  margin: 0 0 var(--space-3);
-}
-.civica-data-intl-group-dot {
-  width: var(--space-2);
-  height: var(--space-2);
-  border-radius: var(--radius-full);
-  flex: none;
-}
-.civica-data-intl-group-count {
-  margin-left: auto;
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text-40);
-  font-weight: var(--font-weight-regular);
-}
-
-.civica-data-intl-rows {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.civica-data-intl-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-card-bg);
-  text-decoration: none;
-  color: inherit;
-  border-top: 1px solid var(--color-stat-border);
-  transition: background var(--motion-fast) var(--motion-ease-out);
-}
-.civica-data-intl-row:first-child {
-  border-top: 0;
-}
-a.civica-data-intl-row:hover {
-  background: var(--color-bg-subtle, var(--color-card-bg));
-}
-.civica-data-intl-row-dot {
-  width: var(--space-2);
-  height: var(--space-2);
-  border-radius: var(--radius-full);
-  flex: none;
-}
-.civica-data-intl-row-name {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-.civica-data-intl-row-abbr {
-  font-family: var(--font-body);
-  font-size: var(--text-15);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
-}
-.civica-data-intl-row-full {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  color: var(--color-text-40);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.civica-data-intl-row-year {
-  font-family: var(--font-body);
-  font-size: var(--text-13);
-  color: var(--color-text-40);
-  font-variant-numeric: tabular-nums;
-}
-
-.civica-data-intl-comembers {
-  margin-top: var(--space-6);
-}
-.civica-data-intl-comembers-head {
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-text-40);
-  margin: 0 0 var(--space-3);
-}
-.civica-data-intl-comembers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: var(--space-2);
-}
-.civica-data-intl-comember {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-card-bg);
-  font-family: var(--font-body);
-  font-size: var(--text-13);
-  color: var(--color-text-primary);
-  text-decoration: none;
-}
-.civica-data-intl-comember-shared {
-  font-variant-numeric: tabular-nums;
-  color: var(--color-text-40);
-  font-size: var(--text-12);
+@media (max-width: 900px) {
+  .civica-data-shell {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+  .civica-data-nav {
+    position: static;
+  }
+  .civica-data-nav-eyebrow {
+    padding: 0;
+  }
+  .civica-data-nav-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .civica-data-nav-link {
+    width: auto;
+    border-left: 0;
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+  }
+  .civica-data-nav-link.is-active {
+    border-color: var(--color-accent);
+    background: color-mix(in oklab, var(--color-accent) 8%, var(--color-page-bg));
+  }
 }
 
 @media (max-width: 600px) {
-  .civica-data-intl-stats {
-    grid-template-columns: 1fr;
+  .civica-data-body {
+    padding: var(--space-5) var(--space-4);
+    padding-bottom: 120px;
   }
 }

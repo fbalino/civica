@@ -105,7 +105,7 @@ export async function FactbookOrganizations({
     coMembership: {},
     hostsOrgs: [],
   };
-  const { memberships, coMembership, hostsOrgs } =
+  const { memberships, hostsOrgs } =
     await getCountryOrganizationsData(jurisdictionId).catch(() => empty);
 
   if (memberships.length === 0) {
@@ -167,7 +167,10 @@ export async function FactbookOrganizations({
         )}
       </div>
 
-      {/* Grouped membership cards */}
+      {/* Grouped membership list — category headers → one row per org.
+          Each row: name (+ full name), role chip, accession year, and a
+          one-line purpose where a curated scope note exists. The full-width
+          tab gives the rows room the old card grid couldn't use well. */}
       <div id="organizations--list" className="org-groups">
         {ORG_TYPE_ORDER.map((type) => {
           const items = byType.get(type);
@@ -187,7 +190,7 @@ export async function FactbookOrganizations({
                 <span className="org-group-count">{items.length}</span>
               </header>
 
-              <div className="org-cards">
+              <ul className="org-rows">
                 {items.map((m) => {
                   const year = membershipYear(m.joinDate);
                   const rLabel = roleLabel(m.orgType, m.role);
@@ -195,111 +198,48 @@ export async function FactbookOrganizations({
                     ? (ROLE_CHIP_CLASS[m.role.toLowerCase()] ?? "")
                     : "";
                   const desc = ORG_DESCRIPTIONS[m.orgSlug] ?? null;
-                  const co = coMembership[m.orgId];
-
-                  // Meta facts: only render slots that have real data.
-                  const meta: { label: string; value: string }[] = [];
-                  meta.push({
-                    label: "Joined",
-                    value: year != null ? String(year) : "Not recorded",
-                  });
-                  if (m.totalMembers != null) {
-                    meta.push({
-                      label: "Members",
-                      value: m.totalMembers.toLocaleString("en-US"),
-                    });
-                  }
-                  if (m.foundedYear != null) {
-                    meta.push({
-                      label: "Founded",
-                      value: String(m.foundedYear),
-                    });
-                  }
-                  if (m.hqName) {
-                    meta.push({ label: "Headquarters", value: m.hqName });
-                  }
 
                   return (
-                    <article key={m.orgId} className="org-card">
-                      <div className="org-card-head">
-                        <span
-                          className="org-card-dot"
-                          style={{ background: color }}
-                          aria-hidden
-                        />
-                        <div className="org-card-id">
+                    <li key={m.orgId} className="org-row">
+                      <span
+                        className="org-row-dot"
+                        style={{ background: color }}
+                        aria-hidden
+                      />
+                      <div className="org-row-main">
+                        <div className="org-row-title">
                           {m.orgSlug ? (
                             <Link
                               href={`/organizations/${m.orgSlug}`}
-                              className="org-card-abbr"
+                              className="org-row-name"
                             >
                               {m.orgName}
                             </Link>
                           ) : (
-                            <span className="org-card-abbr">{m.orgName}</span>
+                            <span className="org-row-name">{m.orgName}</span>
                           )}
                           {m.orgFullName && m.orgFullName !== m.orgName && (
-                            <span className="org-card-full">
+                            <span className="org-row-full">
                               {m.orgFullName}
                             </span>
                           )}
                         </div>
-                        {rLabel && (
-                          <span className={`editorial-chip ${rClass}`}>
-                            {rLabel}
-                          </span>
-                        )}
+                        {desc && <p className="org-row-desc">{desc}</p>}
                       </div>
-
-                      {desc && <p className="org-card-desc">{desc}</p>}
-
-                      <dl className="org-card-meta">
-                        {meta.map((f) => (
-                          <div key={f.label} className="org-card-meta-item">
-                            <dt>{f.label}</dt>
-                            <dd>{f.value}</dd>
-                          </div>
-                        ))}
-                      </dl>
-
-                      {co && co.notable.length > 0 && (
-                        <div className="org-card-co">
-                          <span className="org-card-co-label">
-                            Alongside
-                          </span>
-                          <span className="org-card-co-names">
-                            {co.notable.map((c, i) => (
-                              <span key={c.slug}>
-                                {i > 0 ? ", " : ""}
-                                <Link href={`/country/${c.slug}`}>
-                                  {c.name}
-                                </Link>
-                              </span>
-                            ))}
-                            {co.others > co.notable.length && (
-                              <span className="org-card-co-more">
-                                {" "}
-                                + {co.others - co.notable.length} more
-                              </span>
-                            )}
-                          </span>
-                        </div>
+                      {rLabel ? (
+                        <span className={`editorial-chip ${rClass} org-row-chip`}>
+                          {rLabel}
+                        </span>
+                      ) : (
+                        <span aria-hidden className="org-row-chip" />
                       )}
-
-                      {m.wikidataQid && (
-                        <a
-                          className="org-card-wikidata"
-                          href={`https://www.wikidata.org/wiki/${m.wikidataQid}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Wikidata · {m.wikidataQid}
-                        </a>
-                      )}
-                    </article>
+                      <span className="org-row-year">
+                        {year != null ? year : "—"}
+                      </span>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </section>
           );
         })}

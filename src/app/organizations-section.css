@@ -105,43 +105,46 @@
   color: var(--color-text-40);
 }
 
-.org-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-4);
-}
-
-.org-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-5);
+/* Grouped membership rows — one bordered list per category, one row per org.
+   Row grid: [dot] [name + purpose] [role chip] [accession year]. */
+.org-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
   background: var(--color-card-bg);
-  box-shadow: var(--shadow-hard);
+  overflow: hidden;
 }
-
-.org-card-head {
+.org-row {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: start;
-  gap: var(--space-3);
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-stat-border);
 }
-.org-card-dot {
+.org-row:first-child {
+  border-top: 0;
+}
+.org-row-dot {
   width: var(--space-2);
   height: var(--space-2);
   border-radius: var(--radius-full);
   flex: none;
-  margin-top: calc(var(--space-2) - 1px);
+  align-self: center;
 }
-.org-card-id {
+.org-row-main {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
 }
-.org-card-abbr {
+.org-row-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  min-width: 0;
+}
+.org-row-name {
   font-family: var(--font-body);
   font-size: var(--text-16);
   font-weight: var(--font-weight-semibold);
@@ -149,107 +152,37 @@
   color: var(--color-text-primary);
   text-decoration: none;
 }
-a.org-card-abbr:hover {
+a.org-row-name:hover {
   color: var(--color-accent);
 }
-.org-card-full {
+.org-row-full {
   font-family: var(--font-body);
   font-size: var(--text-13);
   line-height: 1.35;
   color: var(--color-text-50);
 }
-
-.org-card-desc {
-  margin: 0;
+.org-row-desc {
+  margin: var(--space-1) 0 0;
   font-family: var(--font-body);
   font-size: var(--text-13);
   line-height: 1.5;
   color: var(--color-text-60);
 }
-
-/* Meta grid — Joined / Members / Founded / Headquarters */
-.org-card-meta {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3) var(--space-4);
-  margin: 0;
-  padding: var(--space-3) 0 0;
-  border-top: 1px solid var(--color-stat-border);
+.org-row-chip {
+  align-self: center;
+  justify-self: start;
+  white-space: nowrap;
 }
-.org-card-meta-item {
-  min-width: 0;
-}
-.org-card-meta-item dt {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--color-text-40);
-  margin: 0 0 var(--space-1);
-}
-.org-card-meta-item dd {
-  margin: 0;
+.org-row-year {
+  align-self: center;
+  justify-self: end;
   font-family: var(--font-body);
   font-size: var(--text-14);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Co-membership context */
-.org-card-co {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--color-stat-border);
-}
-.org-card-co-label {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--color-text-40);
-}
-.org-card-co-names {
-  font-family: var(--font-body);
-  font-size: var(--text-13);
-  line-height: 1.5;
   color: var(--color-text-primary);
-}
-.org-card-co-names a {
-  color: var(--color-text-primary);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-}
-.org-card-co-names a:hover {
-  color: var(--color-accent);
-  border-bottom-color: var(--color-accent);
-}
-.org-card-co-more {
-  color: var(--color-text-40);
-  font-variant-numeric: tabular-nums;
-}
-
-/* External authority link */
-.org-card-wikidata {
-  margin-top: auto;
-  align-self: flex-start;
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-  color: var(--color-text-40);
-  text-decoration: none;
-  font-variant-numeric: tabular-nums;
-}
-.org-card-wikidata:hover {
-  color: var(--color-accent);
+  min-width: 3ch;
+  text-align: right;
 }
 
 /* Section provenance footer */
@@ -273,7 +206,28 @@ a.org-card-abbr:hover {
 }
 
 @media (max-width: 600px) {
-  .org-cards {
-    grid-template-columns: 1fr;
+  /* Drop the role chip + year onto their own line so the org name keeps
+     full width on narrow screens. */
+  .org-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "dot main"
+      ". meta";
+    row-gap: var(--space-2);
+  }
+  .org-row-dot {
+    grid-area: dot;
+  }
+  .org-row-main {
+    grid-area: main;
+  }
+  .org-row-chip {
+    grid-area: meta;
+    justify-self: start;
+  }
+  .org-row-year {
+    grid-area: meta;
+    justify-self: end;
+    text-align: right;
   }
 }

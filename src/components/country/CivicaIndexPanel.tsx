@@ -3,7 +3,6 @@ import {
   getCIRankings,
   getCICountryDetail,
   getCICountryHistory,
-  getPulseChangelog,
   getRelatedCountries,
 } from "@/lib/db/queries";
 import {
@@ -12,7 +11,11 @@ import {
   type PulseScoreData,
 } from "@/components/ci/CIPulseScoreDisplay";
 import { PulseDimensionalDeltas } from "@/components/pulse/PulseDimensionalDeltas";
-import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
+import {
+  getPulseV2ForCountry,
+  getPulseV2Changelog,
+} from "@/lib/db/queries-pulse-v2";
+import { categoryLabel } from "@/lib/pulse/v2/labels";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { PeerLensPanel } from "@/components/peer-grouping/PeerLensPanel";
 import { getMaterialPeerSet, getGovernancePeerSet } from "@/lib/peer-grouping";
@@ -342,7 +345,14 @@ type PulseEvent = {
   sourceUrl: string | null;
   sourceName: string | null;
   isActive: boolean;
+  /** Below the corroboration-confidence floor (~0.4) → render de-emphasized
+   *  so a single low-confidence classification never headlines the changelog. */
+  lowConfidence?: boolean;
 };
+
+/** Confidence floor below which a Pulse event is shown but visually
+ *  de-emphasized (Goal 2: don't let a low-confidence driver headline). */
+const PULSE_LOW_CONFIDENCE = 0.4;
 
 function eventSeverityClass(severity: number): string {
   if (severity >= 4) return "sev-pos";
@@ -355,7 +365,9 @@ function PulseEventCard({ event }: { event: PulseEvent }) {
   const severityLabel = `${event.severity >= 0 ? "+" : ""}${Math.round(
     event.severity
   )}`;
-  const cardClass = `ci-country-event-card ${event.sourceUrl ? "is-link" : ""}`;
+  const cardClass = `ci-country-event-card${event.sourceUrl ? " is-link" : ""}${
+    event.lowConfidence ? " is-low-confidence" : ""
+  }`;
   const inner = (
     <>
       <div
@@ -367,7 +379,7 @@ function PulseEventCard({ event }: { event: PulseEvent }) {
       </div>
       <div className="ci-country-event-body">
         <div className="ci-country-event-category">
-          {event.category.replaceAll("_", " ")} ·{" "}
+          {categoryLabel(event.category)} ·{" "}
           {new Date(event.eventDate).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -382,8 +394,13 @@ function PulseEventCard({ event }: { event: PulseEvent }) {
       <div className="ci-country-event-meta">
         {event.sourceName ? <div>{event.sourceName}</div> : null}
         {event.confidence !== null ? (
-          <div className="ci-country-event-confidence">
-            Confidence {Math.round(event.confidence * 100)}%
+          <div
+            className={`ci-country-event-confidence${
+              event.lowConfidence ? " is-low" : ""
+            }`}
+          >
+            {event.lowConfidence ? "Low confidence · " : "Confidence "}
+            {Math.round(event.confidence * 100)}%
           </div>
         ) : null}
         <div
@@ -436,11 +453,46 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
       getCICountryHistory(slug),
     ]);
     if (detail) {
-      const changelog = await getPulseChangelog(slug, 20);
-      const rows = Array.isArray(changelog)
-        ? changelog
-        : (changelog as { rows: unknown[] }).rows ?? [];
-      pulseEvents = rows as PulseEvent[];
+      // Pulse changelog reads the v2 CLASSIFIED, PUBLISHED source — never the
+      // legacy `pulse_events` table (which was 100% unclassified, severity 0,
+      // and cross-country contaminated). If v2 returns nothing for this
+      // country we render a clean empty state below; we do NOT fall back.
+      const changelog = await getPulseV2Changelog({
+        country: slug,
+        publishedOnly: true,
+        limit: 20,
+      }).catch(() => ({ rows: [] as Awaited<
+        ReturnType<typeof getPulseV2Changelog>
+      >["rows"] }));
+      pulseEvents = changelog.rows.map((r): PulseEvent => {
+        const lead = r.sourceDetail[0] ?? null;
+        const confidence =
+          r.corroborationConfidence != null
+            ? Number(r.corroborationConfidence)
+            : null;
+        return {
+          id: r.id,
+          eventDate: r.eventDate,
+          category: r.category,
+          severity: Number(r.severityValue),
+          confidence,
+          headline: r.headline,
+          justification: r.aiSummary ?? r.description ?? null,
+          sourceUrl: lead?.sourceUrl ?? null,
+          sourceName: lead?.sourceName ?? null,
+          isActive: true,
+          lowConfidence: confidence != null && confidence < PULSE_LOW_CONFIDENCE,
+        };
+      });
+      // Lead with the most impactful, well-corroborated events: rank by
+      // confidence-gated absolute severity so a single low-confidence driver
+      // never headlines, then by recency.
+      pulseEvents.sort((a, b) => {
+        const wa = Math.abs(a.severity) * (a.lowConfidence ? 0.25 : 1);
+        const wb = Math.abs(b.severity) * (b.lowConfidence ? 0.25 : 1);
+        if (wb !== wa) return wb - wa;
+        return b.eventDate.localeCompare(a.eventDate);
+      });
 
       [globalRankings, regionalRankings, compareSuggestions] = await Promise.all(
         [
@@ -818,25 +870,40 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
           </div>
         </section>
 
-        {pulseEvents.length > 0 ? (
-          <section id="ci-pulse">
-            <div className="ci-country-section-eyebrow">
-              <span>Pulse changelog · latest scored events</span>
-              <small>
-                {pulseEvents.length} event{pulseEvents.length === 1 ? "" : "s"}{" "}
-                surfaced
-              </small>
-            </div>
-            <h3 className="ci-country-section-title">
-              What&apos;s moved the score lately.
-            </h3>
+        <section id="ci-pulse">
+          <div className="ci-country-section-eyebrow">
+            <span>Pulse changelog · classified events</span>
+            <small>
+              {pulseEvents.length > 0
+                ? `${pulseEvents.length} published event${
+                    pulseEvents.length === 1 ? "" : "s"
+                  } · trailing 365 days`
+                : "trailing 365 days"}
+            </small>
+          </div>
+          <h3 className="ci-country-section-title">
+            What&apos;s moved the score lately.
+          </h3>
+          {pulseEvents.length > 0 ? (
             <div className="ci-country-event-list">
               {pulseEvents.map((event) => (
                 <PulseEventCard key={event.id} event={event} />
               ))}
             </div>
-          </section>
-        ) : null}
+          ) : (
+            <div className="cv-card">
+              <p className="ci-country-empty-copy">
+                No published Pulse events yet for {jurisdiction.name}. The Beta
+                pipeline classifies events into governance dimensions; entries
+                queued for human review do not yet appear here. See the{" "}
+                <Link href="/civica-index/pulse-changelog">
+                  global Pulse changelog
+                </Link>{" "}
+                for current activity.
+              </p>
+            </div>
+          )}
+        </section>
 
         {score === null &&
         dimensions.length === 0 &&
