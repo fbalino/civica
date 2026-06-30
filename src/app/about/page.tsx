@@ -120,7 +120,7 @@ export default async function AboutPage() {
       </section>
 
       <div
-        className="cv-container"
+        className="editorial-page editorial-page--wide"
         style={{
           paddingTop: "var(--spacing-section-y)",
           paddingBottom: "var(--spacing-section-y)",

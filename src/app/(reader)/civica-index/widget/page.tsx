@@ -238,12 +238,12 @@ export default async function CivicaIndexWidgetPage({
         }
         .widget-hero { padding-bottom: 28px; border-bottom: 1px solid var(--color-divider); }
         .widget-hero-eyebrow {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-semibold);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
-          color: var(--color-text-30);
+          color: var(--color-text-40);
           margin-bottom: 12px;
         }
         .widget-hero-title {
@@ -264,12 +264,12 @@ export default async function CivicaIndexWidgetPage({
           gap: 8px;
         }
         .widget-search-label {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-semibold);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
-          color: var(--color-text-30);
+          color: var(--color-text-40);
         }
 
         .widget-toolbar {
@@ -286,12 +286,12 @@ export default async function CivicaIndexWidgetPage({
           gap: 6px;
         }
         .widget-toolbar-label {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-semibold);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
-          color: var(--color-text-30);
+          color: var(--color-text-40);
           margin-right: 6px;
         }
         .widget-toolbar-label em {
@@ -301,11 +301,11 @@ export default async function CivicaIndexWidgetPage({
           letter-spacing: 0;
         }
         .widget-toolbar-chip {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-medium);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
-          text-transform: uppercase;
+          letter-spacing: var(--tracking-wide);
+          text-transform: none;
           padding: 6px 12px;
           border: 1px solid var(--color-card-border);
           border-radius: var(--radius-sm);
@@ -342,18 +342,18 @@ export default async function CivicaIndexWidgetPage({
         }
         .widget-size-head { display: flex; flex-direction: column; gap: 4px; }
         .widget-size-eyebrow {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-semibold);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
-          color: var(--color-text-30);
+          color: var(--color-text-40);
         }
         .widget-size-dims {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-regular);
           font-size: var(--text-13);
-          color: var(--color-text-55);
+          color: var(--color-text-secondary);
         }
         .widget-size-frame {
           display: flex;
@@ -383,11 +383,11 @@ export default async function CivicaIndexWidgetPage({
         }
         .widget-copy-btn {
           align-self: flex-start;
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-medium);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
-          text-transform: uppercase;
+          letter-spacing: var(--tracking-wide);
+          text-transform: none;
           padding: 9px 14px;
           border: 1px solid var(--color-card-border);
           border-radius: var(--radius-sm);
@@ -403,12 +403,12 @@ export default async function CivicaIndexWidgetPage({
         }
 
         .widget-section-eyebrow {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-semibold);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
-          color: var(--color-text-30);
+          color: var(--color-text-40);
           margin: 8px 0 4px;
         }
 
@@ -420,12 +420,12 @@ export default async function CivicaIndexWidgetPage({
         }
         .wb-header { margin-bottom: 22px; }
         .wb-eyebrow {
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-semibold);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
-          color: var(--color-text-30);
+          color: var(--color-text-40);
           margin-bottom: 8px;
         }
         .wb-title {
@@ -464,20 +464,20 @@ export default async function CivicaIndexWidgetPage({
         .wb-field { position: relative; }
         .wb-label {
           display: block;
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-semibold);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
-          color: var(--color-text-30);
+          color: var(--color-text-40);
           margin-bottom: 8px;
         }
 
         .wb-input {
           width: 100%;
           padding: 10px 14px;
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-regular);
           font-size: var(--text-14);
           color: var(--color-text-primary);
           background: var(--color-card-bg);
@@ -518,7 +518,7 @@ export default async function CivicaIndexWidgetPage({
           color: var(--color-bg);
         }
         .wb-result-iso {
-          font-family: var(--font-mono);
+          font-family: var(--font-body);
           font-size: var(--text-12);
           letter-spacing: var(--tracking-wider);
           opacity: 0.7;
@@ -556,9 +556,9 @@ export default async function CivicaIndexWidgetPage({
           flex: 1;
         }
         .wb-check-hint {
-          font-family: var(--font-mono);
+          font-family: var(--font-body);
           font-size: var(--text-12);
-          letter-spacing: 0.04em;
+          letter-spacing: var(--tracking-wide);
           opacity: 0.6;
         }
 
@@ -577,11 +577,11 @@ export default async function CivicaIndexWidgetPage({
           background: var(--color-card-bg);
           color: var(--color-text-primary);
           cursor: pointer;
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-medium);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
-          text-transform: uppercase;
+          letter-spacing: var(--tracking-wide);
+          text-transform: none;
           transition: background-color .12s, border-color .12s, color .12s;
         }
         .wb-toggle:hover {
@@ -616,10 +616,10 @@ export default async function CivicaIndexWidgetPage({
           box-shadow: var(--shadow-hard-sm, 2px 2px 0 var(--color-card-border));
         }
         .wb-preview-empty {
-          font-family: var(--font-mono);
+          font-family: var(--font-body);
           font-size: var(--text-12);
-          color: var(--color-text-30);
-          letter-spacing: var(--tracking-caps);
+          color: var(--color-text-40);
+          letter-spacing: var(--tracking-wider);
           text-transform: uppercase;
         }
 
@@ -645,11 +645,11 @@ export default async function CivicaIndexWidgetPage({
           background: var(--color-bg);
           color: var(--color-text-primary);
           cursor: pointer;
-          font-family: var(--font-mono);
-          font-weight: var(--font-weight-mono);
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-medium);
           font-size: var(--text-12);
-          letter-spacing: var(--tracking-caps);
-          text-transform: uppercase;
+          letter-spacing: var(--tracking-wide);
+          text-transform: none;
           transition: background-color .15s, border-color .15s, color .15s;
         }
         .wb-copy:hover {

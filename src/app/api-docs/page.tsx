@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import type { ReaderSidebarItem } from "@/components/editorial/ReaderSidebar";
 import { withOg } from "@/lib/og";
@@ -108,6 +109,11 @@ const EMBED_PARAMS = [
 export default function ApiDocsPage() {
   return (
     <MethodologyLayout items={SECTIONS} contentClassName="methodology-content--wide">
+      <nav className="editorial-breadcrumbs" aria-label="Breadcrumb">
+        <Link href="/">Civica</Link>
+        <span>/</span>
+        <span aria-current="page">API Docs</span>
+      </nav>
       <section id="overview" className="editorial-section">
         <h1 className="editorial-page-title">Public API</h1>
         <div className="api-accent-rule" aria-hidden="true" />
