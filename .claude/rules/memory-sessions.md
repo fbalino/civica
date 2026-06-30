@@ -38,9 +38,10 @@ file exists (re-runnable). All 42 inline figures across the 10 articles are wire
 BOTH /blog index cards AND the article hero): dedicated **public/blog/<slug>/cover.{webp,png}**
 → first-placeholder engraving → frontmatter coverImage → HemicycleCover. The first placeholder
 is skipped inline ONLY when it's serving as the cover (a cover.webp lets it render inline).
-PENDING: owner is generating dedicated 16:9 hero covers (cover.png per slug) from the 10 hero
-prompts I gave; drop them in public/blog/<slug>/cover.png → convert to webp → they auto-become
-the hero (and the first placeholder reverts to an inline figure). Keep converting any new
+DONE: all 10 dedicated 16:9 hero covers (public/blog/<slug>/cover.webp) are in + live — each
+drives its article hero + the /blog index card; the first inline placeholder reverted to an
+in-body figure. The Record is fully illustrated (10 articles: wide hero + inline figures +
+captions) and 190 country engravings are live. Going forward: convert any new
 public/blog/*/*.png and public/engravings/countries/*.png → webp on each drop.
 
 ## 2026-06-29 (pt5) — Hero-height token, articles published, Motion animations, hydration fix
