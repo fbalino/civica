@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { SourceDot } from "@/components/SourceDot";
 
 export interface SubsectionEntry {
   /** DOM id of the subsection heading. */
@@ -11,6 +12,13 @@ export interface SubsectionEntry {
 export interface SourceEntry {
   name: string;
   date: string;
+  /**
+   * Optional canonical source id (e.g. "vdem", "wikidata"). When present a
+   * provenance `<SourceDot>` renders beside the name, reading green (live)
+   * or amber (frozen vintage) exactly as it does everywhere else. The `date`
+   * column stays as the human-readable sync/vintage label.
+   */
+  sourceId?: string;
 }
 
 interface FactbookRightRailProps {
@@ -220,7 +228,18 @@ export function FactbookRightRail({
                 fontSize: "var(--text-13)",
               }}
             >
-              <span style={{ color: "var(--color-text-85)" }}>{src.name}</span>
+              <span
+                style={{
+                  color: "var(--color-text-85)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                }}
+              >
+                {src.name}
+                {src.sourceId ? (
+                  <SourceDot source={src.sourceId} retrievedAt={src.date} />
+                ) : null}
+              </span>
               <span
                 style={{
                   fontFamily: "var(--font-mono)",

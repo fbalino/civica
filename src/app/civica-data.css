@@ -31,6 +31,100 @@
   padding: 0;
 }
 
+/* ----------------------------------------------------------------
+ * Sub-anchor scroll offsets. The right-rail scroll-spy jumps to these
+ * ids; give them the same sticky-header offset the section headers use
+ * so a jump doesn't land under the fixed header. (Single-block sections
+ * wrap their content in `.civica-data-anchor`.)
+ * ---------------------------------------------------------------- */
+.ci-country-detail-page--embedded #ci-score,
+.ci-country-detail-page--embedded #ci-dimensions,
+.ci-country-detail-page--embedded #ci-history,
+.ci-country-detail-page--embedded #ci-rank,
+.ci-country-detail-page--embedded #ci-pulse,
+.civica-data-anchor,
+#organizations--summary {
+  scroll-margin-top: calc(56px + var(--space-5));
+}
+
+/* ----------------------------------------------------------------
+ * Fix 3 — Dimension breakdown table fits the NARROW factbook-main column.
+ * The base `.ci-country-dim-row` grid (260 80 1fr 80 180 + 24px gaps ≈
+ * 696px of fixed track before the bar gets any width) was sized for the
+ * old standalone 1200px CI page and clipped its right-most "contributes"
+ * column inside `.factbook-main` (~584px of content). Restack into a
+ * 3-column / 2-row grid that fits any column width using the SAME five
+ * elements the markup already renders (label, weight, bar, score,
+ * contribution) — no extra DOM. Scoped to the embedded tab so the base
+ * rule is untouched for any other consumer.
+ *
+ *   Row 1:  [ label ............... ] [ score ]
+ *   Row 2:  [ weight ] [ bar ...... ] [ contributes ]
+ * ---------------------------------------------------------------- */
+.ci-country-detail-page--embedded .ci-country-dim-row {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: var(--space-4);
+  row-gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  align-items: center;
+}
+/* Row 1 — name/source label spans the bar+weight columns; score sits right. */
+.ci-country-detail-page--embedded .ci-country-dim-label {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  min-width: 0;
+}
+.ci-country-detail-page--embedded .ci-country-dim-score {
+  grid-column: 3;
+  grid-row: 1;
+  text-align: right;
+  align-self: baseline;
+}
+/* Row 2 — weight · progress bar · contribution, all on one fitting line. */
+.ci-country-detail-page--embedded .ci-country-dim-weight {
+  grid-column: 1;
+  grid-row: 2;
+  text-align: left;
+  white-space: nowrap;
+}
+.ci-country-detail-page--embedded .ci-country-dim-bar {
+  grid-column: 2;
+  grid-row: 2;
+  width: 100%;
+}
+.ci-country-detail-page--embedded .ci-country-dim-contribution {
+  grid-column: 3;
+  grid-row: 2;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ----------------------------------------------------------------
+ * Fix 4 — History + Regional-rank block stops being cramped.
+ * The base `.ci-country-two-col` splits the row into 1.3fr / 1fr — fine on
+ * the old 1200px page, but inside `.factbook-main` (~584px) it squeezes the
+ * history chart and the rank/peer-lens panel into two thin columns. Stack
+ * to a single column in the embedded tab and give the peer-lens cards +
+ * compare chips comfortable spacing now that they own the full width.
+ * ---------------------------------------------------------------- */
+.ci-country-detail-page--embedded .ci-country-two-col {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+}
+/* Peer-lens cards: more air between the two lenses. */
+.ci-country-detail-page--embedded .ci-country-peer-lenses {
+  gap: var(--space-5);
+  margin-bottom: var(--space-7);
+}
+/* Compare chips: roomier gaps + a touch more padding so they don't feel
+ * packed against each other in the now-wider panel. */
+.ci-country-detail-page--embedded .ci-country-compare-links {
+  gap: var(--space-3);
+}
+.ci-country-detail-page--embedded .ci-country-compare-link {
+  padding: var(--space-3) var(--space-5);
+}
+
 /* Rank pill that replaces the standalone page's hero header rank. Sits
  * above the score block on the embedded tab. */
 .ci-country-rank-strip {

@@ -611,7 +611,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
         <div className="ci-country-rank-strip">{rankLabel}</div>
 
         {ciScoreData || pulseV2 ? (
-          <div className="ci-country-score-shell">
+          <div id="ci-score" className="ci-country-score-shell">
             <CIPulseScoreDisplay
               ciScore={ciScoreData}
               ciChangeText={ciChangeText}
@@ -677,7 +677,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
             )}
           </div>
 
-          <div className="ci-country-panel">
+          <div id="ci-rank" className="ci-country-panel">
             <div className="ci-country-section-eyebrow">Regional rank</div>
             <h3 className="ci-country-panel-title">
               Where {jurisdiction.name} sits against peers.

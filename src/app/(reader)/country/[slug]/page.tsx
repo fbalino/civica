@@ -3,6 +3,7 @@ import {
   getJurisdictionBySlug,
   getFactbookSections,
   getFactbookCountryOptions,
+  getAllSources,
 } from "@/lib/db/queries";
 import { reconciliation } from "@/lib/content/site-state";
 import { jsonbToFields } from "@/lib/data/factbook-fields";
@@ -16,6 +17,7 @@ import {
 import {
   FactbookRightRail,
   type SubsectionEntry,
+  type SourceEntry,
 } from "@/components/factbook/FactbookRightRail";
 import {
   getCanonicalFactsForJurisdiction,
@@ -66,7 +68,7 @@ export default async function CountryFactbookTab({
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) notFound();
 
-  const [sections, countryOptions, headerFacts, citeSources] =
+  const [sections, countryOptions, headerFacts, citeSources, allSources] =
     await Promise.all([
       getFactbookSections(jurisdiction.id),
       getFactbookCountryOptions().catch(() => []),
@@ -103,6 +105,12 @@ export default async function CountryFactbookTab({
       // the whole page; the accordion renders fine without source names.
       getDistinctActiveSourcesForJurisdiction(jurisdiction.id).catch(
         () => [] as Array<{ id: string; name: string }>
+      ),
+      // Whole sources table → real `last_sync_at` dates for the right-rail
+      // "Sources on this page" list. Soft-fails to [] so a Neon hiccup just
+      // drops the dates, never the page.
+      getAllSources().catch(
+        () => [] as Awaited<ReturnType<typeof getAllSources>>
       ),
     ]);
 
@@ -142,7 +150,35 @@ export default async function CountryFactbookTab({
     subsectionsBySection[section.id] = subs.slice(0, 12);
   }
 
-  const sources = [{ name: "CIA Factbook", date: FACTBOOK_RETRIEVED_AT }];
+  // Right-rail "Sources on this page" — accurate to the Factbook tab's
+  // content: the CIA World Factbook prose plus every reconciled fact source
+  // that actually wrote an active row for this jurisdiction (V-Dem, World
+  // Bank, IMF, national statistics offices, Wikidata, …). Derived from the
+  // distinct-active-sources query rather than a static list, so a country
+  // with 13 contributing sources shows 13, not a stub. Each entry carries
+  // its real source id (→ correct green/amber <SourceDot>) and real
+  // `last_sync_at` date.
+  const sourceById = new Map(allSources.map((s) => [s.id, s]));
+  const formatSyncDate = (id: string, fallback: string): string => {
+    const d = sourceById.get(id)?.lastSyncAt ?? null;
+    return d ? d.toISOString().slice(0, 10) : fallback;
+  };
+  // `citeSources` already labels + sorts the distinct active source ids with
+  // CIA Factbook + Wikidata pinned to the end. Guarantee CIA Factbook is
+  // present even if (rarely) no country_facts row is attributed to it, since
+  // the prose itself is CIA-sourced.
+  const railSourceList = [...citeSources];
+  if (!railSourceList.some((s) => s.id === "cia_factbook")) {
+    railSourceList.push({ id: "cia_factbook", name: "CIA World Factbook" });
+  }
+  const sources: SourceEntry[] = railSourceList.map((s) => ({
+    name: s.name,
+    date: formatSyncDate(
+      s.id,
+      s.id === "cia_factbook" ? FACTBOOK_RETRIEVED_AT : "Not yet synced"
+    ),
+    sourceId: s.id,
+  }));
 
   return (
     <div className="factbook-body">

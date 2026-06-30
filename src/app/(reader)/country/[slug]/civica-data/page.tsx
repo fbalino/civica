@@ -7,6 +7,7 @@ import {
   getGovernmentStructure,
   getLeaderTimeline,
   getSource,
+  getAllSources,
   getBillsForJurisdiction,
   getInternationalMembershipsBySlugs,
 } from "@/lib/db/queries";
@@ -19,6 +20,7 @@ import {
 import {
   FactbookRightRail,
   type SubsectionEntry,
+  type SourceEntry,
 } from "@/components/factbook/FactbookRightRail";
 import { FactbookGovOrgChart } from "@/components/factbook/FactbookGovOrgChart";
 import { buildOrgChartFromGovernmentStructure } from "@/lib/factbook/gov-org-chart";
@@ -27,6 +29,7 @@ import { FactbookLeaders } from "@/components/factbook/FactbookLeaders";
 import { FactbookBills } from "@/components/factbook/FactbookBills";
 import { ScoresAndRankings } from "@/components/scores/ScoresAndRankings";
 import { CivicaIndexPanel } from "@/components/country/CivicaIndexPanel";
+import { sourceLabel } from "@/lib/data/sources";
 import "@/app/civica-data.css";
 
 export const revalidate = 3600;
@@ -119,6 +122,7 @@ export default async function CountryCivicaDataTab({
     scoresRows,
     countryOptions,
     wikidataSource,
+    allSources,
   ] = await Promise.all([
     getCICountryDetail(slug).catch(() => null),
     getGovernmentStructure(jurisdiction.id).catch(
@@ -133,6 +137,12 @@ export default async function CountryCivicaDataTab({
     getScoresForJurisdiction(jurisdiction.id).catch(() => []),
     getFactbookCountryOptions().catch(() => []),
     getSource("wikidata").catch(() => null),
+    // Whole sources table → real `last_sync_at` dates for the right-rail
+    // "Sources on this page" list. Soft-fails to [] so a Neon hiccup just
+    // drops the dates, never the page.
+    getAllSources().catch(
+      () => [] as Awaited<ReturnType<typeof getAllSources>>
+    ),
   ]);
 
   // Build the org chart once — reused for the gate and the render.
@@ -177,12 +187,53 @@ export default async function CountryCivicaDataTab({
     label: s.label,
   }));
 
-  // Right-rail subsection map. Government gets a "Structure" anchor; the
-  // rest are single-block sections with no sub-anchors.
+  // Right-rail subsection map. EVERY visible section must be a key here —
+  // the rail's section IntersectionObserver only tracks ids that appear in
+  // this map, so a section absent from the map never becomes "active" and
+  // the "In this section" list stays frozen on whichever section IS present
+  // (the old bug: only Government had an entry, so it never updated). The
+  // sub-anchor ids match the DOM ids rendered below (and inside
+  // <CivicaIndexPanel>); the observer silently ignores any that didn't
+  // render (e.g. an absent Pulse block).
   const subsectionsBySection: Record<string, SubsectionEntry[]> = {};
+  if (hasCivicaIndex) {
+    subsectionsBySection["civica-index"] = [
+      { id: "ci-score", label: "Score & Pulse" },
+      { id: "ci-dimensions", label: "Dimension breakdown" },
+      { id: "ci-history", label: "Quarterly history" },
+      { id: "ci-rank", label: "Regional rank & peers" },
+      { id: "ci-pulse", label: "Pulse changelog" },
+    ];
+  }
   if (hasGovernment) {
     subsectionsBySection["government"] = [
-      { id: "government--structure", label: "Structure" },
+      { id: "government--structure", label: "How power is organised" },
+    ];
+  }
+  if (hasLegislature) {
+    subsectionsBySection["legislature"] = [
+      { id: "legislature--chambers", label: "Chamber composition" },
+    ];
+  }
+  if (hasLeaders) {
+    subsectionsBySection["leaders"] = [
+      { id: "leaders--officeholders", label: "Current officeholders" },
+    ];
+  }
+  if (hasBills) {
+    subsectionsBySection["bills"] = [
+      { id: "bills--recent", label: "Recent legislation" },
+    ];
+  }
+  if (hasOrganizations) {
+    subsectionsBySection["organizations"] = [
+      { id: "organizations--summary", label: "Membership summary" },
+      { id: "organizations--list", label: "Memberships by type" },
+    ];
+  }
+  if (hasRankings) {
+    subsectionsBySection["rankings"] = [
+      { id: "rankings--scores", label: "Scores & rankings" },
     ];
   }
 
@@ -206,18 +257,76 @@ export default async function CountryCivicaDataTab({
     (m) => (m.role ?? "").toLowerCase() === "founding"
   ).length;
 
-  // Right-rail sources list, gated by what actually rendered.
-  const sources = [
-    ...(hasCivicaIndex
-      ? [{ name: "Civica Index", date: "2026-01-15" }]
-      : []),
-    ...(hasGovernment || hasLegislature || hasLeaders
-      ? [{ name: "Civica internal", date: "2026-04-12" }]
-      : []),
-    ...(hasOrganizations
-      ? [{ name: "Wikidata", date: "2026-04-30" }]
-      : []),
-  ];
+  // Right-rail "Sources on this page" — accurate to what THIS tab actually
+  // renders. Each entry carries the real source id (so the <SourceDot> reads
+  // green/amber correctly) and the real `last_sync_at` date from the sources
+  // table. We collect the set of source ids contributing to the tab, then
+  // emit one entry per id, deduped and ordered by section.
+  const sourceById = new Map(allSources.map((s) => [s.id, s]));
+  const formatSyncDate = (id: string): string => {
+    const d = sourceById.get(id)?.lastSyncAt ?? null;
+    return d ? d.toISOString().slice(0, 10) : "Not yet synced";
+  };
+
+  const sourceIdsOnPage: string[] = [];
+  const pushSource = (id: string) => {
+    if (id && !sourceIdsOnPage.includes(id)) sourceIdsOnPage.push(id);
+  };
+
+  // Civica Index composite + its four dimension upstreams (always cited in
+  // the breakdown the panel renders).
+  if (hasCivicaIndex) {
+    if (ciDetail) {
+      for (const dim of ciDetail.dimensions) pushSource(dim.sourceId);
+    }
+  }
+  // Government structure + leaders are Wikidata-derived; legislature seat
+  // composition is IPU Parline.
+  if (hasGovernment || hasLeaders) pushSource("wikidata");
+  if (hasLegislature) pushSource("ipu_parline");
+  // Bills carry their own per-source provenance (Congress.gov, national
+  // legislature feeds, …) — pull the distinct ids from the rendered rows.
+  if (hasBills && billsResult) {
+    for (const b of billsResult.rows) pushSource(b.sourceId);
+  }
+  // Organizations / international memberships are Wikidata-derived.
+  if (hasOrganizations) pushSource("wikidata");
+  // Rankings rows each carry a `.source` (V-Dem, Freedom House, HDI, CPI,
+  // RSF, plus the Civica Index + Pulse composites).
+  if (hasRankings) {
+    for (const r of scoresRows) pushSource(r.source);
+  }
+
+  const sources: SourceEntry[] = [];
+  // Lead with the Civica Index composite itself (frozen quarterly vintage →
+  // amber dot via the civica_curated mapping; it has no own sources-table row).
+  if (hasCivicaIndex) {
+    sources.push({
+      name: "Civica Index (composite)",
+      date: ciDetail?.composite?.calculatedAt
+        ? new Date(ciDetail.composite.calculatedAt)
+            .toISOString()
+            .slice(0, 10)
+        : "Beta",
+      sourceId: "civica_curated",
+    });
+  }
+  // Pulse upstream (GDELT) only when pulse events actually rendered on the
+  // tab. CivicaIndexPanel renders the Pulse changelog from getPulseChangelog;
+  // surface GDELT whenever a CI detail exists (the panel's Pulse block).
+  if (hasCivicaIndex) pushSource("gdelt");
+
+  for (const id of sourceIdsOnPage) {
+    // `civica_curated` is already represented by the explicit "Civica Index
+    // (composite)" lead entry above — don't list it twice (the rankings
+    // section's CI row also carries this id).
+    if (id === "civica_curated") continue;
+    sources.push({
+      name: sourceLabel(id),
+      date: formatSyncDate(id),
+      sourceId: id,
+    });
+  }
 
   // Edge case: a country with a masthead but zero Civica overlays. Render
   // a clean note rather than an empty grid with a phantom sidebar.
@@ -282,37 +391,46 @@ export default async function CountryCivicaDataTab({
 
             {/* 3. Legislature. */}
             {section.id === "legislature" && (
-              <FactbookLegislature
-                jurisdictionId={jurisdiction.id}
-                countryName={jurisdiction.name}
-              />
+              <div id="legislature--chambers" className="civica-data-anchor">
+                <FactbookLegislature
+                  jurisdictionId={jurisdiction.id}
+                  countryName={jurisdiction.name}
+                />
+              </div>
             )}
 
             {/* 4. Leaders. */}
             {section.id === "leaders" && (
-              <FactbookLeaders
-                jurisdictionId={jurisdiction.id}
-                countryName={jurisdiction.name}
-                retrievedAt={
-                  wikidataSource?.lastSyncAt
-                    ? wikidataSource.lastSyncAt.toISOString()
-                    : null
-                }
-              />
+              <div id="leaders--officeholders" className="civica-data-anchor">
+                <FactbookLeaders
+                  jurisdictionId={jurisdiction.id}
+                  countryName={jurisdiction.name}
+                  retrievedAt={
+                    wikidataSource?.lastSyncAt
+                      ? wikidataSource.lastSyncAt.toISOString()
+                      : null
+                  }
+                />
+              </div>
             )}
 
             {/* 5. Bills. */}
             {section.id === "bills" && (
-              <FactbookBills
-                countrySlug={slug}
-                countryName={jurisdiction.name}
-              />
+              <div id="bills--recent" className="civica-data-anchor">
+                <FactbookBills
+                  countrySlug={slug}
+                  countryName={jurisdiction.name}
+                />
+              </div>
             )}
 
             {/* 6. Organizations — international footprint. */}
             {section.id === "organizations" && (
               <>
-                <div className="civica-data-intl-stats">
+                <div
+                  id="organizations--summary"
+                  className="civica-data-intl-stats"
+                >
                   <div className="civica-data-intl-stat">
                     <div className="civica-data-intl-stat-k">Memberships</div>
                     <div className="civica-data-intl-stat-v">
@@ -337,6 +455,7 @@ export default async function CountryCivicaDataTab({
                   </div>
                 </div>
 
+                <div id="organizations--list" className="civica-data-anchor">
                 {ORG_TYPE_ORDER.map((type) => {
                   const items = membershipsByType.get(type);
                   if (!items || items.length === 0) return null;
@@ -417,16 +536,19 @@ export default async function CountryCivicaDataTab({
                     </div>
                   );
                 })}
+                </div>
               </>
             )}
 
             {/* 7. Rankings. */}
             {section.id === "rankings" && (
-              <ScoresAndRankings
-                jurisdictionId={jurisdiction.id}
-                countryName={jurisdiction.name}
-                variant="factbook"
-              />
+              <div id="rankings--scores" className="civica-data-anchor">
+                <ScoresAndRankings
+                  jurisdictionId={jurisdiction.id}
+                  countryName={jurisdiction.name}
+                  variant="factbook"
+                />
+              </div>
             )}
           </section>
         ))}
