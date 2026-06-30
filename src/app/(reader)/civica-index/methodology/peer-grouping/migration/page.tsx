@@ -125,7 +125,7 @@ export default async function PeerGroupingMigrationPage() {
                 {rows.map((row) => (
                   <tr key={row.slug}>
                     <td>
-                      <Link href={`/civica-index/${row.slug}`}>
+                      <Link href={`/country/${row.slug}/civica-data`}>
                         {row.name}
                       </Link>
                     </td>

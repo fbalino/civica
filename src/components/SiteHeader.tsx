@@ -82,7 +82,7 @@ export function SiteHeader({
         {/* Primary CTA — desktop only; mobile users get the hamburger menu instead.
             Uses a dedicated class (not Tailwind `hidden`) because `.btn`'s own
             `display` is unlayered and would override a layered utility. */}
-        <Button variant="primary" arrow href="/factbook" className="site-header__cta">
+        <Button variant="primary" arrow href="/country" className="site-header__cta">
           Explore Countries
         </Button>
         <MobileNav searchSlot={searchSlot} logoSlot={logoSlotSmall} />

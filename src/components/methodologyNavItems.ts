@@ -23,7 +23,7 @@ export const METHODOLOGY_NAV_ITEMS: MethodologyNavItem[] = [
     descriptor: "Plain-English intro",
   },
   {
-    href: "/factbook/methodology/reconciliation",
+    href: "/country/methodology/reconciliation",
     label: "Reconciliation",
     descriptor: "Multi-source resolver",
   },

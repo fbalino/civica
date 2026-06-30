@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { Info } from "lucide-react";
 import { CountryFlag } from "@/components/CountryFlag";
-import { CountrySwitcherChips } from "./CountrySwitcherChips";
 import { FactbookLightbox, type LightboxImage } from "./FactbookLightbox";
 import { FactValueDot } from "./FactValueDot";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
@@ -102,7 +101,7 @@ interface FactbookHeaderStripProps {
   /** Phase F.4 — resolver output for gdp_ppp_usd_billions. */
   gdpResolver?: ResolverOutput | null;
   /** Whether this jurisdiction is covered by the Atlas (sovereign states only).
-   *  Hides the "Open in Atlas" chip for non-sovereign territories. */
+   *  Retained for call-site compatibility; no longer toggles any chip. */
   inAtlas?: boolean;
   /** When present, the country's landmark engraving renders as the masthead
    *  backdrop (full 3:2, uncropped) with the header overlaid on top. Resolved
@@ -112,11 +111,8 @@ interface FactbookHeaderStripProps {
    *  five-storied pagoda…"). Rendered as a subtle caption over the hero scrim.
    *  Only passed when an engraving actually exists; null → no caption. */
   heroCaption?: string | null;
-  /** Optional replacement for the under-masthead navigation row. When
-   *  provided, it renders INSTEAD of the legacy <CountrySwitcherChips>
-   *  (e.g. the 3-tab <CountryTabBar> on the unified /country/[slug] page).
-   *  When absent, the masthead keeps its current Factbook · Civica Index
-   *  switcher chips, so /factbook/[slug] is unchanged. */
+  /** The under-masthead navigation row — the 3-tab <CountryTabBar> on the
+   *  unified /country/[slug] page (Factbook · Civica Data · Constitution). */
   nav?: React.ReactNode;
 }
 
@@ -162,7 +158,6 @@ export function FactbookHeaderStrip({
   photos,
   populationResolver,
   gdpResolver,
-  inAtlas = true,
   engravingSrc = null,
   heroCaption = null,
   nav,
@@ -335,7 +330,7 @@ export function FactbookHeaderStrip({
               ))}
             {ciScore != null && (
               <Link
-                href={`/civica-index/${slug}`}
+                href={`/country/${slug}/civica-data`}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -365,7 +360,7 @@ export function FactbookHeaderStrip({
             )}
             {cpDisplay !== null && (
               <Link
-                href={`/civica-index/${slug}#pulse`}
+                href={`/country/${slug}/civica-data#civica-index`}
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
@@ -399,11 +394,7 @@ export function FactbookHeaderStrip({
             )}
           </div>
 
-          <div className="factbook-hero-switcher-wrap">
-            {nav ?? (
-              <CountrySwitcherChips slug={slug} active="factbook" inAtlas={inAtlas} />
-            )}
-          </div>
+          <div className="factbook-hero-switcher-wrap">{nav}</div>
         </div>
 
         <div className="factbook-hero-boxes">

@@ -193,10 +193,10 @@ export default async function AboutPage() {
               }}
             >
               <Link
-                href="/factbook"
+                href="/country"
                 style={{ color: "inherit", textDecoration: "none" }}
               >
-                Civica Factbook
+                Country Profiles
               </Link>
             </h3>
             <p

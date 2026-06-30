@@ -494,7 +494,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
         )}
 
         <Link
-          href={`/countries/${detail.slug}?tab=outcomes`}
+          href={`/country/${detail.slug}`}
           style={{
             display: "block",
             padding: "10px 16px",

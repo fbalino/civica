@@ -63,7 +63,7 @@ export const FACTBOOK_RECONCILIATION_META = Object.freeze({
   status: reconciliation.status,
   version: reconciliation.version,
   reference:
-    "https://civicaatlas.org/factbook/methodology/reconciliation",
+    "https://civicaatlas.org/country/methodology/reconciliation",
   vintage: `Civica Atlas Reconciled ${reconciliation.version} — vintage ${reconciliation.firstVintage}`,
 });
 

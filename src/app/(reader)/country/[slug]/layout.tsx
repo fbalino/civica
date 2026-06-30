@@ -201,7 +201,7 @@ export default async function CountryLayout({
             ) : null}
             ).{" "}
             <Link
-              href="/factbook/methodology/reconciliation"
+              href="/country/methodology/reconciliation"
               className="factbook-reconciliation-notice__link"
             >
               Methodology →

@@ -178,7 +178,7 @@ export function FactValuePanel({
           <strong>This fact has a pending data dispute.</strong>{" "}
           The value below is the prior canonical value while
           reviewers investigate the conflict. See the{" "}
-          <Link href="/factbook/methodology/reconciliation#disputes">
+          <Link href="/country/methodology/reconciliation#disputes">
             methodology
           </Link>{" "}
           for what this means.
@@ -258,7 +258,7 @@ export function FactValuePanel({
         </span>
         <Link
           className="fact-value-panel-foot-link"
-          href="/factbook/methodology/reconciliation"
+          href="/country/methodology/reconciliation"
         >
           Methodology →
         </Link>

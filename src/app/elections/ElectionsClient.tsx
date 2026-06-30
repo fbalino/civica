@@ -177,7 +177,7 @@ export default function ElectionsClient({
               return (
                 <a
                   key={e.election.id}
-                  href={`/countries/${e.jurisdiction.slug}`}
+                  href={`/country/${e.jurisdiction.slug}`}
                   className="index-country-card"
                   style={{ textDecoration: "none", color: "inherit" }}
                 >

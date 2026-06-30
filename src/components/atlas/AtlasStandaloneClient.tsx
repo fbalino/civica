@@ -47,7 +47,7 @@ export function AtlasStandaloneClient({ countries }: AtlasStandaloneClientProps)
               return;
             }
             const slug = atlasIdToSlug(c.id, countries);
-            router.push(`/factbook/${slug}`);
+            router.push(`/country/${slug}`);
           }}
           onUnpinAt={(i) =>
             setPinned((prev) => prev.filter((_, j) => j !== i))

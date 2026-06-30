@@ -398,7 +398,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     })
     .join("");
 
-  const smBody = `<a class="civica-widget small" href="https://civicaatlas.org/civica-index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const smBody = `<a class="civica-widget small" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="mark serif">C</div>
   <div class="body">
     <div class="country">${esc(jurisdiction.name)}</div>
@@ -407,7 +407,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="score serif">${esc(ciDisplay)}</div>
 </a>`;
 
-  const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/civica-index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
     <div class="gov mono">${esc(govType)}</div>
@@ -422,12 +422,12 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="tier-bar"><span style="width:${tierPct}%"></span></div>
   ${attributionHtml}
   <div class="foot mono">
-    <span>civicaatlas.org/countries/${esc(jurisdiction.slug)}</span>
+    <span>civicaatlas.org/country/${esc(jurisdiction.slug)}</span>
     ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
 
-  const lgBody = `<a class="civica-widget large" href="https://civicaatlas.org/civica-index/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const lgBody = `<a class="civica-widget large" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
     <div class="gov mono">${esc(govType)}</div>
@@ -446,7 +446,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   ${dims ? `<div class="dims">${dimBarsHtml}</div>` : ""}
   ${attributionHtml}
   <div class="foot mono">
-    <span>civicaatlas.org/countries/${esc(jurisdiction.slug)}</span>
+    <span>civicaatlas.org/country/${esc(jurisdiction.slug)}</span>
     ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
@@ -492,7 +492,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     .filter(Boolean)
     .join("");
 
-  const customBody = `<a class="civica-widget custom" href="https://civicaatlas.org/factbook/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const customBody = `<a class="civica-widget custom" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="cf-top">
     <div class="cf-brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
   </div>
@@ -500,7 +500,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="cf-rows">${customRowsHtml}</div>
   ${attributionHtml}
   <div class="cf-foot mono">
-    <span>civicaatlas.org/factbook/${esc(jurisdiction.slug)}</span>
+    <span>civicaatlas.org/country/${esc(jurisdiction.slug)}</span>
     ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;

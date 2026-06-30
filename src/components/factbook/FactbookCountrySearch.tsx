@@ -24,7 +24,7 @@ export function FactbookCountrySearch({
   placeholder = "Jump to country...",
   compact = false,
   autoFocus = false,
-  countryPathPrefix = "/factbook",
+  countryPathPrefix = "/country",
   ariaLabel = "Jump to a country",
   showShortcut = false,
   enableShortcut = false,

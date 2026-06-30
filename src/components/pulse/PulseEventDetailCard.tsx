@@ -107,7 +107,7 @@ export function PulseEventDetailCard({
 
         <div className="pulse-event-expanded">
           <div className="pulse-event-actions">
-            <Link href={`/countries/${event.country.slug}`}>
+            <Link href={`/country/${event.country.slug}`}>
               Open country page
             </Link>
             <a href={`#evt-${event.id}`} aria-label="Permalink to this event">

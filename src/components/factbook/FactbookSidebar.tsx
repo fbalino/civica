@@ -16,8 +16,8 @@ export function FactbookSidebar({ items, countries }: FactbookSidebarProps) {
     <ReaderSidebar
       items={items}
       countries={countries}
-      countryPathPrefix="/factbook"
-      searchAriaLabel="Jump to a country factbook"
+      countryPathPrefix="/country"
+      searchAriaLabel="Jump to a country"
       className="factbook-sidebar"
     />
   );

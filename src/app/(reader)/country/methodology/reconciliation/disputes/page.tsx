@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "Public read-only log of conflicts the resolver flagged across CIA Factbook, Wikidata, and named statistical agencies. Open, resolved, and auto-resolved disputes with severity, source attribution, and methodology notes.",
   alternates: {
     canonical:
-      "https://civicaatlas.org/factbook/methodology/reconciliation/disputes",
+      "https://civicaatlas.org/country/methodology/reconciliation/disputes",
   },
 };
 
@@ -70,7 +70,7 @@ export default async function PublicDisputesPage() {
         material-error thresholds may change in future methodology
         version bumps (currently <code>{reconciliation.version}</code>).
         See the{" "}
-        <Link href="/factbook/methodology/reconciliation">
+        <Link href="/country/methodology/reconciliation">
           full reconciliation methodology
         </Link>{" "}
         for context.
@@ -91,7 +91,7 @@ export default async function PublicDisputesPage() {
         <CiteAccordion
           subject={FACTBOOK_RECONCILIATION_META.vintage}
           pageTitle="Data disputes log"
-          url="https://civicaatlas.org/factbook/methodology/reconciliation/disputes"
+          url="https://civicaatlas.org/country/methodology/reconciliation/disputes"
           dataVintage={reconciliation.firstVintageCutDate}
         />
       </section>
@@ -100,7 +100,7 @@ export default async function PublicDisputesPage() {
         className="editorial-footer-nav"
         style={{ marginTop: "var(--space-7)" }}
       >
-        <Link href="/factbook/methodology/reconciliation">
+        <Link href="/country/methodology/reconciliation">
           ← Back to reconciliation methodology
         </Link>
         <Link href="/methodology">Methodology hub →</Link>

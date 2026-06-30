@@ -374,7 +374,7 @@ export default async function CivicaIndexPage({
                   return (
                     <Link
                       key={r.jurisdictionId}
-                      href={`/civica-index/${r.slug}`}
+                      href={`/country/${r.slug}/civica-data`}
                       className="ci-lb-row"
                       role="row"
                       style={

@@ -167,7 +167,7 @@ export async function HomeGrid() {
       <Reveal as="section" className="home-feature">
         <div className="home-feature-num">01</div>
         <div className="home-feature-main">
-          <div className="home-eyebrow">Factbook</div>
+          <div className="home-eyebrow">Countries</div>
           <h2 className="home-feature-title">
             Explore country profiles and key facts at a glance.
           </h2>
@@ -175,8 +175,8 @@ export async function HomeGrid() {
             Every country&rsquo;s government, leaders, legislature, economy, and society
             &mdash; documented with provenance you can trace to its source.
           </p>
-          <Link href="/factbook" className="btn btn--text">
-            <span>Explore Factbook</span>
+          <Link href="/country" className="btn btn--text">
+            <span>Explore Countries</span>
             <span className="btn__arrow" aria-hidden="true">
               &rarr;
             </span>
@@ -190,7 +190,7 @@ export async function HomeGrid() {
               incomeGroup={incomeByJur[japan.jurisdictionId] ?? null}
               stats={buildCardStats(japan)}
               iso3="jpn"
-              href={`/factbook/${japan.slug}`}
+              href={`/country/${japan.slug}`}
             />
           ) : (
             <div className="home-feature-visual">
@@ -228,7 +228,7 @@ export async function HomeGrid() {
               incomeGroup={incomeByJur[estonia.jurisdictionId] ?? null}
               stats={buildCardStats(estonia)}
               iso3="est"
-              href={`/factbook/${estonia.slug}`}
+              href={`/country/${estonia.slug}`}
             />
           ) : (
             <div className="home-feature-visual">
@@ -303,7 +303,7 @@ export async function HomeGrid() {
                           </td>
                           <td>
                             <Link
-                              href={`/civica-index/${r.slug}`}
+                              href={`/country/${r.slug}/civica-data`}
                               className="home-index-country"
                             >
                               <span className="home-index-flag" aria-hidden="true">

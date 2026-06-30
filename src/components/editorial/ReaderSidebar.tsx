@@ -24,7 +24,7 @@ interface ReaderSidebarProps {
 export function ReaderSidebar({
   items,
   countries = [],
-  countryPathPrefix = "/factbook",
+  countryPathPrefix = "/country",
   searchPlaceholder = "Jump to country...",
   searchAriaLabel = "Jump to a country",
   className,

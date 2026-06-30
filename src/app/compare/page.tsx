@@ -346,7 +346,7 @@ export default async function ComparePage({
 
           <footer className="compare-page-footer">
             {selectedJurisdictions.map((c) => (
-              <Link key={c.slug} href={`/countries/${c.slug}`}>
+              <Link key={c.slug} href={`/country/${c.slug}`}>
                 {c.name} profile →
               </Link>
             ))}

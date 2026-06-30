@@ -195,11 +195,12 @@ export function CivicaIndexFilterBar({
         </div>
       </div>
 
-      {/* Jump straight to a country's scorecard */}
+      {/* Jump straight to a country's scorecard (the Civica Data tab of
+          the unified /country page). */}
       <div className="ci-filter-search">
         <CountrySearchCombobox
           countries={searchCountries}
-          countryPathPrefix="/civica-index"
+          hrefForCountry={(country) => `/country/${country.slug}/civica-data`}
           placeholder="Jump to a country&hellip;"
           ariaLabel="Jump to a country's Civica Index scorecard"
         />

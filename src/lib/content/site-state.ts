@@ -214,8 +214,8 @@ export const reconciliation = {
     "At least one external reviewer with relevant expertise plus a public response to their feedback.",
     "At least three quarters of vintaged Beta data so reviewers can audit drift.",
     "At least two documented disputes resolved end-to-end through the public queue.",
-    "Interactive resolver demo at /factbook/methodology/reconciliation/explore.",
-    "Read-only public disputes log at /factbook/methodology/reconciliation/disputes (shipped).",
+    "Interactive resolver demo at /country/methodology/reconciliation/explore.",
+    "Read-only public disputes log at /country/methodology/reconciliation/disputes (shipped).",
   ] as const,
 } as const;
 

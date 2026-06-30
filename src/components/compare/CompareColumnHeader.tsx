@@ -21,7 +21,7 @@ export function CompareColumnHeader({
   return (
     <div className="compare-col-header" style={{ borderBottomColor: seriesColor }}>
       <CountryFlag iso2={iso2} size={28} />
-      <a href={`/countries/${slug}`} className="compare-col-header-name">
+      <a href={`/country/${slug}`} className="compare-col-header-name">
         {name}
       </a>
     </div>

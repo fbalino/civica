@@ -19,7 +19,7 @@ const DESTINATIONS: Array<{
     description: "Interactive atlas of world government structures.",
   },
   {
-    href: "/countries",
+    href: "/country",
     label: "Countries",
     description: "Browse 250+ country profiles and political systems.",
   },

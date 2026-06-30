@@ -110,10 +110,10 @@ const nextConfig: NextConfig = {
         destination: "/organizations/:slug",
         permanent: true,
       },
-      // Country tabs → the factbook country reader (covers hemicycle,
-      // bills, leaders, scores, structure, sections). The global
-      // /elections page remains the canonical home for elections, so
-      // keep that earlier, more-specific rule winning below.
+      // Country tabs → the unified /country/[slug] reader (covers
+      // hemicycle, bills, leaders, scores, structure, sections). The
+      // global /elections page remains the canonical home for elections,
+      // so keep that earlier, more-specific rule winning below.
       {
         source: "/atlas/:slug/elections",
         destination: "/elections",
@@ -121,43 +121,97 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/atlas/:slug/:tab",
-        destination: "/factbook/:slug",
+        destination: "/country/:slug",
         permanent: true,
       },
       {
         source: "/atlas/:slug",
-        destination: "/factbook/:slug",
+        destination: "/country/:slug",
         permanent: true,
       },
       // Phase 5.10 polish — the legacy v1 changelog page reads from
       // pulse_changelog / pulse_daily_scores tables that are no longer
       // surfaced post-cut-over. Public users get the v2 changelog at
       // /civica-index/pulse-changelog. Preserve any external links.
+      // MUST precede the /civica-index/:slug country-detail catch-all
+      // below so "changelog" is handled here rather than treated as a
+      // country slug.
       {
         source: "/civica-index/changelog",
         destination: "/civica-index/pulse-changelog",
         permanent: true,
       },
-      // Phase D.2 — /factbook is the new canonical country reader.
-      // The legacy /countries/[slug] parent page stays live (per the
-      // factbook plan §2.2), but the per-tab sub-routes redirect into
-      // the matching factbook section anchor. /countries/[slug]/outcomes
-      // is intentionally NOT redirected — Outcomes is postponed pending
-      // a methodology project, so the legacy page is the only home for
-      // peer-band data right now.
+      // The country page flip — /country/[slug] is now the canonical
+      // per-country reader (Factbook · Civica Data · Constitution tabs).
+      // The three legacy country surfaces (/factbook, /countries,
+      // /civica-index/[slug]) retire into it.
+      //
+      // Legacy /countries/[slug] per-tab sub-routes redirect into the
+      // matching /country section anchor. These specific rules MUST
+      // precede the bare /countries/:slug rule below.
       {
         source: "/countries/:slug/leaders",
-        destination: "/factbook/:slug#leaders",
+        destination: "/country/:slug/civica-data#leaders",
         permanent: true,
       },
       {
         source: "/countries/:slug/democracy",
-        destination: "/factbook/:slug#scores",
+        destination: "/country/:slug/civica-data#rankings",
         permanent: true,
       },
       {
         source: "/countries/:slug/constitution",
-        destination: "/factbook/:slug",
+        destination: "/country/:slug",
+        permanent: true,
+      },
+      // Legacy /factbook/methodology (bare parent) — the reconciliation
+      // page is the canonical methodology home. Specific rule must
+      // precede the /factbook/:path* catch-all below.
+      {
+        source: "/factbook/methodology",
+        destination: "/country/methodology/reconciliation",
+        permanent: true,
+      },
+      // /factbook landing + every /factbook sub-path (the old country
+      // detail at /factbook/[slug] and the methodology tree) move to
+      // /country and /country/*.
+      {
+        source: "/factbook",
+        destination: "/country",
+        permanent: true,
+      },
+      {
+        source: "/factbook/:path*",
+        destination: "/country/:path*",
+        permanent: true,
+      },
+      // Legacy /civica-index/[slug] country detail → the Civica Data tab
+      // of the unified country page. The negative lookahead protects the
+      // leaderboard sub-routes (methodology, government-types, widget,
+      // pulse-changelog, corrections, replication, changelog) so they are
+      // NOT treated as country slugs. Does not match /civica-index itself.
+      {
+        source:
+          "/civica-index/:slug((?!methodology|government-types|widget|pulse-changelog|corrections|replication|changelog).+)",
+        destination: "/country/:slug/civica-data",
+        permanent: true,
+      },
+      // Legacy /countries landing + /countries/[slug] → /country.
+      {
+        source: "/countries",
+        destination: "/country",
+        permanent: true,
+      },
+      {
+        source: "/countries/:slug",
+        destination: "/country/:slug",
+        permanent: true,
+      },
+      // /country/methodology (bare parent) → the reconciliation page,
+      // the canonical methodology home for the country reader.
+      {
+        source: "/country/methodology",
+        destination: "/country/methodology/reconciliation",
         permanent: true,
       },
       // Phase 3d (structural_family removal) — top-level
@@ -175,14 +229,6 @@ const nextConfig: NextConfig = {
       {
         source: "/government-types/:type",
         destination: "/civica-index/methodology/peer-grouping",
-        permanent: true,
-      },
-      // /factbook/methodology was the parent page referenced from older
-      // links/sitemaps but never existed as a real route. The reconciliation
-      // page is the canonical methodology home for the factbook.
-      {
-        source: "/factbook/methodology",
-        destination: "/factbook/methodology/reconciliation",
         permanent: true,
       },
     ];

@@ -5,21 +5,21 @@ import {
   type FactbookAlmanacCountry,
 } from "@/components/factbook/FactbookAlmanac";
 
-// /factbook landing — Option C ("Typeahead + Almanac Index"). A full-bleed
-// engraving hero (homepage style) with a centered typeahead + region quick-
-// filter chips, over a dense alphabetical "almanac" index of every country.
-// All layout/styling lives in `.factbook-landing-*` classes in factbook.css.
+// /country landing — a full-bleed engraving hero (homepage style) with a
+// centered typeahead + region quick-filter chips, over a dense alphabetical
+// "almanac" index of every country. All layout/styling lives in the
+// `.factbook-landing-*` classes in factbook.css.
 
 export const metadata: Metadata = {
-  title: "Factbook — Every Country",
+  title: "Countries — Every Country",
   description:
     "Reference dossiers for every country and territory. Sourced from the CIA World Factbook with Civica governance overlays.",
-  alternates: { canonical: "https://civicaatlas.org/factbook" },
+  alternates: { canonical: "https://civicaatlas.org/country" },
 };
 
 export const revalidate = 3600;
 
-export default async function FactbookIndexPage() {
+export default async function CountryIndexPage() {
   let countries: FactbookAlmanacCountry[] = [];
   try {
     const rows = await getAllJurisdictions();

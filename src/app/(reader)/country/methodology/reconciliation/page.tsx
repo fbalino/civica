@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   description: `How Civica picks one canonical value per country fact across CIA Factbook, ${tier1Shipped.length} multilateral publishers, ${nsoActive.length} national statistical offices, and Wikidata. Source allowlist, resolver rules, vintaging, disputes, replication, and worked examples drawn from live data.`,
   alternates: {
     canonical:
-      "https://civicaatlas.org/factbook/methodology/reconciliation",
+      "https://civicaatlas.org/country/methodology/reconciliation",
   },
 };
 
@@ -866,8 +866,8 @@ export default async function ReconciliationMethodologyPage() {
           population threshold, so the World Bank cannot displace the
           CIA on freshness alone. Two open <code>material_error</code>{" "}
           disputes sit in the queue at{" "}
-          <Link href="/factbook/methodology/reconciliation/disputes">
-            /factbook/methodology/reconciliation/disputes
+          <Link href="/country/methodology/reconciliation/disputes">
+            /country/methodology/reconciliation/disputes
           </Link>{" "}
           awaiting human review.
         </p>
@@ -1265,8 +1265,8 @@ export default async function ReconciliationMethodologyPage() {
         <p>
           The full dispute log is published as a public read-only
           surface at{" "}
-          <Link href="/factbook/methodology/reconciliation/disputes">
-            /factbook/methodology/reconciliation/disputes
+          <Link href="/country/methodology/reconciliation/disputes">
+            /country/methodology/reconciliation/disputes
           </Link>{" "}
           — every open dispute, every resolved dispute, the system
           actions taken on each, and the methodology rationale where
@@ -1393,7 +1393,7 @@ export default async function ReconciliationMethodologyPage() {
           worked walk-through that re-derives a vintage&rsquo;s
           values from the artefacts — is on the v1.1 roadmap as a
           future page at{" "}
-          <code>/factbook/methodology/reconciliation/replication</code>{" "}
+          <code>/country/methodology/reconciliation/replication</code>{" "}
           (not yet shipped). For the present, the inputs above are
           load-bearing in their git-tagged form, and an external
           reviewer with access to the repository can replay the{" "}
@@ -1474,8 +1474,8 @@ export default async function ReconciliationMethodologyPage() {
           <em>
             Civica Atlas Reconciliation Methodology{" "}
             {reconciliation.version}. Civica Atlas, 2026.{" "}
-            <Link href="https://civicaatlas.org/factbook/methodology/reconciliation">
-              https://civicaatlas.org/factbook/methodology/reconciliation
+            <Link href="https://civicaatlas.org/country/methodology/reconciliation">
+              https://civicaatlas.org/country/methodology/reconciliation
             </Link>
             . Retrieved [date].
           </em>
@@ -1509,8 +1509,8 @@ export default async function ReconciliationMethodologyPage() {
           <em>
             Civica Atlas Reconciled {reconciliation.version} — vintage{" "}
             {reconciliation.firstVintage}. Civica Atlas, 2026.{" "}
-            <Link href="https://civicaatlas.org/factbook/methodology/reconciliation">
-              https://civicaatlas.org/factbook/methodology/reconciliation
+            <Link href="https://civicaatlas.org/country/methodology/reconciliation">
+              https://civicaatlas.org/country/methodology/reconciliation
             </Link>
             . Cut date: 5 May 2026. Methodology version{" "}
             {reconciliation.version}.
@@ -1527,7 +1527,7 @@ export default async function ReconciliationMethodologyPage() {
         <CiteAccordion
           subject={`Civica Atlas Reconciled ${reconciliation.version} — vintage ${reconciliation.firstVintage}`}
           pageTitle="Factbook Reconciliation Methodology"
-          url="https://civicaatlas.org/factbook/methodology/reconciliation"
+          url="https://civicaatlas.org/country/methodology/reconciliation"
           dataVintage={reconciliation.firstVintageCutDate}
           sourceNames={[
             "World Bank Open Data",
@@ -1559,8 +1559,8 @@ export default async function ReconciliationMethodologyPage() {
       >
         <Link href="/methodology">Methodology hub</Link>
         <Link href="/methodology/approach">How we approach data</Link>
-        <Link href="/factbook">Factbook</Link>
-        <Link href="/factbook/methodology/reconciliation/disputes">
+        <Link href="/country">Countries</Link>
+        <Link href="/country/methodology/reconciliation/disputes">
           Disputes log
         </Link>
         <Link href="/civica-index/methodology">

@@ -41,7 +41,7 @@ export function CountrySearchCombobox({
   countries,
   placeholder = "Search countries...",
   ariaLabel = "Search countries",
-  countryPathPrefix = "/countries",
+  countryPathPrefix = "/country",
   hrefForCountry,
   onSelect,
   autoFocus = false,

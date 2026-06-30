@@ -13,7 +13,7 @@ export function GlobalSearch({ countries }: { countries: Country[] }) {
   return (
     <CountrySearchCombobox
       countries={countries}
-      countryPathPrefix="/countries"
+      countryPathPrefix="/country"
       placeholder="Search countries..."
       ariaLabel="Search countries"
       showShortcut

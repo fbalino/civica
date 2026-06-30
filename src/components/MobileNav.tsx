@@ -45,7 +45,7 @@ type NavItem = {
 };
 
 const PRIMARY: NavItem[] = [
-  { href: "/factbook", label: "Factbook", descriptor: "World factbook", glyph: "▤" },
+  { href: "/country", label: "Countries", descriptor: "Every country", glyph: "▤" },
   { href: "/atlas", label: "Atlas", descriptor: "Explore the map", glyph: "◯" },
   {
     href: "/civica-index",

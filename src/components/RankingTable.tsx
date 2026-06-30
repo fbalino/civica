@@ -99,7 +99,7 @@ export function RankingTable({
                 </td>
                 <td style={{ padding: "12px 16px" }}>
                   <a
-                    href={`/countries/${row.slug}`}
+                    href={`/country/${row.slug}`}
                     style={{
                       display: "flex",
                       alignItems: "center",

@@ -7,7 +7,7 @@ import { INDEX_NAV_ITEMS } from "@/components/indexNavItems";
 import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
 
 const LEADING_LINKS = [
-  { href: "/factbook", label: "Factbook" },
+  { href: "/country", label: "Countries" },
   { href: "/atlas", label: "Atlas" },
   { href: "/compare", label: "Compare" },
 ];
@@ -32,9 +32,9 @@ export function NavLinks() {
     pathname === "/methodology" ||
     pathname.startsWith("/methodology/") ||
     // Methodology pages physically live under /civica-index/methodology
-    // and /factbook/methodology — treat them as Methodology-active too.
+    // and /country/methodology — treat them as Methodology-active too.
     pathname.startsWith("/civica-index/methodology") ||
-    pathname.startsWith("/factbook/methodology");
+    pathname.startsWith("/country/methodology");
 
   return (
     <nav style={{ display: "flex", alignItems: "center", gap: 2 }}>

@@ -31,8 +31,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/", changeFrequency: "weekly", priority: 1.0 },
   { path: "/atlas", changeFrequency: "weekly", priority: 0.95 },
   { path: "/organizations", changeFrequency: "monthly", priority: 0.5 },
-  { path: "/factbook", changeFrequency: "weekly", priority: 0.9 },
-  { path: "/countries", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/country", changeFrequency: "weekly", priority: 0.9 },
   { path: "/compare", changeFrequency: "monthly", priority: 0.6 },
   { path: "/civica-index", changeFrequency: "weekly", priority: 0.95 },
   { path: "/civica-index/government-types", changeFrequency: "monthly", priority: 0.7 },
@@ -48,8 +47,8 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/civica-index/widget", changeFrequency: "monthly", priority: 0.4 },
   { path: "/methodology", changeFrequency: "monthly", priority: 0.7 },
   { path: "/methodology/approach", changeFrequency: "monthly", priority: 0.6 },
-  { path: "/factbook/methodology/reconciliation", changeFrequency: "monthly", priority: 0.6 },
-  { path: "/factbook/methodology/reconciliation/disputes", changeFrequency: "weekly", priority: 0.5 },
+  { path: "/country/methodology/reconciliation", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/country/methodology/reconciliation/disputes", changeFrequency: "weekly", priority: 0.5 },
   { path: "/api-docs", changeFrequency: "monthly", priority: 0.6 },
   { path: "/design-system", changeFrequency: "monthly", priority: 0.5 },
   { path: "/elections", changeFrequency: "weekly", priority: 0.7 },
@@ -86,29 +85,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  // Both /factbook/[slug] and /countries/[slug] are indexed because both
-  // remain live (per the factbook plan §2.2 — /countries stays alongside
-  // /factbook). /factbook is the new canonical reader; /countries is the
-  // legacy surface that may inform a future revamp.
-  const factbookPages: MetadataRoute.Sitemap = countries.map((country) => ({
-    url: `${SITE_URL}/factbook/${country.slug}`,
+  // /country/[slug] is the single canonical per-country reader (Factbook ·
+  // Civica Data · Constitution tabs). The legacy /factbook/[slug],
+  // /countries/[slug], and /civica-index/[slug] surfaces 308-redirect here.
+  const countryPages: MetadataRoute.Sitemap = countries.map((country) => ({
+    url: `${SITE_URL}/country/${country.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.9,
-  }));
-
-  const countryPages: MetadataRoute.Sitemap = countries.map((country) => ({
-    url: `${SITE_URL}/countries/${country.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
-
-  const civicaIndexCountryPages: MetadataRoute.Sitemap = countries.map((country) => ({
-    url: `${SITE_URL}/civica-index/${country.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
   }));
 
   const organizationPages: MetadataRoute.Sitemap = ORGANIZATIONS.map((org) => ({
@@ -138,9 +122,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...staticPages,
     ...comparisonPages,
-    ...factbookPages,
     ...countryPages,
-    ...civicaIndexCountryPages,
     ...organizationPages,
     ...blogPages,
   ];

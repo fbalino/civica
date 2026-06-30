@@ -138,7 +138,7 @@ export function FactbookAlmanac({
         <div className="factbook-hero-scrim" aria-hidden="true" />
         <HeroReveal className="factbook-hero-inner">
           <HeroRevealItem className="factbook-hero-eyebrow">
-            The Civica Factbook
+            Countries
           </HeroRevealItem>
           <HeroRevealItem as="h1" id="factbook-hero-title" className="factbook-hero-title">
             Every country, in full.
@@ -151,7 +151,7 @@ export function FactbookAlmanac({
           <HeroRevealItem className="factbook-hero-search">
             <CountrySearchCombobox
               countries={searchOptions}
-              countryPathPrefix="/factbook"
+              countryPathPrefix="/country"
               placeholder="Search any country&hellip;"
               ariaLabel="Search countries"
             />
@@ -245,7 +245,7 @@ export function FactbookAlmanac({
                 {items.map((c) => (
                   <Link
                     key={c.id}
-                    href={`/factbook/${c.slug}`}
+                    href={`/country/${c.slug}`}
                     className="factbook-idx-item"
                   >
                     <span className="factbook-idx-flag" aria-hidden="true">

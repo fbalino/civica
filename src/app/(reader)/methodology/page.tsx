@@ -55,7 +55,7 @@ const SECTIONS: MethodologySection[] = [
       "How Civica integrates and reconciles data from multiple authoritative publishers, what the resolver does when sources disagree, and what provenance signals mean on reader pages.",
     entries: [
       {
-        href: "/factbook/methodology/reconciliation",
+        href: "/country/methodology/reconciliation",
         title: "Reconciliation",
         blurb:
           "The full specification of how the resolver works. Source taxonomy, the canonical-fact layer, freshness rules, editorial assertions, the dispute system, forecast vs measurement, multi-canonical with scope predicate.",
