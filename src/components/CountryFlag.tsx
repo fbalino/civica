@@ -18,7 +18,6 @@ export function CountryFlag({
   if (!iso2) return <span style={{ fontSize: size, lineHeight: 1 }} className={className} />;
 
   const code = iso2.toLowerCase();
-  const height = Math.round(size * 0.75);
 
   return (
     <span
@@ -27,10 +26,8 @@ export function CountryFlag({
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        width: size,
-        height,
-        position: "relative",
         flexShrink: 0,
+        lineHeight: 0,
       }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -38,12 +35,23 @@ export function CountryFlag({
         src={`https://flagcdn.com/${code}.svg`}
         alt={`Flag of ${iso2.toUpperCase()}`}
         width={size}
-        height={height}
+        // Reserve a flag-shaped box (~5:3) BEFORE load. Critical with
+        // loading="lazy": an `height:auto` image is 0px tall pre-load, so the
+        // lazy observer never sees it enter the viewport and never loads it.
+        // The attr seeds the box; CSS `height:auto` corrects to the flag's true
+        // aspect once the SVG's intrinsic 2:1 / 3:2 / 1:1 ratio is known.
+        height={Math.round(size * 0.6)}
         loading="lazy"
         style={{
+          // Size by WIDTH and let height follow the flag's natural aspect ratio,
+          // so wide ensigns (Montserrat, UK, most 2:1 flags) are shown whole
+          // instead of being cropped by a fixed 4:3 box. `maxHeight` + contain
+          // gracefully caps the rare tall/near-square flag (Switzerland 1:1,
+          // Nepal) inside a square rather than stretching it.
           width: size,
-          height,
-          objectFit: "cover",
+          height: "auto",
+          maxHeight: size,
+          objectFit: "contain",
           borderRadius: 2,
           display: "block",
           // Faint hairline ring so light flags (e.g. Japan) still read an
