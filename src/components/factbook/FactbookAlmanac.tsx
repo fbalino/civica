@@ -132,6 +132,7 @@ export function FactbookAlmanac({
         <ParallaxImage
           className="factbook-hero-art"
           src="/engravings/pages/countries.webp"
+          darkSrc="/engravings/pages/countries-dark.webp"
           alt=""
           aria-hidden="true"
         />

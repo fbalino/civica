@@ -39,9 +39,9 @@
   z-index: 0;
   will-change: transform;
 }
-[data-theme="dark"] .home-hero-art-img,
-[data-theme="dark"] .home-engraving img,
-[data-theme="dark"] .country-card-img {
+[data-theme="dark"] .home-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark),
+[data-theme="dark"] .home-engraving img:not(.theme-engraving-light):not(.theme-engraving-dark),
+[data-theme="dark"] .country-card-img:not(.theme-engraving-light):not(.theme-engraving-dark) {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 .home-hero::before {

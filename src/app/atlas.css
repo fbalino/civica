@@ -474,10 +474,9 @@
   display: block;
 }
 
-/* Country engraving banner: engravings are ink-on-paper illustrations, so
-   they invert in dark mode the same way the homepage country-card images do
-   ([data-theme="dark"] .country-card-img in home.css). */
-[data-theme="dark"] .v2-country-card__hero img {
+/* Country engraving banner: real dark assets opt out of the legacy inversion
+   fallback while batches are still landing. */
+[data-theme="dark"] .v2-country-card__hero img:not(.theme-engraving-light):not(.theme-engraving-dark) {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 

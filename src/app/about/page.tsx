@@ -105,6 +105,7 @@ export default async function AboutPage() {
         <ParallaxImage
           className="about-hero-img"
           src="/engravings/pages/about.webp"
+          darkSrc="/engravings/pages/about-dark.webp"
           alt=""
           aria-hidden="true"
         />

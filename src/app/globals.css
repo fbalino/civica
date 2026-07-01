@@ -419,6 +419,18 @@ body {
   overflow-x: clip;
 }
 
+.theme-engraving-dark {
+  display: none !important;
+}
+
+[data-theme="dark"] .theme-engraving-light {
+  display: none !important;
+}
+
+[data-theme="dark"] .theme-engraving-dark {
+  display: block !important;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -918,11 +930,10 @@ a {
       color-mix(in oklab, var(--color-bg) 78%, transparent) 34%,
       color-mix(in oklab, var(--color-bg) 66%, transparent)
     ),
-    url("/engravings/footer-trust.webp");
+    url("/engravings/footer-trust-dark.webp");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  background-blend-mode: multiply;
 }
 
 .site-footer__trust-inner {
@@ -982,14 +993,17 @@ a {
   height: auto;
   object-fit: contain;
   object-position: left center;
+}
+
+.site-footer__source-logo-strip.theme-engraving-light {
   mix-blend-mode: multiply;
   filter: saturate(0.86) contrast(1.03);
 }
 
-[data-theme="dark"] .site-footer__source-logo-strip {
-  mix-blend-mode: screen;
-  filter: invert(1) hue-rotate(180deg) saturate(0.72) contrast(1.06);
-  opacity: 0.84;
+.site-footer__source-logo-strip.theme-engraving-dark {
+  mix-blend-mode: normal;
+  filter: none;
+  opacity: 0.88;
 }
 
 .site-footer__inner {

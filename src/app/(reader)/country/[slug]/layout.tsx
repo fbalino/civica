@@ -9,7 +9,10 @@ import {
 } from "@/lib/db/queries";
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 import { reconciliation } from "@/lib/content/site-state";
-import { engravingCaption } from "@/lib/data/engraving-captions";
+import {
+  darkEngravingCaption,
+  engravingCaption,
+} from "@/lib/data/engraving-captions";
 import { withOg } from "@/lib/og";
 import { FactbookHeaderStrip } from "@/components/factbook/FactbookHeaderStrip";
 import { CivicaAIDrawer } from "@/components/factbook/CivicaAIDrawer";
@@ -145,8 +148,15 @@ export default async function CountryLayout({
         ? `/engravings/countries/${engravingCode}.png`
         : null
     : null;
+  const countryEngravingDarkSrc =
+    engravingCode && existsSync(join(engravingDir, `${engravingCode}-dark.webp`))
+      ? `/engravings/countries/${engravingCode}-dark.webp`
+      : null;
   const heroCaption = countryEngravingSrc
     ? engravingCaption(jurisdiction.iso3)
+    : null;
+  const heroDarkCaption = countryEngravingDarkSrc
+    ? darkEngravingCaption(jurisdiction.iso3) ?? heroCaption
     : null;
 
   return (
@@ -171,7 +181,9 @@ export default async function CountryLayout({
         photos={photos}
         inAtlas={jurisdiction.type === "sovereign_state"}
         engravingSrc={countryEngravingSrc}
+        engravingDarkSrc={countryEngravingDarkSrc}
         heroCaption={heroCaption}
+        heroDarkCaption={heroDarkCaption}
         nav={<CountryTabBar slug={slug} />}
       />
 

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Chip } from "@/components/editorial/Pill";
 import { CountryFlag } from "@/components/CountryFlag";
 
@@ -13,6 +16,7 @@ export type CountryHoverCardProps = {
   iso2: string;
   /** Optional. When omitted, the card renders compactly without a hero band. */
   heroImageUrl?: string;
+  heroImageDarkUrl?: string;
   heroImageAlt?: string;
   stats: [CountryHoverCardStat, CountryHoverCardStat, CountryHoverCardStat];
   ctaHref: string;
@@ -35,9 +39,16 @@ export function CountryHoverCard({
   officialName,
   iso2,
   heroImageUrl,
+  heroImageDarkUrl,
   heroImageAlt,
   stats,
 }: CountryHoverCardProps) {
+  const [darkImageFailed, setDarkImageFailed] = useState(false);
+  const hasDarkImage = Boolean(heroImageDarkUrl && !darkImageFailed);
+  const lightClassName = hasDarkImage
+    ? "theme-engraving-light"
+    : undefined;
+
   return (
     <article className="v2-country-card" aria-label={name}>
       <div className="v2-country-card__body">
@@ -59,6 +70,7 @@ export function CountryHoverCard({
           <div className="v2-country-card__hero">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
+              className={lightClassName}
               src={optimizedHeroSrc(heroImageUrl)}
               alt={heroImageAlt ?? name}
               loading="lazy"
@@ -68,6 +80,16 @@ export function CountryHoverCard({
                 if (wrap) wrap.style.display = "none";
               }}
             />
+            {heroImageDarkUrl && !darkImageFailed ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                className="theme-engraving-dark"
+                src={optimizedHeroSrc(heroImageDarkUrl)}
+                alt={heroImageAlt ?? name}
+                loading="lazy"
+                onError={() => setDarkImageFailed(true)}
+              />
+            ) : null}
           </div>
         )}
 

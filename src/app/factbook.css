@@ -21,9 +21,9 @@
 
 /* Country landmark engraving as the masthead backdrop — full-bleed (edge to
    edge), with the header overlaid at the bottom over an ivory scrim. Content
-   stays in a centered 1280 column via padding-inline. In dark mode the engraving
-   is inverted so its light paper reads as a luminous engraving on the dark page
-   rather than a bright panel. */
+   stays in a centered 1280 column via padding-inline. Dark-mode-specific
+   country art swaps in when present; the old inversion remains only as a
+   temporary fallback while the country batch is incomplete. */
 .factbook-hero--art {
   position: relative;
   width: 100vw;
@@ -68,7 +68,7 @@
   position: relative;
   z-index: 2;
 }
-[data-theme="dark"] .factbook-hero-art-img {
+[data-theme="dark"] .factbook-hero-art-img:not(.theme-engraving-light):not(.theme-engraving-dark) {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 
@@ -1106,9 +1106,13 @@
   z-index: 0;
   will-change: transform;
 }
-[data-theme="dark"] .factbook-hero-art {
+[data-theme="dark"] .factbook-hero-art:not(.theme-engraving-light):not(.theme-engraving-dark) {
   opacity: 0.42;
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
+}
+
+[data-theme="dark"] .factbook-hero-art.theme-engraving-dark {
+  opacity: 0.72;
 }
 .factbook-hero-scrim {
   position: absolute;

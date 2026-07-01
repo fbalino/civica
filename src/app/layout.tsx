@@ -147,8 +147,15 @@ export default function RootLayout({
                 <div className="site-footer__sources-feature">
                   <p>Trusted sources include:</p>
                   <Image
-                    className="site-footer__source-logo-strip"
+                    className="site-footer__source-logo-strip theme-engraving-light"
                     src="/engravings/trusted-source-logos.webp"
+                    width={2000}
+                    height={126}
+                    alt="World Bank, IMF, United Nations, V-Dem Institute, and Freedom House"
+                  />
+                  <Image
+                    className="site-footer__source-logo-strip theme-engraving-dark"
+                    src="/engravings/trusted-source-logos-dark.webp"
                     width={2000}
                     height={126}
                     alt="World Bank, IMF, United Nations, V-Dem Institute, and Freedom House"

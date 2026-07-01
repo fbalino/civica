@@ -1836,7 +1836,7 @@
   pointer-events: none;
   z-index: 1;
 }
-[data-theme="dark"] .about-hero-img {
+[data-theme="dark"] .about-hero-img:not(.theme-engraving-light):not(.theme-engraving-dark) {
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 .about-hero-inner {

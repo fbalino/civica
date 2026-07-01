@@ -33,9 +33,8 @@
  *   • SSR / pre-mount → render with NO transform (resting position), so first
  *     paint is correct and there is never a window read during render. The
  *     transform only attaches once mounted on the client.
- *   • The img keeps whatever `className` the call site passes, so the existing
- *     dark-mode invert filter (e.g. `[data-theme="dark"] .home-hero-art-img`)
- *     still applies — filter + transform coexist fine.
+ *   • When a dark-mode asset is supplied, both images keep the same hero class
+ *     and the global theme-image CSS swaps them via `data-theme`.
  */
 
 import {
@@ -62,7 +61,11 @@ function useHasMounted(): boolean {
    over-scan and prevents a blank edge. 12% is a quiet, editorial amount. */
 const BASE_DRIFT_PCT = 12;
 
-export function ParallaxImage({
+function themeClassName(className: string | undefined, mode: "light" | "dark") {
+  return [className, `theme-engraving-${mode}`].filter(Boolean).join(" ");
+}
+
+function ParallaxImageLayer({
   src,
   className,
   alt = "",
@@ -72,8 +75,7 @@ export function ParallaxImage({
 }: {
   src: string;
   /** Carries the existing classes that own position/over-scan, object-fit,
-   *  object-position, and the dark-mode invert filter — always pass the hero
-   *  img's original className. */
+   *  and object-position — always pass the hero img's original className. */
   className?: string;
   /** Decorative by default. */
   alt?: string;
@@ -133,5 +135,29 @@ export function ParallaxImage({
       style={{ y, ...style }}
       {...rest}
     />
+  );
+}
+
+export function ParallaxImage({
+  darkSrc,
+  ...props
+}: Parameters<typeof ParallaxImageLayer>[0] & {
+  /** Optional dark-mode-specific asset. When present, CSS swaps by theme. */
+  darkSrc?: string | null;
+}) {
+  if (!darkSrc) return <ParallaxImageLayer {...props} />;
+
+  return (
+    <>
+      <ParallaxImageLayer
+        {...props}
+        className={themeClassName(props.className, "light")}
+      />
+      <ParallaxImageLayer
+        {...props}
+        src={darkSrc}
+        className={themeClassName(props.className, "dark")}
+      />
+    </>
   );
 }

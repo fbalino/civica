@@ -12,8 +12,8 @@ import { CountryFlag } from "@/components/CountryFlag";
  * the canonical world_bank_income_group fact resolved.
  *
  * The country engraving (`/engravings/countries/<iso3>.webp`) is the card
- * image; it inverts in dark mode via the shared filter in home.css
- * (`[data-theme="dark"] .country-card-img`).
+ * image. When a matching `-dark.webp` asset exists, it is passed separately
+ * and swapped by the global theme-image CSS.
  */
 
 export interface CountryCardStat {
@@ -34,6 +34,8 @@ export interface CountryCardProps {
   stats: CountryCardStat[];
   /** ISO3 (lowercase) → engraving path. Omitted if no engraving. */
   iso3?: string | null;
+  /** Optional dark-mode engraving path for the same ISO3. */
+  engravingDarkSrc?: string | null;
   /** Destination for the footer link. */
   href: string;
   /** Footer link label (default "View country profile"). */
@@ -47,10 +49,14 @@ export function CountryCard({
   incomeGroup,
   stats,
   iso3,
+  engravingDarkSrc = null,
   href,
   ctaLabel = "View country profile",
 }: CountryCardProps) {
   const engraving = iso3 ? `/engravings/countries/${iso3}.webp` : null;
+  const lightClassName = engravingDarkSrc
+    ? "country-card-img theme-engraving-light"
+    : "country-card-img";
 
   return (
     <div className="country-card">
@@ -89,7 +95,16 @@ export function CountryCard({
       {engraving ? (
         <div className="country-card-img-wrap">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="country-card-img" src={engraving} alt="" aria-hidden="true" />
+          <img className={lightClassName} src={engraving} alt="" aria-hidden="true" />
+          {engravingDarkSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              className="country-card-img theme-engraving-dark"
+              src={engravingDarkSrc}
+              alt=""
+              aria-hidden="true"
+            />
+          ) : null}
         </div>
       ) : null}
 

@@ -686,6 +686,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               officialName={hoverCard.country.govDetail || hoverCard.country.gov}
               iso2={hoverCard.country.iso2 ?? hoverCard.country.id.slice(0, 2)}
               heroImageUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}.webp`}
+              heroImageDarkUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}-dark.webp`}
               stats={[
                 { label: "Political System", value: hoverCard.country.gov },
                 { label: "Capital", value: hoverCard.country.capital },

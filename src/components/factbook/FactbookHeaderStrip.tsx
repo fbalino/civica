@@ -107,10 +107,14 @@ interface FactbookHeaderStripProps {
    *  backdrop (full 3:2, uncropped) with the header overlaid on top. Resolved
    *  server-side, so it's only set when the art file actually exists. */
   engravingSrc?: string | null;
+  /** Optional dark-mode version of `engravingSrc`, swapped in by theme. */
+  engravingDarkSrc?: string | null;
   /** Short description of what the engraving depicts (e.g. "Mount Fuji with a
    *  five-storied pagoda…"). Rendered as a subtle caption over the hero scrim.
    *  Only passed when an engraving actually exists; null → no caption. */
   heroCaption?: string | null;
+  /** Optional dark-mode caption when the dark engraving depicts a different scene. */
+  heroDarkCaption?: string | null;
   /** The under-masthead navigation row — the 3-tab <CountryTabBar> on the
    *  unified /country/[slug] page (Factbook · Civica Data · Constitution). */
   nav?: React.ReactNode;
@@ -159,7 +163,9 @@ export function FactbookHeaderStrip({
   populationResolver,
   gdpResolver,
   engravingSrc = null,
+  engravingDarkSrc = null,
   heroCaption = null,
+  heroDarkCaption = null,
   nav,
 }: FactbookHeaderStripProps) {
   const [lbOpen, setLbOpen] = useState(false);
@@ -230,6 +236,7 @@ export function FactbookHeaderStrip({
           <ParallaxImage
             className="factbook-hero-art-img"
             src={engravingSrc}
+            darkSrc={engravingDarkSrc}
             alt=""
             aria-hidden="true"
           />
@@ -237,7 +244,18 @@ export function FactbookHeaderStrip({
         {engravingSrc && heroCaption && (
           <figcaption className="factbook-hero-caption">
             <span className="factbook-hero-caption-label">Engraving</span>
-            <span className="factbook-hero-caption-text">{heroCaption}</span>
+            {engravingDarkSrc && heroDarkCaption ? (
+              <>
+                <span className="factbook-hero-caption-text theme-engraving-light">
+                  {heroCaption}
+                </span>
+                <span className="factbook-hero-caption-text theme-engraving-dark">
+                  {heroDarkCaption}
+                </span>
+              </>
+            ) : (
+              <span className="factbook-hero-caption-text">{heroCaption}</span>
+            )}
           </figcaption>
         )}
         <div className="factbook-hero-left">

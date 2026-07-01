@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import Link from "next/link";
 import { getAllJurisdictions, getCIRankings } from "@/lib/db/queries";
 import {
@@ -18,6 +20,31 @@ import {
   HeroRevealItem,
 } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
+
+const countryEngravingDir = join(process.cwd(), "public", "engravings", "countries");
+
+function countryDarkEngravingSrc(iso3: string): string | null {
+  return existsSync(join(countryEngravingDir, `${iso3}-dark.webp`))
+    ? `/engravings/countries/${iso3}-dark.webp`
+    : null;
+}
+
+function SpotEngraving({
+  src,
+  darkSrc,
+}: {
+  src: string;
+  darkSrc: string;
+}) {
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="theme-engraving-light" src={src} alt="" aria-hidden="true" />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="theme-engraving-dark" src={darkSrc} alt="" aria-hidden="true" />
+    </>
+  );
+}
 
 /* A single Civica Index ranking row as returned by getCIRankings. */
 interface RankRow {
@@ -114,6 +141,8 @@ export async function HomeGrid() {
 
   const top = rows.slice(0, 8);
   const countriesCount = totalRanked || countries.length || 195;
+  const japanDarkEngraving = countryDarkEngravingSrc("jpn");
+  const estoniaDarkEngraving = countryDarkEngravingSrc("est");
 
   return (
     <div className="home">
@@ -122,6 +151,7 @@ export async function HomeGrid() {
         <ParallaxImage
           className="home-hero-art-img"
           src="/engravings/hero.webp"
+          darkSrc="/engravings/hero-dark.webp"
           alt=""
           aria-hidden="true"
         />
@@ -190,13 +220,16 @@ export async function HomeGrid() {
               incomeGroup={incomeByJur[japan.jurisdictionId] ?? null}
               stats={buildCardStats(japan)}
               iso3="jpn"
+              engravingDarkSrc={japanDarkEngraving}
               href={`/country/${japan.slug}`}
             />
           ) : (
             <div className="home-feature-visual">
               <div className="home-engraving">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/engravings/spot-column.webp" alt="" aria-hidden="true" />
+                <SpotEngraving
+                  src="/engravings/spot-column.webp"
+                  darkSrc="/engravings/spot-column-dark.webp"
+                />
               </div>
             </div>
           )}
@@ -228,13 +261,16 @@ export async function HomeGrid() {
               incomeGroup={incomeByJur[estonia.jurisdictionId] ?? null}
               stats={buildCardStats(estonia)}
               iso3="est"
+              engravingDarkSrc={estoniaDarkEngraving}
               href={`/country/${estonia.slug}`}
             />
           ) : (
             <div className="home-feature-visual">
               <div className="home-engraving">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/engravings/spot-globe.webp" alt="" aria-hidden="true" />
+                <SpotEngraving
+                  src="/engravings/spot-globe.webp"
+                  darkSrc="/engravings/spot-globe-dark.webp"
+                />
               </div>
             </div>
           )}
@@ -335,8 +371,10 @@ export async function HomeGrid() {
           ) : (
             <div className="home-feature-visual">
               <div className="home-engraving">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/engravings/spot-globe.webp" alt="" aria-hidden="true" />
+                <SpotEngraving
+                  src="/engravings/spot-globe.webp"
+                  darkSrc="/engravings/spot-globe-dark.webp"
+                />
               </div>
             </div>
           )}
