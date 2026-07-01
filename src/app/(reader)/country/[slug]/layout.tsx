@@ -22,6 +22,7 @@ import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 import { classifyGovernment } from "@/lib/data/government-category";
 import { formatGovernmentType } from "@/lib/text/clean";
 import { getCountryGallery, wikimediaUrl } from "@/lib/data/country-photos";
+import { getCountryBounds } from "@/lib/data/country-bounds";
 
 export const revalidate = 3600;
 
@@ -137,6 +138,11 @@ export default async function CountryLayout({
       }))
     : [];
 
+  // Bounding box + centroid for the masthead's live interactive map (falls back
+  // to the static locator tile when a country has no bounds entry).
+  const bounds = getCountryBounds(jurisdiction.iso3);
+  const mapboxAvailable = Boolean(process.env.NEXT_PUBLIC_MAPBOX_TOKEN);
+
   const engravingCode = jurisdiction.iso3 ? jurisdiction.iso3.toLowerCase() : null;
   // Prefer the optimized .webp; fall back to a raw .png drop (so new Codex
   // exports saved to public/engravings/countries/ appear before conversion).
@@ -179,6 +185,8 @@ export default async function CountryLayout({
         cpTrend={cpTrend}
         mapImages={mapImages}
         photos={photos}
+        bounds={bounds}
+        mapboxAvailable={mapboxAvailable}
         inAtlas={jurisdiction.type === "sovereign_state"}
         engravingSrc={countryEngravingSrc}
         engravingDarkSrc={countryEngravingDarkSrc}

@@ -2109,3 +2109,159 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
     font-size: 9px;
   }
 }
+
+/* ============================================================
+   Country interactive map — masthead tile + Map Explorer modal
+   (MapLibre 2D Civica skin + on-demand Mapbox 3D). See
+   src/components/factbook/CountryMap* and plan/civica-country-map-hybrid-v1.md
+   ============================================================ */
+.country-map-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Masthead tile */
+.country-map-tile {
+  padding: 0;
+}
+.country-map-tile .country-map-preview {
+  border-radius: inherit;
+}
+.country-map-explore-hint {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--color-bg) 88%, transparent);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity var(--motion-fast, 0.15s) ease;
+  pointer-events: none;
+}
+.country-map-tile:hover .country-map-explore-hint,
+.country-map-tile:focus-visible .country-map-explore-hint {
+  opacity: 1;
+}
+
+/* Explorer modal */
+.map-explorer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: var(--color-scrim);
+  backdrop-filter: blur(2px);
+}
+.map-explorer-panel {
+  position: relative;
+  width: min(1100px, 96vw);
+  height: min(760px, 92vh);
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard-lg);
+  overflow: hidden;
+}
+.map-explorer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-divider);
+}
+.map-explorer-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.map-explorer-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.map-explorer-close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--text-14);
+  line-height: 1;
+}
+.map-explorer-close:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.map-explorer-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.map-explorer-foot {
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+}
+
+/* 3D view (inside the modal) */
+.country-3d-wrap {
+  position: absolute;
+  inset: 0;
+}
+.country-3d-controls {
+  position: absolute;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 3;
+  display: flex;
+  gap: var(--space-2);
+}
+.country-map-mini-btn {
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 600;
+  cursor: pointer;
+}
+.country-map-mini-btn:hover {
+  border-color: var(--color-accent);
+}
+.country-map-mini-btn[aria-pressed="true"] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  border-color: var(--color-accent);
+}
+.country-3d-missing {
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  color: var(--color-text-40);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  text-align: center;
+}

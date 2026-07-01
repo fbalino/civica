@@ -6,8 +6,10 @@ import { Info } from "lucide-react";
 import { CountryFlag } from "@/components/CountryFlag";
 import { FactbookLightbox, type LightboxImage } from "./FactbookLightbox";
 import { FactValueDot } from "./FactValueDot";
+import { CountryMapTile } from "./CountryMapTile";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+import type { CountryBounds } from "@/lib/data/country-bounds";
 import { ciTier } from "@/lib/ci/tiers";
 
 function MetaPill({
@@ -93,6 +95,12 @@ interface FactbookHeaderStripProps {
   cpTrend?: "up" | "down" | "flat" | null;
   mapImages?: LightboxImage[];
   photos: LightboxImage[];
+  /** Country bounding box + centroid (from country-bounds). When present, the
+   *  masthead "Map" tile becomes a live interactive Civica map (opening the Map
+   *  Explorer modal); absent → the static locator-image tile is used. */
+  bounds?: CountryBounds | null;
+  /** True when NEXT_PUBLIC_MAPBOX_TOKEN is configured — enables the 3D toggle. */
+  mapboxAvailable?: boolean;
   /** Phase F.4 — resolver output for population_total. When
    *  provided, the Pop pill renders a `<FactValueDot>` that opens
    *  the alternate-values panel on click. Falls back to plain pill
@@ -160,6 +168,8 @@ export function FactbookHeaderStrip({
   cpTrend,
   mapImages = [],
   photos,
+  bounds = null,
+  mapboxAvailable = false,
   populationResolver,
   gdpResolver,
   engravingSrc = null,
@@ -416,68 +426,76 @@ export function FactbookHeaderStrip({
         </div>
 
         <div className="factbook-hero-boxes">
-          <button
-            type="button"
-            onClick={() => {
-              setLbMode("map");
-              setLbOpen(true);
-            }}
-            aria-label={
-              mapImages.length === 0
-                ? "No maps available"
-                : `Open ${mapImages.length} ${mapImages.length === 1 ? "map" : "maps"}`
-            }
-            disabled={mapImages.length === 0}
-            className="factbook-hero-box"
-            style={{ cursor: mapImages.length === 0 ? "default" : "pointer" }}
-          >
-            {coverMap ? (
-              <img
-                src={coverMap.src}
-                alt=""
-                style={{
-                  objectFit: "contain",
-                  background: "var(--color-bg)",
-                }}
-              />
-            ) : (
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "grid",
-                  placeItems: "center",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-12)",
-                  color: "var(--color-text-40)",
-                  letterSpacing: "var(--tracking-wider)",
-                  textTransform: "uppercase",
-                }}
-              >
-                No map yet
-              </div>
-            )}
-            {mapImages.length > 0 && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "var(--space-3)",
-                  right: "var(--space-3)",
-                  background:
-                    "color-mix(in oklab, var(--color-text-primary) 75%, transparent)",
-                  color: "var(--color-bg)",
-                  padding: "var(--space-1) var(--space-3)",
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "var(--text-12)",
-                  letterSpacing: "var(--tracking-wider)",
-                  textTransform: "uppercase",
-                }}
-              >
-                {mapImages.length} map{mapImages.length === 1 ? "" : "s"}
-              </span>
-            )}
-            <span className="label-strip">Map</span>
-          </button>
+          {bounds ? (
+            <CountryMapTile
+              bounds={bounds}
+              countryName={countryName}
+              mapboxAvailable={mapboxAvailable}
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setLbMode("map");
+                setLbOpen(true);
+              }}
+              aria-label={
+                mapImages.length === 0
+                  ? "No maps available"
+                  : `Open ${mapImages.length} ${mapImages.length === 1 ? "map" : "maps"}`
+              }
+              disabled={mapImages.length === 0}
+              className="factbook-hero-box"
+              style={{ cursor: mapImages.length === 0 ? "default" : "pointer" }}
+            >
+              {coverMap ? (
+                <img
+                  src={coverMap.src}
+                  alt=""
+                  style={{
+                    objectFit: "contain",
+                    background: "var(--color-bg)",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    display: "grid",
+                    placeItems: "center",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-12)",
+                    color: "var(--color-text-40)",
+                    letterSpacing: "var(--tracking-wider)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  No map yet
+                </div>
+              )}
+              {mapImages.length > 0 && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "var(--space-3)",
+                    right: "var(--space-3)",
+                    background:
+                      "color-mix(in oklab, var(--color-text-primary) 75%, transparent)",
+                    color: "var(--color-bg)",
+                    padding: "var(--space-1) var(--space-3)",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "var(--text-12)",
+                    letterSpacing: "var(--tracking-wider)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {mapImages.length} map{mapImages.length === 1 ? "" : "s"}
+                </span>
+              )}
+              <span className="label-strip">Map</span>
+            </button>
+          )}
 
           <button
             type="button"

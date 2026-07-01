@@ -171,6 +171,7 @@
   --color-card-hover-bg: #F6F2EA;
   --color-card-hover-border: #D2CEC5;
   --color-divider: #E4E1DC;
+  --color-scrim: color-mix(in oklab, #0B1B2D 50%, transparent); /* modal backdrop */
   --color-branch-border-alpha: 44;
   --color-stat-border: #EDE9E2;
   --color-selection: rgba(183, 81, 43, 0.16);
@@ -320,6 +321,7 @@
   --color-card-hover-bg: #2b2619;
   --color-card-hover-border: #8a8370;
   --color-divider: #3d382d;
+  --color-scrim: color-mix(in oklab, #000000 62%, transparent); /* modal backdrop */
   --color-stat-border: #3d382d;
   --color-selection: oklch(34% 0.07 45);
   --color-surface-primary: var(--color-bg);
