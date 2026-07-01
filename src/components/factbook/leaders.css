@@ -100,7 +100,9 @@
 .lead-card {
   position: relative;
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
+  /* Photo-left / text-right, roomier. The portrait column is a fixed
+     portrait-oriented frame (see --lead-portrait-w below). */
+  grid-template-columns: var(--lead-portrait-w) minmax(0, 1fr);
   gap: var(--space-5);
   align-items: start;
   padding: var(--space-5) var(--space-6);
@@ -108,63 +110,144 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-hard);
   background: var(--color-card-bg);
-  overflow: hidden;
+  /* NOTE: no `overflow: hidden` here — it would clip the credit tooltip at the
+     card edge. The accent rail is drawn with an inset radius instead. */
 }
-/* Branch accent rail — colored by the office's government-type hue. */
+/* Portrait frame sizing — rectangular, portrait-oriented (4:5), larger than
+   the old 56px round avatar. Kept as tokens so the column + frame stay in sync. */
+.lead-card {
+  --lead-portrait-w: 96px;
+  --lead-portrait-h: 120px;
+}
+/* Branch accent rail — colored by the office's government-type hue. Rounded on
+   the left to follow the card corner now that the card no longer clips. */
 .lead-card::before {
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
   width: 3px;
   background: var(--lead-accent, var(--color-accent));
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
 }
 
+/* Portrait frame — rectangular, portrait-oriented (4:5), larger than the old
+   round avatar. Hairline border + small rounded-rectangle radius; NOT a circle.
+   Both the photo and the monogram fallback fill this identical frame so present
+   and absent portraits read consistently. */
 .lead-avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-full);
+  position: relative;
+  width: var(--lead-portrait-w, 96px);
+  height: var(--lead-portrait-h, 120px);
+  border-radius: var(--radius-md);
   border: 1px solid var(--color-stat-border);
   background: color-mix(in oklab, var(--lead-accent, var(--color-accent)) 10%, var(--color-bg));
   display: flex;
   align-items: center;
   justify-content: center;
   flex: none;
+  overflow: hidden;
+  box-shadow: var(--shadow-hard);
 }
 .lead-avatar-monogram {
   font-family: var(--font-heading);
-  font-size: var(--text-20);
+  font-size: var(--text-28);
   letter-spacing: var(--tracking-tight);
   color: color-mix(in oklab, var(--lead-accent, var(--color-accent)), black 18%);
 }
-/* P2 portrait: the leader's Wikidata P18 photo, hotlinked from the Commons
-   CDN via wikimediaUrl. Fills the same round avatar frame; the monogram is the
-   fallback (null photo or image 404). */
+/* P2 portrait: the leader's Wikidata P18 photo, hotlinked from the Commons CDN
+   via wikimediaUrl. Fills the rectangular frame; `object-position: top center`
+   keeps the head/face from clipping (official portraits sit high in frame). The
+   monogram is the fallback (null photo or image 404). */
 .lead-avatar-photo {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center;
   border-radius: inherit;
   display: block;
 }
-/* Wrapper stacks the avatar + a small attribution caption below it. */
-.lead-avatar-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
-  flex: none;
+
+/* ---- SourceCreditTooltip (reusable long-photo-credit → hover reveal) -----
+   Namespaced `.source-credit*` and co-located here because Leaders is the first
+   surface to use it; move to a shared stylesheet when a second surface adopts
+   it. The wrapper is sized by the `className` passed in (here `.lead-avatar`),
+   so these rules only add the badge + bubble + hover cue on top of that frame. */
+.source-credit {
+  position: relative;
+  display: inline-flex;
+  cursor: help;
 }
-.lead-avatar-credit {
-  width: 56px;
+/* Subtle corner glyph signalling the image carries a source on hover. */
+.source-credit-badge {
+  position: absolute;
+  right: var(--space-1);
+  bottom: var(--space-1);
+  z-index: var(--z-base);
+  width: 15px;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: color-mix(in oklab, var(--color-text-primary) 62%, transparent);
+  color: var(--color-page-bg);
   font-family: var(--font-body);
-  font-size: 9px;
-  line-height: 1.25;
-  text-align: center;
-  color: var(--color-text-40);
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  font-style: italic;
+  line-height: 1;
+  opacity: 0.75;
+  transition: opacity var(--motion-fast) var(--motion-ease);
+  pointer-events: none;
+}
+.source-credit:hover .source-credit-badge,
+.source-credit:focus-visible .source-credit-badge {
+  opacity: 1;
+}
+/* The styled bubble. Hidden until hover/focus (data-open); the native `title`
+   + aria-label on the wrapper remain the always-available fallback.
+   Anchored to the wrapper's LEFT edge (not centered) so a left-of-card portrait
+   — the photo-left leader card — doesn't push the bubble off the card edge. */
+.source-credit-tip {
+  position: absolute;
+  left: 0;
+  z-index: var(--z-popover);
+  width: max-content;
+  max-width: 240px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-card-bg);
+  box-shadow: var(--shadow-hard-lg);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: 1.35;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(var(--space-1));
+  transition: opacity var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease), visibility var(--motion-fast);
+  pointer-events: none;
+}
+/* Default placement above the image; keep it just off the top edge. */
+.source-credit[data-placement="top"] .source-credit-tip {
+  bottom: calc(100% + var(--space-2));
+}
+.source-credit[data-placement="bottom"] .source-credit-tip {
+  top: calc(100% + var(--space-2));
+}
+.source-credit-tip[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .source-credit-tip,
+  .source-credit-badge {
+    transition: none;
+  }
 }
 
 .lead-card-body {
@@ -233,12 +316,16 @@
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
-/* Tenure badge — derived from term start date (every current term). */
+/* Tenure badge — derived from term start date (every current term). The chip
+   must read as one unit ("12 yrs") and never wrap the unit onto its own line,
+   so it's a nowrap inline-flex that does not shrink or wrap its children. */
 .lead-tenure {
   display: inline-flex;
   align-items: baseline;
+  flex: none;
+  flex-wrap: nowrap;
   gap: var(--space-1);
-  padding: 2px var(--space-2);
+  padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   background: color-mix(in oklab, var(--lead-accent, var(--color-accent)) 12%, var(--color-page-bg));
   border: 1px solid color-mix(in oklab, var(--lead-accent, var(--color-accent)) 30%, transparent);
@@ -483,15 +570,10 @@
   }
   .lead-card {
     padding: var(--space-4) var(--space-5);
-    grid-template-columns: 44px minmax(0, 1fr);
+    /* Slightly smaller portrait column on narrow screens, still rectangular. */
+    --lead-portrait-w: 84px;
+    --lead-portrait-h: 105px;
     gap: var(--space-4);
-  }
-  .lead-avatar {
-    width: 44px;
-    height: 44px;
-  }
-  .lead-avatar-credit {
-    width: 44px;
   }
   .lead-row {
     grid-template-columns: minmax(0, 1fr) auto;

@@ -154,10 +154,12 @@ function formatBirthdate(value: string | null): string | null {
   });
 }
 
-// Portrait attribution caption, mirroring the country-page galleryCaption:
+// Portrait attribution line, mirroring the country-page galleryCaption:
 // "Photo: {credit} · {license} · Wikimedia Commons". Degrades gracefully when
-// credit or license is null (e.g. just "Photo: Wikimedia Commons").
-function portraitCaption(media: PersonMedia): string {
+// credit or license is null (e.g. just "Photo: Wikimedia Commons"). This full
+// string is now revealed on hover/focus of the portrait via SourceCreditTooltip
+// (no more ellipsised inline caption).
+function portraitCredit(media: PersonMedia): string {
   const detail: string[] = [];
   if (media.photoCredit && media.photoCredit !== "Wikimedia Commons") {
     detail.push(media.photoCredit);
@@ -381,6 +383,7 @@ export async function FactbookLeaders({
               const partyOffice = p.offices.find((o) => o.partyName);
               const born = formatBirthdate(p.media.dateOfBirth);
               const hasPortrait = Boolean(p.media.photoUrl);
+              const credit = hasPortrait ? portraitCredit(p.media) : null;
               return (
                 <li
                   key={p.personName}
@@ -390,17 +393,11 @@ export async function FactbookLeaders({
                   <span className="lead-card-source">
                     <SourceDot source="wikidata" retrievedAt={retrievedAt} />
                   </span>
-                  <span className="lead-avatar-wrap">
-                    <LeaderPortrait
-                      photoFile={p.media.photoUrl}
-                      personName={p.personName}
-                    />
-                    {hasPortrait && (
-                      <span className="lead-avatar-credit">
-                        {portraitCaption(p.media)}
-                      </span>
-                    )}
-                  </span>
+                  <LeaderPortrait
+                    photoFile={p.media.photoUrl}
+                    personName={p.personName}
+                    credit={credit}
+                  />
                   <div className="lead-card-body">
                     <p className="lead-card-office">
                       <span className="lead-card-office-dot" aria-hidden />
