@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -36,14 +37,6 @@ const NON_TIER1_FOOTER_SOURCES = [
   "Global Peace Index",
   "Fragile States Index",
   "GDELT",
-] as const;
-
-const FOOTER_TRUST_MARKS = [
-  { label: "World Bank", shortLabel: "World Bank" },
-  { label: "International Monetary Fund", shortLabel: "IMF" },
-  { label: "United Nations", shortLabel: "United Nations" },
-  { label: "V-Dem Institute", shortLabel: "V-Dem Institute" },
-  { label: "Freedom House", shortLabel: "Freedom House" },
 ] as const;
 
 const sourceSerif = Source_Serif_4({
@@ -153,16 +146,13 @@ export default function RootLayout({
 
                 <div className="site-footer__sources-feature">
                   <p>Trusted sources include:</p>
-                  <ul className="site-footer__source-marks" aria-label="Featured trusted sources">
-                    {FOOTER_TRUST_MARKS.map((source) => (
-                      <li
-                        key={source.label}
-                        className="site-footer__source-mark"
-                      >
-                        <span className="site-footer__source-name">{source.shortLabel}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <Image
+                    className="site-footer__source-logo-strip"
+                    src="/engravings/trusted-source-logos.webp"
+                    width={2000}
+                    height={126}
+                    alt="World Bank, IMF, United Nations, V-Dem Institute, and Freedom House"
+                  />
                 </div>
               </div>
             </section>

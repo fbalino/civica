@@ -976,43 +976,20 @@ a {
   color: var(--color-text-muted);
 }
 
-.site-footer__source-marks {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--space-3) var(--space-5);
+.site-footer__source-logo-strip {
+  display: block;
+  width: min(100%, 42rem);
+  height: auto;
+  object-fit: contain;
+  object-position: left center;
+  mix-blend-mode: multiply;
+  filter: saturate(0.86) contrast(1.03);
 }
 
-.site-footer__source-mark {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-body);
-  font-size: var(--text-11);
-  font-weight: var(--font-weight-bold);
-  line-height: 1.05;
-  letter-spacing: var(--tracking-normal);
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--color-text-primary) 72%, var(--color-text-muted));
-  white-space: nowrap;
-}
-
-.site-footer__source-name {
-  display: inline-block;
-}
-
-.site-footer__source-mark:nth-child(2) .site-footer__source-name {
-  font-size: var(--text-18);
-  letter-spacing: var(--tracking-normal);
-}
-
-.site-footer__source-mark:nth-child(4) .site-footer__source-name,
-.site-footer__source-mark:nth-child(5) .site-footer__source-name {
-  max-width: 4.75rem;
-  white-space: normal;
+[data-theme="dark"] .site-footer__source-logo-strip {
+  mix-blend-mode: screen;
+  filter: invert(1) hue-rotate(180deg) saturate(0.72) contrast(1.06);
+  opacity: 0.84;
 }
 
 .site-footer__inner {
