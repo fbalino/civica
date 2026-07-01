@@ -481,6 +481,13 @@ export async function getLeaderTimeline(jurisdictionId: string) {
     return {
       personName: t.person.name,
       photoUrl: t.person.photoUrl,
+      // P2 media enrichment (Wikidata P18 portrait + P569 birthdate). The
+      // photo columns carry per-file Commons attribution; the renderer builds
+      // the CDN thumbnail via wikimediaUrl(photoUrl). All nullable — a leader
+      // with no free portrait keeps photoUrl null → monogram fallback.
+      dateOfBirth: t.person.dateOfBirth,
+      photoLicense: t.person.photoLicense,
+      photoCredit: t.person.photoCredit,
       officeName: office?.name ?? "Unknown",
       officeType: office?.officeType ?? "unknown",
       partyName: t.term.partyName,

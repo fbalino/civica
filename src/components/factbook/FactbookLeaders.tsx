@@ -7,6 +7,7 @@ import {
   LeaderTenureTimeline,
   type TenureEntry,
 } from "@/components/factbook/LeaderTenureTimeline";
+import { LeaderPortrait } from "@/components/factbook/LeaderPortrait";
 import "./leaders.css";
 
 /*
@@ -22,12 +23,17 @@ import "./leaders.css";
  *     - isCurrent — true for ~99% of terms
  *   REAL but sparse:
  *     - partyName / partyColor — present on only a handful of terms (US/UK)
+ *     - photoUrl — a Wikidata P18 portrait (Commons FILE NAME, rendered via
+ *       wikimediaUrl) for ~97% of current leaders with a freely licensed image;
+ *       carries per-file photoLicense / photoCredit attribution. Null for the
+ *       rest → monogram fallback (also on an image 404, see LeaderPortrait).
+ *     - dateOfBirth — a Wikidata P569 birthdate for ~99% of current leaders;
+ *       surfaced as "Born {date}" on the principal card. Null → omitted.
  *   ABSENT in the data (so deliberately NOT rendered):
- *     - photoUrl — null for every person → monogram avatar, never a photo
  *     - endDate — null for every term → no "former officeholder" history and
  *       no transition sequence; this is a CURRENT-leadership roster, and the
  *       timeline plots tenure-from-start (see LeaderTenureTimeline).
- *     - date of birth / age / education — not surfaced by the query → omitted
+ *     - age / education — not surfaced by the query → omitted
  *
  * Most countries carry exactly the two principal offices (head of state +
  * head of government); only a couple (US/UK) carry deputy/cabinet/legislative/
@@ -56,10 +62,20 @@ interface OfficeStint {
   isCurrent: boolean;
 }
 
+// Person-level media (P2 enrichment). Attached per person, not per stint —
+// a dual-office holder has one portrait / birthdate.
+interface PersonMedia {
+  photoUrl: string | null;
+  dateOfBirth: string | null;
+  photoLicense: string | null;
+  photoCredit: string | null;
+}
+
 interface PersonGroup {
   personName: string;
   isCurrent: boolean;
   stints: OfficeStint[];
+  media: PersonMedia;
 }
 
 const OFFICE_RANK: Record<string, number> = {
@@ -125,13 +141,30 @@ function tenureYears(startDate: string | null, nowYear: number): number | null {
   return Math.max(0, nowYear - y);
 }
 
-// Two initials from a name, for the monogram avatar (no photos exist in the
-// source, so this is always the avatar — never a broken-image flash).
-function initialsOf(name: string): string {
-  const parts = name.split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return "?";
-  if (parts.length === 1) return parts[0]!.charAt(0).toUpperCase();
-  return (parts[0]!.charAt(0) + parts[parts.length - 1]!.charAt(0)).toUpperCase();
+// "Born 17 September 1950" — the leader's P569 birthdate, when present.
+function formatBirthdate(value: string | null): string | null {
+  if (!value) return null;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+// Portrait attribution caption, mirroring the country-page galleryCaption:
+// "Photo: {credit} · {license} · Wikimedia Commons". Degrades gracefully when
+// credit or license is null (e.g. just "Photo: Wikimedia Commons").
+function portraitCaption(media: PersonMedia): string {
+  const detail: string[] = [];
+  if (media.photoCredit && media.photoCredit !== "Wikimedia Commons") {
+    detail.push(media.photoCredit);
+  }
+  if (media.photoLicense) detail.push(media.photoLicense);
+  detail.push("Wikimedia Commons");
+  return `Photo: ${detail.join(" · ")}`;
 }
 
 function groupByPerson(rows: LeaderRow[]): PersonGroup[] {
@@ -139,9 +172,27 @@ function groupByPerson(rows: LeaderRow[]): PersonGroup[] {
   for (const row of rows) {
     let group = groupMap.get(row.personName);
     if (!group) {
-      group = { personName: row.personName, isCurrent: false, stints: [] };
+      group = {
+        personName: row.personName,
+        isCurrent: false,
+        stints: [],
+        media: {
+          photoUrl: row.photoUrl ?? null,
+          dateOfBirth: row.dateOfBirth ?? null,
+          photoLicense: row.photoLicense ?? null,
+          photoCredit: row.photoCredit ?? null,
+        },
+      };
       groupMap.set(row.personName, group);
     }
+    // A later row for the same person may carry the media the first didn't.
+    if (!group.media.photoUrl && row.photoUrl) group.media.photoUrl = row.photoUrl;
+    if (!group.media.dateOfBirth && row.dateOfBirth)
+      group.media.dateOfBirth = row.dateOfBirth;
+    if (!group.media.photoLicense && row.photoLicense)
+      group.media.photoLicense = row.photoLicense;
+    if (!group.media.photoCredit && row.photoCredit)
+      group.media.photoCredit = row.photoCredit;
     if (row.isCurrent) group.isCurrent = true;
     group.stints.push({
       officeName: row.officeName,
@@ -174,6 +225,7 @@ export async function FactbookLeaders({
   interface Principal {
     personName: string;
     offices: OfficeStint[]; // head_of_state and/or head_of_government
+    media: PersonMedia;
   }
   const principalMap = new Map<string, Principal>();
   for (const g of groups) {
@@ -185,7 +237,7 @@ export async function FactbookLeaders({
       ) {
         let p = principalMap.get(g.personName);
         if (!p) {
-          p = { personName: g.personName, offices: [] };
+          p = { personName: g.personName, offices: [], media: g.media };
           principalMap.set(g.personName, p);
         }
         p.offices.push(s);
@@ -327,6 +379,8 @@ export async function FactbookLeaders({
                 : null;
               // Party (rare): from whichever principal office carries one.
               const partyOffice = p.offices.find((o) => o.partyName);
+              const born = formatBirthdate(p.media.dateOfBirth);
+              const hasPortrait = Boolean(p.media.photoUrl);
               return (
                 <li
                   key={p.personName}
@@ -336,10 +390,16 @@ export async function FactbookLeaders({
                   <span className="lead-card-source">
                     <SourceDot source="wikidata" retrievedAt={retrievedAt} />
                   </span>
-                  <span className="lead-avatar" aria-hidden>
-                    <span className="lead-avatar-monogram">
-                      {initialsOf(p.personName)}
-                    </span>
+                  <span className="lead-avatar-wrap">
+                    <LeaderPortrait
+                      photoFile={p.media.photoUrl}
+                      personName={p.personName}
+                    />
+                    {hasPortrait && (
+                      <span className="lead-avatar-credit">
+                        {portraitCaption(p.media)}
+                      </span>
+                    )}
                   </span>
                   <div className="lead-card-body">
                     <p className="lead-card-office">
@@ -350,6 +410,11 @@ export async function FactbookLeaders({
                       <h4 className="lead-card-name">{p.personName}</h4>
                     </div>
                     <div className="lead-card-meta">
+                      {born && (
+                        <span className="lead-born">
+                          Born <span className="lead-born-date">{born}</span>
+                        </span>
+                      )}
                       {since && (
                         <span className="lead-since">
                           In office since{" "}
@@ -465,8 +530,9 @@ export async function FactbookLeaders({
         <Chip variant="neutral" size="sm">
           Current officeholders only
         </Chip>
-        Officeholders, offices, and term start dates from Wikidata. Civica does
-        not store portraits or biographical detail for these officeholders.
+        Officeholders, offices, and term start dates from Wikidata. Portraits and
+        birthdates are drawn from Wikidata and Wikimedia Commons where a freely
+        licensed image exists; leaders without one show a monogram.
       </p>
     </div>
   );

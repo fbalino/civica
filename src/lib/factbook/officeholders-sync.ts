@@ -32,6 +32,10 @@ import {
 import { sparqlQuery, extractQid } from "@/lib/data/wikidata";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
 
+const COMMONS_ENDPOINT = "https://commons.wikimedia.org/w/api.php";
+const COMMONS_USER_AGENT =
+  "CivicaAtlas/1.0 (https://civicaatlas.org; admin@civicaatlas.org)";
+
 /**
  * Anything that can run the Drizzle queries below — the shared `db` client or
  * a compatible instance. The default is the shared client so the route omits
@@ -60,7 +64,11 @@ export interface OfficeholderSyncSummary {
   titlesWritten: number;
   /** Current terms that gained a party (P102) affiliation. */
   partiesWritten: number;
-  /** Total rows written (base + titles + parties) — drives the freshness stamp. */
+  /** Persons that gained/changed a Commons portrait (P18) filename. */
+  portraitsWritten: number;
+  /** Persons that gained/changed a birthdate (P569). */
+  birthdatesWritten: number;
+  /** Total rows written (base + titles + parties + portraits + birthdates) — drives the freshness stamp. */
   totalRowsWritten: number;
   /** Whether `sources.last_sync_at` was stamped this run. */
   freshnessStamped: boolean;
@@ -510,6 +518,132 @@ SELECT ?person ?party ?partyLabel ?color WHERE {
 `;
 }
 
+// ─── P2 enrichment: portraits (P18) + birthdates (P569) ─────────────────────
+//
+// Keyed on the same person Q-IDs, this pass fetches:
+//   - P18 image → the Commons FILE NAME (stored in `persons.photo_url` as a bare
+//     filename, NOT a URL). The leader card renders it via `wikimediaUrl(file,
+//     ~200)` — the hotlink-the-Wikimedia-CDN approach the country galleries
+//     already use — so the monthly cron refreshes portraits with NO local files.
+//   - the Commons file's own license + author (via the Commons `imageinfo`
+//     `extmetadata`, exactly like `sync-country-galleries.ts`). Image files are
+//     CC-BY-SA / PD / open-gov, NOT CC0, so each portrait carries per-file
+//     attribution → `persons.photo_license` + `persons.photo_credit`.
+//   - P569 date of birth → `persons.date_of_birth`.
+//
+// Honest-data posture: a portrait is proposed ONLY when the Commons file's
+// license is genuinely free (PD / any CC / recognised open-government licence).
+// A non-free or unreadable license is SKIPPED → the person keeps the monogram.
+// A missing DOB stays null. Nothing is fabricated or hotlinked without credit.
+
+/** P18 image (Commons file) + P569 birthdate per person. */
+function mediaQuery(qids: string[]): string {
+  const values = qids.map((q) => `wd:${q}`).join(" ");
+  return `
+SELECT ?person ?image ?dob WHERE {
+  VALUES ?person { ${values} }
+  OPTIONAL { ?person wdt:P18 ?image . }
+  OPTIONAL { ?person wdt:P569 ?dob . }
+}
+`;
+}
+
+/** Resolve a Commons `Special:FilePath/<file>` URL to the bare file name. */
+function commonsFileFromUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  const m = url.match(/Special:FilePath\/(.+?)(\?|$)/);
+  if (!m) return undefined;
+  try {
+    return decodeURIComponent(m[1]).replace(/_/g, " ");
+  } catch {
+    return m[1];
+  }
+}
+
+function stripHtml(value: string | undefined): string {
+  return (value ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Is a Commons `LicenseShortName` genuinely FREE (redistributable, at most
+ * with attribution)? PD, any CC variant (incl. CC0), and recognised
+ * open-government licences count. Anything non-commercial-only, fair-use,
+ * all-rights-reserved, or unreadable is treated as NOT free → skipped.
+ */
+function commonsLicenseIsFree(lic: string): boolean {
+  const l = lic.toLowerCase();
+  if (!l || l === "unknown") return false;
+  if (
+    /non-commercial|noncommercial|\bnc\b|fair use|all rights reserved|non-free|nonfree/.test(
+      l,
+    )
+  ) {
+    return false;
+  }
+  return /cc0|cc[ -]by|public domain|\bpd\b|pdm|gfdl|godl|ogl|open government|europ|attribution|dl-de|etalab|kogl/.test(
+    l,
+  );
+}
+
+interface CommonsFileMeta {
+  license: string;
+  credit: string;
+}
+
+/**
+ * Fetch per-file license + author from the Commons `imageinfo` API, exactly as
+ * `sync-country-galleries.ts` does. Read-only network call; no download.
+ */
+async function fetchCommonsFileMeta(
+  files: string[],
+): Promise<Map<string, CommonsFileMeta>> {
+  const out = new Map<string, CommonsFileMeta>();
+  for (const batch of chunk(files, 40)) {
+    const titles = batch.map((f) => `File:${f}`).join("|");
+    const url = new URL(COMMONS_ENDPOINT);
+    url.searchParams.set("action", "query");
+    url.searchParams.set("format", "json");
+    url.searchParams.set("prop", "imageinfo");
+    url.searchParams.set("iiprop", "extmetadata");
+    url.searchParams.set("titles", titles);
+    try {
+      const res = await fetch(url, {
+        headers: { Accept: "application/json", "User-Agent": COMMONS_USER_AGENT },
+      });
+      if (!res.ok) continue;
+      const data = (await res.json()) as {
+        query?: {
+          pages?: Record<
+            string,
+            {
+              title: string;
+              imageinfo?: Array<{
+                extmetadata?: Record<string, { value?: string }>;
+              }>;
+            }
+          >;
+        };
+      };
+      for (const page of Object.values(data.query?.pages ?? {})) {
+        const file = page.title.replace(/^File:/, "");
+        const ex = page.imageinfo?.[0]?.extmetadata;
+        const license = stripHtml(ex?.LicenseShortName?.value) || "unknown";
+        const author = stripHtml(ex?.Artist?.value);
+        const credit = stripHtml(ex?.Credit?.value);
+        out.set(file, {
+          license,
+          credit: author || credit || "Wikimedia Commons",
+        });
+      }
+    } catch {
+      // Network hiccup on a batch → those files simply have no meta and are
+      // conservatively skipped (unknown license). Never fabricate a license.
+    }
+    await new Promise((r) => setTimeout(r, 400));
+  }
+  return out;
+}
+
 interface EnrichmentRow {
   jurisdictionId: string;
   country: string;
@@ -522,6 +656,10 @@ interface EnrichmentRow {
   personQid: string | null;
   termId: string | null;
   hasParty: boolean;
+  // Current person-level media state (drives idempotent portrait/DOB updates).
+  hasPhoto: boolean;
+  currentPhotoFile: string | null;
+  currentDob: string | null;
 }
 
 interface ProposedTitle {
@@ -543,9 +681,43 @@ interface ProposedParty {
   colorSource: "wikidata" | "legislature_parties" | "none";
 }
 
+interface ProposedPortrait {
+  country: string;
+  person: string;
+  role: string;
+  personId: string;
+  /** Commons file name (bare, no "File:" prefix) — rendered via wikimediaUrl. */
+  file: string;
+  license: string;
+  credit: string;
+  /** True when the person already had this exact file (no-op on apply). */
+  unchanged: boolean;
+}
+
+interface ProposedBirthdate {
+  country: string;
+  person: string;
+  role: string;
+  personId: string;
+  dob: string; // ISO yyyy-mm-dd
+  unchanged: boolean;
+}
+
+/** A P18 image that was found but NOT proposed (non-free / unreadable license). */
+interface SkippedPortrait {
+  country: string;
+  person: string;
+  file: string;
+  license: string;
+}
+
 export interface EnrichmentPlan {
   titles: ProposedTitle[];
   parties: ProposedParty[];
+  portraits: ProposedPortrait[];
+  birthdates: ProposedBirthdate[];
+  skippedPortraits: SkippedPortrait[];
+  noImage: { country: string; role: string; person: string; qid: string | null }[];
   stayGeneric: { country: string; role: string; person: string; qid: string | null }[];
   stats: {
     spineRows: number;
@@ -556,6 +728,15 @@ export interface EnrichmentPlan {
     colorFromWikidata: number;
     colorFromLegislature: number;
     colorMissing: number;
+    // Media (P18 + P569)
+    mediaPersons: number;
+    portraitFound: number;
+    portraitFree: number;
+    portraitSkippedNonFree: number;
+    portraitNoImage: number;
+    portraitAlreadyCurrent: number;
+    dobFound: number;
+    dobAlreadyCurrent: number;
   };
 }
 
@@ -570,10 +751,16 @@ export async function computeEnrichmentPlan(
 ): Promise<EnrichmentPlan> {
   // Spine: every current term on a generic-named head_of_state/head_of_government
   // office, with the person Q-ID and the country Q-ID.
+  // NOTE: the title enrichment only touches STILL-GENERIC offices, but the
+  // media (portrait + DOB) enrichment applies to EVERY current head-of-state /
+  // head-of-government person regardless of whether their office name is still
+  // generic. So the spine intentionally does NOT filter on o.name here; the
+  // title step re-checks GENERIC_OFFICE_NAMES per row.
   const spineRows = (await db.execute(sql`
     SELECT j.id AS jurisdiction_id, j.name AS country, j.wikidata_qid AS country_qid,
            o.id AS office_id, o.office_type, o.name AS office_name,
            p.id AS person_id, p.name AS person_name, p.wikidata_qid AS person_qid,
+           p.photo_url AS current_photo, p.date_of_birth AS current_dob,
            t.id AS term_id, (t.party_name IS NOT NULL) AS has_party
     FROM terms t
     JOIN offices o ON t.office_id = o.id
@@ -582,7 +769,6 @@ export async function computeEnrichmentPlan(
     JOIN persons p ON t.person_id = p.id
     WHERE t.is_current = true
       AND o.office_type IN ('head_of_state','head_of_government')
-      AND o.name IN ('Head of State','Head of Government')
     ORDER BY j.name, o.office_type
   `)) as unknown as {
     rows?: Record<string, unknown>[];
@@ -600,6 +786,9 @@ export async function computeEnrichmentPlan(
     personQid: r.person_qid ? String(r.person_qid) : null,
     termId: r.term_id ? String(r.term_id) : null,
     hasParty: r.has_party === true || r.has_party === "true",
+    hasPhoto: r.current_photo != null,
+    currentPhotoFile: r.current_photo != null ? String(r.current_photo) : null,
+    currentDob: r.current_dob != null ? String(r.current_dob).split("T")[0] : null,
   }));
 
   const personQids = [
@@ -690,6 +879,31 @@ export async function computeEnrichmentPlan(
     }
   }
 
+  // 5. Media: P18 portrait (Commons file) + P569 birthdate per person.
+  //    Read-only — fetches Wikidata (SPARQL) then Commons (imageinfo) for the
+  //    per-file license/author. Writes NOTHING.
+  const imageFileByPerson = new Map<string, string>(); // personQid → commons filename
+  const dobByPerson = new Map<string, string>(); // personQid → yyyy-mm-dd
+  for (const batch of chunk(personQids, 60)) {
+    const bindings = await sparqlQuery(mediaQuery(batch));
+    for (const b of bindings) {
+      const person = extractQid(b.person.value);
+      if (b.image?.value) {
+        const file = commonsFileFromUrl(b.image.value);
+        if (file && !imageFileByPerson.has(person)) imageFileByPerson.set(person, file);
+      }
+      if (b.dob?.value && !dobByPerson.has(person)) {
+        dobByPerson.set(person, b.dob.value.split("T")[0]);
+      }
+    }
+    await new Promise((r) => setTimeout(r, 700));
+  }
+  const distinctFiles = [...new Set(imageFileByPerson.values())];
+  log(
+    `  media: ${imageFileByPerson.size} portraits, ${dobByPerson.size} birthdates; fetching Commons license for ${distinctFiles.length} files`,
+  );
+  const fileMeta = await fetchCommonsFileMeta(distinctFiles);
+
   // ── Title selection ────────────────────────────────────────────────────────
   function chooseTitle(row: EnrichmentRow): { title: string; positionQid: string } | null {
     if (!row.personQid) return null;
@@ -734,6 +948,10 @@ export async function computeEnrichmentPlan(
   const plan: EnrichmentPlan = {
     titles: [],
     parties: [],
+    portraits: [],
+    birthdates: [],
+    skippedPortraits: [],
+    noImage: [],
     stayGeneric: [],
     stats: {
       spineRows: spine.length,
@@ -744,8 +962,20 @@ export async function computeEnrichmentPlan(
       colorFromWikidata: 0,
       colorFromLegislature: 0,
       colorMissing: 0,
+      mediaPersons: 0,
+      portraitFound: 0,
+      portraitFree: 0,
+      portraitSkippedNonFree: 0,
+      portraitNoImage: 0,
+      portraitAlreadyCurrent: 0,
+      dobFound: 0,
+      dobAlreadyCurrent: 0,
     },
   };
+
+  // De-dup media proposals per person (a person can hold two principal offices
+  // — one card, one photo/dob).
+  const mediaSeen = new Set<string>();
 
   for (const row of spine) {
     // TITLE — only propose when the office name is still a generic string.
@@ -806,6 +1036,72 @@ export async function computeEnrichmentPlan(
         });
       }
     }
+
+    // MEDIA — portrait (P18) + birthdate (P569). Person-keyed, de-duped so a
+    // dual-office holder is proposed once. Applies to every current principal
+    // officeholder (not just still-generic offices).
+    if (row.personQid && !mediaSeen.has(row.personId)) {
+      mediaSeen.add(row.personId);
+      plan.stats.mediaPersons++;
+
+      // Birthdate (P569).
+      const dob = dobByPerson.get(row.personQid);
+      if (dob) {
+        plan.stats.dobFound++;
+        if (row.currentDob === dob) {
+          plan.stats.dobAlreadyCurrent++;
+        }
+        plan.birthdates.push({
+          country: row.country,
+          person: row.personName,
+          role: row.officeType,
+          personId: row.personId,
+          dob,
+          unchanged: row.currentDob === dob,
+        });
+      }
+
+      // Portrait (P18) — propose ONLY when the Commons license is genuinely
+      // free. Non-free / unreadable → skip (keep monogram). Never hotlink
+      // without capturing per-file credit.
+      const file = imageFileByPerson.get(row.personQid);
+      if (!file) {
+        plan.stats.portraitNoImage++;
+        plan.noImage.push({
+          country: row.country,
+          role: row.officeType,
+          person: row.personName,
+          qid: row.personQid,
+        });
+      } else {
+        plan.stats.portraitFound++;
+        const meta = fileMeta.get(file);
+        const license = meta?.license ?? "unknown";
+        if (commonsLicenseIsFree(license)) {
+          plan.stats.portraitFree++;
+          const unchanged = row.currentPhotoFile === file;
+          if (unchanged) plan.stats.portraitAlreadyCurrent++;
+          plan.portraits.push({
+            country: row.country,
+            person: row.personName,
+            role: row.officeType,
+            personId: row.personId,
+            file,
+            license,
+            credit: meta?.credit ?? "Wikimedia Commons",
+            unchanged,
+          });
+        } else {
+          plan.stats.portraitSkippedNonFree++;
+          plan.skippedPortraits.push({
+            country: row.country,
+            person: row.personName,
+            file,
+            license,
+          });
+        }
+      }
+    }
   }
 
   return plan;
@@ -836,6 +1132,30 @@ export function reportEnrichmentPlan(
   log(`     · with colour from legislature:  ${s.colorFromLegislature}`);
   log(`     · party name only, no colour:    ${s.colorMissing}`);
 
+  const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : 0);
+  log("\nMEDIA COVERAGE (P18 portrait + P569 birthdate, current officeholders)");
+  log(`  Current officeholder persons:       ${s.mediaPersons}`);
+  log(
+    `  → have a P18 portrait on Wikidata:  ${s.portraitFound} (${pct(
+      s.portraitFound,
+      s.mediaPersons,
+    )}%)`,
+  );
+  log(
+    `     · with a FREE Commons license:   ${s.portraitFree} (would render as a portrait)`,
+  );
+  log(
+    `     · non-free / unreadable license: ${s.portraitSkippedNonFree} (SKIPPED — stays monogram)`,
+  );
+  log(`     · already current (no-op):       ${s.portraitAlreadyCurrent}`);
+  log(`  → NO P18 image (stays monogram):    ${s.portraitNoImage}`);
+  log(
+    `  → have a P569 birthdate:            ${s.dobFound} (${pct(
+      s.dobFound,
+      s.mediaPersons,
+    )}%)  [${s.dobAlreadyCurrent} already current]`,
+  );
+
   const sample = <T,>(arr: T[], n: number): T[] => arr.slice(0, n);
 
   log("\nTITLE SAMPLE (country · role · old → proposed)");
@@ -865,10 +1185,45 @@ export function reportEnrichmentPlan(
     log(`  ${g.country} · ${g.role} · ${g.person} (${g.qid ?? "no qid"})`);
   }
 
+  log("\nPORTRAIT SAMPLE (leader · country · role · Commons file · license · credit)");
+  for (const p of sample(plan.portraits, 15)) {
+    log(`  ${p.person} · ${p.country} · ${p.role}`);
+    log(`      file:    ${p.file}`);
+    log(`      license: ${p.license}   credit: ${p.credit}`);
+  }
+
+  log("\nBIRTHDATE SAMPLE (leader · country · P569)");
+  for (const b of sample(plan.birthdates, 12)) {
+    log(`  ${b.person} · ${b.country} · ${b.dob}`);
+  }
+
+  if (plan.skippedPortraits.length > 0) {
+    log(
+      `\nSKIPPED PORTRAITS (non-free / unreadable license → stays monogram): ${plan.skippedPortraits.length}`,
+    );
+    for (const p of sample(plan.skippedPortraits, 10)) {
+      log(`  ${p.license} — ${p.person} (${p.country}) — ${p.file}`);
+    }
+  }
+
   log(
-    "\nNo schema change. On APPLY, provenance is stamped via markSourcesSynced(\"wikidata\")."
+    `\nNO-IMAGE (no free portrait → stays monogram): ${plan.noImage.length}`,
   );
-  log("Re-run without --dry-run to apply.\n");
+  for (const g of sample(plan.noImage, 12)) {
+    log(`  ${g.country} · ${g.role} · ${g.person}`);
+  }
+
+  log(
+    "\nSchema note: portraits store the Commons FILE NAME in persons.photo_url",
+  );
+  log(
+    "  (rendered via wikimediaUrl, hotlink-the-CDN — no local files); birthdate →",
+  );
+  log(
+    "  persons.date_of_birth; per-file credit → persons.photo_license + persons.photo_credit",
+  );
+  log("  (additive nullable columns). On APPLY, provenance is stamped via");
+  log('  markSourcesSynced("wikidata"). Re-run without --dry-run to apply.\n');
 }
 
 /**
@@ -1026,14 +1381,42 @@ export async function syncFactbookOfficeholders(
     partiesWritten++;
   }
 
+  // ── Apply the P2 media plan (portraits + birthdates) ─────────────────────
+  // Idempotent: skip rows whose stored value already matches (unchanged=true).
+  // Portraits store the Commons FILE NAME (not a URL) + per-file credit; the
+  // renderer builds the CDN thumbnail via wikimediaUrl, so the monthly cron
+  // refreshes portraits with no local files.
+  let portraitsWritten = 0;
+  for (const p of plan.portraits) {
+    if (p.unchanged) continue;
+    await db
+      .update(persons)
+      .set({ photoUrl: p.file, photoLicense: p.license, photoCredit: p.credit })
+      .where(eq(persons.id, p.personId));
+    portraitsWritten++;
+  }
+
+  let birthdatesWritten = 0;
+  for (const b of plan.birthdates) {
+    if (b.unchanged) continue;
+    await db
+      .update(persons)
+      .set({ dateOfBirth: b.dob })
+      .where(eq(persons.id, b.personId));
+    birthdatesWritten++;
+  }
+
   log(`=== Enrichment Applied ===`);
-  log(`Titles written:  ${titlesWritten}`);
-  log(`Parties written: ${partiesWritten}`);
+  log(`Titles written:     ${titlesWritten}`);
+  log(`Parties written:    ${partiesWritten}`);
+  log(`Portraits written:  ${portraitsWritten}`);
+  log(`Birthdates written: ${birthdatesWritten}`);
 
   // Stamp source freshness via the single sanctioned helper — only when
   // this run actually synced rows (AGENTS.md provenance invariant). Total
   // covers the base sync plus the enrichment writes.
-  const totalRowsWritten = synced + titlesWritten + partiesWritten;
+  const totalRowsWritten =
+    synced + titlesWritten + partiesWritten + portraitsWritten + birthdatesWritten;
   const stamped = await markSourcesSynced("wikidata", {
     rowsWritten: totalRowsWritten,
     executor: db,
@@ -1041,7 +1424,9 @@ export async function syncFactbookOfficeholders(
 
   const finishedAtMs = Date.now();
   log(`=== Sync Complete ===`);
-  log(`Total rows written (base + titles + parties): ${totalRowsWritten}`);
+  log(
+    `Total rows written (base + titles + parties + portraits + birthdates): ${totalRowsWritten}`,
+  );
 
   return {
     startedAt,
@@ -1052,6 +1437,8 @@ export async function syncFactbookOfficeholders(
     qidNamesResolved,
     titlesWritten,
     partiesWritten,
+    portraitsWritten,
+    birthdatesWritten,
     totalRowsWritten,
     freshnessStamped: stamped.length > 0,
   };

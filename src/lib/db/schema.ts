@@ -84,7 +84,17 @@ export const persons = pgTable("persons", {
   name: text("name").notNull(),
   dateOfBirth: date("date_of_birth"),
   wikidataQid: text("wikidata_qid"),
+  // `photoUrl` stores the Wikimedia Commons FILE NAME of the leader's P18
+  // portrait (NOT a full URL). The renderer builds a thumbnail via
+  // `wikimediaUrl(file, size)` — the same hotlink-the-CDN approach the country
+  // photo galleries use — so a serverless monthly cron can refresh portraits
+  // with no local image files. A null value renders the monogram fallback.
   photoUrl: text("photo_url"),
+  // Per-portrait Commons attribution (image files are CC-BY-SA / PD / open-gov,
+  // NOT CC0 like the Wikidata statement). Rendered as a small credit caption on
+  // the portrait, mirroring the country-gallery `license`/`credit` fields.
+  photoLicense: text("photo_license"),
+  photoCredit: text("photo_credit"),
   parlinePersonCode: text("parline_person_code"),
 });
 
