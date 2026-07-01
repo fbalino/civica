@@ -1,11 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Reveal, HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import {
+  AlmanacFilters,
+  EMPTY_FILTER_STATE,
+  countryMatchesFilters,
+  totalActiveFilters,
+  type FilterCategory,
+  type FilterState,
+} from "@/components/factbook/AlmanacFilters";
 
 /** One country row as fed to the almanac. */
 export interface FactbookAlmanacCountry {
@@ -17,6 +25,14 @@ export interface FactbookAlmanacCountry {
   capital: string | null;
   /** Raw DB continent (Asia, Africa, Europe, North America, South America, Oceania, ...). */
   continent: string | null;
+  /** Phase F World Bank region — canonical human-readable string. */
+  region?: string | null;
+  /** Phase F World Bank income group — canonical human-readable string. */
+  incomeGroup?: string | null;
+  /** Phase F V-Dem Regimes of the World — canonical human-readable string. */
+  regimeType?: string | null;
+  /** Civica Index tier key (exceptional/strong/mixed/weak/failed) or null. */
+  ciTier?: string | null;
 }
 
 /* ── Region model ──────────────────────────────────────────────────────
@@ -85,12 +101,45 @@ export function FactbookAlmanac({
   countries: ReadonlyArray<FactbookAlmanacCountry>;
 }) {
   const [region, setRegion] = useState<RegionKey>("all");
+  const [filters, setFilters] = useState<FilterState>(EMPTY_FILTER_STATE);
 
-  // Country list scoped to the active region quick-filter.
+  const toggleFilter = useCallback(
+    (category: FilterCategory, value: string) => {
+      setFilters((prev) => {
+        const nextSet = new Set(prev[category]);
+        if (nextSet.has(value)) nextSet.delete(value);
+        else nextSet.add(value);
+        return { ...prev, [category]: nextSet };
+      });
+    },
+    [],
+  );
+
+  const clearFilters = useCallback(() => setFilters(EMPTY_FILTER_STATE), []);
+
+  const activeFilterCount = totalActiveFilters(filters);
+
+  // Country list scoped to the active region quick-filter AND the advanced
+  // filter bar. The hero region chip and the advanced filters both narrow
+  // the same underlying set; they compose.
   const inRegion = useMemo(() => {
-    if (region === "all") return countries;
-    return countries.filter((c) => continentToRegion(c.continent) === region);
-  }, [countries, region]);
+    const regionScoped =
+      region === "all"
+        ? countries
+        : countries.filter((c) => continentToRegion(c.continent) === region);
+    if (activeFilterCount === 0) return regionScoped;
+    return regionScoped.filter((c) =>
+      countryMatchesFilters(
+        {
+          region: c.region ?? null,
+          incomeGroup: c.incomeGroup ?? null,
+          regimeType: c.regimeType ?? null,
+          ciTier: c.ciTier ?? null,
+        },
+        filters,
+      ),
+    );
+  }, [countries, region, filters, activeFilterCount]);
 
   // Combobox options always search the full set (search ignores the chip).
   const searchOptions = useMemo(
@@ -195,13 +244,22 @@ export function FactbookAlmanac({
         <div className="factbook-almanac-head">
           <h2 className="factbook-almanac-title">The complete index</h2>
           <p className="factbook-almanac-sub" aria-live="polite">
-            {region === "all"
+            {region === "all" && activeFilterCount === 0
               ? `${countries.length} countries and territories, A to Z. Jump to a letter or pick from the list.`
-              : `${inRegion.length} ${inRegion.length === 1 ? "entry" : "entries"} in ${
-                  REGIONS.find((r) => r.key === region)?.label
-                }. Jump to a letter or pick from the list.`}
+              : region === "all"
+                ? `${inRegion.length} ${inRegion.length === 1 ? "entry" : "entries"} match your filters. Jump to a letter or pick from the list.`
+                : `${inRegion.length} ${inRegion.length === 1 ? "entry" : "entries"} in ${
+                    REGIONS.find((r) => r.key === region)?.label
+                  }. Jump to a letter or pick from the list.`}
           </p>
         </div>
+
+        <AlmanacFilters
+          filters={filters}
+          onToggle={toggleFilter}
+          onClear={clearFilters}
+          matchCount={inRegion.length}
+        />
 
         <nav className="factbook-alpha-rail" aria-label="Jump to letter">
           {alphabet.map((letter) => {
@@ -223,7 +281,22 @@ export function FactbookAlmanac({
         </nav>
 
         {groups.length === 0 ? (
-          <p className="factbook-almanac-empty">No countries in this region.</p>
+          activeFilterCount > 0 ? (
+            <div className="factbook-almanac-empty" role="status">
+              <p className="factbook-almanac-empty__title">
+                No countries match these filters.
+              </p>
+              <button
+                type="button"
+                className="btn btn--secondary btn--sm"
+                onClick={clearFilters}
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            <p className="factbook-almanac-empty">No countries in this region.</p>
+          )
         ) : (
           // NB: this is a CSS multi-column masonry (`column-count`). A transform
           // on each .factbook-letter-group would yank it out of the column flow

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getAllJurisdictions } from "@/lib/db/queries";
+import { getAllJurisdictions, getAlmanacFilterFacts } from "@/lib/db/queries";
+import { ciTier } from "@/lib/ci/tiers";
 import {
   FactbookAlmanac,
   type FactbookAlmanacCountry,
@@ -22,16 +23,29 @@ export const revalidate = 3600;
 export default async function CountryIndexPage() {
   let countries: FactbookAlmanacCountry[] = [];
   try {
-    const rows = await getAllJurisdictions();
-    countries = rows.map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      iso2: row.iso2,
-      iso3: row.iso3,
-      capital: row.capital,
-      continent: row.continent,
-    }));
+    const [rows, filterFacts] = await Promise.all([
+      getAllJurisdictions(),
+      getAlmanacFilterFacts(),
+    ]);
+    countries = rows.map((row) => {
+      const facts = filterFacts[row.id];
+      const score = facts?.ciScore ?? null;
+      return {
+        id: row.id,
+        slug: row.slug,
+        name: row.name,
+        iso2: row.iso2,
+        iso3: row.iso3,
+        capital: row.capital,
+        continent: row.continent,
+        // Phase F peer-grouping canonical facts (human-readable strings)
+        // + Civica Index tier — drive the advanced filter bar.
+        region: facts?.region ?? null,
+        incomeGroup: facts?.incomeGroup ?? null,
+        regimeType: facts?.regimeType ?? null,
+        ciTier: score != null ? ciTier(score).key : null,
+      };
+    });
   } catch {
     // DB not connected — render the shell; the almanac degrades to empty.
   }

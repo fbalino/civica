@@ -189,7 +189,7 @@
   padding: 0;
   margin: 0;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-chip);
   background: transparent;
   color: var(--color-text-40);
   line-height: var(--leading-none);
@@ -325,7 +325,7 @@
   background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
   border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
   color: color-mix(in oklab, var(--color-status-warning), black 32%);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-chip);
   padding: 1px 7px;
   vertical-align: middle;
 }
@@ -488,7 +488,7 @@
   width: min(720px, calc(100vw - var(--space-6)));
   background: var(--color-bg);
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-2xl);
   box-shadow:
     0 12px 32px color-mix(in oklab, var(--color-text-primary) 14%, transparent),
     0 4px 8px color-mix(in oklab, var(--color-text-primary) 6%, transparent);
@@ -497,6 +497,11 @@
   flex-direction: column;
   /* iOS Safari: keep the drawer above the bottom UI */
   padding-bottom: 0;
+}
+
+.factbook-drawer--input-only,
+.factbook-drawer--collapsed {
+  border-radius: var(--radius-control);
 }
 
 .factbook-drawer-beta {
@@ -516,7 +521,7 @@
 .factbook-drawer-beta__pill {
   background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
   border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-chip);
   color: color-mix(in oklab, var(--color-status-warning), black 32%);
   padding: var(--space-1) var(--space-2);
   font-weight: 500;
@@ -747,7 +752,11 @@
     right: auto;
     transform: translateX(-50%);
     bottom: max(var(--space-3), env(safe-area-inset-bottom));
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-2xl);
+  }
+  .factbook-drawer--input-only,
+  .factbook-drawer--collapsed {
+    border-radius: var(--radius-control);
   }
   .factbook-drawer-beta__copy {
     display: none;
@@ -798,7 +807,7 @@
   gap: var(--space-3);
   padding: var(--space-3) var(--space-5);
   border: 1px solid var(--color-stat-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-chip);
   font-size: var(--text-15);
   color: var(--color-text-60);
   text-decoration: none;
@@ -1243,6 +1252,106 @@
   font-family: var(--font-body);
   color: var(--color-text-muted);
   padding: var(--space-8) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+.factbook-almanac-empty__title {
+  margin: 0;
+  font-size: var(--text-16);
+  color: var(--color-text-primary);
+}
+
+/* ── Advanced filter bar ──────────────────────────────────────────────
+   Layers over the hero region quick-filter. Reuses the canonical
+   .editorial-chip primitive for every filter chip (see editorial.css);
+   this block only owns the surrounding card, group layout, and legends. */
+.almanac-filters {
+  margin: var(--space-6) 0 var(--space-4);
+  padding: var(--space-6);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+}
+.almanac-filters__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.almanac-filters__title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.08em);
+  color: var(--color-text-muted);
+}
+.almanac-filters__status {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-muted);
+}
+.almanac-filters__groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-5) var(--space-6);
+}
+.almanac-filter-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.almanac-filter-group__legend {
+  padding: 0;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide, 0.06em);
+  color: var(--color-text-60);
+}
+.almanac-filter-group__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.almanac-filter-chip {
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+.almanac-filters__actions {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-default);
+  display: flex;
+  justify-content: flex-end;
+}
+.almanac-filters__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.almanac-filters__clear-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-on-accent, #fff);
+  font-size: var(--text-11, 11px);
+  font-weight: 600;
+  line-height: 1;
 }
 
 /* Alpha jump rail */

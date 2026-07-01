@@ -1389,3 +1389,97 @@ export async function getCivicaConditionsForJurisdiction(
     sourceName: string | null;
   }>;
 }
+
+/**
+ * Batch filter facts for the `/country` almanac index.
+ *
+ * Returns, keyed by jurisdiction id, the three Phase F peer-grouping
+ * canonical facts used as list filters plus the country's Civica Index
+ * composite score. All values are the human-readable canonical strings
+ * ("North America", "High income", "Liberal Democracy") straight off the
+ * active `country_facts` rows — no snake_case slugs (see
+ * `lens-metadata.ts`). The CI score is pinned to `methodology_version='beta'`
+ * at the latest available quarter; callers map it to a tier via
+ * `ciTier()` in `src/lib/ci/tiers.ts`.
+ *
+ * One pass over the whole listed set (~200 sovereign states) — cheap
+ * enough to run in the landing's server component. Provenance-free by
+ * design: this is a hot list path, not a citation-bearing surface (a
+ * stale filter value only mis-buckets a card, never mis-cites a fact).
+ */
+export async function getAlmanacFilterFacts(): Promise<
+  Record<
+    string,
+    {
+      region: string | null;
+      incomeGroup: string | null;
+      regimeType: string | null;
+      ciScore: number | null;
+    }
+  >
+> {
+  const out: Record<
+    string,
+    {
+      region: string | null;
+      incomeGroup: string | null;
+      regimeType: string | null;
+      ciScore: number | null;
+    }
+  > = {};
+
+  const ensure = (id: string) => {
+    let entry = out[id];
+    if (!entry) {
+      entry = { region: null, incomeGroup: null, regimeType: null, ciScore: null };
+      out[id] = entry;
+    }
+    return entry;
+  };
+
+  // Peer-grouping canonical facts — active rows only. The fact-keys
+  // mirror PEER_GROUPING_FACT_KEYS in src/lib/peer-grouping/index.ts.
+  const factRows = await db
+    .select({
+      jurisdictionId: countryFacts.jurisdictionId,
+      factKey: countryFacts.factKey,
+      factValue: countryFacts.factValue,
+    })
+    .from(countryFacts)
+    .where(
+      and(
+        sql`${countryFacts.status} = 'active'`,
+        sql`${countryFacts.factKey} IN ('world_bank_region', 'world_bank_income_group', 'vdem_row')`
+      )
+    );
+
+  for (const row of factRows) {
+    if (!row.factValue) continue;
+    const entry = ensure(row.jurisdictionId);
+    if (row.factKey === "world_bank_region") entry.region = row.factValue;
+    else if (row.factKey === "world_bank_income_group")
+      entry.incomeGroup = row.factValue;
+    else if (row.factKey === "vdem_row") entry.regimeType = row.factValue;
+  }
+
+  // Civica Index composite scores — pinned to beta at the latest quarter.
+  const quarter = await getLatestAvailableQuarter("beta");
+  const scoreRows = await db
+    .select({
+      jurisdictionId: ciCompositeScores.jurisdictionId,
+      score: ciCompositeScores.score,
+    })
+    .from(ciCompositeScores)
+    .where(
+      and(
+        eq(ciCompositeScores.quarter, quarter),
+        eq(ciCompositeScores.methodologyVersion, "beta")
+      )
+    );
+
+  for (const row of scoreRows) {
+    ensure(row.jurisdictionId).ciScore = row.score;
+  }
+
+  return out;
+}
