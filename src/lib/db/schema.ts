@@ -11,6 +11,7 @@ import {
   jsonb,
   uniqueIndex,
   index,
+  foreignKey,
 } from "drizzle-orm/pg-core";
 
 export const jurisdictions = pgTable("jurisdictions", {
@@ -819,9 +820,14 @@ export const ciDimensionScores = pgTable(
       .references(() => sources.id)
       .notNull(),
     ingestionId: uuid("ingestion_id").references(() => ciSourceIngestions.id),
-    methodologyVersion: text("methodology_version")
-      .references(() => ciMethodologyVersions.id)
-      .notNull(),
+    // NOTE: methodology_version's FK is declared as an explicit named
+    // foreignKey() below (not inline .references()) because Drizzle's
+    // auto-generated inline name exceeds Postgres's 63-byte identifier
+    // limit and gets silently truncated at creation time — which made
+    // `drizzle-kit push` perpetually propose a "rename" that is actually
+    // a no-op (the truncated new name == the existing DB name). Pinning
+    // the name here matches the live DB and keeps `push` clean.
+    methodologyVersion: text("methodology_version").notNull(),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
@@ -833,6 +839,11 @@ export const ciDimensionScores = pgTable(
     ),
     index("idx_ci_dimension_scores_quarter").on(table.quarter),
     index("idx_ci_dimension_scores_jurisdiction").on(table.jurisdictionId),
+    foreignKey({
+      name: "ci_dimension_scores_methodology_version_ci_methodology_versions",
+      columns: [table.methodologyVersion],
+      foreignColumns: [ciMethodologyVersions.id],
+    }),
   ]
 );
 
@@ -874,9 +885,10 @@ export const ciCompositeScores = pgTable(
     isPartial: boolean("is_partial").notNull().default(false),
     dimensionsAvailable: integer("dimensions_available").notNull().default(6),
     missingDimensions: text("missing_dimensions").array(),
-    methodologyVersion: text("methodology_version")
-      .references(() => ciMethodologyVersions.id)
-      .notNull(),
+    // See the identical note on ciDimensionScores.methodologyVersion above:
+    // explicit named foreignKey() below, not inline .references(), because
+    // Drizzle's auto-generated name truncates past Postgres's 63-byte limit.
+    methodologyVersion: text("methodology_version").notNull(),
     calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
   },
   (table) => [
@@ -887,6 +899,11 @@ export const ciCompositeScores = pgTable(
     ),
     index("idx_ci_composite_quarter_rank").on(table.quarter, table.rank),
     index("idx_ci_composite_jurisdiction").on(table.jurisdictionId),
+    foreignKey({
+      name: "ci_composite_scores_methodology_version_ci_methodology_versions",
+      columns: [table.methodologyVersion],
+      foreignColumns: [ciMethodologyVersions.id],
+    }),
   ]
 );
 
@@ -939,9 +956,10 @@ export const pulseDailyScores = pgTable(
     pulseScore: real("pulse_score").notNull(),
     activeEvents: integer("active_events").notNull(),
     isLowConfidence: boolean("is_low_confidence").notNull().default(false),
-    methodologyVersion: text("methodology_version")
-      .references(() => ciMethodologyVersions.id)
-      .notNull(),
+    // See the identical note on ciDimensionScores.methodologyVersion above:
+    // explicit named foreignKey() below, not inline .references(), because
+    // Drizzle's auto-generated name truncates past Postgres's 63-byte limit.
+    methodologyVersion: text("methodology_version").notNull(),
     calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
   },
   (table) => [
@@ -951,6 +969,11 @@ export const pulseDailyScores = pgTable(
     ),
     index("idx_pulse_daily_date").on(table.scoreDate),
     index("idx_pulse_daily_jurisdiction").on(table.jurisdictionId),
+    foreignKey({
+      name: "pulse_daily_scores_methodology_version_ci_methodology_versions_",
+      columns: [table.methodologyVersion],
+      foreignColumns: [ciMethodologyVersions.id],
+    }),
   ]
 );
 

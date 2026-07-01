@@ -120,12 +120,28 @@ async function main() {
       headline: cluster.title.slice(0, 200),
       description: cluster.body.slice(0, 1500),
     };
+    // Normalize confidence defensively: a missing/undefined/malformed value
+    // must NOT be treated as "not low" (that bug let thin events auto-publish
+    // when the classifying prompt dropped the confidence field). Anything
+    // that isn't a recognized value is treated as "low" — i.e. it queues for
+    // human review rather than silently auto-publishing.
+    if (d.confidence !== "high" && d.confidence !== "medium" && d.confidence !== "low") {
+      console.warn(
+        `  ! missing/invalid confidence for cluster ${d.clusterId} (got ${JSON.stringify(
+          d.confidence
+        )}) — treating as "low" (routes to human review).`
+      );
+    }
+    const conf: "high" | "medium" | "low" =
+      d.confidence === "high" || d.confidence === "medium" || d.confidence === "low"
+        ? d.confidence
+        : "low";
     const ok: ClassifyOneResult = {
       classified,
       // Auto-publish only when the tier is not review-gated AND the agent's
       // classify→verify confidence is not low. Low-confidence events go to
       // the human review queue (published=false) instead of scoring silently.
-      autoPublished: !HUMAN_REVIEW_TIERS.has(d.severityTier) && d.confidence !== "low",
+      autoPublished: !HUMAN_REVIEW_TIERS.has(d.severityTier) && conf !== "low",
     };
     await writeEvent(db, cluster, ok);
     written++;
