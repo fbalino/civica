@@ -11,12 +11,24 @@ import {
   persons,
   terms,
   statements,
+  legislatureParties,
 } from "../src/lib/db/schema";
 import { sparqlQuery, extractQid } from "../src/lib/data/wikidata";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
+
+// `--dry-run` (or DRY_RUN=1) computes the full proposed title/party change set
+// and prints it WITHOUT writing anything to the DB. Used to let the owner
+// approve the enrichment before a real apply pass.
+const DRY_RUN =
+  process.argv.includes("--dry-run") || process.env.DRY_RUN === "1";
+
+// Generic office names we are allowed to overwrite with a real P39 title. A
+// hand-curated US/UK title (e.g. "Chancellor of the Exchequer") is never one
+// of these, so it is never clobbered.
+const GENERIC_OFFICE_NAMES = new Set(["Head of State", "Head of Government"]);
 
 const QUERY = `
 SELECT ?state ?stateLabel ?iso2 ?iso3 ?shortName
@@ -344,7 +356,480 @@ async function upsertStatement(
   });
 }
 
+// ─── P1 + P3 enrichment: real office titles (P39) and party (P102) ──────────
+//
+// Keyed on the person Q-IDs already stored on `persons`, this pass fetches:
+//   - the person's current "position held" (P39) statements and picks the one
+//     that is the head-of-state / head-of-government office FOR THAT COUNTRY,
+//     using the position label → `offices.name` (replacing the generic string);
+//   - the person's current "member of political party" (P102) → `terms.partyName`,
+//     plus the party color (P462→P465) → `terms.partyColor`, with a fallback to
+//     a matching `legislature_parties` color by exact (country, name) match.
+//
+// Honest-data posture: when no plausible head-title P39 resolves we KEEP the
+// generic office name (never invent a title); when no party resolves we leave
+// it null. Nothing is fabricated.
+
+const Q_HEAD_OF_STATE = "Q48352";
+const Q_HEAD_OF_GOVERNMENT = "Q2285706";
+
+interface PositionMeta {
+  label: string;
+  juris: string | null; // P1001 applies-to-jurisdiction
+  of: string | null; // P642 "of"
+  country: string | null; // P17 country
+  isHoS: boolean; // P279* head of state
+  isHoG: boolean; // P279* head of government
+}
+
+interface PartyInfo {
+  name: string;
+  color: string | null;
+}
+
+/** A generic "Head of State of X" label — real but less specific; deprioritise. */
+function isGenericPositionLabel(label: string): boolean {
+  return /^head of (state|government)\b/i.test(label.trim());
+}
+
+// Label patterns for genuine head-of-state / head-of-government offices. The
+// P279* role-class check is incomplete on Wikidata (e.g. "Prime Minister of
+// India" is not modelled as a head-of-government subclass), so we also accept
+// a head-title label. Conversely, a jurisdiction-matched but non-head P39
+// (e.g. "member of the Grand and General Council") must NOT become the office
+// title — this gate blocks that.
+const HEAD_TITLE_RE =
+  /\b(president|prime minister|premier|chancellor|king|queen|monarch|emir|amir|sultan|emperor|empress|pope|supreme leader|captain regent|governor[- ]general|chair(man|person|woman)? of the (presidency|council of ministers|state council|sovereignty council|presidential council)|co[- ]?prince|grand duke|grand duchess|sovereign prince|prince of|head of (state|government)|chief executive|state counsellor|paramount|yang di-?pertuan)\b/i;
+
+function looksLikeHeadTitle(label: string): boolean {
+  return HEAD_TITLE_RE.test(label);
+}
+
+function chunk<T>(arr: T[], n: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+  return out;
+}
+
+/** Current (P582-absent) P39 positions per person. */
+function personPositionsQuery(qids: string[]): string {
+  const values = qids.map((q) => `wd:${q}`).join(" ");
+  return `
+SELECT ?person ?position WHERE {
+  VALUES ?person { ${values} }
+  ?person p:P39 ?st .
+  ?st ps:P39 ?position .
+  FILTER NOT EXISTS { ?st pq:P582 ?end . }
+}
+`;
+}
+
+/** Metadata + HoS/HoG class for a batch of position items. */
+function positionMetaQuery(qids: string[]): string {
+  const values = qids.map((q) => `wd:${q}`).join(" ");
+  return `
+SELECT ?position ?positionLabel ?juris ?of ?country ?isHoS ?isHoG WHERE {
+  VALUES ?position { ${values} }
+  OPTIONAL { ?position wdt:P1001 ?juris . }
+  OPTIONAL { ?position wdt:P642 ?of . }
+  OPTIONAL { ?position wdt:P17 ?country . }
+  BIND(EXISTS { ?position wdt:P279* wd:${Q_HEAD_OF_STATE} } AS ?isHoS)
+  BIND(EXISTS { ?position wdt:P279* wd:${Q_HEAD_OF_GOVERNMENT} } AS ?isHoG)
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+`;
+}
+
+/** Current (P582-absent) party membership + party color per person. */
+function partyQuery(qids: string[]): string {
+  const values = qids.map((q) => `wd:${q}`).join(" ");
+  return `
+SELECT ?person ?party ?partyLabel ?color WHERE {
+  VALUES ?person { ${values} }
+  ?person p:P102 ?st .
+  ?st ps:P102 ?party .
+  FILTER NOT EXISTS { ?st pq:P582 ?end . }
+  OPTIONAL { ?party wdt:P462 ?ce . ?ce wdt:P465 ?color . }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+}
+`;
+}
+
+interface EnrichmentRow {
+  jurisdictionId: string;
+  country: string;
+  countryQid: string | null;
+  officeId: string;
+  officeType: "head_of_state" | "head_of_government";
+  officeName: string;
+  personId: string;
+  personName: string;
+  personQid: string | null;
+  termId: string | null;
+  hasParty: boolean;
+}
+
+interface ProposedTitle {
+  country: string;
+  role: string;
+  officeId: string;
+  oldName: string;
+  newName: string;
+  positionQid: string;
+}
+
+interface ProposedParty {
+  country: string;
+  person: string;
+  role: string;
+  termId: string | null;
+  party: string;
+  color: string | null;
+  colorSource: "wikidata" | "legislature_parties" | "none";
+}
+
+interface EnrichmentPlan {
+  titles: ProposedTitle[];
+  parties: ProposedParty[];
+  stayGeneric: { country: string; role: string; person: string; qid: string | null }[];
+  stats: {
+    spineRows: number;
+    titleResolved: number;
+    titleStaysGeneric: number;
+    partylessConsidered: number;
+    partyResolved: number;
+    colorFromWikidata: number;
+    colorFromLegislature: number;
+    colorMissing: number;
+  };
+}
+
+/**
+ * Compute the full proposed title + party change set from Wikidata, keyed on
+ * the person Q-IDs already stored. Pure read — fetches from Wikidata + reads
+ * the legislature_parties color dictionary; writes NOTHING.
+ */
+async function computeEnrichmentPlan(): Promise<EnrichmentPlan> {
+  // Spine: every current term on a generic-named head_of_state/head_of_government
+  // office, with the person Q-ID and the country Q-ID.
+  const spineRows = (await db.execute(sql`
+    SELECT j.id AS jurisdiction_id, j.name AS country, j.wikidata_qid AS country_qid,
+           o.id AS office_id, o.office_type, o.name AS office_name,
+           p.id AS person_id, p.name AS person_name, p.wikidata_qid AS person_qid,
+           t.id AS term_id, (t.party_name IS NOT NULL) AS has_party
+    FROM terms t
+    JOIN offices o ON t.office_id = o.id
+    JOIN government_bodies gb ON o.body_id = gb.id
+    JOIN jurisdictions j ON gb.jurisdiction_id = j.id
+    JOIN persons p ON t.person_id = p.id
+    WHERE t.is_current = true
+      AND o.office_type IN ('head_of_state','head_of_government')
+      AND o.name IN ('Head of State','Head of Government')
+    ORDER BY j.name, o.office_type
+  `)) as unknown as {
+    rows?: Record<string, unknown>[];
+  };
+  const rawRows = (spineRows.rows ?? (spineRows as unknown as Record<string, unknown>[])) as Record<string, unknown>[];
+  const spine: EnrichmentRow[] = rawRows.map((r) => ({
+    jurisdictionId: String(r.jurisdiction_id),
+    country: String(r.country),
+    countryQid: r.country_qid ? String(r.country_qid) : null,
+    officeId: String(r.office_id),
+    officeType: String(r.office_type) as "head_of_state" | "head_of_government",
+    officeName: String(r.office_name),
+    personId: String(r.person_id),
+    personName: String(r.person_name),
+    personQid: r.person_qid ? String(r.person_qid) : null,
+    termId: r.term_id ? String(r.term_id) : null,
+    hasParty: r.has_party === true || r.has_party === "true",
+  }));
+
+  const personQids = [
+    ...new Set(spine.map((r) => r.personQid).filter((q): q is string => Boolean(q))),
+  ];
+  console.log(
+    `Enrichment spine: ${spine.length} generic offices, ${personQids.length} distinct person Q-IDs`
+  );
+
+  // 1. Current P39 positions per person.
+  const personPositions = new Map<string, string[]>();
+  for (const batch of chunk(personQids, 50)) {
+    const bindings = await sparqlQuery(personPositionsQuery(batch));
+    for (const b of bindings) {
+      const person = extractQid(b.person.value);
+      const position = extractQid(b.position.value);
+      const arr = personPositions.get(person) ?? [];
+      arr.push(position);
+      personPositions.set(person, arr);
+    }
+    await new Promise((r) => setTimeout(r, 800));
+  }
+  const allPositions = [...new Set([...personPositions.values()].flat())];
+  console.log(`  fetched ${allPositions.length} distinct candidate positions`);
+
+  // 2. Position metadata + role class.
+  const posMeta = new Map<string, PositionMeta>();
+  for (const batch of chunk(allPositions, 60)) {
+    const bindings = await sparqlQuery(positionMetaQuery(batch));
+    for (const b of bindings) {
+      const position = extractQid(b.position.value);
+      const meta: PositionMeta =
+        posMeta.get(position) ?? {
+          label: b.positionLabel?.value ?? position,
+          juris: null,
+          of: null,
+          country: null,
+          isHoS: false,
+          isHoG: false,
+        };
+      if (b.juris && !meta.juris) meta.juris = extractQid(b.juris.value);
+      if (b.of && !meta.of) meta.of = extractQid(b.of.value);
+      if (b.country && !meta.country) meta.country = extractQid(b.country.value);
+      meta.isHoS = meta.isHoS || b.isHoS?.value === "true";
+      meta.isHoG = meta.isHoG || b.isHoG?.value === "true";
+      posMeta.set(position, meta);
+    }
+    await new Promise((r) => setTimeout(r, 800));
+  }
+
+  // 3. Party + color per person.
+  const partyByPerson = new Map<string, PartyInfo>();
+  for (const batch of chunk(personQids, 50)) {
+    const bindings = await sparqlQuery(partyQuery(batch));
+    for (const b of bindings) {
+      const person = extractQid(b.person.value);
+      const name = b.partyLabel?.value ?? extractQid(b.party.value);
+      if (/^Q\d+$/.test(name)) continue;
+      const color = b.color?.value ? `#${b.color.value}` : null;
+      const existing = partyByPerson.get(person);
+      // Prefer a value that carries a color; otherwise first seen wins.
+      if (!existing || (!existing.color && color)) {
+        partyByPerson.set(person, { name, color });
+      }
+    }
+    await new Promise((r) => setTimeout(r, 800));
+  }
+
+  // 4. legislature_parties color dictionary, keyed (jurisdictionId, lower(name)).
+  //    Exact-name match only — fuzzy matching risks assigning the wrong colour,
+  //    which would violate the honest-data posture.
+  const legColorRows = await db
+    .select({
+      jurisdictionId: governmentBodies.jurisdictionId,
+      partyName: legislatureParties.partyName,
+      partyColor: legislatureParties.partyColor,
+    })
+    .from(legislatureParties)
+    .innerJoin(
+      governmentBodies,
+      eq(legislatureParties.bodyId, governmentBodies.id)
+    )
+    .where(sql`${legislatureParties.partyColor} IS NOT NULL`);
+  const legColor = new Map<string, string>();
+  for (const r of legColorRows) {
+    if (r.partyColor) {
+      legColor.set(`${r.jurisdictionId}|${r.partyName.toLowerCase()}`, r.partyColor);
+    }
+  }
+
+  // ── Title selection ────────────────────────────────────────────────────────
+  function chooseTitle(row: EnrichmentRow): { title: string; positionQid: string } | null {
+    if (!row.personQid) return null;
+    const positions = personPositions.get(row.personQid) ?? [];
+    const wantHoS = row.officeType === "head_of_state";
+    type Cand = { position: string; meta: PositionMeta; score: number };
+    const cands: Cand[] = [];
+    for (const position of positions) {
+      const meta = posMeta.get(position);
+      if (!meta) continue;
+      const roleClassMatch = wantHoS ? meta.isHoS : meta.isHoG;
+      const roleClassAny = meta.isHoS || meta.isHoG;
+      const headTitle = looksLikeHeadTitle(meta.label);
+      const jurisMatch =
+        (!!row.countryQid && meta.juris === row.countryQid) ||
+        (!!row.countryQid && meta.of === row.countryQid) ||
+        (!!row.countryQid && meta.country === row.countryQid);
+      const headLike = roleClassMatch || headTitle;
+      let score = 0;
+      if (jurisMatch) score += 10;
+      if (roleClassMatch) score += 5;
+      if (headTitle) score += 3;
+      else if (roleClassAny && !roleClassMatch) score -= 8; // wrong role-class
+      if (!isGenericPositionLabel(meta.label)) score += 2;
+      // Gate: must read as a head office AND either match this country's
+      // jurisdiction, or be a bare country-agnostic head title.
+      const eligible =
+        headLike &&
+        (jurisMatch || (!meta.juris && !meta.of && !meta.country));
+      if (eligible) cands.push({ position, meta, score });
+    }
+    if (cands.length === 0) return null;
+    cands.sort(
+      (a, b) => b.score - a.score || a.meta.label.length - b.meta.label.length
+    );
+    const best = cands[0];
+    if (/^Q\d+$/.test(best.meta.label)) return null;
+    return { title: best.meta.label, positionQid: best.position };
+  }
+
+  // ── Assemble the plan ────────────────────────────────────────────────────────
+  const plan: EnrichmentPlan = {
+    titles: [],
+    parties: [],
+    stayGeneric: [],
+    stats: {
+      spineRows: spine.length,
+      titleResolved: 0,
+      titleStaysGeneric: 0,
+      partylessConsidered: 0,
+      partyResolved: 0,
+      colorFromWikidata: 0,
+      colorFromLegislature: 0,
+      colorMissing: 0,
+    },
+  };
+
+  for (const row of spine) {
+    // TITLE — only propose when the office name is still a generic string.
+    if (GENERIC_OFFICE_NAMES.has(row.officeName)) {
+      const chosen = chooseTitle(row);
+      if (chosen) {
+        plan.stats.titleResolved++;
+        plan.titles.push({
+          country: row.country,
+          role: row.officeType,
+          officeId: row.officeId,
+          oldName: row.officeName,
+          newName: chosen.title,
+          positionQid: chosen.positionQid,
+        });
+      } else {
+        plan.stats.titleStaysGeneric++;
+        plan.stayGeneric.push({
+          country: row.country,
+          role: row.officeType,
+          person: row.personName,
+          qid: row.personQid,
+        });
+      }
+    }
+
+    // PARTY — only propose where the current term has no party yet.
+    if (!row.hasParty) {
+      plan.stats.partylessConsidered++;
+      const party = row.personQid ? partyByPerson.get(row.personQid) : undefined;
+      if (party) {
+        plan.stats.partyResolved++;
+        let color = party.color;
+        let colorSource: ProposedParty["colorSource"] = "none";
+        if (color) {
+          colorSource = "wikidata";
+          plan.stats.colorFromWikidata++;
+        } else {
+          const legc = legColor.get(
+            `${row.jurisdictionId}|${party.name.toLowerCase()}`
+          );
+          if (legc) {
+            color = legc;
+            colorSource = "legislature_parties";
+            plan.stats.colorFromLegislature++;
+          } else {
+            plan.stats.colorMissing++;
+          }
+        }
+        plan.parties.push({
+          country: row.country,
+          person: row.personName,
+          role: row.officeType,
+          termId: row.termId,
+          party: party.name,
+          color: color ?? null,
+          colorSource,
+        });
+      }
+    }
+  }
+
+  return plan;
+}
+
+/** Pretty-print the dry-run report for owner approval. */
+function reportEnrichmentPlan(plan: EnrichmentPlan): void {
+  const s = plan.stats;
+  console.log("\n========================================================");
+  console.log("  DRY RUN — proposed government/leadership enrichment");
+  console.log("  (NOTHING written to the database)");
+  console.log("========================================================\n");
+
+  console.log("COVERAGE");
+  console.log(`  Generic-title offices in scope:     ${s.spineRows}`);
+  console.log(
+    `  → would get a REAL title (P39):     ${s.titleResolved} (${Math.round(
+      (s.titleResolved / s.spineRows) * 100
+    )}%)`
+  );
+  console.log(
+    `  → stay generic (no head-title P39): ${s.titleStaysGeneric} (kept honest)`
+  );
+  console.log(`  Partyless current terms considered: ${s.partylessConsidered}`);
+  console.log(`  → would get a party (P102):          ${s.partyResolved}`);
+  console.log(
+    `     · with colour from Wikidata:     ${s.colorFromWikidata}`
+  );
+  console.log(
+    `     · with colour from legislature:  ${s.colorFromLegislature}`
+  );
+  console.log(
+    `     · party name only, no colour:    ${s.colorMissing}`
+  );
+
+  const sample = <T,>(arr: T[], n: number): T[] => arr.slice(0, n);
+
+  console.log("\nTITLE SAMPLE (country · role · old → proposed)");
+  for (const t of sample(plan.titles, 30)) {
+    console.log(
+      `  ${t.country} · ${t.role} · "${t.oldName}" → "${t.newName}"  (${t.positionQid})`
+    );
+  }
+
+  console.log("\nPARTY SAMPLE (country · officeholder · party · colour)");
+  for (const p of sample(
+    plan.parties.filter((p) => p.color),
+    18
+  )) {
+    console.log(
+      `  ${p.country} · ${p.person} · ${p.party} · ${p.color} [${p.colorSource}]`
+    );
+  }
+  const noColorParties = plan.parties.filter((p) => !p.color);
+  console.log(
+    `  …and ${noColorParties.length} parties with a name but NO colour (renders as a label, no dot). e.g.:`
+  );
+  for (const p of sample(noColorParties, 6)) {
+    console.log(`    ${p.country} · ${p.person} · ${p.party} (no colour)`);
+  }
+
+  console.log("\nSTAY-GENERIC SAMPLE (no head-title P39 → name kept generic)");
+  for (const g of sample(plan.stayGeneric, 12)) {
+    console.log(`  ${g.country} · ${g.role} · ${g.person} (${g.qid ?? "no qid"})`);
+  }
+
+  console.log(
+    "\nNo schema change. On APPLY, provenance is stamped via markSourcesSynced(\"wikidata\")."
+  );
+  console.log("Re-run without --dry-run to apply.\n");
+}
+
 async function main() {
+  if (DRY_RUN) {
+    console.log("=== Wikidata Officeholder Enrichment (DRY RUN) ===\n");
+    const plan = await computeEnrichmentPlan();
+    reportEnrichmentPlan(plan);
+    // Dry runs never advance freshness.
+    await markSourcesSynced("wikidata", { rowsWritten: 0, dryRun: true });
+    return;
+  }
+
   console.log("=== Wikidata Officeholder Sync ===\n");
   console.log("Querying Wikidata SPARQL endpoint...");
 
@@ -426,13 +911,7 @@ async function main() {
     console.log(`  ✓ ${stateName}`);
   }
 
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually synced rows (AGENTS.md provenance invariant). Was
-  // previously an unconditional stamp that faked freshness on an
-  // empty/failed run.
-  await markSourcesSynced("wikidata", { rowsWritten: synced });
-
-  console.log(`\n=== Sync Complete ===`);
+  console.log(`\n=== Base Sync Complete ===`);
   console.log(`Synced:  ${synced}`);
   console.log(`Skipped: ${skipped}`);
 
@@ -454,6 +933,43 @@ async function main() {
       }
     }
   }
+
+  // ── Apply the P1 + P3 enrichment plan (real titles + party) ──────────────
+  // Reuses the exact same computeEnrichmentPlan() the dry run reports on, so
+  // what was approved in the dry-run preview is exactly what gets written.
+  console.log("\n=== Applying government-title + party enrichment ===\n");
+  const plan = await computeEnrichmentPlan();
+  reportEnrichmentPlan(plan);
+
+  let titlesWritten = 0;
+  for (const t of plan.titles) {
+    await db.update(offices).set({ name: t.newName }).where(eq(offices.id, t.officeId));
+    titlesWritten++;
+  }
+
+  let partiesWritten = 0;
+  for (const p of plan.parties) {
+    if (!p.termId) continue;
+    await db
+      .update(terms)
+      .set({ partyName: p.party, partyColor: p.color })
+      .where(eq(terms.id, p.termId));
+    partiesWritten++;
+  }
+
+  console.log(`\n=== Enrichment Applied ===`);
+  console.log(`Titles written:  ${titlesWritten}`);
+  console.log(`Parties written: ${partiesWritten}`);
+
+  // Stamp source freshness via the single sanctioned helper — only when
+  // this run actually synced rows (AGENTS.md provenance invariant). Was
+  // previously an unconditional stamp that faked freshness on an
+  // empty/failed run. Total covers the base sync plus the enrichment writes.
+  const totalWritten = synced + titlesWritten + partiesWritten;
+  await markSourcesSynced("wikidata", { rowsWritten: totalWritten });
+
+  console.log(`\n=== Sync Complete ===`);
+  console.log(`Total rows written (base + titles + parties): ${totalWritten}`);
 }
 
 main().catch((err) => {
