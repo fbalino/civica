@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /*
- * Chip (component spec v1 §2) — tinted, rounded, SANS, MIXED-CASE.
+ * Chip (component spec v1 §2) — tinted, fully rounded, SANS, MIXED-CASE.
  *
  * Replaces the old mono/uppercase Pill entirely. One component now backs every
  * filter chip, status pill, income/tier tag, AND the Beta tag. Never uppercase,
@@ -72,7 +72,7 @@ function chipStyle(tone: ChipTone, size: ChipSize) {
   const base = {
     display: "inline-flex",
     alignItems: "center",
-    borderRadius: "var(--radius-sm)",
+    borderRadius: "var(--radius-chip)",
     padding: size === "sm" ? "3px 9px" : "4px 11px",
     fontFamily: "var(--font-body)",
     fontSize: size === "sm" ? "var(--text-12)" : "var(--text-13)",

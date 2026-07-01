@@ -181,7 +181,7 @@
 .ds-btn {
   font-family: var(--font-body); font-size: var(--text-14); font-weight: var(--font-weight-medium);
   border: 1px solid var(--color-border-strong); background: var(--color-surface-elevated); color: var(--color-text-primary);
-  padding: var(--space-3) var(--space-5); cursor: pointer; border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-5); cursor: pointer; border-radius: var(--radius-control);
 }
 .ds-btn.primary { background: var(--color-text-primary); color: var(--color-on-accent); border-color: var(--color-text-primary); }
 .ds-btn.accent { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
@@ -190,17 +190,17 @@
 .ds-chip {
   font-family: var(--font-body); font-size: var(--text-13);
   border: 1px solid var(--color-border-default); background: var(--color-surface-elevated);
-  padding: var(--space-2) var(--space-4); border-radius: var(--radius-sm); color: var(--color-text-secondary);
+  padding: var(--space-2) var(--space-4); border-radius: var(--radius-chip); color: var(--color-text-secondary);
 }
 .ds-chip.on { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
 
 .ds-input {
   display: flex; align-items: center; gap: var(--space-3);
   border: 1px solid var(--color-border-default); background: var(--color-surface-elevated);
-  padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-search);
 }
 .ds-input input { border: 0; background: transparent; outline: none; font-family: var(--font-body); font-size: var(--text-14); color: var(--color-text-primary); width: 100%; }
-.ds-input .kbd { border: 1px solid var(--color-border-default); padding: 0 var(--space-2); border-radius: var(--radius-sm); color: var(--color-text-muted); font-family: var(--font-code); font-size: var(--text-12); }
+.ds-input .kbd { border: 1px solid var(--color-border-default); padding: 0 var(--space-2); border-radius: var(--radius-chip); color: var(--color-text-muted); font-family: var(--font-code); font-size: var(--text-12); }
 
 .ds-tabs { display: flex; flex-wrap: wrap; gap: 0 var(--space-6); border-bottom: 1px solid var(--color-border-default); }
 .ds-tabs button { background: transparent; border: 0; padding: var(--space-3) 0; cursor: pointer; color: var(--color-text-muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: var(--font-body); font-size: var(--text-14); }

@@ -39,7 +39,7 @@
   color: color-mix(in oklab, var(--color-status-warning), black 32%);
   padding: 3px 9px;
   border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-chip);
   line-height: 1.2;
   background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
   white-space: nowrap;
@@ -172,7 +172,7 @@
 /* ── Top filter bar (Phase 1 — replaces the retired left rail) ──────
    Horizontal, full-width bar above the leaderboard. Region is a
    segmented control; the four peer lenses are token-styled selects;
-   a canonical rounded-rect country search deep-links to scorecards. */
+   a canonical fully rounded country search deep-links to scorecards. */
 .ci-filter-bar {
   display: flex;
   flex-direction: column;
@@ -217,7 +217,7 @@
 }
 .ci-filter-select {
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   background: var(--color-surface-elevated);
   color: var(--color-text-primary);
   font-family: var(--font-body);
@@ -234,7 +234,7 @@
 .ci-filter-clear {
   align-self: flex-end;
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   background: var(--color-page-bg);
   color: var(--color-text-60);
   font-family: var(--font-body);

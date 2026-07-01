@@ -49,7 +49,7 @@
   width: 100%;
   background: var(--color-select-bg);
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-control);
   padding: var(--space-3) var(--space-4);
   color: var(--color-text-primary);
   font-family: var(--font-body);
@@ -62,6 +62,7 @@
 }
 .contact-textarea {
   min-height: 160px; /* 160px — intentional minimum height, not spacing */
+  border-radius: var(--radius-xl);
   resize: vertical;
 }
 .contact-input::placeholder,

@@ -185,7 +185,13 @@ export function CivicaAIDrawer({
   return (
     <aside
       aria-label="Civica AI assistant"
-      className="factbook-drawer"
+      className={[
+        "factbook-drawer",
+        isEmpty ? "factbook-drawer--input-only" : "",
+        collapsed ? "factbook-drawer--collapsed" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={{
         // Explicit per-state cap. `auto` for empty/collapsed lets the
         // handle + input rows define their own height; `min(560px, …)`
@@ -344,6 +350,7 @@ export function CivicaAIDrawer({
                 style={{
                   background: "none",
                   border: "1px solid var(--color-stat-border)",
+                  borderRadius: "var(--radius-control)",
                   padding: "var(--space-2) var(--space-4)",
                   fontSize: "var(--text-13)",
                   cursor: streaming ? "default" : "pointer",

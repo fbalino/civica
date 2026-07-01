@@ -31,8 +31,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   `.factbook-landing-hero` (full-bleed) are DISTINCT classes. Do NOT merge — the landing
   once reused `.factbook-hero` and inherited the 1280px cap (white gap on wide screens).
 - Heroes share the `--hero-height` token (`clamp(460px,44vw,640px)`); documented in DESIGN.md.
-- Search fields = rounded RECTANGLE `var(--radius-lg)`, never a pill. `radius-full` is
-  circular-controls-only.
+- Controls are fully rounded as of 2026-07-01: buttons use `--radius-control`,
+  chips/pills/badges use `--radius-chip`, and search fields use `--radius-search`.
+  Cards, panels, menus, tables, and article callouts keep their smaller surface radii.
 - **Hydration:** any SVG built with `Math.cos/sin` must round coords to 2 decimals
   (`Math.round(n*100)/100`) so SSR (Node) and the browser serialize identical attrs. Bit
   `HemicycleCover` and `FactbookLegislatureChart`.

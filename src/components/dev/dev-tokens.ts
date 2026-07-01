@@ -254,6 +254,9 @@ export const DEV_TOKEN_GROUPS: DevTokenGroup[] = [
       sz("--radius-xl", "radius-xl", "16px"),
       sz("--radius-2xl", "radius-2xl", "24px"),
       sz("--radius-full", "radius-full", "9999px"),
+      sz("--radius-control", "radius-control", "9999px"),
+      sz("--radius-chip", "radius-chip", "9999px"),
+      sz("--radius-search", "radius-search", "9999px"),
     ],
   },
   {

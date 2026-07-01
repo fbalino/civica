@@ -148,6 +148,9 @@
   --radius-xl: 16px;
   --radius-2xl: 24px;
   --radius-full: 9999px;
+  --radius-control: var(--radius-full);
+  --radius-chip: var(--radius-full);
+  --radius-search: var(--radius-full);
 
   /* --- Surface palette (almanac light) --- */
   --color-bg: #FAF7F2;                 /* Ivory paper */
@@ -615,7 +618,7 @@ a {
   justify-content: center;
   gap: var(--space-3);
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
   padding: 10px 18px;
   font-family: var(--font-body);
   font-size: var(--text-15);
@@ -765,7 +768,7 @@ a {
   padding: var(--space-1);
   background: var(--color-page-bg);
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-control);
 }
 
 .segmented__item {
@@ -774,7 +777,7 @@ a {
   justify-content: center;
   padding: 6px 14px;
   border: none;
-  border-radius: calc(var(--radius-md) - 3px);
+  border-radius: var(--radius-control);
   background: transparent;
   font-family: var(--font-body);
   font-size: var(--text-14);
@@ -1140,7 +1143,7 @@ a {
   font-weight: var(--font-weight-mono);
   font-size: var(--text-12);
   padding: 2px 8px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-chip);
   white-space: nowrap;
 }
 
@@ -1486,7 +1489,7 @@ a {
   color: var(--color-bg);
   border: none;
   padding: 12px 24px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   cursor: pointer;
 }
 
@@ -1620,7 +1623,7 @@ a {
   font-weight: var(--font-weight-mono);
   font-size: var(--text-13);
   padding: 6px 14px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-chip);
   text-decoration: none;
   background: var(--color-card-bg);
   color: var(--color-text-40);
@@ -4106,9 +4109,9 @@ a {
   min-width: 0;
   width: 100%;
   border: 1px solid var(--color-card-border);
-  /* Canonical search shape: rounded RECTANGLE (radius-lg), not a full pill.
-     Owner decision 2026-06-29 — applies to every search box site-wide. */
-  border-radius: var(--radius-lg);
+  /* Canonical search shape: fully rounded via the design-system search token.
+     Owner decision 2026-07-01 — applies to every search box site-wide. */
+  border-radius: var(--radius-search);
   background: var(--color-surface-elevated);
   color: var(--color-text-primary);
   min-height: calc(var(--space-8) - var(--space-1));
@@ -4159,7 +4162,7 @@ a {
 .country-search__shortcut {
   flex: 0 0 auto;
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-chip);
   padding: var(--space-1) var(--space-2);
   color: var(--color-text-muted);
   font-family: var(--font-mono);

@@ -24,6 +24,9 @@ tokens:
     md: var(--radius-md)
     lg: var(--radius-lg)
     xl: var(--radius-xl)
+    control: var(--radius-control)
+    chip: var(--radius-chip)
+    search: var(--radius-search)
   elevation:
     hard: var(--shadow-hard)
     dark: var(--shadow-dark)
@@ -79,7 +82,7 @@ Elevation is restrained: most surfaces use a 1px hairline (`var(--color-border-d
 
 ## Shapes
 
-Use the small radius scale: `var(--radius-sm)` (4px — chips/badges), `var(--radius-md)` (8px — controls), `var(--radius-lg)` (12px — the default for cards, country/data cards, **and search fields**), `var(--radius-xl)` (16px), plus `var(--radius-2xl)` (24px) and `var(--radius-full)` (circular controls only — avatars, dots, spinners).
+Use the radius scale by surface type. Large surfaces use the small print-like scale: `var(--radius-sm)` (4px), `var(--radius-md)` (8px), `var(--radius-lg)` (12px — the default for cards and country/data cards), `var(--radius-xl)` (16px), and `var(--radius-2xl)` (24px). Interactive controls are fully rounded: buttons use `var(--radius-control)`, chips/pills/badges use `var(--radius-chip)`, and search fields use `var(--radius-search)`. `var(--radius-full)` remains the primitive value behind these semantic control tokens and is also used for true circular controls such as avatars, dots, and spinners.
 
 ## Stacking, motion, breakpoints, and header
 
@@ -95,10 +98,10 @@ Prefer shared primitives for new editorial UI:
 - `EditorialPage`
 - `SectionHeader`
 - `Banner`
-- `Chip` (`src/components/editorial/Pill.tsx`, exported as both `Chip` and the legacy `Pill` alias) — the single tinted, rounded (`--radius-sm`), mixed-case, **sans** chip. Tonal variants `neutral / sage / sand / rose / blue / accent` (via `color-mix`). This replaces every old badge/filter/status pill AND the "Beta" tag. Never uppercase-mono. CSS filter chips use `.editorial-chip` + the `.editorial-chip--{sage,sand,rose,blue,accent}` tonal modifiers.
-- `Button` (`src/components/editorial/Button.tsx`) + the `.btn` system: `.btn--primary` (navy fill, white text, auto-inverts in dark via `color: var(--color-page-bg)`, optional trailing `.btn__arrow`), `.btn--secondary` (hairline outline), `.btn--tertiary`, `.btn--text`; sizes `.btn--sm`/`.btn--lg`; states (hover/active/disabled/loading) + focus-visible ring. Use this for all CTAs — no ad-hoc button styling.
+- `Chip` (`src/components/editorial/Pill.tsx`, exported as both `Chip` and the legacy `Pill` alias) — the single tinted, fully rounded (`--radius-chip`), mixed-case, **sans** chip. Tonal variants `neutral / sage / sand / rose / blue / accent` (via `color-mix`). This replaces every old badge/filter/status pill AND the "Beta" tag. Never uppercase-mono. CSS filter chips use `.editorial-chip` + the `.editorial-chip--{sage,sand,rose,blue,accent}` tonal modifiers.
+- `Button` (`src/components/editorial/Button.tsx`) + the `.btn` system: fully rounded `.btn--primary` (navy fill, white text, auto-inverts in dark via `color: var(--color-page-bg)`, optional trailing `.btn__arrow`), `.btn--secondary` (hairline outline), `.btn--tertiary`, `.btn--text`; sizes `.btn--sm`/`.btn--lg`; states (hover/active/disabled/loading) + focus-visible ring. Use this for all CTAs — no ad-hoc button styling.
 - `SegmentedControl` (`src/components/editorial/SegmentedControl.tsx`) — pill/well container with a navy active segment; for mutually-exclusive view toggles.
-- Search fields are **rounded rectangles** (`--radius-lg`, NOT a full pill) with a leading magnifier + Inter placeholder (see `CountrySearchCombobox` / `GlobalSearch`). This is the canonical shape for every search box site-wide (owner decision 2026-06-29).
+- Search fields are **fully rounded** (`--radius-search`) with a leading magnifier + Inter placeholder (see `CountrySearchCombobox` / `GlobalSearch`). This is the canonical shape for every search box site-wide (owner decision 2026-07-01).
 - `DataTable`
 - `SourceDot`
 
