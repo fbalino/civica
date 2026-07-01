@@ -64,6 +64,16 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   (amber); green is reserved for genuinely live feeds.
 - `sources.last_sync_at` is stamped ONLY via `markSourcesSynced()` (enforced by
   `validate:sync-freshness`). Never write it inline.
+- **Robots-crawl-delay syncs can't use a single Vercel cron — shard by day-of-month.**
+  The Wikidata syncs (`sync-officeholders`, `sync-wikidata`) finish in one monthly cron
+  because SPARQL is a bulk endpoint. The CIA World Leaders cabinet sync
+  (`sync-cia-cabinets`) is a page-by-page HTML crawl bound by cia.gov's 10s robots
+  crawl-delay → a full ~230-country pass is 35–45 min (measured 170 min with retries),
+  far past any Vercel function budget (800s Pro max). Fix: the cron runs DAILY and
+  crawls one 28th of the deterministic sorted slug list (`getUTCDate()-1 % 28`, ~9
+  countries, measured 227s), cycling the whole directory monthly. Idempotent
+  (re-matches existing persons, 0 dupes). Any future crawl-delay-bound adapter must
+  shard the same way, not mirror the SPARQL crons' single-monthly-run shape.
 - Rankings dedup is `DISTINCT ON (jurisdiction, fact_key)` (latent today; matters once a
   ranking fact-key gains a 2nd source).
 - Phase F canonical-fact values are human-readable strings ("Liberal Democracy",
