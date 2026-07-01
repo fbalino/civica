@@ -24,6 +24,8 @@
 //   - terms (current)                → current officeholder + start date
 //   - terms.partyName / partyColor   → holder party affiliation (sparse; 11 of 389)
 
+import { titleCaseTitle } from "@/lib/text/title-case";
+
 // ─── Public model (what the renderer consumes) ─────────────────────────────
 
 export type GovBranchKind = "executive" | "legislative" | "judicial" | "other";
@@ -228,7 +230,10 @@ export function buildGovStructure(
     const holder = holderByOffice.get(o.id);
     return {
       id: `office:${o.id}`,
-      title: title ?? o.name,
+      // Display-only title-casing of stored office names (some are raw
+      // lowercase Wikidata labels, e.g. "monarch of Spain"). Never mutates
+      // stored data; safe on already-correct titles. See title-case.ts.
+      title: titleCaseTitle(title ?? o.name),
       holderName: holder?.name,
       sinceYear: holder?.sinceYear,
       party: holder?.party,

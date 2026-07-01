@@ -1,5 +1,6 @@
 import { getLeaderTimeline } from "@/lib/db/queries";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
+import { titleCaseTitle } from "@/lib/text/title-case";
 import { SourceDot } from "@/components/SourceDot";
 import { Chip } from "@/components/editorial/Pill";
 import {
@@ -248,7 +249,7 @@ export async function FactbookLeaders({
     const officeLabel =
       p.offices.length > 1
         ? "Head of state & government"
-        : humanizeSectionLabel(p.offices[0]!.officeName);
+        : titleCaseTitle(p.offices[0]!.officeName);
     const key = `${p.personName}|principal`;
     if (seenTimeline.has(key)) continue;
     seenTimeline.add(key);
@@ -312,7 +313,7 @@ export async function FactbookLeaders({
               const dual = p.offices.length > 1;
               const officeLabel = dual
                 ? "Head of state & government"
-                : humanizeSectionLabel(p.offices[0]!.officeName);
+                : titleCaseTitle(p.offices[0]!.officeName);
               // Earliest principal start for "since" + tenure.
               const startDates = p.offices
                 .map((o) => o.startDate)
@@ -429,7 +430,7 @@ export async function FactbookLeaders({
                           <span className="lead-row-id">
                             <span className="lead-row-name">{name}</span>
                             <span className="lead-row-office">
-                              {humanizeSectionLabel(stint.officeName)}
+                              {titleCaseTitle(stint.officeName)}
                             </span>
                           </span>
                           {stint.partyName ? (
