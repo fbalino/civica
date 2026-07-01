@@ -78,6 +78,18 @@ export const offices = pgTable("offices", {
   isElected: boolean("is_elected"),
   wikidataQid: text("wikidata_qid"),
   reportsToOfficeId: uuid("reports_to_office_id"),
+  /**
+   * Presentation order within a body, preserving the source list order.
+   *
+   * Populated by the CIA World Leaders cabinet sync
+   * (`src/lib/factbook/cia-cabinets-sync.ts`) with the position's index in
+   * the CIA "Leaders and Cabinet Members" list — that order is protocol /
+   * seniority, not alphabetical, so preserving it makes the Government org
+   * chart read correctly. Nullable and additive: legacy offices leave it
+   * null and fall back to the rank sort. NOT pushed in the P4 dry-run round;
+   * staged for the apply pass's `db:push`.
+   */
+  displayOrder: integer("display_order"),
 });
 
 export const persons = pgTable("persons", {

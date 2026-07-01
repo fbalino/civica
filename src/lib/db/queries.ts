@@ -184,7 +184,13 @@ export async function getGovernmentStructure(jurisdictionId: string) {
   const allOffices = await db
     .select()
     .from(offices)
-    .where(sql`${offices.bodyId} IN ${bodyIds}`);
+    .where(sql`${offices.bodyId} IN ${bodyIds}`)
+    // display_order preserves the CIA "World Leaders" list order for cabinet
+    // offices (protocol/seniority, not alphabetical). ASC NULLS LAST in
+    // Postgres, so legacy offices with a null order sort after. The org chart's
+    // sortRoles() re-groups by rank but is a STABLE sort, so within a rank
+    // (e.g. all cabinet ministers) this order is preserved.
+    .orderBy(asc(offices.displayOrder));
 
   const officeIds = allOffices.map((o) => o.id);
   if (officeIds.length === 0)
@@ -217,7 +223,10 @@ export async function getGovernmentHierarchy(jurisdictionId: string) {
   const allOffices = await db
     .select()
     .from(offices)
-    .where(sql`${offices.bodyId} IN ${bodyIds}`);
+    .where(sql`${offices.bodyId} IN ${bodyIds}`)
+    // See getGovernmentStructure: preserve CIA cabinet list order via
+    // display_order (ASC NULLS LAST); stable downstream sorts keep it.
+    .orderBy(asc(offices.displayOrder));
 
   const officeIds = allOffices.map((o) => o.id);
 
@@ -471,7 +480,17 @@ export async function getLeaderTimeline(jurisdictionId: string) {
     deputy_head: 2,
     cabinet: 3,
     legislative_leader: 4,
+    // The stored office_type for chief justices is `judicial_leader`, not
+    // `judicial` — the bare `judicial` key never matched, so chief justices
+    // fell to the `?? 99` "unknown" rank and sorted last. Key on the real
+    // stored value (the legacy `judicial` alias is kept, harmless).
+    judicial_leader: 5,
     judicial: 5,
+    // CIA World Leaders cabinet import (P4) office_type tags — rank after the
+    // legislative/judicial leadership so the Leaders list reads top-down.
+    central_bank: 6,
+    diplomatic: 7,
+    official: 8,
   };
   const rankOf = (t: string | null | undefined) =>
     OFFICE_RANK[t ?? "unknown"] ?? 99;

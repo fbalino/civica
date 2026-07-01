@@ -17,6 +17,24 @@ const SOURCES = [
     isCommercialUseAllowed: true,
     lastSyncAt: new Date("2026-01-23"),
   },
+  // --- P4 — CIA World Leaders directory (cabinet ministers, deputies,
+  //     central-bank governors, and other listed officials) ---
+  // Per plan/gov-p4-cabinets-judiciary-plan-2026-06-30.md §1.6.
+  // A distinct US-federal publication from the Factbook, at a distinct URL
+  // (`/resources/world-leaders/foreign-governments/`), carrying no copyright
+  // notice → public domain, commercial-use OK, attribution to CIA requested
+  // (same posture as `cia_factbook`). Refreshed monthly by the CIA; Civica
+  // re-syncs monthly via `/api/cron/factbook/sync-cia-cabinets`. Stamped
+  // exclusively via `markSourcesSynced("cia_world_leaders", …)`.
+  {
+    id: "cia_world_leaders",
+    name: "CIA World Leaders",
+    baseUrl:
+      "https://www.cia.gov/resources/world-leaders/foreign-governments/",
+    license: "public_domain",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
   {
     id: "wikidata",
     name: "Wikidata",
