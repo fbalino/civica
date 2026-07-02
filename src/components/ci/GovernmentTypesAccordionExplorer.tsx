@@ -34,6 +34,13 @@ type Props = {
     href: string;
     active: boolean;
   }>;
+  /**
+   * When false, the explorer skips its internal breadcrumb + eyebrow +
+   * title + lede so the page.tsx shell can render the canonical
+   * `.editorial-page` header above it (avoids a duplicate H1). The lens
+   * tabs, controls, and taxonomy explainer always render.
+   */
+  renderHeader?: boolean;
 };
 
 type VisibleRow = {
@@ -396,6 +403,7 @@ export function GovernmentTypesAccordionExplorer({
   plotHelper,
   footerLabel,
   lensTabs,
+  renderHeader = true,
 }: Props) {
   const expandableIds = useMemo(
     () => families.filter((family) => family.subtypes.length > 0).map((family) => family.id),
@@ -504,21 +512,28 @@ export function GovernmentTypesAccordionExplorer({
   return (
     <div className="civica-govtypes">
       <section className="page-hero">
-        <div className="breadcrumb">
-          <Link href="/civica-index">← Index</Link> / Government types
-        </div>
-        <div className="page-eyebrow">Empirical observation · not a ranking</div>
-        <h1 className="page-title">
-          How does government type actually correlate with governance outcomes?
-        </h1>
-        <p className="page-lede">
-          The Civica Index does not bake bonuses or penalties into government
-          types. Instead, we publish what the data says: average CI,
-          distribution spread, and long-run trajectory per category — so you can
-          see whether any government type <em>systematically</em> produces
-          better outcomes, or whether individual countries matter more than
-          their system.
-        </p>
+        {renderHeader ? (
+          <>
+            <div className="breadcrumb">
+              <Link href="/civica-index">← Index</Link> / Government types
+            </div>
+            <div className="page-eyebrow">
+              Empirical observation · not a ranking
+            </div>
+            <h1 className="page-title">
+              How does government type actually correlate with governance
+              outcomes?
+            </h1>
+            <p className="page-lede">
+              The Civica Index does not bake bonuses or penalties into government
+              types. Instead, we publish what the data says: average CI,
+              distribution spread, and long-run trajectory per category — so you
+              can see whether any government type <em>systematically</em>{" "}
+              produces better outcomes, or whether individual countries matter
+              more than their system.
+            </p>
+          </>
+        ) : null}
 
         <div className="lens-switcher" role="tablist" aria-label="Government taxonomy lens">
           {lensTabs.map((tab) => (

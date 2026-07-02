@@ -132,6 +132,66 @@
   align-items: center;
 }
 
+/* ── Compact tool header (analytical explorer views) ────────────────
+ *   For interactive tool pages (e.g. /civica-conditions) that need a
+ *   real editorial header — eyebrow → title → dek — but NOT the tall
+ *   full-bleed engraving hero. Smaller title than .editorial-page-title
+ *   so the controls/chart sit high on the page. Composes the shared
+ *   .editorial-eyebrow + .editorial-breadcrumbs for the eyebrow/crumb. */
+
+.editorial-tool-page {
+  max-width: var(--max-w-content, 1200px);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) 80px; /* 80px — no exact token */
+  color: var(--color-text-primary);
+}
+@media (max-width: 480px) {
+  .editorial-tool-page { padding: var(--space-7) 18px 60px; }
+}
+
+.editorial-tool-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-44);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4);
+}
+@media (max-width: 480px) {
+  .editorial-tool-title { font-size: var(--text-32); }
+}
+
+.editorial-tool-dek {
+  font-family: var(--font-body);
+  font-size: var(--text-16);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-relaxed);
+  max-width: 680px; /* 680px — reading measure, no token */
+  margin: 0 0 var(--space-8);
+}
+
+/* ── Tokenized inline filter select ─────────────────────────────────
+ *   Canonical native <select> for compact filter controls inside a
+ *   tool/editorial surface (year, metric, lens, etc.). Sans font,
+ *   control radius, token colors — replaces per-control inline styles. */
+
+.editorial-inline-select {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-14);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-control);
+  background: var(--color-select-bg, var(--color-surface-elevated));
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+.editorial-inline-select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
 /* ── Inline Beta tag for headlines ──────────────────────────────── */
 
 .editorial-beta-tag {

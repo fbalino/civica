@@ -1576,12 +1576,12 @@ a {
 }
 
 .cv-select {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
   font-size: var(--text-14);
   padding: 12px 16px;
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-control);
   background: var(--color-select-bg);
   color: var(--color-text-primary);
   min-width: 200px;

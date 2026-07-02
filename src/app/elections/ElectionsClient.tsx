@@ -109,14 +109,9 @@ export default function ElectionsClient({
   }, [filteredRecent]);
 
   return (
-    <div className="cv-container" style={{ paddingTop: "var(--spacing-hero-top)", paddingBottom: "var(--spacing-section-y)" }}>
-      {/* Hero */}
-      <h1 className="hero-heading">Elections</h1>
-      <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-16)", color: "var(--color-text-40)", marginBottom: "var(--space-7)" }}>
-        Track upcoming and past elections worldwide. Turnout data from IDEA. Results from Wikidata and official sources.
-      </p>
-
-      {/* Stats — matching Index page pattern */}
+    <div className="cv-container" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--spacing-section-y)" }}>
+      {/* Stats — matching Index page pattern. The page hero (title + dek)
+          renders full-bleed above, in the server page.tsx. */}
       <div className="index-stats-row" style={{ marginBottom: "var(--space-7)" }}>
         {[
           { value: stats.electionsThisYear ?? "—", label: `Elections in ${new Date().getFullYear()}` },

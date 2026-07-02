@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { rankCountriesByFact } from "@/lib/db/queries";
 import { RankingTable } from "@/components/RankingTable";
 import { withOg } from "@/lib/og";
+import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { ParallaxImage } from "@/components/motion/ParallaxImage";
 
 export const revalidate = 3600;
 
@@ -90,28 +92,43 @@ export default async function RankingsPage({
   }));
 
   return (
-    <div
-      style={{
-        maxWidth: "var(--max-w-content)",
-        margin: "0 auto",
-        padding: "var(--spacing-section-y) var(--spacing-page-x)",
-      }}
-    >
-      <h1 className="page-heading">
-        Rankings
-      </h1>
-      <p
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-13)",
-          color: "var(--color-text-30)",
-          marginBottom: 40,
-        }}
+    <>
+      {/* Full-bleed engraving hero (homepage idiom). Rendered as a sibling
+          before the page container — matching /compare — so the 100vw breakout
+          reaches the viewport edges with no top-padding gap. Reuses the
+          canonical .factbook-hero-* class family (eyebrow → title → dek). */}
+      <section
+        className="factbook-landing-hero"
+        aria-labelledby="rankings-hero-title"
       >
-        Countries ranked by key indicators.
-      </p>
+        <ParallaxImage
+          className="factbook-hero-art"
+          src="/engravings/hero.webp"
+          darkSrc="/engravings/hero-dark.webp"
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="factbook-hero-scrim" aria-hidden="true" />
+        <HeroReveal className="factbook-hero-inner">
+          <HeroRevealItem className="factbook-hero-eyebrow">
+            Rankings
+          </HeroRevealItem>
+          <HeroRevealItem
+            as="h1"
+            id="rankings-hero-title"
+            className="factbook-hero-title"
+          >
+            Countries ranked by key indicators.
+          </HeroRevealItem>
+          <HeroRevealItem as="p" className="factbook-hero-dek">
+            Global rankings for 250+ countries by population, GDP, area, life
+            expectancy, and literacy &mdash; drawn from Wikidata, the World
+            Bank, and the archived CIA World Factbook.
+          </HeroRevealItem>
+        </HeroReveal>
+      </section>
 
+      <div className="editorial-page editorial-page--full">
       <nav style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", marginBottom: "var(--space-8)" }}>
         {RANKING_METRICS.map((m) => (
           <a
@@ -150,6 +167,7 @@ export default async function RankingsPage({
           No ranking data available. Run the seed scripts to populate.
         </p>
       )}
-    </div>
+      </div>
+    </>
   );
 }

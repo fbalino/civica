@@ -5,6 +5,8 @@ import { elections, jurisdictions } from "@/lib/db/schema";
 import { sql } from "drizzle-orm";
 import ElectionsClient from "./ElectionsClient";
 import { withOg } from "@/lib/og";
+import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { ParallaxImage } from "@/components/motion/ParallaxImage";
 
 export const revalidate = 3600;
 
@@ -53,5 +55,43 @@ export default async function ElectionsPage() {
     console.error("[elections] stats query failed:", err);
   }
 
-  return <ElectionsClient upcoming={upcoming} recent={recent} stats={stats} />;
+  return (
+    <>
+      {/* Full-bleed engraving hero (homepage idiom). Rendered as a sibling
+          before <ElectionsClient> — matching /compare — so the 100vw breakout
+          reaches the viewport edges with no top-padding gap. The stat row and
+          region chips stay beneath the hero, inside the client component. */}
+      <section
+        className="factbook-landing-hero"
+        aria-labelledby="elections-hero-title"
+      >
+        <ParallaxImage
+          className="factbook-hero-art"
+          src="/engravings/hero.webp"
+          darkSrc="/engravings/hero-dark.webp"
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="factbook-hero-scrim" aria-hidden="true" />
+        <HeroReveal className="factbook-hero-inner">
+          <HeroRevealItem className="factbook-hero-eyebrow">
+            Elections
+          </HeroRevealItem>
+          <HeroRevealItem
+            as="h1"
+            id="elections-hero-title"
+            className="factbook-hero-title"
+          >
+            Elections, tracked worldwide.
+          </HeroRevealItem>
+          <HeroRevealItem as="p" className="factbook-hero-dek">
+            Upcoming and past elections, with voter turnout from IDEA and
+            party-colored results from Wikidata and official sources.
+          </HeroRevealItem>
+        </HeroReveal>
+      </section>
+
+      <ElectionsClient upcoming={upcoming} recent={recent} stats={stats} />
+    </>
+  );
 }

@@ -937,77 +937,33 @@ export function OutcomesExplorer({
         }
       `}</style>
 
-      <section
-        style={{
-          maxWidth: "var(--max-w-content)",
-          margin: "0 auto",
-          padding: `var(--spacing-content-top) var(--spacing-page-x) 80px`,
-        }}
-      >
-        {/* Breadcrumb */}
-        <nav
-          aria-label="breadcrumb"
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-            fontSize: "var(--text-12)",
-            color: "var(--color-text-30)",
-            letterSpacing: "var(--tracking-caps)",
-            textTransform: "uppercase",
-            marginBottom: 20,
-            display: "flex",
-            gap: 6,
-            alignItems: "center",
-          }}
-        >
-          <Link
-            href="/"
-            style={{ color: "inherit", textDecoration: "none" }}
-          >
-            Civica
-          </Link>
-          <span>›</span>
-          <Link
-            href="/compare"
-            style={{ color: "inherit", textDecoration: "none" }}
-          >
-            Compare
-          </Link>
-          <span>›</span>
-          <span style={{ color: "var(--color-text-50)" }}>
-            {isConditionsPage ? "Civica Conditions" : "Outcomes"}
-          </span>
+      <section className="editorial-tool-page">
+        {/* Breadcrumb — canonical .editorial-breadcrumbs */}
+        <nav className="editorial-breadcrumbs" aria-label="breadcrumb">
+          <ol className="editorial-breadcrumbs-list">
+            <li className="editorial-breadcrumbs-item">
+              <Link href="/">Civica</Link>
+            </li>
+            <li className="editorial-breadcrumbs-item">
+              <Link href="/compare">Compare</Link>
+            </li>
+            <li className="editorial-breadcrumbs-item">
+              <span aria-current="page">
+                {isConditionsPage ? "Civica Conditions" : "Outcomes"}
+              </span>
+            </li>
+          </ol>
         </nav>
 
-        {/* Page heading */}
-        <h1
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "var(--text-44)",
-            fontWeight: 400,
-            color: "var(--color-text-primary)",
-            lineHeight: "var(--leading-tight)",
-            letterSpacing: "var(--tracking-tight)",
-            marginBottom: 16,
-          }}
-        >
+        {/* Page heading — compact tool header (not the tall hero) */}
+        <h1 className="editorial-tool-title">
           {isConditionsPage
             ? "Civica Conditions: how do material conditions vary across countries?"
             : "How government type relates to country outcomes"}
         </h1>
 
         {/* Dek */}
-        <p
-          className="dek"
-          style={{
-            fontFamily: "var(--font-body-sans)",
-            fontSize: "var(--text-16)",
-            color: "var(--color-text-50)",
-            lineHeight: "var(--leading-relaxed)",
-            maxWidth: 680,
-            marginBottom: 36,
-          }}
-        >
+        <p className="editorial-tool-dek">
           {isConditionsPage
             ? "Material conditions — human development, peace & security, and economic stability — are separate from governance. These charts show how conditions vary across countries and government types. Government type is one filter among many: history, geography, and external factors all matter."
             : "These charts show how country outcomes vary across government types. Differences here reflect history, geography, wealth, and dozens of other factors — not just institutional design. Read these as patterns to investigate, not conclusions."}
@@ -1141,17 +1097,8 @@ export function OutcomesExplorer({
                 aria-label="Select metric"
                 value={metricId}
                 onChange={(e) => handleMetricChange(e.target.value)}
-                style={{
-                  padding: "7px 12px",
-                  background: "var(--color-select-bg, var(--color-surface-elevated))",
-                  color: "var(--color-text-primary)",
-                  border: "1px solid var(--color-card-border)",
-                  borderRadius: "var(--radius-sm)",
-                  fontFamily: "var(--font-body-sans)",
-                  fontSize: "var(--text-14)",
-                  cursor: "pointer",
-                  minWidth: 180,
-                }}
+                className="editorial-inline-select"
+                style={{ minWidth: 180 }}
               >
                 {Array.from(categoryGroups.entries()).map(([cat, catMetrics]) => (
                   <optgroup key={cat} label={cat}>
@@ -1184,17 +1131,8 @@ export function OutcomesExplorer({
               aria-label="Select year"
               value={year}
               onChange={(e) => handleYearChange(parseInt(e.target.value, 10))}
-              style={{
-                padding: "7px 12px",
-                background: "var(--color-select-bg, var(--color-surface-elevated))",
-                color: "var(--color-text-primary)",
-                border: "1px solid var(--color-card-border)",
-                borderRadius: "var(--radius-sm)",
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-14)",
-                cursor: "pointer",
-              }}
+              className="editorial-inline-select"
+              style={{ fontVariantNumeric: "tabular-nums" }}
             >
               {yearOptions.map((y) => (
                 <option key={y} value={y}>
@@ -1228,17 +1166,8 @@ export function OutcomesExplorer({
               onChange={(e) =>
                 handleTaxonomyChange(e.target.value as GovernmentTaxonomyLens)
               }
-              style={{
-                padding: "10px 12px",
-                background: "var(--color-select-bg, var(--color-surface-elevated))",
-                color: "var(--color-text-primary)",
-                border: "1px solid var(--color-card-border)",
-                borderRadius: "var(--radius-sm)",
-                fontFamily: "var(--font-body-sans)",
-                fontSize: "var(--text-14)",
-                cursor: "pointer",
-                width: "100%",
-              }}
+              className="editorial-inline-select"
+              style={{ width: "100%" }}
             >
               <option value="structural">Structural form</option>
               <option value="regime">Regime type</option>

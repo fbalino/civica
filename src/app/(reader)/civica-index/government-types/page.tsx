@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   GovernmentTypesAccordionExplorer,
   type GovernmentTypeFamily,
@@ -402,9 +403,39 @@ export default async function GovernmentTypesPage({
 
   return (
     <>
+      {/* Canonical page header (eyebrow + editorial-page-title). Rendered in
+          the server page above the client explorer, which is passed
+          renderHeader={false} so there is exactly one H1. Aligned to the
+          explorer's 1200px container. */}
+      <header className="govtypes-page-header">
+        <nav className="editorial-breadcrumbs" aria-label="breadcrumb">
+          <ol className="editorial-breadcrumbs-list">
+            <li className="editorial-breadcrumbs-item">
+              <Link href="/civica-index">Civica Index</Link>
+            </li>
+            <li className="editorial-breadcrumbs-item">
+              <span aria-current="page">Government types</span>
+            </li>
+          </ol>
+        </nav>
+        <span className="editorial-eyebrow">
+          Empirical observation · not a ranking
+        </span>
+        <h1 className="editorial-page-title">
+          How does government type correlate with governance outcomes?
+        </h1>
+        <p className="editorial-page-subtitle">
+          The Civica Index bakes in no bonuses or penalties by government type.
+          These panels publish what the data says — average CI, distribution
+          spread, and long-run trajectory per category — so you can judge
+          whether any system systematically produces better outcomes.
+        </p>
+      </header>
+
       <GovernmentTypesAccordionExplorer
         families={families}
         totalCountries={totalCountries}
+        renderHeader={false}
         lensTitle={
           lens === "regime"
             ? "Regime type (Bjørnskov-Rode / CGV)"
