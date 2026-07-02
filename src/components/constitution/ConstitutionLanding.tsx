@@ -109,7 +109,11 @@ export function ConstitutionLanding({
           {featuredTopics.map((t) => (
             <Link
               key={t.key}
-              href={`/constitution?c=${encodeURIComponent(defaultSlug)}#topic-${encodeURIComponent(t.key)}`}
+              // `?topic=` is a real query param the explorer reads on mount to
+              // preselect the cross-reference topic — not a dead `#topic-` hash
+              // (no code ever read the anchor). Kept out of the reading
+              // column's scroll-spy state so it only seeds the compare pane.
+              href={`/constitution?c=${encodeURIComponent(defaultSlug)}&topic=${encodeURIComponent(t.key)}`}
               className="constitution-topic-chip"
             >
               {t.label}

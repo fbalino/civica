@@ -17,7 +17,7 @@
  */
 import { getJurisdictionsBySlugs } from "@/lib/db/queries";
 import { getTopicExcerpts } from "@/lib/db/queries-constitution";
-import { getTopicLabel } from "@/lib/constitute/topics";
+import { getTopicLabel, isKnownTopic } from "@/lib/constitute/topics";
 import { parseCountrySlugs } from "@/lib/constitution/slugs";
 import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
 
@@ -36,6 +36,15 @@ export async function GET(request: Request) {
   if (!topicKey) {
     return Response.json(
       { error: "Missing required `topic` query parameter." },
+      { status: 400 },
+    );
+  }
+
+  // Reject unknown topic keys up front — a bogus key would otherwise return
+  // 200 + an empty set, masking client bugs and inviting cache pollution.
+  if (!isKnownTopic(topicKey)) {
+    return Response.json(
+      { error: `Unknown constitutional topic \`${topicKey}\`.` },
       { status: 400 },
     );
   }

@@ -98,7 +98,7 @@ Things you may notice as the rollout progresses:
 
 ## Where to dig deeper {#dig-deeper}
 
-- Full reconciliation specification: [/factbook/methodology/reconciliation](/factbook/methodology/reconciliation)
+- Full reconciliation specification: [/country/methodology/reconciliation](/country/methodology/reconciliation)
 - Civica Index composite scoring: [/civica-index/methodology](/civica-index/methodology)
 - Civica Pulse event classification: [/civica-index/methodology/pulse](/civica-index/methodology/pulse)
 - Peer grouping and country comparison: [/civica-index/methodology/peer-grouping](/civica-index/methodology/peer-grouping)

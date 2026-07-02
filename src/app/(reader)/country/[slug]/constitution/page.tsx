@@ -1,11 +1,42 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { getJurisdictionBySlug, getSource } from "@/lib/db/queries";
 import { getConstitutionWithArticles } from "@/lib/db/queries-constitution";
 import { ConstitutionReadingColumn } from "@/components/constitution/ConstitutionReadingColumn";
+import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
+
+// Per-tab metadata. The shared layout's generateMetadata sets the Factbook
+// title + /country/[slug] canonical (correct for the base tab); metadata
+// exported from a page shallowly overrides the layout's for the keys it
+// defines, so this tab self-canonicalizes to its own URL/title instead of
+// pointing back at the Factbook tab.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  if (!jurisdiction) return { title: "Country Not Found" };
+  const title = `Constitution of ${jurisdiction.name}`;
+  const description = `Full constitutional text for ${jurisdiction.name}, indexed from the Constitute Project, with topic cross-references.`;
+  const url = `https://civicaatlas.org/country/${slug}/constitution`;
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: withOg({
+      title: `${title} | Civica`,
+      description,
+      url,
+      type: "website",
+    }),
+  };
+}
 
 // Constitution tab of the unified /country/[slug] page. The masthead, tab
 // bar and AI drawer live in the shared layout — this page renders ONLY the

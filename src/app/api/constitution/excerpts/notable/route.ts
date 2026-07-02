@@ -13,7 +13,7 @@
  */
 import { getJurisdictionsBySlugs } from "@/lib/db/queries";
 import { getNotableTopicPeers } from "@/lib/db/queries-constitution";
-import { getTopicLabel } from "@/lib/constitute/topics";
+import { getTopicLabel, isKnownTopic } from "@/lib/constitute/topics";
 import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
 
 export const revalidate = 3600;
@@ -31,6 +31,14 @@ export async function GET(request: Request) {
   if (!topicKey) {
     return Response.json(
       { error: "Missing required `topic` query parameter." },
+      { status: 400 },
+    );
+  }
+
+  // Reject unknown topic keys up front (mirrors /api/constitution/excerpts).
+  if (!isKnownTopic(topicKey)) {
+    return Response.json(
+      { error: `Unknown constitutional topic \`${topicKey}\`.` },
       { status: 400 },
     );
   }

@@ -4,7 +4,7 @@
   src/app/about/page.tsx wraps it via <MarkdownContent>.
 
   IMPORTANT — only the prose sections live here. The "What we do"
-  3-card grid (Factbook / Civica Index / Civica Pulse), the DB-driven
+  3-card grid (Country Profiles / Civica Index / Civica Pulse), the DB-driven
   data-sources grid populated from getAllSources(), and the
   source-dot provenance legend stay in TSX. Edit those there. Edit
   prose HERE.
@@ -34,7 +34,7 @@ The data pipeline has three layers, each addressing a known failure mode in sing
 
 **Reader surfaces.** Every reader-facing page consumes the resolver. Every value renders a *FactValueDot* — a small chevron that opens a panel revealing the canonical pick, every alternate source, freshness dates, and licenses.
 
-For a plain-English walkthrough, see [How we approach data](/methodology/approach). For the deep technical specification, see [Methodology — Reconciliation](/factbook/methodology/reconciliation).
+For a plain-English walkthrough, see [How we approach data](/methodology/approach). For the deep technical specification, see [Methodology — Reconciliation](/country/methodology/reconciliation).
 
 ## Methodology {#methodology}
 

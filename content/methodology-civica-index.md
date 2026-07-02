@@ -79,7 +79,7 @@ for each country:
                 of the 10,000 simulated CIs
 ```
 
-Most academic sources (V-Dem in particular) publish uncertainty information directly. For sources that do not, a conservative ±5% of the normalized range is used as the indicator's spread. This is documented in the replication package.
+Most academic sources (V-Dem in particular) publish uncertainty information directly. For sources that do not, a conservative ±5% of the normalized range is used as the indicator's spread. This will be documented in the replication package (in preparation, targeted for Q3 2026).
 
 ## Section 7 · Missing data {#missing}
 
@@ -134,7 +134,7 @@ Both series are accessible via the API. See §13 for citation format.
 
 **Source lag.** The CI is only as current as its slowest-updating source. Some upstream indices publish 12–18 months behind real-world developments. Quarterly updates partially smooth this, but the Pulse exists specifically to fill the gap between structural updates.
 
-**Coverage gaps.** Some countries have insufficient source coverage to compute even a partial CI. Those pages display "Insufficient data" rather than guess. The list is published in the replication package.
+**Coverage gaps.** Some countries have insufficient source coverage to compute even a partial CI. Those pages display "Insufficient data" rather than guess. The full list will accompany the replication package (in preparation, targeted for Q3 2026).
 
 **Construct narrowing.** By design, the CI measures governing institutions only. If a reader wants to ask "is this country a good place to live?" — a different and broader question — the CI alone does not answer that. Read it together with [Civica Conditions](/civica-conditions).
 
@@ -171,4 +171,4 @@ Every score is open to dispute. Submit data-error corrections, methodology disag
 
 ### 13.3 · Replication
 
-Full codebook, processing logic, source references, and downloadable derived outputs at [/civica-index/replication](/civica-index/replication).
+A full replication package — codebook, processing logic, source references, and downloadable derived outputs — is in preparation, targeted for Q3 2026. Its landing page is at [/civica-index/replication](/civica-index/replication).

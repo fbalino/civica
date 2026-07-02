@@ -256,7 +256,16 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
       }} />
 
       <div
+        role="button"
+        tabIndex={0}
+        aria-expanded={expanded}
         onClick={() => setExpanded(!expanded)}
+        onKeyDown={(ev) => {
+          if (ev.key === "Enter" || ev.key === " ") {
+            ev.preventDefault();
+            setExpanded((prev) => !prev);
+          }
+        }}
         className="cv-card cv-card--interactive"
       >
         {/* Header */}

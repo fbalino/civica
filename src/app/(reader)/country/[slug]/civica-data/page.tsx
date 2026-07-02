@@ -29,9 +29,40 @@ import { CountryJumpSearch } from "@/components/country/CountryJumpSearch";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
+import { withOg } from "@/lib/og";
+import type { Metadata } from "next";
 import "@/app/civica-data.css";
 
 export const revalidate = 3600;
+
+// Per-tab metadata. The shared layout's generateMetadata sets the Factbook
+// title + /country/[slug] canonical (correct for the base tab); metadata
+// exported from a page shallowly overrides the layout's for the keys it
+// defines, so this tab self-canonicalizes to its own URL/title instead of
+// pointing back at the Factbook tab.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
+  if (!jurisdiction) return { title: "Country Not Found" };
+  const title = `${jurisdiction.name} — Civica Index & Governance Data`;
+  const description = `Civica Index score, governance dimensions, legislature, leaders, bills and international memberships for ${jurisdiction.name}.`;
+  const url = `https://civicaatlas.org/country/${slug}/civica-data`;
+  return {
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: withOg({
+      title: `${title} | Civica`,
+      description,
+      url,
+      type: "website",
+    }),
+  };
+}
 
 // Civica Data tab of the unified /country/[slug] page. This is the Civica
 // value-add layer — the governance sections that overlay (rather than

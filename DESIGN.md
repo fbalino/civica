@@ -123,7 +123,7 @@ Page type drives the layout, not the prose length. **Do not default to `width="n
 
 | Page type | Class / prop | Width | Sidebar? | Examples |
 |---|---|---|---|---|
-| Methodology page or methodology subpage | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/factbook/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
+| Methodology page or methodology subpage | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
 | Filterable list / changelog | `<EditorialPage width="wide">` | 960px | No | `/civica-index/changelog`, `/civica-index/pulse-changelog` |
 | Standard product/editorial page | `<EditorialPage width="full">` | 1200px | No | Atlas-scale layouts |
 | Short-form editorial / blog | `<EditorialPage>` (default `width="narrow"`) | 760px | No | Single-topic blog posts, short essays |

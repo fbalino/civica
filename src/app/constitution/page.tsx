@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { withOg } from "@/lib/og";
-import { parseCountrySlugs } from "@/lib/constitution/slugs";
+import { parseCountrySlugs, DEFAULT_MAX_SLUGS } from "@/lib/constitution/slugs";
 import {
   getConstitutionWithArticles,
   getIndexedConstitutionCountries,
 } from "@/lib/db/queries-constitution";
-import { getTopicTaxonomy } from "@/lib/constitute/topics";
+import { getTopicTaxonomy, isKnownTopic } from "@/lib/constitute/topics";
 import { getSource } from "@/lib/db/queries";
 import { ConstitutionExplorerShell } from "@/components/constitution/ConstitutionExplorerShell";
 import { ConstitutionLanding } from "@/components/constitution/ConstitutionLanding";
 
 export const revalidate = 3600;
 
-const MAX_SLUGS = 4;
+const MAX_SLUGS = DEFAULT_MAX_SLUGS;
 
 /** A curated shortlist of recognizable, high-coverage topics for the landing. */
 const FEATURED_TOPIC_KEYS = [
@@ -80,6 +80,13 @@ export default async function ConstitutionPage({
 }) {
   const sp = await searchParams;
   const requestedSlugs = parseCountrySlugs(sp?.c, MAX_SLUGS);
+
+  // `?topic=<key>` preselects the cross-reference pane's topic (e.g. from a
+  // landing "Explore by topic" chip). Passed as a server prop so it's in the
+  // SSR HTML; validated so a bogus key is simply ignored.
+  const rawTopic = Array.isArray(sp?.topic) ? sp.topic[0] : sp?.topic;
+  const initialTopic =
+    typeof rawTopic === "string" && isKnownTopic(rawTopic) ? rawTopic : null;
 
   // Indexed countries + taxonomy are needed in every state.
   const [indexedCountries, constituteSource] = await Promise.all([
@@ -207,6 +214,7 @@ export default async function ConstitutionPage({
         categories={taxonomy.categories}
         leaves={taxonomy.leaves}
         maxSlugs={MAX_SLUGS}
+        initialTopic={initialTopic}
       />
 
       <ConstitutionFooter />

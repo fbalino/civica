@@ -86,12 +86,39 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={
         active ? "editorial-chip editorial-chip--active" : "editorial-chip"
       }
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * A filter row rendered as a semantic <fieldset>/<legend> group (mirrors the
+ * canonical AlmanacFilters pattern) so screen readers announce the group name
+ * before its chips. Chips carry aria-pressed via <FilterChip>.
+ */
+function FilterFieldset({
+  legend,
+  children,
+}: {
+  legend: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <fieldset className="editorial-filter-row">
+      <legend className="editorial-filter-label">{legend}</legend>
+      <div
+        className="editorial-filter-group"
+        role="group"
+        aria-label={`Filter by ${legend.toLowerCase()}`}
+      >
+        {children}
+      </div>
+    </fieldset>
   );
 }
 
@@ -271,8 +298,7 @@ export function DisputesFilterClient({
       </p>
 
       <div className="editorial-filter-bar">
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Sort</span>
+        <FilterFieldset legend="Sort">
           {(["severity", "age", "oldest"] as DisputeSortKey[]).map((s) => (
             <FilterChip
               key={s}
@@ -285,10 +311,9 @@ export function DisputesFilterClient({
               {SORT_LABELS[s]}
             </FilterChip>
           ))}
-        </div>
+        </FilterFieldset>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Status</span>
+        <FilterFieldset legend="Status">
           <FilterChip
             onClick={() => {
               setStatusBucket(undefined);
@@ -310,10 +335,9 @@ export function DisputesFilterClient({
               {PUBLIC_DISPUTE_STATUS_LABELS[s]}
             </FilterChip>
           ))}
-        </div>
+        </FilterFieldset>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Severity</span>
+        <FilterFieldset legend="Severity">
           <FilterChip
             onClick={() => {
               setSeverityBucket(undefined);
@@ -335,10 +359,9 @@ export function DisputesFilterClient({
               {SEVERITY_BUCKET_LABELS[b]}
             </FilterChip>
           ))}
-        </div>
+        </FilterFieldset>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Kind</span>
+        <FilterFieldset legend="Kind">
           <FilterChip
             onClick={() => {
               setKind(undefined);
@@ -360,10 +383,9 @@ export function DisputesFilterClient({
               {label}
             </FilterChip>
           ))}
-        </div>
+        </FilterFieldset>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Group</span>
+        <FilterFieldset legend="Group">
           <FilterChip
             onClick={() => {
               setGroup(undefined);
@@ -385,11 +407,10 @@ export function DisputesFilterClient({
               {g}
             </FilterChip>
           ))}
-        </div>
+        </FilterFieldset>
 
         {distributions.factKeys.length > 0 ? (
-          <div className="editorial-filter-row">
-            <span className="editorial-filter-label">Fact-key</span>
+          <FilterFieldset legend="Fact-key">
             <FilterChip
               onClick={() => {
                 setFactKey(undefined);
@@ -411,12 +432,11 @@ export function DisputesFilterClient({
                 {fk.value} ({fk.count})
               </FilterChip>
             ))}
-          </div>
+          </FilterFieldset>
         ) : null}
 
         {distributions.sourcePairs.length > 0 ? (
-          <div className="editorial-filter-row">
-            <span className="editorial-filter-label">Source pair</span>
+          <FilterFieldset legend="Source pair">
             <FilterChip
               onClick={() => {
                 setSourcePair(undefined);
@@ -438,11 +458,10 @@ export function DisputesFilterClient({
                 {sp.label} ({sp.count})
               </FilterChip>
             ))}
-          </div>
+          </FilterFieldset>
         ) : null}
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Age</span>
+        <FilterFieldset legend="Age">
           <FilterChip
             onClick={() => {
               setAgeBucket(undefined);
@@ -464,7 +483,7 @@ export function DisputesFilterClient({
               {b}
             </FilterChip>
           ))}
-        </div>
+        </FilterFieldset>
       </div>
 
       {slice.length === 0 ? (

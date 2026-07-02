@@ -28,6 +28,7 @@ function FilterChip({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={
         active ? "editorial-chip editorial-chip--active" : "editorial-chip"
       }
@@ -87,117 +88,142 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
   return (
     <>
       <div className="editorial-filter-bar">
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Country</span>
-          <FilterChip
-            onClick={() => {
-              setCountry(undefined);
-              resetPage();
-            }}
-            active={!country}
+        <fieldset className="editorial-filter-row">
+          <legend className="editorial-filter-label">Country</legend>
+          <div
+            className="editorial-filter-group"
+            role="group"
+            aria-label="Filter by country"
           >
-            All countries
-          </FilterChip>
-          {country ? (
             <FilterChip
               onClick={() => {
                 setCountry(undefined);
                 resetPage();
               }}
-              active
+              active={!country}
             >
-              {countries.find((c) => c.slug === country)?.name ?? country} ✕
+              All countries
             </FilterChip>
-          ) : null}
-          <select
-            className="editorial-filter-select"
-            value={country ?? ""}
-            onChange={(e) => {
-              const next = e.target.value;
-              setCountry(next === "" ? undefined : next);
-              resetPage();
-            }}
+            {country ? (
+              <FilterChip
+                onClick={() => {
+                  setCountry(undefined);
+                  resetPage();
+                }}
+                active
+              >
+                {countries.find((c) => c.slug === country)?.name ?? country} ✕
+              </FilterChip>
+            ) : null}
+            <select
+              className="editorial-filter-select"
+              aria-label="Pick a country"
+              value={country ?? ""}
+              onChange={(e) => {
+                const next = e.target.value;
+                setCountry(next === "" ? undefined : next);
+                resetPage();
+              }}
+            >
+              <option value="">— pick country —</option>
+              {countries.map((c) => (
+                <option key={c.slug} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset className="editorial-filter-row">
+          <legend className="editorial-filter-label">Dimension</legend>
+          <div
+            className="editorial-filter-group"
+            role="group"
+            aria-label="Filter by dimension"
           >
-            <option value="">— pick country —</option>
-            {countries.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.name}
-              </option>
+            <FilterChip
+              onClick={() => {
+                setDimension(undefined);
+                resetPage();
+              }}
+              active={!dimension}
+            >
+              All
+            </FilterChip>
+            {PULSE_DIMENSIONS.map((d) => (
+              <FilterChip
+                key={d}
+                onClick={() => {
+                  setDimension(d);
+                  resetPage();
+                }}
+                active={dimension === d}
+              >
+                {DIMENSION_LABELS[d]}
+              </FilterChip>
             ))}
-          </select>
-        </div>
+          </div>
+        </fieldset>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Dimension</span>
-          <FilterChip
-            onClick={() => {
-              setDimension(undefined);
-              resetPage();
-            }}
-            active={!dimension}
+        <fieldset className="editorial-filter-row">
+          <legend className="editorial-filter-label">Severity</legend>
+          <div
+            className="editorial-filter-group"
+            role="group"
+            aria-label="Filter by severity"
           >
-            All
-          </FilterChip>
-          {PULSE_DIMENSIONS.map((d) => (
             <FilterChip
-              key={d}
               onClick={() => {
-                setDimension(d);
+                setSeverity(undefined);
                 resetPage();
               }}
-              active={dimension === d}
+              active={!severity}
             >
-              {DIMENSION_LABELS[d]}
+              Any
             </FilterChip>
-          ))}
-        </div>
+            {Object.entries(SEVERITY_TIER_LABELS).map(([key, label]) => (
+              <FilterChip
+                key={key}
+                onClick={() => {
+                  setSeverity(key);
+                  resetPage();
+                }}
+                active={severity === key}
+              >
+                {label}
+              </FilterChip>
+            ))}
+          </div>
+        </fieldset>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Severity</span>
-          <FilterChip
-            onClick={() => {
-              setSeverity(undefined);
-              resetPage();
-            }}
-            active={!severity}
+        <fieldset className="editorial-filter-row">
+          <legend className="editorial-filter-label">Status</legend>
+          <div
+            className="editorial-filter-group"
+            role="group"
+            aria-label="Filter by status"
           >
-            Any
-          </FilterChip>
-          {Object.entries(SEVERITY_TIER_LABELS).map(([key, label]) => (
             <FilterChip
-              key={key}
               onClick={() => {
-                setSeverity(key);
+                setShowReview(false);
                 resetPage();
               }}
-              active={severity === key}
+              active={!showReview}
             >
-              {label}
+              Published only
             </FilterChip>
-          ))}
-        </div>
-
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Status</span>
-          <FilterChip
-            onClick={() => {
-              setShowReview(false);
-              resetPage();
-            }}
-            active={!showReview}
-          >
-            Published only
-          </FilterChip>
-          <FilterChip
-            onClick={() => {
-              setShowReview(true);
-              resetPage();
-            }}
-            active={showReview}
-          >
-            Show review queue
-          </FilterChip>
-        </div>
+            <FilterChip
+              onClick={() => {
+                setShowReview(true);
+                resetPage();
+              }}
+              active={showReview}
+            >
+              Show review queue
+            </FilterChip>
+          </div>
+        </fieldset>
       </div>
 
       <div className="editorial-results-header-block">

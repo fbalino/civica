@@ -330,6 +330,37 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
       ? detail.value.toLocaleString(undefined, { maximumFractionDigits: 1 })
       : detail.value.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
+  // Dialog a11y — mirrors MapExplorerModal / FactbookLightbox: Escape to close,
+  // move focus into the panel on open, restore focus to the previously-focused
+  // element (the dot/row the user activated) on close. No body-scroll lock: the
+  // desktop variant is a side rail that coexists with the scrollable map.
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+  useEffect(() => {
+    const previouslyFocused =
+      typeof document !== "undefined"
+        ? (document.activeElement as HTMLElement | null)
+        : null;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    closeRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      // Restore focus only if it's still inside the (now-closing) panel, so we
+      // don't yank focus away from wherever the user has since moved.
+      const active = document.activeElement;
+      if (
+        previouslyFocused &&
+        (!active || panelRef.current?.contains(active as Node)) &&
+        typeof previouslyFocused.focus === "function"
+      ) {
+        previouslyFocused.focus();
+      }
+    };
+  }, [onClose]);
+
   const panelStyle: React.CSSProperties = isDesktop
     ? {
         position: "fixed",
@@ -378,7 +409,13 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
           }}
         />
       )}
-      <div style={panelStyle}>
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="outcomes-detail-title"
+        style={panelStyle}
+      >
         <div
           style={{
             display: "flex",
@@ -388,6 +425,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
           }}
         >
           <h2
+            id="outcomes-detail-title"
             style={{
               fontFamily: "var(--font-heading)",
               fontSize: "var(--text-24)",
@@ -400,6 +438,7 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
             {detail.countryName}
           </h2>
           <button
+            ref={closeRef}
             type="button"
             onClick={onClose}
             aria-label="Close panel"

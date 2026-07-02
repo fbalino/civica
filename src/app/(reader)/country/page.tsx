@@ -50,5 +50,8 @@ export default async function CountryIndexPage() {
     // DB not connected — render the shell; the almanac degrades to empty.
   }
 
+  // FactbookAlmanac seeds shareable region/filter URL state client-side from
+  // window.location (NOT useSearchParams) so this route stays statically
+  // exported with the full index in the HTML — no Suspense/CSR bailout.
   return <FactbookAlmanac countries={countries} />;
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Reveal, HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
@@ -95,13 +96,109 @@ function indexLetter(name: string): string {
   return c >= "A" && c <= "Z" ? c : "#";
 }
 
+/* ── URL <-> filter state ────────────────────────────────────────────────
+   Filters sync to the query string so a filtered view is shareable and
+   survives reload (finding #29). The hero region quick-filter uses `?region=`
+   (a RegionKey); each advanced-filter category uses a repeated param whose
+   values are the canonical human-readable strings (they contain commas, so
+   repeated params — not comma-joined — is the safe encoding). */
+const VALID_REGION_KEYS: ReadonlySet<RegionKey> = new Set([
+  "all",
+  "africa",
+  "americas",
+  "asia",
+  "europe",
+  "oceania",
+]);
+
+/** Query-param name per advanced-filter category. */
+const FILTER_PARAM: Record<FilterCategory, string> = {
+  region: "f_region",
+  income: "f_income",
+  regime: "f_regime",
+  tier: "f_tier",
+};
+const FILTER_CATEGORIES: FilterCategory[] = [
+  "region",
+  "income",
+  "regime",
+  "tier",
+];
+
+/** Parse `?region=` into a RegionKey (defaults to "all"). */
+function regionFromParams(params: URLSearchParams): RegionKey {
+  const raw = params.get("region");
+  return raw && VALID_REGION_KEYS.has(raw as RegionKey)
+    ? (raw as RegionKey)
+    : "all";
+}
+
+/** Parse the repeated advanced-filter params into a FilterState. */
+function filtersFromParams(params: URLSearchParams): FilterState {
+  const next: FilterState = {
+    region: new Set(params.getAll(FILTER_PARAM.region)),
+    income: new Set(params.getAll(FILTER_PARAM.income)),
+    regime: new Set(params.getAll(FILTER_PARAM.regime)),
+    tier: new Set(params.getAll(FILTER_PARAM.tier)),
+  };
+  return next;
+}
+
+/** Serialize region + filters into a query string (stable order). */
+function buildQuery(region: RegionKey, filters: FilterState): string {
+  const params = new URLSearchParams();
+  if (region !== "all") params.set("region", region);
+  for (const cat of FILTER_CATEGORIES) {
+    for (const value of filters[cat]) params.append(FILTER_PARAM[cat], value);
+  }
+  return params.toString();
+}
+
 export function FactbookAlmanac({
   countries,
 }: {
   countries: ReadonlyArray<FactbookAlmanacCountry>;
 }) {
+  const router = useRouter();
+
+  // SSR/static HTML renders the FULL unfiltered index (SEO: /country is a
+  // statically-exported page and must ship all 253 entries in the HTML).
+  // Shareable URL state is seeded CLIENT-SIDE from window.location on mount —
+  // deliberately NOT useSearchParams(), which forces a Suspense/CSR bailout
+  // that would put only a fallback into the static shell (broke `next build`).
   const [region, setRegion] = useState<RegionKey>("all");
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTER_STATE);
+
+  // Seed once from the URL (deep links / reloads). Declared BEFORE the
+  // write-back effect so mount ordering guarantees the seeded state never
+  // rewrites the URL it came from (the write-back equality check no-ops).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if ([...params.keys()].length === 0) return;
+    const seededRegion = regionFromParams(params);
+    const seededFilters = filtersFromParams(params);
+    if (seededRegion !== "all") setRegion(seededRegion);
+    if (totalActiveFilters(seededFilters) > 0) setFilters(seededFilters);
+  }, []);
+
+  // Write region/filter changes back to the URL (replace, no scroll jump, no
+  // history spam). Skip the very first run so we don't rewrite the URL the
+  // state was just seeded from.
+  const didMount = useRef(false);
+  useEffect(() => {
+    if (!didMount.current) {
+      didMount.current = true;
+      return;
+    }
+    const query = buildQuery(region, filters);
+    const current = new URLSearchParams(window.location.search).toString();
+    if (query === current) return;
+    router.replace(query ? `?${query}` : "?", { scroll: false });
+    // Intentionally exclude router from deps: this effect fires on
+    // user-driven region/filter changes only, and reads the current URL
+    // directly from window.location at fire time.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [region, filters]);
 
   const toggleFilter = useCallback(
     (category: FilterCategory, value: string) => {

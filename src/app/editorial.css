@@ -521,6 +521,27 @@
   gap: var(--space-3);
   flex-wrap: wrap;
 }
+/* A11y: filter rows are semantic <fieldset>s grouping their chips, mirroring
+   the canonical AlmanacFilters pattern. Strip the browser's default fieldset
+   chrome so the row lays out exactly like the legacy plain-<div> rows. */
+fieldset.editorial-filter-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+/* The chip group inside a filter fieldset — a role="group" flex container so
+   the legend can sit inline beside the chips. */
+.editorial-filter-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
 .editorial-filter-label {
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
@@ -529,6 +550,14 @@
   letter-spacing: 0.06em; /* 0.06em — no exact token */
   text-transform: uppercase;
   min-width: 80px; /* 80px — intentional min-width, not spacing */
+}
+/* A <legend> reused as the row label. Legends render as a block by default and
+   don't shrink to content; inline-block + zero float keeps it beside its chips
+   inside the flex fieldset with the same typographic treatment. */
+legend.editorial-filter-label {
+  display: inline-block;
+  padding: 0;
+  width: auto;
 }
 @media (max-width: 480px) {
   .editorial-filter-label { min-width: 0; }

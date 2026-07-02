@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
 import { getTopicLabel } from "@/lib/constitute/topics";
+import { sanitizeConstitutionHtml } from "@/lib/constitution/sanitize-html";
 import type { TopicExcerptCountry } from "@/lib/db/queries-constitution";
 import { ConstitutionTopicPicker } from "./ConstitutionTopicPicker";
 import type { TopicCategory, TopicLeaf } from "@/lib/constitute/topics";
@@ -19,6 +20,11 @@ interface ConstitutionCrossReferencePaneProps {
   activeArticleTopics: string[];
   /** Whether the reader has peers to compare (slugs.length > 1). */
   hasPeers: boolean;
+  /**
+   * A topic to preselect on mount (from `?topic=` — e.g. a landing "Explore by
+   * topic" chip). Already validated against the taxonomy by the caller.
+   */
+  initialTopic?: string | null;
 }
 
 /**
@@ -34,30 +40,54 @@ export function ConstitutionCrossReferencePane({
   primary,
   activeArticleTopics,
   hasPeers,
+  initialTopic = null,
 }: ConstitutionCrossReferencePaneProps) {
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  // Seed from `?topic=` so a landing "Explore by topic" chip lands directly on
+  // the chosen topic. Lazy initializer so it applies on first render (SSR +
+  // hydration) rather than after an effect.
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(
+    () => initialTopic,
+  );
   const [countries, setCountries] = useState<TopicExcerptCountry[]>([]);
   const [notable, setNotable] = useState<TopicExcerptCountry[]>([]);
   const [loading, setLoading] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   // Fetch excerpts whenever the topic or the peer set changes.
+  //
+  // Race guard: rapid topic switching (e.g. clicking chips) fires overlapping
+  // requests. Without a guard, a slow response for an *older* topic can resolve
+  // after a newer one and overwrite the pane with stale content. `signal`
+  // aborts the superseded request's fetch; `isCurrent()` is a belt-and-braces
+  // generation check so even a response that lands between abort and the next
+  // effect run can't commit stale state.
   const fetchExcerpts = useCallback(
-    async (topic: string, currentSlugs: string[]) => {
+    async (
+      topic: string,
+      currentSlugs: string[],
+      signal: AbortSignal,
+      isCurrent: () => boolean,
+    ) => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
         params.set("topic", topic);
         for (const s of currentSlugs) params.append("c", s);
-        const res = await fetch(`/api/constitution/excerpts?${params.toString()}`);
+        const res = await fetch(
+          `/api/constitution/excerpts?${params.toString()}`,
+          { signal },
+        );
         if (!res.ok) {
-          setCountries([]);
-          setNotable([]);
+          if (isCurrent()) {
+            setCountries([]);
+            setNotable([]);
+          }
           return;
         }
         const data = (await res.json()) as {
           countries: TopicExcerptCountry[];
         };
+        if (!isCurrent()) return;
         setCountries(data.countries ?? []);
 
         // When only the primary is selected, ALSO fetch notable peers so the
@@ -67,23 +97,29 @@ export function ConstitutionCrossReferencePane({
             `/api/constitution/excerpts/notable?topic=${encodeURIComponent(
               topic,
             )}&exclude=${encodeURIComponent(currentSlugs[0] ?? "")}`,
+            { signal },
           );
           if (notableRes.ok) {
             const nd = (await notableRes.json()) as {
               countries: TopicExcerptCountry[];
             };
-            setNotable(nd.countries ?? []);
-          } else {
+            if (isCurrent()) setNotable(nd.countries ?? []);
+          } else if (isCurrent()) {
             setNotable([]);
           }
-        } else {
+        } else if (isCurrent()) {
           setNotable([]);
         }
-      } catch {
-        setCountries([]);
-        setNotable([]);
+      } catch (err) {
+        // An aborted fetch throws AbortError — that's expected on supersession,
+        // so leave state untouched; only surface real failures.
+        if ((err as { name?: string })?.name === "AbortError") return;
+        if (isCurrent()) {
+          setCountries([]);
+          setNotable([]);
+        }
       } finally {
-        setLoading(false);
+        if (isCurrent()) setLoading(false);
       }
     },
     [],
@@ -95,7 +131,18 @@ export function ConstitutionCrossReferencePane({
       setNotable([]);
       return;
     }
-    void fetchExcerpts(selectedTopic, slugs);
+    const controller = new AbortController();
+    let active = true;
+    void fetchExcerpts(
+      selectedTopic,
+      slugs,
+      controller.signal,
+      () => active,
+    );
+    return () => {
+      active = false;
+      controller.abort();
+    };
   }, [selectedTopic, slugs, fetchExcerpts]);
 
   const selectTopic = (key: string) => {
@@ -264,7 +311,12 @@ function ExcerptCard({
             ) : null}
             <div
               className="constitution-xref-excerpt-text"
-              dangerouslySetInnerHTML={{ __html: ex.excerptHtml }}
+              // Constitute-derived excerpt HTML, passed through the allowlist
+              // sanitizer at this render seam (preserves ids/classes/data-*,
+              // drops scripts/handlers) as defense-in-depth.
+              dangerouslySetInnerHTML={{
+                __html: sanitizeConstitutionHtml(ex.excerptHtml),
+              }}
             />
           </div>
         ))}

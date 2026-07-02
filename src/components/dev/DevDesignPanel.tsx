@@ -179,27 +179,32 @@ export function DevDesignPanel({
       <div className="dev-panel__body">
         {DEV_TOKEN_GROUPS.map((group) => (
           <section key={group.id} className="dev-panel__section">
-            <button
-              type="button"
-              className="dev-panel__section-head"
-              onClick={() =>
-                setOpenSections((s) => ({ ...s, [group.id]: !s[group.id] }))
-              }
-            >
-              <span className="dev-panel__caret" aria-hidden>
-                {openSections[group.id] ? "▾" : "▸"}
-              </span>
-              <span className="dev-panel__section-title">{group.title}</span>
-              <span
+            {/* Two sibling buttons (toggle + reset) inside a flex row — not a
+                <span onClick> nested in a <button>, which is invalid
+                interactive nesting and keyboard-unreachable. */}
+            <div className="dev-panel__section-head">
+              <button
+                type="button"
+                className="dev-panel__section-toggle"
+                aria-expanded={Boolean(openSections[group.id])}
+                onClick={() =>
+                  setOpenSections((s) => ({ ...s, [group.id]: !s[group.id] }))
+                }
+              >
+                <span className="dev-panel__caret" aria-hidden>
+                  {openSections[group.id] ? "▾" : "▸"}
+                </span>
+                <span className="dev-panel__section-title">{group.title}</span>
+              </button>
+              <button
+                type="button"
                 className="dev-panel__section-reset"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  resetSection(group.id);
-                }}
+                aria-label={`Reset ${group.title}`}
+                onClick={() => resetSection(group.id)}
               >
                 reset
-              </span>
-            </button>
+              </button>
+            </div>
 
             {openSections[group.id] && (
               <div className="dev-panel__rows">

@@ -7,6 +7,7 @@ import {
   buildArticleNav,
   type RenderableSection,
 } from "@/lib/constitution/article-nav";
+import { sanitizeConstitutionHtml } from "@/lib/constitution/sanitize-html";
 import type { ConstitutionDetail } from "@/lib/db/queries-constitution";
 
 interface ConstitutionReadingColumnProps {
@@ -39,6 +40,15 @@ export function ConstitutionReadingColumn({
     () => buildArticleNav(constitution.articles),
     [constitution.articles],
   );
+
+  // Sanitize each section's Constitute HTML once (allowlist — preserves ids,
+  // classes and data-* the reader depends on; drops scripts/handlers). Keyed
+  // by DOM id so scroll-spy stays aligned.
+  const sanitizedByDomId = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const s of sections) m.set(s.domId, sanitizeConstitutionHtml(s.html));
+    return m;
+  }, [sections]);
 
   // Scroll-spy across every section DOM id (parts + articles).
   const sectionIds = useMemo(() => sections.map((s) => s.domId), [sections]);
@@ -160,9 +170,13 @@ export function ConstitutionReadingColumn({
               className={`constitution-section${
                 section.partId ? " constitution-section--part" : ""
               }`}
-              // Section HTML is sourced from our own DB (parsed Constitute
-              // text at ingest time), not user input — safe to render.
-              dangerouslySetInnerHTML={{ __html: section.html }}
+              // Section HTML is Constitute-derived (parsed at ingest), passed
+              // through an allowlist sanitizer at this render seam as a
+              // defense-in-depth measure against stored HTML that could later
+              // carry markup we don't trust.
+              dangerouslySetInnerHTML={{
+                __html: sanitizedByDomId.get(section.domId) ?? "",
+              }}
             />
           ))}
         </article>

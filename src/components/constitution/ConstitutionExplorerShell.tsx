@@ -18,6 +18,11 @@ interface ConstitutionExplorerShellProps {
   categories: TopicCategory[];
   leaves: TopicLeaf[];
   maxSlugs: number;
+  /**
+   * A topic to preselect in the cross-reference pane on mount (from the page's
+   * validated `?topic=` param — e.g. a landing "Explore by topic" chip).
+   */
+  initialTopic?: string | null;
 }
 
 /**
@@ -34,6 +39,7 @@ export function ConstitutionExplorerShell({
   categories,
   leaves,
   maxSlugs,
+  initialTopic = null,
 }: ConstitutionExplorerShellProps) {
   const [activeArticleTopics, setActiveArticleTopics] = useState<string[]>([]);
 
@@ -72,6 +78,7 @@ export function ConstitutionExplorerShell({
           }}
           activeArticleTopics={activeArticleTopics}
           hasPeers={hasPeers}
+          initialTopic={initialTopic}
         />
       </div>
     </div>
