@@ -223,9 +223,9 @@ export async function getTopicExcerpts(
 
 /**
  * The set of jurisdictions with a fully-indexed constitution (structured
- * articles present). ~186 of 253. Ordered by population desc then name so the
- * picker's default view surfaces the most-searched countries first, matching
- * `getAllJurisdictions`. Returns [] on error.
+ * articles present). ~186 of 253. Ordered by population desc then name here;
+ * the constitution page re-sorts alphabetically for display, so this ordering
+ * is only the raw fetch order. Returns [] on error.
  */
 export async function getIndexedConstitutionCountries(): Promise<
   IndexedConstitutionCountry[]

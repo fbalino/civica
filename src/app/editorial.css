@@ -1954,21 +1954,18 @@ legend.editorial-filter-label {
   text-decoration: underline;
 }
 
-/* ── 3-pane grid ────────────────────────────────────────────────────── */
+/* ── Explorer grid — three zones (outline · reading · compare) ────────
+ *
+ * The outline is the reading column's OWN sticky nav (`.constitution-reader-
+ * nav`), so the page reads as three zones with only two top-level grid tracks:
+ * the reading column (which carries the outline) and the compare pane. Country
+ * management lives in the page header (`.constitution-country-bar`), not a pane;
+ * the width the old picker pane used is given back to the reading column. */
 .constitution-explorer {
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: var(--space-7);
   align-items: start;
-}
-.constitution-explorer-left {
-  position: sticky;
-  top: 72px;
-  align-self: start;
-  max-height: calc(100vh - 88px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  min-width: 0;
 }
 .constitution-explorer-middle {
   min-width: 0;
@@ -1983,76 +1980,55 @@ legend.editorial-filter-label {
   min-width: 0;
 }
 
-/* ── LEFT: country picker ───────────────────────────────────────────── */
-.constitution-picker-head {
+/* ── Header: country chips + add-popover ──────────────────────────────
+ *
+ * One tonal chip per selected country (first = "Reading"); "+ Add country"
+ * opens a searchable anchored popover. The popover mirrors the almanac filter
+ * dropdown interaction (`.almanac-dd__*` in factbook.css) but keeps its own
+ * `.constitution-add__*` classes so constitution styles stay self-contained. */
+.constitution-country-bar {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-}
-.constitution-picker-title {
-  font-family: var(--font-heading);
-  font-size: var(--text-18);
-  font-weight: 400;
-  margin: 0;
-  color: var(--color-text-primary);
-}
-.constitution-picker-count {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wide);
-  color: var(--color-text-30);
-  margin: 0;
-}
-.constitution-picker-selected {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-}
-.constitution-picker-chip {
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.constitution-country-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-chip);
   background: var(--color-card-bg);
+  font-family: var(--font-body);
   font-size: var(--text-13);
 }
-.constitution-picker-chip--primary {
+.constitution-country-chip--reading {
   border-color: color-mix(in oklab, var(--color-accent) 45%, transparent);
   background: color-mix(in oklab, var(--color-accent) 8%, var(--color-card-bg));
 }
-.constitution-picker-chip-flag {
+.constitution-country-chip__flag {
   display: inline-flex;
   flex-shrink: 0;
 }
-.constitution-picker-chip-name {
-  font-family: var(--font-body);
+.constitution-country-chip__name {
   color: var(--color-text-primary);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
-.constitution-picker-chip-role {
+.constitution-country-chip__role {
   font-family: var(--font-body);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wide);
+  font-size: var(--text-11, 11px);
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
   color: var(--color-accent);
-  margin-left: auto;
 }
-.constitution-picker-chip-remove {
+.constitution-country-chip__x {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-left: var(--space-2);
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   padding: 0;
   border: none;
   background: transparent;
@@ -2060,11 +2036,48 @@ legend.editorial-filter-label {
   cursor: pointer;
   border-radius: var(--radius-full);
 }
-.constitution-picker-chip-remove:hover {
+.constitution-country-chip__x:hover {
   color: var(--color-accent);
   background: color-mix(in oklab, var(--color-accent) 10%, transparent);
 }
-.constitution-picker-search {
+
+.constitution-add {
+  position: relative;
+}
+.constitution-add__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px dashed var(--color-card-border);
+  border-radius: var(--radius-chip);
+  background: transparent;
+  color: var(--color-text-50);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.constitution-add__trigger:hover,
+.constitution-add__trigger[aria-expanded="true"] {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.constitution-add__menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 30;
+  width: 300px;
+  max-width: min(300px, 90vw);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg); /* menus keep surface radii */
+  background: var(--color-bg);
+  box-shadow: var(--shadow-hard-lg);
+}
+.constitution-add__search {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -2072,18 +2085,18 @@ legend.editorial-filter-label {
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-search);
   background: var(--color-card-bg);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
 }
-.constitution-picker-search:focus-within {
+.constitution-add__search:focus-within {
   border-color: color-mix(in oklab, var(--color-accent) 40%, var(--color-card-border));
 }
-.constitution-picker-search-icon {
+.constitution-add__search-icon {
   width: 15px;
   height: 15px;
   color: var(--color-text-30);
   flex-shrink: 0;
 }
-.constitution-picker-search input {
+.constitution-add__search input {
   flex: 1;
   min-width: 0;
   border: none;
@@ -2093,79 +2106,63 @@ legend.editorial-filter-label {
   color: var(--color-text-primary);
   outline: none;
 }
-.constitution-picker-list {
+.constitution-add__list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
+  max-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
-.constitution-picker-item {
-  display: flex;
-  align-items: stretch;
-  gap: var(--space-2);
-}
-.constitution-picker-item-main {
-  flex: 1;
+.constitution-add__option {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  width: 100%;
   padding: var(--space-2) var(--space-3);
-  border: none;
-  background: transparent;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
   text-align: left;
-  min-width: 0;
+  cursor: pointer;
 }
-.constitution-picker-item-main:hover {
-  background: color-mix(in oklab, var(--color-text-primary) 4%, transparent);
+.constitution-add__option:hover {
+  background: var(--color-card-hover-bg);
 }
-.constitution-picker-item-main.is-primary {
-  background: color-mix(in oklab, var(--color-accent) 10%, transparent);
+.constitution-add__option:disabled {
+  cursor: default;
+  color: var(--color-text-40);
 }
-.constitution-picker-item-flag {
+.constitution-add__option-flag {
   display: inline-flex;
   flex-shrink: 0;
 }
-.constitution-picker-item-name {
+.constitution-add__option-name {
   flex: 1;
-  font-family: var(--font-body);
-  font-size: var(--text-14);
-  color: var(--color-text-primary);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.constitution-picker-item-main.is-primary .constitution-picker-item-name {
-  color: var(--color-accent);
-  font-weight: 500;
-}
-.constitution-picker-item-year {
+.constitution-add__option-year {
   font-family: var(--font-body);
   font-variant-numeric: tabular-nums;
   font-size: var(--text-12);
   color: var(--color-text-30);
   flex-shrink: 0;
 }
-.constitution-picker-item-add {
-  flex-shrink: 0;
-  width: 26px;
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  background: transparent;
-  color: var(--color-text-40);
-  font-size: var(--text-16);
-  line-height: 1;
-  cursor: pointer;
-}
-.constitution-picker-item-add:hover {
+.constitution-add__option-added {
+  font-family: var(--font-body);
+  font-size: var(--text-11, 11px);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
   color: var(--color-accent);
-  border-color: color-mix(in oklab, var(--color-accent) 40%, transparent);
+  flex-shrink: 0;
 }
-.constitution-picker-empty {
+.constitution-add__empty {
   font-family: var(--font-body);
   font-size: var(--text-13);
   color: var(--color-text-30);
@@ -2618,6 +2615,34 @@ a.constitution-xref-card-country:hover {
 .constitution-xref-excerpt-text p:last-child {
   margin-bottom: 0;
 }
+/* Scoped reset for the sanitized Constitute markup so clause-number markers and
+ * superscripts stay INSIDE the card's --space-4 padding rather than hanging into
+ * the margin. Constitute lists carry inline `list-style-type` and default
+ * browser indentation; keep the marker inside and the paragraphs on the reading
+ * rhythm. */
+.constitution-xref-excerpt-text :is(ol, ul) {
+  margin: 0 0 var(--space-2);
+  padding-left: var(--space-5);
+  list-style-position: outside;
+}
+.constitution-xref-excerpt-text :is(ol, ul):last-child {
+  margin-bottom: 0;
+}
+.constitution-xref-excerpt-text li {
+  margin: 0 0 var(--space-2);
+}
+.constitution-xref-excerpt-text li:last-child {
+  margin-bottom: 0;
+}
+.constitution-xref-excerpt-text li > p {
+  margin: 0 0 var(--space-2);
+}
+.constitution-xref-excerpt-text .section {
+  margin-left: 0;
+}
+.constitution-xref-excerpt-text sup {
+  line-height: 0;
+}
 .constitution-xref-empty-note {
   font-family: var(--font-body);
   font-size: var(--text-13);
@@ -2758,8 +2783,10 @@ a.constitution-xref-card-country:hover {
 
 /* ── Responsive: collapse to a single column ────────────────────────── */
 @media (max-width: 1100px) {
+  /* Stack the compare pane beneath the reading column (which keeps its own
+     outline nav). */
   .constitution-explorer {
-    grid-template-columns: 220px minmax(0, 1fr);
+    grid-template-columns: 1fr;
   }
   .constitution-explorer-right {
     grid-column: 1 / -1;
@@ -2769,6 +2796,9 @@ a.constitution-xref-card-country:hover {
     padding-top: var(--space-6);
     border-top: 1px solid var(--color-card-border);
   }
+}
+@media (max-width: 720px) {
+  /* Collapse the reading column's own outline above the body. */
   .constitution-reader-layout {
     grid-template-columns: 1fr;
   }
@@ -2778,22 +2808,6 @@ a.constitution-xref-card-country:hover {
     margin-bottom: var(--space-5);
     padding-bottom: var(--space-5);
     border-bottom: 1px solid var(--color-card-border);
-  }
-}
-@media (max-width: 720px) {
-  .constitution-explorer {
-    grid-template-columns: 1fr;
-  }
-  .constitution-explorer-left {
-    position: static;
-    max-height: none;
-    margin-bottom: var(--space-6);
-    padding-bottom: var(--space-6);
-    border-bottom: 1px solid var(--color-card-border);
-  }
-  .constitution-picker-list {
-    max-height: 320px;
-    overflow-y: auto;
   }
   .constitution-page-title-sub {
     display: block;

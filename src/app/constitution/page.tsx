@@ -10,6 +10,7 @@ import {
 import { getTopicTaxonomy, isKnownTopic } from "@/lib/constitute/topics";
 import { getSource } from "@/lib/db/queries";
 import { ConstitutionExplorerShell } from "@/components/constitution/ConstitutionExplorerShell";
+import { ConstitutionCountryBar } from "@/components/constitution/ConstitutionCountryBar";
 import { ConstitutionLanding } from "@/components/constitution/ConstitutionLanding";
 
 export const revalidate = 3600;
@@ -88,11 +89,17 @@ export default async function ConstitutionPage({
   const initialTopic =
     typeof rawTopic === "string" && isKnownTopic(rawTopic) ? rawTopic : null;
 
-  // Indexed countries + taxonomy are needed in every state.
-  const [indexedCountries, constituteSource] = await Promise.all([
+  // Indexed countries + taxonomy are needed in every state. Sorted
+  // ALPHABETICALLY by name here so every country list on the page (the header
+  // add-popover, the landing picker) reads in a predictable order — the old
+  // population ordering read as random.
+  const [indexedCountriesRaw, constituteSource] = await Promise.all([
     getIndexedConstitutionCountries(),
     getSource("constitute_project").catch(() => null),
   ]);
+  const indexedCountries = [...indexedCountriesRaw].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
   const taxonomy = getTopicTaxonomy();
   const sourceRetrievedAt = constituteSource?.lastSyncAt
     ? constituteSource.lastSyncAt.toISOString()
@@ -204,16 +211,21 @@ export default async function ConstitutionPage({
               : ""}
           </span>
         </h1>
+        {/* Country management moved out of a dedicated pane into the header:
+            one chip per selected country (first = "Reading") + an add-popover. */}
+        <ConstitutionCountryBar
+          countries={indexedCountries}
+          selectedSlugs={selectedSlugs}
+          maxSlugs={MAX_SLUGS}
+        />
       </header>
 
       <ConstitutionExplorerShell
-        indexedCountries={indexedCountries}
         selectedSlugs={selectedSlugs}
         primaryConstitution={primaryConstitution}
         sourceRetrievedAt={sourceRetrievedAt}
         categories={taxonomy.categories}
         leaves={taxonomy.leaves}
-        maxSlugs={MAX_SLUGS}
         initialTopic={initialTopic}
       />
 

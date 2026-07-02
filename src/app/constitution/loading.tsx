@@ -2,14 +2,14 @@ export default function Loading() {
   return (
     <div className="editorial-page editorial-page--full">
       <div className="skeleton" style={{ width: 200, height: 14, marginBottom: 12 }} />
-      <div className="skeleton" style={{ width: 420, height: 48, marginBottom: 32 }} />
+      <div className="skeleton" style={{ width: 420, height: 48, marginBottom: 16 }} />
+      {/* Header country-chip row. */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 32 }}>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="skeleton" style={{ width: 120, height: 30 }} />
+        ))}
+      </div>
       <div className="constitution-explorer">
-        <div className="constitution-explorer-left">
-          <div className="skeleton" style={{ height: 32, marginBottom: 12 }} />
-          {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="skeleton" style={{ height: 28, marginBottom: 6 }} />
-          ))}
-        </div>
         <div className="constitution-explorer-middle">
           <div className="skeleton" style={{ height: 20, width: 260, marginBottom: 24 }} />
           {Array.from({ length: 6 }).map((_, i) => (

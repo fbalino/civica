@@ -274,6 +274,50 @@ export function ConstitutionCrossReferencePane({
   );
 }
 
+/**
+ * Normalize a heading/label for the dedupe comparison: lowercase, strip HTML
+ * tags/entities, drop punctuation, collapse whitespace. So
+ * "368. Power of Parliament to amend the Constitution and procedure therefor"
+ * and an `<h3>368. Power of Parliament…</h3>` compare equal.
+ */
+function normalizeHeading(s: string): string {
+  return s
+    .replace(/<[^>]*>/g, " ") // strip tags
+    .replace(/&[a-z]+;|&#\d+;/gi, " ") // strip entities
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ") // drop punctuation
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** The text of the excerpt HTML's leading heading, or null if it doesn't
+ *  start with one. Only a heading at the very start counts as the excerpt's
+ *  "own title" for dedupe purposes. */
+function leadingHeadingText(html: string): string | null {
+  const m = html.match(/^\s*<h[1-6][^>]*>([\s\S]*?)<\/h[1-6]>/i);
+  if (!m) return null;
+  return normalizeHeading(m[1]);
+}
+
+/**
+ * True when the excerpt HTML begins with a heading whose text matches the
+ * article label — in which case the small-caps eyebrow is a DUPLICATE of the
+ * excerpt's own heading and should be suppressed (we keep the excerpt heading).
+ * Matches when either normalized string starts with the other (handles minor
+ * trailing differences).
+ */
+function excerptHeadingMatchesLabel(
+  html: string,
+  articleLabel: string | null,
+): boolean {
+  if (!articleLabel) return false;
+  const heading = leadingHeadingText(html);
+  if (!heading) return false;
+  const label = normalizeHeading(articleLabel);
+  if (!heading || !label) return false;
+  return heading.startsWith(label) || label.startsWith(heading);
+}
+
 function ExcerptCard({
   entry,
   isPrimary,
@@ -302,9 +346,16 @@ function ExcerptCard({
         ) : null}
       </div>
       <div className="constitution-xref-card-body">
-        {entry.excerpts.map((ex, i) => (
+        {entry.excerpts.map((ex, i) => {
+          // Dedupe: when the excerpt's own leading heading repeats the article
+          // label, keep the excerpt heading and suppress the small-caps eyebrow
+          // so the card doesn't show the title twice.
+          const showLabel =
+            !!ex.articleLabel &&
+            !excerptHeadingMatchesLabel(ex.excerptHtml, ex.articleLabel);
+          return (
           <div key={`${ex.sectionId}-${i}`} className="constitution-xref-excerpt">
-            {ex.articleLabel ? (
+            {showLabel ? (
               <div className="constitution-xref-excerpt-label">
                 {ex.articleLabel}
               </div>
@@ -319,7 +370,8 @@ function ExcerptCard({
               }}
             />
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

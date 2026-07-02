@@ -40,9 +40,11 @@ export function ConstitutionLanding({
 }: ConstitutionLandingProps) {
   const router = useRouter();
   const bySlug = new Map(countries.map((c) => [c.slug, c]));
-  const suggestions = SUGGESTED_SLUGS.map((s) => bySlug.get(s)).filter(
-    (c): c is IndexedConstitutionCountry => c != null,
-  );
+  // A curated shortlist, but rendered ALPHABETICALLY like every other country
+  // list on this page (a hand-ordered list read as random).
+  const suggestions = SUGGESTED_SLUGS.map((s) => bySlug.get(s))
+    .filter((c): c is IndexedConstitutionCountry => c != null)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="constitution-landing">
