@@ -125,12 +125,15 @@ const FILTER_CATEGORIES: FilterCategory[] = [
   "tier",
 ];
 
-/** Parse `?region=` into a RegionKey (defaults to "all"). */
-function regionFromParams(params: URLSearchParams): RegionKey {
-  const raw = params.get("region");
-  return raw && VALID_REGION_KEYS.has(raw as RegionKey)
-    ? (raw as RegionKey)
-    : "all";
+/** Parse repeated `?region=` params into a Set (empty = all regions). */
+function regionsFromParams(params: URLSearchParams): Set<RegionKey> {
+  const next = new Set<RegionKey>();
+  for (const raw of params.getAll("region")) {
+    if (raw !== "all" && VALID_REGION_KEYS.has(raw as RegionKey)) {
+      next.add(raw as RegionKey);
+    }
+  }
+  return next;
 }
 
 /** Parse the repeated advanced-filter params into a FilterState. */
@@ -144,10 +147,12 @@ function filtersFromParams(params: URLSearchParams): FilterState {
   return next;
 }
 
-/** Serialize region + filters into a query string (stable order). */
-function buildQuery(region: RegionKey, filters: FilterState): string {
+/** Serialize regions + filters into a query string (stable order). */
+function buildQuery(regions: Set<RegionKey>, filters: FilterState): string {
   const params = new URLSearchParams();
-  if (region !== "all") params.set("region", region);
+  for (const r of REGIONS) {
+    if (r.key !== "all" && regions.has(r.key)) params.append("region", r.key);
+  }
   for (const cat of FILTER_CATEGORIES) {
     for (const value of filters[cat]) params.append(FILTER_PARAM[cat], value);
   }
@@ -166,7 +171,7 @@ export function FactbookAlmanac({
   // Shareable URL state is seeded CLIENT-SIDE from window.location on mount —
   // deliberately NOT useSearchParams(), which forces a Suspense/CSR bailout
   // that would put only a fallback into the static shell (broke `next build`).
-  const [region, setRegion] = useState<RegionKey>("all");
+  const [regions, setRegions] = useState<Set<RegionKey>>(new Set());
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTER_STATE);
 
   // Seed once from the URL (deep links / reloads). Declared BEFORE the
@@ -175,9 +180,9 @@ export function FactbookAlmanac({
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if ([...params.keys()].length === 0) return;
-    const seededRegion = regionFromParams(params);
+    const seededRegions = regionsFromParams(params);
     const seededFilters = filtersFromParams(params);
-    if (seededRegion !== "all") setRegion(seededRegion);
+    if (seededRegions.size > 0) setRegions(seededRegions);
     if (totalActiveFilters(seededFilters) > 0) setFilters(seededFilters);
   }, []);
 
@@ -190,7 +195,7 @@ export function FactbookAlmanac({
       didMount.current = true;
       return;
     }
-    const query = buildQuery(region, filters);
+    const query = buildQuery(regions, filters);
     const current = new URLSearchParams(window.location.search).toString();
     if (query === current) return;
     router.replace(query ? `?${query}` : "?", { scroll: false });
@@ -198,7 +203,7 @@ export function FactbookAlmanac({
     // user-driven region/filter changes only, and reads the current URL
     // directly from window.location at fire time.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [region, filters]);
+  }, [regions, filters]);
 
   const toggleFilter = useCallback(
     (category: FilterCategory, value: string) => {
@@ -221,9 +226,9 @@ export function FactbookAlmanac({
   // the same underlying set; they compose.
   const inRegion = useMemo(() => {
     const regionScoped =
-      region === "all"
+      regions.size === 0
         ? countries
-        : countries.filter((c) => continentToRegion(c.continent) === region);
+        : countries.filter((c) => regions.has(continentToRegion(c.continent)));
     if (activeFilterCount === 0) return regionScoped;
     return regionScoped.filter((c) =>
       countryMatchesFilters(
@@ -236,7 +241,7 @@ export function FactbookAlmanac({
         filters,
       ),
     );
-  }, [countries, region, filters, activeFilterCount]);
+  }, [countries, regions, filters, activeFilterCount]);
 
   // Combobox options always search the full set (search ignores the chip).
   const searchOptions = useMemo(
@@ -306,7 +311,8 @@ export function FactbookAlmanac({
 
           <HeroRevealItem className="factbook-hero-chips" role="group" aria-label="Filter by region">
             {REGIONS.map((r) => {
-              const active = region === r.key;
+              const active =
+                r.key === "all" ? regions.size === 0 : regions.has(r.key);
               return (
                 <button
                   key={r.key}
@@ -319,7 +325,15 @@ export function FactbookAlmanac({
                     .filter(Boolean)
                     .join(" ")}
                   aria-pressed={active}
-                  onClick={() => setRegion(r.key)}
+                  onClick={() =>
+                    setRegions((prev) => {
+                      if (r.key === "all") return new Set();
+                      const next = new Set(prev);
+                      if (next.has(r.key)) next.delete(r.key);
+                      else next.add(r.key);
+                      return next;
+                    })
+                  }
                 >
                   {r.dotVar ? (
                     <span
@@ -333,6 +347,17 @@ export function FactbookAlmanac({
               );
             })}
           </HeroRevealItem>
+
+          {/* Advanced filters live WITH the region chips (owner direction):
+              dropdown pills right under the hero chips, selections as
+              removable pills. The almanac sub-line is the live match count. */}
+          <HeroRevealItem>
+            <AlmanacFilters
+              filters={filters}
+              onToggle={toggleFilter}
+              onClear={clearFilters}
+            />
+          </HeroRevealItem>
         </HeroReveal>
       </section>
 
@@ -341,22 +366,12 @@ export function FactbookAlmanac({
         <div className="factbook-almanac-head">
           <h2 className="factbook-almanac-title">The complete index</h2>
           <p className="factbook-almanac-sub" aria-live="polite">
-            {region === "all" && activeFilterCount === 0
+            {regions.size === 0 && activeFilterCount === 0
               ? `${countries.length} countries and territories, A to Z. Jump to a letter or pick from the list.`
-              : region === "all"
-                ? `${inRegion.length} ${inRegion.length === 1 ? "entry" : "entries"} match your filters. Jump to a letter or pick from the list.`
-                : `${inRegion.length} ${inRegion.length === 1 ? "entry" : "entries"} in ${
-                    REGIONS.find((r) => r.key === region)?.label
-                  }. Jump to a letter or pick from the list.`}
+              : `${inRegion.length} ${inRegion.length === 1 ? "entry" : "entries"} match your filters. Jump to a letter or pick from the list.`}
           </p>
         </div>
 
-        <AlmanacFilters
-          filters={filters}
-          onToggle={toggleFilter}
-          onClear={clearFilters}
-          matchCount={inRegion.length}
-        />
 
         <nav className="factbook-alpha-rail" aria-label="Jump to letter">
           {alphabet.map((letter) => {

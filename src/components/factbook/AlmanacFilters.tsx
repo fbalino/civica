@@ -41,23 +41,6 @@ interface FilterGroupDef {
   options: FilterOption[];
 }
 
-/* World Bank region — canonical labels verbatim from Phase F (see
-   lens-metadata.ts). Labels shortened for the chip where the canonical
-   string is long; the `value` still matches the stored fact verbatim. */
-const REGION_OPTIONS: FilterOption[] = [
-  { value: "East Asia & Pacific", label: "East Asia & Pacific", tone: "editorial-chip--blue" },
-  { value: "Europe & Central Asia", label: "Europe & Central Asia", tone: "editorial-chip--blue" },
-  { value: "Latin America & Caribbean", label: "Latin America & Caribbean", tone: "editorial-chip--accent" },
-  {
-    value: "Middle East, North Africa, Afghanistan & Pakistan",
-    label: "Middle East & North Africa",
-    tone: "editorial-chip--sand",
-  },
-  { value: "North America", label: "North America", tone: "editorial-chip--sage" },
-  { value: "South Asia", label: "South Asia", tone: "editorial-chip--blue" },
-  { value: "Sub-Saharan Africa", label: "Sub-Saharan Africa", tone: "editorial-chip--sand" },
-];
-
 /* World Bank income group — canonical sentence-case labels. */
 const INCOME_OPTIONS: FilterOption[] = [
   { value: "Low income", label: "Low income", tone: "editorial-chip--rose" },
@@ -83,8 +66,10 @@ const TIER_OPTIONS: Array<FilterOption & { value: TierKey }> = [
   { value: "failed", label: "Failed", tone: "editorial-chip--rose" },
 ];
 
+/* The hero's multi-select region chips are the region filter; the WB-region
+   dropdown was a near-duplicate lens and is intentionally NOT rendered (the
+   'region' FilterCategory stays in the model for URL compat). */
 const FILTER_GROUPS: FilterGroupDef[] = [
-  { category: "region", legend: "Region", options: REGION_OPTIONS },
   { category: "income", legend: "Income group", options: INCOME_OPTIONS },
   { category: "regime", legend: "Regime type", options: REGIME_OPTIONS },
   { category: "tier", legend: "Civica Index tier", options: TIER_OPTIONS },
@@ -220,14 +205,11 @@ export function AlmanacFilters({
   filters,
   onToggle,
   onClear,
-  matchCount,
 }: {
   filters: FilterState;
   /** Toggle one value in one category. */
   onToggle: (category: FilterCategory, value: string) => void;
   onClear: () => void;
-  /** How many countries currently match — shown in the status line. */
-  matchCount: number;
 }) {
   const activeCount = totalActiveFilters(filters);
   // One dropdown open at a time.
@@ -243,7 +225,6 @@ export function AlmanacFilters({
   return (
     <section className="almanac-filters" aria-label="Filter countries">
       <div className="almanac-filters__bar">
-        <span className="almanac-filters__label">Filter</span>
         {FILTER_GROUPS.map((group) => (
           <FilterDropdown
             key={group.category}
@@ -256,11 +237,6 @@ export function AlmanacFilters({
             onToggle={(value) => onToggle(group.category, value)}
           />
         ))}
-        <p className="almanac-filters__status" aria-live="polite">
-          {activeCount === 0
-            ? "Showing all countries"
-            : `${matchCount} ${matchCount === 1 ? "country" : "countries"} match`}
-        </p>
       </div>
 
       {activePills.length > 0 && (

@@ -1272,22 +1272,14 @@
    live match count, then the active selections as tonal chips with an ×.
    Replaces the old always-expanded chip wall (owner: "massive… ugly"). */
 .almanac-filters {
-  margin: var(--space-6) 0 var(--space-4);
+  margin: var(--space-4) 0 0; /* sits inside the hero, under the region chips */
 }
 .almanac-filters__bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
-}
-.almanac-filters__label {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide, 0.08em);
-  color: var(--color-text-muted);
-  margin-right: var(--space-1);
+  justify-content: center; /* hero content is a centered column */
+  gap: var(--space-2);
 }
 .almanac-dd {
   position: relative;
@@ -1299,7 +1291,7 @@
   padding: 7px 14px;
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-control);
-  background: var(--color-bg);
+  background: color-mix(in oklab, var(--color-bg) 92%, transparent);
   color: var(--color-text-primary);
   font-family: var(--font-body);
   font-size: var(--text-13);
@@ -1385,17 +1377,11 @@
   background: var(--color-accent);
   border-color: var(--color-accent);
 }
-.almanac-filters__status {
-  margin: 0 0 0 auto;
-  font-family: var(--font-body);
-  font-size: var(--text-13);
-  color: var(--color-text-muted);
-  font-variant-numeric: tabular-nums;
-}
 .almanac-filters__pills {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
   margin-top: var(--space-3);
 }
