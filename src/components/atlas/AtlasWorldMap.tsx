@@ -619,9 +619,16 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                   ? countries.find((c) => c.id === pinned[i])?.name || "—"
                   : "—"}
                 {pinned[i] && (
-                  <span className="x" onClick={() => onUnpinAt(i)}>
+                  <button
+                    type="button"
+                    className="x"
+                    aria-label={`Remove ${
+                      countries.find((c) => c.id === pinned[i])?.name ?? "country"
+                    } from comparison`}
+                    onClick={() => onUnpinAt(i)}
+                  >
                     &times;
-                  </span>
+                  </button>
                 )}
               </span>
             ))}
@@ -692,7 +699,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                 { label: "Capital", value: hoverCard.country.capital },
                 { label: "Population", value: hoverCard.country.pop },
               ]}
-              ctaHref={`/atlas/${hoverCard.country.slug ?? hoverCard.country.id}/structure`}
+              ctaHref={`/country/${hoverCard.country.slug ?? hoverCard.country.id}`}
             />
           </div>
         )}

@@ -57,6 +57,19 @@ const nextConfig: NextConfig = {
         destination: "/civica-index",
         permanent: true,
       },
+      // Country-slug shortcut: /index/:slug would otherwise double-hop
+      // through /civica-index/:slug before landing on the country reader.
+      // The negative lookahead mirrors the /civica-index/:slug rule below
+      // so real /civica-index sub-routes (methodology, government-types,
+      // widget, pulse-changelog, corrections, replication, changelog) are
+      // NOT misread as country slugs and still fall through to the
+      // generic /index/:path* rule underneath.
+      {
+        source:
+          "/index/:slug((?!methodology|government-types|widget|pulse-changelog|corrections|replication|changelog).+)",
+        destination: "/country/:slug/civica-data",
+        permanent: true,
+      },
       {
         source: "/index/:path*",
         destination: "/civica-index/:path*",
@@ -102,7 +115,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/atlas/organizations",
-        destination: "/organizations",
+        destination: "/organizations/un",
         permanent: true,
       },
       {

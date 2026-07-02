@@ -323,7 +323,7 @@ export function OrgDetailPanel({
             return m.inAtlas ? (
               <Link
                 key={m.id}
-                href={`/atlas/${m.slug}/structure`}
+                href={`/country/${m.slug}`}
                 className="intl-mem-row"
               >
                 {rowContent}

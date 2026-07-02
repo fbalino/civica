@@ -532,7 +532,11 @@
   border-radius: var(--radius-sm);
   background: var(--atlas-paper); color: var(--atlas-ink); cursor: pointer;
 }
-.atlas-compare-banner .pill .x { margin-left: 6px; color: var(--atlas-muted); cursor: pointer; }
+.atlas-compare-banner .pill .x {
+  margin-left: 6px; color: var(--atlas-muted); cursor: pointer;
+  /* now a real <button> (a11y) — strip UA chrome, inherit the pill's type */
+  background: none; border: 0; padding: 0; font: inherit; line-height: 1;
+}
 .atlas-compare-banner .go-btn {
   background: var(--atlas-ink); color: var(--atlas-paper); border: 0;
   border-radius: var(--radius-sm);

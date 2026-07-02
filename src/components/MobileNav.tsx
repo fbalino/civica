@@ -551,8 +551,10 @@ function OverlayFooter() {
 
 function SystemStatus() {
   return (
-    <Link
+    <a
       href="https://statuspage.incident.io/civica-atlas"
+      target="_blank"
+      rel="noopener noreferrer"
       style={{
         display: "flex",
         alignItems: "center",
@@ -641,7 +643,7 @@ function SystemStatus() {
       >
         Status
       </span>
-    </Link>
+    </a>
   );
 }
 
