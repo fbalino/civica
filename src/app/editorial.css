@@ -1825,86 +1825,9 @@ legend.editorial-filter-label {
   border-radius: var(--radius-sm);
 }
 
-/* ==========================================================================
-   About page engraving hero
-   Full-bleed engraving masthead (same technique as .factbook-hero--art),
-   title overlaid over an ivory scrim; engraving inverts in dark mode.
-   ========================================================================== */
-.about-hero {
-  position: relative;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  /* Shared canonical hero height (design system) — same as home + factbook. */
-  min-height: var(--hero-height);
-  overflow: hidden;
-  display: flex;
-  align-items: flex-end;
-}
-.about-hero-img {
-  position: absolute;
-  /* Parallax over-scan (see .home-hero-art-img): 20% taller, pulled up 10% so
-     the translateY never reveals a blank edge under overflow:hidden. */
-  inset: -10% 0;
-  width: 100%;
-  height: 120%;
-  object-fit: cover;
-  object-position: center 42%;
-  z-index: 0;
-  will-change: transform;
-}
-.about-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to top,
-    var(--color-bg) 0%,
-    color-mix(in oklab, var(--color-bg) 74%, transparent) 30%,
-    transparent 62%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-[data-theme="dark"] .about-hero-img:not(.theme-engraving-light):not(.theme-engraving-dark) {
-  filter: invert(1) hue-rotate(180deg) brightness(1.04);
-}
-.about-hero-inner {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: var(--max-w-content);
-  margin: 0 auto;
-  padding: 0 var(--spacing-page-x) var(--space-7);
-}
-.about-hero-title {
-  font-family: var(--font-heading);
-  font-size: var(--text-56);
-  font-weight: 400;
-  letter-spacing: var(--tracking-tighter);
-  line-height: var(--leading-tight);
-  color: var(--color-text-primary);
-  margin: 0;
-}
-.about-hero-dek {
-  font-family: var(--font-body);
-  font-size: var(--text-18);
-  color: var(--color-text-60);
-  line-height: var(--leading-normal);
-  margin: var(--space-3) 0 0;
-  max-width: 52ch;
-}
-@media (max-width: 768px) {
-  .about-hero {
-    aspect-ratio: auto;
-    min-height: 220px;
-  }
-  .about-hero-title {
-    font-size: var(--text-40);
-  }
-  .about-hero-dek {
-    font-size: var(--text-16);
-  }
-}
+/* The /about page now uses the canonical full-bleed engraving hero — it
+   reuses the shared .factbook-hero-* class family (factbook.css), matching the
+   homepage and /country. The former bespoke .about-hero* rules were removed. */
 
 /* ═══════════════════════════════════════════════════════════════════════
  * Constitution Explorer (/constitution) — Wave 2, Phase 2b
@@ -2748,27 +2671,6 @@ a.constitution-xref-card-country:hover {
   font-size: var(--text-12);
   color: var(--color-text-30);
 }
-.constitution-landing-search-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-}
-.constitution-landing-search-label {
-  font-family: var(--font-body);
-  font-size: var(--text-13);
-  color: var(--color-text-50);
-}
-.constitution-landing-select {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
-  background: var(--color-card-bg);
-  font-family: var(--font-body);
-  font-size: var(--text-14);
-  color: var(--color-text-primary);
-  min-width: 220px;
-}
 .constitution-landing-topic-note {
   font-family: var(--font-body);
   font-size: var(--text-14);
@@ -2828,14 +2730,10 @@ a.constitution-xref-card-country:hover {
  * note.
  */
 
-.compare-page-hero { padding: var(--space-7) 0; }
-.compare-page-lede {
-  font-size: var(--text-16);
-  color: var(--color-text-60);
-  max-width: 700px; /* 700px — layout literal, no token */
-  line-height: 1.55;
-  margin: 0;
-}
+/* The /compare header is now the canonical full-bleed engraving hero
+   (.factbook-landing-hero + .factbook-hero-* in factbook.css), rendered as a
+   sibling before <EditorialPage> — matching /about. The old bare
+   .compare-page-hero / .compare-page-lede text header was retired with it. */
 .picker-row { margin: var(--space-8) 0 var(--space-6); }
 .compare-selector-grid {
   display: grid;

@@ -21,6 +21,8 @@ import { CompareInternational } from "@/components/compare/CompareInternational"
 import { withOg } from "@/lib/og";
 import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { civicaIndex } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -259,20 +261,44 @@ export default async function ComparePage({
   const hasEnough = validSlugs.length >= 2;
 
   return (
-    <EditorialPage width="full">
-      <section className="compare-page-hero">
-        <h1 className="editorial-page-title">
-          {countryLabels.length === 0
-            ? "Compare countries, side by side."
-            : `${countryLabels.join(" vs. ")}`}
-        </h1>
-        <p className="compare-page-lede">
-          Overview, Civica Index, chambers, elections, and international
-          memberships — everything about any two or three countries in one
-          view.
-        </p>
+    <>
+      {/* Full-bleed engraving hero (homepage idiom). Rendered as a sibling
+          before <EditorialPage> — matching /about — so the 100vw breakout
+          reaches the viewport edges with no top-padding gap. Reuses the
+          canonical .factbook-hero-* class family (eyebrow → title → dek). */}
+      <section
+        className="factbook-landing-hero"
+        aria-labelledby="compare-hero-title"
+      >
+        <ParallaxImage
+          className="factbook-hero-art"
+          src="/engravings/hero.webp"
+          darkSrc="/engravings/hero-dark.webp"
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="factbook-hero-scrim" aria-hidden="true" />
+        <HeroReveal className="factbook-hero-inner">
+          <HeroRevealItem className="factbook-hero-eyebrow">
+            Compare
+          </HeroRevealItem>
+          <HeroRevealItem
+            as="h1"
+            id="compare-hero-title"
+            className="factbook-hero-title"
+          >
+            {countryLabels.length === 0
+              ? "Compare countries, side by side."
+              : `${countryLabels.join(" vs. ")}`}
+          </HeroRevealItem>
+          <HeroRevealItem as="p" className="factbook-hero-dek">
+            Overview, Civica Index, chambers, elections, and international
+            memberships &mdash; any two or three countries in one view.
+          </HeroRevealItem>
+        </HeroReveal>
       </section>
 
+      <EditorialPage width="full">
       <section className="picker-row" aria-label="Country selection">
         <Suspense fallback={null}>
           <CompareCountrySelector
@@ -357,6 +383,7 @@ export default async function ComparePage({
           </footer>
         </>
       )}
-    </EditorialPage>
+      </EditorialPage>
+    </>
   );
 }

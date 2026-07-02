@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { CountryFlag } from "@/components/CountryFlag";
 import type { IndexedConstitutionCountry } from "@/lib/db/queries-constitution";
 
@@ -38,7 +37,6 @@ export function ConstitutionLanding({
   featuredTopics,
   defaultSlug,
 }: ConstitutionLandingProps) {
-  const router = useRouter();
   const bySlug = new Map(countries.map((c) => [c.slug, c]));
   // A curated shortlist, but rendered ALPHABETICALLY like every other country
   // list on this page (a hand-ordered list read as random).
@@ -49,15 +47,18 @@ export function ConstitutionLanding({
   return (
     <div className="constitution-landing">
       <p className="constitution-landing-lede">
-        Read any of {countries.length} national constitutions in full, then
-        compare — side by side — how different countries handle the same
-        question, from human dignity and term limits to emergency powers and the
-        structure of the courts. Every passage is drawn from the Constitute
-        Project.
+        {countries.length} national constitutions are indexed here, topic by
+        topic — from human dignity and term limits to emergency powers and the
+        structure of the courts — so you can trace how each one answers the same
+        question.
       </p>
 
       <section className="constitution-landing-section">
         <h2 className="constitution-landing-heading">Start with a country</h2>
+        <p className="constitution-landing-topic-note">
+          Jump to a widely-read constitution below, or use the search at the top
+          to open any of the {countries.length} on file.
+        </p>
         <div className="constitution-landing-grid">
           {suggestions.map((c) => (
             <Link
@@ -74,30 +75,6 @@ export function ConstitutionLanding({
               ) : null}
             </Link>
           ))}
-        </div>
-        <div className="constitution-landing-search-row">
-          <label htmlFor="constitution-landing-jump" className="constitution-landing-search-label">
-            Or search all {countries.length}:
-          </label>
-          <select
-            id="constitution-landing-jump"
-            className="constitution-landing-select"
-            defaultValue=""
-            onChange={(e) => {
-              if (e.target.value) {
-                router.push(`/constitution?c=${encodeURIComponent(e.target.value)}`);
-              }
-            }}
-          >
-            <option value="" disabled>
-              Choose a country…
-            </option>
-            {countries.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.name}
-              </option>
-            ))}
-          </select>
         </div>
       </section>
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SourceDot } from "@/components/SourceDot";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import { Reveal, HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
@@ -100,23 +101,29 @@ export default async function AboutPage() {
 
   return (
     <>
-      {/* Engraving masthead. */}
-      <section className="about-hero">
+      {/* Full-bleed engraving masthead — canonical site hero pattern
+          (eyebrow → serif title → dek), matching the homepage and /country.
+          Reuses the shared .factbook-hero-* class family from factbook.css. */}
+      <section className="factbook-landing-hero" aria-labelledby="about-hero-title">
         <ParallaxImage
-          className="about-hero-img"
+          className="factbook-hero-art"
           src="/engravings/pages/about.webp"
           darkSrc="/engravings/pages/about-dark.webp"
           alt=""
           aria-hidden="true"
         />
-        <div className="about-hero-inner">
-          <h1 className="about-hero-title">About Civica Atlas</h1>
-          <p className="about-hero-dek">
+        <div className="factbook-hero-scrim" aria-hidden="true" />
+        <HeroReveal className="factbook-hero-inner">
+          <HeroRevealItem className="factbook-hero-eyebrow">About</HeroRevealItem>
+          <HeroRevealItem as="h1" id="about-hero-title" className="factbook-hero-title">
+            About Civica Atlas
+          </HeroRevealItem>
+          <HeroRevealItem as="p" className="factbook-hero-dek">
             An open reference atlas of the world&rsquo;s countries, governments,
             and governance outcomes &mdash; built on multi-source reconciliation,
             statement-level provenance, and published methodology.
-          </p>
-        </div>
+          </HeroRevealItem>
+        </HeroReveal>
       </section>
 
       <div
@@ -128,14 +135,14 @@ export default async function AboutPage() {
       >
         {/* Intro paragraphs — markdown body, sliced to everything
             BEFORE the "How it works" section. */}
-      <section className="editorial-section about-prose-intro">
+      <Reveal as="section" className="editorial-section about-prose-intro" amount={0.15}>
         <MarkdownContent
           file="content/about.md"
           state={state as unknown as Record<string, unknown>}
           stats={null}
           slice={{ to: "how-it-works" }}
         />
-      </section>
+      </Reveal>
 
       <div
         style={{
@@ -145,7 +152,7 @@ export default async function AboutPage() {
         }}
       />
 
-      <section>
+      <Reveal as="section" amount={0.12}>
         <h2 className="page-heading" style={{ marginBottom: 8 }}>
           What we do
         </h2>
@@ -310,7 +317,7 @@ export default async function AboutPage() {
             </p>
           </div>
         </div>
-      </section>
+      </Reveal>
 
       <div
         style={{
@@ -322,14 +329,14 @@ export default async function AboutPage() {
 
       {/* "How it works" + "Methodology" prose — markdown body sliced
           to the range between those two anchors. */}
-      <section className="editorial-section about-prose-howitworks">
+      <Reveal as="section" className="editorial-section about-prose-howitworks" amount={0.12}>
         <MarkdownContent
           file="content/about.md"
           state={state as unknown as Record<string, unknown>}
           stats={null}
           slice={{ from: "how-it-works", to: "standing-posture" }}
         />
-      </section>
+      </Reveal>
 
       <div
         style={{
@@ -339,7 +346,7 @@ export default async function AboutPage() {
         }}
       />
 
-      <section id="sources">
+      <Reveal as="section" id="sources" amount={0.08}>
         <h2 className="page-heading" style={{ marginBottom: 8 }}>
           Data sources
         </h2>
@@ -418,7 +425,7 @@ export default async function AboutPage() {
             </div>
           ))}
         </div>
-      </section>
+      </Reveal>
 
       <div
         style={{
@@ -428,7 +435,7 @@ export default async function AboutPage() {
         }}
       />
 
-      <section>
+      <Reveal as="section" amount={0.12}>
         <h2 className="page-heading" style={{ marginBottom: 8 }}>
           Provenance
         </h2>
@@ -495,7 +502,7 @@ export default async function AboutPage() {
             licenses, and any open dispute markers.
           </div>
         </div>
-      </section>
+      </Reveal>
 
       <div
         style={{
@@ -507,14 +514,14 @@ export default async function AboutPage() {
 
       {/* "Standing posture" + "Open and free" prose — markdown body
           sliced from `standing-posture` to end of file. */}
-      <section className="editorial-section about-prose-outro">
+      <Reveal as="section" className="editorial-section about-prose-outro" amount={0.12}>
         <MarkdownContent
           file="content/about.md"
           state={state as unknown as Record<string, unknown>}
           stats={null}
           slice={{ from: "standing-posture" }}
         />
-      </section>
+      </Reveal>
 
       <div
         style={{

@@ -12,6 +12,7 @@ import { getSource } from "@/lib/db/queries";
 import { ConstitutionExplorerShell } from "@/components/constitution/ConstitutionExplorerShell";
 import { ConstitutionCountryBar } from "@/components/constitution/ConstitutionCountryBar";
 import { ConstitutionLanding } from "@/components/constitution/ConstitutionLanding";
+import { ConstitutionHero } from "@/components/constitution/ConstitutionHero";
 
 export const revalidate = 3600;
 
@@ -119,21 +120,25 @@ export default async function ConstitutionPage({
 
   // ── Landing state — no country selected ──────────────────────────────
   if (requestedSlugs.length === 0) {
+    // Typeahead options for the hero search (routes to /constitution?c=<slug>).
+    const searchOptions = indexedCountries.map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      iso2: c.iso2,
+      iso3: c.iso3,
+    }));
     return (
-      <EditorialPage width="full">
-        <header className="constitution-page-header">
-          <div className="constitution-page-eyebrow">Constitutions</div>
-          <h1 className="editorial-page-title">
-            Read and compare the world&apos;s constitutions.
-          </h1>
-        </header>
-        <ConstitutionLanding
-          countries={indexedCountries}
-          featuredTopics={featuredTopics}
-          defaultSlug={defaultLandingSlug}
-        />
-        <ConstitutionFooter />
-      </EditorialPage>
+      <>
+        <ConstitutionHero countries={searchOptions} />
+        <EditorialPage width="full">
+          <ConstitutionLanding
+            countries={indexedCountries}
+            featuredTopics={featuredTopics}
+            defaultSlug={defaultLandingSlug}
+          />
+          <ConstitutionFooter />
+        </EditorialPage>
+      </>
     );
   }
 

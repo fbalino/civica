@@ -14,6 +14,20 @@
   container-type: inline-size;
 }
 .ci-hero { padding: 40px 0 20px; }
+
+/* The full-bleed engraving hero reuses the canonical .factbook-landing-hero /
+   .factbook-hero-* class family (see factbook.css). This modifier only carries
+   the Beta pill + methodology-under-revision disclosure row that lives beneath
+   the dek — the rest is inherited verbatim from the shared hero classes. */
+.ci-hero-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+/* Stats strip now sits in its own band below the full-bleed hero. */
+.ci-hero--stats { padding: var(--space-7) 0 var(--space-5); }
 .ci-hero-eyebrow {
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
@@ -45,13 +59,13 @@
   white-space: nowrap;
 }
 .ci-hero-rework-note {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wider);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-13);
+  letter-spacing: 0;
   color: var(--color-warn);
-  margin: 0 0 20px;
-  max-width: 720px;
+  margin: 0;
+  max-width: 46rem;
   line-height: 1.5;
 }
 .ci-hero-rework-note a {
