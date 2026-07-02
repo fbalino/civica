@@ -1267,91 +1267,164 @@
    Layers over the hero region quick-filter. Reuses the canonical
    .editorial-chip primitive for every filter chip (see editorial.css);
    this block only owns the surrounding card, group layout, and legends. */
+/* ── Almanac advanced filters — compact dropdown bar + removable pills ──
+   One slim row: a dropdown per category (multi-select checklist popover),
+   live match count, then the active selections as tonal chips with an ×.
+   Replaces the old always-expanded chip wall (owner: "massive… ugly"). */
 .almanac-filters {
   margin: var(--space-6) 0 var(--space-4);
-  padding: var(--space-6);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-card-bg);
 }
-.almanac-filters__head {
+.almanac-filters__bar {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-2) var(--space-4);
-  margin-bottom: var(--space-5);
+  align-items: center;
+  gap: var(--space-3);
 }
-.almanac-filters__title {
-  margin: 0;
+.almanac-filters__label {
   font-family: var(--font-body);
   font-size: var(--text-12);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--tracking-wide, 0.08em);
   color: var(--color-text-muted);
+  margin-right: var(--space-1);
 }
-.almanac-filters__status {
-  margin: 0;
-  font-family: var(--font-body);
-  font-size: var(--text-14);
-  color: var(--color-text-muted);
+.almanac-dd {
+  position: relative;
 }
-.almanac-filters__groups {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-5) var(--space-6);
-}
-.almanac-filter-group {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  min-width: 0;
-}
-.almanac-filter-group__legend {
-  padding: 0;
-  margin-bottom: var(--space-3);
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide, 0.06em);
-  color: var(--color-text-60);
-}
-.almanac-filter-group__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-.almanac-filter-chip {
-  cursor: pointer;
-  transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
-}
-.almanac-filters__actions {
-  margin-top: var(--space-5);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border-default);
-  display: flex;
-  justify-content: flex-end;
-}
-.almanac-filters__clear {
+.almanac-dd__trigger {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  padding: 7px 14px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
 }
-.almanac-filters__clear-count {
+.almanac-dd__trigger:hover,
+.almanac-dd__trigger[aria-expanded="true"] {
+  border-color: var(--color-accent);
+}
+.almanac-dd__trigger.is-active {
+  border-color: var(--color-accent);
+  background: color-mix(in oklab, var(--color-accent) 8%, var(--color-bg));
+}
+.almanac-dd__count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 18px;
-  height: 18px;
+  min-width: 17px;
+  height: 17px;
   padding: 0 var(--space-1);
   border-radius: var(--radius-full);
   background: var(--color-accent);
-  color: var(--color-on-accent, #fff);
+  color: var(--color-on-accent);
   font-size: var(--text-11, 11px);
   font-weight: 600;
   line-height: 1;
+}
+.almanac-dd__caret {
+  font-size: var(--text-11, 11px);
+  color: var(--color-text-40);
+  line-height: 1;
+}
+.almanac-dd__menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 30;
+  min-width: 240px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg); /* menus keep surface radii */
+  background: var(--color-bg);
+  box-shadow: var(--shadow-hard-lg);
+}
+.almanac-dd__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  text-align: left;
+  cursor: pointer;
+}
+.almanac-dd__option:hover {
+  background: var(--color-card-hover-bg);
+}
+.almanac-dd__option.is-selected {
+  font-weight: 600;
+}
+.almanac-dd__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-border-strong, var(--color-border-default));
+  border-radius: var(--radius-sm);
+  font-size: var(--text-11, 11px);
+  line-height: 1;
+  color: var(--color-on-accent);
+  background: var(--color-bg);
+  flex-shrink: 0;
+}
+.almanac-dd__option.is-selected .almanac-dd__check {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+.almanac-filters__status {
+  margin: 0 0 0 auto;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.almanac-filters__pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.almanac-filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-right: var(--space-1);
+}
+.almanac-filter-pill__x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 2px; /* optical gap to the label — no exact token */
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: inherit;
+  font-size: var(--text-13);
+  line-height: 1;
+  cursor: pointer;
+}
+.almanac-filter-pill__x:hover {
+  background: color-mix(in oklab, currentColor 14%, transparent);
+}
+.almanac-filters__clear {
+  margin-left: var(--space-2);
 }
 
 /* Alpha jump rail */

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { TierKey } from "@/lib/ci/tiers";
 
 /* ── Filter model ───────────────────────────────────────────────────────
@@ -127,6 +128,94 @@ export function totalActiveFilters(filters: FilterState): number {
   );
 }
 
+/** One dropdown: a compact trigger + a multi-select checklist popover. */
+function FilterDropdown({
+  group,
+  selected,
+  open,
+  onOpenChange,
+  onToggle,
+}: {
+  group: FilterGroupDef;
+  selected: Set<string>;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onToggle: (value: string) => void;
+}) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+
+  // Close on outside click / Escape (Escape returns focus to the trigger).
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
+        onOpenChange(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onOpenChange(false);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open, onOpenChange]);
+
+  return (
+    <div className="almanac-dd" ref={rootRef}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`almanac-dd__trigger${selected.size > 0 ? " is-active" : ""}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => onOpenChange(!open)}
+      >
+        {group.legend}
+        {selected.size > 0 && (
+          <span className="almanac-dd__count">{selected.size}</span>
+        )}
+        <span className="almanac-dd__caret" aria-hidden>
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div
+          className="almanac-dd__menu"
+          role="listbox"
+          aria-multiselectable="true"
+          aria-label={`Filter by ${group.legend.toLowerCase()}`}
+        >
+          {group.options.map((opt) => {
+            const active = selected.has(opt.value);
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="option"
+                aria-selected={active}
+                className={`almanac-dd__option${active ? " is-selected" : ""}`}
+                onClick={() => onToggle(opt.value)}
+              >
+                <span className="almanac-dd__check" aria-hidden>
+                  {active ? "✓" : ""}
+                </span>
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AlmanacFilters({
   filters,
   onToggle,
@@ -141,72 +230,66 @@ export function AlmanacFilters({
   matchCount: number;
 }) {
   const activeCount = totalActiveFilters(filters);
+  // One dropdown open at a time.
+  const [openCategory, setOpenCategory] = useState<FilterCategory | null>(null);
+
+  // Active selections flattened (category order) for the removable-pill row.
+  const activePills = FILTER_GROUPS.flatMap((group) =>
+    group.options
+      .filter((opt) => filters[group.category].has(opt.value))
+      .map((opt) => ({ ...opt, category: group.category })),
+  );
 
   return (
     <section className="almanac-filters" aria-label="Filter countries">
-      <div className="almanac-filters__head">
-        <h3 className="almanac-filters__title">Refine the index</h3>
+      <div className="almanac-filters__bar">
+        <span className="almanac-filters__label">Filter</span>
+        {FILTER_GROUPS.map((group) => (
+          <FilterDropdown
+            key={group.category}
+            group={group}
+            selected={filters[group.category]}
+            open={openCategory === group.category}
+            onOpenChange={(next) =>
+              setOpenCategory(next ? group.category : null)
+            }
+            onToggle={(value) => onToggle(group.category, value)}
+          />
+        ))}
         <p className="almanac-filters__status" aria-live="polite">
           {activeCount === 0
-            ? "All countries shown. Combine filters to narrow the list."
-            : `${matchCount} ${matchCount === 1 ? "country" : "countries"} match ${activeCount} ${
-                activeCount === 1 ? "filter" : "filters"
-              }.`}
+            ? "Showing all countries"
+            : `${matchCount} ${matchCount === 1 ? "country" : "countries"} match`}
         </p>
       </div>
 
-      <div className="almanac-filters__groups">
-        {FILTER_GROUPS.map((group) => {
-          const selected = filters[group.category];
-          return (
-            <fieldset key={group.category} className="almanac-filter-group">
-              <legend className="almanac-filter-group__legend">
-                {group.legend}
-              </legend>
-              <div
-                className="almanac-filter-group__chips"
-                role="group"
-                aria-label={`Filter by ${group.legend.toLowerCase()}`}
+      {activePills.length > 0 && (
+        <div className="almanac-filters__pills">
+          {activePills.map((pill) => (
+            <span
+              key={`${pill.category}:${pill.value}`}
+              className={`editorial-chip ${pill.tone} almanac-filter-pill`}
+            >
+              {pill.label}
+              <button
+                type="button"
+                className="almanac-filter-pill__x"
+                aria-label={`Remove ${pill.label} filter`}
+                onClick={() => onToggle(pill.category, pill.value)}
               >
-                {group.options.map((opt) => {
-                  const active = selected.has(opt.value);
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      className={[
-                        "editorial-chip",
-                        "almanac-filter-chip",
-                        active ? "editorial-chip--active" : "",
-                        active ? opt.tone : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                      aria-pressed={active}
-                      onClick={() => onToggle(group.category, opt.value)}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </fieldset>
-          );
-        })}
-      </div>
-
-      {activeCount > 0 ? (
-        <div className="almanac-filters__actions">
+                ×
+              </button>
+            </span>
+          ))}
           <button
             type="button"
             className="btn btn--text almanac-filters__clear"
             onClick={onClear}
           >
-            Clear filters
-            <span className="almanac-filters__clear-count">{activeCount}</span>
+            Clear all
           </button>
         </div>
-      ) : null}
+      )}
     </section>
   );
 }
