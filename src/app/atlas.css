@@ -402,6 +402,17 @@
   margin: 0;
 }
 
+/* Muted official/native-name line — mirrors the homepage
+   `.country-card-native` so the atlas hover card and the homepage
+   CountryCard read as the same component family. */
+.v2-country-card__native {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  line-height: var(--leading-snug);
+  margin: 0;
+}
+
 .v2-country-card__chip {
   margin-top: var(--space-2);
 }

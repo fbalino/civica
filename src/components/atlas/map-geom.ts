@@ -47,7 +47,20 @@ export function geomToPath(geom: Geometry): string {
   return d;
 }
 
-export function geomCentroid(geom: Geometry): [number, number] {
+/* Hand-tuned label anchors (lon, lat) for countries whose computed centroid
+   still lands awkwardly (coastline shape, offshore bias). Checked FIRST. */
+const LABEL_ANCHOR_OVERRIDES: Record<string, [number, number]> = {
+  can: [-101, 58], // mainland prairie — computed centroid drifts into Hudson Bay
+  nor: [9, 61.5], // mainland south — fjord vertices pull it seaward
+  chl: [-70.7, -37], // long thin: keep label in the central valley
+};
+
+export function geomCentroid(
+  geom: Geometry,
+  id?: string | null,
+): [number, number] {
+  const override = id ? LABEL_ANCHOR_OVERRIDES[id] : undefined;
+  if (override) return proj(override[0], override[1]);
   const rings =
     geom.type === "Polygon"
       ? [geom.coordinates as number[][][]]
@@ -66,13 +79,33 @@ export function geomCentroid(geom: Geometry): [number, number] {
     }
   }
   if (!best) return [0, 0];
-  let sx = 0;
-  let sy = 0;
-  best.forEach((p) => {
-    sx += p[0];
-    sy += p[1];
-  });
-  return proj(sx / best.length, sy / best.length);
+  // Shoelace AREA centroid of the largest ring — the true center of mass.
+  // (A vertex AVERAGE is biased toward vertex-dense coastlines: Canada's
+  // arctic shore has thousands of points, which dragged "CAN" into the
+  // water. The area centroid weights by geometry, not digitization density.)
+  let a = 0;
+  let cx = 0;
+  let cy = 0;
+  for (let i = 0; i < best.length - 1; i++) {
+    const [x0, y0] = best[i];
+    const [x1, y1] = best[i + 1];
+    const cross = x0 * y1 - x1 * y0;
+    a += cross;
+    cx += (x0 + x1) * cross;
+    cy += (y0 + y1) * cross;
+  }
+  if (a === 0) {
+    // Degenerate ring — fall back to the vertex average.
+    let sx = 0;
+    let sy = 0;
+    best.forEach((pt) => {
+      sx += pt[0];
+      sy += pt[1];
+    });
+    return proj(sx / best.length, sy / best.length);
+  }
+  a *= 0.5;
+  return proj(cx / (6 * a), cy / (6 * a));
 }
 
 export function geomBBoxArea(geom: Geometry): number {

@@ -86,6 +86,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
     const transformRef = useRef({ k: 1, x: 0, y: 0 });
     const dragRef = useRef({
       dragging: false,
+      moved: false, // true once the pointer travels past the click threshold
       startX: 0,
       startY: 0,
       originX: 0,
@@ -226,6 +227,12 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       const onMove = (e: MouseEvent) => {
         const d = dragRef.current;
         if (!d.dragging) return;
+        if (
+          !d.moved &&
+          Math.abs(e.clientX - d.startX) + Math.abs(e.clientY - d.startY) > 4
+        ) {
+          d.moved = true;
+        }
         transformRef.current.x = d.originX + (e.clientX - d.startX);
         transformRef.current.y = d.originY + (e.clientY - d.startY);
         applyTransform();
@@ -323,13 +330,13 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
     }, [applyTransform, zoomAround, mapLoaded]);
 
     function handleSvgMouseDown(e: React.MouseEvent) {
-      if (
-        (e.target as Element).tagName === "path" &&
-        (e.target as Element).getAttribute("data-id")
-      )
-        return;
+      // Start a drag candidate EVERYWHERE — including on countries (owner
+      // report: the map could only be grabbed on water). Click-vs-drag is
+      // disambiguated by the movement threshold below: a mouseup without
+      // movement still selects the country (see the path onClick guard).
       dragRef.current = {
         dragging: true,
+        moved: false,
         startX: e.clientX,
         startY: e.clientY,
         originX: transformRef.current.x,
@@ -460,6 +467,9 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                   onClick={(e) => {
                     if (p.country) {
                       e.stopPropagation();
+                      // A pan that started on this country ends with a click
+                      // event — don't treat it as a selection.
+                      if (dragRef.current.moved) return;
                       onCountrySelect(p.country, { shift: e.shiftKey });
                     }
                   }}
@@ -637,6 +647,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               name={hoverCard.country.name}
               officialName={hoverCard.country.govDetail || hoverCard.country.gov}
               iso2={hoverCard.country.iso2 ?? hoverCard.country.id.slice(0, 2)}
+              incomeGroup={layerData[hoverCard.country.id]?.incomeGroup ?? null}
               heroImageUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}.webp`}
               heroImageDarkUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}-dark.webp`}
               stats={[

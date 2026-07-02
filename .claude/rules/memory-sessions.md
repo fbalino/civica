@@ -51,7 +51,17 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   `<html data-scroll-behavior="smooth">` is set (layout.tsx has it — Next then forces instant
   scroll during route transitions). Removing the attribute regresses to "click a link, land
   mid-page" (scroll-restoration bug). Also: running `npm run build` while `next dev` is up
-  poisons the dev server's chunk cache (stale CSS with old content hash) — restart dev after.
+  poisons the dev server's chunk cache. A dev RESTART is NOT enough — the poisoned state
+  persists in `.next` on disk, and chunk NAMES don't change with content (grep-verifying a
+  served chunk can silently test stale bytes). Fix: kill dev, `rm -rf .next`, restart.
+  Symptom signature: token/rule exists on disk + tsc clean, but computed styles show initial
+  values (empty var() → fill:black / stroke:none).
+- **SVG map labels must be a SCREEN-SPACE layer** (sibling of the zoom-transformed <g>;
+  positions projected per frame in applyTransform; font/halo/letter-spacing in true screen px
+  via the viewBox→viewport ratio — AtlasWorldMap does this). Never put label text inside the
+  scaled group: every size property (incl. letter-spacing attrs) fights the transform (halos
+  grow, glyphs shrink with zoom). Zoom gates label DENSITY (tiers), never size. Label paint:
+  theme-independent white + dark halo (--map-label-fg/-halo tokens).
 
 ## Blog / images
 - Cover resolution = `resolvePostCover()` in `src/lib/blog.ts`: dedicated

@@ -14,6 +14,13 @@ export type CountryHoverCardProps = {
   name: string;
   officialName: string;
   iso2: string;
+  /**
+   * Canonical World Bank income-group label ("High income", "Upper middle
+   * income", …). When present, renders the tinted sage income Chip in the
+   * title stack — matching the homepage CountryCard so the two read as the
+   * same component family. Omitted when the fact is unresolved.
+   */
+  incomeGroup?: string | null;
   /** Optional. When omitted, the card renders compactly without a hero band. */
   heroImageUrl?: string;
   heroImageDarkUrl?: string;
@@ -38,6 +45,7 @@ export function CountryHoverCard({
   name,
   officialName,
   iso2,
+  incomeGroup,
   heroImageUrl,
   heroImageDarkUrl,
   heroImageAlt,
@@ -59,8 +67,11 @@ export function CountryHoverCard({
           <div className="v2-country-card__title-stack">
             <h3 className="v2-country-card__name">{name}</h3>
             {officialName ? (
+              <p className="v2-country-card__native">{officialName}</p>
+            ) : null}
+            {incomeGroup ? (
               <span className="v2-country-card__chip">
-                <Chip variant="neutral">{officialName}</Chip>
+                <Chip variant="sage">{incomeGroup}</Chip>
               </span>
             ) : null}
           </div>

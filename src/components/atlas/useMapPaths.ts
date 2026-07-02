@@ -58,7 +58,7 @@ export function useMapPaths(
             id: ourId,
             country: c,
             neId,
-            centroid: geomCentroid(f.geometry),
+            centroid: geomCentroid(f.geometry, ourId),
             area: geomBBoxArea(f.geometry),
           };
         });
