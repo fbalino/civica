@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 type RateLimitEntry = {
@@ -127,6 +128,45 @@ export function checkInMemoryRateLimit({
     remaining,
     retryAfterSeconds: Math.max(1, Math.ceil((entry.resetAt - now) / 1000)),
   };
+}
+
+/**
+ * Convenience wrapper: enforce a per-IP in-memory limit for a public GET
+ * route and, when exceeded, return the standard 429 JSON `NextResponse`
+ * (with `Retry-After` + `X-RateLimit-Remaining: 0`). Returns null when
+ * the request is allowed, so callers do:
+ *
+ *   const limited = enforceInMemoryRateLimit(req, { scope: "countries-bills" });
+ *   if (limited) return limited;
+ *
+ * This is the shared control the public per-country DB sub-routes use so
+ * they match the hardened `/export` sibling. Defaults to 60/min/IP.
+ */
+export function enforceInMemoryRateLimit(
+  request: Request,
+  {
+    scope,
+    max = 60,
+    windowMs = 60_000,
+  }: { scope: string; max?: number; windowMs?: number },
+): NextResponse | null {
+  const { allowed, retryAfterSeconds } = checkInMemoryRateLimit({
+    scope,
+    key: getRequestIp(request),
+    max,
+    windowMs,
+  });
+  if (allowed) return null;
+  return NextResponse.json(
+    { error: "Rate limit exceeded. Try again shortly." },
+    {
+      status: 429,
+      headers: {
+        "Retry-After": String(retryAfterSeconds),
+        "X-RateLimit-Remaining": "0",
+      },
+    },
+  );
 }
 
 // ── Durable (cross-instance) fixed-window limiter ──────────────────────────

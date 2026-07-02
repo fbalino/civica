@@ -92,7 +92,12 @@ function EndpointSection({
 }
 
 const EMBED_PARAMS = [
-  { name: "size", type: "sm | md | lg", description: "Widget dimensions. Default: md" },
+  {
+    name: "size",
+    type: "sm | md | lg | custom",
+    description:
+      "Widget dimensions. sm=300×80, md=320×180, lg=400×260. Use custom to build your own card with the include/w/h params below. Default: md",
+  },
   {
     name: "theme",
     type: "light | dark",
@@ -103,6 +108,22 @@ const EMBED_PARAMS = [
     type: "0 | 1",
     description:
       "Show available Civica Index dimension mini-bars in the large widget when real dimension scores are present. Default: 0",
+  },
+  {
+    name: "include",
+    type: "comma list",
+    description:
+      "size=custom only. Datapoints to render, in order: ci, cp, capital, gov, pop, gdp, area. Default when omitted: ci,capital,gov.",
+  },
+  {
+    name: "w",
+    type: "integer",
+    description: "size=custom only. Widget width in px. Clamped 280–600. Default 360.",
+  },
+  {
+    name: "h",
+    type: "integer",
+    description: "size=custom only. Widget height in px. Clamped 120–800. Default 320.",
   },
 ];
 
@@ -503,12 +524,20 @@ export default function ApiDocsPage() {
   "data": {
     "slug": "france",
     "name": "France",
+    "governmentClassification": { "regimeType": "semi_presidential_democracy" },
     "quarter": "2026-Q1",
+    "vintageLabel": "Civica Index 2026 Q1 (Beta)",
     "score": 83.2,
     "scoreLower": 79.1,
     "scoreUpper": 86.4,
     "band": "B",
+    "completenessFlag": "full",
     "rank": 18,
+    "totalRanked": 167,
+    "isPartial": false,
+    "missingDimensions": [],
+    "dimensionsAvailable": 4,
+    "methodologyVersion": "beta",
     "dimensions": [
       { "dimension": "democratic_quality", "normalizedScore": 82.4, "rawValue": 0.824, "sourceId": "vdem" }
     ]
@@ -537,9 +566,34 @@ export default function ApiDocsPage() {
           exampleResponse={`{
   "data": [
     {
-      "jurisdiction": { "slug": "france", "name": "France" },
-      "composite": { "score": 83.2, "rank": 18, "quarter": "2026-Q1" },
-      "dimensions": []
+      "jurisdiction": {
+        "slug": "france",
+        "name": "France",
+        "iso2": "FR",
+        "iso3": "FRA",
+        "continent": "Europe",
+        "governmentType": "semi-presidential republic",
+        "governmentTypeDetail": "semi-presidential republic",
+        "governmentClassification": { "regimeType": "semi_presidential_democracy" }
+      },
+      "composite": {
+        "quarter": "2026-Q1",
+        "vintageLabel": "Civica Index 2026 Q1 (Beta)",
+        "score": 83.2,
+        "scoreLower": 79.1,
+        "scoreUpper": 86.4,
+        "band": "B",
+        "completenessFlag": "full",
+        "rank": 18,
+        "totalRanked": 167,
+        "isPartial": false,
+        "missingDimensions": [],
+        "dimensionsAvailable": 4,
+        "methodologyVersion": "beta"
+      },
+      "dimensions": [
+        { "dimension": "democratic_quality", "normalizedScore": 82.4, "rawValue": 0.824, "sourceId": "vdem" }
+      ]
     }
   ],
   "meta": { "quarter": null, "count": 2 }
@@ -673,7 +727,10 @@ for country in resp.json()["data"]:
           the visitor&rsquo;s system color scheme by default. Override with{" "}
           <code>?theme=light</code> or <code>?theme=dark</code>. Add{" "}
           <code>?dims=1</code> to the large widget to show available Civica
-          Index dimension mini-bars when real dimension scores are present.
+          Index dimension mini-bars when real dimension scores are present. For
+          full control, use <code>?size=custom</code> with{" "}
+          <code>?include=</code> to choose which datapoints render and{" "}
+          <code>?w=</code>/<code>?h=</code> to set the dimensions.
         </p>
 
         <div className="api-embed-block">
@@ -694,6 +751,15 @@ for country in resp.json()["data"]:
           <p className="api-embed-size-label">Large — 400 × 260 (optional CI dimensions)</p>
           <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=lg&dims=1"
         width="400" height="260" loading="lazy"
+        title="Civica Index — Brazil"></iframe>`}</CodeBlock>
+        </div>
+
+        <div className="api-embed-block">
+          <p className="api-embed-size-label">
+            Custom — pick your datapoints and dimensions
+          </p>
+          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=custom&include=ci,cp,capital,pop&w=360&h=320"
+        width="360" height="320" loading="lazy"
         title="Civica Index — Brazil"></iframe>`}</CodeBlock>
         </div>
 

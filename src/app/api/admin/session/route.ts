@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   buildAdminCookieHeaders,
   buildAdminClearCookieHeaders,
+  verifyAdminToken,
 } from "@/lib/admin/session";
 
 export async function POST(request: NextRequest) {
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
     redirect = json.redirect ?? redirect;
   }
 
-  if (token !== expected) {
+  if (!verifyAdminToken(token)) {
     const failUrl = new URL("/admin/sign-in?error=1", request.url);
     return NextResponse.redirect(failUrl, 303);
   }

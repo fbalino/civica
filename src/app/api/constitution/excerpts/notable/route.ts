@@ -14,10 +14,16 @@
 import { getJurisdictionsBySlugs } from "@/lib/db/queries";
 import { getNotableTopicPeers } from "@/lib/db/queries-constitution";
 import { getTopicLabel } from "@/lib/constitute/topics";
+import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
 
 export const revalidate = 3600;
 
 export async function GET(request: Request) {
+  const limited = enforceInMemoryRateLimit(request, {
+    scope: "constitution-excerpts-notable",
+  });
+  if (limited) return limited;
+
   const url = new URL(request.url);
   const topicKey = (url.searchParams.get("topic") ?? "").trim();
   const excludeSlug = (url.searchParams.get("exclude") ?? "").trim();

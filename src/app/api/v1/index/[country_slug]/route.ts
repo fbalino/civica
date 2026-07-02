@@ -6,6 +6,10 @@ import {
   ciDimensionScores,
 } from "@/lib/db/schema";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import {
+  STRUCTURAL_FAMILY_DEPRECATION_META,
+  withStructuralFamilyDeprecation,
+} from "@/lib/api/deprecation";
 import { and, eq, sql, desc } from "drizzle-orm";
 
 /**
@@ -30,7 +34,7 @@ export async function GET(
 
     const jurisdiction = await getJurisdictionBySlug(slug);
     if (!jurisdiction) {
-      return apiError("Country not found", 404);
+      return withStructuralFamilyDeprecation(apiError("Country not found", 404));
     }
 
     // Fetch the latest score under the requested methodology. Falling
@@ -50,9 +54,11 @@ export async function GET(
 
     const composite = latestScore[0];
     if (!composite) {
-      return apiError(
-        `No CI data available for this country under methodology "${methodologyVersion}".`,
-        404,
+      return withStructuralFamilyDeprecation(
+        apiError(
+          `No CI data available for this country under methodology "${methodologyVersion}".`,
+          404,
+        ),
       );
     }
 
@@ -83,31 +89,43 @@ export async function GET(
       sourceId: d.sourceId,
     }));
 
-    return apiResponse({
-      data: {
-        slug: jurisdiction.slug,
-        name: jurisdiction.name,
-        governmentClassification: jurisdiction.governmentClassification ?? null,
-        quarter: composite.quarter,
-        vintageLabel: composite.vintageLabel,
-        score: composite.score,
-        scoreLower: composite.scoreLower,
-        scoreUpper: composite.scoreUpper,
-        band: composite.band,
-        completenessFlag: composite.completenessFlag,
-        rank: composite.rank,
-        totalRanked: composite.totalRanked,
-        isPartial: composite.isPartial,
-        missingDimensions: composite.missingDimensions ?? [],
-        dimensionsAvailable: composite.dimensionsAvailable,
-        methodologyVersion: composite.methodologyVersion,
-        dimensions,
-      },
-      meta: { methodology: CI_METHODOLOGY_META },
-    });
+    // This endpoint surfaces `governmentClassification`, which still
+    // carries the deprecated `structuralFamily` / `structuralSubtype`
+    // fields (retired per the 2026-05-02 peer-grouping resolution,
+    // sunset 2027-03-31). Attach the same Deprecation/Sunset/Link
+    // headers + `meta.deprecations` block every sibling structural
+    // surface uses (rankings, countries) so consumers get one
+    // consistent sunset signal.
+    return withStructuralFamilyDeprecation(
+      apiResponse({
+        data: {
+          slug: jurisdiction.slug,
+          name: jurisdiction.name,
+          governmentClassification: jurisdiction.governmentClassification ?? null,
+          quarter: composite.quarter,
+          vintageLabel: composite.vintageLabel,
+          score: composite.score,
+          scoreLower: composite.scoreLower,
+          scoreUpper: composite.scoreUpper,
+          band: composite.band,
+          completenessFlag: composite.completenessFlag,
+          rank: composite.rank,
+          totalRanked: composite.totalRanked,
+          isPartial: composite.isPartial,
+          missingDimensions: composite.missingDimensions ?? [],
+          dimensionsAvailable: composite.dimensionsAvailable,
+          methodologyVersion: composite.methodologyVersion,
+          dimensions,
+        },
+        meta: {
+          methodology: CI_METHODOLOGY_META,
+          ...STRUCTURAL_FAMILY_DEPRECATION_META,
+        },
+      }),
+    );
   } catch (e) {
     console.error("API /v1/index/[country_slug] error:", e);
-    return apiError("Internal server error", 500);
+    return withStructuralFamilyDeprecation(apiError("Internal server error", 500));
   }
 }
 

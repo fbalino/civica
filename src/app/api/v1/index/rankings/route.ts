@@ -158,6 +158,7 @@ export async function GET(request: Request) {
       methodologyVersion: ciCompositeScores.methodologyVersion,
       slug: jurisdictions.slug,
       name: jurisdictions.name,
+      iso2: jurisdictions.iso2,
       iso3: jurisdictions.iso3,
       continent: jurisdictions.continent,
       governmentType: jurisdictions.governmentType,

@@ -2,15 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
+import { verifyAdminBearer } from "@/lib/admin/session";
 
 // Protect with ADMIN_API_KEY env var.
 // Set ADMIN_API_KEY in your Vercel project environment variables.
 // Call with: Authorization: Bearer <ADMIN_API_KEY>
 function isAuthorized(req: NextRequest): boolean {
-  const key = process.env.ADMIN_API_KEY;
-  if (!key) return false;
-  const header = req.headers.get("authorization") ?? "";
-  return header === `Bearer ${key}`;
+  return verifyAdminBearer(req.headers.get("authorization"));
 }
 
 export async function GET(req: NextRequest) {
@@ -19,8 +17,11 @@ export async function GET(req: NextRequest) {
   }
 
   const url = new URL(req.url);
-  const limit = Math.min(parseInt(url.searchParams.get("limit") ?? "50", 10), 200);
-  const offset = parseInt(url.searchParams.get("offset") ?? "0", 10);
+  const limit = Math.min(
+    Math.max(parseInt(url.searchParams.get("limit") ?? "50", 10) || 50, 1),
+    200,
+  );
+  const offset = Math.max(parseInt(url.searchParams.get("offset") ?? "0", 10) || 0, 0);
 
   const rows = await db
     .select()

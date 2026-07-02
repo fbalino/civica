@@ -27,7 +27,10 @@ export function requireCronAuth(request: Request): NextResponse | null {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     // Fail closed when unconfigured, but don't disclose config state.
-    return NextResponse.json({ error: "Unauthorized" }, { status: 500 });
+    // Returns 401 (not 500) for consistency with the admin bearer path —
+    // an unauthenticated caller can't tell "server misconfigured" from
+    // "wrong secret", which is the desired non-disclosure posture.
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const header = request.headers.get("authorization") ?? "";
   const expected = `Bearer ${secret}`;

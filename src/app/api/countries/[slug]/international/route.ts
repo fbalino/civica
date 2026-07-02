@@ -5,6 +5,7 @@ import {
   getCoMembers,
 } from "@/lib/data/international-organizations";
 import { COUNTRIES } from "@/components/atlas/data";
+import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
 
 /**
  * GET /api/countries/[slug]/international
@@ -14,9 +15,14 @@ import { COUNTRIES } from "@/components/atlas/data";
  * curated dataset is keyed by 3-letter id today.
  */
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const limited = enforceInMemoryRateLimit(req, {
+    scope: "countries-international",
+  });
+  if (limited) return limited;
+
   const { slug } = await params;
   const normalized = slug.toLowerCase();
 

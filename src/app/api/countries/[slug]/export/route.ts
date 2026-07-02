@@ -45,6 +45,28 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  // Abuse control (see the note above): bound this full-country dump to
+  // 30 exports / minute / IP with the same per-IP in-memory limiter the
+  // public /api/v1 routes use.
+  const { allowed, retryAfterSeconds } = checkInMemoryRateLimit({
+    scope: "countries-export",
+    key: getRequestIp(req),
+    max: EXPORT_RATE_LIMIT_MAX,
+    windowMs: EXPORT_RATE_LIMIT_WINDOW_MS,
+  });
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded. Try again shortly." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(retryAfterSeconds),
+          "X-RateLimit-Remaining": "0",
+        },
+      }
+    );
+  }
+
   const { slug } = await params;
   const url = new URL(req.url);
   const format = url.searchParams.get("format") ?? "json";

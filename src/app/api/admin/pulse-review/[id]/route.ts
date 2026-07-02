@@ -30,6 +30,8 @@ import {
 } from "@/lib/db/schema";
 import {
   getAdminSession,
+  verifyAdminBearer,
+  sanitizeReviewerName,
   ADMIN_REVIEWER_COOKIE,
 } from "@/lib/admin/session";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
@@ -86,11 +88,10 @@ async function authorize(
 ): Promise<{ reviewerId: string } | null> {
   const expected = process.env.ADMIN_API_KEY;
   if (!expected) return null;
-  // Bearer header path
-  const auth = request.headers.get("authorization") ?? "";
-  if (auth === `Bearer ${expected}`) {
+  // Bearer header path (constant-time compare)
+  if (verifyAdminBearer(request.headers.get("authorization"))) {
     const reviewerHeader = request.headers.get("x-civica-reviewer");
-    return { reviewerId: reviewerHeader?.trim() || "api-bearer" };
+    return { reviewerId: sanitizeReviewerName(reviewerHeader, "api-bearer") };
   }
   // Cookie session path
   const session = await getAdminSession();

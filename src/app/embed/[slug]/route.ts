@@ -1,4 +1,5 @@
 import { type NextRequest } from "next/server";
+import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
 import { getCICountryDetail } from "@/lib/db/queries";
 import {
   V2_DIMENSIONS,
@@ -33,6 +34,15 @@ const WIDGET_FACT_KEYS = [
   "area_total_km2",
 ] as const;
 
+// Abuse control: each embed render hits the DB + fact resolver, so an
+// unthrottled loop is a cheap scraping / cost vector even with the CDN
+// s-maxage. Bound it with the same per-IP in-memory limiter the public
+// /api/v1 routes use. 120/min/IP sits far above a page that embeds many
+// widgets while stopping a tight scrape loop; the CDN cache absorbs the
+// rest.
+const EMBED_RATE_LIMIT_MAX = 120;
+const EMBED_RATE_LIMIT_WINDOW_MS = 60_000;
+
 const DIMENSION_SHORT_LABELS: Record<CIDimensionV2, string> = {
   democratic_quality: "Dem",
   rule_of_law: "Rule",
@@ -45,7 +55,10 @@ function corsHeaders() {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
-    "X-Frame-Options": "ALLOWALL",
+    // `X-Frame-Options: ALLOWALL` was a no-op — ALLOWALL is not a valid
+    // value (only DENY / SAMEORIGIN exist) so browsers ignore it. Cross-
+    // origin framing is granted by the CSP `frame-ancestors *` below,
+    // which IS the standards-compliant control.
     "Content-Security-Policy": "frame-ancestors *",
   };
 }
@@ -58,6 +71,23 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { allowed, retryAfterSeconds } = checkInMemoryRateLimit({
+    scope: "embed",
+    key: getRequestIp(request),
+    max: EMBED_RATE_LIMIT_MAX,
+    windowMs: EMBED_RATE_LIMIT_WINDOW_MS,
+  });
+  if (!allowed) {
+    return new Response("Rate limit exceeded. Try again shortly.", {
+      status: 429,
+      headers: {
+        ...corsHeaders(),
+        "Content-Type": "text/plain",
+        "Retry-After": String(retryAfterSeconds),
+      },
+    });
+  }
+
   const { slug } = await params;
   const { searchParams } = new URL(request.url);
 

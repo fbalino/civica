@@ -3,6 +3,7 @@ import { inArray } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { sources } from "@/lib/db/schema";
 import { getBillsForJurisdiction } from "@/lib/db/queries";
+import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
 
 const SOURCE_TAG: Record<string, string> = {
   congress_gov: "U.S. Congress",
@@ -26,9 +27,12 @@ const SOURCE_TAG: Record<string, string> = {
  * Output shape preserved so `BillsTab` keeps rendering unchanged.
  */
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  const limited = enforceInMemoryRateLimit(req, { scope: "countries-bills" });
+  if (limited) return limited;
+
   const { slug } = await params;
   let result;
   try {

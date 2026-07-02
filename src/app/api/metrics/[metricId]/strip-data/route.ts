@@ -7,11 +7,15 @@ import {
 import { db } from "@/lib/db";
 import { jurisdictions, metricDefinitions, sources } from "@/lib/db/schema";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
+import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ metricId: string }> }
 ) {
+  const limited = enforceInMemoryRateLimit(req, { scope: "metrics-strip-data" });
+  if (limited) return limited;
+
   const { metricId } = await params;
   const { searchParams } = new URL(req.url);
 

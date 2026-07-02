@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getJurisdictionBySlug } from "@/lib/db/queries";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
+import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
 
 /**
  * P1.1 — Scores & Rankings feed for the atlas Scores tab.
@@ -12,9 +13,12 @@ import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
  * factbook and atlas.
  */
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ slug: string }> },
 ) {
+  const limited = enforceInMemoryRateLimit(req, { scope: "countries-scores" });
+  if (limited) return limited;
+
   const { slug } = await params;
   const jurisdiction = await getJurisdictionBySlug(slug);
   if (!jurisdiction) {

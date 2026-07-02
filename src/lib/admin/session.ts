@@ -49,6 +49,52 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(bufA, bufB);
 }
 
+/**
+ * Constant-time check of an incoming `Authorization: Bearer <token>`
+ * header against the server's ADMIN_API_KEY. Returns false when
+ * ADMIN_API_KEY is unset (fail closed) or the header doesn't match.
+ *
+ * All /api/admin/* bearer paths route through this instead of a plain
+ * `header === \`Bearer ${key}\`` so the compare can't leak the secret
+ * via response timing (mirrors the cookie-session `safeEqual` path and
+ * `cron-auth.ts`). The set of accepted tokens is unchanged — only the
+ * comparison mechanics differ.
+ */
+export function verifyAdminBearer(authorizationHeader: string | null): boolean {
+  const expected = process.env.ADMIN_API_KEY;
+  if (!expected) return false;
+  return safeEqual(authorizationHeader ?? "", `Bearer ${expected}`);
+}
+
+/**
+ * Constant-time check of a raw ADMIN_API_KEY (e.g. the sign-in form's
+ * `token` field, no `Bearer ` prefix). Returns false when ADMIN_API_KEY
+ * is unset. Accepted tokens are unchanged — only the compare is
+ * constant-time.
+ */
+export function verifyAdminToken(token: string | null | undefined): boolean {
+  const expected = process.env.ADMIN_API_KEY;
+  if (!expected) return false;
+  return safeEqual(token ?? "", expected);
+}
+
+/**
+ * Sanitise an operator-supplied reviewer name to the same shape the
+ * sign-in cookie path enforces: keep only `[a-zA-Z0-9 _.\-]`, trim, and
+ * cap at 80 chars. Returns `fallback` when the result is empty. Used for
+ * the `x-civica-reviewer` header on the Bearer path so an unbounded /
+ * unescaped value can't land verbatim in an audit-log row.
+ */
+export function sanitizeReviewerName(
+  raw: string | null | undefined,
+  fallback: string,
+): string {
+  return (
+    (raw ?? "").replace(/[^a-zA-Z0-9 _.\-]/g, "").trim().slice(0, 80) ||
+    fallback
+  );
+}
+
 /** Read + validate the admin session cookie. Returns null when the
  *  cookie is missing, invalid, or the server isn't configured with
  *  ADMIN_API_KEY. */

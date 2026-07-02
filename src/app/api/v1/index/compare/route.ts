@@ -1,6 +1,10 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { compareCICountries } from "@/lib/db/queries";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import {
+  STRUCTURAL_FAMILY_DEPRECATION_META,
+  withStructuralFamilyDeprecation,
+} from "@/lib/api/deprecation";
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
@@ -21,6 +25,13 @@ export async function GET(request: Request) {
     const slugs = slugsParam.map((s) => s.toLowerCase());
     const rows = await compareCICountries(slugs, quarter);
 
+    // Curate a public response shape rather than spreading the raw DB rows.
+    // `compareCICountries` returns the full `jurisdictions` row (internal
+    // `id`, `factCacheRefreshedAt`, `createdAt`/`updatedAt`) and full
+    // `ci_dimension_scores` rows (`id`, `ingestionId`, `jurisdictionId`,
+    // `createdAt`) — none of which belong in the public API. Every other
+    // v1 route curates its fields; mirror /api/v1/index/[country_slug].
+    //
     // Emit each per-dimension `normalizedScore` on the SAME v2 fixed-bound
     // scale as the headline composite, so this endpoint reconciles with the
     // /compare page, /api/v1/index/[slug], and the embed card (all of which
@@ -30,18 +41,60 @@ export async function GET(request: Request) {
     // source is missing. Mirrors src/app/api/v1/index/[country_slug]/route.ts
     // and src/components/compare/CompareCivicaIndex.tsx.
     const results = rows.map((row) => ({
-      ...row,
+      jurisdiction: {
+        slug: row.jurisdiction.slug,
+        name: row.jurisdiction.name,
+        iso2: row.jurisdiction.iso2,
+        iso3: row.jurisdiction.iso3,
+        continent: row.jurisdiction.continent,
+        governmentType: row.jurisdiction.governmentType,
+        governmentTypeDetail: row.jurisdiction.governmentTypeDetail,
+        governmentClassification:
+          row.jurisdiction.governmentClassification ?? null,
+      },
+      composite: row.composite
+        ? {
+            quarter: row.composite.quarter,
+            vintageLabel: row.composite.vintageLabel,
+            score: row.composite.score,
+            scoreLower: row.composite.scoreLower,
+            scoreUpper: row.composite.scoreUpper,
+            band: row.composite.band,
+            completenessFlag: row.composite.completenessFlag,
+            rank: row.composite.rank,
+            totalRanked: row.composite.totalRanked,
+            isPartial: row.composite.isPartial,
+            missingDimensions: row.composite.missingDimensions ?? [],
+            dimensionsAvailable: row.composite.dimensionsAvailable,
+            methodologyVersion: row.composite.methodologyVersion,
+          }
+        : null,
       dimensions: row.dimensions.map((d) => ({
-        ...d,
+        dimension: d.dimension,
         normalizedScore:
           displayDimensionScore(d.rawValue, d.sourceId) ?? d.normalizedScore,
+        rawValue: d.rawValue,
+        sourceId: d.sourceId,
       })),
     }));
 
-    return apiResponse({ data: results, meta: { quarter: quarter ?? null, count: results.length } });
+    // `jurisdiction.governmentClassification` still carries the deprecated
+    // `structuralFamily` / `structuralSubtype` fields — attach the same
+    // sunset signal the other structural surfaces use (rankings, countries,
+    // index/[slug]).
+    return withStructuralFamilyDeprecation(
+      apiResponse({
+        data: results,
+        meta: {
+          quarter: quarter ?? null,
+          count: results.length,
+          ...STRUCTURAL_FAMILY_DEPRECATION_META,
+        },
+      }),
+    );
   } catch (e) {
     console.error("API /v1/index/compare error:", e);
-    return apiError("Internal server error", 500);
+    return withStructuralFamilyDeprecation(apiError("Internal server error", 500));
   }
 }
 

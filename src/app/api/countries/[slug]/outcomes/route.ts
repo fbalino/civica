@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { getJurisdictionBySlug, getCountryOutcomes } from "@/lib/db/queries";
+import { enforceInMemoryRateLimit } from "@/lib/api/rate-limit";
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const limited = enforceInMemoryRateLimit(req, { scope: "countries-outcomes" });
+  if (limited) return limited;
+
   const { slug } = await params;
   const { searchParams } = new URL(req.url);
 
