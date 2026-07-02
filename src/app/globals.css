@@ -175,6 +175,13 @@
   --color-card-hover-border: #D2CEC5;
   --color-divider: #E4E1DC;
   --color-scrim: color-mix(in oklab, #0B1B2D 50%, transparent); /* modal backdrop */
+  /* Fullscreen media-overlay (lightbox) chrome. Theme-independent: the
+     lightbox renders on a near-black scrim in both light and dark, so these
+     anchor on absolute black/white and are NOT flipped in the dark block. */
+  --color-overlay-bg: color-mix(in oklab, #000 92%, transparent);
+  --color-overlay-fg: #fff;
+  --color-overlay-caption-bg: color-mix(in oklab, #000 60%, transparent);
+  --color-overlay-border: color-mix(in oklab, #fff 20%, transparent);
   --color-branch-border-alpha: 44;
   --color-stat-border: #EDE9E2;
   --color-selection: rgba(183, 81, 43, 0.16);
@@ -3529,7 +3536,7 @@ a {
   background-size: 24px 24px;
   background-color: var(--color-bg);
   border: 1px solid var(--color-card-border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 28px 20px;
   overflow-x: auto;
   position: relative;
@@ -3549,7 +3556,7 @@ a {
 .ghc-branch {
   background: var(--color-card-bg);
   border: 1px solid var(--color-card-border);
-  border-radius: 10px;
+  border-radius: 10px; /* 10px — no exact token; between --radius-md(8) and --radius-lg(12) */
   overflow: hidden;
   position: relative;
 }

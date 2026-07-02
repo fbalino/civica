@@ -101,12 +101,12 @@
 .pane-handle--left {
   left: var(--atlas-leftW);
   border-left: 0;
-  border-radius: 0 4px 4px 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 .pane-handle--right {
   right: var(--atlas-rightW);
   border-right: 0;
-  border-radius: 4px 0 0 4px;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
 
 /* Strip the aside's own border when collapsed so the empty pane

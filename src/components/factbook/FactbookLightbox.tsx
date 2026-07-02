@@ -16,14 +16,14 @@ interface FactbookLightboxProps {
   onClose: () => void;
 }
 
-// Lightbox-specific tokens — the dialog renders on top of a near-black
-// scrim regardless of the page theme, so we anchor on absolute white +
-// black with token-derived opacity. Defined here as inline CSS vars
-// rather than `:root` because the lightbox is the only consumer.
-const OVERLAY_BG = "color-mix(in oklab, #000 92%, transparent)";
-const OVERLAY_FG = "#fff";
-const OVERLAY_CAPTION_BG = "color-mix(in oklab, #000 60%, transparent)";
-const OVERLAY_BORDER_FG = "color-mix(in oklab, #fff 20%, transparent)";
+// Lightbox-specific overlay chrome. The dialog renders on top of a
+// near-black scrim regardless of the page theme, so these anchor on
+// absolute white + black. The literals live in the :root token-definition
+// block in globals.css (--color-overlay-*); we only reference the vars here.
+const OVERLAY_BG = "var(--color-overlay-bg)";
+const OVERLAY_FG = "var(--color-overlay-fg)";
+const OVERLAY_CAPTION_BG = "var(--color-overlay-caption-bg)";
+const OVERLAY_BORDER_FG = "var(--color-overlay-border)";
 
 export function FactbookLightbox({
   open,

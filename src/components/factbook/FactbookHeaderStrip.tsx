@@ -284,8 +284,8 @@ export function FactbookHeaderStrip({
                 className="factbook-meta-pill--government"
               />
             )}
-            {popStr &&
-              (populationResolver?.canonical ? (
+            {popStr ? (
+              populationResolver?.canonical ? (
                 <span
                   style={{
                     display: "inline-flex",
@@ -319,9 +319,14 @@ export function FactbookHeaderStrip({
                 </span>
               ) : (
                 <MetaPill label="Pop" value={popStr} />
-              ))}
-            {gdpStr &&
-              (gdpResolver?.canonical ? (
+              )
+            ) : (
+              // Provenance-display convention (2026-05-01): show the explicit
+              // "No source" placeholder rather than silently omitting the pill.
+              <MetaPill label="Pop" value="No source" />
+            )}
+            {gdpStr ? (
+              gdpResolver?.canonical ? (
                 <span
                   style={{
                     display: "inline-flex",
@@ -355,7 +360,12 @@ export function FactbookHeaderStrip({
                 </span>
               ) : (
                 <MetaPill label="GDP" value={gdpStr} />
-              ))}
+              )
+            ) : (
+              // Provenance-display convention (2026-05-01): show the explicit
+              // "No source" placeholder rather than silently omitting the pill.
+              <MetaPill label="GDP" value="No source" />
+            )}
             {ciScore != null && (
               <Link
                 href={`/country/${slug}/civica-data`}
