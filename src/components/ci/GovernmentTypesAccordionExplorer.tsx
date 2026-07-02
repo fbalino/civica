@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Reveal } from "@/components/motion/Reveal";
 
 export type GovernmentTypeLeaf = {
   id: string;
@@ -588,7 +589,7 @@ export function GovernmentTypesAccordionExplorer({
 
       {families.length > 0 ? (
         <>
-          <section className="callout-strip">
+          <Reveal as="section" className="callout-strip" amount={0.3}>
             <Callout
               label="Highest avg. CI"
               value={highestAvg ? highestAvg.avgScore.toFixed(1) : "—"}
@@ -621,9 +622,9 @@ export function GovernmentTypesAccordionExplorer({
               color="var(--tier-failed)"
               hint={mostDeclined ? mostDeclined.family.label : "Insufficient history"}
             />
-          </section>
+          </Reveal>
 
-          <section>
+          <Reveal as="section" amount={0.15}>
             <div className="section-eyebrow">
               The full distribution · every country placed by CI
             </div>
@@ -663,9 +664,9 @@ export function GovernmentTypesAccordionExplorer({
 
               <BeeSwarm rows={visibleRows} toggleRow={toggleRow} />
             </div>
-          </section>
+          </Reveal>
 
-          <section>
+          <Reveal as="section" amount={0.1}>
             <div className="section-eyebrow">
               By the numbers · families first, subtypes on demand
             </div>
@@ -762,9 +763,9 @@ export function GovernmentTypesAccordionExplorer({
                 );
               })}
             </div>
-          </section>
+          </Reveal>
 
-          <section className="detail-grid">
+          <Reveal as="section" className="detail-grid" amount={0.2}>
             <div className="panel">
               <div className="section-eyebrow no-margin">What the data says</div>
               <h3>
@@ -806,7 +807,7 @@ export function GovernmentTypesAccordionExplorer({
                 </Link>
               </p>
             </div>
-          </section>
+          </Reveal>
 
           <footer className="gov-footer">
             <div>

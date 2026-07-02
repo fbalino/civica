@@ -5,6 +5,7 @@ import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
+import { Reveal } from "@/components/motion/Reveal";
 import { peerGrouping, civicaIndex, deprecation } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -89,16 +90,16 @@ export default function PeerGroupingMethodologyPage() {
             prose source of truth for sections 1–14. Footnotes via GFM
             (remark-gfm). Per content-templating audit v1.0 §3.6 +
             v1.1 amendment §6.A. */}
-        <section className="editorial-section">
+        <Reveal as="section" className="editorial-section" amount={0.15}>
           <MarkdownContent
             file="content/methodology-peer-grouping.md"
             stats={null}
             state={state as unknown as Record<string, unknown>}
             ctx={ctx}
           />
-        </section>
+        </Reveal>
 
-        <section className="editorial-section" id="cite">
+        <Reveal as="section" className="editorial-section" id="cite" amount={0.15}>
           <h2>Cite this page</h2>
           <CiteAccordion
             subject="Civica Atlas Methodology — Peer grouping"
@@ -106,7 +107,7 @@ export default function PeerGroupingMethodologyPage() {
             url="https://civicaatlas.org/civica-index/methodology/peer-grouping"
             dataVintage={peerGrouping.adoptedAt}
           />
-        </section>
+        </Reveal>
 
         <footer className="editorial-footer-nav">
           <Link href="/civica-index/methodology">

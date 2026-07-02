@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { rankCountriesByFact } from "@/lib/db/queries";
 import { RankingTable } from "@/components/RankingTable";
 import { withOg } from "@/lib/og";
-import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { HeroReveal, HeroRevealItem, Reveal } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 
 export const revalidate = 3600;
@@ -129,7 +129,7 @@ export default async function RankingsPage({
       </section>
 
       <div className="editorial-page editorial-page--full">
-      <nav style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", marginBottom: "var(--space-8)" }}>
+      <Reveal as="nav" amount={0.4} style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap", marginBottom: "var(--space-8)" }}>
         {RANKING_METRICS.map((m) => (
           <a
             key={m.key}
@@ -149,10 +149,12 @@ export default async function RankingsPage({
             {m.title}
           </a>
         ))}
-      </nav>
+      </Reveal>
 
       {tableRows.length > 0 ? (
-        <RankingTable title={metric.title} unit={metric.unit} rows={tableRows} pageSize={25} />
+        <Reveal as="section" amount={0.15}>
+          <RankingTable title={metric.title} unit={metric.unit} rows={tableRows} pageSize={25} />
+        </Reveal>
       ) : (
         <p
           style={{

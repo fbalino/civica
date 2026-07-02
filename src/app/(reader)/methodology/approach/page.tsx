@@ -8,6 +8,7 @@ import {
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
+import { Reveal } from "@/components/motion/Reveal";
 import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
 import {
   tier1Publishers,
@@ -100,19 +101,21 @@ export default async function ApproachPage() {
             content/data-approach.md. Wrapped in `.editorial-section`
             so descendant <h2>/<p>/<ul>/etc. inherit the editorial
             typography from src/app/editorial.css automatically. */}
-        <section className="editorial-section">
+        <Reveal as="section" className="editorial-section" amount={0.15}>
           <MarkdownContent
             file="content/data-approach.md"
             stats={stats as unknown as Record<string, unknown> | null}
             state={state as unknown as Record<string, unknown>}
             ctx={ctx}
           />
-        </section>
+        </Reveal>
 
-        <section
+        <Reveal
+          as="section"
           id="cite"
           className="editorial-section"
           aria-labelledby="cite-heading"
+          amount={0.15}
         >
           <h2 id="cite-heading">Cite this page</h2>
           <CiteAccordion
@@ -121,7 +124,7 @@ export default async function ApproachPage() {
             url="https://civicaatlas.org/methodology/approach"
             dataVintage={civicaIndex.lastRevisionIso}
           />
-        </section>
+        </Reveal>
       </article>
     </EditorialPage>
   );

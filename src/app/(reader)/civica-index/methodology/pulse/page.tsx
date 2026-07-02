@@ -5,6 +5,7 @@ import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
+import { Reveal } from "@/components/motion/Reveal";
 import { pulse, disputeSla } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -88,16 +89,16 @@ export default function PulseMethodologyPage() {
             .editorial-section so descendant h2/p/ul/table inherit
             editorial.css typography. Per content-templating audit
             v1.0 §3.5. */}
-        <section className="editorial-section">
+        <Reveal as="section" className="editorial-section" amount={0.15}>
           <MarkdownContent
             file="content/methodology-pulse.md"
             stats={null}
             state={state as unknown as Record<string, unknown>}
             ctx={ctx}
           />
-        </section>
+        </Reveal>
 
-        <section className="editorial-section" id="cite">
+        <Reveal as="section" className="editorial-section" id="cite" amount={0.15}>
           <h2>Cite this page</h2>
           <CiteAccordion
             subject="Civica Atlas Methodology — Pulse methodology (Beta)"
@@ -109,7 +110,7 @@ export default function PulseMethodologyPage() {
               )?.ranAt
             }
           />
-        </section>
+        </Reveal>
 
         <nav className="editorial-footer-nav" aria-label="Methodology navigation">
           <Link href="/civica-index/methodology">← Civica Index methodology</Link>

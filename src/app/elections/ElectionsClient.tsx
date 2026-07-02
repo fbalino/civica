@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { CountryFlag } from "@/components/CountryFlag";
+import { Reveal } from "@/components/motion/Reveal";
 
 interface ElectionRow {
   election: {
@@ -112,7 +113,7 @@ export default function ElectionsClient({
     <div className="cv-container" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--spacing-section-y)" }}>
       {/* Stats — matching Index page pattern. The page hero (title + dek)
           renders full-bleed above, in the server page.tsx. */}
-      <div className="index-stats-row" style={{ marginBottom: "var(--space-7)" }}>
+      <Reveal as="div" amount={0.4} className="index-stats-row" style={{ marginBottom: "var(--space-7)" }}>
         {[
           { value: stats.electionsThisYear ?? "—", label: `Elections in ${new Date().getFullYear()}` },
           { value: stats.upcomingCount ?? "—", label: "Upcoming" },
@@ -127,10 +128,10 @@ export default function ElectionsClient({
             {i < arr.length - 1 && <div className="index-stat-divider" />}
           </div>
         ))}
-      </div>
+      </Reveal>
 
       {/* Filters */}
-      <div style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-7)", flexWrap: "wrap", alignItems: "center", paddingTop: "var(--space-6)", borderTop: "1px solid var(--color-divider)" }}>
+      <Reveal as="div" amount={0.4} style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-7)", flexWrap: "wrap", alignItems: "center", paddingTop: "var(--space-6)", borderTop: "1px solid var(--color-divider)" }}>
         <select
           value={regionFilter}
           onChange={(e) => setRegionFilter(e.target.value)}
@@ -155,11 +156,11 @@ export default function ElectionsClient({
             {t}
           </button>
         ))}
-      </div>
+      </Reveal>
 
       {/* Upcoming Elections */}
       {filteredUpcoming.length > 0 && (
-        <section style={{ marginBottom: "var(--space-8)" }}>
+        <Reveal as="section" amount={0.15} style={{ marginBottom: "var(--space-8)" }}>
           <div className="index-continent-header">
             <h2 className="index-continent-title">Upcoming Elections</h2>
             <div className="index-continent-meta">
@@ -201,11 +202,11 @@ export default function ElectionsClient({
               );
             })}
           </div>
-        </section>
+        </Reveal>
       )}
 
       {/* Recent Election Results Timeline */}
-      <section>
+      <Reveal as="section" amount={0.1}>
         <div className="index-continent-header">
           <h2 className="index-continent-title">Recent Results</h2>
           <div className="index-continent-meta">
@@ -233,7 +234,7 @@ export default function ElectionsClient({
             </p>
           )}
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

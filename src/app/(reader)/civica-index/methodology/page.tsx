@@ -4,6 +4,7 @@ import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
+import { Reveal } from "@/components/motion/Reveal";
 import {
   getCIMethodology,
   getCIMethodologyHistory,
@@ -180,7 +181,7 @@ export default async function MethodologyPage() {
       {/* Section 1 — Scale (markdown body). Slice ends at the
           next markdown anchor (normalization), since Section 2
           isn't represented in markdown. */}
-      <section className="editorial-section">
+      <Reveal as="section" className="editorial-section">
         <MarkdownContent
           file="content/methodology-civica-index.md"
           stats={null}
@@ -188,10 +189,10 @@ export default async function MethodologyPage() {
           ctx={ctx}
           slice={{ from: "scale", to: "normalization" }}
         />
-      </section>
+      </Reveal>
 
       {/* Section 2 — Dimensions (TSX: bespoke weights bar + dimensions table) */}
-      <section id="dimensions" className="editorial-section">
+      <Reveal as="section" id="dimensions" className="editorial-section">
         <h2>
           <span className="meth-num">Section 2</span>Dimensions
         </h2>
@@ -255,10 +256,10 @@ export default async function MethodologyPage() {
           empirically distinct from Rule of Law in a future re-run of
           that analysis once the WGI indicator is ingested.
         </p>
-      </section>
+      </Reveal>
 
       {/* Sections 3-5 (markdown body): Normalization, Weights, Uncertainty */}
-      <section className="editorial-section">
+      <Reveal as="section" className="editorial-section">
         <MarkdownContent
           file="content/methodology-civica-index.md"
           stats={null}
@@ -266,10 +267,10 @@ export default async function MethodologyPage() {
           ctx={ctx}
           slice={{ from: "normalization", to: "missing" }}
         />
-      </section>
+      </Reveal>
 
       {/* Section 6 — Rank bands (TSX: bespoke band-scale visualization) */}
-      <section id="bands" className="editorial-section">
+      <Reveal as="section" id="bands" className="editorial-section">
         <h2>
           <span className="meth-num">Section 6</span>Rank bands
         </h2>
@@ -307,10 +308,10 @@ export default async function MethodologyPage() {
           score. The exact integer remains available via the API for
           researchers who want it.
         </p>
-      </section>
+      </Reveal>
 
       {/* Sections 7-13 (markdown body): Missing, Conditions, Gov-type, Pulse, Vintages, Limitations, Citation */}
-      <section className="editorial-section">
+      <Reveal as="section" className="editorial-section">
         <MarkdownContent
           file="content/methodology-civica-index.md"
           stats={null}
@@ -318,12 +319,12 @@ export default async function MethodologyPage() {
           ctx={ctx}
           slice={{ from: "missing" }}
         />
-      </section>
+      </Reveal>
 
       {/* Cite block — placed after the markdown's §13 Citation prose
           per the page's existing structure. The CiteAccordion needs
           to be a TSX component because it's interactive. */}
-      <section className="editorial-section">
+      <Reveal as="section" className="editorial-section">
         <h3>13.4 · Generate a citation</h3>
         <CiteAccordion
           subject="Civica Atlas Methodology — Civica Index methodology (Beta)"
@@ -331,11 +332,11 @@ export default async function MethodologyPage() {
           url="https://civicaatlas.org/civica-index/methodology"
           dataVintage={civicaIndex.lastRevisionIso}
         />
-      </section>
+      </Reveal>
 
       {/* Section 14 — Versioning (TSX: bespoke version-strip + DB-driven
           revision history). Per content-templating audit §3.4. */}
-      <section id="versioning" className="editorial-section">
+      <Reveal as="section" id="versioning" className="editorial-section">
         <h2>
           <span className="meth-num">Section 14</span>Versioning
         </h2>
@@ -382,7 +383,7 @@ export default async function MethodologyPage() {
             </ul>
           </>
         )}
-      </section>
+      </Reveal>
     </MethodologyLayout>
   );
 }

@@ -8,6 +8,7 @@ import {
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
+import { Reveal } from "@/components/motion/Reveal";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -162,11 +163,13 @@ export default function MethodologyHubPage() {
         </p>
 
         {SECTIONS.map((section) => (
-          <section
+          <Reveal
+            as="section"
             key={section.id}
             id={section.id}
             className="editorial-section"
             aria-labelledby={`${section.id}-heading`}
+            amount={0.15}
           >
             <h2 id={`${section.id}-heading`}>{section.heading}</h2>
             <p>{section.intro}</p>
@@ -256,7 +259,7 @@ export default function MethodologyHubPage() {
                 ))}
               </ul>
             )}
-          </section>
+          </Reveal>
         ))}
 
         {/* "BETA meaning" + "Not yet published" prose-only sections —
@@ -264,29 +267,31 @@ export default function MethodologyHubPage() {
             content-templating audit v1.0 §3.2. The markdown's per-
             section anchors ({#beta-meaning}, {#not-yet-published}) are
             mirrored in SIDEBAR_ITEMS so the left rail keeps working. */}
-        <section className="editorial-section">
+        <Reveal as="section" className="editorial-section" amount={0.15}>
           <MarkdownContent
             file="content/methodology-overview.md"
             stats={null}
             slice={{ from: "beta-meaning", to: "get-in-touch" }}
           />
-        </section>
+        </Reveal>
 
         {/* Get in touch prose — markdown source of truth. The TSX
             shell keeps the per-section <section> wrapper for layout
             consistency with the rest of the methodology hub. */}
-        <section className="editorial-section">
+        <Reveal as="section" className="editorial-section" amount={0.15}>
           <MarkdownContent
             file="content/methodology-overview.md"
             stats={null}
             slice={{ from: "get-in-touch" }}
           />
-        </section>
+        </Reveal>
 
-        <section
+        <Reveal
+          as="section"
           id="cite"
           className="editorial-section"
           aria-labelledby="cite-heading"
+          amount={0.15}
         >
           <h2 id="cite-heading">Cite this page</h2>
           <CiteAccordion
@@ -295,7 +300,7 @@ export default function MethodologyHubPage() {
             url="https://civicaatlas.org/methodology"
             dataVintage={civicaIndex.lastRevisionIso}
           />
-        </section>
+        </Reveal>
       </article>
     </EditorialPage>
   );

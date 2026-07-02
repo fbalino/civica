@@ -6,6 +6,7 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { EigenvalueChart } from "@/components/methodology/EigenvalueChart";
+import { Reveal } from "@/components/motion/Reveal";
 import { civicaIndex } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -192,7 +193,7 @@ export default function PcaAppendixPage() {
         {/* ────────────────────────────────────────────────────── */}
         {/* Section 1 — Headline finding (TSX: prose + adopted-weights
             table reading from civicaIndex.dimensions) */}
-        <section id="summary" className="editorial-section">
+        <Reveal as="section" id="summary" className="editorial-section">
           <h2>
             <span className="meth-num">Section 1</span>Headline finding
           </h2>
@@ -273,11 +274,11 @@ export default function PcaAppendixPage() {
             rankings is small: the largest delta from the weight
             revision alone is under one point.
           </p>
-        </section>
+        </Reveal>
 
         {/* ────────────────────────────────────────────────────── */}
         {/* Section 2 — The panel (markdown body) */}
-        <section className="editorial-section">
+        <Reveal as="section" className="editorial-section">
           <MarkdownContent
             file="content/methodology-pca-appendix.md"
             stats={null}
@@ -285,11 +286,11 @@ export default function PcaAppendixPage() {
             ctx={ctx}
             slice={{ from: "data", to: "five-dim" }}
           />
-        </section>
+        </Reveal>
 
         {/* ────────────────────────────────────────────────────── */}
         {/* Section 3 — Correlation matrix (TSX: 4×4 table) */}
-        <section id="correlations" className="editorial-section">
+        <Reveal as="section" id="correlations" className="editorial-section">
           <h2>
             <span className="meth-num">Section 3</span>Correlation matrix
           </h2>
@@ -335,11 +336,11 @@ export default function PcaAppendixPage() {
             the ingestion of separate WGI Government Effectiveness
             data.
           </p>
-        </section>
+        </Reveal>
 
         {/* ────────────────────────────────────────────────────── */}
         {/* Section 4 — Eigenvalues + scree (TSX: table + inline-SVG chart) */}
-        <section id="eigenvalues" className="editorial-section">
+        <Reveal as="section" id="eigenvalues" className="editorial-section">
           <h2>
             <span className="meth-num">Section 4</span>Eigenvalues &amp; variance
           </h2>
@@ -386,11 +387,11 @@ export default function PcaAppendixPage() {
               cumulative: r.cumulative,
             }))}
           />
-        </section>
+        </Reveal>
 
         {/* ────────────────────────────────────────────────────── */}
         {/* Section 5 — PC loadings (TSX: 4×4 table) */}
-        <section id="loadings" className="editorial-section">
+        <Reveal as="section" id="loadings" className="editorial-section">
           <h2>
             <span className="meth-num">Section 5</span>PC loadings
           </h2>
@@ -436,11 +437,11 @@ export default function PcaAppendixPage() {
             the rounded values sum exactly to 1.00) gives the adopted
             weights.
           </p>
-        </section>
+        </Reveal>
 
         {/* ────────────────────────────────────────────────────── */}
         {/* Sections 6, 7, 8 — markdown body */}
-        <section className="editorial-section">
+        <Reveal as="section" className="editorial-section">
           <MarkdownContent
             file="content/methodology-pca-appendix.md"
             stats={null}
@@ -448,10 +449,10 @@ export default function PcaAppendixPage() {
             ctx={ctx}
             slice={{ from: "five-dim" }}
           />
-        </section>
+        </Reveal>
 
         {/* Cite */}
-        <section id="cite" className="editorial-section">
+        <Reveal as="section" id="cite" className="editorial-section">
           <h2>Cite this page</h2>
           <CiteAccordion
             subject="Civica Atlas Methodology — PCA appendix"
@@ -459,7 +460,7 @@ export default function PcaAppendixPage() {
             url="https://civicaatlas.org/civica-index/methodology/pca-appendix"
             dataVintage={civicaIndex.lastRevisionIso}
           />
-        </section>
+        </Reveal>
 
         <nav
           className="editorial-footer-nav"

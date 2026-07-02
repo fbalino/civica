@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { type Country, WORLD_PATHS } from "./data";
 import { buildNeIdMap, proj } from "./map-geom";
 import { useMapPaths } from "./useMapPaths";
+import { Reveal } from "@/components/motion/Reveal";
 import {
   type OrgDetail,
   ORG_TYPE_COLOR,
@@ -148,7 +149,7 @@ export function OrgDetailPanel({
       </div>
 
       <div className="org-detail-content">
-        <div className="org-stats">
+        <Reveal as="div" className="org-stats" amount={0.4}>
           <div className="cell">
             <div className="k">Members</div>
             <div className="v">{o.memberCount}</div>
@@ -165,7 +166,7 @@ export function OrgDetailPanel({
             <div className="k">Observers shown</div>
             <div className="v">{observers}</div>
           </div>
-        </div>
+        </Reveal>
 
         <div className="intl-section-head">
           Membership map{" "}
@@ -173,7 +174,7 @@ export function OrgDetailPanel({
             {highlightedCount} of {o.memberCount} members shown in Civica
           </span>
         </div>
-        <div className="intl-panel intl-panel--map">
+        <Reveal as="div" className="intl-panel intl-panel--map" amount={0.2}>
           <svg
             viewBox="0 100 2000 800"
             preserveAspectRatio="xMidYMid meet"
@@ -248,13 +249,15 @@ export function OrgDetailPanel({
             ))}
           </g>
           </svg>
-        </div>
+        </Reveal>
 
         <div className="intl-section-head">
           Regional distribution <span>share of shown members</span>
         </div>
-        <div
+        <Reveal
+          as="div"
           className="org-region-grid"
+          amount={0.3}
           style={{
             "--org-region-cols":
               regionOrder.filter((r) => regionCounts.get(r)).length || 1,
@@ -285,12 +288,12 @@ export function OrgDetailPanel({
             </div>
           );
         })}
-        </div>
+        </Reveal>
 
         <div className="intl-section-head">
           Members <span>join year ascending</span>
         </div>
-        <div className="intl-mem-list intl-mem-list--org">
+        <Reveal as="div" className="intl-mem-list intl-mem-list--org" amount={0.1}>
           <div className="intl-mem-group">
             {sortedMembers.map((m) => {
             const role = (m.role ?? "").toLowerCase();
@@ -338,7 +341,7 @@ export function OrgDetailPanel({
             );
             })}
           </div>
-        </div>
+        </Reveal>
       </div>
     </>
   );

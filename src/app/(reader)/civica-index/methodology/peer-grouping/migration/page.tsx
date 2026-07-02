@@ -4,6 +4,7 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
+import { Reveal } from "@/components/motion/Reveal";
 import {
   getPeerGroupingMigrationTable,
   type PeerGroupingMigrationRow,
@@ -78,7 +79,7 @@ export default async function PeerGroupingMigrationPage() {
         is the recommended bulk-rewrite source.
       </div>
 
-      <section className="editorial-section" id="how-to-read">
+      <Reveal as="section" className="editorial-section" id="how-to-read" amount={0.3}>
         <h2>How to read</h2>
         <p>
           Each row is one sovereign state. The first two columns show
@@ -99,9 +100,9 @@ export default async function PeerGroupingMigrationPage() {
           for the per-jurisdiction fallback table covering Taiwan,
           Kosovo, Palestine, Western Sahara, and Vatican City.
         </p>
-      </section>
+      </Reveal>
 
-      <section className="editorial-section" id="table">
+      <Reveal as="section" className="editorial-section" id="table" amount={0.05}>
         <h2>The table</h2>
         {rows.length === 0 ? (
           <p>No rows available — check back after the next data sync.</p>
@@ -151,9 +152,9 @@ export default async function PeerGroupingMigrationPage() {
             </table>
           </div>
         )}
-      </section>
+      </Reveal>
 
-      <section className="editorial-section" id="cite">
+      <Reveal as="section" className="editorial-section" id="cite" amount={0.15}>
         <h2>Cite this page</h2>
         <CiteAccordion
           subject="Civica Atlas Methodology — Peer-grouping migration table"
@@ -161,7 +162,7 @@ export default async function PeerGroupingMigrationPage() {
           url="https://civicaatlas.org/civica-index/methodology/peer-grouping/migration"
           dataVintage={peerGrouping.adoptedAt}
         />
-      </section>
+      </Reveal>
 
       <footer className="editorial-footer-nav">
         <Link href="/civica-index/methodology/peer-grouping">

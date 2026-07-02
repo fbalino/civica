@@ -5,6 +5,7 @@ import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { Pill } from "@/components/editorial/Pill";
+import { Reveal } from "@/components/motion/Reveal";
 import {
   getBacktestSnapshot,
   getBacktestStats,
@@ -186,7 +187,7 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
   }
 
   return (
-    <section className="editorial-section" id={caseRow.id}>
+    <Reveal as="section" className="editorial-section" id={caseRow.id} amount={0.1}>
       <header
         style={{
           display: "flex",
@@ -343,7 +344,7 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
           Last ran {formatDate(caseRow.latest.ranAt)}
         </p>
       ) : null}
-    </section>
+    </Reveal>
   );
 }
 
@@ -412,7 +413,7 @@ export default async function BacktestReportPage() {
         run so far).
       </div>
 
-      <section className="editorial-section" id="summary">
+      <Reveal as="section" className="editorial-section" id="summary" amount={0.3}>
         <h2>Summary</h2>
         <table>
           <thead>
@@ -452,9 +453,9 @@ export default async function BacktestReportPage() {
             </tr>
           </tbody>
         </table>
-      </section>
+      </Reveal>
 
-      <section className="editorial-section" id="verdict-thresholds">
+      <Reveal as="section" className="editorial-section" id="verdict-thresholds" amount={0.3}>
         <h2>Verdict thresholds</h2>
         <p>
           For each expected (dimension, direction) row, the case passes
@@ -473,13 +474,13 @@ export default async function BacktestReportPage() {
             <strong>Catastrophic</strong>: |Δ| ≥ 5.0
           </li>
         </ul>
-      </section>
+      </Reveal>
 
       {snapshot.map((c) => (
         <CaseSection key={c.id} caseRow={c} />
       ))}
 
-      <section className="editorial-section" id="cite">
+      <Reveal as="section" className="editorial-section" id="cite" amount={0.15}>
         <h2>Cite this page</h2>
         <CiteAccordion
           subject="Civica Atlas Methodology — Pulse backtest report (Beta)"
@@ -491,7 +492,7 @@ export default async function BacktestReportPage() {
             )?.ranAt
           }
         />
-      </section>
+      </Reveal>
 
       <nav
         className="editorial-footer-nav"
