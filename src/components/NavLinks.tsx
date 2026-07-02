@@ -10,6 +10,7 @@ const LEADING_LINKS = [
   { href: "/country", label: "Countries" },
   { href: "/atlas", label: "Atlas" },
   { href: "/compare", label: "Compare" },
+  { href: "/constitution", label: "Constitutions" },
 ];
 
 const TRAILING_LINKS = [

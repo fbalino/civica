@@ -1,0 +1,122 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CountryFlag } from "@/components/CountryFlag";
+import type { IndexedConstitutionCountry } from "@/lib/db/queries-constitution";
+
+interface FeaturedTopic {
+  key: string;
+  label: string;
+}
+
+interface ConstitutionLandingProps {
+  countries: IndexedConstitutionCountry[];
+  featuredTopics: FeaturedTopic[];
+  /** A default country to open when a featured topic is clicked. */
+  defaultSlug: string;
+}
+
+/** A few widely-recognized constitutions to seed the picker. */
+const SUGGESTED_SLUGS = [
+  "united-states",
+  "france",
+  "germany",
+  "japan",
+  "brazil",
+  "india",
+  "south-africa",
+  "mexico",
+];
+
+/**
+ * The `?c=`-less landing state: a short intro, a prominent country picker, and
+ * featured topics. Selecting anything routes to the 3-pane explorer.
+ */
+export function ConstitutionLanding({
+  countries,
+  featuredTopics,
+  defaultSlug,
+}: ConstitutionLandingProps) {
+  const router = useRouter();
+  const bySlug = new Map(countries.map((c) => [c.slug, c]));
+  const suggestions = SUGGESTED_SLUGS.map((s) => bySlug.get(s)).filter(
+    (c): c is IndexedConstitutionCountry => c != null,
+  );
+
+  return (
+    <div className="constitution-landing">
+      <p className="constitution-landing-lede">
+        Read any of {countries.length} national constitutions in full, then
+        compare — side by side — how different countries handle the same
+        question, from human dignity and term limits to emergency powers and the
+        structure of the courts. Every passage is drawn from the Constitute
+        Project.
+      </p>
+
+      <section className="constitution-landing-section">
+        <h2 className="constitution-landing-heading">Start with a country</h2>
+        <div className="constitution-landing-grid">
+          {suggestions.map((c) => (
+            <Link
+              key={c.slug}
+              href={`/constitution?c=${encodeURIComponent(c.slug)}`}
+              className="constitution-landing-card"
+            >
+              <span className="constitution-landing-card-flag" aria-hidden>
+                <CountryFlag iso2={c.iso2} size={22} />
+              </span>
+              <span className="constitution-landing-card-name">{c.name}</span>
+              {c.year ? (
+                <span className="constitution-landing-card-year">{c.year}</span>
+              ) : null}
+            </Link>
+          ))}
+        </div>
+        <div className="constitution-landing-search-row">
+          <label htmlFor="constitution-landing-jump" className="constitution-landing-search-label">
+            Or search all {countries.length}:
+          </label>
+          <select
+            id="constitution-landing-jump"
+            className="constitution-landing-select"
+            defaultValue=""
+            onChange={(e) => {
+              if (e.target.value) {
+                router.push(`/constitution?c=${encodeURIComponent(e.target.value)}`);
+              }
+            }}
+          >
+            <option value="" disabled>
+              Choose a country…
+            </option>
+            {countries.map((c) => (
+              <option key={c.slug} value={c.slug}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </section>
+
+      <section className="constitution-landing-section">
+        <h2 className="constitution-landing-heading">Explore by topic</h2>
+        <p className="constitution-landing-topic-note">
+          Open the {bySlug.get(defaultSlug)?.name ?? "reader"} and jump straight
+          to how each of these questions is answered:
+        </p>
+        <div className="constitution-landing-topics">
+          {featuredTopics.map((t) => (
+            <Link
+              key={t.key}
+              href={`/constitution?c=${encodeURIComponent(defaultSlug)}#topic-${encodeURIComponent(t.key)}`}
+              className="constitution-topic-chip"
+            >
+              {t.label}
+            </Link>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
