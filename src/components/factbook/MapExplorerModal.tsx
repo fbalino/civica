@@ -12,6 +12,7 @@ import { createPortal } from "react-dom";
 import { SegmentedControl } from "@/components/editorial/SegmentedControl";
 import { CountryMap } from "./CountryMap";
 import { Country3DView } from "./Country3DView";
+import { isPmtilesEnabled } from "@/lib/map/civica-map-style";
 import type { CountryBounds } from "@/lib/data/country-bounds";
 
 interface MapExplorerModalProps {
@@ -104,7 +105,9 @@ export function MapExplorerModal({
         <div className="map-explorer-foot">
           {mode === "3d"
             ? "3D terrain & buildings · Mapbox. Drag to pan, right-drag to rotate."
-            : "Civica map · OpenStreetMap data via OpenFreeMap. Drag to pan, scroll to zoom."}
+            : isPmtilesEnabled()
+              ? "Civica map · OpenStreetMap data via Protomaps. Drag to pan, scroll to zoom."
+              : "Civica map · OpenStreetMap data via OpenFreeMap. Drag to pan, scroll to zoom."}
         </div>
       </div>
     </div>,
