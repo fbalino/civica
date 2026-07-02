@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -12,139 +13,28 @@ import { RotateCcw } from "lucide-react";
 import type { Country } from "./data";
 import { type MapPath, MAP_W, MAP_H } from "./map-geom";
 import { CountryHoverCard } from "@/components/v2/CountryHoverCard";
+import { SegmentedControl } from "@/components/editorial/SegmentedControl";
+import type { AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
+import {
+  type AtlasLayerKey,
+  ATLAS_LAYER_OPTIONS,
+  ATLAS_LAYER_TITLE,
+  NO_DATA_FILL,
+  NO_DATA_LABEL,
+  fillForLayer,
+  legendFor,
+  tooltipValueForLayer,
+} from "@/lib/atlas/map-layers";
 
 /* ----------------------------------------------------------------
- * Choropleth helpers + indicator registry
+ * Choropleth layer switcher (Wave 6)
  *
- * Each indicator defines an accessor (Country → numeric) and a set of
- * 4 thresholds that bin the value into one of 5 ramp bands (warm sand
- * → deep navy). Adding a new indicator = adding a row to METRICS.
- *
- * `Country.gdp` and `Country.pop` are pre-formatted display strings
- * ("$27.4T", "334M"), so we parse them back into numerics here. Real
- * V-Dem / Freedom House / HDI integration requires a data-layer pass
- * — those are in METRICS as `disabled: true` until the loader exposes
- * the underlying values.
+ * The map colors every country by one of four CATEGORICAL data layers —
+ * government type, Civica Index tier, V-Dem regime, or World Bank income
+ * group. The active `layer` is controlled by the parent (URL `?layer=`);
+ * all color-token + legend + tooltip logic lives in
+ * `src/lib/atlas/map-layers.ts` so it stays in one documented place.
  * ---------------------------------------------------------------- */
-
-const RAMP_VARS = [
-  "var(--ramp-indicator-1)",
-  "var(--ramp-indicator-2)",
-  "var(--ramp-indicator-3)",
-  "var(--ramp-indicator-4)",
-  "var(--ramp-indicator-5)",
-];
-
-function parseUSD(s: string | undefined): number {
-  if (!s) return 0;
-  const m = s.match(/\$?\s*([\d.]+)\s*([TBMK]?)/i);
-  if (!m) return 0;
-  const n = parseFloat(m[1]);
-  const u = m[2].toUpperCase();
-  return n * (u === "T" ? 1e12 : u === "B" ? 1e9 : u === "M" ? 1e6 : u === "K" ? 1e3 : 1);
-}
-
-function parsePop(s: string | undefined): number {
-  if (!s) return 0;
-  const m = s.match(/([\d.]+)\s*([BMK]?)/i);
-  if (!m) return 0;
-  const n = parseFloat(m[1]);
-  const u = m[2].toUpperCase();
-  return n * (u === "B" ? 1e9 : u === "M" ? 1e6 : u === "K" ? 1e3 : 1);
-}
-
-type MetricKey =
-  | "gdp_per_capita"
-  | "gdp_total"
-  | "population"
-  | "vdem_score"
-  | "freedom_house"
-  | "hdi";
-
-interface MetricDef {
-  key: MetricKey;
-  label: string;
-  unit: string;
-  /** Returns null when the indicator can't be evaluated for this country. */
-  value: (c: Country | null | undefined) => number | null;
-  /** 4 thresholds that split the global distribution into 5 bands. */
-  thresholds: [number, number, number, number];
-  binLabels: [string, string, string, string, string];
-  /** True when the underlying field isn't available in `Country` yet. */
-  disabled?: boolean;
-}
-
-const METRICS: MetricDef[] = [
-  {
-    key: "gdp_per_capita",
-    label: "GDP per Capita",
-    unit: "USD",
-    value: (c) => {
-      if (!c) return null;
-      const gdp = parseUSD(c.gdp);
-      const pop = parsePop(c.pop);
-      return pop > 0 ? gdp / pop : null;
-    },
-    thresholds: [5_000, 15_000, 30_000, 60_000],
-    binLabels: ["< $5K", "$5–15K", "$15–30K", "$30–60K", "> $60K"],
-  },
-  {
-    key: "gdp_total",
-    label: "Total GDP",
-    unit: "USD",
-    value: (c) => (c ? parseUSD(c.gdp) || null : null),
-    thresholds: [50e9, 250e9, 1e12, 5e12],
-    binLabels: ["< $50B", "$50–250B", "$250B–1T", "$1T–5T", "> $5T"],
-  },
-  {
-    key: "population",
-    label: "Population",
-    unit: "people",
-    value: (c) => (c ? parsePop(c.pop) || null : null),
-    thresholds: [5e6, 25e6, 100e6, 500e6],
-    binLabels: ["< 5M", "5–25M", "25–100M", "100M–500M", "> 500M"],
-  },
-  {
-    key: "vdem_score",
-    label: "V-Dem Liberal Democracy",
-    unit: "0–1",
-    value: () => null,
-    thresholds: [0.2, 0.4, 0.6, 0.8],
-    binLabels: ["< 0.2", "0.2–0.4", "0.4–0.6", "0.6–0.8", "> 0.8"],
-    disabled: true,
-  },
-  {
-    key: "freedom_house",
-    label: "Freedom House",
-    unit: "0–100",
-    value: () => null,
-    thresholds: [20, 40, 60, 80],
-    binLabels: ["< 20", "20–40", "40–60", "60–80", "> 80"],
-    disabled: true,
-  },
-  {
-    key: "hdi",
-    label: "Human Development Index",
-    unit: "0–1",
-    value: () => null,
-    thresholds: [0.55, 0.7, 0.8, 0.9],
-    binLabels: ["< 0.55", "0.55–0.7", "0.7–0.8", "0.8–0.9", "> 0.9"],
-    disabled: true,
-  },
-];
-
-const METRIC_BY_KEY: Record<MetricKey, MetricDef> = Object.fromEntries(
-  METRICS.map((m) => [m.key, m]),
-) as Record<MetricKey, MetricDef>;
-
-function fillFor(c: Country | null | undefined, metric: MetricDef): string {
-  const v = metric.value(c);
-  if (v == null) return "var(--ramp-no-data)";
-  for (let i = 0; i < metric.thresholds.length; i++) {
-    if (v < metric.thresholds[i]) return RAMP_VARS[i];
-  }
-  return RAMP_VARS[RAMP_VARS.length - 1];
-}
 
 export interface AtlasWorldMapHandle {
   flyTo: (id: string) => void;
@@ -157,6 +47,12 @@ export interface AtlasWorldMapProps {
   mapLoaded: boolean;
   /** IDs matching the current search/region/gov filter. Non-matching countries render at opacity 0.25. */
   filteredCountryIds: string[];
+  /** Per-iso3 (lower-case) data-layer values fetched server-side — no client DB access. */
+  layerData: Record<string, AtlasLayerValues>;
+  /** The active choropleth layer (owned by the parent; synced to `?layer=`). */
+  layer: AtlasLayerKey;
+  /** Switch the active layer (parent updates state + URL). */
+  onLayerChange: (layer: AtlasLayerKey) => void;
   /** Country IDs pinned for compare (up to 2). Shows the compare banner. */
   pinned: string[];
   /** Called when a country path is clicked; `shift` mirrors e.shiftKey so the caller can route to pin vs open. */
@@ -174,6 +70,9 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       mapPaths,
       mapLoaded,
       filteredCountryIds,
+      layerData,
+      layer,
+      onLayerChange,
       pinned,
       onCountrySelect,
       onUnpinAt,
@@ -184,9 +83,6 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
     const svgRef = useRef<SVGSVGElement>(null);
     const contentRef = useRef<SVGGElement>(null);
     const labelsRef = useRef<SVGGElement>(null);
-    const [metricKey, setMetricKey] = useState<MetricKey>("gdp_per_capita");
-    const [metricMenuOpen, setMetricMenuOpen] = useState(false);
-    const metric = METRIC_BY_KEY[metricKey];
     const transformRef = useRef({ k: 1, x: 0, y: 0 });
     const dragRef = useRef({
       dragging: false,
@@ -202,6 +98,18 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       x: number;
       y: number;
     } | null>(null);
+
+    // Legend rows for the active layer, plus a trailing "No data" row when
+    // at least one mapped country falls back to the neutral no-data fill —
+    // a country with a missing value must never inherit a real category.
+    const legendEntries = useMemo(() => legendFor(layer), [layer]);
+    const hasNoDataCountry = useMemo(
+      () =>
+        countries.some(
+          (c) => fillForLayer(layer, c, layerData[c.id]) === NO_DATA_FILL,
+        ),
+      [layer, countries, layerData],
+    );
 
     const applyTransform = useCallback(() => {
       const t = transformRef.current;
@@ -402,6 +310,8 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
           className="world-map"
           viewBox={`0 0 ${MAP_W} ${MAP_H}`}
           preserveAspectRatio="xMidYMid meet"
+          role="img"
+          aria-label={`World map colored by ${ATLAS_LAYER_TITLE[layer]}`}
           onMouseDown={handleSvgMouseDown}
         >
           <defs>
@@ -453,13 +363,14 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                 />
               ))}
             </g>
-            {/* Country paths — v2 multi-hue choropleth (GDP per capita).
-                Hover signals via stroke change instead of fill so the
-                choropleth band stays visible while the cursor is over. */}
+            {/* Country paths — categorical choropleth driven by the active
+                data layer (government / CI tier / regime / income). Hover
+                signals via stroke change instead of fill so the layer color
+                stays visible while the cursor is over. */}
             {mapPaths.map((p, i) => {
               const baseFill = p.country
-                ? fillFor(p.country, metric)
-                : "var(--ramp-no-data)";
+                ? fillForLayer(layer, p.country, layerData[p.country.id])
+                : NO_DATA_FILL;
               return (
                 <path
                   key={i}
@@ -549,63 +460,52 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
           </g>
         </svg>
 
-        {/* Indicator picker — top-left of the map. Click to choose
-            which indicator is colouring the choropleth. */}
+        {/* Layer switcher — top-left of the map, where the indicator
+            furniture sits. The SegmentedControl picks which categorical
+            data layer colours the choropleth; the legend below switches
+            with the active layer. */}
         <div className="atlas-indicator">
-          <button
-            type="button"
-            className="atlas-indicator-badge"
-            aria-haspopup="listbox"
-            aria-expanded={metricMenuOpen}
-            onClick={() => setMetricMenuOpen((o) => !o)}
-          >
-            <span className="atlas-indicator-badge__eyebrow">Visualizing</span>
-            <span className="atlas-indicator-badge__value">{metric.label}</span>
-            <span className="atlas-indicator-badge__caret" aria-hidden>▾</span>
-          </button>
+          <SegmentedControl<AtlasLayerKey>
+            value={layer}
+            options={ATLAS_LAYER_OPTIONS}
+            onChange={onLayerChange}
+            ariaLabel="Map data layer"
+            className="atlas-layer-switcher"
+          />
 
-          {metricMenuOpen && (
-            <div
-              className="atlas-indicator-menu"
-              role="listbox"
-              aria-label="Choose map indicator"
+          <div className="atlas-indicator-legend">
+            <span className="atlas-indicator-legend__title">
+              {ATLAS_LAYER_TITLE[layer]}
+            </span>
+            <ul
+              className="atlas-indicator-legend__list"
+              aria-label={`${ATLAS_LAYER_TITLE[layer]} legend`}
             >
-              {METRICS.map((m) => (
-                <button
-                  key={m.key}
-                  type="button"
-                  role="option"
-                  aria-selected={m.key === metricKey}
-                  className={`atlas-indicator-menu__item${
-                    m.key === metricKey ? " is-active" : ""
-                  }${m.disabled ? " is-disabled" : ""}`}
-                  disabled={m.disabled}
-                  onClick={() => {
-                    if (m.disabled) return;
-                    setMetricKey(m.key);
-                    setMetricMenuOpen(false);
-                  }}
-                >
-                  <span className="atlas-indicator-menu__label">{m.label}</span>
-                  <span className="atlas-indicator-menu__unit">
-                    {m.disabled ? "Coming soon" : m.unit}
+              {legendEntries.map((entry) => (
+                <li key={entry.label} className="atlas-indicator-legend__bin">
+                  <span
+                    className="atlas-indicator-legend__chip"
+                    style={{ backgroundColor: entry.fill }}
+                    aria-hidden
+                  />
+                  <span className="atlas-indicator-legend__lbl">
+                    {entry.label}
                   </span>
-                </button>
+                </li>
               ))}
-            </div>
-          )}
-
-          {/* Compact bin legend */}
-          <div className="atlas-indicator-legend" aria-hidden>
-            {metric.binLabels.map((lbl, i) => (
-              <span key={lbl} className="atlas-indicator-legend__bin">
-                <span
-                  className="atlas-indicator-legend__chip"
-                  style={{ backgroundColor: RAMP_VARS[i] }}
-                />
-                <span className="atlas-indicator-legend__lbl">{lbl}</span>
-              </span>
-            ))}
+              {hasNoDataCountry && (
+                <li className="atlas-indicator-legend__bin">
+                  <span
+                    className="atlas-indicator-legend__chip"
+                    style={{ backgroundColor: NO_DATA_FILL }}
+                    aria-hidden
+                  />
+                  <span className="atlas-indicator-legend__lbl">
+                    {NO_DATA_LABEL}
+                  </span>
+                </li>
+              )}
+            </ul>
           </div>
         </div>
 
@@ -639,7 +539,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                 onOpenCompare();
               }}
             >
-              Open compare &nearr;
+              Open compare ↗
             </button>
           </div>
         )}
@@ -695,7 +595,18 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               heroImageUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}.webp`}
               heroImageDarkUrl={`/engravings/countries/${hoverCard.country.id.toLowerCase()}-dark.webp`}
               stats={[
-                { label: "Political System", value: hoverCard.country.gov },
+                {
+                  // First stat tracks the active layer so the hover always
+                  // explains the color under the cursor. (The card's
+                  // officialName line still carries the full government
+                  // description.)
+                  label: ATLAS_LAYER_TITLE[layer],
+                  value: tooltipValueForLayer(
+                    layer,
+                    hoverCard.country,
+                    layerData[hoverCard.country.id],
+                  ),
+                },
                 { label: "Capital", value: hoverCard.country.capital },
                 { label: "Population", value: hoverCard.country.pop },
               ]}

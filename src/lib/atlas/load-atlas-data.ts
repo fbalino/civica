@@ -1,6 +1,6 @@
 import { cache } from "react";
 import { db } from "@/lib/db";
-import { sql, desc, asc } from "drizzle-orm";
+import { sql, desc, asc, and, eq } from "drizzle-orm";
 import {
   jurisdictions,
   governmentBodies,
@@ -14,7 +14,9 @@ import {
   organizations,
   organizationMemberships,
   elections,
+  ciCompositeScores,
 } from "@/lib/db/schema";
+import { getLatestAvailableQuarter } from "@/lib/db/queries";
 import { formatGovernmentDisplay } from "@/lib/text/clean";
 import { resolvePartyColor } from "@/lib/data/party-colors";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
@@ -785,4 +787,91 @@ async function _loadAtlasData(): Promise<{
   }
 
   return { countries, chambers };
+}
+
+/**
+ * Per-country data-layer values for the /atlas map choropleth switcher.
+ * Keyed by lower-case iso3 (the atlas `Country.id`), so the client can look
+ * up a country's regime type, income group, and Civica Index score without
+ * any client-side DB access.
+ *
+ * Mirrors the query shape of `getAlmanacFilterFacts` (queries.ts):
+ *   - regime / income come from the canonical fact layer (`status='active'`
+ *     rows of `vdem_row` / `world_bank_income_group`), preserving the
+ *     human-readable upstream strings ("Liberal Democracy", "High income").
+ *   - the Civica Index composite is PINNED to `methodology_version='beta'` at
+ *     the latest available beta quarter (AGENTS.md CI read invariant), so the
+ *     tier coloring reconciles with the rest of the site.
+ */
+export interface AtlasLayerValues {
+  regimeType: string | null;
+  incomeGroup: string | null;
+  ciScore: number | null;
+}
+
+export const loadAtlasLayerData = cache(_loadAtlasLayerData);
+
+async function _loadAtlasLayerData(): Promise<Record<string, AtlasLayerValues>> {
+  // jurisdiction id → lower-case iso3 (atlas Country.id space)
+  const juris = await db
+    .select({ id: jurisdictions.id, iso3: jurisdictions.iso3 })
+    .from(jurisdictions)
+    .where(sql`${jurisdictions.iso3} IS NOT NULL`);
+  const iso3ById = new Map(juris.map((j) => [j.id, j.iso3!.toLowerCase()]));
+
+  const out: Record<string, AtlasLayerValues> = {};
+  const ensure = (iso3: string) => {
+    let entry = out[iso3];
+    if (!entry) {
+      entry = { regimeType: null, incomeGroup: null, ciScore: null };
+      out[iso3] = entry;
+    }
+    return entry;
+  };
+
+  const factRows = await db
+    .select({
+      jurisdictionId: countryFacts.jurisdictionId,
+      factKey: countryFacts.factKey,
+      factValue: countryFacts.factValue,
+    })
+    .from(countryFacts)
+    .where(
+      and(
+        sql`${countryFacts.status} = 'active'`,
+        sql`${countryFacts.factKey} IN ('world_bank_income_group', 'vdem_row')`
+      )
+    );
+
+  for (const row of factRows) {
+    if (!row.factValue) continue;
+    const iso3 = iso3ById.get(row.jurisdictionId);
+    if (!iso3) continue;
+    const entry = ensure(iso3);
+    if (row.factKey === "vdem_row") entry.regimeType = row.factValue;
+    else if (row.factKey === "world_bank_income_group")
+      entry.incomeGroup = row.factValue;
+  }
+
+  const quarter = await getLatestAvailableQuarter("beta");
+  const scoreRows = await db
+    .select({
+      jurisdictionId: ciCompositeScores.jurisdictionId,
+      score: ciCompositeScores.score,
+    })
+    .from(ciCompositeScores)
+    .where(
+      and(
+        eq(ciCompositeScores.quarter, quarter),
+        eq(ciCompositeScores.methodologyVersion, "beta")
+      )
+    );
+
+  for (const row of scoreRows) {
+    const iso3 = iso3ById.get(row.jurisdictionId);
+    if (!iso3) continue;
+    ensure(iso3).ciScore = row.score;
+  }
+
+  return out;
 }

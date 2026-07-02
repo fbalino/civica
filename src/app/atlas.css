@@ -162,8 +162,9 @@
   pointer-events: none; /* let map drag/click pass through the empty middle */
 }
 
-/* Indicator picker (top-left of the atlas map). Click the badge to
-   open the metric menu; below the badge sits a compact bin legend. */
+/* Layer switcher (top-left of the atlas map). A SegmentedControl picks
+   which categorical data layer colours the choropleth; below it sits the
+   switching legend for the active layer. */
 .atlas-indicator {
   position: absolute;
   top: 16px;
@@ -176,107 +177,40 @@
   font-family: var(--font-body);
 }
 
-.atlas-indicator-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  background: color-mix(in oklab, var(--color-card-bg) 92%, transparent);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
+/* Map-furniture treatment for the canonical .segmented control — same
+   elevation register as the zoombar / hints cards floating on the map. */
+.atlas-layer-switcher {
   box-shadow: var(--shadow-hard-md);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
-  cursor: pointer;
+}
+
+.atlas-indicator-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+  background: color-mix(in oklab, var(--color-card-bg) 88%, transparent);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
   font-family: var(--font-body);
-  transition: border-color 120ms ease, background 120ms ease;
+  max-width: 520px;
 }
-.atlas-indicator-badge:hover {
-  background: var(--color-card-bg);
-  border-color: var(--color-text-30);
-}
-.atlas-indicator-badge:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-.atlas-indicator-badge__eyebrow {
+.atlas-indicator-legend__title {
   font-size: var(--text-12);
   font-weight: 600;
   letter-spacing: 0.10em;
   text-transform: uppercase;
   color: var(--color-text-40);
 }
-.atlas-indicator-badge__value {
-  font-family: var(--font-heading);
-  font-size: var(--text-16);
-  font-weight: 500;
-  color: var(--color-text-primary);
-  letter-spacing: -0.005em;
-}
-.atlas-indicator-badge__caret {
-  color: var(--color-text-30);
-  font-size: var(--text-13);
-}
-
-.atlas-indicator-menu {
+.atlas-indicator-legend__list {
   display: flex;
-  flex-direction: column;
-  min-width: 260px;
-  background-color: var(--color-surface-elevated);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-hard-lg);
-  padding: 6px;
-  margin-top: 2px;
-}
-.atlas-indicator-menu__item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 10px 12px;
-  background: none;
-  border: 0;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-family: var(--font-body);
-  text-align: left;
-  color: var(--color-text-primary);
-  transition: background-color 100ms ease;
-}
-.atlas-indicator-menu__item:hover:not(.is-disabled) {
-  background-color: var(--color-grid-cell-hover);
-}
-.atlas-indicator-menu__item.is-active {
-  background-color: var(--color-grid-cell-hover);
-}
-.atlas-indicator-menu__item.is-disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-.atlas-indicator-menu__label {
-  font-size: var(--text-14);
-  font-weight: 500;
-}
-.atlas-indicator-menu__unit {
-  font-family: var(--font-mono);
-  font-size: var(--text-12);
-  color: var(--color-text-40);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.atlas-indicator-legend {
-  display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 10px;
-  padding: 6px 12px;
-  background: color-mix(in oklab, var(--color-card-bg) 88%, transparent);
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  max-width: 520px;
+  gap: 6px 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 .atlas-indicator-legend__bin {
   display: inline-flex;
@@ -291,7 +225,7 @@
   display: inline-block;
 }
 .atlas-indicator-legend__lbl {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-12);
   letter-spacing: 0.02em;
   color: var(--color-text-60);
