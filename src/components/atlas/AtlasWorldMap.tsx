@@ -122,11 +122,21 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       if (labelsRef.current) {
         const tier = t.k >= 4.5 ? 3 : t.k >= 2.5 ? 2 : 1;
         labelsRef.current.setAttribute("data-zoom-tier", String(tier));
-        labelsRef.current.style.fontSize = `${12.5 / t.k}px`;
-        // The label halo (stroke, set in atlas.css) must counter-scale with
-        // zoom like the font does — a fixed stroke-width grows k× when the
-        // <g> scales and swallows the letterforms.
-        labelsRef.current.style.strokeWidth = `${1.75 / t.k}px`;
+        // Screen-space labels: project each map-space centroid through the
+        // current pan/zoom. Labels live OUTSIDE the scaled group, so their
+        // font/halo (set by the sizing effect) never scale with k.
+        const labels = labelsRef.current.children;
+        for (let i = 0; i < labels.length; i++) {
+          const el = labels[i] as SVGTextElement;
+          const cx = Number(el.dataset.cx);
+          const cy = Number(el.dataset.cy);
+          el.setAttribute(
+            "transform",
+            `translate(${Math.round((cx * t.k + t.x) * 100) / 100},${
+              Math.round((cy * t.k + t.y) * 100) / 100
+            })`,
+          );
+        }
       }
     }, []);
 
@@ -191,6 +201,26 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       }),
       [flyTo, animateTo],
     );
+
+    // Label sizing in TRUE screen pixels: 1 CSS px on screen = MAP_W/width
+    // user units in the un-transformed label layer. Set once per mount/resize
+    // (k-independent — zoom only re-projects positions above).
+    useEffect(() => {
+      const svg = svgRef.current;
+      const g = labelsRef.current;
+      if (!svg || !g || !mapLoaded) return;
+      const size = () => {
+        const w = svg.getBoundingClientRect().width || 1;
+        const unit = MAP_W / w; // user units per screen px
+        g.style.fontSize = `${Math.round(12 * unit * 100) / 100}px`;
+        g.style.letterSpacing = `${Math.round(0.5 * unit * 100) / 100}px`;
+        g.style.strokeWidth = `${Math.round(1.5 * unit * 100) / 100}px`;
+        applyTransform(); // re-project after any width change
+      };
+      size();
+      window.addEventListener("resize", size);
+      return () => window.removeEventListener("resize", size);
+    }, [mapLoaded, applyTransform]);
 
     useEffect(() => {
       const onMove = (e: MouseEvent) => {
@@ -437,32 +467,41 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
               );
             })}
             {/* Country labels — visibility controlled by zoom tier via CSS */}
-            <g ref={labelsRef} className="map-labels" data-zoom-tier="1">
-              {mapPaths
-                .filter((p) => p.country && p.id)
-                .map((p) => {
-                  const tier = p.area > 300 ? 1 : p.area > 30 ? 2 : 3;
-                  return (
-                    <text
-                      key={`lbl-${p.id}`}
-                      x={p.centroid[0]}
-                      y={p.centroid[1]}
-                      data-tier={tier}
-                      textAnchor="middle"
-                      dominantBaseline="central"
-                      fontFamily="var(--font-mono)"
-                      fontWeight={600}
-                      letterSpacing="1"
-                      // fill + halo come from .map-labels (theme-independent
-                      // white-on-dark-halo tokens — readable over any data fill).
-                      opacity={1}
-                      style={{ pointerEvents: "none" }}
-                    >
-                      {p.id!.toUpperCase()}
-                    </text>
-                  );
-                })}
-            </g>
+          </g>
+
+          {/* Country labels — SCREEN-SPACE layer (the top-tier map pattern:
+              Mapbox/Google/OSM all keep labels out of the map transform).
+              This <g> is a SIBLING of the zoomed content group, so labels
+              never scale: each frame applyTransform() projects the map
+              centroid to screen coords (cx*k+tx) and font/halo/spacing are
+              sized in true screen pixels via the viewBox→viewport ratio.
+              Zoom changes WHICH labels show (data-zoom-tier), never their
+              size. */}
+          <g
+            ref={labelsRef}
+            className="map-labels"
+            data-zoom-tier="1"
+            style={{ pointerEvents: "none" }}
+          >
+            {mapPaths
+              .filter((p) => p.country && p.id)
+              .map((p) => {
+                const tier = p.area > 300 ? 1 : p.area > 30 ? 2 : 3;
+                return (
+                  <text
+                    key={`lbl-${p.id}`}
+                    data-tier={tier}
+                    data-cx={p.centroid[0]}
+                    data-cy={p.centroid[1]}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    fontFamily="var(--font-mono)"
+                    fontWeight={600}
+                  >
+                    {p.id!.toUpperCase()}
+                  </text>
+                );
+              })}
           </g>
         </svg>
 

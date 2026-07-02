@@ -155,10 +155,11 @@
    codes read over any choropleth fill in both themes. stroke-width is set
    dynamically on the group (counter-scaled with zoom) — 1.25px at k=1. */
 .map-labels {
-  font-size: 12.5px; /* zoomed: counter-scaled by applyTransform (12.5/k) */
+  /* Screen-space label layer: font-size / letter-spacing / stroke-width are
+     set imperatively in true screen px (viewBox-ratio-corrected) by the map's
+     sizing effect. Only the theme-independent paint lives here. */
   fill: var(--map-label-fg);
   stroke: var(--map-label-halo);
-  stroke-width: 1.75px; /* zoomed: counter-scaled (1.75/k) */
   stroke-linejoin: round;
   paint-order: stroke;
 }
