@@ -48,6 +48,10 @@ async function handler(request: Request) {
       qidNamesResolved: summary.qidNamesResolved,
       titlesWritten: summary.titlesWritten,
       partiesWritten: summary.partiesWritten,
+      portraitsWritten: summary.portraitsWritten,
+      birthdatesWritten: summary.birthdatesWritten,
+      personPortraitsWritten: summary.personPortraitsWritten,
+      personBirthdatesWritten: summary.personBirthdatesWritten,
       totalRowsWritten: summary.totalRowsWritten,
       freshnessStamped: summary.freshnessStamped,
     });

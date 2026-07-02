@@ -17,6 +17,7 @@
     "calculate:ci:v2": "tsx scripts/calculate-ci-v2.ts",
     "report:ci:divergence": "tsx scripts/divergence-report-ci-v2.ts",
     "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
+    "enrich:person-portraits": "tsx scripts/enrich-person-portraits.ts",
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
     "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
     "sync:constitutions": "tsx scripts/sync-constitutions.ts",

@@ -511,8 +511,27 @@
 .lead-row-id {
   min-width: 0;
   display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+/* The name/office text column sits to the RIGHT of the row portrait. */
+.lead-row-text {
+  min-width: 0;
+  display: flex;
   flex-direction: column;
   gap: 1px;
+}
+/* Row portrait: the same <LeaderPortrait> frame as the principal cards, but
+   sized down to a compact thumbnail for the dense "Other offices" list. A
+   cabinet minister enriched by the person-portraits backfill shows a photo
+   here; a null photoUrl falls back to the monogram, same as the leader cards. */
+.lead-row .lead-avatar {
+  --lead-portrait-w: 34px;
+  --lead-portrait-h: 42px;
+  border-radius: var(--radius-sm);
+}
+.lead-row .lead-avatar-monogram {
+  font-size: var(--text-15);
 }
 .lead-row-name {
   font-family: var(--font-body);

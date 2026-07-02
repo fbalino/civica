@@ -267,7 +267,10 @@ export async function FactbookLeaders({
             s.officeType !== "head_of_state" &&
             s.officeType !== "head_of_government"
         )
-        .map((s) => ({ name: g.personName, stint: s }))
+        // Carry the person's media (P18 portrait + credit) so a cabinet
+        // minister enriched by the person-portraits backfill shows a thumbnail
+        // here, not just a text row. Null photoUrl → monogram (same as leaders).
+        .map((s) => ({ name: g.personName, stint: s, media: g.media }))
     )
     // Stable order within a branch: by office rank then name.
     .sort((a, b) => {
@@ -279,7 +282,11 @@ export async function FactbookLeaders({
 
   // Group the "other" offices by branch label, preserving rank order.
   const branchOrder = ["deputy_head", "cabinet", "legislative_leader", "judicial_leader", "judicial"];
-  const branches: { type: string; label: string; rows: { name: string; stint: OfficeStint }[] }[] = [];
+  const branches: {
+    type: string;
+    label: string;
+    rows: { name: string; stint: OfficeStint; media: PersonMedia }[];
+  }[] = [];
   for (const type of branchOrder) {
     const inType = otherWithName.filter((o) => o.stint.officeType === type);
     if (inType.length === 0) continue;
@@ -482,17 +489,28 @@ export async function FactbookLeaders({
                     </span>
                   </p>
                   <div className="lead-rows">
-                    {branch.rows.map(({ name, stint }, idx) => {
+                    {branch.rows.map(({ name, stint, media }, idx) => {
                       const since = parseYear(stint.startDate);
+                      const hasPortrait = Boolean(media.photoUrl);
+                      const rowCredit = hasPortrait
+                        ? portraitCredit(media)
+                        : null;
                       return (
                         <div
                           key={`${name}-${stint.officeName}-${idx}`}
                           className="lead-row"
                         >
                           <span className="lead-row-id">
-                            <span className="lead-row-name">{name}</span>
-                            <span className="lead-row-office">
-                              {titleCaseTitle(stint.officeName)}
+                            <LeaderPortrait
+                              photoFile={media.photoUrl}
+                              personName={name}
+                              credit={rowCredit}
+                            />
+                            <span className="lead-row-text">
+                              <span className="lead-row-name">{name}</span>
+                              <span className="lead-row-office">
+                                {titleCaseTitle(stint.officeName)}
+                              </span>
                             </span>
                           </span>
                           {stint.partyName ? (

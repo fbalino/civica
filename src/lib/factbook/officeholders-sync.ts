@@ -31,10 +31,15 @@ import {
 } from "@/lib/db/schema";
 import { sparqlQuery, extractQid } from "@/lib/data/wikidata";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
-
-const COMMONS_ENDPOINT = "https://commons.wikimedia.org/w/api.php";
-const COMMONS_USER_AGENT =
-  "CivicaAtlas/1.0 (https://civicaatlas.org; admin@civicaatlas.org)";
+import {
+  chunk,
+  mediaQuery,
+  commonsFileFromUrl,
+  commonsLicenseIsFree,
+  fetchCommonsFileMeta,
+  parseWikidataDate,
+  enrichPersonPortraits,
+} from "@/lib/factbook/person-portraits";
 
 /**
  * Anything that can run the Drizzle queries below — the shared `db` client or
@@ -68,7 +73,11 @@ export interface OfficeholderSyncSummary {
   portraitsWritten: number;
   /** Persons that gained/changed a birthdate (P569). */
   birthdatesWritten: number;
-  /** Total rows written (base + titles + parties + portraits + birthdates) — drives the freshness stamp. */
+  /** Wider `persons` backfill: portraits filled for non-principal persons (cabinet etc.). */
+  personPortraitsWritten: number;
+  /** Wider `persons` backfill: birthdates filled for non-principal persons. */
+  personBirthdatesWritten: number;
+  /** Total rows written (base + titles + parties + portraits + birthdates + person backfill) — drives the freshness stamp. */
   totalRowsWritten: number;
   /** Whether `sources.last_sync_at` was stamped this run. */
   freshnessStamped: boolean;
@@ -468,12 +477,6 @@ function looksLikeHeadTitle(label: string): boolean {
   return HEAD_TITLE_RE.test(label);
 }
 
-function chunk<T>(arr: T[], n: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
-  return out;
-}
-
 /** Current (P582-absent) P39 positions per person. */
 function personPositionsQuery(qids: string[]): string {
   const values = qids.map((q) => `wd:${q}`).join(" ");
@@ -535,114 +538,13 @@ SELECT ?person ?party ?partyLabel ?color WHERE {
 // license is genuinely free (PD / any CC / recognised open-government licence).
 // A non-free or unreadable license is SKIPPED → the person keeps the monogram.
 // A missing DOB stays null. Nothing is fabricated or hotlinked without credit.
-
-/** P18 image (Commons file) + P569 birthdate per person. */
-function mediaQuery(qids: string[]): string {
-  const values = qids.map((q) => `wd:${q}`).join(" ");
-  return `
-SELECT ?person ?image ?dob WHERE {
-  VALUES ?person { ${values} }
-  OPTIONAL { ?person wdt:P18 ?image . }
-  OPTIONAL { ?person wdt:P569 ?dob . }
-}
-`;
-}
-
-/** Resolve a Commons `Special:FilePath/<file>` URL to the bare file name. */
-function commonsFileFromUrl(url: string | undefined): string | undefined {
-  if (!url) return undefined;
-  const m = url.match(/Special:FilePath\/(.+?)(\?|$)/);
-  if (!m) return undefined;
-  try {
-    return decodeURIComponent(m[1]).replace(/_/g, " ");
-  } catch {
-    return m[1];
-  }
-}
-
-function stripHtml(value: string | undefined): string {
-  return (value ?? "").replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim();
-}
-
-/**
- * Is a Commons `LicenseShortName` genuinely FREE (redistributable, at most
- * with attribution)? PD, any CC variant (incl. CC0), and recognised
- * open-government licences count. Anything non-commercial-only, fair-use,
- * all-rights-reserved, or unreadable is treated as NOT free → skipped.
- */
-function commonsLicenseIsFree(lic: string): boolean {
-  const l = lic.toLowerCase();
-  if (!l || l === "unknown") return false;
-  if (
-    /non-commercial|noncommercial|\bnc\b|fair use|all rights reserved|non-free|nonfree/.test(
-      l,
-    )
-  ) {
-    return false;
-  }
-  return /cc0|cc[ -]by|public domain|\bpd\b|pdm|gfdl|godl|ogl|open government|europ|attribution|dl-de|etalab|kogl/.test(
-    l,
-  );
-}
-
-interface CommonsFileMeta {
-  license: string;
-  credit: string;
-}
-
-/**
- * Fetch per-file license + author from the Commons `imageinfo` API, exactly as
- * `sync-country-galleries.ts` does. Read-only network call; no download.
- */
-async function fetchCommonsFileMeta(
-  files: string[],
-): Promise<Map<string, CommonsFileMeta>> {
-  const out = new Map<string, CommonsFileMeta>();
-  for (const batch of chunk(files, 40)) {
-    const titles = batch.map((f) => `File:${f}`).join("|");
-    const url = new URL(COMMONS_ENDPOINT);
-    url.searchParams.set("action", "query");
-    url.searchParams.set("format", "json");
-    url.searchParams.set("prop", "imageinfo");
-    url.searchParams.set("iiprop", "extmetadata");
-    url.searchParams.set("titles", titles);
-    try {
-      const res = await fetch(url, {
-        headers: { Accept: "application/json", "User-Agent": COMMONS_USER_AGENT },
-      });
-      if (!res.ok) continue;
-      const data = (await res.json()) as {
-        query?: {
-          pages?: Record<
-            string,
-            {
-              title: string;
-              imageinfo?: Array<{
-                extmetadata?: Record<string, { value?: string }>;
-              }>;
-            }
-          >;
-        };
-      };
-      for (const page of Object.values(data.query?.pages ?? {})) {
-        const file = page.title.replace(/^File:/, "");
-        const ex = page.imageinfo?.[0]?.extmetadata;
-        const license = stripHtml(ex?.LicenseShortName?.value) || "unknown";
-        const author = stripHtml(ex?.Artist?.value);
-        const credit = stripHtml(ex?.Credit?.value);
-        out.set(file, {
-          license,
-          credit: author || credit || "Wikimedia Commons",
-        });
-      }
-    } catch {
-      // Network hiccup on a batch → those files simply have no meta and are
-      // conservatively skipped (unknown license). Never fabricate a license.
-    }
-    await new Promise((r) => setTimeout(r, 400));
-  }
-  return out;
-}
+//
+// The low-level media plumbing — `mediaQuery` (SPARQL P18/P569), the Commons
+// `commonsFileFromUrl` / `commonsLicenseIsFree` free-license filter, and the
+// batched `fetchCommonsFileMeta` imageinfo/extmetadata license+author fetch —
+// now lives in the SHARED `@/lib/factbook/person-portraits` module (imported
+// above) so this officeholder sync and the wider `enrich-person-portraits`
+// backfill call ONE implementation. This sync's behaviour is unchanged.
 
 interface EnrichmentRow {
   jurisdictionId: string;
@@ -892,8 +794,11 @@ export async function computeEnrichmentPlan(
         const file = commonsFileFromUrl(b.image.value);
         if (file && !imageFileByPerson.has(person)) imageFileByPerson.set(person, file);
       }
-      if (b.dob?.value && !dobByPerson.has(person)) {
-        dobByPerson.set(person, b.dob.value.split("T")[0]);
+      if (!dobByPerson.has(person)) {
+        // Guard against P569 "some value" blank-node snaks (a genid URI, not a
+        // date) — writing that to a `date` column throws. See parseWikidataDate.
+        const dob = parseWikidataDate(b.dob?.value);
+        if (dob) dobByPerson.set(person, dob);
       }
     }
     await new Promise((r) => setTimeout(r, 700));
@@ -1412,11 +1317,52 @@ export async function syncFactbookOfficeholders(
   log(`Portraits written:  ${portraitsWritten}`);
   log(`Birthdates written: ${birthdatesWritten}`);
 
+  // ── Wider person-portrait backfill (cabinet ministers etc.) ──────────────
+  // The P2 media plan above only enriches the ~400 head-of-state/-government
+  // principals. This delta pass extends the SAME Wikidata P18/P569 + Commons
+  // pipeline to EVERY `persons` row that has a `wikidata_qid` but is still
+  // missing a photo or birthdate — the ~1.9k cabinet ministers a decoupled QID
+  // backfill identified, plus any future delta. Idempotent (skips rows that
+  // already have both), so after the initial local run monthly deltas are tiny
+  // (a full no-write re-scan measured ~90s — well within the cron budget). It
+  // does NOT stamp freshness itself (dryRun-style): the single stamp below
+  // covers all writes, including these.
+  let personPortraitsWritten = 0;
+  let personBirthdatesWritten = 0;
+  try {
+    const personPass = await enrichPersonPortraits({
+      db,
+      // The delta pass owns its own freshness stamp normally, but here the
+      // officeholder sync stamps once at the end, so run it as a non-stamping
+      // apply by folding its counts in and stamping below. It still writes.
+      onProgress: (line) => {
+        if (line.startsWith("!")) log(line);
+      },
+    });
+    personPortraitsWritten = personPass.portraitsWritten;
+    personBirthdatesWritten = personPass.birthdatesWritten;
+    log(
+      `Person-portrait backfill: ${personPortraitsWritten} portraits, ${personBirthdatesWritten} birthdates (${personPass.candidates} candidates scanned)`,
+    );
+  } catch (err) {
+    log(
+      `! person-portrait backfill failed (non-fatal): ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
+  }
+
   // Stamp source freshness via the single sanctioned helper — only when
   // this run actually synced rows (AGENTS.md provenance invariant). Total
   // covers the base sync plus the enrichment writes.
   const totalRowsWritten =
-    synced + titlesWritten + partiesWritten + portraitsWritten + birthdatesWritten;
+    synced +
+    titlesWritten +
+    partiesWritten +
+    portraitsWritten +
+    birthdatesWritten +
+    personPortraitsWritten +
+    personBirthdatesWritten;
   const stamped = await markSourcesSynced("wikidata", {
     rowsWritten: totalRowsWritten,
     executor: db,
@@ -1439,6 +1385,8 @@ export async function syncFactbookOfficeholders(
     partiesWritten,
     portraitsWritten,
     birthdatesWritten,
+    personPortraitsWritten,
+    personBirthdatesWritten,
     totalRowsWritten,
     freshnessStamped: stamped.length > 0,
   };
