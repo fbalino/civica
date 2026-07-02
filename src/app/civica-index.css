@@ -523,13 +523,27 @@
  * sibling .ci-* eyebrows on the same /civica-index page family).
  */
 
+/* Canonical server-rendered page header for the government-types explorer.
+   Aligned to the explorer's 1200px container; the client explorer renders
+   with renderHeader={false} so this is the page's only H1. */
+.govtypes-page-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-8) 0;
+}
+@media (max-width: 480px) {
+  .govtypes-page-header { padding: var(--space-7) 18px 0; }
+}
+
 .civica-govtypes {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--space-8); /* 40px — nearest token is --space-8 (48) / --space-7 (32); source was 40px */
   color: var(--color-text-primary);
 }
-.civica-govtypes .page-hero { padding: 72px 0 var(--space-7); } /* 72px — no exact token */
+/* With the canonical header now above, the explorer's own hero band drops its
+   large top pad (the header owns that space); lens tabs sit right under it. */
+.civica-govtypes .page-hero { padding: var(--space-6) 0 var(--space-7); }
 .civica-govtypes .breadcrumb {
   font-family: var(--font-mono);
   font-weight: 500;
@@ -1051,7 +1065,13 @@
   margin: 0 auto;
   padding: var(--space-8) var(--spacing-page-x) 60px; /* 40px→--space-8 approx; 60px — no exact token */
 }
-.widget-hero { padding-bottom: 28px; border-bottom: 1px solid var(--color-divider); } /* 28px — no exact token */
+/* Compact tool-page header. Aligned to the canonical editorial header pattern
+   (.editorial-eyebrow + .editorial-page-title tokens) but kept compact: a
+   smaller --text-32 title, not the 56px page H1, since this is a tool page. */
+.widget-hero {
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border-default);
+}
 .widget-hero-eyebrow {
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
@@ -1059,16 +1079,17 @@
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
   color: var(--color-text-40);
-  margin-bottom: var(--space-4);
+  margin: 0 0 var(--space-3);
+  display: block;
 }
 .widget-hero-title {
   font-family: var(--font-heading);
   font-size: var(--text-32);
   font-weight: 400;
   letter-spacing: var(--tracking-tighter);
-  line-height: 1.08;
+  line-height: 1.02;
   color: var(--color-text-primary);
-  margin: 0 0 14px; /* 14px — no exact token */
+  margin: 0 0 var(--space-4);
   text-wrap: balance;
 }
 .widget-search {
@@ -1297,7 +1318,7 @@
   color: var(--color-text-primary);
   background: var(--color-card-bg);
   border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-search);
 }
 .wb-input:focus {
   outline: none;
@@ -1470,5 +1491,243 @@
 .wb-copy:hover {
   background: var(--color-accent);
   color: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+/* ── Corrections form (/civica-index/corrections) ───────────────────
+ *
+ * Extracted from the per-page <style> block that used to live inside
+ * src/app/(reader)/civica-index/corrections/page.tsx — those classes had
+ * no real stylesheet home, so the form rendered browser-default. Restyled
+ * on the canonical contact-form pattern (see src/app/contact/contact.css):
+ * Inter small-caps labels, hairline-bordered fully-rounded inputs, token
+ * focus rings, and status-token error/success states. Token-only.
+ * ─────────────────────────────────────────────────────────────────── */
+
+.corr-explainer {
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-8);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+}
+.corr-explainer strong {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+.corr-explainer ul { margin: var(--space-3) 0 0 var(--space-5); padding: 0; }
+.corr-explainer li { margin-bottom: var(--space-2); }
+
+.corr-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.corr-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Canonical small-caps label: Inter + uppercase + letter-spacing. */
+.corr-label {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+.corr-required {
+  color: var(--color-accent);
+  margin-left: var(--space-1);
+}
+.corr-hint {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-style: italic;
+  color: var(--color-text-40);
+  text-transform: none;
+  letter-spacing: var(--tracking-normal);
+  margin-left: var(--space-2);
+}
+
+.corr-select,
+.corr-input,
+.corr-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--color-select-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-search);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: var(--leading-normal);
+  outline: none;
+  transition:
+    border-color var(--motion-fast) var(--motion-ease-out),
+    box-shadow var(--motion-fast) var(--motion-ease-out);
+}
+.corr-textarea {
+  min-height: 160px; /* 160px — intentional minimum height, not spacing */
+  border-radius: var(--radius-xl);
+  resize: vertical;
+}
+.corr-input::placeholder,
+.corr-textarea::placeholder {
+  color: var(--color-text-30);
+}
+.corr-select:focus,
+.corr-input:focus,
+.corr-textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 18%, transparent);
+}
+.corr-char-count {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-30);
+  text-align: right;
+}
+
+.corr-fieldset {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-5) var(--space-3);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.corr-legend {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  padding: 0 var(--space-2);
+}
+
+.corr-privacy-field { margin-top: var(--space-2); }
+.corr-privacy-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+  color: var(--color-text-60);
+  cursor: pointer;
+}
+.corr-checkbox {
+  margin-top: var(--space-1);
+  flex-shrink: 0;
+  accent-color: var(--color-accent);
+}
+
+.corr-field-error {
+  background: color-mix(in oklab, var(--color-status-danger) 10%, var(--color-page-bg) 90%);
+  border: 1px solid var(--color-status-danger);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-primary);
+}
+.corr-success-banner {
+  background: color-mix(in oklab, var(--color-status-success) 10%, var(--color-page-bg) 90%);
+  border: 1px solid var(--color-status-success);
+  border-radius: var(--radius-md);
+  padding: var(--space-5) var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-3);
+}
+
+/* Public corrections log (below the form). */
+.corr-log-row {
+  border-top: 1px solid var(--color-card-border);
+  padding: var(--space-5) 0;
+}
+.corr-log-row:last-child { border-bottom: 1px solid var(--color-card-border); }
+.corr-log-meta {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-30);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+.corr-status-badge {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-page-bg);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+.corr-log-desc {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-normal);
+  color: var(--color-text-60);
+  margin: 0 0 var(--space-3);
+}
+.corr-log-disposition {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+  color: var(--color-text-primary);
+  background: var(--color-grid-cell);
+  border-left: 3px solid var(--color-card-border);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-3);
+}
+.corr-log-disposition strong {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.corr-resolution-note {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-card-border);
+}
+
+/* ── Editorial filter-bar native <select> (used on
+ *    /civica-index/pulse-changelog alongside .editorial-chip filters) ──
+ *
+ * The .editorial-filter-select class had no CSS rule anywhere, so the
+ * country dropdown rendered as an unstyled browser <select>. Matches the
+ * .ci-filter-select page-family treatment so it reads as a sibling of the
+ * tinted filter chips beside it.
+ * ─────────────────────────────────────────────────────────────────── */
+.editorial-filter-select {
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  letter-spacing: var(--tracking-normal);
+  padding: var(--space-2) var(--space-4);
+  max-width: 100%;
+  cursor: pointer;
+  transition: border-color var(--motion-fast) var(--motion-ease-out);
+}
+.editorial-filter-select:focus {
+  outline: none;
   border-color: var(--color-accent);
 }
