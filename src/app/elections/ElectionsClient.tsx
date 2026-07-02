@@ -130,6 +130,21 @@ export default function ElectionsClient({
         ))}
       </Reveal>
 
+      {/* Explainer link — how electoral systems turn votes into seats */}
+      <Reveal as="a" amount={0.4} href="/elections/systems" className="elections-explainer-link">
+        <span className="elections-explainer-link__body">
+          <span className="elections-explainer-link__eyebrow">Explainer</span>
+          <span className="elections-explainer-link__title">
+            How electoral systems work
+          </span>
+          <span className="elections-explainer-link__dek">
+            First past the post, proportional, mixed-member, ranked choice, and
+            two-round — with real per-country data from IPU Parline.
+          </span>
+        </span>
+        <span className="elections-explainer-link__arrow" aria-hidden="true">→</span>
+      </Reveal>
+
       {/* Filters */}
       <Reveal as="div" amount={0.4} style={{ display: "flex", gap: "var(--space-3)", marginBottom: "var(--space-7)", flexWrap: "wrap", alignItems: "center", paddingTop: "var(--space-6)", borderTop: "1px solid var(--color-divider)" }}>
         <select

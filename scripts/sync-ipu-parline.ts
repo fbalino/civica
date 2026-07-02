@@ -38,6 +38,10 @@ interface IpuChamber {
     current_members_number: IpuValue<number>;
     struct_parl_status: IpuValue<{ term: string }>;
     last_election: IpuValue<{ from: string }>;
+    electoral_system: IpuValue<{ term: string }> | IpuValue<{ term: string }>[];
+    electoral_subsystem:
+      | IpuValue<{ term: string }>
+      | IpuValue<{ term: string }>[];
     [key: string]: unknown;
   };
 }
@@ -183,6 +187,21 @@ async function main() {
     const chamberType = chamberTypeFromIpu(statusObj?.term ?? null);
     const lastElectionObj = extractLatestValue(chamber.attributes.last_election);
 
+    // Electoral-system classification (IPU's own two-level taxonomy). We store
+    // IPU's snake_case terms verbatim — no invented Civica labels. `family` is
+    // one of plurality_majority / proportional_representation / mixed_system /
+    // other_systems; `subsystem` is the sub-type (fptp, list_pr, trs, mmp,
+    // parallel_systems, av, stv, sntv, block_vote_bv, other, …). Both nullable:
+    // IPU leaves many appointed/indirect upper chambers unclassified.
+    const electoralSystemObj = extractLatestValue(
+      chamber.attributes.electoral_system
+    );
+    const electoralSubsystemObj = extractLatestValue(
+      chamber.attributes.electoral_subsystem
+    );
+    const electoralSystemFamily = electoralSystemObj?.term ?? null;
+    const electoralSubsystem = electoralSubsystemObj?.term ?? null;
+
     if (!countryCode || !chamberCode) {
       chambersSkipped++;
       continue;
@@ -214,6 +233,8 @@ async function main() {
           name: chamberName,
           totalSeats: seatCount,
           chamberType,
+          electoralSystemFamily,
+          electoralSubsystem,
         })
         .where(eq(governmentBodies.id, bodyId));
     } else {
@@ -242,6 +263,8 @@ async function main() {
             ipuParlineId: chamberCode,
             totalSeats: seatCount ?? matchingBody.totalSeats,
             chamberType: chamberType ?? matchingBody.chamberType,
+            electoralSystemFamily,
+            electoralSubsystem,
           })
           .where(eq(governmentBodies.id, bodyId));
       } else {
@@ -256,6 +279,8 @@ async function main() {
             branch: "legislative",
             ipuParlineId: chamberCode,
             hierarchyLevel: chamberType === "upper" ? 1 : 2,
+            electoralSystemFamily,
+            electoralSubsystem,
           })
           .returning({ id: governmentBodies.id });
         bodyId = inserted[0].id;

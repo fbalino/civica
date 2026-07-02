@@ -66,6 +66,25 @@ export const governmentBodies = pgTable("government_bodies", {
   ipuParlineId: text("ipu_parline_id"),
   hierarchyLevel: integer("hierarchy_level"),
   parentBodyId: uuid("parent_body_id"),
+  /**
+   * Electoral-system classification for this chamber, from IPU Parline
+   * (`/chambers` → `electoral_system` / `electoral_subsystem`), stored as IPU's
+   * own snake_case terms verbatim — no invented Civica taxonomy.
+   *
+   * `electoralSystemFamily` is one of IPU's four families:
+   * `plurality_majority`, `proportional_representation`, `mixed_system`,
+   * `other_systems`. `electoralSubsystem` is IPU's sub-type term (e.g.
+   * `first_past_the_post_fptp`, `list_proportional_representation_list_pr`,
+   * `two_round_system_trs`, `parallel_systems`,
+   * `mixed_member_proportional_system_mmp`, `single_transferable_vote_stv`,
+   * `alternative_vote_av`, `single_non_transferable_vote_sntv`, `block_vote_bv`,
+   * `other`). Both are nullable — IPU leaves many appointed/indirect upper
+   * chambers unclassified. Human-readable display labels live in the page layer
+   * (`src/lib/elections/electoral-systems.ts`), keyed 1:1 off these terms.
+   * Populated by `scripts/sync-ipu-parline.ts`.
+   */
+  electoralSystemFamily: text("electoral_system_family"),
+  electoralSubsystem: text("electoral_subsystem"),
 });
 
 export const offices = pgTable("offices", {
