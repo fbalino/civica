@@ -42,6 +42,16 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   invisible. No GSAP / marquees / scroll-pinning — wrong register for the almanac.
 - `src/app/blog/[slug]/page.tsx` has NO runtime React import (only the global type namespace).
   Use named imports (`isValidElement`), not `React.isValidElement`.
+- **LightningCSS (Turbopack's CSS pipeline) SILENTLY DROPS `font-size: max(var(--x), 1em)`** —
+  the entire rule vanishes from the built chunk, no warning, dev + prod. Use a literal inside
+  `max()` for font-size (e.g. `max(16px, 1em)`). Bit the iOS input auto-zoom guard (globals.css
+  `@media (hover:none) and (pointer:coarse)` block — inputs need computed ≥16px or iOS Safari
+  zooms the viewport on focus and never zooms back).
+- **`html { scroll-behavior: smooth }` breaks App Router scroll-to-top on navigation** unless
+  `<html data-scroll-behavior="smooth">` is set (layout.tsx has it — Next then forces instant
+  scroll during route transitions). Removing the attribute regresses to "click a link, land
+  mid-page" (scroll-restoration bug). Also: running `npm run build` while `next dev` is up
+  poisons the dev server's chunk cache (stale CSS with old content hash) — restart dev after.
 
 ## Blog / images
 - Cover resolution = `resolvePostCover()` in `src/lib/blog.ts`: dedicated

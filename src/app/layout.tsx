@@ -117,6 +117,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${sourceSerif.variable} ${inter.variable}`}
+      // globals.css sets `scroll-behavior: smooth` for in-page anchors; this
+      // attribute tells the Next router to force INSTANT scrolling during
+      // route transitions so navigations land at the top of the new page.
+      // Without it the smooth scroll is interrupted mid-render and the page
+      // stays scrolled — the classic App Router scroll-restoration bug.
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <head>

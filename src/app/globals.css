@@ -424,6 +424,22 @@ body {
   overflow-x: clip;
 }
 
+/* iOS input auto-zoom guard: Safari zooms the whole viewport when a focused
+   input's font-size is under 16px — and never zooms back out on blur. Floor
+   every form control at 16px on touch devices so the auto-zoom never fires.
+   (The alternative — viewport maximum-scale=1 — breaks pinch-zoom on Android
+   and is an accessibility violation; the font-size floor is the sanctioned
+   fix.) Desktop typography is untouched. */
+@media (hover: none) and (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    /* 16px literal (= --text-16): LightningCSS drops max(var(),…) in
+       font-size, and iOS keys the auto-zoom on the COMPUTED 16px anyway. */
+    font-size: max(16px, 1em);
+  }
+}
+
 .theme-engraving-dark {
   display: none !important;
 }
