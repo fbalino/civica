@@ -92,6 +92,29 @@ export default async function ReconciliationMethodologyPage() {
     stats = null;
   }
 
+  // Headline reconciled fact-keys and the live per-fact-key publisher count
+  // (max distinct sources any single country carries). Derived from the DB
+  // rather than hardcoded so the counts and their ordering never drift.
+  const HEADLINE_FACT_KEYS: Array<{ key: string; label: string }> = [
+    { key: "unemployment_rate_pct", label: "unemployment rate" },
+    { key: "population_total", label: "population" },
+    { key: "inflation_rate", label: "inflation rate" },
+    { key: "gdp_real_growth_rate", label: "GDP real growth rate" },
+    { key: "life_expectancy_years", label: "life expectancy" },
+    { key: "public_debt_pct_gdp", label: "public-debt ratio" },
+  ];
+  const factKeyMaxSources = stats?.factKeyMaxSources ?? null;
+  const headlineFactKeyProse = factKeyMaxSources
+    ? HEADLINE_FACT_KEYS.map((f) => ({
+        label: f.label,
+        count: factKeyMaxSources[f.key] ?? 0,
+      }))
+        .filter((f) => f.count > 0)
+        .sort((a, b) => b.count - a.count)
+        .map((f) => `${f.label} (${f.count})`)
+        .join(", ")
+    : null;
+
   return (
     <MethodologyLayout items={SECTIONS}>
       <SmartBreadcrumbs />
@@ -166,11 +189,10 @@ export default async function ReconciliationMethodologyPage() {
           {stats
             ? `${stats.totalFacts.toLocaleString()} rows across ${stats.distinctFactKeys} fact-keys and ${stats.activeSources} active sources`
             : "tens of thousands of rows across the declared fact-keys and active sources"}
-          .{/* TODO: derive from new stats helper post-sweep */} The
-          headline reconciled fact-keys carry six or more publishers
-          each: unemployment rate (12 sources), population (11),
-          inflation rate (9), GDP real growth rate (7), life
-          expectancy (6), public-debt ratio (6).
+          .{" "}
+          {headlineFactKeyProse
+            ? `The most-sourced reconciled fact-keys draw on several publishers each, counting the deepest single-country coverage per key: ${headlineFactKeyProse}.`
+            : "The most-sourced reconciled fact-keys draw on several publishers each — economic and demographic figures such as unemployment, population, inflation, and life expectancy carry the deepest coverage."}
         </p>
       </section>
 

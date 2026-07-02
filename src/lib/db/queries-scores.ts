@@ -102,13 +102,22 @@ function trendBucket(delta: number | null): "up" | "down" | "flat" | null {
 
 // ---- Civica Index ----------------------------------------------------------
 
+const CI_METHODOLOGY_VERSION = "beta";
+
 async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
-  // Latest composite — methodology-agnostic so we surface beta when the
-  // pipeline has only beta rows (which is the current state).
+  // Pin the methodology version (beta) — 47 jurisdictions carry both v1.0
+  // and beta rows at 2023-Q4, so an unpinned read lets Postgres row-order
+  // decide which value leaks into a beta-labeled row / trend arrow. Matches
+  // the pin on compareCICountries / getCICountryHistory.
   const [latest] = await db
     .select()
     .from(ciCompositeScores)
-    .where(eq(ciCompositeScores.jurisdictionId, jId))
+    .where(
+      and(
+        eq(ciCompositeScores.jurisdictionId, jId),
+        eq(ciCompositeScores.methodologyVersion, CI_METHODOLOGY_VERSION),
+      ),
+    )
     .orderBy(desc(ciCompositeScores.quarter))
     .limit(1);
   if (!latest) return null;
@@ -130,6 +139,7 @@ async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
       .where(
         and(
           eq(ciCompositeScores.jurisdictionId, jId),
+          eq(ciCompositeScores.methodologyVersion, CI_METHODOLOGY_VERSION),
           sql`${ciCompositeScores.quarter} <= ${fourYearTarget}`,
         ),
       )
@@ -142,7 +152,12 @@ async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
     const [oldest] = await db
       .select({ score: ciCompositeScores.score })
       .from(ciCompositeScores)
-      .where(eq(ciCompositeScores.jurisdictionId, jId))
+      .where(
+        and(
+          eq(ciCompositeScores.jurisdictionId, jId),
+          eq(ciCompositeScores.methodologyVersion, CI_METHODOLOGY_VERSION),
+        ),
+      )
       .orderBy(asc(ciCompositeScores.quarter))
       .limit(1);
     if (oldest && oldest.score !== latest.score) {
@@ -321,10 +336,15 @@ async function buildVDemRow(jId: string): Promise<ScoreRow | null> {
 }
 
 function freedomHouseLabel(rawValue: number): string {
-  // Freedom in the World rating: 1.0–2.5 = Free, 3.0–5.0 = Partly Free,
-  // 5.5–7.0 = Not Free.
-  if (rawValue <= 2.5) return "Free";
-  if (rawValue <= 5.0) return "Partly Free";
+  // `rawValue` is stored on the 2–14 SUM scale (avg × 2), not the retired
+  // 1–7 AVERAGE — see scripts/ingest-ci-freedom-house.ts:33-50 and the
+  // freedom_house bounds in src/lib/ci/normalize-v2.ts. Freedom in the
+  // World status thresholds on the average map to the sum as:
+  //   Free:        avg ≤ 2.5  ⇔ sum ≤ 5.0
+  //   Partly Free: avg ≤ 5.0  ⇔ sum ≤ 10.0
+  //   Not Free:    otherwise
+  if (rawValue <= 5.0) return "Free";
+  if (rawValue <= 10.0) return "Partly Free";
   return "Not Free";
 }
 

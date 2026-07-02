@@ -232,9 +232,12 @@ export default async function CountryCivicaDataTab({
   if (hasCivicaIndex) {
     civicaIndexSources.push({
       name: "Civica Index (composite)",
+      // "Beta" is a maturity chip, not a date — when the composite has no
+      // calculatedAt, show the same "Not yet synced" the SourceDot beside it
+      // shows (matches syncDate() above). Never print "Beta" in the date cell.
       date: ciDetail?.composite?.calculatedAt
         ? new Date(ciDetail.composite.calculatedAt).toISOString().slice(0, 10)
-        : "Beta",
+        : "Not yet synced",
       sourceId: "civica_curated",
     });
     const dimIds = dedup(

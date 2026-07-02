@@ -533,6 +533,13 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
 
   const { jurisdiction, composite, dimensions, pulse } = detail;
   const taxonomy = jurisdiction.governmentClassification ?? null;
+  // Count the governance dimensions actually rendered in the breakdown —
+  // partial countries (Nauru, Tonga) carry only 3 of the 4 headline
+  // dimensions, so the copy must not hardcode `civicaIndex.dimensionCount`.
+  // Mirrors the DIMENSION_ORDER filter in <DimensionScoreTable>.
+  const renderedDimensionCount = DIMENSION_ORDER.filter((dim) =>
+    dimensions.some((d) => d.dimension === dim)
+  ).length;
   const score = composite ? Math.round(composite.score) : null;
   const resolvedCapital =
     capitalFact?.canonical?.factValue ?? jurisdiction.capital ?? null;
@@ -667,6 +674,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
             <CIPulseScoreDisplay
               ciScore={ciScoreData}
               ciChangeText={ciChangeText}
+              dimensionCount={renderedDimensionCount}
             />
             {pulseV2 ? <PulseDimensionalDeltas data={pulseV2} /> : null}
           </div>
@@ -682,7 +690,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
           <section id="ci-dimensions">
             <div className="ci-country-section-eyebrow">
               <span>
-                Civica Index breakdown · {civicaIndex.dimensionCount} governance
+                Civica Index breakdown · {renderedDimensionCount} governance
                 dimensions
               </span>
               <small>weights empirically derived · source-specific inputs</small>

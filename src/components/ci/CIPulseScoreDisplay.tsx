@@ -45,6 +45,14 @@ interface CIPulseScoreDisplayProps {
    */
   pulseScore?: PulseScoreData | null;
   ciChangeText?: string | null;
+  /**
+   * Number of governance dimensions actually rendered in the breakdown.
+   * Partial countries carry only 3 of the 4 headline dimensions, so the
+   * footer sentence must reflect the real count rather than the static
+   * `civicaIndex.dimensionCount`. Falls back to the static count when the
+   * caller doesn't pass it.
+   */
+  dimensionCount?: number;
 }
 
 function formatQuarter(quarter: string): string {
@@ -53,12 +61,14 @@ function formatQuarter(quarter: string): string {
   return `Q${match[2]} ${match[1]}`;
 }
 
-/** Pick the band row for a given letter; falls back to the F row. */
+/**
+ * Pick the band row for a given letter. Returns null when the letter is
+ * absent/unrecognized — a no-data jurisdiction (Vatican, Jersey, etc.)
+ * must NOT inherit the last band ("F · Failed / authoritarian"); the
+ * caller renders a neutral "No score yet" label instead.
+ */
 function bandRow(letter: string | null) {
-  return (
-    BAND_RANGES.find((b) => b.letter === letter) ??
-    BAND_RANGES[BAND_RANGES.length - 1]
-  );
+  return BAND_RANGES.find((b) => b.letter === letter) ?? null;
 }
 
 /** Map a Beta CI band → a CSS color token from the existing tier palette. */
@@ -318,10 +328,19 @@ function ScorePane({
 export function CIPulseScoreDisplay({
   ciScore,
   ciChangeText,
+  dimensionCount,
 }: CIPulseScoreDisplayProps) {
+  // Prefer the caller's rendered-dimension count; fall back to the static
+  // count when it's absent or 0 (never print "Composite of 0 dimensions").
+  const dimCount =
+    dimensionCount && dimensionCount > 0
+      ? dimensionCount
+      : civicaIndex.dimensionCount;
   const ciBandLetter = ciScore?.band ?? null;
   const ciBandRow = bandRow(ciBandLetter as string | null);
   const ciColorVar = bandColor(ciBandLetter as string | null);
+  // No band row → honest no-data label (never fall back to the F row).
+  const ciBandLabel = ciBandRow ? ciBandRow.label : "No score yet";
 
   const ciIntervalLine =
     ciScore && ciScore.scoreLower != null && ciScore.scoreUpper != null
@@ -333,7 +352,7 @@ export function CIPulseScoreDisplay({
         ciScore.rank && ciScore.totalRanked
           ? `Rank ${ciScore.rank} of ${ciScore.totalRanked}.`
           : null,
-        `Composite of ${civicaIndex.dimensionCount} governance dimensions.`,
+        `Composite of ${dimCount} governance dimensions.`,
         ciScore.completenessFlag === "partial"
           ? "Partial — one optional dimension missing."
           : "Updated quarterly.",
@@ -358,7 +377,7 @@ export function CIPulseScoreDisplay({
         chip={ciScore ? `CI · ${formatQuarter(ciScore.quarter)}${civicaIndex.status === "beta" ? " (Beta)" : ""}` : "CI · Pending"}
         scoreLabel="/ 100"
         bandLetter={(ciBandLetter as string | null) ?? null}
-        bandLabel={ciBandRow.label}
+        bandLabel={ciBandLabel}
         bandColorVar={ciColorVar}
         scoreValue={ciScore ? Math.round(ciScore.score).toString() : "—"}
         intervalLine={ciIntervalLine}

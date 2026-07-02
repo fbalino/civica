@@ -984,7 +984,11 @@ export async function getCICountryDetail(
     })
     .from(ciDimensionScores)
     .where(
-      sql`${ciDimensionScores.jurisdictionId} = ${jId} AND ${ciDimensionScores.quarter} = ${q}`
+      // Pin the methodology version — without it, quarters carrying both
+      // v1.0 and beta rows (e.g. 2023-Q4) mix legacy raw values into a
+      // beta-labeled breakdown. Matches the pin on the composite above and
+      // on compareCICountries / getCIByGovernmentTypeDots.
+      sql`${ciDimensionScores.jurisdictionId} = ${jId} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${methodologyVersion}`
     );
 
   const pulseLatest = await db

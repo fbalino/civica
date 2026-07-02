@@ -101,6 +101,13 @@ export interface SiteStats {
    *  reconciliation methodology page §scope. Drives the replication
    *  page's "all 197 scored jurisdictions" claim. */
   jurisdictionsWithIso3: number;
+
+  /** Per-fact-key MAXIMUM number of distinct sources any single country
+   *  carries for that fact. Drives the reconciliation methodology page's
+   *  "headline reconciled fact-keys carry six or more publishers each"
+   *  prose (unemployment rate, population, inflation, etc.) — read live so
+   *  the counts never drift from the DB. Keyed by `fact_key`. */
+  factKeyMaxSources: Record<string, number>;
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -177,6 +184,27 @@ async function queryFiveSourceFactKeyNames(): Promise<string[]> {
   return (rows as Array<{ fact_key: string }>).map((r) => r.fact_key);
 }
 
+async function queryFactKeyMaxSources(): Promise<Record<string, number>> {
+  // For each fact_key, the largest distinct-source count any single
+  // jurisdiction has for it. This is the "N publishers" number the
+  // reconciliation page cites per headline fact-key.
+  const res = await db.execute(
+    sql`SELECT fact_key, MAX(src)::int AS max_sources
+        FROM (
+          SELECT fact_key, jurisdiction_id, COUNT(DISTINCT source_id) AS src
+          FROM country_facts
+          GROUP BY fact_key, jurisdiction_id
+        ) t
+        GROUP BY fact_key`,
+  );
+  const rows = (res as unknown as { rows?: unknown[] }).rows ?? res;
+  const out: Record<string, number> = {};
+  for (const r of rows as Array<{ fact_key: string; max_sources: number }>) {
+    out[r.fact_key] = Number(r.max_sources);
+  }
+  return out;
+}
+
 async function queryTotalJurisdictions(): Promise<number> {
   return queryScalar(sql`SELECT COUNT(*)::int AS n FROM jurisdictions`);
 }
@@ -216,6 +244,7 @@ export const getSiteStats = cache(async (): Promise<SiteStats> => {
     fiveSourceFactKeyNames,
     totalJurisdictions,
     jurisdictionsWithIso3,
+    factKeyMaxSources,
   ] = await Promise.all([
     queryActiveSources(),
     queryTotalSources(),
@@ -229,6 +258,7 @@ export const getSiteStats = cache(async (): Promise<SiteStats> => {
     queryFiveSourceFactKeyNames(),
     queryTotalJurisdictions(),
     queryJurisdictionsWithIso3(),
+    queryFactKeyMaxSources(),
   ]);
 
   return {
@@ -245,5 +275,6 @@ export const getSiteStats = cache(async (): Promise<SiteStats> => {
     fiveSourceFactKeyNames,
     totalJurisdictions,
     jurisdictionsWithIso3,
+    factKeyMaxSources,
   };
 });
