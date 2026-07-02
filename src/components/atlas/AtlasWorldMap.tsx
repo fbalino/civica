@@ -449,7 +449,14 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                       fontFamily="var(--font-mono)"
                       letterSpacing="1.5"
                       fill="var(--atlas-ink)"
-                      opacity={tier === 1 ? 0.8 : 0.6}
+                      // Paper-colored halo so labels stay legible over ANY
+                      // choropleth fill in BOTH themes (ink-on-saturated-green
+                      // was unreadable in light mode).
+                      stroke="var(--atlas-paper)"
+                      strokeWidth={2.5}
+                      strokeLinejoin="round"
+                      paintOrder="stroke"
+                      opacity={tier === 1 ? 0.9 : 0.7}
                       style={{ pointerEvents: "none" }}
                     >
                       {p.id!.toUpperCase()}
