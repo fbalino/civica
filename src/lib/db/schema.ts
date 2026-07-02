@@ -179,8 +179,61 @@ export const constitutions = pgTable("constitutions", {
   year: integer("year"),
   yearUpdated: integer("year_updated"),
   fullTextHtml: text("full_text_html"),
+  /**
+   * Parsed Constitute HTML, one entry per tagged/titled `<div class="section">`:
+   * `[{ sectionId, headingLabel, topics: string[], html }]`. `topics` are the
+   * Constitute ontology leaf keys pulled from the section's `data-topics`
+   * attribute; `headingLabel` is the nearest ancestor article/title heading;
+   * `html` is the section's own inner HTML (nested sub-sections excluded, so a
+   * clause isn't duplicated across its ancestors). Populated by
+   * `sync-constitutions`. Feeds the reading column and `constitution_topic_excerpts`.
+   */
+  structuredArticles: jsonb("structured_articles"),
   lastFetched: timestamp("last_fetched"),
 });
+
+/**
+ * Cross-reference index for the Constitution Explorer's topic pane.
+ *
+ * One row per (constitution section × Constitute ontology topic key). Built at
+ * ingest time by parsing `data-topics` on each `<div class="section">`, so the
+ * "how do peer constitutions handle <topic>?" pane is a pure DB query
+ * (`topic_key = ? AND jurisdiction_id != ?`) with no live Constitute calls at
+ * page view. `excerpt_html` is the tagged section's FULL subtree inner HTML
+ * (nested sub-sections included, capped ~8KB at a clean tag boundary) so the
+ * pane always shows the passage — Constitute often tags a heading-only wrapper
+ * whose clause text lives in child sections. Sections with no meaningful text
+ * are skipped. `article_label` is the best-effort nearest heading (e.g.
+ * "Article I"). Idempotent: a country's rows are delete+reinserted on each sync.
+ */
+export const constitutionTopicExcerpts = pgTable(
+  "constitution_topic_excerpts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    constitutionId: uuid("constitution_id")
+      .references(() => constitutions.id)
+      .notNull(),
+    /** Constitute ontology topic key, e.g. `lhterm` (joins to the taxonomy). */
+    topicKey: text("topic_key").notNull(),
+    /** Human label for the topic at ingest time, e.g. "Term length of first chamber". */
+    topicLabel: text("topic_label").notNull(),
+    /** Constitute section id the excerpt came from, e.g. `section/8`. */
+    sectionId: text("section_id"),
+    /** The tagged section's full subtree inner HTML (the passage), capped ~8KB. */
+    excerptHtml: text("excerpt_html").notNull(),
+    /** Best-effort nearest article/title heading, e.g. "Article I". */
+    articleLabel: text("article_label"),
+  },
+  (table) => [
+    index("idx_constitution_topic_excerpts_topic").on(table.topicKey),
+    index("idx_constitution_topic_excerpts_jurisdiction").on(
+      table.jurisdictionId,
+    ),
+  ],
+);
 
 export const countryFactbookSections = pgTable(
   "country_factbook_sections",

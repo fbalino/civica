@@ -1,0 +1,2978 @@
+{
+  "generatedAt": "2026-07-01",
+  "source": "https://www.constituteproject.org/service/topics?lang=en",
+  "categories": [
+    {
+      "key": "amendment",
+      "label": "Amendment",
+      "description": "",
+      "count": 573
+    },
+    {
+      "key": "culture_and_identity",
+      "label": "Culture and Identity",
+      "description": "",
+      "count": 4696
+    },
+    {
+      "key": "elections",
+      "label": "Elections",
+      "description": "",
+      "count": 3416
+    },
+    {
+      "key": "executive",
+      "label": "Executive",
+      "description": "",
+      "count": 14291
+    },
+    {
+      "key": "federalism",
+      "label": "Federalism",
+      "description": "",
+      "count": 973
+    },
+    {
+      "key": "international_law",
+      "label": "International Law",
+      "description": "",
+      "count": 2286
+    },
+    {
+      "key": "judiciary",
+      "label": "Judiciary",
+      "description": "",
+      "count": 8716
+    },
+    {
+      "key": "legislature",
+      "label": "Legislature",
+      "description": "",
+      "count": 12571
+    },
+    {
+      "key": "principles_and_symbols",
+      "label": "Principles and Symbols",
+      "description": "",
+      "count": 3856
+    },
+    {
+      "key": "regulation_and_oversight",
+      "label": "Regulation and Oversight",
+      "description": "",
+      "count": 2431
+    },
+    {
+      "key": "rights_and_duties",
+      "label": "Rights and Duties",
+      "description": "",
+      "count": 23671
+    },
+    {
+      "key": "special_sections",
+      "label": "Special Sections",
+      "description": "",
+      "count": 631
+    }
+  ],
+  "leaves": [
+    {
+      "key": "amend",
+      "label": "Constitution amendment procedure",
+      "description": "Details the way in which the text of the constitution can be formally amended. This is distinct from the task of constitutional interpretation often undertaken by courts.",
+      "categoryKey": "amendment",
+      "count": 415
+    },
+    {
+      "key": "unamend",
+      "label": "Unamendable provisions",
+      "description": "Some provisions in the constitutions may be so fundamental to the constitutional order, or so politically contentious, that they are designated as unamendable. In such cases, unamendable provisions are expressly noted in the constitution.",
+      "categoryKey": "amendment",
+      "count": 158
+    },
+    {
+      "key": "indcit",
+      "label": "Citizenship of indigenous groups",
+      "description": "Clarifies the citizenship status of members of indigenous groups. In some cases indigenous groups may be granted citizenship in a sub-national unit.",
+      "categoryKey": "culture_and_identity",
+      "count": 16
+    },
+    {
+      "key": "citrev",
+      "label": "Conditions for revoking citizenship",
+      "description": "Describes the conditions under which a government is allowed to revoke an individual's citizenship. Some constitutions expressly forbid the government from revoking citizenship, regardless of the circumstances.",
+      "categoryKey": "culture_and_identity",
+      "count": 286
+    },
+    {
+      "key": "equalgr2",
+      "label": "Equality regardless of nationality",
+      "description": "Requires that everyone is treated equally before the law, without regard to their nationality. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "culture_and_identity",
+      "count": 76
+    },
+    {
+      "key": "equalgr3",
+      "label": "Equality regardless of origin",
+      "description": "Requires that everyone is treated equally before the law, without regard to their country or place of origin. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "culture_and_identity",
+      "count": 227
+    },
+    {
+      "key": "citdep",
+      "label": "Power to deport citizens",
+      "description": "In extraordinary circumstances, usually relating to criminal convictions abroad, some constitutions give the government the power to deport citizens. In other constitutions, the government is specifically prohibited from deporting citizens but allows deportation of other residents.",
+      "categoryKey": "culture_and_identity",
+      "count": 106
+    },
+    {
+      "key": "citizen",
+      "label": "Requirements for birthright citizenship",
+      "description": "Details the requirements for an individual to be granted citizenship at birth. The requirements may relate to the citizenship or residency of one or both parents, or to the location of an individual's birth.",
+      "categoryKey": "culture_and_identity",
+      "count": 342
+    },
+    {
+      "key": "natcit",
+      "label": "Requirements for naturalization",
+      "description": "Naturalization is the process through which a person acquires a citizenship to which they did not have a right by birth. These provisions detail the requirements an individual must fulfil in order to gain citizenship.",
+      "categoryKey": "culture_and_identity",
+      "count": 277
+    },
+    {
+      "key": "resenex",
+      "label": "Restrictions on entry or exit",
+      "description": "Primarily concerned with the movements of foreign nationals, describes the powers of the government to restrict entry into or exit out of the state.",
+      "categoryKey": "culture_and_identity",
+      "count": 124
+    },
+    {
+      "key": "citren",
+      "label": "Right to renounce citizenship",
+      "description": "Grants individuals the right to renounce their citizenship. This right is sometimes subject to qualifications relating to dual-citizenship, or the existence of a state of war.",
+      "categoryKey": "culture_and_identity",
+      "count": 151
+    },
+    {
+      "key": "indcit",
+      "label": "Citizenship of indigenous groups",
+      "description": "Clarifies the citizenship status of members of indigenous groups. In some cases indigenous groups may be granted citizenship in a sub-national unit.",
+      "categoryKey": "culture_and_identity",
+      "count": 16
+    },
+    {
+      "key": "indpolgr4",
+      "label": "Indigenous right not to pay taxes",
+      "description": "Grants indigenous peoples an exemption from taxation by the central government.",
+      "categoryKey": "culture_and_identity",
+      "count": 4
+    },
+    {
+      "key": "indpolgr5",
+      "label": "Indigenous right to illegal activities",
+      "description": "Grants indigenous peoples the right to take part in activities that are illegal for the non-indigenous population.",
+      "categoryKey": "culture_and_identity",
+      "count": 1
+    },
+    {
+      "key": "indpolgr3",
+      "label": "Indigenous right to political parties",
+      "description": "Grants indigenous peoples the right to form political parties on the basis of group identity.",
+      "categoryKey": "culture_and_identity",
+      "count": 0
+    },
+    {
+      "key": "indpolgr2",
+      "label": "Indigenous right to representation",
+      "description": "Grants indigenous peoples the right to representation in the central government. This might, for example, involve a seat quota in the legislature.",
+      "categoryKey": "culture_and_identity",
+      "count": 38
+    },
+    {
+      "key": "indpolgr6",
+      "label": "Indigenous right to self governance",
+      "description": "Grants indigenous peoples limited rights to self-government, particularly with regard to issues that affect their territory.",
+      "categoryKey": "culture_and_identity",
+      "count": 38
+    },
+    {
+      "key": "indpolgr1",
+      "label": "Indigenous right to vote",
+      "description": "Specifically grants indigenous peoples the right to vote in national elections or referenda.",
+      "categoryKey": "culture_and_identity",
+      "count": 13
+    },
+    {
+      "key": "equalgr5",
+      "label": "Equality regardless of language",
+      "description": "Requires that everyone is treated equally before the law, without regard to their language. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "culture_and_identity",
+      "count": 180
+    },
+    {
+      "key": "lang",
+      "label": "Official or national languages",
+      "description": "Establishes the official languages of the state. Official languages are those used for interactions with state agencies. National languages are often local languages, while the official languages of the state sometimes include the language of a former colonial power.",
+      "categoryKey": "culture_and_identity",
+      "count": 318
+    },
+    {
+      "key": "langprot",
+      "label": "Protection of language use",
+      "description": "Protects the right of individuals to use their native language, or otherwise provides general protections for particular languages. Protected languages may be specified, but remain distinct from the official languages of the state.",
+      "categoryKey": "culture_and_identity",
+      "count": 210
+    },
+    {
+      "key": "trilang",
+      "label": "Trial in native language of accused",
+      "description": "Grants individuals charged with an offense the right to have their trial conducted in a language they understand, or the right to have an interpreter. In some cases, this would include a right to be informed of the reasons for one’s arrest.",
+      "categoryKey": "culture_and_identity",
+      "count": 176
+    },
+    {
+      "key": "equalgr4",
+      "label": "Equality regardless of race",
+      "description": "Requires that everyone is treated equally before the law, without regard to their race. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "culture_and_identity",
+      "count": 294
+    },
+    {
+      "key": "equalgr14",
+      "label": "Equality regardless of tribe or clan",
+      "description": "Requires that everyone is treated equally before the law, without regard to their tribe or clan. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "culture_and_identity",
+      "count": 41
+    },
+    {
+      "key": "ethincl",
+      "label": "Integration of ethnic communities",
+      "description": "Minority ethnic communities are enabled to participate in the affairs of the state or society. Some constitutions offer additional protection against forced assimilation.",
+      "categoryKey": "culture_and_identity",
+      "count": 123
+    },
+    {
+      "key": "opgroup",
+      "label": "Provisions for wealth redistribution",
+      "description": "The state is required to provide additional resources, either in monetary contributions or in services, to specific groups within the society. Categories might include gender, ethnicity, disability, or any other group identity.",
+      "categoryKey": "culture_and_identity",
+      "count": 80
+    },
+    {
+      "key": "equalgr11",
+      "label": "Equality regardless of creed or belief",
+      "description": "Requires that everyone is treated equally before the law, without regard to their creed, belief, or opinions. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "culture_and_identity",
+      "count": 211
+    },
+    {
+      "key": "equalgr6",
+      "label": "Equality regardless of religion",
+      "description": "Requires that everyone is treated equally before the law, without regard to their religion. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "culture_and_identity",
+      "count": 279
+    },
+    {
+      "key": "judcrts8",
+      "label": "Establishment of religious courts",
+      "description": "Courts with limited jurisdiction to adjudicate matters arising in religious law. Jurisdiction may be limited on a confessional basis.",
+      "categoryKey": "culture_and_identity",
+      "count": 25
+    },
+    {
+      "key": "freerel",
+      "label": "Freedom of religion",
+      "description": "Grants individuals the right to hold religious beliefs, and to freely practice those religious beliefs. This right is also commonly understood to include the right to change one's religion, or to have no religion at all.",
+      "categoryKey": "culture_and_identity",
+      "count": 393
+    },
+    {
+      "key": "god",
+      "label": "God or other deities",
+      "description": "An invocation of the divine. Often found in the preamble, particularly in states with an established religion.",
+      "categoryKey": "culture_and_identity",
+      "count": 246
+    },
+    {
+      "key": "offrel",
+      "label": "Official religion",
+      "description": "Establishment of an official religion, or religions, for the state. Other constitutions provide special treatment for certain religions, or conversely, expressly forbid the state from establishing an official religion.",
+      "categoryKey": "culture_and_identity",
+      "count": 188
+    },
+    {
+      "key": "seprel",
+      "label": "Separation of church and state",
+      "description": "Guarantees separation between the state and religious organizations. The state may be forbidden from extending governmental recognition or assistance to religious organizations.",
+      "categoryKey": "culture_and_identity",
+      "count": 151
+    },
+    {
+      "key": "rellaw",
+      "label": "Status of religious law",
+      "description": "Religious law and constitutional law interact in complex ways. Constitutions can treat religious law as entirely separate, integrated to some degree, applied in areas where secular law is silent, considered superior, or used as a source or inspiration for secular law.",
+      "categoryKey": "culture_and_identity",
+      "count": 47
+    },
+    {
+      "key": "reltax",
+      "label": "Tax status of religious organizations",
+      "description": "Religious organizations are granted a special status with regard to taxation. This may include exemptions from regular taxation of income or property.",
+      "categoryKey": "culture_and_identity",
+      "count": 19
+    },
+    {
+      "key": "ecage",
+      "label": "Age restrictions on electoral court judges",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of judge in an electoral court. In some cases may also provide a maximum age.",
+      "categoryKey": "elections",
+      "count": 11
+    },
+    {
+      "key": "ecom",
+      "label": "Electoral commission",
+      "description": "An independent commission responsible for facilitating and regulating elections. May be responsible for monitoring political parties and the financing of elections.",
+      "categoryKey": "elections",
+      "count": 213
+    },
+    {
+      "key": "ecpow",
+      "label": "Electoral court powers",
+      "description": "Establishes the competencies of the electoral court. In addition to hearing challenges of election results, the court may be responsible for certifying various aspects of elections, including voter rolls and final vote tallies.",
+      "categoryKey": "elections",
+      "count": 42
+    },
+    {
+      "key": "ecrdet",
+      "label": "Electoral court removal",
+      "description": "In cases where a judge has committed a crime, or otherwise compromised the integrity of their office, he or she may be removed from office. This may be carried out by the legislature, the executive, or another competent body.",
+      "categoryKey": "elections",
+      "count": 18
+    },
+    {
+      "key": "ecsel",
+      "label": "Electoral court selection",
+      "description": "The procedure through which a candidate for an electoral court judgeship is nominated and approved.  This might involve approval from the executive, and all or part of the legislature.",
+      "categoryKey": "elections",
+      "count": 41
+    },
+    {
+      "key": "ecterm",
+      "label": "Electoral court term length",
+      "description": "The number of years that an electoral judge serves before either reappointment or dismissal is required.",
+      "categoryKey": "elections",
+      "count": 32
+    },
+    {
+      "key": "ecterml",
+      "label": "Electoral court term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a judge in an electoral court.",
+      "categoryKey": "elections",
+      "count": 10
+    },
+    {
+      "key": "ecres",
+      "label": "Eligibility for electoral court judges",
+      "description": "Qualifications that an individual must meet in order to serve as a judge in an electoral court. These often concern educational and professional credentials.",
+      "categoryKey": "elections",
+      "count": 33
+    },
+    {
+      "key": "camppubf",
+      "label": "Campaign financing",
+      "description": "Rules that political parties and candidates must follow in financing electoral campaigns. Some constitutions establish government assistance for such purposes, or forbid receipt of funds from certain other sources.",
+      "categoryKey": "elections",
+      "count": 101
+    },
+    {
+      "key": "census",
+      "label": "Census",
+      "description": "Provides for the enumeration of residents periodically. Additional instructions about the conduct of the census may also be given.",
+      "categoryKey": "elections",
+      "count": 108
+    },
+    {
+      "key": "district",
+      "label": "Electoral districts",
+      "description": "Describes characteristics, or rules for the establishment, of electoral districts. Constitutions rarely directly establish the districts, but rather describe where and how these decisions will be made.",
+      "categoryKey": "elections",
+      "count": 185
+    },
+    {
+      "key": "electsch",
+      "label": "Scheduling of elections",
+      "description": "When elections shall be held. This could be described in terms of a particular day, an interval between elections, or with relation to the dismissal of the legislature or executive.",
+      "categoryKey": "elections",
+      "count": 261
+    },
+    {
+      "key": "freeelec",
+      "label": "Secret ballot",
+      "description": "Voting takes place in such a way that a citizen completes the ballot privately, and the ballot cannot be connected to the voter.",
+      "categoryKey": "elections",
+      "count": 330
+    },
+    {
+      "key": "prtyduty",
+      "label": "Duty to join a political party",
+      "description": "Requires all citizens to be a member of a political party, or of the sole political party of the state.",
+      "categoryKey": "elections",
+      "count": 0
+    },
+    {
+      "key": "equalgr15",
+      "label": "Equality regardless of political party",
+      "description": "Requires that everyone is treated equally before the law, without regard to their political party membership or political opinions. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "elections",
+      "count": 200
+    },
+    {
+      "key": "indpolgr3",
+      "label": "Indigenous right to political parties",
+      "description": "Grants indigenous peoples the right to form political parties on the basis of group identity.",
+      "categoryKey": "elections",
+      "count": 0
+    },
+    {
+      "key": "partprf",
+      "label": "Preferred political parties",
+      "description": "A particular political party, or type of party, has a special status within the state.",
+      "categoryKey": "elections",
+      "count": 10
+    },
+    {
+      "key": "partprh",
+      "label": "Prohibited political parties",
+      "description": "Certain political parties, or parties with particular ideologies or characteristics, are prohibited. For example, some constitutions prohibit parties that are founded on a tribal or group identity.",
+      "categoryKey": "elections",
+      "count": 134
+    },
+    {
+      "key": "partunco",
+      "label": "Regulation of political parties",
+      "description": "Describes which branch or body of the government has the power to regulate political parties, particularly those tasked with determining the unconstitutionality of certain parties.",
+      "categoryKey": "elections",
+      "count": 90
+    },
+    {
+      "key": "partreg",
+      "label": "Restrictions on political parties",
+      "description": "Establishes the boundaries of acceptable activity, or the organizational structure, of political parties. For example, parties may be bound to respect some fundamental principles of the state.",
+      "categoryKey": "elections",
+      "count": 218
+    },
+    {
+      "key": "partrght",
+      "label": "Right to form political parties",
+      "description": "Establishes the right to join a party or other political organization, or gives citizens the right to form new political parties.",
+      "categoryKey": "elections",
+      "count": 261
+    },
+    {
+      "key": "initiat",
+      "label": "Legislative initiatives by citizens",
+      "description": "Allows private citizens to propose new legislation. Usually this requires additional qualifications, such as support from a political party, a member of the legislature, or a certain number of signatures from other citizens.",
+      "categoryKey": "elections",
+      "count": 115
+    },
+    {
+      "key": "referen",
+      "label": "Referenda",
+      "description": "Provides citizens an opportunity to vote for or against a specific piece of proposed legislation. Referenda are proposed by one or more bodies of the government.",
+      "categoryKey": "elections",
+      "count": 315
+    },
+    {
+      "key": "voteun",
+      "label": "Claim of universal suffrage",
+      "description": "The right to vote is held by all citizens. There may nevertheless be some restrictions on voting by residency, age, residency or criminal conviction.",
+      "categoryKey": "elections",
+      "count": 275
+    },
+    {
+      "key": "compvote",
+      "label": "Compulsory voting",
+      "description": "Makes voting mandatory for at least some electors in some elections. This is sometimes qualified on the basis of age, for example after age eighteen, or until age 70.",
+      "categoryKey": "elections",
+      "count": 38
+    },
+    {
+      "key": "indpolgr1",
+      "label": "Indigenous right to vote",
+      "description": "Specifically grants indigenous peoples the right to vote in national elections or referenda.",
+      "categoryKey": "elections",
+      "count": 13
+    },
+    {
+      "key": "voteres",
+      "label": "Restrictions on voting",
+      "description": "Even where voting is considered to be a universal right, there may be some qualifications. For example, restrictions on the basis of residency, age, or criminal convictions are common.",
+      "categoryKey": "elections",
+      "count": 362
+    },
+    {
+      "key": "cabdiss",
+      "label": "Cabinet removal",
+      "description": "Cabinet members generally serve at the pleasure of the appointing power, typically the executive. Many constitutions also allow the legislative branch to remove cabinet members in cases of misconduct.",
+      "categoryKey": "executive",
+      "count": 391
+    },
+    {
+      "key": "cabsel",
+      "label": "Cabinet selection",
+      "description": "Establishes the bodies competent to nominate and approve members of the cabinet. Appointment is usually made by the executive branch, and is in some cases subject to approval by the legislative branch.",
+      "categoryKey": "executive",
+      "count": 393
+    },
+    {
+      "key": "cabrest",
+      "label": "Eligibility for cabinet",
+      "description": "Qualifications that an individual must meet in order to serve in the cabinet. This is sometimes as simple as eligibility to vote, but may include a number of requirements. Ministers may also be restricted from serving as legislators.",
+      "categoryKey": "executive",
+      "count": 341
+    },
+    {
+      "key": "cabinet",
+      "label": "Establishment of cabinet/ministers",
+      "description": "The body of high ranking officials who act as the heads of government departments and advise the head of state or head of government.",
+      "categoryKey": "executive",
+      "count": 405
+    },
+    {
+      "key": "cabpow",
+      "label": "Powers of cabinet",
+      "description": "Matters on which the executive’s ministers have the power to act. These powers are often expressed in very general terms, but in some cases additional powers are enumerated for exercise in particular contexts.",
+      "categoryKey": "executive",
+      "count": 364
+    },
+    {
+      "key": "cabdiss",
+      "label": "Cabinet removal",
+      "description": "Cabinet members generally serve at the pleasure of the appointing power, typically the executive. Many constitutions also allow the legislative branch to remove cabinet members in cases of misconduct.",
+      "categoryKey": "executive",
+      "count": 391
+    },
+    {
+      "key": "execindp",
+      "label": "Claim of executive independence",
+      "description": "Closely related to the idea of separation of powers, this is a constitutional guarantee of the independence of the executive.",
+      "categoryKey": "executive",
+      "count": 44
+    },
+    {
+      "key": "comchief",
+      "label": "Designation of commander in chief",
+      "description": "Establishes ultimate control of the state's armed forces. Usually the head of state or head of government. This may be a ceremonial role, or may involve significant decision-making power.",
+      "categoryKey": "executive",
+      "count": 348
+    },
+    {
+      "key": "cabrest",
+      "label": "Eligibility for cabinet",
+      "description": "Qualifications that an individual must meet in order to serve in the cabinet. This is sometimes as simple as eligibility to vote, but may include a number of requirements. Ministers may also be restricted from serving as legislators.",
+      "categoryKey": "executive",
+      "count": 341
+    },
+    {
+      "key": "hogdec",
+      "label": "Head of government decree power",
+      "description": "Allows the head of government, or exceptionally the cabinet, to enact rules without following the usual channels for the passage of legislation. This power is usually limited to particular circumstances or areas of government activity.",
+      "categoryKey": "executive",
+      "count": 99
+    },
+    {
+      "key": "hogimm",
+      "label": "Head of government immunity",
+      "description": "Protection, whether absolute or limited, against prosecution for the head of government. This may involve protection against prosecution for certain kinds of crimes, or for a specified period of time.",
+      "categoryKey": "executive",
+      "count": 56
+    },
+    {
+      "key": "hogpow",
+      "label": "Head of government powers",
+      "description": "Specific, enumerated powers that are given to the head of government. For example, some heads of government are given the power to issue currency, grant asylum, award decorations, or various other particular powers.",
+      "categoryKey": "executive",
+      "count": 176
+    },
+    {
+      "key": "hogdiss",
+      "label": "Head of government removal",
+      "description": "In cases where the head of government has committed a crime, or lost the confidence of the legislature, he or she may be removed from office. This may be carried out by the legislature, the head of state, or another competent body.",
+      "categoryKey": "executive",
+      "count": 287
+    },
+    {
+      "key": "hosdec",
+      "label": "Head of state decree power",
+      "description": "Allows the head of state to enact rules without following the usual channels for the passage of legislation. This power is usually limited to particular circumstances or areas of government activity.",
+      "categoryKey": "executive",
+      "count": 257
+    },
+    {
+      "key": "hospow",
+      "label": "Head of state powers",
+      "description": "Specific, enumerated powers that are given to the head of state. For example, some heads of state are given the power to issue currency, grant asylum, award decorations, or various other particular powers.",
+      "categoryKey": "executive",
+      "count": 371
+    },
+    {
+      "key": "hosdiss",
+      "label": "Head of state removal",
+      "description": "In cases where the head of state has committed a crime, or lost the confidence of the legislature, he or she may be removed from office. This may be carried out by the legislature, the head of government, or another competent body.",
+      "categoryKey": "executive",
+      "count": 346
+    },
+    {
+      "key": "invexe",
+      "label": "Legislative oversight of the executive",
+      "description": "Mechanisms that allow the legislative branch to ensure that executive agencies are enforcing the laws according to the intent of the legislature. Also provides a check on the misuse or abuse of executive power.",
+      "categoryKey": "executive",
+      "count": 322
+    },
+    {
+      "key": "hogdlim",
+      "label": "Limits on removing head of government",
+      "description": "Protections from removal for the head of government. For example, a failed attempt to remove the head of government may preclude additional votes on the matter for a specified period of time.",
+      "categoryKey": "executive",
+      "count": 63
+    },
+    {
+      "key": "pardon",
+      "label": "Power to pardon",
+      "description": "Gives a body within the executive branch the authority to overrule a criminal conviction.",
+      "categoryKey": "executive",
+      "count": 391
+    },
+    {
+      "key": "cabpow",
+      "label": "Powers of cabinet",
+      "description": "Matters on which the executive’s ministers have the power to act. These powers are often expressed in very general terms, but in some cases additional powers are enumerated for exercise in particular contexts.",
+      "categoryKey": "executive",
+      "count": 364
+    },
+    {
+      "key": "hogage",
+      "label": "Age restrictions on head of government",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of head of government. In some cases may also provide a maximum age.",
+      "categoryKey": "executive",
+      "count": 101
+    },
+    {
+      "key": "hogrest",
+      "label": "Eligibility for head of government",
+      "description": "Qualifications that an individual must meet in order to serve as the head of government. This is sometimes as simple as eligibility to vote, but may include a number of requirements.",
+      "categoryKey": "executive",
+      "count": 153
+    },
+    {
+      "key": "hogdec",
+      "label": "Head of government decree power",
+      "description": "Allows the head of government, or exceptionally the cabinet, to enact rules without following the usual channels for the passage of legislation. This power is usually limited to particular circumstances or areas of government activity.",
+      "categoryKey": "executive",
+      "count": 99
+    },
+    {
+      "key": "hogimm",
+      "label": "Head of government immunity",
+      "description": "Protection, whether absolute or limited, against prosecution for the head of government. This may involve protection against prosecution for certain kinds of crimes, or for a specified period of time.",
+      "categoryKey": "executive",
+      "count": 56
+    },
+    {
+      "key": "hogpow",
+      "label": "Head of government powers",
+      "description": "Specific, enumerated powers that are given to the head of government. For example, some heads of government are given the power to issue currency, grant asylum, award decorations, or various other particular powers.",
+      "categoryKey": "executive",
+      "count": 176
+    },
+    {
+      "key": "hogdiss",
+      "label": "Head of government removal",
+      "description": "In cases where the head of government has committed a crime, or lost the confidence of the legislature, he or she may be removed from office. This may be carried out by the legislature, the head of state, or another competent body.",
+      "categoryKey": "executive",
+      "count": 287
+    },
+    {
+      "key": "hogsucc",
+      "label": "Head of government replacement",
+      "description": "The procedure by which the head of government is replaced in the event that he or she does not complete his or her term. This might involve a predetermined succession, or reversion to the normal selection procedure.",
+      "categoryKey": "executive",
+      "count": 146
+    },
+    {
+      "key": "hogelect",
+      "label": "Head of government selection",
+      "description": "The procedure through which a candidate for the office of head of government is nominated and approved. This typically involves approval from both the legislature and the head of state.",
+      "categoryKey": "executive",
+      "count": 292
+    },
+    {
+      "key": "hogterm",
+      "label": "Head of government term length",
+      "description": "The number of years that a head of government serves before either reappointment or dismissal is required.",
+      "categoryKey": "executive",
+      "count": 51
+    },
+    {
+      "key": "hogterml",
+      "label": "Head of government term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve in the office of head of government.",
+      "categoryKey": "executive",
+      "count": 19
+    },
+    {
+      "key": "hoglegr",
+      "label": "Head of government's role in the legislature",
+      "description": "Establishes whether the head of government is required to serve, or is prohibited from serving, as a member of the legislature.",
+      "categoryKey": "executive",
+      "count": 166
+    },
+    {
+      "key": "hogdlim",
+      "label": "Limits on removing head of government",
+      "description": "Protections from removal for the head of government. For example, a failed attempt to remove the head of government may preclude additional votes on the matter for a specified period of time.",
+      "categoryKey": "executive",
+      "count": 63
+    },
+    {
+      "key": "hosstaff",
+      "label": "Advisory bodies to the head of state",
+      "description": "In addition to a cabinet, other councils of high ranking officials may advise the head of state. This could include a privy council to a monarch, for example. Some advisory bodies may consult on specific topics, such as national security.",
+      "categoryKey": "executive",
+      "count": 237
+    },
+    {
+      "key": "hosage",
+      "label": "Age restrictions on head of state",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of head of state. In some cases may also provide a maximum age.",
+      "categoryKey": "executive",
+      "count": 332
+    },
+    {
+      "key": "hosrest",
+      "label": "Eligibility for head of state",
+      "description": "Qualifications that an individual must meet in order to serve as the head of government. This is sometimes as simple as eligibility to vote, but may include a number of requirements.",
+      "categoryKey": "executive",
+      "count": 367
+    },
+    {
+      "key": "hosdec",
+      "label": "Head of state decree power",
+      "description": "Allows the head of state to enact rules without following the usual channels for the passage of legislation. This power is usually limited to particular circumstances or areas of government activity.",
+      "categoryKey": "executive",
+      "count": 257
+    },
+    {
+      "key": "hosimm",
+      "label": "Head of state immunity",
+      "description": "Protection, whether absolute or limited, against prosecution for the head of state. This may involve protection against prosecution for certain kinds of crimes, or for a specified period of time.",
+      "categoryKey": "executive",
+      "count": 264
+    },
+    {
+      "key": "hospow",
+      "label": "Head of state powers",
+      "description": "Specific, enumerated powers that are given to the head of state. For example, some heads of state are given the power to issue currency, grant asylum, award decorations, or various other particular powers.",
+      "categoryKey": "executive",
+      "count": 371
+    },
+    {
+      "key": "hosdiss",
+      "label": "Head of state removal",
+      "description": "In cases where the head of state has committed a crime, or lost the confidence of the legislature, he or she may be removed from office. This may be carried out by the legislature, the head of government, or another competent body.",
+      "categoryKey": "executive",
+      "count": 346
+    },
+    {
+      "key": "hossucc",
+      "label": "Head of state replacement",
+      "description": "The procedure by which the head of state is replaced in the event that he or she does not complete his or her term. This might involve a predetermined succession, or reversion to the normal selection procedure.",
+      "categoryKey": "executive",
+      "count": 384
+    },
+    {
+      "key": "hoselect",
+      "label": "Head of state selection",
+      "description": "The procedure through which a candidate for the office of head of state is nominated and approved. While there is great variation, common procedures include heredity, direct election, or election by the legislature.",
+      "categoryKey": "executive",
+      "count": 411
+    },
+    {
+      "key": "hosterm",
+      "label": "Head of state term length",
+      "description": "The number of years that a head of state serves before either reappointment or dismissal is required.",
+      "categoryKey": "executive",
+      "count": 348
+    },
+    {
+      "key": "hosterml",
+      "label": "Head of state term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve in the office of head of state",
+      "categoryKey": "executive",
+      "count": 258
+    },
+    {
+      "key": "comchief",
+      "label": "Designation of commander in chief",
+      "description": "Establishes ultimate control of the state's armed forces. Usually the head of state or head of government. This may be a ceremonial role, or may involve significant decision-making power.",
+      "categoryKey": "executive",
+      "count": 348
+    },
+    {
+      "key": "milserv",
+      "label": "Duty to serve in the military",
+      "description": "A duty to serve a specified period of time in the country's military. Often also includes protections for conscientious objectors.",
+      "categoryKey": "executive",
+      "count": 262
+    },
+    {
+      "key": "em",
+      "label": "Emergency provisions",
+      "description": "Allows the government to declare an exceptional state, such as emergency, siege, or martial law. Usually gives the government additional powers, and may suspend some normal functions of the political system.",
+      "categoryKey": "executive",
+      "count": 385
+    },
+    {
+      "key": "judcrts4",
+      "label": "Establishment of military courts",
+      "description": "Courts with jurisdiction limited to charges against members of the military, and tasked with enforcing military law.",
+      "categoryKey": "executive",
+      "count": 159
+    },
+    {
+      "key": "war",
+      "label": "Power to declare/approve war",
+      "description": "The process that the government must follow in order to establish a declaration of war. For example, this could be a power of the head of state, of the cabinet as a whole, or it could require consent from the legislative branch.",
+      "categoryKey": "executive",
+      "count": 274
+    },
+    {
+      "key": "civilmil",
+      "label": "Restrictions on minister of defense",
+      "description": "Qualifications that an individual must meet in order to serve as the minister of defense. Particularly concerned with whether the minister is required to be, or prohibited from being, a member of the military.",
+      "categoryKey": "executive",
+      "count": 15
+    },
+    {
+      "key": "milrest",
+      "label": "Restrictions on the armed forces",
+      "description": "Limitations either on the government's use of the military, or on the actions of members of the military. For example, prohibition of domestic deployment of the military, or restrictions on the political rights of military officers.",
+      "categoryKey": "executive",
+      "count": 193
+    },
+    {
+      "key": "milcom",
+      "label": "Selection of active-duty commanders",
+      "description": "The selection process for the highest ranking officers in the military. This often involves appointment by the head of the executive branch, and in some cases also requires the approval of at least part of the legislature.",
+      "categoryKey": "executive",
+      "count": 257
+    },
+    {
+      "key": "terror",
+      "label": "Terrorism",
+      "description": "Terrorism specifically mentioned, usually in the context of the criminal justice system, or with regard to the activities of the military or other public safety bodies.",
+      "categoryKey": "executive",
+      "count": 74
+    },
+    {
+      "key": "atgen",
+      "label": "Attorney general",
+      "description": "The office responsible for representing the government in criminal or civil cases. The office may have various names, including the public prosecutor, or prosecutor general.",
+      "categoryKey": "executive",
+      "count": 319
+    },
+    {
+      "key": "depexec",
+      "label": "Deputy executive",
+      "description": "Specification of the deputy to the head of state or head of government. The deputy executive typically has the power to act when the executive is absent or becomes incapable of holding office.",
+      "categoryKey": "executive",
+      "count": 251
+    },
+    {
+      "key": "cabinet",
+      "label": "Establishment of cabinet/ministers",
+      "description": "The body of high ranking officials who act as the heads of government departments and advise the head of state or head of government.",
+      "categoryKey": "executive",
+      "count": 405
+    },
+    {
+      "key": "execnum",
+      "label": "Name/structure of executive(s)",
+      "description": "Distinguishes the structure of the executive. Establishes the offices of head of state and/or head of government.",
+      "categoryKey": "executive",
+      "count": 415
+    },
+    {
+      "key": "fedrev",
+      "label": "Federal review of subnational legislation",
+      "description": "In federal countries, the power of the federal government to review legislation passed by the governments of the subnational units. Such review could be undertaken by a federal court or another part of the federal government.",
+      "categoryKey": "federalism",
+      "count": 108
+    },
+    {
+      "key": "fedsep",
+      "label": "National vs subnational laws",
+      "description": "Establishes which level of government has supremacy on certain legislative matters or in cases where their laws are in conflict.",
+      "categoryKey": "federalism",
+      "count": 136
+    },
+    {
+      "key": "access",
+      "label": "Accession of territory",
+      "description": "Allows the state to incorporate new territory into the country. Usually also specifies the necessary steps for this to happen.",
+      "categoryKey": "federalism",
+      "count": 105
+    },
+    {
+      "key": "seccess",
+      "label": "Secession of territory",
+      "description": "Addresses secession or withdrawal of groups or territories of the state. In cases where secession is allowed, usually also specifies the legal process that must take place.",
+      "categoryKey": "federalism",
+      "count": 46
+    },
+    {
+      "key": "mun",
+      "label": "Municipal government",
+      "description": "Establishes the organs of municipal or local government, and their competencies.",
+      "categoryKey": "federalism",
+      "count": 318
+    },
+    {
+      "key": "sub",
+      "label": "Subsidiary unit government",
+      "description": "Specifies the competencies of the governments of the subsidiary units in a federal system.",
+      "categoryKey": "federalism",
+      "count": 260
+    },
+    {
+      "key": "custlaw",
+      "label": "Customary international law",
+      "description": "Reference to customary international law, the law of nations, or the generally accepted principles of international law.",
+      "categoryKey": "international_law",
+      "count": 141
+    },
+    {
+      "key": "intrght",
+      "label": "International human rights treaties",
+      "description": "Reference to one or more specific international treaties or instruments concerning human rights.",
+      "categoryKey": "international_law",
+      "count": 120
+    },
+    {
+      "key": "intlaw",
+      "label": "International law",
+      "description": "Reference to international law, including treaties, agreements, norms, or other commitments.",
+      "categoryKey": "international_law",
+      "count": 378
+    },
+    {
+      "key": "intorgs",
+      "label": "International organizations",
+      "description": "Reference to international organizations, whether generally or with regard to specific international organizations such as the United Nations.",
+      "categoryKey": "international_law",
+      "count": 301
+    },
+    {
+      "key": "headforn",
+      "label": "Foreign affairs representative",
+      "description": "Indicates the government official or body authorized to speak for the state abroad. This function could be fulfilled by the head of state, or by another government official such as the foreign minister.",
+      "categoryKey": "international_law",
+      "count": 320
+    },
+    {
+      "key": "war",
+      "label": "Power to declare/approve war",
+      "description": "The process that the government must follow in order to establish a declaration of war. For example, this could be a power of the head of state, of the cabinet as a whole, or it could require consent from the legislative branch.",
+      "categoryKey": "international_law",
+      "count": 274
+    },
+    {
+      "key": "intrght",
+      "label": "International human rights treaties",
+      "description": "Reference to one or more specific international treaties or instruments concerning human rights.",
+      "categoryKey": "international_law",
+      "count": 120
+    },
+    {
+      "key": "treatcon",
+      "label": "Legal status of treaties",
+      "description": "This especially concerns the status of treaties with regard to the constitution or ordinary law, and determines whether treaties are superior or inferior to the constitution or ordinary law.",
+      "categoryKey": "international_law",
+      "count": 272
+    },
+    {
+      "key": "treat",
+      "label": "Treaty ratification",
+      "description": "The steps that the government must follow to gain approval for accession to a treaty. Commonly this involves gaining the consent of part or all of the legislature.",
+      "categoryKey": "international_law",
+      "count": 360
+    },
+    {
+      "key": "adsel",
+      "label": "Administrative court selection",
+      "description": "The procedure through which a candidate for an administrative judgeship is nominated and approved. This might involve approval from the executive, and all or part of the legislature.",
+      "categoryKey": "judiciary",
+      "count": 72
+    },
+    {
+      "key": "adterm",
+      "label": "Administrative court term length",
+      "description": "The number of years that an administrative judge serves before either reappointment or dismissal is required.",
+      "categoryKey": "judiciary",
+      "count": 30
+    },
+    {
+      "key": "adtermn",
+      "label": "Administrative court term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a judge in an administrative court.",
+      "categoryKey": "judiciary",
+      "count": 11
+    },
+    {
+      "key": "adage",
+      "label": "Age restrictions on administrative judges",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of judge in an administrative court. In some cases may also provide a maximum age.",
+      "categoryKey": "judiciary",
+      "count": 12
+    },
+    {
+      "key": "adres",
+      "label": "Eligibility for administrative  judges",
+      "description": "Conditions that an individual must fulfil in order to serve as a judge in an administrative court. These often concern educational and professional credentials.",
+      "categoryKey": "judiciary",
+      "count": 45
+    },
+    {
+      "key": "judcrts1",
+      "label": "Establishment of administrative courts",
+      "description": "Courts that adjudicate disputes about the government's exercise of power in ordinary administrative functions.",
+      "categoryKey": "judiciary",
+      "count": 126
+    },
+    {
+      "key": "illadmin",
+      "label": "Ultra-vires administrative actions",
+      "description": "Protects individuals from the use of excess power by administrative agencies of the government. Commonly also establishes procedures for review of such actions and provides redress for those harmed.",
+      "categoryKey": "judiciary",
+      "count": 222
+    },
+    {
+      "key": "conage",
+      "label": "Age restrictions on constitutional court judges",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of judge in a constitutional court. In some cases may also provide a maximum age.",
+      "categoryKey": "judiciary",
+      "count": 53
+    },
+    {
+      "key": "concop",
+      "label": "Constitutional court opinions",
+      "description": "Determines procedures for, or treatment of, judicial opinions handed down by the constitutional court.",
+      "categoryKey": "judiciary",
+      "count": 33
+    },
+    {
+      "key": "conpow",
+      "label": "Constitutional court powers",
+      "description": "Establishes the competencies of the constitutional court, other than adjudication and review of legislation. Such powers may include supervision of elections, impeachment of the executive, review of treaties, or other specified functions.",
+      "categoryKey": "judiciary",
+      "count": 192
+    },
+    {
+      "key": "conrem",
+      "label": "Constitutional court removal",
+      "description": "In cases where a judge has committed a crime, or otherwise compromised the integrity of their office, he or she may be removed from office. This may be carried out by the legislature, the executive, or another competent body.",
+      "categoryKey": "judiciary",
+      "count": 95
+    },
+    {
+      "key": "consel",
+      "label": "Constitutional court selection",
+      "description": "The procedure through which a candidate for a constitutional court judgeship is nominated and approved.  This might involve approval from the executive, and all or part of the legislature.",
+      "categoryKey": "judiciary",
+      "count": 200
+    },
+    {
+      "key": "conterm",
+      "label": "Constitutional court term length",
+      "description": "The number of years that a constitutional court judge serves before either reappointment or dismissal is required.",
+      "categoryKey": "judiciary",
+      "count": 170
+    },
+    {
+      "key": "conlim",
+      "label": "Constitutional court term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a judge in a constitutional court.",
+      "categoryKey": "judiciary",
+      "count": 102
+    },
+    {
+      "key": "conres",
+      "label": "Eligibility for const court judges",
+      "description": "Qualifications that an individual must meet in order to serve as a judge in a constitutional court. These often concern educational and professional credentials.",
+      "categoryKey": "judiciary",
+      "count": 168
+    },
+    {
+      "key": "judcrts2",
+      "label": "Establishment of constitutional court",
+      "description": "A court that is especially empowered to interpret the constitution, and usually to rule on whether legislation is in accord with the principles of the constitution.",
+      "categoryKey": "judiciary",
+      "count": 201
+    },
+    {
+      "key": "ecage",
+      "label": "Age restrictions on electoral court judges",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of judge in an electoral court. In some cases may also provide a maximum age.",
+      "categoryKey": "judiciary",
+      "count": 11
+    },
+    {
+      "key": "ecpow",
+      "label": "Electoral court powers",
+      "description": "Establishes the competencies of the electoral court. In addition to hearing challenges of election results, the court may be responsible for certifying various aspects of elections, including voter rolls and final vote tallies.",
+      "categoryKey": "judiciary",
+      "count": 42
+    },
+    {
+      "key": "ecrdet",
+      "label": "Electoral court removal",
+      "description": "In cases where a judge has committed a crime, or otherwise compromised the integrity of their office, he or she may be removed from office. This may be carried out by the legislature, the executive, or another competent body.",
+      "categoryKey": "judiciary",
+      "count": 18
+    },
+    {
+      "key": "ecsel",
+      "label": "Electoral court selection",
+      "description": "The procedure through which a candidate for an electoral court judgeship is nominated and approved.  This might involve approval from the executive, and all or part of the legislature.",
+      "categoryKey": "judiciary",
+      "count": 41
+    },
+    {
+      "key": "ecterm",
+      "label": "Electoral court term length",
+      "description": "The number of years that an electoral judge serves before either reappointment or dismissal is required.",
+      "categoryKey": "judiciary",
+      "count": 32
+    },
+    {
+      "key": "ecterml",
+      "label": "Electoral court term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a judge in an electoral court.",
+      "categoryKey": "judiciary",
+      "count": 10
+    },
+    {
+      "key": "ecres",
+      "label": "Eligibility for electoral court judges",
+      "description": "Qualifications that an individual must meet in order to serve as a judge in an electoral court. These often concern educational and professional credentials.",
+      "categoryKey": "judiciary",
+      "count": 33
+    },
+    {
+      "key": "conpow",
+      "label": "Constitutional court powers",
+      "description": "Establishes the competencies of the constitutional court, other than adjudication and review of legislation. Such powers may include supervision of elections, impeachment of the executive, review of treaties, or other specified functions.",
+      "categoryKey": "judiciary",
+      "count": 192
+    },
+    {
+      "key": "conrem",
+      "label": "Constitutional court removal",
+      "description": "In cases where a judge has committed a crime, or otherwise compromised the integrity of their office, he or she may be removed from office. This may be carried out by the legislature, the executive, or another competent body.",
+      "categoryKey": "judiciary",
+      "count": 95
+    },
+    {
+      "key": "interp",
+      "label": "Constitutional interpretation",
+      "description": "Describes which bodies of government are empowered to interpret the constitution. This is commonly the role of a constitutional court or supreme court, but in some cases is a responsibility of all or a part of the legislature.",
+      "categoryKey": "judiciary",
+      "count": 380
+    },
+    {
+      "key": "uncon",
+      "label": "Constitutionality of legislation",
+      "description": "Procedures for examining whether the content of a piece of legislation is in accord with the constitution. This may or may not be permissible prior to the promulgation of the legislation.",
+      "categoryKey": "judiciary",
+      "count": 348
+    },
+    {
+      "key": "judind",
+      "label": "Judicial independence",
+      "description": "An explicit declaration that judges are autonomous or the judiciary as a whole is independent. This may include protection from outside influence on their decision making, particularly from other branches of the government.",
+      "categoryKey": "judiciary",
+      "count": 361
+    },
+    {
+      "key": "judprec",
+      "label": "Judicial precedence",
+      "description": "A requirement that judges must at least take into account, and potentially follow, precedents set by rulings in higher courts.",
+      "categoryKey": "judiciary",
+      "count": 70
+    },
+    {
+      "key": "judretir",
+      "label": "Mandatory retirement age for judges",
+      "description": "Specifies the age at which judges must step down. A common alternative to term limits.",
+      "categoryKey": "judiciary",
+      "count": 202
+    },
+    {
+      "key": "judsal",
+      "label": "Protection of judges' salaries",
+      "description": "Prevents tampering with the salaries of judges for political ends. Can bolster judicial independence.  Provisions about protection of the overall judicial budget are included here.",
+      "categoryKey": "judiciary",
+      "count": 165
+    },
+    {
+      "key": "suppow",
+      "label": "Supreme court powers",
+      "description": "Establishes the competencies of the supreme court, other than adjudication and review of legislation. Such powers may include supervision of elections, impeachment of the executive, review of treaties, or other specified functions.",
+      "categoryKey": "judiciary",
+      "count": 237
+    },
+    {
+      "key": "jrem",
+      "label": "Supreme/ordinary court judge removal",
+      "description": "In cases where a judge has committed a crime, or otherwise compromised the integrity of their office, he or she may be removed from office. This may be carried out by the legislature, the executive, or another competent body.",
+      "categoryKey": "judiciary",
+      "count": 341
+    },
+    {
+      "key": "interp",
+      "label": "Constitutional interpretation",
+      "description": "Describes which bodies of government are empowered to interpret the constitution. This is commonly the role of a constitutional court or supreme court, but in some cases is a responsibility of all or a part of the legislature.",
+      "categoryKey": "judiciary",
+      "count": 380
+    },
+    {
+      "key": "uncon",
+      "label": "Constitutionality of legislation",
+      "description": "Procedures for examining whether the content of a piece of legislation is in accord with the constitution. This may or may not be permissible prior to the promulgation of the legislation.",
+      "categoryKey": "judiciary",
+      "count": 348
+    },
+    {
+      "key": "amparo",
+      "label": "Right to amparo",
+      "description": "Gives citizens the right to request judicial review of government actions or judgments that they believe have violated their rights.",
+      "categoryKey": "judiciary",
+      "count": 33
+    },
+    {
+      "key": "illadmin",
+      "label": "Ultra-vires administrative actions",
+      "description": "Protects individuals from the use of excess power by administrative agencies of the government. Commonly also establishes procedures for review of such actions and provides redress for those harmed.",
+      "categoryKey": "judiciary",
+      "count": 222
+    },
+    {
+      "key": "ordage",
+      "label": "Age restrictions on ordinary court judges",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of judge in an ordinary court. In some cases may also provide a maximum age.",
+      "categoryKey": "judiciary",
+      "count": 47
+    },
+    {
+      "key": "ordres",
+      "label": "Eligibility for ordinary court judges",
+      "description": "Qualifications that an individual must meet in order to serve as a judge in an ordinary court. These often concern educational and professional credentials.",
+      "categoryKey": "judiciary",
+      "count": 176
+    },
+    {
+      "key": "ordsel",
+      "label": "Ordinary court selection",
+      "description": "The procedure through which a candidate for an ordinary court judgeship is nominated and approved.  This might involve approval from the executive, and all or part of the legislature.",
+      "categoryKey": "judiciary",
+      "count": 327
+    },
+    {
+      "key": "ordterm",
+      "label": "Ordinary court term length",
+      "description": "The number of years that an ordinary court judge serves before either reappointment or dismissal is required.",
+      "categoryKey": "judiciary",
+      "count": 120
+    },
+    {
+      "key": "ordterml",
+      "label": "Ordinary court term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a judge in an ordinary court.",
+      "categoryKey": "judiciary",
+      "count": 19
+    },
+    {
+      "key": "judcrts5",
+      "label": "Courts for judging public officials",
+      "description": "Special courts that are empowered to review the actions of public servants acting in their official capacity.",
+      "categoryKey": "judiciary",
+      "count": 57
+    },
+    {
+      "key": "judcrts1",
+      "label": "Establishment of administrative courts",
+      "description": "Courts that adjudicate disputes about the government's exercise of power in ordinary administrative functions.",
+      "categoryKey": "judiciary",
+      "count": 126
+    },
+    {
+      "key": "judcrts2",
+      "label": "Establishment of constitutional court",
+      "description": "A court that is especially empowered to interpret the constitution, and usually to rule on whether legislation is in accord with the principles of the constitution.",
+      "categoryKey": "judiciary",
+      "count": 201
+    },
+    {
+      "key": "judcrts3",
+      "label": "Establishment of courts of amparo",
+      "description": "Courts that review government actions to determine whether an individual's rights were infringed or violated.",
+      "categoryKey": "judiciary",
+      "count": 0
+    },
+    {
+      "key": "jc",
+      "label": "Establishment of judicial council",
+      "description": "Establishes a special body to monitor judges. Judicial councils are commonly tasked with reviewing complaints about judges, and are sometimes involved in selecting, promoting, and removing judges.",
+      "categoryKey": "judiciary",
+      "count": 295
+    },
+    {
+      "key": "judcrts7",
+      "label": "Establishment of labor courts",
+      "description": "Courts with limited jurisdiction to adjudicate disputes between individuals or trade unions and businesses.",
+      "categoryKey": "judiciary",
+      "count": 32
+    },
+    {
+      "key": "judcrts4",
+      "label": "Establishment of military courts",
+      "description": "Courts with jurisdiction limited to charges against members of the military, and tasked with enforcing military law.",
+      "categoryKey": "judiciary",
+      "count": 159
+    },
+    {
+      "key": "judcrts8",
+      "label": "Establishment of religious courts",
+      "description": "Courts with limited jurisdiction to adjudicate matters arising in religious law. Jurisdiction may be limited on a confessional basis.",
+      "categoryKey": "judiciary",
+      "count": 25
+    },
+    {
+      "key": "judcrts6",
+      "label": "Establishment of tax courts",
+      "description": "Courts with limited jurisdiction to adjudicate disputes between individuals or businesses and the state with regard to taxation.",
+      "categoryKey": "judiciary",
+      "count": 5
+    },
+    {
+      "key": "levjud",
+      "label": "Structure of the courts",
+      "description": "Establishes the basic organization of the judicial branch. In some cases only the highest court is established, leaving further organization to be determined by ordinary legislation.",
+      "categoryKey": "judiciary",
+      "count": 408
+    },
+    {
+      "key": "hocage",
+      "label": "Age restrictions on supreme court judges",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of judge on the supreme court. In some cases may also provide a maximum age.",
+      "categoryKey": "judiciary",
+      "count": 77
+    },
+    {
+      "key": "hocres",
+      "label": "Eligibility for supreme court judges",
+      "description": "Qualifications that an individual must meet in order to serve as a judge on the supreme court. These often concern educational and professional credentials.",
+      "categoryKey": "judiciary",
+      "count": 245
+    },
+    {
+      "key": "hocsize",
+      "label": "Number of supreme court judges",
+      "description": "Establishes the number of seats on the supreme court.",
+      "categoryKey": "judiciary",
+      "count": 174
+    },
+    {
+      "key": "hocop",
+      "label": "Supreme court opinions",
+      "description": "Determines procedures for, or treatment of, judicial opinions handed down by the supreme court.",
+      "categoryKey": "judiciary",
+      "count": 54
+    },
+    {
+      "key": "suppow",
+      "label": "Supreme court powers",
+      "description": "Establishes the competencies of the supreme court, other than adjudication and review of legislation. Such powers may include supervision of elections, impeachment of the executive, review of treaties, or other specified functions.",
+      "categoryKey": "judiciary",
+      "count": 237
+    },
+    {
+      "key": "hocsel",
+      "label": "Supreme court selection",
+      "description": "The procedure through which a candidate for a supreme court judgeship is nominated and approved.  This might involve approval from the executive, and all or part of the legislature.",
+      "categoryKey": "judiciary",
+      "count": 366
+    },
+    {
+      "key": "hocterm",
+      "label": "Supreme court term length",
+      "description": "The number of years that a supreme court justice serves before either reappointment or dismissal is required.",
+      "categoryKey": "judiciary",
+      "count": 218
+    },
+    {
+      "key": "hocterml",
+      "label": "Supreme court term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a judge on the supreme court.",
+      "categoryKey": "judiciary",
+      "count": 55
+    },
+    {
+      "key": "lhage",
+      "label": "Age restrictions on first chamber",
+      "description": "Most commonly establishes the minimum age that an individual must have attained to be eligible to serve as a representative in the first chamber of the legislature. In some cases may also provide a maximum age.",
+      "categoryKey": "legislature",
+      "count": 330
+    },
+    {
+      "key": "lhrest",
+      "label": "Eligibility for first chamber",
+      "description": "Qualifications that an individual must meet in order to serve as a representative in the first chamber of the legislature. These often concern residency, proficiency in the official language, or prior occupation.",
+      "categoryKey": "legislature",
+      "count": 378
+    },
+    {
+      "key": "lhquota",
+      "label": "First chamber representation quotas",
+      "description": "Specifies the proportion of the seats in the first chamber that must be assigned to representatives of a particular group, such as women, ethnic groups, political parties, religious groups, or social classes.",
+      "categoryKey": "legislature",
+      "count": 110
+    },
+    {
+      "key": "lhspleg",
+      "label": "First chamber reserved policy areas",
+      "description": "Names specific areas of legislation that are a special concern for the first chamber. This may include sole authority to legislate in these areas.",
+      "categoryKey": "legislature",
+      "count": 149
+    },
+    {
+      "key": "lhselect",
+      "label": "First chamber selection",
+      "description": "Describes the procedure through which members of the first chamber of the legislature are elected or appointed.",
+      "categoryKey": "legislature",
+      "count": 416
+    },
+    {
+      "key": "lhlead",
+      "label": "Leader of first chamber",
+      "description": "Names the office that presides over the first chamber of the legislature. This function might be fulfilled by the head of government, a member of the chamber, the deputy executive, or another official.",
+      "categoryKey": "legislature",
+      "count": 392
+    },
+    {
+      "key": "lhseats",
+      "label": "Size of first chamber",
+      "description": "The total number of seats in the first chamber of the legislature.",
+      "categoryKey": "legislature",
+      "count": 312
+    },
+    {
+      "key": "lhterm",
+      "label": "Term length for first chamber",
+      "description": "The number of years that a representative in the first chamber of the legislature serves before reelection, reappointment, or dismissal is required.",
+      "categoryKey": "legislature",
+      "count": 397
+    },
+    {
+      "key": "lhtrmlim",
+      "label": "Term limits for first chamber",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a representative in the first chamber of the legislature.",
+      "categoryKey": "legislature",
+      "count": 25
+    },
+    {
+      "key": "legapp",
+      "label": "Approval or veto of general legislation",
+      "description": "The power to approve or reject legislation, in whole or in part, after it has been passed by the legislature. Some systems do not require this final step.",
+      "categoryKey": "legislature",
+      "count": 378
+    },
+    {
+      "key": "divhouse",
+      "label": "Division of labor between chambers",
+      "description": "Specifies the manner in which the work of the legislative process is divided between the two chambers of the legislature. For example, legislation could be considered concurrently or sequentially, or could be divided on the basis of policy areas.",
+      "categoryKey": "legislature",
+      "count": 168
+    },
+    {
+      "key": "legini",
+      "label": "Initiation of general legislation",
+      "description": "Specifies who has the power to propose new legislation. Beyond members of the legislature, this may or may not be extended to political parties, the general public, the head of government, or the head of state.",
+      "categoryKey": "legislature",
+      "count": 376
+    },
+    {
+      "key": "legsupr",
+      "label": "Supermajority required for legislation",
+      "description": "Particularly vital or contentious policy areas may require a supermajority of a specified size in order to pass legislation.  Although constitutional amendments often require a supermajority, this topic addresses ordinary legislation only.",
+      "categoryKey": "legislature",
+      "count": 129
+    },
+    {
+      "key": "override",
+      "label": "Veto override procedure",
+      "description": "Allows the legislature to take additional steps to pass legislation that has been vetoed by the actor responsible for approving or rejecting legislation. This typically requires a supermajority, but there is some variation.",
+      "categoryKey": "legislature",
+      "count": 277
+    },
+    {
+      "key": "legapp",
+      "label": "Approval or veto of general legislation",
+      "description": "The power to approve or reject legislation, in whole or in part, after it has been passed by the legislature. Some systems do not require this final step.",
+      "categoryKey": "legislature",
+      "count": 378
+    },
+    {
+      "key": "legdiss",
+      "label": "Dismissal of the legislature",
+      "description": "Specifies who has the authority to dismiss the legislature. May also specify the conditions under which this may take place.",
+      "categoryKey": "legislature",
+      "count": 302
+    },
+    {
+      "key": "immunity",
+      "label": "Immunity of legislators",
+      "description": "Protection, whether absolute or limited, against prosecution for members of the legislature. This may involve protection against prosecution for certain kinds of crimes, or for a specified period of time.",
+      "categoryKey": "legislature",
+      "count": 386
+    },
+    {
+      "key": "invexe",
+      "label": "Legislative oversight of the executive",
+      "description": "Mechanisms that allow the legislative branch to ensure that executive agencies are enforcing the laws according to the intent of the legislature. Also provides a check on the misuse or abuse of executive power.",
+      "categoryKey": "legislature",
+      "count": 322
+    },
+    {
+      "key": "remleg",
+      "label": "Removal of individual legislators",
+      "description": "Procedures for removing individual members of the legislature for crimes or malfeasance. In some cases this action is taken by the legislator's chamber.",
+      "categoryKey": "legislature",
+      "count": 323
+    },
+    {
+      "key": "legrep",
+      "label": "Replacement of legislators",
+      "description": "Establishes the procedure through which a seat in the legislature may be filled in the event that a legislator has been removed from office, resigns, or dies.",
+      "categoryKey": "legislature",
+      "count": 246
+    },
+    {
+      "key": "override",
+      "label": "Veto override procedure",
+      "description": "Allows the legislature to take additional steps to pass legislation that has been vetoed by the actor responsible for approving or rejecting legislation. This typically requires a supermajority, but there is some variation.",
+      "categoryKey": "legislature",
+      "count": 277
+    },
+    {
+      "key": "attend",
+      "label": "Attendance by legislators",
+      "description": "Requires legislators to attend sessions or votes. Examples include mandatory attendance, punishment after a specified number of absences, or delegating the matter to ordinary law.",
+      "categoryKey": "legislature",
+      "count": 187
+    },
+    {
+      "key": "income",
+      "label": "Compensation of legislators",
+      "description": "Specifies the actors involved in establishing the compensation of legislators. In addition to the legislature, this might involve the head of state, head of government, an independent commission, or other actors.",
+      "categoryKey": "legislature",
+      "count": 202
+    },
+    {
+      "key": "assets",
+      "label": "Earnings disclosure requirement",
+      "description": "Requires legislators to disclose their income, or the value of their assets. This disclosure is typically made to a specified official or commission, and is not necessarily made public.",
+      "categoryKey": "legislature",
+      "count": 74
+    },
+    {
+      "key": "exsess",
+      "label": "Extraordinary legislative sessions",
+      "description": "Establishes who has the authority to call an extraordinary session of the legislature, and in some cases what circumstances would allow them to take such action.",
+      "categoryKey": "legislature",
+      "count": 342
+    },
+    {
+      "key": "legjoint",
+      "label": "Joint meetings of legislative chambers",
+      "description": "Provides for the two chambers of a bicameral legislature to meet jointly. This may involve a body made up of both chambers, or a special joint session for specific purposes.",
+      "categoryKey": "legislature",
+      "count": 132
+    },
+    {
+      "key": "session",
+      "label": "Length of legislative sessions",
+      "description": "The number of days or months that the legislature meets within a year.",
+      "categoryKey": "legislature",
+      "count": 235
+    },
+    {
+      "key": "profleg",
+      "label": "Outside professions of legislators",
+      "description": "May bar legislators from engaging in other occupations during their term in office. Limitations might include prohibitions on holding some or all other public offices, or engaging in private business.",
+      "categoryKey": "legislature",
+      "count": 336
+    },
+    {
+      "key": "pubmeet",
+      "label": "Public or private sessions",
+      "description": "Specifies whether the legislature is to conduct its business in public or in private. When legislative sessions are generally public, some constitutions may also specify the conditions (if any) under which the legislature may hold private sessions.",
+      "categoryKey": "legislature",
+      "count": 234
+    },
+    {
+      "key": "pubmin",
+      "label": "Publication of deliberations",
+      "description": "Requires that a written record of the deliberations of the legislature be published.",
+      "categoryKey": "legislature",
+      "count": 84
+    },
+    {
+      "key": "quorum",
+      "label": "Quorum for legislative sessions",
+      "description": "The legislature is only permitted to conduct its business, especially to vote on legislation, when a certain percentage of its members are present.",
+      "categoryKey": "legislature",
+      "count": 315
+    },
+    {
+      "key": "recvote",
+      "label": "Secrecy of legislative votes",
+      "description": "Establishes the level of transparency in legislative voting. This could be a matter of public record, always kept secret, or varied depending on the topic of the vote.",
+      "categoryKey": "legislature",
+      "count": 42
+    },
+    {
+      "key": "legdiss",
+      "label": "Dismissal of the legislature",
+      "description": "Specifies who has the authority to dismiss the legislature. May also specify the conditions under which this may take place.",
+      "categoryKey": "legislature",
+      "count": 302
+    },
+    {
+      "key": "immunity",
+      "label": "Immunity of legislators",
+      "description": "Protection, whether absolute or limited, against prosecution for members of the legislature. This may involve protection against prosecution for certain kinds of crimes, or for a specified period of time.",
+      "categoryKey": "legislature",
+      "count": 386
+    },
+    {
+      "key": "remleg",
+      "label": "Removal of individual legislators",
+      "description": "Procedures for removing individual members of the legislature for crimes or malfeasance. In some cases this action is taken by the legislator's chamber.",
+      "categoryKey": "legislature",
+      "count": 323
+    },
+    {
+      "key": "legrep",
+      "label": "Replacement of legislators",
+      "description": "Establishes the procedure through which a seat in the legislature may be filled in the event that a legislator has been removed from office, resigns, or dies.",
+      "categoryKey": "legislature",
+      "count": 246
+    },
+    {
+      "key": "uhage",
+      "label": "Age restrictions on second chamber",
+      "description": "Most commonly establishes the minimum age that an individual must have attained to be eligible to serve as a representative in the second chamber of the legislature. In some cases may also provide a maximum age.",
+      "categoryKey": "legislature",
+      "count": 133
+    },
+    {
+      "key": "uhrest",
+      "label": "Eligibility for second chamber",
+      "description": "Qualifications that an individual must meet in order to serve as a representative in the second chamber of the legislature. These often concern residency, proficiency in the official language, or prior occupation.",
+      "categoryKey": "legislature",
+      "count": 166
+    },
+    {
+      "key": "uhlead",
+      "label": "Leader of second chamber",
+      "description": "Names the office that presides over the second chamber of the legislature. This function might be fulfilled by a member of the chamber, the deputy executive, or another official.",
+      "categoryKey": "legislature",
+      "count": 165
+    },
+    {
+      "key": "uhquota",
+      "label": "Second chamber representation quotas",
+      "description": "Specifies the proportion of the seats in the second chamber that must be assigned to representatives of a particular group, such as women, ethnic groups, political parties, religious groups, or social classes.",
+      "categoryKey": "legislature",
+      "count": 51
+    },
+    {
+      "key": "uhspleg",
+      "label": "Second chamber reserved policy areas",
+      "description": "Names specific areas of legislation that are a special concern for the second chamber. This may include sole authority to legislate in these areas.",
+      "categoryKey": "legislature",
+      "count": 75
+    },
+    {
+      "key": "uhselect",
+      "label": "Second chamber selection",
+      "description": "Describes the procedure through which members of the second chamber of the legislature are elected or appointed. This is often different from the selection procedure used for the first chamber.",
+      "categoryKey": "legislature",
+      "count": 183
+    },
+    {
+      "key": "uhseats",
+      "label": "Size of second chamber",
+      "description": "The total number of seats in the second chamber of the legislature.",
+      "categoryKey": "legislature",
+      "count": 139
+    },
+    {
+      "key": "uhterm",
+      "label": "Term length of second chamber",
+      "description": "The number of years that a representative in the second chamber of the legislature serves before reelection, reappointment, or dismissal is required.",
+      "categoryKey": "legislature",
+      "count": 148
+    },
+    {
+      "key": "uhtrmlim",
+      "label": "Term limits of second chamber",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a representative in the second chamber of the legislature.",
+      "categoryKey": "legislature",
+      "count": 21
+    },
+    {
+      "key": "balbudgt",
+      "label": "Balanced budget",
+      "description": "A requirement that the government pass a budget in which incoming revenue meets or exceeds the value of the government's expenditures in a fiscal year.",
+      "categoryKey": "legislature",
+      "count": 65
+    },
+    {
+      "key": "budget",
+      "label": "Budget bills",
+      "description": "Special legislative processes for budget bills, which may include restrictions on proposal, approval, or amendment. Budget bills refer to legislation that lays out the revenues and expenditures for some period of time, usually in years.",
+      "categoryKey": "legislature",
+      "count": 372
+    },
+    {
+      "key": "econplan",
+      "label": "Economic plans",
+      "description": "Mention of national economic plans, possibly with the procedure for establishing them. Such procedures may include special rules for proposal, approval, or amendment.",
+      "categoryKey": "legislature",
+      "count": 117
+    },
+    {
+      "key": "finance",
+      "label": "Finance bills",
+      "description": "Special legislative processes for finance bills, which may include restrictions on proposal, approval, or amendment. Finance bills refer to legislation specifically for the borrowing of money for governmental use, like loans from NGOs, other countries, or even private individuals.",
+      "categoryKey": "legislature",
+      "count": 115
+    },
+    {
+      "key": "orglaw",
+      "label": "Organic laws",
+      "description": "Special legislative processes for organic laws, which may include restrictions on proposal, approval, or amendment. Organic laws establish fundamental aspects of the constitutional order, including establishing institutions like the courts or legislature, and in some jurisdictions are accorded similar status to the constitution itself. They sometimes require a higher standard for approval than ordinary law.",
+      "categoryKey": "legislature",
+      "count": 82
+    },
+    {
+      "key": "spend",
+      "label": "Spending bills",
+      "description": "Special legislative processes for spending bills, which may include restrictions on proposal, approval, or amendment. Spending bills refer to legislation specifically for the expenditure of government money.",
+      "categoryKey": "legislature",
+      "count": 135
+    },
+    {
+      "key": "tax",
+      "label": "Tax bills",
+      "description": "Special legislative processes for tax bills, which may include restrictions on proposal, approval, or amendment. Tax bills refer to legislation specifically for collecting revenue for public use, usually in the form of taxes or tariffs.",
+      "categoryKey": "legislature",
+      "count": 198
+    },
+    {
+      "key": "commit",
+      "label": "Legislative committees",
+      "description": "The constitution establishes the existence of legislative committees.  Sometimes details on formation and procedure are provided.",
+      "categoryKey": "legislature",
+      "count": 350
+    },
+    {
+      "key": "stdcom",
+      "label": "Standing committees",
+      "description": "Establishes permanent committees with oversight in given policy areas, which often exercise legislative authority when the legislature is not in session. May also specify how members of these committees are selected, and how long they serve.",
+      "categoryKey": "legislature",
+      "count": 130
+    },
+    {
+      "key": "housenum",
+      "label": "Structure of legislative chamber(s)",
+      "description": "Establishes the number of chambers in the legislature.",
+      "categoryKey": "legislature",
+      "count": 415
+    },
+    {
+      "key": "civil",
+      "label": "Civil service recruitment",
+      "description": "Requires that officials in the public service are recruited and promoted on the basis of merit. This is intended to be a hedge against patronage and nepotism, and may require standardized exams or a specified kind of credential.",
+      "categoryKey": "principles_and_symbols",
+      "count": 137
+    },
+    {
+      "key": "colony",
+      "label": "Colonies",
+      "description": "Mention of territory beyond the national borders that is under the government's control. This may include colonies, protectorates, or territories.",
+      "categoryKey": "principles_and_symbols",
+      "count": 37
+    },
+    {
+      "key": "prevlead",
+      "label": "Crimes of the previous regime",
+      "description": "Usually in the context of specifying the new regime's treatment of these crimes. May grant amnesty or require punishment.",
+      "categoryKey": "principles_and_symbols",
+      "count": 37
+    },
+    {
+      "key": "motive",
+      "label": "Motives for writing constitution",
+      "description": "Frames the constitution in a particular context. Often a response to the country's recent history.",
+      "categoryKey": "principles_and_symbols",
+      "count": 287
+    },
+    {
+      "key": "oath",
+      "label": "Oaths to abide by constitution",
+      "description": "Requires certain public office holders to take an oath to support or abide by the constitution.",
+      "categoryKey": "principles_and_symbols",
+      "count": 358
+    },
+    {
+      "key": "resrce",
+      "label": "Ownership of natural resources",
+      "description": "Describes ownership of natural resources in general, or makes specific references to ownership or use of energy, mineral, water, flora, fauna, or other natural resources.",
+      "categoryKey": "principles_and_symbols",
+      "count": 273
+    },
+    {
+      "key": "figures",
+      "label": "Political theorists/figures",
+      "description": "Reference to historical figures or political theorists. Usually mentioned in the preamble in the context of a particular political tradition.",
+      "categoryKey": "principles_and_symbols",
+      "count": 70
+    },
+    {
+      "key": "artists",
+      "label": "Reference to art",
+      "description": "References to art or artists indicate the importance of art to the national identity, and are often made in the context of mandating state support for the arts.",
+      "categoryKey": "principles_and_symbols",
+      "count": 264
+    },
+    {
+      "key": "prevcond",
+      "label": "Reference to country's history",
+      "description": "May invoke particular triumphs or tragedies in the country's past. Situates the constitution in the country's larger legal and political identity.",
+      "categoryKey": "principles_and_symbols",
+      "count": 158
+    },
+    {
+      "key": "solid",
+      "label": "Reference to fraternity/solidarity",
+      "description": "Considered one of the fundamental values of many states. Often mentioned in the preamble as a motivation for the constitution.",
+      "categoryKey": "principles_and_symbols",
+      "count": 191
+    },
+    {
+      "key": "science",
+      "label": "Reference to science",
+      "description": "Reference to science, which may include prioritization of investment in scientific research, or mandate state support for science and innovation.",
+      "categoryKey": "principles_and_symbols",
+      "count": 283
+    },
+    {
+      "key": "region",
+      "label": "Regional group(s)",
+      "description": "Reference to a group of states, a geographical region, or an intergovernmental organization, such as the European Union.",
+      "categoryKey": "principles_and_symbols",
+      "count": 176
+    },
+    {
+      "key": "auth",
+      "label": "Source of constitutional authority",
+      "description": "Establishes the agent with the authority to install the constitution or from which the state derives its ultimate authority. Many constitutions invoke the people, an assembly, a group of subnational units, a monarch, or a deity.",
+      "categoryKey": "principles_and_symbols",
+      "count": 317
+    },
+    {
+      "key": "system",
+      "label": "Type of government envisioned",
+      "description": "A description of the system of government that the constitution is intended to create. Could be a description of the structure of the state, or of the political system.",
+      "categoryKey": "principles_and_symbols",
+      "count": 375
+    },
+    {
+      "key": "anthem",
+      "label": "National anthem",
+      "description": "Names the official anthem of the state.",
+      "categoryKey": "principles_and_symbols",
+      "count": 261
+    },
+    {
+      "key": "capital",
+      "label": "National capital",
+      "description": "Names the capital city of the state.",
+      "categoryKey": "principles_and_symbols",
+      "count": 255
+    },
+    {
+      "key": "flag",
+      "label": "National flag",
+      "description": "Describes the principal features of the national flag.",
+      "categoryKey": "principles_and_symbols",
+      "count": 297
+    },
+    {
+      "key": "motto",
+      "label": "National motto",
+      "description": "Affirms the national motto, sometimes in more than one language.",
+      "categoryKey": "principles_and_symbols",
+      "count": 80
+    },
+    {
+      "key": "ecage",
+      "label": "Age restrictions on electoral court judges",
+      "description": "Most commonly establishes the minimum age that an individual must have attained before assuming the office of judge in an electoral court. In some cases may also provide a maximum age.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 11
+    },
+    {
+      "key": "ecom",
+      "label": "Electoral commission",
+      "description": "An independent commission responsible for facilitating and regulating elections. May be responsible for monitoring political parties and the financing of elections.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 213
+    },
+    {
+      "key": "ecpow",
+      "label": "Electoral court powers",
+      "description": "Establishes the competencies of the electoral court. In addition to hearing challenges of election results, the court may be responsible for certifying various aspects of elections, including voter rolls and final vote tallies.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 42
+    },
+    {
+      "key": "ecrdet",
+      "label": "Electoral court removal",
+      "description": "In cases where a judge has committed a crime, or otherwise compromised the integrity of their office, he or she may be removed from office. This may be carried out by the legislature, the executive, or another competent body.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 18
+    },
+    {
+      "key": "ecsel",
+      "label": "Electoral court selection",
+      "description": "The procedure through which a candidate for an electoral court judgeship is nominated and approved.  This might involve approval from the executive, and all or part of the legislature.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 41
+    },
+    {
+      "key": "ecterm",
+      "label": "Electoral court term length",
+      "description": "The number of years that an electoral judge serves before either reappointment or dismissal is required.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 32
+    },
+    {
+      "key": "ecterml",
+      "label": "Electoral court term limits",
+      "description": "The number of terms, either consecutive or in total, that an individual may serve as a judge in an electoral court.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 10
+    },
+    {
+      "key": "ecres",
+      "label": "Eligibility for electoral court judges",
+      "description": "Qualifications that an individual must meet in order to serve as a judge in an electoral court. These often concern educational and professional credentials.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 33
+    },
+    {
+      "key": "partunco",
+      "label": "Regulation of political parties",
+      "description": "Describes which branch or body of the government has the power to regulate political parties, particularly those tasked with determining the unconstitutionality of certain parties.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 90
+    },
+    {
+      "key": "bank",
+      "label": "Central bank",
+      "description": "Establishes or affirms a central bank. May also include requirements for its governance and operations.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 195
+    },
+    {
+      "key": "cc",
+      "label": "Counter corruption commission",
+      "description": "An independent commission specifically empowered to investigate corruption within the government.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 59
+    },
+    {
+      "key": "ecom",
+      "label": "Electoral commission",
+      "description": "An independent commission responsible for facilitating and regulating elections. May be responsible for monitoring political parties and the financing of elections.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 213
+    },
+    {
+      "key": "jc",
+      "label": "Establishment of judicial council",
+      "description": "Establishes a special body to monitor judges. Judicial councils are commonly tasked with reviewing complaints about judges, and are sometimes involved in selecting, promoting, and removing judges.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 295
+    },
+    {
+      "key": "hr",
+      "label": "Human rights commission",
+      "description": "An independent commission tasked with investigating potential violations of human rights. The commission may be empowered to take action, or may be required to forward its findings to the regular courts.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 86
+    },
+    {
+      "key": "medcom",
+      "label": "Media commission",
+      "description": "Establishes a commission to regulate mass media. This may include ensuring free expression, and in some cases enforcing some form of censorship.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 81
+    },
+    {
+      "key": "ombuds",
+      "label": "Ombudsman",
+      "description": "A public official tasked with investigating improper or illegal actions on the part of government agencies which may infringe on the rights of individuals. Enables individuals to bring complaints about the actions of the government.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 171
+    },
+    {
+      "key": "truthcom",
+      "label": "Truth and reconciliation commission",
+      "description": "A special commission tasked with hearing testimony and gathering evidence about human rights violations and other crimes, usually committed by a previous regime. Testimony given in such a commission may or may not be protected from use in future prosecutions.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 15
+    },
+    {
+      "key": "medcom",
+      "label": "Media commission",
+      "description": "Establishes a commission to regulate mass media. This may include ensuring free expression, and in some cases enforcing some form of censorship.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 81
+    },
+    {
+      "key": "radio",
+      "label": "Radio",
+      "description": "Reference to the wireless transmission of audio programs, usually in the context of regulation.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 168
+    },
+    {
+      "key": "govmed",
+      "label": "State operation of the media",
+      "description": "Describes the relationship between the state and the media. This may give the state control over all media, allow the state to operate some media, or prohibit the state from such activities.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 117
+    },
+    {
+      "key": "telecom",
+      "label": "Telecommunications",
+      "description": "Reference to wired or wireless communication, and the industries that support it, usually in the context of regulation. Includes telephones, satellites, the internet, and other communication technologies.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 225
+    },
+    {
+      "key": "tv",
+      "label": "Television",
+      "description": "Reference to the wireless transmission of audio-visual programs, usually in the context of regulation.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 168
+    },
+    {
+      "key": "illsub",
+      "label": "Drugs, alcohol, and illegal substances",
+      "description": "Provisions about the regulation or criminalization of the trafficking, sale, or consumption of alcohol, drugs, or other controlled or illegal substances.",
+      "categoryKey": "regulation_and_oversight",
+      "count": 67
+    },
+    {
+      "key": "prtyduty",
+      "label": "Duty to join a political party",
+      "description": "Requires all citizens to be a member of a political party, or of the sole political party of the state.",
+      "categoryKey": "rights_and_duties",
+      "count": 0
+    },
+    {
+      "key": "taxes",
+      "label": "Duty to pay taxes",
+      "description": "Requires all citizens to contribute to the expenses of the state through taxes. This is usually a general statement and may still allow for variation on the basis of income.",
+      "categoryKey": "rights_and_duties",
+      "count": 187
+    },
+    {
+      "key": "milserv",
+      "label": "Duty to serve in the military",
+      "description": "A duty to serve a specified period of time in the country's military. Often also includes protections for conscientious objectors.",
+      "categoryKey": "rights_and_duties",
+      "count": 262
+    },
+    {
+      "key": "work",
+      "label": "Duty to work",
+      "description": "Requires individuals to contribute to the betterment of their society through work. This is usually a general statement and may still allow for variation on the basis of disability, age or other factors.",
+      "categoryKey": "rights_and_duties",
+      "count": 107
+    },
+    {
+      "key": "voteun",
+      "label": "Claim of universal suffrage",
+      "description": "The right to vote is held by all citizens. There may nevertheless be some restrictions on voting by residency, age, residency or criminal conviction.",
+      "categoryKey": "rights_and_duties",
+      "count": 275
+    },
+    {
+      "key": "assem",
+      "label": "Freedom of assembly",
+      "description": "Grants individuals the right to gather in groups, in public spaces, for any otherwise legal purpose. This is right is closely associated with the idea of protest.",
+      "categoryKey": "rights_and_duties",
+      "count": 391
+    },
+    {
+      "key": "assoc",
+      "label": "Freedom of association",
+      "description": "Grants individuals the right to form groups or associations for any otherwise legal purpose. This also sometimes includes the right not to join or associate with a group.",
+      "categoryKey": "rights_and_duties",
+      "count": 385
+    },
+    {
+      "key": "express",
+      "label": "Freedom of expression",
+      "description": "Grants individuals the right to express their thoughts and feelings without prior censorship or other forms of governmental interference. This right is rarely absolute, and is often limited in cases of sedition, hate speech, or obscenity.",
+      "categoryKey": "rights_and_duties",
+      "count": 398
+    },
+    {
+      "key": "freemove",
+      "label": "Freedom of movement",
+      "description": "Grants citizens the right to travel and reside anywhere within the state, and to travel to and from other countries. The right does not normally grant non-citizens access to the state.",
+      "categoryKey": "rights_and_duties",
+      "count": 378
+    },
+    {
+      "key": "opinion",
+      "label": "Freedom of opinion/thought/conscience",
+      "description": "Grants individuals the right to believe or think anything they find compelling. This does not necessarily mean that they have a right to express these beliefs.",
+      "categoryKey": "rights_and_duties",
+      "count": 351
+    },
+    {
+      "key": "press",
+      "label": "Freedom of press",
+      "description": "Grants individuals, especially journalists and publishers, the right to free expression through all forms of media. In many jurisdictions this includes a protection against prior censorship.",
+      "categoryKey": "rights_and_duties",
+      "count": 331
+    },
+    {
+      "key": "freerel",
+      "label": "Freedom of religion",
+      "description": "Grants individuals the right to hold religious beliefs, and to freely practice those religious beliefs. This right is also commonly understood to include the right to change one's religion, or to have no religion at all.",
+      "categoryKey": "rights_and_duties",
+      "count": 393
+    },
+    {
+      "key": "dignity",
+      "label": "Human dignity",
+      "description": "Considered one of the fundamental values of many states. Often mentioned in the preamble as a motivation for the constitution. Also a justification for some constitutional provisions.",
+      "categoryKey": "rights_and_duties",
+      "count": 319
+    },
+    {
+      "key": "civmar",
+      "label": "Provision for civil marriage",
+      "description": "Recognizes secular marriages performed by a government official or other so empowered individuals, or religious marriages that also involve a license from the state.",
+      "categoryKey": "rights_and_duties",
+      "count": 38
+    },
+    {
+      "key": "marriage",
+      "label": "Regulation of marriage",
+      "description": "Regulates marriage, including granting the right to marry and establishing rules regarding divorce. May include a definition of marriage, and may or may not be limited to heterosexual couples.",
+      "categoryKey": "rights_and_duties",
+      "count": 169
+    },
+    {
+      "key": "petition",
+      "label": "Right of petition",
+      "description": "Grants groups and individuals the right to bring petitions to the government. This includes the right to bring complaints about the actions of the government.",
+      "categoryKey": "rights_and_duties",
+      "count": 234
+    },
+    {
+      "key": "acfree",
+      "label": "Right to academic freedom",
+      "description": "Allows scholars to pursue their research agenda without undue interference from the state. This is usually understood to also include freedom to teach and publish.",
+      "categoryKey": "rights_and_duties",
+      "count": 181
+    },
+    {
+      "key": "arms",
+      "label": "Right to bear arms",
+      "description": "Grants individuals the right to possess firearms and other weapons. This right may in some jurisdictions still be subject to regulation of the kinds of weapons that can be possessed, and the places and manners in which they may be transported.",
+      "categoryKey": "rights_and_duties",
+      "count": 11
+    },
+    {
+      "key": "nomil",
+      "label": "Right to conscientious objection",
+      "description": "Grants individuals whose religious or ethical beliefs prevent them from participating in war an exemption from military service.",
+      "categoryKey": "rights_and_duties",
+      "count": 132
+    },
+    {
+      "key": "devlpers",
+      "label": "Right to development of personality",
+      "description": "Grants individuals the right to both develop and express their own unique personality.",
+      "categoryKey": "rights_and_duties",
+      "count": 117
+    },
+    {
+      "key": "fndfam",
+      "label": "Right to found a family",
+      "description": "Grants individuals the right to commit to one another and raise children together. This right is closely tied to the right to marry. Many constitutions stipulate only a general state duty to protect the family.",
+      "categoryKey": "rights_and_duties",
+      "count": 225
+    },
+    {
+      "key": "infoacc",
+      "label": "Right to information",
+      "description": "Grants individuals access to information collected or held by the government, particularly information about oneself, or information of general public interest.",
+      "categoryKey": "rights_and_duties",
+      "count": 199
+    },
+    {
+      "key": "overthrw",
+      "label": "Right to overthrow government",
+      "description": "Grants citizens the right to overthrow the government under certain circumstances. This right is usually expressed in terms of defending the constitutional order, rather than establishing a new one.",
+      "categoryKey": "rights_and_duties",
+      "count": 40
+    },
+    {
+      "key": "privacy",
+      "label": "Right to privacy",
+      "description": "Grants individuals protection against government intrusion into their property, papers, person, or communications without proper authorization. Also protects against such intrusions by private individuals.",
+      "categoryKey": "rights_and_duties",
+      "count": 372
+    },
+    {
+      "key": "libel",
+      "label": "Right to protect one's reputation",
+      "description": "Grants individuals the right to defend themselves against libel or slander. Understood in the context of freedom of expression, this may not include prior censorship, allowing instead for legal remedy after the fact.",
+      "categoryKey": "rights_and_duties",
+      "count": 179
+    },
+    {
+      "key": "citren",
+      "label": "Right to renounce citizenship",
+      "description": "Grants individuals the right to renounce their citizenship. This right is sometimes subject to qualifications relating to dual-citizenship, or the existence of a state of war.",
+      "categoryKey": "rights_and_duties",
+      "count": 151
+    },
+    {
+      "key": "childpro",
+      "label": "Rights of children",
+      "description": "Children are guaranteed certain rights or afforded special protections, which may include state-provided education and healthcare, and/or the right to be free from any kind of abuse.",
+      "categoryKey": "rights_and_duties",
+      "count": 290
+    },
+    {
+      "key": "debtors",
+      "label": "Rights of debtors",
+      "description": "Protection for individuals who are unable to repay loans or other financial obligations. The contractual rights of the lender are qualified by the right of the debtor to their freedom or dignity.",
+      "categoryKey": "rights_and_duties",
+      "count": 69
+    },
+    {
+      "key": "parents",
+      "label": "Rights or duties of parents",
+      "description": "Grants parents certain rights or duties regarding their children. May include the duty to provide for one's legal children, or the right to make decisions about their education, upbringing, and other aspects of their lives.",
+      "categoryKey": "rights_and_duties",
+      "count": 115
+    },
+    {
+      "key": "exprop",
+      "label": "Protection from expropriation",
+      "description": "Protects individuals and businesses from government confiscation of their property without proper compensation. The level of compensation may be variously specified as fair, full, appropriate, adequate, or otherwise.",
+      "categoryKey": "rights_and_duties",
+      "count": 381
+    },
+    {
+      "key": "intprop",
+      "label": "Provisions for intellectual property",
+      "description": "Gives individuals and businesses the exclusive right to protect and profit from their creative works.",
+      "categoryKey": "rights_and_duties",
+      "count": 198
+    },
+    {
+      "key": "occupate",
+      "label": "Right to choose occupation",
+      "description": "Grants individuals the freedom to choose their occupation and their place of employment without interference from the government.",
+      "categoryKey": "rights_and_duties",
+      "count": 242
+    },
+    {
+      "key": "freecomp",
+      "label": "Right to competitive marketplace",
+      "description": "Protects individuals and businesses from monopolies, price fixing, and other means of reducing competition in the marketplace.",
+      "categoryKey": "rights_and_duties",
+      "count": 161
+    },
+    {
+      "key": "busines",
+      "label": "Right to establish a business",
+      "description": "Grants individuals the right to establish for-profit commercial endeavors.",
+      "categoryKey": "rights_and_duties",
+      "count": 202
+    },
+    {
+      "key": "proprght",
+      "label": "Right to own property",
+      "description": "Allows individuals and corporations the sole ownership of real property, effects, financial instruments, or other objects. This right is in some cases open to violation in the interests of the community.",
+      "categoryKey": "rights_and_duties",
+      "count": 353
+    },
+    {
+      "key": "transfer",
+      "label": "Right to transfer property",
+      "description": "Grants the right to dispose of property through sale, gift, private wills, or other means.",
+      "categoryKey": "rights_and_duties",
+      "count": 201
+    },
+    {
+      "key": "judcrts3",
+      "label": "Establishment of courts of amparo",
+      "description": "Courts that review government actions to determine whether an individual's rights were infringed or violated.",
+      "categoryKey": "rights_and_duties",
+      "count": 0
+    },
+    {
+      "key": "hr",
+      "label": "Human rights commission",
+      "description": "An independent commission tasked with investigating potential violations of human rights. The commission may be empowered to take action, or may be required to forward its findings to the regular courts.",
+      "categoryKey": "rights_and_duties",
+      "count": 86
+    },
+    {
+      "key": "inalrght",
+      "label": "Inalienable rights",
+      "description": "Rights that are understood to be unassailable, either because they are fundamental or “natural.”  In some countries, they may be absolute rights, not subject even to qualification.",
+      "categoryKey": "rights_and_duties",
+      "count": 226
+    },
+    {
+      "key": "ombuds",
+      "label": "Ombudsman",
+      "description": "A public official tasked with investigating improper or illegal actions on the part of government agencies which may infringe on the rights of individuals. Enables individuals to bring complaints about the actions of the government.",
+      "categoryKey": "rights_and_duties",
+      "count": 171
+    },
+    {
+      "key": "amparo",
+      "label": "Right to amparo",
+      "description": "Gives citizens the right to request judicial review of government actions or judgments that they believe have violated their rights.",
+      "categoryKey": "rights_and_duties",
+      "count": 33
+    },
+    {
+      "key": "indcit",
+      "label": "Citizenship of indigenous groups",
+      "description": "Clarifies the citizenship status of members of indigenous groups. In some cases indigenous groups may be granted citizenship in a sub-national unit.",
+      "categoryKey": "rights_and_duties",
+      "count": 16
+    },
+    {
+      "key": "equalgr9",
+      "label": "Equality for persons with disabilities",
+      "description": "Requires that everyone is treated equally before the law, without regard to any disability. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 100
+    },
+    {
+      "key": "equalgr8",
+      "label": "Equality regardless of age",
+      "description": "Requires that everyone is treated equally before the law, without regard to their age. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 51
+    },
+    {
+      "key": "equalgr11",
+      "label": "Equality regardless of creed or belief",
+      "description": "Requires that everyone is treated equally before the law, without regard to their creed, belief, or opinions. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 211
+    },
+    {
+      "key": "equalgr13",
+      "label": "Equality regardless of financial status",
+      "description": "Requires that everyone is treated equally before the law, without regard to their financial status or property ownership. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 132
+    },
+    {
+      "key": "equalgr1",
+      "label": "Equality regardless of gender",
+      "description": "Requires that everyone is treated equally before the law, without regard to their gender or sex. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 355
+    },
+    {
+      "key": "equalgr5",
+      "label": "Equality regardless of language",
+      "description": "Requires that everyone is treated equally before the law, without regard to their language. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 180
+    },
+    {
+      "key": "equalgr2",
+      "label": "Equality regardless of nationality",
+      "description": "Requires that everyone is treated equally before the law, without regard to their nationality. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 76
+    },
+    {
+      "key": "equalgr3",
+      "label": "Equality regardless of origin",
+      "description": "Requires that everyone is treated equally before the law, without regard to their country or place of origin. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 227
+    },
+    {
+      "key": "equalgr16",
+      "label": "Equality regardless of parentage",
+      "description": "Requires that everyone is treated equally before the law, without regard to their parentage or birth. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 100
+    },
+    {
+      "key": "equalgr15",
+      "label": "Equality regardless of political party",
+      "description": "Requires that everyone is treated equally before the law, without regard to their political party membership or political opinions. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 200
+    },
+    {
+      "key": "equalgr4",
+      "label": "Equality regardless of race",
+      "description": "Requires that everyone is treated equally before the law, without regard to their race. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 294
+    },
+    {
+      "key": "equalgr6",
+      "label": "Equality regardless of religion",
+      "description": "Requires that everyone is treated equally before the law, without regard to their religion. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 279
+    },
+    {
+      "key": "equalgr7",
+      "label": "Equality regardless of sexual orientation",
+      "description": "Requires that everyone is treated equally before the law, without regard to their sexual orientation. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 22
+    },
+    {
+      "key": "equalgr10",
+      "label": "Equality regardless of skin color",
+      "description": "Requires that everyone is treated equally before the law, without regard to their skin color. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 157
+    },
+    {
+      "key": "equalgr12",
+      "label": "Equality regardless of social status",
+      "description": "Requires that everyone is treated equally before the law, without regard to their social status or origin. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 180
+    },
+    {
+      "key": "equalgr14",
+      "label": "Equality regardless of tribe or clan",
+      "description": "Requires that everyone is treated equally before the law, without regard to their tribe or clan. This may apply to both public and private interactions in some jurisdictions.",
+      "categoryKey": "rights_and_duties",
+      "count": 41
+    },
+    {
+      "key": "equal",
+      "label": "General guarantee of equality",
+      "description": "Guarantees that all individuals are entitled to the same privileges and immunities. Prohibits favoritism or discrimination to any group. All are considered to be equal before the law.",
+      "categoryKey": "rights_and_duties",
+      "count": 401
+    },
+    {
+      "key": "indpolgr4",
+      "label": "Indigenous right not to pay taxes",
+      "description": "Grants indigenous peoples an exemption from taxation by the central government.",
+      "categoryKey": "rights_and_duties",
+      "count": 4
+    },
+    {
+      "key": "indpolgr5",
+      "label": "Indigenous right to illegal activities",
+      "description": "Grants indigenous peoples the right to take part in activities that are illegal for the non-indigenous population.",
+      "categoryKey": "rights_and_duties",
+      "count": 1
+    },
+    {
+      "key": "indpolgr3",
+      "label": "Indigenous right to political parties",
+      "description": "Grants indigenous peoples the right to form political parties on the basis of group identity.",
+      "categoryKey": "rights_and_duties",
+      "count": 0
+    },
+    {
+      "key": "indpolgr2",
+      "label": "Indigenous right to representation",
+      "description": "Grants indigenous peoples the right to representation in the central government. This might, for example, involve a seat quota in the legislature.",
+      "categoryKey": "rights_and_duties",
+      "count": 38
+    },
+    {
+      "key": "indpolgr6",
+      "label": "Indigenous right to self governance",
+      "description": "Grants indigenous peoples limited rights to self-government, particularly with regard to issues that affect their territory.",
+      "categoryKey": "rights_and_duties",
+      "count": 38
+    },
+    {
+      "key": "indpolgr1",
+      "label": "Indigenous right to vote",
+      "description": "Specifically grants indigenous peoples the right to vote in national elections or referenda.",
+      "categoryKey": "rights_and_duties",
+      "count": 13
+    },
+    {
+      "key": "socclas",
+      "label": "Mentions of social class",
+      "description": "Explicit references to social class. This may be in the context of either outlawing or providing for a system of social classes within the state, or in the context of pursuing socio-economic equality.",
+      "categoryKey": "rights_and_duties",
+      "count": 136
+    },
+    {
+      "key": "asylum",
+      "label": "Protection of stateless persons",
+      "description": "Requires the state to offer its protection to one or more of the following vulnerable groups: stateless persons, asylum seekers, or refugees.",
+      "categoryKey": "rights_and_duties",
+      "count": 192
+    },
+    {
+      "key": "matequal",
+      "label": "Provision for matrimonial equality",
+      "description": "Gives both spouses the same rights in marriage and family law. This is a separate issue from the general guarantee of gender equality.",
+      "categoryKey": "rights_and_duties",
+      "count": 146
+    },
+    {
+      "key": "rightres",
+      "label": "Restrictions on rights of groups",
+      "description": "Explains circumstances under which the rights of some individuals or groups may be restricted.",
+      "categoryKey": "rights_and_duties",
+      "count": 66
+    },
+    {
+      "key": "cultrght",
+      "label": "Right to culture",
+      "description": "Establishes the right of individuals to practice their culture. May also require the state to protect or promote cultural rights.",
+      "categoryKey": "rights_and_duties",
+      "count": 323
+    },
+    {
+      "key": "selfdet",
+      "label": "Right to self determination",
+      "description": "Establishes a group right to self determination. This may be a reference to the nation as a whole, to groups in other countries, or to a portion of the state's population.",
+      "categoryKey": "rights_and_duties",
+      "count": 85
+    },
+    {
+      "key": "binding",
+      "label": "Binding effect of const rights",
+      "description": "Establishes whether or not the rights listed in the constitution are binding on private individuals as well as the state.",
+      "categoryKey": "rights_and_duties",
+      "count": 99
+    },
+    {
+      "key": "abide",
+      "label": "Duty to obey the constitution",
+      "description": "Requires citizens or public officers to obey the constitution. This primarily applies to individuals in cases where the constitution includes a statement of the duties of citizens or holders of public office.",
+      "categoryKey": "rights_and_duties",
+      "count": 262
+    },
+    {
+      "key": "excrim",
+      "label": "Extradition procedure",
+      "description": "Details the procedure that must be followed for the state to surrender an individual apprehended on its territory to the government of another state for criminal proceedings. Where permitted, this is usually further regulated through bi-lateral treaties.",
+      "categoryKey": "rights_and_duties",
+      "count": 239
+    },
+    {
+      "key": "dueproc",
+      "label": "Guarantee of due process",
+      "description": "Ensures that defendants in criminal trials are entitled to have their cases heard according to the process established by law. This may include specific rights, such as the right to be informed of the charges, the right to counsel, and the right to appeal.",
+      "categoryKey": "rights_and_duties",
+      "count": 80
+    },
+    {
+      "key": "jury",
+      "label": "Jury trials required",
+      "description": "Grants individuals the right to trial by jury, or more generally provides for citizen participation in the adjudication of guilt in criminal trials.",
+      "categoryKey": "rights_and_duties",
+      "count": 98
+    },
+    {
+      "key": "presinoc",
+      "label": "Presumption of innocence in trials",
+      "description": "Requires that those adjudicating a criminal trial maintain the posture that the accused is \"innocent until proven guilty.\" This places the burden of proof on the side of the prosecution in the trial.",
+      "categoryKey": "rights_and_duties",
+      "count": 326
+    },
+    {
+      "key": "wolaw",
+      "label": "Principle of no punishment without law",
+      "description": "Protects individuals from being prosecuted for actions that were not crimes at the time they were committed. Similarly, the sentence imposed cannot be greater than the one that was mandated at the time that the crime was committed.",
+      "categoryKey": "rights_and_duties",
+      "count": 317
+    },
+    {
+      "key": "prisonrg",
+      "label": "Prison registry",
+      "description": "Requires that the state produce a public registry of the names of those imprisoned. This often serves as a check on arbitrary or unjust imprisonment.",
+      "categoryKey": "rights_and_duties",
+      "count": 20
+    },
+    {
+      "key": "juvenile",
+      "label": "Privileges for juveniles in criminal process",
+      "description": "Grants juveniles charged with crimes special protections in the judicial system. This may include special courts, different sentencing rules, or special detention centers.",
+      "categoryKey": "rights_and_duties",
+      "count": 112
+    },
+    {
+      "key": "doubjep",
+      "label": "Prohibition of double jeopardy",
+      "description": "Prohibits the state from charging an individual with an offense for which they have already been acquitted. This does not necessarily prevent the prosecution from appealing an acquittal.",
+      "categoryKey": "rights_and_duties",
+      "count": 222
+    },
+    {
+      "key": "expost",
+      "label": "Protection from ex post facto laws",
+      "description": "Protects individuals from prosecution for acts that were not criminal at the time that they were committed, or from changes in the penalties for acts.",
+      "categoryKey": "rights_and_duties",
+      "count": 340
+    },
+    {
+      "key": "falseimp",
+      "label": "Protection from false imprisonment",
+      "description": "Provides redress for individuals who have been confined or arrested without just cause, or have otherwise suffered from judicial error.",
+      "categoryKey": "rights_and_duties",
+      "count": 193
+    },
+    {
+      "key": "miranda",
+      "label": "Protection from self-incrimination",
+      "description": "Grants individuals the right to forego answering questions during an interrogation or in court that would tend to confirm the individual's guilt. In some cases an individual may waive this right if they so choose.",
+      "categoryKey": "rights_and_duties",
+      "count": 232
+    },
+    {
+      "key": "habcorp",
+      "label": "Protection from unjustified restraint",
+      "description": "Protects individuals from arbitrary detention or improper arrests. Sometimes specified as a right to a writ of habeas corpus.",
+      "categoryKey": "rights_and_duties",
+      "count": 365
+    },
+    {
+      "key": "vicright",
+      "label": "Protection of victim's rights",
+      "description": "Grants the victims of crime rights in the justice process. These rights may include attendance at the trial, an opportunity to speak at the trial, restitution, or other measures to address the needs of crime victims.",
+      "categoryKey": "rights_and_duties",
+      "count": 70
+    },
+    {
+      "key": "evidence",
+      "label": "Regulation of evidence collection",
+      "description": "Regulates the state's actions with regard to searches and seizures, particularly with regard to criminal investigations. May also prohibit the admission of involuntary confessions, or other suspect forms of evidence.",
+      "categoryKey": "rights_and_duties",
+      "count": 300
+    },
+    {
+      "key": "amparo",
+      "label": "Right to amparo",
+      "description": "Gives citizens the right to request judicial review of government actions or judgments that they believe have violated their rights.",
+      "categoryKey": "rights_and_duties",
+      "count": 33
+    },
+    {
+      "key": "appeal",
+      "label": "Right to appeal judicial decisions",
+      "description": "Gives individuals the right to appeal a judicial decision in a higher court if they are not satisfied with the outcome in the court of first instance. Does not necessarily require the appellate court to hear the case, but the mention of an appellate court may imply the power to appeal.",
+      "categoryKey": "rights_and_duties",
+      "count": 268
+    },
+    {
+      "key": "couns",
+      "label": "Right to counsel",
+      "description": "Gives individuals who have been arrested the right to legal counsel. In absence of a right to counsel some constitutions grant only the right to a defense.",
+      "categoryKey": "rights_and_duties",
+      "count": 335
+    },
+    {
+      "key": "examwit",
+      "label": "Right to examine evidence/witnesses",
+      "description": "Grants an accused offender, and their legal counsel, the right to cross-examine evidence or witnesses brought against them by the prosecution.",
+      "categoryKey": "rights_and_duties",
+      "count": 128
+    },
+    {
+      "key": "fairtri",
+      "label": "Right to fair trial",
+      "description": "Protects individuals from unfair procedures. Fair trials often require a public hearing within a reasonable time following the arrest, and judgment by a competent and impartial jury.",
+      "categoryKey": "rights_and_duties",
+      "count": 262
+    },
+    {
+      "key": "prerel",
+      "label": "Right to pre-trial release",
+      "description": "Grants individuals who have been arrested and charged with a crime the right to be released from custody until the time of their trial. This may require paying the court a sum of money to be repaid at the time of the trial, or other conditions for release.",
+      "categoryKey": "rights_and_duties",
+      "count": 129
+    },
+    {
+      "key": "pubtri",
+      "label": "Right to public trial",
+      "description": "Grants individuals charged with an offense the right to have their trial held in public.",
+      "categoryKey": "rights_and_duties",
+      "count": 287
+    },
+    {
+      "key": "speedtri",
+      "label": "Right to speedy trial",
+      "description": "Grants individuals charged with an offense the right to be brought to trial without any undue delay.",
+      "categoryKey": "rights_and_duties",
+      "count": 221
+    },
+    {
+      "key": "trilang",
+      "label": "Trial in native language of accused",
+      "description": "Grants individuals charged with an offense the right to have their trial conducted in a language they understand, or the right to have an interpreter. In some cases, this would include a right to be informed of the reasons for one’s arrest.",
+      "categoryKey": "rights_and_duties",
+      "count": 176
+    },
+    {
+      "key": "cappun",
+      "label": "Prohibition of capital punishment",
+      "description": "Forbids the state from employing the death penalty as a punishment for any crime.",
+      "categoryKey": "rights_and_duties",
+      "count": 157
+    },
+    {
+      "key": "corppun",
+      "label": "Prohibition of corporal punishment",
+      "description": "Forbids the state from inflicting physical harm on an offender as a punishment for any crime.",
+      "categoryKey": "rights_and_duties",
+      "count": 44
+    },
+    {
+      "key": "cruelty",
+      "label": "Prohibition of cruel treatment",
+      "description": "Forbids the state from treating individuals in a way that offends the principle of human dignity. This may include forms of corporal or capital punishment, excessive delays in assessing punishment, or other actions prejudicial to the rights of offenders.",
+      "categoryKey": "rights_and_duties",
+      "count": 339
+    },
+    {
+      "key": "slave",
+      "label": "Prohibition of slavery",
+      "description": "Forbids the practice of owning or otherwise exploiting human beings. May still allow for compulsory labor as a punishment for a crime, and/or compulsory service in the military in time of war.",
+      "categoryKey": "rights_and_duties",
+      "count": 301
+    },
+    {
+      "key": "torture",
+      "label": "Prohibition of torture",
+      "description": "Forbids the state from torturing individuals, and in some cases from using coerced statements in court.  This prohibition may be limited in cases of war or other circumstances.",
+      "categoryKey": "rights_and_duties",
+      "count": 338
+    },
+    {
+      "key": "life",
+      "label": "Right to life",
+      "description": "Establishes a right to life. The precise meaning of this provision varies between jurisdictions, and may or may not be a reference to the unborn.",
+      "categoryKey": "rights_and_duties",
+      "count": 321
+    },
+    {
+      "key": "achighed",
+      "label": "Access to higher education",
+      "description": "Guarantees individuals equal access to higher education. In some cases this may be limited on a competitive basis, or by tests of aptitude.",
+      "categoryKey": "rights_and_duties",
+      "count": 151
+    },
+    {
+      "key": "edcomp",
+      "label": "Compulsory education",
+      "description": "Requires children to attend school. This may be a requirement up to a certain age, or to a certain level of educational attainment.",
+      "categoryKey": "rights_and_duties",
+      "count": 274
+    },
+    {
+      "key": "edfree",
+      "label": "Free education",
+      "description": "Requires the state to provide education free of charge. This may be limited at a certain age or level of educational attainment.",
+      "categoryKey": "rights_and_duties",
+      "count": 309
+    },
+    {
+      "key": "childwrk",
+      "label": "Limits on employment of children",
+      "description": "Protects children against exploitation in the workplace. This may be in the form of a ban on child workers, or as a requirement for additional protections for child workers.",
+      "categoryKey": "rights_and_duties",
+      "count": 177
+    },
+    {
+      "key": "conright",
+      "label": "Protection of consumers",
+      "description": "Addresses consumer rights or consumer protection. Protects consumers from harmful products and/or predatory or unethical business practices.",
+      "categoryKey": "rights_and_duties",
+      "count": 107
+    },
+    {
+      "key": "env",
+      "label": "Protection of environment",
+      "description": "Imposes a duty on the state or on the people to protect or conserve the environment. This may also accord to citizens the right to enjoy a healthy environment.",
+      "categoryKey": "rights_and_duties",
+      "count": 335
+    },
+    {
+      "key": "scifree",
+      "label": "Right to enjoy the benefits of science",
+      "description": "Accords individuals the right to enjoy the benefits of scientific progress, or obligates the state to promote scientific advancement for the benefit of society.",
+      "categoryKey": "rights_and_duties",
+      "count": 54
+    },
+    {
+      "key": "health",
+      "label": "Right to health care",
+      "description": "Obligates the state to provide health care to its citizens, or provides individuals with the general right to health care.  In some cases, health care must be provided by the government free of charge.",
+      "categoryKey": "rights_and_duties",
+      "count": 288
+    },
+    {
+      "key": "jointrde",
+      "label": "Right to join trade unions",
+      "description": "Grants individuals the right to form and join trade unions or professional associations. This is an explicit right that goes beyond freedom of association.",
+      "categoryKey": "rights_and_duties",
+      "count": 330
+    },
+    {
+      "key": "remuner",
+      "label": "Right to just remuneration",
+      "description": "Grants individuals the right to just remuneration or fair/equal payment for work. May also regulate wages including the establishment of a minimum or living wage.",
+      "categoryKey": "rights_and_duties",
+      "count": 215
+    },
+    {
+      "key": "standliv",
+      "label": "Right to reasonable standard of living",
+      "description": "Grants individuals the right to a standard of living that sustains human dignity. May also refer to adequate well-being, suitable existence, or life worthy of a human being.",
+      "categoryKey": "rights_and_duties",
+      "count": 182
+    },
+    {
+      "key": "leisure",
+      "label": "Right to rest and leisure",
+      "description": "Grants individuals the right to vacations, weekly holidays, and/or annual paid vacation. May be provided via regulation of working hours.",
+      "categoryKey": "rights_and_duties",
+      "count": 182
+    },
+    {
+      "key": "safework",
+      "label": "Right to safe work environment",
+      "description": "Grants individuals the right to work in environments free of preventable hazards. This may include an obligation on the state to provide safe working conditions, or to address violations thereof.",
+      "categoryKey": "rights_and_duties",
+      "count": 188
+    },
+    {
+      "key": "shelter",
+      "label": "Right to shelter",
+      "description": "Grants individuals the right to adequate shelter or housing. Often framed in terms of facilitating family life.",
+      "categoryKey": "rights_and_duties",
+      "count": 162
+    },
+    {
+      "key": "strike",
+      "label": "Right to strike",
+      "description": "Grants individuals and groups the right to cease work for a period of time, in an effort to exert pressure on their employer. This may or may not include protection for the jobs of strikers.",
+      "categoryKey": "rights_and_duties",
+      "count": 204
+    },
+    {
+      "key": "water",
+      "label": "Right to water",
+      "description": "Grants individuals the right to water. May include a guarantee of safe, clean, or potable drinking water. Often associated with a state duty to provide or protect water as a resource.",
+      "categoryKey": "rights_and_duties",
+      "count": 54
+    },
+    {
+      "key": "provwork",
+      "label": "Right to work",
+      "description": "Gives citizens a general right to work, and/or obligates the state to provide work. This is distinct from the right to choose one's occupation.",
+      "categoryKey": "rights_and_duties",
+      "count": 285
+    },
+    {
+      "key": "finsup4",
+      "label": "State support for children",
+      "description": "Obligates the state to provide financial or material resources to children.",
+      "categoryKey": "rights_and_duties",
+      "count": 248
+    },
+    {
+      "key": "finsup3",
+      "label": "State support for the disabled",
+      "description": "Obligates the state to provide financial or material resources to persons with disabilities.",
+      "categoryKey": "rights_and_duties",
+      "count": 284
+    },
+    {
+      "key": "finsup1",
+      "label": "State support for the elderly",
+      "description": "Obligates the state to provide financial or material resources to elderly persons.",
+      "categoryKey": "rights_and_duties",
+      "count": 259
+    },
+    {
+      "key": "finsup2",
+      "label": "State support for the unemployed",
+      "description": "Obligates the state to provide financial or material resources to unemployed persons.",
+      "categoryKey": "rights_and_duties",
+      "count": 152
+    },
+    {
+      "key": "preamble",
+      "label": "Preamble",
+      "description": "An introductory section which may or may not be considered an enforceable part of the constitution.",
+      "categoryKey": "special_sections",
+      "count": 336
+    },
+    {
+      "key": "tranprov",
+      "label": "Transitional provisions",
+      "description": "Temporary sections of the constitution that guide the transition from the previous system to the current constitutional order.",
+      "categoryKey": "special_sections",
+      "count": 295
+    }
+  ]
+}
