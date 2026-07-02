@@ -151,6 +151,18 @@
 .atlas-view svg.world-map:active { cursor: grabbing; }
 
 /* Country label zoom tiers — tier 1 always visible, tier 2/3 appear as you zoom in */
+/* Label halo: paper-colored stroke UNDER the ink glyphs (paint-order) so
+   codes read over any choropleth fill in both themes. stroke-width is set
+   dynamically on the group (counter-scaled with zoom) — 1.25px at k=1. */
+.map-labels {
+  font-size: 12.5px; /* zoomed: counter-scaled by applyTransform (12.5/k) */
+  fill: var(--map-label-fg);
+  stroke: var(--map-label-halo);
+  stroke-width: 1.75px; /* zoomed: counter-scaled (1.75/k) */
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
 .map-labels[data-zoom-tier="1"] [data-tier="2"],
 .map-labels[data-zoom-tier="1"] [data-tier="3"] { display: none; }
 .map-labels[data-zoom-tier="2"] [data-tier="3"] { display: none; }

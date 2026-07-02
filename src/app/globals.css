@@ -175,6 +175,11 @@
   --color-card-hover-border: #D2CEC5;
   --color-divider: #E4E1DC;
   --color-scrim: color-mix(in oklab, #0B1B2D 50%, transparent); /* modal backdrop */
+  /* Atlas map labels sit on choropleth DATA fills (never on theme paper), so
+     they are theme-independent: white caps with a dark halo — the standard
+     cartographic combo that reads on any fill in light AND dark. */
+  --map-label-fg: #FFFFFF;
+  --map-label-halo: rgba(11, 27, 45, 0.85);
   /* Fullscreen media-overlay (lightbox) chrome. Theme-independent: the
      lightbox renders on a near-black scrim in both light and dark, so these
      anchor on absolute black/white and are NOT flipped in the dark block. */

@@ -122,7 +122,11 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       if (labelsRef.current) {
         const tier = t.k >= 4.5 ? 3 : t.k >= 2.5 ? 2 : 1;
         labelsRef.current.setAttribute("data-zoom-tier", String(tier));
-        labelsRef.current.style.fontSize = `${11 / t.k}px`;
+        labelsRef.current.style.fontSize = `${12.5 / t.k}px`;
+        // The label halo (stroke, set in atlas.css) must counter-scale with
+        // zoom like the font does — a fixed stroke-width grows k× when the
+        // <g> scales and swallows the letterforms.
+        labelsRef.current.style.strokeWidth = `${1.75 / t.k}px`;
       }
     }, []);
 
@@ -447,16 +451,11 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
                       textAnchor="middle"
                       dominantBaseline="central"
                       fontFamily="var(--font-mono)"
-                      letterSpacing="1.5"
-                      fill="var(--atlas-ink)"
-                      // Paper-colored halo so labels stay legible over ANY
-                      // choropleth fill in BOTH themes (ink-on-saturated-green
-                      // was unreadable in light mode).
-                      stroke="var(--atlas-paper)"
-                      strokeWidth={2.5}
-                      strokeLinejoin="round"
-                      paintOrder="stroke"
-                      opacity={tier === 1 ? 0.9 : 0.7}
+                      fontWeight={600}
+                      letterSpacing="1"
+                      // fill + halo come from .map-labels (theme-independent
+                      // white-on-dark-halo tokens — readable over any data fill).
+                      opacity={1}
                       style={{ pointerEvents: "none" }}
                     >
                       {p.id!.toUpperCase()}
