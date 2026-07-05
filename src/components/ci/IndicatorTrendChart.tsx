@@ -29,6 +29,14 @@
  *
  * SOFT-FAIL — no series (or fewer than 2 points across all series) → renders
  * nothing (no empty frame), per the placement spec.
+ *
+ * GAPS ARE HONEST — a hole in a published series (e.g. V-Dem codes 1945–1990
+ * West Germany as a separate polity, so unified Germany has a 47-year gap)
+ * breaks the line into separate segments rather than interpolating a straight
+ * line across decades that were never published. Observations left with no
+ * connectable neighbour render as dots. The visible window also snaps to the
+ * first year with data inside the selected range, so "50y" on a country whose
+ * series start in 1990 draws 1990–2025 edge to edge, not a dataless margin.
  */
 
 import { useMemo, useState } from "react";
@@ -72,6 +80,14 @@ const RANGE_YEARS: Record<RangeKey, number | null> = {
   "50y": 50,
   max: null,
 };
+
+/**
+ * Consecutive points further apart than this many years break the line into
+ * separate segments instead of drawing through the hole. 2 keeps biennial
+ * publication cadences connected (WGI published every other year 1996–2002)
+ * while real data gaps (occupations, polity splits, methodology resets) break.
+ */
+const GAP_BREAK_YEARS = 2;
 
 // ─── viewBox geometry (authoritative coordinate space) ──────────────
 const VIEW_W = 720;
@@ -149,23 +165,34 @@ export function IndicatorTrendChart({
     };
   }, [drawable]);
 
-  // Visible window from the selected range.
+  // All distinct data years across the active series, sorted.
+  const activeYears = useMemo(() => {
+    const set = new Set<number>();
+    for (const s of activeSeries) for (const p of s.points) set.add(p.year);
+    return Array.from(set).sort((a, b) => a - b);
+  }, [activeSeries]);
+
+  // Visible window from the selected range, snapped to real data: the left
+  // edge is the first ACTIVE-series year inside the range, so a country whose
+  // series all start later than the nominal range floor gets full-width lines
+  // instead of a dataless left margin.
   const rangeYears = RANGE_YEARS[range];
+  const windowMax =
+    activeYears.length > 0 ? activeYears[activeYears.length - 1] : maxYearAll;
+  const rangeFloor =
+    rangeYears == null ? -Infinity : windowMax - rangeYears + 1;
   const windowMin =
-    rangeYears == null
+    activeYears.find((y) => y >= rangeFloor) ??
+    (rangeYears == null
       ? minYearAll
-      : Math.max(minYearAll, maxYearAll - rangeYears + 1);
-  const windowMax = maxYearAll;
+      : Math.max(minYearAll, maxYearAll - rangeYears + 1));
   const yearSpan = windowMax - windowMin || 1;
 
   // All distinct years in-window, sorted — hover columns + x-ticks index this.
-  const windowYears = useMemo(() => {
-    const set = new Set<number>();
-    for (const s of activeSeries)
-      for (const p of s.points)
-        if (p.year >= windowMin && p.year <= windowMax) set.add(p.year);
-    return Array.from(set).sort((a, b) => a - b);
-  }, [activeSeries, windowMin, windowMax]);
+  const windowYears = useMemo(
+    () => activeYears.filter((y) => y >= windowMin && y <= windowMax),
+    [activeYears, windowMin, windowMax]
+  );
 
   // Soft-fail: nothing drawable at all → render nothing (no empty frame).
   if (drawable.length === 0) return null;
@@ -175,7 +202,10 @@ export function IndicatorTrendChart({
   const yAt = (displayIndex: number) =>
     r2(PLOT_Y + PLOT_H - (displayIndex / 100) * PLOT_H);
 
-  // Build one path per active series over the visible window.
+  // Build one path per active series over the visible window. A jump of more
+  // than GAP_BREAK_YEARS starts a new subpath (M) so the line never
+  // interpolates across a hole in the published series; points with no
+  // connectable neighbour on either side collect as dots instead.
   const seriesPaths = activeSeries.map((s) => {
     const pts = s.points
       .filter((p) => p.year >= windowMin && p.year <= windowMax)
@@ -186,10 +216,18 @@ export function IndicatorTrendChart({
         const y = yAt(
           toDisplayIndex(p.value, s.nativeMin, s.nativeMax, s.isInverted)
         );
-        return `${i === 0 ? "M" : "L"}${x} ${y}`;
+        const breakBefore =
+          i === 0 || p.year - pts[i - 1].year > GAP_BREAK_YEARS;
+        return `${breakBefore ? "M" : "L"}${x} ${y}`;
       })
       .join(" ");
-    return { series: s, d, pts };
+    const isolated = pts.filter((p, i) => {
+      const noPrev = i === 0 || p.year - pts[i - 1].year > GAP_BREAK_YEARS;
+      const noNext =
+        i === pts.length - 1 || pts[i + 1].year - p.year > GAP_BREAK_YEARS;
+      return noPrev && noNext;
+    });
+    return { series: s, d, pts, isolated };
   });
 
   // X-axis year ticks: first, last, and a few evenly-spaced interior years.
@@ -363,6 +401,21 @@ export function IndicatorTrendChart({
               strokeLinejoin="round"
             />
           ))}
+
+          {/* Observations isolated by gap breaks — visible as dots. */}
+          {seriesPaths.map(({ series: s, isolated }) =>
+            isolated.map((p) => (
+              <circle
+                key={`iso-${s.indicator}-${p.year}`}
+                cx={xAt(p.year)}
+                cy={yAt(
+                  toDisplayIndex(p.value, s.nativeMin, s.nativeMax, s.isInverted)
+                )}
+                r={2.5}
+                fill={dimensionColorVar(s.dimension)}
+              />
+            ))
+          )}
 
           {/* Emphasised marker dots for the hovered year. */}
           {hoverYear != null
