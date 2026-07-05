@@ -6,6 +6,7 @@ import { eq, asc } from "drizzle-orm";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Banner } from "@/components/editorial/Banner";
 import { BetaChip } from "@/components/editorial/BetaChip";
+import { Button } from "@/components/editorial/Button";
 import { advisoryBoard, civicaIndex } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -82,6 +83,12 @@ export default async function AdvisoryBoardPage() {
           {civicaIndex.cutoverTarget})
         </div>
       </Banner>
+
+      <div style={{ marginTop: "var(--space-7)" }}>
+        <Button href="/about/advisory-board/apply" variant="primary" arrow>
+          Apply to join
+        </Button>
+      </div>
 
       <section className="editorial-section" style={{ marginTop: "48px" }}>
         <h2>Board criteria</h2>

@@ -1237,6 +1237,43 @@ export const advisoryBoardMembers = pgTable("advisory_board_members", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
+/**
+ * Inbound applications to join the academic advisory board
+ * (v2 methodology spec §3.1). Populated by the public
+ * `/about/advisory-board/apply` form, which POSTs to the
+ * `/api/advisory-applications` route handler. The owner reads new
+ * applications through the authed admin surface at
+ * `/admin/advisory-applications` (mirrors how contact submissions
+ * arrive — DB row + bearer/session-gated admin read; no email
+ * provider is wired for either).
+ *
+ * `cvUrl` holds an applicant-supplied CV link (Google Scholar,
+ * personal site, institutional page, or a hosted PDF). Server file
+ * uploads are not wired (the Vercel Blob SDK isn't a dependency), so
+ * the form is intentionally links-only rather than half-shipping a
+ * broken upload.
+ */
+export const advisoryApplications = pgTable("advisory_applications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  institution: text("institution").notNull(),
+  /** Role / title, e.g. "Associate Professor of Political Science" */
+  role: text("role").notNull(),
+  /** Primary area of expertise (governance measurement, comparative politics, …) */
+  expertiseArea: text("expertise_area").notNull(),
+  /** Free-text statement of relevant experience (the "why me") */
+  experience: text("experience").notNull(),
+  /** Relevant links: publications, Google Scholar, LinkedIn, ORCID, etc. */
+  links: text("links"),
+  /** Applicant-supplied CV link (scholar page / personal site / hosted PDF) */
+  cvUrl: text("cv_url"),
+  ipAddress: text("ip_address"),
+  /** Triage lifecycle: new → reviewed → contacted → archived */
+  status: text("status").notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // --- Phase 5.5 — Pulse Beta foundation (dimensional deltas) ---
 
 /**

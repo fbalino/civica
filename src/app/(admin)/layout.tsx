@@ -72,6 +72,18 @@ export default async function AdminLayout({
           >
             Audit log
           </Link>
+          <span aria-hidden style={{ color: "var(--color-text-40)" }}>
+            ·
+          </span>
+          <Link
+            href="/admin/advisory-applications"
+            style={{
+              color: "var(--color-text-60)",
+              textDecoration: "none",
+            }}
+          >
+            Advisory applications
+          </Link>
         </div>
         <div
           style={{
