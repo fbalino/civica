@@ -22,7 +22,7 @@ import {
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "How we approach data — Civica Atlas",
+  title: "How We Approach Data — Sources & Reconciliation",
   description:
     "A plain-English walkthrough of how Civica handles country data, why multi-source reconciliation matters, and what you'll see on reader pages as a result.",
   alternates: {

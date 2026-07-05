@@ -8,14 +8,14 @@ import { ParallaxImage } from "@/components/motion/ParallaxImage";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "World Government Rankings — GDP, Population, Democracy Index",
+  title: "Country Rankings — Democracy, Freedom & Governance",
   description:
-    "Explore global rankings for 250+ countries by GDP, population, area, life expectancy, and more. Data from Wikidata, World Bank, and archived CIA World Factbook.",
+    "Rank 250+ countries by GDP, population, area, life expectancy, and democracy index. Sourced from Wikidata, the World Bank, and the archived CIA World Factbook.",
   alternates: { canonical: "https://civicaatlas.org/rankings" },
   openGraph: withOg({
-    title: "World Government Rankings — GDP, Population, Democracy Index | Civica",
+    title: "Country Rankings — Democracy, Freedom & Governance · Civica Atlas",
     description:
-      "Explore global rankings for 250+ countries by GDP, population, area, life expectancy, and more.",
+      "Rank 250+ countries by GDP, population, area, life expectancy, and democracy index.",
     url: "https://civicaatlas.org/rankings",
   }),
 };

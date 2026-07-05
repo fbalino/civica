@@ -12,9 +12,9 @@ import {
 // `.factbook-landing-*` classes in factbook.css.
 
 export const metadata: Metadata = {
-  title: "Countries — Every Country",
+  title: "Countries — Reference Dossier for Every Nation",
   description:
-    "Reference dossiers for every country and territory. Sourced from the CIA World Factbook with Civica governance overlays.",
+    "Browse reference dossiers for every country and territory on Earth: government, geography, people, and economy from the CIA World Factbook with Civica governance overlays.",
   alternates: { canonical: "https://civicaatlas.org/country" },
 };
 

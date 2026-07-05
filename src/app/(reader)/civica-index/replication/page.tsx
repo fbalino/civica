@@ -11,9 +11,9 @@ import { replication, civicaIndex } from "@/lib/content/site-state";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Replication package — Civica Index",
+  title: "Civica Index Replication Package",
   description:
-    "Reproduce every Civica Index score from primary sources. Full methodology, codebook, processing logic, and downloadable outputs — coming at Beta launch.",
+    "Reproduce every Civica Index score from primary sources: full methodology, codebook, processing logic, and downloadable outputs — coming at Beta launch.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/replication" },
 };
 

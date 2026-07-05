@@ -51,6 +51,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/api-docs", changeFrequency: "monthly", priority: 0.6 },
   { path: "/design-system", changeFrequency: "monthly", priority: 0.5 },
   { path: "/elections", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/elections/systems", changeFrequency: "monthly", priority: 0.6 },
   { path: "/civica-conditions", changeFrequency: "weekly", priority: 0.7 },
   { path: "/rankings", changeFrequency: "weekly", priority: 0.7 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
@@ -58,6 +59,8 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/about/advisory-board", changeFrequency: "monthly", priority: 0.4 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.4 },
   { path: "/licensing", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
+  { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
   { path: "/glossary", changeFrequency: "monthly", priority: 0.5 },
 ];
 

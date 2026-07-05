@@ -11,7 +11,7 @@ import { disputeSla } from "@/lib/content/site-state";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Corrections — Civica Index",
+  title: "Corrections — Report a Civica Index Error",
   description: `Dispute a data error, methodology decision, or Pulse event classification. Every submission is logged publicly and reviewed within ${disputeSla.fullDispositionDays} days.`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/corrections" },
 };

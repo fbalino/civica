@@ -12,7 +12,7 @@ import { withOg } from "@/lib/og";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "About Civica Atlas — Open Reference Atlas of World Governments",
+  title: "About — Open Reference Atlas of World Governments",
   description:
     "Civica Atlas is an academic-grade reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.",
   alternates: { canonical: "https://civicaatlas.org/about" },

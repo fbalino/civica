@@ -222,45 +222,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Closing line */
-.home-closing {
-  text-align: center;
-  padding: var(--space-8) 0 0;
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-}
-
-/* Data-provenance wordmark row (the real Civica sources) */
-.home-sources {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3) var(--space-4);
-  padding: var(--space-4) 0 0;
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  color: var(--color-text-40);
-}
-.home-sources-label {
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-}
-.home-sources-list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2) var(--space-3);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-60);
-}
-.home-sources-list span { white-space: nowrap; }
-.home-sources-sep { color: var(--color-text-40); }
-
 @media (max-width: 60rem) {
   .home-hero { min-height: auto; padding: var(--space-7) 0; background-position: 72% center; }
   .home-hero::before {

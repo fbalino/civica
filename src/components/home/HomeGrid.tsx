@@ -380,30 +380,6 @@ export async function HomeGrid() {
           )}
         </div>
       </Reveal>
-
-      <div className="home-closing">Open &middot; Transparent &middot; Nonpartisan</div>
-      <div className="home-sources">
-        <span className="home-sources-label">Data from</span>
-        <span className="home-sources-list">
-          <span>World Bank</span>
-          <span className="home-sources-sep" aria-hidden="true">
-            &middot;
-          </span>
-          <span>IMF</span>
-          <span className="home-sources-sep" aria-hidden="true">
-            &middot;
-          </span>
-          <span>UN</span>
-          <span className="home-sources-sep" aria-hidden="true">
-            &middot;
-          </span>
-          <span>V-Dem</span>
-          <span className="home-sources-sep" aria-hidden="true">
-            &middot;
-          </span>
-          <span>Freedom House</span>
-        </span>
-      </div>
     </div>
   );
 }

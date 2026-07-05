@@ -16,9 +16,9 @@ import { pulse } from "@/lib/content/site-state";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Pulse backtest report (Beta) — Civica Index",
+  title: "Civica Pulse Backtest Report (Beta)",
   description:
-    "How the Civica Pulse Beta pipeline performs against named historical governance shocks. Per-case trajectories, expected vs. computed outcomes, and pass/fail verdicts.",
+    "How the Civica Pulse Beta pipeline performs against named historical governance shocks: per-case trajectories, expected versus computed outcomes, and pass/fail verdicts.",
   alternates: {
     canonical:
       "https://civicaatlas.org/civica-index/methodology/pulse/backtest",

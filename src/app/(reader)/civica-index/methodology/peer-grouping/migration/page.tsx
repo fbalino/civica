@@ -15,9 +15,9 @@ import { STRUCTURAL_FAMILY_SUNSET_DATE_ISO } from "@/lib/api/deprecation";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Per-country migration table — Peer-grouping methodology",
+  title: "Peer-Grouping Migration Table — By Country",
   description:
-    "Per-country mapping from the retired structural_family taxonomy to the replacement peer-lens fields (World Bank region+income, V-Dem RoW, BR/CGV regime, monarchy_status, government_form_description). Replication-script maintainers can also consume this as JSON via /api/v1/peer-groupings/migration.",
+    "Per-country mapping from the retired structural_family taxonomy to the replacement peer-lens fields: World Bank region and income, V-Dem RoW, BR/CGV regime, and constitutional form.",
   alternates: {
     canonical:
       "https://civicaatlas.org/civica-index/methodology/peer-grouping/migration",

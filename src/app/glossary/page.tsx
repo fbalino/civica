@@ -13,9 +13,9 @@ import "../glossary.css";
 
 export const revalidate = 86400;
 
-const TITLE = "Glossary — Civica";
+const TITLE = "Glossary of Governance Terms";
 const DESCRIPTION =
-  "The vocabulary of governance, plainly defined — every term Civica uses across the Index, the Pulse, and the Factbook, with concise definitions and links to the methodology that puts each to work.";
+  "The vocabulary of governance, plainly defined — every term Civica uses across the Index, the Pulse, and the Factbook, with concise definitions and links to the methodology behind each.";
 const CANONICAL = "https://civicaatlas.org/glossary";
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   alternates: { canonical: CANONICAL },
   openGraph: withOg({
-    title: TITLE,
+    title: `${TITLE} · Civica Atlas`,
     description: DESCRIPTION,
     url: CANONICAL,
     type: "article",

@@ -53,7 +53,6 @@ export async function generateMetadata({
     /* ignore — fall back to generic title */
   }
 
-  const title = `${titleBase} | Civica`;
   const canonical =
     slugs.length > 0
       ? `https://civicaatlas.org/constitution?${slugs
@@ -62,14 +61,14 @@ export async function generateMetadata({
       : "https://civicaatlas.org/constitution";
 
   return {
-    title,
+    title: titleBase,
     description:
       "Read national constitutions in full and compare, topic by topic, how different countries handle the same constitutional question. Text from the Constitute Project.",
     alternates: { canonical },
     openGraph: withOg({
-      title,
+      title: `${titleBase} · Civica Atlas`,
       description:
-        "Read and compare the world's constitutions, topic by topic.",
+        "Read and compare the world's constitutions in full, topic by topic.",
       url: canonical,
     }),
   };

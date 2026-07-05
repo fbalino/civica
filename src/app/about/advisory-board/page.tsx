@@ -16,8 +16,8 @@ const ADVISORY_BOARD_STATUS_LABEL: Record<string, string> = {
 };
 
 export const metadata: Metadata = {
-  title: "Advisory board — Civica Index",
-  description: `Independent academic review for the Civica Index methodology. ${advisoryBoard.targetSize.min}–${advisoryBoard.targetSize.max} scholars in governance measurement, political methodology, and comparative politics.`,
+  title: "Advisory Board — Independent Academic Review",
+  description: `Independent academic review for the Civica Index methodology: ${advisoryBoard.targetSize.min}–${advisoryBoard.targetSize.max} scholars in governance measurement, political methodology, and comparative politics.`,
   alternates: { canonical: "https://civicaatlas.org/about/advisory-board" },
 };
 

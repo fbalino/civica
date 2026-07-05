@@ -11,14 +11,14 @@ import type { SystemKey, SystemCountry } from "@/lib/elections/electoral-systems
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "How Electoral Systems Work — First Past the Post, PR, Mixed & More",
+  title: "How Electoral Systems Work — FPTP, PR, Mixed & More",
   description:
-    "How the world's legislatures turn votes into seats: First Past the Post, proportional representation, mixed-member, ranked choice, and two-round systems — with real per-country classifications from IPU Parline.",
+    "How the world's legislatures turn votes into seats: First Past the Post, proportional representation, mixed-member, ranked choice, and two-round systems, with per-country data from IPU Parline.",
   alternates: { canonical: "https://civicaatlas.org/elections/systems" },
   openGraph: withOg({
-    title: "How Electoral Systems Work | Civica",
+    title: "How Electoral Systems Work — FPTP, PR, Mixed & More · Civica Atlas",
     description:
-      "First Past the Post, proportional representation, mixed-member, ranked choice, and two-round systems, with real per-country data from IPU Parline.",
+      "First Past the Post, proportional representation, mixed-member, ranked choice, and two-round systems, with per-country data from IPU Parline.",
     url: "https://civicaatlas.org/elections/systems",
   }),
 };

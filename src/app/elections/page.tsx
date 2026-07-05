@@ -11,14 +11,14 @@ import { ParallaxImage } from "@/components/motion/ParallaxImage";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Election Timeline & Results — Upcoming and Past Elections Worldwide",
+  title: "Elections Around the World — Calendar & Results",
   description:
-    "Track upcoming and past elections worldwide. Voter turnout data, party-colored results, electoral system labels, and historical timelines for a growing set of countries.",
+    "Track upcoming and past elections worldwide: voter turnout, party-colored results, electoral system labels, and historical timelines for a growing set of countries.",
   alternates: { canonical: "https://civicaatlas.org/elections" },
   openGraph: withOg({
-    title: "Election Timeline & Results | Civica",
+    title: "Elections Around the World — Calendar & Results · Civica Atlas",
     description:
-      "Track upcoming and past elections worldwide with turnout visualization and party-colored results.",
+      "Track upcoming and past elections worldwide, with turnout visualization and party-colored results.",
     url: "https://civicaatlas.org/elections",
   }),
 };

@@ -22,15 +22,15 @@ export async function generateMetadata({
   const { slug } = await params;
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) return { title: "Country Not Found" };
-  const title = `Constitution of ${jurisdiction.name}`;
-  const description = `Full constitutional text for ${jurisdiction.name}, indexed from the Constitute Project, with topic cross-references.`;
+  const title = `Constitution of ${jurisdiction.name} — Full Text`;
+  const description = `The full constitutional text of ${jurisdiction.name}, indexed article by article from the Constitute Project with topic cross-references and provenance.`;
   const url = `https://civicaatlas.org/country/${slug}/constitution`;
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: withOg({
-      title: `${title} | Civica`,
+      title: `${title} · Civica Atlas`,
       description,
       url,
       type: "website",

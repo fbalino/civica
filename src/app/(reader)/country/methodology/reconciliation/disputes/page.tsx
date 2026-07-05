@@ -15,10 +15,9 @@ import { DisputesFilterClient } from "./DisputesFilterClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title:
-    "Data disputes log (Beta) — Civica Atlas reconciliation methodology",
+  title: "Data Disputes Log — Reconciliation Conflicts (Beta)",
   description:
-    "Public read-only log of conflicts the resolver flagged across CIA Factbook, Wikidata, and named statistical agencies. Open, resolved, and auto-resolved disputes with severity, source attribution, and methodology notes.",
+    "A public, read-only log of conflicts the resolver flagged across the CIA Factbook, Wikidata, and named statistical agencies — open, resolved, and auto-resolved disputes with source attribution.",
   alternates: {
     canonical:
       "https://civicaatlas.org/country/methodology/reconciliation/disputes",

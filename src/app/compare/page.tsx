@@ -63,7 +63,9 @@ export async function generateMetadata({
   const sp = await searchParams;
   const slugs = parseSlugs(sp?.c);
 
-  let titleBase = "Compare Countries";
+  // Default (no selection) uses the canonical page-type template. When two or
+  // three countries are selected, front-load their names.
+  let title = "Compare Countries — Government, Economy & Governance";
   try {
     if (slugs.length > 0) {
       const rows = await getJurisdictionsBySlugs(slugs);
@@ -71,14 +73,13 @@ export async function generateMetadata({
         .map((s) => rows.find((r) => r.slug === s))
         .filter(Boolean) as typeof rows;
       if (ordered.length > 0) {
-        titleBase = `${ordered.map((c) => c.name).join(" vs. ")}`;
+        title = `${ordered.map((c) => c.name).join(" vs. ")} — Compare Countries`;
       }
     }
   } catch {
     /* ignore — fall back to generic title */
   }
 
-  const title = `${titleBase} — Compare | Civica`;
   const canonical = slugs.length > 0
     ? `https://civicaatlas.org/compare?${slugs.map((s) => `c=${encodeURIComponent(s)}`).join("&")}`
     : "https://civicaatlas.org/compare";
@@ -86,12 +87,12 @@ export async function generateMetadata({
   return {
     title,
     description:
-      "Side-by-side country comparison: factbook overview, Civica Index scores, parliamentary chambers, recent elections, and international organization memberships.",
+      "Compare any two or three countries side by side: factbook overview, Civica Index scores, parliamentary chambers, recent elections, and international memberships.",
     alternates: { canonical },
     openGraph: withOg({
-      title,
+      title: `${title} · Civica Atlas`,
       description:
-        "Compare the governance, scoring, chambers, elections, and global memberships of any two or three countries.",
+        "Compare the governance, scoring, chambers, elections, and global memberships of any two or three countries side by side.",
       url: canonical,
     }),
   };

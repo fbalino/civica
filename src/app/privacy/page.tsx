@@ -1,0 +1,187 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Banner } from "@/components/editorial/Banner";
+import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { SectionHeader } from "@/components/editorial/SectionHeader";
+import { withOg } from "@/lib/og";
+
+export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "How Civica Atlas handles your information — written in plain language for a public reference site with no user accounts and no analytics tracking.",
+  alternates: { canonical: "https://civicaatlas.org/privacy" },
+  openGraph: withOg({
+    title: "Privacy Policy · Civica Atlas",
+    description:
+      "How Civica Atlas handles your information — plain language, no user accounts, no analytics tracking.",
+    url: "https://civicaatlas.org/privacy",
+  }),
+};
+
+export default function PrivacyPage() {
+  return (
+    <EditorialPage
+      breadcrumbs={
+        <>
+          <Link href="/about">About</Link>
+          <span>/</span>
+          Privacy
+        </>
+      }
+      title="Privacy Policy"
+      meta="Last updated: July 4, 2026"
+    >
+      <section className="editorial-section">
+        <p className="editorial-page-subtitle">
+          Civica Atlas is a public reference site. There are no visitor
+          accounts, no sign-up, and no advertising or analytics trackers. This
+          page explains, in plain language, the small amount of information the
+          site touches and why.
+        </p>
+
+        <Banner variant="info">
+          This is a plain-language summary of how the site works today, not
+          formal legal boilerplate. If a specific practice changes, this page
+          changes with it.
+        </Banner>
+      </section>
+
+      <section id="no-accounts" className="editorial-section">
+        <SectionHeader
+          eyebrow="The short version"
+          title="No accounts, no tracking"
+          dek="Reading Civica Atlas does not require you to identify yourself."
+        />
+
+        <ul>
+          <li>
+            There are no visitor accounts, logins, or profiles. You never create
+            one, and we never ask you to.
+          </li>
+          <li>
+            The site runs no advertising networks, no third-party analytics
+            (such as Google Analytics or Plausible), and no behavioral tracking
+            pixels.
+          </li>
+          <li>
+            We do not sell, rent, or share personal information, because we do
+            not collect a store of it in the first place.
+          </li>
+        </ul>
+      </section>
+
+      <section id="storage" className="editorial-section">
+        <SectionHeader
+          eyebrow="On your device"
+          title="What the site stores in your browser"
+          dek="A couple of small preferences live in your own browser, not on our servers."
+        />
+
+        <ul>
+          <li>
+            <strong>Theme preference.</strong> When you switch between light and
+            dark mode, that choice is saved in your browser&rsquo;s local storage
+            (under the key <code>theme</code>) so the site remembers it on your
+            next visit. It stays on your device.
+          </li>
+          <li>
+            <strong>Ask Civica history.</strong> If you use the in-page Ask
+            Civica assistant, your conversation is kept in your browser&rsquo;s
+            local storage so it survives page navigation. Clearing your browser
+            storage removes it.
+          </li>
+        </ul>
+
+        <p>
+          You can clear both at any time by clearing your browser&rsquo;s site
+          data for civicaatlas.org. The site keeps working without them; it just
+          forgets your theme choice and prior chat.
+        </p>
+      </section>
+
+      <section id="messages" className="editorial-section">
+        <SectionHeader
+          eyebrow="When you write to us"
+          title="Information you choose to send"
+          dek="Two features let you send content on purpose. Here is where it goes."
+        />
+
+        <ul>
+          <li>
+            <strong>Contact form.</strong> If you use the{" "}
+            <Link href="/contact">contact form</Link>, the details you type
+            there (such as your message and any email address you provide) are
+            sent to the Civica editorial team so we can reply. We use them to
+            respond to you and nothing else.
+          </li>
+          <li>
+            <strong>Ask Civica assistant.</strong> Messages you type into the
+            Ask Civica assistant are sent to our AI provider (Anthropic) to
+            generate a reply, the same way any AI chat feature works. Avoid
+            typing sensitive personal information into it.
+          </li>
+        </ul>
+      </section>
+
+      <section id="servers" className="editorial-section">
+        <SectionHeader
+          eyebrow="Infrastructure"
+          title="Hosting and standard server logs"
+          dek="Like any website, the servers that deliver Civica Atlas can see basic request information."
+        />
+
+        <p>
+          Civica Atlas is served by a hosting provider (Vercel). As with any
+          site, the infrastructure that delivers pages can process routine
+          technical information such as your IP address and browser type in the
+          course of returning a page to you and keeping the service running.
+          Civica does not build visitor profiles from this and does not use it
+          for advertising.
+        </p>
+
+        <p>
+          A separate sign-in cookie exists only for internal editorial staff who
+          review data corrections. It is never set for ordinary visitors reading
+          the site.
+        </p>
+      </section>
+
+      <section id="data-licensing" className="editorial-section">
+        <SectionHeader
+          eyebrow="About the data"
+          title="Country data is public reference data"
+          dek="The facts on Civica Atlas are about governments, not about you."
+        />
+
+        <p>
+          The government structures, constitutions, elections, and index scores
+          on this site come from public and licensed sources, not from tracking
+          visitors. For how that data may be reused and cited, see{" "}
+          <Link href="/licensing">Licensing</Link>.
+        </p>
+      </section>
+
+      <section id="contact" className="editorial-section">
+        <SectionHeader
+          eyebrow="Questions"
+          title="Reaching us about privacy"
+          dek="If anything here is unclear, ask."
+        />
+
+        <p>
+          Send privacy questions through the{" "}
+          <Link href="/contact">contact page</Link>. If this policy changes, the
+          &ldquo;last updated&rdquo; date at the top of the page changes with it.
+        </p>
+      </section>
+
+      <footer className="editorial-footer-nav">
+        <Link href="/terms">Terms of Use</Link>
+        <Link href="/licensing">Licensing</Link>
+        <Link href="/contact">Contact</Link>
+      </footer>
+    </EditorialPage>
+  );
+}

@@ -14,6 +14,12 @@ import {
   engravingCaption,
 } from "@/lib/data/engraving-captions";
 import { withOg } from "@/lib/og";
+import { JsonLd } from "@/lib/seo/json-ld";
+import {
+  buildBreadcrumbList,
+  buildCountry,
+  type JsonLdNode,
+} from "@/lib/seo/jsonld";
 import { FactbookHeaderStrip } from "@/components/factbook/FactbookHeaderStrip";
 import { CivicaAIDrawer } from "@/components/factbook/CivicaAIDrawer";
 import { CountryTabBar } from "@/components/country/CountryTabBar";
@@ -43,17 +49,19 @@ export async function generateMetadata({
     formatGovernmentType(
       jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType
     ) || "sovereign state";
-  const title = `${jurisdiction.name} Factbook — Government, Geography, People`;
-  const description = `Reference factbook for ${jurisdiction.name}: ${govLabel.toLowerCase()} government, geography, people and economy. Sourced from the CIA World Factbook with Civica governance overlays.`;
+  const title = `${jurisdiction.name} — Government & Political System`;
+  const description = `How ${jurisdiction.name} is governed: its ${govLabel.toLowerCase()} system, branches of power, geography, people, and economy — sourced from the CIA World Factbook with Civica governance overlays.`;
   const url = `https://civicaatlas.org/country/${slug}`;
   return {
     title,
+    // withOg injects the shared default social image, because Next replaces
+    // (not merges) the root layout's openGraph when a page sets its own. The
+    // document `title` gets the "· Civica Atlas" template appended by Next; the
+    // OG title is standalone, so we brand it explicitly and never double-suffix.
     description,
     alternates: { canonical: url },
-    // withOg injects the shared default social image, because Next replaces
-    // (not merges) the root layout's openGraph when a page sets its own.
     openGraph: withOg({
-      title: `${title} | Civica`,
+      title: `${title} · Civica Atlas`,
       description,
       url,
       type: "website",
@@ -165,8 +173,27 @@ export default async function CountryLayout({
     ? darkEngravingCaption(jurisdiction.iso3) ?? heroCaption
     : null;
 
+  // Structured data: Home → Countries → {Name} breadcrumb, plus a Country node
+  // with a Wikidata `sameAs` when the already-fetched jurisdiction carries a
+  // QID (no extra DB query). buildCountry returns null when there's no QID.
+  const countryPath = `/country/${slug}`;
+  const seoNodes: JsonLdNode[] = [
+    buildBreadcrumbList([
+      { name: "Home", url: "/" },
+      { name: "Countries", url: "/country" },
+      { name: jurisdiction.name },
+    ]),
+  ];
+  const countryNode = buildCountry({
+    name: jurisdiction.name,
+    path: countryPath,
+    wikidataQid: jurisdiction.wikidataQid,
+  });
+  if (countryNode) seoNodes.push(countryNode);
+
   return (
     <>
+      <JsonLd data={seoNodes} />
       <FactbookHeaderStrip
         slug={slug}
         countryName={jurisdiction.name}

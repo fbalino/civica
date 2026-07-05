@@ -27,12 +27,18 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const org = getOrganizationBySlug(slug);
-  if (!org) return { title: "Organizations — Civica" };
+  if (!org) return { title: "Organization Not Found" };
+  const title = `${org.name} — ${ORG_TYPE_LABEL[org.type]}`;
+  const description = `${org.fullName}: ${ORG_TYPE_LABEL[org.type].toLowerCase()} profile with membership map, regional breakdown, and full member list on Civica Atlas.`;
   return {
-    title: `${org.name} — Organizations — Civica`,
-    description: `${org.fullName}. ${ORG_TYPE_LABEL[org.type]}.`,
+    title,
+    description,
+    alternates: {
+      canonical: `https://civicaatlas.org/organizations/${org.slug}`,
+    },
     openGraph: withOg({
-      title: `${org.name} — Organizations — Civica`,
+      title: `${title} · Civica Atlas`,
+      description,
       url: `https://civicaatlas.org/organizations/${org.slug}`,
     }),
   };

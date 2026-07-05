@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     canonical: "https://civicaatlas.org/civica-index/government-types",
   },
   openGraph: withOg({
-    title: "Civica Index by peer lens | Civica Index",
+    title: "Civica Index by Peer Lens — Bi-Lens Explorer · Civica Atlas",
     description:
       "V-Dem Regimes of the World by default; BR/CGV regime type on demand. Distribution, spread, and trajectory for every lens cohort.",
     url: "https://civicaatlas.org/civica-index/government-types",

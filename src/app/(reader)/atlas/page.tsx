@@ -8,11 +8,14 @@ export const revalidate = 3600;
 
 export async function generateMetadata() {
   return {
-    title: "Atlas — Civica",
+    title: "World Atlas — Interactive Map of Every Government",
     description:
-      "Every government, every chamber, one interactive world map. Pan, zoom, and click any country to open its factbook entry.",
+      "An interactive world map of every government. Pan, zoom, and click any country to open its factbook entry, Civica Index score, and governance data.",
+    alternates: { canonical: "https://civicaatlas.org/atlas" },
     openGraph: withOg({
-      title: "Atlas — Civica",
+      title: "World Atlas — Interactive Map of Every Government · Civica Atlas",
+      description:
+        "An interactive world map of every government. Click any country to open its factbook entry and governance data.",
       url: "https://civicaatlas.org/atlas",
     }),
   };

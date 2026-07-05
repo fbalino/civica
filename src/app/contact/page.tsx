@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     "Send a message to the Civica editorial team — data corrections, story tips, partnerships, press inquiries, and more.",
   alternates: { canonical: "https://civicaatlas.org/contact" },
   openGraph: withOg({
-    title: "Contact the Editors | Civica",
+    title: "Contact the Editors · Civica Atlas",
     description:
       "Send a message to the Civica editorial team — data corrections, story tips, partnerships, press inquiries, and more.",
     url: "https://civicaatlas.org/contact",

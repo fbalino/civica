@@ -14,9 +14,9 @@ import { civicaIndex, pulse } from "@/lib/content/site-state";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Methodology — Civica Atlas",
+  title: "Methodology — How Civica Builds Its Data",
   description:
-    "Index of Civica Atlas methodology documents. Reconciliation, composite scoring, event classification, peer grouping, and the academic disciplines behind every Civica methodology decision.",
+    "Index of Civica Atlas methodology documents: reconciliation, composite scoring, event classification, peer grouping, and the academic disciplines behind every methodology decision.",
   alternates: { canonical: "https://civicaatlas.org/methodology" },
 };
 

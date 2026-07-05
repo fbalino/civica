@@ -11,9 +11,9 @@ import { pulse, disputeSla } from "@/lib/content/site-state";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Pulse methodology (Beta) — Civica Index",
+  title: "Civica Pulse Methodology — Event Scoring (Beta)",
   description:
-    "How the Civica Pulse Beta detects, classifies, and scores governance events between quarterly index updates. Source taxonomy, classify-and-verify confidence, asymmetric scoring, decay model, and known limitations.",
+    "How the Civica Pulse Beta detects, classifies, and scores governance events between quarterly index updates: source taxonomy, classify-and-verify confidence, asymmetric scoring, and decay.",
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/methodology/pulse",
   },

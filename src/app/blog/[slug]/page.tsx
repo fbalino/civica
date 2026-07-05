@@ -15,6 +15,8 @@ import { BlogCover } from "@/components/blog/BlogCover";
 import { ReadingProgress } from "@/components/blog/ReadingProgress";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { withOg } from "@/lib/og";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { buildArticle } from "@/lib/seo/jsonld";
 
 export const revalidate = 3600;
 
@@ -39,7 +41,7 @@ export async function generateMetadata({
     alternates: { canonical: `${SITE_URL}/blog/${post.slug}` },
     openGraph: withOg({
       type: "article",
-      title: `${post.title} | The Record`,
+      title: `${post.title} · Civica Atlas`,
       description: post.description,
       url: `${SITE_URL}/blog/${post.slug}`,
       publishedTime: post.date,
@@ -313,18 +315,20 @@ export default async function BlogPostPage({
       ? slugifyCaption(cover.caption)
       : null;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
+  // Article structured data. Author + publisher are the Civica Atlas
+  // Organization (built by the shared helper). The image is the RESOLVED cover
+  // (dedicated cover → first-placeholder engraving → frontmatter), made
+  // absolute — not the raw frontmatter coverImage, which is often null.
+  const articleJsonLd = buildArticle({
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    author: { "@type": "Organization", name: post.author },
-    publisher: { "@type": "Organization", name: "Civica" },
+    // No separate modified date in frontmatter; buildArticle falls back to the
+    // published date (i.e. "unchanged since publication"), not a fabricated one.
     url: `${SITE_URL}/blog/${post.slug}`,
     keywords: post.tags,
-    image: post.coverImage ? `${SITE_URL}${post.coverImage}` : undefined,
-  };
+    image: cover.image ? `${SITE_URL}${cover.image}` : undefined,
+  });
 
   const authorInitials = post.author
     .split(" ")
@@ -338,10 +342,7 @@ export default async function BlogPostPage({
       <ReadingProgress />
 
       <article className="post-article">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <JsonLd data={articleJsonLd} />
 
         {/* Hero — scrim over the cover with the eyebrow, headline + byline
             overlaid (matches the longform mockup). Preserves the header

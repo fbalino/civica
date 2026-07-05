@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "Notes from the chambers — articles on governance, political systems, and the architecture of public life from the Civica desk.",
   alternates: { canonical: `${SITE_URL}/blog` },
   openGraph: withOg({
-    title: "The Record | Civica",
+    title: "The Record · Civica Atlas",
     description:
       "Notes from the chambers — articles on governance, political systems, and the architecture of public life from the Civica desk.",
     url: `${SITE_URL}/blog`,

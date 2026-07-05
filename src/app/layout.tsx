@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
 import { CivicaLogo } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { DevDesignMount } from "@/components/dev/DevDesignMount";
-import { tier1Publishers } from "@/lib/content/site-state";
 import { OG_IMAGES, OG_DEFAULT_IMAGE } from "@/lib/og";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { buildOrganization, buildWebSite } from "@/lib/seo/jsonld";
 import "./globals.css";
 import "./editorial.css";
 import "./atlas.css";
@@ -19,25 +19,6 @@ import "./civica-index-detail.css";
 import "./factbook.css";
 import "./civica-chat.css";
 import "@/components/dev/dev-design.css";
-
-// Sources NOT covered by `tier1Publishers` — supporting feeds,
-// governance specialists, and indices. Update by hand when a major
-// new non-Tier-1 source lands. Tier-1 publishers are appended below
-// from `tier1Publishers.filter(p => p.shipped)`.
-const NON_TIER1_FOOTER_SOURCES = [
-  "CIA World Factbook (archived)",
-  "Wikidata",
-  "Wikimedia Commons",
-  "V-Dem",
-  "IPU Parline",
-  "Constitute Project",
-  "BR/CGV",
-  "Freedom House",
-  "Transparency CPI",
-  "Global Peace Index",
-  "Fragile States Index",
-  "GDELT",
-] as const;
 
 const sourceSerif = Source_Serif_4({
   variable: "--font-source-serif",
@@ -69,11 +50,11 @@ const SITE_URL = "https://civicaatlas.org";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Civica — Interactive Atlas of World Government Structures | 250+ Countries",
-    template: "%s | Civica",
+    default: "Civica Atlas — How Every Country Is Governed",
+    template: "%s · Civica Atlas",
   },
   description:
-    "Explore how every country in the world is governed. Interactive visualizations of government structures, branches of power, and political systems for 250+ nations. The modern successor to the CIA World Factbook.",
+    "Interactive atlas of government structures, constitutions, elections, and governance data for every country — with the Civica Index, an original governance score.",
   // Default self-referencing canonical on the apex host. The relative "./"
   // resolves to the CURRENT route against `metadataBase` (Next runs it through
   // `path.posix.resolve(pathname, "./")`), so every page that doesn't set its
@@ -86,7 +67,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Civica",
+    siteName: "Civica Atlas",
     locale: "en_US",
     images: OG_IMAGES,
   },
@@ -105,29 +86,24 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const tier1ShippedShortNames = tier1Publishers
-    .filter((p) => p.shipped)
-    .map((p) => p.shortName);
-  const footerSourceList = [
-    ...NON_TIER1_FOOTER_SOURCES,
-    ...tier1ShippedShortNames,
-  ].join(", ");
-
   return (
     <html
       lang="en"
       className={`${sourceSerif.variable} ${inter.variable}`}
-      // globals.css sets `scroll-behavior: smooth` for in-page anchors; this
-      // attribute tells the Next router to force INSTANT scrolling during
-      // route transitions so navigations land at the top of the new page.
-      // Without it the smooth scroll is interrupted mid-render and the page
-      // stays scrolled — the classic App Router scroll-restoration bug.
-      data-scroll-behavior="smooth"
+      // The root scroller uses NO CSS smooth scrolling (globals.css sets
+      // `scroll-behavior: auto`) so the router's scroll-to-top on navigation
+      // is always instant and can never be canceled mid-animation by the new
+      // page's render. In-page smooth scrolling is JS-driven with explicit
+      // `behavior: "smooth"` where wanted. Do not reintroduce a global
+      // `scroll-behavior: smooth` — it strands readers mid-page after
+      // navigation (observed on both mobile and desktop).
       suppressHydrationWarning
     >
-      <head>
-      </head>
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        {/* Site-wide structured data: publisher Organization + WebSite. One
+            <script type="application/ld+json"> per node. Next injects the
+            metadata tags into <head> itself. */}
+        <JsonLd data={[buildOrganization(), buildWebSite()]} />
         <ThemeProvider>
           <SiteHeader
             searchSlot={<GlobalSearchWrapper />}
@@ -137,95 +113,7 @@ export default function RootLayout({
 
           <main style={{ flex: 1 }}>{children}</main>
 
-          <footer className="site-footer">
-            <section className="site-footer__trust" aria-label="Civica commitments and trusted sources">
-              <div className="site-footer__trust-inner">
-                <div className="site-footer__trust-copy">
-                  <h2>Open. Transparent. Nonpartisan.</h2>
-                  <p>
-                    Civica Atlas is an open knowledge initiative. All data is
-                    free to use with proper attribution.
-                  </p>
-                </div>
-
-                <div className="site-footer__trust-rule" aria-hidden="true" />
-
-                <div className="site-footer__sources-feature">
-                  <p>Trusted sources include:</p>
-                  <Image
-                    className="site-footer__source-logo-strip theme-engraving-light"
-                    src="/engravings/trusted-source-logos.webp"
-                    width={2000}
-                    height={126}
-                    alt="World Bank, IMF, United Nations, V-Dem Institute, and Freedom House"
-                  />
-                  <Image
-                    className="site-footer__source-logo-strip theme-engraving-dark"
-                    src="/engravings/trusted-source-logos-dark.webp"
-                    width={2000}
-                    height={126}
-                    alt="World Bank, IMF, United Nations, V-Dem Institute, and Freedom House"
-                  />
-                </div>
-              </div>
-            </section>
-
-            <div className="site-footer__inner">
-              <div className="site-footer__brand">
-                <div className="site-footer__mark">
-                  <CivicaLogo size={28} />
-                  <span>Civica</span>
-                </div>
-                <p className="site-footer__source">
-                  Sources include {footerSourceList}.
-                </p>
-                <div className="site-footer__legend">
-                  <span>
-                    <span className="site-footer__dot site-footer__dot--live" />
-                    Live source
-                  </span>
-                  <span>
-                    <span className="site-footer__dot site-footer__dot--frozen" />
-                    Archived
-                  </span>
-                </div>
-              </div>
-
-              <nav className="site-footer__links" aria-label="Footer navigation">
-                <Link href="/blog">Blog</Link>
-                <span>&middot;</span>
-                <Link href="/api-docs">API Docs</Link>
-                <span>&middot;</span>
-                <Link href="/design-system">Design System</Link>
-                <span>&middot;</span>
-                <a
-                  href="https://statuspage.incident.io/civica-atlas"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Status Page
-                </a>
-                <span>&middot;</span>
-                <Link href="/licensing">Licensing</Link>
-                <span>&middot;</span>
-                <Link href="/glossary">Glossary</Link>
-                <span>&middot;</span>
-                <Link href="/contact">Contact</Link>
-                <span>&middot;</span>
-                <a
-                  href="https://github.com/fbalino/civica"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  GitHub
-                </a>
-                <span>&middot;</span>
-                <Link href="/about">About</Link>
-                <span>&middot;</span>
-                <Link href="/about#sources">Sources</Link>
-              </nav>
-            </div>
-          </footer>
+          <SiteFooter />
           <DevDesignMount />
         </ThemeProvider>
       </body>

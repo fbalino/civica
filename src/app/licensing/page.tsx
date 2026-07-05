@@ -9,14 +9,14 @@ import { withOg } from "@/lib/og";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Licensing - Civica Atlas",
+  title: "Licensing — Data & Code Reuse Terms",
   description:
-    "Licensing and reuse notes for Civica Atlas data, sources, public API responses, and code.",
+    "How to reuse Civica Atlas data, sources, public API responses, and code — with the license posture for each upstream source, from public domain to publisher-restricted.",
   alternates: { canonical: "https://civicaatlas.org/licensing" },
   openGraph: withOg({
-    title: "Licensing | Civica Atlas",
+    title: "Licensing — Data & Code Reuse Terms · Civica Atlas",
     description:
-      "Licensing and reuse notes for Civica Atlas data, sources, public API responses, and code.",
+      "How to reuse Civica Atlas data, sources, public API responses, and code, with the license posture for each upstream source.",
     url: "https://civicaatlas.org/licensing",
   }),
 };

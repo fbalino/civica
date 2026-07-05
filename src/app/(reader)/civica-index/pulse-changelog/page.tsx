@@ -14,9 +14,9 @@ import { PulseChangelogFilterClient } from "./PulseChangelogFilterClient";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Pulse changelog (Beta) — Civica Index",
+  title: "Civica Pulse Changelog — Classified Events (Beta)",
   description:
-    "Every governance event classified by the Civica Pulse Beta pipeline. Filterable by country, dimension, and severity, with full source attribution and human-review status.",
+    "Every governance event classified by the Civica Pulse Beta pipeline, filterable by country, dimension, and severity, with full source attribution and human-review status.",
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/pulse-changelog",
   },

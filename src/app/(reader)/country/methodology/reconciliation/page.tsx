@@ -55,8 +55,8 @@ const destatisDeParenthetical =
   destatisDe?.status === "deferred" ? "deferred to v1.1" : "deferred";
 
 export const metadata: Metadata = {
-  title: `Factbook reconciliation methodology (${reconciliation.version}) — Civica Atlas`,
-  description: `How Civica picks one canonical value per country fact across CIA Factbook, ${tier1Shipped.length} multilateral publishers, ${nsoActive.length} national statistical offices, and Wikidata. Source allowlist, resolver rules, vintaging, disputes, replication, and worked examples drawn from live data.`,
+  title: `Factbook Reconciliation Methodology (${reconciliation.version})`,
+  description: `How Civica picks one canonical value per country fact across the CIA Factbook, ${tier1Shipped.length} multilateral publishers, ${nsoActive.length} national statistical offices, and Wikidata — source allowlist, resolver rules, vintaging, and worked examples.`,
   alternates: {
     canonical:
       "https://civicaatlas.org/country/methodology/reconciliation",

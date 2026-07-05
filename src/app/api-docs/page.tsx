@@ -7,14 +7,14 @@ import { withOg } from "@/lib/og";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "API Documentation — Civica Public API",
+  title: "API Documentation — Public Governance Data API",
   description:
-    "Documentation for the Civica public REST API. Access government structure data, country metadata, and political system classifications for 250+ countries.",
+    "Documentation for the Civica public REST API: government structure, country metadata, Civica Index scores, and political system classifications for 250+ countries.",
   alternates: { canonical: "https://civicaatlas.org/api-docs" },
   openGraph: withOg({
-    title: "API Documentation — Civica Public API | Civica",
+    title: "API Documentation — Public Governance Data API · Civica Atlas",
     description:
-      "Documentation for the Civica public REST API. Access government structure data for 250+ countries.",
+      "Documentation for the Civica public REST API. Access government structure and governance data for 250+ countries.",
     url: "https://civicaatlas.org/api-docs",
   }),
 };

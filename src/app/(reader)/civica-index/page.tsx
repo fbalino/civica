@@ -25,6 +25,8 @@ import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import { civicaIndex } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { buildDataset } from "@/lib/seo/jsonld";
 import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 
@@ -66,14 +68,14 @@ function decorateOptions<K extends string>(
 }
 
 export const metadata: Metadata = {
-  title: "Civica Index — Global Governance Rankings",
+  title: "Civica Index — Governance Scores for 190+ Countries",
   description:
-    `Composite governance score for every sovereign state and territory. ${civicaIndex.dimensionCount} governance dimensions, empirically-derived weights, fixed-bound normalization, 90% confidence intervals.${civicaIndex.status === "beta" ? " Beta methodology" : ""} — see /civica-index/methodology.`,
+    `An original governance score for 190+ sovereign states across ${civicaIndex.dimensionCount} dimensions, with empirically-derived weights, fixed-bound normalization, and 90% confidence intervals.${civicaIndex.status === "beta" ? " Beta methodology." : ""}`,
   alternates: { canonical: "https://civicaatlas.org/civica-index" },
   openGraph: withOg({
-    title: "Civica Index — Global Governance Rankings | Civica Atlas",
+    title: "Civica Index — Governance Scores for 190+ Countries · Civica Atlas",
     description:
-      "The governance health of every country. Quarterly structural scores across 190+ sovereign states.",
+      "The governance health of every country. Quarterly structural scores across 190+ sovereign states, with published confidence intervals.",
     url: "https://civicaatlas.org/civica-index",
   }),
 };
@@ -247,12 +249,34 @@ export default async function CivicaIndexPage({
     rawRows.length > 0
       ? rawRows.reduce((s, r) => s + (r.score ?? 0), 0) / rawRows.length
       : 0;
-  const currentVintage =
-    rawRows.find((row) => row.vintageLabel)?.vintageLabel ??
-    "Quarterly structural score";
+  const realVintage = rawRows.find((row) => row.vintageLabel)?.vintageLabel;
+  const currentVintage = realVintage ?? "Quarterly structural score";
+
+  // Dataset structured data for the Civica Index leaderboard. Creator/publisher
+  // are the Civica Atlas Organization; license points at the reuse terms on
+  // /licensing (Civica's posture is "cite Civica Atlas + upstream sources", not
+  // a bare SPDX license); the distribution is the documented public JSON API.
+  // temporalCoverage is only emitted when a real vintage label is present.
+  const datasetJsonLd = buildDataset({
+    name: "Civica Index",
+    description:
+      `An original composite governance score for 190+ sovereign states across ${civicaIndex.dimensionCount} dimensions, with empirically-derived weights, fixed-bound normalization, and 90% confidence intervals.`,
+    url: "https://civicaatlas.org/civica-index",
+    license: "https://civicaatlas.org/licensing",
+    temporalCoverage: realVintage ?? undefined,
+    distributionUrl: "https://civicaatlas.org/api/v1/index/rankings",
+    keywords: [
+      "governance",
+      "democracy",
+      "rule of law",
+      "governance index",
+      "country rankings",
+    ],
+  });
 
   return (
     <div className="civica-index-page">
+      <JsonLd data={datasetJsonLd} />
       {/* ── Full-bleed engraving hero (matches the homepage / /country hero) ── */}
       <section
         className="factbook-landing-hero ci-landing-hero"
