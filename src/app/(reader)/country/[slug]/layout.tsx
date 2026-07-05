@@ -13,6 +13,10 @@ import {
   darkEngravingCaption,
   engravingCaption,
 } from "@/lib/data/engraving-captions";
+import {
+  darkTerritoryEngravingCaption,
+  territoryEngravingCaption,
+} from "@/lib/data/territory-engraving-captions";
 import { withOg } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import {
@@ -156,22 +160,41 @@ export default async function CountryLayout({
   // Prefer the optimized .webp; fall back to a raw .png drop (so new Codex
   // exports saved to public/engravings/countries/ appear before conversion).
   const engravingDir = join(process.cwd(), "public", "engravings", "countries");
-  const countryEngravingSrc = engravingCode
+  const territoryEngravingDir = join(process.cwd(), "public", "engravings", "territories");
+  const iso3EngravingSrc = engravingCode
     ? existsSync(join(engravingDir, `${engravingCode}.webp`))
       ? `/engravings/countries/${engravingCode}.webp`
       : existsSync(join(engravingDir, `${engravingCode}.png`))
         ? `/engravings/countries/${engravingCode}.png`
         : null
     : null;
-  const countryEngravingDarkSrc =
+  const territoryEngravingSrc = existsSync(join(territoryEngravingDir, `${slug}.webp`))
+    ? `/engravings/territories/${slug}.webp`
+    : existsSync(join(territoryEngravingDir, `${slug}.png`))
+      ? `/engravings/territories/${slug}.png`
+      : null;
+  const countryEngravingSrc = iso3EngravingSrc ?? territoryEngravingSrc;
+  const iso3EngravingDarkSrc =
     engravingCode && existsSync(join(engravingDir, `${engravingCode}-dark.webp`))
       ? `/engravings/countries/${engravingCode}-dark.webp`
       : null;
-  const heroCaption = countryEngravingSrc
-    ? engravingCaption(jurisdiction.iso3)
+  const territoryEngravingDarkSrc = existsSync(join(territoryEngravingDir, `${slug}-dark.webp`))
+    ? `/engravings/territories/${slug}-dark.webp`
     : null;
-  const heroDarkCaption = countryEngravingDarkSrc
+  const countryEngravingDarkSrc = iso3EngravingSrc
+    ? iso3EngravingDarkSrc
+    : territoryEngravingSrc
+      ? territoryEngravingDarkSrc
+      : null;
+  const heroCaption = iso3EngravingSrc
+    ? engravingCaption(jurisdiction.iso3)
+    : territoryEngravingSrc
+      ? territoryEngravingCaption(slug)
+      : null;
+  const heroDarkCaption = iso3EngravingDarkSrc
     ? darkEngravingCaption(jurisdiction.iso3) ?? heroCaption
+    : territoryEngravingDarkSrc
+      ? darkTerritoryEngravingCaption(slug) ?? heroCaption
     : null;
 
   // Structured data: Home → Countries → {Name} breadcrumb, plus a Country node

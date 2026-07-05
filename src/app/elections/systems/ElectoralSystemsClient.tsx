@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Chip } from "@/components/editorial/Pill";
+import { Tooltip } from "@/components/editorial/Tooltip";
 import { SegmentedControl } from "@/components/editorial/SegmentedControl";
 import { SourceDot } from "@/components/SourceDot";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
@@ -445,19 +446,19 @@ function SystemCard({
           ) : (
             <>
               {shown.map((c) => (
-                <Link
+                <Tooltip
                   key={c.slug}
-                  href={`/country/${c.slug}`}
-                  className="elsys-chip"
-                  title={
+                  content={
                     c.subtypeLabel && c.subtypeLabel !== copy.name
                       ? `${c.name} — ${c.subtypeLabel} (IPU Parline)`
                       : `${c.name} (IPU Parline)`
                   }
                 >
-                  <CountryFlag iso2={c.iso2} size={16} />
-                  {c.name}
-                </Link>
+                  <Link href={`/country/${c.slug}`} className="elsys-chip">
+                    <CountryFlag iso2={c.iso2} size={16} />
+                    {c.name}
+                  </Link>
+                </Tooltip>
               ))}
               {remaining > 0 && (
                 <span className="elsys-chip-more">+{remaining} more</span>

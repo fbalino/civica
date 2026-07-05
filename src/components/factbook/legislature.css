@@ -313,6 +313,17 @@
   align-items: stretch;
   width: 100%;
 }
+/* The dim/show control is wrapped in the canonical <Tooltip>; its trigger
+   wrapper takes over the flex-child role so the button still stretches to fill
+   the row (the button's own `flex:1` is inert inside the grid wrapper). */
+.party-browser-rowmain-tip {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+.party-browser-rowmain-tip > .party-browser-rowmain {
+  width: 100%;
+}
 .party-browser-row.is-dim .party-browser-rowmain {
   opacity: 0.42;
 }

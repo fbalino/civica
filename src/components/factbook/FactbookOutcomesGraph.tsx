@@ -206,7 +206,6 @@ export async function FactbookOutcomesGraph({
           <div
             key={m.metricId}
             className="factbook-outcomes-row"
-            title={m.name}
             style={{ ["--tier-color" as string]: tierVar }}
           >
             <div className="factbook-outcomes-label">

@@ -1,19 +1,19 @@
 # Project Memory Decisions
 
-## 2026-07-05 — Pulse paid classifier runs on DeepSeek (owner decision, overriding the research doc's Haiku preference)
+## 2026-07-05 — Pulse classifier: CROSS-MODEL ENSEMBLE (owner decision; supersedes both the 3-temperature scheme and the brief single-engine plan)
 
-Owner chose DeepSeek (v4-flash default; GLM as alternate) for the paid
-classify→verify path so the daily cron resumes fully automated — the
-subscription routine's daily manual approvals were untenable. The research
-doc (plan/pulse-classifier-cost-resolution-v1.md §8) preferred Anthropic
-Haiku 4.5 and explicitly flagged that adopting a China-domiciled model for a
-citable governance signal deserves a deliberate call — the owner made that
-call on 2026-07-05 knowing the trade-off. Guardrails that made it acceptable:
-the published methodology is engine-agnostic (same prompts/passes/review
-gates), the agreement-eval bar (category ≥90%, severity ≥85%, zero
-directional flips vs human-reviewed gold labels) must pass before and after
-any engine change, and the provider layer makes reverting to Anthropic a
-pure env change (PULSE_CLASSIFY_PROVIDER). Backtests stay on Anthropic.
+The classify pass runs once each on THREE heterogeneous engines (DeepSeek
+v4-flash, GLM, Haiku 4.5; optional 4th voter gpt-4.1-mini when an OpenAI key
+exists) — the owner's own proposal, and stronger than the retired
+same-model 3-temperature vote because cross-vendor errors are independent.
+Consensus maps onto the EXISTING published agreement semantics: 3/3 = 'all',
+2/3 = 'two_of_three' (+ adversarial verify pass on one engine), no majority =
+'none' → human-review queue. IMPORTANT calibration rule the owner stated
+emphatically: his past manual approvals were smoke tests, NOT gold labels —
+never benchmark engines against "what Fernando approved before"; quality is
+measured by ensemble consensus rates + the review queue staying small. The
+China-domiciled-model optics flag from the research doc is mitigated by
+design: no single vendor decides a label alone. Backtests stay on Anthropic.
 
 ## 2026-07-05 — IDEA voter-turnout adopted under its NON-COMMERCIAL license (owner sign-off)
 

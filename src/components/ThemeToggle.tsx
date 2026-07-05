@@ -1,12 +1,15 @@
 "use client";
 
 import { useTheme } from "./ThemeProvider";
+import { Tooltip } from "./editorial/Tooltip";
 
 export function ThemeToggle() {
   const { resolved, setTheme } = useTheme();
   const nextTheme = resolved === "dark" ? "light" : "dark";
+  const label = `Switch to ${nextTheme} mode`;
 
   return (
+    <Tooltip content={label}>
     <button
       type="button"
       onClick={() => setTheme(nextTheme)}
@@ -22,8 +25,7 @@ export function ThemeToggle() {
         border: "none",
         cursor: "pointer",
       }}
-      aria-label={`Switch to ${nextTheme} mode`}
-      title={`Switch to ${nextTheme} mode`}
+      aria-label={label}
     >
       {resolved === "dark" ? (
         <svg
@@ -56,5 +58,6 @@ export function ThemeToggle() {
         </svg>
       )}
     </button>
+    </Tooltip>
   );
 }

@@ -15,6 +15,7 @@
 import { BAND_RANGES, type CIBand } from "@/lib/ci/bands";
 import { civicaIndex } from "@/lib/content/site-state";
 import { BetaChip } from "@/components/editorial/BetaChip";
+import { Tooltip } from "@/components/editorial/Tooltip";
 
 export interface CIScoreData {
   score: number;
@@ -188,10 +189,9 @@ function ScorePane({
             {title}
           </span>
           {civicaIndex.status === "beta" ? (
-            <BetaChip
-              aria-label="Beta — methodology under active revision"
-              title="Methodology under active revision. See /civica-index/methodology for details."
-            />
+            <Tooltip content="Methodology under active revision. See /civica-index/methodology for details.">
+              <BetaChip aria-label="Beta — methodology under active revision" />
+            </Tooltip>
           ) : null}
         </div>
         <span

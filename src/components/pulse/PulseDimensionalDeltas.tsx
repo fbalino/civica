@@ -11,6 +11,7 @@
 
 import Link from "next/link";
 import { Pill } from "@/components/editorial/Pill";
+import { Tooltip } from "@/components/editorial/Tooltip";
 import type { PulseV2ForCountry, DimensionRow } from "@/lib/db/queries-pulse-v2";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
 import { pulse } from "@/lib/content/site-state";
@@ -134,13 +135,12 @@ function DimensionRowView({
       >
         {DIMENSION_LABELS[row.dimension]}
         {limited && row.limitedReason ? (
-          <span
-            className="pulse-dimension-limited-tag"
-            title="This delta rests on thin evidence — read it as a provisional signal, not a confident score."
-          >
-            <span className="pulse-dimension-limited-dot" aria-hidden="true" />
-            Limited signal · {row.limitedReason}
-          </span>
+          <Tooltip content="This delta rests on thin evidence — read it as a provisional signal, not a confident score.">
+            <span className="pulse-dimension-limited-tag">
+              <span className="pulse-dimension-limited-dot" aria-hidden="true" />
+              Limited signal · {row.limitedReason}
+            </span>
+          </Tooltip>
         ) : null}
       </div>
 

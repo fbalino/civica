@@ -17,6 +17,11 @@ Antique-atlas illustration assets for the almanac design language.
   masthead (e.g. `usa.webp`, `jpn.webp`).
 - `countries/<iso3>-dark.webp` — dark-mode nighttime country hero, same dimensions
   and landmark vocabulary, with edges vignetted into Civica's dark background.
+- `territories/<slug>.webp` — light-mode per-territory or special-jurisdiction
+  hero art for pages that intentionally have no `jurisdictions.iso3`.
+- `territories/<slug>-dark.webp` — dark-mode companion art for those
+  slug-keyed territory heroes. Prefer a distinct nighttime composition rather
+  than a recolor when generating new assets.
 
 ## Format / workflow
 
@@ -29,3 +34,8 @@ WebP (and delete the PNG) before committing so the repo and page loads stay ligh
 Dark-mode country art must be saved as `<iso3>-dark.webp`; generate it as a real
 nighttime engraving with a vignette that dissolves into the dark theme background
 rather than relying on CSS inversion.
+
+Territory art follows the same WebP format and dimensions, but is saved under
+`territories/` using the country-page slug. Do not add ISO3 codes to
+ISO2-only territory rows just to make art resolve; those rows stay outside the
+ISO3 reconciliation and scoring pipeline by design.

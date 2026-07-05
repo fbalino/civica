@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Info } from "lucide-react";
 import { CountryFlag } from "@/components/CountryFlag";
+import { Tooltip } from "@/components/editorial/Tooltip";
 import { FactbookLightbox, type LightboxImage } from "./FactbookLightbox";
 import { FactValueDot } from "./FactValueDot";
 import { CountryMapTile } from "./CountryMapTile";
@@ -26,10 +27,21 @@ function MetaPill({
   dotColor?: string;
   className?: string;
 }) {
+  // The government-type value can ellipsis-truncate (factbook.css), so it carries
+  // the canonical instant <Tooltip> with the full text — the masthead
+  // government-type fact readable on hover without the slow native `title`.
+  // Short numeric pills (Pop/GDP) never truncate, so no tooltip is added there.
+  const valueCanTruncate = (className ?? "").includes(
+    "factbook-meta-pill--government"
+  );
+  const valueSpan = (
+    <span className="factbook-meta-pill-value" style={{ color: "var(--color-text-primary)" }}>
+      {value}
+    </span>
+  );
   return (
     <span
       className={`factbook-meta-pill${className ? ` ${className}` : ""}`}
-      title={note ? undefined : value}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -56,9 +68,16 @@ function MetaPill({
           {label}
         </span>
       )}
-      <span className="factbook-meta-pill-value" style={{ color: "var(--color-text-primary)" }}>
-        {value}
-      </span>
+      {valueCanTruncate && !note ? (
+        <Tooltip
+          content={value}
+          triggerStyle={{ minWidth: 0, flex: "0 1 auto" }}
+        >
+          {valueSpan}
+        </Tooltip>
+      ) : (
+        valueSpan
+      )}
       {note ? (
         <button
           type="button"
@@ -365,6 +384,7 @@ export function FactbookHeaderStrip({
               <MetaPill label="GDP" value="No source" />
             )}
             {ciScore != null && (
+              <Tooltip content="View Civica Index detail">
               <Link
                 href={`/country/${slug}/civica-data`}
                 style={{
@@ -377,7 +397,6 @@ export function FactbookHeaderStrip({
                   textDecoration: "none",
                   whiteSpace: "nowrap",
                 }}
-                title="View Civica Index detail"
               >
                 <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}>CI</span>
                 <span
@@ -393,8 +412,10 @@ export function FactbookHeaderStrip({
                 </span>
                 <BetaTag />
               </Link>
+              </Tooltip>
             )}
             {cpDisplay !== null && (
+              <Tooltip content="View Civica Pulse detail">
               <Link
                 href={`/country/${slug}/civica-data#civica-index`}
                 style={{
@@ -407,7 +428,6 @@ export function FactbookHeaderStrip({
                   textDecoration: "none",
                   whiteSpace: "nowrap",
                 }}
-                title="View Civica Pulse detail"
               >
                 <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}>CP</span>
                 <span style={{ color: "var(--color-text-primary)", lineHeight: 1 }}>{cpDisplay}</span>
@@ -427,6 +447,7 @@ export function FactbookHeaderStrip({
                 )}
                 <BetaTag />
               </Link>
+              </Tooltip>
             )}
           </div>
 

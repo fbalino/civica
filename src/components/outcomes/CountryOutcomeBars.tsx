@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useReducer } from "react";
 import { classifyGovernment } from "@/lib/data/government-category";
+import { Tooltip } from "@/components/editorial/Tooltip";
 import styles from "./CountryOutcomeBars.module.css";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -421,50 +422,51 @@ function MetricBarRow({ metric: m, govType, showTrend }: MetricBarRowProps) {
           <span className={styles.cob__name}>{m.name}</span>
           {m.unit && <span className={styles.cob__unit}>{m.unit}</span>}
           {!noData && (
-            <span
-              className={styles.cob__direction}
-              title={
+            <Tooltip
+              content={
                 m.higherIsBetter
                   ? "Higher value is better"
                   : "Lower value is better"
               }
             >
-              {m.higherIsBetter ? <ArrowUp /> : <ArrowDown />}
-              {m.higherIsBetter ? "Higher is better" : "Lower is better"}
-            </span>
+              <span className={styles.cob__direction}>
+                {m.higherIsBetter ? <ArrowUp /> : <ArrowDown />}
+                {m.higherIsBetter ? "Higher is better" : "Lower is better"}
+              </span>
+            </Tooltip>
           )}
         </div>
         <div className={styles.cob__value}>
           <span className={styles.cob__number}>{valueFmt}</span>
           {showTrend && m.isStale && !noData && (
-            <span
-              className={styles.cob__stale}
-              title={`Most recent datapoint is from ${m.asOfYear}`}
-            >
-              Stale · {m.asOfYear}
-            </span>
+            <Tooltip content={`Most recent datapoint is from ${m.asOfYear}`}>
+              <span className={styles.cob__stale}>
+                Stale · {m.asOfYear}
+              </span>
+            </Tooltip>
           )}
           {noData ? (
             <span className={styles.cob__rank}>No data</span>
           ) : tier ? (
-            <span
-              className={styles.cob__verdict}
-              title={`${tier.label}${
+            <Tooltip
+              content={`${tier.label}${
                 m.rank && m.totalRanked
                   ? ` · ranked ${m.rank} of ${m.totalRanked} peers`
                   : ""
               }`}
             >
-              <span className={styles.cob__verdictLabel}>{tier.shortLabel}</span>
-              {m.rank && m.totalRanked && (
-                <>
-                  <span className={styles.cob__verdictSep}>·</span>
-                  <span className={styles.cob__verdictRank}>
-                    {m.rank}/{m.totalRanked}
-                  </span>
-                </>
-              )}
-            </span>
+              <span className={styles.cob__verdict}>
+                <span className={styles.cob__verdictLabel}>{tier.shortLabel}</span>
+                {m.rank && m.totalRanked && (
+                  <>
+                    <span className={styles.cob__verdictSep}>·</span>
+                    <span className={styles.cob__verdictRank}>
+                      {m.rank}/{m.totalRanked}
+                    </span>
+                  </>
+                )}
+              </span>
+            </Tooltip>
           ) : m.peer && m.peer.peerCount < 5 ? (
             <span className={styles.cob__rank}>
               Peer group · <b>{m.peer.peerCount}</b>

@@ -141,7 +141,9 @@ export default function DesignSystemPage() {
               <h3 className="ds-sub">{ramp.title}</h3>
               <div className="ds-ramp">
                 {ramp.tokens.map((t) => (
-                  <div key={t.cssVar} className="ds-ramp-cell" style={{ background: `var(${t.cssVar})` }} title={t.cssVar} />
+                  <Tooltip key={t.cssVar} className="ds-ramp-cell-tip" content={t.cssVar}>
+                    <div className="ds-ramp-cell" style={{ background: `var(${t.cssVar})` }} />
+                  </Tooltip>
                 ))}
               </div>
             </>

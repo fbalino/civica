@@ -14,6 +14,7 @@ import type { Country } from "./data";
 import { type MapPath, MAP_W, MAP_H } from "./map-geom";
 import { CountryHoverCard } from "@/components/v2/CountryHoverCard";
 import { SegmentedControl } from "@/components/editorial/SegmentedControl";
+import { Tooltip } from "@/components/editorial/Tooltip";
 import type { AtlasLayerValues } from "@/lib/atlas/load-atlas-data";
 import {
   type AtlasLayerKey,
@@ -621,9 +622,11 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
             <button onClick={() => zoomAround(MAP_W / 2, MAP_H / 2, 1 / 1.3)}>
               &minus;
             </button>
-            <button title="Reset" onClick={() => animateTo(0, 0, 1)}>
-              <RotateCcw size={15} aria-hidden />
-            </button>
+            <Tooltip className="atlas-zoombar-reset-tip" content="Reset view">
+              <button aria-label="Reset view" onClick={() => animateTo(0, 0, 1)}>
+                <RotateCcw size={15} aria-hidden />
+              </button>
+            </Tooltip>
           </div>
         </div>
 

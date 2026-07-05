@@ -441,7 +441,6 @@ export function FactbookAlmanac({
                     <span
                       className="factbook-idx-dot"
                       style={{ background: REGION_DOT[continentToRegion(c.continent)] }}
-                      title={c.continent ?? undefined}
                       aria-hidden="true"
                     />
                   </Link>

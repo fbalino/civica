@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { LegislatureParty } from "@/lib/factbook/legislature";
+import { Tooltip } from "@/components/editorial/Tooltip";
 
 /**
  * Party Browser — the deepened per-party view for the Civica Data → Legislature
@@ -148,11 +149,19 @@ export function PartyBrowser({
                   isDimmed ? " is-dim" : ""
                 }`}
               >
+                <Tooltip
+                  className="party-browser-rowmain-tip"
+                  content={
+                    isDimmed
+                      ? `Show ${p.name} in the hemicycle`
+                      : `Dim ${p.name} in the hemicycle`
+                  }
+                >
                 <button
                   type="button"
                   className="party-browser-rowmain"
                   aria-pressed={isDimmed}
-                  title={
+                  aria-label={
                     isDimmed
                       ? `Show ${p.name} in the hemicycle`
                       : `Dim ${p.name} in the hemicycle`
@@ -167,10 +176,7 @@ export function PartyBrowser({
                   <span className="party-browser-name">
                     {p.name}
                     {hasCoalitionData && p.inCoalition && (
-                      <span
-                        className="party-browser-tag party-browser-tag--gov"
-                        title="Member of the governing coalition"
-                      >
+                      <span className="party-browser-tag party-browser-tag--gov">
                         In government
                       </span>
                     )}
@@ -191,6 +197,7 @@ export function PartyBrowser({
                     </span>
                   </span>
                 </button>
+                </Tooltip>
                 <button
                   type="button"
                   className="party-browser-expand"

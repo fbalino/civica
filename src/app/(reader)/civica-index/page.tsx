@@ -310,10 +310,7 @@ export default async function CivicaIndexPage({
             sensitivity on top.
           </HeroRevealItem>
           <HeroRevealItem className="ci-hero-status">
-            <BetaChip
-              aria-label="Beta — methodology under active revision"
-              title="Methodology under active revision. See methodology page for details."
-            />
+            <BetaChip aria-label="Beta — methodology under active revision" />
             <span className="ci-hero-rework-note">
               Methodology under active revision —{" "}
               <Link href="/civica-index/methodology">see methodology</Link> for
@@ -453,21 +450,14 @@ export default async function CivicaIndexPage({
                       </div>
 
                       <div className="ci-lb-score" role="cell">
-                        <span
-                          className="dot frozen"
-                          title="Quarterly structural score"
-                          aria-hidden="true"
-                        />
+                        <span className="dot frozen" aria-hidden="true" />
                         <span
                           className={`ci-lb-score-value ${tier.className}`}
                         >
                           {Math.round(r.score)}
                         </span>
                         {r.scoreLower != null && r.scoreUpper != null ? (
-                          <span
-                            className="ci-lb-score-interval"
-                            title="90% confidence interval"
-                          >
+                          <span className="ci-lb-score-interval">
                             ({r.scoreLower}–{r.scoreUpper})
                           </span>
                         ) : null}
@@ -479,9 +469,7 @@ export default async function CivicaIndexPage({
 
                       <div className="ci-lb-dims" role="cell">
                         {r.completenessFlag === "partial" ? (
-                          <span
-                            title={`${r.dimensionsAvailable}/${civicaIndex.dimensionCount} dimensions available`}
-                          >
+                          <span>
                             {r.dimensionsAvailable}/{civicaIndex.dimensionCount}
                             <span className="ci-dim-warn" aria-hidden="true" />
                           </span>

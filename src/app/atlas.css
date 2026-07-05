@@ -287,6 +287,10 @@
   font-size: var(--text-16); cursor: pointer; border-bottom: 1px solid var(--atlas-rule);
 }
 .atlas-zoombar button:last-child { border-bottom: 0; }
+/* The Reset control is wrapped in the canonical <Tooltip>; its trigger wrapper
+   is the flex-column child, so it (not the button) is the zoombar's last child. */
+.atlas-zoombar-reset-tip { display: flex; }
+.atlas-zoombar-reset-tip > button { border-bottom: 0; }
 .atlas-zoombar button:hover { background: var(--atlas-paper-2); }
 
 /* ===== HOVER CARD ===== */

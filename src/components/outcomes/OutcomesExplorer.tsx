@@ -11,6 +11,7 @@ import React, {
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { MetricStripPlot } from "@/components/outcomes/MetricStripPlot";
+import { Tooltip } from "@/components/editorial/Tooltip";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import type {
   StripDot,
@@ -459,38 +460,39 @@ function TaxonomyGlossaryCard({
   description: string;
 }) {
   return (
-    <div
-      title={title}
-      style={{
-        borderLeft: "1px solid var(--color-card-border)",
-        paddingLeft: 14,
-      }}
-    >
+    <Tooltip content={title} triggerStyle={{ display: "block" }}>
       <div
         style={{
-          fontFamily: "var(--font-body)",
-          fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
-          fontSize: "var(--text-12)",
-          letterSpacing: "var(--tracking-caps)",
-          textTransform: "uppercase",
-          color: "var(--color-accent)",
-          marginBottom: 6,
+          borderLeft: "1px solid var(--color-card-border)",
+          paddingLeft: 14,
         }}
       >
-        {label}
+        <div
+          style={{
+            fontFamily: "var(--font-body)",
+            fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
+            fontSize: "var(--text-12)",
+            letterSpacing: "var(--tracking-caps)",
+            textTransform: "uppercase",
+            color: "var(--color-accent)",
+            marginBottom: 6,
+          }}
+        >
+          {label}
+        </div>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: "var(--font-body-sans)",
+            fontSize: "var(--text-14)",
+            color: "var(--color-text-50)",
+            lineHeight: 1.55,
+          }}
+        >
+          {description}
+        </p>
       </div>
-      <p
-        style={{
-          margin: 0,
-          fontFamily: "var(--font-body-sans)",
-          fontSize: "var(--text-14)",
-          color: "var(--color-text-50)",
-          lineHeight: 1.55,
-        }}
-      >
-        {description}
-      </p>
-    </div>
+    </Tooltip>
   );
 }
 
