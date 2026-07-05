@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Chip } from "@/components/editorial/Pill";
+import { SourceDot } from "@/components/SourceDot";
 import { DataTable } from "@/components/editorial/DataTable";
 import { AdminRow } from "@/app/(admin)/AdminRow";
 import { getPulseReviewQueue } from "@/lib/db/queries-pulse-review";
@@ -212,6 +213,15 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
                     >
                       <span className="admin-row-primary">
                         {event.country.name}
+                        <span className="admin-cell-dots">
+                          {event.sourceIds.map((src) => (
+                            <SourceDot
+                              key={src}
+                              source={src}
+                              retrievedAt={null}
+                            />
+                          ))}
+                        </span>
                       </span>
                       <span className="admin-row-secondary">
                         {event.headline}
