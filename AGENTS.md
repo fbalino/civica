@@ -7,6 +7,16 @@ Domain: `civicaatlas.org`.
 
 ## Design system is non-negotiable
 - Read [DESIGN.md](DESIGN.md) before any UI work.
+- **OWNER MANDATE (2026-07-05, after repeated drift): EVERYTHING follows the
+  design system — never hard-code values, EVER.** When the system genuinely
+  lacks what you need, the fix is a NEW design-system component/token first
+  (globals.css + `/design-system` page + DESIGN.md), then use it — never a
+  page-local approximation. **Run `npm run validate:design-tokens` before every
+  commit that touches UI** — it fails on any NEW hardcoded color, pixel font
+  size, or raw font-family versus the checked-in baseline
+  (`scripts/design-token-baseline.json`; the baselined legacy violations are
+  the cleanup backlog — ratchet the baseline DOWN with `--update-baseline`
+  after sanctioned cleanups, never up).
 - No hardcoded hex / rgb / rgba / oklch in component code or page CSS — use `var(--color-*)`. Hex literals are only allowed inside `:root` token-definition blocks and inside `<DesignSystemSwatch>`.
 - No hardcoded `font-family`, `font-size` in px, or padding/margin magic numbers in new UI — use `--font-*`, `--text-*`, and `--space-*`.
 - New pages must build on shared primitives: `<EditorialPage>`, `<SectionHeader>`, `<Banner>`, `<Chip>` (the tinted sans chip; `<Pill>` is a legacy alias), `<Button>`, `<SegmentedControl>`, `<DataTable>`, and `<SourceDot>`.

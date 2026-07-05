@@ -1,5 +1,12 @@
 # Project Memory Preferences
 
+- THE WHOLE DESIGN SYSTEM IS A CLOSED SET (owner, escalated 2026-07-05: "We
+  NEVER hard code, EVER... it's a waste of tokens because we have to redo
+  everything"). Applies to every visual decision, not just layouts: colors,
+  type, spacing, controls, tooltips, tables. Missing capability ⇒ add a
+  design-system component/token FIRST, then use it. Enforced mechanically by
+  `npm run validate:design-tokens` (baseline ratchet) — run it before every
+  UI commit; agent briefs must require it.
 - LAYOUT SHELLS ARE A CLOSED SET (owner, restated with frustration 2026-07-04
   after /privacy + /terms shipped as bare narrow columns): every new page MUST
   use a documented layout row from DESIGN.md's "Picking the layout" table.

@@ -1,5 +1,15 @@
 # Project Memory Decisions
 
+## 2026-07-05 — IDEA voter-turnout adopted under its NON-COMMERCIAL license (owner sign-off)
+
+International IDEA turnout data ships on /elections under CC-BY-NC-SA-4.0
+(same non-commercial family as IPU Parline and Constitute). **If Civica ever
+charges money for anything — subscriptions, paid API, paid embeds — the
+NC-licensed sources (IDEA turnout, IPU, Constitute) must be relicensed or
+removed FIRST.** Owner accepted this constraint explicitly ("fine,
+non-commercial") on 2026-07-05. Any future monetization discussion must
+surface this entry.
+
 ## 2026-06-20 — `--shadow-hard*` token NAMING is the last leftover of the v2 look — owner-gated (do not "fix" unasked)
 
 The palette convergence the 2026-06-20 blind audit flagged has since landed: the
