@@ -20,8 +20,9 @@
  * the daily refresh is intended to run via a Claude Code subscription
  * routine (see ~/.claude rules / scripts/pulse-daily-refresh.ts) rather
  * than API billing. For a future cost-optimized API path, fold the
- * `subject_iso3` field into the existing 3-run classifier output instead
- * of issuing this extra call.
+ * `subject_iso3` field into the classify pass's output instead of issuing
+ * this extra call (the subscription path already does this — its agent
+ * returns `subjectIso3` alongside the classification).
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { sql } from "drizzle-orm";

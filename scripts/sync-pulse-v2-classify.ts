@@ -1,8 +1,8 @@
 /**
- * Phase 5.5 — Pulse v2 classifier runner.
+ * Pulse v2 classifier runner.
  *
- * Pulls clusters that don't yet have pulse_events_v2 rows and runs
- * each through the multi-run classifier. Run after pulse:v2:cluster.
+ * Pulls clusters that don't yet have pulse_events_v2 rows and runs each
+ * through the classify→verify classifier. Run after pulse:v2:cluster.
  *
  * Usage:
  *   npm run pulse:v2:classify

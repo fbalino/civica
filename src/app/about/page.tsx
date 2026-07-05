@@ -309,8 +309,9 @@ export default async function AboutPage() {
               An event-driven directional signal layered on the Index. Its
               automated daily refresh is currently paused, so published values
               reflect the most recent completed run rather than a live feed.
-              Multi-run LLM classifier with three-temperature agreement scoring,
-              asymmetric corroboration rules, severity-tier human review.
+              Two-pass LLM classification (classify, then adversarially
+              verify), asymmetric corroboration rules, severity-tier human
+              review.
               Backtested against {pulse.backtest.cases.length} named historical
               governance shocks.
               {pulse.status === "beta" ? " Currently in BETA." : ""}

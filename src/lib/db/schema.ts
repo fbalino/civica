@@ -1310,18 +1310,23 @@ export const pulseEventsV2 = pgTable(
     severityValue: real("severity_value").notNull(),
     /** Computed by the corroboration step, range [0, 1] */
     corroborationConfidence: real("corroboration_confidence").notNull(),
-    /** All 3 classifier runs preserved for audit. Shape:
+    /** Reasoning passes preserved for audit. The classify→verify
+     *  classifier records two (classify + verify); the subscription path
+     *  records one agent pass; legacy rows may hold three. Shape:
      *  [{run, temp, model, category, dimension, severity, confidence, raw}, ...] */
     classifierRuns: jsonb("classifier_runs").notNull(),
-    /** 'all' | 'two_of_three' | 'none' — drives confidence boost/penalty */
+    /** 'all' | 'two_of_three' | 'none' — drives confidence boost/penalty.
+     *  The published classify→verify confidence maps onto it: high→'all',
+     *  medium→'two_of_three', low→'none'. */
     classifierAgreement: text("classifier_agreement").notNull(),
     humanReviewed: boolean("human_reviewed").notNull().default(false),
     reviewerId: text("reviewer_id"),
     reviewNotes: text("review_notes"),
     /** pending | approved | rejected | edited */
     reviewStatus: text("review_status").notNull().default("pending"),
-    /** True only when classifier agreement is sufficient AND review is
-     *  not required, OR human reviewer has approved it. Score-driving. */
+    /** True only when verify confidence is not low AND the severity tier
+     *  is not review-gated, OR a human reviewer has approved it.
+     *  Score-driving. */
     published: boolean("published").notNull().default(false),
     headline: text("headline").notNull(),
     description: text("description").notNull(),

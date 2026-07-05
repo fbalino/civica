@@ -301,8 +301,8 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
       <section className="editorial-section">
         <h2>Classifier runs</h2>
         <p>
-          Three independent passes at temperatures 0.0, 0.4, and 0.8.
-          Per-run output is preserved verbatim for audit.
+          Two independent reasoning passes — classify, then verify (refute).
+          Per-pass output is preserved verbatim for audit.
         </p>
         <div
           style={{

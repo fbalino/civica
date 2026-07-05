@@ -4,7 +4,8 @@
  * Defines the canonical shapes used across the v2 pulse pipeline:
  * connectors return `RawEventInput[]`, the orchestrator writes them
  * to the `raw_events` staging table, clustering produces `EventCluster`
- * groupings, and the multi-run classifier produces `ClassifierRun[]`.
+ * groupings, and the classify→verify classifier produces `ClassifierRun[]`
+ * (the classify pass and the verify pass).
  */
 
 /** CI-aligned dimensions the Pulse can affect. Stability is published
@@ -57,7 +58,11 @@ export interface RawEventInput {
   raw: Record<string, unknown>;
 }
 
-/** A single classifier run output — three of these per cluster. */
+/** A single reasoning-pass output. The classify→verify classifier
+ *  records two per event (pass 1 = classify, pass 2 = verify); the
+ *  subscription path records a single agent pass. `run: 3` is retained
+ *  for compatibility with any legacy rows written by the retired
+ *  3-temperature scheme. */
 export interface ClassifierRun {
   run: 1 | 2 | 3;
   temp: number;
@@ -66,14 +71,19 @@ export interface ClassifierRun {
   dimension: PulseDimension;
   severityTier: SeverityTier;
   severityValue: number;
-  /** Self-reported confidence. Not used for scoring (spec §5.2 — LLM
-   *  self-confidence is uncalibrated) but preserved for audit. */
+  /** Self-reported confidence. Not used for scoring (LLM self-confidence
+   *  is uncalibrated) but preserved for audit. */
   selfConfidence: number;
   rationale: string;
   raw: string;
 }
 
-/** Result of comparing 3 runs. */
+/** Persisted confidence signal on `pulse_events_v2.classifier_agreement`.
+ *  The published classify→verify confidence maps onto it: high→"all",
+ *  medium→"two_of_three", low→"none" (see
+ *  `classifier-prompt.ts#agreementFromConfidence`). Retained under these
+ *  legacy names so downstream readers (corroborate.ts, review UI,
+ *  changelog) stay compatible. */
 export type ClassifierAgreement = "all" | "two_of_three" | "none";
 
 /** A clustered event — what gets written to `pulse_events_v2`. */

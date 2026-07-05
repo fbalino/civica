@@ -1,21 +1,20 @@
 /**
- * Phase 5.8 — backtest harness.
+ * Backtest harness.
  *
  * For a given backtest case:
  *   1. Load the curated events (`backtest_events` rows for the case).
- *   2. Run each through the multi-run classifier (uses the same
- *      logic as classify.ts but inline so we don't need raw_events
- *      cluster scaffolding).
+ *   2. Run each through the classify→verify classifier (the same logic
+ *      as classify.ts, inline so we don't need raw_events cluster
+ *      scaffolding).
  *   3. Build a trajectory by sampling decayed dimensional impact
  *      every 30 days from event_date−180 to event_date+365.
  *   4. Compute a verdict against the case's expected directions.
  *   5. Insert one `backtest_runs` row.
  *
  * The classifier here is identical to the production v2 classifier
- * (same prompt, same temperatures, same agreement logic). We do not
- * need to write to pulse_events_v2 — the harness keeps everything
- * scoped to its own tables so a backtest doesn't pollute production
- * data.
+ * (same classify + verify prompts, same confidence semantics). We do not
+ * need to write to pulse_events_v2 — the harness keeps everything scoped
+ * to its own tables so a backtest doesn't pollute production data.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -46,7 +45,6 @@ import {
 type Db = NeonHttpDatabase<typeof schema>;
 
 const MODEL = "claude-sonnet-4-6";
-const TEMPERATURES = [0.0, 0.4, 0.8] as const;
 
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
@@ -56,17 +54,16 @@ function getAnthropic(): Anthropic {
   return _anthropic;
 }
 
-// Single source of truth — same prompt as production classify.ts.
-import { CLASSIFIER_SYSTEM_PROMPT } from "./classifier-prompt";
+// Single source of truth — same prompts + parsing as production classify.ts.
+import {
+  CLASSIFIER_SYSTEM_PROMPT,
+  VERIFY_SYSTEM_PROMPT,
+  agreementFromConfidence,
+  parseClassify,
+  parseVerify,
+  type VerifyConfidence,
+} from "./classifier-prompt";
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
-
-interface ClassifierLite {
-  category: string;
-  severity_tier: SeverityTier;
-  severity_value: number;
-  self_confidence: number;
-  rationale: string;
-}
 
 interface ClassifiedBacktestEvent {
   eventDate: string;
@@ -78,59 +75,15 @@ interface ClassifiedBacktestEvent {
   /** Final corroboration confidence in [0, 1] */
   corroborationConfidence: number;
   pressFreedomScore: number;
-  /** Which classifier runs we'll preserve in the run snapshot */
+  /** The two reasoning passes preserved in the run snapshot */
   runs: Array<{
     run: number;
-    temp: number;
+    pass: "classify" | "verify";
     category: string;
     severityTier: string;
     severityValue: number;
+    confidence?: VerifyConfidence;
   }>;
-}
-
-async function runOnce(
-  userContent: string,
-  temperature: number
-): Promise<ClassifierLite | null> {
-  const client = getAnthropic();
-  let response;
-  try {
-    response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 800,
-      temperature,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userContent }],
-    });
-  } catch (err) {
-    console.error(`[backtest:classify] LLM call failed at temp=${temperature}:`, err);
-    return null;
-  }
-  const text =
-    response.content[0]?.type === "text" ? response.content[0].text : "";
-  const cleaned = text.trim().replace(/^```(?:json)?\s*/, "").replace(/```\s*$/, "");
-  try {
-    const parsed = JSON.parse(cleaned) as Partial<ClassifierLite>;
-    if (!parsed.category) return null;
-    if (parsed.category === "none") {
-      return {
-        category: "none",
-        severity_tier: "low_neg",
-        severity_value: 0,
-        self_confidence: 0,
-        rationale: parsed.rationale ?? "",
-      };
-    }
-    return {
-      category: parsed.category,
-      severity_tier: parsed.severity_tier as SeverityTier,
-      severity_value: Number(parsed.severity_value ?? 0),
-      self_confidence: Number(parsed.self_confidence ?? 0),
-      rationale: String(parsed.rationale ?? ""),
-    };
-  } catch {
-    return null;
-  }
 }
 
 async function classifyEvent(
@@ -142,70 +95,68 @@ async function classifyEvent(
   const userContent = `Country: ${countryName}\n\nHeadline: ${title}\n\nBody:\n${body ?? ""}`;
   const press = pressFreedomScore(iso3);
 
-  // Three runs in parallel
-  const results = await Promise.all(
-    TEMPERATURES.map(async (temp, idx) => {
-      const r = await runOnce(userContent, temp);
-      return { idx, temp, r };
-    })
-  );
-
-  interface FilteredRun {
-    run: number;
-    temp: number;
-    category: string;
-    dimension: PulseDimension;
-    severityTier: SeverityTier;
-    severityValue: number;
-  }
-  const filtered: FilteredRun[] = [];
-  for (const { idx, temp, r } of results) {
-    if (!r || r.category === "none") continue;
-    const cat = EVENT_CATEGORY_INDEX[r.category];
-    if (!cat) continue;
-    if (!cat.allowedTiers.includes(r.severity_tier)) continue;
-    const range = SEVERITY_TIER_RANGES[r.severity_tier];
-    const clamped = Math.max(
-      range.min,
-      Math.min(range.max, Math.round(r.severity_value))
-    );
-    filtered.push({
-      run: idx + 1,
-      temp,
-      category: r.category,
-      dimension: cat.dimension,
-      severityTier: r.severity_tier,
-      severityValue: clamped,
+  // Pass 1 — classify.
+  const client = getAnthropic();
+  let classifyResp;
+  try {
+    classifyResp = await client.messages.create({
+      model: MODEL,
+      max_tokens: 800,
+      temperature: 0,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userContent }],
     });
+  } catch (err) {
+    console.error(`[backtest:classify] classify call failed:`, err);
+    return null;
   }
+  const classifyText =
+    classifyResp.content[0]?.type === "text" ? classifyResp.content[0].text : "";
+  const first = parseClassify(classifyText);
+  if (!first || first.category === "none") return null;
 
-  if (filtered.length === 0) return null;
-
-  // Agreement on (category, severityTier)
-  const keys = filtered.map((r) => `${r.category}::${r.severityTier}`);
-  const counts = new Map<string, number>();
-  for (const k of keys) counts.set(k, (counts.get(k) ?? 0) + 1);
-  const allMatch = filtered.length === 3 && new Set(keys).size === 1;
-  const maxCount = Math.max(...counts.values());
-  const agreement: ClassifierAgreement = allMatch
-    ? "all"
-    : maxCount >= 2
-      ? "two_of_three"
-      : "none";
-
-  const majorityKey = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
-  const winners = filtered.filter(
-    (r) => `${r.category}::${r.severityTier}` === majorityKey
+  const cat = EVENT_CATEGORY_INDEX[first.category];
+  if (!cat) return null;
+  if (!cat.allowedTiers.includes(first.severityTier)) return null;
+  const range = SEVERITY_TIER_RANGES[first.severityTier];
+  const severityValue = Math.max(
+    range.min,
+    Math.min(range.max, Math.round(first.severityValue))
   );
-  if (winners.length === 0) return null;
-  const consensus = winners[0];
-  const avgSeverity = Math.round(
-    winners.reduce((s, r) => s + r.severityValue, 0) / winners.length
-  );
+
+  // Pass 2 — verify (refute).
+  const verifyContent = `${userContent}
+
+FIRST-PASS CLASSIFICATION TO VERIFY:
+- category: ${first.category} (dimension ${cat.dimension})
+- runner-up considered: ${first.runnerUp}
+- severity: ${first.severityTier} (${severityValue})
+- rationale: ${first.rationale}`;
+  let verifyResp;
+  try {
+    verifyResp = await client.messages.create({
+      model: MODEL,
+      max_tokens: 500,
+      temperature: 0,
+      system: VERIFY_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: verifyContent }],
+    });
+  } catch (err) {
+    console.error(`[backtest:classify] verify call failed:`, err);
+    verifyResp = null;
+  }
+  const verifyText =
+    verifyResp && verifyResp.content[0]?.type === "text"
+      ? verifyResp.content[0].text
+      : "";
+  const verify = verifyText ? parseVerify(verifyText) : null;
+  const confidence: VerifyConfidence = verify?.confidence ?? "low";
+  const agreement = agreementFromConfidence(confidence);
 
   // Corroboration confidence (simplified — single source per event in
-  // our seed data, so we lean on classifier agreement). Production
-  // pipeline would also count specialist + news sources.
+  // our seed data, so we lean on the classify→verify confidence).
+  // Production pipeline (corroborate.ts) also counts specialist + news
+  // sources. The agreement→base mapping mirrors baselineConfidence there.
   const baseConf =
     agreement === "all" ? 0.85 : agreement === "two_of_three" ? 0.65 : 0.4;
   const tier = pressFreedomTier(press);
@@ -221,20 +172,30 @@ async function classifyEvent(
 
   return {
     eventDate: "", // filled by caller
-    category: consensus.category,
-    dimension: consensus.dimension,
-    severityTier: consensus.severityTier,
-    severityValue: avgSeverity,
+    category: first.category,
+    dimension: cat.dimension,
+    severityTier: first.severityTier,
+    severityValue,
     classifierAgreement: agreement,
     corroborationConfidence: conf,
     pressFreedomScore: press,
-    runs: filtered.map((f) => ({
-      run: f.run,
-      temp: f.temp,
-      category: f.category,
-      severityTier: f.severityTier,
-      severityValue: f.severityValue,
-    })),
+    runs: [
+      {
+        run: 1,
+        pass: "classify",
+        category: first.category,
+        severityTier: first.severityTier,
+        severityValue,
+      },
+      {
+        run: 2,
+        pass: "verify",
+        category: first.category,
+        severityTier: first.severityTier,
+        severityValue,
+        confidence,
+      },
+    ],
   };
 }
 
@@ -402,7 +363,7 @@ export async function runBacktest(
   // Snapshot: the parameters that produced this run.
   const paramSnapshot = {
     model: MODEL,
-    temperatures: TEMPERATURES,
+    classifier: "classify-then-verify",
     halfLifeSamples: Object.fromEntries(
       ["coup", "judicial_purge", "journalist_arrest"].map((k) => [
         k,
@@ -410,10 +371,12 @@ export async function runBacktest(
       ])
     ),
     deltaBounds: [DELTA_LOWER_BOUND, DELTA_UPPER_BOUND],
-    classifierAgreementWeights: {
-      all: 0.85,
-      two_of_three: 0.65,
-      none: 0.4,
+    // Verify-confidence → corroboration base (mirrors corroborate.ts):
+    // high→all→0.85, medium→two_of_three→0.65, low→none→0.4.
+    confidenceBaseWeights: {
+      high: 0.85,
+      medium: 0.65,
+      low: 0.4,
     },
   };
 

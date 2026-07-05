@@ -7,7 +7,7 @@ import { classifyClusters } from "@/lib/pulse/v2/classify";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// 3 LLM calls per cluster — allow generous time.
+// Two LLM calls per cluster (classify + verify) — allow generous time.
 export const maxDuration = 800;
 
 async function handler(request: Request) {

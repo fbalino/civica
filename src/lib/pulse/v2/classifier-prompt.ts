@@ -1,11 +1,20 @@
 /**
- * Phase 5.5 / 5.8 — shared classifier system prompt.
+ * Shared classifier prompts — classify, then verify.
  *
- * Single source of truth for the prompt sent to Claude during both
+ * Single source of truth for the prompts sent to Claude during both
  * production classification (`classify.ts`) and backtesting
  * (`backtest.ts`). Keeping them aligned prevents prompt drift —
  * a class of subtle bugs where the backtest harness uses a slightly
  * different prompt than production and validates the wrong thing.
+ *
+ * The confidence model is the one published in
+ * `content/methodology-pulse.md` (§ "Classification confidence —
+ * classify, then verify"): two genuinely independent reasoning passes,
+ * NOT repeated sampling of one prompt at different temperatures.
+ *   1. CLASSIFIER_SYSTEM_PROMPT — assign category, severity, and the
+ *      runner-up category considered.
+ *   2. VERIFY_SYSTEM_PROMPT — a second independent pass that actively
+ *      tries to REFUTE the first, yielding a high/medium/low confidence.
  *
  * Disambiguation rules live here so they apply to both paths
  * identically. See `taxonomy.ts` (CLASSIFIER DISAMBIGUATION RULES
@@ -13,6 +22,7 @@
  */
 
 import { EVENT_CATEGORIES } from "./taxonomy";
+import type { ClassifierAgreement, SeverityTier } from "./types";
 
 export const CLASSIFIER_SYSTEM_PROMPT = (() => {
   const taxonomyLines = EVENT_CATEGORIES.map(
@@ -131,12 +141,178 @@ If the event does NOT clearly match any of the categories above (e.g.
 it's a sports story, weather event, or routine politics), respond
 with category="none".
 
+Also name the SINGLE runner-up category you most seriously considered but
+rejected (the closest alternative), or "none" if the winner was unambiguous
+and no other category came close. A clear winner over the runner-up is a
+stronger signal than a close call.
+
 Respond with JSON ONLY, no preamble:
 {
   "category": "<id from list or 'none'>",
+  "runner_up": "<id from list or 'none'>",
   "severity_tier": "<one of the allowed_tiers for that category>",
   "severity_value": <integer in the tier's range, signed>,
   "self_confidence": <float 0.0-1.0>,
   "rationale": "<one sentence>"
 }`;
 })();
+
+/**
+ * Verify (refute) prompt — the second, independent reasoning pass.
+ *
+ * Per the published methodology, this pass re-reads the source and
+ * actively tries to REFUTE the first classification rather than merely
+ * re-sampling it. It judges four things and returns a single confidence:
+ *   - Is the category right rather than the named runner-up?
+ *   - Is the severity tier/value justified by the source?
+ *   - Is the subject country the one the event is ABOUT (not the
+ *     source's language or outlet)?
+ *   - Is it a discrete, enacted governance event at all (not opinion,
+ *     an un-enacted announcement, or an inter-state foreign-policy act)?
+ *
+ * confidence is "high" or "medium" ONLY when the classification survives
+ * this scrutiny and the call is unambiguous; otherwise "low". Low-
+ * confidence events route to human review rather than auto-publishing.
+ */
+export const VERIFY_SYSTEM_PROMPT = `You are the VERIFIER for Civica's Pulse Beta. You receive a governance event, a first-pass classification of it, and the runner-up category the classifier considered. Your job is NOT to re-classify from scratch — it is to independently try to REFUTE the first pass and report how much it survives scrutiny.
+
+Actively challenge the first-pass classification on four axes:
+1. CATEGORY — Is the chosen category genuinely the best fit, or is the named runner-up (or some other category) at least as good? Apply the same dimension-specificity precedence the classifier uses (the more dimension-specific category beats a generic procedural one).
+2. SEVERITY — Is the severity tier and signed value justified by what the source actually reports, or is it inflated/understated?
+3. SUBJECT COUNTRY — Is the event PRIMARILY about the governance of the stated subject country, judged by the SUBJECT of the event and NOT the language of the text or the country of the outlet? An inter-state / foreign-policy act (one country sanctioning, invading, or recognizing another) is the SENDER's act, not a change to the target's own domestic governance.
+4. IS IT AN EVENT — Is this a discrete, formally ENACTED governance event, or is it opinion/commentary, a mere announcement/pledge/draft that was never enacted, a market/business story, or routine politics? If it is not a real governance event, that is a decisive refutation.
+
+Then assign confidence:
+- "high": the classification survives on all four axes and every call is unambiguous.
+- "medium": it survives, but at least one axis is a somewhat close call.
+- "low": you found a genuine problem on any axis, OR the category-vs-runner-up call is close, OR you cannot confirm it is a real, correctly-attributed governance event. When in doubt, choose "low".
+
+Respond with JSON ONLY, no preamble:
+{
+  "verdict": "<one of: confirmed | revised | rejected>",
+  "confidence": "<one of: high | medium | low>",
+  "category_ok": <true|false>,
+  "severity_ok": <true|false>,
+  "subject_ok": <true|false>,
+  "is_event": <true|false>,
+  "rationale": "<one sentence naming the strongest objection you found, or why none survives>"
+}`;
+
+export type VerifyConfidence = "high" | "medium" | "low";
+
+/** Parsed classify-pass output. `category === "none"` means "not a Pulse
+ *  event"; the rest of the fields are ignored in that case. */
+export interface ClassifyResultLite {
+  category: string;
+  runnerUp: string;
+  severityTier: SeverityTier;
+  severityValue: number;
+  selfConfidence: number;
+  rationale: string;
+}
+
+/** Parsed verify-pass output. */
+export interface VerifyResultLite {
+  verdict: "confirmed" | "revised" | "rejected";
+  confidence: VerifyConfidence;
+  categoryOk: boolean;
+  severityOk: boolean;
+  subjectOk: boolean;
+  isEvent: boolean;
+  rationale: string;
+}
+
+/** Strip markdown code fences the model sometimes wraps JSON in. */
+function stripFences(text: string): string {
+  return text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```\s*$/i, "")
+    .trim();
+}
+
+/**
+ * Parse the classify-pass JSON. Returns null when the payload is
+ * unparseable or has no category. Callers treat null as a failed run.
+ */
+export function parseClassify(text: string): ClassifyResultLite | null {
+  const cleaned = stripFences(text);
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(cleaned) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+  if (!parsed.category) return null;
+  if (parsed.category === "none") {
+    return {
+      category: "none",
+      runnerUp: "none",
+      severityTier: "low_neg",
+      severityValue: 0,
+      selfConfidence: 0,
+      rationale: typeof parsed.rationale === "string" ? parsed.rationale : "",
+    };
+  }
+  return {
+    category: String(parsed.category),
+    runnerUp:
+      typeof parsed.runner_up === "string" ? parsed.runner_up : "none",
+    severityTier: parsed.severity_tier as SeverityTier,
+    severityValue: Number(parsed.severity_value ?? 0),
+    selfConfidence: Number(parsed.self_confidence ?? 0),
+    rationale: String(parsed.rationale ?? ""),
+  };
+}
+
+/**
+ * Parse the verify-pass JSON. Returns null when unparseable. A malformed
+ * or missing confidence is treated conservatively as "low" (routes to
+ * human review) rather than silently auto-publishing.
+ */
+export function parseVerify(text: string): VerifyResultLite | null {
+  const cleaned = stripFences(text);
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(cleaned) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+  const conf = parsed.confidence;
+  const confidence: VerifyConfidence =
+    conf === "high" || conf === "medium" || conf === "low" ? conf : "low";
+  const verdict =
+    parsed.verdict === "confirmed" ||
+    parsed.verdict === "revised" ||
+    parsed.verdict === "rejected"
+      ? parsed.verdict
+      : "confirmed";
+  return {
+    verdict,
+    confidence,
+    categoryOk: parsed.category_ok !== false,
+    severityOk: parsed.severity_ok !== false,
+    subjectOk: parsed.subject_ok !== false,
+    isEvent: parsed.is_event !== false,
+    rationale: String(parsed.rationale ?? ""),
+  };
+}
+
+/**
+ * Map the published classify→verify confidence onto the persisted
+ * `classifier_agreement` column so downstream readers (corroborate.ts,
+ * the review UI, the changelog) keep working unchanged. The confidence
+ * boost/penalty those readers apply lines up with the three levels:
+ *   high   → "all"          (confidence boost +0.2)
+ *   medium → "two_of_three" (neutral)
+ *   low    → "none"         (penalty −0.3, routes to human review)
+ */
+export function agreementFromConfidence(
+  confidence: VerifyConfidence
+): ClassifierAgreement {
+  return confidence === "high"
+    ? "all"
+    : confidence === "medium"
+      ? "two_of_three"
+      : "none";
+}

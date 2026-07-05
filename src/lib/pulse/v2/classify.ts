@@ -1,27 +1,38 @@
 /**
- * Phase 5.5 — multi-run cluster classifier.
+ * Cluster classifier — classify, then verify.
  *
  * For each unclassified cluster (a `cluster_id` in raw_events that
  * doesn't yet have a `pulse_events_v2` row), build a representative
- * title+body, run it through Claude THREE times with different
- * temperatures, compare agreement, and write the consensus result
- * to `pulse_events_v2`. Spec §5.2 — multi-model agreement is the
- * primary confidence signal because LLM self-reported confidence
- * isn't calibrated.
+ * title+body, then run the two independent reasoning passes published
+ * in `content/methodology-pulse.md` (§ "Classification confidence —
+ * classify, then verify"):
  *
- * Agreement rules (spec §5.2):
- *   - All 3 agree on category + tier  → confidence boost +0.2
- *   - 2 of 3 agree                    → neutral
- *   - No agreement                    → confidence penalty -0.3,
- *                                        flag for human review
+ *   1. CLASSIFY — one pass assigns category, severity, subject country,
+ *      and the runner-up category it considered.
+ *   2. VERIFY (refute) — a second, independent pass re-reads the source
+ *      and actively tries to refute the first (right category vs.
+ *      runner-up? severity justified? subject country correct? is it a
+ *      discrete governance event at all?), yielding a high/medium/low
+ *      confidence.
  *
- * Auto-publish gating per spec §5.1:
+ * The methodology explicitly rejects sampling the same prompt repeatedly
+ * (the retired 3-temperature scheme): re-running one prompt only measures
+ * decoding randomness, not correctness. Confidence comes from the
+ * classify→verify passes plus real-world corroboration (corroborate.ts).
+ *
+ * Auto-publish gating:
  *   - Severity tier in HUMAN_REVIEW_TIERS  → review required
- *   - classifierAgreement === "none"      → review required
- *   - low_pos / low_neg + agreement       → auto-publish
+ *   - verify confidence === "low"          → review required
+ *   - otherwise                            → auto-publish
  *
- * Reviewer UI lands in Phase 5.7. For 5.5 the review queue is just
- * `pulse_events_v2` rows where `published = false`.
+ * The persisted `classifier_agreement` column is retained for schema and
+ * downstream compatibility (corroborate.ts, the review UI, the changelog):
+ * the verify confidence maps onto it as high→"all", medium→"two_of_three",
+ * low→"none", which lines up with the confidence boost/penalty those
+ * readers already apply. The `classifier_runs` jsonb preserves both passes
+ * for audit.
+ *
+ * The review queue is `pulse_events_v2` rows where `published = false`.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -51,7 +62,6 @@ import type {
 type Db = NeonHttpDatabase<typeof schema>;
 
 const MODEL = "claude-sonnet-4-6";
-const TEMPERATURES = [0.0, 0.4, 0.8] as const;
 
 /** Lazy-init the Anthropic client per the project convention.
  *  Module-level `new Anthropic()` evaluates before dotenv. */
@@ -63,20 +73,20 @@ function getAnthropic(): Anthropic {
   return _anthropic;
 }
 
-// Single source of truth for the classifier prompt — shared with
-// backtest.ts so both paths classify identically.
-import { CLASSIFIER_SYSTEM_PROMPT } from "./classifier-prompt";
+// Single source of truth for the classifier prompts — shared with
+// backtest.ts so both paths classify + verify identically.
+import {
+  CLASSIFIER_SYSTEM_PROMPT,
+  VERIFY_SYSTEM_PROMPT,
+  type ClassifyResultLite,
+  type VerifyResultLite,
+  agreementFromConfidence,
+  parseClassify,
+  parseVerify,
+} from "./classifier-prompt";
 import { resolveSubjectJurisdiction } from "./country-attribution";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
-
-interface ClassifierResultLite {
-  category: string;
-  severity_tier: SeverityTier;
-  severity_value: number;
-  self_confidence: number;
-  rationale: string;
-}
 
 export interface ClusterToClassify {
   clusterId: string;
@@ -138,11 +148,12 @@ export async function classifyClusters(
       }
       if ("category" in result && result.category === "none") {
         summary.noneCategory++;
-        // Marked as examined would prevent future retries, but a
-        // cluster_examined_at table is out of scope for 5.5. The
-        // loadUnclassified query excludes clusters that already have
-        // a pulse_events_v2 row, so re-runs will retry "none" clusters
-        // — which is fine because LLM cost is small (3 calls).
+        // A cluster_examined_at table would let us mark "none" clusters as
+        // examined so they aren't re-tried, but it's out of scope here. The
+        // loadUnclassified query excludes clusters that already have a
+        // pulse_events_v2 row, so re-runs retry "none" clusters — fine
+        // because a dropped cluster costs only the single classify call
+        // (the verify + subject-attribution calls never fire for "none").
         continue;
       }
       // Narrowed: result is ClassifyOneResult here
@@ -181,104 +192,89 @@ async function classifyOne(
 ): Promise<ClassifyOneResult | { category: "none" } | null> {
   const userContent = buildUserContent(cluster);
 
-  // Three runs in parallel
-  const runs: ClassifierRun[] = [];
-  const noneVotes: number[] = [];
+  // Pass 1 — classify (category, severity, runner-up).
+  const first = await runClassify(userContent);
+  if (!first) return null;
+  if (first.category === "none") return { category: "none" };
 
-  const promises = TEMPERATURES.map(async (temp, idx) => {
-    const result = await runOnce(userContent, temp);
-    if (!result) return { idx, run: null as ClassifierRun | null, none: false };
-    if (result.category === "none") {
-      return { idx, run: null as ClassifierRun | null, none: true };
-    }
-    const cat = EVENT_CATEGORY_INDEX[result.category];
-    if (!cat) {
-      console.warn(
-        `[classify] cluster ${cluster.clusterId} run ${idx + 1}: invalid category "${result.category}"`
-      );
-      return { idx, run: null as ClassifierRun | null, none: false };
-    }
-    if (!cat.allowedTiers.includes(result.severity_tier)) {
-      console.warn(
-        `[classify] cluster ${cluster.clusterId} run ${idx + 1}: tier ${result.severity_tier} not allowed for ${result.category}`
-      );
-      return { idx, run: null as ClassifierRun | null, none: false };
-    }
-    const range = SEVERITY_TIER_RANGES[result.severity_tier];
-    const clamped = Math.max(range.min, Math.min(range.max, Math.round(result.severity_value)));
-    const run: ClassifierRun = {
-      run: (idx + 1) as 1 | 2 | 3,
-      temp,
-      model: MODEL,
-      category: result.category,
-      dimension: cat.dimension,
-      severityTier: result.severity_tier,
-      severityValue: clamped,
-      selfConfidence: result.self_confidence,
-      rationale: result.rationale,
-      raw: JSON.stringify(result),
-    };
-    return { idx, run, none: false };
-  });
-
-  for (const r of await Promise.all(promises)) {
-    if (r.none) noneVotes.push(r.idx);
-    if (r.run) runs.push(r.run);
-  }
-
-  // Majority "none" → not a Pulse event
-  if (noneVotes.length >= 2) {
-    return { category: "none" };
-  }
-
-  if (runs.length === 0) {
+  const cat = EVENT_CATEGORY_INDEX[first.category];
+  if (!cat) {
+    console.warn(
+      `[classify] cluster ${cluster.clusterId}: invalid category "${first.category}"`
+    );
     return null;
   }
-
-  // Compute agreement on (category, severityTier) tuple
-  const keys = runs.map((r) => `${r.category}::${r.severityTier}`);
-  const allMatch = keys.every((k) => k === keys[0]) && runs.length === 3;
-  const counts = new Map<string, number>();
-  for (const k of keys) counts.set(k, (counts.get(k) ?? 0) + 1);
-  const maxCount = Math.max(...counts.values());
-
-  let agreement: ClassifierAgreement;
-  if (runs.length === 3 && allMatch) agreement = "all";
-  else if (maxCount >= 2) agreement = "two_of_three";
-  else agreement = "none";
-
-  // Pick the majority run (or run #1 on tie)
-  const majorityKey = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
-  const consensus = runs.find(
-    (r) => `${r.category}::${r.severityTier}` === majorityKey
-  )!;
-
-  // Average severity_value across the runs that picked the majority key
-  const matchingRuns = runs.filter(
-    (r) => `${r.category}::${r.severityTier}` === majorityKey
+  if (!cat.allowedTiers.includes(first.severityTier)) {
+    console.warn(
+      `[classify] cluster ${cluster.clusterId}: tier ${first.severityTier} not allowed for ${first.category}`
+    );
+    return null;
+  }
+  const range = SEVERITY_TIER_RANGES[first.severityTier];
+  const severityValue = Math.max(
+    range.min,
+    Math.min(range.max, Math.round(first.severityValue))
   );
-  const avgSeverity = Math.round(
-    matchingRuns.reduce((sum, r) => sum + r.severityValue, 0) /
-      matchingRuns.length
-  );
+
+  // Pass 2 — verify (refute). Independent re-read that tries to knock the
+  // first pass down; yields the published high/medium/low confidence.
+  const verify = await runVerify(userContent, {
+    category: first.category,
+    runnerUp: first.runnerUp,
+    dimension: cat.dimension,
+    severityTier: first.severityTier,
+    severityValue,
+    rationale: first.rationale,
+  });
+  // A failed verify pass is conservative: treat as low confidence so the
+  // event routes to human review rather than auto-publishing unverified.
+  const confidence = verify?.confidence ?? "low";
+  const agreement: ClassifierAgreement = agreementFromConfidence(confidence);
+
+  const classifyRun: ClassifierRun = {
+    run: 1,
+    temp: 0,
+    model: MODEL,
+    category: first.category,
+    dimension: cat.dimension,
+    severityTier: first.severityTier,
+    severityValue,
+    selfConfidence: first.selfConfidence,
+    rationale: first.rationale,
+    raw: JSON.stringify({ pass: "classify", ...first }),
+  };
+  const verifyRun: ClassifierRun = {
+    run: 2,
+    temp: 0,
+    model: MODEL,
+    category: first.category,
+    dimension: cat.dimension,
+    severityTier: first.severityTier,
+    severityValue,
+    selfConfidence: first.selfConfidence,
+    rationale: verify
+      ? `verify (${verify.verdict}, ${confidence}): ${verify.rationale}`
+      : "verify pass failed — treated as low confidence",
+    raw: JSON.stringify({ pass: "verify", ...(verify ?? { confidence }) }),
+  };
 
   const classified: ClassifiedEvent = {
     jurisdictionId: cluster.jurisdictionId,
     eventDate: cluster.eventDate,
-    category: consensus.category,
-    dimension: consensus.dimension as PulseDimension,
-    severityTier: consensus.severityTier,
-    severityValue: avgSeverity,
-    classifierRuns: runs,
+    category: first.category,
+    dimension: cat.dimension,
+    severityTier: first.severityTier,
+    severityValue,
+    classifierRuns: [classifyRun, verifyRun],
     classifierAgreement: agreement,
     headline: cluster.title.slice(0, 200),
     description: cluster.body.slice(0, 1500),
   };
 
-  // Auto-publish gate per spec §5.1
+  // Auto-publish gate: low-confidence events and review-gated severity
+  // tiers always route to the human review queue.
   const requiresReview =
-    agreement === "none" ||
-    HUMAN_REVIEW_TIERS.has(consensus.severityTier);
+    confidence === "low" || HUMAN_REVIEW_TIERS.has(first.severityTier);
 
   return {
     classified,
@@ -286,56 +282,73 @@ async function classifyOne(
   };
 }
 
-async function runOnce(
-  userContent: string,
-  temperature: number
-): Promise<ClassifierResultLite | null> {
+async function runClassify(
+  userContent: string
+): Promise<ClassifyResultLite | null> {
   const client = getAnthropic();
   let response;
   try {
     response = await client.messages.create({
       model: MODEL,
       max_tokens: 800,
-      temperature,
+      temperature: 0,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userContent }],
     });
   } catch (err) {
-    console.error(`[classify] LLM call failed at temp=${temperature}:`, err);
+    console.error(`[classify] classify call failed:`, err);
     return null;
   }
-
   const text =
     response.content[0]?.type === "text" ? response.content[0].text : "";
-
-  // Strip leading/trailing fences if present
-  const cleaned = text.trim().replace(/^```(?:json)?\s*/, "").replace(/```\s*$/, "");
-
-  try {
-    const parsed = JSON.parse(cleaned) as Partial<ClassifierResultLite>;
-    if (!parsed.category) return null;
-    if (parsed.category === "none") {
-      return {
-        category: "none",
-        severity_tier: "low_neg",
-        severity_value: 0,
-        self_confidence: 0,
-        rationale: parsed.rationale ?? "",
-      };
-    }
-    return {
-      category: parsed.category,
-      severity_tier: parsed.severity_tier as SeverityTier,
-      severity_value: Number(parsed.severity_value ?? 0),
-      self_confidence: Number(parsed.self_confidence ?? 0),
-      rationale: String(parsed.rationale ?? ""),
-    };
-  } catch (err) {
-    console.warn(
-      `[classify] JSON parse failed at temp=${temperature}: ${cleaned.slice(0, 100)}`
-    );
+  const parsed = parseClassify(text);
+  if (!parsed) {
+    console.warn(`[classify] classify parse failed: ${text.slice(0, 100)}`);
     return null;
   }
+  return parsed;
+}
+
+async function runVerify(
+  userContent: string,
+  first: {
+    category: string;
+    runnerUp: string;
+    dimension: PulseDimension;
+    severityTier: SeverityTier;
+    severityValue: number;
+    rationale: string;
+  }
+): Promise<VerifyResultLite | null> {
+  const client = getAnthropic();
+  const verifyContent = `${userContent}
+
+FIRST-PASS CLASSIFICATION TO VERIFY:
+- category: ${first.category} (dimension ${first.dimension})
+- runner-up considered: ${first.runnerUp}
+- severity: ${first.severityTier} (${first.severityValue})
+- rationale: ${first.rationale}`;
+  let response;
+  try {
+    response = await client.messages.create({
+      model: MODEL,
+      max_tokens: 500,
+      temperature: 0,
+      system: VERIFY_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: verifyContent }],
+    });
+  } catch (err) {
+    console.error(`[classify] verify call failed:`, err);
+    return null;
+  }
+  const text =
+    response.content[0]?.type === "text" ? response.content[0].text : "";
+  const parsed = parseVerify(text);
+  if (!parsed) {
+    console.warn(`[classify] verify parse failed: ${text.slice(0, 100)}`);
+    return null;
+  }
+  return parsed;
 }
 
 function buildUserContent(cluster: ClusterToClassify): string {
