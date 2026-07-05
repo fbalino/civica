@@ -8,6 +8,7 @@ import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
 import { SourceDot } from "@/components/SourceDot";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { SegmentedControlDemo } from "./SegmentedControlDemo";
+import { IndicatorTrendChartDemo } from "./IndicatorTrendChartDemo";
 import { DEV_TOKEN_GROUPS, type DevTokenGroup } from "@/components/dev/dev-tokens";
 
 import "./design-system.css";
@@ -440,6 +441,11 @@ export default function DesignSystemPage() {
                 houseLabel="Lower house"
                 countryName="Sample Country"
               />
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4>Long-run indicator trend (IndicatorTrendChart)</h4>
+              <IndicatorTrendChartDemo />
             </div>
           </div>
         </section>

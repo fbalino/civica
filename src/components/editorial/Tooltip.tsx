@@ -117,6 +117,13 @@ interface TooltipProps {
   placement?: TooltipPlacement;
   /** Extra class on the trigger wrapper. */
   className?: string;
+  /**
+   * Inline styles for the trigger WRAPPER span. Needed when the trigger must
+   * carry geometry the wrapper itself owns — e.g. an absolutely-positioned
+   * hover column laid over an SVG chart, where the measurable box has to be
+   * the wrapper (the Tooltip positions against `triggerRef.getBoundingClientRect()`).
+   */
+  triggerStyle?: CSSProperties;
 }
 
 export function Tooltip({
@@ -124,6 +131,7 @@ export function Tooltip({
   children,
   placement = "top",
   className,
+  triggerStyle,
 }: TooltipProps) {
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState<TooltipCoords | null>(null);
@@ -271,6 +279,7 @@ export function Tooltip({
     <span
       ref={triggerRef}
       className={wrapperClass}
+      style={triggerStyle}
       {...(focusableChild
         ? {}
         : {

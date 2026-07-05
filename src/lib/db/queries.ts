@@ -24,6 +24,7 @@ import {
   ciCompositeScores,
   ciDimensionScores,
   ciMethodologyVersions,
+  indicatorHistory,
   pulseDailyScores,
   bills,
   organizations,
@@ -812,7 +813,7 @@ export async function getUpcomingElections(limit = 20) {
     .limit(limit);
 }
 
-export async function getRecentElectionsWithResults(limit = 40) {
+export async function getRecentElectionsWithResults(limit = 60) {
   const rows = await db
     .select({
       election: elections,
@@ -825,7 +826,24 @@ export async function getRecentElectionsWithResults(limit = 40) {
     })
     .from(elections)
     .innerJoin(jurisdictions, eq(elections.jurisdictionId, jurisdictions.id))
-    .where(sql`${elections.electionDate} < CURRENT_DATE`)
+    // "Recent Results" is a results section: only surface past elections that
+    // actually carry party/candidate result rows, so a card never renders as an
+    // empty box (owner feedback: Sao Tome/Ethiopia/Guinea showed blank cards).
+    // ~70% of past elections have no compiled results (IPU carries seats only
+    // for the chambers it classifies; most Wikidata presidential rows carry no
+    // results at all); showing muted "not compiled" cards for all of them would
+    // read as broken. Result-less elections stay discoverable in the calendar
+    // (upcoming) and on each country page. Only source-confirmed dates qualify —
+    // a Civica-computed "estimated" next date never has results and is excluded
+    // here regardless. See plan/elections-data-sourcing-resolution-v1.md §6.
+    .where(
+      sql`${elections.electionDate} < CURRENT_DATE
+        AND ${elections.dateConfidence} IS DISTINCT FROM 'estimated'
+        AND EXISTS (
+          SELECT 1 FROM ${electionResults}
+          WHERE ${electionResults.electionId} = ${elections.id}
+        )`
+    )
     .orderBy(desc(elections.electionDate))
     .limit(limit);
 
@@ -1285,6 +1303,71 @@ export async function getCICountryHistory(
       ),
     )
     .orderBy(asc(ciCompositeScores.quarter));
+}
+
+/**
+ * Long-run indicator history for a country — every year of every source
+ * indicator in `indicator_history` for the given slug, grouped by dimension.
+ *
+ * Backs the multi-series `<IndicatorTrendChart>` on the Civica Data tab.
+ * Values are returned in each source's NATIVE scale (with bounds +
+ * orientation) so the chart owns display normalisation. Soft-fails to an
+ * empty result when the country has no history rows.
+ */
+export interface IndicatorHistorySeries {
+  dimension: string;
+  indicator: string;
+  sourceId: string;
+  nativeMin: number;
+  nativeMax: number;
+  isInverted: boolean;
+  points: Array<{ year: number; value: number }>;
+}
+
+export async function getIndicatorHistoryForCountry(
+  slug: string,
+): Promise<IndicatorHistorySeries[]> {
+  const jurisdiction = await db
+    .select({ id: jurisdictions.id })
+    .from(jurisdictions)
+    .where(eq(jurisdictions.slug, slug))
+    .limit(1);
+  if (!jurisdiction[0]) return [];
+
+  const rows = await db
+    .select({
+      dimension: indicatorHistory.dimension,
+      indicator: indicatorHistory.indicator,
+      sourceId: indicatorHistory.sourceId,
+      nativeMin: indicatorHistory.nativeMin,
+      nativeMax: indicatorHistory.nativeMax,
+      isInverted: indicatorHistory.isInverted,
+      year: indicatorHistory.year,
+      value: indicatorHistory.value,
+    })
+    .from(indicatorHistory)
+    .where(eq(indicatorHistory.jurisdictionId, jurisdiction[0].id))
+    .orderBy(asc(indicatorHistory.indicator), asc(indicatorHistory.year));
+
+  // Group into one series per (indicator).
+  const byIndicator = new Map<string, IndicatorHistorySeries>();
+  for (const r of rows) {
+    let series = byIndicator.get(r.indicator);
+    if (!series) {
+      series = {
+        dimension: r.dimension,
+        indicator: r.indicator,
+        sourceId: r.sourceId,
+        nativeMin: r.nativeMin,
+        nativeMax: r.nativeMax,
+        isInverted: r.isInverted,
+        points: [],
+      };
+      byIndicator.set(r.indicator, series);
+    }
+    series.points.push({ year: r.year, value: r.value });
+  }
+  return Array.from(byIndicator.values());
 }
 
 export async function compareCICountries(slugs: string[], quarter?: string) {

@@ -682,3 +682,172 @@
     overflow-wrap: anywhere;
   }
 }
+
+/* ----------------------------------------------------------------
+ * Long-run indicator trend chart (<IndicatorTrendChart>)
+ * Multi-series historical governance chart on the Civica Data tab
+ * and the /design-system gallery. Tokens only.
+ * ---------------------------------------------------------------- */
+.indicator-trend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.indicator-trend-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.indicator-trend-legend {
+  gap: var(--space-2);
+}
+
+.indicator-trend-chip {
+  cursor: pointer;
+  gap: 7px;
+  transition: color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    opacity var(--motion-fast) var(--motion-ease);
+}
+
+/* Active series: hairline picks up the neutral-active treatment. Off series:
+   muted + reduced-opacity swatch so the toggle state reads at a glance. */
+.indicator-trend-chip.is-on {
+  border-color: var(--color-text-30);
+  color: var(--color-text-primary);
+}
+
+.indicator-trend-chip.is-off {
+  color: var(--color-text-40);
+  opacity: 0.6;
+}
+
+.indicator-trend-chip-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  flex: none;
+}
+
+.indicator-trend-chip.is-off .indicator-trend-chip-swatch {
+  opacity: 0.4;
+}
+
+.indicator-trend-range {
+  flex: none;
+}
+
+.indicator-trend-chart-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.indicator-trend-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* HTML hover overlay laid over the fluid SVG. Each per-year column IS the
+   canonical Tooltip trigger wrapper (.editorial-tooltip-trigger), which
+   carries its coordinates via the Tooltip `triggerStyle` prop so the
+   wrapper is the measurable box the tooltip anchors to. The inner hit span
+   fills it. Percent maps 1:1 to the viewBox (SVG is width:100%, fixed ratio). */
+.indicator-trend-hover-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.indicator-trend-hover-col {
+  position: absolute;
+  display: block;
+  pointer-events: auto;
+  cursor: crosshair;
+}
+
+.indicator-trend-hover-hit {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.indicator-trend-axis-note {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: 1.5;
+  color: var(--color-text-50);
+}
+
+/* Tooltip body (rendered inside the canonical .editorial-tooltip surface). */
+.indicator-trend-tip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 160px;
+}
+
+.indicator-trend-tip-year {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  opacity: 0.75;
+  font-variant-numeric: tabular-nums;
+}
+
+.indicator-trend-tip-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+}
+
+.indicator-trend-tip-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 3px;
+  border-radius: var(--radius-full);
+}
+
+.indicator-trend-tip-label {
+  white-space: nowrap;
+}
+
+.indicator-trend-tip-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .indicator-trend-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Provenance row under the long-run chart — one SourceDot per source. */
+.ci-country-long-run-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.ci-country-long-run-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+}

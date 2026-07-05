@@ -17,6 +17,7 @@ import {
 } from "@/lib/db/queries-pulse-v2";
 import { categoryLabel } from "@/lib/pulse/v2/labels";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
+import { CountryTrendSection } from "@/components/ci/CountryTrendSection";
 import { PeerLensPanel } from "@/components/peer-grouping/PeerLensPanel";
 import { getMaterialPeerSet, getGovernancePeerSet } from "@/lib/peer-grouping";
 import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
@@ -877,6 +878,12 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
             </div>
           </div>
         </section>
+
+        {/* Long-run source-indicator history — its own numbered-section-
+            consistent block. The quarterly CI line above stays; this joins it
+            with the decades-long underlying indicators. Soft-fails to null
+            when the country has no `indicator_history` rows. */}
+        <CountryTrendSection slug={slug} />
 
         <section id="ci-pulse">
           <div className="ci-country-section-eyebrow">

@@ -742,6 +742,14 @@ export const contactSubmissions = pgTable("contact_submissions", {
   subject: text("subject").notNull(),
   message: text("message").notNull(),
   ipAddress: text("ip_address"),
+  /**
+   * Triage lifecycle for the admin Messages surface: new → read → archived.
+   * Additive column (default 'new') so existing rows and the public contact
+   * POST path are unaffected — the insert never sets it. Mirrors the
+   * advisory_applications.status pattern; flipped only via the authed
+   * /api/admin/messages/[id] route.
+   */
+  status: text("status").notNull().default("new"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -938,6 +946,69 @@ export const ciDimensionScores = pgTable(
       columns: [table.methodologyVersion],
       foreignColumns: [ciMethodologyVersions.id],
     }),
+  ]
+);
+
+/**
+ * Long-run source-indicator history — one row per
+ * (jurisdiction, indicator, year). Backs the multi-series historical
+ * trend charts on the country page's Civica Data tab (audit
+ * Recommendation 4: "trend evidence is what governance scholars
+ * actually cite").
+ *
+ * The CI pipeline (`ci_dimension_scores`) intentionally keeps only the
+ * latest vintage per quarter; this table is the parallel, append-only
+ * archive of the FULL published series for each source indicator
+ * (V-Dem back to 1789, Freedom House 2003+, WGI 1996+, HDI 1990+,
+ * CPI 2012+). It is read-only evidence for the chart — it does NOT feed
+ * CI scoring.
+ *
+ * Values are stored in each source's NATIVE published scale (with the
+ * scale bounds + orientation captured per row) rather than pre-normalised
+ * to 0–100, so the archive stays faithful to the citable source and the
+ * chart owns display normalisation. Backfilled + refreshed by
+ * `scripts/ingest-indicator-history.ts` (idempotent upsert on the
+ * uniqueness key); freshness stamped via `markSourcesSynced()`.
+ */
+export const indicatorHistory = pgTable(
+  "indicator_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id)
+      .notNull(),
+    /** CI dimension this indicator informs (mirrors `ci_dimension_scores.dimension`). */
+    dimension: text("dimension").notNull(),
+    /** Source-native indicator key, e.g. "v2x_libdem", "rl.est", "hdi". */
+    indicator: text("indicator").notNull(),
+    /** Calendar year of the observation. */
+    year: integer("year").notNull(),
+    /** Observation in the source's native published scale. */
+    value: real("value").notNull(),
+    /** Native scale bounds + orientation, so consumers can normalise for display. */
+    nativeMin: real("native_min").notNull(),
+    nativeMax: real("native_max").notNull(),
+    /** true when a LOWER native value is BETTER (e.g. GPI, FH 1–7 rating). */
+    isInverted: boolean("is_inverted").notNull().default(false),
+    /** Provenance: sources.id (e.g. "vdem", "worldbank_wgi"). */
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_indicator_history_unique").on(
+      table.jurisdictionId,
+      table.indicator,
+      table.year
+    ),
+    // Hot path: "give me every year of every indicator for this country".
+    index("idx_indicator_history_jur_dim").on(
+      table.jurisdictionId,
+      table.dimension
+    ),
+    index("idx_indicator_history_indicator").on(table.indicator),
   ]
 );
 
