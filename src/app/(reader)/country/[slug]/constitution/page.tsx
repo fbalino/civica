@@ -22,7 +22,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) return { title: "Country Not Found" };
-  const title = `Constitution of ${jurisdiction.name} — Full Text`;
+  const title = `${jurisdiction.name} — Constitution, Full Text`;
   const description = `The full constitutional text of ${jurisdiction.name}, indexed article by article from the Constitute Project with topic cross-references and provenance.`;
   const url = `https://civicaatlas.org/country/${slug}/constitution`;
   return {
