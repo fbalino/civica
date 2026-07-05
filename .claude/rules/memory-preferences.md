@@ -1,5 +1,13 @@
 # Project Memory Preferences
 
+- LAYOUT SHELLS ARE A CLOSED SET (owner, restated with frustration 2026-07-04
+  after /privacy + /terms shipped as bare narrow columns): every new page MUST
+  use a documented layout row from DESIGN.md's "Picking the layout" table.
+  Sectioned document pages (legal, policy, reference) take `methodology-layout`
+  + `ReaderSidebar` (1200px, left sidebar) — `width="narrow"` is for blog-style
+  essays only. Never invent a page width or one-off look; if no row fits,
+  extend the table first. When delegating UI to subagents, the brief must name
+  the exact layout row — "reader page" without the shell name causes drift.
 - Prefer simple explanations because the user is non-technical.
 - When possible, verify visual changes locally before handing back URLs.
 - Keep Civica Index and atlas concerns separated clearly in routing and UI copy.

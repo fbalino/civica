@@ -47,10 +47,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   `max()` for font-size (e.g. `max(16px, 1em)`). Bit the iOS input auto-zoom guard (globals.css
   `@media (hover:none) and (pointer:coarse)` block — inputs need computed ≥16px or iOS Safari
   zooms the viewport on focus and never zooms back).
-- **`html { scroll-behavior: smooth }` breaks App Router scroll-to-top on navigation** unless
-  `<html data-scroll-behavior="smooth">` is set (layout.tsx has it — Next then forces instant
-  scroll during route transitions). Removing the attribute regresses to "click a link, land
-  mid-page" (scroll-restoration bug). Also: running `npm run build` while `next dev` is up
+- **The root scroller must NOT use CSS `scroll-behavior: smooth` — at all** (2026-07-04).
+  It turns the router's scroll-to-top on navigation into an animated scroll the next page's
+  render cancels mid-flight → readers land mid-page. The earlier mitigation
+  (`<html data-scroll-behavior="smooth">`) proved INSUFFICIENT in production (owner reproduced
+  on desktop + mobile with it deployed); both the CSS rule and the attribute are gone.
+  globals.css pins `html { scroll-behavior: auto }` with a comment. In-page smooth scrolling
+  is JS-only with explicit `behavior: "smooth"` (section navs, ReaderSidebar, constitution
+  outline) — never reintroduce the global CSS rule. Also: running `npm run build` while `next dev` is up
   poisons the dev server's chunk cache. A dev RESTART is NOT enough — the poisoned state
   persists in `.next` on disk, and chunk NAMES don't change with content (grep-verifying a
   served chunk can silently test stale bytes). Fix: kill dev, `rm -rf .next`, restart.

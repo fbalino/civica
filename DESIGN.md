@@ -124,11 +124,14 @@ Page type drives the layout, not the prose length. **Do not default to `width="n
 | Page type | Class / prop | Width | Sidebar? | Examples |
 |---|---|---|---|---|
 | Methodology page or methodology subpage | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
+| Legal / policy / ANY multi-section document page | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/privacy`, `/terms` |
 | Filterable list / changelog | `<EditorialPage width="wide">` | 960px | No | `/civica-index/changelog`, `/civica-index/pulse-changelog` |
 | Standard product/editorial page | `<EditorialPage width="full">` | 1200px | No | Atlas-scale layouts |
 | Short-form editorial / blog | `<EditorialPage>` (default `width="narrow"`) | 760px | No | Single-topic blog posts, short essays |
 
 **Default disambiguation rule**: if the URL is under `/methodology`, `/*/methodology`, or otherwise documents a methodology decision, use `methodology-layout`. Reaching for `width="narrow"` on a methodology page is wrong even if the prose feels short — methodology pages share a sidebar convention readers expect to find.
+
+**Owner rule (2026-07-04, restated after repeated drift): NEVER invent a new page width or layout shell.** Every new page picks a row from this table — a sectioned document of any kind (legal, policy, reference, explainer) gets the `methodology-layout` + `ReaderSidebar` shell, NOT a bare narrow column. `width="narrow"` is reserved for blog-style essays. If none of the rows fit, the fix is to extend this table (one decision, reused everywhere), never to hand-roll a one-off layout on the page.
 
 The `<EditorialPage>` component's prop docstring describes what each width prop *technically* does. This document describes which one to *pick*. When they conflict, this document wins.
 
