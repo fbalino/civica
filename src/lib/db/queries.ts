@@ -171,6 +171,246 @@ export async function rankCountriesByFact(
     .limit(limit);
 }
 
+/**
+ * Wide, one-row-per-country matrix backing the multi-column `/rankings`
+ * table. Every sensible country-level metric Civica tracks with broad
+ * coverage becomes a column, each carrying its own numeric value + source
+ * provenance (source id + retrieved date) so the page can render a
+ * per-column `<SourceDot>`. Consumers sort client-side.
+ *
+ * Two provenance layers are unioned per country:
+ *  - Structural / factbook facts from `country_facts`, deduped to one
+ *    canonical row per (jurisdiction, fact_key) with the same DISTINCT ON
+ *    rule as `rankCountriesByFact` (prefer status='active', then newest
+ *    vintage) so a second source row can never inflate or repeat a value.
+ *  - Governance scores from the beta Civica Index: the composite
+ *    (`ci_composite_scores`) plus the four normalized 0-100 dimension
+ *    scores (`ci_dimension_scores`), both pinned to `methodology_version =
+ *    'beta'` at the latest available quarter (see the CI read-query
+ *    invariant — a v1.0/beta mix double-counts).
+ *
+ * A metric a country lacks is simply absent from `metrics`; the UI renders
+ * an em-dash. Only sovereign states are included.
+ */
+export type RankingMetricCell = {
+  /** Numeric value used for sorting + formatting. */
+  value: number;
+  /** Source id for the `<SourceDot>` (e.g. "cia_factbook", "undp_hdi"). */
+  source: string;
+  /** ISO string for the dot's freshness label, or null. */
+  retrievedAt: string | null;
+  /** Civica Index rank band (A–F), on the `civica_index` cell only. */
+  band?: string;
+};
+
+export type RankingCountryRow = {
+  slug: string;
+  name: string;
+  iso2: string | null;
+  /** Keyed by ranking-metric id (see RANKING_COLUMNS on the page). */
+  metrics: Record<string, RankingMetricCell>;
+};
+
+/** country_facts fact keys surfaced as ranking columns, keyed by the
+ *  column id the page uses. Kept here so the pivot and the page agree. */
+const RANKING_FACT_KEYS: Record<string, string> = {
+  population: "population",
+  gdp_ppp: "gdp_ppp",
+  gdp_per_capita_ppp: "gdp_per_capita_ppp",
+  total_area: "total_area",
+  life_expectancy: "life_expectancy",
+  hdi_score: "hdi_score",
+  literacy_rate: "literacy_rate",
+  median_age: "median_age",
+};
+
+/** ci_dimension_scores dimensions surfaced as columns (normalized 0-100),
+ *  keyed by column id. */
+const RANKING_CI_DIMENSIONS: Record<string, string> = {
+  democratic_quality: "democratic_quality",
+  freedom_rights: "freedom_rights",
+  rule_of_law: "rule_of_law",
+  corruption_control: "corruption_control",
+};
+
+export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
+  const factKeys = Object.values(RANKING_FACT_KEYS);
+  const dimensions = Object.values(RANKING_CI_DIMENSIONS);
+  const quarter = await getLatestAvailableQuarter("beta");
+
+  const byId = new Map<string, RankingCountryRow & { id: string }>();
+  const ensure = (
+    id: string,
+    slug: string,
+    name: string,
+    iso2: string | null,
+  ) => {
+    let row = byId.get(id);
+    if (!row) {
+      row = { id, slug, name, iso2, metrics: {} };
+      byId.set(id, row);
+    }
+    return row;
+  };
+
+  // Reverse maps: fact_key/dimension -> column id.
+  const factKeyToColumn = new Map(
+    Object.entries(RANKING_FACT_KEYS).map(([col, key]) => [key, col]),
+  );
+  const dimensionToColumn = new Map(
+    Object.entries(RANKING_CI_DIMENSIONS).map(([col, dim]) => [dim, col]),
+  );
+
+  // ── country_facts (canonical row per (jurisdiction, fact_key)) ──
+  const factResult = await db.execute(sql`
+    SELECT
+      j.id            AS jurisdiction_id,
+      j.slug,
+      j.name,
+      j.iso2,
+      cf.fact_key,
+      cf.fact_value_numeric,
+      cf.source_id,
+      cf.retrieved_at
+    FROM (
+      SELECT DISTINCT ON (jurisdiction_id, fact_key)
+        jurisdiction_id, fact_key, fact_value_numeric, source_id, retrieved_at
+      FROM country_facts
+      WHERE fact_key IN ${factKeys} AND fact_value_numeric IS NOT NULL
+      ORDER BY
+        jurisdiction_id,
+        fact_key,
+        (status = 'active' OR status IS NULL) DESC,
+        as_of DESC NULLS LAST,
+        retrieved_at DESC
+    ) cf
+    JOIN jurisdictions j
+      ON j.id = cf.jurisdiction_id
+      AND j.type = 'sovereign_state' AND LOWER(j.name) <> 'none'
+  `);
+  const factRows = (
+    Array.isArray(factResult)
+      ? factResult
+      : ((factResult as { rows?: unknown[] }).rows ?? [])
+  ) as Array<{
+    jurisdiction_id: string;
+    slug: string;
+    name: string;
+    iso2: string | null;
+    fact_key: string;
+    fact_value_numeric: number | string | null;
+    source_id: string;
+    retrieved_at: string | Date | null;
+  }>;
+
+  for (const r of factRows) {
+    const column = factKeyToColumn.get(r.fact_key);
+    if (!column) continue;
+    const value = Number(r.fact_value_numeric);
+    if (!Number.isFinite(value)) continue;
+    const row = ensure(r.jurisdiction_id, r.slug, r.name, r.iso2);
+    row.metrics[column] = {
+      value,
+      source: r.source_id,
+      retrievedAt: toIso(r.retrieved_at),
+    };
+  }
+
+  // ── Civica Index composite (beta, latest quarter) ──
+  const compositeResult = await db.execute(sql`
+    SELECT
+      j.id AS jurisdiction_id, j.slug, j.name, j.iso2,
+      cs.score, cs.band, cs.calculated_at
+    FROM ci_composite_scores cs
+    JOIN jurisdictions j
+      ON j.id = cs.jurisdiction_id
+      AND j.type = 'sovereign_state' AND LOWER(j.name) <> 'none'
+    WHERE cs.quarter = ${quarter} AND cs.methodology_version = 'beta'
+  `);
+  const compositeRows = (
+    Array.isArray(compositeResult)
+      ? compositeResult
+      : ((compositeResult as { rows?: unknown[] }).rows ?? [])
+  ) as Array<{
+    jurisdiction_id: string;
+    slug: string;
+    name: string;
+    iso2: string | null;
+    score: number | string | null;
+    band: string | null;
+    calculated_at: string | Date | null;
+  }>;
+
+  for (const r of compositeRows) {
+    const value = Number(r.score);
+    if (!Number.isFinite(value)) continue;
+    const row = ensure(r.jurisdiction_id, r.slug, r.name, r.iso2);
+    row.metrics.civica_index = {
+      value,
+      source: "civica_curated",
+      retrievedAt: toIso(r.calculated_at),
+    };
+    if (r.band) row.metrics.civica_index.band = r.band;
+  }
+
+  // ── Civica Index dimension scores (beta, latest quarter) ──
+  // Selects the jurisdiction identity (slug/name/iso2) so a country that has
+  // dimension scores but no composite and no ranking country_facts still SEEDS
+  // its own row (via ensure) instead of being silently dropped. Today every CI
+  // country also has a composite, so this is defensive, not corrective.
+  const dimensionResult = await db.execute(sql`
+    SELECT
+      ds.jurisdiction_id, j.slug, j.name, j.iso2,
+      ds.dimension, ds.normalized_score,
+      ds.source_id, ds.created_at
+    FROM ci_dimension_scores ds
+    JOIN jurisdictions j
+      ON j.id = ds.jurisdiction_id
+      AND j.type = 'sovereign_state' AND LOWER(j.name) <> 'none'
+    WHERE ds.quarter = ${quarter}
+      AND ds.methodology_version = 'beta'
+      AND ds.dimension IN ${dimensions}
+  `);
+  const dimensionRows = (
+    Array.isArray(dimensionResult)
+      ? dimensionResult
+      : ((dimensionResult as { rows?: unknown[] }).rows ?? [])
+  ) as Array<{
+    jurisdiction_id: string;
+    slug: string;
+    name: string;
+    iso2: string | null;
+    dimension: string;
+    normalized_score: number | string | null;
+    source_id: string;
+    created_at: string | Date | null;
+  }>;
+
+  for (const r of dimensionRows) {
+    const column = dimensionToColumn.get(r.dimension);
+    if (!column) continue;
+    const value = Number(r.normalized_score);
+    if (!Number.isFinite(value)) continue;
+    // Seed the row if this country wasn't introduced by facts/composite, so a
+    // dimension-only country is never silently dropped from the matrix.
+    const row = ensure(r.jurisdiction_id, r.slug, r.name, r.iso2);
+    row.metrics[column] = {
+      value,
+      source: r.source_id,
+      retrievedAt: toIso(r.created_at),
+    };
+  }
+
+  return [...byId.values()].map(({ id: _id, ...row }) => row);
+}
+
+function toIso(value: string | Date | null | undefined): string | null {
+  if (!value) return null;
+  if (value instanceof Date) return value.toISOString();
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+}
+
 export async function getGovernmentStructure(jurisdictionId: string) {
   const bodies = await db
     .select()
@@ -1204,67 +1444,6 @@ export async function getCIMethodologyHistory() {
     .select()
     .from(ciMethodologyVersions)
     .orderBy(desc(ciMethodologyVersions.publishedAt));
-}
-
-export async function getPulseChangelog(
-  slug?: string,
-  limit = 50,
-  offset = 0
-) {
-  const slugFilter = slug
-    ? sql`AND j.slug = ${slug}`
-    : sql``;
-
-  return db.execute(sql`
-    SELECT
-      pe.id,
-      pe.event_date             AS "eventDate",
-      pe.category,
-      pe.severity,
-      pe.confidence,
-      pe.headline,
-      pe.justification,
-      pe.source_url             AS "sourceUrl",
-      pe.source_name            AS "sourceName",
-      pe.is_active              AS "isActive",
-      j.slug,
-      j.name                    AS "countryName",
-      j.iso2,
-      j.flag_url                AS "flagUrl",
-      j.continent,
-      j.capital,
-      (
-        SELECT pds.pulse_score
-        FROM pulse_daily_scores pds
-        WHERE pds.jurisdiction_id = j.id
-        ORDER BY pds.score_date DESC
-        LIMIT 1
-      )                         AS "pulseLatest"
-    FROM pulse_events pe
-    JOIN jurisdictions j ON pe.jurisdiction_id = j.id
-    WHERE j.type = 'sovereign_state'
-      ${slugFilter}
-    ORDER BY pe.event_date DESC, pe.created_at DESC
-    LIMIT ${limit}
-    OFFSET ${offset}
-  `);
-}
-
-export async function getPulseHistory(slug: string, days = 90) {
-  return db.execute(sql`
-    SELECT
-      pds.score_date            AS "scoreDate",
-      pds.ci_baseline           AS "ciBaseline",
-      pds.event_impact          AS "eventImpact",
-      pds.pulse_score           AS "pulseScore",
-      pds.active_events         AS "activeEvents",
-      pds.is_low_confidence     AS "isLowConfidence"
-    FROM pulse_daily_scores pds
-    JOIN jurisdictions j ON pds.jurisdiction_id = j.id
-    WHERE j.slug = ${slug}
-      AND pds.score_date >= CURRENT_DATE - ${days}
-    ORDER BY pds.score_date ASC
-  `);
 }
 
 /**

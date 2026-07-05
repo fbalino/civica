@@ -1646,6 +1646,46 @@ a {
   animation: skeleton-pulse 1.8s ease-in-out infinite;
 }
 
+/* Rankings loading skeleton — a matrix of placeholder bars. Dimensions live
+   here (composed from space tokens) instead of as inline pixel magic numbers on
+   the loading page, so the skeleton stays on the token system. One shared line
+   height, a country-name column, a narrower metric column, and a small flag
+   swatch. */
+.rankings-skeleton {
+  overflow-x: auto;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+}
+.rankings-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-card-border);
+}
+.rankings-skeleton-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: calc(var(--space-9) + var(--space-8) + var(--space-3));
+}
+/* Line bars share one height (~space-4 + a hair). */
+.rankings-skeleton .skeleton {
+  height: calc(var(--space-4) + var(--space-1));
+}
+.rankings-skeleton-label {
+  width: calc(var(--space-9) + var(--space-8) + var(--space-3));
+}
+.rankings-skeleton-metric {
+  width: calc(var(--space-9) + var(--space-3));
+}
+.rankings-skeleton-flag {
+  width: var(--space-6);
+}
+.rankings-skeleton-fill {
+  flex: 1;
+}
+
 /* ============================================================
    Ranking chip (country detail → links to /rankings)
    ============================================================ */
