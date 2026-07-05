@@ -1,0 +1,187 @@
+/*
+ * "Off the map" — 404 page styles
+ * ───────────────────────────────
+ *
+ * Scoped to src/app/not-found.tsx (imported there only). Composes the shared
+ * editorial classes (.editorial-page, .editorial-eyebrow) for the reading
+ * column; the classes below cover only what the almanac 404 adds on top: the
+ * centered layout, the compass spot-engraving, the search slot, and the
+ * destination-card grid.
+ *
+ * Tokens only — no hex/rgb/oklch literals, no px font sizes, no --font-code.
+ * Required reading: ./DESIGN.md, ./editorial.css.
+ */
+
+/* ── Centered editorial column ──────────────────────────────────────── */
+
+.not-found {
+  text-align: center;
+  padding-top: var(--space-9);
+}
+
+@media (max-width: 480px) {
+  .not-found {
+    padding-top: var(--space-7);
+  }
+}
+
+/* ── Compass spot-engraving (theme swap handled globally) ───────────── */
+
+.not-found__engraving {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 var(--space-6);
+}
+
+.not-found__engraving img {
+  width: 128px;
+  height: auto;
+  opacity: 0.85;
+}
+
+/* ── Header block ───────────────────────────────────────────────────── */
+
+.not-found__eyebrow {
+  /* .editorial-eyebrow already sets the small-caps Inter register; this only
+     centers the eyebrow's implicit block box within the column. */
+  margin-inline: auto;
+}
+
+/* Scoped under .not-found so this out-ranks the shared `.editorial-page h1`
+   rule (0,2,0 vs 0,1,1) — the title is an <h1> inside `.editorial-page`, so an
+   unscoped `.not-found__title` (0,1,0) would lose the cascade to it. */
+.not-found .not-found__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-56);
+  font-weight: 400;
+  letter-spacing: var(--tracking-tighter);
+  line-height: 1.02;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-5);
+}
+
+@media (max-width: 480px) {
+  .not-found .not-found__title {
+    font-size: var(--text-32);
+  }
+}
+
+.not-found__dek {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: 400;
+  letter-spacing: -0.01em; /* -0.01em — matches .editorial-page-subtitle */
+  line-height: 1.4;
+  color: var(--color-text-60);
+  max-width: 560px;
+  margin: 0 auto var(--space-8);
+}
+
+/* ── Search slot ────────────────────────────────────────────────────── */
+
+.not-found__search {
+  max-width: 480px;
+  margin: 0 auto var(--space-9);
+  text-align: start;
+}
+
+/* ── Destination grid ───────────────────────────────────────────────── */
+
+.not-found__destinations {
+  border-top: 1px solid var(--color-card-border);
+  padding-top: var(--space-8);
+}
+
+.not-found__destinations-title {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+  margin: 0 0 var(--space-5);
+}
+
+.not-found__grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+@media (max-width: 768px) {
+  .not-found__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .not-found__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.not-found__card {
+  display: block;
+  height: 100%;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  text-align: start;
+  transition:
+    border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
+}
+
+.not-found__card:hover {
+  border-color: color-mix(
+    in oklab,
+    var(--color-text-primary) 24%,
+    var(--color-card-border)
+  );
+}
+
+.not-found__card:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.not-found__card-label {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: 400;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1);
+}
+
+.not-found__card-desc {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-normal);
+  color: var(--color-text-50);
+}
+
+/* ── Small print ────────────────────────────────────────────────────── */
+
+.not-found__note {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-50);
+  margin: var(--space-8) 0 0;
+}
+
+.not-found__note a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+
+.not-found__note a:hover {
+  color: var(--color-text-primary);
+}

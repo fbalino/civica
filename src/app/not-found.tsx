@@ -1,192 +1,158 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getAllJurisdictions } from "@/lib/db/queries";
+import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
+import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
+import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import "./not-found.css";
 
 export const metadata: Metadata = {
   title: "Page Not Found — 404",
   description:
-    "The page you're looking for doesn't exist in the Civica atlas. Return to the homepage or browse countries, elections, and government types.",
+    "This address isn't in the Civica atlas. Search for a country or head to the Civica Index, World Atlas, Elections, Compare, or The Record.",
   robots: { index: false, follow: false },
 };
 
-const DESTINATIONS: Array<{
+const DESTINATIONS: ReadonlyArray<{
   href: string;
   label: string;
   description: string;
 }> = [
   {
-    href: "/",
-    label: "Home",
-    description: "Interactive atlas of world government structures.",
-  },
-  {
     href: "/country",
     label: "Countries",
-    description: "Browse 250+ country profiles and political systems.",
+    description: "Government structures for every country on Earth.",
+  },
+  {
+    href: "/civica-index",
+    label: "Civica Index",
+    description: "The governance score, ranked for 190+ countries.",
+  },
+  {
+    href: "/atlas",
+    label: "World Atlas",
+    description: "The interactive map of world political systems.",
   },
   {
     href: "/elections",
     label: "Elections",
-    description: "Recent national elections and turnout figures.",
-  },
-  {
-    href: "/civica-index/methodology/peer-grouping",
-    label: "Government Types",
-    description: "Presidential, parliamentary, and other systems explained.",
+    description: "National election calendars and results.",
   },
   {
     href: "/compare",
     label: "Compare",
-    description: "Place two or more countries side by side.",
+    description: "Place countries side by side.",
   },
   {
-    href: "/rankings",
-    label: "Rankings",
-    description: "Democracy, freedom, and governance indices.",
+    href: "/blog",
+    label: "The Record",
+    description: "Field notes on governance and the data behind it.",
   },
 ];
 
-export default function NotFound() {
+/* The compass spot-engraving. Light + dark variants swap via the global
+   .theme-engraving-light / .theme-engraving-dark rules in globals.css. */
+function CompassEngraving() {
   return (
-    <div
-      style={{
-        maxWidth: "var(--max-w-content)",
-        margin: "0 auto",
-        padding: "var(--spacing-section-y) var(--spacing-page-x)",
-        minHeight: "60vh",
-      }}
-    >
-      <div
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
-          fontSize: "var(--text-12)",
-          letterSpacing: "var(--tracking-caps)",
-          textTransform: "uppercase",
-          color: "var(--color-text-30)",
-          marginBottom: "var(--space-6)",
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--space-3)",
-        }}
-      >
-        <span>Error 404</span>
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            background: "var(--color-source-frozen)",
-          }}
-          aria-hidden="true"
-        />
-        <span>Page not found</span>
-      </div>
-
-      <h1 className="page-heading" style={{ marginBottom: "var(--space-4)" }}>
-        This page isn&apos;t in the atlas.
-      </h1>
-
-      <div
-        style={{
-          width: 40,
-          height: 2,
-          background: "var(--color-accent)",
-          borderRadius: "var(--radius-sm)",
-          marginBottom: "var(--space-8)",
-        }}
+    <div className="not-found__engraving" aria-hidden="true">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className="theme-engraving-light"
+        src="/engravings/spot-compass.webp"
+        alt=""
       />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className="theme-engraving-dark"
+        src="/engravings/spot-compass-dark.webp"
+        alt=""
+      />
+    </div>
+  );
+}
 
-      <p
-        className="cv-prose"
-        style={{
-          maxWidth: 640,
-          marginBottom: "var(--space-3)",
-        }}
+export default async function NotFound() {
+  // Soft-fail: the search is real when the DB is reachable, and the page still
+  // renders coherently (an empty combobox) when it is not.
+  let countries: {
+    slug: string;
+    name: string;
+    iso2: string | null;
+    iso3: string | null;
+    capital: string | null;
+  }[] = [];
+  try {
+    const all = await getAllJurisdictions();
+    countries = all.map((c) => ({
+      slug: c.slug,
+      name: c.name,
+      iso2: c.iso2,
+      iso3: c.iso3,
+      capital: readCachedFieldFromRow(c, "capital"),
+    }));
+  } catch {
+    countries = [];
+  }
+
+  return (
+    <HeroReveal as="div" className="editorial-page not-found">
+      <HeroRevealItem>
+        <CompassEngraving />
+      </HeroRevealItem>
+
+      <HeroRevealItem
+        as="p"
+        className="editorial-eyebrow not-found__eyebrow"
       >
-        The page you requested either moved, was renamed, or never existed. Civica
-        maps government structures for every country in the world and the entry you
-        were looking for may live under a different route.
-      </p>
+        Error 404 · Terra incognita
+      </HeroRevealItem>
 
-      <p
-        className="cv-prose cv-prose--muted"
-        style={{
-          maxWidth: 640,
-          marginBottom: "var(--space-9)",
-        }}
+      <HeroRevealItem as="h1" className="not-found__title">
+        This page is off the map.
+      </HeroRevealItem>
+
+      <HeroRevealItem as="p" className="not-found__dek">
+        The atlas covers every country on Earth — but not this address. It may
+        have moved when routes were consolidated, or never existed.
+      </HeroRevealItem>
+
+      <HeroRevealItem className="not-found__search">
+        <CountrySearchCombobox
+          countries={countries}
+          countryPathPrefix="/country"
+          placeholder="Find a country…"
+          ariaLabel="Find a country"
+        />
+      </HeroRevealItem>
+
+      <HeroRevealItem
+        as="section"
+        className="not-found__destinations"
+        aria-labelledby="not-found-destinations"
       >
-        Try one of the destinations below, or use search from the header to find a
-        specific country, election, or topic.
-      </p>
-
-      <section aria-labelledby="not-found-destinations">
-        <h2
-          id="not-found-destinations"
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
-            fontSize: "var(--text-12)",
-            letterSpacing: "var(--tracking-caps)",
-            textTransform: "uppercase",
-            color: "var(--color-text-40)",
-            marginBottom: "var(--space-5)",
-          }}
-        >
-          Go somewhere useful
+        <h2 id="not-found-destinations" className="not-found__destinations-title">
+          Places to pick up the trail
         </h2>
-
-        <ul
-          style={{
-            listStyle: "none",
-            margin: 0,
-            padding: 0,
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-            gap: "var(--space-3)",
-          }}
-        >
+        <ul className="not-found__grid">
           {DESTINATIONS.map((destination) => (
             <li key={destination.href}>
-              <Link
-                href={destination.href}
-                style={{
-                  display: "block",
-                  padding: "var(--space-4) var(--space-5)",
-                  background: "var(--color-card-bg)",
-                  border: "1px solid var(--color-card-border)",
-                  borderRadius: "var(--radius-md)",
-                  textDecoration: "none",
-                  color: "inherit",
-                  transition:
-                    "background-color 0.15s ease, border-color 0.15s ease",
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-heading)",
-                    fontSize: "var(--text-20)",
-                    fontWeight: 400,
-                    color: "var(--color-text-primary)",
-                    marginBottom: 4,
-                  }}
-                >
+              <Link href={destination.href} className="not-found__card">
+                <span className="not-found__card-label">
                   {destination.label}
-                </div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: "var(--text-14)",
-                    lineHeight: "var(--leading-normal)",
-                    color: "var(--color-text-50)",
-                  }}
-                >
+                </span>
+                <span className="not-found__card-desc">
                   {destination.description}
-                </div>
+                </span>
               </Link>
             </li>
           ))}
         </ul>
-      </section>
-    </div>
+      </HeroRevealItem>
+
+      <HeroRevealItem as="p" className="not-found__note">
+        Convinced this page should exist?{" "}
+        <Link href="/contact">Tell us.</Link>
+      </HeroRevealItem>
+    </HeroReveal>
   );
 }
