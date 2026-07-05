@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { getUpcomingElections, getRecentElectionsWithResults } from "@/lib/db/queries";
+import {
+  getUpcomingElections,
+  getRecentElectionsWithResults,
+  getSource,
+} from "@/lib/db/queries";
 import { db } from "@/lib/db/index";
 import { elections, jurisdictions } from "@/lib/db/schema";
 import { sql } from "drizzle-orm";
@@ -13,12 +17,12 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Elections Around the World — Calendar & Results",
   description:
-    "Track upcoming and past elections worldwide: voter turnout, party-colored results, electoral system labels, and historical timelines for a growing set of countries.",
+    "A worldwide election calendar: legislative dates, electoral systems, and party seat results from IPU Parline, plus presidential elections from Wikidata.",
   alternates: { canonical: "https://civicaatlas.org/elections" },
   openGraph: withOg({
     title: "Elections Around the World — Calendar & Results · Civica Atlas",
     description:
-      "Track upcoming and past elections worldwide, with turnout visualization and party-colored results.",
+      "A worldwide election calendar: legislative dates and party seat results from IPU Parline, plus presidential elections from Wikidata.",
     url: "https://civicaatlas.org/elections",
   }),
 };
@@ -27,6 +31,16 @@ export default async function ElectionsPage() {
   let upcoming: Awaited<ReturnType<typeof getUpcomingElections>> = [];
   let recent: Awaited<ReturnType<typeof getRecentElectionsWithResults>> = [];
   let stats = { totalElections: 0, upcomingCount: 0, avgTurnout: 0, electionsThisYear: 0 };
+  // Sourced coverage framing (resolution §3, §5): legislative dates from IPU
+  // Parline, presidential dates from Wikidata. Numbers are live-from-DB so the
+  // page can never overstate its coverage; all soft-fail to null when the DB is
+  // unreachable, and the client renders a static sourced line in that case.
+  let coverage: {
+    legislativeJurisdictions: number;
+    presidentialJurisdictions: number;
+    ipuRetrievedAt: string | null;
+    wikidataRetrievedAt: string | null;
+  } | null = null;
 
   try {
     [upcoming, recent] = await Promise.all([
@@ -40,6 +54,8 @@ export default async function ElectionsPage() {
         upcoming: sql<number>`COUNT(*) FILTER (WHERE ${elections.electionDate} >= CURRENT_DATE)`,
         avgTurnout: sql<number>`ROUND((AVG(${elections.turnoutPercent}) FILTER (WHERE ${elections.turnoutPercent} IS NOT NULL))::numeric, 1)`,
         thisYear: sql<number>`COUNT(*) FILTER (WHERE EXTRACT(YEAR FROM ${elections.electionDate}::date) = EXTRACT(YEAR FROM CURRENT_DATE))`,
+        legislativeJur: sql<number>`COUNT(DISTINCT ${elections.jurisdictionId}) FILTER (WHERE LOWER(${elections.electionType}) = 'legislative')`,
+        presidentialJur: sql<number>`COUNT(DISTINCT ${elections.jurisdictionId}) FILTER (WHERE LOWER(${elections.electionType}) = 'presidential')`,
       })
       .from(elections)
       .innerJoin(jurisdictions, sql`${elections.jurisdictionId} = ${jurisdictions.id}`)
@@ -50,6 +66,20 @@ export default async function ElectionsPage() {
       upcomingCount: Number(statsRow?.upcoming ?? 0),
       avgTurnout: Number(statsRow?.avgTurnout ?? 0),
       electionsThisYear: Number(statsRow?.thisYear ?? 0),
+    };
+
+    const [ipuSource, wikidataSource] = await Promise.all([
+      getSource("ipu_parline"),
+      getSource("wikidata"),
+    ]);
+
+    coverage = {
+      legislativeJurisdictions: Number(statsRow?.legislativeJur ?? 0),
+      presidentialJurisdictions: Number(statsRow?.presidentialJur ?? 0),
+      ipuRetrievedAt: ipuSource?.lastSyncAt ? ipuSource.lastSyncAt.toISOString() : null,
+      wikidataRetrievedAt: wikidataSource?.lastSyncAt
+        ? wikidataSource.lastSyncAt.toISOString()
+        : null,
     };
   } catch (err) {
     console.error("[elections] stats query failed:", err);
@@ -85,13 +115,18 @@ export default async function ElectionsPage() {
             Elections, tracked worldwide.
           </HeroRevealItem>
           <HeroRevealItem as="p" className="factbook-hero-dek">
-            Upcoming and past elections, with voter turnout from IDEA and
-            party-colored results from Wikidata and official sources.
+            A worldwide election calendar: legislative dates and party seat
+            results from IPU Parline, and presidential elections from Wikidata.
           </HeroRevealItem>
         </HeroReveal>
       </section>
 
-      <ElectionsClient upcoming={upcoming} recent={recent} stats={stats} />
+      <ElectionsClient
+        upcoming={upcoming}
+        recent={recent}
+        stats={stats}
+        coverage={coverage}
+      />
     </>
   );
 }

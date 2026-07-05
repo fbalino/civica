@@ -171,6 +171,16 @@ export const elections = pgTable("elections", {
   registeredVoters: integer("registered_voters"),
   totalValidVotes: integer("total_valid_votes"),
   wikidataQid: text("wikidata_qid"),
+  /**
+   * Whether `electionDate` is a source-confirmed date or a Civica-computed
+   * projection. `"confirmed"` = an IPU/Wikidata-published date. `"estimated"`
+   * = a `last_election + parliamentary_term` projection (reserved; NOT emitted
+   * in elections v1 — the conservative default excludes Civica-computed next
+   * dates from the public page per the resolution's deferred Q2). Nullable so
+   * the hand-seeded legacy rows are unaffected. See
+   * `plan/elections-data-sourcing-resolution-v1.md` §3, §6.1.
+   */
+  dateConfidence: text("date_confidence"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

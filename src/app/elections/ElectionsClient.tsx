@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { CountryFlag } from "@/components/CountryFlag";
 import { Reveal } from "@/components/motion/Reveal";
+import { SourceDot } from "@/components/SourceDot";
+import { Banner } from "@/components/editorial/Banner";
 
 interface ElectionRow {
   election: {
@@ -19,6 +21,23 @@ interface ElectionRow {
     iso2: string | null;
     continent: string | null;
   };
+}
+
+interface Coverage {
+  legislativeJurisdictions: number;
+  presidentialJurisdictions: number;
+  ipuRetrievedAt: string | null;
+  wikidataRetrievedAt: string | null;
+}
+
+/**
+ * Which source produced a row's date, per the field-by-field authority model
+ * (resolution §3): legislative dates come from IPU Parline; presidential dates
+ * from Wikidata. Everything else (referendum/local/general legacy rows) is
+ * attributed to Wikidata, its broader identity/date spine.
+ */
+function sourceForType(electionType: string | null): "ipu_parline" | "wikidata" {
+  return electionType?.toLowerCase() === "legislative" ? "ipu_parline" : "wikidata";
 }
 
 interface RecentElectionRow extends ElectionRow {
@@ -72,13 +91,18 @@ export default function ElectionsClient({
   upcoming,
   recent,
   stats,
+  coverage,
 }: {
   upcoming: ElectionRow[];
   recent: ElectionRow[];
   stats: Stats;
+  coverage: Coverage | null;
 }) {
   const [regionFilter, setRegionFilter] = useState("All Regions");
   const [typeFilter, setTypeFilter] = useState("All Types");
+
+  const ipuRetrievedAt = coverage?.ipuRetrievedAt ?? null;
+  const wikidataRetrievedAt = coverage?.wikidataRetrievedAt ?? null;
 
   const filteredUpcoming = useMemo(() => {
     return upcoming.filter((e) => {
@@ -128,6 +152,50 @@ export default function ElectionsClient({
             {i < arr.length - 1 && <div className="index-stat-divider" />}
           </div>
         ))}
+      </Reveal>
+
+      {/* Coverage framing — honest, sourced (resolution §3, §5). Legislative
+          dates + party seats from IPU Parline; presidential from Wikidata. No
+          turnout claim (not ingested in v1). Numbers are live-from-DB. */}
+      <Reveal as="div" amount={0.3} style={{ marginBottom: "var(--space-7)" }}>
+        <Banner variant="info">
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "var(--space-2) var(--space-3)",
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-15)",
+              lineHeight: 1.55,
+              color: "var(--color-text-primary)",
+            }}
+          >
+            {coverage ? (
+              <>
+                Legislative election dates, electoral systems, and party seat
+                results for{" "}
+                <strong>{coverage.legislativeJurisdictions}</strong> national
+                parliaments come from IPU Parline
+                <SourceDot source="ipu_parline" retrievedAt={ipuRetrievedAt} />;
+                presidential elections for{" "}
+                <strong>{coverage.presidentialJurisdictions}</strong> countries
+                come from Wikidata
+                <SourceDot source="wikidata" retrievedAt={wikidataRetrievedAt} />.
+                Only source-confirmed dates are shown.
+              </>
+            ) : (
+              <>
+                Legislative election dates, electoral systems, and party seat
+                results come from IPU Parline
+                <SourceDot source="ipu_parline" retrievedAt={null} />;
+                presidential elections come from Wikidata
+                <SourceDot source="wikidata" retrievedAt={null} />. Only
+                source-confirmed dates are shown.
+              </>
+            )}
+          </span>
+        </Banner>
       </Reveal>
 
       {/* Explainer link — how electoral systems turn votes into seats */}
@@ -202,10 +270,21 @@ export default function ElectionsClient({
                     </div>
                   </div>
                   <div className="index-card-bottom">
-                    <div className="index-card-data">
+                    <div
+                      className="index-card-data"
+                      style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}
+                    >
                       <span className="index-card-datum" style={{ color: "var(--color-accent)" }}>
                         {formatDate(e.election.electionDate)}
                       </span>
+                      <SourceDot
+                        source={sourceForType(e.election.electionType)}
+                        retrievedAt={
+                          sourceForType(e.election.electionType) === "ipu_parline"
+                            ? ipuRetrievedAt
+                            : wikidataRetrievedAt
+                        }
+                      />
                     </div>
                     {days !== null && days > 0 && (
                       <span className="index-card-datum index-card-datum--dim">
@@ -238,7 +317,12 @@ export default function ElectionsClient({
                 {year}
               </div>
               {items.map((e) => (
-                <TimelineCard key={e.election.id} election={e} />
+                <TimelineCard
+                  key={e.election.id}
+                  election={e}
+                  ipuRetrievedAt={ipuRetrievedAt}
+                  wikidataRetrievedAt={wikidataRetrievedAt}
+                />
               ))}
             </div>
           ))}
@@ -254,10 +338,20 @@ export default function ElectionsClient({
   );
 }
 
-function TimelineCard({ election: e }: { election: ElectionRow }) {
+function TimelineCard({
+  election: e,
+  ipuRetrievedAt,
+  wikidataRetrievedAt,
+}: {
+  election: ElectionRow;
+  ipuRetrievedAt: string | null;
+  wikidataRetrievedAt: string | null;
+}) {
   const [expanded, setExpanded] = useState(true);
-  const isLegislative = e.election.electionType === "legislative";
+  const isLegislative = e.election.electionType?.toLowerCase() === "legislative";
   const dotColor = isLegislative ? "var(--color-branch-legislative)" : "var(--color-branch-executive)";
+  const rowSource = sourceForType(e.election.electionType);
+  const rowRetrievedAt = rowSource === "ipu_parline" ? ipuRetrievedAt : wikidataRetrievedAt;
 
   return (
     <div style={{ position: "relative", paddingLeft: 52, paddingBottom: "var(--space-7)" }}>
@@ -299,7 +393,10 @@ function TimelineCard({ election: e }: { election: ElectionRow }) {
 
         {/* Meta */}
         <div style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", color: "var(--color-text-40)", display: "flex", gap: "var(--space-5)", flexWrap: "wrap", alignItems: "center" }}>
-          <span>{formatDate(e.election.electionDate)}</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-2)" }}>
+            {formatDate(e.election.electionDate)}
+            <SourceDot source={rowSource} retrievedAt={rowRetrievedAt} />
+          </span>
           {e.election.electoralSystem && (
             <span style={{
               fontFamily: "var(--font-mono)", fontWeight: "var(--font-weight-mono)",

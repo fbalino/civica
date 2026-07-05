@@ -19,6 +19,8 @@
     "sync:wikidata": "tsx scripts/sync-wikidata-officeholders.ts",
     "enrich:person-portraits": "tsx scripts/enrich-person-portraits.ts",
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
+    "sync:elections-ipu": "tsx scripts/sync-elections-ipu.ts",
+    "sync:elections-wikidata": "tsx scripts/sync-elections-wikidata.ts",
     "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
     "sync:constitutions": "tsx scripts/sync-constitutions.ts",
     "reparse:constitutions": "tsx scripts/reparse-constitutions.ts",
