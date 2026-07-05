@@ -446,14 +446,17 @@ export default async function CountryCivicaDataTab({
     )
   );
 
-  // Sidebar entries mirror the visible sections 1:1 — the SAME
-  // <FactbookSidebar> (ReaderSidebar primitive) the Factbook tab renders,
-  // inside the SAME grid geometry, by owner mandate (2026-07-05): the two
-  // tabs must never drift apart visually again.
-  const sidebarItems = visibleSections.map((s) => ({
-    id: s.id,
-    label: s.label,
-  }));
+  // Sidebar entries mirror the visible sections plus the same citation anchor
+  // the Factbook tab exposes. The SAME <FactbookSidebar> (ReaderSidebar
+  // primitive) renders inside the SAME grid geometry by owner mandate
+  // (2026-07-05): the two tabs must never drift apart visually again.
+  const sidebarItems = [
+    ...visibleSections.map((s) => ({
+      id: s.id,
+      label: s.label,
+    })),
+    { id: "cite", label: "Cite this page" },
+  ];
 
   return (
     <div className="factbook-tab">
@@ -470,23 +473,28 @@ export default async function CountryCivicaDataTab({
       <div className="civica-data-body">
         <FactbookSidebar items={sidebarItems} />
 
-        <CivicaDataSections items={items} defaultId={defaultId} />
-      </div>
-
-      {/* Per-tab citation footer — multi-format (APA · BibTeX · Chicago ·
-       *  JSON) with a structured-citation JSON tab and a raw-data download.
-       *  Mirrors the Factbook tab's footer; the URL is this tab's canonical
-       *  path. */}
-      <section className="civica-data-cite" aria-label="Cite this page">
-        <CiteAccordion
-          subject={`Civica Atlas — ${jurisdiction.name}`}
-          pageTitle="Civica Data"
-          url={`https://civicaatlas.org/country/${slug}/civica-data`}
-          downloadSlug={slug}
-          dataVintage={citeDataVintage}
-          sourceNames={citeSourceNames}
+        <CivicaDataSections
+          items={items}
+          defaultId={defaultId}
+          footer={
+            <section
+              id="cite"
+              className="editorial-section"
+              aria-labelledby="cite-heading"
+            >
+              <h2 id="cite-heading">Cite this page</h2>
+              <CiteAccordion
+                subject={`Civica Atlas — ${jurisdiction.name}`}
+                pageTitle="Civica Data"
+                url={`https://civicaatlas.org/country/${slug}/civica-data`}
+                downloadSlug={slug}
+                dataVintage={citeDataVintage}
+                sourceNames={citeSourceNames}
+              />
+            </section>
+          }
         />
-      </section>
+      </div>
     </div>
   );
 }

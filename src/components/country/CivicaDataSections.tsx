@@ -12,6 +12,7 @@ export interface CivicaDataSectionItem {
 
 interface CivicaDataSectionsProps {
   items: CivicaDataSectionItem[];
+  footer?: ReactNode;
   /**
    * Deep-link target from the URL (`?section=` / `#hash`), resolved server-side
    * to a real, visible section id. Used only to scroll to that section on load;
@@ -42,6 +43,7 @@ interface CivicaDataSectionsProps {
  */
 export function CivicaDataSections({
   items,
+  footer,
   defaultId,
 }: CivicaDataSectionsProps) {
   const ids = useMemo(() => items.map((i) => i.id), [items]);
@@ -105,6 +107,7 @@ export function CivicaDataSections({
           {item.content}
         </section>
       ))}
+      {footer}
     </div>
   );
 }
