@@ -8,7 +8,9 @@ exists) — the owner's own proposal, and stronger than the retired
 same-model 3-temperature vote because cross-vendor errors are independent.
 Consensus maps onto the EXISTING published agreement semantics: 3/3 = 'all',
 2/3 = 'two_of_three' (+ adversarial verify pass on one engine), no majority =
-'none' → human-review queue. IMPORTANT calibration rule the owner stated
+'none' → human-review queue. The verify pass is a SIGNAL, not a veto (owner
+loosened the gate same day): a refuted verify sends only WEAK majorities
+(low self-confidence or degraded runs) to review; severe tiers always review. IMPORTANT calibration rule the owner stated
 emphatically: his past manual approvals were smoke tests, NOT gold labels —
 never benchmark engines against "what Fernando approved before"; quality is
 measured by ensemble consensus rates + the review queue staying small. The
