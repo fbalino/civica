@@ -647,7 +647,7 @@ export default function ApiDocsPage() {
           id="pulse-changelog-v2"
           method="GET"
           path="/api/v1/pulse/changelog/v2"
-          description="Returns the v2 dimensional Pulse changelog. The legacy /api/v1/pulse/changelog endpoint remains for old clients and advertises this successor with deprecation headers."
+          description="Returns the dimensional Pulse changelog — per-event, per-dimension deltas with severity tiers and driving sources."
           parameters={[
             {
               name: "country",

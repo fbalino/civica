@@ -260,6 +260,195 @@ function FilterMenu({
   );
 }
 
+// ─── Single-select menu ───────────────────────────────────────────────────────
+// Same trigger + popover shape as the multi-select FilterMenu above and the
+// canonical almanac / civica-index filter controls: a token-styled trigger
+// button that opens a listbox popover. Single-select — picking an option applies
+// it and closes the menu — so Metric / Year / Lens read as siblings of the
+// Government-type and Region controls on the same page rather than bare native
+// <select> pills.
+
+interface SingleSelectItem {
+  value: string;
+  label: string;
+}
+
+interface SingleSelectMenuProps {
+  label: string;
+  value: string;
+  items: SingleSelectItem[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSelect: (value: string) => void;
+  /** Optional min-width for the trigger (defaults to a compact 160px). */
+  minWidth?: number;
+  /** Tabular numerals for numeric option sets (e.g. Year). */
+  tabularNums?: boolean;
+  ariaLabel: string;
+}
+
+function SingleSelectMenu({
+  label,
+  value,
+  items,
+  open,
+  onOpenChange,
+  onSelect,
+  minWidth = 160,
+  tabularNums = false,
+  ariaLabel,
+}: SingleSelectMenuProps) {
+  const selected = items.find((item) => item.value === value);
+  const summary = selected?.label ?? "Select";
+
+  return (
+    <div style={{ position: "relative", minWidth }}>
+      <div
+        style={{
+          fontFamily: "var(--font-body)",
+          fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
+          fontSize: "var(--text-12)",
+          letterSpacing: "var(--tracking-caps)",
+          textTransform: "uppercase",
+          color: "var(--color-text-30)",
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <button
+        type="button"
+        onClick={() => onOpenChange(!open)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={ariaLabel}
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          padding: "10px 12px",
+          borderRadius: "var(--radius-sm)",
+          border: "1px solid var(--color-card-border)",
+          background: "var(--color-select-bg, var(--color-surface-elevated))",
+          color: "var(--color-text-primary)",
+          fontFamily: "var(--font-body-sans)",
+          fontSize: "var(--text-14)",
+          fontVariantNumeric: tabularNums ? "tabular-nums" : "normal",
+          cursor: "pointer",
+          textAlign: "left",
+        }}
+      >
+        <span
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {summary}
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-body)",
+            color: "var(--color-text-40)",
+            transition: "transform 140ms ease",
+            transform: open ? "rotate(180deg)" : "rotate(0deg)",
+          }}
+        >
+          ▾
+        </span>
+      </button>
+      {open ? (
+        <div
+          role="listbox"
+          aria-label={ariaLabel}
+          style={{
+            position: "absolute",
+            top: "calc(100% + 6px)",
+            left: 0,
+            zIndex: 50,
+            minWidth: "100%",
+            maxWidth: 320,
+            background: "var(--color-card-bg)",
+            border: "1px solid var(--color-card-border)",
+            borderRadius: "var(--radius-sm)",
+            boxShadow: "var(--shadow-dark)",
+            padding: "8px",
+          }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gap: 2,
+              maxHeight: 260,
+              overflowY: "auto",
+            }}
+          >
+            {items.map((item) => {
+              const active = item.value === value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => {
+                    onSelect(item.value);
+                    onOpenChange(false);
+                  }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    width: "100%",
+                    padding: "6px 8px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "none",
+                    background: active
+                      ? "var(--color-surface-elevated)"
+                      : "transparent",
+                    color: active
+                      ? "var(--color-text-primary)"
+                      : "var(--color-text-60)",
+                    fontFamily: "var(--font-body-sans)",
+                    fontSize: "var(--text-14)",
+                    fontVariantNumeric: tabularNums ? "tabular-nums" : "normal",
+                    fontWeight: active ? 600 : 400,
+                    cursor: "pointer",
+                    textAlign: "left",
+                  }}
+                >
+                  <span
+                    aria-hidden
+                    style={{
+                      width: 12,
+                      flexShrink: 0,
+                      color: "var(--color-accent)",
+                    }}
+                  >
+                    {active ? "✓" : ""}
+                  </span>
+                  <span
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function TaxonomyGlossaryCard({
   label,
   title,
@@ -589,9 +778,12 @@ export function OutcomesExplorer({
   });
   const [smallMultiples, setSmallMultiples] = useState(false);
   const [methodologyOpen, setMethodologyOpen] = useState(false);
-  const [openMenu, setOpenMenu] = useState<null | "government" | "region">(
-    null,
-  );
+  const [openMenu, setOpenMenu] = useState<
+    null | "metric" | "year" | "lens" | "government" | "region"
+  >(null);
+  const metricMenuRef = useRef<HTMLDivElement>(null);
+  const yearMenuRef = useRef<HTMLDivElement>(null);
+  const lensMenuRef = useRef<HTMLDivElement>(null);
   const govMenuRef = useRef<HTMLDivElement>(null);
   const regionMenuRef = useRef<HTMLDivElement>(null);
 
@@ -807,6 +999,9 @@ export function OutcomesExplorer({
     const handler = (e: MouseEvent) => {
       const target = e.target as Node;
       if (
+        metricMenuRef.current?.contains(target) ||
+        yearMenuRef.current?.contains(target) ||
+        lensMenuRef.current?.contains(target) ||
         govMenuRef.current?.contains(target) ||
         regionMenuRef.current?.contains(target)
       ) {
@@ -815,7 +1010,14 @@ export function OutcomesExplorer({
       setOpenMenu(null);
     };
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenMenu(null);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("keydown", onKeyDown);
+    };
   }, [openMenu]);
 
   // ── Handlers ──
@@ -917,6 +1119,34 @@ export function OutcomesExplorer({
 
   // ── Category groups ──
   const categoryGroups = useMemo(() => groupByCategory(metrics), [metrics]);
+
+  // Flattened, category-ordered metric options for the custom single-select
+  // menu (the native <select> used <optgroup>; the popover keeps the same
+  // category order and prefixes each label with its category for context).
+  const metricMenuItems = useMemo(
+    () =>
+      Array.from(categoryGroups.entries()).flatMap(([cat, catMetrics]) =>
+        catMetrics.map((m) => ({
+          value: m.id,
+          label: `${cat} · ${m.name}`,
+        })),
+      ),
+    [categoryGroups],
+  );
+
+  const yearMenuItems = useMemo(
+    () => yearOptions.map((y) => ({ value: String(y), label: String(y) })),
+    [yearOptions],
+  );
+
+  const lensMenuItems = useMemo(
+    () => [
+      { value: "structural", label: "Structural form" },
+      { value: "regime", label: "Regime type" },
+      { value: "raw", label: "Raw source" },
+    ],
+    [],
+  );
 
   // ── Metric selector ──
   const isMobile = !isDesktop;
@@ -1039,21 +1269,21 @@ export function OutcomesExplorer({
             marginBottom: 28,
           }}
         >
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--font-body)",
-                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-12)",
-                letterSpacing: "var(--tracking-caps)",
-                textTransform: "uppercase",
-                color: "var(--color-text-30)",
-                marginBottom: 6,
-              }}
-            >
-              Metric
-            </div>
-            {useSegmented ? (
+          {useSegmented ? (
+            <div>
+              <div
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
+                  fontSize: "var(--text-12)",
+                  letterSpacing: "var(--tracking-caps)",
+                  textTransform: "uppercase",
+                  color: "var(--color-text-30)",
+                  marginBottom: 6,
+                }}
+              >
+                Metric
+              </div>
               <div
                 role="group"
                 aria-label="Select metric"
@@ -1092,87 +1322,51 @@ export function OutcomesExplorer({
                   </button>
                 ))}
               </div>
-            ) : (
-              <select
-                aria-label="Select metric"
+            </div>
+          ) : (
+            <div ref={metricMenuRef}>
+              <SingleSelectMenu
+                label="Metric"
+                ariaLabel="Select metric"
                 value={metricId}
-                onChange={(e) => handleMetricChange(e.target.value)}
-                className="editorial-inline-select"
-                style={{ minWidth: 180 }}
-              >
-                {Array.from(categoryGroups.entries()).map(([cat, catMetrics]) => (
-                  <optgroup key={cat} label={cat}>
-                    {catMetrics.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.name}
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-            )}
+                items={metricMenuItems}
+                open={openMenu === "metric"}
+                onOpenChange={(next) =>
+                  setOpenMenu(next ? "metric" : null)
+                }
+                onSelect={handleMetricChange}
+                minWidth={200}
+              />
+            </div>
+          )}
+
+          <div ref={yearMenuRef}>
+            <SingleSelectMenu
+              label="Year"
+              ariaLabel="Select year"
+              value={String(year)}
+              items={yearMenuItems}
+              open={openMenu === "year"}
+              onOpenChange={(next) => setOpenMenu(next ? "year" : null)}
+              onSelect={(value) => handleYearChange(parseInt(value, 10))}
+              minWidth={130}
+              tabularNums
+            />
           </div>
 
-          <div>
-            <div
-              style={{
-                fontFamily: "var(--font-body)",
-                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-12)",
-                letterSpacing: "var(--tracking-caps)",
-                textTransform: "uppercase",
-                color: "var(--color-text-30)",
-                marginBottom: 6,
-              }}
-            >
-              Year
-            </div>
-            <select
-              aria-label="Select year"
-              value={year}
-              onChange={(e) => handleYearChange(parseInt(e.target.value, 10))}
-              className="editorial-inline-select"
-              style={{ fontVariantNumeric: "tabular-nums" }}
-            >
-              {yearOptions.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div
-            style={{
-              minWidth: 200,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: "var(--font-body)",
-                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
-                fontSize: "var(--text-12)",
-                letterSpacing: "var(--tracking-caps)",
-                textTransform: "uppercase",
-                color: "var(--color-text-30)",
-                marginBottom: 6,
-              }}
-            >
-              Lens
-            </div>
-            <select
-              aria-label="Select taxonomy lens"
+          <div ref={lensMenuRef}>
+            <SingleSelectMenu
+              label="Lens"
+              ariaLabel="Select taxonomy lens"
               value={taxonomy}
-              onChange={(e) =>
-                handleTaxonomyChange(e.target.value as GovernmentTaxonomyLens)
+              items={lensMenuItems}
+              open={openMenu === "lens"}
+              onOpenChange={(next) => setOpenMenu(next ? "lens" : null)}
+              onSelect={(value) =>
+                handleTaxonomyChange(value as GovernmentTaxonomyLens)
               }
-              className="editorial-inline-select"
-              style={{ width: "100%" }}
-            >
-              <option value="structural">Structural form</option>
-              <option value="regime">Regime type</option>
-              <option value="raw">Raw source</option>
-            </select>
+              minWidth={200}
+            />
           </div>
 
           {availableGovTypes.length > 0 && (

@@ -159,8 +159,9 @@ Once the Beta exits and the Index stabilizes, the "Beta" suffix drops; the year-
 GET /api/v1/index/{country_slug}
 GET /api/v1/index/rankings
 GET /api/v1/index/methodology
-GET /api/v1/pulse/{country_slug}              (Beta — see Pulse spec)
-GET /api/v1/pulse/changelog                   (Beta)
+GET /api/v1/pulse/{country_slug}/dimensions   (Beta — see Pulse spec)
+GET /api/v1/pulse/{country_slug}/events       (Beta)
+GET /api/v1/pulse/changelog/v2                 (Beta)
 ```
 
 Every CI API response includes a `meta.methodology` block describing the methodology revision date and the Beta status — so machine consumers can detect the development phase programmatically.
