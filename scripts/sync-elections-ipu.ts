@@ -24,17 +24,31 @@
  *     predicate "ipu_last_election"), mirroring the existing seats_per_parties
  *     provenance write.
  *
- * Conservative v1 scope (per plan/elections-data-sourcing-resolution-v1.md,
- * owner Q1/Q2 deferred): NO turnout ingestion, and NO Civica-computed
- * "estimated next election" rows. Only source-confirmed past dates.
+ * ESTIMATED NEXT ELECTION (owner-adopted in elections round 2): in addition to
+ * the confirmed past-date rows, this sync derives a Civica-computed "next
+ * election due" row per chamber from `last_election + parliamentary_term` years
+ * (IPU carries the term length but NOT a next-election date). These rows carry
+ * `dateConfidence = "estimated"` and are visually distinguished on the page
+ * (muted, with an InfoTip disclosing they are a Civica projection, not a
+ * source-confirmed date). An estimate is written ONLY when it lands in the
+ * future AND no source-confirmed upcoming election already exists for that
+ * jurisdiction — a real scheduled date always wins. Estimates never carry
+ * results and are excluded from the "Recent Results" section by the query
+ * layer. Suppress them with --no-estimates. See resolution §3, §6.1 (the
+ * earlier "Q2 deferred / no estimates" posture is now superseded by the owner's
+ * round-2 adoption).
+ *
+ * Turnout is still NOT ingested here — that is `sync-elections-turnout-idea.ts`.
  *
  * Idempotent: re-running matches existing (jurisdictionId, bodyId,
  * electionDate) rows and updates them in place; result rows for a matched
- * election are replaced deterministically. Existing hand-seeded rows (bodyId
- * NULL) are never touched — they collide on neither key.
+ * election are replaced deterministically. The single estimated row per
+ * (jurisdictionId, bodyId) is replaced deterministically each run. Existing
+ * hand-seeded rows (bodyId NULL) are never touched — they collide on neither key.
  *
  * Flags: --dry-run (read-only preview, writes nothing, never stamps freshness),
- *        --limit N (process only the first N chambers — for quick sampling).
+ *        --limit N (process only the first N chambers — for quick sampling),
+ *        --no-estimates (skip the estimated-next-election derivation).
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });
@@ -65,6 +79,7 @@ const SOURCE_LICENSE = "CC-BY-NC-SA-4.0";
 const RETRIEVED_AT = new Date();
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const NO_ESTIMATES = process.argv.includes("--no-estimates");
 const LIMIT = (() => {
   const i = process.argv.indexOf("--limit");
   if (i !== -1 && process.argv[i + 1]) {
@@ -89,6 +104,8 @@ interface IpuChamber {
     chamber_name: IpuValue<{ en: string; fr: string }>;
     parliament: IpuValue<string>;
     last_election: IpuValue<{ from: string }>;
+    /** Term length in years — an array of dated values; we take the latest. */
+    parliamentary_term?: IpuValue<number> | IpuValue<number>[];
     electoral_system: IpuValue<{ term: string }> | IpuValue<{ term: string }>[];
     electoral_subsystem:
       | IpuValue<{ term: string }>
@@ -262,6 +279,22 @@ async function main() {
   let electionsFailed = 0;
   const samples: string[] = [];
 
+  // Collected during the main loop, consumed by the estimated-next-election
+  // pass below: one entry per chamber that has BOTH a last_election date and a
+  // parliamentary_term. Deduped by bodyId (a body maps to exactly one chamber).
+  const estimateInputs = new Map<
+    string,
+    {
+      jurisdictionId: string;
+      bodyId: string;
+      country: string;
+      chamberName: string;
+      lastElectionDate: string;
+      termYears: number;
+      systemLabel: string | null;
+    }
+  >();
+
   for (const chamber of allChambers) {
     const chamberCode = extractLatestValue(chamber.attributes.chamber_code);
     const chamberNameObj = extractLatestValue(chamber.attributes.chamber_name);
@@ -289,6 +322,21 @@ async function main() {
     const electionName = `${new Date(electionDate).getUTCFullYear()} ${chamberName} election`;
     const ipuElectionId = electionIdFromChamberAndDate(chamberCode, lastElectionObj.from);
     const sourceUrl = `${IPU_BASE}/elections/${ipuElectionId}`;
+
+    // Record term length for the estimated-next-election pass (owner-adopted).
+    // `parliamentary_term` is a dated array; take the latest positive integer.
+    const termYears = extractLatestValue(chamber.attributes.parliamentary_term);
+    if (!NO_ESTIMATES && typeof termYears === "number" && termYears > 0) {
+      estimateInputs.set(body.bodyId, {
+        jurisdictionId: body.jurisdictionId,
+        bodyId: body.bodyId,
+        country: body.country,
+        chamberName,
+        lastElectionDate: electionDate,
+        termYears,
+        systemLabel,
+      });
+    }
 
     // Fetch party seat results for this election (same call as the legislature
     // sync). If the election record is missing we still upsert the date row.
@@ -456,9 +504,173 @@ async function main() {
     await sleep(200);
   }
 
+  // ── Estimated next election (owner-adopted) ────────────────────────────────
+  // For each chamber with last_election + parliamentary_term, project the next
+  // due date. Write it as dateConfidence="estimated" ONLY when it is in the
+  // future AND no SOURCE-CONFIRMED upcoming election already exists for that
+  // jurisdiction (a real scheduled date always wins — no double calendar entry).
+  // One estimated row per (jurisdictionId, bodyId): replaced deterministically
+  // each run, so re-runs never duplicate.
+  let estimatesWritten = 0;
+  let estimatesSkippedPast = 0;
+  let estimatesSkippedConfirmed = 0;
+  const estimateSamples: string[] = [];
+  const todayIso = RETRIEVED_AT.toISOString().slice(0, 10);
+
+  if (!NO_ESTIMATES) {
+    for (const est of estimateInputs.values()) {
+      // last_election + term years, same month/day.
+      const base = new Date(`${est.lastElectionDate}T00:00:00Z`);
+      const projected = new Date(base);
+      projected.setUTCFullYear(projected.getUTCFullYear() + est.termYears);
+      const estimatedDate = projected.toISOString().slice(0, 10);
+
+      // Only a FUTURE estimate is useful (a past-due estimate is just noise).
+      if (estimatedDate <= todayIso) {
+        estimatesSkippedPast++;
+        continue;
+      }
+
+      // Any REAL (non-estimated) upcoming legislative/general election for this
+      // jurisdiction supersedes the projection — a dated source row always wins
+      // over a term-length estimate, even a Wikidata row whose dateConfidence is
+      // null. Only our own "estimated" rows are ignored here (so the estimate
+      // can replace its own prior projection on re-run).
+      const confirmedFuture = await db
+        .select({ id: elections.id })
+        .from(elections)
+        .where(
+          and(
+            eq(elections.jurisdictionId, est.jurisdictionId),
+            sql`${elections.electionDate} >= CURRENT_DATE`,
+            sql`${elections.dateConfidence} IS DISTINCT FROM 'estimated'`,
+            sql`LOWER(${elections.electionType}) IN ('legislative', 'general')`
+          )
+        )
+        .limit(1);
+      if (confirmedFuture.length > 0) {
+        estimatesSkippedConfirmed++;
+        // Clean up a now-superseded estimate we may have written on a prior run.
+        if (!DRY_RUN) {
+          await db
+            .delete(elections)
+            .where(
+              and(
+                eq(elections.jurisdictionId, est.jurisdictionId),
+                eq(elections.bodyId, est.bodyId),
+                eq(elections.dateConfidence, "estimated")
+              )
+            );
+        }
+        continue;
+      }
+
+      if (estimateSamples.length < 10) {
+        estimateSamples.push(
+          `  ${est.country} · ${est.chamberName} · last ${est.lastElectionDate} + ${est.termYears}y → est. ${estimatedDate}`
+        );
+      }
+
+      if (DRY_RUN) {
+        estimatesWritten++;
+        continue;
+      }
+
+      const estimatedName = `Next ${est.chamberName} election (estimated)`;
+      // Idempotent: match the single estimated row for this (jurisdiction, body).
+      const existingEst = await db
+        .select({ id: elections.id })
+        .from(elections)
+        .where(
+          and(
+            eq(elections.jurisdictionId, est.jurisdictionId),
+            eq(elections.bodyId, est.bodyId),
+            eq(elections.dateConfidence, "estimated")
+          )
+        )
+        .limit(1);
+
+      let estRowId: string;
+      if (existingEst.length > 0) {
+        estRowId = existingEst[0].id;
+        await db
+          .update(elections)
+          .set({
+            electionDate: estimatedDate,
+            electionType: "legislative",
+            electionName: estimatedName,
+            electoralSystem: est.systemLabel,
+            dateConfidence: "estimated",
+          })
+          .where(eq(elections.id, estRowId));
+      } else {
+        const ins = await db
+          .insert(elections)
+          .values({
+            jurisdictionId: est.jurisdictionId,
+            bodyId: est.bodyId,
+            electionDate: estimatedDate,
+            electionType: "legislative",
+            electionName: estimatedName,
+            electoralSystem: est.systemLabel,
+            dateConfidence: "estimated",
+          })
+          .returning({ id: elections.id });
+        estRowId = ins[0].id;
+      }
+      estimatesWritten++;
+
+      // Provenance: the estimate derives from IPU's own last_election + term,
+      // but is a Civica computation — record it as such (predicate makes the
+      // derivation explicit; it is NOT an IPU-asserted next date).
+      const estStmtValue = JSON.stringify({
+        derived_from: "ipu last_election + parliamentary_term",
+        last_election: est.lastElectionDate,
+        parliamentary_term_years: est.termYears,
+        estimated_next_election: estimatedDate,
+        note: "Civica-computed estimate, not a source-confirmed date.",
+      });
+      const existingEstStmt = await db
+        .select({ id: statements.id })
+        .from(statements)
+        .where(
+          and(
+            eq(statements.subjectTable, "elections"),
+            eq(statements.subjectId, estRowId),
+            eq(statements.predicate, "civica_estimated_next_election")
+          )
+        )
+        .limit(1);
+      if (existingEstStmt.length > 0) {
+        await db
+          .update(statements)
+          .set({
+            objectValue: estStmtValue,
+            sourceId: SOURCE_ID,
+            sourceUrl: `${IPU_BASE}/chambers`,
+            sourceLicense: SOURCE_LICENSE,
+            retrievedAt: RETRIEVED_AT,
+          })
+          .where(eq(statements.id, existingEstStmt[0].id));
+      } else {
+        await db.insert(statements).values({
+          subjectTable: "elections",
+          subjectId: estRowId,
+          predicate: "civica_estimated_next_election",
+          objectValue: estStmtValue,
+          sourceId: SOURCE_ID,
+          sourceUrl: `${IPU_BASE}/chambers`,
+          sourceLicense: SOURCE_LICENSE,
+          retrievedAt: RETRIEVED_AT,
+          confidence: 0.5,
+        });
+      }
+    }
+  }
+
   // Freshness — single sanctioned path, only on a non-dry-run that wrote rows.
   const stamped = await markSourcesSynced(SOURCE_ID, {
-    rowsWritten: DRY_RUN ? 0 : electionsUpserted,
+    rowsWritten: DRY_RUN ? 0 : electionsUpserted + estimatesWritten,
     at: RETRIEVED_AT,
   });
 
@@ -472,9 +684,18 @@ async function main() {
   console.log(`  Chambers no date:     ${chambersNoDate}`);
   console.log(`  Chambers no body:     ${chambersNoBody}`);
   console.log(`  Election records 404: ${electionsFailed}`);
+  if (!NO_ESTIMATES) {
+    console.log(`  Estimated next rows:  ${estimatesWritten}`);
+    console.log(`    · skipped (past-due):        ${estimatesSkippedPast}`);
+    console.log(`    · skipped (confirmed wins):  ${estimatesSkippedConfirmed}`);
+  }
   console.log(`  Freshness stamped:    ${stamped.length > 0 ? "yes" : "no"}`);
   console.log(`\nSample:`);
   for (const s of samples) console.log(s);
+  if (!NO_ESTIMATES && estimateSamples.length > 0) {
+    console.log(`\nEstimated next elections:`);
+    for (const s of estimateSamples) console.log(s);
+  }
 }
 
 main().catch((err) => {

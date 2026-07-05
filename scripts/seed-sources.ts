@@ -59,6 +59,25 @@ const SOURCES = [
     isCommercialUseAllowed: false,
     lastSyncAt: null,
   },
+  // --- Elections v2 — International IDEA Voter Turnout Database ---
+  // Per plan/elections-data-sourcing-resolution-v1.md §2c + owner-adopted Q1
+  // (accept the non-commercial posture, same class as ipu_parline).
+  // Bulk .xlsx export of all presidential + parliamentary turnout since 1945:
+  // https://www.idea.int/data-tools/export?type=region_only&themeId=293&world=all
+  // License: IDEA site-wide CC BY-NC-SA 4.0
+  // (https://www.idea.int/creative-commons-licence) — attribution required,
+  // NON-COMMERCIAL only. `scripts/sync-elections-turnout-idea.ts` matches rows
+  // onto our elections by ISO2 + type + nearest date, and stamps freshness via
+  // markSourcesSynced("international_idea", …). The sync also defensively
+  // upserts this row at start so a cron deploy without a fresh seed run works.
+  {
+    id: "international_idea",
+    name: "International IDEA Voter Turnout Database",
+    baseUrl: "https://www.idea.int/data-tools/data/voter-turnout-database",
+    license: "CC-BY-NC-SA-4.0",
+    isCommercialUseAllowed: false,
+    lastSyncAt: null,
+  },
   {
     id: "parlgov",
     name: "ParlGov",

@@ -20,6 +20,7 @@ export const SOURCE_NAMES: Record<string, string> = {
   wikidata: "Wikidata",
   cia_factbook: "CIA World Factbook",
   ipu_parline: "IPU Parline",
+  international_idea: "International IDEA",
   constitute_project: "Constitute Project",
   parlgov: "ParlGov",
   congress_gov: "Congress.gov",
@@ -80,6 +81,10 @@ export const FROZEN_SOURCES = new Set<string>([
   "constitute_project",
   "unodc",
   "civica_curated",
+  // International IDEA turnout is a periodically-updated bulk vintage (a sync
+  // run of a downloadable dataset, not a live feed) → amber, per the elections
+  // resolution's SourceDot posture (plan/elections-data-sourcing-resolution-v1.md §3).
+  "international_idea",
 ]);
 
 /** Human-readable display name for a source id (falls back to the id). */
