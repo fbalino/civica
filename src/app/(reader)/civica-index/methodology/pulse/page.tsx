@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
@@ -62,9 +63,7 @@ export default function PulseMethodologyPage() {
 
         <h1 className="editorial-page-title">
           Pulse methodology
-          {pulse.status === "beta" ? (
-            <span className="editorial-beta-tag">Beta</span>
-          ) : null}
+          {pulse.status === "beta" ? <BetaChip inHeading /> : null}
         </h1>
         <p className="editorial-page-subtitle">
           An event-sensitive governance shock monitor layered on top of the

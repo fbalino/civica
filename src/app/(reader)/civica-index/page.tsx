@@ -28,6 +28,7 @@ import { withOg } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildDataset } from "@/lib/seo/jsonld";
 import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
 
 export const revalidate = 3600;
@@ -309,13 +310,10 @@ export default async function CivicaIndexPage({
             sensitivity on top.
           </HeroRevealItem>
           <HeroRevealItem className="ci-hero-status">
-            <span
-              className="ci-beta-pill"
+            <BetaChip
               aria-label="Beta — methodology under active revision"
               title="Methodology under active revision. See methodology page for details."
-            >
-              Beta
-            </span>
+            />
             <span className="ci-hero-rework-note">
               Methodology under active revision —{" "}
               <Link href="/civica-index/methodology">see methodology</Link> for

@@ -39,25 +39,8 @@
   display: flex; align-items: center; gap: 10px;
   flex-wrap: wrap;
 }
-.ci-beta-pill {
-  /* The Beta tag is now the sand Chip (§2): sans, mixed-case "Beta", NOT mono,
-     NOT uppercase. Tonal sand wash on paper, same-hue low-alpha border,
-     darkened-hue text — matches .editorial-chip--sand. */
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-body);
-  font-weight: 500;
-  font-size: var(--text-12);
-  letter-spacing: 0;
-  text-transform: none;
-  color: color-mix(in oklab, var(--color-status-warning), black 32%);
-  padding: 3px 9px;
-  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
-  border-radius: var(--radius-chip);
-  line-height: 1.2;
-  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
-  white-space: nowrap;
-}
+/* The Beta tag is the <BetaChip> component (canonical sand <Chip>). The former
+   .ci-beta-pill class was removed when its call sites migrated. */
 .ci-hero-rework-note {
   font-family: var(--font-body);
   font-weight: var(--font-weight-regular);

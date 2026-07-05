@@ -121,8 +121,8 @@ function FilterMenu({
     <div style={{ position: "relative", minWidth: 210 }}>
       <div
         style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+          fontFamily: "var(--font-body)",
+          fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
           fontSize: "var(--text-12)",
           letterSpacing: "var(--tracking-caps)",
           textTransform: "uppercase",
@@ -164,7 +164,7 @@ function FilterMenu({
         </span>
         <span
           style={{
-            fontFamily: "var(--font-mono)",
+            fontFamily: "var(--font-body)",
             color: "var(--color-text-40)",
             transition: "transform 140ms ease",
             transform: open ? "rotate(180deg)" : "rotate(0deg)",
@@ -200,8 +200,8 @@ function FilterMenu({
           >
             <div
               style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontFamily: "var(--font-body)",
+                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
                 fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
@@ -218,8 +218,8 @@ function FilterMenu({
                 border: "none",
                 padding: 0,
                 cursor: "pointer",
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontFamily: "var(--font-body)",
+                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
                 fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
@@ -279,8 +279,8 @@ function TaxonomyGlossaryCard({
     >
       <div
         style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+          fontFamily: "var(--font-body)",
+          fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
           fontSize: "var(--text-12)",
           letterSpacing: "var(--tracking-caps)",
           textTransform: "uppercase",
@@ -475,8 +475,8 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
         <div style={{ marginBottom: 16 }}>
           <div
             style={{
-              fontFamily: "var(--font-mono)",
-              fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+              fontFamily: "var(--font-body)",
+              fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
               fontSize: "var(--text-28)",
               color: "var(--color-accent)",
               lineHeight: 1,
@@ -517,8 +517,8 @@ function DetailPanel({ detail, onClose, isDesktop }: DetailPanelProps) {
               borderRadius: "var(--radius-sm)",
               background: "var(--color-surface-elevated)",
               border: "1px solid var(--color-stat-border)",
-              fontFamily: "var(--font-mono)",
-              fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+              fontFamily: "var(--font-body)",
+              fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
               fontSize: "var(--text-13)",
               color: "var(--color-text-60)",
               marginBottom: 20,
@@ -981,8 +981,8 @@ export function OutcomesExplorer({
         >
           <div
             style={{
-              fontFamily: "var(--font-mono)",
-              fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+              fontFamily: "var(--font-body)",
+              fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
               fontSize: "var(--text-12)",
               letterSpacing: "0.12em",
               textTransform: "uppercase",
@@ -1042,8 +1042,8 @@ export function OutcomesExplorer({
           <div>
             <div
               style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontFamily: "var(--font-body)",
+                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
                 fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
@@ -1116,8 +1116,8 @@ export function OutcomesExplorer({
           <div>
             <div
               style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontFamily: "var(--font-body)",
+                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
                 fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
@@ -1149,8 +1149,8 @@ export function OutcomesExplorer({
           >
             <div
               style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontFamily: "var(--font-body)",
+                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
                 fontSize: "var(--text-12)",
                 letterSpacing: "var(--tracking-caps)",
                 textTransform: "uppercase",
@@ -1368,8 +1368,8 @@ export function OutcomesExplorer({
             </p>
             <p
               style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)" as React.CSSProperties["fontWeight"],
+                fontFamily: "var(--font-body)",
+                fontWeight: "var(--font-weight-medium)" as React.CSSProperties["fontWeight"],
                 fontSize: "var(--text-12)",
                 color: "var(--color-text-25)",
                 letterSpacing: "var(--tracking-caps)",

@@ -313,22 +313,8 @@
   color: var(--color-text-40);
   letter-spacing: var(--tracking-wide);
 }
-.factbook-reconciliation-notice__beta {
-  /* Sand Chip (§2): sans, mixed-case "Beta", NOT mono/uppercase. */
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
-  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
-  color: color-mix(in oklab, var(--color-status-warning), black 32%);
-  border-radius: var(--radius-chip);
-  padding: 1px 7px;
-  vertical-align: middle;
-}
+/* The inline "Beta" tag in the reconciliation notice is the <BetaChip>
+   component (canonical sand <Chip>). Its former dedicated class was removed. */
 .factbook-reconciliation-notice__link {
   color: var(--color-text-60);
   text-decoration: underline;
@@ -517,18 +503,8 @@
   text-transform: uppercase;
 }
 
-/* Mixed-case sand Chip (matches .ci-beta-pill / .factbook-reconciliation-notice__beta). */
-.factbook-drawer-beta__pill {
-  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
-  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
-  border-radius: var(--radius-chip);
-  color: color-mix(in oklab, var(--color-status-warning), black 32%);
-  padding: var(--space-1) var(--space-2);
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
+/* The AI drawer's "Beta" tag is the <BetaChip> component (canonical sand
+   <Chip>). Its former dedicated .factbook-drawer-beta__pill class was removed. */
 .factbook-drawer-beta__copy {
   white-space: nowrap;
 }

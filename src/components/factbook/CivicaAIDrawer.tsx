@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CivicaChatMessage } from "@/components/civica-chat/CivicaChatMessage";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { onCivicaAsk } from "@/lib/shell/events";
 
 interface Message {
@@ -386,7 +387,7 @@ export function CivicaAIDrawer({
           className="factbook-drawer-beta"
           aria-label="Civica AI is in beta. Verify important answers."
         >
-          <span className="factbook-drawer-beta__pill">Beta</span>
+          <BetaChip />
           <span className="factbook-drawer-beta__copy">
             Verify important answers
           </span>

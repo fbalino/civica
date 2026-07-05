@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { db } from "@/lib/db";
 import { jurisdictions } from "@/lib/db/schema";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import {
   getPulseV2Changelog,
   type PulseV2ChangelogRow,
@@ -83,9 +84,7 @@ export default async function PulseChangelogPage() {
 
       <h1 className="editorial-page-title">
         Pulse changelog
-        {pulse.status === "beta" ? (
-          <span className="editorial-beta-tag">Beta</span>
-        ) : null}
+        {pulse.status === "beta" ? <BetaChip inHeading /> : null}
       </h1>
       <p className="editorial-page-subtitle">
         Every governance event classified by the Civica Pulse Beta pipeline.

@@ -227,6 +227,41 @@ const nextConfig: NextConfig = {
         destination: "/country/methodology/reconciliation",
         permanent: true,
       },
+      // Intuitive-slug aliases for the Holy See. Its CIA Factbook name is
+      // "Holy See (Vatican City)", which the importer slugified to
+      // `holy-see-vatican-city` — the canonical URL. Readers reach for
+      // /country/vatican-city, /country/vatican, or /country/holy-see, all
+      // of which would otherwise 404. 308 to the canonical slug.
+      {
+        source: "/country/vatican-city",
+        destination: "/country/holy-see-vatican-city",
+        permanent: true,
+      },
+      {
+        source: "/country/vatican-city/:tab",
+        destination: "/country/holy-see-vatican-city/:tab",
+        permanent: true,
+      },
+      {
+        source: "/country/vatican",
+        destination: "/country/holy-see-vatican-city",
+        permanent: true,
+      },
+      {
+        source: "/country/vatican/:tab",
+        destination: "/country/holy-see-vatican-city/:tab",
+        permanent: true,
+      },
+      {
+        source: "/country/holy-see",
+        destination: "/country/holy-see-vatican-city",
+        permanent: true,
+      },
+      {
+        source: "/country/holy-see/:tab",
+        destination: "/country/holy-see-vatican-city/:tab",
+        permanent: true,
+      },
       // Phase 3d (structural_family removal) — top-level
       // /government-types and /government-types/[type] pages are
       // archived per the 2026-05-02 peer-grouping resolution. The

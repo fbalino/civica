@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 /*
  * Chip (component spec v1 §2) — tinted, fully rounded, SANS, MIXED-CASE.
@@ -66,6 +66,12 @@ interface ChipProps {
   variant?: ChipVariant;
   size?: ChipSize;
   className?: string;
+  /** Extra inline styles merged after the tonal recipe (e.g. positioning). */
+  style?: CSSProperties;
+  /** Accessible label, forwarded to the rendered element. */
+  "aria-label"?: string;
+  /** Native tooltip, forwarded to the rendered element. */
+  title?: string;
 }
 
 function chipStyle(tone: ChipTone, size: ChipSize) {
@@ -106,10 +112,18 @@ export function Chip({
   variant = "neutral",
   size = "sm",
   className,
+  style,
+  "aria-label": ariaLabel,
+  title,
 }: ChipProps) {
   const tone = VARIANT_TONE[variant];
   return (
-    <span className={className} style={chipStyle(tone, size)}>
+    <span
+      className={className}
+      style={{ ...chipStyle(tone, size), ...style }}
+      aria-label={ariaLabel}
+      title={title}
+    >
       {children}
     </span>
   );

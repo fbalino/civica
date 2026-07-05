@@ -194,26 +194,10 @@
 
 /* ── Inline Beta tag for headlines ──────────────────────────────── */
 
-.editorial-beta-tag {
-  /* The Beta tag is now the sand Chip (§2): sans, mixed-case "Beta", NOT mono,
-     NOT uppercase. Tonal sand wash on paper, same-hue low-alpha border,
-     darkened-hue text — the exact recipe used by .editorial-chip--sand. */
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  background: color-mix(in oklab, var(--color-status-warning) 16%, var(--color-page-bg));
-  border: 1px solid color-mix(in oklab, var(--color-status-warning) 32%, transparent);
-  color: color-mix(in oklab, var(--color-status-warning), black 32%);
-  border-radius: var(--radius-chip);
-  padding: 3px 9px;
-  white-space: nowrap;
-  vertical-align: middle;
-  margin-left: var(--space-3);
-}
+/* The site-wide Beta tag is the <BetaChip> component
+   (src/components/editorial/BetaChip.tsx), which renders the canonical sand
+   <Chip>. The former .editorial-beta-tag class (and its three siblings in
+   civica-index.css / factbook.css) was removed when all call sites migrated. */
 
 /* ── Warning callout (used for Beta disclosures, methodology
  *    caveats, etc. — companion to <Banner variant="warn">) ──────── */
@@ -969,7 +953,7 @@ legend.editorial-filter-label {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 3px 9px; /* 3px/9px — canonical chip padding (matches editorial-beta-tag, no exact space token) */
+  padding: 3px 9px; /* 3px/9px — canonical chip padding (matches the sand <Chip>, no exact space token) */
   background: var(--color-card-bg);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-sm);

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Banner } from "@/components/editorial/Banner";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
@@ -46,10 +47,10 @@ export default async function ReplicationPage() {
         </nav>
 
         <h1 className="editorial-page-title">
-          Replication package{" "}
-          <span className="editorial-beta-tag">
+          Replication package
+          <BetaChip inHeading>
             {REPLICATION_STATUS_LABEL[replication.status]}
-          </span>
+          </BetaChip>
         </h1>
         <p className="editorial-page-subtitle">
           Reproduce every Civica Index score from primary sources.

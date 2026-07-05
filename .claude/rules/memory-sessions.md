@@ -117,13 +117,15 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   populates env vars).
 
 ## Deferred / calendar-gated (do NOT "fix" unasked)
-- **Design-system "v2 palette fork"** — owner-deferred (see memory-decisions 2026-06-20). Code
-  uses Bronze/Parchment + soft shadows; DESIGN.md/CLAUDE.md/embed still describe the v1
-  cinnabar/hard-shadow look; the `--shadow-hard*` tokens are now soft. Don't reconcile until
-  the owner picks the canonical look.
+- **`--shadow-hard*` token naming** — owner-gated (see memory-decisions 2026-06-20). The palette
+  fork is reconciled: code, DESIGN.md, and the embed all use Parchment + terracotta + soft
+  shadows. Only the token NAMES still read "hard" while their values are soft. Don't rename
+  unasked.
 - **`structural_family` removal** — only Phase 6 remains, calendar-gated to **2027-03-31** (drop
   the columns + constants, 410 the legacy `/api/v1/government-types`). See memory-decisions
   2026-05-02.
 - **~18 near-identical factbook sync adapters** — DRY refactor deferred.
-- **Outcomes section** (peer-band graph) postponed pending peer-comparison methodology — slot
-  kept as a comment in `factbook/[slug]/page.tsx`.
+- **Country-page peer-band panel** — the site-wide conditions explorer shipped at
+  `/civica-conditions`; what remains deferred is the per-country outcome peer-band panel
+  (component built, unwired), pending the peer-comparison methodology extension to material
+  outcomes.

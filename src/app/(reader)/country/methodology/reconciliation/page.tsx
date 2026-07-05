@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
 import {
@@ -121,7 +122,7 @@ export default async function ReconciliationMethodologyPage() {
 
       <h1 className="editorial-page-title">
         Factbook Reconciliation
-        <span className="editorial-beta-tag">{reconciliation.version}</span>
+        <BetaChip inHeading>{reconciliation.version}</BetaChip>
       </h1>
       <p className="editorial-page-subtitle">
         How Civica picks one canonical value per country fact when

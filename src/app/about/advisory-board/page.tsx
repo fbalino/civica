@@ -5,6 +5,7 @@ import { advisoryBoardMembers } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Banner } from "@/components/editorial/Banner";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { advisoryBoard, civicaIndex } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -54,9 +55,9 @@ export default async function AdvisoryBoardPage() {
       <header>
         <h1 className="editorial-page-title">
           Advisory board
-          <span className="editorial-beta-tag">
+          <BetaChip inHeading>
             {ADVISORY_BOARD_STATUS_LABEL[advisoryBoard.status] ?? advisoryBoard.status}
-          </span>
+          </BetaChip>
         </h1>
         <p className="editorial-page-subtitle">
           Independent review for the Civica Index methodology.

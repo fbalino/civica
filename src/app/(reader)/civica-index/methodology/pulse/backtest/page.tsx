@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
@@ -394,9 +395,7 @@ export default async function BacktestReportPage() {
 
       <h1 className="editorial-page-title">
         Pulse backtest report
-        {pulse.status === "beta" ? (
-          <span className="editorial-beta-tag">Beta</span>
-        ) : null}
+        {pulse.status === "beta" ? <BetaChip inHeading /> : null}
       </h1>
       <p className="editorial-page-subtitle">
         How the Pulse Beta pipeline performs against named historical

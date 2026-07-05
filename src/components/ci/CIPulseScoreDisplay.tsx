@@ -14,6 +14,7 @@
 
 import { BAND_RANGES, type CIBand } from "@/lib/ci/bands";
 import { civicaIndex } from "@/lib/content/site-state";
+import { BetaChip } from "@/components/editorial/BetaChip";
 
 export interface CIScoreData {
   score: number;
@@ -187,13 +188,10 @@ function ScorePane({
             {title}
           </span>
           {civicaIndex.status === "beta" ? (
-            <span
-              className="ci-beta-pill"
+            <BetaChip
               aria-label="Beta — methodology under active revision"
               title="Methodology under active revision. See /civica-index/methodology for details."
-            >
-              Beta
-            </span>
+            />
           ) : null}
         </div>
         <span

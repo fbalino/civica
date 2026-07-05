@@ -23,6 +23,7 @@ import {
 import { FactbookHeaderStrip } from "@/components/factbook/FactbookHeaderStrip";
 import { CivicaAIDrawer } from "@/components/factbook/CivicaAIDrawer";
 import { CountryTabBar } from "@/components/country/CountryTabBar";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import type { LightboxImage } from "@/components/factbook/FactbookLightbox";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 import { classifyGovernment } from "@/lib/data/government-category";
@@ -238,9 +239,7 @@ export default async function CountryLayout({
             {reconciliation.status === "beta" ? (
               <>
                 {" "}
-                <span className="factbook-reconciliation-notice__beta">
-                  Beta
-                </span>
+                <BetaChip />
               </>
             ) : null}
             ).{" "}

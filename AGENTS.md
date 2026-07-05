@@ -20,7 +20,7 @@ Domain: `civicaatlas.org`.
 - **Academic legitimacy matters.** The Bjornskov-Rode / CGV regime taxonomy and BR/CGV attribution is already integrated — keep it prominent.
 
 ## Active plan
-Consult `~/.claude/plans/excellent-findings-thank-you-bubbly-kay.md` for the current phased roadmap (bug sweep → unified `/compare` → three-pane shell refactor → IA consolidation → widget gallery → legitimacy workstream).
+Consult `plan/civica-feature-roadmap-2026-06-30.md` for the current sequenced roadmap — it maps the remaining `mockups/` ideas onto the `/country/[slug]` 3-tab IA and the standalone surfaces (Atlas, Civica Index leaderboard, Compare, Elections, embed), in build-order waves.
 
 ## Tech Stack
 - **Next.js 16.2** (App Router, Turbopack, React 19.2)

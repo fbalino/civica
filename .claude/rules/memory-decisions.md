@@ -1,34 +1,23 @@
 # Project Memory Decisions
 
-## 2026-06-20 — Design-system "v2" visual fork is UNRESOLVED — pending owner decision (do not "fix" unasked)
+## 2026-06-20 — `--shadow-hard*` token NAMING is the last leftover of the v2 look — owner-gated (do not "fix" unasked)
 
-The 2026-06-20 blind audit found the live site silently migrated to a "v2"
-visual language that the canonical docs and the embed widget do NOT match —
-three diverging design systems:
-- **Live site** (globals.css): Bronze accent (#A87241), Parchment paper
-  (#FAF7F2), softened radii, and SOFT blurred shadows (the `--shadow-hard*`
-  tokens were redefined to soft layered shadows in both themes — the name now
-  lies).
-- **Docs** (DESIGN.md, CLAUDE.md, /design-system page copy): still describe the
-  v1 system — cinnabar accent, paper #f4f1ea, "hard offset shadows only, no
-  blur."
-- **Embed** (src/app/embed/[slug]/route.ts): still hand-defines the v1 palette
-  + TRUE hard-offset shadows, so an embedded Civica card looks materially
-  different from the same card on-site.
+The palette convergence the 2026-06-20 blind audit flagged has since landed: the
+live site (globals.css), DESIGN.md, and the embed widget
+(`src/app/embed/[slug]/route.ts`) now all use the same v2 language — Parchment
+paper `#FAF7F2`, terracotta accent `#B7512B`, soft navy-tinted shadows. The
+embed no longer hand-defines a divergent v1 palette or true hard-offset shadows.
 
-Owner (2026-06-20) explicitly deferred this: "I'm gonna have to look at it at
-some other point — just flag it and leave it." So: DO NOT reconcile or revert
-the palette/shadows until the owner picks which look is canonical. When he
-decides, the fix is: make code + DESIGN.md + CLAUDE.md + the embed route + the
-/design-system page all agree, and rename `--shadow-hard*` if soft is kept.
-Until then, an auditor reviewing code against DESIGN.md will see false "drift"
-on correct v2 code, and vice-versa — this entry is the disambiguator.
+The ONE remaining leftover is cosmetic and owner-gated: the `--shadow-hard*`
+token NAMES still read "hard" while their VALUES are soft (`0 1px 2px
+rgba(15,23,42,.06)`). Renaming them is deferred until the owner signs off (DESIGN.md
+notes "a rename is pending in a later pass"). Do NOT rename or reconcile the token
+names unasked; the values are already correct everywhere.
 
-(Also deferred, lower priority: the "rankings dedup" item = getCountryRankings/
-rankCountriesByFact rank over country_facts without a status='active' / one-row-
-per-(jurisdiction,fact_key) dedup. Latent only — those ranking keys are
-single-source today, so no current double-count; revisit if a ranking fact-key
-ever gains a second source. queries.ts:120, :251.)
+(The former "rankings dedup" caveat is RESOLVED: both `rankCountriesByFact`
+(queries.ts:120) and `getCountryRankings` (queries.ts:289) now select
+`DISTINCT ON (jurisdiction_id, fact_key)` over `country_facts`, so a second
+source row can never double-count a country in a ranking.)
 
 ## 2026-05-02 — `structural_family` retirement adopted; domain-specific peer lenses replace it
 

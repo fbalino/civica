@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { FACTBOOK_RECONCILIATION_META } from "@/lib/factbook/reconcile/api";
 import {
@@ -50,9 +51,7 @@ export default async function PublicDisputesPage() {
 
       <h1 className="editorial-page-title">
         Data disputes
-        {reconciliation.status === "beta" ? (
-          <span className="editorial-beta-tag">Beta</span>
-        ) : null}
+        {reconciliation.status === "beta" ? <BetaChip inHeading /> : null}
       </h1>
       <p className="editorial-page-subtitle">
         Public read-only log of conflicts the resolver flagged across the

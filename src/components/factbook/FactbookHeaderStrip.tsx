@@ -8,6 +8,7 @@ import { FactbookLightbox, type LightboxImage } from "./FactbookLightbox";
 import { FactValueDot } from "./FactValueDot";
 import { CountryMapTile } from "./CountryMapTile";
 import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import { BetaChip } from "@/components/editorial/BetaChip";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import type { CountryBounds } from "@/lib/data/country-bounds";
 import { ciTier } from "@/lib/ci/tiers";
@@ -74,12 +75,9 @@ function MetaPill({
 
 function BetaTag() {
   return (
-    <span
-      className="ci-beta-pill"
+    <BetaChip
       style={{ marginLeft: "var(--space-1)", alignSelf: "center", lineHeight: 1 }}
-    >
-      Beta
-    </span>
+    />
   );
 }
 

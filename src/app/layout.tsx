@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Source_Serif_4, Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { GlobalSearchWrapper } from "@/components/GlobalSearchWrapper";
-import { CivicaLogo } from "@/components/CivicaLogo";
+import { CivicaLogo, CivicaLogoSprite } from "@/components/CivicaLogo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { DevDesignMount } from "@/components/dev/DevDesignMount";
@@ -100,6 +100,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        {/* The Civica mark geometry, emitted once per document as a hidden
+            <symbol>. Every <CivicaLogo> below is a lightweight <use> reference,
+            so the ~228 KB vector is inlined once instead of ~3× per view. */}
+        <CivicaLogoSprite />
         {/* Site-wide structured data: publisher Organization + WebSite. One
             <script type="application/ld+json"> per node. Next injects the
             metadata tags into <head> itself. */}
