@@ -55,6 +55,17 @@ export function ReaderSidebar({
                 href={`#${item.id}`}
                 className={`reader-sidebar-link${isActive ? " is-active" : ""}`}
                 onClick={(e) => {
+                  // Only intercept a plain left-click. Modifier/middle clicks
+                  // (open-in-new-tab, new-window, download) keep native behavior.
+                  if (
+                    e.metaKey ||
+                    e.ctrlKey ||
+                    e.shiftKey ||
+                    e.altKey ||
+                    e.button !== 0
+                  ) {
+                    return;
+                  }
                   e.preventDefault();
                   const el = document.getElementById(item.id);
                   if (!el) return;

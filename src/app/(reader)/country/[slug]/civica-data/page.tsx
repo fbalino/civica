@@ -49,14 +49,14 @@ export async function generateMetadata({
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) return { title: "Country Not Found" };
   const title = `${jurisdiction.name} — Civica Index & Governance Data`;
-  const description = `Civica Index score, governance dimensions, legislature, leaders, bills and international memberships for ${jurisdiction.name}.`;
+  const description = `The Civica Index score, governance dimensions, legislature, leaders, bills, and international memberships for ${jurisdiction.name}, with full source provenance.`;
   const url = `https://civicaatlas.org/country/${slug}/civica-data`;
   return {
     title,
     description,
     alternates: { canonical: url },
     openGraph: withOg({
-      title: `${title} | Civica`,
+      title: `${title} · Civica Atlas`,
       description,
       url,
       type: "website",
@@ -76,15 +76,17 @@ export async function generateMetadata({
 //   6. Organizations   — international memberships footprint.
 //   7. Rankings        — curated scores & rankings.
 //
-// LAYOUT (rebuilt): a master–detail shell — a sticky left section nav +
-// a full-width content pane that shows ONE section at a time
-// (<CivicaDataSections>). The old narrow main column + right rail are gone;
-// per-section provenance now lives in a compact "Sources" strip at the foot
-// of each section. Every section is visibility-gated upfront so the nav
-// never lists a phantom entry. The masthead, tab bar, reconciliation notice,
-// and AI drawer live in the shared layout. The "jump to country" search + its
-// sticky-bar handoff render here via <CountryJumpSearch> — a normal-flow field
-// above the shell that scrolls away, so the sticky bar never shows alongside it.
+// LAYOUT: a factbook-style stacked scroll (<CivicaDataSections>). Every visible
+// section renders one after another in a single scroll column — nothing hidden,
+// all of it in the DOM and on screen. A sticky left nav (numbered 01–07) is
+// scroll-spy anchor navigation: the active entry follows the scroll, and a click
+// smooth-scrolls to that section. Each section opens with a numbered chapter
+// header, then its body, then a compact "Sources" provenance strip. Every
+// section is visibility-gated upfront so the nav never lists a phantom entry.
+// The masthead, tab bar, reconciliation notice, and AI drawer live in the shared
+// layout. The "jump to country" search + its sticky-bar handoff render here via
+// <CountryJumpSearch> — a normal-flow field above the shell that scrolls away,
+// so the sticky bar never shows alongside it.
 
 type SectionId =
   | "civica-index"
@@ -346,8 +348,10 @@ export default async function CountryCivicaDataTab({
     government: orgChart ? (
       <>
         <div className="civica-data-gov-structure">
-          <p className="civica-data-gov-eyebrow">Civica · structure</p>
-          <h3 className="civica-data-gov-heading">How power is organised</h3>
+          <p className="civica-data-gov-dek">
+            How power is organised — the offices, bodies, and current
+            officeholders.
+          </p>
           <FactbookGovOrgChart
             chart={orgChart}
             countryName={jurisdiction.name}
@@ -444,7 +448,7 @@ export default async function CountryCivicaDataTab({
   return (
     <div className="civica-data-body">
       {/* In-content country search + sticky-bar handoff. A normal-flow field
-       *  ABOVE the master–detail shell, so it scrolls away; the shared sticky
+       *  ABOVE the stacked-scroll shell, so it scrolls away; the shared sticky
        *  bar reveals only once it's out of view (never both). The section nav
        *  below stays sticky but no longer holds its own search. */}
       <CountryJumpSearch

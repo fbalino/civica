@@ -1,11 +1,13 @@
 /*
  * Civica Data tab — /country/[slug]/civica-data
  *
- * LAYOUT (rebuilt): a master–detail shell. A sticky left section nav
- * (`.civica-data-nav`) + a full-width content pane (`.civica-data-pane`)
- * that shows ONE section at a time. The old narrow `.factbook-main` column
- * and the `<FactbookRightRail>` are gone, so each section now owns the full
- * reading width and carries its own compact Sources strip at the foot.
+ * LAYOUT: a factbook-style stacked scroll. A sticky left section nav
+ * (`.civica-data-nav`) + a single content column (`.civica-data-pane`) that
+ * lists EVERY visible section one after another — nothing hidden, all of it in
+ * the DOM and on screen. The nav is scroll-spy anchor navigation (active entry
+ * follows the scroll; click smooth-scrolls to the section). Each section opens
+ * with a numbered chapter header, then its body, then a compact Sources strip.
+ * Mirrors the Factbook tab's reader layout.
  *
  * Imported by the page directly (not globally) — it is the only surface that
  * needs these rules. Tokens only, no hardcoded values.
@@ -23,7 +25,7 @@
 }
 
 /* ----------------------------------------------------------------
- * Master–detail shell — sticky nav (left) + content pane (right).
+ * Stacked-scroll shell — sticky nav (left) + one scroll column (right).
  * ---------------------------------------------------------------- */
 .civica-data-shell {
   display: grid;
@@ -62,7 +64,6 @@
   gap: var(--space-3);
   width: 100%;
   padding: var(--space-3) var(--space-4);
-  border: 0;
   border-left: 2px solid transparent;
   background: transparent;
   color: var(--color-text-60);
@@ -70,6 +71,7 @@
   font-size: var(--text-15);
   line-height: var(--leading-normal);
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition: color var(--motion-fast) var(--motion-ease-out),
     background var(--motion-fast) var(--motion-ease-out);
@@ -103,15 +105,52 @@
   min-width: 0;
 }
 
-/* ── Right content pane ────────────────────────────────────────── */
+/* ── Scroll column — every section stacked ─────────────────────── */
 .civica-data-pane {
   min-width: 0;
 }
-.civica-data-panel {
+
+/* Each section is a chapter in the scroll. Hairline rules between them give
+ * the long column visible chapter boundaries; `scroll-margin-top` keeps an
+ * anchor jump from landing under the fixed header. Mirrors `.factbook-section`. */
+.civica-data-section {
   min-width: 0;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-7);
+  border-bottom: 1px solid var(--color-stat-border);
+  scroll-margin-top: calc(var(--header-height) + var(--space-5));
 }
-.civica-data-panel[hidden] {
-  display: none;
+.civica-data-section:first-child {
+  padding-top: 0;
+}
+.civica-data-section:last-child {
+  border-bottom: 0;
+}
+
+/* Numbered chapter header — eyebrow ("01 · Civica Index") + serif title, in the
+ * same register the Factbook tab uses to announce its numbered sections. */
+.civica-data-section-header {
+  margin-bottom: var(--space-6);
+}
+.civica-data-section-eyebrow {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-12);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-3);
+}
+.civica-data-section-num {
+  font-variant-numeric: tabular-nums;
+}
+.civica-data-section-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: var(--tracking-tighter);
+  color: var(--color-text-primary);
 }
 
 /* ----------------------------------------------------------------
@@ -309,30 +348,30 @@
 }
 
 /* ----------------------------------------------------------------
- * Government — "How power is organised" org-chart block
+ * Government — "How power is organised" org-chart block. The numbered
+ * chapter header supplies the section title; this wrapper only spaces the
+ * chart within the section.
  * ---------------------------------------------------------------- */
 .civica-data-gov-structure {
   margin-bottom: var(--space-7);
-  scroll-margin-top: calc(56px + var(--space-5));
 }
-.civica-data-gov-eyebrow {
+
+/* One-line muted framing under the numbered chapter header, matching the
+ * register the Factbook tab uses for section deks. */
+.civica-data-gov-dek {
   font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
-  color: var(--color-accent);
-  margin: 0 0 var(--space-3);
-}
-.civica-data-gov-heading {
-  font-family: var(--font-heading);
-  font-size: var(--text-20);
-  font-weight: 400;
-  margin: 0 0 var(--space-4);
+  font-size: var(--text-15);
+  line-height: var(--leading-normal);
+  color: var(--color-text-60);
+  margin: 0 0 var(--space-5);
 }
 
 /* ----------------------------------------------------------------
- * Tablet / mobile — nav stacks above the pane as a horizontal scroller.
+ * Tablet / mobile — single column. The nav collapses to a static, bordered
+ * "On this page" panel above the stacked sections, mirroring how the Factbook
+ * tab's `.factbook-sidebar` behaves on narrow screens (not sticky — a tall
+ * list would otherwise pin half the screen). The numbered vertical list and
+ * its scroll-spy active state are unchanged.
  * ---------------------------------------------------------------- */
 @media (max-width: 900px) {
   .civica-data-shell {
@@ -341,25 +380,12 @@
   }
   .civica-data-nav {
     position: static;
+    border: 1px solid var(--color-stat-border);
+    padding: var(--space-4);
+    background: color-mix(in oklab, var(--color-text-primary) 2%, transparent);
   }
   .civica-data-nav-eyebrow {
     padding: 0;
-  }
-  .civica-data-nav-list {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
-  .civica-data-nav-link {
-    width: auto;
-    border-left: 0;
-    border: 1px solid var(--color-card-border);
-    border-radius: var(--radius-sm);
-    padding: var(--space-2) var(--space-3);
-  }
-  .civica-data-nav-link.is-active {
-    border-color: var(--color-accent);
-    background: color-mix(in oklab, var(--color-accent) 8%, var(--color-page-bg));
   }
 }
 
