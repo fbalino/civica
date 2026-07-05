@@ -1,0 +1,976 @@
+/* ============================================================================
+ * Civica Admin — single stylesheet for the operator workspace.
+ *
+ * OWNER MANDATE: everything follows the design system. Every value below is a
+ * design token (var(--color-*), var(--space-*), var(--text-*), var(--font-*),
+ * var(--radius-*)). No hex / rgb / px font sizes / raw font-family — the
+ * validate:design-tokens gate must stay clean.
+ *
+ * Scope: `.admin-*` classes only. Imported once from (admin)/layout.tsx so the
+ * whole admin route group shares one chrome. Both light + dark themes inherit
+ * automatically because only role tokens are referenced.
+ *
+ * The admin shell renders *below* the site header (root layout owns that) as
+ * its own bordered workspace: a wordmark bar, a sticky left nav with live
+ * count badges, and a 1200px content column.
+ * ========================================================================== */
+
+/* ── Shell layout ─────────────────────────────────────────────────────────── */
+
+.admin-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  color: var(--color-text-primary);
+}
+
+.admin-shell-grid {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: start;
+}
+
+/* ── Wordmark bar (Civica Admin) ──────────────────────────────────────────── */
+
+.admin-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--color-border-default);
+  margin-bottom: var(--space-7);
+}
+
+.admin-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: inherit;
+}
+
+.admin-wordmark-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1;
+}
+
+.admin-wordmark-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--color-text-muted);
+}
+
+.admin-wordmark-name {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+}
+
+.admin-masthead-right {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.admin-reviewer {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+}
+
+.admin-reviewer-label {
+  font-size: var(--text-12);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+}
+
+.admin-reviewer-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+/* ── Left nav ─────────────────────────────────────────────────────────────── */
+
+.admin-nav {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-5));
+  align-self: start;
+  min-width: 0;
+}
+
+.admin-nav-title {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wider);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-4);
+  padding: 0 var(--space-4);
+}
+
+.admin-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-left: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: var(--leading-normal);
+  text-decoration: none;
+  transition: color var(--motion-fast) var(--motion-ease),
+    background var(--motion-fast) var(--motion-ease);
+}
+
+.admin-nav-link:hover {
+  color: var(--color-text-primary);
+  background: color-mix(in oklab, var(--color-text-primary) 4%, transparent);
+}
+
+.admin-nav-link.is-active {
+  border-left-color: var(--color-accent);
+  color: var(--color-text-primary);
+  background: color-mix(in oklab, var(--color-accent) 7%, transparent);
+  font-weight: var(--font-weight-medium);
+}
+
+.admin-nav-label {
+  min-width: 0;
+}
+
+/* Count badge — a compact numeric chip. Neutral by default; accent tone when
+ * items need attention (pending / new). Fully rounded like the Chip primitive. */
+.admin-nav-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-6);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-chip);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-normal);
+  border: 1px solid var(--color-card-border);
+  background: var(--color-page-bg);
+  color: var(--color-text-secondary);
+}
+
+.admin-nav-count--attention {
+  border-color: color-mix(in oklab, var(--color-accent) 32%, transparent);
+  background: color-mix(in oklab, var(--color-accent) 16%, var(--color-page-bg));
+  color: color-mix(in oklab, var(--color-accent), black 32%);
+}
+
+.admin-nav-count--zero {
+  color: var(--color-text-muted);
+}
+
+/* Secondary nav (audit log etc.) — quieter than the primary sections. */
+.admin-nav-secondary {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border-default);
+}
+
+/* ── Content column ───────────────────────────────────────────────────────── */
+
+.admin-content {
+  min-width: 0;
+  padding-bottom: var(--space-9);
+}
+
+.admin-page-head {
+  margin-bottom: var(--space-6);
+}
+
+.admin-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.admin-breadcrumbs a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.admin-breadcrumbs a:hover {
+  color: var(--color-text-primary);
+}
+
+.admin-breadcrumbs-sep {
+  color: var(--color-text-muted);
+}
+
+.admin-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-36);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-3);
+}
+
+.admin-subtitle {
+  font-family: var(--font-body);
+  font-size: var(--text-16);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-4);
+  max-width: 68ch;
+}
+
+.admin-subtitle a {
+  color: var(--color-accent);
+}
+
+.admin-subtitle code {
+  font-family: var(--font-code);
+  font-size: var(--text-13);
+}
+
+.admin-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-6);
+}
+
+.admin-meta-sep {
+  color: var(--color-text-muted);
+}
+
+.admin-meta a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.admin-meta .admin-meta-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Filter row (canonical editorial chips) ───────────────────────────────── */
+
+.admin-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.admin-filter-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.admin-filter-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+  margin-right: var(--space-2);
+  min-width: var(--space-9);
+}
+
+.admin-filter-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+/* ── Data table (extends the editorial-data-table primitive) ──────────────── */
+
+.admin-table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
+  margin-bottom: var(--space-6);
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Whole-row link cells: the anchor fills the cell so the row reads as clickable
+ * while remaining real, keyboard-focusable links. */
+.admin-table tbody tr {
+  cursor: pointer;
+}
+
+.admin-table tbody tr:hover td {
+  background: color-mix(in oklab, var(--color-text-primary) 3%, transparent);
+}
+
+.admin-row-link {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+}
+
+.admin-row-primary {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.admin-row-secondary {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.admin-cell-date {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+}
+
+.admin-cell-chips {
+  display: inline-flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.admin-cell-dots {
+  display: inline-flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+
+.admin-cell-arrow {
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ── Empty state (editorial-empty register) ───────────────────────────────── */
+
+.admin-empty {
+  border: 1px dashed var(--color-border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8) var(--space-6);
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.admin-empty strong {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+/* ── Pagination ───────────────────────────────────────────────────────────── */
+
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.admin-pagination a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.admin-pagination span[aria-hidden] {
+  color: var(--color-text-muted);
+}
+
+/* ── Detail surfaces ──────────────────────────────────────────────────────── */
+
+.admin-card {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard);
+  background: var(--color-surface-primary);
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.admin-card--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-section {
+  margin-bottom: var(--space-7);
+}
+
+.admin-section-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-20);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-3);
+}
+
+.admin-section-intro {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-4);
+  max-width: 72ch;
+}
+
+.admin-section-intro code {
+  font-family: var(--font-code);
+  font-size: var(--text-13);
+}
+
+/* Two-column fact grid (dispute A/B, message header, etc.) */
+.admin-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.admin-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-2);
+}
+
+.admin-fact-value {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  line-height: var(--leading-tight);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+  word-break: break-word;
+}
+
+.admin-fact-note {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+/* Definition-style key/value rows (message + submitter metadata). */
+.admin-kv {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-3) var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+}
+
+.admin-kv dt {
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+  align-self: baseline;
+  padding-top: 2px;
+}
+
+.admin-kv dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  min-width: 0;
+  word-break: break-word;
+}
+
+.admin-kv dd a {
+  color: var(--color-accent);
+}
+
+/* Long prose block (message body, source description). */
+.admin-prose {
+  font-family: var(--font-body);
+  font-size: var(--text-16);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.admin-prose-muted {
+  color: var(--color-text-secondary);
+}
+
+/* Callout note (banner-adjacent, quieter). */
+.admin-note {
+  border: 1px solid var(--color-border-default);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--color-accent) 5%, var(--color-surface-primary));
+  padding: var(--space-4) var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
+
+.admin-note strong {
+  color: var(--color-text-primary);
+}
+
+.admin-note code {
+  font-family: var(--font-code);
+  font-size: var(--text-13);
+}
+
+/* ── Forms (decision panels) ──────────────────────────────────────────────── */
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.admin-field-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+}
+
+.admin-input,
+.admin-select,
+.admin-textarea {
+  font-family: var(--font-body);
+  font-size: max(16px, 1rem);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-page-bg);
+  color: var(--color-text-primary);
+  width: 100%;
+}
+
+.admin-input:focus-visible,
+.admin-select:focus-visible,
+.admin-textarea:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+}
+
+.admin-textarea {
+  resize: vertical;
+  min-height: calc(var(--space-9) * 2);
+  line-height: var(--leading-relaxed);
+}
+
+.admin-input-inline {
+  font-family: var(--font-body);
+  font-size: max(16px, 1rem);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-page-bg);
+  color: var(--color-text-primary);
+}
+
+.admin-grid-form {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-4);
+  align-items: center;
+}
+
+.admin-grid-form .admin-field-label {
+  justify-self: start;
+}
+
+.admin-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Semantic button tones for decision panels. The `.btn` system has no
+ * danger/success variant, so these admin-scoped modifiers layer a tinted
+ * fill + matching border onto `.btn` using status tokens only. Destructive
+ * (reject) → danger; affirmative (approve / resolve) → success. */
+.btn.admin-btn-danger {
+  border-color: color-mix(in oklab, var(--color-status-danger) 40%, transparent);
+  background: color-mix(in oklab, var(--color-status-danger) 14%, var(--color-page-bg));
+  color: color-mix(in oklab, var(--color-status-danger), black 28%);
+}
+
+.btn.admin-btn-danger:hover {
+  background: color-mix(in oklab, var(--color-status-danger) 22%, var(--color-page-bg));
+}
+
+.btn.admin-btn-success {
+  border-color: color-mix(in oklab, var(--color-status-success) 40%, transparent);
+  background: color-mix(in oklab, var(--color-status-success) 16%, var(--color-page-bg));
+  color: color-mix(in oklab, var(--color-status-success), black 30%);
+}
+
+.btn.admin-btn-success:hover {
+  background: color-mix(in oklab, var(--color-status-success) 24%, var(--color-page-bg));
+}
+
+.btn.admin-btn-accent {
+  border-color: color-mix(in oklab, var(--color-accent) 40%, transparent);
+  background: color-mix(in oklab, var(--color-accent) 14%, var(--color-page-bg));
+  color: color-mix(in oklab, var(--color-accent), black 30%);
+}
+
+.btn.admin-btn-accent:hover {
+  background: color-mix(in oklab, var(--color-accent) 22%, var(--color-page-bg));
+}
+
+.btn.admin-btn-danger:disabled,
+.btn.admin-btn-success:disabled,
+.btn.admin-btn-accent:disabled {
+  opacity: 0.5;
+}
+
+.admin-actions--full {
+  grid-column: 1 / -1;
+  margin-top: var(--space-2);
+}
+
+.admin-action-form {
+  display: inline-flex;
+  margin: 0;
+}
+
+.admin-hint {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-muted);
+  margin: var(--space-2) 0 0;
+}
+
+/* ── Audit timeline ───────────────────────────────────────────────────────── */
+
+.admin-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.admin-timeline-item {
+  border-left: 2px solid var(--color-border-default);
+  padding-left: var(--space-4);
+}
+
+.admin-timeline-meta {
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  flex-wrap: wrap;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-timeline-actor {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.admin-timeline-headline {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  color: var(--color-text-primary);
+  margin-top: 2px;
+}
+
+.admin-timeline-notes {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Sources / list cards inside detail ───────────────────────────────────── */
+
+.admin-source-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.admin-source-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+}
+
+.admin-source-item strong {
+  color: var(--color-text-primary);
+}
+
+.admin-source-link {
+  margin-left: auto;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.admin-runs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-3);
+}
+
+.admin-run-card {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-primary);
+  padding: var(--space-4);
+}
+
+.admin-run-head {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.admin-run-category {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.admin-run-chips {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.admin-run-rationale {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+  line-height: var(--leading-normal);
+}
+
+.admin-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  margin-bottom: var(--space-4);
+}
+
+.admin-back-link:hover {
+  color: var(--color-text-primary);
+}
+
+/* ── Sign-in card ─────────────────────────────────────────────────────────── */
+
+.admin-signin-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - var(--header-height) * 4);
+  padding: var(--space-8) var(--space-5);
+}
+
+.admin-signin-card {
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard-lg);
+  background: var(--color-surface-primary);
+  padding: var(--space-8);
+}
+
+.admin-signin-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  text-align: center;
+}
+
+.admin-signin-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--color-text-muted);
+}
+
+.admin-signin-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-28);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.admin-signin-lede {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: 0 0 var(--space-6);
+}
+
+.admin-signin-error {
+  margin-bottom: var(--space-5);
+}
+
+.admin-signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.admin-signin-form .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .admin-shell-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .admin-nav {
+    position: static;
+  }
+
+  .admin-nav-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .admin-nav-link {
+    border-left: 0;
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-chip);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .admin-nav-link.is-active {
+    border-color: color-mix(in oklab, var(--color-accent) 40%, transparent);
+  }
+
+  .admin-nav-secondary {
+    margin-top: var(--space-3);
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .admin-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-grid-form {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .admin-grid-form .admin-field-label {
+    margin-top: var(--space-3);
+  }
+}

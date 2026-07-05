@@ -1,14 +1,25 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getAdminSession } from "@/lib/admin/session";
+import { getAdminCounts } from "@/lib/admin/counts";
+import { CivicaLogo } from "@/components/CivicaLogo";
+import { AdminNav } from "./AdminNav";
+import "@/app/admin.css";
 
 /**
- * Phase 5.7 — admin chrome.
+ * Admin shell.
  *
- * Wraps every (admin)/* route with a thin status bar and a session
- * check. If no admin session is present, the layout redirects to
- * /admin/sign-in (which lives OUTSIDE the (admin) route group so it
- * doesn't trigger this redirect itself).
+ * One chrome for every `(admin)/*` route: a "Civica Admin" wordmark bar, a
+ * sticky left nav with live count badges, and a 1200px content column. The
+ * layout is a server component — it runs the session gate and fetches the nav
+ * counts; the nav itself is a thin client component (active-link highlighting).
+ *
+ * Auth is unchanged: if there's no valid admin session the layout redirects to
+ * /admin/sign-in (which lives OUTSIDE this route group, so it never triggers
+ * this redirect on itself). The session semantics live in
+ * `src/lib/admin/session.ts` and are deliberately untouched.
+ *
+ * All styling is in `.admin-*` classes (admin.css); this file composes them.
  */
 export default async function AdminLayout({
   children,
@@ -18,92 +29,36 @@ export default async function AdminLayout({
   const session = await getAdminSession();
   if (!session) redirect("/admin/sign-in");
 
+  const counts = await getAdminCounts();
+
   return (
-    <div>
-      <div
-        style={{
-          background: "var(--color-card-bg)",
-          borderBottom: "1px solid var(--color-card-border)",
-          padding: "10px 24px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
-          flexWrap: "wrap",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-12)",
-          fontWeight: "var(--font-weight-mono)",
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          color: "var(--color-text-40)",
-        }}
-      >
-        <div style={{ display: "inline-flex", gap: 16, alignItems: "center" }}>
-          <Link
-            href="/admin/pulse-review"
-            style={{
-              color: "var(--color-status-warning)",
-              textDecoration: "none",
-            }}
-          >
-            Pulse review
-          </Link>
-          <span aria-hidden style={{ color: "var(--color-text-40)" }}>
-            ·
+    <div className="admin-shell">
+      <div className="admin-masthead">
+        <Link href="/admin/pulse-review" className="admin-wordmark">
+          <CivicaLogo size={32} />
+          <span className="admin-wordmark-text">
+            <span className="admin-wordmark-eyebrow">Civica</span>
+            <span className="admin-wordmark-name">Admin</span>
           </span>
-          <Link
-            href="/admin/data-disputes"
-            style={{
-              color: "var(--color-text-60)",
-              textDecoration: "none",
-            }}
-          >
-            Data disputes
-          </Link>
-          <span aria-hidden style={{ color: "var(--color-text-40)" }}>
-            ·
+        </Link>
+
+        <div className="admin-masthead-right">
+          <span className="admin-reviewer">
+            <span className="admin-reviewer-label">Reviewer</span>
+            <span className="admin-reviewer-name">{session.reviewerId}</span>
           </span>
-          <Link
-            href="/admin/data-disputes/audit"
-            style={{
-              color: "var(--color-text-60)",
-              textDecoration: "none",
-            }}
-          >
-            Audit log
-          </Link>
-          <span aria-hidden style={{ color: "var(--color-text-40)" }}>
-            ·
-          </span>
-          <Link
-            href="/admin/advisory-applications"
-            style={{
-              color: "var(--color-text-60)",
-              textDecoration: "none",
-            }}
-          >
-            Advisory applications
-          </Link>
-        </div>
-        <div
-          style={{
-            display: "inline-flex",
-            gap: 16,
-            alignItems: "center",
-          }}
-        >
-          <span>Reviewer: {session.reviewerId}</span>
           <form action="/api/admin/sign-out" method="post">
-            <button
-              type="submit"
-              className="btn btn--secondary btn--sm"
-            >
+            <button type="submit" className="btn btn--secondary btn--sm">
               Sign out
             </button>
           </form>
         </div>
       </div>
-      {children}
+
+      <div className="admin-shell-grid">
+        <AdminNav counts={counts} />
+        <div className="admin-content">{children}</div>
+      </div>
     </div>
   );
 }

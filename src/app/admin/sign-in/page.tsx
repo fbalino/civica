@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { CivicaLogo } from "@/components/CivicaLogo";
+import { Banner } from "@/components/editorial/Banner";
 import { getAdminSession } from "@/lib/admin/session";
+import "@/app/admin.css";
 
 export const metadata: Metadata = {
   title: "Admin sign-in",
@@ -12,121 +14,96 @@ interface PageProps {
   searchParams: Promise<{ error?: string; redirect?: string }>;
 }
 
+/**
+ * Admin sign-in.
+ *
+ * A centered card (hairline border, --radius-lg, soft shadow) with the Civica
+ * mark, canonical rounded inputs, and a primary Button. The auth flow is
+ * unchanged underneath: the form POSTs the reviewer name + ADMIN_API_KEY to
+ * /api/admin/session, which constant-time-verifies the token and sets the
+ * HttpOnly session cookie. On a bad token that route redirects back here with
+ * ?error=1, surfaced via the danger Banner.
+ *
+ * This page sits OUTSIDE the (admin) route group so it doesn't inherit the
+ * admin shell (or its session redirect). It imports admin.css directly for the
+ * card classes.
+ */
 export default async function AdminSignInPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const session = await getAdminSession();
   if (session) redirect(params.redirect ?? "/admin/pulse-review");
 
   const error = params.error === "1";
-  const redirectAfter = params.redirect ?? "/admin/pulse-review";
+  const redirectAfter =
+    params.redirect && params.redirect.startsWith("/")
+      ? params.redirect
+      : "/admin/pulse-review";
 
   return (
-    <EditorialPage>
-      <h1 className="editorial-page-title">Admin sign-in</h1>
-      <p className="editorial-page-subtitle">
-        Internal Pulse review queue. Operators with the ADMIN_API_KEY can
-        sign in to review queued events.
-      </p>
-
-      {error ? (
-        <div
-          className="editorial-warning"
-          role="alert"
-          style={{
-            background:
-              "color-mix(in oklch, var(--tier-failed) 10%, var(--color-page-bg) 90%)",
-            borderColor: "var(--tier-failed)",
-          }}
-        >
-          Token did not match. Try again.
+    <div className="admin-signin-wrap">
+      <div className="admin-signin-card">
+        <div className="admin-signin-brand">
+          <CivicaLogo size={44} />
+          <span className="admin-signin-eyebrow">Civica Admin</span>
+          <h1 className="admin-signin-title">Sign in</h1>
         </div>
-      ) : null}
 
-      <form
-        action="/api/admin/session"
-        method="post"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "var(--space-4)",
-          maxWidth: 480,
-          marginTop: "var(--space-4)",
-        }}
-      >
-        <input type="hidden" name="redirect" value={redirectAfter} />
+        <p className="admin-signin-lede">
+          Operator access to the review queues. Sign in with the shared admin
+          key to triage Pulse events, data disputes, applications, and
+          messages.
+        </p>
 
-        <label
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-12)",
-            fontWeight: "var(--font-weight-mono)",
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            color: "var(--color-text-40)",
-          }}
+        {error ? (
+          <Banner variant="danger" className="admin-signin-error">
+            That admin key did not match. Check the key and try again.
+          </Banner>
+        ) : null}
+
+        <form
+          action="/api/admin/session"
+          method="post"
+          className="admin-signin-form"
         >
-          Reviewer name
-          <input
-            type="text"
-            name="reviewerName"
-            placeholder="e.g. Fernando"
-            required
-            style={{
-              padding: "8px 10px",
-              fontFamily: "var(--font-body)",
-              fontSize: "var(--text-15)",
-              border: "1px solid var(--color-card-border)",
-              borderRadius: "var(--radius-sm)",
-              background: "var(--color-page-bg)",
-              color: "var(--color-text-primary)",
-              textTransform: "none",
-              letterSpacing: "0",
-            }}
-          />
-        </label>
+          <input type="hidden" name="redirect" value={redirectAfter} />
 
-        <label
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 6,
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-12)",
-            fontWeight: "var(--font-weight-mono)",
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            color: "var(--color-text-40)",
-          }}
-        >
-          Admin token
-          <input
-            type="password"
-            name="token"
-            autoComplete="off"
-            required
-            style={{
-              padding: "8px 10px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-14)",
-              border: "1px solid var(--color-card-border)",
-              borderRadius: "var(--radius-sm)",
-              background: "var(--color-page-bg)",
-              color: "var(--color-text-primary)",
-            }}
-          />
-        </label>
+          <div className="admin-field">
+            <label className="admin-field-label" htmlFor="reviewerName">
+              Reviewer name
+            </label>
+            <input
+              id="reviewerName"
+              className="admin-input"
+              type="text"
+              name="reviewerName"
+              placeholder="e.g. Fernando"
+              autoComplete="name"
+              required
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="btn btn--primary"
-          style={{ alignSelf: "flex-start" }}
-        >
-          Sign in
-        </button>
-      </form>
-    </EditorialPage>
+          <div className="admin-field">
+            <label className="admin-field-label" htmlFor="token">
+              Admin key
+            </label>
+            <input
+              id="token"
+              className="admin-input"
+              type="password"
+              name="token"
+              autoComplete="off"
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn--primary">
+            <span>Sign in</span>
+            <span className="btn__arrow" aria-hidden="true">
+              &rarr;
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

@@ -1,19 +1,13 @@
 /**
- * Phase F.5 — operator data-disputes queue.
- * Extended in R.21:
- *   - severity-desc default sort (normalized `|gap| / threshold`)
- *   - filter chips for source-pair, fact-key, severity bucket, age bucket
- *   - severity badge on each card
- *   - sort selector (severity / newest / oldest)
- *   - link to /admin/data-disputes/audit
+ * Operator data-disputes queue.
  *
- * Mirrors `/admin/pulse-review`:
- *   - Filter chips
- *   - Editorial cards listing each open dispute
- *   - Click into `/admin/data-disputes/[id]` for the resolution form
+ * Lists open conflicts the resolver flagged for human review — material errors
+ * between sources, plausibility-envelope rejections, and public corrections —
+ * in the canonical DataTable. Each row links to `/admin/data-disputes/[id]`
+ * for the resolution form. Filters use the canonical editorial chips.
  *
- * Auth gating happens in `(admin)/layout.tsx`. This page assumes a
- * valid admin session.
+ * Auth gating happens in `(admin)/layout.tsx`; this page assumes a valid admin
+ * session.
  *
  * Methodology:
  *   - Phase F.5: ~/civica/plan/phase-f-methodology-v0.1.md §7
@@ -21,8 +15,8 @@
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EditorialPage } from "@/components/editorial/EditorialPage";
-import { Pill } from "@/components/editorial/Pill";
+import { Chip } from "@/components/editorial/Pill";
+import { DataTable } from "@/components/editorial/DataTable";
 import {
   getDataDisputeQueue,
   getDisputeFilterDistributions,
@@ -54,24 +48,24 @@ const KIND_LABELS: Record<string, string> = {
 
 const KIND_VARIANT: Record<
   string,
-  "default" | "accent" | "success" | "warn" | "danger"
+  "neutral" | "accent" | "success" | "warn" | "danger"
 > = {
   material_error: "danger",
   plausibility_envelope: "warn",
   group_a_override: "warn",
   group_c_override: "warn",
-  rank_demoted: "default",
+  rank_demoted: "neutral",
   public_correction: "accent",
-  other: "default",
+  other: "neutral",
 };
 
 const FACT_GROUPS = ["A", "B", "C"] as const;
 
 const SEVERITY_VARIANT: Record<
   SeverityBucket,
-  "default" | "accent" | "success" | "warn" | "danger"
+  "neutral" | "accent" | "success" | "warn" | "danger"
 > = {
-  lo: "default",
+  lo: "neutral",
   mid: "warn",
   hi: "danger",
   xhi: "danger",
@@ -101,7 +95,7 @@ interface PageProps {
 
 function buildHref(
   base: Record<string, string | undefined>,
-  override: Record<string, string | undefined>,
+  override: Record<string, string | undefined>
 ): string {
   const params = new URLSearchParams();
   const merged = { ...base, ...override };
@@ -143,25 +137,8 @@ function formatDate(iso: string): string {
   });
 }
 
-function formatFactValue(
-  fact: {
-    factValue: string | null;
-    factValueNumeric: number | null;
-    factUnit: string | null;
-  } | null,
-): string {
-  if (!fact) return "—";
-  if (fact.factValueNumeric !== null) {
-    const formatted = fact.factValueNumeric.toLocaleString(undefined, {
-      maximumFractionDigits: 4,
-    });
-    return fact.factUnit ? `${formatted} ${fact.factUnit}` : formatted;
-  }
-  return fact.factValue ?? "—";
-}
-
 function severityBadgeVariant(score: SeverityScore) {
-  if (score.bucket == null) return "default" as const;
+  if (score.bucket == null) return "neutral" as const;
   return SEVERITY_VARIANT[score.bucket];
 }
 
@@ -179,7 +156,8 @@ export default async function DataDisputesQueuePage({
   const factKey = params.factKey ? params.factKey : undefined;
   const sourcePair = params.sourcePair ? params.sourcePair : undefined;
   const severityBucket =
-    params.severityBucket && (SEVERITY_BUCKETS as string[]).includes(params.severityBucket)
+    params.severityBucket &&
+    (SEVERITY_BUCKETS as string[]).includes(params.severityBucket)
       ? (params.severityBucket as SeverityBucket)
       : undefined;
   const ageBucket =
@@ -195,24 +173,26 @@ export default async function DataDisputesQueuePage({
   const limit = 50;
   const offset = (page - 1) * limit;
 
-  const [{ rows, totalOpen, totalMatching }, distributions] = await Promise.all([
-    getDataDisputeQueue({
-      disputeKind: kind,
-      factGroup: group,
-      factKey,
-      sourcePair,
-      severityBucket,
-      ageBucket,
-      includeResolved: showResolved,
-      sort,
-      limit,
-      offset,
-    }),
-    getDisputeFilterDistributions({
-      includeResolved: showResolved,
-      topN: 8,
-    }),
-  ]);
+  const [{ rows, totalOpen, totalMatching }, distributions] = await Promise.all(
+    [
+      getDataDisputeQueue({
+        disputeKind: kind,
+        factGroup: group,
+        factKey,
+        sourcePair,
+        severityBucket,
+        ageBucket,
+        includeResolved: showResolved,
+        sort,
+        limit,
+        offset,
+      }),
+      getDisputeFilterDistributions({
+        includeResolved: showResolved,
+        topN: 8,
+      }),
+    ]
+  );
 
   const baseParams = {
     kind,
@@ -221,54 +201,46 @@ export default async function DataDisputesQueuePage({
     sourcePair,
     severityBucket,
     ageBucket,
-    sort: sort === "severity" ? undefined : sort, // omit default
+    sort: sort === "severity" ? undefined : sort,
     showResolved: showResolved ? "1" : undefined,
   };
 
   return (
-    <EditorialPage width="wide">
-      <h1 className="editorial-page-title">Data disputes</h1>
-      <p className="editorial-page-subtitle">
-        Open conflicts the resolver flagged for human review — material
-        errors between sources, plausibility-envelope rejections, and
-        public correction submissions. Resolutions are recorded for audit
-        but the resolver continues to compute canonical picks per
-        methodology rules; manual pinning of canonical rows is a future
-        extension.
-      </p>
+    <>
+      <header className="admin-page-head">
+        <h1 className="admin-title">Data disputes</h1>
+        <p className="admin-subtitle">
+          Open conflicts the resolver flagged for human review — material errors
+          between sources, plausibility-envelope rejections, and public
+          corrections. Resolutions are recorded for audit while the resolver
+          keeps computing canonical picks per methodology.
+        </p>
+        <p className="admin-meta">
+          <span className="admin-meta-num">{totalOpen}</span>
+          <span>open</span>
+          <span className="admin-meta-sep">·</span>
+          <span>
+            Showing <span className="admin-meta-num">{rows.length}</span> of{" "}
+            <span className="admin-meta-num">{totalMatching}</span>
+            {totalMatching !== totalOpen ? " (filtered)" : ""}
+          </span>
+          <span className="admin-meta-sep">·</span>
+          <Link
+            href={buildHref(baseParams, {
+              showResolved: showResolved ? undefined : "1",
+              page: undefined,
+            })}
+          >
+            {showResolved ? "Hide resolved" : "Show resolved"}
+          </Link>
+          <span className="admin-meta-sep">·</span>
+          <Link href="/admin/data-disputes/audit">Audit log →</Link>
+        </p>
+      </header>
 
-      <p
-        className="editorial-page-meta"
-        style={{ marginBottom: 24, gap: 12, flexWrap: "wrap" }}
-      >
-        <span>{totalOpen} open</span>
-        <span>·</span>
-        <span>
-          Showing {rows.length} of {totalMatching}
-          {totalMatching !== totalOpen ? " (filtered)" : ""}
-        </span>
-        <span>·</span>
-        <Link
-          href={buildHref(baseParams, {
-            showResolved: showResolved ? undefined : "1",
-            page: undefined,
-          })}
-          style={{ color: "var(--color-accent)" }}
-        >
-          {showResolved ? "Hide resolved" : "Show resolved"}
-        </Link>
-        <span>·</span>
-        <Link
-          href="/admin/data-disputes/audit"
-          style={{ color: "var(--color-accent)" }}
-        >
-          Audit log →
-        </Link>
-      </p>
-
-      <div className="editorial-filter-bar">
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Sort</span>
+      <div className="admin-filters">
+        <div className="admin-filter-row">
+          <span className="admin-filter-label">Sort</span>
           {(["severity", "age", "oldest"] as DisputeSortKey[]).map((s) => (
             <FilterChip
               key={s}
@@ -283,8 +255,8 @@ export default async function DataDisputesQueuePage({
           ))}
         </div>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Severity</span>
+        <div className="admin-filter-row">
+          <span className="admin-filter-label">Severity</span>
           <FilterChip
             href={buildHref(baseParams, {
               severityBucket: undefined,
@@ -308,13 +280,10 @@ export default async function DataDisputesQueuePage({
           ))}
         </div>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Kind</span>
+        <div className="admin-filter-row">
+          <span className="admin-filter-label">Kind</span>
           <FilterChip
-            href={buildHref(baseParams, {
-              kind: undefined,
-              page: undefined,
-            })}
+            href={buildHref(baseParams, { kind: undefined, page: undefined })}
             active={!kind}
           >
             All
@@ -330,13 +299,10 @@ export default async function DataDisputesQueuePage({
           ))}
         </div>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Group</span>
+        <div className="admin-filter-row">
+          <span className="admin-filter-label">Group</span>
           <FilterChip
-            href={buildHref(baseParams, {
-              group: undefined,
-              page: undefined,
-            })}
+            href={buildHref(baseParams, { group: undefined, page: undefined })}
             active={!group}
           >
             Any
@@ -353,8 +319,8 @@ export default async function DataDisputesQueuePage({
         </div>
 
         {distributions.factKeys.length > 0 ? (
-          <div className="editorial-filter-row">
-            <span className="editorial-filter-label">Fact-key</span>
+          <div className="admin-filter-row">
+            <span className="admin-filter-label">Fact-key</span>
             <FilterChip
               href={buildHref(baseParams, {
                 factKey: undefined,
@@ -380,8 +346,8 @@ export default async function DataDisputesQueuePage({
         ) : null}
 
         {distributions.sourcePairs.length > 0 ? (
-          <div className="editorial-filter-row">
-            <span className="editorial-filter-label">Source pair</span>
+          <div className="admin-filter-row">
+            <span className="admin-filter-label">Source pair</span>
             <FilterChip
               href={buildHref(baseParams, {
                 sourcePair: undefined,
@@ -406,8 +372,8 @@ export default async function DataDisputesQueuePage({
           </div>
         ) : null}
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Age</span>
+        <div className="admin-filter-row">
+          <span className="admin-filter-label">Age</span>
           <FilterChip
             href={buildHref(baseParams, {
               ageBucket: undefined,
@@ -420,10 +386,7 @@ export default async function DataDisputesQueuePage({
           {AGE_BUCKETS.map((b) => (
             <FilterChip
               key={b}
-              href={buildHref(baseParams, {
-                ageBucket: b,
-                page: undefined,
-              })}
+              href={buildHref(baseParams, { ageBucket: b, page: undefined })}
               active={ageBucket === b}
             >
               {b}
@@ -433,168 +396,90 @@ export default async function DataDisputesQueuePage({
       </div>
 
       {rows.length === 0 ? (
-        <p className="editorial-empty">
+        <div className="admin-empty">
+          <strong>Queue is clear</strong>
           {totalOpen === 0 && !showResolved
-            ? "Queue is clear — nothing flagged for human review."
+            ? "Nothing is flagged for human review."
             : "No disputes match these filters."}
-        </p>
+        </div>
       ) : (
-        <div style={{ marginBottom: 24 }}>
-          {rows.map((dispute) => (
-            <Link
-              key={dispute.id}
-              href={`/admin/data-disputes/${dispute.id}`}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <article
-                className="editorial-card"
-                style={{ cursor: "pointer" }}
-              >
-                <header className="editorial-card-head">
-                  <div className="editorial-card-head-left">
-                    <span
-                      style={{
-                        fontFamily: "var(--font-heading)",
-                        fontSize: "var(--text-16)",
-                        fontWeight: 500,
-                        color: "var(--color-text-primary)",
-                      }}
+        <div className="admin-table-scroll">
+          <DataTable className="admin-table">
+            <thead>
+              <tr>
+                <th>Country / fact</th>
+                <th>Kind</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th className="num">Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((dispute) => (
+                <tr key={dispute.id}>
+                  <td>
+                    <Link
+                      href={`/admin/data-disputes/${dispute.id}`}
+                      className="admin-row-link"
                     >
-                      {dispute.country.name}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "var(--text-12)",
-                        color: "var(--color-text-40)",
-                        letterSpacing: "0.05em",
-                      }}
-                    >
-                      {dispute.factKey}
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "var(--text-12)",
-                        color: "var(--color-text-40)",
-                        letterSpacing: "0.05em",
-                      }}
-                    >
-                      · {formatDate(dispute.createdAt)}
-                    </span>
-                  </div>
-                  <div className="editorial-card-pills">
-                    {dispute.severity.severity != null ? (
-                      <Pill variant={severityBadgeVariant(dispute.severity)}>
-                        {formatSeverity(dispute.severity)}
-                      </Pill>
-                    ) : null}
-                    <Pill
-                      variant={KIND_VARIANT[dispute.disputeKind] ?? "default"}
-                    >
-                      {KIND_LABELS[dispute.disputeKind] ?? dispute.disputeKind}
-                    </Pill>
-                    <Pill>{`Group ${dispute.factGroup}`}</Pill>
-                    {dispute.status !== "open" ? (
-                      <Pill
-                        variant={
-                          dispute.status === "in_review"
-                            ? "accent"
-                            : "default"
-                        }
+                      <span className="admin-row-primary">
+                        {dispute.country.name} · {dispute.factKey}
+                      </span>
+                      <span className="admin-row-secondary">
+                        {dispute.description ??
+                          `${
+                            KIND_LABELS[dispute.disputeKind] ?? "Dispute"
+                          } · Group ${dispute.factGroup}`}
+                      </span>
+                    </Link>
+                  </td>
+                  <td>
+                    <span className="admin-cell-chips">
+                      <Chip
+                        variant={KIND_VARIANT[dispute.disputeKind] ?? "neutral"}
                       >
-                        {dispute.status.replaceAll("_", " ")}
-                      </Pill>
-                    ) : null}
-                  </div>
-                </header>
-
-                <h3
-                  className="editorial-card-headline"
-                  style={{ marginTop: 8 }}
-                >
-                  {dispute.description ??
-                    `${KIND_LABELS[dispute.disputeKind] ?? "dispute"} on ${dispute.factKey}`}
-                </h3>
-
-                <div
-                  style={{
-                    marginTop: 12,
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 16,
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-13)",
-                    color: "var(--color-text-60)",
-                  }}
-                >
-                  <div>
-                    <div
-                      style={{
-                        textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        color: "var(--color-text-30)",
-                        marginBottom: 4,
-                      }}
-                    >
-                      A · {dispute.factA?.sourceId ?? "—"}
-                    </div>
-                    <div style={{ color: "var(--color-text-primary)" }}>
-                      {formatFactValue(dispute.factA)}
-                    </div>
-                    {dispute.factA?.asOf ? (
-                      <div style={{ color: "var(--color-text-40)" }}>
-                        as of {dispute.factA.asOf}
-                      </div>
-                    ) : null}
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        textTransform: "uppercase",
-                        letterSpacing: "0.08em",
-                        color: "var(--color-text-30)",
-                        marginBottom: 4,
-                      }}
-                    >
-                      B · {dispute.factB?.sourceId ?? "—"}
-                    </div>
-                    <div style={{ color: "var(--color-text-primary)" }}>
-                      {formatFactValue(dispute.factB)}
-                    </div>
-                    {dispute.factB?.asOf ? (
-                      <div style={{ color: "var(--color-text-40)" }}>
-                        as of {dispute.factB.asOf}
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-
-                <footer
-                  className="editorial-card-foot"
-                  style={{ marginTop: 12 }}
-                >
-                  <span>
-                    {dispute.submitterName
-                      ? `Submitted by ${dispute.submitterName} · `
-                      : ""}
-                    Open →
-                  </span>
-                </footer>
-              </article>
-            </Link>
-          ))}
+                        {KIND_LABELS[dispute.disputeKind] ??
+                          dispute.disputeKind}
+                      </Chip>
+                      <Chip>{`Group ${dispute.factGroup}`}</Chip>
+                    </span>
+                  </td>
+                  <td>
+                    {dispute.severity.severity != null ? (
+                      <Chip variant={severityBadgeVariant(dispute.severity)}>
+                        {formatSeverity(dispute.severity)}
+                      </Chip>
+                    ) : (
+                      <span className="admin-cell-arrow">—</span>
+                    )}
+                  </td>
+                  <td>
+                    {dispute.status === "open" ? (
+                      <Chip variant="warn">Open</Chip>
+                    ) : dispute.status === "in_review" ? (
+                      <Chip variant="accent">In review</Chip>
+                    ) : (
+                      <Chip>{dispute.status.replaceAll("_", " ")}</Chip>
+                    )}
+                  </td>
+                  <td className="num admin-cell-date">
+                    {formatDate(dispute.createdAt)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </DataTable>
         </div>
       )}
 
       {totalMatching > limit ? (
-        <nav className="editorial-pagination" aria-label="Pagination">
+        <nav className="admin-pagination" aria-label="Pagination">
           {page > 1 ? (
             <Link href={buildHref(baseParams, { page: String(page - 1) })}>
               ← Page {page - 1}
             </Link>
           ) : (
-            <span>—</span>
+            <span aria-hidden>—</span>
           )}
           <span>Page {page}</span>
           {offset + rows.length < totalMatching ? (
@@ -602,10 +487,10 @@ export default async function DataDisputesQueuePage({
               Page {page + 1} →
             </Link>
           ) : (
-            <span>—</span>
+            <span aria-hidden>—</span>
           )}
         </nav>
       ) : null}
-    </EditorialPage>
+    </>
   );
 }

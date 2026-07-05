@@ -1,32 +1,33 @@
 /**
- * Advisory-application status mutation.
+ * Contact-message status mutation.
  *
- * POST /api/admin/advisory-applications/[id]
+ * POST /api/admin/messages/[id]
  *
  * Form body or JSON:
- *   status     'new' | 'reviewed' | 'contacted' | 'archived'   (required)
- *   redirect   post-success redirect path                       (default: queue)
+ *   status     'new' | 'read' | 'archived'   (required)
+ *   redirect   post-success redirect path     (default: messages queue)
  *
- * Flips the application's triage status so the admin queue's status filter
- * chips (Reviewed / Contacted / Archived) reflect reality instead of every row
- * being stuck on `new`. Form callers get a 303 redirect back to the queue; JSON
- * callers get JSON.
+ * Flips a contact submission's triage status so the Messages queue's filter
+ * chips (New / Read / Archived) reflect reality. This is the smallest honest
+ * mutation for the read-only Messages surface — the public contact POST never
+ * sets `status` (defaults to 'new'); only this authed route changes it.
  *
  * Auth: Bearer ADMIN_API_KEY (CLI / API) or admin session cookie — the same
- * `authorize()` shape as `/api/admin/data-disputes/[id]`.
+ * `authorize()` shape as `/api/admin/advisory-applications/[id]` and
+ * `/api/admin/data-disputes/[id]`.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { advisoryApplications } from "@/lib/db/schema";
+import { contactSubmissions } from "@/lib/db/schema";
 import {
   getAdminSession,
   verifyAdminBearer,
   sanitizeReviewerName,
 } from "@/lib/admin/session";
 
-const VALID_STATUSES = ["new", "reviewed", "contacted", "archived"] as const;
+const VALID_STATUSES = ["new", "read", "archived"] as const;
 type Status = (typeof VALID_STATUSES)[number];
 
 function isStatus(value: unknown): value is Status {
@@ -42,7 +43,7 @@ interface StatusBody {
 }
 
 async function readBody(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<{ body: StatusBody; isForm: boolean }> {
   const contentType = request.headers.get("content-type") ?? "";
   if (contentType.includes("application/x-www-form-urlencoded")) {
@@ -62,7 +63,7 @@ async function readBody(
 }
 
 async function authorize(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<{ reviewerId: string } | null> {
   const expected = process.env.ADMIN_API_KEY;
   if (!expected) return null;
@@ -79,7 +80,7 @@ async function authorize(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await authorize(request);
   if (!auth) {
@@ -94,20 +95,17 @@ export async function POST(
   }
 
   const updated = await db
-    .update(advisoryApplications)
+    .update(contactSubmissions)
     .set({ status: body.status })
-    .where(eq(advisoryApplications.id, id))
-    .returning({ id: advisoryApplications.id });
+    .where(eq(contactSubmissions.id, id))
+    .returning({ id: contactSubmissions.id });
 
   if (updated.length === 0) {
-    return NextResponse.json(
-      { error: "application not found" },
-      { status: 404 },
-    );
+    return NextResponse.json({ error: "message not found" }, { status: 404 });
   }
 
   if (isForm) {
-    const redirect = body.redirect ?? "/admin/advisory-applications";
+    const redirect = body.redirect ?? "/admin/messages";
     return NextResponse.redirect(new URL(redirect, request.url), 303);
   }
   return NextResponse.json({

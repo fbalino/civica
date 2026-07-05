@@ -1,23 +1,11 @@
 /**
- * Phase F.5 — operator data-dispute detail + resolution form.
- * Extended in R.21:
- *   - severity badge in the meta strip
- *   - "auto-resolve eligible" informational badge when the resolver
- *     no longer emits this dispute
- *   - "Audit history" panel listing prior state changes
- *   - "Reopen" button on resolved/rejected disputes
+ * Operator data-dispute detail + resolution form.
  *
- * Two columns side-by-side showing fact A vs fact B with their full
- * provenance metadata. Resolution form below offers five actions:
- *   - Resolve: A wins
- *   - Resolve: B wins
- *   - Hold (no change)
- *   - Reject as invalid
- *   - Reopen (resolved disputes only)
- *
- * Each action POSTs to /api/admin/data-disputes/[id], updating
- * `data_disputes.status` + reviewer fields, recording resolved_at +
- * reviewer notes, and writing a `data_facts_audit_log` row.
+ * Two columns show fact A vs fact B with full provenance. The resolution form
+ * offers Resolve A / Resolve B / Hold / Reject (and Reopen on resolved rows),
+ * each POSTing to `/api/admin/data-disputes/[id]` — which updates
+ * `data_disputes.status`, stamps `resolved_at`, records the reviewer, and
+ * writes a `data_facts_audit_log` row. Auth + semantics unchanged.
  *
  * Methodology:
  *   - Phase F.5: ~/civica/plan/phase-f-methodology-v0.1.md §7
@@ -26,8 +14,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EditorialPage } from "@/components/editorial/EditorialPage";
-import { Pill } from "@/components/editorial/Pill";
+import { Chip } from "@/components/editorial/Pill";
 import { getDataDispute } from "@/lib/db/queries-data-disputes";
 import { getAuditLogForDispute } from "@/lib/factbook/reconcile/dispute-audit-log";
 import {
@@ -63,9 +50,9 @@ const STATUS_LABELS: Record<string, string> = {
 
 const SEVERITY_VARIANT: Record<
   SeverityBucket,
-  "default" | "accent" | "success" | "warn" | "danger"
+  "neutral" | "accent" | "success" | "warn" | "danger"
 > = {
-  lo: "default",
+  lo: "neutral",
   mid: "warn",
   hi: "danger",
   xhi: "danger",
@@ -114,7 +101,7 @@ function formatFactValue(
     factValue: string | null;
     factValueNumeric: number | null;
     factUnit: string | null;
-  } | null,
+  } | null
 ): string {
   if (!fact) return "—";
   if (fact.factValueNumeric !== null) {
@@ -127,7 +114,7 @@ function formatFactValue(
 }
 
 function severityBadgeVariant(score: SeverityScore) {
-  if (score.bucket == null) return "default" as const;
+  if (score.bucket == null) return "neutral" as const;
   return SEVERITY_VARIANT[score.bucket];
 }
 
@@ -148,59 +135,18 @@ function FactColumn({
     | null;
 }) {
   return (
-    <div className="editorial-card" style={{ margin: 0 }}>
-      <header className="editorial-card-head">
-        <div className="editorial-card-head-left">
-          <span
-            style={{
-              fontFamily: "var(--font-body)",
-              fontSize: "var(--text-12)",
-              letterSpacing: "var(--tracking-caps)",
-              textTransform: "uppercase",
-              color: "var(--color-text-30)",
-            }}
-          >
-            Fact {label}
-          </span>
-          <Pill>{fact?.sourceId ?? "—"}</Pill>
-        </div>
-      </header>
-      <div
-        style={{
-          fontFamily: "var(--font-heading)",
-          fontSize: "var(--text-32)",
-          color: "var(--color-text-primary)",
-          margin: "12px 0 8px",
-          lineHeight: 1.1,
-        }}
-      >
-        {formatFactValue(fact)}
+    <div className="admin-card">
+      <p className="admin-eyebrow">Fact {label}</p>
+      <div className="admin-fact-value">{formatFactValue(fact)}</div>
+      <div className="admin-cell-chips">
+        <Chip>{fact?.sourceId ?? "—"}</Chip>
       </div>
       {fact?.asOf || fact?.factYear ? (
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-13)",
-            color: "var(--color-text-40)",
-          }}
-        >
+        <p className="admin-fact-note">
           {fact?.asOf ? `as of ${fact.asOf}` : null}
           {fact?.asOf && fact?.factYear ? " · " : null}
           {fact?.factYear ? `year ${fact.factYear}` : null}
-        </div>
-      ) : null}
-      {fact?.factValue && fact.factValueNumeric !== null ? (
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--text-12)",
-            color: "var(--color-text-30)",
-            marginTop: 8,
-            wordBreak: "break-word",
-          }}
-        >
-          raw: {fact.factValue}
-        </div>
+        </p>
       ) : null}
     </div>
   );
@@ -218,237 +164,169 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
     dispute.status === "rejected_invalid";
 
   return (
-    <EditorialPage width="wide">
-      <div style={{ marginBottom: 16 }}>
-        <Link
-          href="/admin/data-disputes"
-          className="editorial-page-meta"
-          style={{ color: "var(--color-text-40)" }}
-        >
-          ← All disputes
-        </Link>
-      </div>
+    <>
+      <Link href="/admin/data-disputes" className="admin-back-link">
+        ← All disputes
+      </Link>
 
-      <h1 className="editorial-page-title">
-        {dispute.country.name} · {dispute.factKey}
-      </h1>
-      <p className="editorial-page-subtitle">
-        {dispute.description ??
-          `${KIND_LABELS[dispute.disputeKind] ?? "Dispute"} flagged for review.`}
-      </p>
-
-      <div
-        className="editorial-page-meta"
-        style={{ marginBottom: 24, gap: 12, flexWrap: "wrap" }}
-      >
-        <Pill>{KIND_LABELS[dispute.disputeKind] ?? dispute.disputeKind}</Pill>
-        <Pill>{`Group ${dispute.factGroup}`}</Pill>
-        {dispute.severity.severity != null ? (
-          <Pill variant={severityBadgeVariant(dispute.severity)}>
-            {formatSeverity(dispute.severity)}
-          </Pill>
-        ) : null}
-        <Pill
-          variant={
-            isResolved
-              ? "default"
-              : dispute.status === "in_review"
+      <header className="admin-page-head">
+        <h1 className="admin-title">
+          {dispute.country.name} · {dispute.factKey}
+        </h1>
+        <p className="admin-subtitle">
+          {dispute.description ??
+            `${
+              KIND_LABELS[dispute.disputeKind] ?? "Dispute"
+            } flagged for review.`}
+        </p>
+        <p className="admin-meta">
+          <Chip variant={KIND_VARIANTof(dispute.disputeKind)}>
+            {KIND_LABELS[dispute.disputeKind] ?? dispute.disputeKind}
+          </Chip>
+          <Chip>{`Group ${dispute.factGroup}`}</Chip>
+          {dispute.severity.severity != null ? (
+            <Chip variant={severityBadgeVariant(dispute.severity)}>
+              {formatSeverity(dispute.severity)}
+            </Chip>
+          ) : null}
+          <Chip
+            variant={
+              isResolved
+                ? "neutral"
+                : dispute.status === "in_review"
                 ? "accent"
                 : "warn"
-          }
-        >
-          {STATUS_LABELS[dispute.status] ?? dispute.status}
-        </Pill>
-        {dispute.autoResolveEligible ? (
-          <Pill variant="accent">Auto-resolve eligible</Pill>
-        ) : null}
-        <span>Created {formatDate(dispute.createdAt)}</span>
-        {dispute.proposedAction ? (
-          <span>· Proposed: {dispute.proposedAction}</span>
-        ) : null}
-      </div>
+            }
+          >
+            {STATUS_LABELS[dispute.status] ?? dispute.status}
+          </Chip>
+          {dispute.autoResolveEligible ? (
+            <Chip variant="accent">Auto-resolve eligible</Chip>
+          ) : null}
+          <span className="admin-meta-sep">·</span>
+          <span>Created {formatDate(dispute.createdAt)}</span>
+          {dispute.proposedAction ? (
+            <span>· Proposed: {dispute.proposedAction}</span>
+          ) : null}
+        </p>
+      </header>
 
       {dispute.autoResolveEligible && dispute.autoResolveNote ? (
-        <p
-          style={{
-            background: "var(--color-card-bg)",
-            border: "1px solid var(--color-card-border)",
-            borderRadius: "var(--radius-sm)",
-            padding: "10px 14px",
-            marginBottom: 24,
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-60)",
-          }}
-        >
-          <strong style={{ color: "var(--color-text-primary)" }}>
-            Note —
-          </strong>{" "}
-          {dispute.autoResolveNote}. The next auto-resolve cron run
-          (daily at 02:30 UTC) will close this dispute as
-          <code> resolved_auto_stale</code>. Manual resolution remains
-          available and is preserved in the audit trail; pick whichever
-          action best reflects the editorial record you want.
-        </p>
+        <div className="admin-note">
+          <strong>Note —</strong> {dispute.autoResolveNote}. The next
+          auto-resolve cron run (daily at 02:30 UTC) will close this dispute as{" "}
+          <code>resolved_auto_stale</code>. Manual resolution remains available
+          and is preserved in the audit trail; pick whichever action best
+          reflects the editorial record you want.
+        </div>
       ) : null}
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 16,
-          marginBottom: 32,
-        }}
-      >
-        <FactColumn label="A" fact={dispute.factA} />
-        <FactColumn label="B" fact={dispute.factB} />
-      </div>
+      <section className="admin-section">
+        <h2 className="admin-section-title">Sources in conflict</h2>
+        <div className="admin-grid-2">
+          <FactColumn label="A" fact={dispute.factA} />
+          <FactColumn label="B" fact={dispute.factB} />
+        </div>
+      </section>
 
       {dispute.submitterName || dispute.submitterAffiliation ? (
-        <section className="editorial-section" style={{ marginBottom: 24 }}>
-          <h2 className="editorial-section-title">Submitter</h2>
-          <p>
-            {dispute.submitterName ?? "anonymous"}
-            {dispute.submitterAffiliation
-              ? ` · ${dispute.submitterAffiliation}`
-              : ""}
-            {dispute.submitterEmail ? ` · ${dispute.submitterEmail}` : ""}
-          </p>
+        <section className="admin-section">
+          <h2 className="admin-section-title">Submitter</h2>
+          <div className="admin-card">
+            <p className="admin-prose">
+              {dispute.submitterName ?? "anonymous"}
+              {dispute.submitterAffiliation
+                ? ` · ${dispute.submitterAffiliation}`
+                : ""}
+              {dispute.submitterEmail ? ` · ${dispute.submitterEmail}` : ""}
+            </p>
+          </div>
         </section>
       ) : null}
 
       {isResolved ? (
-        <section className="editorial-section" style={{ marginBottom: 24 }}>
-          <h2 className="editorial-section-title">Resolution</h2>
-          <p>
-            <strong>{STATUS_LABELS[dispute.status] ?? dispute.status}</strong>
-            {dispute.resolvedAt ? ` · ${formatDate(dispute.resolvedAt)}` : ""}
-            {dispute.reviewerId ? ` · by ${dispute.reviewerId}` : ""}
-          </p>
-          {dispute.resolutionAction ? (
-            <p style={{ color: "var(--color-text-60)" }}>
-              Action: {dispute.resolutionAction}
+        <section className="admin-section">
+          <h2 className="admin-section-title">Resolution</h2>
+          <div className="admin-card">
+            <p className="admin-prose">
+              <strong>
+                {STATUS_LABELS[dispute.status] ?? dispute.status}
+              </strong>
+              {dispute.resolvedAt ? ` · ${formatDate(dispute.resolvedAt)}` : ""}
+              {dispute.reviewerId ? ` · by ${dispute.reviewerId}` : ""}
             </p>
-          ) : null}
-          {dispute.reviewerNotes ? (
-            <p style={{ color: "var(--color-text-60)" }}>
-              Notes: {dispute.reviewerNotes}
-            </p>
-          ) : null}
+            {dispute.resolutionAction ? (
+              <p className="admin-prose admin-prose-muted">
+                Action: {dispute.resolutionAction}
+              </p>
+            ) : null}
+            {dispute.reviewerNotes ? (
+              <p className="admin-prose admin-prose-muted">
+                Notes: {dispute.reviewerNotes}
+              </p>
+            ) : null}
 
-          <form
-            method="POST"
-            action={`/api/admin/data-disputes/${dispute.id}`}
-            style={{ marginTop: 16 }}
-          >
-            <input
-              type="hidden"
-              name="redirect"
-              value={`/admin/data-disputes/${dispute.id}`}
-            />
-            <input
-              type="hidden"
-              name="action"
-              value="reopen"
-            />
-            <button
-              type="submit"
-              className="btn btn--secondary btn--sm"
+            <form
+              method="POST"
+              action={`/api/admin/data-disputes/${dispute.id}`}
+              className="admin-actions"
             >
-              Reopen this dispute
-            </button>
-          </form>
-          <p
-            style={{
-              marginTop: "var(--space-2)",
-              fontFamily: "var(--font-body)",
-              fontSize: "var(--text-12)",
-              color: "var(--color-text-40)",
-            }}
-          >
-            Reopen flips the status back to <code>open</code>, preserves
-            reviewer notes for history, and writes a <code>reopen</code>
-            audit-log row. The next auto-resolve cron may re-close the
-            dispute as stale unless the underlying values changed.
-          </p>
+              <input
+                type="hidden"
+                name="redirect"
+                value={`/admin/data-disputes/${dispute.id}`}
+              />
+              <input type="hidden" name="action" value="reopen" />
+              <button type="submit" className="btn btn--secondary btn--sm">
+                Reopen this dispute
+              </button>
+            </form>
+            <p className="admin-hint">
+              Reopen flips the status back to <code>open</code>, preserves
+              reviewer notes for history, and writes a <code>reopen</code>{" "}
+              audit-log row.
+            </p>
+          </div>
         </section>
       ) : (
-        <section className="editorial-section" style={{ marginBottom: 24 }}>
-          <h2 className="editorial-section-title">Resolve</h2>
-          <p style={{ color: "var(--color-text-60)", marginBottom: 16 }}>
+        <section className="admin-section">
+          <h2 className="admin-section-title">Resolve</h2>
+          <p className="admin-section-intro">
             Recording your decision sets <code>data_disputes.status</code>,
-            stamps <code>resolved_at</code>, writes your reviewer ID +
-            notes, and inserts a <code>data_facts_audit_log</code> row
-            with the pre/post snapshot. Per F.5 v1, the resolver
-            continues to compute canonical picks via methodology rules
-            for <code>hold</code> / <code>reject</code>; <code>resolve_a</code>
-            / <code>resolve_b</code> demote the losing rows so the
-            resolver returns the chosen value on next read.
+            stamps <code>resolved_at</code>, writes your reviewer ID + notes,
+            and inserts a <code>data_facts_audit_log</code> row. Per F.5 v1 the
+            resolver keeps computing canonical picks for <code>hold</code> /{" "}
+            <code>reject</code>; <code>resolve_a</code> / <code>resolve_b</code>{" "}
+            demote the losing rows so the resolver returns the chosen value on
+            next read.
           </p>
           <form
             method="POST"
             action={`/api/admin/data-disputes/${dispute.id}`}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 16,
-            }}
+            className="admin-form"
           >
-            <label
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 6,
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-13)",
-                  color: "var(--color-text-40)",
-                  textTransform: "uppercase",
-                  letterSpacing: "var(--tracking-wider)",
-                }}
-              >
+            <div className="admin-field">
+              <label className="admin-field-label" htmlFor="notes">
                 Reviewer notes
-              </span>
+              </label>
               <textarea
+                id="notes"
+                className="admin-textarea"
                 name="notes"
                 rows={4}
                 placeholder="Optional — e.g. 'Wikidata 2024 figure preferred; CIA prose appears to be 2017-vintage.'"
-                style={{
-                  fontFamily: "var(--font-body)",
-                  fontSize: "var(--text-15)",
-                  padding: "10px 12px",
-                  border: "1px solid var(--color-card-border)",
-                  borderRadius: "var(--radius-sm, 4px)",
-                  background: "var(--color-bg)",
-                  color: "var(--color-text-primary)",
-                  resize: "vertical",
-                }}
               />
-            </label>
+            </div>
 
-            <input
-              type="hidden"
-              name="redirect"
-              value="/admin/data-disputes"
-            />
+            <input type="hidden" name="redirect" value="/admin/data-disputes" />
 
-            <div
-              style={{
-                display: "flex",
-                gap: "var(--space-2)",
-                flexWrap: "wrap",
-              }}
-            >
+            <div className="admin-actions">
               <button
                 type="submit"
                 name="action"
                 value="resolve_a"
                 disabled={!dispute.factA}
-                className="btn btn--sm"
-                style={{ background: "var(--color-success)" }}
+                className="btn btn--sm admin-btn-success"
               >
                 Resolve · A wins
               </button>
@@ -457,8 +335,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 name="action"
                 value="resolve_b"
                 disabled={!dispute.factB}
-                className="btn btn--sm"
-                style={{ background: "var(--color-success)" }}
+                className="btn btn--sm admin-btn-success"
               >
                 Resolve · B wins
               </button>
@@ -474,8 +351,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                 type="submit"
                 name="action"
                 value="reject"
-                className="btn btn--sm"
-                style={{ background: "var(--color-danger)" }}
+                className="btn btn--sm admin-btn-danger"
               >
                 Reject as invalid
               </button>
@@ -484,50 +360,23 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
         </section>
       )}
 
-      <section className="editorial-section" style={{ marginBottom: 24 }}>
-        <h2 className="editorial-section-title">Audit history</h2>
+      <section className="admin-section">
+        <h2 className="admin-section-title">Audit history</h2>
         {auditTrail.length === 0 ? (
-          <p style={{ color: "var(--color-text-60)" }}>
-            No audit entries yet. The audit log starts at 2026-05-05
-            (R.21 wiring); pre-R.21 reviewer decisions are recoverable
-            from the resolution metadata above.
+          <p className="admin-section-intro">
+            No audit entries yet. The audit log starts at 2026-05-05 (R.21
+            wiring); pre-R.21 reviewer decisions are recoverable from the
+            resolution metadata above.
           </p>
         ) : (
-          <ul
-            style={{
-              listStyle: "none",
-              padding: 0,
-              margin: 0,
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-            }}
-          >
+          <ul className="admin-timeline">
             {auditTrail.map((row) => (
-              <li
-                key={row.id}
-                style={{
-                  borderLeft: "2px solid var(--color-card-border)",
-                  paddingLeft: 12,
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "var(--text-13)",
-                    color: "var(--color-text-40)",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  {formatDateTime(row.createdAt)} · {row.actorId}
+              <li key={row.id} className="admin-timeline-item">
+                <div className="admin-timeline-meta">
+                  <span>{formatDateTime(row.createdAt)}</span>
+                  <span className="admin-timeline-actor">{row.actorId}</span>
                 </div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: "var(--text-15)",
-                    color: "var(--color-text-primary)",
-                  }}
-                >
+                <div className="admin-timeline-headline">
                   <strong>
                     {AUDIT_ACTION_LABELS[row.action] ?? row.action}
                   </strong>
@@ -536,22 +385,32 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
                     : ""}
                 </div>
                 {row.notes ? (
-                  <div
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "var(--text-14)",
-                      color: "var(--color-text-60)",
-                      marginTop: 2,
-                    }}
-                  >
-                    {row.notes}
-                  </div>
+                  <div className="admin-timeline-notes">{row.notes}</div>
                 ) : null}
               </li>
             ))}
           </ul>
         )}
       </section>
-    </EditorialPage>
+    </>
   );
+}
+
+const KIND_VARIANT_MAP: Record<
+  string,
+  "neutral" | "accent" | "success" | "warn" | "danger"
+> = {
+  material_error: "danger",
+  plausibility_envelope: "warn",
+  group_a_override: "warn",
+  group_c_override: "warn",
+  rank_demoted: "neutral",
+  public_correction: "accent",
+  other: "neutral",
+};
+
+function KIND_VARIANTof(
+  kind: string
+): "neutral" | "accent" | "success" | "warn" | "danger" {
+  return KIND_VARIANT_MAP[kind] ?? "neutral";
 }

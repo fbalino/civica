@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { EditorialPage } from "@/components/editorial/EditorialPage";
-import { Pill } from "@/components/editorial/Pill";
+import { Chip } from "@/components/editorial/Pill";
 import { SourceDot } from "@/components/SourceDot";
+import { DataTable } from "@/components/editorial/DataTable";
 import { getPulseReviewQueue } from "@/lib/db/queries-pulse-review";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
 
@@ -31,7 +31,7 @@ const SEVERITY_LABELS: Record<string, string> = {
 
 const SEVERITY_VARIANT: Record<
   string,
-  "default" | "accent" | "success" | "warn" | "danger"
+  "neutral" | "accent" | "success" | "warn" | "danger"
 > = {
   low_pos: "success",
   moderate_pos: "success",
@@ -116,26 +116,27 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
   const baseParams = { dimension, severity };
 
   return (
-    <EditorialPage width="wide">
-      <h1 className="editorial-page-title">Review queue</h1>
-      <p className="editorial-page-subtitle">
-        Pending Pulse events awaiting reviewer decision. Severe and
-        catastrophic events plus events without classifier consensus land
-        here automatically.
-      </p>
+    <>
+      <header className="admin-page-head">
+        <h1 className="admin-title">Pulse review</h1>
+        <p className="admin-subtitle">
+          Pending Pulse events awaiting a reviewer decision. Severe and
+          catastrophic events, plus events without classifier consensus, land
+          here automatically.
+        </p>
+        <p className="admin-meta">
+          <span className="admin-meta-num">{totalPending}</span>
+          <span>total pending</span>
+          <span className="admin-meta-sep">·</span>
+          <span>
+            Showing <span className="admin-meta-num">{rows.length}</span>
+          </span>
+        </p>
+      </header>
 
-      <p
-        className="editorial-page-meta"
-        style={{ marginBottom: 24 }}
-      >
-        <span>{totalPending} total pending</span>
-        <span>·</span>
-        <span>Showing {rows.length}</span>
-      </p>
-
-      <div className="editorial-filter-bar">
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Dimension</span>
+      <div className="admin-filters">
+        <div className="admin-filter-row">
+          <span className="admin-filter-label">Dimension</span>
           <FilterChip
             href={buildHref(baseParams, {
               dimension: undefined,
@@ -156,8 +157,8 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
           ))}
         </div>
 
-        <div className="editorial-filter-row">
-          <span className="editorial-filter-label">Severity</span>
+        <div className="admin-filter-row">
+          <span className="admin-filter-label">Severity</span>
           <FilterChip
             href={buildHref(baseParams, {
               severity: undefined,
@@ -180,106 +181,95 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
       </div>
 
       {rows.length === 0 ? (
-        <p className="editorial-empty">
+        <div className="admin-empty">
+          <strong>Nothing to review</strong>
           {totalPending === 0
-            ? "Queue is empty — every event has been reviewed."
+            ? "Every queued event has been reviewed."
             : "No events match these filters."}
-        </p>
+        </div>
       ) : (
-        <div style={{ marginBottom: 24 }}>
-          {rows.map((event) => (
-            <Link
-              key={event.id}
-              href={`/admin/pulse-review/${event.id}`}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <article
-                className="editorial-card"
-                style={{ cursor: "pointer" }}
-              >
-                <header className="editorial-card-head">
-                  <div className="editorial-card-head-left">
-                    <span
-                      style={{
-                        fontFamily: "var(--font-heading)",
-                        fontSize: "var(--text-16)",
-                        fontWeight: 500,
-                        color: "var(--color-text-primary)",
-                      }}
+        <div className="admin-table-scroll">
+          <DataTable className="admin-table">
+            <thead>
+              <tr>
+                <th>Country / headline</th>
+                <th>Dimension</th>
+                <th>Severity</th>
+                <th>Consensus</th>
+                <th className="num">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((event) => (
+                <tr key={event.id}>
+                  <td>
+                    <Link
+                      href={`/admin/pulse-review/${event.id}`}
+                      className="admin-row-link"
                     >
-                      {event.country.name}
+                      <span className="admin-row-primary">
+                        {event.country.name}
+                      </span>
+                      <span className="admin-row-secondary">
+                        {event.headline}
+                      </span>
+                    </Link>
+                    <span className="admin-cell-dots">
+                      {event.sourceIds.map((src) => (
+                        <SourceDot key={src} source={src} retrievedAt={null} />
+                      ))}
                     </span>
-                    <span
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: "var(--text-12)",
-                        color: "var(--color-text-40)",
-                        letterSpacing: "0.05em",
-                      }}
-                    >
-                      {formatDate(event.eventDate)}
-                    </span>
-                  </div>
-                  <div className="editorial-card-pills">
-                    <Pill>
+                  </td>
+                  <td>
+                    <Chip>
                       {DIMENSION_LABELS[event.dimension] ?? event.dimension}
-                    </Pill>
-                    <Pill
-                      variant={
-                        SEVERITY_VARIANT[event.severityTier] ?? "default"
-                      }
-                    >
-                      {SEVERITY_LABELS[event.severityTier] ??
-                        event.severityTier}{" "}
-                      ·{" "}
-                      {event.severityValue > 0
-                        ? `+${event.severityValue}`
-                        : event.severityValue}
-                    </Pill>
+                    </Chip>
+                  </td>
+                  <td>
+                    <span className="admin-cell-chips">
+                      <Chip
+                        variant={SEVERITY_VARIANT[event.severityTier] ?? "neutral"}
+                      >
+                        {SEVERITY_LABELS[event.severityTier] ??
+                          event.severityTier}{" "}
+                        ·{" "}
+                        {event.severityValue > 0
+                          ? `+${event.severityValue}`
+                          : event.severityValue}
+                      </Chip>
+                      {event.pressFreedomScoreAtClassification != null &&
+                      event.pressFreedomScoreAtClassification < 50 ? (
+                        <Chip variant="warn">Restricted press</Chip>
+                      ) : null}
+                    </span>
+                  </td>
+                  <td>
                     {event.classifierAgreement === "all" ? (
-                      <Pill variant="success">3/3 agree</Pill>
+                      <Chip variant="success">3/3 agree</Chip>
                     ) : event.classifierAgreement === "two_of_three" ? (
-                      <Pill>2/3 agree</Pill>
+                      <Chip>2/3 agree</Chip>
                     ) : (
-                      <Pill variant="warn">No consensus</Pill>
+                      <Chip variant="warn">No consensus</Chip>
                     )}
-                    {event.pressFreedomScoreAtClassification != null &&
-                    event.pressFreedomScoreAtClassification < 50 ? (
-                      <Pill variant="warn">Restricted press</Pill>
-                    ) : null}
-                  </div>
-                </header>
-
-                <h3 className="editorial-card-headline">{event.headline}</h3>
-
-                <footer className="editorial-card-foot">
-                  <div className="editorial-card-foot-row">
-                    {event.sourceIds.map((src) => (
-                      <SourceDot key={src} source={src} retrievedAt={null} />
-                    ))}
-                  </div>
-                  <span>
-                    Confidence{" "}
-                    {(event.corroborationConfidence ?? 0).toFixed(2)} ·{" "}
-                    {event.severityValue > 0 ? "+" : ""}
-                    {event.severityValue} · Open →
-                  </span>
-                </footer>
-              </article>
-            </Link>
-          ))}
+                  </td>
+                  <td className="num admin-cell-date">
+                    {formatDate(event.eventDate)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </DataTable>
         </div>
       )}
 
-      {/* Pagination */}
       {totalPending > limit ? (
-        <nav className="editorial-pagination" aria-label="Pagination">
+        <nav className="admin-pagination" aria-label="Pagination">
           {page > 1 ? (
             <Link href={buildHref(baseParams, { page: String(page - 1) })}>
               ← Page {page - 1}
             </Link>
           ) : (
-            <span>—</span>
+            <span aria-hidden>—</span>
           )}
           <span>Page {page}</span>
           {offset + rows.length < totalPending ? (
@@ -287,10 +277,10 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
               Page {page + 1} →
             </Link>
           ) : (
-            <span>—</span>
+            <span aria-hidden>—</span>
           )}
         </nav>
       ) : null}
-    </EditorialPage>
+    </>
   );
 }
