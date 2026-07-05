@@ -23,7 +23,7 @@
  * bulk redistribution. Attribution: Elkins, Ginsburg & Melton, "Constitute:
  * The World's Constitutions to Read, Search, and Compare."
  */
-import { parse, type HTMLElement } from "node-html-parser";
+import { parse, type HTMLElement, type Node } from "node-html-parser";
 
 import { db as sharedDb } from "@/lib/db";
 import {
@@ -193,24 +193,105 @@ function nearestHeading(sec: HTMLElement): string | null {
 }
 
 /**
- * The section's OWN inner HTML — the concatenation of its direct children that
- * are NOT themselves `div.section` nodes. This yields the section's actual
- * provision text without duplicating every descendant clause into its
- * ancestors (the root section otherwise contains the entire document).
+ * Is this node a `div.section` — i.e. a node that `parseConstitutionHtml`'s
+ * `querySelectorAll("div.section")` will emit as its OWN entry? Deliberately
+ * the same predicate (tag `div` + class `section`) so the set of subtrees we
+ * exclude from a parent's own content is exactly the set that renders
+ * elsewhere — nothing is dropped from one place without appearing in another.
+ */
+function isSectionDiv(node: Node): boolean {
+  if (node.nodeType !== 1) return false;
+  const el = node as HTMLElement;
+  return (
+    (el.rawTagName ?? "").toLowerCase() === "div" &&
+    !!el.classList &&
+    el.classList.contains("section")
+  );
+}
+
+/**
+ * Serialize a node's subtree, omitting every descendant `div.section` subtree
+ * at ANY depth — not just direct children. Constitute sometimes nests a
+ * section inside an intermediate wrapper (e.g. `<ol><li><div class="section">`
+ * in the U.S. ratification block); a direct-child-only skip would leave that
+ * nested section's full markup inside the parent's stored `html` while the
+ * nested section ALSO renders as its own entry — the same clause twice in the
+ * reading column.
+ *
+ * NON-DESTRUCTIVE by construction: this walks the live parse tree without
+ * mutating it. `excerptHtmlForSection()` serializes the FULL subtree (nested
+ * sections included, by design) and `nearestHeading()` walks live ancestors,
+ * so the shared tree must stay intact — no `remove()`, no detaching.
+ *
+ * Fast path: a subtree containing no `div.section` serializes verbatim via the
+ * library (this also covers void tags like `<br>`, which have no children);
+ * only wrapper chains that actually contain nested sections are rebuilt
+ * tag-by-tag around the surviving children.
+ */
+function serializeWithoutNestedSections(node: Node): string {
+  if (node.nodeType !== 1) return node.toString();
+  const el = node as HTMLElement;
+  if (isSectionDiv(el)) return "";
+  if (!el.querySelector("div.section")) return el.toString();
+  const tag = el.rawTagName || "div";
+  const attrs = el.rawAttrs ? ` ${el.rawAttrs}` : "";
+  let inner = "";
+  for (const child of el.childNodes) {
+    inner += serializeWithoutNestedSections(child);
+  }
+  return `<${tag}${attrs}>${inner}</${tag}>`;
+}
+
+/**
+ * Text counterpart of `serializeWithoutNestedSections`: the subtree's visible
+ * text minus every descendant `div.section` subtree at any depth.
+ */
+function textWithoutNestedSections(node: Node): string {
+  if (node.nodeType !== 1) return node.text;
+  const el = node as HTMLElement;
+  if (isSectionDiv(el)) return "";
+  if (!el.querySelector("div.section")) return el.text;
+  let out = "";
+  for (const child of el.childNodes) {
+    out += textWithoutNestedSections(child);
+  }
+  return out;
+}
+
+/**
+ * The section's OWN inner HTML — its subtree MINUS every descendant
+ * `div.section` subtree at any depth (those render as their own entries).
+ * This yields the section's actual provision text without duplicating any
+ * descendant clause into its ancestors (the root section otherwise contains
+ * the entire document, and wrapper-mediated nesting otherwise leaks nested
+ * sections into the parent verbatim).
  */
 function ownHtml(sec: HTMLElement): string {
   let out = "";
   for (const child of sec.childNodes) {
-    if (
-      child.nodeType === 1 &&
-      (child as HTMLElement).classList &&
-      (child as HTMLElement).classList.contains("section")
-    ) {
-      continue; // skip nested sub-sections — they're their own entries
-    }
-    out += child.toString();
+    out += serializeWithoutNestedSections(child);
   }
   return out.trim();
+}
+
+/**
+ * The section's OWN visible text — the whitespace-collapsed text of exactly
+ * the content `ownHtml` serializes (subtree minus descendant `div.section`
+ * subtrees at any depth). Non-empty when the section carries its own provision
+ * text rather than only wrapping nested sub-sections. This is what lets us keep
+ * body-only sections: Constitute nests each article's clause text in a bare
+ * child `div.section` with no `data-topics` and no heading, so the body lives
+ * ONLY there — such a section has topics 0 and heading null but a real ownText.
+ * Conversely, a wrapper whose entire content is nested sections (even behind
+ * intermediate `<ol>/<li>` wrappers) now yields an empty ownText and is
+ * correctly dropped — its content is fully captured by the nested entries.
+ */
+function ownText(sec: HTMLElement): string {
+  let out = "";
+  for (const child of sec.childNodes) {
+    out += textWithoutNestedSections(child);
+  }
+  return out.replace(/\s+/g, " ").trim();
 }
 
 /** Extract the ontology topic keys from a section's `data-topics` attribute. */
@@ -283,10 +364,12 @@ function excerptHtmlForSection(sec: HTMLElement): string | null {
 
 /**
  * Parse a Constitute constitution HTML document into parsed sections.
- * We keep a section entry when it carries topic tags OR its own heading — i.e.
- * the semantically meaningful units (tagged provisions + article/title
- * boundaries), skipping the purely-structural wrapper sections whose content is
- * already captured by their children.
+ * We keep a section entry when it carries topic tags OR its own heading OR its
+ * own body text — i.e. the semantically meaningful units (tagged provisions,
+ * article/title boundaries, AND the bare body-only sections where Constitute
+ * nests an article's clause text). Only the purely-structural wrapper sections —
+ * no topics, no heading, and no own text (all content lives in nested children,
+ * which become their own entries) — are dropped.
  *
  * Each entry carries BOTH payloads: `html` (own inner HTML, children excluded —
  * stored in `structured_articles`) and `excerptHtml` (full subtree, capped —
@@ -308,8 +391,10 @@ export function parseConstitutionHtml(html: string): ParsedSection[] {
     const topics = topicKeysFromSection(sec);
     const heading = ownHeading(sec);
 
-    // Keep tagged provisions and titled sections; drop bare structural wrappers.
-    if (topics.length === 0 && !heading) continue;
+    // Keep tagged provisions, titled sections, and body-only sections (a bare
+    // child div.section holding an article's clause text). Drop only the
+    // purely-structural wrappers whose content is already captured by children.
+    if (topics.length === 0 && !heading && !ownText(sec)) continue;
 
     articles.push({
       sectionId,
@@ -572,7 +657,7 @@ async function upsertConstitution(
  * shows the passage, not a hollow heading. Sections whose subtree has no
  * meaningful text (`excerptHtml === null`) are skipped. Returns rows written.
  */
-async function replaceTopicExcerpts(
+export async function replaceTopicExcerpts(
   db: ConstituteSyncDb,
   jurisdictionId: string,
   constitutionId: string,

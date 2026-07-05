@@ -21,6 +21,7 @@
     "sync:ipu": "tsx scripts/sync-ipu-parline.ts",
     "sync:wikidata-parties": "tsx scripts/sync-wikidata-parties.ts",
     "sync:constitutions": "tsx scripts/sync-constitutions.ts",
+    "reparse:constitutions": "tsx scripts/reparse-constitutions.ts",
     "ingest:ci": "tsx scripts/ingest-ci-all.ts",
     "calculate:ci": "tsx scripts/calculate-ci-composite.ts",
     "ingest:pulse:events": "tsx scripts/ingest-pulse-events.ts",
