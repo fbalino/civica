@@ -454,8 +454,12 @@ body {
   select,
   textarea {
     /* 16px literal (= --text-16): LightningCSS drops max(var(),…) in
-       font-size, and iOS keys the auto-zoom on the COMPUTED 16px anyway. */
-    font-size: max(16px, 1em);
+       font-size, and iOS keys the auto-zoom on the COMPUTED 16px anyway.
+       !important so this floor beats every higher-specificity control skin
+       (.country-search input, .cv-select, .editorial-inline-select, the
+       atlas/constitution search fields, …) — a bare element selector loses
+       that cascade and the guard silently stops guarding. */
+    font-size: max(16px, 1em) !important;
   }
 }
 
@@ -613,6 +617,9 @@ a {
   font-family: var(--font-body);
   font-weight: 500;
   font-size: var(--text-15);
+  /* Two-word labels ("The Record") must never wrap into a two-line nav item
+     at laptop widths — the row scrolls/tightens instead. */
+  white-space: nowrap;
   background: none;
   border: none;
   padding: 10px 14px;
@@ -1294,7 +1301,9 @@ a {
 
 @media (max-width: 480px) {
   .site-footer__nav {
-    grid-template-columns: 1fr;
+    /* Two columns on phones: ~30 links in one column made the footer
+       ~2,100px tall; two tracks halve the scroll and still fit 375px. */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .site-footer__bottom {

@@ -91,15 +91,16 @@ export default function PrivacyPage() {
 
           <ul>
             <li>
-              <strong>Theme preference.</strong> When you switch between light
-              and dark mode, that choice is saved in your browser&rsquo;s
+              <strong>Theme preference.</strong>{" "}
+              When you switch between light and dark mode, that choice is saved in your browser&rsquo;s
               local storage (under the key <code>theme</code>) so the site
               remembers it on your next visit. It stays on your device.
             </li>
             <li>
-              <strong>Ask Civica history.</strong> If you use the in-page Ask
-              Civica assistant, your conversation is kept in your
-              browser&rsquo;s local storage so it survives page navigation.
+              <strong>Ask Civica history.</strong>{" "}
+              If you use the in-page Ask Civica assistant, your conversation
+              is kept in your browser&rsquo;s local storage so it survives
+              page navigation.
               Clearing your browser storage removes it.
             </li>
           </ul>
