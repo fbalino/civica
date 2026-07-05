@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { wikimediaUrl } from "@/lib/data/country-photos";
-import { SourceCreditTooltip } from "@/components/factbook/SourceCreditTooltip";
+import { Tooltip } from "@/components/editorial/Tooltip";
 
 /*
  * LeaderPortrait — the portrait for a principal-leadership card.
@@ -21,15 +21,16 @@ import { SourceCreditTooltip } from "@/components/factbook/SourceCreditTooltip";
  * clipping. The monogram fallback fills the SAME rectangular frame so present
  * and absent portraits read consistently.
  *
- * CREDIT: photo credits are often long ("Photo: {credit} · {license} ·
- * Wikimedia Commons"). Rather than an ellipsised inline caption, the full credit
- * is passed to `credit` and revealed on hover/focus of the portrait via the
- * reusable <SourceCreditTooltip> (also exposed as a native title/aria-label for
- * keyboard + AT + no-JS). The monogram fallback has no credit.
+ * HOVER: the portrait carries the canonical <Tooltip> primitive — an INSTANT,
+ * design-system tooltip (no slow native `title`). It shows the person's name and
+ * office, and, when a portrait is present, the photo credit line beneath (the
+ * legally/ethically required attribution) — so credit is surfaced without an
+ * ellipsised caption or a native-title delay. Keyboard-focusable and touch-
+ * operable via the <Tooltip> trigger.
  *
  * Client component ONLY because the image needs an onError fallback; the
  * monogram path is otherwise identical to the prior server-rendered avatar,
- * so a leader without a portrait still renders the monogram with no JS.
+ * so a leader without a portrait still renders the monogram (and its tooltip).
  */
 
 function initialsOf(name: string): string {
@@ -42,48 +43,49 @@ function initialsOf(name: string): string {
 export function LeaderPortrait({
   photoFile,
   personName,
+  office,
   credit,
 }: {
   photoFile: string | null;
   personName: string;
-  /** Full photo credit line; when present + a photo shows, revealed on hover. */
+  /** The office this person holds — shown under their name in the tooltip. */
+  office?: string | null;
+  /** Full photo credit line; folded into the tooltip when a photo shows. */
   credit?: string | null;
 }) {
   const [failed, setFailed] = useState(false);
   const showPhoto = Boolean(photoFile) && !failed;
 
-  if (!showPhoto) {
-    return (
-      <span className="lead-avatar">
-        <span className="lead-avatar-monogram" aria-hidden>
-          {initialsOf(personName)}
-        </span>
+  const frame = showPhoto ? (
+    <span className="lead-avatar">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        className="lead-avatar-photo"
+        src={wikimediaUrl(photoFile!, 240)}
+        alt={`Portrait of ${personName}`}
+        width={96}
+        height={120}
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    </span>
+  ) : (
+    <span className="lead-avatar">
+      <span className="lead-avatar-monogram" aria-hidden>
+        {initialsOf(personName)}
       </span>
-    );
-  }
-
-  const img = (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      className="lead-avatar-photo"
-      src={wikimediaUrl(photoFile!, 240)}
-      alt={`Portrait of ${personName}`}
-      width={96}
-      height={120}
-      loading="lazy"
-      onError={() => setFailed(true)}
-    />
+    </span>
   );
 
-  // When we have a credit, wrap the framed image in the reusable tooltip so the
-  // long attribution reveals on hover/focus instead of truncating in a caption.
-  if (credit) {
-    return (
-      <SourceCreditTooltip credit={credit} className="lead-avatar">
-        {img}
-      </SourceCreditTooltip>
-    );
-  }
+  const tip = (
+    <span className="lead-portrait-tip">
+      <span className="lead-portrait-tip-name">{personName}</span>
+      {office && <span className="lead-portrait-tip-office">{office}</span>}
+      {showPhoto && credit && (
+        <span className="lead-portrait-tip-credit">{credit}</span>
+      )}
+    </span>
+  );
 
-  return <span className="lead-avatar">{img}</span>;
+  return <Tooltip content={tip}>{frame}</Tooltip>;
 }

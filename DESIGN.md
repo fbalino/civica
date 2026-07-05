@@ -104,6 +104,7 @@ Prefer shared primitives for new editorial UI:
 - Search fields are **fully rounded** (`--radius-search`) with a leading magnifier + Inter placeholder (see `CountrySearchCombobox` / `GlobalSearch`). This is the canonical shape for every search box site-wide (owner decision 2026-07-01).
 - `DataTable`
 - `SourceDot`
+- `Tooltip` / `InfoTip` (`src/components/editorial/Tooltip.tsx`) — the canonical INSTANT tooltip: an inverted (ink-navy in light, ivory in dark), no-arrow surface portalled to `<body>` so it escapes overflow clips, positioned above the trigger and flipping below when it would clip. `<Tooltip content={…}>{trigger}</Tooltip>` wraps any hoverable/focusable node; `<InfoTip content={…}/>` is a circled-i button carrying one (used to mark Civica-derived estimates). Styled in `editorial.css` under `.editorial-tooltip`. Use this instead of native `title` attributes.
 
 Every visible data point should carry provenance where possible. Use `SourceDot`; do not hand-roll provenance markers.
 

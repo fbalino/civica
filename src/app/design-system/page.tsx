@@ -4,6 +4,7 @@ import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { Banner } from "@/components/editorial/Banner";
 import { Pill } from "@/components/editorial/Pill";
 import { StatusDot } from "@/components/editorial/StatusDot";
+import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
 import { SourceDot } from "@/components/SourceDot";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { SegmentedControlDemo } from "./SegmentedControlDemo";
@@ -309,6 +310,29 @@ export default function DesignSystemPage() {
             <div className="ds-comp">
               <h4>Segmented control (real)</h4>
               <SegmentedControlDemo />
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4>Tooltip + InfoTip (real)</h4>
+              <div
+                className="ds-row"
+                style={{
+                  alignItems: "center",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-14)",
+                  color: "var(--color-text-secondary)",
+                }}
+              >
+                <Tooltip content="Instant, inverted, portalled above the trigger — flips below when it would clip.">
+                  <button type="button" className="btn btn--secondary">
+                    Hover or focus me
+                  </button>
+                </Tooltip>
+                <span>
+                  Civica-derived estimate
+                  <InfoTip content="Not a source figure — Civica computes this from the underlying data. Hover the trigger for the note." />
+                </span>
+              </div>
             </div>
 
             <div className="ds-comp ds-comp--wide">

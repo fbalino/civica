@@ -157,8 +157,8 @@ function formatBirthdate(value: string | null): string | null {
 // Portrait attribution line, mirroring the country-page galleryCaption:
 // "Photo: {credit} · {license} · Wikimedia Commons". Degrades gracefully when
 // credit or license is null (e.g. just "Photo: Wikimedia Commons"). This full
-// string is now revealed on hover/focus of the portrait via SourceCreditTooltip
-// (no more ellipsised inline caption).
+// string is folded into the portrait's <Tooltip> beneath the name + office, so
+// the attribution is surfaced on hover/focus without an ellipsised caption.
 function portraitCredit(media: PersonMedia): string {
   const detail: string[] = [];
   if (media.photoCredit && media.photoCredit !== "Wikimedia Commons") {
@@ -403,6 +403,7 @@ export async function FactbookLeaders({
                   <LeaderPortrait
                     photoFile={p.media.photoUrl}
                     personName={p.personName}
+                    office={officeLabel}
                     credit={credit}
                   />
                   <div className="lead-card-body">
@@ -504,6 +505,7 @@ export async function FactbookLeaders({
                             <LeaderPortrait
                               photoFile={media.photoUrl}
                               personName={name}
+                              office={titleCaseTitle(stint.officeName)}
                               credit={rowCredit}
                             />
                             <span className="lead-row-text">
