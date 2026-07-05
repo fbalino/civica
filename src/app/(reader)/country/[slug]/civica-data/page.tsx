@@ -14,6 +14,7 @@ import {
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
 import { FactbookGovOrgChart } from "@/components/factbook/FactbookGovOrgChart";
+import { FactbookSidebar } from "@/components/factbook/FactbookSidebar";
 import { buildOrgChartFromGovernmentStructure } from "@/lib/factbook/gov-org-chart";
 import { FactbookLegislature } from "@/components/factbook/FactbookLegislature";
 import { FactbookLeaders } from "@/components/factbook/FactbookLeaders";
@@ -445,19 +446,32 @@ export default async function CountryCivicaDataTab({
     )
   );
 
+  // Sidebar entries mirror the visible sections 1:1 — the SAME
+  // <FactbookSidebar> (ReaderSidebar primitive) the Factbook tab renders,
+  // inside the SAME grid geometry, by owner mandate (2026-07-05): the two
+  // tabs must never drift apart visually again.
+  const sidebarItems = visibleSections.map((s) => ({
+    id: s.id,
+    label: s.label,
+  }));
+
   return (
-    <div className="civica-data-body">
-      {/* In-content country search + sticky-bar handoff. A normal-flow field
-       *  ABOVE the stacked-scroll shell, so it scrolls away; the shared sticky
-       *  bar reveals only once it's out of view (never both). The section nav
-       *  below stays sticky but no longer holds its own search. */}
+    <div className="factbook-tab">
+      {/* In-content country search + sticky-bar handoff — identical position
+       *  and geometry to the Factbook tab: a normal-flow field ABOVE the body
+       *  grid (not inside its padded box), so both tabs place it at exactly
+       *  the same offset and it scrolls away before the sticky bar reveals. */}
       <CountryJumpSearch
         country={{ name: jurisdiction.name, iso2: jurisdiction.iso2 }}
         countries={countryOptions}
         className="civica-data-tab-search"
       />
 
-      <CivicaDataSections items={items} defaultId={defaultId} />
+      <div className="civica-data-body">
+        <FactbookSidebar items={sidebarItems} />
+
+        <CivicaDataSections items={items} defaultId={defaultId} />
+      </div>
 
       {/* Per-tab citation footer — multi-format (APA · BibTeX · Chicago ·
        *  JSON) with a structured-citation JSON tab and a raw-data download.

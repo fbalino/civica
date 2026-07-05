@@ -1,112 +1,32 @@
 /*
  * Civica Data tab — /country/[slug]/civica-data
  *
- * LAYOUT: a factbook-style stacked scroll. A sticky left section nav
- * (`.civica-data-nav`) + a single content column (`.civica-data-pane`) that
- * lists EVERY visible section one after another — nothing hidden, all of it in
- * the DOM and on screen. The nav is scroll-spy anchor navigation (active entry
- * follows the scroll; click smooth-scrolls to the section). Each section opens
- * with a numbered chapter header, then its body, then a compact Sources strip.
- * Mirrors the Factbook tab's reader layout.
- *
- * Imported by the page directly (not globally) — it is the only surface that
- * needs these rules. Tokens only, no hardcoded values.
+ * LAYOUT: a factbook-style stacked scroll. The sticky left "On this page"
+ * navigation is the SAME FactbookSidebar (ReaderSidebar primitive) the
+ * Factbook tab renders — styled entirely by factbook.css — inside a body
+ * grid that is a geometry clone of `.factbook-body`. This file owns ONLY
+ * what is unique to this tab: the numbered chapter sections, per-section
+ * sources strips, and the cite footer.
  */
 
-/* ----------------------------------------------------------------
- * Outer container — full standard product width (matches
- * `.editorial-page--full`), centered, with room for the docked AI drawer.
- * ---------------------------------------------------------------- */
 .civica-data-body {
-  max-width: 1200px;
+  /* GEOMETRY CLONE of .factbook-body (factbook.css) — the two country tabs
+     share one surface: same 1280px cap, same 240px sidebar column, same
+     gap and padding, the SAME <FactbookSidebar> component. Owner mandate
+     (2026-07-05): these tabs must never drift apart again. The only
+     difference is the absent right rail (this tab has none). */
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--space-7);
+  max-width: 1280px;
   margin: 0 auto;
   padding: var(--space-7) var(--space-6);
   padding-bottom: 120px; /* clearance for the docked Civica AI drawer */
-}
-
-/* ----------------------------------------------------------------
- * Stacked-scroll shell — sticky nav (left) + one scroll column (right).
- * ---------------------------------------------------------------- */
-.civica-data-shell {
-  display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
-  gap: var(--space-8);
   align-items: start;
 }
 
-/* ── Left section nav ──────────────────────────────────────────── */
-.civica-data-nav {
-  position: sticky;
-  top: calc(var(--header-height) + var(--space-9) + var(--space-5));
-  align-self: start;
-  min-width: 0;
-}
-.civica-data-nav-eyebrow {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wider);
-  color: var(--color-text-40);
-  margin: 0 0 var(--space-4);
-  padding: 0 var(--space-4);
-}
-.civica-data-nav-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-}
-.civica-data-nav-link {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  border-left: 2px solid transparent;
-  background: transparent;
-  color: var(--color-text-60);
-  font-family: var(--font-body);
-  font-size: var(--text-15);
-  line-height: var(--leading-normal);
-  text-align: left;
-  text-decoration: none;
-  cursor: pointer;
-  transition: color var(--motion-fast) var(--motion-ease-out),
-    background var(--motion-fast) var(--motion-ease-out);
-}
-.civica-data-nav-link:hover {
-  color: var(--color-text-primary);
-  background: color-mix(in oklab, var(--color-text-primary) 3%, transparent);
-}
-.civica-data-nav-link.is-active {
-  border-left-color: var(--color-accent);
-  color: var(--color-text-primary);
-  background: color-mix(in oklab, var(--color-text-primary) 4%, transparent);
-  font-weight: var(--font-weight-medium);
-}
-.civica-data-nav-link:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: -2px;
-}
-.civica-data-nav-num {
-  font-family: var(--font-body);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--text-12);
-  color: var(--color-text-30);
-  align-self: center;
-  min-width: 20px;
-}
-.civica-data-nav-link.is-active .civica-data-nav-num {
-  color: var(--color-accent);
-}
-.civica-data-nav-text {
-  min-width: 0;
-}
-
 /* ── Scroll column — every section stacked ─────────────────────── */
-.civica-data-pane {
+.civica-data-main {
   min-width: 0;
 }
 
@@ -322,6 +242,7 @@
  * Empty state — country with a masthead but zero Civica overlays.
  * ---------------------------------------------------------------- */
 .civica-data-empty-card {
+  grid-column: 1 / -1;
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
   background: var(--color-card-bg);
@@ -373,19 +294,17 @@
  * list would otherwise pin half the screen). The numbered vertical list and
  * its scroll-spy active state are unchanged.
  * ---------------------------------------------------------------- */
-@media (max-width: 900px) {
-  .civica-data-shell {
-    grid-template-columns: minmax(0, 1fr);
+@media (max-width: 1100px) {
+  .civica-data-body {
+    grid-template-columns: 200px minmax(0, 1fr);
     gap: var(--space-6);
   }
-  .civica-data-nav {
-    position: static;
-    border: 1px solid var(--color-stat-border);
-    padding: var(--space-4);
-    background: color-mix(in oklab, var(--color-text-primary) 2%, transparent);
-  }
-  .civica-data-nav-eyebrow {
-    padding: 0;
+}
+
+@media (max-width: 768px) {
+  .civica-data-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
   }
 }
 
