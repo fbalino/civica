@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 const BASE_URL = "https://civicaatlas.org/api/v1";
+const SITE_URL = "https://civicaatlas.org";
 
 const SECTIONS: ReaderSidebarItem[] = [
   { id: "overview", label: "Overview" },
@@ -35,6 +36,7 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "pulse-dimensions", label: "Pulse dimensions" },
   { id: "pulse-changelog-v2", label: "Pulse changelog" },
   { id: "usage-examples", label: "Usage examples" },
+  { id: "bulk-data", label: "Bulk data" },
   { id: "data-sources", label: "Data sources" },
   { id: "widget-embed", label: "Widget embed" },
 ];
@@ -90,6 +92,20 @@ function EndpointSection({
     </section>
   );
 }
+
+const BULK_EXPORT_PARAMS = [
+  {
+    name: ":slug",
+    type: "string",
+    description: 'Country slug, e.g. "france" or "united-states".',
+  },
+  {
+    name: "format",
+    type: "json | csv",
+    description:
+      "Response format. json returns flat fields, the full fact list, and a per-fact provenance block. csv returns the fact list with a self-describing citation header. Default: json.",
+  },
+];
 
 const EMBED_PARAMS = [
   {
@@ -702,6 +718,65 @@ console.log(data.government.executive);`}</CodeBlock>
 resp = requests.get("${BASE_URL}/countries", params={"government_type": "monarchy"})
 for country in resp.json()["data"]:
     print(country["name"], country["population"])`}</CodeBlock>
+      </section>
+
+      <hr className="api-section-divider" />
+
+      <section id="bulk-data" className="editorial-section">
+        <h2>Bulk Data</h2>
+
+        <p className="api-intro">
+          Every country&rsquo;s full record is downloadable in one request as
+          JSON or CSV. To assemble the whole dataset, enumerate countries with{" "}
+          <code>/api/v1/countries</code> and pull each country&rsquo;s export.
+          The JSON export carries a per-fact provenance block; the CSV export
+          carries a self-describing citation header so the file is traceable
+          when opened in a spreadsheet or research tool.
+        </p>
+
+        <EndpointSection
+          id="country-export"
+          method="GET"
+          path="/api/countries/:slug/export"
+          description="Downloads the full reconciled record for a single country — flat summary fields, the complete fact list, and, in JSON, statement-level provenance for each canonical field. Rate-limited to 30 exports per minute per IP."
+          parameters={BULK_EXPORT_PARAMS}
+          exampleResponse={`{
+  "name": "France",
+  "iso2": "FR",
+  "iso3": "FRA",
+  "capital": "Paris",
+  "population": 69082000,
+  "gdpBillions": 3732,
+  "facts": [
+    { "category": "demographics", "key": "literacy_rate", "value": "...", "numericValue": null, "unit": "%", "year": 2024 }
+  ],
+  "provenance": {
+    "population": { "sourceId": "un_data", "sourceName": "UN Statistics Division", "asOf": "2024", "license": "..." }
+  },
+  "meta": { "reconciliation": { "status": "beta", "version": "v0.2-beta", "vintage": "2026-Q1" } }
+}`}
+        />
+
+        <h3 className="api-example-heading">Full-dataset pull (bash)</h3>
+        <CodeBlock>{`# 1. Enumerate every country slug (paginate with limit/offset until meta.hasMore is false).
+curl "${BASE_URL}/countries?limit=250&offset=0" | jq -r '.data[].slug' > slugs.txt
+
+# 2. Download each country's full record. Stay under the 30/min/IP export limit.
+while read slug; do
+  curl -s "${SITE_URL}/api/countries/$slug/export?format=json" -o "data/$slug.json"
+  sleep 2
+done < slugs.txt`}</CodeBlock>
+
+        <h3 className="api-example-heading">CSV export</h3>
+        <CodeBlock>{`curl "${SITE_URL}/api/countries/france/export?format=csv" -o france-data.csv`}</CodeBlock>
+
+        <p className="api-info-card__body">
+          A single frozen, versioned dataset artifact — one download for the
+          entire atlas, with a persistent identifier for citation — is a planned
+          addition. Until it ships, the per-country export plus the country list
+          above is the supported path for a complete pull, and every record
+          keeps its source, license, and vintage attached.
+        </p>
       </section>
 
       <hr className="api-section-divider" />

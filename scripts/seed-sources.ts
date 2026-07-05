@@ -318,7 +318,13 @@ const SOURCES = [
     id: "unesco_uis",
     name: "UNESCO Institute for Statistics",
     baseUrl: "https://uis.unesco.org",
-    license: "CC-BY-3.0-IGO",
+    // UIS data is CC BY-SA 4.0, verified live at
+    // https://databrowser.uis.unesco.org/terms-and-conditions and the UIS
+    // Data API `info.license` block. The earlier `CC-BY-3.0-IGO` label was a
+    // seed conflation with the WHO GHO license (which IS CC-BY-NC-SA-3.0-IGO).
+    // CC BY-SA 4.0 carries no non-commercial clause, so the commercial-use
+    // flag below is correct. Adopted in plan/unesco-uis-resolution-v1.md §Q1.
+    license: "CC-BY-SA-4.0",
     isCommercialUseAllowed: true,
     lastSyncAt: null,
   },
