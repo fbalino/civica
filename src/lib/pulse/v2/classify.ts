@@ -21,8 +21,10 @@
  * classify→verify passes plus real-world corroboration (corroborate.ts).
  *
  * Auto-publish gating:
- *   - Severity tier in HUMAN_REVIEW_TIERS  → review required
- *   - verify confidence === "low"          → review required
+ *   - Severity tier in HUMAN_REVIEW_TIERS  → review required (absolute)
+ *   - verify refuted/low on a WEAK consensus (bare majority with low
+ *     self-confidence, or a degraded run) → review; confident majorities
+ *     and unanimous verdicts publish over a lone refuter
  *   - otherwise                            → auto-publish
  *
  * The persisted `classifier_agreement` column is retained for schema and
@@ -92,7 +94,8 @@ const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 // Resolve the classify ENSEMBLE once per module load (lazy client init
 // happens inside the provider layer). Owner decision 2026-07-05: the classify
 // pass runs one call per independent vendor so their errors are uncorrelated.
-// Default set: DeepSeek v4-flash + GLM 4.7-flashx + Anthropic Haiku 4.5.
+// Default set: DeepSeek v4-flash + GLM 4.7 + Anthropic Haiku 4.5 (the
+// flashx tier was disqualified on latency — 60s+ per call stalls the cron).
 // Overridable via PULSE_CLASSIFY_ENSEMBLE (comma list of provider:model). When
 // that names exactly ONE pair, the pipeline runs in single-engine mode (the
 // prior classify→verify behavior) — no consensus, no extra calls.
@@ -338,8 +341,9 @@ async function classifyOneSingle(
  * published-gate semantics:
  *   - 'all' consensus       → verify STILL runs (one engine) as the
  *     adversarial check; a low confidence still routes to review.
- *   - 'two_of_three'        → verify runs; a REFUTED verdict downgrades to
- *     review.
+ *   - 'two_of_three'        → verify runs; a refuted verdict downgrades to
+ *     review ONLY when the majority is weak (low self-confidence or a
+ *     degraded run) — the verifier is a signal, not a veto.
  *   - 'none' (deadlock / no quorum) → skip verify, straight to review.
  *
  * Every engine's classify run + the verify run are recorded in
@@ -458,9 +462,9 @@ async function classifyOneEnsemble(
  * Gate for the ensemble:
  *   - severity tier in HUMAN_REVIEW_TIERS   → review (unchanged invariant)
  *   - deadlock/no-quorum (forceReview)      → review, no auto-publish
- *   - verify confidence "low" OR verify failed → review
- *   - verify REFUTED (is_event=false / verdict "rejected") → review
- *   - otherwise                              → auto-publish
+ *   - verify refuted/low/failed AND weak consensus → review
+ *   - otherwise (incl. a lone refuter against a unanimous or confident
+ *     majority verdict)                      → auto-publish
  */
 function buildEnsembleResult(
   cluster: ClusterToClassify,
@@ -525,11 +529,21 @@ function buildEnsembleResult(
     description: cluster.body.slice(0, 1500),
   };
 
+  // LOOSENED GATE (owner decision 2026-07-05): the adversarial verifier is a
+  // signal, not a veto. A refuted or low-confidence verify routes to review
+  // only when the consensus itself is weak — a bare majority with low
+  // self-confidence, or a degraded run (an engine dropped out). Unanimous
+  // verdicts and confident majorities publish over a lone refuter. The
+  // severe-tier human gate stays absolute (published methodology promise),
+  // as do deadlock/no-quorum routes.
+  const weakConsensus =
+    consensus.agreement !== "all" &&
+    (consensus.selfConfidence < 0.7 || consensus.degraded);
+  const verifierObjects = verifyConfidence === "low" || verifyRefuted;
   const requiresReview =
     opts.forceReview ||
     HUMAN_REVIEW_TIERS.has(consensus.severityTier) ||
-    verifyConfidence === "low" ||
-    verifyRefuted;
+    (verifierObjects && weakConsensus);
 
   return { classified, autoPublished: !requiresReview };
 }

@@ -368,6 +368,9 @@ interface EnsembleEventOutcome {
   consensusCategory: string;
   consensusTier: SeverityTier | null;
   agreement: "all" | "two_of_three" | "none";
+  /** consensus self-confidence (majority run's) — needed to re-score gate
+   *  policies offline without re-spending on API calls */
+  selfConfidence: number | null;
   degraded: boolean;
   voterCount: number;
   /** verify pass ran (only on a real majority) */
@@ -562,6 +565,7 @@ async function runEnsembleEval() {
       consensusCategory: consensus.category,
       consensusTier: realMajority ? consensus.severityTier : null,
       agreement: consensus.agreement,
+      selfConfidence: realMajority ? consensus.selfConfidence : null,
       degraded: consensus.degraded,
       voterCount: consensus.voterCount,
       verifyRan,
@@ -701,6 +705,10 @@ function reportEnsemble(
   const report = {
     generatedAt: new Date().toISOString(),
     mode: "ensemble",
+    // Every vote recorded per cluster: gate-policy questions ("what if a
+    // refuted majority published?") re-score these rows offline for $0
+    // instead of re-running paid evals.
+    rows: outcomes,
     mock,
     ensemble: ensemble.map(engineKey),
     verifyEngine: engineKey(verifyCfg),
