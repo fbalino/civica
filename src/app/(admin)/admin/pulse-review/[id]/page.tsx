@@ -238,7 +238,16 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
                   {signedSeverity(run.severityValue)}
                 </Chip>
               </div>
-              <div className="admin-run-rationale">{run.rationale}</div>
+              {run.rationale &&
+              run.rationale !== "subscription-agent classification" ? (
+                <div className="admin-run-rationale">{run.rationale}</div>
+              ) : (
+                <div className="admin-run-rationale admin-run-rationale--empty">
+                  No per-model rationale recorded (legacy classification).
+                  Re-run under the current ensemble to capture each
+                  model&rsquo;s reasoning.
+                </div>
+              )}
             </div>
           ))}
         </div>

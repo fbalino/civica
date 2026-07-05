@@ -854,6 +854,11 @@
   line-height: var(--leading-normal);
 }
 
+.admin-run-rationale--empty {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
 .admin-back-link {
   display: inline-flex;
   align-items: center;
