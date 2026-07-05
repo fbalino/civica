@@ -98,6 +98,11 @@ export default function ContactClient() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [state, setState] = useState<FormState>("idle");
   const [serverError, setServerError] = useState<string | null>(null);
+  // Honeypot: a real, visually-hidden field a human never sees or fills, but a
+  // dumb bot autocompletes. Its value is sent to the API, which silently drops
+  // any submission where it's non-empty. Bound to state so it actually carries
+  // a value (previously a hardcoded "", which made the trap a no-op).
+  const [trap, setTrap] = useState("");
 
   const nameId = useId();
   const emailId = useId();
@@ -136,7 +141,7 @@ export default function ContactClient() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...values, _trap: "" }),
+        body: JSON.stringify({ ...values, _trap: trap }),
       });
       if (res.status === 201) {
         setState("success");
@@ -178,6 +183,32 @@ export default function ContactClient() {
           <SuccessPanel onReset={reset} />
         ) : (
           <form className="contact-card" onSubmit={submit} noValidate>
+            {/* Honeypot — visually hidden, off the tab order, hidden from AT.
+                Humans never fill it; bots do, and the API drops those. */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: "absolute",
+                width: "1px",
+                height: "1px",
+                overflow: "hidden",
+                clip: "rect(0 0 0 0)",
+                whiteSpace: "nowrap",
+              }}
+            >
+              <label htmlFor="contact-website">
+                Leave this field empty
+                <input
+                  id="contact-website"
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={trap}
+                  onChange={(e) => setTrap(e.target.value)}
+                />
+              </label>
+            </div>
             <div className="contact-field">
               <span className="contact-label" id="contact-category-label">
                 Category
