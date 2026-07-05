@@ -35,7 +35,6 @@
  * The review queue is `pulse_events_v2` rows where `published = false`.
  */
 
-import Anthropic from "@anthropic-ai/sdk";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import {
@@ -61,18 +60,6 @@ import type {
 
 type Db = NeonHttpDatabase<typeof schema>;
 
-const MODEL = "claude-sonnet-4-6";
-
-/** Lazy-init the Anthropic client per the project convention.
- *  Module-level `new Anthropic()` evaluates before dotenv. */
-let _anthropic: Anthropic | null = null;
-function getAnthropic(): Anthropic {
-  if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_PULSE_CLASSIFIER });
-  }
-  return _anthropic;
-}
-
 // Single source of truth for the classifier prompts — shared with
 // backtest.ts so both paths classify + verify identically.
 import {
@@ -85,8 +72,20 @@ import {
   parseVerify,
 } from "./classifier-prompt";
 import { resolveSubjectJurisdiction } from "./country-attribution";
+// Provider abstraction — the engine (Anthropic / DeepSeek / GLM) is
+// env-driven. The published two-pass classify→verify methodology is
+// unchanged; only which model runs each pass moves here.
+// See plan/pulse-classifier-cost-resolution-v1.md (owner decision 2026-07-05).
+import { callClassifier, resolveProviderConfig } from "./provider";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
+
+// Resolve the classify/verify engines once per module load (lazy client
+// init happens inside the provider layer). Defaults to DeepSeek per the
+// 2026-07-05 owner decision; overridable via PULSE_CLASSIFY_PROVIDER /
+// PULSE_VERIFY_PROVIDER (+ *_MODEL).
+const CLASSIFY_CONFIG = resolveProviderConfig("classify");
+const VERIFY_CONFIG = resolveProviderConfig("verify");
 
 export interface ClusterToClassify {
   clusterId: string;
@@ -234,7 +233,7 @@ async function classifyOne(
   const classifyRun: ClassifierRun = {
     run: 1,
     temp: 0,
-    model: MODEL,
+    model: CLASSIFY_CONFIG.model,
     category: first.category,
     dimension: cat.dimension,
     severityTier: first.severityTier,
@@ -246,7 +245,7 @@ async function classifyOne(
   const verifyRun: ClassifierRun = {
     run: 2,
     temp: 0,
-    model: MODEL,
+    model: VERIFY_CONFIG.model,
     category: first.category,
     dimension: cat.dimension,
     severityTier: first.severityTier,
@@ -285,25 +284,23 @@ async function classifyOne(
 async function runClassify(
   userContent: string
 ): Promise<ClassifyResultLite | null> {
-  const client = getAnthropic();
   let response;
   try {
-    response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 800,
-      temperature: 0,
+    response = await callClassifier(CLASSIFY_CONFIG, {
       system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userContent }],
+      user: userContent,
+      maxTokens: 800,
+      expectJson: true,
     });
   } catch (err) {
     console.error(`[classify] classify call failed:`, err);
     return null;
   }
-  const text =
-    response.content[0]?.type === "text" ? response.content[0].text : "";
-  const parsed = parseClassify(text);
+  const parsed = parseClassify(response.text);
   if (!parsed) {
-    console.warn(`[classify] classify parse failed: ${text.slice(0, 100)}`);
+    console.warn(
+      `[classify] classify parse failed: ${response.text.slice(0, 100)}`
+    );
     return null;
   }
   return parsed;
@@ -320,7 +317,6 @@ async function runVerify(
     rationale: string;
   }
 ): Promise<VerifyResultLite | null> {
-  const client = getAnthropic();
   const verifyContent = `${userContent}
 
 FIRST-PASS CLASSIFICATION TO VERIFY:
@@ -330,22 +326,21 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
 - rationale: ${first.rationale}`;
   let response;
   try {
-    response = await client.messages.create({
-      model: MODEL,
-      max_tokens: 500,
-      temperature: 0,
+    response = await callClassifier(VERIFY_CONFIG, {
       system: VERIFY_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: verifyContent }],
+      user: verifyContent,
+      maxTokens: 500,
+      expectJson: true,
     });
   } catch (err) {
     console.error(`[classify] verify call failed:`, err);
     return null;
   }
-  const text =
-    response.content[0]?.type === "text" ? response.content[0].text : "";
-  const parsed = parseVerify(text);
+  const parsed = parseVerify(response.text);
   if (!parsed) {
-    console.warn(`[classify] verify parse failed: ${text.slice(0, 100)}`);
+    console.warn(
+      `[classify] verify parse failed: ${response.text.slice(0, 100)}`
+    );
     return null;
   }
   return parsed;

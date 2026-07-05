@@ -17,7 +17,6 @@
  * to its own tables so a backtest doesn't pollute production data.
  */
 
-import Anthropic from "@anthropic-ai/sdk";
 import { eq, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import {
@@ -44,16 +43,6 @@ import {
 
 type Db = NeonHttpDatabase<typeof schema>;
 
-const MODEL = "claude-sonnet-4-6";
-
-let _anthropic: Anthropic | null = null;
-function getAnthropic(): Anthropic {
-  if (!_anthropic) {
-    _anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY_PULSE_CLASSIFIER });
-  }
-  return _anthropic;
-}
-
 // Single source of truth — same prompts + parsing as production classify.ts.
 import {
   CLASSIFIER_SYSTEM_PROMPT,
@@ -63,7 +52,39 @@ import {
   parseVerify,
   type VerifyConfidence,
 } from "./classifier-prompt";
+// Provider abstraction (env-driven engine). The backtest is the published
+// quality floor, so it defaults to Anthropic — NOT the cheap classify
+// default the production path uses. Override with PULSE_BACKTEST_PROVIDER /
+// PULSE_BACKTEST_MODEL only when deliberately re-validating a candidate
+// engine's backtest verdicts (plan/pulse-classifier-cost-resolution-v1.md §6.3).
+import {
+  callClassifier,
+  PROVIDER_DEFAULT_MODEL,
+  type ClassifierProvider,
+  type ResolvedProviderConfig,
+} from "./provider";
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
+
+/** Backtest engine: Anthropic by default (the validated quality floor),
+ *  overridable via PULSE_BACKTEST_PROVIDER / PULSE_BACKTEST_MODEL. Kept
+ *  separate from the production classify defaults so a cheap production
+ *  swap never silently changes what the backtest validates against. */
+function resolveBacktestConfig(): ResolvedProviderConfig {
+  const raw = (process.env.PULSE_BACKTEST_PROVIDER ?? "").trim().toLowerCase();
+  const provider: ClassifierProvider =
+    raw === "deepseek" || raw === "glm" || raw === "anthropic"
+      ? (raw as ClassifierProvider)
+      : raw === "zhipu"
+        ? "glm"
+        : "anthropic";
+  const model =
+    (process.env.PULSE_BACKTEST_MODEL ?? "").trim() ||
+    PROVIDER_DEFAULT_MODEL[provider];
+  return { provider, model };
+}
+
+const BACKTEST_CONFIG = resolveBacktestConfig();
+const MODEL = BACKTEST_CONFIG.model;
 
 interface ClassifiedBacktestEvent {
   eventDate: string;
@@ -96,23 +117,19 @@ async function classifyEvent(
   const press = pressFreedomScore(iso3);
 
   // Pass 1 — classify.
-  const client = getAnthropic();
   let classifyResp;
   try {
-    classifyResp = await client.messages.create({
-      model: MODEL,
-      max_tokens: 800,
-      temperature: 0,
+    classifyResp = await callClassifier(BACKTEST_CONFIG, {
       system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: userContent }],
+      user: userContent,
+      maxTokens: 800,
+      expectJson: true,
     });
   } catch (err) {
     console.error(`[backtest:classify] classify call failed:`, err);
     return null;
   }
-  const classifyText =
-    classifyResp.content[0]?.type === "text" ? classifyResp.content[0].text : "";
-  const first = parseClassify(classifyText);
+  const first = parseClassify(classifyResp.text);
   if (!first || first.category === "none") return null;
 
   const cat = EVENT_CATEGORY_INDEX[first.category];
@@ -134,21 +151,17 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
 - rationale: ${first.rationale}`;
   let verifyResp;
   try {
-    verifyResp = await client.messages.create({
-      model: MODEL,
-      max_tokens: 500,
-      temperature: 0,
+    verifyResp = await callClassifier(BACKTEST_CONFIG, {
       system: VERIFY_SYSTEM_PROMPT,
-      messages: [{ role: "user", content: verifyContent }],
+      user: verifyContent,
+      maxTokens: 500,
+      expectJson: true,
     });
   } catch (err) {
     console.error(`[backtest:classify] verify call failed:`, err);
     verifyResp = null;
   }
-  const verifyText =
-    verifyResp && verifyResp.content[0]?.type === "text"
-      ? verifyResp.content[0].text
-      : "";
+  const verifyText = verifyResp?.text ?? "";
   const verify = verifyText ? parseVerify(verifyText) : null;
   const confidence: VerifyConfidence = verify?.confidence ?? "low";
   const agreement = agreementFromConfidence(confidence);

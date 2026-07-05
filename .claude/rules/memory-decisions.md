@@ -1,5 +1,20 @@
 # Project Memory Decisions
 
+## 2026-07-05 — Pulse paid classifier runs on DeepSeek (owner decision, overriding the research doc's Haiku preference)
+
+Owner chose DeepSeek (v4-flash default; GLM as alternate) for the paid
+classify→verify path so the daily cron resumes fully automated — the
+subscription routine's daily manual approvals were untenable. The research
+doc (plan/pulse-classifier-cost-resolution-v1.md §8) preferred Anthropic
+Haiku 4.5 and explicitly flagged that adopting a China-domiciled model for a
+citable governance signal deserves a deliberate call — the owner made that
+call on 2026-07-05 knowing the trade-off. Guardrails that made it acceptable:
+the published methodology is engine-agnostic (same prompts/passes/review
+gates), the agreement-eval bar (category ≥90%, severity ≥85%, zero
+directional flips vs human-reviewed gold labels) must pass before and after
+any engine change, and the provider layer makes reverting to Anthropic a
+pure env change (PULSE_CLASSIFY_PROVIDER). Backtests stay on Anthropic.
+
 ## 2026-07-05 — IDEA voter-turnout adopted under its NON-COMMERCIAL license (owner sign-off)
 
 International IDEA turnout data ships on /elections under CC-BY-NC-SA-4.0
