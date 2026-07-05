@@ -15,6 +15,7 @@
  */
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdminRow } from "@/app/(admin)/AdminRow";
 import { Chip } from "@/components/editorial/Pill";
 import { DataTable } from "@/components/editorial/DataTable";
 import {
@@ -416,7 +417,7 @@ export default async function DataDisputesQueuePage({
             </thead>
             <tbody>
               {rows.map((dispute) => (
-                <tr key={dispute.id}>
+                <AdminRow key={dispute.id} href={`/admin/data-disputes/${dispute.id}`}>
                   <td>
                     <Link
                       href={`/admin/data-disputes/${dispute.id}`}
@@ -465,7 +466,7 @@ export default async function DataDisputesQueuePage({
                   <td className="num admin-cell-date">
                     {formatDate(dispute.createdAt)}
                   </td>
-                </tr>
+                </AdminRow>
               ))}
             </tbody>
           </DataTable>

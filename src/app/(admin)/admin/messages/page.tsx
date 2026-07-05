@@ -12,6 +12,7 @@
  */
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdminRow } from "@/app/(admin)/AdminRow";
 import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
@@ -167,7 +168,7 @@ export default async function MessagesQueuePage({ searchParams }: PageProps) {
                   ? (msg.status as Status)
                   : "new";
                 return (
-                  <tr key={msg.id}>
+                  <AdminRow key={msg.id} href={`/admin/messages/${msg.id}`}>
                     <td>
                       <Link
                         href={`/admin/messages/${msg.id}`}
@@ -187,7 +188,7 @@ export default async function MessagesQueuePage({ searchParams }: PageProps) {
                     <td className="num admin-cell-date">
                       {formatDate(msg.createdAt)}
                     </td>
-                  </tr>
+                  </AdminRow>
                 );
               })}
             </tbody>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Chip } from "@/components/editorial/Pill";
-import { SourceDot } from "@/components/SourceDot";
 import { DataTable } from "@/components/editorial/DataTable";
+import { AdminRow } from "@/app/(admin)/AdminRow";
 import { getPulseReviewQueue } from "@/lib/db/queries-pulse-review";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
 
@@ -201,7 +201,10 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
             </thead>
             <tbody>
               {rows.map((event) => (
-                <tr key={event.id}>
+                <AdminRow
+                  key={event.id}
+                  href={`/admin/pulse-review/${event.id}`}
+                >
                   <td>
                     <Link
                       href={`/admin/pulse-review/${event.id}`}
@@ -214,11 +217,6 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
                         {event.headline}
                       </span>
                     </Link>
-                    <span className="admin-cell-dots">
-                      {event.sourceIds.map((src) => (
-                        <SourceDot key={src} source={src} retrievedAt={null} />
-                      ))}
-                    </span>
                   </td>
                   <td>
                     <Chip>
@@ -255,7 +253,7 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
                   <td className="num admin-cell-date">
                     {formatDate(event.eventDate)}
                   </td>
-                </tr>
+                </AdminRow>
               ))}
             </tbody>
           </DataTable>

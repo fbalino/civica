@@ -13,6 +13,7 @@
  */
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdminRow } from "@/app/(admin)/AdminRow";
 import { db } from "@/lib/db";
 import { advisoryApplications } from "@/lib/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
@@ -177,7 +178,7 @@ export default async function AdvisoryApplicationsQueuePage({
                   ? (app.status as Status)
                   : "new";
                 return (
-                  <tr key={app.id}>
+                  <AdminRow key={app.id} href={`/admin/advisory-applications/${app.id}`}>
                     <td>
                       <Link
                         href={`/admin/advisory-applications/${app.id}`}
@@ -200,7 +201,7 @@ export default async function AdvisoryApplicationsQueuePage({
                     <td className="num admin-cell-date">
                       {formatDate(app.createdAt)}
                     </td>
-                  </tr>
+                  </AdminRow>
                 );
               })}
             </tbody>
