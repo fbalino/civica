@@ -24,10 +24,22 @@
  *   - "glm"       — Zhipu / Z.ai OpenAI-compatible endpoint at
  *     https://api.z.ai/api/paas/v4. Flagship `glm-4.7`; cheap fast tier
  *     `glm-4.7-flashx`. Plain `fetch`, no new dependency.
+ *   - "openai"    — OpenAI chat completions at https://api.openai.com/v1
+ *     (`OPENAI_API_KEY`), documented model `gpt-4.1-mini`. Wired as an
+ *     optional FOURTH ensemble voter (owner decision 2026-07-05); inactive
+ *     until the key exists AND `PULSE_CLASSIFY_ENSEMBLE` names it. Plain
+ *     `fetch`, no new dependency.
  *
- * The two OpenAI-compatible providers share one code path (they differ
- * only in base URL, key, and model id). Anthropic keeps its native SDK
- * call because the prompts and JSON parsing were validated against it.
+ * The three OpenAI-compatible providers (deepseek, glm, openai) share one
+ * code path (they differ only in base URL, key, and model id). Anthropic
+ * keeps its native SDK call because the prompts and JSON parsing were
+ * validated against it.
+ *
+ * Ensemble note: the cross-model ensemble (`classify.ts`,
+ * `PULSE_CLASSIFY_ENSEMBLE`) runs ONE classify pass per independent vendor
+ * so their errors are uncorrelated. This provider layer is still the single
+ * seam — the ensemble just calls `callClassifier` once per configured
+ * provider+model.
  *
  * Env-driven config (documented in `.env.example`):
  *   PULSE_CLASSIFY_PROVIDER / PULSE_CLASSIFY_MODEL   — the classify pass
@@ -46,7 +58,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 
-export type ClassifierProvider = "anthropic" | "deepseek" | "glm";
+export type ClassifierProvider = "anthropic" | "deepseek" | "glm" | "openai";
 
 /** The two passes this provider layer serves. */
 export type ClassifierPass = "classify" | "verify";
@@ -93,12 +105,14 @@ export const PROVIDER_DEFAULT_MODEL: Record<ClassifierProvider, string> = {
   anthropic: "claude-sonnet-4-6",
   deepseek: "deepseek-v4-flash",
   glm: "glm-4.7",
+  openai: "gpt-4.1-mini",
 };
 
-/** OpenAI-compatible endpoints. Both accept `/chat/completions`. */
-const OPENAI_COMPAT_BASE: Record<"deepseek" | "glm", string> = {
+/** OpenAI-compatible endpoints. All accept `/chat/completions`. */
+const OPENAI_COMPAT_BASE: Record<"deepseek" | "glm" | "openai", string> = {
   deepseek: "https://api.deepseek.com",
   glm: "https://api.z.ai/api/paas/v4",
+  openai: "https://api.openai.com/v1",
 };
 
 /** Env var holding the key for each provider. */
@@ -106,6 +120,7 @@ const PROVIDER_KEY_ENV: Record<ClassifierProvider, string> = {
   anthropic: "ANTHROPIC_API_KEY_PULSE_CLASSIFIER",
   deepseek: "DEEPSEEK_API_KEY",
   glm: "GLM_API_KEY",
+  openai: "OPENAI_API_KEY",
 };
 
 /**
@@ -128,6 +143,8 @@ export const PROVIDER_MODEL_PRICES: Record<
   "glm-4.7-flashx": { inputPerMTok: 0.07, outputPerMTok: 0.4 },
   "glm-4.7-flash": { inputPerMTok: 0.0, outputPerMTok: 0.0 },
   "glm-5.2": { inputPerMTok: 1.4, outputPerMTok: 4.4 },
+  // OpenAI (optional 4th ensemble voter)
+  "gpt-4.1-mini": { inputPerMTok: 0.4, outputPerMTok: 1.6 },
 };
 
 export interface ResolvedProviderConfig {
@@ -135,12 +152,13 @@ export interface ResolvedProviderConfig {
   model: string;
 }
 
-function parseProvider(
+export function parseProvider(
   value: string | undefined,
   fallback: ClassifierProvider
 ): ClassifierProvider {
   const v = (value ?? "").trim().toLowerCase();
-  if (v === "anthropic" || v === "deepseek" || v === "glm") return v;
+  if (v === "anthropic" || v === "deepseek" || v === "glm" || v === "openai")
+    return v;
   // "zhipu" is a common alias for the GLM provider.
   if (v === "zhipu") return "glm";
   return fallback;
@@ -170,6 +188,83 @@ export function resolveProviderConfig(
   const model =
     (modelEnv ?? "").trim() || PROVIDER_DEFAULT_MODEL[provider];
   return { provider, model };
+}
+
+/**
+ * The default ensemble: three heterogeneous vendors so their errors are
+ * independent (owner decision 2026-07-05).
+ *
+ * GLM tier: the owner's instruction was to default to the cheap fast tier
+ * `glm-4.7-flashx` and fall back to flagship `glm-4.7` if flashx disappoints
+ * in the smoke test. It disappointed — flashx measured 29–74 s per call
+ * (frequently exceeding the 60 s request timeout and throwing), which made it
+ * a non-functional voter that degraded most clusters. Flagship `glm-4.7`
+ * answered the same prompts in 3–5 s with sound JSON, so it is the default.
+ * `PULSE_CLASSIFY_ENSEMBLE` can still select flashx if its latency recovers.
+ */
+export const DEFAULT_ENSEMBLE: ResolvedProviderConfig[] = [
+  { provider: "deepseek", model: "deepseek-v4-flash" },
+  { provider: "glm", model: "glm-4.7" },
+  { provider: "anthropic", model: "claude-haiku-4-5" },
+];
+
+/** The verify engine used by the ensemble's adversarial pass. Cheap,
+ *  same-vendor as the prompts (owner decision 2026-07-05). */
+export const DEFAULT_ENSEMBLE_VERIFY: ResolvedProviderConfig = {
+  provider: "anthropic",
+  model: "claude-haiku-4-5",
+};
+
+/**
+ * Parse a `provider:model` pair (e.g. `glm:glm-4.7-flashx`). A bare
+ * provider (`glm`) resolves to that provider's default model. Returns null
+ * for an unparseable / unknown-provider token so callers can skip it.
+ */
+export function parseProviderModelPair(
+  token: string
+): ResolvedProviderConfig | null {
+  const raw = token.trim();
+  if (!raw) return null;
+  const [provRaw, ...rest] = raw.split(":");
+  const provider = parseProvider(provRaw, "deepseek");
+  // Reject an unknown provider token instead of silently defaulting it.
+  const normalizedProv = (provRaw ?? "").trim().toLowerCase();
+  const known =
+    normalizedProv === "anthropic" ||
+    normalizedProv === "deepseek" ||
+    normalizedProv === "glm" ||
+    normalizedProv === "openai" ||
+    normalizedProv === "zhipu";
+  if (!known) return null;
+  const model = rest.join(":").trim() || PROVIDER_DEFAULT_MODEL[provider];
+  return { provider, model };
+}
+
+/**
+ * Resolve the classify ENSEMBLE from `PULSE_CLASSIFY_ENSEMBLE` — a comma
+ * list of `provider:model` pairs. Unset → the default three-vendor
+ * ensemble. When the var names exactly ONE valid pair, the caller runs in
+ * single-engine mode (the prior behavior). Unknown/blank tokens are dropped;
+ * if every token is invalid the default ensemble is used.
+ */
+export function resolveClassifyEnsemble(): ResolvedProviderConfig[] {
+  const raw = (process.env.PULSE_CLASSIFY_ENSEMBLE ?? "").trim();
+  if (!raw) return DEFAULT_ENSEMBLE;
+  const parsed = raw
+    .split(",")
+    .map((t) => parseProviderModelPair(t))
+    .filter((p): p is ResolvedProviderConfig => p !== null);
+  return parsed.length > 0 ? parsed : DEFAULT_ENSEMBLE;
+}
+
+/**
+ * Resolve the ensemble's verify engine from `PULSE_ENSEMBLE_VERIFY`
+ * (a single `provider:model` pair). Unset → Anthropic Haiku 4.5.
+ */
+export function resolveEnsembleVerifyConfig(): ResolvedProviderConfig {
+  const raw = (process.env.PULSE_ENSEMBLE_VERIFY ?? "").trim();
+  if (!raw) return DEFAULT_ENSEMBLE_VERIFY;
+  return parseProviderModelPair(raw) ?? DEFAULT_ENSEMBLE_VERIFY;
 }
 
 /** The env var that must be set for a provider to run. */
@@ -286,7 +381,7 @@ export interface OpenAiCompatOptions {
 }
 
 async function callOpenAiCompat(
-  provider: "deepseek" | "glm",
+  provider: "deepseek" | "glm" | "openai",
   model: string,
   req: ProviderRequest,
   opts: OpenAiCompatOptions = {}
@@ -299,6 +394,13 @@ async function callOpenAiCompat(
   );
   const url = `${baseUrl}/chat/completions`;
 
+  // Only the hybrid-reasoner providers (DeepSeek V4, GLM current-gen) accept
+  // the `thinking` switch and spend a reasoning budget from max_tokens.
+  // OpenAI's chat-completions API REJECTS an unknown `thinking` field and
+  // does not emit a billed reasoning stream on gpt-4.1-mini, so it gets the
+  // plain answer-sized budget and no thinking param.
+  const isHybridReasoner = provider === "deepseek" || provider === "glm";
+
   const body: Record<string, unknown> = {
     model,
     temperature: 0,
@@ -306,16 +408,36 @@ async function callOpenAiCompat(
     // billed `reasoning_content` stream BEFORE the answer, drawing from the
     // same max_tokens budget. A budget sized for the ~300-token answer gets
     // consumed by reasoning and truncates `content` mid-JSON (measured: 50.5%
-    // parse failures at max_tokens 500-800). Give the answer its requested
-    // budget PLUS generous reasoning headroom; the parser still reads only
-    // `message.content`, and the eval script measures the real token cost
-    // including reasoning.
-    max_tokens: Math.max(req.maxTokens * 4, 4096),
+    // parse failures at max_tokens 500-800). Give hybrid reasoners the
+    // answer's requested budget PLUS generous reasoning headroom; the parser
+    // still reads only `message.content`, and the eval script measures the real
+    // token cost including reasoning. OpenAI (no billed reasoning stream on
+    // gpt-4.1-mini) gets the plain answer-sized budget.
+    max_tokens: isHybridReasoner
+      ? Math.max(req.maxTokens * 4, 4096)
+      : req.maxTokens,
     messages: [
       { role: "system", content: req.system },
       { role: "user", content: req.user },
     ],
   };
+  // Both DeepSeek V4 and GLM current-gen accept this switch. Default is
+  // DISABLED for a practical reason: the billed reasoning stream draws from
+  // the same output budget and truncates the answer JSON on long clusters
+  // (measured before the switch existed). Whether reasoning actually helps
+  // classification quality is an EMPIRICAL question — the eval script runs
+  // both arms via PULSE_COMPAT_THINKING=enabled, which also raises the output
+  // ceiling so reasoning has room. OpenAI does not accept this field, so it is
+  // only sent for hybrid reasoners.
+  if (isHybridReasoner) {
+    body.thinking =
+      process.env.PULSE_COMPAT_THINKING === "enabled"
+        ? { type: "enabled" }
+        : { type: "disabled" };
+    if (process.env.PULSE_COMPAT_THINKING === "enabled") {
+      body.max_tokens = Math.max(req.maxTokens * 4, 16384);
+    }
+  }
   // JSON mode: both DeepSeek and GLM accept the OpenAI-style flag. The
   // methodology prompts already end with "Respond with JSON ONLY", so
   // this is belt-and-suspenders on top of the parser tolerance. DeepSeek

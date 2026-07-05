@@ -334,10 +334,14 @@ export interface PulseV2ClassifierRun {
   run: number;
   temp: number;
   model?: string;
+  /** Vendor engine that produced the run (ensemble rows; absent on legacy). */
+  provider?: string;
   category: string;
   dimension: string;
   severityTier: string;
   severityValue: number;
+  /** Verify-pass verdict on the verify row (absent on classify/legacy rows). */
+  confidence?: "high" | "medium" | "low";
   rationale: string;
 }
 
@@ -457,10 +461,17 @@ export async function getPulseV2Changelog(
           run: Number(rr.run ?? 0),
           temp: Number(rr.temp ?? 0),
           model: rr.model ? String(rr.model) : undefined,
+          provider: rr.provider ? String(rr.provider) : undefined,
           category: String(rr.category ?? ""),
           dimension: String(rr.dimension ?? ""),
           severityTier: String(rr.severityTier ?? rr.severity_tier ?? ""),
           severityValue: Number(rr.severityValue ?? rr.severity_value ?? 0),
+          confidence:
+            rr.confidence === "high" ||
+            rr.confidence === "medium" ||
+            rr.confidence === "low"
+              ? rr.confidence
+              : undefined,
           rationale: String(rr.rationale ?? ""),
         }))
       : [];

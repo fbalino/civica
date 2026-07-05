@@ -60,7 +60,7 @@ The Pulse runs on a daily cadence (Beta). Because it runs as a scheduled job rat
 
 1. **Ingest.** Pull the trailing window of records from every active feed and write them to a staging table.
 2. **Cluster.** Embed each record with a sentence transformer (all-MiniLM-L6-v2, 384-dim). Group records by country and ±48-hour window using cosine similarity ≥ 0.75, so one real-world event covered by many sources collapses to a single cluster.
-3. **Classify and verify.** For each cluster an LLM reads the underlying reports and assigns one taxonomy category, a severity tier and value, and the **subject country** — the country whose governance the event is actually about, judged from the substance of the event and *not* from the language of the article or the country of the outlet (a Portuguese-outlet story about U.S. politics is a United States event, not a Brazilian one). It then runs an independent **verification pass** that tries to refute its own classification. See [classification confidence](#classification-confidence).
+3. **Classify and verify.** For each cluster, several independent models from different vendors each read the underlying reports and assign one taxonomy category, a severity tier and value, and the **subject country** — the country whose governance the event is actually about, judged from the substance of the event and *not* from the language of the article or the country of the outlet (a Portuguese-outlet story about U.S. politics is a United States event, not a Brazilian one). The published classification is the majority verdict across those models, and an independent **verification pass** then tries to refute it. See [classification confidence](#classification-confidence).
 4. **Corroborate.** Count distinct specialist and news sources and compute a source-diversity score, then apply the asymmetric and press-freedom weightings below to produce a corroboration confidence in [0, 1].
 5. **Human review.** Severe- and catastrophic-severity events, and any low-confidence classification, route to a review queue and do **not** affect published scores until a human approves them.
 6. **Score.** Multiply each published event's severity by its corroboration confidence, decay it by an event-type-specific half-life, sum per (country, dimension), clamp to [−15, +10], and write the dimensional deltas.
@@ -173,21 +173,27 @@ The Pulse models a coup as the **stability rupture**. The democratic damage that
 
 This mirrors how political scientists model regime breakdown: the coup is the rupture event, the consolidation is what kills democratic institutions over the following weeks and months. Each cascade event is independently classifiable; their dimensional impacts accumulate naturally on the right rows. A reader looking at the country page sees Stability plummet on day one and Democratic Quality, Rule of Law, and Rights & Freedoms degrade over the following months as the new regime consolidates power.
 
-## Classification confidence — classify, then verify {#classification-confidence}
+## Classification confidence — cross-model consensus, then verify {#classification-confidence}
 
-LLM self-reported confidence is not calibrated, so the Pulse does not trust a model that merely says it is sure. It also does not rely on sampling the same prompt repeatedly: re-running one prompt only measures the randomness of the model's decoding, not whether the answer is correct — confidently-wrong answers tend to recur. Confidence instead comes from **two genuinely independent reasoning passes, plus real-world corroboration**:
+LLM self-reported confidence is not calibrated, so the Pulse does not trust a model that merely says it is sure. It also does not rely on sampling the same prompt repeatedly: re-running one prompt only measures the randomness of a single model's decoding, not whether the answer is correct — confidently-wrong answers tend to recur. Confidence instead comes from **agreement across several independent models, an adversarial verification pass, and real-world corroboration**.
 
-1. **Classify with reasoning.** The classifier reads the clustered reports and assigns a category, severity, and subject country, and names the **runner-up category** it considered. A clear winner is a stronger signal than a close call.
-2. **Verify (refute).** A second, independent pass re-reads the source and actively tries to *refute* the first: is the category right rather than the runner-up? is the severity justified? is the subject country the one the event is about (not the source's language or outlet)? is it even a discrete governance event at all?
-3. **Confidence.** An event is **high** or **medium** confidence only when it survives that verification and the call is unambiguous; otherwise it is **low**.
+**The classify pass is an ensemble of independent models.** Each cluster is classified in parallel by three models from **different vendors** — currently DeepSeek (`deepseek-v4-flash`), Zhipu GLM (`glm-4.7`), and Anthropic Claude Haiku 4.5 — so their errors are independent rather than correlated. (The exact set is configurable; a fourth model can be added.) Each model independently assigns a category, a severity tier and value, and names the **runner-up category** it considered. The published classification is the **majority verdict**:
+
+- **All three agree** → highest-confidence classification.
+- **Two of three agree** → the majority category is taken, but the disagreement is recorded and the event faces the verification pass below before it can publish.
+- **No majority** (three different answers, or too few models returned a usable answer) → the event is treated as unresolved and routed to human review; it does not publish automatically.
+
+Where the majority agrees on the category but differs on severity, the Pulse takes the majority tier and, on a tie, the **more severe** tier (the conservative reading); the published severity value is the median of the agreeing models. If one model errors or returns an unparseable answer, classification degrades to the models that did respond and the degradation is recorded, rather than failing the event.
+
+**Then an adversarial verification pass.** A separate model re-reads the source and actively tries to *refute* the majority classification: is the category right rather than the runner-up? is the severity justified? is the subject country the one the event is about (not the source's language or outlet)? is it even a discrete governance event at all? This pass runs on unanimous classifications as a final adversarial check, and on two-of-three classifications where a refuted verdict downgrades the event to review; it is skipped only when the models already deadlocked (the event is heading to review regardless). It returns **high**, **medium**, or **low** confidence, and is trusted only when the classification survives on all four axes.
 
 What this drives:
 
-- **Low-confidence events are not auto-published.** They go to the human review queue and do not affect scores until a person approves them. Only events that are both confidently classified and below the severe-severity threshold publish automatically; severe and catastrophic events always route to review regardless of confidence.
-- **Most raw news is dropped.** The classifier is deliberately strict about what qualifies as an event: opinion columns, partisan commentary, market and business stories, and un-enacted announcements are not governance events and are discarded rather than scored.
+- **Unresolved and low-confidence events are not auto-published.** A deadlocked classification, a verification that comes back low-confidence or refuted, and any severe- or catastrophic-severity event all route to the human review queue and do not affect scores until a person approves them. Only events that are confidently classified, survive verification, and fall below the severe-severity threshold publish automatically.
+- **Most raw news is dropped.** The classifier is deliberately strict about what qualifies as an event: opinion columns, partisan commentary, market and business stories, and un-enacted announcements are not governance events and are discarded rather than scored. Independent models flagging the same item as a non-event is itself a strong drop signal.
 - **Corroboration is the primary weight on the events that do score** — see the next two sections. Source diversity and press-freedom context determine how heavily a published event moves the dimensional deltas.
 
-Every event stores its classification rationale, runner-up, and verification result, so any published value traces back to the reasoning that produced it and can be challenged via the [corrections process](#corrections).
+Every event stores each model's classification and rationale, the runner-up, the agreement level, and the verification result, so any published value traces back to the reasoning that produced it and can be challenged via the [corrections process](#corrections).
 
 ## Asymmetric scoring — anti-gaming {#asymmetric-scoring}
 
@@ -251,7 +257,7 @@ Country pages where the country's RSF score falls below 30 surface this caveat d
 
 - Coverage is uneven and currently leans on news plus a few specialist feeds. Until the full specialist stack is active, closed-regime detection is weaker than the design intends, and sparse-coverage countries may show artificially stable deltas that understate real events.
 - The classifier is deliberately strict — the large majority of ingested news is commentary, business, or un-enacted announcements rather than discrete governance events, and is dropped. This keeps noise out of the scores, but a genuine event can occasionally be discarded; missing-event disputes are welcomed.
-- LLM classification is imperfect. Every classification is logged with its rationale, runner-up, and verification result, and is subject to correction via the disputes process below.
+- LLM classification is imperfect. Every classification is logged with each model's answer and rationale, the runner-up, the cross-model agreement level, and the verification result, and is subject to correction via the disputes process below.
 - Positive events require stronger corroboration than negative events. This is intentional anti-gaming. In free-press environments it has minimal effect; in closed regimes it means state-originated positive claims are discounted unless independently verified.
 - Dimensional deltas are bounded. A single event cannot produce more than −15 or +10 points of movement on any single dimension. This prevents extremes from distorting comparisons but may understate truly catastrophic situations.
 - The Pulse is not yet peer-reviewed and should not be cited as authoritative.

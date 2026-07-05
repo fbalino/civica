@@ -168,7 +168,9 @@ export function PulseEventDetailCard({
                 {event.classifierRuns.map((run) => (
                   <div key={run.run} className="pulse-event-classifier-run">
                     <div className="pulse-event-meta-label">
-                      Run {run.run} · temp {run.temp}
+                      {run.model
+                        ? `${run.provider ? `${run.provider} · ` : ""}${run.model}`
+                        : `Run ${run.run} · temp ${run.temp}`}
                     </div>
                     <div className="pulse-event-classifier-category">
                       {categoryLabel(run.category)}

@@ -170,11 +170,16 @@ export interface ReviewEventDetail {
     run: number;
     temp: number;
     model: string;
+    /** Vendor engine that produced the run (ensemble rows; absent on legacy). */
+    provider?: string;
     category: string;
     dimension: string;
     severityTier: string;
     severityValue: number;
     selfConfidence: number;
+    /** Verify-pass verdict on the verify row (ensemble/single); absent on
+     *  classify rows and legacy rows. */
+    confidence?: "high" | "medium" | "low";
     rationale: string;
   }>;
   classifierAgreement: string;

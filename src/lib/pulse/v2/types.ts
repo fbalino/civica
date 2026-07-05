@@ -58,15 +58,29 @@ export interface RawEventInput {
   raw: Record<string, unknown>;
 }
 
-/** A single reasoning-pass output. The classify→verify classifier
- *  records two per event (pass 1 = classify, pass 2 = verify); the
- *  subscription path records a single agent pass. `run: 3` is retained
- *  for compatibility with any legacy rows written by the retired
- *  3-temperature scheme. */
+/** A single reasoning-pass output. Recorded per event for audit.
+ *
+ *  Shape history (all fields are ADDITIVE — legacy rows stay readable and
+ *  every historical writer's rows continue to parse):
+ *   - Retired 3-temperature scheme: three classify runs (`run` 1–3), `temp`
+ *     the sampling temperature, one `model`.
+ *   - Single-engine classify→verify: run 1 = classify, run 2 = verify;
+ *     `temp` is 0.
+ *   - Cross-model ENSEMBLE (owner decision 2026-07-05): one classify run per
+ *     independent vendor engine (`run` 1..N), plus a single verify run
+ *     (`run` 10). `provider` names the vendor; `model` the model id;
+ *     `confidence` carries the verify pass's high/medium/low verdict on the
+ *     verify row. `temp` stays 0 (deterministic decode).
+ *
+ *  `run` is a plain number (was `1 | 2 | 3`) so the ensemble's classify +
+ *  verify rows have distinct React keys and audit ordinals. */
 export interface ClassifierRun {
-  run: 1 | 2 | 3;
+  run: number;
   temp: number;
   model: string;
+  /** Vendor engine that produced this run (ensemble rows). Optional so
+   *  legacy rows without it still satisfy the type. */
+  provider?: ClassifierProvider;
   category: string;
   dimension: PulseDimension;
   severityTier: SeverityTier;
@@ -74,9 +88,18 @@ export interface ClassifierRun {
   /** Self-reported confidence. Not used for scoring (LLM self-confidence
    *  is uncalibrated) but preserved for audit. */
   selfConfidence: number;
+  /** Verify-pass confidence verdict (high | medium | low), on the verify
+   *  row only. Absent on classify rows. */
+  confidence?: "high" | "medium" | "low";
   rationale: string;
   raw: string;
 }
+
+/** Provider engines the classifier layer can call. Mirrors
+ *  `ClassifierProvider` in `provider.ts`; duplicated here (a string-literal
+ *  union, no runtime cost) to keep `types.ts` free of a provider-module
+ *  import cycle. */
+export type ClassifierProvider = "anthropic" | "deepseek" | "glm" | "openai";
 
 /** Persisted confidence signal on `pulse_events_v2.classifier_agreement`.
  *  The published classify→verify confidence maps onto it: high→"all",

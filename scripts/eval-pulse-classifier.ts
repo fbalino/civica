@@ -1,10 +1,24 @@
 /**
- * Pulse classifier agreement eval — mechanizes §7 of
+ * Pulse classifier eval — two modes.
+ *
+ * ── --ensemble (owner decision 2026-07-05) ────────────────────────────
+ * Runs the CONFIGURED cross-model ensemble (PULSE_CLASSIFY_ENSEMBLE —
+ * default DeepSeek v4-flash + GLM 4.7-flashx + Anthropic Haiku 4.5) over N
+ * historical clusters (default 200) and reports the AGREEMENT DISTRIBUTION:
+ * unanimous %, two-of-three %, deadlock %, the engine-pair agreement matrix,
+ * per-engine "none"-category rate, verify-refutation rate on majorities, the
+ * projected review-queue size per day at current volume, and measured cost
+ * per event and per month. It does NOT score against stored labels — the
+ * owner's position is that past approvals were smoke tests, not gold;
+ * consensus quality is measured by cross-model agreement. Writes a dated JSON
+ * report to tmp/.
+ *
+ * ── default single-candidate mode — §7 of ──────────────────────────────
  * plan/pulse-classifier-cost-resolution-v1.md (the quality bar a cheap
  * candidate engine must clear before it replaces the incumbent on the
  * paid classify path).
  *
- * What it does:
+ * What the single-candidate mode does:
  *   1. Pulls N already-classified historical clusters from pulse_events_v2
  *      as the GOLD set (preferring human_reviewed / approved rows — the
  *      highest-confidence labels available).
@@ -28,6 +42,8 @@
  * can be smoke-tested with zero network + zero keys.
  *
  * Usage:
+ *   npm run eval:pulse-classifier -- --ensemble --n 200      # ensemble distribution
+ *   npm run eval:pulse-classifier -- --ensemble --mock       # ensemble plumbing smoke test
  *   npm run eval:pulse-classifier -- --provider deepseek --model deepseek-v4-flash
  *   npm run eval:pulse-classifier -- --provider glm --model glm-4.7 --n 100
  *   npm run eval:pulse-classifier -- --mock            # plumbing smoke test
@@ -57,10 +73,15 @@ import {
   providerKeyPresent,
   PROVIDER_DEFAULT_MODEL,
   PROVIDER_MODEL_PRICES,
+  resolveClassifyEnsemble,
+  resolveEnsembleVerifyConfig,
   type ClassifierProvider,
   type OpenAiCompatOptions,
   type ResolvedProviderConfig,
 } from "../src/lib/pulse/v2/provider";
+import { computeConsensus, type EnsembleRun } from "../src/lib/pulse/v2/ensemble";
+import { HUMAN_REVIEW_TIERS } from "../src/lib/pulse/v2/taxonomy";
+import type { SeverityTier } from "../src/lib/pulse/v2/types";
 
 /* ------------------------------------------------------------------ */
 /*  CLI parsing                                                        */
@@ -260,10 +281,16 @@ ${row.description}`;
     inputTokens += c.usage.inputTokens;
     outputTokens += c.usage.outputTokens;
     const parsed = parseClassify(c.text);
-    if (parsed && parsed.category !== "none") {
+    // Any well-formed answer counts as parsed — including category "none"
+    // (the model declining to call this a governance event). Against a gold
+    // row, "none" is a CATEGORY DISAGREEMENT, not a parse failure; conflating
+    // the two hid the real miss pattern behind a fake plumbing number.
+    if (parsed) {
+      parseOk = true;
       candCategory = parsed.category;
       candSeverityTier = parsed.severityTier;
-      parseOk = true;
+    }
+    if (parsed && parsed.category !== "none") {
 
       // Pass 2 — verify (runs for token/cost realism; result not scored
       // against gold here, matching §7 which scores category + tier).
@@ -316,7 +343,473 @@ function pct(n: number, d: number): number {
   return d === 0 ? 0 : Math.round((n / d) * 1000) / 10;
 }
 
+/* ================================================================== */
+/*  --ensemble mode                                                    */
+/*                                                                     */
+/*  Runs the CONFIGURED cross-model ensemble (PULSE_CLASSIFY_ENSEMBLE, */
+/*  default DeepSeek + GLM + Anthropic Haiku) over N historical        */
+/*  clusters and reports the AGREEMENT DISTRIBUTION. There is no       */
+/*  scoring against stored labels — the owner's position is that past  */
+/*  approvals were smoke tests, not gold. Consensus quality is         */
+/*  measured by how often the independent engines agree.               */
+/* ================================================================== */
+
+/** Assumed clustered daily volume for projections — midpoint of the
+ *  documented 8–20 clusters/day (plan §3). */
+const CLUSTERS_PER_DAY = 15;
+const DAYS_PER_MONTH = 30;
+
+interface EnsembleEventOutcome {
+  eventId: string;
+  countryName: string;
+  /** provider:model → category the engine returned ("none" | "error" | cat) */
+  perEngine: Record<string, string>;
+  /** consensus category ("none" on deadlock/no-quorum) */
+  consensusCategory: string;
+  consensusTier: SeverityTier | null;
+  agreement: "all" | "two_of_three" | "none";
+  degraded: boolean;
+  voterCount: number;
+  /** verify pass ran (only on a real majority) */
+  verifyRan: boolean;
+  verifyRefuted: boolean;
+  verifyConfidence: "high" | "medium" | "low" | null;
+  /** routed to human review under the published gate */
+  review: boolean;
+  inputTokens: number;
+  outputTokens: number;
+  /** per-provider token usage for per-engine cost */
+  tokensByModel: Record<string, { input: number; output: number }>;
+}
+
+function engineKey(cfg: ResolvedProviderConfig): string {
+  return `${cfg.provider}:${cfg.model}`;
+}
+
+async function runEnsembleEval() {
+  const mock = hasFlag("--mock");
+  const n = Number(argValue("--n") ?? "200") || 200;
+  const configuredEnsemble = resolveClassifyEnsemble();
+  const configuredVerify = resolveEnsembleVerifyConfig();
+
+  // In --mock mode, everything must flow through the injectable OpenAI-compat
+  // fetch layer (makeMockFetch), which does NOT stub Anthropic's native SDK.
+  // Remap any anthropic engine to a deepseek-shaped stub so the plumbing check
+  // is fully network- and key-free while preserving the engine COUNT and the
+  // per-engine labels. Real runs use the configured engines verbatim.
+  const toMockEngine = (c: ResolvedProviderConfig): ResolvedProviderConfig =>
+    c.provider === "anthropic"
+      ? { provider: "deepseek", model: `mock-${c.model}` }
+      : c;
+  const ensemble = mock
+    ? configuredEnsemble.map(toMockEngine)
+    : configuredEnsemble;
+  const verifyCfg = mock ? toMockEngine(configuredVerify) : configuredVerify;
+
+  console.log(`\nPulse classifier eval — ENSEMBLE mode${mock ? "  [MOCK]" : ""}`);
+  console.log(
+    `Engines (${ensemble.length}): ${ensemble.map(engineKey).join(", ")}`
+  );
+  console.log(`Verify engine: ${engineKey(verifyCfg)}`);
+  console.log(`Sample size (clusters): up to ${n}\n`);
+
+  // Key gate: every engine that will actually run needs its key (unless
+  // --mock). The verify engine key is required too.
+  if (!mock) {
+    const needKeys = [...ensemble, verifyCfg];
+    const missing = needKeys.filter((c) => !providerKeyPresent(c.provider));
+    if (missing.length) {
+      const names = [...new Set(missing.map((c) => providerKeyEnvName(c.provider)))];
+      console.error(
+        `Missing API key(s) for the configured ensemble: ${names.join(", ")}.\n` +
+          `Set them in .env.local to run a real ensemble eval, or pass --mock to\n` +
+          `smoke-test the plumbing (no keys, no network).`
+      );
+      process.exit(2);
+    }
+  }
+  if (!process.env.DATABASE_URL) {
+    console.error("DATABASE_URL is not set — cannot load clusters.");
+    process.exit(2);
+  }
+
+  const db = drizzle({ client: neon(process.env.DATABASE_URL), schema });
+  // Reuse the same loader (pulls the most recent classified events as
+  // representative clusters). We do NOT read their stored category as a
+  // label — only the headline + description as the source text.
+  const rows = await loadGoldRows(db, n);
+  if (rows.length === 0) {
+    console.error("No clusters found in pulse_events_v2 — nothing to evaluate.");
+    process.exit(2);
+  }
+  console.log(`Loaded ${rows.length} clusters.\n`);
+
+  const httpOpts: OpenAiCompatOptions = mock
+    ? { fetchImpl: makeMockFetch(), apiKey: "mock" }
+    : {};
+
+  const outcomes: EnsembleEventOutcome[] = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    process.stdout.write(
+      `  [${i + 1}/${rows.length}] ${row.countryName.slice(0, 16).padEnd(16)} `
+    );
+    const userContent = `Country: ${row.countryName}\n\nHeadline: ${row.headline}\n\nBody:\n${row.description}`;
+
+    // --- Fan out one classify call per engine, in parallel ---
+    const settled = await Promise.allSettled(
+      ensemble.map(async (cfg) => {
+        const c = await callClassifier(
+          cfg,
+          {
+            system: CLASSIFIER_SYSTEM_PROMPT,
+            user: userContent,
+            maxTokens: 800,
+            expectJson: true,
+          },
+          httpOpts
+        );
+        return { cfg, resp: c };
+      })
+    );
+
+    const runs: EnsembleRun[] = [];
+    const perEngine: Record<string, string> = {};
+    const tokensByModel: Record<string, { input: number; output: number }> = {};
+    let inputTokens = 0;
+    let outputTokens = 0;
+
+    settled.forEach((outcome, idx) => {
+      const cfg = ensemble[idx];
+      const key = engineKey(cfg);
+      if (outcome.status === "rejected") {
+        perEngine[key] = "error";
+        return;
+      }
+      const { resp } = outcome.value;
+      inputTokens += resp.usage.inputTokens;
+      outputTokens += resp.usage.outputTokens;
+      tokensByModel[cfg.model] = {
+        input: (tokensByModel[cfg.model]?.input ?? 0) + resp.usage.inputTokens,
+        output:
+          (tokensByModel[cfg.model]?.output ?? 0) + resp.usage.outputTokens,
+      };
+      const parsed = parseClassify(resp.text);
+      if (!parsed) {
+        perEngine[key] = "error"; // unparseable == dropped voter
+        return;
+      }
+      perEngine[key] = parsed.category;
+      runs.push({ config: cfg, result: parsed });
+    });
+
+    const consensus = computeConsensus(runs, ensemble.length);
+
+    // Verify pass placement: runs only on a REAL majority (agreement !==
+    // "none" AND category !== "none"), mirroring production.
+    let verifyRan = false;
+    let verifyRefuted = false;
+    let verifyConfidence: "high" | "medium" | "low" | null = null;
+    const realMajority =
+      consensus.agreement !== "none" && consensus.category !== "none";
+    if (realMajority) {
+      try {
+        const verifyContent = `${userContent}\n\nFIRST-PASS CLASSIFICATION TO VERIFY:\n- category: ${consensus.category}\n- runner-up considered: ${consensus.runnerUp}\n- severity: ${consensus.severityTier} (${consensus.severityValue})\n- rationale: ensemble ${consensus.agreement} (${consensus.agreeingCount}/${consensus.voterCount})`;
+        const v = await callClassifier(
+          verifyCfg,
+          {
+            system: VERIFY_SYSTEM_PROMPT,
+            user: verifyContent,
+            maxTokens: 500,
+            expectJson: true,
+          },
+          httpOpts
+        );
+        inputTokens += v.usage.inputTokens;
+        outputTokens += v.usage.outputTokens;
+        tokensByModel[verifyCfg.model] = {
+          input:
+            (tokensByModel[verifyCfg.model]?.input ?? 0) + v.usage.inputTokens,
+          output:
+            (tokensByModel[verifyCfg.model]?.output ?? 0) +
+            v.usage.outputTokens,
+        };
+        const parsedV = parseVerify(v.text);
+        verifyRan = true;
+        verifyConfidence = parsedV?.confidence ?? "low";
+        verifyRefuted =
+          parsedV != null &&
+          (parsedV.isEvent === false || parsedV.verdict === "rejected");
+      } catch {
+        verifyRan = true;
+        verifyConfidence = "low"; // conservative: a failed verify == low
+      }
+    }
+
+    // Published-gate replica (matches classify.ts buildEnsembleResult).
+    const review =
+      !realMajority ||
+      (consensus.severityTier != null &&
+        HUMAN_REVIEW_TIERS.has(consensus.severityTier)) ||
+      verifyConfidence === "low" ||
+      verifyRefuted;
+
+    outcomes.push({
+      eventId: row.eventId,
+      countryName: row.countryName,
+      perEngine,
+      consensusCategory: consensus.category,
+      consensusTier: realMajority ? consensus.severityTier : null,
+      agreement: consensus.agreement,
+      degraded: consensus.degraded,
+      voterCount: consensus.voterCount,
+      verifyRan,
+      verifyRefuted,
+      verifyConfidence,
+      review,
+      inputTokens,
+      outputTokens,
+      tokensByModel,
+    });
+
+    console.log(
+      `${consensus.agreement.padEnd(13)} ${consensus.category}${
+        consensus.degraded ? " (degraded)" : ""
+      }${review ? " → review" : ""}`
+    );
+  }
+
+  reportEnsemble(outcomes, ensemble, verifyCfg, mock);
+}
+
+function reportEnsemble(
+  outcomes: EnsembleEventOutcome[],
+  ensemble: ResolvedProviderConfig[],
+  verifyCfg: ResolvedProviderConfig,
+  mock: boolean
+) {
+  const total = outcomes.length;
+  const unanimous = outcomes.filter((o) => o.agreement === "all").length;
+  const twoOfThree = outcomes.filter(
+    (o) => o.agreement === "two_of_three"
+  ).length;
+  const deadlock = outcomes.filter((o) => o.agreement === "none").length;
+  const degraded = outcomes.filter((o) => o.degraded).length;
+  const reviewCount = outcomes.filter((o) => o.review).length;
+
+  // Majority "none" (ensemble agreed = not a governance event) vs a deadlock
+  // "none" (no quorum / no majority). Both surface as consensusCategory==="none",
+  // distinguished by agreement.
+  const droppedAsNone = outcomes.filter(
+    (o) => o.consensusCategory === "none" && o.agreement !== "none"
+  ).length;
+
+  // --- Engine-pair agreement matrix (over clusters where BOTH engines in the
+  //     pair returned a usable, non-error category) ---
+  const keys = ensemble.map(engineKey);
+  const pairMatrix: Array<{
+    a: string;
+    b: string;
+    agreePct: number;
+    comparable: number;
+  }> = [];
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = i + 1; j < keys.length; j++) {
+      const a = keys[i];
+      const b = keys[j];
+      let comparable = 0;
+      let agree = 0;
+      for (const o of outcomes) {
+        const ca = o.perEngine[a];
+        const cb = o.perEngine[b];
+        if (!ca || !cb || ca === "error" || cb === "error") continue;
+        comparable++;
+        if (ca === cb) agree++;
+      }
+      pairMatrix.push({ a, b, agreePct: pct(agree, comparable), comparable });
+    }
+  }
+
+  // --- Per-engine "none"-category rate + error rate ---
+  const perEngineStats = keys.map((k) => {
+    let noneCount = 0;
+    let errorCount = 0;
+    let returned = 0;
+    for (const o of outcomes) {
+      const c = o.perEngine[k];
+      if (c === undefined) continue;
+      if (c === "error") {
+        errorCount++;
+        continue;
+      }
+      returned++;
+      if (c === "none") noneCount++;
+    }
+    return {
+      engine: k,
+      nonePct: pct(noneCount, returned),
+      errorPct: pct(errorCount, total),
+      returned,
+    };
+  });
+
+  // --- Verify refutation rate on majorities ---
+  const verifyRan = outcomes.filter((o) => o.verifyRan).length;
+  const verifyRefuted = outcomes.filter((o) => o.verifyRefuted).length;
+  const verifyLow = outcomes.filter(
+    (o) => o.verifyRan && o.verifyConfidence === "low"
+  ).length;
+
+  // --- Projected review-queue size per day at current volume ---
+  const reviewRate = total === 0 ? 0 : reviewCount / total;
+  const projectedReviewPerDay = reviewRate * CLUSTERS_PER_DAY;
+
+  // --- Cost math ---
+  const totalInput = outcomes.reduce((a, o) => a + o.inputTokens, 0);
+  const totalOutput = outcomes.reduce((a, o) => a + o.outputTokens, 0);
+  // Per-model token totals across the run.
+  const modelTokens: Record<string, { input: number; output: number }> = {};
+  for (const o of outcomes) {
+    for (const [model, t] of Object.entries(o.tokensByModel)) {
+      modelTokens[model] = {
+        input: (modelTokens[model]?.input ?? 0) + t.input,
+        output: (modelTokens[model]?.output ?? 0) + t.output,
+      };
+    }
+  }
+  let runCost = 0;
+  const perModelCost: Array<{
+    model: string;
+    input: number;
+    output: number;
+    usd: number | null;
+  }> = [];
+  for (const [model, t] of Object.entries(modelTokens)) {
+    const price = PROVIDER_MODEL_PRICES[model];
+    const usd = price
+      ? (t.input / 1_000_000) * price.inputPerMTok +
+        (t.output / 1_000_000) * price.outputPerMTok
+      : null;
+    if (usd != null) runCost += usd;
+    perModelCost.push({ model, input: t.input, output: t.output, usd });
+  }
+  const costPerEvent = total === 0 ? 0 : runCost / total;
+  const costPerDay = costPerEvent * CLUSTERS_PER_DAY;
+  const costPerMonth = costPerDay * DAYS_PER_MONTH;
+
+  const report = {
+    generatedAt: new Date().toISOString(),
+    mode: "ensemble",
+    mock,
+    ensemble: ensemble.map(engineKey),
+    verifyEngine: engineKey(verifyCfg),
+    sampleSize: total,
+    projectionBasis: {
+      clustersPerDay: CLUSTERS_PER_DAY,
+      daysPerMonth: DAYS_PER_MONTH,
+      note: "Clustered daily volume = midpoint of the documented 8–20 clusters/day.",
+    },
+    distribution: {
+      unanimousPct: pct(unanimous, total),
+      twoOfThreePct: pct(twoOfThree, total),
+      deadlockPct: pct(deadlock, total),
+      degradedPct: pct(degraded, total),
+      droppedAsNonePct: pct(droppedAsNone, total),
+      reviewQueuePct: pct(reviewCount, total),
+      counts: {
+        unanimous,
+        twoOfThree,
+        deadlock,
+        degraded,
+        droppedAsNone,
+        review: reviewCount,
+      },
+    },
+    enginePairAgreement: pairMatrix,
+    perEngine: perEngineStats,
+    verify: {
+      ranCount: verifyRan,
+      refutedCount: verifyRefuted,
+      refutationPctOfMajorities: pct(verifyRefuted, verifyRan),
+      lowConfidenceCount: verifyLow,
+      lowConfidencePctOfMajorities: pct(verifyLow, verifyRan),
+    },
+    projectedReviewQueue: {
+      perDay: Math.round(projectedReviewPerDay * 10) / 10,
+      reviewRatePct: pct(reviewCount, total),
+    },
+    tokens: { input: totalInput, output: totalOutput },
+    cost: {
+      perModel: perModelCost,
+      runUsd: Math.round(runCost * 10000) / 10000,
+      perEventUsd: Math.round(costPerEvent * 1_000_000) / 1_000_000,
+      perDayUsd: Math.round(costPerDay * 10000) / 10000,
+      perMonthUsd: Math.round(costPerMonth * 100) / 100,
+      note: "Priced from PROVIDER_MODEL_PRICES (July 2026). Includes billed reasoning tokens for hybrid reasoners.",
+    },
+  };
+
+  // --- Console summary ---
+  console.log("\n════════  ENSEMBLE DISTRIBUTION  ════════");
+  console.log(`  sample:            ${total} clusters`);
+  console.log(`  unanimous (3/3):   ${report.distribution.unanimousPct}%  (${unanimous})`);
+  console.log(`  two-of-three:      ${report.distribution.twoOfThreePct}%  (${twoOfThree})`);
+  console.log(`  deadlock (none):   ${report.distribution.deadlockPct}%  (${deadlock})`);
+  console.log(`  degraded runs:     ${report.distribution.degradedPct}%  (${degraded})`);
+  console.log(`  agreed "none":     ${report.distribution.droppedAsNonePct}%  (${droppedAsNone})  [dropped, not a gov event]`);
+  console.log(`  → review queue:    ${report.distribution.reviewQueuePct}%  (${reviewCount})`);
+
+  console.log("\n  Engine-pair category agreement (both returned a category):");
+  for (const p of pairMatrix) {
+    console.log(`    ${p.agreePct.toString().padStart(5)}%  ${p.a}  ×  ${p.b}   (n=${p.comparable})`);
+  }
+
+  console.log("\n  Per-engine 'none' rate + error rate:");
+  for (const e of perEngineStats) {
+    console.log(
+      `    ${e.engine.padEnd(34)}  none ${e.nonePct.toString().padStart(5)}%   error ${e.errorPct.toString().padStart(5)}%   (returned ${e.returned})`
+    );
+  }
+
+  console.log("\n  Verify pass (on majorities only):");
+  console.log(`    ran on:          ${verifyRan} majorities`);
+  console.log(`    refuted:         ${report.verify.refutationPctOfMajorities}%  (${verifyRefuted})`);
+  console.log(`    low-confidence:  ${report.verify.lowConfidencePctOfMajorities}%  (${verifyLow})`);
+
+  console.log("\n  Projected review-queue at current volume:");
+  console.log(
+    `    ${report.projectedReviewQueue.perDay} clusters/day  (${report.projectedReviewQueue.reviewRatePct}% of ${CLUSTERS_PER_DAY}/day)`
+  );
+
+  console.log("\n  Cost:");
+  for (const m of perModelCost) {
+    console.log(
+      `    ${m.model.padEnd(24)}  ${m.input.toLocaleString()} in · ${m.output.toLocaleString()} out  ${
+        m.usd != null ? `$${m.usd.toFixed(4)}` : "(no price)"
+      }`
+    );
+  }
+  console.log(`    run total:       $${report.cost.runUsd.toFixed(4)} for ${total} clusters`);
+  console.log(`    per event:       $${costPerEvent.toFixed(6)}`);
+  console.log(
+    `    projected:       $${report.cost.perDayUsd.toFixed(4)}/day · $${report.cost.perMonthUsd.toFixed(2)}/month  (at ${CLUSTERS_PER_DAY} clusters/day)`
+  );
+
+  // --- Write dated report to tmp/ ---
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+  const dir = join(process.cwd(), "tmp");
+  mkdirSync(dir, { recursive: true });
+  const jsonPath = join(dir, `pulse-classifier-ensemble-eval-${stamp}.json`);
+  writeFileSync(jsonPath, JSON.stringify(report, null, 2));
+  console.log(`\n  Report written: ${jsonPath}`);
+}
+
 async function main() {
+  if (hasFlag("--ensemble")) {
+    await runEnsembleEval();
+    return;
+  }
   const mock = hasFlag("--mock");
   const provider = parseProviderArg(argValue("--provider"));
   const model =

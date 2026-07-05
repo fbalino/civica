@@ -209,14 +209,16 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
       <section className="admin-section">
         <h2 className="admin-section-title">Classifier runs</h2>
         <p className="admin-section-intro">
-          Two independent reasoning passes — classify, then verify (refute).
-          Per-pass output is preserved verbatim for audit.
+          Independent reasoning passes — one classify run per model, then a
+          verify (refute) pass. Each run is preserved verbatim for audit.
         </p>
         <div className="admin-runs-grid">
           {event.classifierRuns.map((run) => (
             <div key={run.run} className="admin-run-card">
               <div className="admin-run-head">
-                Run {run.run} · temp {run.temp}
+                {run.model
+                  ? `${run.provider ? `${run.provider} · ` : ""}${run.model}`
+                  : `Run ${run.run} · temp ${run.temp}`}
               </div>
               <div className="admin-run-category">
                 {categoryLabel(run.category)}
