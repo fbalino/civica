@@ -18,10 +18,9 @@ const DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc";
 const UA = "CivicaAtlasBot/1.0 (+https://civicaatlas.org; noise measurement)";
 
 const THEME_QUERY =
-  "(theme:ARREST OR theme:PROTEST OR theme:TRIAL OR theme:CORRUPTION OR " +
-  "theme:ELECTION OR theme:ELECTION_FRAUD OR theme:DEMOCRACY OR " +
-  "theme:RESIGNATION OR theme:SANCTIONS OR theme:CENSORSHIP OR " +
-  "theme:WB_1176_HUMAN_RIGHTS OR theme:WB_2955_POLITICAL_PROCESSES)";
+  "(theme:ARREST OR theme:PROTEST OR theme:CORRUPTION OR " +
+  "theme:ELECTION_FRAUD OR theme:TRIAL OR theme:WB_1176_HUMAN_RIGHTS OR " +
+  "theme:CENSORSHIP)";
 
 const KEYWORD_QUERY =
   "(government OR parliament OR election OR coup OR protest OR reform OR " +

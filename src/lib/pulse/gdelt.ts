@@ -44,32 +44,24 @@ export function resolveGdeltQueryMode(): GdeltQueryMode {
 // the rest are documented GKG themes. An unknown theme name in an OR is
 // harmless — it simply contributes no matches, never an error — so the set is
 // safe to extend without breaking the query.
-// The set size is bounded: GDELT's DOC API rejects a query beyond ~350 chars
-// ("your query was too short or too long"). A 15-`theme:` OR-group (~330
-// chars) is the verified ceiling, so STANDARD stays at 12 and WIDE adds 3.
+// The set size is BOUNDED by GDELT's DOC-API query-length limit: a query
+// beyond ~200 chars is rejected ("your query was too short or too long", a
+// plain-text body that breaks JSON parsing). Verified live over IPv4: 7
+// `theme:` clauses (~140 chars) return results; 12 (~254 chars) are rejected.
+// So STANDARD stays at 7 and WIDE adds 2 (~180 chars, still under the limit).
 const GOVERNANCE_THEMES_STANDARD = [
   "ARREST",
   "PROTEST",
-  "TRIAL",
   "CORRUPTION",
-  "ELECTION",
   "ELECTION_FRAUD",
-  "DEMOCRACY",
-  "RESIGNATION",
-  "SANCTIONS",
-  "CENSORSHIP",
+  "TRIAL",
   "WB_1176_HUMAN_RIGHTS",
-  "WB_2955_POLITICAL_PROCESSES",
+  "CENSORSHIP",
 ];
 
-// Extra themes activated only in the "wide" scope — broadening recall toward
-// political violence, security-service actions, and impeachments the core set
-// can miss. Capped at 3 so the combined query stays under the length limit.
-const GOVERNANCE_THEMES_WIDE_EXTRA = [
-  "WB_1104_POLITICAL_VIOLENCE",
-  "SECURITY_SERVICES",
-  "IMPEACHMENT",
-];
+// Extra themes for the "wide" scope — broader democratic-process and
+// economic-coercion coverage. Capped at 2 to stay under the length limit.
+const GOVERNANCE_THEMES_WIDE_EXTRA = ["DEMOCRACY", "SANCTIONS"];
 
 // Legacy plain-keyword query terms — used only when PULSE_GDELT_QUERY_MODE is
 // "keywords". Retained verbatim as the documented fallback.
