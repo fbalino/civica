@@ -23,7 +23,12 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { rawEvents } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
-import { embedBatch, cosineSimilarity } from "./embed";
+import { tryEmbedBatch, cosineSimilarity, lexicalSimilarity } from "./embed";
+
+// Jaccard threshold for the lexical fallback — a pair of stories sharing this
+// fraction of their significant tokens is treated as the same event. Higher
+// than the cosine threshold because token overlap is a coarser signal.
+const LEXICAL_SIM_THRESHOLD = 0.5;
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -101,7 +106,13 @@ export async function runClustering(
   console.log(
     `[cluster] embedding ${candidates.length} candidates (this triggers model load on first run)…`
   );
-  const embeddings = await embedBatch(texts);
+  // Semantic embeddings when the local model loads; null on serverless where
+  // the ONNX native runtime is absent — then similarity is lexical (Jaccard).
+  const embeddings = await tryEmbedBatch(texts);
+  const useEmbeddings = embeddings !== null;
+  console.log(
+    `[cluster] similarity mode: ${useEmbeddings ? "semantic embeddings" : "lexical (embedding model unavailable)"}`
+  );
 
   // Bucket by jurisdictionId
   const buckets = new Map<string, number[]>(); // jurisdictionId → indexes
@@ -146,8 +157,13 @@ export async function runClustering(
         if (!withinDateWindow(candidates[ia].eventDate, candidates[ib].eventDate)) {
           continue;
         }
-        const sim = cosineSimilarity(embeddings[ia], embeddings[ib]);
-        if (sim >= CLUSTER_SIM_THRESHOLD) {
+        const sim = useEmbeddings
+          ? cosineSimilarity(embeddings![ia], embeddings![ib])
+          : lexicalSimilarity(texts[ia], texts[ib]);
+        const threshold = useEmbeddings
+          ? CLUSTER_SIM_THRESHOLD
+          : LEXICAL_SIM_THRESHOLD;
+        if (sim >= threshold) {
           union(ia, ib);
         }
       }
@@ -173,7 +189,7 @@ export async function runClustering(
         await db
           .update(rawEvents)
           .set({
-            embedding: embeddings[idx],
+            embedding: useEmbeddings ? embeddings![idx] : null,
             clusterId,
             clusteredAt: now,
           })
