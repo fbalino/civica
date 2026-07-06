@@ -1,4 +1,26 @@
+import dns from "node:dns";
+
+// ROOT CAUSE of "GDELT worked before, then silently returned nothing from
+// Vercel": GDELT's IPv6 address is unreachable from some networks (notably
+// Vercel's serverless functions). Node prefers IPv6 by default (v17+), so the
+// TCP connect hangs on the dead IPv6 path until it times out
+// (UND_ERR_CONNECT_TIMEOUT), and the DOC fetch fails without a response — the
+// IPv4 address answers fine. A residential IP that happened to resolve IPv4
+// masked this. Preferring IPv4 makes the connection complete. Process-global
+// and safe — IPv4-first is a reliability win for the other RSS feeds too.
+dns.setDefaultResultOrder("ipv4first");
+
 const GDELT_DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc";
+
+// A descriptive, honest bot User-Agent + Accept headers. GDELT is a public
+// programmatic API; identifying the client is good-citizen practice (and some
+// fronting layers drop requests with no User-Agent at all).
+const GDELT_REQUEST_HEADERS: Record<string, string> = {
+  "User-Agent":
+    "CivicaAtlasBot/1.0 (+https://civicaatlas.org; Pulse governance-event ingest)",
+  Accept: "application/json,text/plain,*/*",
+  "Accept-Language": "en-US,en;q=0.9",
+};
 
 // ── Query mode ─────────────────────────────────────────────────────────────
 // PULSE_GDELT_QUERY_MODE = "themes" (default) | "keywords".
@@ -198,7 +220,10 @@ export async function fetchGdeltEvents(hoursBack = 24): Promise<GdeltArticle[]> 
   // server responses (429/503) — GDELT frequently answers 429 for a few
   // seconds when polled, and without a retry the daily refresh loses its
   // highest-volume source for the whole day.
-  const res = await fetchWithRetry(url, { signal: AbortSignal.timeout(60_000) });
+  const res = await fetchWithRetry(url, {
+    headers: GDELT_REQUEST_HEADERS,
+    signal: AbortSignal.timeout(60_000),
+  });
 
   if (!res.ok) {
     throw new Error(`GDELT API error: ${res.status} ${res.statusText}`);

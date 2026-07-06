@@ -127,7 +127,18 @@ export async function fetchGdelt(
   try {
     articles = await fetchGdeltEvents(hoursBack);
   } catch (err) {
-    console.warn(`[gdelt] fetch failed: ${(err as Error).message}`);
+    // Surface the UNDERLYING cause — Node's fetch reports a bare
+    // "fetch failed", but err.cause carries the real reason (ENOTFOUND,
+    // ECONNRESET, a TLS error, an abort/timeout), which is what actually
+    // tells us whether it's DNS, a WAF reset, or a slow endpoint.
+    const e = err as Error & { cause?: unknown };
+    const cause =
+      e.cause instanceof Error
+        ? `${e.cause.name}: ${e.cause.message}`
+        : e.cause
+          ? String(e.cause)
+          : "(no cause)";
+    console.warn(`[gdelt] fetch failed: ${e.message} | cause: ${cause}`);
     return { rows: [], unmatchedCountry: 0, fetched: 0 };
   }
 
