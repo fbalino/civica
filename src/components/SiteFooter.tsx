@@ -52,6 +52,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
     title: "Explore",
     links: [
       { label: "Countries", href: "/country" },
+      { label: "Parties", href: "/parties" },
       { label: "World Atlas", href: "/atlas" },
       { label: "Compare", href: "/compare" },
       { label: "Elections", href: "/elections" },

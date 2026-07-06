@@ -46,6 +46,7 @@ type NavItem = {
 
 const PRIMARY: NavItem[] = [
   { href: "/country", label: "Countries", descriptor: "Every country", glyph: "▤" },
+  { href: "/parties", label: "Parties", descriptor: "Ideology & seats", glyph: "◐" },
   { href: "/atlas", label: "Atlas", descriptor: "Explore the map", glyph: "◯" },
   { href: "/constitution", label: "Constitutions", descriptor: "Read & compare", glyph: "§" },
   {

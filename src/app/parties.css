@@ -1,0 +1,302 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * parties.css — the cross-country political-party browser (/parties) and
+ * its <IdeologyCompass> design-system component.
+ *
+ * Tokens only (owner mandate — the design system is a closed set): every
+ * colour is a role token, every size a spacing or text token, every font a
+ * font-stack token. No hex/rgb/px-font literals live here.
+ * ───────────────────────────────────────────────────────────────────── */
+
+/* ── Ideology compass (design-system component) ──────────────────────── */
+
+.ideology-compass {
+  width: 100%;
+}
+
+.ideology-compass-chart-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.ideology-compass-svg {
+  display: block;
+  overflow: visible;
+}
+
+/* SVG text classes — Inter throughout; quadrant + tick captions are muted
+   uppercase small-caps, axis labels sentence-case. Sizes come from tokens via
+   the `font-size` CSS property on the <text> class (SVG honours it), so no
+   pixel font sizes appear in the TSX. */
+.ideology-compass-quadrant {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+.ideology-compass-axis-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-wide);
+}
+
+.ideology-compass-tick {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+}
+
+/* HTML hover overlay laid over the fluid SVG — mirrors the IndicatorTrendChart
+   pattern. Each dot's hit node IS the canonical Tooltip trigger wrapper
+   (.editorial-tooltip-trigger), carrying its coordinates via the Tooltip
+   `triggerStyle` prop. Percent maps 1:1 to the viewBox (SVG is width:100%,
+   fixed aspect ratio). */
+.ideology-compass-hover-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ideology-compass-hover-col {
+  position: absolute;
+  display: block;
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+}
+
+.ideology-compass-hover-hit {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Tooltip body (rendered inside the canonical .editorial-tooltip surface). */
+.ideology-compass-tip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 168px;
+}
+
+.ideology-compass-tip-name {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.ideology-compass-tip-country {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  opacity: 0.75;
+  margin-bottom: var(--space-1);
+}
+
+.ideology-compass-tip-rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ideology-compass-tip-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  align-items: baseline;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+}
+
+.ideology-compass-tip-row dt {
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.ideology-compass-tip-row dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Compass caption (honest coverage line) under the chart. */
+.ideology-compass-caption {
+  margin: var(--space-4) auto 0;
+  max-width: 720px;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-50);
+  text-align: center;
+}
+
+/* ── /parties page shell (composes <EditorialPage width="full">) ─────── */
+
+.parties-hero-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-accent);
+  margin: 0 0 var(--space-3);
+}
+
+.parties-compass-panel {
+  margin: 0 0 var(--space-8);
+  padding: var(--space-6);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-card-bg);
+}
+
+.parties-compass-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: center;
+  margin: var(--space-4) auto 0;
+  max-width: 720px;
+}
+
+.parties-compass-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+}
+
+/* ── Filter row (SingleSelectMenu / editorial-chip siblings) ─────────── */
+
+.parties-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-end;
+  margin: 0 0 var(--space-6);
+}
+
+.parties-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+  padding-bottom: var(--space-2);
+}
+
+.parties-filter-toggle input {
+  accent-color: var(--color-accent);
+  cursor: pointer;
+}
+
+.parties-result-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0 0 var(--space-4);
+}
+
+.parties-result-count {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-50);
+}
+
+/* Pager row under the table when the list is capped to the first page. */
+.parties-pager {
+  display: flex;
+  justify-content: center;
+  margin: var(--space-5) 0 0;
+}
+
+/* ── List cells ──────────────────────────────────────────────────────── */
+
+.parties-cell-party {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.parties-cell-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex: none;
+}
+
+.parties-cell-name {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.parties-cell-country {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.parties-cell-country-name {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.parties-cell-provenance {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.parties-cell-ideology {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.parties-source-footnote {
+  margin: var(--space-8) 0 0;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-50);
+}
+
+.parties-source-footnote a {
+  color: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+  .parties-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

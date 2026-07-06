@@ -157,6 +157,78 @@ export const legislatureParties = pgTable("legislature_parties", {
   wikidataQid: text("wikidata_qid"),
 });
 
+/**
+ * Expert-coded ideology positions for the cross-country party browser +
+ * ideology compass, matched from V-Dem's **V-Party v2** dataset (source id
+ * `vparty`). See `plan/party-ideology-sourcing-resolution-v1.md` (§4) — the
+ * adopted contract for this table.
+ *
+ * Keyed 1:1 to a specific Civica `legislature_parties` row (unique on
+ * `legislature_party_id`) so the ideology attaches to that party and travels
+ * with it. A separate table (not columns on `legislature_parties`) because:
+ * (a) `legislature_parties` is a seat-snapshot refreshed by legislature syncs,
+ * a different vintage + cadence from the frozen 2022 V-Party release;
+ * (b) it lets us carry the match provenance (which V-Party party, what year,
+ * what method) and swap in a future V-Party vintage without touching seats.
+ *
+ * Provenance is load-bearing: a party with **no** V-Party match gets no row
+ * here at all — the UI renders an honest "ideology not recorded" state, never
+ * a fabricated position (resolution §5).
+ *
+ * Two axis values, per the adopted compass (resolution §2.5):
+ *   - `economicLeftRight` = `v2pariglef` interval point estimate (X axis;
+ *     ≈ −4 far-left … +4 far-right). `economicLrOrd` is the 0–6 ordinal bucket
+ *     for labelling.
+ *   - `antiPluralism` = `v2xpa_antiplural` Anti-Pluralism Index, 0 (pluralist)
+ *     … 1 (anti-pluralist) (Y axis).
+ */
+export const partyPositions = pgTable(
+  "party_positions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** The Civica `legislature_parties` row this position attaches to. */
+    legislaturePartyId: uuid("legislature_party_id")
+      .references(() => legislatureParties.id)
+      .notNull(),
+    /** Provenance: always `vparty` today. */
+    sourceId: text("source_id")
+      .references(() => sources.id)
+      .notNull(),
+    /** V-Party numeric party id (`v2paid` = Party Facts core-party id). */
+    vpartyId: integer("vparty_id").notNull(),
+    /** Harmonized English V-Party name kept for auditability of the match. */
+    vpartyNameEn: text("vparty_name_en"),
+    /** X axis — `v2pariglef` economic left–right interval point estimate. */
+    economicLeftRight: real("economic_left_right").notNull(),
+    /** `v2pariglef_ord` 0–6 ordinal bucket (0 Far-left … 6 Far-right). */
+    economicLrOrd: integer("economic_lr_ord"),
+    /** Y axis — `v2xpa_antiplural` Anti-Pluralism Index, 0–1. */
+    antiPluralism: real("anti_pluralism").notNull(),
+    /** `v2xpa_popul` Populism Index, 0–1 (optional third lens). */
+    populism: real("populism"),
+    /** The V-Party election year the stored position is coded for. */
+    codedYear: integer("coded_year").notNull(),
+    /** How the Civica row was matched: 'exact' | 'abbrev' | 'token' | 'manual'. */
+    matchMethod: text("match_method").notNull(),
+    /**
+     * Match trust (resolution §4.2): 'high' for exact / abbrev matches,
+     * 'review' for the fuzzy token matches that await a curation pass. The
+     * read layer only surfaces a displayable `position` for 'high' rows — a
+     * wrong ideology is worse than an honest "not recorded". Raw rows of every
+     * confidence are kept in the table for that future curation pass.
+     */
+    matchConfidence: text("match_confidence").notNull().default("high"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    // One ideology position per Civica party row — the upsert conflict target.
+    uniqueIndex("idx_party_positions_legislature_party").on(
+      table.legislaturePartyId,
+    ),
+    index("idx_party_positions_source").on(table.sourceId),
+  ],
+);
+
 export const elections = pgTable("elections", {
   id: uuid("id").primaryKey().defaultRandom(),
   jurisdictionId: uuid("jurisdiction_id")

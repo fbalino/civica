@@ -34,6 +34,7 @@ export const SOURCE_NAMES: Record<string, string> = {
   senat_fr: "Sénat",
   bjornskov_rode: "Bjornskov-Rode / CGV",
   vdem: "V-Dem",
+  vparty: "V-Dem V-Party",
   worldbank_wgi: "World Bank WGI",
   world_bank: "World Bank",
   freedom_house: "Freedom House",
@@ -66,6 +67,9 @@ export const SOURCE_NAMES: Record<string, string> = {
 export const FROZEN_SOURCES = new Set<string>([
   "cia_factbook",
   "vdem",
+  // V-Party v2 is a fixed Feb-2022 academic release (coverage through 2019),
+  // not a live feed → amber. Per plan/party-ideology-sourcing-resolution-v1.md §4.1.
+  "vparty",
   "vdem_pulse",
   "worldbank_wgi",
   "worldbank_wgi_corruption",

@@ -8,6 +8,7 @@ import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
 
 const LEADING_LINKS = [
   { href: "/country", label: "Countries" },
+  { href: "/parties", label: "Parties" },
   { href: "/atlas", label: "Atlas" },
   { href: "/compare", label: "Compare" },
   { href: "/constitution", label: "Constitutions" },

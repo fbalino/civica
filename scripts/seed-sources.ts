@@ -198,6 +198,26 @@ const SOURCES = [
     isCommercialUseAllowed: false,
     lastSyncAt: null,
   },
+  // --- Party ideology — V-Dem V-Party v2 ---
+  // Per plan/party-ideology-sourcing-resolution-v1.md §4.1. Expert-coded party
+  // policy positions (economic left–right `v2pariglef` × anti-pluralism
+  // `v2xpa_antiplural`) powering the cross-country party browser + ideology
+  // compass. A distinct V-Dem dataset with its own version + citation, so it
+  // gets its own id (not a reuse of `vdem`). License: CC-BY-SA — commercial use
+  // IS allowed (attribution + share-alike), unlike Civica's other party sources
+  // (IPU Parline / Constitute / IDEA turnout are all non-commercial). V-Party v2
+  // is a fixed Feb-2022 release covering through 2019, so `SourceDot` treats it
+  // as a FROZEN vintage (amber) — see src/lib/data/sources.ts. Matched onto
+  // `legislature_parties` by `scripts/ingest-vparty-positions.ts`, which stamps
+  // freshness via `markSourcesSynced("vparty", …)`.
+  {
+    id: "vparty",
+    name: "V-Dem — V-Party",
+    baseUrl: "https://www.v-dem.net/data/v-party-dataset/",
+    license: "CC-BY-SA",
+    isCommercialUseAllowed: true,
+    lastSyncAt: null,
+  },
   {
     id: "rsf_press_freedom",
     name: "Reporters Without Borders Press Freedom Index",
