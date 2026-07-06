@@ -1,6 +1,56 @@
 const GDELT_DOC_API = "https://api.gdeltproject.org/api/v2/doc/doc";
 
-// Base governance query terms (the "standard" scope).
+// ── Query mode ─────────────────────────────────────────────────────────────
+// PULSE_GDELT_QUERY_MODE = "themes" (default) | "keywords".
+//   themes:   filter on GDELT's GKG THEMES — labels its event-extraction
+//             engine assigns to each article (e.g. theme:ARREST fires on a
+//             political detention, NOT on a "military-style jacket" story).
+//             Far higher precision than string matching; this is the default.
+//   keywords: the legacy plain-keyword OR-list, kept behind this switch so a
+//             theme set that ever underperforms can be reverted by env alone.
+export type GdeltQueryMode = "themes" | "keywords";
+
+export function resolveGdeltQueryMode(): GdeltQueryMode {
+  return (process.env.PULSE_GDELT_QUERY_MODE ?? "").trim().toLowerCase() ===
+    "keywords"
+    ? "keywords"
+    : "themes";
+}
+
+// Core governance GKG themes (the "standard" scope). ARREST and PROTEST are
+// verified live (each returns a full page of governance-relevant world news);
+// the rest are documented GKG themes. An unknown theme name in an OR is
+// harmless — it simply contributes no matches, never an error — so the set is
+// safe to extend without breaking the query.
+// The set size is bounded: GDELT's DOC API rejects a query beyond ~350 chars
+// ("your query was too short or too long"). A 15-`theme:` OR-group (~330
+// chars) is the verified ceiling, so STANDARD stays at 12 and WIDE adds 3.
+const GOVERNANCE_THEMES_STANDARD = [
+  "ARREST",
+  "PROTEST",
+  "TRIAL",
+  "CORRUPTION",
+  "ELECTION",
+  "ELECTION_FRAUD",
+  "DEMOCRACY",
+  "RESIGNATION",
+  "SANCTIONS",
+  "CENSORSHIP",
+  "WB_1176_HUMAN_RIGHTS",
+  "WB_2955_POLITICAL_PROCESSES",
+];
+
+// Extra themes activated only in the "wide" scope — broadening recall toward
+// political violence, security-service actions, and impeachments the core set
+// can miss. Capped at 3 so the combined query stays under the length limit.
+const GOVERNANCE_THEMES_WIDE_EXTRA = [
+  "WB_1104_POLITICAL_VIOLENCE",
+  "SECURITY_SERVICES",
+  "IMPEACHMENT",
+];
+
+// Legacy plain-keyword query terms — used only when PULSE_GDELT_QUERY_MODE is
+// "keywords". Retained verbatim as the documented fallback.
 const GOVERNANCE_TERMS_STANDARD = [
   "government",
   "parliament",
@@ -13,11 +63,6 @@ const GOVERNANCE_TERMS_STANDARD = [
   "sanctions",
   "corruption",
 ];
-
-// Additional terms activated only in the "wide" scope. Kept deliberately
-// conservative — these are still governance-adjacent (not a generic news
-// firehose), broadening recall for events the standard terms miss (judicial,
-// press-freedom, and civil-liberties stories in particular).
 const GOVERNANCE_TERMS_WIDE_EXTRA = [
   "judiciary",
   "supreme court",
@@ -28,6 +73,31 @@ const GOVERNANCE_TERMS_WIDE_EXTRA = [
   "state of emergency",
   "martial law",
 ];
+
+// Domains dropped post-fetch: pure celebrity/gossip/aggregator outlets that a
+// theme filter shouldn't surface but occasionally do. Kept short and
+// defensible; extend per deployment via PULSE_GDELT_DOMAIN_BLOCKLIST (a
+// comma-separated list). Matched as a domain suffix so subdomains are covered.
+const GDELT_DOMAIN_BLOCKLIST = [
+  "tmz.com",
+  "eonline.com",
+  "justjared.com",
+  "perezhilton.com",
+  "pagesix.com",
+];
+
+function domainBlocklist(): string[] {
+  const extra = (process.env.PULSE_GDELT_DOMAIN_BLOCKLIST ?? "")
+    .split(",")
+    .map((d) => d.trim().toLowerCase())
+    .filter(Boolean);
+  return [...GDELT_DOMAIN_BLOCKLIST, ...extra];
+}
+
+function isBlockedDomain(domain: string, blocklist: string[]): boolean {
+  const d = (domain ?? "").toLowerCase();
+  return blocklist.some((b) => d === b || d.endsWith(`.${b}`));
+}
 
 /**
  * Ingest width knob — `PULSE_GDELT_SCOPE`:
@@ -61,6 +131,21 @@ function governanceTermsFor(scope: GdeltScope): string {
   // GDELT treats a bare space as OR inside a parenthesized group, but
   // multi-word phrases must be quoted so they match as a phrase.
   return terms.map((t) => (t.includes(" ") ? `"${t}"` : t)).join(" OR ");
+}
+
+function governanceThemesFor(scope: GdeltScope): string {
+  const themes =
+    scope === "wide"
+      ? [...GOVERNANCE_THEMES_STANDARD, ...GOVERNANCE_THEMES_WIDE_EXTRA]
+      : GOVERNANCE_THEMES_STANDARD;
+  return themes.map((t) => `theme:${t}`).join(" OR ");
+}
+
+/** The DOC-API query string for the active mode + scope. */
+function buildQuery(scope: GdeltScope, mode: GdeltQueryMode): string {
+  return mode === "keywords"
+    ? `(${governanceTermsFor(scope)})`
+    : `(${governanceThemesFor(scope)})`;
 }
 
 // GDELT's DOC API hard-caps `maxrecords` at 250 per request, so "wide"
@@ -99,7 +184,7 @@ export async function fetchGdeltEvents(hoursBack = 24): Promise<GdeltArticle[]> 
   const start = new Date(now.getTime() - effectiveHoursBack * 60 * 60 * 1000);
 
   const params = new URLSearchParams({
-    query: `(${governanceTermsFor(scope)})`,
+    query: buildQuery(scope, resolveGdeltQueryMode()),
     mode: "artlist",
     format: "json",
     maxrecords: String(GDELT_MAX_RECORDS),
@@ -120,7 +205,10 @@ export async function fetchGdeltEvents(hoursBack = 24): Promise<GdeltArticle[]> 
   }
 
   const data = (await res.json()) as GdeltResponse;
-  return data.articles ?? [];
+  const articles = data.articles ?? [];
+  // Drop celebrity/gossip/aggregator domains that slip past the theme filter.
+  const blocklist = domainBlocklist();
+  return articles.filter((a) => !isBlockedDomain(a.domain, blocklist));
 }
 
 /** HTTP statuses worth retrying with backoff — rate limit + transient

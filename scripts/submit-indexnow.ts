@@ -193,3 +193,5 @@ main().catch((err) => {
   console.error("[indexnow] Unexpected error:", err);
   process.exit(1);
 });
+
+export {};
