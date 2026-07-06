@@ -10,6 +10,7 @@ import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { SegmentedControlDemo } from "./SegmentedControlDemo";
 import { IndicatorTrendChartDemo } from "./IndicatorTrendChartDemo";
 import { IdeologyCompassDemo } from "./IdeologyCompassDemo";
+import { ExploreMenuDemo } from "./ExploreMenuDemo";
 import { DEV_TOKEN_GROUPS, type DevTokenGroup } from "@/components/dev/dev-tokens";
 
 import "./design-system.css";
@@ -426,6 +427,25 @@ export default function DesignSystemPage() {
                 <Banner variant="warn">Pulse is paused — scores may be stale.</Banner>
                 <Banner variant="danger">This figure failed reconciliation.</Banner>
               </div>
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4>Explore megamenu (real .explore-menu)</h4>
+              <p
+                style={{
+                  margin: "0 0 var(--space-4)",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "var(--text-13)",
+                  color: "var(--color-text-muted)",
+                  maxWidth: "48ch",
+                }}
+              >
+                The header&rsquo;s &ldquo;Explore&rdquo; panel, shown open. Ivory
+                paper, a terracotta hairline top rule, and destination rows that
+                pair a spot engraving with a serif name and a one-line
+                description. Rows warm on hover and keyboard focus.
+              </p>
+              <ExploreMenuDemo />
             </div>
 
             <div className="ds-comp ds-comp--wide">

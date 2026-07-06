@@ -437,6 +437,32 @@ export const countryFacts = pgTable(
     // ── Vintaging / freshness (Phase F additions) ──
     /** Full date the upstream assigned, where finer than year. */
     asOf: date("as_of"),
+    /**
+     * Real underlying MEASUREMENT year, when it differs from the
+     * publisher's prose-vintage stamp (`factYear` / `asOf`).
+     *
+     * CIA Factbook stamps a republication / projection year on its
+     * demographic estimates — e.g. `Population: 338,016,259 (2025 est.)`
+     * is a current-year estimate CIA constructs from the prior year's
+     * UN World Population Prospects reference data, not a 2025
+     * measurement. For those rows the measurement vintage is one year
+     * older than the stamp. Recording the true year here lets the
+     * resolver's freshness comparator rank a primary publisher's actual
+     * measurement ahead of CIA's republication stamp without mutating
+     * CIA's original `factYear` / `as_of` provenance.
+     *
+     * NULL for every row whose stamp already equals its measurement
+     * year (the common case) — the resolver falls back to the existing
+     * `asOf || factYear || retrievedAt` ladder. No false precision:
+     * a null means "the stamp IS the measurement year, as far as we
+     * assert." Populated ONLY by the CIA seed script and the scoped CIA
+     * backfill, for the five demographic fact-keys where CIA's
+     * projection methodology is documented.
+     *
+     * Contract: `~/civica/plan/cia-stale-vintage-resolution-v1.md`
+     * (Option A, owner-confirmed).
+     */
+    dataVintageYear: integer("data_vintage_year"),
     /** When our sync pulled the row. Backfilled to created_at. */
     retrievedAt: timestamp("retrieved_at").defaultNow().notNull(),
     /** Upstream dataset version handle, e.g. "WB WDI 2026.04",
@@ -483,6 +509,39 @@ export const countryFacts = pgTable(
      *  R.2 IMF / R.6 UNDP HDI / R.7 OECD / R.10 ILO. */
     valueType: text("value_type").notNull().default("measured"),
 
+    /**
+     * Growth-methodology discriminator — the HOW behind a growth-rate
+     * figure. Different publishers report GDP growth on different bases
+     * (annual year-on-year, four-quarter accumulated, quarter-on-quarter
+     * seasonally adjusted, annualized quarterly), and the raw numbers are
+     * NOT directly comparable across bases. This column labels each source
+     * row with the measurement style so the resolver can prefer the
+     * comparable annual-YoY publisher, and the UI can disclose the basis.
+     *
+     * Controlled vocabulary (see `src/lib/data/growth-methodology.ts`):
+     *   'annual_yoy'                   — annual real growth, year-on-year
+     *                                    (World Bank, IMF, Eurostat, and
+     *                                    most NSOs; the comparable default).
+     *   'four_quarter_accumulated_yoy' — four-quarter cumulative rate vs.
+     *                                    the same period a year earlier
+     *                                    (IBGE / Brazil's headline print).
+     *   'qoq_seasonally_adjusted'      — quarter-on-quarter, seasonally
+     *                                    adjusted (Stats SA's P0441 print).
+     *   'annualized_qoq'               — quarter-on-quarter annualized
+     *                                    (US BEA-style headline).
+     *   'unspecified'                  — publisher's basis is unknown /
+     *                                    not asserted.
+     *
+     * NULL for every non-growth fact-key (the column is meaningful ONLY on
+     * `gdp_real_growth_rate` / the `gdp_growth_rate` legacy alias). Set at
+     * write time by each growth-emitting sync script and backfilled for
+     * existing rows by `scripts/backfill-growth-methodology.ts`.
+     *
+     * Contract: `~/civica/plan/gdp-growth-methodology-mix-resolution-v1.md`
+     * (Option E, owner-adopted).
+     */
+    growthMethodology: text("growth_methodology"),
+
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
@@ -523,6 +582,33 @@ export const countryFacts = pgTable(
  * See `~/civica/plan/forecast-vs-measurement-v1.md` § 2d.
  */
 export type FactValueType = "measured" | "projected";
+
+/**
+ * `country_facts.growth_methodology` controlled vocabulary.
+ *
+ * The measurement basis behind a growth-rate figure. Meaningful only on
+ * `gdp_real_growth_rate` (and its `gdp_growth_rate` legacy alias); NULL
+ * everywhere else.
+ *
+ * - `annual_yoy` — annual real growth, year-on-year (World Bank, IMF,
+ *   Eurostat, and most NSOs). The comparable default.
+ * - `four_quarter_accumulated_yoy` — four-quarter cumulative rate vs. the
+ *   same period a year earlier (IBGE / Brazil's headline print).
+ * - `qoq_seasonally_adjusted` — quarter-on-quarter, seasonally adjusted
+ *   (Stats SA's P0441 print).
+ * - `annualized_qoq` — quarter-on-quarter annualized (US BEA-style).
+ * - `unspecified` — publisher's basis is unknown / not asserted.
+ *
+ * Human-readable labels + resolver preference logic live in
+ * `src/lib/data/growth-methodology.ts`.
+ * Contract: `~/civica/plan/gdp-growth-methodology-mix-resolution-v1.md`.
+ */
+export type GrowthMethodology =
+  | "annual_yoy"
+  | "four_quarter_accumulated_yoy"
+  | "qoq_seasonally_adjusted"
+  | "annualized_qoq"
+  | "unspecified";
 
 /**
  * Phase F — quarterly fact vintages.

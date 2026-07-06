@@ -76,6 +76,7 @@ function row(partial: Partial<FactRow>): FactRow {
     factYear: partial.factYear ?? null,
     valueJson: null,
     asOf: partial.asOf ?? null,
+    dataVintageYear: partial.dataVintageYear ?? null,
     retrievedAt: partial.retrievedAt ?? "2026-04-01T00:00:00Z",
     upstreamVintageLabel: partial.upstreamVintageLabel ?? null,
     methodologyVersion: "v0.1-beta",
@@ -83,6 +84,7 @@ function row(partial: Partial<FactRow>): FactRow {
     statusReason: null,
     sourceNote: null,
     valueType: partial.valueType ?? "measured",
+    growthMethodology: partial.growthMethodology ?? null,
   };
 }
 

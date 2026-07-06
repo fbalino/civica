@@ -6,6 +6,12 @@ import { slugify } from "@/lib/text/slugify";
 import { FactValueDot } from "@/components/factbook/FactValueDot";
 import { formatFactRowValue } from "@/components/factbook/FactValuePanel";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
+import { InfoTip } from "@/components/editorial/Tooltip";
+import { growthMethodologyTooltip } from "@/lib/data/growth-methodology";
+
+/** Growth fact-keys whose reconciled value carries a methodology InfoTip
+ *  when the canonical publisher reports on a non-annual basis. */
+const GROWTH_FACT_KEYS = new Set(["gdp_real_growth_rate", "gdp_growth_rate"]);
 
 /**
  * Phase F.4 — for the small set of structured-section leaves whose
@@ -367,6 +373,17 @@ function CanonicalLeafRow({
   if (!canonical) return null;
   const value = formatFactRowValue(canonical, factKey);
 
+  // Q5 — growth-methodology InfoTip. When the reconciled growth figure was
+  // measured on a basis that is not directly comparable to an annual figure
+  // (four-quarter accumulated, QoQ seasonally adjusted, annualized QoQ),
+  // show a small circled-i beside the value stating the basis in plain
+  // words. Annual YoY (the comparable default) and unspecified get no tip —
+  // the full methodology detail lives in the alternates panel / Cite block.
+  // ~/civica/plan/gdp-growth-methodology-mix-resolution-v1.md
+  const growthTip = GROWTH_FACT_KEYS.has(factKey)
+    ? growthMethodologyTooltip(canonical.growthMethodology)
+    : null;
+
   return (
     <div
       style={{
@@ -404,6 +421,15 @@ function CanonicalLeafRow({
             ariaLabel={`${factLabel}, see all sources`}
           />
         )}
+        {growthTip ? (
+          <>
+            {" "}
+            <InfoTip
+              content={growthTip}
+              label={`${factLabel} — how this figure is measured`}
+            />
+          </>
+        ) : null}
       </dd>
     </div>
   );

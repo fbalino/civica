@@ -101,6 +101,7 @@ import {
   type PersistDisputeSummary,
 } from "./dispute-persistence";
 import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -809,6 +810,15 @@ export async function syncIbgeBr(
       counter.projection_rows++;
     }
 
+    // Growth-methodology label — NULL on non-growth fact-keys; the
+    // per-source default (IBGE table 5932 → four-quarter accumulated YoY)
+    // on the growth key. Written to `country_facts.growth_methodology`.
+    const growthMethodology = resolveGrowthMethodology(
+      null,
+      "ibge_br",
+      config.factKey,
+    );
+
     const upstreamPayload = {
       source: "ibge_br",
       endpoint: buildDataUrl(config),
@@ -918,6 +928,7 @@ export async function syncIbgeBr(
           snapshotId,
           sourceNote: config.sourceNote ?? null,
           valueType,
+          growthMethodology,
         })
         .onConflictDoUpdate({
           target: [
@@ -950,6 +961,7 @@ export async function syncIbgeBr(
             snapshotId,
             sourceNote: config.sourceNote ?? null,
             valueType,
+            growthMethodology,
             updatedAt: new Date(),
           },
         });

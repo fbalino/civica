@@ -52,6 +52,35 @@ export type FactRowStatus =
 export type FactValueType = "measured" | "projected";
 
 /**
+ * Growth-methodology discriminator — the HOW behind a growth-rate figure.
+ *
+ * Different publishers report GDP growth on different measurement bases,
+ * and the raw numbers are NOT directly comparable across bases. This
+ * labels each `gdp_real_growth_rate` source row with its style so the
+ * resolver can prefer the comparable annual-YoY publisher and the UI can
+ * disclose the basis. NULL on every non-growth fact-key.
+ *
+ * - `annual_yoy` — annual real growth, year-on-year (the comparable
+ *   default; World Bank, IMF, Eurostat, most NSOs).
+ * - `four_quarter_accumulated_yoy` — four-quarter cumulative vs. the same
+ *   period a year earlier (IBGE / Brazil).
+ * - `qoq_seasonally_adjusted` — quarter-on-quarter, seasonally adjusted
+ *   (Stats SA).
+ * - `annualized_qoq` — quarter-on-quarter annualized (US BEA-style).
+ * - `unspecified` — publisher's basis is unknown / not asserted.
+ *
+ * Human-readable labels + resolver preference logic live in
+ * `src/lib/data/growth-methodology.ts`.
+ * See `~/civica/plan/gdp-growth-methodology-mix-resolution-v1.md`.
+ */
+export type GrowthMethodology =
+  | "annual_yoy"
+  | "four_quarter_accumulated_yoy"
+  | "qoq_seasonally_adjusted"
+  | "annualized_qoq"
+  | "unspecified";
+
+/**
  * Civica fact-group classification (methodology §1.1).
  *
  * Mirrors the `FactGroup` exported by the parallel agent's
@@ -85,6 +114,17 @@ export interface FactRow {
   factYear: number | null;
   valueJson: unknown;
   asOf: string | null; // ISO date YYYY-MM-DD
+  /**
+   * Real underlying measurement year, when it differs from the
+   * publisher's prose-vintage stamp (`factYear` / `asOf`). Non-null
+   * only for rows whose stamp is a republication / projection year
+   * (currently the five CIA demographic fact-keys — see
+   * `~/civica/plan/cia-stale-vintage-resolution-v1.md`). When set, the
+   * resolver's `freshness()` comparator uses it in preference to
+   * `asOf` / `factYear`. NULL means "the stamp IS the measurement
+   * year" and the standard ladder applies.
+   */
+  dataVintageYear: number | null;
   retrievedAt: string; // ISO timestamp
   upstreamVintageLabel: string | null;
   methodologyVersion: string;
@@ -97,6 +137,14 @@ export interface FactRow {
    *  to projected rows only when no measurement is available.
    *  See `~/civica/plan/forecast-vs-measurement-v1.md`. */
   valueType: FactValueType;
+  /** Growth-methodology discriminator — the measurement basis behind a
+   *  growth-rate figure (annual YoY, four-quarter accumulated, QoQ
+   *  seasonally adjusted, annualized QoQ). NULL on non-growth fact-keys
+   *  and on growth rows whose basis has not been labelled. The resolver's
+   *  `gdp_real_growth_rate` canonical pick prefers `annual_yoy` publishers
+   *  over non-YoY ones unless the non-YoY row is materially fresher.
+   *  See `~/civica/plan/gdp-growth-methodology-mix-resolution-v1.md`. */
+  growthMethodology: GrowthMethodology | null;
 }
 
 /**

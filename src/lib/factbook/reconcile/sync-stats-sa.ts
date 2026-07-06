@@ -107,6 +107,7 @@ import {
   type PersistDisputeSummary,
 } from "./dispute-persistence";
 import { payloadHash, type CivicaSourceRole } from "./_sync-common";
+import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
 
 type Db = typeof import("@/lib/db").db;
 
@@ -1330,6 +1331,16 @@ export async function syncStatsSa(
       counter.projection_rows++;
     }
 
+    // Growth-methodology label — NULL on non-growth fact-keys; the
+    // per-source default (Stats SA's P0441 → QoQ seasonally adjusted) on
+    // the growth key. Written to `country_facts.growth_methodology` so the
+    // resolver's comparability rule and the UI InfoTip read a stored value.
+    const growthMethodology = resolveGrowthMethodology(
+      null,
+      STATS_SA_SOURCE_ID,
+      config.factKey,
+    );
+
     // Build upstream payload for snapshot dedup + audit trail.
     const upstreamPayload: Record<string, unknown> = {
       source: STATS_SA_SOURCE_ID,
@@ -1451,6 +1462,7 @@ export async function syncStatsSa(
           snapshotId,
           sourceNote: config.sourceNote ?? null,
           valueType,
+          growthMethodology,
         })
         .onConflictDoUpdate({
           target: [
@@ -1484,6 +1496,7 @@ export async function syncStatsSa(
             snapshotId,
             sourceNote: config.sourceNote ?? null,
             valueType,
+            growthMethodology,
             updatedAt: new Date(),
           },
         });

@@ -124,17 +124,20 @@ const WORKED_EXAMPLES: WorkedExample[] = [
   },
   {
     id: "we3",
-    label: "Worked example 3 — Germany GDP growth, multi-canonical with scope predicate",
-    countrySlug: "germany",
-    countryIso3: "DEU",
+    // Growth-methodology comparability rule (Q3). Brazil's IBGE reports a
+    // four-quarter accumulated figure (2025); the World Bank reports annual
+    // year-on-year (2024). IBGE is exactly 12 months fresher — not MORE than
+    // 12 — so the comparable annual-YoY World Bank value wins canonical.
+    // ~/civica/plan/gdp-growth-methodology-mix-resolution-v1.md
+    label: "Worked example 3 — Brazil GDP growth, annual-YoY preferred over four-quarter",
+    countrySlug: "brazil",
+    countryIso3: "BRA",
     factKey: "gdp_real_growth_rate",
-    expectedSource: "eurostat",
-    expectedValue: 0.2,
-    expectedFactYear: 2025,
-    expectedDecisionReason: "incumbent_held",
-    // 5% relative tolerance because magnitude < 1 (0.2%) makes 0.1%
-    // relative tolerance impossibly tight (0.0002 absolute).
-    tolerance: 0.05,
+    expectedSource: "world_bank",
+    expectedValue: 3.419315,
+    expectedFactYear: 2024,
+    expectedDecisionReason: "fresher_winner",
+    tolerance: 0.01,
   },
   {
     id: "we4",
@@ -165,14 +168,20 @@ const WORKED_EXAMPLES: WorkedExample[] = [
   },
   {
     id: "we6",
-    label: "Worked example 6 — IMF projection vs measurement (Argentina population)",
+    // IMF projection partition + CIA vintage normalization (Option A).
+    // The IMF 2031 projection is excluded by the measured-vs-projected
+    // partition; among the measured rows, CIA's "(2025 est.)" nowcast is
+    // aged to data_vintage_year=2024, so it no longer outranks the genuine
+    // UN WPP 2024 measurement. UN WPP wins canonical (World Bank republishes
+    // the same 45,696,160). ~/civica/plan/cia-stale-vintage-resolution-v1.md
+    label: "Worked example 6 — IMF projection excluded, CIA nowcast aged, UN WPP wins (Argentina population)",
     countrySlug: "argentina",
     countryIso3: "ARG",
     factKey: "population_total",
-    expectedSource: "cia_factbook",
-    expectedValue: 45_418_096,
-    expectedFactYear: 2025,
-    expectedDecisionReason: "incumbent_held",
+    expectedSource: "un_data",
+    expectedValue: 45_696_160,
+    expectedFactYear: 2024,
+    expectedDecisionReason: "fresher_winner",
     tolerance: 0.001,
   },
   {
@@ -189,20 +198,24 @@ const WORKED_EXAMPLES: WorkedExample[] = [
   },
   {
     id: "we8",
-    label: "Worked example 8 — Marshall Islands population, disputed-pending case",
+    // Disputes system, RESOLVED state. The Marshall Islands material-error
+    // dispute (CIA's diaspora-inclusive 82,011 vs the UN/WB 37,548
+    // consensus) was triaged by demoting the divergent CIA estimate and
+    // the older/projected rows (status='demoted'), leaving the World Bank's
+    // 2024 measurement as the sole active source. isDisputed is therefore
+    // false and the pick is a single active source. (Pre-dates the CIA
+    // vintage work; CIA is demoted out of the candidate pool entirely, so
+    // data_vintage_year never enters this resolution.)
+    label: "Worked example 8 — Marshall Islands population, dispute resolved by demotion",
     countrySlug: "marshall-islands",
     countryIso3: "MHL",
     factKey: "population_total",
-    expectedSource: "cia_factbook",
-    expectedValue: 82_011,
+    expectedSource: "world_bank",
+    expectedValue: 37_548,
     expectedFactYear: 2024,
-    expectedDecisionReason: "incumbent_held",
+    expectedDecisionReason: "single_source",
     tolerance: 0.001,
-    // The surviving R.21 disputes-triage case the auto-resolve cron
-    // preserved as `status='open'`. If this drops to false, WE8's
-    // editorial framing is broken — the entire example exists to
-    // demonstrate the disputes system.
-    expectIsDisputed: true,
+    expectIsDisputed: false,
   },
 ];
 

@@ -65,6 +65,7 @@ function row(partial: Partial<FactRow>): FactRow {
     factYear: partial.factYear ?? null,
     valueJson: partial.valueJson ?? null,
     asOf: partial.asOf ?? null,
+    dataVintageYear: partial.dataVintageYear ?? null,
     retrievedAt: partial.retrievedAt ?? "2026-04-01T00:00:00Z",
     upstreamVintageLabel: partial.upstreamVintageLabel ?? null,
     methodologyVersion: partial.methodologyVersion ?? "v0.1-beta",
@@ -72,6 +73,7 @@ function row(partial: Partial<FactRow>): FactRow {
     statusReason: partial.statusReason ?? null,
     sourceNote: partial.sourceNote ?? null,
     valueType: partial.valueType ?? "measured",
+    growthMethodology: partial.growthMethodology ?? null,
   };
 }
 
@@ -95,6 +97,15 @@ const GDP_NOMINAL_DEF: FactKeyDefinition = {
   label: "GDP (nominal)",
   envelope: { min: 0, max: 1e14 },
   materialErrorPctThreshold: 0.8, // 80%
+};
+
+const GROWTH_DEF: FactKeyDefinition = {
+  key: "gdp_real_growth_rate",
+  group: "B",
+  category: "economy",
+  label: "Real GDP growth rate",
+  envelope: { min: -50, max: 50, isPercent: true },
+  materialErrorPpThreshold: 50,
 };
 
 const CAPITAL_DEF: FactKeyDefinition = {
@@ -274,6 +285,176 @@ test("Single-source case — only one row, that row wins", () => {
   const out = resolveFromRows([only], POPULATION_DEF);
   assertWinner(out, only.id, "single_source");
   assert.equal(out.proposedDisputes.length, 0);
+});
+
+// ────────────────────────────────────────────────────────────────
+// data_vintage_year — CIA-stale-vintage correction (Option A).
+// ~/civica/plan/cia-stale-vintage-resolution-v1.md
+// ────────────────────────────────────────────────────────────────
+
+test("data_vintage_year — CIA's projection stamp loses to a fresher primary measurement", () => {
+  // Anchor case shape (USA population_total): CIA carries a 2025 est.
+  // stamp but its measurement vintage is 2024; the primary publisher's
+  // real 2024 measurement should win once dataVintageYear ages CIA down.
+  const cia = row({
+    factKey: "population_total",
+    factGroup: "B",
+    sourceId: "cia_factbook",
+    factValueNumeric: 338_016_260,
+    factYear: 2025,
+    asOf: "2025-01-01",
+    dataVintageYear: 2024, // real measurement vintage, stamp untouched
+  });
+  const primary = row({
+    factKey: "population_total",
+    factGroup: "B",
+    sourceId: "world_bank",
+    factValueNumeric: 340_110_980,
+    factYear: 2024,
+    asOf: "2024-01-01",
+  });
+  const out = resolveFromRows([cia, primary], POPULATION_DEF);
+  // Primary wins: with dataVintageYear=2024, CIA is no longer strictly
+  // fresher than the 2024 primary, and CIA is Tier 3 on the tiebreak.
+  assertWinner(out, primary.id, "fresher_winner");
+  // CIA's original stamp is untouched — the correction lives only in
+  // dataVintageYear.
+  const ciaAlt = out.alternates.find((r) => r.sourceId === "cia_factbook");
+  assert.equal(ciaAlt?.factYear, 2025);
+  assert.equal(ciaAlt?.dataVintageYear, 2024);
+});
+
+test("data_vintage_year — null vintage falls back to the stamp ladder (CIA still wins on a fresher stamp)", () => {
+  // Control: with NO dataVintageYear, the pre-correction behaviour holds —
+  // CIA's fresher 2025 stamp beats the 2024 primary. Proves the column,
+  // not a resolver special-case, drives the flip.
+  const cia = row({
+    factKey: "population_total",
+    factGroup: "B",
+    sourceId: "cia_factbook",
+    factValueNumeric: 338_016_260,
+    factYear: 2025,
+    asOf: "2025-01-01",
+    // dataVintageYear left null
+  });
+  const primary = row({
+    factKey: "population_total",
+    factGroup: "B",
+    sourceId: "world_bank",
+    factValueNumeric: 340_110_980,
+    factYear: 2024,
+    asOf: "2024-01-01",
+  });
+  const out = resolveFromRows([cia, primary], POPULATION_DEF);
+  assertWinner(out, cia.id, "incumbent_held");
+});
+
+// ────────────────────────────────────────────────────────────────
+// Q3 — growth-methodology comparability rule (fact-key-scoped).
+// ~/civica/plan/gdp-growth-methodology-mix-resolution-v1.md
+// ────────────────────────────────────────────────────────────────
+
+test("Q3 growth — non-YoY winner exactly 12 months fresher yields to annual_yoy (Brazil shape)", () => {
+  // IBGE reports four-quarter accumulated (as_of 2025-01-01); World Bank
+  // reports annual YoY (as_of 2024-01-01). The gap is exactly 12 calendar
+  // months — NOT more than 12 — so the comparable annual-YoY publisher wins.
+  const ibge = row({
+    factKey: "gdp_real_growth_rate",
+    factGroup: "B",
+    sourceId: "ibge_br",
+    factValueNumeric: 2.3,
+    factYear: 2025,
+    asOf: "2025-01-01",
+    growthMethodology: "four_quarter_accumulated_yoy",
+  });
+  const wb = row({
+    factKey: "gdp_real_growth_rate",
+    factGroup: "B",
+    sourceId: "world_bank",
+    factValueNumeric: 3.42,
+    factYear: 2024,
+    asOf: "2024-01-01",
+    growthMethodology: "annual_yoy",
+  });
+  const out = resolveFromRows([ibge, wb], GROWTH_DEF);
+  assertWinner(out, wb.id, "fresher_winner");
+});
+
+test("Q3 growth — non-YoY winner MORE than 12 months fresher is kept (South Africa shape)", () => {
+  // Stats SA reports QoQ SA (as_of 2025-12-31); World Bank reports annual
+  // YoY (as_of 2024-01-01). Stats SA is ~2 years fresher (> 12 months), so
+  // the specialised publisher keeps the canonical pick.
+  const statsSa = row({
+    factKey: "gdp_real_growth_rate",
+    factGroup: "B",
+    sourceId: "stats_sa",
+    factValueNumeric: 0.4,
+    factYear: 2025,
+    asOf: "2025-12-31",
+    growthMethodology: "qoq_seasonally_adjusted",
+  });
+  const wb = row({
+    factKey: "gdp_real_growth_rate",
+    factGroup: "B",
+    sourceId: "world_bank",
+    factValueNumeric: 0.53,
+    factYear: 2024,
+    asOf: "2024-01-01",
+    growthMethodology: "annual_yoy",
+  });
+  const out = resolveFromRows([statsSa, wb], GROWTH_DEF);
+  assertWinner(out, statsSa.id, "incumbent_held");
+});
+
+test("Q3 growth — no methodology mix (all annual_yoy) leaves freshness pick untouched (Germany shape)", () => {
+  // Eurostat + World Bank both annual YoY; the rule requires a mix, so the
+  // freshest (Eurostat) wins purely on freshness — no growth adjustment.
+  const eurostat = row({
+    factKey: "gdp_real_growth_rate",
+    factGroup: "B",
+    sourceId: "eurostat",
+    factValueNumeric: 0.2,
+    factYear: 2025,
+    asOf: "2025-01-01",
+    growthMethodology: "annual_yoy",
+  });
+  const wb = row({
+    factKey: "gdp_real_growth_rate",
+    factGroup: "B",
+    sourceId: "world_bank",
+    factValueNumeric: -0.5,
+    factYear: 2024,
+    asOf: "2024-01-01",
+    growthMethodology: "annual_yoy",
+  });
+  const out = resolveFromRows([eurostat, wb], GROWTH_DEF);
+  assertWinner(out, eurostat.id, "incumbent_held");
+});
+
+test("Q3 growth — rule does NOT apply to non-growth fact-keys", () => {
+  // Same freshness shape as the Brazil case but on population_total: the
+  // growth adjustment must not fire, so the fresher row wins normally.
+  const fresh = row({
+    factKey: "population_total",
+    factGroup: "B",
+    sourceId: "ibge_br",
+    factValueNumeric: 203_000_000,
+    factYear: 2025,
+    asOf: "2025-01-01",
+    growthMethodology: "four_quarter_accumulated_yoy", // ignored off-growth
+  });
+  const older = row({
+    factKey: "population_total",
+    factGroup: "B",
+    sourceId: "world_bank",
+    factValueNumeric: 216_000_000,
+    factYear: 2024,
+    asOf: "2024-01-01",
+    growthMethodology: "annual_yoy",
+  });
+  const out = resolveFromRows([fresh, older], POPULATION_DEF);
+  // Fresher row wins (rule is fact-key-scoped and never fires here).
+  assertWinner(out, fresh.id, "incumbent_held");
 });
 
 test("No active rows — canonical=null, decisionReason=no_active_rows", () => {

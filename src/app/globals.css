@@ -893,7 +893,10 @@ a {
 }
 
 .nav-dropdown:hover .nav-dropdown-menu,
-.nav-dropdown:focus-within .nav-dropdown-menu {
+.nav-dropdown:focus-within .nav-dropdown-menu,
+/* JS-driven open state for the Explore megamenu (keeps aria-expanded truthful);
+   the :hover/:focus-within rules above remain the no-JS fallback. */
+.nav-dropdown-menu.explore-menu--open {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
@@ -938,6 +941,149 @@ a {
   color: var(--color-text-primary);
   background: var(--color-card-bg);
   border-color: var(--color-card-border);
+}
+
+/* ============================================================
+   Explore megamenu — "The Reading Room"
+   A wide two-column browse panel dropped from the "Explore" nav
+   trigger. Extends the .nav-dropdown-menu interaction model
+   (CSS :hover / :focus-within) with an ivory paper surface, a
+   hairline top rule carrying a terracotta hint, a soft
+   navy-tinted shadow, and destination rows pairing a spot
+   engraving with a serif name + Inter description. Token-only.
+   ============================================================ */
+
+.explore-menu {
+  /* Two generous columns. On a base .nav-dropdown-menu the panel is
+     centred under the trigger via translateX(-50%); clamp keeps it
+     inside the viewport on narrow laptops. */
+  grid-template-columns: repeat(2, minmax(15rem, 1fr));
+  gap: var(--space-6);
+  width: min(40rem, calc(100vw - var(--space-7)));
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-hard-lg);
+  /* Hairline top rule with a terracotta hint — the fine-press signal. */
+  border-top: 2px solid var(--color-accent);
+}
+
+.explore-col {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+}
+
+.explore-col-label {
+  margin: 0 0 var(--space-2) var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-text-40);
+}
+
+.explore-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition:
+    background var(--motion-fast) var(--motion-ease-out),
+    border-color var(--motion-fast) var(--motion-ease-out);
+}
+
+.explore-item__engraving {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--color-accent) 5%, var(--color-card-bg));
+  border: 1px solid var(--color-card-border);
+  overflow: hidden;
+}
+
+.explore-item__engraving img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--motion-base) var(--motion-ease-out);
+}
+
+.explore-item__body {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.explore-item__name {
+  font-family: var(--font-heading);
+  font-size: var(--text-16);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: var(--tracking-snug);
+  color: var(--color-text-primary);
+}
+
+.explore-item__desc {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: 1.35;
+  color: var(--color-text-40);
+}
+
+/* Restrained hover: the row warms and its accent hairline appears; the
+   engraving nudges up a hair. Focus mirrors hover for keyboard readers. */
+.explore-item:hover,
+.explore-item:focus-visible {
+  background: color-mix(in oklab, var(--color-accent) 6%, var(--color-card-bg));
+  border-color: color-mix(in oklab, var(--color-accent) 28%, var(--color-card-border));
+  outline: none;
+}
+
+.explore-item:hover .explore-item__engraving img,
+.explore-item:focus-visible .explore-item__engraving img {
+  transform: translateY(-2px) scale(1.03);
+}
+
+.explore-item--active {
+  border-color: color-mix(in oklab, var(--color-accent) 28%, var(--color-card-border));
+}
+
+.explore-item--active .explore-item__name {
+  color: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-item__engraving img {
+    transition: none;
+  }
+  .explore-item:hover .explore-item__engraving img,
+  .explore-item:focus-visible .explore-item__engraving img {
+    transform: none;
+  }
+}
+
+/* Below the wide breakpoint the megamenu could clip; the mobile nav
+   (hamburger) owns browse there, and the desktop nav row is hidden by
+   the `hidden md:flex` wrapper anyway. No extra handling needed. */
+
+/* Static, always-open rendering for the /design-system showcase — unpins the
+   panel from the absolute dropdown slot and forces it visible. */
+.explore-menu--static {
+  position: static;
+  transform: none;
+  opacity: 1;
+  pointer-events: auto;
+  max-width: 100%;
 }
 
 /* ============================================================

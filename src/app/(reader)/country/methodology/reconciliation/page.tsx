@@ -70,6 +70,7 @@ const SECTIONS = [
   { id: "sources", label: "Sources" },
   { id: "resolver", label: "The resolver" },
   { id: "value-types", label: "Measurement vs projection" },
+  { id: "cia-vintage", label: "CIA vintage stamps" },
   { id: "multi-canonical", label: "Multi-canonical scope" },
   { id: "two-fact-keys", label: "Two-fact-key splits" },
   { id: "vintaging", label: "Vintaging" },
@@ -651,47 +652,59 @@ export default async function ReconciliationMethodologyPage() {
           canonical vs displayed value&rdquo; section below.
         </p>
 
-        <h3 id="example-germany-gdp">
-          Worked example 3 — Germany GDP growth, multi-canonical with
-          scope predicate
+        <h3 id="example-growth-methodology">
+          Worked example 3 — GDP growth, mixed measurement
+          methodologies
         </h3>
         <p>
-          <strong>Pattern.</strong> Multi-canonical-with-scope-predicate
-          pattern (Eurostat origin). Eurostat is canonical for the
-          EU-27 + EFTA-4 subset on{" "}
-          <code>gdp_real_growth_rate</code>, while the IMF and World
-          Bank stay canonical globally. Both publishers can be tagged{" "}
-          <code>civicaRole=&apos;canonical&apos;</code> for the same
-          fact-key, distinguished by scope.
+          <strong>Pattern.</strong> Growth-methodology comparability
+          rule, fact-key-scoped to <code>gdp_real_growth_rate</code>.
+          Publishers report GDP growth on different measurement bases,
+          and the raw numbers are <em>not</em> directly comparable. Each
+          source row carries a <code>growth_methodology</code> label
+          &mdash; <code>annual_yoy</code> (the comparable default; World
+          Bank, IMF, Eurostat, and most national statistics offices),{" "}
+          <code>four_quarter_accumulated_yoy</code> (Brazil&rsquo;s IBGE),
+          and <code>qoq_seasonally_adjusted</code> (South
+          Africa&rsquo;s Stats SA). The resolver reads this label to
+          keep the canonical pick comparable.
         </p>
         <p>
-          <strong>Live rows.</strong> Eurostat reports 0.2% (2025),
-          tagged canonical for the EU+EFTA scope. The World Bank
-          reports −0.50% (2024), tagged canonical globally. The IMF
-          reports 0.6% (2031), tagged as a projection (excluded from
-          the candidate pool).
+          <strong>The rule.</strong> When two or more publishers cover
+          the same country on this fact-key and at least one reports
+          annual year-on-year while at least one reports on a different
+          basis, the resolver prefers the annual-YoY publisher &mdash;{" "}
+          <em>unless</em> the non-annual publisher is more than twelve
+          months fresher. A single quarter&rsquo;s quarter-on-quarter
+          print should not outrank the comparable annual figure everyone
+          else uses, but a genuinely more recent specialised measurement
+          still wins.
         </p>
         <p>
-          <strong>Resolver outcome.</strong> Eurostat&rsquo;s 0.2%
-          (2025) wins canonical with{" "}
-          <code>decisionReason=&apos;incumbent_held&apos;</code>. The
-          alternates panel labels Eurostat <em>canonical (EU+EFTA)</em>{" "}
-          and the World Bank <em>canonical (global)</em>.
+          <strong>Brazil (rule fires).</strong> IBGE reports 2.3% on a
+          four-quarter accumulated basis (2025); the World Bank reports
+          3.4% annual year-on-year (2024). The IBGE figure is exactly
+          twelve months fresher &mdash; not <em>more than</em> twelve
+          &mdash; so the comparable annual-YoY World Bank value wins
+          canonical with{" "}
+          <code>decisionReason=&apos;fresher_winner&apos;</code>. IBGE
+          stays in the alternates panel, labelled with its
+          four-quarter methodology.
         </p>
         <p>
-          <strong>Story.</strong> Eurostat republishes Destatis data
-          for Germany within weeks of national release with
-          EU-harmonised methodology. For EU-27 + EFTA-4
-          jurisdictions, Eurostat ships canonical alongside the
-          global Tier-1 publishers without forcing any of them to
-          alternate. The scope predicate (<code>iso2 IN (EU27 + EFTA4)</code>)
-          is the methodology primitive that lets two publishers
-          coexist as canonical. Because the resolver is
-          freshness-driven, whichever publisher ships latest wins the
-          runtime pick; the editorial-canonical layer just records
-          that both are authoritative for their declared scopes.
-          When Destatis ships in v1.1, Germany will see three
-          canonical publishers: Eurostat, Destatis, and IMF.
+          <strong>South Africa (specialised publisher held).</strong>{" "}
+          Stats SA reports 0.4% quarter-on-quarter, seasonally adjusted
+          (2025); the World Bank reports 0.5% annual year-on-year
+          (2024). Stats SA is roughly two years fresher &mdash; well
+          past the twelve-month edge &mdash; so it keeps the canonical
+          pick with{" "}
+          <code>decisionReason=&apos;incumbent_held&apos;</code>. Beside
+          the reconciled figure the country page shows a small circled-i
+          whose tooltip reads &ldquo;Quarter-on-quarter, seasonally
+          adjusted &mdash; not directly comparable to annual
+          figures,&rdquo; and the full basis is recorded in the
+          alternates panel. The reader is never handed a number measured
+          on an undisclosed basis.
         </p>
 
         <h3 id="example-uk-inflation">
@@ -787,20 +800,31 @@ export default async function ReconciliationMethodologyPage() {
         </p>
         <p>
           <strong>Live rows for Argentina population_total.</strong>{" "}
-          The CIA reports 45,418,096 (2025, measured). The World Bank
-          reports 45,696,160 (2024, measured). UN WPP reports
-          45,696,160 (2024, measured — bit-exact match to the World
-          Bank because the World Bank republishes UN WPP). The IMF
-          reports 50,394,000 (2031, projected). Wikidata holds an
+          The CIA reports 45,418,096 with a{" "}
+          <code>(2025 est.)</code> stamp — a current-year nowcast, so
+          its <code>data_vintage_year</code> normalizes to 2024 (see{" "}
+          <a href="#cia-vintage">CIA vintage stamps</a> below). The
+          World Bank reports 45,696,160 (2024, measured). UN WPP
+          reports 45,696,160 (2024, measured — bit-exact match to the
+          World Bank because the World Bank republishes UN WPP). The
+          IMF reports 50,394,000 (2031, projected). Wikidata holds an
           older 44,938,712 (2019, measured) claim.
         </p>
         <p>
-          <strong>Resolver outcome.</strong> The CIA&rsquo;s 45.4 M
-          (2025) wins canonical with{" "}
-          <code>decisionReason=&apos;incumbent_held&apos;</code>. The
-          IMF&rsquo;s 50.4 M (2031 projection) is excluded from the
-          candidate pool by the measurement-vs-projection partition;
-          it surfaces in the alternates panel labelled <em>(projected)</em>.
+          <strong>Resolver outcome.</strong> Two partitions decide this
+          fact. First, the IMF&rsquo;s 50.4 M (2031 projection) is
+          excluded from the candidate pool by the
+          measurement-vs-projection partition; it surfaces in the
+          alternates panel labelled <em>(projected)</em>. Second, among
+          the surviving measurements the CIA&rsquo;s{" "}
+          <code>(2025 est.)</code> nowcast is aged to its 2024
+          measurement vintage, so it no longer outranks the UN WPP 2024
+          reading it was derived from. UN WPP&rsquo;s 45,696,160 (2024)
+          wins canonical with{" "}
+          <code>decisionReason=&apos;fresher_winner&apos;</code> (the
+          World Bank republishes the identical value); the CIA reading
+          moves to the alternates panel with its published{" "}
+          <code>(2025 est.)</code> stamp intact.
         </p>
         <p>
           <strong>Story.</strong> Before the 4 May 2026 fix, the
@@ -863,55 +887,56 @@ export default async function ReconciliationMethodologyPage() {
         </p>
 
         <h3 id="example-marshall-islands">
-          Worked example 8 — Marshall Islands population,
-          disputed-pending case
+          Worked example 8 — Marshall Islands population, dispute
+          resolved by demotion
         </h3>
         <p>
-          <strong>Pattern.</strong> The disputes system in production.
-          The material-error gap is real — about 119% between the
-          CIA&rsquo;s value and the World Bank&rsquo;s — and the
+          <strong>Pattern.</strong> The disputes system after
+          resolution. A material-error gap — about 118% between the
+          CIA&rsquo;s value and the World Bank&rsquo;s — was raised as
+          a dispute rather than silently averaged, because the
           disagreement reflects a genuine definitional split, not a
-          typo. The auto-resolve cron preserves these as open rather
-          than auto-closing.
+          typo. Triage then resolved it by demoting rows out of the
+          active set rather than leaving them to compete on freshness.
         </p>
         <p>
-          <strong>Live rows.</strong> The CIA reports 82,011 (2024,
-          frozen). The World Bank reports 37,548 (2024). UN WPP
-          reports 37,548 (2024, bit-exact match). The IMF reports
-          33,000 (2031, projected). Wikidata holds an older 53,127
-          (2017) claim.
+          <strong>Live rows.</strong> The CIA reports 82,011 with a{" "}
+          <code>(2024 est.)</code> stamp. The World Bank reports 37,548
+          (2024). UN WPP reports 37,548 (2024, bit-exact match). The
+          IMF reports 33,000 (2031, projected). Wikidata holds an older
+          53,127 (2017) claim. When the material-error dispute was
+          resolved, every row except the World Bank measurement was
+          demoted out of the active set (<code>status=&apos;demoted&apos;</code>),
+          each stamped with the resolving dispute&rsquo;s id.
         </p>
         <p>
-          <strong>Resolver outcome.</strong> The CIA&rsquo;s 82,011
-          (2024) holds canonical via{" "}
-          <code>decisionReason=&apos;incumbent_held&apos;</code>. The
-          material-error guard fires because the gap exceeds the
-          population threshold, so the World Bank cannot displace the
-          CIA on freshness alone. Two open <code>material_error</code>{" "}
-          disputes sit in the queue at{" "}
+          <strong>Resolver outcome.</strong> With only the World
+          Bank&rsquo;s 37,548 (2024) left active, it is canonical via{" "}
+          <code>decisionReason=&apos;single_source&apos;</code>, and the
+          fact is no longer flagged <code>(disputed)</code>. The
+          CIA&rsquo;s divergent 82,011 estimate and the older and
+          projected rows sit demoted — recorded for the provenance
+          trail, but excluded from the candidate pool. The disputes log
+          is at{" "}
           <Link href="/country/methodology/reconciliation/disputes">
             /country/methodology/reconciliation/disputes
-          </Link>{" "}
-          awaiting human review.
+          </Link>
+          .
         </p>
         <p>
-          <strong>Story.</strong> This is a genuine multi-source
+          <strong>Story.</strong> The gap is a genuine multi-source
           disagreement, not a data-entry mistake. The CIA&rsquo;s
-          82,011 figure follows in-country census methodology; the
-          World Bank and UN&rsquo;s 37,548 follows a different
-          demographic accounting that excludes the large Marshallese
+          82,011 follows an accounting that counts the large Marshallese
           diaspora holding permanent right of residency under the
-          Compact of Free Association with the United States. Both
-          methodologies are defensible; the resulting answers differ.
-          The disputes-triage cron correctly preserves these as{" "}
-          <code>status=&apos;open&apos;</code> rather than
-          auto-closing them. By contrast, 31 of 33 disputes in the
-          live system were stale by-products of pre-threshold-raise
-          resolver runs, and the cron correctly closed them as{" "}
-          <code>status=&apos;resolved_auto_stale&apos;</code>. The
-          Marshall Islands case is the closest the live system has to
-          a textbook disputed-pending case — open for review,
-          methodology-grade rather than mechanical.
+          Compact of Free Association with the United States; the World
+          Bank and UN&rsquo;s 37,548 follows resident-population
+          accounting. Both methodologies are defensible, which is why
+          the disagreement surfaced as a dispute in the first place
+          rather than being averaged away. The resolution keeps the
+          resident-population measurement canonical and preserves the
+          CIA reading demoted rather than deleted, so the full
+          provenance trail — including the value not chosen — stays
+          inspectable.
         </p>
       </section>
 
@@ -943,6 +968,68 @@ export default async function ReconciliationMethodologyPage() {
           measurement, labelled with a projection flag. Worked
           Example 6 above (Argentina population) is the canonical
           illustration.
+        </p>
+      </section>
+
+      <section className="editorial-section" id="cia-vintage">
+        <h2>CIA vintage stamps</h2>
+        <p>
+          A CIA World Factbook entry carries a prose-derived vintage
+          stamp such as <code>(2025 est.)</code>. For most fact-keys that
+          stamp is the year of the underlying measurement, and the
+          resolver treats it as the row&rsquo;s freshness. Five
+          demographic fact-keys are the documented exception:
+          population, birth rate, death rate, population growth rate, and
+          median age. CIA&rsquo;s published methodology constructs these
+          as current-year <em>estimates</em> built from the prior
+          year&rsquo;s reference data — chiefly the UN World Population
+          Prospects and, for the United States, US Census Bureau
+          projections. The <code>(2025 est.)</code> label on those rows
+          is a republication and projection year, not the year the
+          measurement was taken.
+        </p>
+        <p>
+          Left unadjusted, that stamp reads as fresher than a primary
+          publisher&rsquo;s actual measurement carrying a one-year-older
+          date — so the CIA nowcast would win the freshness-driven
+          canonical pick over the measurement it was derived from. To
+          keep the canonical value the real measurement, Civica records a
+          derived measurement year in a dedicated{" "}
+          <code>data_vintage_year</code> field for exactly those five
+          demographic fact-keys, set to one year before CIA&rsquo;s prose
+          stamp — but only where that stamp carries the{" "}
+          <code>(YYYY est.)</code> estimate qualifier. A bare{" "}
+          <code>(YYYY)</code> reading is a real measurement in that year,
+          not a nowcast off prior-year data — a small-territory census such
+          as the Falkland Islands, Norfolk Island, or Vatican City — and
+          keeps its stamp unchanged. The resolver&rsquo;s freshness
+          comparator reads <code>data_vintage_year</code> when present and
+          otherwise falls back to the publisher&rsquo;s{" "}
+          <code>as_of</code> / <code>fact_year</code> stamp.
+        </p>
+        <p>
+          CIA&rsquo;s original stamp is never overwritten. The Factbook
+          row keeps its published <code>fact_year</code> and{" "}
+          <code>as_of</code> exactly as issued; the measurement year lives
+          alongside it in <code>data_vintage_year</code>, and the
+          alternates panel still shows the CIA reading with its own label.
+          Every other CIA fact-key — and any of the five with no year
+          stamp to derive from — leaves <code>data_vintage_year</code>{" "}
+          empty and keeps CIA&rsquo;s stamp as its freshness, with this
+          caveat. The correction is a statement about data vintage, not a
+          judgement about CIA&rsquo;s reliability: the Factbook is a
+          high-quality reference, and this simply records the republication
+          posture its own documentation describes.
+        </p>
+        <p>
+          The practical effect is concentrated in the demographic stack.
+          For the United States, for instance, population and median age
+          resolve to the US Census Bureau&rsquo;s current measurement
+          rather than CIA&rsquo;s later projection of it; for countries
+          without a national statistical office in this layer, the same
+          five keys resolve to the UN or World Bank measurement CIA
+          nowcasts from. Worked Example 7 above (Brazil population) shows
+          the freshness-driven pick with an NSO in play.
         </p>
       </section>
 
@@ -978,9 +1065,8 @@ export default async function ReconciliationMethodologyPage() {
           by the Eurostat resolution which named the
           &ldquo;multi-canonical with scope predicate&rdquo;
           primitive, then extended by NSO Wave 1 which applied the
-          same pattern to country-singleton scopes. Worked Examples
-          3 (Germany GDP) and 4 (UK inflation) above are the
-          canonical illustrations.
+          same pattern to country-singleton scopes. Worked Example 4
+          (UK inflation) above is the canonical illustration.
         </p>
       </section>
 

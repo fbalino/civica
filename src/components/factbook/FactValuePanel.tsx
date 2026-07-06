@@ -13,6 +13,7 @@
 import Link from "next/link";
 import type { FactRow, ResolverOutput } from "@/lib/factbook/reconcile/types";
 import { reconciliation } from "@/lib/content/site-state";
+import { growthMethodologyLabel } from "@/lib/data/growth-methodology";
 
 const SOURCE_LABELS: Record<string, string> = {
   cia_factbook: "CIA World Factbook",
@@ -230,6 +231,15 @@ export function FactValuePanel({
                 As of {formatAsOf(row)}
                 {row.upstreamVintageLabel
                   ? ` · ${row.upstreamVintageLabel}`
+                  : ""}
+                {/* Growth basis (non-null only on growth fact-keys) —
+                    disclosed on EVERY row so a reader comparing, e.g.,
+                    Stats SA's quarter-on-quarter figure against the World
+                    Bank's annual one can see they sit on different bases.
+                    This is what the methodology page means by "the full
+                    basis is recorded in the alternates panel." */}
+                {row.growthMethodology
+                  ? ` · ${growthMethodologyLabel(row.growthMethodology)}`
                   : ""}
                 {url ? (
                   <>

@@ -30,6 +30,7 @@ import { reconciliation } from "@/lib/content/site-state";
 import { resolveFromRows } from "./resolver";
 import { getFactKey } from "./fact-keys";
 import type { FactRow, ResolverOutput } from "./types";
+import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
 
 /**
  * Phase F.4 / R.22 — public-API metadata block.
@@ -741,6 +742,9 @@ interface CountryFactDbRow {
   factYear: number | null;
   valueJson: unknown;
   asOf: string | null;
+  /** Real measurement year when it differs from the prose stamp;
+   *  drives resolver freshness. See resolver `freshness()`. */
+  dataVintageYear?: number | null;
   retrievedAt: Date | string;
   upstreamVintageLabel: string | null;
   methodologyVersion: string;
@@ -749,6 +753,8 @@ interface CountryFactDbRow {
   sourceNote: string | null;
   /** Bug 1 — `'measured'` (default) or `'projected'`. */
   valueType?: string | null;
+  /** Growth-methodology discriminator; NULL on non-growth fact-keys. */
+  growthMethodology?: string | null;
 }
 
 export function dbRowToFactRow(row: CountryFactDbRow): FactRow {
@@ -777,6 +783,7 @@ export function dbRowToFactRow(row: CountryFactDbRow): FactRow {
     factYear: row.factYear,
     valueJson: row.valueJson,
     asOf: row.asOf,
+    dataVintageYear: row.dataVintageYear ?? null,
     retrievedAt:
       typeof row.retrievedAt === "string"
         ? row.retrievedAt
@@ -793,5 +800,10 @@ export function dbRowToFactRow(row: CountryFactDbRow): FactRow {
     statusReason: row.statusReason,
     sourceNote: row.sourceNote,
     valueType: row.valueType === "projected" ? "projected" : "measured",
+    growthMethodology: resolveGrowthMethodology(
+      row.growthMethodology,
+      row.sourceId,
+      row.factKey
+    ),
   };
 }

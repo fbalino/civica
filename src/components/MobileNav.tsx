@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { INDEX_NAV_ITEMS, type IndexNavItem } from "@/components/indexNavItems";
 import { METHODOLOGY_NAV_ITEMS } from "@/components/methodologyNavItems";
+import { EXPLORE_NAV_GROUPS } from "@/components/exploreNavItems";
 import { tier1Publishers } from "@/lib/content/site-state";
 
 // Sources NOT covered by `tier1Publishers` — supporting feeds,
@@ -44,11 +45,33 @@ type NavItem = {
   children?: IndexNavItem[];
 };
 
+/** Spot engraving per Explore surface — mirrors the desktop megamenu so the
+ * mobile accordion carries the same visual identity. */
+const EXPLORE_GLYPH: Record<string, string> = {
+  laurel: "❦",
+  globe: "◯",
+  compass: "✦",
+  column: "§",
+  ship: "⚓",
+  mountains: "△",
+};
+
+/** The Explore accordion: the eight browse surfaces, grouped and labeled the
+ * same way as the desktop megamenu (single source: EXPLORE_NAV_GROUPS). */
+const EXPLORE_SECTIONS: { label: string; items: NavItem[] }[] =
+  EXPLORE_NAV_GROUPS.map((group) => ({
+    label: group.label,
+    items: group.items.map((item) => ({
+      href: item.href,
+      label: item.label,
+      descriptor: item.description,
+      glyph: EXPLORE_GLYPH[item.engraving] ?? "◦",
+    })),
+  }));
+
+/** Everything that is NOT a browse surface: the Index/Methodology hubs and
+ * the two editorial links. */
 const PRIMARY: NavItem[] = [
-  { href: "/country", label: "Countries", descriptor: "Every country", glyph: "▤" },
-  { href: "/parties", label: "Parties", descriptor: "Ideology & seats", glyph: "◐" },
-  { href: "/atlas", label: "Atlas", descriptor: "Explore the map", glyph: "◯" },
-  { href: "/constitution", label: "Constitutions", descriptor: "Read & compare", glyph: "§" },
   {
     href: "/civica-index",
     label: "Index",
@@ -206,6 +229,26 @@ function MenuOverlay({
       </div>
 
       <div style={{ padding: "22px 20px 8px" }}>
+        <Eyebrow>Explore</Eyebrow>
+        {EXPLORE_SECTIONS.map((section, si) => (
+          <div key={section.label} style={{ marginTop: si === 0 ? 12 : 16 }}>
+            <SubEyebrow>{section.label}</SubEyebrow>
+            <nav style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 8 }}>
+              {section.items.map((item, i) => (
+                <PanelRow
+                  key={item.href}
+                  item={item}
+                  active={isActive(item.href)}
+                  delay={(si * 4 + i) * 22}
+                  isActive={isActive}
+                />
+              ))}
+            </nav>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ padding: "20px 20px 8px" }}>
         <Eyebrow>The Atlas</Eyebrow>
         <nav style={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 10 }}>
           {PRIMARY.map((item, i) => (
@@ -289,7 +332,7 @@ function PanelRow({
       >
         <span
           style={{
-            fontFamily: "var(--font-mono)",
+            fontFamily: "var(--font-body)",
             fontSize: "var(--text-15)",
             color: active ? "var(--color-accent)" : "var(--color-text-primary)",
             textAlign: "center",
@@ -314,8 +357,8 @@ function PanelRow({
             style={{
               display: "block",
               marginTop: 2,
-              fontFamily: "var(--font-mono)",
-              fontWeight: "var(--font-weight-mono)",
+              fontFamily: "var(--font-body)",
+              fontWeight: "var(--font-weight-medium)",
               fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
             }}
@@ -325,7 +368,7 @@ function PanelRow({
         </span>
         <span
           style={{
-            fontFamily: "var(--font-mono)",
+            fontFamily: "var(--font-body)",
             fontSize: "var(--text-13)",
             color: "var(--color-text-25)",
           }}
@@ -373,8 +416,8 @@ function PanelRow({
                 </span>
                 <span
                   style={{
-                    fontFamily: "var(--font-mono)",
-                    fontWeight: "var(--font-weight-mono)",
+                    fontFamily: "var(--font-body)",
+                    fontWeight: "var(--font-weight-medium)",
                     fontSize: "var(--text-12)",
                     color: "var(--color-text-30)",
                     textTransform: "uppercase",
@@ -421,8 +464,8 @@ function OverlayHeader({ onClose, logoSlot }: { onClose: () => void; logoSlot?: 
         </span>
         <span
           style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
+            fontFamily: "var(--font-body)",
+            fontWeight: "var(--font-weight-medium)",
             fontSize: "var(--text-12)",
             letterSpacing: "var(--tracking-caps)",
             color: "var(--color-text-30)",
@@ -460,11 +503,30 @@ function Eyebrow({ children }: { children: ReactNode }) {
   return (
     <div
       style={{
-        fontFamily: "var(--font-mono)",
-        fontWeight: "var(--font-weight-mono)",
+        fontFamily: "var(--font-body)",
+        fontWeight: "var(--font-weight-medium)",
         fontSize: "var(--text-12)",
         letterSpacing: "var(--tracking-caps)",
         color: "var(--color-text-30)",
+        textTransform: "uppercase",
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** A softer group sub-label inside a section — used for the two Explore
+ * groups ("Countries & Places", "Politics & Data"). */
+function SubEyebrow({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        fontFamily: "var(--font-body)",
+        fontWeight: 600,
+        fontSize: "var(--text-12)",
+        letterSpacing: "var(--tracking-caps)",
+        color: "var(--color-text-40)",
         textTransform: "uppercase",
       }}
     >
@@ -500,8 +562,8 @@ function OverlayFooter() {
 
       <p
         style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
+          fontFamily: "var(--font-body)",
+          fontWeight: "var(--font-weight-medium)",
           fontSize: "var(--text-12)",
           color: "var(--color-text-30)",
           lineHeight: 1.5,
@@ -523,8 +585,8 @@ function OverlayFooter() {
       >
         <span
           style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
+            fontFamily: "var(--font-body)",
+            fontWeight: "var(--font-weight-medium)",
             fontSize: "var(--text-12)",
             color: "var(--color-text-25)",
             letterSpacing: "var(--tracking-caps)",
@@ -535,8 +597,8 @@ function OverlayFooter() {
         </span>
         <span
           style={{
-            fontFamily: "var(--font-mono)",
-            fontWeight: "var(--font-weight-mono)",
+            fontFamily: "var(--font-body)",
+            fontWeight: "var(--font-weight-medium)",
             fontSize: "var(--text-12)",
             color: "var(--color-text-25)",
             letterSpacing: "var(--tracking-caps)",
@@ -621,8 +683,8 @@ function SystemStatus() {
           <span
             style={{
               marginTop: 2,
-              fontFamily: "var(--font-mono)",
-              fontWeight: "var(--font-weight-mono)",
+              fontFamily: "var(--font-body)",
+              fontWeight: "var(--font-weight-medium)",
               fontSize: "var(--text-12)",
               color: "var(--color-text-30)",
               letterSpacing: "var(--tracking-wide)",
@@ -634,8 +696,8 @@ function SystemStatus() {
       </span>
       <span
         style={{
-          fontFamily: "var(--font-mono)",
-          fontWeight: "var(--font-weight-mono)",
+          fontFamily: "var(--font-body)",
+          fontWeight: "var(--font-weight-medium)",
           fontSize: "var(--text-12)",
           letterSpacing: "var(--tracking-caps)",
           color: "var(--color-text-25)",
@@ -655,8 +717,8 @@ function LegendDot({ color, label }: { color: string; label: string }) {
         display: "inline-flex",
         alignItems: "center",
         gap: 6,
-        fontFamily: "var(--font-mono)",
-        fontWeight: "var(--font-weight-mono)",
+        fontFamily: "var(--font-body)",
+        fontWeight: "var(--font-weight-medium)",
         fontSize: "var(--text-12)",
         color: "var(--color-text-30)",
       }}

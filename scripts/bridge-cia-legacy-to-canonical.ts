@@ -119,6 +119,7 @@ async function main() {
         factValueNumeric: countryFacts.factValueNumeric,
         factUnit: countryFacts.factUnit,
         factYear: countryFacts.factYear,
+        dataVintageYear: countryFacts.dataVintageYear,
         sourceNote: countryFacts.sourceNote,
         retrievedAt: countryFacts.retrievedAt,
       })
@@ -181,6 +182,11 @@ async function main() {
           factUnit: canonicalDef.unit ?? row.factUnit,
           factYear: row.factYear,
           asOf,
+          // Carry the CIA vintage correction across the legacy→canonical
+          // bridge so population_total inherits the measurement year set
+          // on the legacy `population` row by seed-from-factbook.ts.
+          // See ~/civica/plan/cia-stale-vintage-resolution-v1.md.
+          dataVintageYear: row.dataVintageYear,
           retrievedAt: row.retrievedAt ?? new Date(),
           upstreamVintageLabel: "CIA Factbook 2026-01-frozen",
           methodologyVersion: "v0.1-beta",
@@ -202,6 +208,7 @@ async function main() {
             factUnit: canonicalDef.unit ?? row.factUnit,
             factYear: row.factYear,
             asOf,
+            dataVintageYear: row.dataVintageYear,
             sourceUrl: `https://www.cia.gov/the-world-factbook/countries/${row.slug}/`,
             upstreamVintageLabel: "CIA Factbook 2026-01-frozen",
             updatedAt: new Date(),

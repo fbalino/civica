@@ -185,7 +185,37 @@ interface FactExtraction {
   factUnit: string;
   factYear: number | null;
   sourceNote: string;
+  /** Real underlying measurement year when it differs from CIA's prose
+   *  stamp (`factYear`). Non-null only for the five demographic keys
+   *  whose CIA "(YYYY est.)" stamp is a projection one year ahead of the
+   *  measurement vintage. See `CIA_VINTAGE_OFFSET_KEYS` and
+   *  `~/civica/plan/cia-stale-vintage-resolution-v1.md` (Option A). */
+  dataVintageYear: number | null;
 }
+
+/**
+ * CIA constructs these five demographic estimates as current-year
+ * projections off prior-year UN World Population Prospects / US Census
+ * reference data, and stamps them "(YYYY est.)". The true measurement
+ * vintage is one year older than the stamp, so a future re-sync records
+ * `data_vintage_year = factYear - 1` for these keys — WITHOUT mutating
+ * CIA's original `factYear`. The seed-time key for population is the
+ * legacy `population` alias (bridged to `population_total` downstream by
+ * `scripts/bridge-cia-legacy-to-canonical.ts`, which carries this value
+ * across); the other four seed directly under their canonical names.
+ *
+ * Every other CIA fact-key leaves `data_vintage_year` NULL — its stamp
+ * IS its measurement year, and the resolver falls back to the standard
+ * `as_of || fact_year || retrieved_at` freshness ladder. No false
+ * precision. Contract: `~/civica/plan/cia-stale-vintage-resolution-v1.md`.
+ */
+const CIA_VINTAGE_OFFSET_KEYS = new Set<string>([
+  "population",
+  "birth_rate",
+  "death_rate",
+  "population_growth_rate",
+  "median_age",
+]);
 
 function extractFacts(data: Record<string, unknown>): FactExtraction[] {
   const facts: FactExtraction[] = [];
@@ -199,6 +229,27 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
     const text = extractText(raw);
     if (!text) return;
     const parsed = parseNumeric(text);
+    // CIA's "(YYYY est.)" stamp on the five demographic keys is a
+    // projection year one ahead of the underlying measurement vintage.
+    // Record the real measurement year so the resolver's freshness
+    // comparator ranks a primary publisher's actual measurement ahead
+    // of CIA's republication stamp.
+    //
+    // Gate on the "est." qualifier: only an ESTIMATE stamp is a
+    // current-year projection off prior-year data. A bare "(YYYY)" stamp
+    // (or "(YYYY census)") is a real measurement in that year — leaving
+    // its vintage NULL keeps a genuine census figure (Falkland Islands,
+    // Vatican City, Norfolk Island…) from being wrongly aged below a
+    // UN/WB nowcast. This is Risk 1 in the resolution doc
+    // (~/civica/plan/cia-stale-vintage-resolution-v1.md §7). Only when a
+    // year was parsed AND the stamp is an estimate (no false precision).
+    const isEstimateStamp = /\best\.?/i.test(parsed.note ?? "");
+    const dataVintageYear =
+      parsed.year != null &&
+      CIA_VINTAGE_OFFSET_KEYS.has(factKey) &&
+      isEstimateStamp
+        ? parsed.year - 1
+        : null;
     facts.push({
       category,
       factKey,
@@ -207,6 +258,7 @@ function extractFacts(data: Record<string, unknown>): FactExtraction[] {
       factUnit: overrideUnit ?? parsed.unit,
       factYear: parsed.year,
       sourceNote: parsed.note,
+      dataVintageYear,
     });
   }
 
@@ -567,6 +619,9 @@ async function processCountryFile(
           factValueNumeric: fact.factValueNumeric,
           factUnit: fact.factUnit,
           factYear: fact.factYear,
+          // Recompute on every re-sync so the CIA vintage correction
+          // survives (5 demographic keys → factYear-1; else null).
+          dataVintageYear: fact.dataVintageYear,
           sourceNote: fact.sourceNote,
           retrievedAt: new Date(),
         },

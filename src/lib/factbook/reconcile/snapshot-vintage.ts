@@ -42,6 +42,7 @@ import {
 import { resolveFromRows } from "./resolver";
 import { getFactKey } from "./fact-keys";
 import type { FactRow, ResolverOutput } from "./types";
+import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
 
 type Db = typeof defaultDb;
 
@@ -261,6 +262,9 @@ interface FactRowDb {
   factYear: number | null;
   valueJson: unknown;
   asOf: string | null;
+  /** Real measurement year when it differs from the prose stamp;
+   *  drives resolver freshness on replay. */
+  dataVintageYear?: number | null;
   retrievedAt: Date | string;
   upstreamVintageLabel: string | null;
   methodologyVersion: string;
@@ -269,6 +273,8 @@ interface FactRowDb {
   sourceNote: string | null;
   /** Bug 1 — `'measured'` (default) or `'projected'`. */
   valueType?: string | null;
+  /** Growth-methodology discriminator; NULL on non-growth fact-keys. */
+  growthMethodology?: string | null;
 }
 
 function dbRowToFactRow(row: FactRowDb): FactRow {
@@ -297,6 +303,7 @@ function dbRowToFactRow(row: FactRowDb): FactRow {
     factYear: row.factYear,
     valueJson: row.valueJson,
     asOf: row.asOf,
+    dataVintageYear: row.dataVintageYear ?? null,
     retrievedAt:
       typeof row.retrievedAt === "string"
         ? row.retrievedAt
@@ -313,6 +320,11 @@ function dbRowToFactRow(row: FactRowDb): FactRow {
     statusReason: row.statusReason,
     sourceNote: row.sourceNote,
     valueType: row.valueType === "projected" ? "projected" : "measured",
+    growthMethodology: resolveGrowthMethodology(
+      row.growthMethodology,
+      row.sourceId,
+      row.factKey
+    ),
   };
 }
 

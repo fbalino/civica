@@ -21,6 +21,10 @@ import {
 } from "@/lib/factbook/reconcile/fact-keys";
 import { isAllowedReference } from "@/lib/factbook/reconcile/source-allowlist";
 import { isNsoForJurisdiction } from "@/lib/factbook/reconcile/nso-overrides";
+import {
+  resolveGrowthMethodology,
+  isAnnualYoy,
+} from "@/lib/data/growth-methodology";
 import type {
   DecisionReason,
   FactRow,
@@ -362,6 +366,25 @@ function resolveGroupB(
     winner = cand;
   }
 
+  // Q3 — growth-methodology comparability rule (fact-key-scoped).
+  //
+  // For `gdp_real_growth_rate` only: when ≥2 publishers exist AND at
+  // least one reports on the comparable annual year-on-year basis AND at
+  // least one reports on a different basis (four-quarter accumulated,
+  // QoQ seasonally adjusted, annualized QoQ), prefer the annual-YoY
+  // publisher — UNLESS the non-YoY publisher is more than 12 months
+  // fresher. A raw freshness ladder would otherwise let a quarter's QoQ
+  // print outrank the comparable annual figure everyone else uses.
+  //
+  // Applies only when the freshness winner above is a non-YoY row; if the
+  // annual-YoY publisher already won on freshness, nothing changes.
+  // Fact-key-scoped exactly like the per-fact threshold params.
+  // Resolution: `~/civica/plan/gdp-growth-methodology-mix-resolution-v1.md`.
+  const growthYoyWinner = preferAnnualYoyForGrowth(def, active, winner);
+  if (growthYoyWinner && growthYoyWinner.id !== winner.id) {
+    winner = growthYoyWinner;
+  }
+
   // Decision-reason naming:
   //   - `fresher_winner` — a non-prior row beat the prior on
   //     freshness (or freshness tie + higher source priority).
@@ -384,6 +407,73 @@ function resolveGroupB(
 /* ────────────────────────────────────────────────────────────────
  * Predicates and helpers
  * ──────────────────────────────────────────────────────────────── */
+
+/** Growth fact-keys the Q3 comparability rule applies to. Both the
+ *  Phase F key and the CIA legacy alias share the same growth semantics. */
+const GROWTH_FACT_KEYS = new Set(["gdp_real_growth_rate", "gdp_growth_rate"]);
+
+/**
+ * Calendar-aware "is A more than 12 months fresher than B?" — the freshness
+ * edge a non-YoY growth publisher must exceed to keep the canonical pick
+ * from the annual-YoY publisher (Q3).
+ *
+ * A fixed 365-day window is wrong across a leap year: two figures one
+ * calendar year apart (e.g. as_of 2024-01-01 vs 2025-01-01) span 366 days,
+ * which a 365-day threshold would misread as ">12 months". We instead shift
+ * B's freshness date forward 12 calendar months and require A to be strictly
+ * later than that, so exactly-one-year-apart figures are NOT ">12 months".
+ */
+function moreThanTwelveMonthsFresher(aMs: number, bMs: number): boolean {
+  const b = new Date(bMs);
+  const bPlus12 = new Date(b);
+  bPlus12.setUTCMonth(bPlus12.getUTCMonth() + 12);
+  return aMs > bPlus12.getTime();
+}
+
+/**
+ * Q3 — growth-methodology comparability adjustment.
+ *
+ * When resolving a growth fact-key and the freshness winner is NOT on the
+ * comparable `annual_yoy` basis, look for an annual-YoY publisher in the
+ * active pool. If one exists AND the current (non-YoY) winner is not more
+ * than 12 months fresher than it, return that annual-YoY row so the
+ * canonical pick uses the comparable basis. Returns `null` to leave the
+ * winner unchanged (non-growth key, winner already YoY, no YoY publisher,
+ * or the non-YoY winner is >12 months fresher).
+ *
+ * When several annual-YoY publishers qualify, the freshest wins (ties
+ * broken by lowest source-priority number via the caller's ordering — the
+ * pool is already effectively ordered, so we pick the freshest here).
+ */
+function preferAnnualYoyForGrowth(
+  def: FactKeyDefinition,
+  active: FactRow[],
+  winner: FactRow
+): FactRow | null {
+  if (!GROWTH_FACT_KEYS.has(def.key)) return null;
+  // Winner already on the comparable basis — nothing to prefer.
+  if (isAnnualYoy(winner.growthMethodology)) return null;
+
+  // Candidate annual-YoY publishers (excluding the winner itself).
+  const yoy = active.filter(
+    (r) => r.id !== winner.id && isAnnualYoy(r.growthMethodology)
+  );
+  if (yoy.length === 0) return null;
+
+  // Need a genuine methodology MIX: at least one non-YoY row present.
+  // The winner is non-YoY by the guard above, so the mix already holds.
+
+  // Freshest annual-YoY publisher.
+  const bestYoy = [...yoy].sort((a, b) => freshness(b) - freshness(a))[0];
+
+  // Keep the non-YoY winner only if it is MORE THAN 12 months fresher than
+  // the best annual-YoY publisher. Otherwise prefer the annual-YoY row.
+  if (moreThanTwelveMonthsFresher(freshness(winner), freshness(bestYoy))) {
+    return null;
+  }
+
+  return bestYoy;
+}
 
 function finalize(
   canonical: FactRow,
@@ -551,6 +641,16 @@ function lowestTierFirst(rows: FactRow[]): FactRow {
 }
 
 function freshness(row: FactRow): number {
+  // `dataVintageYear` records the REAL underlying measurement year when
+  // it differs from the publisher's prose-vintage stamp. It wins the
+  // ladder so a source that restamps a republication year (e.g. CIA's
+  // "(2025 est.)" projection built off prior-year data) is ranked by the
+  // measurement's true age, not by the year written on the label. The
+  // resolver stays generic — the vintage judgment lives in the DATA (the
+  // column) and the seed/backfill scripts, never in per-source branches
+  // here. NULL falls through to the existing stamp ladder.
+  // See `~/civica/plan/cia-stale-vintage-resolution-v1.md` (Option A).
+  if (row.dataVintageYear != null) return Date.UTC(row.dataVintageYear, 0, 1);
   if (row.asOf) return Date.parse(row.asOf);
   if (row.factYear != null) return Date.UTC(row.factYear, 0, 1);
   return Date.parse(row.retrievedAt);
@@ -653,6 +753,7 @@ function rowFromDb(r: typeof countryFacts.$inferSelect): FactRow {
     factYear: r.factYear ?? null,
     valueJson: r.valueJson ?? null,
     asOf: r.asOf ?? null,
+    dataVintageYear: r.dataVintageYear ?? null,
     retrievedAt:
       r.retrievedAt instanceof Date
         ? r.retrievedAt.toISOString()
@@ -667,5 +768,13 @@ function rowFromDb(r: typeof countryFacts.$inferSelect): FactRow {
     // resolver robust against a hypothetical DB-side null.
     valueType:
       r.valueType === "projected" ? "projected" : "measured",
+    // Growth-methodology discriminator — NULL on non-growth fact-keys.
+    // Stored column wins; falls back to the per-source default when a
+    // growth row has not yet been labelled (new row before backfill).
+    growthMethodology: resolveGrowthMethodology(
+      r.growthMethodology,
+      r.sourceId,
+      r.factKey
+    ),
   };
 }
