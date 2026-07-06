@@ -11,6 +11,16 @@
  * appearing only in GDELT (no specialist-feed corroboration) are
  * weighted lower and held to stricter rules in low-press-freedom
  * countries — that logic lives in `corroborate.ts`, not here.
+ *
+ * BODY ENRICHMENT: GDELT returns only headline + URL, never article
+ * text. Without a body the classifier sees just the headline plus the
+ * outlet domain, which is too thin for ambiguous stories. After the
+ * rows are built we fetch each article and replace the domain-name
+ * placeholder with extracted text (`article-extract.ts`), bounded to a
+ * small concurrent pool. This is strictly best-effort: any URL that
+ * fails / is paywalled keeps the domain-name fallback, and one bad URL
+ * never fails the ingest. Controlled by PULSE_ARTICLE_FETCH (on|off,
+ * default on) and PULSE_ARTICLE_FETCH_CONCURRENCY (default 5).
  */
 
 import {
@@ -18,6 +28,7 @@ import {
   parseArticleDate,
   extractSourceName,
 } from "../../gdelt";
+import { extractArticleText } from "../article-extract";
 import {
   resolveCountry,
   type JurisdictionMap,
@@ -25,6 +36,80 @@ import {
 import type { RawEventInput } from "../types";
 
 const SOURCE_ID = "gdelt";
+
+const DEFAULT_CONCURRENCY = 5;
+
+/** PULSE_ARTICLE_FETCH — "off" disables body enrichment (headline-only,
+ *  the pre-enrichment behaviour). Anything else (incl. unset) = on. */
+function articleFetchEnabled(): boolean {
+  return (process.env.PULSE_ARTICLE_FETCH ?? "on").trim().toLowerCase() !== "off";
+}
+
+/** PULSE_ARTICLE_FETCH_CONCURRENCY — parallel article fetches (default 5). */
+function articleFetchConcurrency(): number {
+  const raw = Number(process.env.PULSE_ARTICLE_FETCH_CONCURRENCY);
+  return Number.isFinite(raw) && raw >= 1 ? Math.floor(raw) : DEFAULT_CONCURRENCY;
+}
+
+/** Tiny bounded-concurrency worker pool — runs `fn` over `items`, at most
+ *  `n` in flight, preserving index→result order. */
+async function pool<T, R>(
+  items: T[],
+  n: number,
+  fn: (item: T, index: number) => Promise<R>
+): Promise<R[]> {
+  const out: R[] = new Array(items.length);
+  let cursor = 0;
+  async function worker() {
+    while (cursor < items.length) {
+      const i = cursor++;
+      out[i] = await fn(items[i], i);
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(n, items.length) }, worker)
+  );
+  return out;
+}
+
+/**
+ * Enrich each row's `body` with extracted article text, in place.
+ * Keeps the existing value (the outlet domain) whenever extraction
+ * returns null. Logs a per-batch summary. Never throws.
+ */
+async function enrichBodies(rows: RawEventInput[]): Promise<void> {
+  if (rows.length === 0) return;
+
+  const concurrency = articleFetchConcurrency();
+  let enriched = 0;
+  let fellBack = 0;
+
+  await pool(rows, concurrency, async (row) => {
+    const url = row.sourceUrl;
+    if (!url) {
+      fellBack++;
+      return;
+    }
+    let text: string | null = null;
+    try {
+      text = await extractArticleText(url);
+    } catch {
+      // extractArticleText never throws, but stay defensive: a bad URL
+      // must not fail the whole ingest.
+      text = null;
+    }
+    if (text) {
+      row.body = text;
+      enriched++;
+    } else {
+      fellBack++;
+    }
+  });
+
+  console.log(
+    `[gdelt] article enrichment: ${enriched} enriched / ${fellBack} fell back to domain name (of ${rows.length}) @ concurrency ${concurrency}`
+  );
+}
 
 export interface GdeltFetchResult {
   rows: RawEventInput[];
@@ -69,9 +154,22 @@ export async function fetchGdelt(
       rawCountryName: rawCountry ?? null,
       eventDate,
       title: article.title,
+      // Fallback body = outlet domain. Replaced with extracted article text
+      // below when enrichment is enabled and the fetch succeeds.
       body: extractSourceName(article.domain),
       raw: article as unknown as Record<string, unknown>,
     });
+  }
+
+  // Best-effort body enrichment — never allowed to fail the ingest.
+  if (articleFetchEnabled()) {
+    try {
+      await enrichBodies(rows);
+    } catch (err) {
+      console.warn(
+        `[gdelt] article enrichment errored (kept domain fallbacks): ${(err as Error).message}`
+      );
+    }
   }
 
   return { rows, unmatchedCountry, fetched: articles.length };

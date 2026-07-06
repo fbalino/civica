@@ -49,6 +49,7 @@
     "pulse:v2:classify": "tsx scripts/sync-pulse-v2-classify.ts",
     "pulse:v2:score": "tsx scripts/sync-pulse-v2-score.ts",
     "pulse:v2:all": "tsx scripts/run-pulse-v2.ts",
+    "pulse:reenrich-articles": "tsx scripts/reenrich-pulse-articles.ts",
     "eval:pulse-classifier": "tsx scripts/eval-pulse-classifier.ts",
     "backtest:seed": "tsx scripts/seed-backtest-cases.ts",
     "backtest:run": "tsx scripts/run-backtest.ts",
