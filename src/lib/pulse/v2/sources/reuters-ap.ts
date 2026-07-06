@@ -19,10 +19,13 @@ import {
 } from "../country-resolver";
 import type { RawEventInput } from "../types";
 
-const REUTERS_URL =
-  process.env.REUTERS_RSS_URL ?? "https://www.reutersagency.com/feed/";
-const AP_URL =
-  process.env.AP_RSS_URL ?? "https://feeds.apnews.com/rss/ap_topnews";
+// Opt-in via env. The former hardcoded defaults are dead — Reuters retired
+// its public agency RSS (404) and AP's feed host no longer resolves
+// (ENOTFOUND) — so they fetched nothing but logged a failure every run.
+// Left empty by default and skipped (like RSF/ACLED); set a working feed URL
+// to re-enable.
+const REUTERS_URL = process.env.REUTERS_RSS_URL ?? "";
+const AP_URL = process.env.AP_RSS_URL ?? "";
 
 export interface ReutersApFetchResult {
   rows: RawEventInput[];
@@ -37,6 +40,12 @@ async function fetchOne(
   sourceId: string,
   map: JurisdictionMap
 ): Promise<{ rows: RawEventInput[]; unmatched: number; fetched: number }> {
+  if (!url) {
+    console.log(
+      `[${sourceId}] no feed URL configured — skipping (set its *_RSS_URL to enable).`
+    );
+    return { rows: [], unmatched: 0, fetched: 0 };
+  }
   let items;
   try {
     items = await fetchRss(url);
