@@ -1,29 +1,32 @@
 /**
- * Phase 5.7 — admin session helpers.
+ * Admin session helpers.
  *
- * Browser-friendly auth for the /admin/* routes. The ADMIN_API_KEY
- * env var is the single shared secret; the user supplies it once via
- * the sign-in form, and we set an HttpOnly cookie that proves the
- * operator knew the key — WITHOUT storing the raw key itself.
+ * Browser-friendly auth for the /admin/* routes. Access is a single
+ * owner account: a username (`ADMIN_USERNAME`) plus a password whose
+ * salted scrypt hash lives in `ADMIN_PASSWORD_HASH` (see
+ * `src/lib/admin/password.ts`). The operator signs in once with
+ * username + password; on success we set an HttpOnly cookie that proves
+ * the browser completed a valid sign-in — WITHOUT storing the password
+ * or its hash in the cookie.
  *
- * Cookie format (2026-06 security hardening): `<nonce>.<tokenHash>`,
- * where `nonce` is a random per-session value and
- * `tokenHash = sha256(ADMIN_API_KEY + ":" + nonce)`. Validation
- * recomputes the hash from the cookie's nonce plus the server's
- * ADMIN_API_KEY and constant-time compares. Only a sign-in that knew
- * ADMIN_API_KEY could have produced a matching pair, so a leaked
- * cookie no longer exposes the master secret (and rotating the env
- * var invalidates every outstanding cookie). The /api/admin/* Bearer
- * header path is unchanged — operators with the raw key still get the
- * UI for free; they just exchange it for an opaque session cookie.
+ * Cookie format: `<nonce>.<hmac>`, where `nonce` is a random per-session
+ * value and `hmac = HMAC-SHA256(ADMIN_SESSION_SECRET, nonce)`. The
+ * signing key is a dedicated `ADMIN_SESSION_SECRET` — deliberately
+ * separate from the password hash so the cookie's validity doesn't hinge
+ * on the credential, and rotating the secret invalidates every
+ * outstanding cookie. Validation recomputes the HMAC from the cookie's
+ * nonce plus the server secret and constant-time compares, so a leaked
+ * cookie exposes neither the secret nor the password.
  *
- * The reviewer's display name is captured at sign-in time and stored
- * in a sibling `civica_admin_reviewer` cookie (also HttpOnly). It's
- * surfaced as the `reviewerId` on every audit log row.
+ * There is NO bearer/API-key path anymore — the /admin/* surface and its
+ * mutation routes gate on this session cookie only. The reviewer display
+ * name on every audit-log row is the configured `ADMIN_USERNAME` (or an
+ * optional `ADMIN_DISPLAY_NAME` override), captured at sign-in time and
+ * stored in a sibling HttpOnly `civica_admin_reviewer` cookie.
  */
 
 import { cookies } from "next/headers";
-import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 export const ADMIN_SESSION_COOKIE = "civica_admin_session";
 export const ADMIN_REVIEWER_COOKIE = "civica_admin_reviewer";
@@ -33,11 +36,10 @@ export interface AdminSession {
   reviewerId: string;
 }
 
-/** Derive the opaque session token for a given nonce. The raw
- *  ADMIN_API_KEY never leaves the server — only this one-way hash of
- *  `key:nonce` is ever stored in the cookie. */
-function deriveSessionToken(adminKey: string, nonce: string): string {
-  return createHash("sha256").update(`${adminKey}:${nonce}`).digest("hex");
+/** Sign a nonce with the session secret. The secret never leaves the
+ *  server — only this keyed HMAC of the nonce is stored in the cookie. */
+function signNonce(secret: string, nonce: string): string {
+  return createHmac("sha256", secret).update(nonce).digest("hex");
 }
 
 /** Constant-time string compare that tolerates length mismatches
@@ -50,40 +52,34 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 /**
- * Constant-time check of an incoming `Authorization: Bearer <token>`
- * header against the server's ADMIN_API_KEY. Returns false when
- * ADMIN_API_KEY is unset (fail closed) or the header doesn't match.
- *
- * All /api/admin/* bearer paths route through this instead of a plain
- * `header === \`Bearer ${key}\`` so the compare can't leak the secret
- * via response timing (mirrors the cookie-session `safeEqual` path and
- * `cron-auth.ts`). The set of accepted tokens is unchanged — only the
- * comparison mechanics differ.
+ * The reviewer display name for audit-log rows. Prefers the optional
+ * `ADMIN_DISPLAY_NAME`, falling back to `ADMIN_USERNAME`, then to a
+ * generic "admin". Sanitised to the audit-safe shape so an odd env value
+ * can't land unescaped in a log row.
  */
-export function verifyAdminBearer(authorizationHeader: string | null): boolean {
-  const expected = process.env.ADMIN_API_KEY;
-  if (!expected) return false;
-  return safeEqual(authorizationHeader ?? "", `Bearer ${expected}`);
+export function adminReviewerName(): string {
+  return sanitizeReviewerName(
+    process.env.ADMIN_DISPLAY_NAME || process.env.ADMIN_USERNAME,
+    "admin",
+  );
 }
 
 /**
- * Constant-time check of a raw ADMIN_API_KEY (e.g. the sign-in form's
- * `token` field, no `Bearer ` prefix). Returns false when ADMIN_API_KEY
- * is unset. Accepted tokens are unchanged — only the compare is
- * constant-time.
+ * Constant-time verify a submitted username against `ADMIN_USERNAME`.
+ * Returns false when `ADMIN_USERNAME` is unset (fail closed). The
+ * password half is checked separately via `verifyPassword`
+ * (`src/lib/admin/password.ts`); a sign-in requires BOTH.
  */
-export function verifyAdminToken(token: string | null | undefined): boolean {
-  const expected = process.env.ADMIN_API_KEY;
+export function verifyAdminUsername(username: string | null | undefined): boolean {
+  const expected = process.env.ADMIN_USERNAME;
   if (!expected) return false;
-  return safeEqual(token ?? "", expected);
+  return safeEqual((username ?? "").trim(), expected);
 }
 
 /**
- * Sanitise an operator-supplied reviewer name to the same shape the
- * sign-in cookie path enforces: keep only `[a-zA-Z0-9 _.\-]`, trim, and
- * cap at 80 chars. Returns `fallback` when the result is empty. Used for
- * the `x-civica-reviewer` header on the Bearer path so an unbounded /
- * unescaped value can't land verbatim in an audit-log row.
+ * Sanitise an operator-supplied reviewer name to a bounded, audit-safe
+ * shape: keep only `[a-zA-Z0-9 _.\-]`, trim, and cap at 80 chars. Returns
+ * `fallback` when the result is empty.
  */
 export function sanitizeReviewerName(
   raw: string | null | undefined,
@@ -97,38 +93,38 @@ export function sanitizeReviewerName(
 
 /** Read + validate the admin session cookie. Returns null when the
  *  cookie is missing, invalid, or the server isn't configured with
- *  ADMIN_API_KEY. */
+ *  ADMIN_SESSION_SECRET. */
 export async function getAdminSession(): Promise<AdminSession | null> {
-  const expected = process.env.ADMIN_API_KEY;
-  if (!expected) return null;
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret) return null;
 
   const cookieJar = await cookies();
   const session = cookieJar.get(ADMIN_SESSION_COOKIE)?.value;
   if (!session) return null;
 
-  // Cookie is `<nonce>.<tokenHash>`. Recompute the expected hash from
-  // the nonce + server key and constant-time compare.
+  // Cookie is `<nonce>.<hmac>`. Recompute the expected HMAC from the
+  // nonce + server secret and constant-time compare.
   const dot = session.indexOf(".");
   if (dot <= 0 || dot === session.length - 1) return null;
   const nonce = session.slice(0, dot);
-  const presentedHash = session.slice(dot + 1);
-  const expectedHash = deriveSessionToken(expected, nonce);
-  if (!safeEqual(presentedHash, expectedHash)) return null;
+  const presentedMac = session.slice(dot + 1);
+  const expectedMac = signNonce(secret, nonce);
+  if (!safeEqual(presentedMac, expectedMac)) return null;
 
   const reviewerId =
     cookieJar.get(ADMIN_REVIEWER_COOKIE)?.value?.trim() ||
-    "anonymous-reviewer";
+    adminReviewerName();
   return { reviewerId };
 }
 
 /** Set both cookies on a Response. Mints a fresh per-session nonce and
- *  stores `<nonce>.<tokenHash>` — never the raw ADMIN_API_KEY. */
+ *  stores `<nonce>.<hmac>` — never any secret material. */
 export function buildAdminCookieHeaders(
-  reviewerName: string
+  reviewerName: string,
 ): Array<[string, string]> {
-  const adminKey = process.env.ADMIN_API_KEY ?? "";
+  const secret = process.env.ADMIN_SESSION_SECRET ?? "";
   const nonce = randomBytes(18).toString("hex");
-  const sessionValue = `${nonce}.${deriveSessionToken(adminKey, nonce)}`;
+  const sessionValue = `${nonce}.${signNonce(secret, nonce)}`;
   const maxAge = SESSION_TTL_DAYS * 24 * 60 * 60;
   const common = `Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}`;
   // Secure flag in production only (cookies-without-secure are blocked

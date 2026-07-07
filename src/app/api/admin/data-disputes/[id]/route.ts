@@ -23,7 +23,8 @@
  * does NOT undo `country_facts` demotions — manual de-demotion is
  * out of scope for v1.0 (see resolution doc §6 Q3).
  *
- * Auth: Bearer ADMIN_API_KEY (CLI / API) or admin session cookie.
+ * Auth: the admin session cookie set by /api/admin/session (sign in at
+ * /admin/sign-in). There is no bearer/API-key path.
  *
  * Methodology:
  *   - Phase F.5: ~/civica/plan/phase-f-methodology-v0.1.md §7
@@ -38,12 +39,7 @@ import {
   disputeLoserId,
   OPEN_DISPUTE_STATUSES,
 } from "@/lib/factbook/reconcile/dispute-resolution";
-import {
-  getAdminSession,
-  verifyAdminBearer,
-  sanitizeReviewerName,
-  ADMIN_REVIEWER_COOKIE,
-} from "@/lib/admin/session";
+import { getAdminSession } from "@/lib/admin/session";
 import {
   snapshotDispute,
   writeDisputeAuditLog,
@@ -94,43 +90,11 @@ async function readBody(
   return { isForm: false, body: json };
 }
 
-async function authorize(
-  request: NextRequest,
-): Promise<{ reviewerId: string } | null> {
-  const expected = process.env.ADMIN_API_KEY;
-  if (!expected) return null;
-  // Bearer header path (constant-time compare)
-  if (verifyAdminBearer(request.headers.get("authorization"))) {
-    const reviewerHeader = request.headers.get("x-civica-reviewer");
-    return { reviewerId: sanitizeReviewerName(reviewerHeader, "api-bearer") };
-  }
-  // Cookie session path
-  const session = await getAdminSession();
-  if (session) return { reviewerId: session.reviewerId };
-  // Fallback: read cookies directly off the request (test harnesses).
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  if (
-    cookieHeader.includes(
-      `civica_admin_session=${encodeURIComponent(expected)}`,
-    )
-  ) {
-    const reviewerMatch = cookieHeader.match(
-      new RegExp(`${ADMIN_REVIEWER_COOKIE}=([^;]+)`),
-    );
-    return {
-      reviewerId: reviewerMatch
-        ? decodeURIComponent(reviewerMatch[1])
-        : "anonymous-reviewer",
-    };
-  }
-  return null;
-}
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const auth = await authorize(request);
+  const auth = await getAdminSession();
   if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

@@ -18,11 +18,12 @@ interface PageProps {
  * Admin sign-in.
  *
  * A centered card (hairline border, --radius-lg, soft shadow) with the Civica
- * mark, canonical rounded inputs, and a primary Button. The auth flow is
- * unchanged underneath: the form POSTs the reviewer name + ADMIN_API_KEY to
- * /api/admin/session, which constant-time-verifies the token and sets the
- * HttpOnly session cookie. On a bad token that route redirects back here with
- * ?error=1, surfaced via the danger Banner.
+ * mark, canonical rounded inputs, and a primary Button. The form POSTs a
+ * username + password to /api/admin/session, which constant-time-verifies the
+ * username against ADMIN_USERNAME and the password against the salted scrypt
+ * hash in ADMIN_PASSWORD_HASH, then sets the HttpOnly session cookie. On a bad
+ * credential that route redirects back here with ?error=1, surfaced via the
+ * danger Banner.
  *
  * This page sits OUTSIDE the (admin) route group so it doesn't inherit the
  * admin shell (or its session redirect). It imports admin.css directly for the
@@ -49,14 +50,15 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
         </div>
 
         <p className="admin-signin-lede">
-          Operator access to the review queues. Sign in with the shared admin
-          key to triage Pulse events, data disputes, applications, and
+          Operator access to the review queues. Sign in with your admin username
+          and password to triage Pulse events, data disputes, applications, and
           messages.
         </p>
 
         {error ? (
           <Banner variant="danger" className="admin-signin-error">
-            That admin key did not match. Check the key and try again.
+            That username or password did not match. Check your credentials and
+            try again.
           </Banner>
         ) : null}
 
@@ -68,30 +70,32 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
           <input type="hidden" name="redirect" value={redirectAfter} />
 
           <div className="admin-field">
-            <label className="admin-field-label" htmlFor="reviewerName">
-              Reviewer name
+            <label className="admin-field-label" htmlFor="username">
+              Username
             </label>
             <input
-              id="reviewerName"
+              id="username"
               className="admin-input"
               type="text"
-              name="reviewerName"
-              placeholder="e.g. Fernando"
-              autoComplete="name"
+              name="username"
+              autoComplete="username"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
               required
             />
           </div>
 
           <div className="admin-field">
-            <label className="admin-field-label" htmlFor="token">
-              Admin key
+            <label className="admin-field-label" htmlFor="password">
+              Password
             </label>
             <input
-              id="token"
+              id="password"
               className="admin-input"
               type="password"
-              name="token"
-              autoComplete="off"
+              name="password"
+              autoComplete="current-password"
               required
             />
           </div>

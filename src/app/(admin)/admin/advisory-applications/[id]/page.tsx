@@ -3,8 +3,8 @@
  *
  * Full application view with the status-transition buttons. Each button POSTs
  * to the existing `/api/admin/advisory-applications/[id]` route (auth: admin
- * session cookie or Bearer ADMIN_API_KEY), which flips `status` and 303s back
- * here. Auth gating for the page itself happens in `(admin)/layout.tsx`.
+ * session cookie), which flips `status` and 303s back here. Auth gating for the
+ * page itself happens in `(admin)/layout.tsx`.
  */
 import type { Metadata } from "next";
 import Link from "next/link";
