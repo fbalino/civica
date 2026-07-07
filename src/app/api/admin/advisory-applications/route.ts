@@ -2,18 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { advisoryApplications } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
-import { verifyAdminBearer } from "@/lib/admin/session";
+import { getAdminSession } from "@/lib/admin/session";
 
-// Protect with ADMIN_API_KEY env var (mirrors /api/admin/contact).
-// Call with: Authorization: Bearer <ADMIN_API_KEY>
-function isAuthorized(req: NextRequest): boolean {
-  return verifyAdminBearer(req.headers.get("authorization"));
-}
-
+// Gated on the admin session cookie set by /api/admin/session (mirrors
+// /api/admin/contact). Sign in at /admin/sign-in; no bearer/API-key path.
 const VALID_STATUSES = ["new", "reviewed", "contacted", "archived"] as const;
 
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!(await getAdminSession())) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 

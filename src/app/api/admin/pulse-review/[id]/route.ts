@@ -17,8 +17,8 @@
  * inserted with the before/after snapshot. Form callers get a 303
  * redirect; JSON callers get JSON.
  *
- * Auth: either Bearer ADMIN_API_KEY header (CLI / API callers) or
- * the admin session cookie set by /api/admin/session.
+ * Auth: the admin session cookie set by /api/admin/session (sign in at
+ * /admin/sign-in). There is no bearer/API-key path.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -28,12 +28,7 @@ import {
   pulseEventsV2,
   pulseReviewAuditLog,
 } from "@/lib/db/schema";
-import {
-  getAdminSession,
-  verifyAdminBearer,
-  sanitizeReviewerName,
-  ADMIN_REVIEWER_COOKIE,
-} from "@/lib/admin/session";
+import { getAdminSession } from "@/lib/admin/session";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
 
 type Action = "approve" | "edit" | "reject";
@@ -83,40 +78,11 @@ async function readBody(
   return { isForm: false, body: json };
 }
 
-async function authorize(
-  request: NextRequest
-): Promise<{ reviewerId: string } | null> {
-  const expected = process.env.ADMIN_API_KEY;
-  if (!expected) return null;
-  // Bearer header path (constant-time compare)
-  if (verifyAdminBearer(request.headers.get("authorization"))) {
-    const reviewerHeader = request.headers.get("x-civica-reviewer");
-    return { reviewerId: sanitizeReviewerName(reviewerHeader, "api-bearer") };
-  }
-  // Cookie session path
-  const session = await getAdminSession();
-  if (session) return { reviewerId: session.reviewerId };
-  // Fallback: read cookies directly off the request for clients that
-  // can't await next/headers — e.g. test harnesses.
-  const cookieHeader = request.headers.get("cookie") ?? "";
-  if (cookieHeader.includes(`civica_admin_session=${encodeURIComponent(expected)}`)) {
-    const reviewerMatch = cookieHeader.match(
-      new RegExp(`${ADMIN_REVIEWER_COOKIE}=([^;]+)`)
-    );
-    return {
-      reviewerId: reviewerMatch
-        ? decodeURIComponent(reviewerMatch[1])
-        : "anonymous-reviewer",
-    };
-  }
-  return null;
-}
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await authorize(request);
+  const auth = await getAdminSession();
   if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

@@ -157,7 +157,7 @@ git clone https://github.com/fbalino/civica.git
 cd civica
 npm install
 cp .env.example .env.local
-# Fill in DATABASE_URL, ANTHROPIC_API_KEY, ADMIN_API_KEY, CRON_SECRET
+# Fill in DATABASE_URL, ANTHROPIC_API_KEY, ADMIN_USERNAME/ADMIN_PASSWORD_HASH/ADMIN_SESSION_SECRET, CRON_SECRET
 npm run dev
 ```
 
@@ -167,7 +167,7 @@ Required env vars (documented in `.env.example`):
 
 - `DATABASE_URL` — Neon Postgres connection string
 - `ANTHROPIC_API_KEY` — required for `/api/chat` and Pulse event classification
-- `ADMIN_API_KEY` — bearer token for `/api/admin/*` (returns 401 if unset)
+- `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` — the admin-login credentials for the `/admin` back office and `/api/admin/*` routes (all three required; routes fail closed if unset). Generate the password hash with `npm run admin:set-password`.
 - `CRON_SECRET` — bearer token for the Vercel cron endpoints
 
 Common npm scripts:

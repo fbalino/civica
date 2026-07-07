@@ -3,8 +3,8 @@
  *
  * Shows the full submission (sender, subject, message body, metadata) and the
  * status-transition buttons. Each button POSTs to `/api/admin/messages/[id]`
- * (auth: admin session cookie or Bearer ADMIN_API_KEY), which flips `status`
- * and 303s back here. Page auth gating happens in `(admin)/layout.tsx`.
+ * (auth: admin session cookie), which flips `status` and 303s back here. Page
+ * auth gating happens in `(admin)/layout.tsx`.
  *
  * The message body itself is never mutated — this surface is read-only apart
  * from the triage status.

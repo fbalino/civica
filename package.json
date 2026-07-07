@@ -92,7 +92,8 @@
     "test:watch": "node --import tsx --test --watch \"src/**/*.test.ts\"",
     "test:db": "RUN_DB_TESTS=1 node --import tsx --test \"src/**/*.test.ts\"",
     "validate:design-tokens": "tsx scripts/validate-design-tokens.ts",
-    "measure:gdelt-noise": "tsx scripts/measure-gdelt-noise.ts"
+    "measure:gdelt-noise": "tsx scripts/measure-gdelt-noise.ts",
+    "admin:set-password": "tsx scripts/hash-admin-password.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

@@ -2,17 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
-import { verifyAdminBearer } from "@/lib/admin/session";
+import { getAdminSession } from "@/lib/admin/session";
 
-// Protect with ADMIN_API_KEY env var.
-// Set ADMIN_API_KEY in your Vercel project environment variables.
-// Call with: Authorization: Bearer <ADMIN_API_KEY>
-function isAuthorized(req: NextRequest): boolean {
-  return verifyAdminBearer(req.headers.get("authorization"));
-}
-
+// Gated on the admin session cookie set by /api/admin/session. Sign in
+// at /admin/sign-in with the ADMIN_USERNAME / ADMIN_PASSWORD_HASH
+// credentials; there is no bearer/API-key path.
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!(await getAdminSession())) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 

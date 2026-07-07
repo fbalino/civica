@@ -12,20 +12,16 @@
  * mutation for the read-only Messages surface — the public contact POST never
  * sets `status` (defaults to 'new'); only this authed route changes it.
  *
- * Auth: Bearer ADMIN_API_KEY (CLI / API) or admin session cookie — the same
- * `authorize()` shape as `/api/admin/advisory-applications/[id]` and
- * `/api/admin/data-disputes/[id]`.
+ * Auth: the admin session cookie set by /api/admin/session (sign in at
+ * /admin/sign-in) — the same session-only gate as
+ * `/api/admin/advisory-applications/[id]` and `/api/admin/data-disputes/[id]`.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { contactSubmissions } from "@/lib/db/schema";
-import {
-  getAdminSession,
-  verifyAdminBearer,
-  sanitizeReviewerName,
-} from "@/lib/admin/session";
+import { getAdminSession } from "@/lib/admin/session";
 
 const VALID_STATUSES = ["new", "read", "archived"] as const;
 type Status = (typeof VALID_STATUSES)[number];
@@ -62,27 +58,11 @@ async function readBody(
   return { isForm: false, body: json };
 }
 
-async function authorize(
-  request: NextRequest
-): Promise<{ reviewerId: string } | null> {
-  const expected = process.env.ADMIN_API_KEY;
-  if (!expected) return null;
-  // Bearer header path (constant-time compare).
-  if (verifyAdminBearer(request.headers.get("authorization"))) {
-    const reviewerHeader = request.headers.get("x-civica-reviewer");
-    return { reviewerId: sanitizeReviewerName(reviewerHeader, "api-bearer") };
-  }
-  // Cookie session path.
-  const session = await getAdminSession();
-  if (session) return { reviewerId: session.reviewerId };
-  return null;
-}
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await authorize(request);
+  const auth = await getAdminSession();
   if (!auth) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
