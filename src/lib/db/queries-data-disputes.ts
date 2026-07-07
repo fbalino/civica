@@ -1022,3 +1022,117 @@ export async function getPublicDisputeFilterDistributions(
 
   return { sourcePairs, factKeys };
 }
+
+// ---------------------------------------------------------------------------
+// Duplicate consolidation (DISPLAY-ONLY)
+//
+// The resolver opens ONE dispute per contested source PAIR. A single fact —
+// e.g. Marshall Islands `population_total` — that disagrees across three
+// publishers (CIA × World Bank, CIA × IMF, CIA × UN) therefore spawns three
+// near-identical pairwise dispute rows. Read as three separate list items,
+// they read as confusing duplicates and bury the one a reviewer annotated.
+//
+// These helpers roll the flat pairwise rows up into ONE entry per
+// (jurisdiction, fact_key), keeping each pairwise dispute as an expandable
+// sub-row. This changes only how the list is DISPLAYED — creation, storage,
+// and resolution are untouched (each sub-dispute still has its own id and its
+// own detail/resolution page). Both the public reader feed and the admin
+// queue consume the same grouping so the two surfaces stay consistent.
+// ---------------------------------------------------------------------------
+
+/** A consolidated fact group: one (jurisdiction, fact_key) with its N
+ *  pairwise sub-disputes rolled up. The `lead` row is the representative used
+ *  for the collapsed summary (highest severity, then newest). */
+export interface DisputeFactGroup<Row> {
+  /** Stable key `${jurisdictionId}::${factKey}`. */
+  key: string;
+  factKey: string;
+  factGroup: string;
+  country: { id: string; slug: string; name: string };
+  /** Representative sub-dispute used for the collapsed row headline. */
+  lead: Row;
+  /** Every pairwise dispute for this (jurisdiction, fact_key), lead first. */
+  members: Row[];
+  /** Distinct source ids across all members (for the "3 sources" summary). */
+  sourceIds: string[];
+  /** True when any member carries reviewer notes — lets the list flag an
+   *  annotated group even when it isn't the lead. */
+  hasReviewerNotes: boolean;
+}
+
+type GroupableRow = {
+  id: string;
+  factKey: string;
+  factGroup: string;
+  country: { id: string; slug: string; name: string };
+  createdAt: string;
+  severity: SeverityScore;
+  factA: { sourceId: string } | null;
+  factB: { sourceId: string } | null;
+  reviewerNotes?: string | null;
+};
+
+/** Pick the representative (lead) sub-dispute for a group: highest severity,
+ *  tie-broken by newest created_at. Mirrors the flat list's default ordering
+ *  so the collapsed headline matches what a reader would have seen first. */
+function severityThenNewest<Row extends GroupableRow>(a: Row, b: Row): number {
+  const sa = a.severity.severity ?? -Infinity;
+  const sb = b.severity.severity ?? -Infinity;
+  if (sb !== sa) return sb - sa;
+  return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+}
+
+/**
+ * Group an already-filtered, already-sorted flat dispute list into one entry
+ * per (jurisdiction, fact_key). Group order follows the incoming row order
+ * (first appearance wins), so the caller's sort — severity / newest / oldest —
+ * is preserved at the group level. Members within a group are ordered by
+ * severity then recency.
+ */
+export function groupDisputesByFact<Row extends GroupableRow>(
+  rows: Row[],
+): DisputeFactGroup<Row>[] {
+  const byKey = new Map<string, DisputeFactGroup<Row>>();
+  const order: string[] = [];
+
+  for (const row of rows) {
+    const key = `${row.country.id}::${row.factKey}`;
+    let group = byKey.get(key);
+    if (!group) {
+      group = {
+        key,
+        factKey: row.factKey,
+        factGroup: row.factGroup,
+        country: row.country,
+        lead: row,
+        members: [],
+        sourceIds: [],
+        hasReviewerNotes: false,
+      };
+      byKey.set(key, group);
+      order.push(key);
+    }
+    group.members.push(row);
+  }
+
+  return order.map((key) => {
+    const group = byKey.get(key)!;
+    const members = [...group.members].sort(severityThenNewest);
+    const sourceIds = Array.from(
+      new Set(
+        members.flatMap((m) =>
+          [m.factA?.sourceId, m.factB?.sourceId].filter(
+            (s): s is string => Boolean(s),
+          ),
+        ),
+      ),
+    );
+    return {
+      ...group,
+      lead: members[0],
+      members,
+      sourceIds,
+      hasReviewerNotes: members.some((m) => Boolean(m.reviewerNotes)),
+    };
+  });
+}

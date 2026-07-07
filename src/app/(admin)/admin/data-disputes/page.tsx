@@ -21,6 +21,7 @@ import { DataTable } from "@/components/editorial/DataTable";
 import {
   getDataDisputeQueue,
   getDisputeFilterDistributions,
+  groupDisputesByFact,
   type DisputeSortKey,
   type AgeBucket,
 } from "@/lib/db/queries-data-disputes";
@@ -172,28 +173,37 @@ export default async function DataDisputesQueuePage({
   const showResolved = params.showResolved === "1";
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
   const limit = 50;
-  const offset = (page - 1) * limit;
 
-  const [{ rows, totalOpen, totalMatching }, distributions] = await Promise.all(
-    [
-      getDataDisputeQueue({
-        disputeKind: kind,
-        factGroup: group,
-        factKey,
-        sourcePair,
-        severityBucket,
-        ageBucket,
-        includeResolved: showResolved,
-        sort,
-        limit,
-        offset,
-      }),
-      getDisputeFilterDistributions({
-        includeResolved: showResolved,
-        topN: 8,
-      }),
-    ]
-  );
+  // Pull the full matched set (the queue stays well under 200) so that
+  // duplicate consolidation groups every pairwise dispute for a fact
+  // together, not just those that landed on the same DB page. We then
+  // paginate the GROUPED entries. Creation/resolution are untouched — this
+  // is a display-only roll-up of the near-identical pairwise rows the
+  // resolver opens per contested source pair.
+  const [{ rows, totalOpen }, distributions] = await Promise.all([
+    getDataDisputeQueue({
+      disputeKind: kind,
+      factGroup: group,
+      factKey,
+      sourcePair,
+      severityBucket,
+      ageBucket,
+      includeResolved: showResolved,
+      sort,
+      limit: 500,
+      offset: 0,
+    }),
+    getDisputeFilterDistributions({
+      includeResolved: showResolved,
+      topN: 8,
+    }),
+  ]);
+
+  const allGroups = groupDisputesByFact(rows);
+  const totalGroups = allGroups.length;
+  const totalPairs = rows.length;
+  const groupOffset = (page - 1) * limit;
+  const groups = allGroups.slice(groupOffset, groupOffset + limit);
 
   const baseParams = {
     kind,
@@ -221,9 +231,15 @@ export default async function DataDisputesQueuePage({
           <span>open</span>
           <span className="admin-meta-sep">·</span>
           <span>
-            Showing <span className="admin-meta-num">{rows.length}</span> of{" "}
-            <span className="admin-meta-num">{totalMatching}</span>
-            {totalMatching !== totalOpen ? " (filtered)" : ""}
+            <span className="admin-meta-num">{totalGroups}</span> facts in
+            conflict
+            {totalPairs !== totalGroups ? (
+              <>
+                {" "}
+                (<span className="admin-meta-num">{totalPairs}</span> source
+                pairs)
+              </>
+            ) : null}
           </span>
           <span className="admin-meta-sep">·</span>
           <Link
@@ -396,7 +412,7 @@ export default async function DataDisputesQueuePage({
         </div>
       </div>
 
-      {rows.length === 0 ? (
+      {groups.length === 0 ? (
         <div className="admin-empty">
           <strong>Queue is clear</strong>
           {totalOpen === 0 && !showResolved
@@ -416,64 +432,72 @@ export default async function DataDisputesQueuePage({
               </tr>
             </thead>
             <tbody>
-              {rows.map((dispute) => (
-                <AdminRow key={dispute.id} href={`/admin/data-disputes/${dispute.id}`}>
-                  <td>
-                    <Link
-                      href={`/admin/data-disputes/${dispute.id}`}
-                      className="admin-row-link"
-                    >
-                      <span className="admin-row-primary">
-                        {dispute.country.name} · {dispute.factKey}
-                      </span>
-                      <span className="admin-row-secondary">
-                        {dispute.description ??
-                          `${
-                            KIND_LABELS[dispute.disputeKind] ?? "Dispute"
-                          } · Group ${dispute.factGroup}`}
-                      </span>
-                    </Link>
-                  </td>
-                  <td>
-                    <span className="admin-cell-chips">
-                      <Chip
-                        variant={KIND_VARIANT[dispute.disputeKind] ?? "neutral"}
+              {groups.map((g) => {
+                const lead = g.lead;
+                const pairs = g.members.length;
+                return (
+                  <AdminRow key={g.key} href={`/admin/data-disputes/${lead.id}`}>
+                    <td>
+                      <Link
+                        href={`/admin/data-disputes/${lead.id}`}
+                        className="admin-row-link"
                       >
-                        {KIND_LABELS[dispute.disputeKind] ??
-                          dispute.disputeKind}
-                      </Chip>
-                      <Chip>{`Group ${dispute.factGroup}`}</Chip>
-                    </span>
-                  </td>
-                  <td>
-                    {dispute.severity.severity != null ? (
-                      <Chip variant={severityBadgeVariant(dispute.severity)}>
-                        {formatSeverity(dispute.severity)}
-                      </Chip>
-                    ) : (
-                      <span className="admin-cell-arrow">—</span>
-                    )}
-                  </td>
-                  <td>
-                    {dispute.status === "open" ? (
-                      <Chip variant="warn">Open</Chip>
-                    ) : dispute.status === "in_review" ? (
-                      <Chip variant="accent">In review</Chip>
-                    ) : (
-                      <Chip>{dispute.status.replaceAll("_", " ")}</Chip>
-                    )}
-                  </td>
-                  <td className="num admin-cell-date">
-                    {formatDate(dispute.createdAt)}
-                  </td>
-                </AdminRow>
-              ))}
+                        <span className="admin-row-primary">
+                          {g.country.name} · {g.factKey}
+                        </span>
+                        <span className="admin-row-secondary">
+                          {pairs > 1
+                            ? `${pairs} source pairs · ${g.sourceIds.join(", ")}`
+                            : (lead.description ??
+                              `${
+                                KIND_LABELS[lead.disputeKind] ?? "Dispute"
+                              } · Group ${g.factGroup}`)}
+                        </span>
+                      </Link>
+                    </td>
+                    <td>
+                      <span className="admin-cell-chips">
+                        <Chip
+                          variant={KIND_VARIANT[lead.disputeKind] ?? "neutral"}
+                        >
+                          {KIND_LABELS[lead.disputeKind] ?? lead.disputeKind}
+                        </Chip>
+                        {pairs > 1 ? <Chip variant="accent">×{pairs}</Chip> : null}
+                        {g.hasReviewerNotes ? (
+                          <Chip variant="accent">note</Chip>
+                        ) : null}
+                      </span>
+                    </td>
+                    <td>
+                      {lead.severity.severity != null ? (
+                        <Chip variant={severityBadgeVariant(lead.severity)}>
+                          {formatSeverity(lead.severity)}
+                        </Chip>
+                      ) : (
+                        <span className="admin-cell-arrow">—</span>
+                      )}
+                    </td>
+                    <td>
+                      {lead.status === "open" ? (
+                        <Chip variant="warn">Open</Chip>
+                      ) : lead.status === "in_review" ? (
+                        <Chip variant="accent">In review</Chip>
+                      ) : (
+                        <Chip>{lead.status.replaceAll("_", " ")}</Chip>
+                      )}
+                    </td>
+                    <td className="num admin-cell-date">
+                      {formatDate(lead.createdAt)}
+                    </td>
+                  </AdminRow>
+                );
+              })}
             </tbody>
           </DataTable>
         </div>
       )}
 
-      {totalMatching > limit ? (
+      {totalGroups > limit ? (
         <nav className="admin-pagination" aria-label="Pagination">
           {page > 1 ? (
             <Link href={buildHref(baseParams, { page: String(page - 1) })}>
@@ -483,7 +507,7 @@ export default async function DataDisputesQueuePage({
             <span aria-hidden>—</span>
           )}
           <span>Page {page}</span>
-          {offset + rows.length < totalMatching ? (
+          {groupOffset + groups.length < totalGroups ? (
             <Link href={buildHref(baseParams, { page: String(page + 1) })}>
               Page {page + 1} →
             </Link>

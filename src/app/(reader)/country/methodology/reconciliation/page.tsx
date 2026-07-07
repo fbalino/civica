@@ -1365,6 +1365,30 @@ export default async function ReconciliationMethodologyPage() {
 
       <section className="editorial-section" id="disputes">
         <h2>Disputes</h2>
+
+        <div className="disputes-callout">
+          <div className="disputes-callout-text">
+            <p className="disputes-callout-title">
+              Browse the public disputes log
+            </p>
+            <p className="disputes-callout-desc">
+              Every open, resolved, and auto-resolved conflict the
+              resolver flagged — with source attribution, outcomes, and
+              the reviewer&rsquo;s methodology rationale where one was
+              recorded. Filter by status, kind, fact-key, and more.
+            </p>
+          </div>
+          <Link
+            href="/country/methodology/reconciliation/disputes"
+            className="btn btn--primary"
+          >
+            Open the disputes log
+            <span className="btn__arrow" aria-hidden>
+              →
+            </span>
+          </Link>
+        </div>
+
         <p>
           A dispute row is opened automatically when a numeric
           disagreement exceeds the material-error guard, when a
