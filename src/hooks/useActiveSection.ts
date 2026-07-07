@@ -36,15 +36,37 @@ export function useActiveSection(
     const intersecting = new Map<string, boolean>();
 
     const pickActive = () => {
-      // Walk the ids in document order and select the first one
-      // currently intersecting. Deterministic when several entries
-      // overlap the rootMargin band.
-      for (const id of ids) {
-        if (intersecting.get(id)) {
+      const activeIds = ids.filter((id) => intersecting.get(id));
+      if (activeIds.length === 0) return;
+
+      // Prefer the DEEPEST intersecting section — one that does not itself
+      // contain another intersecting section. A page can nest sections
+      // (e.g. /api-docs puts every endpoint sub-section inside one big
+      // `#endpoints` section); the ancestor's element spans the whole
+      // region, so it stays intersecting the entire time and, under a
+      // naive "first in document order" pick, would keep winning while the
+      // reader scrolls past ten nested items. Skipping any section that
+      // contains another active one lets the child win.
+      //
+      // For flat pages (no nesting) no section contains another, so this
+      // resolves to the first intersecting id in document order — identical
+      // to the previous behavior. Deterministic either way.
+      for (const id of activeIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const containsAnotherActive = activeIds.some((otherId) => {
+          if (otherId === id) return false;
+          const other = document.getElementById(otherId);
+          return other != null && el.contains(other);
+        });
+        if (!containsAnotherActive) {
           setActive(id);
           return;
         }
       }
+      // Fallback: every candidate contained another (shouldn't happen) —
+      // keep document order.
+      setActive(activeIds[0]);
     };
 
     const observer = new IntersectionObserver(
