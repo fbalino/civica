@@ -7,6 +7,7 @@ import { StatusDot } from "@/components/editorial/StatusDot";
 import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
 import { SourceDot } from "@/components/SourceDot";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
+import { PageHero } from "@/components/PageHero";
 import { SegmentedControlDemo } from "./SegmentedControlDemo";
 import { IndicatorTrendChartDemo } from "./IndicatorTrendChartDemo";
 import { IdeologyCompassDemo } from "./IdeologyCompassDemo";
@@ -478,10 +479,61 @@ export default function DesignSystemPage() {
           </div>
         </section>
 
-        {/* 05 Voice */}
+        {/* 05 Page hero */}
         <section className="ds-section">
           <div className="ds-section-head">
-            <span className="num">05 · Voice</span>
+            <span className="num">05 · Page hero</span>
+            <h2>One hero, everywhere.</h2>
+            <span className="dek">
+              The single <code>&lt;PageHero&gt;</code> shell every browse and
+              landing page shares — full-bleed band, shared height, 1200px inner
+              column, eyebrow → serif H1 → dek, with optional engraving, search,
+              and chip slots. Only <code>/blog</code> and methodology pages opt
+              out.
+            </span>
+          </div>
+          {/* Real PageHero, rendered live. It is 100vw full-bleed by design, so
+              it breaks out of this container exactly as it does on real pages. */}
+          <PageHero
+            eyebrow="Section · Page"
+            titleId="ds-page-hero-title"
+            title="Every page opens the same way."
+            description="Eyebrow, serif headline, and a one-line standfirst on a full-bleed engraving band. Pages add a search field or filter chips through slots; the frame never changes."
+            engraving={{
+              src: "/engravings/pages/index.webp",
+              darkSrc: "/engravings/pages/index-dark.webp",
+            }}
+            search={
+              <CountrySearchCombobox
+                countries={[]}
+                placeholder="Optional search slot…"
+                ariaLabel="Demo search"
+              />
+            }
+          />
+          <p
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: "var(--text-13)",
+              color: "var(--color-text-muted)",
+              maxWidth: "64ch",
+              margin: "var(--space-5) 0 0",
+              lineHeight: "var(--leading-normal)",
+            }}
+          >
+            Import from <code>@/components/PageHero</code>. Props:{" "}
+            <code>eyebrow</code>, <code>title</code>, <code>description</code>,{" "}
+            <code>engraving</code> (light/dark asset), <code>search</code>,{" "}
+            <code>chips</code>, and a trailing <code>children</code> slot for a
+            stat strip or CTA. Given the same content it renders identical to the
+            home, <code>/country</code>, and <code>/about</code> heroes.
+          </p>
+        </section>
+
+        {/* 06 Voice */}
+        <section className="ds-section">
+          <div className="ds-section-head">
+            <span className="num">06 · Voice</span>
             <h2>Clear, civic, dry.</h2>
             <span className="dek">Like a textbook written by a journalist. Factual, spare, a little warm.</span>
           </div>

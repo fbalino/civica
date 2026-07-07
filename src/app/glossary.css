@@ -16,36 +16,9 @@
   padding: 0 var(--space-6);
 }
 
-/* ── Title block ─────────────────────────────────────────────── */
-.glossary-titleblock {
-  padding: var(--space-8) 0 var(--space-6);
-}
-.glossary-eyebrow {
-  font-family: var(--font-body);
-  font-size: var(--text-12);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-}
-.glossary-title {
-  font-family: var(--font-heading);
-  font-weight: 400;
-  font-size: var(--text-56);
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  margin: var(--space-4) 0;
-  color: var(--color-text-primary);
-}
-.glossary-dek {
-  font-family: var(--font-heading);
-  font-weight: 300;
-  font-size: var(--text-20);
-  line-height: 1.55;
-  color: var(--color-text-60);
-  max-width: 62ch;
-  margin: 0;
-}
+/* The glossary title block is now the canonical full-bleed <PageHero>
+   (eyebrow → serif title → dek); the former bespoke .glossary-titleblock /
+   -eyebrow / -title / -dek rules were removed in favour of the shared shell. */
 
 /* ── Sticky A–Z index strip ──────────────────────────────────── */
 .glossary-azbar {
@@ -261,8 +234,5 @@
   }
   .glossary-term:nth-child(1) {
     border-top: 0;
-  }
-  .glossary-title {
-    font-size: var(--text-40);
   }
 }

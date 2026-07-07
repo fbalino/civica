@@ -71,7 +71,7 @@ Use the standard container widths:
 - `.factbook-body` — 1280px is allowed only for the factbook surface because it carries two sidebars.
 - **The `/country/[slug]` tabs (Factbook · Civica Data · Constitution) are ONE surface**: every tab uses the `.factbook-body` geometry (1280px cap, 240px left column, `--space-7` gap, same padding — `.civica-data-body` is a documented clone) and the SAME `<FactbookSidebar>`/`ReaderSidebar` component for its "On this page" nav, with `<CountryJumpSearch>` at the identical position above the body grid. Never give a country tab its own nav markup, column widths, or search placement (owner mandate 2026-07-05, after the tabs drifted).
 
-**Hero sections** are full-bleed bands (`width: 100vw; margin-left: calc(50% - 50vw)`) and MUST share one canonical height via **`var(--hero-height)`** (`clamp(460px, 44vw, 640px)`) so every hero reads as one design language — the homepage (`.home-hero`), the factbook landing (`.factbook-landing-hero`), and the about page (`.about-hero`) all use it. On mobile they relax to content height. The per-country factbook masthead (`.factbook-hero--art`) is a distinct engraving-overlay pattern, not a section hero. Do NOT give a new hero a one-off height; use the token.
+**Hero sections** are full-bleed bands (`width: 100vw; margin-left: calc(50% - 50vw)`) and MUST share one canonical height via **`var(--hero-height)`** (`clamp(460px, 44vw, 640px)`) so every hero reads as one design language. **The single canonical page hero is the `<PageHero>` component** (`src/components/PageHero.tsx`) — every browse/landing page uses it, never a hand-rolled hero (see the Hero subsection under "Editorial layout classes" below). It composes the `.factbook-landing-hero` / `.factbook-hero-*` class family, which the homepage (`.home-hero`) also mirrors. On mobile heroes relax to content height. The per-country factbook masthead (`.factbook-hero--art`) is a distinct engraving-overlay pattern, not a section hero. Do NOT give a new hero a one-off height, width, or markup; use `<PageHero>`.
 
 Use `var(--space-*)` for new spacing decisions unless an existing component contract requires a fixed dimension.
 
@@ -137,7 +137,29 @@ Page type drives the layout, not the prose length. **Do not default to `width="n
 
 **Owner rule (2026-07-04, restated after repeated drift): NEVER invent a new page width or layout shell.** Every new page picks a row from this table — a sectioned document of any kind (legal, policy, reference, explainer) gets the `methodology-layout` + `ReaderSidebar` shell, NOT a bare narrow column. `width="narrow"` is reserved for blog-style essays. If none of the rows fit, the fix is to extend this table (one decision, reused everywhere), never to hand-roll a one-off layout on the page.
 
+**The page hero is orthogonal to the container.** A browse/landing page opens with the canonical `<PageHero>` full-bleed band (see the Hero subsection below), then drops its body into one of the container rows above. Never hand-roll a hero, and never give one a one-off width — the government-types-vs-pulse-changelog width mismatch that this replaced is exactly the drift to avoid.
+
 The `<EditorialPage>` component's prop docstring describes what each width prop *technically* does. This document describes which one to *pick*. When they conflict, this document wins.
+
+### Page hero — `<PageHero>` (the one canonical hero)
+
+**Every browse/landing page opens with `<PageHero>` (`src/components/PageHero.tsx`) — there is exactly one hero shell, and it never varies.** Same full-bleed band, same shared `var(--hero-height)`, same 1200px inner column, same eyebrow → serif H1 → dek type scale, same optional engraving + scrim, same on-mount stagger. Only the *content* changes per page. Given the same content it renders pixel-for-pixel identical to the home, `/country`, and `/about` heroes. Demoed live on `/design-system` (section 05).
+
+Props:
+
+- `eyebrow` — small-caps terracotta label above the title (e.g. `"Rankings"`, `"Civica Index · Government types"`). For a sub-page, encode the section context here instead of a breadcrumb — the hero carries no breadcrumb.
+- `title` (required) — the serif H1. Accepts a `ReactNode`, so an inline `<BetaChip inHeading />` is fine.
+- `description` — the standfirst / dek paragraph.
+- `engraving` — `{ src, darkSrc? }` for the parallax engraving + left-protecting scrim. **Omit it** for pages with no dedicated engraving; the hero renders clean on paper. Page engravings live in `public/engravings/pages/*.webp` (+ `-dark`); the generic fallback is `/engravings/hero.webp`.
+- `search` — optional slot for a `<CountrySearchCombobox>` / `<GlobalSearch>` in the canonical hero search position.
+- `chips` — optional slot for a filter/region chip row.
+- `children` — optional trailing slot for anything else (a stat strip, a status row, CTAs), rendered last inside the same stagger.
+- `titleId` — id wired to the section's `aria-labelledby` (defaults to `page-hero-title`).
+- `className` — layout escape hatch on the outer `<section>` (e.g. `ci-landing-hero` adds only the Civica Index beta-status row).
+
+`PageHero` is a server component (it only composes the `"use client"` motion primitives), so it drops straight into any server page. When the hero content is interactive (a live search box or filter chips wired to client state — `/country`, `/parties`, `/elections`, `/constitution`), render `PageHero` from inside that page's existing client component and pass the interactive nodes as slots.
+
+**Exclusions — do NOT use `<PageHero>`:** `/blog` and `/blog/*` keep their editorial nameplate; every methodology page uses `methodology-layout` + `ReaderSidebar`; and interactive data-explorer tools whose whole point is a compact tool header above the controls (`/civica-conditions`, which uses `editorial-tool-title`) keep that compact header rather than a 460–640px band that would push the tool below the fold.
 
 Container classes:
 

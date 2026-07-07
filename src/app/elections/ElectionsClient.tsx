@@ -2,12 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { CountryFlag } from "@/components/CountryFlag";
-import {
-  Reveal,
-  HeroReveal,
-  HeroRevealItem,
-} from "@/components/motion/Reveal";
-import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import { Reveal } from "@/components/motion/Reveal";
+import { PageHero } from "@/components/PageHero";
 import { SourceDot } from "@/components/SourceDot";
 import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
 import {
@@ -191,47 +187,32 @@ export default function ElectionsClient({
 
   return (
     <>
-      {/* Full-bleed engraving hero (homepage idiom) with a centered country
-          typeahead — the same CountrySearchCombobox the /country landing tab
-          uses. Selecting a country narrows every list below client-side. */}
-      <section
-        className="factbook-landing-hero"
-        aria-labelledby="elections-hero-title"
-      >
-        <ParallaxImage
-          className="factbook-hero-art"
-          src="/engravings/hero.webp"
-          darkSrc="/engravings/hero-dark.webp"
-          alt=""
-          aria-hidden="true"
-        />
-        <div className="factbook-hero-scrim" aria-hidden="true" />
-        <HeroReveal className="factbook-hero-inner">
-          <HeroRevealItem className="factbook-hero-eyebrow">
-            Elections
-          </HeroRevealItem>
-          <HeroRevealItem
-            as="h1"
-            id="elections-hero-title"
-            className="factbook-hero-title"
-          >
-            Elections, tracked worldwide.
-          </HeroRevealItem>
-          <HeroRevealItem as="p" className="factbook-hero-dek">
+      {/* Canonical full-bleed page hero (shared PageHero shell) with a centered
+          country typeahead — the same CountrySearchCombobox the /country landing
+          tab uses. Selecting a country narrows every list below client-side. */}
+      <PageHero
+        eyebrow="Elections"
+        titleId="elections-hero-title"
+        title="Elections, tracked worldwide."
+        description={
+          <>
             A worldwide election calendar: legislative dates and party seat
             results from IPU Parline, and presidential elections from Wikidata.
-          </HeroRevealItem>
-
-          <HeroRevealItem className="factbook-hero-search">
-            <CountrySearchCombobox
-              countries={searchOptions}
-              placeholder="Filter by country&hellip;"
-              ariaLabel="Filter elections by country"
-              onSelect={(c) => setCountryFilter(c)}
-            />
-          </HeroRevealItem>
-        </HeroReveal>
-      </section>
+          </>
+        }
+        engraving={{
+          src: "/engravings/hero.webp",
+          darkSrc: "/engravings/hero-dark.webp",
+        }}
+        search={
+          <CountrySearchCombobox
+            countries={searchOptions}
+            placeholder="Filter by country&hellip;"
+            ariaLabel="Filter elections by country"
+            onSelect={(c) => setCountryFilter(c)}
+          />
+        }
+      />
 
       <div className="cv-container" style={{ paddingTop: "var(--space-8)", paddingBottom: "var(--spacing-section-y)" }}>
         {/* Stats — matching Index page pattern. */}

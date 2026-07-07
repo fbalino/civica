@@ -506,17 +506,9 @@
  * sibling .ci-* eyebrows on the same /civica-index page family).
  */
 
-/* Canonical server-rendered page header for the government-types explorer.
-   Aligned to the explorer's 1200px container; the client explorer renders
-   with renderHeader={false} so this is the page's only H1. */
-.govtypes-page-header {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: var(--space-8) var(--space-8) 0;
-}
-@media (max-width: 480px) {
-  .govtypes-page-header { padding: var(--space-7) 18px 0; }
-}
+/* The government-types explorer header is the canonical full-bleed <PageHero>
+   (rendered by the server page); the client explorer renders with
+   renderHeader={false} so PageHero's H1 is the page's only H1. */
 
 .civica-govtypes {
   max-width: 1200px;

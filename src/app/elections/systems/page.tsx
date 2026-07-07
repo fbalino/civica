@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { getElectoralSystemBuckets } from "@/lib/elections/electoral-systems";
 import { getSource } from "@/lib/db/queries";
 import { withOg } from "@/lib/og";
-import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
-import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { Reveal } from "@/components/motion/Reveal";
+import { PageHero } from "@/components/PageHero";
 import ElectoralSystemsClient from "./ElectoralSystemsClient";
 import type { SystemKey, SystemCountry } from "@/lib/elections/electoral-systems";
 
@@ -49,39 +48,23 @@ export default async function ElectoralSystemsPage() {
 
   return (
     <>
-      {/* Full-bleed engraving hero — same idiom as /elections. Rendered as a
-          sibling BEFORE the page container so the 100vw breakout reaches the
-          viewport edges with no top-padding gap. */}
-      <section
-        className="factbook-landing-hero"
-        aria-labelledby="elsys-hero-title"
-      >
-        <ParallaxImage
-          className="factbook-hero-art"
-          src="/engravings/hero.webp"
-          darkSrc="/engravings/hero-dark.webp"
-          alt=""
-          aria-hidden="true"
-        />
-        <div className="factbook-hero-scrim" aria-hidden="true" />
-        <HeroReveal className="factbook-hero-inner">
-          <HeroRevealItem className="factbook-hero-eyebrow">
-            Elections · Explainer
-          </HeroRevealItem>
-          <HeroRevealItem
-            as="h1"
-            id="elsys-hero-title"
-            className="factbook-hero-title"
-          >
-            How electoral systems work.
-          </HeroRevealItem>
-          <HeroRevealItem as="p" className="factbook-hero-dek">
+      {/* Canonical full-bleed page hero (shared PageHero shell). */}
+      <PageHero
+        eyebrow="Elections · Explainer"
+        titleId="elsys-hero-title"
+        title="How electoral systems work."
+        description={
+          <>
             Every democracy has to turn votes into seats. The rule it uses
             shapes who governs — and Civica classifies each one from IPU
             Parline&rsquo;s own data.
-          </HeroRevealItem>
-        </HeroReveal>
-      </section>
+          </>
+        }
+        engraving={{
+          src: "/engravings/hero.webp",
+          darkSrc: "/engravings/hero-dark.webp",
+        }}
+      />
 
       <div className="editorial-page editorial-page--full">
         <Reveal as="nav" amount={0.5} className="editorial-breadcrumbs">

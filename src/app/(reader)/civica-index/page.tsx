@@ -27,9 +27,8 @@ import { civicaIndex } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildDataset } from "@/lib/seo/jsonld";
-import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
 import { BetaChip } from "@/components/editorial/BetaChip";
-import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import { PageHero } from "@/components/PageHero";
 
 export const revalidate = 3600;
 
@@ -278,47 +277,37 @@ export default async function CivicaIndexPage({
   return (
     <div className="civica-index-page">
       <JsonLd data={datasetJsonLd} />
-      {/* ── Full-bleed engraving hero (matches the homepage / /country hero) ── */}
-      <section
-        className="factbook-landing-hero ci-landing-hero"
-        aria-labelledby="ci-hero-title"
-      >
-        <ParallaxImage
-          className="factbook-hero-art"
-          src="/engravings/hero.webp"
-          darkSrc="/engravings/hero-dark.webp"
-          alt=""
-          aria-hidden="true"
-        />
-        <div className="factbook-hero-scrim" aria-hidden="true" />
-        <HeroReveal className="factbook-hero-inner">
-          <HeroRevealItem className="factbook-hero-eyebrow">
-            Civica Index
-          </HeroRevealItem>
-          <HeroRevealItem
-            as="h1"
-            id="ci-hero-title"
-            className="factbook-hero-title"
-          >
-            The governance health of every country.
-          </HeroRevealItem>
-          <HeroRevealItem as="p" className="factbook-hero-dek">
+      {/* ── Canonical full-bleed page hero (shared PageHero shell). The
+          ci-landing-hero modifier + children slot carry only the Beta pill +
+          methodology-under-revision disclosure beneath the dek. ── */}
+      <PageHero
+        className="ci-landing-hero"
+        eyebrow="Civica Index"
+        titleId="ci-hero-title"
+        title="The governance health of every country."
+        description={
+          <>
             A composite governance score for every sovereign state and
             territory. {civicaIndex.dimensionCount} governance dimensions,
             empirically-derived weights, fixed-bound normalization, and
             published 90% confidence intervals. The Civica Pulse layers event
             sensitivity on top.
-          </HeroRevealItem>
-          <HeroRevealItem className="ci-hero-status">
-            <BetaChip aria-label="Beta — methodology under active revision" />
-            <span className="ci-hero-rework-note">
-              Methodology under active revision —{" "}
-              <Link href="/civica-index/methodology">see methodology</Link> for
-              the current state of the rebuild.
-            </span>
-          </HeroRevealItem>
-        </HeroReveal>
-      </section>
+          </>
+        }
+        engraving={{
+          src: "/engravings/hero.webp",
+          darkSrc: "/engravings/hero-dark.webp",
+        }}
+      >
+        <span className="ci-hero-status">
+          <BetaChip aria-label="Beta — methodology under active revision" />
+          <span className="ci-hero-rework-note">
+            Methodology under active revision —{" "}
+            <Link href="/civica-index/methodology">see methodology</Link> for
+            the current state of the rebuild.
+          </span>
+        </span>
+      </PageHero>
 
       <div className="ci-container">
         <section className="ci-hero ci-hero--stats">
