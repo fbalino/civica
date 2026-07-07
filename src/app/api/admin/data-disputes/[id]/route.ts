@@ -31,9 +31,13 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { countryFacts, dataDisputes } from "@/lib/db/schema";
+import {
+  disputeLoserId,
+  OPEN_DISPUTE_STATUSES,
+} from "@/lib/factbook/reconcile/dispute-resolution";
 import {
   getAdminSession,
   verifyAdminBearer,
@@ -207,17 +211,33 @@ export async function POST(
   const newStatus = ACTION_TO_STATUS[body.action];
 
   // Phase F.5.1 — wire the reviewer decision through to the resolver.
-  // For 'resolve_a' / 'resolve_b' we identify the winner row, then
-  // demote every OTHER active country_facts row for the same
-  // (jurisdiction, fact_key). The resolver only consumes status='active'
-  // rows (see resolver.ts), so flipping the loser to 'demoted' makes
-  // the next read return the reviewer-chosen value.
+  //
+  // A dispute adjudicates exactly ONE pair (fact_id_a vs fact_id_b). For
+  // 'resolve_a' / 'resolve_b' we demote ONLY the losing party — never the
+  // whole candidate pool. The resolver consumes status='active' rows and
+  // re-picks canonical by methodology over the survivors, so a source that
+  // was never part of the dispute (a bystander that AGREES with the winner,
+  // or a fresher third publisher) correctly stays active and visible in the
+  // alternates panel. Demoting every non-winner was a bug: it collapsed the
+  // multi-source panel and demoted sources that had nothing to do with the
+  // disagreement. See src/lib/factbook/reconcile/dispute-resolution.ts.
   //
   // 'hold' / 'reject' leave country_facts untouched — the dispute
   // resolution is recorded for audit and the resolver continues to
   // compute canonical via methodology rules.
   let demotedCount = 0;
   if (body.action === "resolve_a" || body.action === "resolve_b") {
+    // A resolve on an already-terminal dispute would demote a second row
+    // (flipping resolve_a↔resolve_b leaves BOTH parties demoted, pointing the
+    // dispute at two dead rows). Require an explicit reopen first.
+    if (!OPEN_DISPUTE_STATUSES.has(existing.status)) {
+      return NextResponse.json(
+        {
+          error: `dispute is already ${existing.status}; reopen it before re-resolving`,
+        },
+        { status: 409 },
+      );
+    }
     const winnerId =
       body.action === "resolve_a" ? existing.factIdA : existing.factIdB;
     if (!winnerId) {
@@ -231,25 +251,34 @@ export async function POST(
         { status: 400 },
       );
     }
-    const demoteResult = await db
-      .update(countryFacts)
-      .set({
-        status: "demoted",
-        // Status reason carries the dispute id so the audit trail can
-        // be reconstructed even if data_disputes evolves later.
-        statusReason: `demoted_by_dispute_${id}`,
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(countryFacts.jurisdictionId, existing.jurisdictionId),
-          eq(countryFacts.factKey, existing.factKey),
-          ne(countryFacts.id, winnerId),
-          eq(countryFacts.status, "active"),
-        ),
-      )
-      .returning({ id: countryFacts.id });
-    demotedCount = demoteResult.length;
+    const loserId = disputeLoserId(
+      body.action,
+      existing.factIdA,
+      existing.factIdB,
+    );
+    // Unary disputes (e.g. plausibility_envelope) carry no fact_id_b, so
+    // there is no losing peer to demote — record the decision, demote nothing.
+    if (loserId) {
+      const demoteResult = await db
+        .update(countryFacts)
+        .set({
+          status: "demoted",
+          // Status reason carries the dispute id so the audit trail can
+          // be reconstructed even if data_disputes evolves later.
+          statusReason: `demoted_by_dispute_${id}`,
+          updatedAt: new Date(),
+        })
+        .where(
+          and(
+            eq(countryFacts.id, loserId),
+            // Keep the active predicate so a re-run / already-demoted loser
+            // is a safe no-op rather than a redundant write.
+            eq(countryFacts.status, "active"),
+          ),
+        )
+        .returning({ id: countryFacts.id });
+      demotedCount = demoteResult.length;
+    }
   }
 
   await db

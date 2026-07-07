@@ -888,36 +888,40 @@ export default async function ReconciliationMethodologyPage() {
 
         <h3 id="example-marshall-islands">
           Worked example 8 — Marshall Islands population, dispute
-          resolved by demotion
+          resolved (only the losing row demoted)
         </h3>
         <p>
-          <strong>Pattern.</strong> The disputes system after
-          resolution. A material-error gap — about 118% between the
+          <strong>Pattern.</strong> The disputes system, correctly
+          resolved. A material-error gap — about 118% between the
           CIA&rsquo;s value and the World Bank&rsquo;s — was raised as
           a dispute rather than silently averaged, because the
           disagreement reflects a genuine definitional split, not a
-          typo. Triage then resolved it by demoting rows out of the
-          active set rather than leaving them to compete on freshness.
+          typo. A reviewer adjudicated the pair; resolving a dispute
+          demotes only the <em>losing</em> row, leaving every other
+          source active in the alternates panel.
         </p>
         <p>
           <strong>Live rows.</strong> The CIA reports 82,011 with a{" "}
           <code>(2024 est.)</code> stamp. The World Bank reports 37,548
           (2024). UN WPP reports 37,548 (2024, bit-exact match). The
           IMF reports 33,000 (2031, projected). Wikidata holds an older
-          53,127 (2017) claim. When the material-error dispute was
-          resolved, every row except the World Bank measurement was
-          demoted out of the active set (<code>status=&apos;demoted&apos;</code>),
-          each stamped with the resolving dispute&rsquo;s id.
+          53,127 (2017) claim. The reviewer resolved the dispute in
+          favour of the resident-population figure, so the CIA row — the
+          losing party — is demoted (<code>status=&apos;demoted&apos;</code>);
+          the other four sources stay active.
         </p>
         <p>
-          <strong>Resolver outcome.</strong> With only the World
-          Bank&rsquo;s 37,548 (2024) left active, it is canonical via{" "}
-          <code>decisionReason=&apos;single_source&apos;</code>, and the
+          <strong>Resolver outcome.</strong> With the CIA outlier out of
+          the candidate pool, the resolver picks canonical over the
+          survivors: UN WPP and the World Bank both report 37,548 (2024,
+          the reviewer&rsquo;s value), so the incumbent UN WPP
+          measurement holds via{" "}
+          <code>decisionReason=&apos;incumbent_held&apos;</code> and the
           fact is no longer flagged <code>(disputed)</code>. The
-          CIA&rsquo;s divergent 82,011 estimate and the older and
-          projected rows sit demoted — recorded for the provenance
-          trail, but excluded from the candidate pool. The disputes log
-          is at{" "}
+          CIA&rsquo;s 82,011 stays demoted — recorded for the
+          provenance trail, but excluded from the pick; the IMF
+          projection and the older Wikidata claim remain visible as
+          alternates. The disputes log is at{" "}
           <Link href="/country/methodology/reconciliation/disputes">
             /country/methodology/reconciliation/disputes
           </Link>
@@ -932,11 +936,10 @@ export default async function ReconciliationMethodologyPage() {
           Bank and UN&rsquo;s 37,548 follows resident-population
           accounting. Both methodologies are defensible, which is why
           the disagreement surfaced as a dispute in the first place
-          rather than being averaged away. The resolution keeps the
-          resident-population measurement canonical and preserves the
-          CIA reading demoted rather than deleted, so the full
-          provenance trail — including the value not chosen — stays
-          inspectable.
+          rather than being averaged away. Resolving it removes only the
+          value the reviewer rejected and preserves the rest of the
+          source set — including the CIA reading, demoted rather than
+          deleted — so the full provenance trail stays inspectable.
         </p>
       </section>
 

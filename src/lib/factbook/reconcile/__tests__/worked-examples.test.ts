@@ -198,22 +198,24 @@ const WORKED_EXAMPLES: WorkedExample[] = [
   },
   {
     id: "we8",
-    // Disputes system, RESOLVED state. The Marshall Islands material-error
-    // dispute (CIA's diaspora-inclusive 82,011 vs the UN/WB 37,548
-    // consensus) was triaged by demoting the divergent CIA estimate and
-    // the older/projected rows (status='demoted'), leaving the World Bank's
-    // 2024 measurement as the sole active source. isDisputed is therefore
-    // false and the pick is a single active source. (Pre-dates the CIA
-    // vintage work; CIA is demoted out of the candidate pool entirely, so
-    // data_vintage_year never enters this resolution.)
-    label: "Worked example 8 — Marshall Islands population, dispute resolved by demotion",
+    // Disputes system, correctly RESOLVED. A reviewer resolved the
+    // Marshall Islands material-error dispute in favour of the UN/World Bank
+    // resident-population figure (37,548), rejecting the CIA's
+    // diaspora-inflated 82,011. Resolution demotes ONLY the losing party —
+    // the CIA row (status='demoted') — while every other source stays active
+    // and visible in the alternates panel. The resolver then picks canonical
+    // over the survivors: UN WPP and the World Bank both report 37,548 (2024,
+    // the reviewer's value), so the incumbent UN WPP measurement holds. Not
+    // disputed. (CIA is demoted out of the candidate pool, so the CIA-vintage
+    // work never enters this resolution.)
+    label: "Worked example 8 — Marshall Islands population, dispute resolved (only the losing row demoted)",
     countrySlug: "marshall-islands",
     countryIso3: "MHL",
     factKey: "population_total",
-    expectedSource: "world_bank",
+    expectedSource: "un_data",
     expectedValue: 37_548,
     expectedFactYear: 2024,
-    expectedDecisionReason: "single_source",
+    expectedDecisionReason: "incumbent_held",
     tolerance: 0.001,
     expectIsDisputed: false,
   },
