@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SourceDot } from "@/components/SourceDot";
-import { ParallaxImage } from "@/components/motion/ParallaxImage";
-import { Reveal, HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
+import { Reveal } from "@/components/motion/Reveal";
+import { PageHero } from "@/components/PageHero";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
@@ -101,30 +101,23 @@ export default async function AboutPage() {
 
   return (
     <>
-      {/* Full-bleed engraving masthead — canonical site hero pattern
-          (eyebrow → serif title → dek), matching the homepage and /country.
-          Reuses the shared .factbook-hero-* class family from factbook.css. */}
-      <section className="factbook-landing-hero" aria-labelledby="about-hero-title">
-        <ParallaxImage
-          className="factbook-hero-art"
-          src="/engravings/pages/about.webp"
-          darkSrc="/engravings/pages/about-dark.webp"
-          alt=""
-          aria-hidden="true"
-        />
-        <div className="factbook-hero-scrim" aria-hidden="true" />
-        <HeroReveal className="factbook-hero-inner">
-          <HeroRevealItem className="factbook-hero-eyebrow">About</HeroRevealItem>
-          <HeroRevealItem as="h1" id="about-hero-title" className="factbook-hero-title">
-            About Civica Atlas
-          </HeroRevealItem>
-          <HeroRevealItem as="p" className="factbook-hero-dek">
+      {/* Canonical full-bleed page hero (shared PageHero shell). */}
+      <PageHero
+        eyebrow="About"
+        titleId="about-hero-title"
+        title="About Civica Atlas"
+        description={
+          <>
             An open reference atlas of the world&rsquo;s countries, governments,
             and governance outcomes &mdash; built on multi-source reconciliation,
             statement-level provenance, and published methodology.
-          </HeroRevealItem>
-        </HeroReveal>
-      </section>
+          </>
+        }
+        engraving={{
+          src: "/engravings/pages/about.webp",
+          darkSrc: "/engravings/pages/about-dark.webp",
+        }}
+      />
 
       <div
         className="editorial-page editorial-page--wide"

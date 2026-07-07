@@ -21,8 +21,7 @@ import { CompareInternational } from "@/components/compare/CompareInternational"
 import { withOg } from "@/lib/og";
 import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
-import { HeroReveal, HeroRevealItem } from "@/components/motion/Reveal";
-import { ParallaxImage } from "@/components/motion/ParallaxImage";
+import { PageHero } from "@/components/PageHero";
 import { civicaIndex } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
@@ -263,41 +262,26 @@ export default async function ComparePage({
 
   return (
     <>
-      {/* Full-bleed engraving hero (homepage idiom). Rendered as a sibling
-          before <EditorialPage> — matching /about — so the 100vw breakout
-          reaches the viewport edges with no top-padding gap. Reuses the
-          canonical .factbook-hero-* class family (eyebrow → title → dek). */}
-      <section
-        className="factbook-landing-hero"
-        aria-labelledby="compare-hero-title"
-      >
-        <ParallaxImage
-          className="factbook-hero-art"
-          src="/engravings/hero.webp"
-          darkSrc="/engravings/hero-dark.webp"
-          alt=""
-          aria-hidden="true"
-        />
-        <div className="factbook-hero-scrim" aria-hidden="true" />
-        <HeroReveal className="factbook-hero-inner">
-          <HeroRevealItem className="factbook-hero-eyebrow">
-            Compare
-          </HeroRevealItem>
-          <HeroRevealItem
-            as="h1"
-            id="compare-hero-title"
-            className="factbook-hero-title"
-          >
-            {countryLabels.length === 0
-              ? "Compare countries, side by side."
-              : `${countryLabels.join(" vs. ")}`}
-          </HeroRevealItem>
-          <HeroRevealItem as="p" className="factbook-hero-dek">
+      {/* Canonical full-bleed page hero (shared PageHero shell). */}
+      <PageHero
+        eyebrow="Compare"
+        titleId="compare-hero-title"
+        title={
+          countryLabels.length === 0
+            ? "Compare countries, side by side."
+            : countryLabels.join(" vs. ")
+        }
+        description={
+          <>
             Overview, Civica Index, chambers, elections, and international
             memberships &mdash; any two or three countries in one view.
-          </HeroRevealItem>
-        </HeroReveal>
-      </section>
+          </>
+        }
+        engraving={{
+          src: "/engravings/hero.webp",
+          darkSrc: "/engravings/hero-dark.webp",
+        }}
+      />
 
       <EditorialPage width="full">
       <section className="picker-row" aria-label="Country selection">

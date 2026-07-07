@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { jurisdictions } from "@/lib/db/schema";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { BetaChip } from "@/components/editorial/BetaChip";
+import { PageHero } from "@/components/PageHero";
 import {
   getPulseV2Changelog,
   type PulseV2ChangelogRow,
@@ -75,22 +76,28 @@ export default async function PulseChangelogPage() {
     : "The automated daily refresh is currently paused; showing the latest available data.";
 
   return (
-    <EditorialPage width="wide">
-      <nav className="editorial-breadcrumbs">
-        <Link href="/civica-index">← Civica Index</Link>
-        <span>/</span>
-        Pulse changelog
-      </nav>
+    <>
+      {/* Canonical full-bleed page hero (shared PageHero shell) — matches the
+          government-types explorer hero exactly (same eyebrow pattern, same
+          shell width). */}
+      <PageHero
+        eyebrow="Civica Index · Pulse changelog"
+        titleId="pulse-changelog-hero-title"
+        title={
+          <>
+            Pulse changelog
+            {pulse.status === "beta" ? <BetaChip inHeading /> : null}
+          </>
+        }
+        description={
+          <>
+            Every governance event classified by the Civica Pulse Beta pipeline.
+            {freshnessNote}
+          </>
+        }
+      />
 
-      <h1 className="editorial-page-title">
-        Pulse changelog
-        {pulse.status === "beta" ? <BetaChip inHeading /> : null}
-      </h1>
-      <p className="editorial-page-subtitle">
-        Every governance event classified by the Civica Pulse Beta pipeline.
-        {freshnessNote}
-      </p>
-
+      <EditorialPage width="wide">
       <div className="editorial-warning">
         The Civica Pulse Beta is an event-sensitive governance shock monitor
         under active validation. Its automated daily refresh is currently
@@ -107,6 +114,7 @@ export default async function PulseChangelogPage() {
       <Suspense fallback={null}>
         <PulseChangelogFilterClient events={events} countries={countries} />
       </Suspense>
-    </EditorialPage>
+      </EditorialPage>
+    </>
   );
 }

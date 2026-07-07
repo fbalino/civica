@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { withOg } from "@/lib/og";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
+import { PageHero } from "@/components/PageHero";
 import {
   getPartiesForBrowser,
   getPartyBrowserFacets,
@@ -59,33 +60,26 @@ export default async function PartiesPage() {
   const countryCount = facets.countries.length;
 
   return (
-    <EditorialPage
-      width="full"
-      breadcrumbs={
-        <ol className="editorial-breadcrumbs-list">
-          <li className="editorial-breadcrumbs-item">
-            <Link href="/">Civica</Link>
-          </li>
-          <li className="editorial-breadcrumbs-item">
-            <span aria-current="page">Parties</span>
-          </li>
-        </ol>
-      }
-    >
-      <p className="parties-hero-eyebrow">Political parties</p>
-      <h1 className="editorial-page-title">
-        Every party, on one ideology compass
-      </h1>
-      <p className="editorial-page-subtitle">
-        The governing and opposition parties of{" "}
-        {countryCount > 0 ? countryCount.toLocaleString() : "the world's"}{" "}
-        legislatures, placed on an economic left–right axis against an
-        anti-pluralism axis. Ideology positions come from the V-Party dataset
-        (V-Dem); seat counts come from IPU Parline and Wikidata. Every value
-        traces to its source, and where no position is recorded, the party is
-        listed honestly rather than guessed.
-      </p>
+    <>
+      {/* Canonical full-bleed page hero (shared PageHero shell). */}
+      <PageHero
+        eyebrow="Political parties"
+        titleId="parties-hero-title"
+        title="Every party, on one ideology compass"
+        description={
+          <>
+            The governing and opposition parties of{" "}
+            {countryCount > 0 ? countryCount.toLocaleString() : "the world's"}{" "}
+            legislatures, placed on an economic left–right axis against an
+            anti-pluralism axis. Ideology positions come from the V-Party dataset
+            (V-Dem); seat counts come from IPU Parline and Wikidata. Every value
+            traces to its source, and where no position is recorded, the party is
+            listed honestly rather than guessed.
+          </>
+        }
+      />
 
+      <EditorialPage width="full">
       {parties.length > 0 ? (
         <PartyExplorer
           parties={parties}
@@ -120,6 +114,7 @@ export default async function PartiesPage() {
         the political-compass meme&rsquo;s authoritarian–libertarian axis.{" "}
         <Link href="/civica-index/methodology">Read the methodology.</Link>
       </p>
-    </EditorialPage>
+      </EditorialPage>
+    </>
   );
 }

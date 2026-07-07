@@ -9,6 +9,7 @@ import {
 } from "@/lib/data/glossary";
 import { GlossaryNav } from "./GlossaryNav";
 import { Stagger, StaggerItem } from "@/components/motion/Reveal";
+import { PageHero } from "@/components/PageHero";
 import "../glossary.css";
 
 export const revalidate = 86400;
@@ -63,18 +64,20 @@ export default function GlossaryPage() {
 
   return (
     <>
-      <div className="glossary-page">
-        <div className="glossary-titleblock">
-          <div className="glossary-eyebrow">Reference</div>
-          <h1 className="glossary-title">Glossary</h1>
-          <p className="glossary-dek">
+      {/* Canonical full-bleed page hero (shared PageHero shell). */}
+      <PageHero
+        eyebrow="Reference"
+        titleId="glossary-hero-title"
+        title="Glossary"
+        description={
+          <>
             The vocabulary of governance, plainly defined. Every term Civica uses
             across the Index, the Pulse, and the Factbook — with a concise
             definition and, where relevant, a link to the methodology that puts
             it to work.
-          </p>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <GlossaryNav activeLetters={activeLetters} />
 
