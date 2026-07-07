@@ -8,12 +8,18 @@
  *
  * Stored format (self-describing, single line, safe for an env var):
  *
- *   scrypt$<N>$<r>$<p>$<saltHex>$<hashHex>
+ *   scrypt:<N>:<r>:<p>:<saltHex>:<hashHex>
  *
  * where N/r/p are the scrypt cost parameters and keylen is fixed at
  * 64 bytes. Encoding the cost parameters in the string means a future
  * cost bump can re-hash old passwords without a schema change, and a
  * hash produced today keeps verifying after the defaults move.
+ *
+ * The delimiter is `:`, NOT the conventional PHC `$`, on purpose: this
+ * value lives in `.env.local`, and Next.js's env loader (dotenv-expand)
+ * treats `$name` as a variable reference — so a `$`-delimited hash whose
+ * salt/hash segment starts with a letter would be silently mangled at
+ * load time. `:` has no special meaning in an env value.
  *
  * `hashPassword` is used only by the `admin:set-password` helper script
  * (never at request time). `verifyPassword` runs on every sign-in.
@@ -78,7 +84,7 @@ export async function hashPassword(plain: string): Promise<string> {
     SCRYPT_P,
     salt.toString("hex"),
     derived.toString("hex"),
-  ].join("$");
+  ].join(":");
 }
 
 /**
@@ -96,7 +102,7 @@ export async function verifyPassword(
 ): Promise<boolean> {
   if (!storedHash || !plain) return false;
 
-  const parts = storedHash.split("$");
+  const parts = storedHash.split(":");
   if (parts.length !== 6 || parts[0] !== "scrypt") return false;
 
   const n = Number(parts[1]);

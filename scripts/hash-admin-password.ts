@@ -3,7 +3,7 @@
  *
  * Hashes an admin password with the same salted scrypt KDF the sign-in
  * route verifies against (`src/lib/admin/password.ts`) and prints the
- * `scrypt$...` value to paste into `.env.local` (and Vercel) as
+ * `scrypt:...` value to paste into `.env.local` (and Vercel) as
  * ADMIN_PASSWORD_HASH. The plaintext is NEVER written to disk or echoed
  * back.
  *
