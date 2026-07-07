@@ -229,6 +229,21 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
         </div>
       </section>
 
+      {dispute.reviewerNotes ? (
+        <section className="admin-section">
+          <h2 className="admin-section-title">Reviewer note</h2>
+          <div className="admin-note">
+            <p className="admin-prose">{dispute.reviewerNotes}</p>
+            {dispute.reviewerId ? (
+              <p className="admin-prose admin-prose-muted">
+                — {dispute.reviewerId}
+                {dispute.resolvedAt ? ` · ${formatDate(dispute.resolvedAt)}` : ""}
+              </p>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
       {dispute.submitterName || dispute.submitterAffiliation ? (
         <section className="admin-section">
           <h2 className="admin-section-title">Submitter</h2>
@@ -262,7 +277,7 @@ export default async function DataDisputeDetailPage({ params }: PageProps) {
             ) : null}
             {dispute.reviewerNotes ? (
               <p className="admin-prose admin-prose-muted">
-                Notes: {dispute.reviewerNotes}
+                Reviewer note shown above.
               </p>
             ) : null}
 

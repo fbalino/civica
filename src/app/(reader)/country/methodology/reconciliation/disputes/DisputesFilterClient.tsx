@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Pill } from "@/components/editorial/Pill";
+import { SegmentedControl } from "@/components/editorial/SegmentedControl";
+import { SingleSelectMenu } from "@/components/editorial/SingleSelectMenu";
 import {
   PUBLIC_DISPUTE_STATUS_BUCKETS,
   PUBLIC_DISPUTE_STATUS_LABELS,
+  groupDisputesByFact,
   type PublicDisputeStatusBucket,
   type PublicDisputeRow,
   type PublicAuditLogRow,
@@ -73,54 +76,16 @@ const SORT_LABELS: Record<DisputeSortKey, string> = {
 
 const PAGE_SIZE = 50;
 
-function FilterChip({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={
-        active ? "editorial-chip editorial-chip--active" : "editorial-chip"
-      }
-    >
-      {children}
-    </button>
-  );
-}
-
-/**
- * A filter row rendered as a semantic <fieldset>/<legend> group (mirrors the
- * canonical AlmanacFilters pattern) so screen readers announce the group name
- * before its chips. Chips carry aria-pressed via <FilterChip>.
- */
-function FilterFieldset({
-  legend,
-  children,
-}: {
-  legend: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <fieldset className="editorial-filter-row">
-      <legend className="editorial-filter-label">{legend}</legend>
-      <div
-        className="editorial-filter-group"
-        role="group"
-        aria-label={`Filter by ${legend.toLowerCase()}`}
-      >
-        {children}
-      </div>
-    </fieldset>
-  );
-}
+/** Which dropdown is currently open — enforces "one menu open at a time". */
+type OpenMenu =
+  | "sort"
+  | "kind"
+  | "factKey"
+  | "severity"
+  | "group"
+  | "sourcePair"
+  | "age"
+  | null;
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
@@ -188,29 +153,76 @@ export function DisputesFilterClient({
   totalAll,
 }: Props) {
   const [statusBucket, setStatusBucket] = useState<
-    PublicDisputeStatusBucket | undefined
-  >();
-  const [kind, setKind] = useState<string | undefined>();
-  const [group, setGroup] = useState<string | undefined>();
-  const [factKey, setFactKey] = useState<string | undefined>();
-  const [sourcePair, setSourcePair] = useState<string | undefined>();
-  const [severityBucket, setSeverityBucket] = useState<
-    SeverityBucket | undefined
-  >();
-  const [ageBucket, setAgeBucket] = useState<AgeBucket | undefined>();
+    PublicDisputeStatusBucket | "all"
+  >("all");
+  const [kind, setKind] = useState<string>("");
+  const [group, setGroup] = useState<string>("");
+  const [factKey, setFactKey] = useState<string>("");
+  const [sourcePair, setSourcePair] = useState<string>("");
+  const [severityBucket, setSeverityBucket] = useState<SeverityBucket | "">("");
+  const [ageBucket, setAgeBucket] = useState<AgeBucket | "">("");
   const [sort, setSort] = useState<DisputeSortKey>("severity");
+  const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
   const [page, setPage] = useState(1);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [auditCache, setAuditCache] = useState<
     Record<string, PublicAuditLogRow[] | "loading">
   >({});
   const [, startTransition] = useTransition();
+  const toolbarRef = useRef<HTMLDivElement>(null);
 
   const resetPage = () => setPage(1);
 
-  const filtered = useMemo(() => {
+  // Outside-click / Escape closes any open dropdown (SingleSelectMenu is
+  // caller-controlled, so the parent owns dismissal).
+  useEffect(() => {
+    if (!openMenu) return;
+    function onPointerDown(event: PointerEvent) {
+      if (
+        toolbarRef.current &&
+        !toolbarRef.current.contains(event.target as Node)
+      ) {
+        setOpenMenu(null);
+      }
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpenMenu(null);
+    }
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [openMenu]);
+
+  const hasActiveFilter =
+    statusBucket !== "all" ||
+    Boolean(kind) ||
+    Boolean(group) ||
+    Boolean(factKey) ||
+    Boolean(sourcePair) ||
+    Boolean(severityBucket) ||
+    Boolean(ageBucket);
+
+  const resetAll = () => {
+    setStatusBucket("all");
+    setKind("");
+    setGroup("");
+    setFactKey("");
+    setSourcePair("");
+    setSeverityBucket("");
+    setAgeBucket("");
+    resetPage();
+  };
+
+  // ── Filter + sort the flat pairwise rows, THEN consolidate into one entry
+  //    per (jurisdiction, fact_key). The three near-identical pairwise
+  //    disputes for one fact collapse into a single expandable group.
+  const groups = useMemo(() => {
     const matched = disputes.filter((d) => {
-      if (statusBucket && d.statusBucket !== statusBucket) return false;
+      if (statusBucket !== "all" && d.statusBucket !== statusBucket)
+        return false;
       if (kind && d.disputeKind !== kind) return false;
       if (group && d.factGroup !== group) return false;
       if (factKey && d.factKey !== factKey) return false;
@@ -241,7 +253,7 @@ export function DisputesFilterClient({
       return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     });
 
-    return matched;
+    return groupDisputesByFact(matched);
   }, [
     disputes,
     statusBucket,
@@ -254,11 +266,12 @@ export function DisputesFilterClient({
     sort,
   ]);
 
-  const totalMatching = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(totalMatching / PAGE_SIZE));
+  const totalGroups = groups.length;
+  const totalMatchingRows = groups.reduce((n, g) => n + g.members.length, 0);
+  const totalPages = Math.max(1, Math.ceil(totalGroups / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
   const offset = (safePage - 1) * PAGE_SIZE;
-  const slice = filtered.slice(offset, offset + PAGE_SIZE);
+  const slice = groups.slice(offset, offset + PAGE_SIZE);
 
   const handleExpand = (disputeId: string) => {
     if (expandedId === disputeId) {
@@ -275,216 +288,182 @@ export function DisputesFilterClient({
     }
   };
 
+  // Dropdown item sets.
+  const sortItems = (["severity", "age", "oldest"] as DisputeSortKey[]).map(
+    (s) => ({ value: s, label: SORT_LABELS[s] }),
+  );
+  const kindItems = [
+    { value: "", label: "All kinds" },
+    ...Object.entries(KIND_LABELS).map(([value, label]) => ({ value, label })),
+  ];
+  const groupItems = [
+    { value: "", label: "Any group" },
+    ...FACT_GROUPS.map((g) => ({ value: g, label: `Group ${g}` })),
+  ];
+  const severityItems = [
+    { value: "", label: "Any severity" },
+    ...SEVERITY_BUCKETS.map((b) => ({
+      value: b,
+      label: SEVERITY_BUCKET_LABELS[b],
+    })),
+  ];
+  const ageItems = [
+    { value: "", label: "Any age" },
+    ...AGE_BUCKETS.map((b) => ({ value: b, label: b })),
+  ];
+  const factKeyItems = [
+    { value: "", label: "Any fact-key" },
+    ...distributions.factKeys.map((fk) => ({
+      value: fk.value,
+      label: `${fk.value} (${fk.count})`,
+    })),
+  ];
+  const sourcePairItems = [
+    { value: "", label: "Any source pair" },
+    ...distributions.sourcePairs.map((sp) => ({
+      value: sp.value,
+      label: `${sp.label} (${sp.count})`,
+    })),
+  ];
+
   return (
     <>
-      <p
-        className="editorial-page-meta"
-        style={{
-          marginBottom: "var(--space-6)",
-          gap: "var(--space-4)",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="disputes-controls">
+        <SegmentedControl<PublicDisputeStatusBucket | "all">
+          ariaLabel="Filter by status"
+          value={statusBucket}
+          onChange={(v) => {
+            setStatusBucket(v);
+            resetPage();
+          }}
+          options={[
+            { value: "all", label: "All" },
+            ...PUBLIC_DISPUTE_STATUS_BUCKETS.map((s) => ({
+              value: s,
+              label: PUBLIC_DISPUTE_STATUS_LABELS[s],
+            })),
+          ]}
+        />
+
+        <div className="disputes-toolbar" ref={toolbarRef}>
+          <SingleSelectMenu
+            label="Sort"
+            ariaLabel="Sort disputes"
+            value={sort}
+            items={sortItems}
+            open={openMenu === "sort"}
+            onOpenChange={(o) => setOpenMenu(o ? "sort" : null)}
+            onSelect={(v) => {
+              setSort(v as DisputeSortKey);
+              resetPage();
+            }}
+            minWidth={130}
+          />
+          <SingleSelectMenu
+            label="Kind"
+            ariaLabel="Filter by dispute kind"
+            value={kind}
+            items={kindItems}
+            open={openMenu === "kind"}
+            onOpenChange={(o) => setOpenMenu(o ? "kind" : null)}
+            onSelect={(v) => {
+              setKind(v);
+              resetPage();
+            }}
+            minWidth={150}
+          />
+          <SingleSelectMenu
+            label="Fact-key"
+            ariaLabel="Filter by fact-key"
+            value={factKey}
+            items={factKeyItems}
+            open={openMenu === "factKey"}
+            onOpenChange={(o) => setOpenMenu(o ? "factKey" : null)}
+            onSelect={(v) => {
+              setFactKey(v);
+              resetPage();
+            }}
+            minWidth={170}
+          />
+          <SingleSelectMenu
+            label="Severity"
+            ariaLabel="Filter by severity"
+            value={severityBucket}
+            items={severityItems}
+            open={openMenu === "severity"}
+            onOpenChange={(o) => setOpenMenu(o ? "severity" : null)}
+            onSelect={(v) => {
+              setSeverityBucket(v as SeverityBucket | "");
+              resetPage();
+            }}
+            minWidth={140}
+          />
+          <SingleSelectMenu
+            label="Group"
+            ariaLabel="Filter by fact group"
+            value={group}
+            items={groupItems}
+            open={openMenu === "group"}
+            onOpenChange={(o) => setOpenMenu(o ? "group" : null)}
+            onSelect={(v) => {
+              setGroup(v);
+              resetPage();
+            }}
+            minWidth={120}
+          />
+          <SingleSelectMenu
+            label="Source pair"
+            ariaLabel="Filter by source pair"
+            value={sourcePair}
+            items={sourcePairItems}
+            open={openMenu === "sourcePair"}
+            onOpenChange={(o) => setOpenMenu(o ? "sourcePair" : null)}
+            onSelect={(v) => {
+              setSourcePair(v);
+              resetPage();
+            }}
+            minWidth={180}
+          />
+          <SingleSelectMenu
+            label="Age"
+            ariaLabel="Filter by dispute age"
+            value={ageBucket}
+            items={ageItems}
+            open={openMenu === "age"}
+            onOpenChange={(o) => setOpenMenu(o ? "age" : null)}
+            onSelect={(v) => {
+              setAgeBucket(v as AgeBucket | "");
+              resetPage();
+            }}
+            minWidth={120}
+          />
+          {hasActiveFilter ? (
+            <button
+              type="button"
+              className="disputes-reset"
+              onClick={resetAll}
+            >
+              Reset filters
+            </button>
+          ) : null}
+        </div>
+      </div>
+
+      <p className="disputes-summary">
         <span>{totalAll} total disputes on record</span>
-        <span>·</span>
+        <span aria-hidden>·</span>
         <span>
-          Showing {slice.length} of {totalMatching}
-          {totalMatching !== totalAll ? " (filtered)" : ""}
+          {totalGroups} {totalGroups === 1 ? "fact" : "facts"} in conflict
+          {totalMatchingRows !== totalGroups
+            ? ` (${totalMatchingRows} source pairs)`
+            : ""}
+          {hasActiveFilter ? " · filtered" : ""}
         </span>
-        <span>·</span>
+        <span aria-hidden>·</span>
         <span>
           Page {safePage} of {totalPages}
         </span>
       </p>
-
-      <div className="editorial-filter-bar">
-        <FilterFieldset legend="Sort">
-          {(["severity", "age", "oldest"] as DisputeSortKey[]).map((s) => (
-            <FilterChip
-              key={s}
-              onClick={() => {
-                setSort(s);
-                resetPage();
-              }}
-              active={sort === s}
-            >
-              {SORT_LABELS[s]}
-            </FilterChip>
-          ))}
-        </FilterFieldset>
-
-        <FilterFieldset legend="Status">
-          <FilterChip
-            onClick={() => {
-              setStatusBucket(undefined);
-              resetPage();
-            }}
-            active={!statusBucket}
-          >
-            All
-          </FilterChip>
-          {PUBLIC_DISPUTE_STATUS_BUCKETS.map((s) => (
-            <FilterChip
-              key={s}
-              onClick={() => {
-                setStatusBucket(s);
-                resetPage();
-              }}
-              active={statusBucket === s}
-            >
-              {PUBLIC_DISPUTE_STATUS_LABELS[s]}
-            </FilterChip>
-          ))}
-        </FilterFieldset>
-
-        <FilterFieldset legend="Severity">
-          <FilterChip
-            onClick={() => {
-              setSeverityBucket(undefined);
-              resetPage();
-            }}
-            active={!severityBucket}
-          >
-            Any
-          </FilterChip>
-          {SEVERITY_BUCKETS.map((b) => (
-            <FilterChip
-              key={b}
-              onClick={() => {
-                setSeverityBucket(b);
-                resetPage();
-              }}
-              active={severityBucket === b}
-            >
-              {SEVERITY_BUCKET_LABELS[b]}
-            </FilterChip>
-          ))}
-        </FilterFieldset>
-
-        <FilterFieldset legend="Kind">
-          <FilterChip
-            onClick={() => {
-              setKind(undefined);
-              resetPage();
-            }}
-            active={!kind}
-          >
-            All
-          </FilterChip>
-          {Object.entries(KIND_LABELS).map(([key, label]) => (
-            <FilterChip
-              key={key}
-              onClick={() => {
-                setKind(key);
-                resetPage();
-              }}
-              active={kind === key}
-            >
-              {label}
-            </FilterChip>
-          ))}
-        </FilterFieldset>
-
-        <FilterFieldset legend="Group">
-          <FilterChip
-            onClick={() => {
-              setGroup(undefined);
-              resetPage();
-            }}
-            active={!group}
-          >
-            Any
-          </FilterChip>
-          {FACT_GROUPS.map((g) => (
-            <FilterChip
-              key={g}
-              onClick={() => {
-                setGroup(g);
-                resetPage();
-              }}
-              active={group === g}
-            >
-              {g}
-            </FilterChip>
-          ))}
-        </FilterFieldset>
-
-        {distributions.factKeys.length > 0 ? (
-          <FilterFieldset legend="Fact-key">
-            <FilterChip
-              onClick={() => {
-                setFactKey(undefined);
-                resetPage();
-              }}
-              active={!factKey}
-            >
-              Any
-            </FilterChip>
-            {distributions.factKeys.map((fk) => (
-              <FilterChip
-                key={fk.value}
-                onClick={() => {
-                  setFactKey(fk.value);
-                  resetPage();
-                }}
-                active={factKey === fk.value}
-              >
-                {fk.value} ({fk.count})
-              </FilterChip>
-            ))}
-          </FilterFieldset>
-        ) : null}
-
-        {distributions.sourcePairs.length > 0 ? (
-          <FilterFieldset legend="Source pair">
-            <FilterChip
-              onClick={() => {
-                setSourcePair(undefined);
-                resetPage();
-              }}
-              active={!sourcePair}
-            >
-              Any
-            </FilterChip>
-            {distributions.sourcePairs.map((sp) => (
-              <FilterChip
-                key={sp.value}
-                onClick={() => {
-                  setSourcePair(sp.value);
-                  resetPage();
-                }}
-                active={sourcePair === sp.value}
-              >
-                {sp.label} ({sp.count})
-              </FilterChip>
-            ))}
-          </FilterFieldset>
-        ) : null}
-
-        <FilterFieldset legend="Age">
-          <FilterChip
-            onClick={() => {
-              setAgeBucket(undefined);
-              resetPage();
-            }}
-            active={!ageBucket}
-          >
-            Any
-          </FilterChip>
-          {AGE_BUCKETS.map((b) => (
-            <FilterChip
-              key={b}
-              onClick={() => {
-                setAgeBucket(b);
-                resetPage();
-              }}
-              active={ageBucket === b}
-            >
-              {b}
-            </FilterChip>
-          ))}
-        </FilterFieldset>
-      </div>
 
       {slice.length === 0 ? (
         <p className="editorial-empty">
@@ -494,19 +473,19 @@ export function DisputesFilterClient({
         </p>
       ) : (
         <div style={{ marginBottom: "var(--space-6)" }}>
-          {slice.map((dispute) => (
-            <DisputeCard
-              key={dispute.id}
-              dispute={dispute}
-              expanded={expandedId === dispute.id}
-              auditState={auditCache[dispute.id]}
-              onToggle={() => handleExpand(dispute.id)}
+          {slice.map((factGroup) => (
+            <DisputeGroupCard
+              key={factGroup.key}
+              factGroup={factGroup}
+              expandedId={expandedId}
+              auditCache={auditCache}
+              onToggleAudit={handleExpand}
             />
           ))}
         </div>
       )}
 
-      {totalMatching > PAGE_SIZE ? (
+      {totalGroups > PAGE_SIZE ? (
         <nav className="editorial-pagination" aria-label="Pagination">
           {safePage > 1 ? (
             <button
@@ -520,7 +499,7 @@ export function DisputesFilterClient({
             <span>—</span>
           )}
           <span>Page {safePage}</span>
-          {offset + slice.length < totalMatching ? (
+          {offset + slice.length < totalGroups ? (
             <button
               type="button"
               onClick={() => setPage(safePage + 1)}
@@ -537,71 +516,58 @@ export function DisputesFilterClient({
   );
 }
 
-function DisputeCard({
-  dispute,
-  expanded,
-  auditState,
-  onToggle,
+/**
+ * One consolidated card per (jurisdiction, fact_key). The header carries the
+ * fact and status; the body lists every pairwise sub-dispute (source A vs B,
+ * outcome, reviewer notes, audit history) as its own sub-row. When a fact has
+ * a single pairwise dispute the card reads like a normal dispute; when it has
+ * several, they roll up under one heading instead of scattering as near-dupes.
+ */
+function DisputeGroupCard({
+  factGroup,
+  expandedId,
+  auditCache,
+  onToggleAudit,
 }: {
-  dispute: PublicDisputeRow;
-  expanded: boolean;
-  auditState: PublicAuditLogRow[] | "loading" | undefined;
-  onToggle: () => void;
+  factGroup: ReturnType<typeof groupDisputesByFact<PublicDisputeRow>>[number];
+  expandedId: string | null;
+  auditCache: Record<string, PublicAuditLogRow[] | "loading">;
+  onToggleAudit: (id: string) => void;
 }) {
+  const { lead, members } = factGroup;
+  const multi = members.length > 1;
+
   return (
     <article
-      className="editorial-card"
-      id={`dispute-${dispute.id}`}
+      className="editorial-card disputes-group"
+      id={`dispute-${lead.id}`}
       style={{ scrollMarginTop: "var(--space-7)" }}
     >
       <header className="editorial-card-head">
         <div className="editorial-card-head-left">
-          <span
-            style={{
-              fontFamily: "var(--font-heading)",
-              fontSize: "var(--text-16)",
-              fontWeight: 500,
-              color: "var(--color-text-primary)",
-            }}
-          >
-            {dispute.country.name}
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-12)",
-              color: "var(--color-text-40)",
-              letterSpacing: "0.05em",
-            }}
-          >
-            {dispute.factKey}
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-12)",
-              color: "var(--color-text-40)",
-              letterSpacing: "0.05em",
-            }}
-          >
-            · created {formatDate(dispute.createdAt)}
-          </span>
+          <span className="disputes-country">{factGroup.country.name}</span>
+          <span className="disputes-factkey">{factGroup.factKey}</span>
+          {multi ? (
+            <span className="disputes-factkey">
+              · {members.length} source pairs
+            </span>
+          ) : null}
         </div>
         <div className="editorial-card-pills">
-          {dispute.severity.severity != null ? (
-            <Pill variant={severityBadgeVariant(dispute.severity)}>
-              {formatSeverity(dispute.severity)}
+          {lead.severity.severity != null ? (
+            <Pill variant={severityBadgeVariant(lead.severity)}>
+              {formatSeverity(lead.severity)}
             </Pill>
           ) : null}
-          <Pill variant={KIND_VARIANT[dispute.disputeKind] ?? "default"}>
-            {KIND_LABELS[dispute.disputeKind] ?? dispute.disputeKind}
+          <Pill variant={KIND_VARIANT[lead.disputeKind] ?? "default"}>
+            {KIND_LABELS[lead.disputeKind] ?? lead.disputeKind}
           </Pill>
-          <Pill>{`Group ${dispute.factGroup}`}</Pill>
-          <Pill variant={STATUS_BUCKET_VARIANT[dispute.statusBucket]}>
-            {PUBLIC_DISPUTE_STATUS_LABELS[dispute.statusBucket]}
+          <Pill>{`Group ${factGroup.factGroup}`}</Pill>
+          <Pill variant={STATUS_BUCKET_VARIANT[lead.statusBucket]}>
+            {PUBLIC_DISPUTE_STATUS_LABELS[lead.statusBucket]}
           </Pill>
-          {dispute.systemAction === "auto_resolve_stale" ? (
-            <Pill>auto_resolve_stale</Pill>
+          {factGroup.hasReviewerNotes ? (
+            <Pill variant="accent">Reviewer note</Pill>
           ) : null}
         </div>
       </header>
@@ -610,94 +576,94 @@ function DisputeCard({
         className="editorial-card-headline"
         style={{ marginTop: "var(--space-3)" }}
       >
-        {dispute.description ??
-          `${KIND_LABELS[dispute.disputeKind] ?? "Dispute"} on ${dispute.factKey}.`}
+        {lead.description ??
+          `${KIND_LABELS[lead.disputeKind] ?? "Dispute"} on ${factGroup.factKey}.`}
       </h3>
 
-      <div
-        style={{
-          marginTop: "var(--space-3)",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "var(--space-5)",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--text-13)",
-          color: "var(--color-text-60)",
-        }}
-      >
-        <div>
-          <div
-            style={{
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "var(--color-text-30)",
-              marginBottom: "var(--space-2)",
-            }}
-          >
+      <div className="disputes-subrows">
+        {members.map((dispute) => (
+          <DisputeSubRow
+            key={dispute.id}
+            dispute={dispute}
+            showPairHeading={multi}
+            expanded={expandedId === dispute.id}
+            auditState={auditCache[dispute.id]}
+            onToggle={() => onToggleAudit(dispute.id)}
+          />
+        ))}
+      </div>
+    </article>
+  );
+}
+
+function DisputeSubRow({
+  dispute,
+  showPairHeading,
+  expanded,
+  auditState,
+  onToggle,
+}: {
+  dispute: PublicDisputeRow;
+  showPairHeading: boolean;
+  expanded: boolean;
+  auditState: PublicAuditLogRow[] | "loading" | undefined;
+  onToggle: () => void;
+}) {
+  return (
+    <div className="disputes-subrow">
+      {showPairHeading ? (
+        <div className="disputes-subrow-head">
+          <span className="disputes-pair-label">
+            {dispute.factA?.sourceId ?? "—"} × {dispute.factB?.sourceId ?? "—"}
+          </span>
+          <span className="disputes-subrow-meta">
+            <Pill variant={STATUS_BUCKET_VARIANT[dispute.statusBucket]}>
+              {PUBLIC_DISPUTE_STATUS_LABELS[dispute.statusBucket]}
+            </Pill>
+            <span>created {formatDate(dispute.createdAt)}</span>
+          </span>
+        </div>
+      ) : (
+        <div className="disputes-subrow-head">
+          <span className="disputes-subrow-meta">
+            created {formatDate(dispute.createdAt)}
+          </span>
+        </div>
+      )}
+
+      <div className="disputes-facts">
+        <div className="disputes-fact">
+          <div className="disputes-fact-label">
             A · {dispute.factA?.sourceId ?? "—"}
           </div>
-          <div style={{ color: "var(--color-text-primary)" }}>
+          <div className="disputes-fact-value">
             {formatFactValue(dispute.factA)}
           </div>
           {dispute.factA?.asOf ? (
-            <div style={{ color: "var(--color-text-40)" }}>
-              as of {dispute.factA.asOf}
-            </div>
+            <div className="disputes-fact-asof">as of {dispute.factA.asOf}</div>
           ) : null}
         </div>
-        <div>
-          <div
-            style={{
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              color: "var(--color-text-30)",
-              marginBottom: "var(--space-2)",
-            }}
-          >
+        <div className="disputes-fact">
+          <div className="disputes-fact-label">
             B · {dispute.factB?.sourceId ?? "—"}
           </div>
-          <div style={{ color: "var(--color-text-primary)" }}>
+          <div className="disputes-fact-value">
             {formatFactValue(dispute.factB)}
           </div>
           {dispute.factB?.asOf ? (
-            <div style={{ color: "var(--color-text-40)" }}>
-              as of {dispute.factB.asOf}
-            </div>
+            <div className="disputes-fact-asof">as of {dispute.factB.asOf}</div>
           ) : null}
         </div>
       </div>
 
       {dispute.statusBucket !== "open" ? (
-        <div
-          style={{
-            marginTop: "var(--space-4)",
-            paddingTop: "var(--space-3)",
-            borderTop: "1px solid var(--color-card-border)",
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-60)",
-            display: "flex",
-            gap: "var(--space-3)",
-            flexWrap: "wrap",
-            alignItems: "baseline",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-12)",
-              color: "var(--color-text-40)",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-            }}
-          >
-            Outcome
-          </span>
-          <span style={{ color: "var(--color-text-primary)" }}>
+        <div className="disputes-outcome">
+          <span className="disputes-outcome-label">Outcome</span>
+          <span className="disputes-outcome-value">
             {dispute.resolutionLabel ?? "—"}
           </span>
           {dispute.resolvedAt ? (
-            <span style={{ color: "var(--color-text-40)" }}>
+            <span className="disputes-outcome-date">
               · {formatDate(dispute.resolvedAt)}
             </span>
           ) : null}
@@ -705,155 +671,55 @@ function DisputeCard({
       ) : null}
 
       {dispute.reviewerNotes ? (
-        <div
-          style={{
-            marginTop: "var(--space-3)",
-            fontFamily: "var(--font-body)",
-            fontSize: "var(--text-14)",
-            color: "var(--color-text-60)",
-            lineHeight: 1.55,
-          }}
-        >
-          <span
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-12)",
-              color: "var(--color-text-40)",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              marginRight: "var(--space-3)",
-            }}
-          >
-            Notes
-          </span>
-          {dispute.reviewerNotes}
+        <div className="disputes-note">
+          <span className="disputes-note-label">Reviewer note</span>
+          <p className="disputes-note-body">{dispute.reviewerNotes}</p>
         </div>
       ) : null}
 
-      <footer
-        className="editorial-card-foot"
-        style={{ marginTop: "var(--space-4)" }}
-      >
-        <div className="editorial-card-foot-row">
-          {dispute.submitterName ? (
-            <span>Submitted by {dispute.submitterName}</span>
-          ) : null}
-        </div>
-        <div className="editorial-card-foot-row">
-          <button
-            type="button"
-            onClick={onToggle}
-            style={{
-              background: "none",
-              border: "none",
-              padding: 0,
-              cursor: "pointer",
-              color: "var(--color-accent)",
-              font: "inherit",
-            }}
-          >
-            {expanded ? "Hide audit history ↑" : "Show audit history →"}
-          </button>
-        </div>
-      </footer>
+      <div className="disputes-subrow-foot">
+        {dispute.submitterName ? (
+          <span className="disputes-submitter">
+            Submitted by {dispute.submitterName}
+          </span>
+        ) : (
+          <span />
+        )}
+        <button
+          type="button"
+          onClick={onToggle}
+          className="disputes-audit-toggle"
+        >
+          {expanded ? "Hide audit history ↑" : "Show audit history →"}
+        </button>
+      </div>
 
       {expanded ? (
-        <div
-          style={{
-            marginTop: "var(--space-4)",
-            paddingTop: "var(--space-3)",
-            borderTop: "1px solid var(--color-card-border)",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "var(--text-12)",
-              color: "var(--color-text-40)",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              marginBottom: "var(--space-3)",
-            }}
-          >
-            Audit history
-          </div>
+        <div className="disputes-audit">
+          <div className="disputes-audit-title">Audit history</div>
           {auditState === "loading" || auditState === undefined ? (
-            <p
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "var(--text-14)",
-                color: "var(--color-text-60)",
-                margin: 0,
-              }}
-            >
-              Loading audit history…
-            </p>
+            <p className="disputes-audit-empty">Loading audit history…</p>
           ) : auditState.length === 0 ? (
-            <p
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "var(--text-14)",
-                color: "var(--color-text-60)",
-                margin: 0,
-              }}
-            >
+            <p className="disputes-audit-empty">
               No audit entries on this dispute. The audit log starts at
-              2026-05-05; pre-R.21 reviewer decisions are recoverable from
-              the resolution metadata above.
+              2026-05-05; pre-R.21 reviewer decisions are recoverable from the
+              resolution metadata above.
             </p>
           ) : (
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                display: "flex",
-                flexDirection: "column",
-                gap: "var(--space-3)",
-              }}
-            >
+            <ul className="disputes-audit-list">
               {auditState.map((row) => (
-                <li
-                  key={row.id}
-                  style={{
-                    borderLeft: "2px solid var(--color-card-border)",
-                    paddingLeft: "var(--space-3)",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "var(--text-12)",
-                      color: "var(--color-text-40)",
-                      letterSpacing: "0.05em",
-                    }}
-                  >
+                <li key={row.id} className="disputes-audit-item">
+                  <div className="disputes-audit-meta">
                     {formatDateTime(row.createdAt)} · {row.actorLabel}
                   </div>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "var(--text-14)",
-                      color: "var(--color-text-primary)",
-                      marginTop: "var(--space-1, 4px)",
-                    }}
-                  >
+                  <div className="disputes-audit-headline">
                     <strong>{row.action}</strong>
                     {row.beforeStatus && row.afterStatus
                       ? `: ${row.beforeStatus} → ${row.afterStatus}`
                       : ""}
                   </div>
                   {row.notes ? (
-                    <div
-                      style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "var(--text-14)",
-                        color: "var(--color-text-60)",
-                        marginTop: "var(--space-1, 4px)",
-                      }}
-                    >
-                      {row.notes}
-                    </div>
+                    <div className="disputes-audit-notes">{row.notes}</div>
                   ) : null}
                 </li>
               ))}
@@ -861,6 +727,6 @@ function DisputeCard({
           )}
         </div>
       ) : null}
-    </article>
+    </div>
   );
 }

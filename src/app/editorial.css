@@ -3970,3 +3970,301 @@ a.constitution-xref-card-country:hover {
   font-style: italic;
   line-height: 1;
 }
+
+/* ── Data disputes log (reader) ─────────────────────────────────────
+   A compact, designed control bar (one SegmentedControl for status + a
+   wrapping row of SingleSelectMenu dropdowns) over consolidated fact
+   cards. One fact = one card; its N pairwise sub-disputes roll up as
+   sub-rows instead of scattering as near-identical list items. */
+
+.disputes-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-md);
+}
+.disputes-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3) var(--space-4);
+}
+.disputes-reset {
+  align-self: flex-end;
+  margin-bottom: 2px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-accent);
+}
+.disputes-reset:hover {
+  text-decoration: underline;
+}
+
+.disputes-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-muted);
+}
+
+/* ── Consolidated fact card ─────────────────────────────────────── */
+
+.disputes-country {
+  font-family: var(--font-heading);
+  font-size: var(--text-16);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+.disputes-factkey {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+  font-variant-numeric: tabular-nums;
+}
+
+.disputes-subrows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+/* Sub-rows only get a divider when there is more than one pairwise
+   dispute rolled up under the fact (single-dispute cards read flat). */
+.disputes-subrow + .disputes-subrow {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-card-border);
+}
+.disputes-subrow-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.disputes-pair-label {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+.disputes-subrow-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+}
+
+.disputes-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+.disputes-fact-label {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-30);
+  margin-bottom: var(--space-2);
+}
+.disputes-fact-value {
+  font-family: var(--font-body);
+  font-size: var(--text-15);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+.disputes-fact-asof {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+}
+
+.disputes-outcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-card-border);
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+}
+.disputes-outcome-label {
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-40);
+}
+.disputes-outcome-value {
+  color: var(--color-text-primary);
+}
+.disputes-outcome-date {
+  color: var(--color-text-40);
+}
+
+/* Reviewer note — surfaced prominently in the card body, not buried in
+   the audit-history accordion. Accent left rule marks it as editorial. */
+.disputes-note {
+  margin-top: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-card-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: color-mix(in oklab, var(--color-accent) 5%, var(--color-card-bg));
+}
+.disputes-note-label {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+}
+.disputes-note-body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-primary);
+  white-space: pre-wrap;
+}
+
+.disputes-subrow-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+}
+.disputes-submitter {
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-text-40);
+}
+.disputes-audit-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  color: var(--color-accent);
+}
+.disputes-audit-toggle:hover {
+  text-decoration: underline;
+}
+
+.disputes-audit {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-card-border);
+}
+.disputes-audit-title {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--color-text-40);
+  margin-bottom: var(--space-3);
+}
+.disputes-audit-empty {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+}
+.disputes-audit-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.disputes-audit-item {
+  border-left: 2px solid var(--color-card-border);
+  padding-left: var(--space-3);
+}
+.disputes-audit-meta {
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--color-text-40);
+}
+.disputes-audit-headline {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-primary);
+  margin-top: var(--space-1);
+}
+.disputes-audit-notes {
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+}
+
+/* Discoverability card on the reconciliation methodology page. */
+.disputes-callout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: var(--space-5) 0;
+  padding: var(--space-5) var(--space-6);
+  border: 1px solid var(--color-card-border);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--color-accent) 4%, var(--color-card-bg));
+  box-shadow: var(--shadow-hard);
+}
+.disputes-callout-text {
+  max-width: 62ch;
+}
+.disputes-callout-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-18);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-2);
+}
+.disputes-callout-desc {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-14);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 640px) {
+  .disputes-facts {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+}
