@@ -105,6 +105,33 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   "High income", "North America"), NOT snake_case slugs. `lens-metadata.ts` returns null for
   unknown values rather than crashing.
 
+## Admin auth / env / infra gotchas
+- **Next.js `.env` does dotenv-EXPANSION on `$`.** Any value in `.env.local` with an
+  unescaped `$name` is treated as a variable reference and silently mangled at load
+  (a `$` segment starting with a letter → expanded to empty). This bit `ADMIN_PASSWORD_HASH`
+  (PHC `scrypt$N$r$p$salt$hash` → salt/hash eaten → correct password rejected). Fix used:
+  the admin scrypt hash delimiter is `:` not `$` (`src/lib/admin/password.ts`). RULE: never
+  put an unescaped `$` in any `.env.local` value; on Vercel it's stored raw (no expansion),
+  so a value can work in prod but fail locally (or vice-versa). In-memory unit tests do NOT
+  catch this — it only reproduces through a real `.env` round-trip.
+- **Admin auth is username+password ONLY (no bearer).** `ADMIN_API_KEY` is retired; admin
+  routes gate on `getAdminSession()` (cookie signed by `ADMIN_SESSION_SECRET` HMAC). Required
+  prod/local env: `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` (via `npm run admin:set-password`),
+  `ADMIN_SESSION_SECRET` (`openssl rand -hex 32`). Routes fail closed (sign-in 500 / API 401)
+  if any is unset. Crons use a SEPARATE `CRON_SECRET` — unaffected. Setting these on Vercel
+  must precede the deploy that ships the change, or the admin backend locks out.
+- **Shell `$USERNAME`/`$USER` = the macOS account ("fernandobalino"), not a value you meant.**
+  When scripting env writes, pass string literals — a bare `USERNAME=...` assignment can be
+  shadowed and `"$USERNAME"` reach Vercel as the OS account name. (Bit the prod `ADMIN_USERNAME`
+  write once.)
+- **Worktree agents can't boot a Turbopack dev server** (Turbopack rejects a symlink to the
+  main repo's `node_modules` across the worktree boundary). Agents that need browser
+  verification will either clone `node_modules` in (APFS clonefile) or OVERLAY their diff onto
+  the shared main checkout + `pkill` the shared preview server, then revert. After parallel
+  worktree agents run, VERIFY main-checkout integrity (`git status`) and expect the preview
+  server to have been restarted under you. Do browser verification of merged work in the main
+  session, not in the worktrees.
+
 ## Pulse (currently PAUSED — no API spend)
 - The v2 pipeline self-corrects SUBJECT-country attribution via
   `src/lib/pulse/v2/country-attribution.ts` (wired into `classify.ts`) — ignore the story's
