@@ -945,6 +945,33 @@
   justify-content: center;
 }
 
+.admin-signin-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  color: var(--color-text-muted);
+}
+
+.admin-signin-divider::before,
+.admin-signin-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border-default);
+}
+
+.admin-signin-google {
+  width: 100%;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 900px) {

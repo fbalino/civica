@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CivicaLogo } from "@/components/CivicaLogo";
 import { Banner } from "@/components/editorial/Banner";
 import { getAdminSession } from "@/lib/admin/session";
+import { isGoogleSignInConfigured } from "@/lib/admin/google-oauth";
 import "@/app/admin.css";
 
 export const metadata: Metadata = {
@@ -25,6 +26,11 @@ interface PageProps {
  * credential that route redirects back here with ?error=1, surfaced via the
  * danger Banner.
  *
+ * When Google sign-in is configured (GOOGLE_CLIENT_ID/SECRET +
+ * ADMIN_GOOGLE_EMAIL all set), a second "Sign in with Google" option appears
+ * below the form. It's an alternate door into the SAME single-owner admin
+ * session, not a new account type — see src/lib/admin/google-oauth.ts.
+ *
  * This page sits OUTSIDE the (admin) route group so it doesn't inherit the
  * admin shell (or its session redirect). It imports admin.css directly for the
  * card classes.
@@ -35,10 +41,12 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
   if (session) redirect(params.redirect ?? "/admin/pulse-review");
 
   const error = params.error === "1";
+  const googleError = params.error === "google";
   const redirectAfter =
     params.redirect && params.redirect.startsWith("/")
       ? params.redirect
       : "/admin/pulse-review";
+  const googleConfigured = isGoogleSignInConfigured();
 
   return (
     <div className="admin-signin-wrap">
@@ -59,6 +67,12 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
           <Banner variant="danger" className="admin-signin-error">
             That username or password did not match. Check your credentials and
             try again.
+          </Banner>
+        ) : null}
+
+        {googleError ? (
+          <Banner variant="danger" className="admin-signin-error">
+            That Google account isn&rsquo;t authorized for admin access.
           </Banner>
         ) : null}
 
@@ -107,6 +121,21 @@ export default async function AdminSignInPage({ searchParams }: PageProps) {
             </span>
           </button>
         </form>
+
+        {googleConfigured ? (
+          <>
+            <div className="admin-signin-divider" role="separator">
+              <span>or</span>
+            </div>
+
+            <a
+              href={`/api/admin/google/start?redirect=${encodeURIComponent(redirectAfter)}`}
+              className="btn btn--secondary admin-signin-google"
+            >
+              <span>Sign in with Google</span>
+            </a>
+          </>
+        ) : null}
       </div>
     </div>
   );
