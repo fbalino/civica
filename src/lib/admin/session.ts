@@ -126,7 +126,14 @@ export function buildAdminCookieHeaders(
   const nonce = randomBytes(18).toString("hex");
   const sessionValue = `${nonce}.${signNonce(secret, nonce)}`;
   const maxAge = SESSION_TTL_DAYS * 24 * 60 * 60;
-  const common = `Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}`;
+  // SameSite=Lax, not Strict: the Google sign-in return (start → Google →
+  // callback → this cookie) is a cross-site-initiated top-level GET
+  // redirect chain, and Strict cookies aren't sent on the request
+  // immediately following it — the browser would land back on
+  // /admin/sign-in even though the cookie was set correctly. Lax still
+  // blocks the cookie on cross-site POST/PUT/DELETE (the actual CSRF
+  // vector); every mutating admin route is POST/PUT/DELETE already.
+  const common = `Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}`;
   // Secure flag in production only (cookies-without-secure are blocked
   // on HTTPS but useful for local dev over http://localhost).
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
@@ -143,7 +150,7 @@ export function buildAdminCookieHeaders(
 }
 
 export function buildAdminClearCookieHeaders(): Array<[string, string]> {
-  const common = `Path=/; HttpOnly; SameSite=Strict; Max-Age=0`;
+  const common = `Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
   return [
     ["Set-Cookie", `${ADMIN_SESSION_COOKIE}=; ${common}${secure}`],
