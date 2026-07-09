@@ -155,6 +155,7 @@ export default function MethodologyHubPage() {
       <article className="methodology-content">
         <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Methodology</h1>
+        {/* PUBLIC_CLAIM: methodology.decision-coverage */}
         <p className="editorial-page-subtitle">
           Every load-bearing methodology decision in Civica is documented as a
           citable resolution before the corresponding code ships. This page

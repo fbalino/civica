@@ -6,3 +6,5 @@ Append one plain-language line for every completed checklist task. Each line nam
 
 - Planning baseline established: product direction, experimental-product posture, orchestration policy, Blind Audit protocol, and master-plan operating contract were recorded. This is plan setup, not a checked implementation task.
 - Repository-grounded master plan completed: 288 atomic tasks across ten areas validate exactly against `MASTER-CHECKLIST.md`; the blind audit, Fable Index design-space study, owner overview, decisions, manual checks, evidence rules, and orchestration state are preserved. Implementation progress remains 0/288 by design.
+- CLM-001 completed: 24 headline claims across all 14 required public surfaces now have owners, evidence, versions, gates, exact-copy markers, and a passing zero-orphan validator in commit `feat(claims): establish public claim registry and tier policy (CLM-001, CLM-002)`; evidence: `plan/evidence/CLM-001/`.
+- CLM-002 completed: seven canonical evidence tiers now define allowed language and disclosure, and automated fixtures prove every registered claim maps to exactly one tier in the same commit; evidence: `plan/evidence/CLM-002/`.

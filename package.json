@@ -85,6 +85,7 @@
     "migrate:rate-limits": "tsx scripts/create-rate-limits-table.ts",
     "regenerate:readme": "tsx scripts/regenerate-readme.ts",
     "validate:content-templates": "tsx scripts/validate-content-templates.ts",
+    "validate:public-claims": "tsx scripts/validate-public-claims.ts",
     "validate:sync-freshness": "tsx scripts/validate-sync-freshness.ts",
     "validate:territory-engravings": "tsx scripts/validate-territory-engravings.ts",
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",

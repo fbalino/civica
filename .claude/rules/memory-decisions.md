@@ -1,5 +1,16 @@
 # Project Memory Decisions
 
+## 2026-07-09 — One evidence tier per public claim
+
+Every headline public claim must be registered and assigned exactly one of
+seven canonical tiers: institutional posture, source-reported fact, reconciled
+fact, derived descriptive metric, research-beta estimate, experimental
+heuristic, or retired/deprecated output. Registration is inventory, not
+endorsement; overclaims remain subject to qualification/removal and the G3/G5
+gates. The durable contract is `plan/decisions/claim-tier-v1.md`; the typed
+implementation and validator live under `src/lib/claims/` and
+`scripts/validate-public-claims.ts`.
+
 ## 2026-07-09 — Atlas-first academic publication readiness (owner decision)
 
 Civica Atlas is primarily a trusted, provenance-first comparative reference to

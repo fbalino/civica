@@ -20,8 +20,10 @@
   Validate with: npm run validate:content-templates
 -->
 
+<!-- PUBLIC_CLAIM: about.atlas-positioning -->
 Civica Atlas is an open reference atlas of the world's countries, governments, and governance outcomes. It combines data from authoritative sources into a single, browsable atlas of political systems, demographics, economies, and the institutions that shape them.
 
+<!-- PUBLIC_CLAIM: about.provenance-coverage -->
 The project is built in the same posture as Our World in Data, the V-Dem Institute, and the World Bank's statistical division — an academic publication with a UI on top, not a website that happens to have data. Every fact carries provenance, every methodology decision is documented, and every disagreement between sources is surfaced rather than hidden.
 
 ## How it works {#how-it-works}

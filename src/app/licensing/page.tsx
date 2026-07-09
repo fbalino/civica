@@ -67,6 +67,7 @@ export default function LicensingPage() {
       title="Licensing"
     >
       <section className="editorial-section">
+        {/* PUBLIC_CLAIM: licensing.mixed-rights */}
         <p className="editorial-page-subtitle">
           Civica is a mixed-source reference atlas. Public-domain and CC0 data
           can generally be reused freely; publisher-restricted datasets remain

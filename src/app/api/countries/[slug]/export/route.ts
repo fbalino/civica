@@ -172,6 +172,7 @@ export async function GET(
     // still cite the reconciliation methodology + vintage in a comment
     // header so the export is self-describing when opened in a text
     // editor or imported into a research tool.
+    // PUBLIC_CLAIM: export.full-provenance
     const citation = [
       `# Civica Atlas country export — ${jurisdiction.name}`,
       `# Reconciliation: ${FACTBOOK_RECONCILIATION_META.status} ${FACTBOOK_RECONCILIATION_META.version}`,

@@ -9,10 +9,12 @@
 -->
 # Civica Atlas
 
+<!-- PUBLIC_CLAIM: readme.positioning -->
 An open reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.
 
 [civicaatlas.org](https://civicaatlas.org)
 
+<!-- PUBLIC_CLAIM: readme.release-status -->
 > **Status: pre-launch beta.** The data layer and reader pages are live and being used by the team for end-to-end review. Public launch + external methodology review are planned phases, not shipped yet. See [Current state](#current-state) below.
 
 ---
@@ -31,10 +33,12 @@ Country dossiers covering geography, demographics, government, economy, energy, 
 
 ### Civica Index — `/civica-index`
 
+<!-- PUBLIC_CLAIM: readme.index-estimate -->
 An original composite governance score on a 0–100 scale, computed quarterly across four governance dimensions: democratic quality, rule of law, freedoms & rights, and corruption control. Material conditions (human development, peace & security, economic stability) live on the separate `/civica-conditions` companion layer. Built on V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting indices. PCA-derived weights (27/26/23/24), frozen reference periods, Monte Carlo uncertainty intervals. Currently in BETA pending external methodological review.
 
 ### Civica Pulse — `/civica-index/pulse-changelog`
 
+<!-- PUBLIC_CLAIM: readme.pulse-signal -->
 A daily directional signal layered on top of the Index. Ingests governance-relevant events from CIVICUS Monitor, Human Rights Watch, Amnesty International, ACLED, IPU, GDELT, and others. Multi-run LLM classifier with three-temperature agreement scoring. Asymmetric corroboration (positive events require specialist sources; restricted-press countries require multi-source confirmation). Backtested against 10 named historical governance shocks (Myanmar 2021, Niger 2023, Tunisia 2021, Afghanistan 2021, Sri Lanka 2022, Brazil 2023, Hungary 2010-present, Ethiopia 2020–22, Colombia 2016, Poland 2023). Currently in BETA.
 
 ## What makes this different
@@ -45,7 +49,7 @@ Civica's pipeline is built on opposite premises:
 
 - **Multi-source reconciliation.** Currently 20 active source orchestrators (CIA Factbook archive; the eleven Tier-1 publishers — World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats; V-Dem; Wikidata; and six national statistics offices already syncing — US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) writing into a canonical `country_facts` table. ~26,000 reconciled facts across 88 declared fact-keys. v1 target is 11 Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus 30–40 national statistics offices (first wave: 6 in progress; Destatis-DE deferred to v1.1; NBS-Nigeria permanently deferred).
 
-- **Per-fact provenance.** Every value on every reader-facing page renders a `<FactValueDot>` chevron. Click it and you see the canonical pick, every alternate source, the as-of date per source, the publisher's license, and the freshness winner. Disagreements above a configurable threshold create disputes routed to a human review queue.
+- <!-- PUBLIC_CLAIM: readme.per-value-provenance --> **Per-fact provenance.** Every value on every reader-facing page renders a `<FactValueDot>` chevron. Click it and you see the canonical pick, every alternate source, the as-of date per source, the publisher's license, and the freshness winner. Disagreements above a configurable threshold create disputes routed to a human review queue.
 
 - **Forecast vs measurement.** The resolver distinguishes measured rows from projected rows (IMF WEO ships forecasts to 2030; ILO publishes nowcasts beyond the current year). Canonical picks come from measured rows when both exist. See [`forecast-vs-measurement-v1.md`](./docs/methodology-decisions.md#forecast-vs-measurement).
 

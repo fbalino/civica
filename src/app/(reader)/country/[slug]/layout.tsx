@@ -55,6 +55,7 @@ export async function generateMetadata({
       jurisdiction.governmentTypeDetail ?? jurisdiction.governmentType
     ) || "sovereign state";
   const title = `${jurisdiction.name} — Government & Political System`;
+  // PUBLIC_CLAIM: country.source-layer
   const description = `How ${jurisdiction.name} is governed: its ${govLabel.toLowerCase()} system, branches of power, geography, people, and economy — sourced from the CIA World Factbook with Civica governance overlays.`;
   const url = `https://civicaatlas.org/country/${slug}`;
   return {

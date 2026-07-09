@@ -65,6 +65,7 @@ export default async function AdvisoryBoardPage() {
         </p>
       </header>
 
+      {/* PUBLIC_CLAIM: advisory.independent-review-plan */}
       <p className="editorial-page-subtitle" style={{ margin: "0 0 32px" }}>
         Per the v2 methodology specification, the Civica Index will be reviewed
         by an independent academic advisory board of{" "}

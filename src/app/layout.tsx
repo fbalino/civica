@@ -53,6 +53,8 @@ export const metadata: Metadata = {
     default: "Civica Atlas — How Every Country Is Governed",
     template: "%s · Civica Atlas",
   },
+  // PUBLIC_CLAIM: metadata.default-atlas-scope
+  // PUBLIC_CLAIM: metadata.default-index-score
   description:
     "Interactive atlas of government structures, constitutions, elections, and governance data for every country — with the Civica Index, an original governance score.",
   // Default self-referencing canonical on the apex host. The relative "./"

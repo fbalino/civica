@@ -8,6 +8,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Public API — Governance Data for 250+ Countries",
+  // PUBLIC_CLAIM: api.coverage-and-products
   description:
     "Documentation for the Civica public REST API: government structure, country metadata, Civica Index scores, and political system classifications for 250+ countries.",
   alternates: { canonical: "https://civicaatlas.org/api-docs" },

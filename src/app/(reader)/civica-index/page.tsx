@@ -69,6 +69,7 @@ function decorateOptions<K extends string>(
 
 export const metadata: Metadata = {
   title: "Civica Index — Governance Scores for 190+ Countries",
+  // PUBLIC_CLAIM: index.composite-estimate
   description:
     `An original governance score for 190+ sovereign states across ${civicaIndex.dimensionCount} dimensions, with empirically-derived weights, fixed-bound normalization, and 90% confidence intervals.${civicaIndex.status === "beta" ? " Beta methodology." : ""}`,
   alternates: { canonical: "https://civicaatlas.org/civica-index" },

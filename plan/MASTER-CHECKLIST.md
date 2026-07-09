@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 0
-- **Remaining:** 288
-- **Progress:** 0%
+- **Completed:** 2
+- **Remaining:** 286
+- **Progress:** 0.7%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -14,8 +14,8 @@ Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, no
 
 Source: `plan/02-positioning-claims-and-documentation.md`
 
-- [ ] **CLM-001** (P0) Create a machine-readable public-claims registry covering home, country pages, Index, Pulse, methodology, about, licensing, advisory board, API docs, README, `CITATION.cff`, metadata, exports, and embeds. _Done when: the registry records route/artifact, exact claim, claim tier, evidence source, implementation owner, methodology version, and gate for every headline empirical or institutional claim, and a validator reports zero unregistered headline claims._
-- [ ] **CLM-002** (P0) Adopt a canonical claim-tier vocabulary for source-reported facts, reconciled facts, derived descriptive metrics, research-beta estimates, experimental heuristics, and retired/deprecated outputs. _Done when: a decision document defines allowed language and disclosure for each tier and automated fixtures map every registered claim to exactly one tier._
+- [x] **CLM-001** (P0) Create a machine-readable public-claims registry covering home, country pages, Index, Pulse, methodology, about, licensing, advisory board, API docs, README, `CITATION.cff`, metadata, exports, and embeds. _Done when: the registry records route/artifact, exact claim, claim tier, evidence source, implementation owner, methodology version, and gate for every headline empirical or institutional claim, and a validator reports zero unregistered headline claims._
+- [x] **CLM-002** (P0) Adopt a canonical claim-tier vocabulary for source-reported facts, reconciled facts, derived descriptive metrics, research-beta estimates, experimental heuristics, and retired/deprecated outputs. _Done when: a decision document defines allowed language and disclosure for each tier and automated fixtures map every registered claim to exactly one tier._
 - [ ] **CLM-003** (P0) Make “Civica Atlas is a provenance-first comparative reference to how every country is governed” the working product position. _Done when: homepage, about, metadata, README, citation abstract, social cards, and reviewer brief use an approved semantically equivalent atlas-first description and no primary description says the Index/Pulse are the product._
 - [ ] **CLM-004** (P0) Remove or qualify academic-authority claims that outrun the current release. _Done when: repository and rendered-site searches find no unqualified “academically citable,” “authoritative,” “validated,” “confidence interval,” “daily governance,” or equivalent claim for an artifact that has not passed its gate; each remaining use links to supporting evidence._
 - [ ] **CLM-005** (P0) Remove judgmental A–F country grading and categorical labels from target UI, API, exports, metadata, and prose. _Done when: a repository/API/browser audit finds no public country letter grade or “failed/authoritarian” score-band label, historical data is migrated or explicitly deprecated, and neutral replacement presentation passes design-system/browser tests._

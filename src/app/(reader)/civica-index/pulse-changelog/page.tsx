@@ -17,6 +17,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Civica Pulse Changelog — Classified Events (Beta)",
+  // PUBLIC_CLAIM: pulse.event-ledger
   description:
     "Every governance event classified by the Civica Pulse Beta pipeline, filterable by country, dimension, and severity, with full source attribution and human-review status.",
   alternates: {

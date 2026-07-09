@@ -13,10 +13,12 @@
 -->
 # Civica Atlas
 
+<!-- PUBLIC_CLAIM: readme.positioning -->
 An open reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.
 
 [civicaatlas.org](https://civicaatlas.org)
 
+<!-- PUBLIC_CLAIM: readme.release-status -->
 > **Status: {{ctx.launchPhaseProse}}.** The data layer and reader pages are live and being used by the team for end-to-end review. Public launch + external methodology review are planned phases, not shipped yet. See [Current state](#current-state) below.
 
 ---
@@ -35,10 +37,12 @@ Country dossiers covering geography, demographics, government, economy, energy, 
 
 ### Civica Index — `/civica-index`
 
+<!-- PUBLIC_CLAIM: readme.index-estimate -->
 An original composite governance score on a 0–100 scale, computed quarterly across {{ctx.civicaIndexDimensionCountWord}} governance dimensions: {{ctx.civicaIndexDimensionLabelsProse}}. Material conditions (human development, peace & security, economic stability) live on the separate `/civica-conditions` companion layer. Built on V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting indices. PCA-derived weights ({{ctx.civicaIndexWeightsString}}), frozen reference periods, Monte Carlo uncertainty intervals. Currently in {{ctx.civicaIndexStatusUpper}} pending external methodological review.
 
 ### Civica Pulse — `/civica-index/pulse-changelog`
 
+<!-- PUBLIC_CLAIM: readme.pulse-signal -->
 A daily directional signal layered on top of the Index. Ingests governance-relevant events from CIVICUS Monitor, Human Rights Watch, Amnesty International, ACLED, IPU, GDELT, and others. Multi-run LLM classifier with three-temperature agreement scoring. Asymmetric corroboration (positive events require specialist sources; restricted-press countries require multi-source confirmation). Backtested against {{state.pulse.backtest.cases.length}} named historical governance shocks ({{ctx.pulseBacktestCasesProse}}). Currently in {{ctx.pulseStatusUpper}}.
 
 ## What makes this different
@@ -49,7 +53,7 @@ Civica's pipeline is built on opposite premises:
 
 - **Multi-source reconciliation.** Currently {{stats.activeSources | "20"}} active source orchestrators (CIA Factbook archive; the {{ctx.tier1ShippedCountWord}} Tier-1 publishers — {{ctx.tier1ShippedFullNamesProse}}; V-Dem; Wikidata; and {{ctx.nsoInProgressCountWord}} national statistics offices already syncing — {{ctx.nsoInProgressNamesProse}}) writing into a canonical `country_facts` table. ~{{ctx.totalFactsRoundedThousands | "26,000"}} reconciled facts across {{stats.distinctFactKeys | "88"}} declared fact-keys. v1 target is {{ctx.tier1ShippedCount}} Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus {{state.nsoTarget.min}}–{{state.nsoTarget.max}} national statistics offices (first wave: {{ctx.nsoInProgressCount}} in progress; {{ctx.nsoDeferredNamesProse}}).
 
-- **Per-fact provenance.** Every value on every reader-facing page renders a `<FactValueDot>` chevron. Click it and you see the canonical pick, every alternate source, the as-of date per source, the publisher's license, and the freshness winner. Disagreements above a configurable threshold create disputes routed to a human review queue.
+- <!-- PUBLIC_CLAIM: readme.per-value-provenance --> **Per-fact provenance.** Every value on every reader-facing page renders a `<FactValueDot>` chevron. Click it and you see the canonical pick, every alternate source, the as-of date per source, the publisher's license, and the freshness winner. Disagreements above a configurable threshold create disputes routed to a human review queue.
 
 - **Forecast vs measurement.** The resolver distinguishes measured rows from projected rows (IMF WEO ships forecasts to 2030; ILO publishes nowcasts beyond the current year). Canonical picks come from measured rows when both exist. See [`forecast-vs-measurement-v1.md`](./docs/methodology-decisions.md#forecast-vs-measurement).
 

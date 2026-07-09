@@ -415,6 +415,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   // sources backing the visible reconciled facts (population, GDP,
   // area, capital). Only renders when the resolver returned at least
   // one canonical row; the small widget skips it for space reasons.
+  // PUBLIC_CLAIM: embed.reconciled-attribution
   const attributionHtml = attributionLabel
     ? `<div class="attribution mono">Source: ${esc(attributionLabel)} · Civica Atlas reconciled ${esc(FACTBOOK_RECONCILIATION_META.version)}</div>`
     : "";
@@ -437,6 +438,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="score serif">${esc(ciDisplay)}</div>
 </a>`;
 
+  // PUBLIC_CLAIM: embed.index-score
   const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
