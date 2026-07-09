@@ -132,14 +132,20 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   server to have been restarted under you. Do browser verification of merged work in the main
   session, not in the worktrees.
 
-## Pulse (currently PAUSED — no API spend)
+## Pulse (daily cron active; academically experimental)
+- The production daily cron was re-enabled on 2026-07-05. Do not describe Pulse
+  as paused or cost-free from memory; inspect the current cron/runtime/provider
+  configuration before making cadence or spend claims.
+- Per the 2026-07-09 atlas-first decision, the near-term defensible product is a
+  versioned event ledger. Ensemble agreement is not validation, and public
+  numeric deltas remain experimental pending the master-plan gates.
 - The v2 pipeline self-corrects SUBJECT-country attribution via
   `src/lib/pulse/v2/country-attribution.ts` (wired into `classify.ts`) — ignore the story's
   language/outlet, attribute to the country the event is ABOUT.
-- The `pulse-daily` skill runs the refresh on the Max SUBSCRIPTION, not the API: export
-  clusters (free) → the AGENT classifies → apply via the validated `writeEvent` (free).
-  Subscription billing requires NO bare `ANTHROPIC_API_KEY` in the env (the suffixed
-  `ANTHROPIC_API_KEY_*` keys only feed project scripts, never Claude Code auth).
+- The local `pulse-daily` subscription skill is a manual workflow, not the
+  canonical description of the active production cron. Production classification
+  can use configured provider APIs; keep cost controls and provider/version logs
+  explicit.
 - Lazy-init the Anthropic client (a module-level `new Anthropic()` evaluates before dotenv
   populates env vars).
 

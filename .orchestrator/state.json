@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "controller": "codex",
+  "project": {
+    "name": "Civica Academic Publication Readiness",
+    "root": "/Users/fernandobalino/Projects/civica",
+    "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
+    "status": "active",
+    "phase": "master_plan_ready"
+  },
+  "budget": {
+    "mode": "subscription_only",
+    "api_approved": false,
+    "provider": null,
+    "model": null,
+    "cap_usd": 0,
+    "approved_at": null,
+    "enforced_by": null
+  },
+  "worker_policy": {
+    "primary_execution": "current primary Codex session",
+    "codex_subagents": {
+      "default": "disabled for routine work",
+      "allowed_preferences": [
+        "luna",
+        "terra"
+      ],
+      "condition": "only when the available tool can enforce the requested model and the lane is bounded and low-context"
+    },
+    "claude": {
+      "design_decider": "fable",
+      "routine_models": [
+        "sonnet",
+        "opus"
+      ],
+      "subscription_only": true
+    }
+  },
+  "workers": {
+    "fable_index_design_space": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "fable",
+      "session_id": "9600b789-408f-40b1-b4f6-3f3445fe7391",
+      "subscription_first": true,
+      "owned_artifact": "plan/research/fable-index-design-space-2026-07-09.md"
+    },
+    "blind_academic": {
+      "status": "completed",
+      "provider": "codex-subagent",
+      "ownership": "read-only findings"
+    },
+    "blind_platform": {
+      "status": "completed",
+      "provider": "codex-subagent",
+      "ownership": "read-only findings and adversarial verification"
+    },
+    "blind_experience": {
+      "status": "completed",
+      "provider": "codex-subagent",
+      "ownership": "read-only module ledger and visual recall audit"
+    }
+  },
+  "manifests": [],
+  "artifacts": [
+    "plan/MASTER-PLAN-OVERVIEW.md",
+    "plan/00-mission-and-operating-rules.md",
+    "plan/01-current-state-audit.md",
+    "plan/MASTER-CHECKLIST.md",
+    "plan/civica-academic-readiness-blind-audit-2026-07-09.md",
+    "plan/research/fable-index-design-space-2026-07-09.md",
+    "plan/DECISIONS.md",
+    "plan/MANUAL-CHECKS.md",
+    "plan/PROGRESS.md"
+  ],
+  "open_decisions": [
+    "Final Index disposition after the preregistered candidate tournament",
+    "Final Pulse numeric-signal disposition after ledger and prospective validation",
+    "Owner approval of the engraving color-grade pilot",
+    "Owner selection among three Explore navigation concepts",
+    "Reviewer shortlist/contact terms after the G4 agent-complete gate",
+    "Keep or rename outcome after trademark/confusion research and professional review"
+  ],
+  "verification": {
+    "git_status": "Pre-existing user untracked plan artifacts preserved; new master-plan/orchestration artifacts are untracked; no tracked application source was modified by this planning run.",
+    "build": "npm run build passed during the baseline audit; Turbopack reported unintended full-project tracing from dynamic Markdown content resolution.",
+    "tests": "npm test, npm run test:db, validate:content-templates, validate:sync-freshness, and validate:design-tokens passed at baseline. Master-plan validator passes 288/288 task lines.",
+    "browser": "Live site audited across representative routes, themes, viewports, keyboard/touch states, embeds, advisory flow, and asset geometry; root browser session finalized with no open tabs.",
+    "visual_review": "Targeted art/caption/menu audit plus sealed blind module and 266-pair asset audit completed; findings mapped to objective tasks."
+  },
+  "updated_at": "2026-07-09T23:33:54Z"
+}

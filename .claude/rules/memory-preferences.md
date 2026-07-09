@@ -1,5 +1,12 @@
 # Project Memory Preferences
 
+- **Credit-aware orchestration (owner, 2026-07-09):** default to the primary
+  Codex session for implementation and verification. Do not spawn Sol-class
+  Codex subagents for routine work. Luna/Terra are acceptable only for bounded,
+  low-context lanes when model selection is actually enforceable; otherwise
+  stay local. Fable 5 is the key decision-maker for consequential design
+  choices. Use Claude Sonnet/Opus for bounded routine Claude work. No paid API
+  fallback without explicit approval and a hard cap.
 - THE WHOLE DESIGN SYSTEM IS A CLOSED SET (owner, escalated 2026-07-05: "We
   NEVER hard code, EVER... it's a waste of tokens because we have to redo
   everything"). Applies to every visual decision, not just layouts: colors,

@@ -1,0 +1,75 @@
+# Civica Academic Publication Readiness — Decisions
+
+This is the durable decision log for the active master plan. New entries append; existing entries are revised only through an explicit superseding decision.
+
+## 2026-07-09
+
+### APR-D001 — Atlas-first product identity
+
+**Decision:** Civica Atlas is primarily a trusted, provenance-first comparative reference to how every country is governed. The atlas, structured data, source trail, and reconciliation are the flagship.
+**Why:** This is the project's strongest existing scholarly contribution and the clearest defensible public position.
+
+### APR-D002 — Original scores are secondary experiments
+
+**Decision:** The Civica Index and Pulse are not required to remain headline products. Their UI, API, metadata, and prose must reflect experimental standing until they clear explicit validation gates.
+**Why:** Product investment and visual polish cannot substitute for construct validity, reproducibility, calibration, or external review.
+
+### APR-D003 — Index tournament, not predetermined retirement
+
+**Decision:** The current Index competes against simple baselines and materially different candidate designs. The process must permit redesign, demotion, or retirement, but it must also search creatively for a measurement product that exploits Civica's distinctive data.
+**Why:** High redundancy is a serious warning but not, by itself, proof that every possible composite or original measurement is valueless.
+
+### APR-D004 — Pulse becomes an event ledger first
+
+**Decision:** Pulse's academically plausible near-term product is a versioned, provenance-rich governance-event ledger. Public numeric governance deltas may return only after prospective, representative, human-anchored validation.
+**Why:** Documented-event incidence can be evaluated directly; a latent daily governance score requires evidence the current system does not yet provide.
+
+### APR-D005 — Retire judgmental country grades
+
+**Decision:** A–F grading and labels that classify countries as “failed” are removed from the target product. Future presentation uses source-native indicators, distributions, uncertainty, and neutral descriptive language.
+**Why:** Grade cutoffs create unsupported categorical and normative claims and invite misuse.
+
+### APR-D006 — Agent work precedes external review
+
+**Decision:** Codex, bounded Claude/Fable work, automated analysis, blind audits, reproducibility work, and browser QA should complete all feasible internal preparation before reviewers are approached.
+**Why:** Reviewer attention should be spent on real scholarly judgment rather than defects agents and tests can resolve first.
+
+### APR-D007 — Human review remains a publication gate
+
+**Decision:** Qualified independent human review cannot be replaced by model panels. It occurs after the agent-complete gate and before authoritative measurement claims or broad academic outreach.
+**Why:** External domain expertise, accountability, independence, and reputational judgment are part of scholarly legitimacy.
+
+### APR-D008 — Canonical positioning sentence
+
+**Decision:** The working positioning is: “Civica Atlas is a provenance-first comparative reference to how every country is governed.”
+**Why:** It is clear, distinctive, and supportable without leaning on experimental scores.
+
+### APR-D009 — Outreach follows a citable release candidate
+
+**Decision:** Reviewer discovery and outreach preparation belong in the plan, but contact and broad marketing wait for their readiness gates. The first flagship should be a frozen, reproducible atlas dataset/release with DOI, rights manifest, codebook, citation, and case studies.
+**Why:** Academic adoption begins with a usable scholarly artifact, not a generic awareness campaign.
+
+### APR-D010 — Name is open to evidence-based change
+
+**Decision:** Civica Atlas may be renamed if trademark/confusion research or professional advice shows material risk or if a stronger distinctive identity emerges. No rename is assumed in advance.
+**Why:** The owner prefers avoiding future disputes but does not want an unnecessary brand migration.
+
+### APR-D011 — Subscription-only orchestration
+
+**Decision:** Use Codex and Claude subscription authentication. No paid model API is authorized for this effort.
+**Why:** Existing subscriptions can perform the work; cost-bearing fallbacks require separate approval and a hard cap.
+
+### APR-D012 — One active academic-readiness checklist
+
+**Decision:** `plan/MASTER-CHECKLIST.md` becomes the single execution source of truth for this effort once validated. Existing dated plans are preserved as historical inputs; still-relevant open work is imported, and superseded work is documented.
+**Why:** Civica currently has many overlapping plans, which makes progress and authority difficult to establish.
+
+### APR-D013 — Behavior and public methodology change together
+
+**Decision:** Any change to scoring, classification, sources, cadence, uncertainty, missingness, routes, or release status must update all public and operational documentation in the same task.
+**Why:** A research reference cannot tolerate code, data, and published methodology describing different systems.
+
+### APR-D014 — Credit-aware worker routing
+
+**Decision:** Primary Codex performs routine implementation and verification locally. Do not spawn Sol-class Codex subagents for ordinary work. Use Luna/Terra only for bounded, low-context lanes when the available tool can actually guarantee that model choice; otherwise do the work in the primary session. Fable 5 remains the key decision-maker for consequential visual/product design choices. Claude Sonnet or Opus may handle bounded routine critique or research. No paid API fallback is authorized.
+**Why:** The planning audit consumed roughly 60% of the owner's available OpenAI session credits; uncontrolled high-reasoning fan-out is unsustainable and unnecessary for sequential implementation.

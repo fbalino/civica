@@ -30,7 +30,11 @@ Domain: `civicaatlas.org`.
 - **Academic legitimacy matters.** The Bjornskov-Rode / CGV regime taxonomy and BR/CGV attribution is already integrated — keep it prominent.
 
 ## Active plan
-Consult `plan/civica-feature-roadmap-2026-06-30.md` for the current sequenced roadmap — it maps the remaining `mockups/` ideas onto the `/country/[slug]` 3-tab IA and the standalone surfaces (Atlas, Civica Index leaderboard, Compare, Elections, embed), in build-order waves.
+The active source of execution truth is `plan/MASTER-CHECKLIST.md`, governed by
+`plan/00-mission-and-operating-rules.md`; the plain-language owner view is
+`plan/MASTER-PLAN-OVERVIEW.md`. The 2026-06-30 feature roadmap and other dated
+plans are historical inputs: preserve them, but do not execute an unchecked item
+unless it has been imported into the master checklist with a stable task ID.
 
 ## Tech Stack
 - **Next.js 16.2** (App Router, Turbopack, React 19.2)

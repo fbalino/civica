@@ -1,19 +1,57 @@
 # Project Memory Decisions
 
+## 2026-07-09 — Atlas-first academic publication readiness (owner decision)
+
+Civica Atlas is primarily a trusted, provenance-first comparative reference to
+how every country is governed. The atlas, structured institutional data,
+source trail, and reconciliation are the flagship. The Civica Index and Pulse
+are secondary research experiments and must earn stronger claims through the
+gated program in `plan/MASTER-CHECKLIST.md`.
+
+Locked direction:
+
+- Remove A–F country grading and judgmental country bands from the target
+  product.
+- Run a preregistered Index tournament against simple baselines, a source-native
+  Governance Evidence Dashboard, and genuinely Civica-native candidates. The
+  process may redesign, demote, or retire the current composite; no candidate is
+  guaranteed to win.
+- Pulse becomes a versioned governance-event ledger first. Numeric governance
+  deltas remain experimental unless prospective, representative, human-anchored
+  validation supports a separate signal.
+- Complete all feasible agent/code/data/documentation/browser work before
+  soliciting qualified external reviewers. Human review remains a publication
+  gate and is not replaced by model consensus.
+- The working positioning is: “Civica Atlas is a provenance-first comparative
+  reference to how every country is governed.”
+- Reviewer discovery, advisory-board repair, release/DOI work, brand/legal
+  review, and outreach are in the master plan; contact waits for the G4
+  agent-complete gate.
+- A rename remains available if professional trademark/confusion review shows
+  material risk. No rename is presumed.
+
+`plan/DECISIONS.md` is the detailed decision record. This entry supersedes any
+older memory that treats the Index/Pulse as required headline products, treats
+ensemble agreement as validation, or says Pulse is paused.
+
 ## 2026-07-05 — Pulse classifier: CROSS-MODEL ENSEMBLE (owner decision; supersedes both the 3-temperature scheme and the brief single-engine plan)
 
 The classify pass runs once each on THREE heterogeneous engines (DeepSeek
 v4-flash, GLM, Haiku 4.5; optional 4th voter gpt-4.1-mini when an OpenAI key
 exists) — the owner's own proposal, and stronger than the retired
-same-model 3-temperature vote because cross-vendor errors are independent.
+same-model 3-temperature vote because the voters are more heterogeneous. Their
+errors are **not** assumed independent; shared prompts, sources, taxonomy, and
+training ecosystems can correlate them.
 Consensus maps onto the EXISTING published agreement semantics: 3/3 = 'all',
 2/3 = 'two_of_three' (+ adversarial verify pass on one engine), no majority =
 'none' → human-review queue. The verify pass is a SIGNAL, not a veto (owner
 loosened the gate same day): a refuted verify sends only WEAK majorities
 (low self-confidence or degraded runs) to review; severe tiers always review. IMPORTANT calibration rule the owner stated
 emphatically: his past manual approvals were smoke tests, NOT gold labels —
-never benchmark engines against "what Fernando approved before"; quality is
-measured by ensemble consensus rates + the review queue staying small. The
+never benchmark engines against "what Fernando approved before." Per the
+superseding 2026-07-09 decision, ensemble consensus and queue size are process
+diagnostics, not quality validation; representative independent human labels,
+retrieval/clustering tests, calibration, and subgroup results are required. The
 China-domiciled-model optics flag from the research doc is mitigated by
 design: no single vendor decides a label alone. Backtests stay on Anthropic.
 
