@@ -38,7 +38,7 @@ export async function getLatestMethodologyVersion(db: Db): Promise<string> {
     .limit(1);
   if (rows.length === 0) {
     throw new Error(
-      "No methodology version found. Run seed-ci-methodology first."
+      "No methodology version found. Run seed-ci-methodology first.",
     );
   }
   return rows[0].id;
@@ -56,7 +56,7 @@ export async function runIngestion(
      * seed script ran. Defaults to NOW() when omitted.
      */
     vintageAt?: Date;
-  }
+  },
 ): Promise<{ ingested: number; skipped: number }> {
   const iso3Map = await buildIso3Map(db);
   const methodologyVersion = await getLatestMethodologyVersion(db);
@@ -106,7 +106,7 @@ export async function runIngestion(
       record.rawValue,
       result.globalMinObserved,
       result.globalMaxObserved,
-      record.isInverted
+      record.isInverted,
     );
 
     await db
@@ -131,6 +131,7 @@ export async function runIngestion(
         set: {
           normalizedScore,
           rawValue: record.rawValue,
+          sourceId: result.sourceId,
           ingestionId: ingestion.id,
         },
       });

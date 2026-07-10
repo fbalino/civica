@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "readOnly": true,
+  "datasetYear": 2024,
+  "quarter": "2024-Q4",
+  "tolerance": {
+    "rowCount": "exact",
+    "rawValue": "absolute difference <= 1e-6; deterministic six-decimal SHA-256 checksum representation"
+  },
+  "inputSha256": {
+    "vdem": "bd6430d6b78785c7422acee7d75bef1b852f2ce1baa5f673ae40ffca64ffe51b",
+    "worldbankWgi": "25a2f9eabb90b0092973392c0b31571aa58b691cc5786292e504b52f693e1eb8",
+    "freedomHouse": "d6ac861af6e7dcea7e870e39ddbcd2925730a653c1466f8992a7d0005f53be88",
+    "transparencyCpi": "34d1c16eb3c5b04cad2cf116c852dfc4ab8144b1c66cb37c74011848639f5736"
+  },
+  "inputHashPass": true,
+  "freedomHouseUnmatchedCountryNames": [],
+  "rows": [
+    {"id":"vdem.democratic_quality","releaseRows":170,"liveRows":170,"semanticSha256":"292baff241a2ce58b03095fbe3b33d77cbae9334dc3fb317e9be3446203d1ae9","parsedOnlyIso3":[],"liveOnlyIso3":[],"valueMismatches":[],"pass":true},
+    {"id":"worldbank_wgi.democratic_quality_fallback","releaseRows":20,"liveRows":20,"semanticSha256":"e778f7e22e61bc5a27db7cd950c6460e2b6a518edf5c2d89024481f130fc9614","parsedOnlyIso3":[],"liveOnlyIso3":[],"valueMismatches":[],"pass":true},
+    {"id":"worldbank_wgi.rule_of_law","releaseRows":190,"liveRows":190,"semanticSha256":"d044d289579a6a783b7b1080882996fdd9c1f80db9658252305ad60787e75744","parsedOnlyIso3":[],"liveOnlyIso3":[],"valueMismatches":[],"pass":true},
+    {"id":"freedom_house.freedom_rights","releaseRows":190,"liveRows":190,"semanticSha256":"72fcf93f963760eb0b3d72e071f2613ded26035291dc2ac15e6329699dda35f5","parsedOnlyIso3":[],"liveOnlyIso3":[],"valueMismatches":[],"pass":true},
+    {"id":"transparency_intl.corruption_control","releaseRows":175,"liveRows":175,"semanticSha256":"f02decf8d360745d100581fa57a7c02f13668866ac0b1f3af6facf83d8d6a617","parsedOnlyIso3":[],"liveOnlyIso3":[],"valueMismatches":[],"pass":true}
+  ],
+  "pass": true
+}

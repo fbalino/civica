@@ -23,6 +23,7 @@
 # local artifacts from diagnostic runs / playwright
 /output/
 /test-results/
+/.firecrawl/
 
 # misc
 .DS_Store

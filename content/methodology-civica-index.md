@@ -41,18 +41,21 @@ Scores are integers, not decimals. The underlying data is not precise enough to 
 
 ## Section 3 · Normalization {#normalization}
 
-Every source uses a different native scale. Civica normalizes them to 0–100 using **fixed theoretical bounds** rather than observed minimums and maximums, so scores remain comparable across years and aren't shifted by changes elsewhere in the dataset. The current implementation is a hard-coded lookup table, one row per source actually ingested into the four headline dimensions — there is no fallback transform for a source outside this table; the dimension is simply skipped:
+Every source uses a different native scale. Civica normalizes them to 0–100 using **fixed theoretical bounds** rather than observed minimums and maximums, so scores remain comparable across years and aren't shifted by changes elsewhere in the dataset. The current implementation uses the explicit source paths below. A source outside this table is skipped rather than receiving an invented transform:
 
 [//]: # "GEN:START normalization-table (source: scripts/generate-ci-normalization-table.ts)"
 
 | Dimension | Source | Native scale | Transform to 0–100 |
 |---|---|---|---|
 | Democratic quality | V-Dem Liberal Democracy Index | 0.0 – 1.0 | score × 100 |
+| Democratic quality (coverage fallback) | World Bank WGI Voice & Accountability | −2.5 to +2.5 | ((score + 2.5) / 5.0) × 100 |
 | Rule of law | World Bank WGI Rule of Law | −2.5 to +2.5 | ((score + 2.5) / 5.0) × 100 |
 | Freedoms & rights | Freedom House (PR + CL, combined) | 2 – 14 (sum, inverted) | ((14 − score) / 12) × 100 |
 | Corruption control | Transparency International CPI | 0 – 100 | score (already on target scale) |
 
 [//]: # "GEN:END normalization-table"
+
+The frozen 2024-Q4 Beta release uses **World Bank WGI Voice & Accountability as a coverage fallback only where V-Dem has no democratic-quality row**. The stored row keeps `worldbank_wgi` as its source and uses WGI's fixed bounds. This is a construct substitution, not a claim that Voice & Accountability is equivalent to V-Dem's Liberal Democracy Index. It is a named limitation that must be tested in the later Index candidate tournament; readers comparing countries should inspect the source indicator rather than assume one uniform democratic-quality input.
 
 ## Section 4 · Weight determination {#weights}
 
@@ -87,7 +90,7 @@ Some inputs, including V-Dem, publish uncertainty information directly. For sour
 
 Different countries have different data coverage. Civica enforces three rules to handle missing data without distorting the score:
 
-- **Mandatory dimensions.** Democratic Quality and Rule of Law are required. If either is missing, no CI is published for that country — the page reads "Insufficient data for governance index" with an explanation of which dimensions are missing.
+- **Mandatory dimensions.** Democratic Quality and Rule of Law are required. Democratic Quality uses V-Dem when present and the disclosed WGI Voice & Accountability coverage fallback otherwise. If either mandatory dimension is still missing, no CI is published for that country — the page reads "Insufficient data for governance index" with an explanation of which dimensions are missing.
 - **Partial estimate.** If the mandatory dimensions are present but one of the others (Freedoms & Rights or Corruption Control) is missing, a partial estimate is published and flagged visually. The weights of the dimensions actually present are re-proportioned to carry the full composite weight, and the simulation range receives a fixed 20% widening; the widening is an explicit heuristic sensitivity adjustment, not a statistical confidence correction.
 - **Complete estimate.** All {{state.civicaIndex.dimensionCount}} dimensions present. No missing-dimension flag.
 

@@ -27,7 +27,7 @@ const EN_DASH = "–";
 const MINUS = "−";
 const TIMES = "×";
 
-/** The production source_id each headline CI dimension is ingested
+/** The primary production source_id each headline CI dimension is ingested
  *  from — mirrors the mapping documented in
  *  `src/lib/ci/__tests__/worked-examples.test.ts` ("production
  *  source_id actually written by each dimension's ingestion adapter").
@@ -142,12 +142,13 @@ function transformLabel(
 }
 
 /**
- * The four headline-dimension rows, in `V2_DIMENSIONS` order — the
- * same order the published methodology table and the running scorer
- * both use.
+ * The active source-transform rows. The deployed 2024-Q4 release uses WGI
+ * Voice & Accountability only where V-Dem has no row; keeping that
+ * substitution here prevents the public methodology from pretending every
+ * democratic-quality value is V-Dem.
  */
 export function getNormalizationTableRows(): readonly NormalizationTableRow[] {
-  return V2_DIMENSIONS.map((dimensionId) => {
+  const primary = V2_DIMENSIONS.map((dimensionId) => {
     const sourceId = HEADLINE_DIMENSION_SOURCE[dimensionId];
     const descriptor = normalizationDescriptor(sourceId);
     if (!descriptor) {
@@ -175,6 +176,30 @@ export function getNormalizationTableRows(): readonly NormalizationTableRow[] {
       ),
     };
   });
+  const descriptor = normalizationDescriptor("worldbank_wgi");
+  if (!descriptor) {
+    throw new Error("normalization-table: WGI fallback bounds are missing");
+  }
+  const display = SOURCE_DISPLAY.worldbank_wgi;
+  const fallback: NormalizationTableRow = {
+    dimensionId: "democratic_quality",
+    dimensionLabel: "Democratic quality (coverage fallback)",
+    sourceId: "worldbank_wgi",
+    sourceLabel: "World Bank WGI Voice & Accountability",
+    nativeScaleLabel: nativeScaleLabel(
+      descriptor.nativeMin,
+      descriptor.nativeMax,
+      display.decimals,
+      display.nativeScaleNote,
+    ),
+    transformLabel: transformLabel(
+      descriptor.nativeMin,
+      descriptor.nativeMax,
+      descriptor.isInverted,
+      display.decimals,
+    ),
+  };
+  return [primary[0], fallback, ...primary.slice(1)];
 }
 
 /** Render the rows as a GFM markdown table, matching the published

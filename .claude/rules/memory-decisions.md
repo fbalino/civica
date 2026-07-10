@@ -545,3 +545,14 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   remain public.
 - Never describe this as 40% of facts. DAT-005 owns statement/fact-key coverage
   across the dataset. Durable record: APR-D034 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Reproduce the Index before redesigning it
+
+- The frozen `2024-Q4` Beta Index has four dimensions and four publisher
+  inputs. Democratic Quality uses 170 V-Dem rows plus 20 separately attributed
+  WGI Voice & Accountability fallback rows.
+- Treat that fallback as an explicit construct substitution, never as V-Dem or
+  as an equivalent measure. Preserve it only to reproduce the frozen release;
+  the G3 tournament decides whether it has incremental value.
+- HDI and GPI are Conditions inputs, not current Index dimensions. Durable
+  record: APR-D035 in `plan/DECISIONS.md`.

@@ -131,7 +131,7 @@ Canonical npm scripts (in `package.json`):
 - `npm run db:generate` / `npm run db:push` — Drizzle migrations
 
 ## Civica Index pipeline (manual today; cron target in the plan)
-1. `tsx scripts/ingest-ci-all.ts` — runs all 6 dimension adapters (V-Dem, WGI, HDI, Freedom House, CPI, GPI)
+1. `tsx scripts/ingest-ci-all.ts` — runs the four current Beta dimensions: V-Dem primary democratic quality, the disclosed WGI Voice & Accountability coverage fallback, WGI Rule of Law, Freedom House, and Transparency CPI. HDI/GPI are Conditions inputs, not Index dimensions.
 2. `tsx scripts/calculate-ci-composite.ts` — computes composite scores and ranks
 3. For Pulse v2: `npm run pulse:v2:ingest` → `npm run pulse:v2:cluster` → `npm run pulse:v2:classify` → `npm run pulse:v2:score` (the score step corroborates first, then writes experimental per-dimension deltas)
 

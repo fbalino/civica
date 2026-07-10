@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-019_complete_next_DAT-001"
+    "current_task": "DAT-001_complete_next_DAT-002"
   },
   "budget": {
     "mode": "subscription_only",
@@ -535,6 +535,21 @@
       "session_id": "8d2be085-ad96-47e2-b851-71097c9095cc",
       "subscription_first": true,
       "ownership": "read-only independent CLM-018 acceptance review; ACCEPT_WITH_NONBLOCKING_NOTES, no blockers; all four optional notes folded before commit"
+    },
+    "sp53_dat001_inventory": {
+      "status": "completed_with_primary_rejection_of_filename_only_conclusion",
+      "provider": "codex-cli",
+      "model_requested": "gpt-5.3-codex-spark",
+      "model_used": "gpt-5.3-codex-spark",
+      "session_id": "019f4da7-ade7-7780-b1be-3c126257996c",
+      "subscription_first": true,
+      "usage": {
+        "input_tokens": 6689535,
+        "cached_input_tokens": 6390400,
+        "output_tokens": 30467,
+        "reasoning_tokens": 18833
+      },
+      "ownership": "bounded read-only production-adapter inventory; route inventory retained, filename-level adapter-completeness conclusion rejected by primary"
     }
   },
   "manifests": [],
@@ -578,6 +593,10 @@
     "plan/evidence/CLM-018/op48-final-acceptance-result.json",
     "plan/evidence/CLM-019/README.md",
     "plan/evidence/CLM-019/browser-checks.md",
+    "plan/evidence/DAT-001/README.md",
+    "plan/evidence/DAT-001/browser-checks.md",
+    "plan/evidence/DAT-001/ci-reproduction-result.json",
+    "plan/evidence/DAT-001/sp53-inventory.json",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -593,11 +612,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-019: sync-freshness, replication, editorial-illustration, all thirteen aggregate claims/documentation children, compilation, TypeScript, and 86 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "356/356 full-suite tests and 7/7 focused provenance fixtures passed with typecheck, targeted ESLint, design-token validation, diff checks, and a 320-file public-source provenance sweep. Master plan validates at 19/288 complete (6.6%).",
-    "public_claims": "41 claims cover 14/14 required surfaces across 7 canonical tiers; 47 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims. Compact renderer provenance is generated as 4/10 (40%) with six named exceptions.",
-    "browser": "Local desktop/mobile QA passed on methodology, About, home, rankings, API docs, Atlas, and the small embed; no horizontal overflow; six fresh isolated route loads were console-clean; coverage, exceptions, links, source dots, embed vintage, and rights metadata were present as applicable.",
-    "visual_review": "The methodology coverage disclosure and the small embed vintage were browser-proven and retained under plan/evidence/CLM-019/."
+    "build": "npm run build passed for DAT-001: production-adapter closure, sync freshness, replication, editorial illustration, all thirteen claims/documentation children, compilation, TypeScript, and route generation succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "365/365 claims/documentation tests and 9/9 focused production-source fixtures passed with typecheck, targeted ESLint, sync freshness across 667 files, exact publisher-input hashes, exact release row counts, and identical five-group semantic checksums. Master plan validates at 20/288 complete (6.9%).",
+    "public_claims": "Index methodology identifies the 20-row WGI Voice & Accountability coverage fallback as a construct substitution while preserving the four-dimension Beta Index and its later validation gate.",
+    "browser": "Local desktop and 390px mobile QA passed on the Index normalization methodology; the generated fallback row and disclosure were present with no horizontal overflow and HTTP 200.",
+    "visual_review": "The Index methodology visibly distinguishes the WGI fallback from V-Dem; browser evidence is retained under plan/evidence/DAT-001/."
   },
-  "updated_at": "2026-07-10T20:05:05Z"
+  "updated_at": "2026-07-10T23:45:00Z"
 }
