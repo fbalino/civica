@@ -487,6 +487,12 @@ export default async function CivicaIndexPage({
             </p>
           </section>
         )}
+        <footer className="ci-footer">
+          <Link href="/policies#corrections">Corrections policy</Link>
+          <Link href="/policies#retractions">Retraction policy</Link>
+          <Link href="/policies#versioning">Versioning policy</Link>
+          <Link href="/policies#known-limitations">Known limitations</Link>
+        </footer>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { getAllMetricDefinitionsWithCoverage } from "@/lib/db/queries";
 import { OutcomesExplorer } from "@/components/outcomes/OutcomesExplorer";
 import type { MetricOption } from "@/components/outcomes/OutcomesExplorer";
 import { withOg } from "@/lib/og";
+import { ResearchArtifactPolicyLinks } from "@/components/policy/ResearchArtifactPolicyLinks";
 
 export const revalidate = 3600;
 
@@ -111,13 +112,18 @@ export default async function CivicaConditionsPage() {
     metrics[0]?.latestYear ?? currentYear;
 
   return (
-    <Suspense fallback={<ExplorerFallback />}>
-      <OutcomesExplorer
-        metrics={metrics}
-        initialMetricId={firstMetricId}
-        initialYear={defaultYear}
-        pageVariant="civica-conditions"
-      />
-    </Suspense>
+    <>
+      <Suspense fallback={<ExplorerFallback />}>
+        <OutcomesExplorer
+          metrics={metrics}
+          initialMetricId={firstMetricId}
+          initialYear={defaultYear}
+          pageVariant="civica-conditions"
+        />
+      </Suspense>
+      <div className="editorial-page editorial-page--full">
+        <ResearchArtifactPolicyLinks anchors={["known-limitations", "corrections"]} />
+      </div>
+    </>
   );
 }

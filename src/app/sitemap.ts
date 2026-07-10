@@ -45,6 +45,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/civica-index/replication", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/widget", changeFrequency: "monthly", priority: 0.4 },
   { path: "/methodology", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/policies", changeFrequency: "monthly", priority: 0.5 },
   { path: "/methodology/approach", changeFrequency: "monthly", priority: 0.6 },
   { path: "/country/methodology/reconciliation", changeFrequency: "monthly", priority: 0.6 },
   { path: "/country/methodology/reconciliation/disputes", changeFrequency: "weekly", priority: 0.5 },

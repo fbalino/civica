@@ -596,6 +596,76 @@ const CLM_015_CONCEPTS: DocConcept[] = [
   },
 ];
 
+/* ────────────────────────────────────────────────────────────────
+ * Concepts — CLM-016 (correction / retraction / versioning /
+ * known-limitations policy)
+ * ──────────────────────────────────────────────────────────────── */
+
+const CLM_016_CONCEPTS: DocConcept[] = [
+  {
+    id: "policy-page",
+    title: "Correction / retraction / versioning / known-limitations policy",
+    owner: "CLM-016",
+    canonical: {
+      kind: "reader-markdown",
+      path: "content/policies.md",
+    },
+    relations: [
+      {
+        kind: "reader-tsx",
+        path: "src/app/(reader)/policies/page.tsx",
+        relationship: "interpolated",
+        note: "Thin public shell that renders the canonical markdown through <MarkdownContent>; SLA/version values are supplied from site-state.ts.",
+      },
+      {
+        kind: "source",
+        path: "src/lib/policy/research-artifacts.ts",
+        symbol: "RESEARCH_ARTIFACTS",
+        relationship: "contract-test",
+        note: "Closed registry of the six research artifacts that must link to /policies#<anchor>; scripts/validate-policy-surface.ts fails on a missing or unregistered artifact.",
+      },
+      {
+        kind: "source",
+        path: "src/lib/policy/correction-simulator.ts",
+        symbol: "simulateCorrection",
+        relationship: "contract-test",
+        note: "Pure correction/retraction/clarification simulator whose frozen fixtures are asserted equal to the OP48 contract §7.5 expected output by policy-surface.ts's simulator-drift check.",
+      },
+      ...[
+        "src/app/(reader)/civica-index/page.tsx",
+        "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
+        "src/app/(reader)/country/methodology/reconciliation/page.tsx",
+        "content/methodology-peer-grouping.md",
+        "content/methodology-pca-appendix.md",
+        "src/app/civica-conditions/page.tsx",
+      ].map<DocRelation>((path) => ({
+        kind: path.endsWith(".md") ? "reader-markdown" : "reader-tsx",
+        path,
+        relationship: "link-only",
+        note: "Registered research artifact — link-only mirror pointing at /policies#<anchor>; never restates policy body prose.",
+      })),
+      {
+        kind: "reader-tsx",
+        path: "src/app/(reader)/civica-index/corrections/page.tsx",
+        relationship: "link-only",
+        note: "Corrections intake form links /policies#corrections and /policies#data-api-corrections as the governing policy; the form/log remain the operational surface, not the policy source.",
+      },
+      {
+        kind: "reader-tsx",
+        path: "src/app/(reader)/methodology/page.tsx",
+        relationship: "link-only",
+        note: "Methodology hub indexes /policies alongside every other methodology page.",
+      },
+      {
+        kind: "readme",
+        path: "README.template.md",
+        relationship: "link-only",
+        note: "Mentions /policies in the methodology table, link only — no policy body duplicated.",
+      },
+    ],
+  },
+];
+
 export const DOC_CONCEPTS: DocConcept[] = [
   ...MIGRATED_CONCEPTS,
   ...ALREADY_SATISFIED_CONCEPTS,
@@ -604,6 +674,7 @@ export const DOC_CONCEPTS: DocConcept[] = [
   ...DEFERRED_CONCEPTS,
   ...CLM_014_CONCEPTS,
   ...CLM_015_CONCEPTS,
+  ...CLM_016_CONCEPTS,
 ];
 
 /* ────────────────────────────────────────────────────────────────

@@ -1741,6 +1741,10 @@ export default async function ReconciliationMethodologyPage() {
           Pulse methodology
         </Link>
         <Link href="/civica-index/corrections">Corrections form</Link>
+        <Link href="/policies#corrections">Corrections policy</Link>
+        <Link href="/policies#retractions">Retraction policy</Link>
+        <Link href="/policies#versioning">Versioning policy</Link>
+        <Link href="/policies#known-limitations">Known limitations</Link>
       </nav>
     </MethodologyLayout>
   );

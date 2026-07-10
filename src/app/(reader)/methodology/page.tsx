@@ -122,6 +122,20 @@ const SECTIONS: MethodologySection[] = [
       },
     ],
   },
+  {
+    id: "policies",
+    heading: "Policies",
+    intro:
+      "One correction, retraction, versioning, and known-limitations policy governs every research artifact above.",
+    entries: [
+      {
+        href: "/policies",
+        title: "Policies",
+        blurb:
+          "Severity classes and response targets, how retraction differs from correction and supersession, version-increment rules, historical preservation, API/data correction behavior, and notification posture.",
+      },
+    ],
+  },
   // Entry-less sections (BETA meaning, Not yet published) and the
   // Get-in-touch / page-lead prose moved to content/methodology-overview.md
   // and rendered via <MarkdownContent slice> below. The five sections
@@ -136,6 +150,7 @@ const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "scoring", label: "Civica Index" },
   { id: "pulse", label: "Civica Pulse" },
   { id: "peer-grouping", label: "Peer grouping" },
+  { id: "policies", label: "Policies" },
   { id: "beta-meaning", label: "BETA meaning" },
   { id: "not-yet-published", label: "Not yet published" },
   { id: "cite", label: "Cite this page" },

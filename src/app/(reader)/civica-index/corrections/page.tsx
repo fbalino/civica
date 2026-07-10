@@ -12,7 +12,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Corrections — Report a Civica Index Error",
-  description: `Report an error in the research-beta Civica Index or an experimental Pulse event classification. Every submission is logged publicly, with a target full disposition within ${disputeSla.fullDispositionDays} days.`,
+  description: `Report an error in the research-beta Civica Index or an experimental Pulse event classification. Public submissions appear in the corrections log; the best-effort full-disposition target is ${disputeSla.fullDispositionDays} days.`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/corrections" },
 };
 
@@ -140,7 +140,8 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         Every score in the Civica Index traces to a public data source.
         If you believe a value is wrong, a methodology decision is flawed,
         or a Pulse event has been misclassified, you can dispute it here.
-        All submissions are reviewed by the Civica team.
+        Submissions enter Civica&rsquo;s review queue. Public submissions
+        appear in the log below; privacy-requested submissions do not.
       </p>
 
       <Banner variant="info" className="corr-explainer">
@@ -216,11 +217,18 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         )}
 
         <p className="corr-resolution-note">
-          Resolution targets: initial response within{" "}
+          Best-effort targets: initial review in{" "}
           <strong>{disputeSla.initialResponseDays} days</strong>, full
-          disposition within{" "}
-          <strong>{disputeSla.fullDispositionDays} days</strong> of
-          submission.
+          disposition in{" "}
+          <strong>{disputeSla.fullDispositionDays} days</strong>. These are
+          calendar-day targets, not guaranteed response windows. This form
+          and log operate under Civica&rsquo;s{" "}
+          <Link href="/policies#corrections">corrections policy</Link>{" "}
+          (severity classes, response targets, and disposition types) and{" "}
+          <Link href="/policies#data-api-corrections">
+            data &amp; API correction policy
+          </Link>
+          .
         </p>
       </section>
     </EditorialPage>

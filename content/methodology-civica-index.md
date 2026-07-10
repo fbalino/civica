@@ -163,7 +163,7 @@ The full, generated endpoint list — Civica Index rankings/compare/history/meth
 
 ### 13.2 · Disputes & corrections
 
-Every score is open to dispute. Submit data-error corrections, methodology disagreements, or Pulse event misclassifications at [/civica-index/corrections](/civica-index/corrections). Resolution targets: {{state.disputeSla.initialResponseDays}} days initial response, {{state.disputeSla.fullDispositionDays}} days full disposition. Every dispute and outcome is logged publicly.
+Every score is open to dispute. Submit data-error corrections, methodology disagreements, or Pulse event misclassifications at [/civica-index/corrections](/civica-index/corrections). Best-effort targets are {{state.disputeSla.initialResponseDays}} calendar days for initial review and {{state.disputeSla.fullDispositionDays}} calendar days for full disposition. Public submissions can be followed in the corrections log; privacy-requested submissions are omitted. The governing rules are in the [corrections and versioning policy](/policies#corrections).
 
 ### 13.3 · Replication
 

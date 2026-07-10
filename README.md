@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: 7ba6710c8e1ff53c234e54615176a326a18542b2917e06ecd3295826d916e8de
-  Generated body SHA-256: d8d96315535084b3a32c232b504fc13809c99adb4bfcbf0ef8f833b2c93e1bb6
+  Template SHA-256: 0f3cec9646ab791e0df766369733f3cc1e4a96ffd32e671c78e864d058f5f9f1
+  Generated body SHA-256: 3552dd249030fb281b90866762dda23fa9d8a631f12da0b649c1ba900ee5a9bd
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -122,6 +122,7 @@ Public methodology pages (in approximate read order):
 | Civica Pulse — event classification + experimental effects | `/civica-index/methodology/pulse` |
 | Civica Pulse — archived diagnostic smoke test | `/civica-index/methodology/pulse/backtest` |
 | Peer grouping — V-Dem RoW, World Bank region/income, regime classification | `/civica-index/methodology/peer-grouping` |
+| Policies — corrections, retractions, versioning, known limitations | `/policies` |
 
 Internal methodology resolution documents (audit trail, eventually published) cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, and more. Public publication of these resolutions is a v1.x deliverable.
 

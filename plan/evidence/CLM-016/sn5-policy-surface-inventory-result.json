@@ -1,0 +1,42 @@
+{
+  "status": "completed",
+  "provider": "claude-code",
+  "model_requested": "claude-sonnet-5",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 12817,
+      "outputTokens": 10444,
+      "cacheReadInputTokens": 1108679,
+      "cacheCreationInputTokens": 76080,
+      "webSearchRequests": 0,
+      "costUSD": 0.9841947000000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000
+    }
+  },
+  "session_id": "f4b37660-efa3-4220-91ba-4b9ece46bb09",
+  "subscription_first": true,
+  "result": {
+    "status": "completed",
+    "summary": "Wrote CLM-016 policy-surface inventory report at plan/evidence/CLM-016/sn5-policy-surface-inventory.md covering current corrections/dispute infrastructure (correction_log, data_disputes, fact_snapshots, data_facts_audit_log, disputeSla, Pulse known-limitations section), the bounded list of research artifacts needing policy links, a no-DB-write simulation fixture design, the pulse_changelog naming trap, and recommended owned vs. untouched files with objective acceptance checks.",
+    "artifacts": [
+      "plan/evidence/CLM-016/sn5-policy-surface-inventory.md"
+    ],
+    "changed_files": [
+      "plan/evidence/CLM-016/sn5-policy-surface-inventory.md"
+    ],
+    "commands_run": [
+      "grep -rli correction/retraction/errata across src,content",
+      "grep schema.ts for correctionLog, dataDisputes, factSnapshots, dataFactsAuditLog, pulseChangelog",
+      "ls content/*.md",
+      "grep site-state.ts for disputeSla/version fields",
+      "read corrections page/route, admin data-disputes page, footer, doc-concepts.ts header"
+    ],
+    "verification": "Report content cross-checked directly against schema.ts, route.ts, page.tsx, SiteFooter.tsx, site-state.ts, and content/*.md via grep/read; no application or plan files other than the owned report were modified; no browser/DB/tests run per constraints.",
+    "needs_user": false,
+    "next_action": "Hand report to the CLM-016 implementer to design the policy page, doc-concepts registration, and simulated-correction test per \u00a75/\u00a76."
+  },
+  "duration_ms": 136760,
+  "num_turns": 28,
+  "returncode": 0
+}

@@ -1,0 +1,39 @@
+{
+  "status": "completed",
+  "provider": "claude-code",
+  "model_requested": "claude-opus-4-8",
+  "model_usage": {
+    "claude-opus-4-8": {
+      "inputTokens": 12581,
+      "outputTokens": 18484,
+      "cacheReadInputTokens": 707892,
+      "cacheCreationInputTokens": 125184,
+      "webSearchRequests": 0,
+      "costUSD": 2.130791,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000
+    }
+  },
+  "session_id": "16475c5d-bbd5-4a2c-aed8-9f39cb06a7b1",
+  "subscription_first": true,
+  "result": {
+    "status": "completed",
+    "summary": "Wrote the CLM-016 correction/retraction/version/known-limitations policy and acceptance contract, adjudicating a single canonical /policies location with link-only mirrors, policy severity classes with anti-overpromise targets sourced from existing disputeSla, precise correction/retraction/supersession/clarification/version-change distinctions with their markers, historical-preservation/API-correction/notification rules, a closed mechanically-registered RESEARCH_ARTIFACTS set, a pure DB-free simulated-correction fixture with exact changelog/supersession/release-note outputs, fail-closed validator rules with FP/FN fixtures, and explicit deferred boundaries. Ends with a file-by-file implementation map and an ACCEPT/REJECT checklist.",
+    "artifacts": [
+      "plan/evidence/CLM-016/op48-policy-contract.md"
+    ],
+    "changed_files": [
+      "plan/evidence/CLM-016/op48-policy-contract.md"
+    ],
+    "commands_run": [
+      "ls plan/evidence/CLM-016/ and find src/app for correction/dispute routes",
+      "grep for policy mentions, version/revision schema tables, reader routes"
+    ],
+    "verification": "Contract-only task; no application/plan code changed, so no validators/tests were run. Contract is internally cross-checked against the current repo anchors it cites (correction_log enum, disputeSla, claim-tiers, doc-concepts, replication-surface pattern, site-state version fields) which were read directly. Simulated-correction fixture and expected outputs are specified for a later build task to assert via a pure test.",
+    "needs_user": false,
+    "next_action": "Owner/build task can implement the file-by-file map in \u00a712 (new /policies page, correction-simulator.ts, policy-surface.ts, research-artifacts.ts, validator + fixtures) and register the four institutional-posture claims and the policy-page doc concept, then run validate:policy-surface + the standard validator/test/build sweep."
+  },
+  "duration_ms": 274591,
+  "num_turns": 16,
+  "returncode": 0
+}

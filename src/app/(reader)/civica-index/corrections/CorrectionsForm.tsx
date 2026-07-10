@@ -84,7 +84,7 @@ export function CorrectionsForm({ countries, submitted }: Props) {
   if (done) {
     return (
       <div className="corr-success-banner">
-        <strong>Submission received.</strong> We&rsquo;ll send an initial response within {disputeSla.initialResponseDays} days.
+        <strong>Submission received.</strong> The best-effort initial-review target is {disputeSla.initialResponseDays} calendar days; it is not a guaranteed response window.
         Thank you for helping improve the Civica Index.
       </div>
     );

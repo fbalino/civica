@@ -123,6 +123,7 @@ Public methodology pages (in approximate read order):
 | Civica Pulse — event classification + experimental effects | `/civica-index/methodology/pulse` |
 | Civica Pulse — archived diagnostic smoke test | `/civica-index/methodology/pulse/backtest` |
 | Peer grouping — V-Dem RoW, World Bank region/income, regime classification | `/civica-index/methodology/peer-grouping` |
+| Policies — corrections, retractions, versioning, known limitations | `/policies` |
 
 Internal methodology resolution documents (audit trail, eventually published) cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, and more. Public publication of these resolutions is a v1.x deliverable.
 

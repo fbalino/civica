@@ -120,9 +120,13 @@ Every external classification is pinned to a specific upstream vintage. The curr
 - **government_form_description currency.** CIA Factbook is frozen January 2026. Constitutional changes after that date are not reflected in the description until an alternative source pipeline is wired up. The field is descriptive metadata, not analytical taxonomy, so this staleness is bounded in impact.
 - **Single-lens defaults.** Each domain has one default peer lens. Power users may want to compose lenses ("electoral democracies in Sub-Saharan Africa") for finer-grained comparisons. Compound peer sets are not in v1.0; they are an explicit deferred enhancement.
 
+See the site-wide [known-limitations policy](/policies#known-limitations) for how this section relates to every other Civica research artifact.
+
 ## Versioning + changelog {#versioning}
 
 - **Current version:** {{state.peerGrouping.version}}, dated {{state.peerGrouping.adoptedAt}}. External review by a comparative-politics scholar is pending. Material changes to the lens definitions, minimum-n rule, fallback chain, or source vintages create a new methodology version.
+
+Version increments, retractions, and corrections to this page follow the site-wide [versioning policy](/policies#versioning).
 
 ## References {#references}
 

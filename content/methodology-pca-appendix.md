@@ -63,6 +63,8 @@ The methodology spec considers adding a fifth dimension — *Administrative Capa
 
 **No source-substitution sensitivity test.** The spec calls for swapping each primary source with its secondary (e.g., V-Dem Liberal Democracy → V-Dem Polyarchy) and confirming rank stability. This requires the secondary sources to be ingested in parallel. Deferred to the same follow-up.
 
+See the site-wide [known-limitations policy](/policies#known-limitations) for how this section relates to every other Civica research artifact, and the [versioning policy](/policies#versioning) for how a re-run of this analysis would be published.
+
 ## Section 8 · Reproducing this analysis {#reproduction}
 
 The full Python pipeline that produced these numbers is checked into the repository at `analysis/phase-5-3/run_pca.py`. It pulls directly from the production database, applies the same fixed-bound normalization documented in the main methodology, runs PCA via scikit-learn, and writes:

@@ -1,5 +1,16 @@
 # Project Memory Decisions
 
+## 2026-07-10 — Publication policy distinguishes rules from shipped machinery
+
+`content/policies.md` is the canonical correction, retraction, supersession,
+versioning, limitations, preservation, API/data, and notification policy. Six
+research artifacts are registered link-only mirrors. Current public intake and
+logging must not be described as an automated release/archive system: there is
+no frozen public package, universal historical API, automated release-note job,
+or subscriber notification today. Run `npm run validate:policy-surface` after
+changing policy prose, artifact links, or the simulator. Durable record:
+APR-D031 in `plan/DECISIONS.md`.
+
 ## 2026-07-10 — Research terminology is an executable contract
 
 The 14 normative research definitions live only in

@@ -1,0 +1,44 @@
+{
+  "status": "completed",
+  "provider": "claude-code",
+  "model_requested": "claude-opus-4-8",
+  "model_usage": {
+    "claude-opus-4-8": {
+      "inputTokens": 2440,
+      "outputTokens": 9000,
+      "cacheReadInputTokens": 1644116,
+      "cacheCreationInputTokens": 165661,
+      "webSearchRequests": 0,
+      "costUSD": 2.7158680000000004,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000
+    }
+  },
+  "session_id": "16475c5d-bbd5-4a2c-aed8-9f39cb06a7b1",
+  "subscription_first": true,
+  "result": {
+    "status": "completed",
+    "summary": "Verdict: ACCEPT\n\nBlocking findings: None\n\nCLM-016 acceptance review of the uncommitted diff against plan/evidence/CLM-016/op48-policy-contract.md. Every contract requirement is met and mechanically enforced:\n\n- One canonical policy with honest boundaries: content/policies.md (rendered at /policies via a thin MethodologyLayout shell, src/app/(reader)/policies/page.tsx:38-101 \u2014 the DESIGN.md sectioned-document layout, no per-page style, values from site-state/PUBLICATION_POLICY_META). Five current-capability boundaries are explicitly stated AND validator-required (policy-surface.ts:215-233): no automated correction-publication job, no frozen public release package, no versioned API endpoint, no email list, privacy-omitted-but-retained log.\n- Exact definitions/severity/response/preservation/API/notification/version rules: five dispositions (policies.md:33-43), four policy severity classes with targets interpolated from disputeSla (policies.md:58-68), preservation/tombstone rules (85-104,151-156), API behavior incl. untouched source-freshness (158-175), notification posture (177-190), MAJOR/MINOR/PATCH increments (106-134). Policy severity is kept explicitly distinct from the reconciliation numeric buckets.\n- Closed six-artifact reciprocal links: RESEARCH_ARTIFACTS is a closed set with REQUIRED_ARTIFACT_IDS reciprocity (research-artifacts.ts:56-133); grep confirmed all six pages link their required /policies#anchors (Index, Pulse, reconciliation, peer-grouping, pca-appendix link directly; civica-conditions via <ResearchArtifactPolicyLinks anchors={[\"known-limitations\",\"corrections\"]}/>), and /policies#known-limitations links back to all six (policies.md:144-149).\n- Pure correction/retraction/clarification outputs: simulateCorrection (correction-simulator.ts) is DB-free and clock-free; FIXTURE_CORRECTION/RETRACTION/CLARIFICATION match the contract \u00a77.5 shapes exactly \u2014 retraction yields a same-version tombstone with retractedAt and supersedes:null, clarification yields no supersession and no version bump.\n- Fail-closed, FP-resistant validation: scripts/validate-policy-surface.ts is wired into the build chain (package.json:7) and exits non-zero on any issue; 12 issue codes; interpolation-marker stripping prevents interpolated SLA/version values from false-tripping.\n- No unsupported guarantee / no migration theater: overpromise-staffing, overpromise-notification, and migration-theater scanners plus explicit \"best-effort, not a staffed SLA\" language (policies.md:65-68, page.tsx:63-72).\n- Coherent registries/build: 4 institutional-posture policy claims registered in public-claims.ts; policy-page concept registered in doc-concepts.ts with canonical content/policies.md + link-only shell.\n\nVerification run (all green): npm run validate:policy-surface (PASS, 6 artifacts, 8/8 mirrors); npx tsx --test on both policy test files (21/21 pass, incl. clean-fixture true-negative, FN guards for missing link/duplicated prose/overpromise/migration-theater/missing-boundary/simulator-mutation, and FP guards for the word \"correction\", interpolated 30 days, interpolated version, and the noun \"limitation\"); validate:content-templates (policies.md interpolations resolve cleanly); validate:public-claims (0 unregistered/leaks); validate:doc-sources (6 anchors + 100 cross-links, 0 broken).\n\nNon-blocking notes (max 4):\n1. ResearchArtifact.versionSource is documented as informational-only (not validator-enforced); civica-index points at civicaIndex.status / civicaIndex.pca (status/object, not a literal version string) \u2014 acceptable but slightly loose vs the other four.\n2. hardcoded-sla/hardcoded-version scanners run only over content/policies.md, not the TSX shell; the shell is safe because it reads site-state/PUBLICATION_POLICY_META, but a future hardcode directly in page.tsx wouldn't be caught by THIS validator (design-token/content-template guards give partial coverage).\n3. The migration-theater scanner allows the policy's legitimate \"was wrong\" phrasing (it keys on \"was broken\"/\"now fixed\"/\"used to\"/\"previously wrong\") \u2014 intentional and correct, but the two phrase families sit close together.\n4. Extra #deferred and #cite sections are (correctly) outside the required POLICY_ANCHORS set \u2014 no issue, noted for completeness.\n\nCommands actually run: git status --short; git diff --stat/-- on the diff; grep over the six artifact surfaces and registry diffs; npm run validate:policy-surface; npx tsx --test src/lib/policy/__tests__/{correction-simulator,policy-surface}.test.ts; npm run validate:content-templates; npm run validate:public-claims; npm run validate:doc-sources.",
+    "artifacts": [
+      "plan/evidence/CLM-016/op48-policy-contract.md"
+    ],
+    "changed_files": [],
+    "commands_run": [
+      "git status --short",
+      "git diff --stat HEAD",
+      "git diff src/lib/claims/public-claims.ts src/lib/docs/doc-concepts.ts",
+      "grep -roE policy links across the six artifact surfaces",
+      "npm run validate:policy-surface",
+      "npx tsx --test src/lib/policy/__tests__/correction-simulator.test.ts src/lib/policy/__tests__/policy-surface.test.ts",
+      "npm run validate:content-templates",
+      "npm run validate:public-claims",
+      "npm run validate:doc-sources"
+    ],
+    "verification": "Read all core policy files (research-artifacts.ts, correction-simulator.ts, policy-surface.ts, validate-policy-surface.ts, content/policies.md, policies/page.tsx, policy-surface.test.ts) and the six artifact link surfaces plus the public-claims/doc-concepts/methodology-mirror diffs. Ran the policy validator (PASS), both unit-test files (21/21 pass), and the content-template/public-claims/doc-sources validators (all pass). Simulator outputs verified equal to contract \u00a77.5 by the passing deep-equality tests. No browser/server used; no files edited.",
+    "needs_user": false,
+    "next_action": "Accept and commit the CLM-016 diff. Optional follow-ups (non-blocking): tighten ResearchArtifact.versionSource to point at literal version strings where one exists, and consider extending the hardcoded-sla/version scan to the /policies TSX shell for defense-in-depth."
+  },
+  "duration_ms": 167853,
+  "num_turns": 16,
+  "returncode": 0
+}

@@ -235,6 +235,90 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "policy.corrections",
+    surface: "methodology",
+    routeOrArtifact: "/policies#corrections",
+    exactClaim:
+      "A correction changes a published value or statement that was wrong, without withdrawing the artifact it appears in.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "content/policies.md",
+      "src/lib/policy/correction-simulator.ts",
+      "src/lib/policy/research-artifacts.ts",
+      "src/lib/content/site-state.ts",
+    ],
+    implementationOwner: "Atlas editorial and research methods (CLM-016)",
+    methodologyVersion: "policy-surface-v1",
+    gate: "G1",
+    source: {
+      path: "content/policies.md",
+      fragment:
+        "A **correction** changes a published value or statement that was wrong, without withdrawing the artifact it appears in.",
+    },
+  },
+  {
+    id: "policy.retractions",
+    surface: "methodology",
+    routeOrArtifact: "/policies#retractions",
+    exactClaim:
+      "For a frozen, versioned release, Civica's rule is that retraction creates a visible tombstone rather than deletion, while supersession links the old and new versions in both directions.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "content/policies.md",
+      "src/lib/policy/correction-simulator.ts",
+      "src/lib/policy/research-artifacts.ts",
+    ],
+    implementationOwner: "Atlas editorial and research methods (CLM-016)",
+    methodologyVersion: "policy-surface-v1",
+    gate: "G1",
+    source: {
+      path: "content/policies.md",
+      fragment:
+        "For a frozen, versioned release, Civica's rule is that retraction creates a visible tombstone rather than deletion, while supersession links the old and new versions in both directions.",
+    },
+  },
+  {
+    id: "policy.versioning",
+    surface: "methodology",
+    routeOrArtifact: "/policies#versioning",
+    exactClaim:
+      "For artifacts that expose a methodology version, this policy defines what each increment means without renaming existing fields.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "content/policies.md",
+      "src/lib/content/site-state.ts",
+      "src/lib/policy/research-artifacts.ts",
+    ],
+    implementationOwner: "Atlas editorial and research methods (CLM-016)",
+    methodologyVersion: "policy-surface-v1",
+    gate: "G1",
+    source: {
+      path: "content/policies.md",
+      fragment:
+        "For those that do, this policy defines what each increment means without renaming existing fields:",
+    },
+  },
+  {
+    id: "policy.known-limitations",
+    surface: "methodology",
+    routeOrArtifact: "/policies#known-limitations",
+    exactClaim:
+      "The policy links the six registered research artifacts to the most specific limitations or methodology disclosure currently available.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "content/policies.md",
+      "src/lib/policy/research-artifacts.ts",
+    ],
+    implementationOwner: "Atlas editorial and research methods (CLM-016)",
+    methodologyVersion: "policy-surface-v1",
+    gate: "G1",
+    source: {
+      path: "content/policies.md",
+      fragment:
+        "It links the six registered research artifacts to the most specific limitations or methodology disclosure currently available.",
+    },
+  },
+  {
     id: "about.atlas-positioning",
     surface: "about",
     routeOrArtifact: "/about",

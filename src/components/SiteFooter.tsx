@@ -89,6 +89,7 @@ const FOOTER_COLUMNS: FooterColumn[] = [
         label: "Peer Grouping",
         href: "/civica-index/methodology/peer-grouping",
       },
+      { label: "Policies", href: "/policies" },
       { label: "The Record (Blog)", href: "/blog" },
       { label: "API Docs", href: "/api-docs" },
     ],

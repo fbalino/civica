@@ -145,6 +145,7 @@ const CTX_ALLOWLIST: Record<string, readonly string[]> = {
     "corrLow",
     "corrHigh",
   ],
+  "content/policies.md": [],
 };
 
 /** Files in `content/` that haven't yet been migrated to runtime

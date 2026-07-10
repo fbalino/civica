@@ -274,4 +274,4 @@ Country pages flagged by the provisional press-context lookup surface this cavea
 
 ## Corrections and disputes {#corrections}
 
-File a Pulse dispute via the [corrections form](/civica-index/corrections). Pulse-specific dispute categories include event misclassification, severity miscalibration, false positives, missing events, and duplicate events. Each dispute is logged publicly with its disposition and outcome. Resolution target: {{state.disputeSla.initialResponseDays}} days initial response, {{state.disputeSla.fullDispositionDays}} days full disposition.
+File a Pulse dispute via the [corrections form](/civica-index/corrections). Pulse-specific dispute categories include event misclassification, severity miscalibration, false positives, missing events, and duplicate events. Public submissions can be followed in the corrections log; privacy-requested submissions are omitted. Best-effort targets are {{state.disputeSla.initialResponseDays}} calendar days for initial review and {{state.disputeSla.fullDispositionDays}} calendar days for full disposition. The governing rules are in the [corrections policy](/policies#corrections).
