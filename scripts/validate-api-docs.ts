@@ -42,7 +42,10 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
-import { API_ROUTES, type RouteContract } from "../src/lib/api/contract/registry";
+import {
+  API_ROUTES,
+  type RouteContract,
+} from "../src/lib/api/contract/registry";
 
 const ROOT = process.cwd();
 const V1_DIR = path.join(ROOT, "src/app/api/v1");
@@ -91,11 +94,16 @@ export function filePathToPathTemplate(absOrRelRouteFile: string): string {
   const normalized = absOrRelRouteFile.replace(/\\/g, "/");
   const marker = "/src/app/";
   const idx = normalized.indexOf(marker);
-  const rel = idx >= 0 ? normalized.slice(idx + marker.length) : normalized.replace(/^src\/app\//, "");
+  const rel =
+    idx >= 0
+      ? normalized.slice(idx + marker.length)
+      : normalized.replace(/^src\/app\//, "");
   const withoutRoute = rel.replace(/\/route\.ts$/, "");
   const segments = withoutRoute
     .split("/")
-    .map((seg) => (seg.startsWith("[") && seg.endsWith("]") ? `:${seg.slice(1, -1)}` : seg));
+    .map((seg) =>
+      seg.startsWith("[") && seg.endsWith("]") ? `:${seg.slice(1, -1)}` : seg,
+    );
   return `/${segments.join("/")}`;
 }
 
@@ -109,7 +117,9 @@ export function findPhantomRoutes(
   liveV1Paths: Set<string>,
   registry: Pick<RouteContract, "versioned" | "pathTemplate">[],
 ): string[] {
-  const registryV1Paths = new Set(registry.filter((r) => r.versioned).map((r) => r.pathTemplate));
+  const registryV1Paths = new Set(
+    registry.filter((r) => r.versioned).map((r) => r.pathTemplate),
+  );
   return [...liveV1Paths].filter((p) => !registryV1Paths.has(p)).sort();
 }
 
@@ -134,7 +144,8 @@ async function checkInventory(report: Report): Promise<void> {
 
   const knownFiles = new Set<string>();
   for (const f of v1Files) knownFiles.add(path.relative(ROOT, f));
-  if (await fileExists(path.join(ROOT, EXPORT_ROUTE_FILE))) knownFiles.add(EXPORT_ROUTE_FILE);
+  if (await fileExists(path.join(ROOT, EXPORT_ROUTE_FILE)))
+    knownFiles.add(EXPORT_ROUTE_FILE);
 
   for (const id of findUncontractedEntries(API_ROUTES, knownFiles)) {
     const route = API_ROUTES.find((r) => r.id === id)!;
@@ -144,7 +155,9 @@ async function checkInventory(report: Report): Promise<void> {
   }
 
   if (!(await fileExists(path.join(ROOT, EXPORT_ROUTE_FILE)))) {
-    report.errors.push(`[inventory] expected bulk export route missing: ${EXPORT_ROUTE_FILE}`);
+    report.errors.push(
+      `[inventory] expected bulk export route missing: ${EXPORT_ROUTE_FILE}`,
+    );
   }
 
   report.info.push(
@@ -180,7 +193,9 @@ async function checkDocsCoverage(report: Report): Promise<void> {
           : ""),
     );
   }
-  report.info.push(`[docs-coverage] checked ${API_ROUTES.length} registry route(s) against ${API_DOCS_PAGE}`);
+  report.info.push(
+    `[docs-coverage] checked ${API_ROUTES.length} registry route(s) against ${API_DOCS_PAGE}`,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -219,9 +234,15 @@ export function diffParams(
 ): string[] {
   const errors: string[] = [];
   const queryRead = extractQueryParamsRead(source);
-  const pathRead = new Set([...extractPathParamsRead(source)].map((n) => `:${n}`));
-  const declaredQuery = new Set(declaredParams.filter((p) => p.in === "query").map((p) => p.name));
-  const declaredPath = new Set(declaredParams.filter((p) => p.in === "path").map((p) => p.name));
+  const pathRead = new Set(
+    [...extractPathParamsRead(source)].map((n) => `:${n}`),
+  );
+  const declaredQuery = new Set(
+    declaredParams.filter((p) => p.in === "query").map((p) => p.name),
+  );
+  const declaredPath = new Set(
+    declaredParams.filter((p) => p.in === "path").map((p) => p.name),
+  );
 
   for (const name of declaredQuery) {
     if (!queryRead.has(name)) {
@@ -257,9 +278,13 @@ export function diffParams(
 async function checkParamDrift(report: Report): Promise<void> {
   for (const route of API_ROUTES) {
     const source = await readFile(route.filePath);
-    report.errors.push(...diffParams(route.id, route.filePath, route.params, source));
+    report.errors.push(
+      ...diffParams(route.id, route.filePath, route.params, source),
+    );
   }
-  report.info.push(`[param-drift] checked ${API_ROUTES.length} route(s)' declared params against source`);
+  report.info.push(
+    `[param-drift] checked ${API_ROUTES.length} route(s)' declared params against source`,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -275,7 +300,9 @@ export function deprecationMismatch(
   hasDeprecationContract: boolean,
   source: string,
 ): string | null {
-  const usesDeprecationHelper = source.includes("withStructuralFamilyDeprecation");
+  const usesDeprecationHelper = source.includes(
+    "withStructuralFamilyDeprecation",
+  );
   if (hasDeprecationContract && !usesDeprecationHelper) {
     return `[deprecation] route "${routeId}" declares a deprecation contract but ${filePath} never calls withStructuralFamilyDeprecation`;
   }
@@ -292,7 +319,11 @@ export function deprecationScopeMismatch(
   source: string,
 ): string | null {
   if (appliesWhen === "always") {
-    if (!/if\s*\(rateLimited\)\s*return\s+withStructuralFamilyDeprecation\(rateLimited\)/.test(source)) {
+    if (
+      !/if\s*\(rateLimited\)\s*return\s+withStructuralFamilyDeprecation\(rateLimited\)/.test(
+        source,
+      )
+    ) {
       return `[deprecation] route "${routeId}" does not decorate its 429 rate-limit response in ${filePath}`;
     }
     return null;
@@ -310,7 +341,12 @@ export function deprecationScopeMismatch(
 async function checkDeprecationConsistency(report: Report): Promise<void> {
   for (const route of API_ROUTES) {
     const source = await readFile(route.filePath);
-    const mismatch = deprecationMismatch(route.id, route.filePath, route.deprecation !== null, source);
+    const mismatch = deprecationMismatch(
+      route.id,
+      route.filePath,
+      route.deprecation !== null,
+      source,
+    );
     if (mismatch) report.errors.push(mismatch);
     if (route.deprecation) {
       const scopeMismatch = deprecationScopeMismatch(
@@ -322,7 +358,9 @@ async function checkDeprecationConsistency(report: Report): Promise<void> {
       if (scopeMismatch) report.errors.push(scopeMismatch);
     }
   }
-  report.info.push(`[deprecation] checked ${API_ROUTES.length} route(s) for header/registry consistency`);
+  report.info.push(
+    `[deprecation] checked ${API_ROUTES.length} route(s) for header/registry consistency`,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -366,8 +404,22 @@ export function usesSharedCsvBuilder(source: string): boolean {
   return source.includes("buildCountryExportCsv");
 }
 
+export function isRightsBlockedExport(source: string): boolean {
+  return (
+    source.includes('evaluatePublicExport("country-export-json-csv"') &&
+    source.includes("status: 503") &&
+    !/Content-Disposition|attachment;/.test(source)
+  );
+}
+
 async function checkCsvContract(report: Report): Promise<void> {
   const source = await readFile(EXPORT_ROUTE_FILE);
+  if (isRightsBlockedExport(source)) {
+    report.info.push(
+      `[csv-contract] ${EXPORT_ROUTE_FILE} is withheld by the DAT-003 rights gate and emits no attachment`,
+    );
+    return;
+  }
   if (!usesSharedCsvBuilder(source)) {
     report.errors.push(
       `[csv-contract] ${EXPORT_ROUTE_FILE} no longer calls buildCountryExportCsv (contract/csv.ts) — the CSV header/citation format may have been re-inlined and can drift from the documented contract`,
@@ -378,8 +430,12 @@ async function checkCsvContract(report: Report): Promise<void> {
       `[csv-contract] ${EXPORT_ROUTE_FILE} contains a hand-typed CSV header string literal — it must come from COUNTRY_EXPORT_CSV_COLUMNS/COUNTRY_EXPORT_CSV_HEADER in contract/csv.ts instead`,
     );
   }
-  if (report.errors.filter((e) => e.startsWith("[csv-contract]")).length === 0) {
-    report.info.push(`[csv-contract] ${EXPORT_ROUTE_FILE} sources its CSV header/citation from contract/csv.ts`);
+  if (
+    report.errors.filter((e) => e.startsWith("[csv-contract]")).length === 0
+  ) {
+    report.info.push(
+      `[csv-contract] ${EXPORT_ROUTE_FILE} sources its CSV header/citation from contract/csv.ts`,
+    );
   }
 }
 
@@ -392,12 +448,16 @@ function assertNoDuplicateRegistryIds(report: Report): void {
   const seenPaths = new Set<string>();
   for (const route of API_ROUTES) {
     if (seenIds.has(route.id)) {
-      report.errors.push(`[registry] duplicate route id in contract/registry.ts: "${route.id}"`);
+      report.errors.push(
+        `[registry] duplicate route id in contract/registry.ts: "${route.id}"`,
+      );
     }
     seenIds.add(route.id);
     const key = `${route.method} ${route.pathTemplate}`;
     if (seenPaths.has(key)) {
-      report.errors.push(`[registry] duplicate path+method in contract/registry.ts: ${key}`);
+      report.errors.push(
+        `[registry] duplicate path+method in contract/registry.ts: ${key}`,
+      );
     }
     seenPaths.add(key);
   }
@@ -451,7 +511,8 @@ async function main(): Promise<void> {
 // imports this module's pure functions (findPhantomRoutes, diffParams,
 // etc.) for negative-fixture coverage and must not also trigger a full
 // validation run (with its own process.exit) as an import side effect.
-const isMainModule = process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
+const isMainModule =
+  process.argv[1] && import.meta.url === `file://${process.argv[1]}`;
 if (isMainModule) {
   main().catch((err) => {
     console.error(err);

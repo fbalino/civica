@@ -567,3 +567,15 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The frozen Index has four valid captures. The pre-G2 Atlas must continue to
   fail release generation until its remaining captures exist. Durable record:
   APR-D036 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Unverified reuse rights block public exports
+
+- `src/lib/rights/manifest.ts` is the canonical rights contract; its public
+  surfaces are `/licensing#rights-manifest` and `/api/rights-manifest`.
+- Only a verified source record may permit public export. Pending,
+  non-commercial, restricted, or unknown source terms fail closed.
+- The frozen Index artifact publishes input metadata and hashes only; it does
+  not redistribute publisher payloads.
+- The old mixed-source country JSON/CSV export stays withheld with HTTP 503
+  until DAT-017/DAT-027 ships a field-level rights-filtered replacement.
+- Durable record: APR-D037 in `plan/DECISIONS.md`.

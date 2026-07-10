@@ -22,7 +22,7 @@
  *   5. False affirmative complete-manifest claims anywhere in the swept set.
  *   6. Required public-claim linkage: the `/licensing` page markers
  *      (`licensing.mixed-rights`, `licensing.code-status`,
- *      `licensing.interim-registry`) are present, matching the
+ *      `licensing.rights-manifest`) are present, matching the
  *      PUBLIC_CLAIM comment convention used across the repo.
  *
  * False-positive guards live in the scanner itself (negation-awareness) and
@@ -236,7 +236,7 @@ async function main(): Promise<void> {
     "PUBLIC_CLAIM: licensing.mixed-rights",
     "PUBLIC_CLAIM: licensing.access-vs-reuse",
     "PUBLIC_CLAIM: licensing.code-status",
-    "PUBLIC_CLAIM: licensing.interim-registry",
+    "PUBLIC_CLAIM: licensing.rights-manifest",
     "PUBLIC_CLAIM: licensing.imagery-policy",
   ];
   if (licensingSource === null) {

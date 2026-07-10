@@ -1,18 +1,14 @@
 /**
- * CLM-018 — canonical interim current-rights registry.
+ * Canonical public rights policy and surface registry.
  *
  * This module is the single typed source for Civica's reuse-rights posture:
  * one canonical rights page, the access-vs-reuse boundary statement, code
- * rights (no root LICENSE file exists), the status of the future complete
- * release-rights manifest (owned by DAT-003, not this page), an explicitly
- * interim/incomplete artifact-class registry, and the set of public surfaces
+ * rights (no root LICENSE file exists), the DAT-003 machine-readable rights
+ * registry, an artifact-class summary, and the set of public surfaces
  * that must carry a rights pointer. `/licensing` renders from this registry;
  * `scripts/validate-rights-claims.ts` scans the required surfaces against it.
  *
- * Scope discipline: this is an interim, human-readable current-rights
- * registry, not a complete machine-readable source/field/product/release
- * rights manifest. DAT-003 owns that manifest and it has not shipped. Never
- * present this registry, or `/licensing`, as that manifest.
+ * Source/product/release enforcement lives in `src/lib/rights/manifest.ts`.
  */
 
 import { absoluteUrl } from "@/lib/site";
@@ -69,11 +65,11 @@ export interface ReleaseManifestStatus {
 }
 
 export const RELEASE_MANIFEST_STATUS: ReleaseManifestStatus = {
-  available: false,
+  available: true,
   owner: "DAT-003",
-  // PUBLIC_CLAIM: licensing.interim-registry
+  // PUBLIC_CLAIM: licensing.rights-manifest
   statement:
-    "Civica does not currently publish a complete, machine-readable rights manifest covering every source, field, product, and frozen release. This page is an interim, human-readable current-rights registry, not that manifest. The complete manifest is owned by DAT-003 and has not shipped.",
+    "Civica publishes a machine-readable rights registry for every production source, export product, field class, and checked release artifact. Unverified source terms remain marked pending and are blocked from public bulk export.",
 };
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -166,8 +162,10 @@ export const RIGHTS_ARTIFACT_CLASSES: readonly RightsArtifactClassRow[] = [
     scope: "AI-assisted country/territory hero illustrations.",
     currentPermissionPosture:
       "Display on Civica Atlas is authorized by Civica. No separate license is granted for third-party reuse; provenance and legal review is pending.",
-    governingBasis: "Civica's imagery policy at /licensing#imagery (unchanged by this registry).",
-    readerAction: "Contact the editors before reusing an engraving anywhere else.",
+    governingBasis:
+      "Civica's imagery policy at /licensing#imagery (unchanged by this registry).",
+    readerAction:
+      "Contact the editors before reusing an engraving anywhere else.",
   },
   {
     id: "frozen-releases",
@@ -175,10 +173,10 @@ export const RIGHTS_ARTIFACT_CLASSES: readonly RightsArtifactClassRow[] = [
     scope:
       "Any future frozen, versioned dataset release or archival snapshot of Civica's data.",
     currentPermissionPosture:
-      "No frozen release package is currently published. There is nothing to grant or restrict yet.",
+      "The checked 2024-Q4 Index input manifest contains provenance metadata and hashes only. No frozen Atlas data package or Index score dataset is published.",
     governingBasis: RELEASE_MANIFEST_STATUS.statement,
     readerAction:
-      "Do not cite or link to a 'frozen release' as if one currently exists; watch DAT-003 for the complete manifest.",
+      "Use the release-artifact registry below to distinguish distributable metadata from publisher files and data products that remain withheld.",
   },
 ];
 
@@ -199,7 +197,8 @@ export const REQUIRED_RIGHTS_SURFACE_IDS = [
   "citation-file",
 ] as const;
 
-export type RequiredRightsSurfaceId = (typeof REQUIRED_RIGHTS_SURFACE_IDS)[number];
+export type RequiredRightsSurfaceId =
+  (typeof REQUIRED_RIGHTS_SURFACE_IDS)[number];
 
 export interface RequiredRightsSurface {
   id: RequiredRightsSurfaceId;
@@ -298,10 +297,16 @@ function isNegated(text: string, index: number): boolean {
   return NEGATION_RE.test(preceding);
 }
 
-function scan(text: string, ruleId: string, patterns: readonly RegExp[]): RightsScanFinding[] {
+function scan(
+  text: string,
+  ruleId: string,
+  patterns: readonly RegExp[],
+): RightsScanFinding[] {
   const findings: RightsScanFinding[] = [];
   for (const pattern of patterns) {
-    const flags = pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`;
+    const flags = pattern.flags.includes("g")
+      ? pattern.flags
+      : `${pattern.flags}g`;
     const re = new RegExp(pattern.source, flags);
     let m: RegExpExecArray | null;
     while ((m = re.exec(text)) !== null) {
@@ -412,11 +417,17 @@ const COMPLETE_MANIFEST_CLAIM_PATTERNS: readonly RegExp[] = [
 
 /** False claims that the complete DAT-003 manifest already exists/ships. */
 export function findCompleteManifestClaims(text: string): RightsScanFinding[] {
-  return scan(text, "false-complete-manifest-claim", COMPLETE_MANIFEST_CLAIM_PATTERNS);
+  return scan(
+    text,
+    "false-complete-manifest-claim",
+    COMPLETE_MANIFEST_CLAIM_PATTERNS,
+  );
 }
 
 /** Runs every prohibited-language scanner over one text blob. */
-export function findAllProhibitedRightsLanguage(text: string): RightsScanFinding[] {
+export function findAllProhibitedRightsLanguage(
+  text: string,
+): RightsScanFinding[] {
   return [
     ...findBlanketOpenDataClaims(text),
     ...findCodeOpenSourceClaims(text),

@@ -11,6 +11,13 @@ import {
   RELEASE_MANIFEST_STATUS,
   ACCESS_VS_REUSE_BOUNDARY,
 } from "@/lib/claims/reuse-rights";
+import {
+  PRODUCT_RIGHTS,
+  RELEASE_ARTIFACT_RIGHTS,
+  RIGHTS_MANIFEST_PATH,
+  RIGHTS_MANIFEST_VERSION,
+  SOURCE_RIGHTS,
+} from "@/lib/rights/manifest";
 
 export const revalidate = 3600;
 
@@ -54,10 +61,92 @@ export default function LicensingPage() {
           in the registry below when point-of-use coverage is absent.
         </Banner>
 
-        <Banner variant="warn">
-          {/* PUBLIC_CLAIM: licensing.interim-registry */}
+        <Banner variant="info">
+          {/* PUBLIC_CLAIM: licensing.rights-manifest */}
           {RELEASE_MANIFEST_STATUS.statement}
         </Banner>
+      </section>
+
+      <section id="rights-manifest" className="editorial-section">
+        <SectionHeader
+          eyebrow={RIGHTS_MANIFEST_VERSION}
+          title="Source and export rights registry"
+          dek="Pending means the source stays out of public bulk downloads until its terms record is verified."
+        />
+
+        <p>
+          The same registry is available as{" "}
+          <a href={RIGHTS_MANIFEST_PATH}>machine-readable JSON</a>.
+        </p>
+
+        <DataTable>
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>License or status</th>
+              <th>Public export</th>
+              <th>Terms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SOURCE_RIGHTS.map((source) => (
+              <tr key={source.sourceId}>
+                <td>{source.sourceId}</td>
+                <td>
+                  {source.licenseId} · {source.reviewStatus}
+                </td>
+                <td>{source.publicExport}</td>
+                <td>
+                  <a href={source.termsUrl} target="_blank" rel="noopener noreferrer">
+                    Publisher terms
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </DataTable>
+
+        <SectionHeader eyebrow="Products" title="Bulk export decisions" />
+        <DataTable>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Status</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+            {PRODUCT_RIGHTS.map((product) => (
+              <tr key={product.productId}>
+                <td>{product.routeOrArtifact}</td>
+                <td>{product.publicBulkExport}</td>
+                <td>{product.reason}</td>
+              </tr>
+            ))}
+          </tbody>
+        </DataTable>
+
+        <SectionHeader eyebrow="Releases" title="Checked artifacts" />
+        <DataTable>
+          <thead>
+            <tr>
+              <th>Release</th>
+              <th>Artifact</th>
+              <th>Distributed</th>
+              <th>Excluded payloads</th>
+            </tr>
+          </thead>
+          <tbody>
+            {RELEASE_ARTIFACT_RIGHTS.map((artifact) => (
+              <tr key={`${artifact.releaseId}:${artifact.artifactPath}`}>
+                <td>{artifact.releaseId}</td>
+                <td>{artifact.artifactPath}</td>
+                <td>{artifact.publicDistribution}</td>
+                <td>{artifact.excludedSourcePayloads.join(", ")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </DataTable>
       </section>
 
       <section id="source-licenses" className="editorial-section">

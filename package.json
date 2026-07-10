@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
+    "build": "npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:rights-manifest && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -110,6 +110,7 @@
     "validate:policy-surface": "tsx scripts/validate-policy-surface.ts",
     "validate:claims-docs": "tsx scripts/validate-claims-docs.ts",
     "validate:rights-claims": "tsx scripts/validate-rights-claims.ts",
+    "validate:rights-manifest": "tsx scripts/validate-rights-manifest.ts",
     "validate:provenance-claims": "tsx scripts/validate-provenance-claims.ts",
     "crawl:metadata": "tsx scripts/crawl-public-metadata.ts",
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",

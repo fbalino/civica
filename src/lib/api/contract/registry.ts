@@ -20,12 +20,11 @@ import {
   STRUCTURAL_FAMILY_SUNSET_DATE_ISO,
   PEER_GROUPINGS_SUCCESSOR_HREF,
 } from "@/lib/api/deprecation";
-import { RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MS, CORS_HEADERS } from "@/lib/api/helpers";
 import {
-  EXPORT_RATE_LIMIT_MAX,
-  EXPORT_RATE_LIMIT_WINDOW_MS,
-} from "@/lib/api/contract/rate-limits";
-import { COUNTRY_EXPORT_CSV_COLUMNS } from "@/lib/api/contract/csv";
+  RATE_LIMIT_MAX,
+  RATE_LIMIT_WINDOW_MS,
+  CORS_HEADERS,
+} from "@/lib/api/helpers";
 
 export interface RouteParam {
   name: string;
@@ -99,12 +98,6 @@ const v1RateLimit: RateLimitContract = {
   scope: "per-ip",
 };
 
-const exportRateLimit: RateLimitContract = {
-  max: EXPORT_RATE_LIMIT_MAX,
-  windowMs: EXPORT_RATE_LIMIT_WINDOW_MS,
-  scope: "per-ip",
-};
-
 export const API_ROUTES: RouteContract[] = [
   {
     id: "countries",
@@ -116,7 +109,12 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Paginated list of sovereign states with basic metadata. Filter by continent or by a typed peer lens: region, income, V-Dem regime, CGV regime, or monarchy status.",
     params: [
-      { name: "continent", in: "query", type: "string", description: 'Filter by continent (e.g. "Africa", "Europe").' },
+      {
+        name: "continent",
+        in: "query",
+        type: "string",
+        description: 'Filter by continent (e.g. "Africa", "Europe").',
+      },
       {
         name: "taxonomy",
         in: "query",
@@ -131,8 +129,18 @@ export const API_ROUTES: RouteContract[] = [
         description:
           'Lens value. With taxonomy=region: "Sub-Saharan Africa". With taxonomy=vdem: "Liberal Democracy". With taxonomy=raw: partial match against the CIA prose. See /api/v1/peer-groupings for the full value list per lens.',
       },
-      { name: "limit", in: "query", type: "integer", description: "Results per page (default 50, max 250)." },
-      { name: "offset", in: "query", type: "integer", description: "Number of results to skip (default 0)." },
+      {
+        name: "limit",
+        in: "query",
+        type: "integer",
+        description: "Results per page (default 50, max 250).",
+      },
+      {
+        name: "offset",
+        in: "query",
+        type: "integer",
+        description: "Number of results to skip (default 0).",
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -151,7 +159,13 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Detailed government structure for a single country. Look up by slug, ISO 3166-1 alpha-2, or alpha-3 code.",
     params: [
-      { name: ":code", in: "path", type: "string", description: 'Country slug, ISO-2, or ISO-3 code (e.g. "us", "USA", "united-states").' },
+      {
+        name: ":code",
+        in: "path",
+        type: "string",
+        description:
+          'Country slug, ISO-2, or ISO-3 code (e.g. "us", "USA", "united-states").',
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -187,8 +201,18 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Latest research-beta Civica Index composite, Monte Carlo input-variation range, rank, completeness fields, and available dimension rows for one country. No categorical country grades.",
     params: [
-      { name: ":country_slug", in: "path", type: "string", description: 'Country slug, e.g. "france" or "united-states".' },
-      { name: "methodology", in: "query", type: "string", description: 'Optional methodology version. Defaults to "beta".' },
+      {
+        name: ":country_slug",
+        in: "path",
+        type: "string",
+        description: 'Country slug, e.g. "france" or "united-states".',
+      },
+      {
+        name: "methodology",
+        in: "query",
+        type: "string",
+        description: 'Optional methodology version. Defaults to "beta".',
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -207,7 +231,12 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Quarter-by-quarter Civica Index composite history for one country (beta methodology): quarter, score, rank, totalRanked, isPartial.",
     params: [
-      { name: ":country_slug", in: "path", type: "string", description: 'Country slug, e.g. "france".' },
+      {
+        name: ":country_slug",
+        in: "path",
+        type: "string",
+        description: 'Country slug, e.g. "france".',
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -226,7 +255,13 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Civica Index score distribution (count, avg/min/max/median, quartiles) grouped by government-type bucket, for the requested or latest quarter.",
     params: [
-      { name: "quarter", in: "query", type: "string", description: 'Optional quarter label such as "2026-Q1". Defaults to latest available.' },
+      {
+        name: "quarter",
+        in: "query",
+        type: "string",
+        description:
+          'Optional quarter label such as "2026-Q1". Defaults to latest available.',
+      },
       {
         name: "taxonomy",
         in: "query",
@@ -254,10 +289,23 @@ export const API_ROUTES: RouteContract[] = [
     pathTemplate: "/api/v1/index/compare",
     filePath: "src/app/api/v1/index/compare/route.ts",
     versioned: true,
-    summary: "Compares up to 10 countries on the Civica Index for a given quarter.",
+    summary:
+      "Compares up to 10 countries on the Civica Index for a given quarter.",
     params: [
-      { name: "slug", in: "query", type: "string[]", description: 'Repeatable country slug, e.g. "?slug=france&slug=germany". Required.' },
-      { name: "quarter", in: "query", type: "string", description: "Optional quarter. Defaults to each country's latest available comparison data." },
+      {
+        name: "slug",
+        in: "query",
+        type: "string[]",
+        description:
+          'Repeatable country slug, e.g. "?slug=france&slug=germany". Required.',
+      },
+      {
+        name: "quarter",
+        in: "query",
+        type: "string",
+        description:
+          "Optional quarter. Defaults to each country's latest available comparison data.",
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -273,9 +321,16 @@ export const API_ROUTES: RouteContract[] = [
     pathTemplate: "/api/v1/index/methodology",
     filePath: "src/app/api/v1/index/methodology/route.ts",
     versioned: true,
-    summary: "Published Civica Index methodology version record (weights, notes, publish date). Defaults to the latest version.",
+    summary:
+      "Published Civica Index methodology version record (weights, notes, publish date). Defaults to the latest version.",
     params: [
-      { name: "version", in: "query", type: "string", description: 'Optional methodology version id, e.g. "beta". Defaults to the most recently published version.' },
+      {
+        name: "version",
+        in: "query",
+        type: "string",
+        description:
+          'Optional methodology version id, e.g. "beta". Defaults to the most recently published version.',
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -294,19 +349,58 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Civica Index rankings for the latest available quarter, or a requested quarter. Pulse is not available as a scalar ranking.",
     params: [
-      { name: "quarter", in: "query", type: "string", description: 'Optional quarter label such as "2026-Q1". Defaults to latest available.' },
-      { name: "methodology", in: "query", type: "string", description: 'Methodology version. Defaults to "beta".' },
-      { name: "sort", in: "query", type: "string", description: 'Must be "ci" (the only supported value) or omitted; any other value returns 400.' },
-      { name: "continent", in: "query", type: "string", description: 'Filter by continent (e.g. "Europe").' },
+      {
+        name: "quarter",
+        in: "query",
+        type: "string",
+        description:
+          'Optional quarter label such as "2026-Q1". Defaults to latest available.',
+      },
+      {
+        name: "methodology",
+        in: "query",
+        type: "string",
+        description: 'Methodology version. Defaults to "beta".',
+      },
+      {
+        name: "sort",
+        in: "query",
+        type: "string",
+        description:
+          'Must be "ci" (the only supported value) or omitted; any other value returns 400.',
+      },
+      {
+        name: "continent",
+        in: "query",
+        type: "string",
+        description: 'Filter by continent (e.g. "Europe").',
+      },
       {
         name: "taxonomy",
         in: "query",
         type: "string",
-        description: "Filter lens. Accepts: raw | region | income | vdem | cgv | monarchy (plus the deprecated structural | regime).",
+        description:
+          "Filter lens. Accepts: raw | region | income | vdem | cgv | monarchy (plus the deprecated structural | regime).",
       },
-      { name: "government_type", in: "query", type: "string", description: "Lens value — see /api/v1/countries's parameter of the same name." },
-      { name: "limit", in: "query", type: "integer", description: "Pagination page size. Defaults to 50, caps at 250." },
-      { name: "offset", in: "query", type: "integer", description: "Pagination offset." },
+      {
+        name: "government_type",
+        in: "query",
+        type: "string",
+        description:
+          "Lens value — see /api/v1/countries's parameter of the same name.",
+      },
+      {
+        name: "limit",
+        in: "query",
+        type: "integer",
+        description: "Pagination page size. Defaults to 50, caps at 250.",
+      },
+      {
+        name: "offset",
+        in: "query",
+        type: "integer",
+        description: "Pagination offset.",
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -360,7 +454,12 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Public experimental per-dimension Pulse deltas for one country, their evidence qualifiers, and driving published events. No scalar Pulse score.",
     params: [
-      { name: ":country_slug", in: "path", type: "string", description: 'Country slug, e.g. "brazil".' },
+      {
+        name: ":country_slug",
+        in: "path",
+        type: "string",
+        description: 'Country slug, e.g. "brazil".',
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -379,7 +478,12 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Published and review-queued ledger rows for one country with source attribution, review state, and whether publication followed human review.",
     params: [
-      { name: ":country_slug", in: "path", type: "string", description: 'Country slug, e.g. "brazil".' },
+      {
+        name: ":country_slug",
+        in: "path",
+        type: "string",
+        description: 'Country slug, e.g. "brazil".',
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -398,13 +502,49 @@ export const API_ROUTES: RouteContract[] = [
     summary:
       "Pulse event ledger with category, dimension, severity, sources, publication origin, and review state. Not a stream of per-event deltas; includes mixed older classifier generations.",
     params: [
-      { name: "country", in: "query", type: "string", description: "Optional country slug filter." },
-      { name: "dimension", in: "query", type: "string", description: "Optional Pulse dimension filter." },
-      { name: "severity", in: "query", type: "string", description: "Optional severity tier filter." },
-      { name: "since", in: "query", type: "YYYY-MM-DD", description: "Only events on or after this date." },
-      { name: "published_only", in: "query", type: "0 | 1", description: "Set to 1 to exclude events still queued for human review." },
-      { name: "limit", in: "query", type: "integer", description: "Page size (default 50, max 250)." },
-      { name: "offset", in: "query", type: "integer", description: "Page offset." },
+      {
+        name: "country",
+        in: "query",
+        type: "string",
+        description: "Optional country slug filter.",
+      },
+      {
+        name: "dimension",
+        in: "query",
+        type: "string",
+        description: "Optional Pulse dimension filter.",
+      },
+      {
+        name: "severity",
+        in: "query",
+        type: "string",
+        description: "Optional severity tier filter.",
+      },
+      {
+        name: "since",
+        in: "query",
+        type: "YYYY-MM-DD",
+        description: "Only events on or after this date.",
+      },
+      {
+        name: "published_only",
+        in: "query",
+        type: "0 | 1",
+        description:
+          "Set to 1 to exclude events still queued for human review.",
+      },
+      {
+        name: "limit",
+        in: "query",
+        type: "integer",
+        description: "Page size (default 50, max 250).",
+      },
+      {
+        name: "offset",
+        in: "query",
+        type: "integer",
+        description: "Page offset.",
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -421,25 +561,19 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/countries/[slug]/export/route.ts",
     versioned: false,
     summary:
-      "Downloads the full reconciled record for a single country — flat summary fields, the complete fact list, and, in JSON, statement-level provenance for each canonical field.",
+      "Returns 503 while the former mixed-source country download is withheld for source/field rights closure. DAT-017/DAT-027 owns its rights-filtered replacement.",
     params: [
-      { name: ":slug", in: "path", type: "string", description: 'Country slug, e.g. "france" or "united-states".' },
       {
-        name: "format",
-        in: "query",
-        type: "json | csv",
-        description: `Response format. json returns flat fields (no "data" envelope — see below), the full fact list, and a per-fact provenance block. csv returns the fact list (columns: ${COUNTRY_EXPORT_CSV_COLUMNS.join(", ")}) with a self-describing citation comment header. Default: json.`,
+        name: ":slug",
+        in: "path",
+        type: "string",
+        description: 'Country slug, e.g. "france" or "united-states".',
       },
     ],
-    // Owner call (CLM-012): this route is NOT part of the /api/v1
-    // contract and intentionally keeps its own runtime behavior —
-    // flat JSON (no envelope), a CSV branch, no CORS headers, and its
-    // own 30 req/min/IP limiter. Document truthfully rather than
-    // normalize it to the /v1 shape.
     cors: false,
     corsHeaders: null,
-    rateLimit: exportRateLimit,
-    errorStatuses: [404, 429],
+    rateLimit: null,
+    errorStatuses: [503],
     deprecation: null,
     exampleId: "countryExport",
   },

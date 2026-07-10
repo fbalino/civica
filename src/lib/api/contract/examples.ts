@@ -16,7 +16,10 @@
  */
 
 import { createPulseRuntimeMethodSnapshot } from "@/lib/pulse/v2/runtime-contract";
-import { STRUCTURAL_FAMILY_META, REGIME_TYPE_META } from "@/lib/government-taxonomy";
+import {
+  STRUCTURAL_FAMILY_META,
+  REGIME_TYPE_META,
+} from "@/lib/government-taxonomy";
 import {
   zCountriesListResponse,
   zCountryDetailResponse,
@@ -32,7 +35,7 @@ import {
   zPulseDimensionsResponse,
   zPulseEventsResponse,
   zPulseChangelogResponse,
-  zCountryExportJson,
+  zCountryExportBlocked,
   type GovernmentClassificationShape,
 } from "./schemas";
 import {
@@ -53,12 +56,8 @@ import {
   shapePulseDimensionsData,
   shapePulseEventsData,
   shapePulseChangelogRow,
-  shapeCountryExportJson,
 } from "./shapes";
-import {
-  buildCountryExportCsv,
-  COUNTRY_EXPORT_CSV_HEADER,
-} from "./csv";
+import { COUNTRY_EXPORT_CSV_HEADER } from "./csv";
 
 /* ────────────────────────────────────────────────────────────────
  * Shared fixture pieces
@@ -82,7 +81,8 @@ const usaClassification: GovernmentClassificationShape = {
   structuralSubtype: "federal_presidential_republic",
   structuralSubtypeLabel: "Federal presidential republic",
   structuralColorVar: STRUCTURAL_FAMILY_META.presidential_republic.colorVar,
-  structuralColorFallback: STRUCTURAL_FAMILY_META.presidential_republic.fallback,
+  structuralColorFallback:
+    STRUCTURAL_FAMILY_META.presidential_republic.fallback,
   regimeColorVar: REGIME_TYPE_META.presidential_democracy.colorVar,
   regimeColorFallback: REGIME_TYPE_META.presidential_democracy.fallback,
   primitives: {
@@ -134,7 +134,8 @@ const norwayClassification: GovernmentClassificationShape = {
   structuralSubtype: "parliamentary_constitutional_monarchy",
   structuralSubtypeLabel: "Parliamentary constitutional monarchy",
   structuralColorVar: STRUCTURAL_FAMILY_META.constitutional_monarchy.colorVar,
-  structuralColorFallback: STRUCTURAL_FAMILY_META.constitutional_monarchy.fallback,
+  structuralColorFallback:
+    STRUCTURAL_FAMILY_META.constitutional_monarchy.fallback,
   regimeColorVar: REGIME_TYPE_META.parliamentary_democracy.colorVar,
   regimeColorFallback: REGIME_TYPE_META.parliamentary_democracy.fallback,
   primitives: {
@@ -223,7 +224,8 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
     worldBankIncomeGroup: "High income",
     vdemRow: "Liberal Democracy",
     monarchyStatus: "none",
-    governmentFormDescription: "Unitary semi-presidential constitutional republic",
+    governmentFormDescription:
+      "Unitary semi-presidential constitutional republic",
     governmentType: "semi-presidential republic",
     governmentTypeDetail: "semi-presidential republic",
     governmentClassification: franceClassification,
@@ -262,7 +264,12 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
           totalSeats: 577,
           offices: [],
           parties: [
-            { name: "Renaissance", seats: 172, color: null, isRulingCoalition: true },
+            {
+              name: "Renaissance",
+              seats: 172,
+              color: null,
+              isRulingCoalition: true,
+            },
           ],
         },
       ],
@@ -270,7 +277,13 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
     civicaIndex: {
       quarter: "2026-Q1",
       composite: { score: 83.2, rank: 18, totalRanked: 167, isPartial: false },
-      dimensions: [{ dimension: "democratic_quality", normalizedScore: 82.4, rawValue: 0.824 }],
+      dimensions: [
+        {
+          dimension: "democratic_quality",
+          normalizedScore: 82.4,
+          rawValue: 0.824,
+        },
+      ],
     },
     provenance: {
       population: exampleProvenanceEntry,
@@ -289,7 +302,13 @@ const governmentTypesExampleResponse = zGovernmentTypesResponse.strict().parse({
       governmentType: "Presidential republic",
       structuralFamily: "presidential_republic",
       count: 58,
-      topExamples: ["United States", "Brazil", "Indonesia", "Nigeria", "Mexico"],
+      topExamples: [
+        "United States",
+        "Brazil",
+        "Indonesia",
+        "Nigeria",
+        "Mexico",
+      ],
     }),
   ],
   meta: shapeGovernmentTypesMeta(10),
@@ -317,7 +336,12 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
     dimensionsAvailable: 4,
     methodologyVersion: "beta",
     dimensions: [
-      { dimension: "democratic_quality", normalizedScore: 82.4, rawValue: 0.824, sourceId: "vdem" },
+      {
+        dimension: "democratic_quality",
+        normalizedScore: 82.4,
+        rawValue: 0.824,
+        sourceId: "vdem",
+      },
     ],
   }),
   meta: {
@@ -358,8 +382,20 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
 
 const indexHistoryExampleResponse = zIndexHistoryResponse.strict().parse({
   data: [
-    shapeIndexHistoryItem({ quarter: "2025-Q4", score: 82.6, rank: 19, totalRanked: 165, isPartial: false }),
-    shapeIndexHistoryItem({ quarter: "2026-Q1", score: 83.2, rank: 18, totalRanked: 167, isPartial: false }),
+    shapeIndexHistoryItem({
+      quarter: "2025-Q4",
+      score: 82.6,
+      rank: 19,
+      totalRanked: 165,
+      isPartial: false,
+    }),
+    shapeIndexHistoryItem({
+      quarter: "2026-Q1",
+      score: 83.2,
+      rank: 18,
+      totalRanked: 167,
+      isPartial: false,
+    }),
   ],
   meta: {
     methodology: {
@@ -380,22 +416,24 @@ const indexHistoryExampleResponse = zIndexHistoryResponse.strict().parse({
  * /api/v1/index/by-government-type
  * ──────────────────────────────────────────────────────────────── */
 
-const indexByGovernmentTypeExampleResponse = zIndexByGovernmentTypeResponse.strict().parse({
-  data: [
-    shapeIndexByGovernmentTypeItem({
-      key: "parliamentary_democracy",
-      governmentType: "Parliamentary democracy",
-      count: 42,
-      avgScore: 78.4,
-      minScore: 51.2,
-      maxScore: 96.1,
-      medianScore: 80.0,
-      q1: 68.5,
-      q3: 88.9,
-    }),
-  ],
-  meta: { quarter: "2026-Q1", taxonomy: "raw" },
-});
+const indexByGovernmentTypeExampleResponse = zIndexByGovernmentTypeResponse
+  .strict()
+  .parse({
+    data: [
+      shapeIndexByGovernmentTypeItem({
+        key: "parliamentary_democracy",
+        governmentType: "Parliamentary democracy",
+        count: 42,
+        avgScore: 78.4,
+        minScore: 51.2,
+        maxScore: 96.1,
+        medianScore: 80.0,
+        q1: 68.5,
+        q3: 88.9,
+      }),
+    ],
+    meta: { quarter: "2026-Q1", taxonomy: "raw" },
+  });
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/index/compare
@@ -426,7 +464,14 @@ const indexCompareResultA = shapeIndexCompareResult({
     dimensionsAvailable: 4,
     methodologyVersion: "beta",
   },
-  dimensions: [{ dimension: "democratic_quality", normalizedScore: 82.4, rawValue: 0.824, sourceId: "vdem" }],
+  dimensions: [
+    {
+      dimension: "democratic_quality",
+      normalizedScore: 82.4,
+      rawValue: 0.824,
+      sourceId: "vdem",
+    },
+  ],
 });
 
 const indexCompareResultB = shapeIndexCompareResult({
@@ -469,7 +514,14 @@ const indexCompareResultB = shapeIndexCompareResult({
     dimensionsAvailable: 4,
     methodologyVersion: "beta",
   },
-  dimensions: [{ dimension: "democratic_quality", normalizedScore: 85.1, rawValue: 0.851, sourceId: "vdem" }],
+  dimensions: [
+    {
+      dimension: "democratic_quality",
+      normalizedScore: 85.1,
+      rawValue: 0.851,
+      sourceId: "vdem",
+    },
+  ],
 });
 
 const indexCompareExampleResponse = zIndexCompareResponse.parse({
@@ -512,34 +564,36 @@ const indexCompareExampleResponse = zIndexCompareResponse.parse({
  * /api/v1/index/methodology
  * ──────────────────────────────────────────────────────────────── */
 
-const indexMethodologyExampleResponse = zIndexMethodologyResponse.strict().parse({
-  data: shapeIndexMethodologyData({
-    id: "beta",
-    publishedAt: "2026-05-15T00:00:00.000Z",
-    weights: {
-      democratic_quality: 0.3,
-      rule_of_law: 0.3,
-      freedom_rights: 0.2,
-      corruption_control: 0.2,
-    },
-    notes:
-      "Research-beta composite under active validation. Numeric estimates are secondary experimental outputs and are not categorical country grades.",
-    createdAt: "2026-05-15T00:00:00.000Z",
-  }),
-  meta: {
-    methodology: {
-      status: "beta",
-      last_revised: "2026-07-01",
-      reference: "https://civicaatlas.org/civica-index/methodology",
-      presentation: {
-        format: "numeric_position",
-        scale: { min: 0, max: 100 },
-        input_variation_range: "central_90_percent",
-        categorical_grades: false,
+const indexMethodologyExampleResponse = zIndexMethodologyResponse
+  .strict()
+  .parse({
+    data: shapeIndexMethodologyData({
+      id: "beta",
+      publishedAt: "2026-05-15T00:00:00.000Z",
+      weights: {
+        democratic_quality: 0.3,
+        rule_of_law: 0.3,
+        freedom_rights: 0.2,
+        corruption_control: 0.2,
+      },
+      notes:
+        "Research-beta composite under active validation. Numeric estimates are secondary experimental outputs and are not categorical country grades.",
+      createdAt: "2026-05-15T00:00:00.000Z",
+    }),
+    meta: {
+      methodology: {
+        status: "beta",
+        last_revised: "2026-07-01",
+        reference: "https://civicaatlas.org/civica-index/methodology",
+        presentation: {
+          format: "numeric_position",
+          scale: { min: 0, max: 100 },
+          input_variation_range: "central_90_percent",
+          categorical_grades: false,
+        },
       },
     },
-  },
-});
+  });
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/index/rankings
@@ -592,8 +646,18 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       description:
         "World Bank Country and Lending Groups regional classification (7 regions). Default material peer lens — pair with world_bank_income_group for the canonical material cohort. Refreshed annually each July.",
       values: [
-        { value: "East Asia & Pacific", label: "East Asia & Pacific", totalCountries: 29, scoredCountries: 29 },
-        { value: "Europe & Central Asia", label: "Europe & Central Asia", totalCountries: 52, scoredCountries: 52 },
+        {
+          value: "East Asia & Pacific",
+          label: "East Asia & Pacific",
+          totalCountries: 29,
+          scoredCountries: 29,
+        },
+        {
+          value: "Europe & Central Asia",
+          label: "Europe & Central Asia",
+          totalCountries: 52,
+          scoredCountries: 52,
+        },
       ],
     },
     world_bank_income_group: {
@@ -604,7 +668,12 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       description:
         "World Bank income group classification (4 tiers, low → high). Pairs with world_bank_region for the canonical material cohort. Refreshed annually each July.",
       values: [
-        { value: "High income", label: "High income", totalCountries: 62, scoredCountries: 60 },
+        {
+          value: "High income",
+          label: "High income",
+          totalCountries: 62,
+          scoredCountries: 60,
+        },
       ],
     },
     vdem_row: {
@@ -615,7 +684,12 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       description:
         "V-Dem Regimes of the World (Lührmann, Tannenberg & Lindberg 2018). Default governance peer lens — 4 tiers spanning closed autocracy through liberal democracy. Annual cadence.",
       values: [
-        { value: "Liberal Democracy", label: "Liberal Democracy", totalCountries: 33, scoredCountries: 33 },
+        {
+          value: "Liberal Democracy",
+          label: "Liberal Democracy",
+          totalCountries: 33,
+          scoredCountries: 33,
+        },
       ],
     },
     cgv_regime: {
@@ -626,7 +700,12 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       description:
         "Bjørnskov-Rode / Cheibub-Gandhi-Vreeland regime classification (6 categories). Optional alternate governance lens distinguishing democracies by executive form and authoritarian systems by ruling-elite structure.",
       values: [
-        { value: "presidential_democracy", label: "Presidential democracy", totalCountries: 58, scoredCountries: 55 },
+        {
+          value: "presidential_democracy",
+          label: "Presidential democracy",
+          totalCountries: 58,
+          scoredCountries: 55,
+        },
       ],
     },
     monarchy_status: {
@@ -637,7 +716,12 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       description:
         "Monarchy status (6-value enum: none / constitutional / absolute / ceremonial / elective / theocratic). Descriptive constitutional-form metadata, NOT an analytical peer lens. Provided here for filterability ('show me ceremonial monarchies').",
       values: [
-        { value: "constitutional", label: "Constitutional monarchy", totalCountries: 34, scoredCountries: 33 },
+        {
+          value: "constitutional",
+          label: "Constitutional monarchy",
+          totalCountries: 34,
+          scoredCountries: 33,
+        },
       ],
     },
   }),
@@ -646,7 +730,8 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
       status: "stable",
       version: "v1.0",
       versionDate: "2026-05-02",
-      methodology: "https://civicaatlas.org/civica-index/methodology/peer-grouping",
+      methodology:
+        "https://civicaatlas.org/civica-index/methodology/peer-grouping",
     },
   },
 });
@@ -658,9 +743,11 @@ const peerGroupingsExampleResponse = zPeerGroupingsResponse.strict().parse({
 
 const pulseSnapshot = createPulseRuntimeMethodSnapshot();
 
-const pulseMethodologyExampleResponse = zPulseMethodologyResponse.strict().parse({
-  data: pulseSnapshot,
-});
+const pulseMethodologyExampleResponse = zPulseMethodologyResponse
+  .strict()
+  .parse({
+    data: pulseSnapshot,
+  });
 
 /** Every other Pulse endpoint's `meta.methodology` block, shared once
  *  here instead of copy-pasted per example. */
@@ -669,7 +756,8 @@ function pulseMethodologyMetaExample() {
     status: "experimental" as const,
     version: pulseSnapshot.version,
     taxonomy_version: pulseSnapshot.taxonomy.version,
-    reference: "https://civicaatlas.org/civica-index/methodology/pulse" as const,
+    reference:
+      "https://civicaatlas.org/civica-index/methodology/pulse" as const,
     runtime_snapshot: "/api/v1/pulse/methodology" as const,
     method_version_coverage: "mixed_legacy_unversioned" as const,
     presentation: {
@@ -692,14 +780,25 @@ function pulseMethodologyMetaExample() {
 
 const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
   data: shapePulseDimensionsData({
-    jurisdiction: { id: "jur-bra", slug: "brazil", name: "Brazil", iso3: "BRA" },
+    jurisdiction: {
+      id: "jur-bra",
+      slug: "brazil",
+      name: "Brazil",
+      iso3: "BRA",
+    },
     dimensions: {
       democratic_quality: {
         dimension: "democratic_quality",
         delta: null,
         contributingEventIds: [],
         drivingEvents: [],
-        evidence: { nEvents: 0, maxConfidence: 0, minSources: 0, maxSources: 0, allSingleSource: false },
+        evidence: {
+          nEvents: 0,
+          maxConfidence: 0,
+          minSources: 0,
+          maxSources: 0,
+          allSingleSource: false,
+        },
         limitedSignal: false,
         limitedReason: null,
       },
@@ -708,9 +807,22 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         delta: -1.2,
         contributingEventIds: ["evt_9f1c2a"],
         drivingEvents: [
-          { id: "evt_9f1c2a", headline: "Court ruling narrows judicial review", eventDate: "2026-07-01", severityTier: "moderate_neg", severityValue: -1.2, sources: ["gdelt"] },
+          {
+            id: "evt_9f1c2a",
+            headline: "Court ruling narrows judicial review",
+            eventDate: "2026-07-01",
+            severityTier: "moderate_neg",
+            severityValue: -1.2,
+            sources: ["gdelt"],
+          },
         ],
-        evidence: { nEvents: 1, maxConfidence: 0.42, minSources: 1, maxSources: 1, allSingleSource: true },
+        evidence: {
+          nEvents: 1,
+          maxConfidence: 0.42,
+          minSources: 1,
+          maxSources: 1,
+          allSingleSource: true,
+        },
         limitedSignal: true,
         limitedReason: "Single event",
       },
@@ -719,7 +831,13 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         delta: null,
         contributingEventIds: [],
         drivingEvents: [],
-        evidence: { nEvents: 0, maxConfidence: 0, minSources: 0, maxSources: 0, allSingleSource: false },
+        evidence: {
+          nEvents: 0,
+          maxConfidence: 0,
+          minSources: 0,
+          maxSources: 0,
+          allSingleSource: false,
+        },
         limitedSignal: false,
         limitedReason: null,
       },
@@ -728,7 +846,13 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         delta: null,
         contributingEventIds: [],
         drivingEvents: [],
-        evidence: { nEvents: 0, maxConfidence: 0, minSources: 0, maxSources: 0, allSingleSource: false },
+        evidence: {
+          nEvents: 0,
+          maxConfidence: 0,
+          minSources: 0,
+          maxSources: 0,
+          allSingleSource: false,
+        },
         limitedSignal: false,
         limitedReason: null,
       },
@@ -737,14 +861,25 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         delta: null,
         contributingEventIds: [],
         drivingEvents: [],
-        evidence: { nEvents: 0, maxConfidence: 0, minSources: 0, maxSources: 0, allSingleSource: false },
+        evidence: {
+          nEvents: 0,
+          maxConfidence: 0,
+          minSources: 0,
+          maxSources: 0,
+          allSingleSource: false,
+        },
         limitedSignal: false,
         limitedReason: null,
       },
     },
     lastComputedAt: "2026-07-09T09:00:29.000Z",
     totalEvents: 1,
-    pressFreedomContext: { score: 58, source: "approximate_static_2024_subset", directLookup: true, defaultApplied: false },
+    pressFreedomContext: {
+      score: 58,
+      source: "approximate_static_2024_subset",
+      directLookup: true,
+      defaultApplied: false,
+    },
   }),
   meta: {
     methodology: pulseMethodologyMetaExample(),
@@ -772,9 +907,17 @@ const pulseEventsExampleResponse = zPulseEventsResponse.strict().parse({
         published: true,
         reviewStatus: "approved",
         headline: "Court ruling narrows judicial review",
-        description: "A high court decision curtails judicial review of executive decrees.",
+        description:
+          "A high court decision curtails judicial review of executive decrees.",
         publicationOrigin: "auto",
-        sources: [{ sourceId: "gdelt", sourceType: "news", sourceName: "GDELT", sourceUrl: null }],
+        sources: [
+          {
+            sourceId: "gdelt",
+            sourceType: "news",
+            sourceName: "GDELT",
+            sourceUrl: null,
+          },
+        ],
       },
     ],
   }),
@@ -799,7 +942,16 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
       severityValue: -1.2,
       classifierAgreement: "all",
       classifierRuns: [
-        { run: 1, temp: 0, provider: "deepseek", category: "judicial_independence_rollback", dimension: "rule_of_law", severityTier: "moderate_neg", severityValue: -1.2, rationale: "Court decision restricts judicial review scope." },
+        {
+          run: 1,
+          temp: 0,
+          provider: "deepseek",
+          category: "judicial_independence_rollback",
+          dimension: "rule_of_law",
+          severityTier: "moderate_neg",
+          severityValue: -1.2,
+          rationale: "Court decision restricts judicial review scope.",
+        },
       ],
       corroborationConfidence: 0.42,
       pressFreedomScoreAtClassification: 58,
@@ -808,10 +960,18 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
       published: true,
       reviewStatus: "approved",
       headline: "Court ruling narrows judicial review",
-      description: "A high court decision curtails judicial review of executive decrees.",
+      description:
+        "A high court decision curtails judicial review of executive decrees.",
       aiSummary: null,
       sources: ["gdelt"],
-      sourceDetail: [{ sourceId: "gdelt", sourceName: "GDELT", sourceType: "news", sourceUrl: null }],
+      sourceDetail: [
+        {
+          sourceId: "gdelt",
+          sourceName: "GDELT",
+          sourceType: "news",
+          sourceUrl: null,
+        },
+      ],
     }),
   ],
   meta: {
@@ -826,54 +986,15 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
  * /api/countries/[slug]/export
  * ──────────────────────────────────────────────────────────────── */
 
-const countryExportFacts = [
-  { category: "demographics", key: "literacy_rate", value: "99", numericValue: 99, unit: "%", year: 2024 },
-];
-
-const countryExportJsonExample: ReturnType<typeof shapeCountryExportJson> = shapeCountryExportJson(
-  zCountryExportJson.strict().parse({
-    name: "France",
-    iso2: "FR",
-    iso3: "FRA",
-    continent: "Europe",
-    capital: "Paris",
-    population: 69082000,
-    gdpBillions: 3130,
-    areaSqKm: 643801,
-    languages: "French",
-    currency: "Euro (EUR)",
-    governmentType: "semi-presidential republic",
-    governmentTypeDetail: "semi-presidential republic",
-    governmentClassification: franceClassification,
-    democracyIndex: 7.99,
-    worldBankRegion: "Europe & Central Asia",
-    worldBankIncomeGroup: "High income",
-    vdemRow: "Liberal Democracy",
-    monarchyStatus: "none",
-    governmentFormDescription: "Unitary semi-presidential constitutional republic",
-    facts: countryExportFacts,
-    provenance: { population: exampleProvenanceEntry },
-    meta: {
-      reconciliation: {
-        status: "beta",
-        version: "v0.2-beta",
-        reference: "https://civicaatlas.org/country/methodology/reconciliation",
-        vintage: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
-      },
-    },
-  }),
-);
-
-const countryExportCsvExample = buildCountryExportCsv(
-  {
-    countryName: "France",
-    reconciliationStatus: "beta",
-    reconciliationVersion: "v0.2-beta",
-    reconciliationVintage: "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1",
-    reconciliationReference: "https://civicaatlas.org/country/methodology/reconciliation",
-  },
-  countryExportFacts,
-);
+const countryExportJsonExample = zCountryExportBlocked.parse({
+  error: "Country data export is not published.",
+  code: "EXPORT_RIGHTS_BLOCKED",
+  country: "france",
+  reason:
+    "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-017/DAT-027 will replace it with rights-filtered canonical-plus-alternates exports.",
+  rightsManifest: "/api/rights-manifest",
+  replacementGate: "DAT-017/DAT-027",
+});
 
 /* ────────────────────────────────────────────────────────────────
  * Public map + renderer
@@ -906,11 +1027,9 @@ export function renderExample(id: ExampleId): string {
   return JSON.stringify(EXAMPLES[id], null, 2);
 }
 
-/** The CSV branch has no JSON envelope to validate against a zod
- *  schema — its contract is the header/citation format in `csv.ts`.
- *  Rendered separately since it isn't JSON. */
+/** Plain status text shown beside the blocked JSON response. */
 export function renderCountryExportCsvExample(): string {
-  return countryExportCsvExample;
+  return "CSV export is withheld until DAT-017/DAT-027 publishes a rights-filtered artifact.";
 }
 
 export { COUNTRY_EXPORT_CSV_HEADER };

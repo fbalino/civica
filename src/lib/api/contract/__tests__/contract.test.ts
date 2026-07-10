@@ -34,6 +34,7 @@ import {
   deprecationMismatch,
   deprecationScopeMismatch,
   hasInlineCsvHeader,
+  isRightsBlockedExport,
   usesSharedCsvBuilder,
   filePathToPathTemplate,
 } from "../../../../../scripts/validate-api-docs";
@@ -112,8 +113,16 @@ test("negative fixture: stripped deprecation call is caught by deprecationMismat
       return apiResponse({ data: [] });
     }
   `;
-  const result = deprecationMismatch("countries", "fake/route.ts", true, sourceWithoutHelper);
-  assert.ok(result, "expected a mismatch message when the deprecation contract is set but the helper is unused");
+  const result = deprecationMismatch(
+    "countries",
+    "fake/route.ts",
+    true,
+    sourceWithoutHelper,
+  );
+  assert.ok(
+    result,
+    "expected a mismatch message when the deprecation contract is set but the helper is unused",
+  );
   assert.match(result!, /never calls withStructuralFamilyDeprecation/);
 });
 
@@ -123,9 +132,20 @@ test("negative fixture: an undeclared deprecation helper call is also caught", (
       return withStructuralFamilyDeprecation(apiResponse({ data: [] }));
     }
   `;
-  const result = deprecationMismatch("index-methodology", "fake/route.ts", false, sourceWithHelper);
-  assert.ok(result, "expected a mismatch message when the route calls the helper but has no registry contract");
-  assert.match(result!, /stripped deprecation headers or a missing registry entry/);
+  const result = deprecationMismatch(
+    "index-methodology",
+    "fake/route.ts",
+    false,
+    sourceWithHelper,
+  );
+  assert.ok(
+    result,
+    "expected a mismatch message when the route calls the helper but has no registry contract",
+  );
+  assert.match(
+    result!,
+    /stripped deprecation headers or a missing registry entry/,
+  );
 });
 
 test("negative fixture: a deprecated route that leaves 429 undecorated is caught", () => {
@@ -135,7 +155,8 @@ test("negative fixture: a deprecated route that leaves 429 undecorated is caught
     return withStructuralFamilyDeprecation(apiResponse({ data: [] }));
   `;
   assert.match(
-    deprecationScopeMismatch("countries", "fake/route.ts", "always", source) ?? "",
+    deprecationScopeMismatch("countries", "fake/route.ts", "always", source) ??
+      "",
     /does not decorate its 429/,
   );
 });
@@ -173,7 +194,9 @@ test("negative fixture: a live route path absent from the registry is a phantom 
 });
 
 test("the real live registry has zero phantom routes against itself", () => {
-  const liveV1Paths = new Set(API_ROUTES.filter((r) => r.versioned).map((r) => r.pathTemplate));
+  const liveV1Paths = new Set(
+    API_ROUTES.filter((r) => r.versioned).map((r) => r.pathTemplate),
+  );
   assert.deepEqual(findPhantomRoutes(liveV1Paths, API_ROUTES), []);
 });
 
@@ -184,10 +207,15 @@ test("the real live registry has zero phantom routes against itself", () => {
 test("negative fixture: a registry entry whose file no longer exists is uncontracted", () => {
   const registry = [
     { id: "real-route", filePath: "src/app/api/v1/countries/route.ts" },
-    { id: "deleted-route", filePath: "src/app/api/v1/countries/[code]/old-route.ts" },
+    {
+      id: "deleted-route",
+      filePath: "src/app/api/v1/countries/[code]/old-route.ts",
+    },
   ];
   const knownFiles = new Set(["src/app/api/v1/countries/route.ts"]);
-  assert.deepEqual(findUncontractedEntries(registry, knownFiles), ["deleted-route"]);
+  assert.deepEqual(findUncontractedEntries(registry, knownFiles), [
+    "deleted-route",
+  ]);
 });
 
 // ─────────────────────────────────────────────────────────────────────
@@ -212,7 +240,10 @@ test("negative fixture: a shape function itself rejects a smuggled extra field",
     id: "internal-db-uuid-should-never-be-public",
   };
   assert.throws(
-    () => shapeCountryListItem(leaked as Parameters<typeof shapeCountryListItem>[0]),
+    () =>
+      shapeCountryListItem(
+        leaked as Parameters<typeof shapeCountryListItem>[0],
+      ),
     z.ZodError,
   );
 });
@@ -247,7 +278,10 @@ test("negative fixture: a documented query param the handler never reads is flag
     sourceMissingContinent,
   );
   assert.equal(errors.length, 1);
-  assert.match(errors[0], /documents query param "continent" but no searchParams/);
+  assert.match(
+    errors[0],
+    /documents query param "continent" but no searchParams/,
+  );
 });
 
 test("negative fixture: a param the handler reads but the registry never declares is flagged", () => {
@@ -258,18 +292,33 @@ test("negative fixture: a param the handler reads but the registry never declare
       return apiResponse({ data: [] });
     }
   `;
-  const errors = diffParams("countries", "fake/route.ts", [], sourceWithUndeclaredParam);
+  const errors = diffParams(
+    "countries",
+    "fake/route.ts",
+    [],
+    sourceWithUndeclaredParam,
+  );
   assert.equal(errors.length, 1);
-  assert.match(errors[0], /reads query param "undocumented_debug_flag".*not declared/);
+  assert.match(
+    errors[0],
+    /reads query param "undocumented_debug_flag".*not declared/,
+  );
 });
 
 test("the real registry has zero param drift for every route", async () => {
   const { readFile } = await import("node:fs/promises");
   const path = await import("node:path");
   for (const route of API_ROUTES) {
-    const source = await readFile(path.join(process.cwd(), route.filePath), "utf8");
+    const source = await readFile(
+      path.join(process.cwd(), route.filePath),
+      "utf8",
+    );
     const errors = diffParams(route.id, route.filePath, route.params, source);
-    assert.deepEqual(errors, [], `unexpected param drift on route "${route.id}": ${errors.join("; ")}`);
+    assert.deepEqual(
+      errors,
+      [],
+      `unexpected param drift on route "${route.id}": ${errors.join("; ")}`,
+    );
   }
 });
 
@@ -286,7 +335,7 @@ test("negative fixture: a re-inlined CSV header string is flagged", () => {
   assert.equal(usesSharedCsvBuilder(regressed), false);
 });
 
-test("the real export route sources its CSV header from contract/csv.ts, not an inline string", async () => {
+test("the real export route is rights-blocked and emits no legacy attachment", async () => {
   const { readFile } = await import("node:fs/promises");
   const path = await import("node:path");
   const source = await readFile(
@@ -294,7 +343,8 @@ test("the real export route sources its CSV header from contract/csv.ts, not an 
     "utf8",
   );
   assert.equal(hasInlineCsvHeader(source), false);
-  assert.equal(usesSharedCsvBuilder(source), true);
+  assert.equal(usesSharedCsvBuilder(source), false);
+  assert.equal(isRightsBlockedExport(source), true);
 });
 
 // ─────────────────────────────────────────────────────────────────────

@@ -97,14 +97,17 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 
 - Free/no-account access, a citation, a download, and permission to use a
   hosted embed are not blanket licenses for the underlying data.
-- `src/lib/claims/reuse-rights.ts` is the interim current-rights registry and
-  `/licensing#reuse` is its public surface. It explicitly is not DAT-003's
-  future complete source/field/product/release rights manifest.
+- `src/lib/rights/manifest.ts` is the machine-readable source/field/product/
+  release rights contract; `/api/rights-manifest` is its JSON surface and
+  `/licensing#rights-manifest` is the reader view. Pending source terms never
+  permit public bulk export.
+- `src/lib/claims/reuse-rights.ts` remains the public policy/summary registry.
 - The repository has no root `LICENSE` file. Do not call the code open-source,
   MIT-licensed, or reusable under a repository license until BRD-007/008 makes
   and implements that decision.
-- Run `npm run validate:rights-claims` after changing public rights, licensing,
-  download, citation, embed, code-license, or release-manifest language.
+- Run both `npm run validate:rights-manifest` and
+  `npm run validate:rights-claims` after changing public rights, licensing,
+  downloads, citation, embeds, code-license, or release-manifest language.
 - `src/lib/claims/provenance-coverage.ts` measures compact renderer classes on
   home, Atlas, rankings, and embeds. Do not turn its class-level percentage
   into a claim about all database rows or facts; DAT-005 owns that later

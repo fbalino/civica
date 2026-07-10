@@ -443,7 +443,10 @@ export const zGovernmentTypesItem = z
 export const zGovernmentTypesResponse = z
   .object({
     data: z.array(zGovernmentTypesItem),
-    meta: z.object({ total: z.number() }).extend(zDeprecationMeta.shape).strict(),
+    meta: z
+      .object({ total: z.number() })
+      .extend(zDeprecationMeta.shape)
+      .strict(),
   })
   .strict();
 
@@ -937,11 +940,13 @@ export const zPulseMethodologySnapshot = z
     schemaVersion: z.string(),
     methodology: z.unknown(),
     version: z.string(),
-    taxonomy: z.object({
-      version: z.string(),
-      categoryCount: z.number(),
-      dimensions: z.array(zPulseDimension),
-    }).strict(),
+    taxonomy: z
+      .object({
+        version: z.string(),
+        categoryCount: z.number(),
+        dimensions: z.array(zPulseDimension),
+      })
+      .strict(),
     status: z.literal("experimental"),
     mixed_legacy_unversioned: z.literal(true),
     ledgerHistory: z.unknown(),
@@ -965,10 +970,8 @@ export const zPulseMethodologyResponse = z
 /* ────────────────────────────────────────────────────────────────
  * /api/countries/[slug]/export (non-/v1, documented "Bulk Data")
  *
- * Scope decision (owner call): preserve current runtime behavior
- * exactly — flat top-level JSON (no `data` envelope), a CSV branch,
- * no CORS headers, 30 req/min/IP. Document it truthfully rather than
- * normalize it to the /v1 envelope shape.
+ * The legacy success schemas remain for the DAT-027 replacement design, but
+ * the current route returns only zCountryExportBlocked.
  * ──────────────────────────────────────────────────────────────── */
 
 export const zCountryExportFact = z
@@ -1006,5 +1009,16 @@ export const zCountryExportJson = z
     facts: z.array(zCountryExportFact),
     provenance: z.record(z.string(), zApiProvenanceEntry),
     meta: z.object({ reconciliation: zFactbookReconciliationMeta }).strict(),
+  })
+  .strict();
+
+export const zCountryExportBlocked = z
+  .object({
+    error: z.literal("Country data export is not published."),
+    code: z.literal("EXPORT_RIGHTS_BLOCKED"),
+    country: z.string(),
+    reason: z.string(),
+    rightsManifest: z.literal("/api/rights-manifest"),
+    replacementGate: z.literal("DAT-017/DAT-027"),
   })
   .strict();

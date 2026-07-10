@@ -226,7 +226,8 @@ export const PUBLIC_CLAIMS = [
       "plan/00-mission-and-operating-rules.md",
       "plan/MASTER-CHECKLIST.md",
     ],
-    implementationOwner: "Civica Index research lane and release packaging (DAT-022)",
+    implementationOwner:
+      "Civica Index research lane and release packaging (DAT-022)",
     methodologyVersion: "replication-status-v1",
     gate: "G1",
     source: {
@@ -379,8 +380,7 @@ export const PUBLIC_CLAIMS = [
     id: "methodology.provenance-coverage",
     surface: "methodology",
     routeOrArtifact: "/methodology/approach#reader-pages",
-    exactClaim:
-      `Across ${PROVENANCE_COVERAGE_SUMMARY.total} registered compact renderer classes on home, Atlas, rankings, and embeds, ${PROVENANCE_COVERAGE_SUMMARY.complete} (${PROVENANCE_COVERAGE_SUMMARY.percent}%) currently expose source, date/vintage, and rights context on the compact surface itself; this is not dataset-wide value coverage.`,
+    exactClaim: `Across ${PROVENANCE_COVERAGE_SUMMARY.total} registered compact renderer classes on home, Atlas, rankings, and embeds, ${PROVENANCE_COVERAGE_SUMMARY.complete} (${PROVENANCE_COVERAGE_SUMMARY.percent}%) currently expose source, date/vintage, and rights context on the compact surface itself; this is not dataset-wide value coverage.`,
     tier: "institutional-posture",
     evidenceSources: [
       "src/lib/claims/provenance-coverage.ts",
@@ -419,11 +419,11 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
-    id: "licensing.interim-registry",
+    id: "licensing.rights-manifest",
     surface: "licensing",
-    routeOrArtifact: "/licensing#reuse",
+    routeOrArtifact: "/licensing#rights-manifest",
     exactClaim:
-      "Civica does not currently publish a complete, machine-readable rights manifest covering every source, field, product, and frozen release. This page is an interim, human-readable current-rights registry, not that manifest. The complete manifest is owned by DAT-003 and has not shipped.",
+      "Civica publishes a machine-readable rights registry for every production source, export product, field class, and checked release artifact. Unverified source terms remain marked pending and are blocked from public bulk export.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/lib/claims/reuse-rights.ts",
@@ -431,12 +431,12 @@ export const PUBLIC_CLAIMS = [
       "plan/03-data-provenance-and-reproducibility.md",
     ],
     implementationOwner: "Licensing and data governance",
-    methodologyVersion: "interim-rights-registry-v1",
+    methodologyVersion: "rights-manifest-v1",
     gate: "G2",
     source: {
       path: "src/lib/claims/reuse-rights.ts",
       fragment:
-        "Civica does not currently publish a complete, machine-readable rights manifest covering every source, field, product, and frozen release.",
+        "Civica publishes a machine-readable rights registry for every production source, export product, field class, and checked release artifact.",
       mirrors: ["src/app/licensing/page.tsx"],
     },
   },
@@ -582,7 +582,11 @@ export const PUBLIC_CLAIMS = [
     exactClaim:
       "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
     tier: "institutional-posture",
-    evidenceSources: ["README.template.md", "README.md", "src/app/about/page.tsx"],
+    evidenceSources: [
+      "README.template.md",
+      "README.md",
+      "src/app/about/page.tsx",
+    ],
     implementationOwner: "Repository editorial",
     methodologyVersion: "atlas-publication-policy-v1",
     gate: "G1",
@@ -679,8 +683,7 @@ export const PUBLIC_CLAIMS = [
     gate: "G2",
     source: {
       path: "README.template.md",
-      fragment:
-        "Civica does not yet claim universal per-value coverage.",
+      fragment: "Civica does not yet claim universal per-value coverage.",
       mirrors: ["README.md"],
     },
   },
@@ -709,7 +712,8 @@ export const PUBLIC_CLAIMS = [
     id: "citation.index-estimate",
     surface: "citation",
     routeOrArtifact: "CITATION.cff — abstract",
-    exactClaim: "The Civica Index is an explicitly experimental research output.",
+    exactClaim:
+      "The Civica Index is an explicitly experimental research output.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "CITATION.cff",
@@ -729,9 +733,14 @@ export const PUBLIC_CLAIMS = [
     id: "citation.pulse-signal",
     surface: "citation",
     routeOrArtifact: "CITATION.cff — abstract",
-    exactClaim: "The Civica Pulse is an explicitly experimental research output.",
+    exactClaim:
+      "The Civica Pulse is an explicitly experimental research output.",
     tier: "experimental-heuristic",
-    evidenceSources: ["CITATION.cff", "src/lib/pulse/v2", "content/methodology-pulse.md"],
+    evidenceSources: [
+      "CITATION.cff",
+      "src/lib/pulse/v2",
+      "content/methodology-pulse.md",
+    ],
     implementationOwner: "Pulse event-ledger research lane",
     methodologyVersion: "pulse-v2.1-beta",
     gate: "G3",
@@ -845,23 +854,18 @@ export const PUBLIC_CLAIMS = [
     surface: "exports",
     routeOrArtifact: "/api/countries/{slug}/export?format=csv|json",
     exactClaim:
-      "The JSON country export adds structured provenance for supported headline fields when a canonical resolver row exists; facts[] and CSV rows do not yet contain per-row source, license, and vintage.",
-    tier: "reconciled-fact",
+      "Country JSON and CSV downloads are withheld until DAT-017/DAT-027 replaces the mixed-source route with a rights-filtered canonical-plus-alternates export.",
+    tier: "retired-deprecated-output",
     evidenceSources: [
       "src/app/api/countries/[slug]/export/route.ts",
-      "src/lib/factbook/reconcile/api.ts",
+      "src/lib/rights/manifest.ts",
     ],
     implementationOwner: "Atlas exports and reconciliation",
     methodologyVersion: "reconciliation-v0.2-beta",
     gate: "G2",
     source: {
-      // CLM-012: the CSV citation comment block (incl. this line) now
-      // comes from contract/csv.ts's buildCountryExportCsvCitation,
-      // shared with contract/registry.ts's documented example — the
-      // claim pins that shared source, not the route.ts call site.
-      path: "src/lib/api/contract/csv.ts",
-      fragment:
-        "# JSON adds provenance for supported headline fields; facts[] rows remain without per-row provenance.",
+      path: "src/app/api/countries/[slug]/export/route.ts",
+      fragment: "Country data export is not published.",
     },
   },
   {

@@ -5,8 +5,16 @@ import type { ReaderSidebarItem } from "@/components/editorial/ReaderSidebar";
 import { Banner } from "@/components/editorial/Banner";
 import { Chip } from "@/components/editorial/Pill";
 import { withOg } from "@/lib/og";
-import { getRouteContract, type RouteContract, type RouteParam } from "@/lib/api/contract/registry";
-import { renderExample, renderCountryExportCsvExample, type ExampleId } from "@/lib/api/contract/examples";
+import {
+  getRouteContract,
+  type RouteContract,
+  type RouteParam,
+} from "@/lib/api/contract/registry";
+import {
+  renderExample,
+  renderCountryExportCsvExample,
+  type ExampleId,
+} from "@/lib/api/contract/examples";
 
 export const revalidate = 3600;
 
@@ -25,7 +33,6 @@ export const metadata: Metadata = {
 };
 
 const BASE_URL = "https://civicaatlas.org/api/v1";
-const SITE_URL = "https://civicaatlas.org";
 
 const SECTIONS: ReaderSidebarItem[] = [
   { id: "overview", label: "Overview" },
@@ -75,24 +82,27 @@ function DeprecationNote({ route }: { route: RouteContract }) {
     route.deprecation.appliesWhen === "taxonomy-structural-regime";
   return (
     <Banner variant="warn">
-      <strong>{entry.identifier}</strong> (
-      {entry.kind}) is deprecated, sunsetting {route.deprecation.sunsetIso}. Replaced by{" "}
+      <strong>{entry.identifier}</strong> ({entry.kind}) is deprecated,
+      sunsetting {route.deprecation.sunsetIso}. Replaced by{" "}
       {entry.replacedBy.join(", ")} — see{" "}
-      <Link href={route.deprecation.successor}>{route.deprecation.successor}</Link>.{" "}
+      <Link href={route.deprecation.successor}>
+        {route.deprecation.successor}
+      </Link>
+      .{" "}
       {conditional ? (
         <>
           Requests using <code>taxonomy=structural</code> or{" "}
           <code>taxonomy=regime</code> carry <code>Deprecation</code>/
           <code>Sunset</code>/<code>Link</code> headers. Successful JSON
-          responses also include a <code>meta.deprecations</code> block with
-          the same information.
+          responses also include a <code>meta.deprecations</code> block with the
+          same information.
         </>
       ) : (
         <>
           Every response from this endpoint carries <code>Deprecation</code>/
           <code>Sunset</code>/<code>Link</code> headers. Successful JSON
-          responses also include a <code>meta.deprecations</code> block with
-          the same information.
+          responses also include a <code>meta.deprecations</code> block with the
+          same information.
         </>
       )}
     </Banner>
@@ -132,9 +142,13 @@ function EndpointSection({
 
       {deprecatedBanner && route.deprecation && (
         <Banner variant="warn">
-          This entire endpoint is deprecated, sunsetting {route.deprecation.sunsetIso}. Use{" "}
-          <Link href={route.deprecation.successor}>{route.deprecation.successor}</Link> instead. Every
-          response carries <code>Deprecation</code>/<code>Sunset</code>/<code>Link</code> headers.
+          This entire endpoint is deprecated, sunsetting{" "}
+          {route.deprecation.sunsetIso}. Use{" "}
+          <Link href={route.deprecation.successor}>
+            {route.deprecation.successor}
+          </Link>{" "}
+          instead. Every response carries <code>Deprecation</code>/
+          <code>Sunset</code>/<code>Link</code> headers.
         </Banner>
       )}
       <DeprecationNote route={route} />
@@ -156,8 +170,9 @@ function EndpointSection({
 
       <h4 className="api-section-label">Illustrative Example Response</h4>
       <p className="api-info-card__body">
-        Values and totals shown below are illustrative; live responses may differ. The shape is generated
-        from, and validated against, the same schema the route itself is contract-tested against — see{" "}
+        Values and totals shown below are illustrative; live responses may
+        differ. The shape is generated from, and validated against, the same
+        schema the route itself is contract-tested against — see{" "}
         <code>npm run validate:api-docs</code>.
       </p>
       <CodeBlock>{exampleResponse}</CodeBlock>
@@ -196,12 +211,14 @@ const EMBED_PARAMS = [
   {
     name: "w",
     type: "integer",
-    description: "size=custom only. Widget width in px. Clamped 280–600. Default 360.",
+    description:
+      "size=custom only. Widget width in px. Clamped 280–600. Default 360.",
   },
   {
     name: "h",
     type: "integer",
-    description: "size=custom only. Widget height in px. Clamped 120–800. Default 320.",
+    description:
+      "size=custom only. Widget height in px. Clamped 120–800. Default 320.",
   },
 ];
 
@@ -213,7 +230,9 @@ export default function ApiDocsPage() {
   const indexRankingsRoute = getRouteContract("index-rankings");
   const indexCountryRoute = getRouteContract("index-country");
   const indexHistoryRoute = getRouteContract("index-history");
-  const indexByGovernmentTypeRoute = getRouteContract("index-by-government-type");
+  const indexByGovernmentTypeRoute = getRouteContract(
+    "index-by-government-type",
+  );
   const indexCompareRoute = getRouteContract("index-compare");
   const indexMethodologyRoute = getRouteContract("index-methodology");
   const pulseMethodologyRoute = getRouteContract("pulse-methodology");
@@ -223,7 +242,10 @@ export default function ApiDocsPage() {
   const countryExportRoute = getRouteContract("country-export");
 
   return (
-    <MethodologyLayout items={SECTIONS} contentClassName="methodology-content--wide">
+    <MethodologyLayout
+      items={SECTIONS}
+      contentClassName="methodology-content--wide"
+    >
       <nav className="editorial-breadcrumbs" aria-label="Breadcrumb">
         <Link href="/">Civica</Link>
         <span>/</span>
@@ -234,9 +256,11 @@ export default function ApiDocsPage() {
         <div className="api-accent-rule" aria-hidden="true" />
 
         <p className="api-intro">
-          The Civica API provides read-only access to government structure data for
-          sovereign states. All <code>/api/v1/*</code> responses are JSON. The bulk
-          export below also supports CSV. No authentication is required.
+          The Civica API provides read-only access to government structure data
+          for sovereign states. All <code>/api/v1/*</code> responses are JSON.
+          No authentication is required. The former mixed-source country
+          download is withheld while its replacement receives field-level rights
+          controls.
         </p>
 
         <div className="api-info-card">
@@ -247,23 +271,25 @@ export default function ApiDocsPage() {
           <div className="api-info-card__row">
             <h3 className="api-section-label">Rate Limits</h3>
             <p className="api-info-card__body">
-              Every <code>/api/v1/*</code> endpoint applies a best-effort per-IP throttle
-              of {countriesRoute.rateLimit?.max} requests per {(countriesRoute.rateLimit?.windowMs ?? 0) / 1000}{" "}
-              seconds (in-memory, per server instance — not a durable global counter).
-              The bulk <code>/api/countries/:slug/export</code> endpoint below has its own,
-              separate limit of {countryExportRoute.rateLimit?.max} requests per{" "}
-              {(countryExportRoute.rateLimit?.windowMs ?? 0) / 1000} seconds. Exceeding either
-              returns a 429 status with a <code>Retry-After</code> header.
+              Every <code>/api/v1/*</code> endpoint applies a best-effort per-IP
+              throttle of {countriesRoute.rateLimit?.max} requests per{" "}
+              {(countriesRoute.rateLimit?.windowMs ?? 0) / 1000} seconds
+              (in-memory, per server instance — not a durable global counter).
+              The withheld <code>/api/countries/:slug/export</code> route
+              returns 503 and does not consume the ordinary API allowance.
+              Exceeding a live endpoint&rsquo;s limit returns 429 with a{" "}
+              <code>Retry-After</code>
+              header.
             </p>
           </div>
           <div className="api-info-card__row">
             <h3 className="api-section-label">CORS</h3>
             <p className="api-info-card__body">
-              Every <code>/api/v1/*</code> endpoint supports cross-origin requests
-              (<code>Access-Control-Allow-Origin: *</code>). The bulk{" "}
-              <code>/api/countries/:slug/export</code> endpoint does not send CORS
-              headers — it is designed for server-side/CLI pulls, not in-browser
-              <code>fetch</code>.
+              Every <code>/api/v1/*</code> endpoint supports cross-origin
+              requests (<code>Access-Control-Allow-Origin: *</code>). The bulk{" "}
+              <code>/api/countries/:slug/export</code> endpoint does not send
+              CORS headers. It currently returns only a rights-blocked status
+              response.
             </p>
           </div>
           <div className="api-info-card__row">
@@ -469,23 +495,18 @@ for country in resp.json()["data"]:
         <h2>Bulk Data</h2>
 
         <p className="api-intro">
-          Each sovereign state&rsquo;s full record is downloadable in one request
-          as JSON or CSV. To assemble the sovereign-state dataset, enumerate
-          countries with <code>/api/v1/countries</code> and pull each
-          country&rsquo;s export. The JSON export carries a structured provenance
-          block for supported headline fields when a canonical resolver row
-          exists; its broader <code>facts[]</code> rows do not yet carry
-          per-row source, vintage, or license fields. The CSV export carries a
-          reconciliation citation header, not per-row provenance.
+          Country JSON and CSV downloads are withheld. The previous response
+          mixed cached fields, derived classifications, and source rows without
+          a license record for every field. DAT-017 and DAT-027 will replace it
+          with a versioned, rights-filtered export whose canonical and alternate
+          rows retain their source terms.
         </p>
 
         <Banner variant="info">
-          This endpoint is <strong>not</strong> part of the <code>/api/v1</code> contract —
-          it lives at <code>/api/countries/:slug/export</code>, has its own{" "}
-          {countryExportRoute.rateLimit?.max} req/{(countryExportRoute.rateLimit?.windowMs ?? 0) / 1000}s
-          rate limit, sends no CORS headers, and its JSON response has no{" "}
-          <code>data</code> envelope — every field is top-level, for back-compat
-          with existing consumers.
+          The route remains at <code>/api/countries/:slug/export</code> so
+          callers receive an explicit 503 status, the rights-manifest location,
+          and the replacement gate. It is not part of the <code>/api/v1</code>{" "}
+          contract.
         </Banner>
 
         <EndpointSection
@@ -498,36 +519,16 @@ for country in resp.json()["data"]:
           exampleResponse={docExample("countryExport")}
         />
 
-        <h3 className="api-example-heading">CSV export — illustrative example</h3>
-        <p className="api-info-card__body">
-          Values shown are illustrative. Columns and the citation comment
-          header are generated by the same function the route calls — see{" "}
-          <code>src/lib/api/contract/csv.ts</code>.
-        </p>
+        <h3 className="api-example-heading">CSV status</h3>
         <CodeBlock>{renderCountryExportCsvExample()}</CodeBlock>
-
-        <h3 className="api-example-heading">Full-dataset pull (bash)</h3>
-        <CodeBlock>{`# 1. Enumerate every sovereign-state slug (paginate with limit/offset until meta.hasMore is false).
-curl "${BASE_URL}/countries?limit=250&offset=0" | jq -r '.data[].slug' > slugs.txt
-
-# 2. Download each country's full record. Stay under the 30/min/IP export limit.
-while read slug; do
-  curl -s "${SITE_URL}/api/countries/$slug/export?format=json" -o "data/$slug.json"
-  sleep 2
-done < slugs.txt`}</CodeBlock>
-
-        <h3 className="api-example-heading">CSV export</h3>
-        <CodeBlock>{`curl "${SITE_URL}/api/countries/france/export?format=csv" -o france-data.csv`}</CodeBlock>
 
         <p className="api-info-card__body">
           A single frozen, versioned dataset artifact — one download for the
           entire atlas, with a persistent identifier for citation — is a planned
-          addition. Until it ships, the per-country export plus the country list
-          above is the supported path for a sovereign-state pull. Treat the
-          current files as incomplete provenance exports: JSON links supported
-          headline fields only, while <code>facts[]</code> and CSV rows omit
-          per-row source, license, and vintage. DAT-027 owns the canonical-plus-
-          alternates research export that closes that gap.
+          addition. There is no supported bulk-download workaround today. The
+          country-list API remains available for ordinary queries; it is not a
+          substitute for a rights-cleared research release. DAT-027 owns the
+          canonical-plus-alternates replacement.
         </p>
       </section>
 
@@ -536,12 +537,12 @@ done < slugs.txt`}</CodeBlock>
       <section id="data-sources" className="editorial-section">
         <h2>Data Sources & Licensing</h2>
         <p className="api-info-card__body">
-          API data is sourced from the CIA World Factbook (public domain, archived
-          January 2026), Wikidata (CC0), IPU Parline, and the Constitute Project,
-          among others. Public-domain and CC0 sources are generally reusable;
-          IPU Parline and Constitute Project data is subject to their respective
-          non-commercial licenses. Free, no-account API access is not itself a
-          reuse license — see{" "}
+          API data is sourced from the CIA World Factbook (public domain,
+          archived January 2026), Wikidata (CC0), IPU Parline, and the
+          Constitute Project, among others. Public-domain and CC0 sources are
+          generally reusable; IPU Parline and Constitute Project data is subject
+          to their respective non-commercial licenses. Free, no-account API
+          access is not itself a reuse license — see{" "}
           <Link href="/licensing#reuse">Licensing</Link> for the current,
           source-by-source posture before redistributing API data.
         </p>
@@ -553,9 +554,9 @@ done < slugs.txt`}</CodeBlock>
         <h2>Widget Embed</h2>
         <p className="api-intro">
           Embed a live Civica Index widget on any website using a standard{" "}
-          <code>&lt;iframe&gt;</code>. Widgets update every 5 minutes and respect
-          the visitor&rsquo;s system color scheme by default. Override with{" "}
-          <code>?theme=light</code> or <code>?theme=dark</code>. Add{" "}
+          <code>&lt;iframe&gt;</code>. Widgets update every 5 minutes and
+          respect the visitor&rsquo;s system color scheme by default. Override
+          with <code>?theme=light</code> or <code>?theme=dark</code>. Add{" "}
           <code>?dims=1</code> to the large widget to show available Civica
           Index dimension mini-bars when real dimension scores are present. For
           full control, use <code>?size=custom</code> with{" "}
@@ -578,7 +579,9 @@ done < slugs.txt`}</CodeBlock>
         </div>
 
         <div className="api-embed-block">
-          <p className="api-embed-size-label">Large — 400 × 260 (optional CI dimensions)</p>
+          <p className="api-embed-size-label">
+            Large — 400 × 260 (optional CI dimensions)
+          </p>
           <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=lg&dims=1"
         width="400" height="260" loading="lazy"
         title="Civica Index — Brazil"></iframe>`}</CodeBlock>
