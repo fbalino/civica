@@ -313,6 +313,29 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "licensing.imagery-policy",
+    surface: "licensing",
+    routeOrArtifact: "/licensing#imagery",
+    exactClaim:
+      "Civica does not currently retain a complete per-asset generation record — prompt text, reference imagery, and model version — for the launch corpus of country and territory engravings. Assets created or replaced going forward retain that record. Automated checks currently cover defined technical properties — asset presence, format, and dimensions — for territory engravings. Human visual review of what each engraving depicts and whether its caption correctly names the landmark is being strengthened over time; it is not yet complete or independently audited. Display of these engravings on Civica Atlas is authorized by Civica. Civica does not currently grant a separate license for third-party reuse of editorial illustrations outside the site; provenance and legal review of this imagery is pending.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/app/licensing/page.tsx",
+      "public/engravings/README.md",
+      "scripts/validate-territory-engravings.ts",
+      "src/lib/data/engraving-captions.ts",
+      "src/components/factbook/FactbookHeaderStrip.tsx",
+    ],
+    implementationOwner: "Licensing and data governance",
+    methodologyVersion: "imagery-policy-v1",
+    gate: "G2",
+    source: {
+      path: "src/app/licensing/page.tsx",
+      fragment:
+        "Civica does not currently retain a complete per-asset generation\n          record",
+    },
+  },
+  {
     id: "advisory.independent-review-plan",
     surface: "advisory-board",
     routeOrArtifact: "/about/advisory-board",

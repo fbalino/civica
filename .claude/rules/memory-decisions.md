@@ -471,3 +471,16 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Index-facing structured metadata states research-Beta posture. Pulse-facing
   structured metadata states experimental or archived-diagnostic posture;
   visible body chips do not satisfy the metadata contract.
+
+## 2026-07-10 — Editorial engravings are non-documentary illustrations
+
+- `/licensing#imagery` is the canonical imagery policy; About and country/
+  territory captions link to it without duplicating the full prose.
+- Every engraving masthead visibly says `Editorial engraving` and
+  `AI-assisted illustration`, even when its landmark caption is missing.
+- The launch corpus has no complete per-asset prompt/reference/model manifest.
+  Never imply otherwise; file existence alone is not manifest coverage.
+- No separate third-party reuse license is granted while provenance/legal
+  review remains pending.
+- The caption uses a dedicated final masthead row so map and image tiles can
+  never cover it; preserve the responsive Fable-approved placement.

@@ -55,3 +55,5 @@ We are not these institutions. We do not have their funding, their staff, their 
 ## Open and free {#open-and-free}
 
 Civica Atlas is built to be a free, open reference. The codebase is open-source. Public-domain and CC0-licensed data is freely available. Per-source licenses are preserved at the row level and disclosed on supported reader surfaces. If you are an academic interested in reviewing the methodology, citing the data, or collaborating on extensions, please [get in touch](/contact). External review is an explicit goal of the project, not a hypothetical.
+
+Country and territory hero images are AI-assisted editorial illustrations, not photographs; see the [imagery policy](/licensing#imagery) for tools, records, review, and reuse rights.

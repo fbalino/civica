@@ -52,6 +52,11 @@ const SOURCE_ROWS = [
     license: "Repository license",
     note: "Code reuse is governed by the license and notices in the public GitHub repository.",
   },
+  {
+    source: "Country and territory hero engravings",
+    license: "Civica editorial imagery — no third-party reuse license granted",
+    note: "AI-assisted editorial illustrations, not documentary photographs. See Imagery below.",
+  },
 ];
 
 export default function LicensingPage() {
@@ -133,6 +138,75 @@ export default function LicensingPage() {
             <Link href="/about#sources">Data sources</Link>.
           </li>
         </ul>
+      </section>
+
+      <section id="imagery" className="editorial-section">
+        <SectionHeader
+          eyebrow="Imagery"
+          title="Country and territory engravings"
+          dek="Civica's hero engravings are AI-assisted editorial illustrations, not documentary photographs."
+        />
+
+        {/* PUBLIC_CLAIM: licensing.imagery-policy */}
+        <p>
+          Every country and territory masthead can carry an antique-style
+          engraving depicting a well-known landmark or landscape. These
+          images are AI-assisted editorial illustrations produced for
+          Civica&apos;s almanac design language — they are not photographs
+          and are not a claim about what a landmark currently looks like.
+          Pages that show one are captioned &ldquo;Editorial engraving&rdquo;
+          with a link back to this section.
+        </p>
+
+        <SectionHeader eyebrow="Tools" title="How the engravings are made" />
+        <p>
+          Assets are produced with AI image-generation tooling (Codex-driven
+          generation), exported as PNG, then converted to WebP
+          (<code>cwebp -q 80 -resize 1500 0</code>) before being committed
+          under <code>public/engravings/countries/</code> and{" "}
+          <code>public/engravings/territories/</code>. See{" "}
+          <a
+            href="https://github.com/fbalino/civica/blob/main/public/engravings/README.md"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            public/engravings/README.md
+          </a>{" "}
+          for the current format and workflow.
+        </p>
+
+        <SectionHeader eyebrow="Records" title="What is and isn't retained" />
+        <p>
+          Civica does not currently retain a complete per-asset generation
+          record — prompt text, reference imagery, and model version — for
+          the launch corpus of country and territory engravings. Assets
+          created or replaced going forward retain that record. Do not treat
+          an existing engraving as having a documented prompt/reference
+          history unless a record has been published for it.
+        </p>
+
+        <SectionHeader eyebrow="Quality" title="Review and correction" />
+        <p>
+          Automated checks currently cover defined technical properties —
+          asset presence, format, and dimensions — for territory engravings
+          (<code>npm run validate:territory-engravings</code>). Human visual
+          review of what each engraving depicts and whether its caption
+          correctly names the landmark is being strengthened over time; it is
+          not yet complete or independently audited. If you notice a wrong
+          landmark, an inaccurate caption, or anything else off about an
+          engraving, use the{" "}
+          <Link href="/contact">contact form</Link> and we will investigate
+          and correct it.
+        </p>
+
+        <SectionHeader eyebrow="Rights" title="Reuse rights" />
+        <p>
+          Display of these engravings on Civica Atlas is authorized by
+          Civica. Civica does not currently grant a separate license for
+          third-party reuse of editorial illustrations outside the site;
+          provenance and legal review of this imagery is pending. Contact us
+          before reusing an engraving anywhere else.
+        </p>
       </section>
 
       <section id="code" className="editorial-section">

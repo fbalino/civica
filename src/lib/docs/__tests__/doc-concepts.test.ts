@@ -485,7 +485,11 @@ test("negative fixture: an unknown publicClaimIds entry is caught, without impor
 });
 
 test("positive control: real DOC_CONCEPTS publicClaimIds all resolve against a fixture claim-id set matching the known real ids", () => {
-  const knownIds = new Set(["home.reference-scope", "home.visible-positioning"]);
+  const knownIds = new Set([
+    "home.reference-scope",
+    "home.visible-positioning",
+    "licensing.imagery-policy",
+  ]);
   assert.deepEqual(checkPublicClaimIds(DOC_CONCEPTS, knownIds), []);
 });
 

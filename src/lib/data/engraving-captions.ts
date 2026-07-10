@@ -1,7 +1,8 @@
 // Country engraving hero captions.
-// Source: Codex engraving manifest (~/civica/plan/country-engraving-manifest-2026-06-28.json).
-// Each engraving in /public/engravings/countries/<iso3>.webp depicts the landmark below.
-// Regenerate from the manifest if new countries are added.
+// Each engraving in /public/engravings/countries/<iso3>.webp depicts the landmark
+// named below. This file is the caption record for the launch corpus; it is not
+// backed by a separate per-asset generation manifest (prompt/reference/model
+// history). See /licensing#imagery for the current imagery policy.
 
 export const ENGRAVING_CAPTIONS: Record<string, string> = {
   afg: "The Minaret of Jam in a rugged mountain valley",

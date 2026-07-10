@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-013_complete_next_CLM-014"
+    "current_task": "CLM-014_complete_next_CLM-015"
   },
   "budget": {
     "mode": "subscription_only",
@@ -341,6 +341,51 @@
       "session_id": "275037c2-1a86-45a3-b6da-21ab4409d06b",
       "subscription_first": true,
       "ownership": "read-only independent CLM-013 acceptance review; ACCEPT with no blockers"
+    },
+    "fb5_clm014_disclosure_design": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "fable",
+      "model_used": "claude-fable-5",
+      "session_id": "81335973-e7f7-4e6e-9729-234e10f13698",
+      "subscription_first": true,
+      "ownership": "binding imagery-disclosure information architecture and screenshot-grounded caption-placement correction"
+    },
+    "op48_clm014_provenance_contract": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "3e5746e8-c72c-4e2e-945a-13d72e6defb7",
+      "subscription_first": true,
+      "ownership": "read-only truth, provenance, rights, and validator acceptance contract"
+    },
+    "sn5_clm014_policy_surfaces": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "7146b406-1a5d-4d0a-bdf4-03b0b5f9e25d",
+      "subscription_first": true,
+      "ownership": "licensing/about/country-caption policy surfaces and registered claim/doc-source integration"
+    },
+    "sn5_clm014_disclosure_validator": {
+      "status": "stopped_after_partial_implementation_then_primary_hardening",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "26c31628-e518-48fb-a60b-1860e82e0a66",
+      "subscription_first": true,
+      "ownership": "partial pure validator, wrapper, and adversarial fixtures; stopped after ten-minute expansion"
+    },
+    "op48_clm014_final_acceptance": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "8fa88caf-5c03-43de-ad6c-a59599a2a01d",
+      "subscription_first": true,
+      "ownership": "read-only independent CLM-014 acceptance review; ACCEPT with no blockers"
     }
   },
   "manifests": [],
@@ -372,6 +417,8 @@
     "plan/evidence/CLM-013/README.md",
     "plan/evidence/CLM-013/browser-checks.md",
     "plan/evidence/CLM-013/crawl-results.md",
+    "plan/evidence/CLM-014/README.md",
+    "plan/evidence/CLM-014/browser-checks.md",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -387,11 +434,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-013: compilation, TypeScript, runtime/claim/freshness/doc-source/doc-reference/replication/API/metadata guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "237/237 full-suite tests, 53 focused metadata fixtures, all build validators, targeted ESLint, and diff checks passed. The first crawl found 24 issues across 14 routes; the repaired production crawl passed 843/843 sitemap URLs. Master plan validates at 13/288 complete.",
-    "public_claims": "31 claims cover 14/14 required surfaces across 7 canonical tiers; 35 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "CLM-013 metadata was inspected in production Chrome on home, Index, Pulse methodology, query comparison, France Civica Data, and France Constitution at desktop light and mobile dark widths with reduced motion. Every sample returned 200 with one canonical and matching og:url, no document overflow, and no console errors.",
-    "visual_review": "CLM-013 viewport screenshots confirm metadata-only changes did not regress the Index or Pulse reader surfaces in light/dark themes."
+    "build": "npm run build passed for CLM-014: compilation, TypeScript, runtime/claim/freshness/doc-source/doc-reference/replication/API/metadata/editorial-illustration guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "275/275 full-suite tests and 38 focused illustration-disclosure fixtures passed with typecheck, targeted ESLint, design/content/docs/claims/numeric/metadata guards, diff checks, and a fail-closed manifest-coverage rule. Master plan validates at 14/288 complete.",
+    "public_claims": "32 claims cover 14/14 required surfaces across 7 canonical tiers; 36 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
+    "browser": "CLM-014 was inspected in production Chrome across Japan, United States, Bolivia, Greenland, Licensing, and About at 1024/1280/1440 desktop light and 390 mobile dark widths. Captions had zero title/tile overlap or horizontal overflow; the anchor, focus, theme swap, 6.57:1 dark link contrast, and clean production console passed.",
+    "visual_review": "Fable 5 corrected the reproduced map/image-tile caption obstruction by assigning the disclosure a dedicated final masthead row. Final desktop/mobile screenshots confirm the disclosure remains restrained and readable."
   },
-  "updated_at": "2026-07-10T11:55:33Z"
+  "updated_at": "2026-07-10T12:35:24Z"
 }

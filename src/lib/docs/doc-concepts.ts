@@ -522,12 +522,41 @@ const ALREADY_SATISFIED_CONCEPTS: DocConcept[] = [
   },
 ];
 
+const CLM_014_CONCEPTS: DocConcept[] = [
+  {
+    id: "imagery-policy",
+    title: "Country/territory engraving imagery policy",
+    owner: "CLM-014",
+    canonical: {
+      kind: "reader-tsx",
+      path: "src/app/licensing/page.tsx",
+      symbol: "#imagery",
+    },
+    relations: [
+      {
+        kind: "reader-markdown",
+        path: "content/about.md",
+        relationship: "link-only",
+        note: "About links to /licensing#imagery rather than restating the policy.",
+      },
+      {
+        kind: "reader-tsx",
+        path: "src/components/factbook/FactbookHeaderStrip.tsx",
+        relationship: "link-only",
+        note: "Every country/territory masthead engraving caption links to /licensing#imagery.",
+      },
+    ],
+    publicClaimIds: ["licensing.imagery-policy"],
+  },
+];
+
 export const DOC_CONCEPTS: DocConcept[] = [
   ...MIGRATED_CONCEPTS,
   ...ALREADY_SATISFIED_CONCEPTS,
   ...CLM_011_RECONCILED_CONCEPTS,
   ...CLM_012_RESOLVED_CONCEPTS,
   ...DEFERRED_CONCEPTS,
+  ...CLM_014_CONCEPTS,
 ];
 
 /* ────────────────────────────────────────────────────────────────

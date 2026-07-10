@@ -72,20 +72,20 @@
   filter: invert(1) hue-rotate(180deg) brightness(1.04);
 }
 
-/* Subtle caption naming the landmark depicted in the masthead engraving.
-   Sits bottom-right over the scrim (which has already faded the art into
-   --color-bg there), so it reads as muted page text in both themes — not a
-   headline. Only rendered on --art heroes that resolved a caption. */
+/* Subtle plate caption for the masthead engraving. It occupies its own final
+   grid row so the map/photo tiles and country tabs can never cover it. The
+   disclosure remains present even when no landmark caption was resolved. */
 .factbook-hero-caption {
-  position: absolute;
-  right: max(var(--space-6), calc((100vw - 1280px) / 2));
-  bottom: var(--space-3);
+  position: relative;
+  order: 4;
+  grid-column: 1 / -1;
   z-index: 2;
-  display: inline-flex;
+  display: flex;
+  justify-content: flex-end;
   align-items: baseline;
   gap: var(--space-3);
-  max-width: min(60ch, 55%);
-  margin: 0;
+  max-width: none;
+  margin: var(--space-3) 0 0;
   font-family: var(--font-sans);
   text-align: right;
   pointer-events: none;
@@ -103,17 +103,21 @@
   line-height: var(--leading-snug);
   color: var(--color-text-50);
 }
-
-@media (max-width: 768px) {
-  .factbook-hero-caption {
-    left: var(--space-5);
-    right: var(--space-5);
-    bottom: var(--space-3);
-    max-width: none;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-  }
+.factbook-hero-caption-link {
+  flex: 0 0 auto;
+  pointer-events: auto;
+  font-size: var(--text-12);
+  color: var(--color-text-50);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
+.factbook-hero-caption-link:hover {
+  color: var(--color-accent);
+}
+.factbook-hero-caption-link:focus-visible {
+  color: var(--color-accent);
+}
+
 .factbook-hero-left {
   min-width: 0;
   display: flex;

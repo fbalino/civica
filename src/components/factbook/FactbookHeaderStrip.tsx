@@ -251,21 +251,26 @@ export function FactbookHeaderStrip({
             aria-hidden="true"
           />
         )}
-        {engravingSrc && heroCaption && (
+        {engravingSrc && (
           <figcaption className="factbook-hero-caption">
-            <span className="factbook-hero-caption-label">Engraving</span>
-            {engravingDarkSrc && heroDarkCaption ? (
-              <>
-                <span className="factbook-hero-caption-text theme-engraving-light">
-                  {heroCaption}
-                </span>
-                <span className="factbook-hero-caption-text theme-engraving-dark">
-                  {heroDarkCaption}
-                </span>
-              </>
-            ) : (
-              <span className="factbook-hero-caption-text">{heroCaption}</span>
-            )}
+            <span className="factbook-hero-caption-label">Editorial engraving</span>
+            {heroCaption ? (
+              engravingDarkSrc && heroDarkCaption ? (
+                <>
+                  <span className="factbook-hero-caption-text theme-engraving-light">
+                    {heroCaption}
+                  </span>
+                  <span className="factbook-hero-caption-text theme-engraving-dark">
+                    {heroDarkCaption}
+                  </span>
+                </>
+              ) : (
+                <span className="factbook-hero-caption-text">{heroCaption}</span>
+              )
+            ) : null}
+            <Link href="/licensing#imagery" className="factbook-hero-caption-link">
+              AI-assisted illustration
+            </Link>
           </figcaption>
         )}
         <div className="factbook-hero-left">
