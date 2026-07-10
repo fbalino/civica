@@ -93,10 +93,20 @@ export default async function ConstitutionPage({
   // ALPHABETICALLY by name here so every country list on the page (the header
   // add-popover, the landing picker) reads in a predictable order — the old
   // population ordering read as random.
-  const [indexedCountriesRaw, constituteSource] = await Promise.all([
-    getIndexedConstitutionCountries(),
-    getSource("constitute_project").catch(() => null),
-  ]);
+  const [indexedCountriesResult, constituteSourceResult] =
+    await Promise.allSettled([
+      getIndexedConstitutionCountries({ throwOnError: true }),
+      getSource("constitute_project"),
+    ]);
+  const catalogAvailable = indexedCountriesResult.status === "fulfilled";
+  const indexedCountriesRaw =
+    indexedCountriesResult.status === "fulfilled"
+      ? indexedCountriesResult.value
+      : [];
+  const constituteSource =
+    constituteSourceResult.status === "fulfilled"
+      ? constituteSourceResult.value
+      : null;
   const indexedCountries = [...indexedCountriesRaw].sort((a, b) =>
     a.name.localeCompare(b.name),
   );
@@ -134,10 +144,34 @@ export default async function ConstitutionPage({
             countries={indexedCountries}
             featuredTopics={featuredTopics}
             defaultSlug={defaultLandingSlug}
+            catalogAvailable={catalogAvailable}
           />
           <ConstitutionFooter />
         </EditorialPage>
       </>
+    );
+  }
+
+  if (!catalogAvailable) {
+    return (
+      <EditorialPage width="full">
+        <header className="constitution-page-header">
+          <div className="constitution-page-eyebrow">Constitutions</div>
+          <h1 className="editorial-page-title">
+            Constitution catalog unavailable
+          </h1>
+        </header>
+        <div className="constitution-empty-state">
+          <p>
+            The indexed constitution catalog could not be loaded. Please try
+            again later.
+          </p>
+          <Link href="/constitution" className="btn btn--secondary">
+            Return to Constitution Explorer
+          </Link>
+        </div>
+        <ConstitutionFooter />
+      </EditorialPage>
     );
   }
 

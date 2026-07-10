@@ -225,9 +225,12 @@ export async function getTopicExcerpts(
  * The set of jurisdictions with a fully-indexed constitution (structured
  * articles present). ~186 of 253. Ordered by population desc then name here;
  * the constitution page re-sorts alphabetically for display, so this ordering
- * is only the raw fetch order. Returns [] on error.
+ * is only the raw fetch order. Returns [] on error unless `throwOnError` is
+ * requested by a caller that must distinguish outage from a genuine empty set.
  */
-export async function getIndexedConstitutionCountries(): Promise<
+export async function getIndexedConstitutionCountries(options: {
+  throwOnError?: boolean;
+} = {}): Promise<
   IndexedConstitutionCountry[]
 > {
   try {
@@ -256,6 +259,7 @@ export async function getIndexedConstitutionCountries(): Promise<
       "[queries-constitution] getIndexedConstitutionCountries:",
       err,
     );
+    if (options.throwOnError) throw err;
     return [];
   }
 }

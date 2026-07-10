@@ -35,7 +35,7 @@ export default async function ReplicationPage() {
   } catch {
     stats = null;
   }
-  const scoredJurisdictions = stats?.jurisdictionsWithIso3 ?? null;
+  const scoredJurisdictions = stats?.currentScoredJurisdictions ?? null;
 
   return (
     <MethodologyLayout items={SECTIONS}>
@@ -103,9 +103,9 @@ export default async function ReplicationPage() {
             <li>
               <strong>Downloadable outputs.</strong> Country-level CSV covering{" "}
               {scoredJurisdictions !== null
-              ? `all ${scoredJurisdictions}`
-                : "all"}{" "}
-              scored jurisdictions: CI score, Monte Carlo input-variation range, rank,
+                ? `the ${scoredJurisdictions} jurisdictions with a current Beta score`
+                : "jurisdictions with a current Beta score"}
+              : CI score, Monte Carlo input-variation range, rank,
               dimensional breakdowns, completeness flag (Full /
               Partial / Insufficient), and data vintage per source.
             </li>

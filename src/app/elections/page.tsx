@@ -28,7 +28,13 @@ export const metadata: Metadata = {
 export default async function ElectionsPage() {
   let upcoming: Awaited<ReturnType<typeof getUpcomingElections>> = [];
   let recent: Awaited<ReturnType<typeof getRecentElectionsWithResults>> = [];
-  let stats = { totalElections: 0, upcomingCount: 0, avgTurnout: 0, electionsThisYear: 0 };
+  let stats: {
+    totalElections: number;
+    upcomingCount: number;
+    avgTurnout: number;
+    electionsThisYear: number;
+  } | null = null;
+  let electionDataAvailable = false;
   // Sourced coverage framing (resolution §3, §5): legislative dates from IPU
   // Parline, presidential dates from Wikidata, turnout from International IDEA.
   // Numbers are live-from-DB so the foot-of-page sources note can never overstate
@@ -53,6 +59,7 @@ export default async function ElectionsPage() {
       // outside a short recency window. Grouped by year in the client.
       getRecentElectionsWithResults(400),
     ]);
+    electionDataAvailable = true;
 
     const [statsRow] = await db
       .select({
@@ -105,6 +112,7 @@ export default async function ElectionsPage() {
       recent={recent}
       stats={stats}
       coverage={coverage}
+      dataAvailable={electionDataAvailable}
     />
   );
 }

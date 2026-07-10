@@ -45,13 +45,13 @@ const SOURCE_DESCRIPTIONS: Record<string, string> = {
   bjornskov_rode:
     "Academic regime-classification dataset (Bjørnskov & Rode 2020, distributed by QoG). Underpins Civica's regime-type taxonomy as an alternate governance lens.",
   vdem:
-    "Varieties of Democracy — 470+ indicators on democratic quality, produced by the V-Dem Institute. Provides Regimes of the World classification used as Civica's default governance peer lens.",
+    "Varieties of Democracy — indicators on democratic quality produced by the V-Dem Institute. Provides Regimes of the World classification used as Civica's default governance peer lens.",
   worldbank_wgi:
     "Worldwide Governance Indicators — World Bank's six aggregate measures of governance quality, an input to the Civica Index.",
   worldbank_wdi:
-    "World Development Indicators — World Bank's flagship economic and demographic dataset across ~190 countries.",
+    "World Development Indicators — World Bank's flagship economic and demographic dataset.",
   freedom_house:
-    "Freedom in the World — annual assessment of political rights and civil liberties in 195 countries.",
+    "Freedom in the World — annual assessment of political rights and civil liberties.",
   transparency_intl:
     "Corruption Perceptions Index — Transparency International's ranking of perceived public-sector corruption.",
   undp_hdi:
@@ -69,7 +69,7 @@ const SOURCE_DESCRIPTIONS: Record<string, string> = {
   unesco_uis:
     "UNESCO Institute for Statistics — education and literacy indicators including attainment levels and enrolment rates.",
   oecd_stat:
-    "OECD.Stat — economic, social, and governance indicators across the 38 OECD member states with selected partner-country coverage.",
+    "OECD.Stat — economic, social, and governance indicators for OECD members and selected partner countries.",
   fao_faostat:
     "FAOSTAT — agricultural, land-use, and food-security statistics from the UN Food and Agriculture Organization.",
   ilo_ilostat:
@@ -81,7 +81,13 @@ const SOURCE_DESCRIPTIONS: Record<string, string> = {
 };
 
 export default async function AboutPage() {
-  const dbSources = await getAllSources();
+  let dbSources: Awaited<ReturnType<typeof getAllSources>> = [];
+  try {
+    dbSources = await getAllSources();
+  } catch {
+    // Keep the institutional/about copy available when the database is down.
+    // The source roster and its count are omitted rather than rendered as zero.
+  }
   const sourcesForDisplay = dbSources.map((source) => ({
     id: source.id,
     name: source.name,
@@ -351,7 +357,9 @@ export default async function AboutPage() {
             marginBottom: 24,
           }}
         >
-          Civica currently catalogues {sourcesForDisplay.length} source records.
+          {sourcesForDisplay.length > 0
+            ? `Civica currently catalogues ${sourcesForDisplay.length} source records. `
+            : "Civica catalogues named source records as the database is available. "}
           Reader surfaces show source and freshness context where the underlying
           record carries it.
         </p>

@@ -156,8 +156,10 @@ function buildQuery(regions: Set<RegionKey>, filters: FilterState): string {
 
 export function FactbookAlmanac({
   countries,
+  catalogAvailable,
 }: {
   countries: ReadonlyArray<FactbookAlmanacCountry>;
+  catalogAvailable: boolean;
 }) {
   const router = useRouter();
 
@@ -360,7 +362,9 @@ export function FactbookAlmanac({
         <div className="factbook-almanac-head">
           <h2 className="factbook-almanac-title">The complete index</h2>
           <p className="factbook-almanac-sub" aria-live="polite">
-            {regions.size === 0 && activeFilterCount === 0
+            {!catalogAvailable
+              ? "Countries and territories are temporarily unavailable."
+              : regions.size === 0 && activeFilterCount === 0
               ? `${countries.length} countries and territories, A to Z. Jump to a letter or pick from the list.`
               : `${inRegion.length} ${inRegion.length === 1 ? "entry" : "entries"} match your filters. Jump to a letter or pick from the list.`}
           </p>

@@ -47,6 +47,7 @@ dotenvConfig({ path: ".env.local", override: true });
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { substitute, type SubstitutionContext } from "../src/lib/content/markdown/substitute";
+import { findStatsMarkersWithoutFallback } from "../src/lib/claims/public-numeric-claims";
 
 // ─────────────────────────────────────────────────────────────────────
 // CLI args
@@ -210,6 +211,7 @@ async function main(): Promise<void> {
   const files = await listContentFiles();
   let totalUnresolved = 0;
   let totalFallbacks = 0;
+  let totalMissingStatsFallbacks = 0;
   let totalSkipped = 0;
   let totalChecked = 0;
 
@@ -236,6 +238,11 @@ async function main(): Promise<void> {
     }
 
     const body = stripAuthoringBanner(raw);
+    // This is a source-level contract, not a resolution-time check. When the
+    // DB is reachable, a bare {{stats.*}} marker resolves successfully and the
+    // substitution engine cannot reveal that the page would leak a literal
+    // marker during an outage.
+    const missingStatsFallbacks = findStatsMarkersWithoutFallback(body);
     const context: SubstitutionContext = {
       state: stateRecord,
       stats,
@@ -248,10 +255,21 @@ async function main(): Promise<void> {
     // Count fallbacks-used and unresolved.
     if (
       result.unresolvedPaths.length === 0 &&
-      result.fallbacksUsed.length === 0
+      result.fallbacksUsed.length === 0 &&
+      missingStatsFallbacks.length === 0
     ) {
       console.log(`✓ ${file} (clean)`);
       continue;
+    }
+
+    if (missingStatsFallbacks.length > 0) {
+      totalMissingStatsFallbacks += missingStatsFallbacks.length;
+      console.log(
+        `✗ ${file}: ${missingStatsFallbacks.length} stats reference(s) missing a quoted soft fallback`,
+      );
+      for (const missing of missingStatsFallbacks) {
+        console.log(`    L${missing.line}: ${missing.marker}`);
+      }
     }
 
     if (result.unresolvedPaths.length > 0) {
@@ -281,10 +299,13 @@ async function main(): Promise<void> {
   );
   console.log(`         ${totalUnresolved} unresolved path(s)`);
   console.log(`         ${totalFallbacks} fallback(s) used`);
+  console.log(
+    `         ${totalMissingStatsFallbacks} stats reference(s) missing soft fallbacks`,
+  );
 
-  if (totalUnresolved > 0) {
+  if (totalUnresolved > 0 || totalMissingStatsFallbacks > 0) {
     console.error(
-      `\n✗ Validation failed: ${totalUnresolved} unresolved {{path}} reference(s).`,
+      `\n✗ Validation failed: ${totalUnresolved} unresolved {{path}} reference(s); ${totalMissingStatsFallbacks} {{stats.*}} reference(s) missing quoted fallbacks.`,
     );
     process.exit(1);
   }

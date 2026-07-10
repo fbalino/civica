@@ -98,9 +98,14 @@ export interface SiteStats {
   totalJurisdictions: number;
 
   /** Jurisdictions with iso3 set — the "covered" universe per the
-   *  reconciliation methodology page §scope. Drives the replication
-   *  page's "all 197 scored jurisdictions" claim. */
+   *  reconciliation methodology page §scope. This is an identity-coverage
+   *  count, not a Civica Index score-coverage count. */
   jurisdictionsWithIso3: number;
+
+  /** Jurisdictions with a non-null score in the latest available Beta
+   *  Civica Index quarter. This is the sanctioned runtime value for prose
+   *  that describes how many jurisdictions are currently scored. */
+  currentScoredJurisdictions: number;
 
   /** Per-fact-key MAXIMUM number of distinct sources any single country
    *  carries for that fact. Drives the reconciliation methodology page's
@@ -215,6 +220,21 @@ async function queryJurisdictionsWithIso3(): Promise<number> {
   );
 }
 
+async function queryCurrentScoredJurisdictions(): Promise<number> {
+  return queryScalar(
+    sql`SELECT COUNT(DISTINCT jurisdiction_id)::int AS n
+        FROM ci_composite_scores
+        WHERE methodology_version = 'beta'
+          AND score IS NOT NULL
+          AND quarter = (
+            SELECT MAX(quarter)
+            FROM ci_composite_scores
+            WHERE methodology_version = 'beta'
+              AND score IS NOT NULL
+          )`,
+  );
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Public entry point
 // ─────────────────────────────────────────────────────────────────────
@@ -244,6 +264,7 @@ export const getSiteStats = cache(async (): Promise<SiteStats> => {
     fiveSourceFactKeyNames,
     totalJurisdictions,
     jurisdictionsWithIso3,
+    currentScoredJurisdictions,
     factKeyMaxSources,
   ] = await Promise.all([
     queryActiveSources(),
@@ -258,6 +279,7 @@ export const getSiteStats = cache(async (): Promise<SiteStats> => {
     queryFiveSourceFactKeyNames(),
     queryTotalJurisdictions(),
     queryJurisdictionsWithIso3(),
+    queryCurrentScoredJurisdictions(),
     queryFactKeyMaxSources(),
   ]);
 
@@ -275,6 +297,7 @@ export const getSiteStats = cache(async (): Promise<SiteStats> => {
     fiveSourceFactKeyNames,
     totalJurisdictions,
     jurisdictionsWithIso3,
+    currentScoredJurisdictions,
     factKeyMaxSources,
   };
 });

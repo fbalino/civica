@@ -10,12 +10,12 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Conditions — Material Conditions by Country",
   description:
-    "See how human development, peace and security, and economic stability vary across 195 countries and government types — the material outcomes behind the numbers.",
+    "See how human development, peace and security, and economic stability vary across countries and government types. Coverage varies by metric and year.",
   alternates: { canonical: "https://civicaatlas.org/civica-conditions" },
   openGraph: withOg({
     title: "Civica Conditions — Material Conditions by Country · Civica Atlas",
     description:
-      "See how human development, peace and security, and economic stability vary across 195 countries and government types.",
+      "See how human development, peace and security, and economic stability vary across countries and government types. Coverage varies by metric and year.",
     url: "https://civicaatlas.org/civica-conditions",
   }),
 };

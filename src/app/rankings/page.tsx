@@ -10,12 +10,12 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Country Rankings — Democracy, Freedom & Governance",
   description:
-    "Sort 250+ countries across governance and development metrics — the Civica Index, democracy, freedom, rule of law, corruption control, GDP, population, HDI, life expectancy and more. Sourced from the Civica Index, Wikidata, the World Bank, and the archived CIA World Factbook.",
+    "Sort countries across governance and development metrics — the Civica Index, democracy, freedom, rule of law, corruption control, GDP, population, HDI, life expectancy and more. Sourced from the Civica Index, Wikidata, the World Bank, and the archived CIA World Factbook.",
   alternates: { canonical: "https://civicaatlas.org/rankings" },
   openGraph: withOg({
     title: "Country Rankings — Democracy, Freedom & Governance · Civica Atlas",
     description:
-      "Sort 250+ countries across the Civica Index, democracy, freedom, rule of law, GDP, population, HDI and more.",
+      "Sort countries across the Civica Index, democracy, freedom, rule of law, GDP, population, HDI and more.",
     url: "https://civicaatlas.org/rankings",
   }),
 };
@@ -34,13 +34,17 @@ export default async function RankingsPage() {
       <PageHero
         eyebrow="Rankings"
         titleId="rankings-hero-title"
-        title="Countries ranked across every metric."
+        title="Countries ranked across governance and development metrics."
         description={
           <>
-            Sort 250+ countries by the Civica Index and its governance
-            dimensions &mdash; democracy, freedom, rule of law, corruption
-            control &mdash; alongside population, GDP, area, HDI, life
-            expectancy and literacy. Every column traces to its source.
+            Sort{" "}
+            {rows.length > 0
+              ? `${rows.length} jurisdictions`
+              : "available jurisdictions"}{" "}
+            by the Civica Index and its governance dimensions &mdash;
+            democracy, freedom, rule of law, corruption control &mdash;
+            alongside population, GDP, area, HDI, life expectancy and literacy.
+            Every column traces to its source.
           </>
         }
         engraving={{

@@ -119,7 +119,7 @@ export function RankingsMatrix({ rows }: { rows: RankingCountryRow[] }) {
         rows={rows}
         getRowKey={(row) => row.slug}
         initialSort={{ columnId: "civica_index", direction: "desc" }}
-        caption={`${rows.length} sovereign states · click a column header to re-sort`}
+        caption={`${rows.length} jurisdictions · click a column header to re-sort`}
       />
     </div>
   );

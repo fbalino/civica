@@ -1,5 +1,26 @@
 # Project Memory Decisions
 
+## 2026-07-09 — Index retained during validation; prelaunch docs state current truth
+
+- Removing A–F grades and qualitative country bands does **not** retire the
+  Civica Index. The current 0–100 composite, dimensions, histories, rankings,
+  pipeline, and APIs remain active research-beta outputs while they compete in
+  the validation tournament.
+- Civica currently has no user or API migration burden. Public product and
+  methodology pages describe the best current system in the present tense;
+  implementation history, superseded approaches, and migration tables stay in
+  internal plans/version control unless needed to interpret a released
+  scholarly artifact.
+- The obsolete public peer-grouping migration page and endpoint were removed.
+  Do not recreate public change-history theater merely to document private
+  prelaunch development.
+- Bounded subagent and subscription-authenticated Claude/Fable delegation is
+  encouraged when it materially improves speed or audit independence. Fable 5
+  remains the key decision-maker for consequential design choices; paid API
+  fallbacks remain unauthorized.
+
+Durable records: APR-D018 through APR-D020 in `plan/DECISIONS.md`.
+
 ## 2026-07-09 — Public uncertainty and Pulse cadence terminology
 
 - The current Civica Index Monte Carlo bounds are input-variation ranges under

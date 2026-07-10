@@ -316,8 +316,8 @@ export const PUBLIC_CLAIMS = [
     surface: "api-docs",
     routeOrArtifact: "/api-docs",
     exactClaim:
-      "The Civica public REST API provides government structure, country metadata, Civica Index scores, and political-system classifications for 250+ countries.",
-    tier: "derived-descriptive-metric",
+      "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, Civica Index scores, and political-system classifications.",
+    tier: "institutional-posture",
     evidenceSources: [
       "src/app/api-docs/page.tsx",
       "src/app/api/v1/countries/route.ts",
@@ -329,7 +329,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/api-docs/page.tsx",
       fragment:
-        "Documentation for the Civica public REST API: government structure, country metadata, Civica Index scores, and political system classifications for 250+ countries.",
+        "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, Civica Index scores, and political-system classifications.",
     },
   },
   {

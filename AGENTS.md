@@ -118,6 +118,7 @@ Seven `content/*.md` files are now the rendered prose source of truth for their 
 - **Soft-fail every `{{stats.*}}` reference** with a `| "fallback"` arg. Pages must render coherently when `getSiteStats()` throws (e.g., DB unreachable). Mirror the try/catch in `src/app/(reader)/methodology/approach/page.tsx`.
 - **The seventh file (`content/methodology-reconciliation.md`) is deferred** until the `<WorkedExample>` editorial primitive lands (per `~/civica/plan/content-templating-implementation-v1.md` §3.2). Its TSX page at `src/app/(reader)/country/methodology/reconciliation/page.tsx` remains the prose source of truth in the meantime.
 - **Discipline before push:** when editing methodology prose, run `npm run validate:content-templates` and verify the affected page renders correctly on `localhost:3000`. Add `ctx.*` keys to the validator's `CTX_ALLOWLIST` whenever a markdown file references a new pre-computed helper.
+- **Mutable public counts are registered claims.** A current coverage/count claim in public prose or UI must resolve from runtime state with a nonnumeric soft fallback, or be visibly tied to a dated frozen release. Register it in `PUBLIC_NUMERIC_CLAIMS` (`src/lib/claims/public-numeric-claims.ts`) and run `npm run validate:numeric-claims`; do not restore convenient literals such as `195 countries` or `250+ countries`.
 
 Full architecture documented at `~/civica/plan/content-templating-implementation-v1.md` (substitution engine, slice prop, soft-fail discipline, per-page strategy, `<WorkedExample>` follow-up).
 

@@ -21,12 +21,12 @@ const DESTINATIONS: ReadonlyArray<{
   {
     href: "/country",
     label: "Countries",
-    description: "Government structures for every country on Earth.",
+    description: "Government structures and source-linked country profiles.",
   },
   {
     href: "/civica-index",
     label: "Civica Index",
-    description: "The governance score, ranked for 190+ countries.",
+    description: "An experimental research index of governance dimensions.",
   },
   {
     href: "/atlas",
@@ -112,8 +112,8 @@ export default async function NotFound() {
       </HeroRevealItem>
 
       <HeroRevealItem as="p" className="not-found__dek">
-        The atlas covers every country on Earth — but not this address. It may
-        have moved when routes were consolidated, or never existed.
+        This address isn&rsquo;t in the atlas. It may have moved when routes were
+        consolidated, or never existed.
       </HeroRevealItem>
 
       <HeroRevealItem className="not-found__search">

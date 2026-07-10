@@ -172,9 +172,9 @@ export default async function ReconciliationMethodologyPage() {
           often release them faster than multilateral datasets. For any
           given country and fact — Argentina&apos;s inflation,
           Brazil&apos;s population, the United Kingdom&apos;s
-          consumer-price index — Civica may hold three, five, or even
-          twelve candidate values from different sources, each with
-          its own measurement date and reference chain.
+          consumer-price index — Civica may hold several candidate
+          values from different sources, each with its own measurement
+          date and reference chain.
         </p>
         <p>
           The reconciliation layer is the rule-based system that
@@ -186,15 +186,14 @@ export default async function ReconciliationMethodologyPage() {
           source allowlist must be able to reproduce the choice.
         </p>
         <p>
-          As of vintage {reconciliation.firstVintage}, the
-          canonical-fact layer holds{" "}
+          In the current live database, the canonical-fact layer holds{" "}
           {stats
             ? `${stats.totalFacts.toLocaleString()} rows across ${stats.distinctFactKeys} fact-keys and ${stats.activeSources} active sources`
-            : "tens of thousands of rows across the declared fact-keys and active sources"}
+            : "rows across the declared fact-keys and active sources"}
           .{" "}
           {headlineFactKeyProse
-            ? `The most-sourced reconciled fact-keys draw on several publishers each, counting the deepest single-country coverage per key: ${headlineFactKeyProse}.`
-            : "The most-sourced reconciled fact-keys draw on several publishers each — economic and demographic figures such as unemployment, population, inflation, and life expectancy carry the deepest coverage."}
+            ? `Current publisher depth is greatest for these reconciled fact-keys, counting the deepest single-country coverage per key: ${headlineFactKeyProse}.`
+            : "Current publisher depth is greatest for economic and demographic fact-keys such as unemployment, population, inflation, and life expectancy."}
         </p>
       </section>
 
@@ -290,18 +289,17 @@ export default async function ReconciliationMethodologyPage() {
 
         <h3>Country coverage policy</h3>
         <p>
-          Civica covers all 193 UN member states as sovereign
-          jurisdictions, plus the 2 UN observer states (the Holy See
-          and Palestine), plus partially-recognized entities that
-          have a user-assigned ISO 3166-1 code and are treated as
-          distinct statistical units by the World Bank and IMF
-          (Kosovo). This mirrors the country lists used by Our World
-          in Data, the World Bank, the UN Statistical Division,
-          UNDP, and V-Dem. Civica makes no editorial claim about any
-          country&rsquo;s sovereignty or recognition status — the
-          coverage floor is &ldquo;what UN agencies and the World
-          Bank treat as a country,&rdquo; not Civica&rsquo;s own
-          judgment.
+          Civica&rsquo;s coverage policy follows the UN member-state
+          and observer-state set, including the Holy See and
+          Palestine, and also includes statistical entities with a
+          user-assigned ISO 3166-1 code that the World Bank and IMF
+          treat as distinct units, such as Kosovo. This mirrors the
+          country lists used by Our World in Data, the World Bank, the
+          UN Statistical Division, UNDP, and V-Dem. Civica makes no
+          editorial claim about any country&rsquo;s sovereignty or
+          recognition status — the coverage floor is &ldquo;what UN
+          agencies and the World Bank treat as a country,&rdquo; not
+          Civica&rsquo;s own judgment.
         </p>
         <p>
           For Palestine, two parallel records exist: territory-level
@@ -342,7 +340,7 @@ export default async function ReconciliationMethodologyPage() {
         <ul>
           <li>
             <Link href="https://data.worldbank.org">World Bank Open Data</Link>{" "}
-            — World Development Indicators (20 indicators ingested).
+            — selected World Development Indicators.
           </li>
           <li>
             <Link href="https://www.imf.org">International Monetary Fund</Link>{" "}
@@ -366,7 +364,7 @@ export default async function ReconciliationMethodologyPage() {
           </li>
           <li>
             <Link href="https://stats.oecd.org">OECD.Stat</Link> —
-            member-only scope (38 OECD countries).
+            OECD-member scope.
           </li>
           <li>
             <Link href="https://www.fao.org/faostat">FAO FAOSTAT</Link>{" "}
@@ -392,10 +390,10 @@ export default async function ReconciliationMethodologyPage() {
         <p>
           The International Energy Agency was scoped for v1 and{" "}
           <strong>scrapped on 4 May 2026</strong> after legal review:
-          the IEA Terms of Use restrict redistribution to ≤5 data
+          the IEA Terms of Use restrict redistribution to no more than five data
           points on an &ldquo;occasional, ad-hoc basis,&rdquo; which
-          is incompatible with Civica&rsquo;s quarterly cron and
-          ~190-country redistribution model. No commercial budget was
+          is incompatible with Civica&rsquo;s quarterly cron and broad
+          cross-country redistribution model. No commercial budget was
           allocated to upgrade. The audit trail for the scrap
           decision is preserved as an internal resolution document;
           the v1 commitment is the {tier1Shipped.length} active
@@ -542,11 +540,15 @@ export default async function ReconciliationMethodologyPage() {
           </li>
         </ul>
         <p>
-          The eight worked examples that follow are normative — they
-          are pinned to the live database as of the methodology{" "}
-          {reconciliation.version} cut. Each illustrates a distinct
-          reconciliation pattern. Every value is real and was probed
-          against the resolver before this page shipped.
+          <strong>
+            Frozen worked examples — methodology {reconciliation.version},
+            vintage {reconciliation.firstVintage}.
+          </strong>{" "}
+          The eight examples that follow record the rows and resolver
+          outcomes from that frozen release; they are not live database
+          readouts. Each illustrates a distinct reconciliation pattern,
+          and every value was probed against the resolver before this
+          page shipped.
         </p>
         <p
           style={{
@@ -557,13 +559,10 @@ export default async function ReconciliationMethodologyPage() {
             margin: "var(--space-2) 0 var(--space-5)",
           }}
         >
-          Footnote on vintage. Specific numerical values cited below
-          reflect {currentVintage}; the methodologically-relevant
-          claim in each example is the pattern of canonical/alternate
-          attribution, not the exact figure. Future vintages may
-          refresh the underlying numbers; the resolver outcome
-          (which row wins canonical) is preserved by the rule, not
-          the figure.
+          Vintage note. Specific numerical values cited below reflect{" "}
+          {currentVintage}. The exact figures are release-bound; the
+          methodologically relevant claim in each example is the pattern
+          of canonical/alternate attribution.
         </p>
 
         <h3 id="example-argentina-inflation">
@@ -577,7 +576,7 @@ export default async function ReconciliationMethodologyPage() {
           <code>public_debt_pct_gdp</code>).
         </p>
         <p>
-          <strong>Live rows.</strong> The World Bank reports 219.88%
+          <strong>Frozen example rows.</strong> The World Bank reports 219.88%
           (2024). The IMF World Economic Outlook reports 7.5% (2031,
           tagged as a projection). The CIA World Factbook reports
           73.1% (2022, frozen).
@@ -616,7 +615,7 @@ export default async function ReconciliationMethodologyPage() {
           measurement</em>.
         </p>
         <p>
-          <strong>Live rows.</strong> The World Bank reports 78.89
+          <strong>Frozen example rows.</strong> The World Bank reports 78.89
           years (2024). The CIA reports 80.9 years (2024, frozen).
           WHO Global Health Observatory reports 76.37 years (2021),
           tagged{" "}
@@ -717,7 +716,7 @@ export default async function ReconciliationMethodologyPage() {
           pattern, extended to country-singleton scope.
         </p>
         <p>
-          <strong>Live rows.</strong> ONS-UK reports 3.9% CPIH (2025).
+          <strong>Frozen example rows.</strong> ONS-UK reports 3.9% CPIH (2025).
           The World Bank reports 3.27% (2024). The IMF reports 2.0%
           (2031, projected). The CIA reports 3.3% (2024, frozen).
         </p>
@@ -755,7 +754,7 @@ export default async function ReconciliationMethodologyPage() {
           regex.&rdquo;
         </p>
         <p>
-          <strong>Live rows.</strong> Stats SA reports 31.4% (Q4
+          <strong>Frozen example rows.</strong> Stats SA reports 31.4% (Q4
           2025, with <code>as_of=2025-12-31</code>) from the LU1 row
           of Quarterly Labour Force Survey Table A. The World Bank
           reports 32.39% (2025). ILO ILOSTAT reports 32.59% (2027,
@@ -800,7 +799,9 @@ export default async function ReconciliationMethodologyPage() {
           countries).
         </p>
         <p>
-          <strong>Live rows for Argentina population_total.</strong>{" "}
+          <strong>
+            Frozen example rows for Argentina population_total.
+          </strong>{" "}
           The CIA reports 45,418,096 with a{" "}
           <code>(2025 est.)</code> stamp — a current-year nowcast, so
           its <code>data_vintage_year</code> normalizes to 2024 (see{" "}
@@ -840,9 +841,9 @@ export default async function ReconciliationMethodologyPage() {
           resolver&rsquo;s candidate pool now filters to{" "}
           <code>value_type=&apos;measured&apos;</code> first; IMF
           projections appear in the alternates panel with a
-          projection flag. 1,716 IMF rows tagged{" "}
-          <code>projected</code>; 1,396 (jurisdiction, fact-key)
-          pairs un-flipped to the correct measurement. The underlying
+          projection flag. The documented 4 May 2026 migration tagged
+          1,716 IMF rows as <code>projected</code> and un-flipped 1,396
+          (jurisdiction, fact-key) pairs to the correct measurement. The underlying
           methodology is documented further in the &ldquo;Measurement
           vs projection&rdquo; section below.
         </p>
@@ -857,7 +858,7 @@ export default async function ReconciliationMethodologyPage() {
           not an error.
         </p>
         <p>
-          <strong>Live rows.</strong> IBGE reports 213,421,040
+          <strong>Frozen example rows.</strong> IBGE reports 213,421,040
           (2025), tagged{" "}
           <code>civicaRole=&apos;canonical&apos;</code> for Brazil.
           The CIA reports 221,359,387 (2025, frozen). The World Bank
@@ -902,7 +903,7 @@ export default async function ReconciliationMethodologyPage() {
           source active in the alternates panel.
         </p>
         <p>
-          <strong>Live rows.</strong> The CIA reports 82,011 with a{" "}
+          <strong>Frozen example rows.</strong> The CIA reports 82,011 with a{" "}
           <code>(2024 est.)</code> stamp. The World Bank reports 37,548
           (2024). UN WPP reports 37,548 (2024, bit-exact match). The
           IMF reports 33,000 (2031, projected). Wikidata holds an older
@@ -1156,9 +1157,8 @@ export default async function ReconciliationMethodologyPage() {
           {new Date(reconciliation.firstVintageCutDate).toLocaleDateString(
             "en-GB",
             { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" },
-          )}{" "}
-          over {stats ? stats.activeSources : "the"} active sources writing through
-          the resolver. The methodology version is embedded in the
+          )}. It records the resolver state at that cut. The methodology
+          version is embedded in the
           label so any cited vintage value carries the rules that
           produced it. When methodology revises to the next version,
           the next vintage label embeds it, and the{" "}
@@ -1270,8 +1270,9 @@ export default async function ReconciliationMethodologyPage() {
           the textbook case.
         </p>
         <p>
-          The same pattern surfaces on Brazil&rsquo;s population.
-          Civica holds six values for that fact, each from a
+          The frozen {reconciliation.firstVintage} example shows the same
+          pattern on Brazil&rsquo;s population. At that cut, Civica held six
+          values for that fact, each from a
           different publisher, each with a different measurement
           date: IBGE 213,421,040 (2025) — the NSO winner; the CIA
           221,359,387 (2025); the World Bank 211,998,573 (2024); UN
@@ -1337,9 +1338,9 @@ export default async function ReconciliationMethodologyPage() {
         <p>
           The first such case landed at{" "}
           <code>health_expenditure_pct_gdp</code>: the WHO Global
-          Health Expenditure Database (~190 countries) and the OECD
-          System of Health Accounts (51 countries — 38 OECD members
-          plus 13 SHA partners) both apply the SHA-2011 methodology
+          Health Expenditure Database (broad global coverage) and the OECD
+          System of Health Accounts (OECD members and participating SHA
+          partners) both apply the SHA-2011 methodology
           jointly developed by WHO, OECD, and Eurostat. Their
           numerators (current health expenditure summed across all
           financing schemes) and denominators (GDP at market prices)
@@ -1440,7 +1441,8 @@ export default async function ReconciliationMethodologyPage() {
           the underlying values have shifted), the cron marks it{" "}
           <code>resolved_auto_stale</code> with an audit-log row. The
           stale-cleanup pattern accounts for the empirical observation
-          that 31 of 33 disputes in the live system were stale
+          that, at the methodology {reconciliation.version} cut on{" "}
+          {reconciliation.lastUpdated}, 31 of 33 disputes were stale
           by-products of pre-threshold-raise resolver runs. Group A,
           Group C, and plausibility-envelope disputes are{" "}
           <em>never</em> auto-resolved — identity and categorical

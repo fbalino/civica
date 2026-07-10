@@ -154,9 +154,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   fork is reconciled: code, DESIGN.md, and the embed all use Parchment + terracotta + soft
   shadows. Only the token NAMES still read "hard" while their values are soft. Don't rename
   unasked.
-- **`structural_family` removal** — only Phase 6 remains, calendar-gated to **2027-03-31** (drop
-  the columns + constants, 410 the legacy `/api/v1/government-types`). See memory-decisions
-  2026-05-02.
+- **`structural_family` cleanup** — the taxonomy remains retired and must not
+  re-enter new paths. The former 2027 compatibility window is no longer an
+  owner requirement because Civica has no current API users; when the active
+  checklist reaches API/schema cleanup, prefer the clean current contract over
+  public migration theater. Preserve only internal history needed for replay or
+  a released scholarly artifact. See APR-D020 and memory-decisions 2026-07-09.
 - **~18 near-identical factbook sync adapters** — DRY refactor deferred.
 - **Country-page peer-band panel** — the site-wide conditions explorer shipped at
   `/civica-conditions`; what remains deferred is the per-country outcome peer-band panel

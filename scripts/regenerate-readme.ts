@@ -3,6 +3,7 @@
  *
  *   Run with:  npm run regenerate:readme
  *              npm run regenerate:readme -- --strict   (fail on unresolved paths)
+ *              npm run regenerate:readme -- --offline  (exercise soft fallbacks)
  *              npm run regenerate:readme -- --output README.regenerated.md
  *   Adopted via: ~/civica/plan/readme-templating-implementation-v1.md
  *
@@ -63,6 +64,7 @@ import path from "node:path";
 
 interface CliArgs {
   strict: boolean;
+  offline: boolean;
   template: string;
   output: string;
 }
@@ -70,12 +72,14 @@ interface CliArgs {
 function parseArgs(argv: string[]): CliArgs {
   const args: CliArgs = {
     strict: false,
+    offline: false,
     template: "README.template.md",
     output: "README.md",
   };
   for (let i = 2; i < argv.length; i++) {
     const arg = argv[i];
     if (arg === "--strict") args.strict = true;
+    else if (arg === "--offline") args.offline = true;
     else if (arg === "--template") args.template = argv[++i] ?? args.template;
     else if (arg === "--output") args.output = argv[++i] ?? args.output;
     else if (arg === "--help" || arg === "-h") {
@@ -86,11 +90,13 @@ function parseArgs(argv: string[]): CliArgs {
           "Usage:",
           "  npm run regenerate:readme",
           "  npm run regenerate:readme -- --strict",
+          "  npm run regenerate:readme -- --offline",
           "  npm run regenerate:readme -- --output README.regenerated.md",
           "  npm run regenerate:readme -- --template README.template.md --output README.md",
           "",
           "Flags:",
           "  --strict             exit 1 on unresolved {{path}} markers (default: warn only)",
+          "  --offline            skip live stats and render every declared soft fallback",
           "  --template <path>    template input path (default: README.template.md)",
           "  --output <path>      output path (default: README.md)",
         ].join("\n"),
@@ -396,12 +402,12 @@ function buildContext(
           factKeyToProse,
         ),
       )
-    : "population, life expectancy, unemployment, inflation, public debt";
+    : undefined;
 
   // Total facts → rounded thousands string.
   const totalFactsRoundedThousands = stats
-    ? roundedThousandsString(stats.totalFacts)
-    : "26,000";
+    ? `About ${roundedThousandsString(stats.totalFacts)}`
+    : undefined;
 
   // Launch phase prose.
   const launchPhaseProse =
@@ -462,8 +468,14 @@ async function main(): Promise<void> {
     ReturnType<typeof import("../src/lib/content/site-stats").getSiteStats>
   > | null = null;
   try {
-    const statsModule = await import("../src/lib/content/site-stats");
-    stats = await statsModule.getSiteStats();
+    if (args.offline) {
+      console.warn(
+        "[soft-fail] --offline supplied; rendering template-defined fallbacks without querying the database.",
+      );
+    } else {
+      const statsModule = await import("../src/lib/content/site-stats");
+      stats = await statsModule.getSiteStats();
+    }
   } catch (err) {
     console.warn(
       "[soft-fail] getSiteStats() failed; falling back to template-defined fallbacks for {{stats.*}} markers.",

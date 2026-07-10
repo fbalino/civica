@@ -21,6 +21,7 @@ export const revalidate = 3600;
 
 export default async function CountryIndexPage() {
   let countries: FactbookAlmanacCountry[] = [];
+  let catalogAvailable = false;
   try {
     const [rows, filterFacts] = await Promise.all([
       getAllJurisdictions(),
@@ -43,12 +44,18 @@ export default async function CountryIndexPage() {
         regimeType: facts?.regimeType ?? null,
       };
     });
+    catalogAvailable = true;
   } catch {
-    // DB not connected — render the shell; the almanac degrades to empty.
+    // DB not connected — render the shell without claiming a zero-row atlas.
   }
 
   // FactbookAlmanac seeds shareable region/filter URL state client-side from
   // window.location (NOT useSearchParams) so this route stays statically
   // exported with the full index in the HTML — no Suspense/CSR bailout.
-  return <FactbookAlmanac countries={countries} />;
+  return (
+    <FactbookAlmanac
+      countries={countries}
+      catalogAvailable={catalogAvailable}
+    />
+  );
 }

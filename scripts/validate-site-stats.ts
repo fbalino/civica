@@ -101,6 +101,13 @@ async function main() {
       detail: `live: ${stats.jurisdictionsWithIso3}`,
     },
     {
+      label: "currentScoredJurisdictions is bounded by ISO3 coverage",
+      pass:
+        stats.currentScoredJurisdictions >= 0 &&
+        stats.currentScoredJurisdictions <= stats.jurisdictionsWithIso3,
+      detail: `scored: ${stats.currentScoredJurisdictions}, ISO3: ${stats.jurisdictionsWithIso3}`,
+    },
+    {
       label: "totalSourcesInRegistry > activeSources (registry includes non-factbook sources)",
       pass: stats.totalSourcesInRegistry > stats.activeSources,
       detail: `total: ${stats.totalSourcesInRegistry}, active: ${stats.activeSources}`,

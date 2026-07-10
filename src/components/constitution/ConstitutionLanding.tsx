@@ -14,6 +14,7 @@ interface ConstitutionLandingProps {
   featuredTopics: FeaturedTopic[];
   /** A default country to open when a featured topic is clicked. */
   defaultSlug: string;
+  catalogAvailable: boolean;
 }
 
 /** A few widely-recognized constitutions to seed the picker. */
@@ -36,6 +37,7 @@ export function ConstitutionLanding({
   countries,
   featuredTopics,
   defaultSlug,
+  catalogAvailable,
 }: ConstitutionLandingProps) {
   const bySlug = new Map(countries.map((c) => [c.slug, c]));
   // A curated shortlist, but rendered ALPHABETICALLY like every other country
@@ -43,6 +45,17 @@ export function ConstitutionLanding({
   const suggestions = SUGGESTED_SLUGS.map((s) => bySlug.get(s))
     .filter((c): c is IndexedConstitutionCountry => c != null)
     .sort((a, b) => a.name.localeCompare(b.name));
+
+  if (!catalogAvailable) {
+    return (
+      <div className="constitution-landing">
+        <p className="constitution-landing-lede">
+          The indexed constitution catalog is temporarily unavailable. Topic
+          definitions and methodology remain available while the data reloads.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="constitution-landing">
@@ -57,7 +70,7 @@ export function ConstitutionLanding({
         <h2 className="constitution-landing-heading">Start with a country</h2>
         <p className="constitution-landing-topic-note">
           Jump to a widely-read constitution below, or use the search at the top
-          to open any of the {countries.length} on file.
+          to open another indexed constitution.
         </p>
         <div className="constitution-landing-grid">
           {suggestions.map((c) => (

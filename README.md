@@ -47,7 +47,7 @@ Most public country-data sites republish a single upstream source (usually CIA F
 
 Civica's pipeline is built on opposite premises:
 
-- **Multi-source reconciliation.** Currently 20 active source orchestrators (CIA Factbook archive; the eleven Tier-1 publishers — World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats; V-Dem; Wikidata; and six national statistics offices already syncing — US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) writing into a canonical `country_facts` table. ~26,000 reconciled facts across 88 declared fact-keys. v1 target is 11 Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus 30–40 national statistics offices (first wave: 6 in progress; Destatis-DE deferred to v1.1; NBS-Nigeria permanently deferred).
+- **Multi-source reconciliation.** Currently 20 active source orchestrators (CIA Factbook archive; the eleven Tier-1 publishers — World Bank WDI, IMF WEO, UN Data, WHO GHO, UNESCO UIS, UNDP HDI, OECD.Stat, FAO FAOSTAT, ILO ILOSTAT, Eurostat, WTO Stats; V-Dem; Wikidata; and six national statistics offices already syncing — US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) writing into a canonical `country_facts` table. About 26,000 reconciled facts across 88 declared fact-keys. v1 target is 11 Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus 30–40 national statistics offices (first wave: 6 in progress; Destatis-DE deferred to v1.1; NBS-Nigeria permanently deferred).
 
 - <!-- PUBLIC_CLAIM: readme.per-value-provenance --> **Per-fact provenance where implemented.** Resolver-backed values can render a `<FactValueDot>` chevron showing the selected source, available alternatives, observation dates, and license metadata. Civica does not yet claim universal per-value coverage.
 
@@ -66,9 +66,9 @@ This is a pre-launch project. Honest snapshot:
 | Metric | Status |
 |---|---|
 | Active source orchestrators writing facts | 20 (11 Tier-1 + CIA archive + Wikidata + V-Dem + 6 NSO Wave 1) — IEA scrapped due to license incompatibility |
-| `country_facts` rows | ~26,000 across 88 declared fact-keys |
-| Multi-sourced fact-keys (≥2 sources, at least one country) | 27 |
-| 5+ source fact-keys | 5 (population, life expectancy, unemployment, inflation, public debt) |
+| `country_facts` rows | About 26,000 across 88 declared fact-keys |
+| Multi-sourced fact-keys (two or more sources, at least one country) | 27 |
+| Fact-keys with five or more sources | 5 (population, life expectancy, unemployment, inflation, public debt) |
 | Adopted methodology resolution docs | 30+ |
 | NSO (national statistics office) syncs | First wave: 6 in progress (US Census Bureau, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA); Destatis-DE deferred to v1.1 (Genesis-Online API requires manual account creation with regulatory review, outside Civica's unattended-cron architecture. Eurostat republishes Destatis figures in the meantime.); NBS-Nigeria permanently deferred (primary data is PDF/Excel; ingestion cost not justified for v1.) |
 | External methodology review | Not yet — planned post-v1 |
@@ -76,7 +76,7 @@ This is a pre-launch project. Honest snapshot:
 
 The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in BETA, scored under the v2-Beta four-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`). Stabilization depends on longitudinal, factor-analysis, and input-variation validation plus external academic review; no launch date is claimed.
 
-For live numbers (active sources, fact counts, multi-sourced coverage), see `/about` — values are read directly from the database, not maintained as inline prose. Page values may briefly differ from the metrics above as new vintages land.
+For live source and fact-layer totals, see `/country/methodology/reconciliation` — those values are read directly from the database rather than maintained as inline prose. Page values may briefly differ from this generated README as new vintages land.
 
 Reader pages may show "BETA" markers in places where the underlying data layer or methodology is still being finalized. This is by design — silent staleness is dishonest; flagged staleness is academic discipline.
 
@@ -132,7 +132,7 @@ Civica's data and posture are deeply indebted to the institutions whose work it 
 - [International Monetary Fund](https://www.imf.org/en/Publications/WEO) — World Economic Outlook macroeconomic data and projections.
 - [United Nations Statistics Division](https://unstats.un.org), [UN Population Division](https://population.un.org), [UNDP](https://hdr.undp.org), [WHO Global Health Observatory](https://www.who.int/data/gho), [UNESCO Institute for Statistics](https://uis.unesco.org), [OECD.Stat](https://stats.oecd.org), [FAO FAOSTAT](https://www.fao.org/faostat), [ILO ILOSTAT](https://ilostat.ilo.org), [Eurostat](https://ec.europa.eu/eurostat), [WTO Stats](https://stats.wto.org).
 - [Inter-Parliamentary Union (IPU Parline)](https://data.ipu.org) — national parliament structural data.
-- [Constitute Project](https://constituteproject.org) — full-text constitutions for 200+ countries.
+- [Constitute Project](https://constituteproject.org) — full-text constitutions and comparative constitutional data.
 - [Bjørnskov-Rode / CGV regime classification](https://qog.pol.gu.se) — academic regime taxonomy.
 - [Wikidata](https://www.wikidata.org) — structured knowledge spine.
 

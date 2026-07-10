@@ -56,7 +56,6 @@ interface RankRow {
   governmentType: string | null;
   population: number | string | null;
   flagUrl: string | null;
-  totalRanked?: number;
   jurisdictionId: string;
   governmentClassification: { regimeTypeLabel: string | null } | null;
 }
@@ -105,13 +104,11 @@ export async function HomeGrid() {
 
   // Live Civica Index rankings — drives the featured cards + the Index table.
   let rows: RankRow[] = [];
-  let totalRanked = 0;
   try {
     const result = await getCIRankings(undefined, {});
     rows = (
       Array.isArray(result) ? result : ((result as { rows?: unknown[] }).rows ?? [])
     ) as RankRow[];
-    totalRanked = rows[0]?.totalRanked ?? rows.length;
   } catch {}
 
   // Featured cards: find Japan + Estonia in the rankings (by slug/iso3).
@@ -138,7 +135,7 @@ export async function HomeGrid() {
   }
 
   const top = rows.slice(0, 8);
-  const countriesCount = totalRanked || countries.length || 195;
+  const catalogCount = countries.length || null;
   const japanDarkEngraving = countryDarkEngravingSrc("jpn");
   const estoniaDarkEngraving = countryDarkEngravingSrc("est");
 
@@ -168,8 +165,8 @@ export async function HomeGrid() {
             </HeroRevealItem>
             <HeroRevealItem className="home-stats" role="group" aria-label="Coverage">
               <div className="home-stat">
-                <span className="home-stat-value">{countriesCount}</span>
-                <span className="home-stat-label">Countries</span>
+                <span className="home-stat-value">{catalogCount ?? "—"}</span>
+                <span className="home-stat-label">Countries &amp; territories</span>
               </div>
               <div className="home-stat">
                 <span className="home-stat-value">{civicaIndex.dimensionCount}</span>

@@ -13,11 +13,11 @@
 
 ## What this is
 
-Civica's factbook draws on multiple sources for the same underlying fact. The CIA World Factbook is comprehensive but stopped updating in January 2026. Wikidata is fresh but its claims vary in quality. Multilateral statistical agencies (the World Bank, IMF, UN, WHO, and seven others) publish official or established international series but cover narrower fact sets. National statistical offices (US Census, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) publish official national statistics and often release them faster than multilateral datasets. For any given country and fact — Argentina's inflation, Brazil's population, the United Kingdom's consumer-price index — Civica may hold three, five, or even twelve candidate values from different sources, each with its own measurement date and reference chain.
+Civica's factbook draws on multiple sources for the same underlying fact. The CIA World Factbook is comprehensive but stopped updating in January 2026. Wikidata is fresh but its claims vary in quality. Multilateral statistical agencies such as the World Bank, IMF, UN, and WHO publish official or established international series but cover narrower fact sets. National statistical offices (US Census, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) publish official national statistics and often release them faster than multilateral datasets. For any given country and fact — Argentina's inflation, Brazil's population, the United Kingdom's consumer-price index — Civica may hold several candidate values from different sources, each with its own measurement date and reference chain.
 
 The reconciliation layer is the rule-based system that picks one value to display, preserves the rest for transparency, and escalates disagreements that look like data errors or contested changes. The rules are deterministic: no language model, no confidence scores, no convergence loops. A third party with our inputs and the source allowlist must be able to reproduce the choice.
 
-As of vintage 2026-Q1, the canonical-fact layer holds 25,821 rows across 88 fact-keys and 20 active sources. The headline reconciled fact-keys carry six or more publishers each: unemployment rate (12 sources), population (11), inflation rate (9), GDP real growth rate (7), life expectancy (6), public-debt ratio (6).
+In the current live database, the canonical-fact layer holds rows across the declared fact-keys and active sources. Current publisher depth is greatest for economic and demographic fact-keys such as unemployment, population, inflation, and life expectancy. These are live totals, not attributes of the frozen 2026-Q1 vintage; the public page reads the exact figures from `getSiteStats()` at render time.
 
 ---
 
@@ -52,7 +52,7 @@ The reconciliation layer does not govern judgment claims — regime classificati
 
 ### Country coverage policy
 
-Civica covers all 193 UN member states as sovereign jurisdictions, plus the 2 UN observer states (the Holy See and Palestine), plus partially-recognized entities that have a user-assigned ISO 3166-1 code and are treated as distinct statistical units by the World Bank and IMF (Kosovo). This mirrors the country lists used by Our World in Data, the World Bank, the UN Statistical Division, UNDP, and V-Dem. Civica makes no editorial claim about any country's sovereignty or recognition status — the coverage floor is "what UN agencies and the World Bank treat as a country," not Civica's own judgment.
+Civica's coverage policy follows the UN member-state and observer-state set, including the Holy See and Palestine, and also includes statistical entities with a user-assigned ISO 3166-1 code that the World Bank and IMF treat as distinct units, such as Kosovo. This mirrors the country lists used by Our World in Data, the World Bank, the UN Statistical Division, UNDP, and V-Dem. Civica makes no editorial claim about any country's sovereignty or recognition status — the coverage floor is "what UN agencies and the World Bank treat as a country," not Civica's own judgment.
 
 For Palestine, two parallel records exist: territory-level CIA Factbook entries for the West Bank and Gaza Strip (preserving the Factbook's separate prose for each territory) sit alongside a unified `PSE` row that acts as the iso3-keyed reconciliation target for World Bank, IMF, WHO, UNDP, UNESCO, and V-Dem data. Kosovo is included under the user-assigned ISO code `XKX`, following World Bank, IMF, and UNDP practice. Western Sahara, Hong Kong, and other CIA Factbook territory entries remain in the database with their Factbook content but without iso3 codes — they receive only Civica's CIA Factbook treatment because Tier-1 publishers do not write separate rows for them.
 
@@ -62,25 +62,25 @@ For Palestine, two parallel records exist: territory-level CIA Factbook entries 
 
 A Wikidata claim is accepted only if its references — via the `P248` "stated in" property or the `P854` reference URL — point to an entry on the allowlist. Allowlist entries are organised in four tiers; the full list lives in [`src/lib/factbook/reconcile/source-allowlist.ts`](https://github.com/fbalino/civica/blob/main/src/lib/factbook/reconcile/source-allowlist.ts) and is the single source of truth — both the schema and the resolver import from it.
 
-### Tier 1 — Multilateral statistical agencies (11 active)
+### Tier 1 — Multilateral statistical agencies
 
-- [World Bank Open Data](https://data.worldbank.org) — World Development Indicators (20 indicators ingested).
+- [World Bank Open Data](https://data.worldbank.org) — selected World Development Indicators.
 - [International Monetary Fund](https://www.imf.org) — World Economic Outlook (WEO).
 - [United Nations Statistics Division](https://unstats.un.org) — UN World Population Prospects + UNData portal.
 - [UNDP Human Development Reports](https://hdr.undp.org) — HDI domain.
 - [WHO Global Health Observatory](https://www.who.int/data/gho) — health indicators canonical.
 - [UNESCO Institute for Statistics](https://uis.unesco.org) — literacy and education canonical.
-- [OECD.Stat](https://stats.oecd.org) — member-only scope (38 OECD countries).
+- [OECD.Stat](https://stats.oecd.org) — OECD-member scope.
 - [FAO FAOSTAT](https://www.fao.org/faostat) — agriculture domain.
 - [ILO ILOSTAT](https://ilostat.ilo.org) — unemployment canonical (with measured-vs-projected partition for ILOEST nowcasts).
 - [Eurostat](https://ec.europa.eu/eurostat) — EU-27 + EFTA-4 scope; multi-canonical-with-scope-predicate origin pattern.
 - [WTO Stats](https://stats.wto.org) — merchandise trade canonical (with two-fact-key split against the World Bank's goods-and-services aggregate).
 
-The International Energy Agency was scoped for v1 and **scrapped on 4 May 2026** after legal review: the IEA Terms of Use restrict redistribution to ≤5 data points on an "occasional, ad-hoc basis," which is incompatible with Civica's quarterly cron and ~190-country redistribution model. No commercial budget was allocated to upgrade. The audit trail for the scrap decision is preserved as an internal resolution document; the v1 commitment is the 11 active publishers above.
+The International Energy Agency was scoped for v1 and **scrapped on 4 May 2026** after legal review: the IEA Terms of Use restrict redistribution to no more than five data points on an "occasional, ad-hoc basis," which is incompatible with Civica's quarterly cron and broad cross-country redistribution model. No commercial budget was allocated to upgrade. The audit trail for the scrap decision is preserved as an internal resolution document; the v1 commitment is the active publisher roster above.
 
-### Tier 2 — National statistical offices (6 of 8 active)
+### Tier 2 — National statistical offices
 
-The methodology page enumerated 8 NSOs by name during early design. 6 are live in v1 and 2 are deferred with specific blockers (see per-NSO entries below). New NSOs are added on demand — when a fact-key for a specific country has no Tier-1 coverage, an NSO publishes the relevant official national series, or readers ask for it. The long-term goal is roughly 30–40 NSO domains, which subsequent NSO waves will pursue. Every addition triggers a methodology version bump.
+The methodology page named the initial NSO wave during early design. The live and deferred offices are identified individually below, with specific blockers for each deferral. New NSOs are added on demand — when a fact-key for a specific country has no Tier-1 coverage, an NSO publishes the relevant official national series, or readers ask for it. Subsequent waves will pursue broader NSO coverage. Every addition triggers a methodology version bump.
 
 - **US Census Bureau** (live) — ACS 1-Year + Decennial; population, unemployment, urbanisation indicators for the United States.
 - **ONS-UK** (live) — public time-series API; population, CPIH inflation, GDP real growth, unemployment for the United Kingdom.
@@ -116,15 +116,15 @@ When sources disagree, two guards apply for Group B:
 - **Material-error rejection.** A fresher value differing from the older one by more than a per-category "impossible" threshold (population > 50% in a year, GDP nominal in USD > 80%, inflation and public-debt ratios > 300 percentage points after the 5 May 2026 hyperinflation hot-fix) is rejected as likely data corruption or a unit-of-measure error. A dispute row is created and the prior canonical value remains until reviewed.
 - **Reference-quality floor.** The fresher source must have at least one Tier-1 or Tier-2 reference. A Wikidata claim whose references are all rejected per the allowlist cannot win even if it is fresher.
 
-The eight worked examples that follow are normative — they are pinned to the live database as of the methodology v0.2-beta cut. Each illustrates a distinct reconciliation pattern. Every value is real and was probed against the resolver before this page shipped.
+**Frozen worked examples — methodology v0.2-beta, vintage 2026-Q1.** The eight examples that follow record the rows and resolver outcomes from that frozen release; they are not live database readouts. Each illustrates a distinct reconciliation pattern, and every value was probed against the resolver before this page shipped.
 
-*Footnote on vintage. Specific numerical values cited below reflect Civica Atlas 2026Q3; the methodologically-relevant claim in each example is the pattern of canonical/alternate attribution, not the exact figure. Future vintages may refresh the underlying numbers; the resolver outcome (which row wins canonical) is preserved by the rule, not the figure.*
+*Vintage note. Specific numerical values cited below reflect Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1. The exact figures are release-bound; the methodologically relevant claim in each example is the pattern of canonical/alternate attribution.*
 
 ### Worked example 1 — Argentina inflation, hyperinflation hot-fix
 
 **Pattern.** Group B fresher-source-wins after the post-canonical-pick-investigation material-error threshold raise (50 pp → 300 pp for `inflation_rate` and `public_debt_pct_gdp`).
 
-**Live rows.** The World Bank reports 219.88% (2024). The IMF World Economic Outlook reports 7.5% (2031, tagged as a projection). The CIA World Factbook reports 73.1% (2022, frozen).
+**Frozen example rows.** The World Bank reports 219.88% (2024). The IMF World Economic Outlook reports 7.5% (2031, tagged as a projection). The CIA World Factbook reports 73.1% (2022, frozen).
 
 **Resolver outcome.** The World Bank's 219.88% (2024) wins canonical with `decisionReason='fresher_winner'`. The CIA value moves to alternate.
 
@@ -134,7 +134,7 @@ The eight worked examples that follow are normative — they are pinned to the l
 
 **Pattern.** Editorial-canonical assertion preserved alongside freshness-driven canonical pick. Two honest answers to two different questions: *who measured this* versus *what's the most recent measurement*.
 
-**Live rows.** The World Bank reports 78.89 years (2024). The CIA reports 80.9 years (2024, frozen). WHO Global Health Observatory reports 76.37 years (2021), tagged `civicaRole='canonical'` as the editorial-domain authority. UN WPP reports 77.05 years (2024). UNDP HDI reports 79.30 years (2023). Wikidata reports 77.0 years (2022).
+**Frozen example rows.** The World Bank reports 78.89 years (2024). The CIA reports 80.9 years (2024, frozen). WHO Global Health Observatory reports 76.37 years (2021), tagged `civicaRole='canonical'` as the editorial-domain authority. UN WPP reports 77.05 years (2024). UNDP HDI reports 79.30 years (2023). Wikidata reports 77.0 years (2022).
 
 **Resolver outcome.** UN WPP's 77.05 (2024) wins canonical with `decisionReason='fresher_winner'`. Multiple Tier-1 publishers (UN, World Bank, CIA) all carry a 2024 reading; the runtime canonical pick among same-vintage Tier-1 publishers is sensitive to the tied-date tiebreak ordering rather than to a methodology assertion (open question logged at v1.0-followup §3.1). The alternates panel renders WHO 76.37 (2021) labelled as the editorial canonical alongside the World Bank, CIA, UNDP, and Wikidata rows.
 
@@ -154,7 +154,7 @@ The eight worked examples that follow are normative — they are pinned to the l
 
 **Pattern.** NSO-as-canonical-override via freshness alone. The same multi-canonical-with-scope-predicate pattern, extended to country-singleton scope.
 
-**Live rows.** ONS-UK reports 3.9% CPIH (2025). The World Bank reports 3.27% (2024). The IMF reports 2.0% (2031, projected). The CIA reports 3.3% (2024, frozen).
+**Frozen example rows.** ONS-UK reports 3.9% CPIH (2025). The World Bank reports 3.27% (2024). The IMF reports 2.0% (2031, projected). The CIA reports 3.3% (2024, frozen).
 
 **Resolver outcome.** ONS-UK's 3.9% (2025) wins canonical with `decisionReason='fresher_winner'`. CPIH (the UK's statistical concept that includes owner-occupied housing) has been the ONS headline measure since 2017.
 
@@ -164,7 +164,7 @@ The eight worked examples that follow are normative — they are pinned to the l
 
 **Pattern.** Novel ingest pattern — PDF extraction via the Anthropic SDK's native PDF support. Stats SA has no API; its data ships as monthly and quarterly PDF releases at stable URLs. The methodology is "scrape with a deterministic LLM call, not a regex."
 
-**Live rows.** Stats SA reports 31.4% (Q4 2025, with `as_of=2025-12-31`) from the LU1 row of Quarterly Labour Force Survey Table A. The World Bank reports 32.39% (2025). ILO ILOSTAT reports 32.59% (2027, tagged as an ILOEST nowcast projection — excluded from the candidate pool). The IMF reports 31.9% (2031, projected). The CIA reports 33.2% (2024, frozen). Wikidata holds an older 27.2% (2018) claim.
+**Frozen example rows.** Stats SA reports 31.4% (Q4 2025, with `as_of=2025-12-31`) from the LU1 row of Quarterly Labour Force Survey Table A. The World Bank reports 32.39% (2025). ILO ILOSTAT reports 32.59% (2027, tagged as an ILOEST nowcast projection — excluded from the candidate pool). The IMF reports 31.9% (2031, projected). The CIA reports 33.2% (2024, frozen). Wikidata holds an older 27.2% (2018) claim.
 
 **Resolver outcome.** Stats SA's 31.4% (Q4 2025) wins canonical with `decisionReason='fresher_winner'`.
 
@@ -174,17 +174,17 @@ The eight worked examples that follow are normative — they are pinned to the l
 
 **Pattern.** The `value_type` partition. IMF WEO ships forward projections through the current year + 5 years. The resolver requires the canonical pick to be a measurement whenever any measurement exists for the same (jurisdiction, fact-key) pair. Projections only win canonical when no measurement exists (e.g., `fiscal_balance_pct_gdp` for IMF-only countries).
 
-**Live rows for Argentina population_total.** The CIA reports 45,418,096 with a `(2025 est.)` stamp — a current-year nowcast, so its `data_vintage_year` normalizes to 2024 (see "CIA vintage stamps" below). The World Bank reports 45,696,160 (2024, measured). UN WPP reports 45,696,160 (2024, measured — bit-exact match to the World Bank because the World Bank republishes UN WPP). The IMF reports 50,394,000 (2031, projected). Wikidata holds an older 44,938,712 (2019, measured) claim.
+**Frozen example rows for Argentina population_total.** The CIA reports 45,418,096 with a `(2025 est.)` stamp — a current-year nowcast, so its `data_vintage_year` normalizes to 2024 (see "CIA vintage stamps" below). The World Bank reports 45,696,160 (2024, measured). UN WPP reports 45,696,160 (2024, measured — bit-exact match to the World Bank because the World Bank republishes UN WPP). The IMF reports 50,394,000 (2031, projected). Wikidata holds an older 44,938,712 (2019, measured) claim.
 
 **Resolver outcome.** Two partitions decide this fact. First, the IMF's 50.4 M (2031 projection) is excluded from the candidate pool by the measurement-vs-projection partition; it surfaces in the alternates panel labelled *(projected)*. Second, among the surviving measurements the CIA's `(2025 est.)` nowcast is aged to its 2024 measurement vintage, so it no longer outranks the UN WPP 2024 reading it was derived from. UN WPP's 45,696,160 (2024) wins canonical with `decisionReason='fresher_winner'` (the World Bank republishes the identical value); the CIA reading moves to the alternates panel with its published `(2025 est.)` stamp intact.
 
-**Story.** Before the 4 May 2026 fix, the IMF's 2031 projection was winning Argentina's canonical race against UN/WB 2024 measurements because the freshness comparator treated future `as_of` dates the same as past ones. The fix added an explicit `value_type` enum to `country_facts` (`measured` | `projected`) and a year-based discriminator at IMF sync time: `fact_year > current_year → projected`. The resolver's candidate pool now filters to `value_type='measured'` first; IMF projections appear in the alternates panel with a projection flag. 1,716 IMF rows tagged `projected`; 1,396 (jurisdiction, fact-key) pairs un-flipped to the correct measurement. The underlying methodology is documented further in the "Measurement vs projection" section below.
+**Story.** Before the 4 May 2026 fix, the IMF's 2031 projection was winning Argentina's canonical race against UN/WB 2024 measurements because the freshness comparator treated future `as_of` dates the same as past ones. The fix added an explicit `value_type` enum to `country_facts` (`measured` | `projected`) and a year-based discriminator at IMF sync time: `fact_year > current_year → projected`. The resolver's candidate pool now filters to `value_type='measured'` first; IMF projections appear in the alternates panel with a projection flag. The documented 4 May 2026 migration tagged 1,716 IMF rows as `projected` and un-flipped 1,396 (jurisdiction, fact-key) pairs to the correct measurement. The underlying methodology is documented further in the "Measurement vs projection" section below.
 
 ### Worked example 7 — Brazil population, six publishers, IBGE override
 
 **Pattern.** NSO override layered over multi-publisher disagreement that is methodologically real, not an error.
 
-**Live rows.** IBGE reports 213,421,040 (2025), tagged `civicaRole='canonical'` for Brazil. The CIA reports 221,359,387 (2025, frozen). The World Bank reports 211,998,573 (2024). UN WPP reports 211,998,573 (2024, bit-exact match — World Bank republishes UN). The IMF reports 216,988,990 (2031, projected). Wikidata holds an older 203,062,512 (2022) claim.
+**Frozen example rows.** IBGE reports 213,421,040 (2025), tagged `civicaRole='canonical'` for Brazil. The CIA reports 221,359,387 (2025, frozen). The World Bank reports 211,998,573 (2024). UN WPP reports 211,998,573 (2024, bit-exact match — World Bank republishes UN). The IMF reports 216,988,990 (2031, projected). Wikidata holds an older 203,062,512 (2022) claim.
 
 **Resolver outcome.** IBGE's 213.4 M (2025) wins canonical with `decisionReason='fresher_winner'`. The CIA's 221.4 M (2025) is the second-place alternate.
 
@@ -194,7 +194,7 @@ The eight worked examples that follow are normative — they are pinned to the l
 
 **Pattern.** The disputes system, correctly resolved. A material-error gap — about 118% between the CIA's value and the World Bank's — was raised as a dispute rather than silently averaged, because the disagreement reflects a genuine definitional split, not a typo. A reviewer adjudicated the pair; resolving a dispute demotes only the *losing* row, leaving every other source active in the alternates panel.
 
-**Live rows.** The CIA reports 82,011 with a `(2024 est.)` stamp. The World Bank reports 37,548 (2024). UN WPP reports 37,548 (2024, bit-exact match). The IMF reports 33,000 (2031, projected). Wikidata holds an older 53,127 (2017) claim. The reviewer resolved the dispute in favour of the resident-population figure, so the CIA row — the losing party — is demoted (`status='demoted'`); the other four sources stay active.
+**Frozen example rows.** The CIA reports 82,011 with a `(2024 est.)` stamp. The World Bank reports 37,548 (2024). UN WPP reports 37,548 (2024, bit-exact match). The IMF reports 33,000 (2031, projected). Wikidata holds an older 53,127 (2017) claim. The reviewer resolved the dispute in favour of the resident-population figure, so the CIA row — the losing party — is demoted (`status='demoted'`); the other four sources stay active.
 
 **Resolver outcome.** With the CIA outlier out of the candidate pool, the resolver picks canonical over the survivors: UN WPP and the World Bank both report 37,548 (2024, the reviewer's value), so the incumbent UN WPP measurement holds via `decisionReason='incumbent_held'` and the fact is no longer flagged `(disputed)`. The CIA's 82,011 stays demoted — recorded for the provenance trail, but excluded from the pick; the IMF projection and the older Wikidata claim remain visible as alternates. The disputes log is at [/country/methodology/reconciliation/disputes](https://civicaatlas.org/country/methodology/reconciliation/disputes).
 
@@ -240,7 +240,7 @@ The vintage label format is:
 
 `Civica Atlas Reconciled v<methodology_version> — vintage <YYYY-Qn>`
 
-The first frozen v1 vintage is **`Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1`**, cut on 5 May 2026 over 17 active sources writing through the resolver. The methodology version is embedded in the label so any cited vintage value carries the rules that produced it. When methodology revises to `v0.3-beta`, the next vintage label embeds that version, and the v0.2-beta vintages remain stable as historical citations.
+The first frozen v1 vintage is **`Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1`**, cut on 5 May 2026. It records the resolver state at that cut. The methodology version is embedded in the label so any cited vintage value carries the rules that produced it. When methodology revises to `v0.3-beta`, the next vintage label embeds that version, and the v0.2-beta vintages remain stable as historical citations.
 
 Pinning a citation to a specific vintage gives the reader a value that does not move. If the upstream World Bank revises a 2024 GDP figure six months later, that revision lands in a new vintage; the prior snapshot is unchanged. Civica stores vintages uniformly, while displays can filter quarters where nothing materially changed so readers do not need to scroll past silent vintages.
 
@@ -269,7 +269,7 @@ Sometimes the source Civica regards as the editorial authority for a fact is not
 
 When the editorial canonical happens to also be the freshest source, both questions resolve to the same row and there is nothing to explain. But canonical publishers often release on slow cycles — the UN Population Division refreshes its World Population Prospects dataset every two years, and the WHO GHO ships life-expectancy on a similar slow cadence. While that cycle runs, fresher data from the CIA, the World Bank, or an NSO may sit on the same fact and win on freshness. The country page shows the freshest value; the alternates panel shows the editorial canonical alongside. Worked Example 2 above (United States life expectancy, where UN WPP's 77.05 (2024) wins display while WHO's 76.37 (2021) is editorially canonical) is the textbook case.
 
-The same pattern surfaces on Brazil's population. Civica holds six values for that fact, each from a different publisher, each with a different measurement date: IBGE 213,421,040 (2025) — the NSO winner; the CIA 221,359,387 (2025); the World Bank 211,998,573 (2024); UN WPP 211,998,573 (2024, bit-exact match); the IMF 216,988,990 (2031, projected); Wikidata 203,062,512 (2022). UN is the editorial canonical for population because nearly every other source — including the World Bank — derives its number from UN WPP. IBGE wins on freshness in 2025 because the country's own statistical office publishes ahead of UN's biennial revision. When UN ships the next WPP revision, the canonical pick will move back to UN automatically — no methodology change needed.
+The frozen 2026-Q1 example shows the same pattern on Brazil's population. At that cut, Civica held six values for that fact, each from a different publisher, each with a different measurement date: IBGE 213,421,040 (2025) — the NSO winner; the CIA 221,359,387 (2025); the World Bank 211,998,573 (2024); UN WPP 211,998,573 (2024, bit-exact match); the IMF 216,988,990 (2031, projected); Wikidata 203,062,512 (2022). UN is the editorial canonical for population because nearly every other source — including the World Bank — derives its number from UN WPP. IBGE wins on freshness in 2025 because the country's own statistical office publishes ahead of UN's biennial revision. When UN ships the next WPP revision, the canonical pick will move back to UN automatically — no methodology change needed.
 
 This is not a contradiction. It is how Civica balances two honest answers to two different questions: *who measured this*, and *what's the most recent measurement*. A reader who sees an NSO value on the country page and a UN or WHO label on the alternates panel is seeing the system working as designed.
 
@@ -285,7 +285,7 @@ The flagship example: in early 2026, Civica ingested mean and expected years of 
 
 **Shared canonical publishers.** A small number of fact-keys are computed by two independent Tier-1 publishers using the same joint methodology. When this happens, both publishers ship as canonical — neither is the "true" upstream.
 
-The first such case landed at `health_expenditure_pct_gdp`: the WHO Global Health Expenditure Database (~190 countries) and the OECD System of Health Accounts (51 countries — 38 OECD members plus 13 SHA partners) both apply the SHA-2011 methodology jointly developed by WHO, OECD, and Eurostat. Their numerators (current health expenditure summed across all financing schemes) and denominators (GDP at market prices) come from the same primary national health-account submissions; values converge to within ~0.1 percentage points and the small remaining noise reflects GDP-revision pickup timing rather than real methodological disagreement. The resolver picks the fresher row within envelope; the alternates panel renders both as editorial canonical for their respective coverage scopes.
+The first such case landed at `health_expenditure_pct_gdp`: the WHO Global Health Expenditure Database (broad global coverage) and the OECD System of Health Accounts (OECD members and participating SHA partners) both apply the SHA-2011 methodology jointly developed by WHO, OECD, and Eurostat. Their numerators (current health expenditure summed across all financing schemes) and denominators (GDP at market prices) come from the same primary national health-account submissions; values converge to within ~0.1 percentage points and the small remaining noise reflects GDP-revision pickup timing rather than real methodological disagreement. The resolver picks the fresher row within envelope; the alternates panel renders both as editorial canonical for their respective coverage scopes.
 
 A reader who sees two canonical labels next to one fact is looking at the second pattern. A reader who sees a UNESCO canonical label on a row that used to cite UNDP is looking at the first. These patterns are distinct from the multi-canonical-with-scope-predicate pattern documented above (where two publishers are canonical for the same fact-key in different scopes); here the two publishers are jointly methodologically responsible for the measurement itself.
 
@@ -301,7 +301,7 @@ Readers can also file a dispute manually. The unified corrections form at [/civi
 
 Operators review through an admin shell. They see both values, both citations, both measurement dates, a diff highlight, the resolver's proposed action and rationale, and three buttons: accept the proposal, override and pick a specific source, or hold for further investigation. Every action writes to an audit log with before-and-after JSON snapshots, the reviewer's identity, the action, and any notes.
 
-A daily auto-resolve cron at 02:30 UTC re-evaluates every open `material_error` dispute against the current resolver output. If the resolver no longer proposes the dispute (because thresholds have been refined or because the underlying values have shifted), the cron marks it `resolved_auto_stale` with an audit-log row. The stale-cleanup pattern accounts for the empirical observation that 31 of 33 disputes in the live system were stale by-products of pre-threshold-raise resolver runs. Group A, Group C, and plausibility-envelope disputes are *never* auto-resolved — identity and categorical conflicts always require human eyes.
+A daily auto-resolve cron at 02:30 UTC re-evaluates every open `material_error` dispute against the current resolver output. If the resolver no longer proposes the dispute (because thresholds have been refined or because the underlying values have shifted), the cron marks it `resolved_auto_stale` with an audit-log row. At the methodology v0.2-beta cut on 5 May 2026, 31 of 33 disputes were stale by-products of pre-threshold-raise resolver runs. Group A, Group C, and plausibility-envelope disputes are *never* auto-resolved — identity and categorical conflicts always require human eyes.
 
 Resolution targets — these are targets, not gates; the fact continues to render the prior canonical value while the dispute is open:
 

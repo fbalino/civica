@@ -7,15 +7,15 @@ import { withOg } from "@/lib/og";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Public API — Governance Data for 250+ Countries",
+  title: "Public API — Sovereign-State Governance Data",
   // PUBLIC_CLAIM: api.coverage-and-products
   description:
-    "Documentation for the Civica public REST API: government structure, country metadata, Civica Index scores, and political system classifications for 250+ countries.",
+    "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, Civica Index scores, and political-system classifications.",
   alternates: { canonical: "https://civicaatlas.org/api-docs" },
   openGraph: withOg({
-    title: "Public API — Governance Data for 250+ Countries · Civica Atlas",
+    title: "Public API — Sovereign-State Governance Data · Civica Atlas",
     description:
-      "Documentation for the Civica public REST API. Access government structure and governance data for 250+ countries.",
+      "Documentation for the Civica public REST API. Access sovereign-state government structure and governance data.",
     url: "https://civicaatlas.org/api-docs",
   }),
 };
@@ -28,7 +28,6 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "endpoints", label: "Endpoints" },
   { id: "countries", label: "List countries" },
   { id: "country-detail", label: "Country detail" },
-  { id: "government-types", label: "Government types" },
   { id: "peer-groupings", label: "Peer groupings" },
   { id: "index-rankings", label: "Index rankings" },
   { id: "index-country", label: "Index country" },
@@ -87,7 +86,10 @@ function EndpointSection({
         </>
       )}
 
-      <h4 className="api-section-label">Example Response</h4>
+      <h4 className="api-section-label">Illustrative Example Response</h4>
+      <p className="api-info-card__body">
+        Values and totals shown below are illustrative; live responses may differ.
+      </p>
       <CodeBlock>{exampleResponse}</CodeBlock>
     </section>
   );
@@ -157,7 +159,7 @@ export default function ApiDocsPage() {
 
         <p className="api-intro">
           The Civica API provides read-only access to government structure data for
-          250+ countries. All responses are JSON. No authentication is required.
+          sovereign states. All responses are JSON. No authentication is required.
         </p>
 
         <div className="api-info-card">
@@ -215,7 +217,7 @@ export default function ApiDocsPage() {
           id="countries"
           method="GET"
           path="/api/v1/countries"
-          description="Returns a paginated list of sovereign states with basic metadata. Filter by continent or peer-lens taxonomy. The legacy ?taxonomy=structural and ?taxonomy=regime filters remain functional through 2027-03-31; new code should pass the typed peer-lens values (region | income | vdem | cgv | monarchy)."
+          description="Returns a paginated list of sovereign states with basic metadata. Filter by continent or by a typed peer lens: region, income, V-Dem regime, CGV regime, or monarchy status."
           parameters={[
             {
               name: "continent",
@@ -226,7 +228,7 @@ export default function ApiDocsPage() {
               name: "taxonomy",
               type: "string",
               description:
-                "Filter lens. Accepts: raw | region | income | vdem | cgv | monarchy | structural (DEPRECATED) | regime (DEPRECATED). When non-raw, pair with `government_type` to filter by lens value.",
+                "Filter lens. Accepts: raw | region | income | vdem | cgv | monarchy. When non-raw, pair with `government_type` to filter by lens value.",
             },
             {
               name: "government_type",
@@ -262,8 +264,6 @@ export default function ApiDocsPage() {
         "regimeType": "presidential_democracy",
         "regimeSource": "Bjornskov-Rode / CGV (QoG Standard)",
         "regimeYear": 2025,
-        "structuralFamily": "presidential_republic (DEPRECATED — sunset T+2 vintages)",
-        "structuralSubtype": "federal_presidential_republic (DEPRECATED — sunset T+2 vintages)",
         "primitives": {
           "isFederal": true,
           "isMonarchy": false,
@@ -314,8 +314,6 @@ export default function ApiDocsPage() {
       "regimeType": "semi_presidential_democracy",
       "regimeSource": "Bjornskov-Rode / CGV (QoG Standard)",
       "regimeYear": 2025,
-      "structuralFamily": "semi_presidential (DEPRECATED — sunset T+2 vintages)",
-      "structuralSubtype": "semi_presidential_republic (DEPRECATED — sunset T+2 vintages)",
       "primitives": {
         "isFederal": false,
         "isMonarchy": false,
@@ -351,40 +349,6 @@ export default function ApiDocsPage() {
       ],
       "legislative": [...]
     }
-  }
-}`}
-        />
-
-        <EndpointSection
-          id="government-types"
-          method="GET"
-          path="/api/v1/government-types"
-          description="Deprecated; scheduled for removal on 2027-03-31. Use /api/v1/peer-groupings for current domain-specific peer-lens metadata."
-          exampleResponse={`{
-  "data": [
-    {
-      "governmentType": "presidential republic",
-      "count": 42,
-      "topExamples": ["United States", "Brazil", "Indonesia", "Nigeria", "Mexico"]
-    }
-  ],
-  "meta": {
-    "total": 12,
-    "deprecations": [
-      {
-        "identifier": "structural_family",
-        "kind": "field+filter",
-        "sunset": "2027-03-31",
-        "successor": "/api/v1/peer-groupings",
-        "replacedBy": [
-          "world_bank_region",
-          "world_bank_income_group",
-          "vdem_row",
-          "monarchy_status",
-          "government_form_description"
-        ]
-      }
-    ]
   }
 }`}
         />
@@ -658,8 +622,7 @@ export default function ApiDocsPage() {
         <h3 className="api-example-heading">curl</h3>
         <CodeBlock>{`curl "${BASE_URL}/countries?continent=Europe&limit=10"
 curl "${BASE_URL}/countries/us"
-curl "${BASE_URL}/peer-groupings"            # peer-lens metadata
-curl "${BASE_URL}/government-types"          # DEPRECATED — sunsets 2027-03-31`}</CodeBlock>
+curl "${BASE_URL}/peer-groupings"            # peer-lens metadata`}</CodeBlock>
 
         <h3 className="api-example-heading">JavaScript (fetch)</h3>
         <CodeBlock>{`const res = await fetch("${BASE_URL}/countries/fr");
@@ -680,12 +643,12 @@ for country in resp.json()["data"]:
         <h2>Bulk Data</h2>
 
         <p className="api-intro">
-          Every country&rsquo;s full record is downloadable in one request as
-          JSON or CSV. To assemble the whole dataset, enumerate countries with{" "}
-          <code>/api/v1/countries</code> and pull each country&rsquo;s export.
-          The JSON export carries a per-fact provenance block; the CSV export
-          carries a self-describing citation header so the file is traceable
-          when opened in a spreadsheet or research tool.
+          Each sovereign state&rsquo;s full record is downloadable in one request
+          as JSON or CSV. To assemble the sovereign-state dataset, enumerate
+          countries with <code>/api/v1/countries</code> and pull each
+          country&rsquo;s export. The JSON export carries a per-fact provenance
+          block; the CSV export carries a self-describing citation header so
+          the file is traceable when opened in a spreadsheet or research tool.
         </p>
 
         <EndpointSection
@@ -712,7 +675,7 @@ for country in resp.json()["data"]:
         />
 
         <h3 className="api-example-heading">Full-dataset pull (bash)</h3>
-        <CodeBlock>{`# 1. Enumerate every country slug (paginate with limit/offset until meta.hasMore is false).
+        <CodeBlock>{`# 1. Enumerate every sovereign-state slug (paginate with limit/offset until meta.hasMore is false).
 curl "${BASE_URL}/countries?limit=250&offset=0" | jq -r '.data[].slug' > slugs.txt
 
 # 2. Download each country's full record. Stay under the 30/min/IP export limit.
@@ -728,8 +691,8 @@ done < slugs.txt`}</CodeBlock>
           A single frozen, versioned dataset artifact — one download for the
           entire atlas, with a persistent identifier for citation — is a planned
           addition. Until it ships, the per-country export plus the country list
-          above is the supported path for a complete pull, and every record
-          keeps its source, license, and vintage attached.
+          above is the supported path for a complete sovereign-state pull, and
+          every record keeps its source, license, and vintage attached.
         </p>
       </section>
 

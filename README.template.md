@@ -51,7 +51,7 @@ Most public country-data sites republish a single upstream source (usually CIA F
 
 Civica's pipeline is built on opposite premises:
 
-- **Multi-source reconciliation.** Currently {{stats.activeSources | "20"}} active source orchestrators (CIA Factbook archive; the {{ctx.tier1ShippedCountWord}} Tier-1 publishers — {{ctx.tier1ShippedFullNamesProse}}; V-Dem; Wikidata; and {{ctx.nsoInProgressCountWord}} national statistics offices already syncing — {{ctx.nsoInProgressNamesProse}}) writing into a canonical `country_facts` table. ~{{ctx.totalFactsRoundedThousands | "26,000"}} reconciled facts across {{stats.distinctFactKeys | "88"}} declared fact-keys. v1 target is {{ctx.tier1ShippedCount}} Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus {{state.nsoTarget.min}}–{{state.nsoTarget.max}} national statistics offices (first wave: {{ctx.nsoInProgressCount}} in progress; {{ctx.nsoDeferredNamesProse}}).
+- **Multi-source reconciliation.** Currently {{stats.activeSources | "multiple"}} active source orchestrators (CIA Factbook archive; the {{ctx.tier1ShippedCountWord}} Tier-1 publishers — {{ctx.tier1ShippedFullNamesProse}}; V-Dem; Wikidata; and {{ctx.nsoInProgressCountWord}} national statistics offices already syncing — {{ctx.nsoInProgressNamesProse}}) writing into a canonical `country_facts` table. {{ctx.totalFactsRoundedThousands | "Many"}} reconciled facts across {{stats.distinctFactKeys | "many"}} declared fact-keys. v1 target is {{ctx.tier1ShippedCount}} Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus {{state.nsoTarget.min}}–{{state.nsoTarget.max}} national statistics offices (first wave: {{ctx.nsoInProgressCount}} in progress; {{ctx.nsoDeferredNamesProse}}).
 
 - <!-- PUBLIC_CLAIM: readme.per-value-provenance --> **Per-fact provenance where implemented.** Resolver-backed values can render a `<FactValueDot>` chevron showing the selected source, available alternatives, observation dates, and license metadata. Civica does not yet claim universal per-value coverage.
 
@@ -69,10 +69,10 @@ This is a pre-launch project. Honest snapshot:
 
 | Metric | Status |
 |---|---|
-| Active source orchestrators writing facts | {{stats.activeSources | "20"}} ({{ctx.tier1ShippedCount}} Tier-1 + CIA archive + Wikidata + V-Dem + {{ctx.nsoInProgressCount}} NSO Wave 1) — IEA scrapped due to license incompatibility |
-| `country_facts` rows | ~{{ctx.totalFactsRoundedThousands | "26,000"}} across {{stats.distinctFactKeys | "88"}} declared fact-keys |
-| Multi-sourced fact-keys (≥2 sources, at least one country) | {{stats.multiSourcedFactKeys | "27"}} |
-| 5+ source fact-keys | {{stats.fiveSourceFactKeys | "5"}} ({{ctx.fiveSourceFactKeyNamesProse}}) |
+| Active source orchestrators writing facts | {{stats.activeSources | "Multiple"}} ({{ctx.tier1ShippedCount}} Tier-1 + CIA archive + Wikidata + V-Dem + {{ctx.nsoInProgressCount}} NSO Wave 1) — IEA scrapped due to license incompatibility |
+| `country_facts` rows | {{ctx.totalFactsRoundedThousands | "Many"}} across {{stats.distinctFactKeys | "many"}} declared fact-keys |
+| Multi-sourced fact-keys (two or more sources, at least one country) | {{stats.multiSourcedFactKeys | "Multiple"}} |
+| Fact-keys with five or more sources | {{stats.fiveSourceFactKeys | "Several"}} ({{ctx.fiveSourceFactKeyNamesProse | "publisher list unavailable while the database is offline"}}) |
 | Adopted methodology resolution docs | {{state.adoptedResolutionCount}}+ |
 | NSO (national statistics office) syncs | First wave: {{ctx.nsoInProgressCount}} in progress ({{ctx.nsoInProgressNamesProse}}); {{ctx.nsoDeferredStatusTableProse}} |
 | External methodology review | {{ctx.externalReviewStatusProse}} |
@@ -80,7 +80,7 @@ This is a pre-launch project. Honest snapshot:
 
 The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in {{ctx.civicaIndexStatusUpper}}, scored under the v2-Beta {{ctx.civicaIndexDimensionCountWord}}-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`). Stabilization depends on longitudinal, factor-analysis, and input-variation validation plus external academic review; no launch date is claimed.
 
-For live numbers (active sources, fact counts, multi-sourced coverage), see `/about` — values are read directly from the database, not maintained as inline prose. Page values may briefly differ from the metrics above as new vintages land.
+For live source and fact-layer totals, see `/country/methodology/reconciliation` — those values are read directly from the database rather than maintained as inline prose. Page values may briefly differ from this generated README as new vintages land.
 
 Reader pages may show "BETA" markers in places where the underlying data layer or methodology is still being finalized. This is by design — silent staleness is dishonest; flagged staleness is academic discipline.
 
@@ -136,7 +136,7 @@ Civica's data and posture are deeply indebted to the institutions whose work it 
 - [International Monetary Fund](https://www.imf.org/en/Publications/WEO) — World Economic Outlook macroeconomic data and projections.
 - [United Nations Statistics Division](https://unstats.un.org), [UN Population Division](https://population.un.org), [UNDP](https://hdr.undp.org), [WHO Global Health Observatory](https://www.who.int/data/gho), [UNESCO Institute for Statistics](https://uis.unesco.org), [OECD.Stat](https://stats.oecd.org), [FAO FAOSTAT](https://www.fao.org/faostat), [ILO ILOSTAT](https://ilostat.ilo.org), [Eurostat](https://ec.europa.eu/eurostat), [WTO Stats](https://stats.wto.org).
 - [Inter-Parliamentary Union (IPU Parline)](https://data.ipu.org) — national parliament structural data.
-- [Constitute Project](https://constituteproject.org) — full-text constitutions for 200+ countries.
+- [Constitute Project](https://constituteproject.org) — full-text constitutions and comparative constitutional data.
 - [Bjørnskov-Rode / CGV regime classification](https://qog.pol.gu.se) — academic regime taxonomy.
 - [Wikidata](https://www.wikidata.org) — structured knowledge spine.
 

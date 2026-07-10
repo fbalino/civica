@@ -111,11 +111,13 @@ export default function ElectionsClient({
   recent,
   stats,
   coverage,
+  dataAvailable,
 }: {
   upcoming: ElectionRow[];
   recent: ElectionRow[];
-  stats: Stats;
+  stats: Stats | null;
   coverage: Coverage | null;
+  dataAvailable: boolean;
 }) {
   const [regionFilter, setRegionFilter] = useState("All Regions");
   const [typeFilter, setTypeFilter] = useState("All Types");
@@ -218,10 +220,10 @@ export default function ElectionsClient({
         {/* Stats — matching Index page pattern. */}
         <Reveal as="div" amount={0.4} className="index-stats-row" style={{ marginBottom: "var(--space-7)" }}>
           {[
-            { value: stats.electionsThisYear ?? "—", label: `Elections in ${new Date().getFullYear()}` },
-            { value: stats.upcomingCount ?? "—", label: "Upcoming" },
-            { value: stats.avgTurnout != null ? `${stats.avgTurnout}%` : "—", label: "Avg Turnout" },
-            { value: stats.totalElections != null ? stats.totalElections.toLocaleString() : "—", label: "Total Tracked" },
+            { value: stats?.electionsThisYear ?? "—", label: `Elections in ${new Date().getFullYear()}` },
+            { value: stats?.upcomingCount ?? "—", label: "Upcoming" },
+            { value: stats?.avgTurnout != null ? `${stats.avgTurnout}%` : "—", label: "Avg Turnout" },
+            { value: stats?.totalElections != null ? stats.totalElections.toLocaleString() : "—", label: "Total Tracked" },
           ].map((s, i, arr) => (
             <div key={s.label} style={{ display: "contents" }}>
               <div className="index-stat">
@@ -373,7 +375,11 @@ export default function ElectionsClient({
           <div className="index-continent-header">
             <h2 className="index-continent-title">Recent Results</h2>
             <div className="index-continent-meta">
-              <span>{filteredRecent.length} elections</span>
+              <span>
+                {dataAvailable
+                  ? `${filteredRecent.length} elections`
+                  : "Data temporarily unavailable"}
+              </span>
             </div>
           </div>
 
@@ -399,7 +405,9 @@ export default function ElectionsClient({
 
             {recentByYear.length === 0 && (
               <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-15)", color: "var(--color-text-25)", padding: "40px 0", textAlign: "center" }}>
-                {anyFilterActive
+                {!dataAvailable
+                  ? "Election data is temporarily unavailable."
+                  : anyFilterActive
                   ? "No compiled results match the current filters."
                   : "No compiled results yet."}
               </p>
