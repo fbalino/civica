@@ -62,6 +62,11 @@ export const currentVintage =
 // Civica Index (CI) — composite governance score
 // ─────────────────────────────────────────────────────────────────────
 
+import { getPcaAnalysisSummary as PCA_ANALYSIS_SUMMARY_FN } from "@/lib/ci/pca-analysis";
+/** Computed once at module load — pure, DB-free, no clock. See
+ *  `civicaIndex.pca` below. */
+const PCA_ANALYSIS_SUMMARY = PCA_ANALYSIS_SUMMARY_FN();
+
 /** Methodology-version state, dimension catalogue, and weights for the
  *  Civica Index. Resolves the README/About "six dimensions" vs CI
  *  methodology page "four dimensions" inconsistency: the running v2
@@ -100,14 +105,24 @@ export const civicaIndex = {
 
   /** Phase 5.3 PCA results — the empirical justification for
    *  weights above. Single source of truth for both the methodology
-   *  page and the PCA appendix. */
+   *  page and the PCA appendix.
+   *
+   *  `panelSize`, `pc1VarianceExplained`, `pc1LoadingRange`, and
+   *  `correlationRange` are DERIVED from
+   *  `src/lib/ci/pca-analysis.generated.json` via
+   *  `getPcaAnalysisSummary()` (CLM-009 bounded-repair F1) — never
+   *  hardcode these a second time here; the generated snapshot is the
+   *  only place the underlying analysis-run numbers exist.
+   *  `lastRunDate` and `dataVintage` are presentation-only labels not
+   *  recoverable from the snapshot's raw numbers and remain manually
+   *  maintained. */
   pca: {
     lastRunDate: "April 2026" as const,
-    panelSize: 46 as const,
     dataVintage: "2023" as const,
-    pc1VarianceExplained: 0.907 as const,
-    pc1LoadingRange: [0.479, 0.516] as const,
-    correlationRange: [0.74, 0.98] as const,
+    panelSize: PCA_ANALYSIS_SUMMARY.panelSize,
+    pc1VarianceExplained: PCA_ANALYSIS_SUMMARY.pc1VarianceExplained,
+    pc1LoadingRange: PCA_ANALYSIS_SUMMARY.pc1LoadingRange,
+    correlationRange: PCA_ANALYSIS_SUMMARY.correlationRange,
   },
 
   /** Status of the v2 methodology rebuild. v2 here refers to the
@@ -204,10 +219,17 @@ export const reconciliation = {
 // Peer grouping methodology
 // ─────────────────────────────────────────────────────────────────────
 
+import { DEFAULT_MIN_N as PEER_GROUPING_DEFAULT_MIN_N } from "@/lib/peer-grouping/constants";
+
 export const peerGrouping = {
   version: "v1.0" as const,
   adoptedAt: "2026-05-02" as const,
   externalReviewStatus: "pending" as const,
+  /** The minimum-n rule cited in the methodology's fallback-chain
+   *  section. Imported from the pure `constants.ts` module (NOT
+   *  `@/lib/peer-grouping`, which imports the database) so this
+   *  DB-free config file stays DB-free. */
+  defaultMinN: PEER_GROUPING_DEFAULT_MIN_N,
   /** Page-version changelog. Each revision documents what changed
    *  and why. */
   versionHistory: [

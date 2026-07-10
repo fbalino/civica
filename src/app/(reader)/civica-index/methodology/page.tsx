@@ -199,7 +199,8 @@ export default async function MethodologyPage() {
           ))}
         </div>
 
-        <table>
+        <div className="editorial-table-scroll">
+          <table>
           <thead>
             <tr>
               <th>Dimension</th>
@@ -218,7 +219,8 @@ export default async function MethodologyPage() {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
 
         <p>
           <strong>The weights above are PCA-derived and adopted.</strong>{" "}

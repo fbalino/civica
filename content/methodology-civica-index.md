@@ -43,12 +43,16 @@ Scores are integers, not decimals. The underlying data is not precise enough to 
 
 Every source uses a different native scale. Civica normalizes them to 0–100 using **fixed theoretical bounds** rather than observed minimums and maximums, so scores remain comparable across years and aren't shifted by changes elsewhere in the dataset. The current implementation is a hard-coded lookup table, one row per source actually ingested into the four headline dimensions — there is no fallback transform for a source outside this table; the dimension is simply skipped:
 
+[//]: # "GEN:START normalization-table (source: scripts/generate-ci-normalization-table.ts)"
+
 | Dimension | Source | Native scale | Transform to 0–100 |
 |---|---|---|---|
 | Democratic quality | V-Dem Liberal Democracy Index | 0.0 – 1.0 | score × 100 |
 | Rule of law | World Bank WGI Rule of Law | −2.5 to +2.5 | ((score + 2.5) / 5.0) × 100 |
 | Freedoms & rights | Freedom House (PR + CL, combined) | 2 – 14 (sum, inverted) | ((14 − score) / 12) × 100 |
 | Corruption control | Transparency International CPI | 0 – 100 | score (already on target scale) |
+
+[//]: # "GEN:END normalization-table"
 
 ## Section 4 · Weight determination {#weights}
 

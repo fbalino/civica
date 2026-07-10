@@ -37,6 +37,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { jurisdictions, governmentTaxonomies } from "@/lib/db/schema";
 import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
+import { DEFAULT_MIN_N } from "@/lib/peer-grouping/constants";
 import type {
   PeerLensName,
   WorldBankIncomeGroupKey,
@@ -48,8 +49,10 @@ import type {
  * Public types
  * ──────────────────────────────────────────────────────────────── */
 
-/** The default minimum-n threshold for rendering a peer band. */
-export const DEFAULT_MIN_N = 8;
+/** The default minimum-n threshold for rendering a peer band. Defined
+ *  in the pure `constants.ts` module (no DB import) and re-exported
+ *  here for existing call sites — see that file for why. */
+export { DEFAULT_MIN_N };
 
 export type PeerSetFallbackReason =
   | "n_below_threshold"

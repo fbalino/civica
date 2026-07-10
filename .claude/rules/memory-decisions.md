@@ -1,5 +1,14 @@
 # Project Memory Decisions
 
+## 2026-07-10 — One canonical source per methodology/release concept
+
+Methodology and release concepts have exactly one named canonical path/symbol
+in `src/lib/docs/doc-concepts.ts`. Mirrors are generated, interpolated/imported,
+contract-tested, or link-only; they are never independent prose copies. Run
+`npm run validate:doc-sources` after changing a registered concept, formula,
+route, anchor, or generated block. Durable record: APR-D024 in
+`plan/DECISIONS.md`.
+
 ## 2026-07-09 — Index retained during validation; prelaunch docs state current truth
 
 - Removing A–F grades and qualitative country bands does **not** retire the

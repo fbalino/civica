@@ -8,6 +8,7 @@ import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { EigenvalueChart } from "@/components/methodology/EigenvalueChart";
 import { Reveal } from "@/components/motion/Reveal";
 import { civicaIndex } from "@/lib/content/site-state";
+import pcaAnalysis from "@/lib/ci/pca-analysis.generated.json";
 
 export const revalidate = 3600;
 
@@ -40,48 +41,48 @@ const ADOPTED_WEIGHT_BY_ID: Record<string, number> = Object.fromEntries(
   civicaIndex.dimensions.map((d) => [d.id, d.weight]),
 );
 
-const LOADINGS: LoadingRow[] = [
-  {
-    dimension: "democratic_quality",
-    label: "Democratic quality",
-    pc1: 0.516,
-    pc2: 0.261,
-    pc3: -0.529,
-    pc4: 0.621,
-    weightSuggested: 0.266,
-    weightProvisional: 0.30,
-  },
-  {
-    dimension: "rule_of_law",
-    label: "Rule of law",
-    pc1: 0.507,
-    pc2: -0.407,
-    pc3: 0.684,
-    pc4: 0.333,
-    weightSuggested: 0.257,
-    weightProvisional: 0.25,
-  },
-  {
-    dimension: "freedom_rights",
-    label: "Freedoms & rights",
-    pc1: 0.479,
-    pc2: 0.698,
-    pc3: 0.280,
-    pc4: -0.452,
-    weightSuggested: 0.229,
-    weightProvisional: 0.25,
-  },
-  {
-    dimension: "corruption_control",
-    label: "Corruption control",
-    pc1: 0.498,
-    pc2: -0.528,
-    pc3: -0.417,
-    pc4: -0.547,
-    weightSuggested: 0.248,
-    weightProvisional: 0.20,
-  },
-];
+/** Display-label lookup, same source as `ADOPTED_WEIGHT_BY_ID`. */
+const LABEL_BY_ID: Record<string, string> = Object.fromEntries(
+  civicaIndex.dimensions.map((d) => [d.id, d.label]),
+);
+
+/** Find a row in a generated-snapshot array by its `dimension` key, or
+ *  throw — the snapshot and `civicaIndex.dimensions` are both derived
+ *  from the same four-dimension governance core, so a miss here means
+ *  the generated snapshot is stale (see `npm run generate:pca-analysis
+ *  -- --check`), not a normal runtime condition to fall back from. */
+function findByDimension<T extends { dimension: string }>(
+  rows: readonly T[],
+  dimension: string,
+): T {
+  const row = rows.find((r) => r.dimension === dimension);
+  if (!row) {
+    throw new Error(
+      `pca-appendix: no row for dimension "${dimension}" in generated PCA snapshot`,
+    );
+  }
+  return row;
+}
+
+const LOADINGS: LoadingRow[] = pcaAnalysis.dimensions.map((dimension) => {
+  const pca = findByDimension(pcaAnalysis.loadingsPca, dimension);
+  return {
+    dimension,
+    label: LABEL_BY_ID[dimension] ?? dimension,
+    pc1: pca.pc1,
+    pc2: pca.pc2,
+    pc3: pca.pc3,
+    pc4: pca.pc4,
+    weightSuggested:
+      pcaAnalysis.pcaSuggestedWeights[
+        dimension as keyof typeof pcaAnalysis.pcaSuggestedWeights
+      ],
+    weightProvisional:
+      pcaAnalysis.provisionalWeights[
+        dimension as keyof typeof pcaAnalysis.provisionalWeights
+      ],
+  };
+});
 
 interface EigenRow {
   pc: string;
@@ -90,12 +91,12 @@ interface EigenRow {
   cumulative: number;
 }
 
-const EIGENVALUES: EigenRow[] = [
-  { pc: "PC1", eigenvalue: 3.707, varExplained: 0.907, cumulative: 0.907 },
-  { pc: "PC2", eigenvalue: 0.343, varExplained: 0.084, cumulative: 0.991 },
-  { pc: "PC3", eigenvalue: 0.027, varExplained: 0.007, cumulative: 0.997 },
-  { pc: "PC4", eigenvalue: 0.011, varExplained: 0.003, cumulative: 1.000 },
-];
+const EIGENVALUES: EigenRow[] = pcaAnalysis.eigenvalues.map((e) => ({
+  pc: e.component,
+  eigenvalue: e.eigenvalue,
+  varExplained: e.varianceExplained,
+  cumulative: e.cumulative,
+}));
 
 interface CorrRow {
   dim: string;
@@ -105,36 +106,16 @@ interface CorrRow {
   corruption_control: number;
 }
 
-const CORRELATIONS: CorrRow[] = [
-  {
-    dim: "Democratic quality",
-    democratic_quality: 1.0,
-    rule_of_law: 0.90,
-    freedom_rights: 0.95,
-    corruption_control: 0.89,
-  },
-  {
-    dim: "Rule of law",
-    democratic_quality: 0.90,
-    rule_of_law: 1.0,
-    freedom_rights: 0.81,
-    corruption_control: 0.98,
-  },
-  {
-    dim: "Freedoms & rights",
-    democratic_quality: 0.95,
-    rule_of_law: 0.81,
-    freedom_rights: 1.0,
-    corruption_control: 0.74,
-  },
-  {
-    dim: "Corruption control",
-    democratic_quality: 0.89,
-    rule_of_law: 0.98,
-    freedom_rights: 0.74,
-    corruption_control: 1.0,
-  },
-];
+const CORRELATIONS: CorrRow[] = pcaAnalysis.dimensions.map((dimension) => {
+  const row = findByDimension(pcaAnalysis.correlations, dimension);
+  return {
+    dim: LABEL_BY_ID[dimension] ?? dimension,
+    democratic_quality: row.values.democratic_quality,
+    rule_of_law: row.values.rule_of_law,
+    freedom_rights: row.values.freedom_rights,
+    corruption_control: row.values.corruption_control,
+  };
+});
 
 const SECTIONS = [
   { id: "summary", label: "Headline finding" },
@@ -228,7 +209,8 @@ export default function PcaAppendixPage() {
             (a standard practice in composite-index construction):
           </p>
 
-          <table>
+          <div className="editorial-table-scroll">
+            <table>
             <thead>
               <tr>
                 <th>Dimension</th>
@@ -262,7 +244,8 @@ export default function PcaAppendixPage() {
                 <td className="editorial-td-num">1.00</td>
               </tr>
             </tbody>
-          </table>
+            </table>
+          </div>
 
           <p>
             The biggest revision is corruption control (0.20 →{" "}
@@ -298,7 +281,8 @@ export default function PcaAppendixPage() {
             Pearson correlations between the{" "}
             {civicaIndex.dimensionCount} normalized dimensions:
           </p>
-          <table>
+          <div className="editorial-table-scroll">
+            <table>
             <thead>
               <tr>
                 <th></th>
@@ -325,7 +309,8 @@ export default function PcaAppendixPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
           <p>
             Every off-diagonal correlation is above {corrLow} — strong
             by any reasonable threshold. Rule of law and corruption
@@ -348,7 +333,8 @@ export default function PcaAppendixPage() {
             PCA on the standardized panel (mean 0, variance 1 per
             dimension) yields these eigenvalues:
           </p>
-          <table>
+          <div className="editorial-table-scroll">
+            <table>
             <thead>
               <tr>
                 <th>Component</th>
@@ -373,7 +359,8 @@ export default function PcaAppendixPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
           <p>
             The Kaiser criterion (retain components with eigenvalue
             &gt; 1) selects only PC1. The scree plot makes the same
@@ -399,7 +386,8 @@ export default function PcaAppendixPage() {
             How much each dimension contributes to each principal
             component:
           </p>
-          <table>
+          <div className="editorial-table-scroll">
+            <table>
             <thead>
               <tr>
                 <th>Dimension</th>
@@ -420,7 +408,8 @@ export default function PcaAppendixPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+            </table>
+          </div>
           <p>
             On PC1 — the only component the data supports — the{" "}
             {civicaIndex.dimensionCount} loadings are tightly clustered

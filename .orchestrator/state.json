@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-008_complete"
+    "current_task": "CLM-009_complete_next_CLM-010"
   },
   "budget": {
     "mode": "subscription_only",
@@ -23,6 +23,7 @@
     "codex_subagents": {
       "default": "disabled for routine work",
       "allowed_preferences": [
+        "spark",
         "luna",
         "terra"
       ],
@@ -115,6 +116,87 @@
       "session_id": "ebb6f311-59e1-439b-b945-3b8aab4f99e1",
       "subscription_first": true,
       "ownership": "read-only CLM-008 acceptance review"
+    },
+    "sn5_clm009_documentation_audit": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "81e8146e-49b1-4d7e-bf0d-73af622ef561",
+      "subscription_first": true,
+      "ownership": "read-only CLM-009 concept and duplication ledger"
+    },
+    "op48_clm009_registry_architecture": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "08aabf62-620c-4cc0-b00d-ed0fd6b652d3",
+      "subscription_first": true,
+      "ownership": "read-only CLM-009 registry architecture"
+    },
+    "op48_clm009_reconciled_architecture": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "08aabf62-620c-4cc0-b00d-ed0fd6b652d3",
+      "subscription_first": true,
+      "ownership": "read-only reconciliation of CLM-009 audit findings"
+    },
+    "sn5_clm009_implementation": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "5b4e0939-9cff-45aa-88de-c9588b040e08",
+      "subscription_first": true,
+      "ownership": "single writer for CLM-009 implementation files"
+    },
+    "op48_clm009_final_review": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "08aabf62-620c-4cc0-b00d-ed0fd6b652d3",
+      "subscription_first": true,
+      "ownership": "read-only CLM-009 acceptance review"
+    },
+    "sn5_clm009_browser_qa": {
+      "status": "blocked",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "fbf2527e-495c-4683-ad64-1bd78ee68d7f",
+      "subscription_first": true,
+      "ownership": "browser QA and plan/evidence/CLM-009 browser artifacts only"
+    },
+    "tr_clm009_browser_qa": {
+      "status": "completed",
+      "provider": "codex-cli",
+      "model_requested": "gpt-5.6-terra",
+      "model_used": "gpt-5.6-terra",
+      "session_id": "019f4b08-3125-7712-a9af-ac7b01999d7e",
+      "subscription_first": true,
+      "ownership": "browser QA and plan/evidence/CLM-009 browser artifacts only"
+    },
+    "sn5_clm009_browser_acceptance_repair": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "2b329bbd-f9a1-48f5-bdea-eb722a2ce27b",
+      "subscription_first": true,
+      "ownership": "invisible generated markers and shared Markdown table treatment"
+    },
+    "sp53_clm009_production_recheck": {
+      "status": "completed_with_invalid_qa_artifact_replaced",
+      "provider": "codex-cli",
+      "model_requested": "gpt-5.3-codex-spark",
+      "model_used": "gpt-5.3-codex-spark",
+      "session_id": "019f4b1d-ef6e-7071-8fb8-71893416cfd1",
+      "subscription_first": true,
+      "ownership": "production browser QA only; final viewport/theme measurements were replaced by primary Codex"
     }
   },
   "manifests": [],
@@ -135,6 +217,8 @@
     "plan/evidence/CLM-007/sonnet-final-review.json",
     "plan/evidence/CLM-008/README.md",
     "plan/evidence/CLM-008/browser-checks.md",
+    "plan/evidence/CLM-009/README.md",
+    "plan/evidence/CLM-009/browser-checks.md",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -150,11 +234,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-008: compilation, TypeScript, runtime/claim/freshness guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "104 tests, the executable Index worked-examples fixture, content templates, public/numeric claims, design tokens, sync freshness, targeted ESLint, and diff checks passed. Master plan is 8/288 complete pending final plan validation.",
+    "build": "npm run build passed for CLM-009: compilation, TypeScript, runtime/claim/freshness/doc-source guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "149 tests, deterministic generator checks, doc-source/content/public/numeric/runtime/design/freshness validators, targeted ESLint, and diff checks passed. Master plan is 9/288 complete pending final master-plan validation.",
     "public_claims": "28 claims cover 14/14 required surfaces across 7 canonical tiers; 34 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "CLM-008 Index methodology and rankings were checked on desktop/mobile in light/dark themes with zero console warnings/errors and no document-level horizontal overflow; the corrected source, missingness, median, candidate-source, and v2 ranking values rendered.",
-    "visual_review": "Final CLM-008 methodology screenshots were inspected in both themes; no acceptance-blocking overlap or contrast issue remained."
+    "browser": "CLM-009 methodology, PCA appendix, and peer grouping were checked from a fresh production build at 1440x1000 and 390x844. Invisible markers stayed absent, every wide table scrolled inside the shared wrapper, theme toggle/state worked on every route, and there was no document overflow, console error, or HTTP 4xx/5xx response.",
+    "visual_review": "Final CLM-009 light mobile and dark desktop screenshots were inspected; no acceptance-blocking marker text, overlap, or clipping remained."
   },
-  "updated_at": "2026-07-10T07:09:00Z"
+  "updated_at": "2026-07-10T08:35:00Z"
 }

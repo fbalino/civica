@@ -5,6 +5,12 @@ non-git-recoverable gotchas and constraints. Per-feature "what shipped" history
 lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelogs.
 
 ## Current architecture state
+- **Documentation-source registry (CLM-009).** `src/lib/docs/doc-concepts.ts`
+  names the canonical path/symbol and synchronization mode for methodology and
+  release concepts across reader markdown, TSX, API examples, runbooks, memory,
+  and generated README surfaces. `npm run validate:doc-sources` is the DB-free
+  drift/route/anchor/link guard; do not create an unregistered prose or formula
+  mirror.
 - **Reader-first (Option B, 2026-06-30).** The three-pane `(shell)` route group is
   GONE; pages are full-width reader pages under `(reader)`. KEPT: `src/lib/shell/events.ts`
   (the `civica:ask` window-event bus — still used by the factbook CivicaAIDrawer / bills /

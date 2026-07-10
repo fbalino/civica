@@ -72,7 +72,7 @@ Neither field is used as a peer-grouping primitive. They are available as filter
 
 ## Minimum-n rule and fallback chain {#minimum-n}
 
-A peer band only renders when the cohort has at least **n ≥ 8** countries. Below that floor, the panel falls back to a broader grouping with an explanatory label, following these chains:
+A peer band only renders when the cohort has at least **n ≥ {{state.peerGrouping.defaultMinN}}** countries. Below that floor, the panel falls back to a broader grouping with an explanatory label, following these chains:
 
 **Material lens (region × income):**
 

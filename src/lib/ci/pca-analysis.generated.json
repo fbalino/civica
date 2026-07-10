@@ -1,0 +1,140 @@
+{
+  "source": "analysis/phase-5-3 (results.json + eigenvalues.csv + loadings_pca.csv + loadings_factor.csv + correlations.csv)",
+  "panelSize": 46,
+  "panelYear": "2023-Q4",
+  "dimensions": [
+    "democratic_quality",
+    "rule_of_law",
+    "freedom_rights",
+    "corruption_control"
+  ],
+  "kaiserComponents": 1,
+  "variancePc1": 0.9066041083375665,
+  "eigenvalues": [
+    {
+      "component": "PC1",
+      "eigenvalue": 3.7070034652024955,
+      "varianceExplained": 0.9066041083375665,
+      "cumulative": 0.9066041083375665
+    },
+    {
+      "component": "PC2",
+      "eigenvalue": 0.3432881067003693,
+      "varianceExplained": 0.08395633044302507,
+      "cumulative": 0.9905604387805916
+    },
+    {
+      "component": "PC3",
+      "eigenvalue": 0.027275605896728578,
+      "varianceExplained": 0.006670664485612965,
+      "cumulative": 0.9972311032662046
+    },
+    {
+      "component": "PC4",
+      "eigenvalue": 0.011321711089296414,
+      "varianceExplained": 0.0027688967337953178,
+      "cumulative": 0.9999999999999999
+    }
+  ],
+  "loadingsPca": [
+    {
+      "dimension": "democratic_quality",
+      "pc1": 0.5159511709214507,
+      "pc2": 0.26104197234207116,
+      "pc3": -0.5292121718003813,
+      "pc4": 0.6209556788683624
+    },
+    {
+      "dimension": "rule_of_law",
+      "pc1": 0.5066202940436886,
+      "pc2": -0.40665153565263873,
+      "pc3": 0.6836192445483509,
+      "pc4": 0.3326186024526879
+    },
+    {
+      "dimension": "freedom_rights",
+      "pc1": 0.4789894256495738,
+      "pc2": 0.6980159392232383,
+      "pc3": 0.2803918816214237,
+      "pc4": -0.45246355812041855
+    },
+    {
+      "dimension": "corruption_control",
+      "pc1": 0.49769407973549534,
+      "pc2": -0.5284556422420074,
+      "pc3": -0.4171086170558736,
+      "pc4": -0.5468597980804243
+    }
+  ],
+  "loadingsFactor": [
+    {
+      "dimension": "democratic_quality",
+      "f1": 0.9933907195057102
+    },
+    {
+      "dimension": "rule_of_law",
+      "f1": 0.975425440972346
+    },
+    {
+      "dimension": "freedom_rights",
+      "f1": 0.9222261271970196
+    },
+    {
+      "dimension": "corruption_control",
+      "f1": 0.9582392827584939
+    }
+  ],
+  "correlations": [
+    {
+      "dimension": "democratic_quality",
+      "values": {
+        "democratic_quality": 1,
+        "rule_of_law": 0.9048992489157961,
+        "freedom_rights": 0.9503350597755765,
+        "corruption_control": 0.8870145016127976
+      }
+    },
+    {
+      "dimension": "rule_of_law",
+      "values": {
+        "democratic_quality": 0.9048992489157961,
+        "rule_of_law": 1,
+        "freedom_rights": 0.7881310610168973,
+        "corruption_control": 0.9769165723377056
+      }
+    },
+    {
+      "dimension": "freedom_rights",
+      "values": {
+        "democratic_quality": 0.9503350597755765,
+        "rule_of_law": 0.7881310610168973,
+        "freedom_rights": 1,
+        "corruption_control": 0.7402459406119208
+      }
+    },
+    {
+      "dimension": "corruption_control",
+      "values": {
+        "democratic_quality": 0.8870145016127976,
+        "rule_of_law": 0.9769165723377056,
+        "freedom_rights": 0.7402459406119208,
+        "corruption_control": 1
+      }
+    }
+  ],
+  "provisionalWeights": {
+    "democratic_quality": 0.3,
+    "rule_of_law": 0.25,
+    "freedom_rights": 0.25,
+    "corruption_control": 0.2
+  },
+  "pcaSuggestedWeights": {
+    "democratic_quality": 0.266,
+    "rule_of_law": 0.257,
+    "freedom_rights": 0.229,
+    "corruption_control": 0.248
+  },
+  "decision": "Keep 4-dimension governance core. PCA confirms strong shared variance across the four indicators (PC1 loads on all four), consistent with a single latent 'governance quality' factor — but also that each contributes roughly equally to that factor, supporting the 4-way breakout for interpretability.",
+  "fifthDimensionTest": "Administrative Capacity (WGI Government Effectiveness) is NOT tested in this phase because the indicator is not yet ingested. Deferred to a follow-up — when ingested, re-run this PCA to test whether it loads on a distinct factor or collapses into Rule of Law.",
+  "sampleSizeCaveat": "This PCA was run on n=46 country-year observations from a single recent year (2023). The spec calls for a 2000–2024 panel, which would yield thousands of observations. The current sample is statistically usable but underpowered. Final weights will be re-validated when the historical panel is ingested. The structural decision (4-dim core, weights proportional to loadings) is unlikely to change."
+}

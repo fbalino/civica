@@ -201,9 +201,18 @@ export async function MarkdownContent({
       // Map markdown elements to plain HTML. The surrounding
       // `.editorial-section` wrapper applies typography automatically
       // (per editorial.css), so we don't override h2/p/ul/etc.
-      // GFM tables get their styling from `.editorial-section table`.
-      // Future per-page customisation can pass a `components` prop
-      // overlay in a v1.1 amendment if needed.
+      // GFM tables get their styling from `.editorial-section table`;
+      // `table` is the one override needed, wrapping it in the shared
+      // `.editorial-table-scroll` primitive so a wide table scrolls
+      // horizontally on mobile instead of clipping against the body's
+      // `overflow-x: clip`.
+      components={{
+        table: ({ children }) => (
+          <div className="editorial-table-scroll">
+            <table>{children}</table>
+          </div>
+        ),
+      }}
     >
       {result.output}
     </ReactMarkdown>

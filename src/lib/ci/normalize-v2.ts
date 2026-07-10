@@ -175,3 +175,40 @@ export function displayDimensionScore(
 export function defaultUncertaintyV2(sourceId: string): number {
   return BOUNDS[sourceId as CISourceId]?.defaultUncertainty ?? 5;
 }
+
+/**
+ * A single source's normalization descriptor, read-only. Mirrors
+ * `SourceBounds` plus the `sourceId` it was looked up under, so a
+ * consumer never needs its own copy of the `BOUNDS` table.
+ */
+export interface NormalizationDescriptor {
+  sourceId: CISourceId;
+  nativeMin: number;
+  nativeMax: number;
+  isInverted: boolean;
+  defaultUncertainty: number;
+}
+
+/**
+ * Read-only accessor over the fixed-bound table (CLM-009 §3). `BOUNDS`
+ * itself is never exported — every consumer that needs the native
+ * scale / inversion / uncertainty for a source (or all of them) goes
+ * through this function, so there is exactly one place that can ever
+ * mutate the underlying table (there isn't one).
+ */
+export function normalizationDescriptors(): readonly NormalizationDescriptor[] {
+  return (Object.keys(BOUNDS) as CISourceId[]).map((sourceId) => ({
+    sourceId,
+    ...BOUNDS[sourceId],
+  }));
+}
+
+/** Single-source variant of `normalizationDescriptors()`. Returns
+ *  `undefined` for an unrecognized source id. */
+export function normalizationDescriptor(
+  sourceId: string,
+): NormalizationDescriptor | undefined {
+  const bounds = BOUNDS[sourceId as CISourceId];
+  if (!bounds) return undefined;
+  return { sourceId: sourceId as CISourceId, ...bounds };
+}

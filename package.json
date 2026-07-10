@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:sync-freshness && npm run validate:public-claims && npm run validate:numeric-claims && npm run validate:pulse-runtime && next build",
+    "build": "npm run validate:sync-freshness && npm run validate:public-claims && npm run validate:numeric-claims && npm run validate:pulse-runtime && npm run validate:doc-sources && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -92,6 +92,9 @@
     "validate:public-claims": "tsx scripts/validate-public-claims.ts",
     "validate:sync-freshness": "tsx scripts/validate-sync-freshness.ts",
     "validate:territory-engravings": "tsx scripts/validate-territory-engravings.ts",
+    "generate:ci-normalization-table": "tsx scripts/generate-ci-normalization-table.ts",
+    "generate:pca-analysis": "tsx scripts/generate-pca-analysis.ts",
+    "validate:doc-sources": "tsx scripts/validate-doc-sources.ts",
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "test:watch": "node --import tsx --test --watch \"src/**/*.test.ts\"",
