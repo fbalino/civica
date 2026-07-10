@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CivicaLogo } from "@/components/CivicaLogo";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { tier1Publishers } from "@/lib/content/site-state";
+import { RIGHTS_REGISTRY_PATH } from "@/lib/claims/reuse-rights";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 
@@ -174,11 +175,11 @@ export async function SiteFooter() {
       >
         <div className="site-footer__trust-inner">
           <div className="site-footer__trust-copy">
-            <h2>Open. Traceable. Nonpartisan.</h2>
+            <h2>Accessible. Traceable. Nonpartisan.</h2>
             <p>
-              Civica Atlas is an open knowledge initiative. Access and reuse
-              terms vary by source; see Licensing for attribution and
-              restrictions.
+              Civica Atlas is free to access. Reuse terms vary by source; see{" "}
+              <Link href={RIGHTS_REGISTRY_PATH}>Licensing</Link> for the
+              current rights posture.
             </p>
           </div>
 

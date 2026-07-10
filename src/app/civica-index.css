@@ -1171,6 +1171,18 @@
   margin: var(--space-3) 0 var(--space-2);
 }
 
+/* CLM-018 — reuse-rights note below the widget gallery. Same token recipe
+   as .elsys-sources (editorial.css) for a small muted footnote paragraph. */
+.widget-rights-note {
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-divider);
+  font-family: var(--font-body);
+  font-size: var(--text-13);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-40);
+}
+
 /* ===== Phase G — builder ===== */
 .wb {
   margin-top: var(--space-8);

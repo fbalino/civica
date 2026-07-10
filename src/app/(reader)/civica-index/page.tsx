@@ -26,6 +26,7 @@ import { civicaIndex } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildDataset } from "@/lib/seo/jsonld";
+import { RIGHTS_REGISTRY_URL } from "@/lib/claims/reuse-rights";
 import { BetaChip } from "@/components/editorial/BetaChip";
 import { Banner } from "@/components/editorial/Banner";
 import { ScorePosition } from "@/components/editorial/ScorePosition";
@@ -264,7 +265,7 @@ export default async function CivicaIndexPage({
     description:
       `A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.`,
     url: "https://civicaatlas.org/civica-index",
-    license: "https://civicaatlas.org/licensing",
+    license: RIGHTS_REGISTRY_URL,
     temporalCoverage: realVintage ?? undefined,
     distributionUrl: "https://civicaatlas.org/api/v1/index/rankings",
     keywords: [

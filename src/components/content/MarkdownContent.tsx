@@ -81,7 +81,7 @@ export interface MarkdownContentProps {
    *  Per content-templating audit v1.1 amendment 6.D (added during
    *  Phase 3.1 about-page migration to preserve the original section
    *  ordering on /about — intro → cards → how-it-works → ... →
-   *  standing-posture → open-and-free). */
+   *  standing-posture → access-and-reuse). */
   slice?: { from?: string; to?: string };
   /** When true, log a warning to the server console for every
    *  unresolved `{{path}}` marker. Default true. The validation

@@ -13,6 +13,7 @@ import {
   FACTBOOK_RECONCILIATION_META,
   sourceName,
 } from "@/lib/factbook/reconcile/api";
+import { RIGHTS_REGISTRY_URL } from "@/lib/claims/reuse-rights";
 
 /**
  * Phase F.4 — embed widget reconciled fact-keys.
@@ -418,6 +419,7 @@ function buildHtml(args: BuildHtmlArgs): string {
 </a>`;
 
   // PUBLIC_CLAIM: embed.index-score
+  // PUBLIC_CLAIM: embeds.reuse-rights
   const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
@@ -433,7 +435,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="score-position"><span style="width:${scorePct}%"></span></div>
   ${attributionHtml}
   <div class="foot mono">
-    <span>civicaatlas.org/country/${esc(jurisdiction.slug)}</span>
+    <span>Reuse: civicaatlas.org/licensing</span>
     ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
@@ -457,7 +459,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   ${dims ? `<div class="dims">${dimBarsHtml}</div>` : ""}
   ${attributionHtml}
   <div class="foot mono">
-    <span>civicaatlas.org/country/${esc(jurisdiction.slug)}</span>
+    <span>Reuse: civicaatlas.org/licensing</span>
     ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
@@ -506,7 +508,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="cf-rows">${customRowsHtml}</div>
   ${attributionHtml}
   <div class="cf-foot mono">
-    <span>civicaatlas.org/country/${esc(jurisdiction.slug)}</span>
+    <span>Reuse: civicaatlas.org/licensing</span>
     ${updatedDate ? `<span>UPDATED &middot; ${esc(updatedDate)}</span>` : ""}
   </div>
 </a>`;
@@ -525,6 +527,7 @@ function buildHtml(args: BuildHtmlArgs): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=${width},initial-scale=1">
+<meta name="civica:rights" content="${RIGHTS_REGISTRY_URL}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -619,20 +622,21 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
 
 /* ── Medium 320×180 ── */
 .civica-widget.medium{
-  width:320px;padding:18px 20px 16px;
-  display:flex;flex-direction:column;gap:10px;
+  width:320px;height:180px;padding:12px 16px 10px;
+  display:flex;flex-direction:column;gap:5px;
 }
 .civica-widget.medium .top{display:flex;justify-content:space-between;align-items:center}
 .civica-widget.medium .brand{font-family:'Source Serif 4',serif;font-weight:600;font-size:13px;letter-spacing:-0.005em}
 .civica-widget.medium .dotlabel{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:400;font-size:10px;color:var(--ink-3);margin-left:6px;text-transform:uppercase;letter-spacing:0.1em}
 .civica-widget.medium .gov{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em}
 .civica-widget.medium .country-row{display:flex;justify-content:space-between;align-items:baseline}
-.civica-widget.medium .name{font-family:'Source Serif 4',serif;font-weight:500;font-size:22px;letter-spacing:-0.015em}
-.civica-widget.medium .num{font-family:'Source Serif 4',serif;font-weight:500;font-size:46px;line-height:0.95;letter-spacing:-0.025em}
+.civica-widget.medium .name{font-family:'Source Serif 4',serif;font-weight:500;font-size:20px;letter-spacing:-0.015em}
+.civica-widget.medium .num{font-family:'Source Serif 4',serif;font-weight:500;font-size:38px;line-height:0.95;letter-spacing:-0.025em}
 .civica-widget.medium .score-context{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-2)}
 .civica-widget.medium .score-position{position:relative;height:4px;background:var(--rule-soft)}
 .civica-widget.medium .score-position>span{position:absolute;inset:0 auto 0 0;background:var(--indicator)}
-.civica-widget.medium .foot{display:flex;justify-content:space-between;align-items:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:var(--ink-3);padding-top:8px;border-top:1px dashed var(--rule)}
+.civica-widget.medium .attribution{font-size:8px}
+.civica-widget.medium .foot{display:flex;justify-content:space-between;align-items:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:9px;color:var(--ink-3);padding-top:4px;border-top:1px dashed var(--rule)}
 
 /* ── Large 400×260 ── */
 .civica-widget.large{

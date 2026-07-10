@@ -288,6 +288,9 @@ const RESEARCH_BETA_RE = /research-beta/i;
 // review.") as well as a more literal "not independently reviewed" — both
 // satisfy "not"..."independent"..."review" in that order.
 const NOT_INDEPENDENTLY_REVIEWED_RE = /not[\s\S]{0,60}independent[\s\S]{0,30}review/i;
+// CLM-018 — conditionsOfAccess must explicitly separate free ACCESS from a
+// reuse LICENSE, not just repeat "free" in different words.
+const ACCESS_VS_REUSE_RE = /access[\s\S]{0,120}\bnot\b[\s\S]{0,60}\breuse\b/i;
 
 export interface DatasetValidationInput {
   /** Every JSON-LD node found on the page (from `extractJsonLdNodes`). */
@@ -358,8 +361,19 @@ export function validateDatasetNode(input: DatasetValidationInput): DatasetValid
     }
   }
 
-  if (typeof node.license !== "string" || !isAbsoluteApexUrl(node.license, input.siteUrl)) {
-    errors.push("Dataset.license must be an absolute apex URL");
+  const expectedRightsUrl = `${input.siteUrl}/licensing#reuse`;
+  if (node.license !== expectedRightsUrl) {
+    errors.push(`Dataset.license must equal the canonical rights registry URL ${expectedRightsUrl}`);
+  }
+
+  const conditionsOfAccess =
+    typeof node.conditionsOfAccess === "string" ? node.conditionsOfAccess : "";
+  if (conditionsOfAccess.trim() === "") {
+    errors.push("Dataset.conditionsOfAccess must be a nonempty string");
+  } else if (!ACCESS_VS_REUSE_RE.test(conditionsOfAccess)) {
+    errors.push(
+      "Dataset.conditionsOfAccess must disclose that free access is not a reuse license",
+    );
   }
 
   if (typeof node.isAccessibleForFree !== "boolean") {

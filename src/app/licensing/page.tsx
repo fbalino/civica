@@ -5,6 +5,12 @@ import { DataTable } from "@/components/editorial/DataTable";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { withOg } from "@/lib/og";
+import {
+  RIGHTS_ARTIFACT_CLASSES,
+  CODE_RIGHTS,
+  RELEASE_MANIFEST_STATUS,
+  ACCESS_VS_REUSE_BOUNDARY,
+} from "@/lib/claims/reuse-rights";
 
 export const revalidate = 3600;
 
@@ -20,44 +26,6 @@ export const metadata: Metadata = {
     url: "https://civicaatlas.org/licensing",
   }),
 };
-
-const SOURCE_ROWS = [
-  {
-    source: "CIA World Factbook archive",
-    license: "Public domain",
-    note: "Frozen January 2026 reference layer preserved after the Factbook sunset.",
-  },
-  {
-    source: "Wikidata and selected Wikimedia Commons media",
-    license: "CC0 or file-level Commons license",
-    note: "Structured facts and media retain their upstream attribution and license metadata.",
-  },
-  {
-    source: "IPU Parline and Constitute Project",
-    license: "Non-commercial upstream terms",
-    note: "These records are visible for research and reference use but remain subject to publisher restrictions.",
-  },
-  {
-    source: "V-Dem, WGI, HDI, Freedom House, CPI, GPI, FSI, and other index feeds",
-    license: "Publisher-specific terms",
-    note: "Civica preserves source, vintage, and license context with the derived score inputs.",
-  },
-  {
-    source: "Civica Index and Civica Pulse outputs",
-    license: "Civica methodology and derived outputs",
-    note: "Cite Civica Atlas and the upstream sources shown with each data point when reusing outputs.",
-  },
-  {
-    source: "Civica source code",
-    license: "Repository license",
-    note: "Code reuse is governed by the license and notices in the public GitHub repository.",
-  },
-  {
-    source: "Country and territory hero engravings",
-    license: "Civica editorial imagery — no third-party reuse license granted",
-    note: "AI-assisted editorial illustrations, not documentary photographs. See Imagery below.",
-  },
-];
 
 export default function LicensingPage() {
   return (
@@ -84,29 +52,36 @@ export default function LicensingPage() {
           reuse obligations, follow the upstream publisher license shown with
           each data point.
         </Banner>
+
+        <Banner variant="warn">
+          {/* PUBLIC_CLAIM: licensing.interim-registry */}
+          {RELEASE_MANIFEST_STATUS.statement}
+        </Banner>
       </section>
 
       <section id="source-licenses" className="editorial-section">
         <SectionHeader
           eyebrow="Sources"
-          title="Source license summary"
-          dek="Civica keeps license and freshness metadata attached to source rows and reader-facing data points."
+          title="Artifact-class license summary"
+          dek="Civica keeps license and freshness metadata attached to source rows and reader-facing data points where that coverage exists today."
         />
 
         <DataTable>
           <thead>
             <tr>
-              <th>Source</th>
-              <th>License posture</th>
-              <th>Reuse note</th>
+              <th>Artifact class</th>
+              <th>Current permission posture</th>
+              <th>Governing basis</th>
+              <th>What to do</th>
             </tr>
           </thead>
           <tbody>
-            {SOURCE_ROWS.map((row) => (
-              <tr key={row.source}>
-                <td>{row.source}</td>
-                <td>{row.license}</td>
-                <td>{row.note}</td>
+            {RIGHTS_ARTIFACT_CLASSES.map((row) => (
+              <tr key={row.id}>
+                <td>{row.label}</td>
+                <td>{row.currentPermissionPosture}</td>
+                <td>{row.governingBasis}</td>
+                <td>{row.readerAction}</td>
               </tr>
             ))}
           </tbody>
@@ -120,6 +95,9 @@ export default function LicensingPage() {
           dek="Treat provenance as part of the data, not decoration."
         />
 
+        {/* PUBLIC_CLAIM: licensing.access-vs-reuse */}
+        <p>{ACCESS_VS_REUSE_BOUNDARY}</p>
+
         <ul>
           <li>
             Preserve source names, license labels, and freshness dates when you
@@ -127,7 +105,8 @@ export default function LicensingPage() {
           </li>
           <li>
             Cite Civica Atlas when reusing Civica Index, Civica Pulse, or
-            reconciliation-derived outputs.
+            reconciliation-derived outputs — citing is a request for credit,
+            not a grant of reuse permission.
           </li>
           <li>
             Do not treat restricted upstream sources as open data just because
@@ -216,17 +195,20 @@ export default function LicensingPage() {
           dek="Implementation details, issue tracking, and code reuse terms live with the public repository."
         />
 
+        {/* PUBLIC_CLAIM: licensing.code-status */}
+        <p>{CODE_RIGHTS.posture}</p>
+
         <p>
           The Civica repository is available on{" "}
           <a
-            href="https://github.com/fbalino/civica"
+            href={CODE_RIGHTS.repositoryUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
             GitHub
           </a>
-          . Check the repository license and notices before redistributing code
-          or building a derivative service.
+          . Check the repository for any future license file and notices
+          before redistributing code or building a derivative service.
         </p>
       </section>
 

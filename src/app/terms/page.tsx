@@ -42,12 +42,12 @@ export default function TermsPage() {
       <article className="methodology-content">
         <SmartBreadcrumbs />
         <h1 className="editorial-page-title">Terms of Use</h1>
-        <p className="editorial-page-meta">Last updated: July 4, 2026</p>
+        <p className="editorial-page-meta">Last updated: July 10, 2026</p>
         <p className="editorial-page-subtitle">
-          Civica Atlas is a free, open reference for how every country on
-          Earth is governed. These terms describe, in plain language, what you
-          can do with the site and its data, and the limits that come with a
-          reference work built from many sources.
+          Civica Atlas is a free-to-access comparative reference for how every
+          country on Earth is governed. These terms describe, in plain
+          language, what you can do with the site and its data, and the
+          limits that come with a reference work built from many sources.
         </p>
 
         <section className="editorial-section">

@@ -52,8 +52,8 @@ Civica's approach is shaped by the institutions and data publishers it cites. Ou
 
 We are not these institutions. We do not have their funding, their staff, their decades of accumulated trust, or their formal review processes. Civica instead keeps versioned methodology records, labels novel work as beta, and aims to surface disagreement rather than hiding it.
 
-## Open and free {#open-and-free}
+## Access and reuse {#open-and-free}
 
-Civica Atlas is built to be a free, open reference. The codebase is open-source. Public-domain and CC0-licensed data is freely available. Per-source licenses are preserved at the row level and disclosed on supported reader surfaces. If you are an academic interested in reviewing the methodology, citing the data, or collaborating on extensions, please [get in touch](/contact). External review is an explicit goal of the project, not a hypothetical.
+Civica Atlas is free to access without an account. The repository is publicly viewable on GitHub, but no root LICENSE file is published, so no open-source or MIT reuse license currently applies to the code. Public-domain (CIA Factbook archive) and CC0 (Wikidata) source data is generally reusable; other sources carry non-commercial or publisher-specific terms. Per-source licenses are preserved where disclosed on reader surfaces, but that coverage is not yet complete everywhere. See [Licensing](/licensing#reuse) for the current, source-by-source posture. If you are an academic interested in reviewing the methodology, citing the data, or collaborating on extensions, please [get in touch](/contact). External review is an explicit goal of the project, not a hypothetical.
 
 Country and territory hero images are AI-assisted editorial illustrations, not photographs; see the [imagery policy](/licensing#imagery) for tools, records, review, and reuse rights.

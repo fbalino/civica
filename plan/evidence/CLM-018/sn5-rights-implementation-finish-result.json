@@ -1,0 +1,35 @@
+{
+  "status": "partial",
+  "provider": "claude-code",
+  "model_requested": "claude-sonnet-5",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 41239,
+      "outputTokens": 47980,
+      "cacheReadInputTokens": 16856660,
+      "cacheCreationInputTokens": 496965,
+      "webSearchRequests": 0,
+      "costUSD": 7.87673175,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000
+    }
+  },
+  "session_id": "26cf58cf-fe10-40bf-8013-2fdb2214ae36",
+  "subscription_first": true,
+  "result": {
+    "status": "partial",
+    "summary": "Launched a background Sonnet 5 worker agent to finish the CLM-018 partial rights/licensing implementation (reuse-rights.ts, jsonld.ts, metadata-contract.ts) per the detailed spec, including corrections to license claims, /licensing page rendering, footer/About/Terms/API-docs/embeds/CiteAccordion/CITATION.cff/README updates, a new validate-rights-claims.ts validator wired into validate:claims-docs, and full verification (tests, validators, typecheck, lint). No commit will be made.",
+    "artifacts": [],
+    "changed_files": [],
+    "commands_run": [
+      "wc -l src/lib/claims/reuse-rights.ts src/lib/seo/jsonld.ts src/lib/seo/metadata-contract.ts"
+    ],
+    "verification": "Pending \u2014 background agent will run focused rights/metadata tests, validate-rights-claims.ts, validate:public-claims, validate:metadata, validate:content-templates, validate:claims-docs, typecheck, targeted ESLint, and doc-references check, reporting pass/fail for each on completion.",
+    "needs_user": false,
+    "next_action": "Await background agent completion notification, then relay its full changed-files list and verification results to the user."
+  },
+  "duration_ms": 34985,
+  "num_turns": 4,
+  "returncode": 0,
+  "stderr": "Background tasks still running after 600s; terminating. Set CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 to wait indefinitely."
+}

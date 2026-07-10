@@ -221,7 +221,7 @@ Full script reference: see [AGENTS.md](./AGENTS.md).
 
 ## Contributing
 
-Civica is open-source and welcomes contributions. Most public-facing content is CC0 or under the original publisher's license (preserved per-row in `country_facts.license`). The Civica codebase itself is MIT-licensed.
+Civica welcomes contributions. The repository is publicly viewable on GitHub, but no root LICENSE file is published, so no open-source or MIT reuse license currently applies to the code. Public-facing data mixes public-domain, CC0, and publisher-restricted sources (preserved per-row where disclosed) — see [Licensing](https://civicaatlas.org/licensing#reuse) for the current, source-by-source posture.
 
 If you're an academic interested in reviewing the methodology, please get in touch — external review is an explicit goal of the project, not a hypothetical.
 

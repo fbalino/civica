@@ -108,6 +108,12 @@ export const CLAIMS_DOCS_GATE_MANIFEST: GateManifest = {
       categories: ["terminology-policy"],
       description: "Publication policy prose matches current capability boundaries and its executable contract.",
     },
+    {
+      id: "rights-claims",
+      npmScript: "validate:rights-claims",
+      categories: ["terminology-policy"],
+      description: "Data/code reuse-rights claims match the interim rights registry; no false open-source/MIT/complete-manifest/blanket-open-data language on required surfaces.",
+    },
   ],
 };
 
@@ -227,7 +233,7 @@ export const STALE_COPY_FIXTURE_EVIDENCE: Record<GateCategory, string> = {
   "experimental-labels":
     "src/lib/seo/__tests__/metadata-contract.test.ts — missing research-beta/experimental labels",
   "terminology-policy":
-    "src/lib/research-terminology.test.ts and src/lib/policy/__tests__/policy-surface.test.ts",
+    "src/lib/research-terminology.test.ts, src/lib/policy/__tests__/policy-surface.test.ts, and src/lib/claims/__tests__/reuse-rights.test.ts",
 };
 
 /**

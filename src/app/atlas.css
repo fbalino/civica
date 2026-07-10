@@ -875,6 +875,20 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   text-transform: uppercase;
 }
 
+/* CLM-018 — reuse-rights pointer in the cite accordion, same token recipe
+   as .cite-sources. */
+.cite-rights-note {
+  margin-top: var(--space-3);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  color: var(--atlas-muted);
+  line-height: var(--leading-normal);
+}
+.cite-rights-note a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 /* ===== ALL POLITICAL PARTIES — always-visible interactive table ===== */
 .atlas-parties-table {
   margin-top: 18px;

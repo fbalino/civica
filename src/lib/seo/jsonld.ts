@@ -17,6 +17,7 @@
 
 import { SITE_URL, absoluteUrl } from "@/lib/site";
 import { OG_DEFAULT_IMAGE_ABSOLUTE } from "@/lib/og";
+import { ACCESS_VS_REUSE_BOUNDARY } from "@/lib/claims/reuse-rights";
 
 export { SITE_URL };
 export const SITE_NAME = "Civica Atlas";
@@ -205,6 +206,11 @@ export interface DatasetInput {
 /**
  * Dataset node for the Civica Index. Creator is the Organization; the
  * distribution points at the documented public JSON API.
+ *
+ * `isAccessibleForFree: true` means no-charge ACCESS only — it is not a
+ * reuse grant. `conditionsOfAccess` carries the canonical access-vs-reuse
+ * boundary statement (src/lib/claims/reuse-rights.ts) so a crawler reading
+ * only structured metadata still sees that distinction.
  */
 export function buildDataset(input: DatasetInput): JsonLdNode {
   return stripUndefined({
@@ -217,6 +223,7 @@ export function buildDataset(input: DatasetInput): JsonLdNode {
     publisher: organizationRef(),
     license: input.license,
     isAccessibleForFree: true,
+    conditionsOfAccess: ACCESS_VS_REUSE_BOUNDARY,
     temporalCoverage: input.temporalCoverage,
     keywords:
       input.keywords && input.keywords.length > 0 ? input.keywords : undefined,

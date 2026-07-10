@@ -532,10 +532,13 @@ done < slugs.txt`}</CodeBlock>
         <h2>Data Sources & Licensing</h2>
         <p className="api-info-card__body">
           API data is sourced from the CIA World Factbook (public domain, archived
-          January 2026), Wikidata (CC0), IPU Parline, and the Constitute Project.
-          All public-domain and CC0 data is freely available for any use. Data from
-          IPU Parline and Constitute Project is subject to their respective
-          non-commercial licenses.
+          January 2026), Wikidata (CC0), IPU Parline, and the Constitute Project,
+          among others. Public-domain and CC0 sources are generally reusable;
+          IPU Parline and Constitute Project data is subject to their respective
+          non-commercial licenses. Free, no-account API access is not itself a
+          reuse license — see{" "}
+          <Link href="/licensing#reuse">Licensing</Link> for the current,
+          source-by-source posture before redistributing API data.
         </p>
       </section>
 

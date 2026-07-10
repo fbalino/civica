@@ -397,6 +397,71 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "licensing.interim-registry",
+    surface: "licensing",
+    routeOrArtifact: "/licensing#reuse",
+    exactClaim:
+      "Civica does not currently publish a complete, machine-readable rights manifest covering every source, field, product, and frozen release. This page is an interim, human-readable current-rights registry, not that manifest. The complete manifest is owned by DAT-003 and has not shipped.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/lib/claims/reuse-rights.ts",
+      "src/app/licensing/page.tsx",
+      "plan/03-data-provenance-and-reproducibility.md",
+    ],
+    implementationOwner: "Licensing and data governance",
+    methodologyVersion: "interim-rights-registry-v1",
+    gate: "G2",
+    source: {
+      path: "src/lib/claims/reuse-rights.ts",
+      fragment:
+        "Civica does not currently publish a complete, machine-readable rights manifest covering every source, field, product, and frozen release.",
+      mirrors: ["src/app/licensing/page.tsx"],
+    },
+  },
+  {
+    id: "licensing.access-vs-reuse",
+    surface: "licensing",
+    routeOrArtifact: "/licensing#reuse",
+    exactClaim:
+      "Free, no-account access to a page, download, or embed is not a reuse license. The exact upstream designation attached to each source governs reuse for that source.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/lib/claims/reuse-rights.ts",
+      "src/lib/db/schema.ts",
+      "scripts/seed-sources.ts",
+    ],
+    implementationOwner: "Licensing and data governance",
+    methodologyVersion: "interim-rights-registry-v1",
+    gate: "G2",
+    source: {
+      path: "src/lib/claims/reuse-rights.ts",
+      fragment:
+        "Free, no-account access to a page, download, or embed is not a reuse license.",
+      mirrors: ["src/app/licensing/page.tsx"],
+    },
+  },
+  {
+    id: "licensing.code-status",
+    surface: "licensing",
+    routeOrArtifact: "/licensing#code",
+    exactClaim:
+      "The Civica source code is publicly viewable, but no root LICENSE file is published and no open-source reuse license is currently granted.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/lib/claims/reuse-rights.ts",
+      "src/app/licensing/page.tsx",
+    ],
+    implementationOwner: "Licensing and data governance",
+    methodologyVersion: "interim-rights-registry-v1",
+    gate: "G2",
+    source: {
+      path: "src/lib/claims/reuse-rights.ts",
+      fragment:
+        "No root LICENSE file is published, so no open-source reuse license (MIT or otherwise) is currently granted for the code.",
+      mirrors: ["src/app/licensing/page.tsx"],
+    },
+  },
+  {
     id: "licensing.imagery-policy",
     surface: "licensing",
     routeOrArtifact: "/licensing#imagery",
@@ -794,6 +859,28 @@ export const PUBLIC_CLAIMS = [
       path: "src/app/embed/[slug]/route.ts",
       fragment:
         "Source: ${esc(attributionLabel)} · Civica Atlas reconciled ${esc(FACTBOOK_RECONCILIATION_META.version)}",
+    },
+  },
+  {
+    id: "embeds.reuse-rights",
+    surface: "embeds",
+    routeOrArtifact: "/embed/{slug} and /civica-index/widget",
+    exactClaim:
+      "Embedding the hosted widget is permitted, but that permission covers only the hosted display and does not grant a separate license to the underlying data.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/lib/claims/reuse-rights.ts",
+      "src/app/embed/[slug]/route.ts",
+      "src/app/(reader)/civica-index/widget/page.tsx",
+    ],
+    implementationOwner: "Embeds and licensing",
+    methodologyVersion: "interim-rights-registry-v1",
+    gate: "G2",
+    source: {
+      path: "src/app/(reader)/civica-index/widget/page.tsx",
+      fragment:
+        "Embedding the hosted widget on a third-party page is permitted, but",
+      mirrors: ["src/app/embed/[slug]/route.ts"],
     },
   },
   {

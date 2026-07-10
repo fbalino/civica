@@ -3,11 +3,12 @@
 # it on release. Spec: https://citation-file-format.github.io/
 #
 # The `license` key is intentionally omitted: Civica Atlas is a mixed-source
-# reference work with no single license. Public-domain and CC0 data is freely
-# reusable; publisher-restricted datasets (IPU Parline, Constitute Project,
-# index feeds) remain governed by their upstream terms; the source code is
-# governed by the notices in the public repository. See
-# https://civicaatlas.org/licensing for the per-source posture. Declaring one
+# reference work with no single license. Public-domain and CC0 sources have
+# their own broad reuse posture; publisher-restricted datasets (IPU Parline,
+# Constitute Project, index feeds) remain governed by their upstream terms.
+# The code is publicly viewable, but no root LICENSE file currently grants an
+# open-source reuse license. See https://civicaatlas.org/licensing#reuse for
+# the current rights registry. Declaring one
 # SPDX license here would misrepresent that posture, so we omit it rather than
 # fabricate one.
 cff-version: 1.2.0
@@ -29,5 +30,5 @@ keywords:
   - political science
   - world factbook
   - civica index
-  - open data
+  - source-linked data
   - comparative politics

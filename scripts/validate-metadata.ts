@@ -37,6 +37,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 import { SITE_URL, absoluteUrl } from "../src/lib/site";
+import { RIGHTS_REGISTRY_URL } from "../src/lib/claims/reuse-rights";
 import { buildDataset } from "../src/lib/seo/jsonld";
 import {
   hasArgumentlessNewDate,
@@ -140,7 +141,7 @@ function checkSampleDatasetNode(): string[] {
     description:
       "A research-beta composite across four governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.",
     url: canonical,
-    license: absoluteUrl("/licensing"),
+    license: RIGHTS_REGISTRY_URL,
     distributionUrl: absoluteUrl("/api/v1/index/rankings"),
     keywords: ["governance", "democracy", "rule of law"],
   });

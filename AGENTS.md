@@ -86,6 +86,19 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 - V-Dem, World Bank WGI, UNDP HDI, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index — feed the Civica Index
 - Pulse production-active feeds are the observed source IDs in `src/lib/pulse/v2/runtime-method.generated.json`; connector presence alone does not make a feed active
 
+## Rights-language discipline
+
+- Free/no-account access, a citation, a download, and permission to use a
+  hosted embed are not blanket licenses for the underlying data.
+- `src/lib/claims/reuse-rights.ts` is the interim current-rights registry and
+  `/licensing#reuse` is its public surface. It explicitly is not DAT-003's
+  future complete source/field/product/release rights manifest.
+- The repository has no root `LICENSE` file. Do not call the code open-source,
+  MIT-licensed, or reusable under a repository license until BRD-007/008 makes
+  and implements that decision.
+- Run `npm run validate:rights-claims` after changing public rights, licensing,
+  download, citation, embed, code-license, or release-manifest language.
+
 ## Core environment variables
 The complete, authoritative contract (every var, required/optional, and why) is
 `.env.example` — read it rather than trusting a partial list here. Headline

@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: 1b50a2b656c2159cab543a594aa0e670aab87d0c08330a83d903c7150d15c32a
-  Generated body SHA-256: 6757a98700d4d6d71dc01e71a28a06c9a0e677133b216986103eacf10e7d550a
+  Template SHA-256: b0ad9703e6feea761bed6f9981b58b0fc53d44e5c6df2ea02ba4db674e6db983
+  Generated body SHA-256: a8b499f87c2be396cd36f89118ac4e29fc5b8cdb742f9898be49fa34237d3c31
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -220,7 +220,7 @@ Full script reference: see [AGENTS.md](./AGENTS.md).
 
 ## Contributing
 
-Civica is open-source and welcomes contributions. Most public-facing content is CC0 or under the original publisher's license (preserved per-row in `country_facts.license`). The Civica codebase itself is MIT-licensed.
+Civica welcomes contributions. The repository is publicly viewable on GitHub, but no root LICENSE file is published, so no open-source or MIT reuse license currently applies to the code. Public-facing data mixes public-domain, CC0, and publisher-restricted sources (preserved per-row where disclosed) — see [Licensing](https://civicaatlas.org/licensing#reuse) for the current, source-by-source posture.
 
 If you're an academic interested in reviewing the methodology, please get in touch — external review is an explicit goal of the project, not a hypothetical.
 

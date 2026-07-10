@@ -99,7 +99,7 @@ export default async function AboutPage() {
   }));
 
   // The pure-prose intro + "How it works" + "Methodology" + "Standing
-  // posture" + "Open and free" sections live in content/about.md.
+  // posture" + "Access and reuse" sections live in content/about.md.
   // The 3-card "What we do" grid, the DB-driven sources grid, and
   // the provenance-dot legend stay in TSX because they're either
   // bespoke layout or live data, not prose. Per

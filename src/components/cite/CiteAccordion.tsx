@@ -9,6 +9,7 @@ import {
   formatJSON,
   type CiteInput,
 } from "@/lib/cite/format";
+import { RIGHTS_REGISTRY_PATH } from "@/lib/claims/reuse-rights";
 
 export interface CiteAccordionProps {
   /** Country / subject of the page being cited. */
@@ -205,6 +206,11 @@ export function CiteAccordion({
             {sourceNames.join(", ")}
           </div>
         ) : null}
+
+        <div className="cite-rights-note">
+          Citing is a request for credit, not a reuse license.{" "}
+          <a href={RIGHTS_REGISTRY_PATH}>Reuse terms</a>
+        </div>
       </div>
     </details>
   );

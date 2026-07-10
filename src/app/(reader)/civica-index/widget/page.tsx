@@ -224,6 +224,15 @@ export default async function CivicaIndexWidgetPage({
 
         {/* Phase G — custom builder. Lives below the three preset cards. */}
         <WidgetBuilder countries={countries} initialSlug={slug} />
+
+        {/* PUBLIC_CLAIM: embeds.reuse-rights */}
+        <p className="widget-rights-note">
+          Embedding the hosted widget on a third-party page is permitted, but
+          that permission covers only the hosted display — it does not grant
+          a separate license to the underlying data shown inside it. See{" "}
+          <Link href="/licensing#reuse">Licensing</Link> for the current
+          reuse posture.
+        </p>
       </div>
     </div>
   );

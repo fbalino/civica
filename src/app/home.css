@@ -103,7 +103,7 @@
   color: var(--color-text-primary);
   line-height: 1;
 }
-/* Mark stats (◆ Open data, ◆ Independent) render diamond + label on ONE line.
+/* Mark stats (◆ Source-linked, ◆ Independent) render diamond + label on ONE line.
    Use flex-row so the diamond and text stay together without breaking. */
 .home-stat--mark {
   flex-direction: row;

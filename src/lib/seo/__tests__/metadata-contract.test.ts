@@ -324,8 +324,10 @@ function validDatasetNode(overrides: Record<string, unknown> = {}): Record<strin
     url: LOC,
     creator: { "@id": `${SITE_URL}/#organization` },
     publisher: { "@id": `${SITE_URL}/#organization` },
-    license: `${SITE_URL}/licensing`,
+    license: `${SITE_URL}/licensing#reuse`,
     isAccessibleForFree: true,
+    conditionsOfAccess:
+      "Free, no-account access to a page, download, or embed is not a reuse license. Reuse permission depends on the specific source's own upstream terms.",
     distribution: [
       {
         "@type": "DataDownload",
@@ -425,6 +427,60 @@ test("validateDatasetNode fails when creator/publisher/license/distribution are 
   assert.ok(result.errors.some((e) => /Dataset\.publisher/.test(e)));
   assert.ok(result.errors.some((e) => /Dataset\.license/.test(e)));
   assert.ok(result.errors.some((e) => /Dataset\.distribution/.test(e)));
+});
+
+test("validateDatasetNode rejects an apex license URL that misses the canonical rights anchor", () => {
+  const result = validateDatasetNode({
+    nodes: [validDatasetNode({ license: `${SITE_URL}/licensing` })],
+    canonical: LOC,
+    siteUrl: SITE_URL,
+  });
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((e) => /canonical rights registry URL/.test(e)));
+});
+
+test("validateDatasetNode fails when conditionsOfAccess is missing, empty, or doesn't separate access from reuse", () => {
+  const missing = validateDatasetNode({
+    nodes: [validDatasetNode({ conditionsOfAccess: undefined })],
+    canonical: LOC,
+    siteUrl: SITE_URL,
+  });
+  assert.equal(missing.ok, false);
+  assert.ok(missing.errors.some((e) => /Dataset\.conditionsOfAccess must be a nonempty string/.test(e)));
+
+  const empty = validateDatasetNode({
+    nodes: [validDatasetNode({ conditionsOfAccess: "   " })],
+    canonical: LOC,
+    siteUrl: SITE_URL,
+  });
+  assert.equal(empty.ok, false);
+  assert.ok(empty.errors.some((e) => /Dataset\.conditionsOfAccess must be a nonempty string/.test(e)));
+
+  const noBoundary = validateDatasetNode({
+    nodes: [validDatasetNode({ conditionsOfAccess: "This dataset is free to use." })],
+    canonical: LOC,
+    siteUrl: SITE_URL,
+  });
+  assert.equal(noBoundary.ok, false);
+  assert.ok(
+    noBoundary.errors.some((e) =>
+      /Dataset\.conditionsOfAccess must disclose that free access is not a reuse license/.test(e),
+    ),
+  );
+});
+
+test("validateDatasetNode passes when conditionsOfAccess carries the access-vs-reuse boundary", () => {
+  const result = validateDatasetNode({
+    nodes: [
+      validDatasetNode({
+        conditionsOfAccess:
+          "Access to this dataset is free. Free access is not the same as a reuse license — see /licensing.",
+      }),
+    ],
+    canonical: LOC,
+    siteUrl: SITE_URL,
+  });
+  assert.equal(result.ok, true);
 });
 
 test("validateDatasetNode fails when @context is missing or not https://schema.org", () => {

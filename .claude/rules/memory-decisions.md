@@ -519,3 +519,18 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   read-only repository permissions and no database or secret dependency.
 - Keep freshness, replication, and editorial-illustration guards explicit in
   `npm run build`; do not duplicate the aggregate gate's children there.
+
+## 2026-07-10 — Free access is not a reuse license
+
+- `/licensing#reuse` is the canonical interim rights surface, generated from
+  `src/lib/claims/reuse-rights.ts`; it is explicitly not DAT-003's future
+  complete source/field/product/release manifest.
+- A free page/API/download, a citation, or permission to display the hosted
+  iframe does not grant blanket reuse rights in the underlying data. Rights
+  remain source- and artifact-specific.
+- The repository is publicly viewable but has no root license file. Do not
+  call it open-source or MIT-licensed until BRD-007/008 selects and publishes
+  a license.
+- Keep Dataset `isAccessibleForFree: true` paired with `conditionsOfAccess`
+  that states the access/reuse boundary and with the exact canonical rights URL.
+- Durable record: APR-D033 in `plan/DECISIONS.md`.
