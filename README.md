@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: 0f3cec9646ab791e0df766369733f3cc1e4a96ffd32e671c78e864d058f5f9f1
-  Generated body SHA-256: 3552dd249030fb281b90866762dda23fa9d8a631f12da0b649c1ba900ee5a9bd
+  Template SHA-256: 1b50a2b656c2159cab543a594aa0e670aab87d0c08330a83d903c7150d15c32a
+  Generated body SHA-256: 6757a98700d4d6d71dc01e71a28a06c9a0e677133b216986103eacf10e7d550a
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -188,7 +188,33 @@ npm run sync:factbook:un-data    # UN Data sync
 # ... one sync orchestrator per source; see package.json
 npm run pulse:v2:all             # Run the full Pulse pipeline (ingest → cluster → classify → corroborate → score)
 npm run regenerate:readme        # Regenerate README.md from README.template.md
+npm run validate:claims-docs     # Claims-and-documentation CI gate (see below)
 ```
+
+### Claims-and-documentation CI gate
+
+`npm run validate:claims-docs` is the single command that runs Civica's
+registered public-claim, mutable-number, route/anchor, API-example,
+methodology-fixture, experimental-label, and research-terminology checks. It reuses the existing focused
+validators rather than duplicating their logic — see
+`src/lib/ci/claims-docs-gate.ts` for the manifest and
+`.github/workflows/claims-docs.yml` for the CI wiring. It covers:
+
+- **Registry coverage + prohibited claim language** — `validate:public-claims`
+- **Numeric templates** — `validate:numeric-claims`, `validate:content-templates`
+- **Routes/anchors** — `validate:doc-sources`, `validate:doc-references`
+- **API examples** — `validate:api-docs`
+- **Methodology fixtures** — the full unit-test suite (`npm test`), `validate:pulse-runtime`
+- **Experimental labels** — `validate:metadata`, `validate:public-claims`
+- **Terminology/policy overclaims** — `validate:terminology`, `validate:policy-surface`
+
+Before running any real validator, it re-proves one seeded orchestration
+failure per category so a child failure cannot be swallowed. The semantic
+stale-copy fixtures live in the focused unit tests and run through the gate's
+`npm test` child. The gate then runs every real validator and exits nonzero if
+any child fails. `npm run build` runs it
+automatically alongside the non-claims guards (sync-freshness, replication
+surface, editorial-illustration disclosure) before `next build`.
 
 Full script reference: see [AGENTS.md](./AGENTS.md).
 

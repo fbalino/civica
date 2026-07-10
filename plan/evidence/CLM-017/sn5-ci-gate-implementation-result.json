@@ -1,0 +1,54 @@
+{
+  "status": "completed",
+  "provider": "claude-code",
+  "model_requested": "claude-sonnet-5",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 13409,
+      "outputTokens": 18604,
+      "cacheReadInputTokens": 4861839,
+      "cacheCreationInputTokens": 85277,
+      "webSearchRequests": 0,
+      "costUSD": 2.2895006999999996,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000
+    }
+  },
+  "session_id": "ebbc35b7-ddd5-4bd5-91e0-def974695a87",
+  "subscription_first": true,
+  "result": {
+    "status": "completed",
+    "summary": "Implemented the CLM-017 claims-and-documentation CI gate: a pure typed manifest/orchestration module (src/lib/ci/claims-docs-gate.ts) mapping 11 checks to the 7 required Done-when categories, reusing existing npm validators (public-claims, numeric-claims, content-templates, doc-sources, doc-references, api-docs, unit tests, pulse-runtime, metadata, terminology, policy-surface) without duplicating their logic. Added scripts/validate-claims-docs.ts (npm run validate:claims-docs) which first proves seeded stale-copy fixtures fail closed per category in-process, then runs every child validator, reports each result, and exits nonzero on any failure. Added a pure test suite proving manifest validation (duplicate/missing/unknown category rejection), evaluateGate semantics, and that every category's seeded fixture independently fails the gate. Added .github/workflows/claims-docs.yml (push/PR, Node 22, npm ci, npm run validate:claims-docs \u2014 no DB/secrets needed since content-templates soft-fails without DATABASE_URL). Simplified npm run build to: sync-freshness && replication-surface && editorial-illustrations && validate:claims-docs && next build. Documented the command in README.template.md (regenerated README.md) and AGENTS.md's Committing section.",
+    "artifacts": [
+      "src/lib/ci/claims-docs-gate.ts",
+      "src/lib/ci/__tests__/claims-docs-gate.test.ts",
+      "scripts/validate-claims-docs.ts",
+      ".github/workflows/claims-docs.yml"
+    ],
+    "changed_files": [
+      "src/lib/ci/claims-docs-gate.ts",
+      "src/lib/ci/__tests__/claims-docs-gate.test.ts",
+      "scripts/validate-claims-docs.ts",
+      ".github/workflows/claims-docs.yml",
+      "package.json",
+      "README.template.md",
+      "README.md",
+      "AGENTS.md"
+    ],
+    "commands_run": [
+      "npm test (321 pass, 0 fail)",
+      "npm run validate:claims-docs (full pass)",
+      "npm run typecheck",
+      "npm run lint -- <new files>",
+      "npm run regenerate:readme",
+      "npm run validate:doc-references",
+      "git diff --check"
+    ],
+    "verification": "Focused gate tests (9 new tests) pass within the 321-test full suite; npm run validate:claims-docs passes end-to-end locally without touching any owned scope outside the brief; npm run typecheck and targeted eslint on new files are clean; validate:doc-references (README/route/file-pointer sync) passes; git diff --check clean; content-templates validator soft-fails gracefully without DATABASE_URL, confirming the gate works in a DB-less CI runner. Not committed, per instructions.",
+    "needs_user": false,
+    "next_action": "None required \u2014 ready for review/commit by the orchestrator."
+  },
+  "duration_ms": 309064,
+  "num_turns": 53,
+  "returncode": 0
+}

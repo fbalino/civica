@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 16
-- **Remaining:** 272
-- **Progress:** 5.6%
+- **Completed:** 17
+- **Remaining:** 271
+- **Progress:** 5.9%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -30,7 +30,7 @@ Source: `plan/02-positioning-claims-and-documentation.md`
 - [x] **CLM-014** (P0) Publish an AI-assisted editorial-illustration disclosure and asset-provenance policy. _Done when: licensing/about/country-caption surfaces state that engravings are non-documentary editorial illustrations; the policy describes tools, retained manifests, human/automated QA, landmark-error correction, and reuse rights; browser checks confirm disclosure is visible without overwhelming the page._
 - [x] **CLM-015** (P1) Create and enforce a research terminology glossary for source, observation, fact, reconciliation, estimate, indicator, index, signal, event, confidence, uncertainty, validation, replication, and peer review. _Done when: the glossary is published, registered public docs link or conform to its definitions, and a terminology lint catches prohibited ambiguous usages in methodology content._
 - [x] **CLM-016** (P1) Publish correction, retraction, version, and known-limitations policies linked from every research artifact. _Done when: policies define severity, response time, historical preservation, API/data corrections, notification, and version increments; a simulated correction produces the expected changelog, supersession marker, and release-note entry._
-- [ ] **CLM-017** (P0) Add a claims-and-documentation CI gate. _Done when: one documented command validates registry coverage, numeric templates, internal routes/anchors, API examples, methodology fixtures, experimental labels, and prohibited claim language; the command fails on seeded stale-copy fixtures and runs in CI._
+- [x] **CLM-017** (P0) Add a claims-and-documentation CI gate. _Done when: one documented command validates registry coverage, numeric templates, internal routes/anchors, API examples, methodology fixtures, experimental labels, and prohibited claim language; the command fails on seeded stale-copy fixtures and runs in CI._
 - [ ] **CLM-018** (P0) Replace blanket “all data is open/free to use” claims with exact mixed-rights language. _Done when: footer, about, licensing, terms, metadata, downloads, API docs, embeds, and citation surfaces distinguish free access from reuse rights; every reuse claim resolves to the source/release rights manifest; no global surface calls all data open._
 - [ ] **CLM-019** (P0) Qualify universal per-value provenance claims to measured coverage or make them true. _Done when: every rendered empirical value class has accessible source/vintage/rights linkage or the public claim states the generated coverage percentage and named exceptions; home/Atlas/leaderboard/embed fixtures are included._
 

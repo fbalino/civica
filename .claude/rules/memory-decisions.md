@@ -506,3 +506,16 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   review remains pending.
 - The caption uses a dedicated final masthead row so map and image tiles can
   never cover it; preserve the responsive Fable-approved placement.
+
+## 2026-07-10 — Claims and documentation use one CI gate
+
+- `npm run validate:claims-docs` is the canonical DB-free aggregate for claims
+  registry coverage, numeric templates, routes/anchors, API examples,
+  methodology fixtures, experimental labels, and prohibited language.
+- Specialist validators remain the semantic sources of truth. Seeded aggregate
+  fixtures prove orchestration fails closed; focused negative tests prove each
+  validator catches its own stale-copy class.
+- GitHub push and pull-request checks run typecheck plus the aggregate gate with
+  read-only repository permissions and no database or secret dependency.
+- Keep freshness, replication, and editorial-illustration guards explicit in
+  `npm run build`; do not duplicate the aggregate gate's children there.

@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-016_complete_next_CLM-017"
+    "current_task": "CLM-017_complete_next_CLM-018"
   },
   "budget": {
     "mode": "subscription_only",
@@ -455,6 +455,42 @@
       "session_id": "16475c5d-bbd5-4a2c-aed8-9f39cb06a7b1",
       "subscription_first": true,
       "ownership": "read-only independent CLM-016 acceptance review; ACCEPT with no blockers"
+    },
+    "tr_clm017_recon_attempt": {
+      "status": "stopped_unverifiable_model_before_repo_inspection",
+      "provider": "codex-cli",
+      "model_requested": "gpt-5.6-terra",
+      "model_used": "unverified",
+      "session_id": "019f4c9d-90fc-7821-abe8-08fb39821972",
+      "subscription_first": true,
+      "ownership": "requested Terra reconnaissance; worker self-reported Terra was not active and stopped without contributing findings"
+    },
+    "sn5_clm017_implementation": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "claude-sonnet-5",
+      "model_used": "claude-sonnet-5",
+      "session_id": "ebbc35b7-ddd5-4bd5-91e0-def974695a87",
+      "subscription_first": true,
+      "ownership": "bounded single-writer CLM-017 CI-gate implementation, followed by primary hardening and verification"
+    },
+    "sn5_clm017_review_alias_attempt": {
+      "status": "failed_before_review_model_alias_unavailable",
+      "provider": "claude-code",
+      "model_requested": "sonnet-5",
+      "model_used": "none",
+      "session_id": "9c5173b7-dd4b-495f-a8cb-080b7b6eb080",
+      "subscription_first": true,
+      "ownership": "attempted read-only final review; no findings produced and no model credit claimed"
+    },
+    "op48_clm017_final_acceptance": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "claude-opus-4-8",
+      "model_used": "claude-opus-4-8",
+      "session_id": "6aacc0d9-40e2-4d91-9635-bd84087c5408",
+      "subscription_first": true,
+      "ownership": "read-only independent CLM-017 acceptance review; ACCEPT with no blockers"
     }
   },
   "manifests": [],
@@ -492,6 +528,7 @@
     "plan/evidence/CLM-015/browser-checks.md",
     "plan/evidence/CLM-016/README.md",
     "plan/evidence/CLM-016/browser-checks.md",
+    "plan/evidence/CLM-017/README.md",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -507,11 +544,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-016: compilation, TypeScript, runtime/claim/freshness/doc-source/doc-reference/replication/API/metadata/editorial-illustration/terminology/policy-surface guards, and 86 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "311/311 full-suite tests and 21 focused policy/simulator fixtures passed with typecheck, targeted ESLint, design/content/docs/claims/numeric/metadata guards, diff checks, and a deterministic DB/network/clock-free correction simulator and policy validator. Master plan validates at 16/288 complete.",
+    "build": "npm run build passed for CLM-017: sync-freshness, replication, editorial-illustration, the aggregate claims/documentation gate, compilation, TypeScript, and 86 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "323/323 full-suite tests and 12/12 focused gate fixtures passed with typecheck, targeted ESLint, YAML parsing, doc-reference validation, diff checks, all eleven child validators, and Opus 4.8 ACCEPT. Master plan validates at 17/288 complete.",
     "public_claims": "36 claims cover 14/14 required surfaces across 7 canonical tiers; 40 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "CLM-016 was inspected in production Chrome at 1440 desktop light and 390 mobile dark. /policies had no overflow, fresh anchors cleared the sticky header by 72px, registered Index/Conditions links rendered, correction targets were visibly best-effort, and the production console was clean.",
-    "visual_review": "The policy page reuses the canonical methodology/sidebar/editorial system without new styling. Desktop and mobile screenshots confirm readable hierarchy; the shared editorial anchor offset repaired sticky-header obstruction for methodology headings."
+    "browser": "Not applicable for CLM-017: no rendered UI changed.",
+    "visual_review": "Not applicable for CLM-017: this task adds CI orchestration, tests, workflow, and operational documentation only."
   },
-  "updated_at": "2026-07-10T15:15:20Z"
+  "updated_at": "2026-07-10T15:37:35Z"
 }
