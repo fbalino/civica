@@ -7,14 +7,12 @@ import {
   FACTBOOK_RECONCILIATION_META,
   type ApiProvenanceEntry,
 } from "@/lib/factbook/reconcile/api";
-
-// Abuse control: this endpoint streams a full per-country dump and was
-// previously unthrottled — a cheap scraping / DoS vector across all 260+
-// countries. We bound it with the same per-IP in-memory limiter the public
-// /api/v1 routes use. 30 exports / minute / IP sits well above any normal
-// "download this country's data" click while stopping a tight scrape loop.
-const EXPORT_RATE_LIMIT_MAX = 30;
-const EXPORT_RATE_LIMIT_WINDOW_MS = 60_000;
+import { shapeCountryExportJson } from "@/lib/api/contract/shapes";
+import { buildCountryExportCsv } from "@/lib/api/contract/csv";
+import {
+  EXPORT_RATE_LIMIT_MAX,
+  EXPORT_RATE_LIMIT_WINDOW_MS,
+} from "@/lib/api/contract/rate-limits";
 
 /**
  * Phase F.4 — provenance map for the bulk export.
@@ -164,23 +162,21 @@ export async function GET(
   };
 
   if (format === "csv") {
-    const header = "category,key,value,numeric_value,unit,year";
-    const rows = data.facts.map((f) =>
-      [f.category, f.key, `"${(f.value ?? "").replace(/"/g, '""')}"`, f.numericValue ?? "", f.unit ?? "", f.year ?? ""].join(",")
-    );
     // CSV consumers can't carry the structured provenance block, but we
     // still cite the reconciliation methodology + vintage in a comment
     // header so the export is self-describing when opened in a text
-    // editor or imported into a research tool.
-    // PUBLIC_CLAIM: export.full-provenance
-    const citation = [
-      `# Civica Atlas country export — ${jurisdiction.name}`,
-      `# Reconciliation: ${FACTBOOK_RECONCILIATION_META.status} ${FACTBOOK_RECONCILIATION_META.version}`,
-      `# Vintage: ${FACTBOOK_RECONCILIATION_META.vintage}`,
-      `# Methodology: ${FACTBOOK_RECONCILIATION_META.reference}`,
-      `# For full per-fact provenance, request format=json.`,
-    ].join("\n");
-    const csv = [citation, header, ...rows].join("\n");
+    // editor or imported into a research tool — see the citation text
+    // in contract/csv.ts.
+    const csv = buildCountryExportCsv(
+      {
+        countryName: jurisdiction.name,
+        reconciliationStatus: FACTBOOK_RECONCILIATION_META.status,
+        reconciliationVersion: FACTBOOK_RECONCILIATION_META.version,
+        reconciliationVintage: FACTBOOK_RECONCILIATION_META.vintage,
+        reconciliationReference: FACTBOOK_RECONCILIATION_META.reference,
+      },
+      data.facts,
+    );
     return new Response(csv, {
       headers: {
         "Content-Type": "text/csv",
@@ -193,12 +189,12 @@ export async function GET(
   // `meta` are additive siblings so existing consumers reading
   // `data.population` etc. continue to work unchanged. ──
   return NextResponse.json(
-    {
+    shapeCountryExportJson({
       ...data,
       meta: {
         reconciliation: FACTBOOK_RECONCILIATION_META,
       },
-    },
+    }),
     {
       headers: {
         "Content-Disposition": `attachment; filename="${slug}-data.json"`,

@@ -19,6 +19,7 @@ import {
   auditPublicNumericClaims,
   type PublicNumericDocument,
 } from "../src/lib/claims/public-numeric-claims";
+import { EXAMPLES } from "../src/lib/api/contract/examples";
 
 const ROOT = process.cwd();
 const TYPESCRIPT_EXTENSIONS = new Set([".ts", ".tsx"]);
@@ -120,15 +121,24 @@ async function collectSourceFiles(): Promise<string[]> {
     }
   }
 
+  // CLM-012: these modules render directly into /api-docs and are public
+  // prose/example sources even though they live under src/lib.
+  if (await exists("src/lib/api/contract/registry.ts")) {
+    files.add("src/lib/api/contract/registry.ts");
+  }
+
   return [...files].sort();
 }
 
 async function collectDocuments(): Promise<PublicNumericDocument[]> {
   const files = await collectSourceFiles();
-  return Promise.all(
+  const documents = await Promise.all(
     files.map(async (file) => ({
       file,
-      surface: surfaceFor(file),
+      surface:
+        file === "src/lib/api/contract/registry.ts"
+          ? "/api-docs"
+          : surfaceFor(file),
       source: await fs.readFile(path.resolve(ROOT, file), "utf8"),
       kind:
         file.endsWith(".md") || file.endsWith(".mdx")
@@ -136,6 +146,22 @@ async function collectDocuments(): Promise<PublicNumericDocument[]> {
           : ("typescript" as const),
     })),
   );
+
+  // Canonical examples are objects, so serialize them into the same visible
+  // "Illustrative Example Response" context rendered by EndpointSection.
+  // This preserves the CLM-006 guard after examples moved out of page.tsx.
+  for (const [id, value] of Object.entries(EXAMPLES)) {
+    documents.push({
+      file: "src/lib/api/contract/examples.ts",
+      surface: "/api-docs",
+      source: `const ${id} = ${JSON.stringify(
+        `Illustrative Example Response: ${JSON.stringify(value)}`,
+      )};`,
+      kind: "typescript",
+    });
+  }
+
+  return documents;
 }
 
 async function main(): Promise<void> {

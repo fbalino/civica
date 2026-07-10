@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:sync-freshness && npm run validate:public-claims && npm run validate:numeric-claims && npm run validate:pulse-runtime && npm run validate:doc-sources && npm run validate:doc-references && npm run validate:replication-surface && next build",
+    "build": "npm run validate:sync-freshness && npm run validate:public-claims && npm run validate:numeric-claims && npm run validate:pulse-runtime && npm run validate:doc-sources && npm run validate:doc-references && npm run validate:replication-surface && npm run validate:api-docs && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -97,10 +97,12 @@
     "validate:doc-sources": "tsx scripts/validate-doc-sources.ts",
     "validate:doc-references": "tsx scripts/validate-doc-references.ts",
     "validate:replication-surface": "tsx scripts/validate-replication-surface.ts",
+    "validate:api-docs": "tsx scripts/validate-api-docs.ts",
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "test:watch": "node --import tsx --test --watch \"src/**/*.test.ts\"",
     "test:db": "RUN_DB_TESTS=1 node --import tsx --test \"src/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit",
     "validate:design-tokens": "tsx scripts/validate-design-tokens.ts",
     "measure:gdelt-noise": "tsx scripts/measure-gdelt-noise.ts",
     "admin:set-password": "tsx scripts/hash-admin-password.ts"
@@ -127,7 +129,8 @@
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "rss-parser": "^3.13.0"
+    "rss-parser": "^3.13.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

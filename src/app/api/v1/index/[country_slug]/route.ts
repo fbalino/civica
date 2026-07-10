@@ -11,6 +11,7 @@ import {
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { and, eq, sql, desc } from "drizzle-orm";
+import { shapeIndexCountryData } from "@/lib/api/contract/shapes";
 
 /**
  * This endpoint serves the current Beta methodology by default. Pass
@@ -23,7 +24,7 @@ export async function GET(
   { params }: { params: Promise<{ country_slug: string }> }
 ) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return rateLimited;
+  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
     const { country_slug } = await params;
@@ -110,7 +111,7 @@ export async function GET(
     // consistent sunset signal.
     return withStructuralFamilyDeprecation(
       apiResponse({
-        data: {
+        data: shapeIndexCountryData({
           slug: jurisdiction.slug,
           name: jurisdiction.name,
           governmentClassification: jurisdiction.governmentClassification ?? null,
@@ -127,7 +128,7 @@ export async function GET(
           dimensionsAvailable: composite.dimensionsAvailable,
           methodologyVersion: composite.methodologyVersion,
           dimensions,
-        },
+        }),
         meta: {
           methodology: CI_METHODOLOGY_META,
           ...STRUCTURAL_FAMILY_DEPRECATION_META,

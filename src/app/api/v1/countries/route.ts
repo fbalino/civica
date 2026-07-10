@@ -27,9 +27,9 @@ import {
   getCanonicalFactsForJurisdictions,
 } from "@/lib/factbook/reconcile/api";
 import {
-  STRUCTURAL_FAMILY_DEPRECATION_META,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
+import { shapeCountryListItem, shapeCountriesListMeta } from "@/lib/api/contract/shapes";
 
 /**
  * Resolver-canonical display facts the list serves. Mirrors the
@@ -141,7 +141,7 @@ function buildPeerLensCondition(
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return rateLimited;
+  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
     const url = new URL(request.url);
@@ -246,27 +246,26 @@ export async function GET(request: Request) {
 
       const paged = filtered.slice(offset, offset + limit);
       const displayFacts = await resolveListDisplayFacts(paged);
-      const pagedResolved = paged.map((country) => {
-        const d = displayFacts.get(country.id);
-        return {
+      const pagedResolved = paged.map(({ id, ...country }) => {
+        const d = displayFacts.get(id);
+        return shapeCountryListItem({
           ...country,
           capital: d?.capital ?? country.capital,
           population: d?.population ?? country.population,
           gdpBillions: d?.gdpBillions ?? country.gdpBillions,
           areaSqKm: d?.areaSqKm ?? country.areaSqKm,
-        };
+        });
       });
       return withStructuralFamilyDeprecation(
         apiResponse({
           data: pagedResolved,
-          meta: {
+          meta: shapeCountriesListMeta({
             total: filtered.length,
             limit,
             offset,
             hasMore: offset + limit < filtered.length,
             taxonomy,
-            ...STRUCTURAL_FAMILY_DEPRECATION_META,
-          },
+          }),
         }),
       );
     }
@@ -307,7 +306,7 @@ export async function GET(request: Request) {
       apiResponse({
         data: countries.map(({ id, ...country }) => {
           const d = displayFacts.get(id);
-          return {
+          return shapeCountryListItem({
             ...country,
             // Resolver-canonical display facts override the cache,
             // mirroring /api/v1/countries/[code].
@@ -316,16 +315,15 @@ export async function GET(request: Request) {
             gdpBillions: d?.gdpBillions ?? country.gdpBillions,
             areaSqKm: d?.areaSqKm ?? country.areaSqKm,
             governmentClassification: classificationMap.get(id) ?? null,
-          };
+          });
         }),
-        meta: {
+        meta: shapeCountriesListMeta({
           total,
           limit,
           offset,
           hasMore: offset + limit < total,
           taxonomy,
-          ...STRUCTURAL_FAMILY_DEPRECATION_META,
-        },
+        }),
       }),
     );
   } catch (e) {

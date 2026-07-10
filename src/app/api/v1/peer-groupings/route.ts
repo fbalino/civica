@@ -39,6 +39,7 @@ import {
   type CGVRegimeTypeKey,
   type MonarchyStatusKey,
 } from "@/lib/peer-grouping/lens-metadata";
+import { shapePeerGroupingsData } from "@/lib/api/contract/shapes";
 
 const SOURCE_NAMES: Record<string, string> = {
   world_bank: "World Bank",
@@ -113,7 +114,11 @@ export async function GET(request: Request) {
       getMonarchyStatusDistribution(),
     ]);
 
-    const lenses: Record<string, LensBlock> = {
+    // No explicit `Record<string, LensBlock>` annotation — this object
+    // literal's exact 5-key shape must flow through to
+    // `shapePeerGroupingsData`/`zPeerGroupingsData` unwidened so the
+    // contract layer can catch a missing/renamed lens at compile time.
+    const lenses = {
       world_bank_region: {
         factKey: "world_bank_region",
         filterParam: "region",
@@ -122,7 +127,7 @@ export async function GET(request: Request) {
         description:
           "World Bank Country and Lending Groups regional classification (7 regions). Default material peer lens — pair with `world_bank_income_group` for the canonical material cohort. Refreshed annually each July.",
         values: decorateLens<WorldBankRegionKey>(region, WORLD_BANK_REGION_META),
-      },
+      } satisfies LensBlock,
       world_bank_income_group: {
         factKey: "world_bank_income_group",
         filterParam: "income",
@@ -134,7 +139,7 @@ export async function GET(request: Request) {
           income,
           WORLD_BANK_INCOME_GROUP_META,
         ),
-      },
+      } satisfies LensBlock,
       vdem_row: {
         factKey: "vdem_row",
         filterParam: "vdem",
@@ -143,7 +148,7 @@ export async function GET(request: Request) {
         description:
           "V-Dem Regimes of the World (Lührmann, Tannenberg & Lindberg 2018). Default governance peer lens — 4 tiers spanning closed autocracy through liberal democracy. Annual cadence.",
         values: decorateLens<VDemRowKey>(vdem, VDEM_ROW_META),
-      },
+      } satisfies LensBlock,
       cgv_regime: {
         factKey: "regime_type_cgv",
         filterParam: "cgv",
@@ -152,7 +157,7 @@ export async function GET(request: Request) {
         description:
           "Bjørnskov-Rode / Cheibub-Gandhi-Vreeland regime classification (6 categories). Optional alternate governance lens distinguishing democracies by executive form and authoritarian systems by ruling-elite structure.",
         values: decorateLens<CGVRegimeTypeKey>(cgv, CGV_REGIME_TYPE_META),
-      },
+      } satisfies LensBlock,
       monarchy_status: {
         factKey: "monarchy_status",
         filterParam: "monarchy",
@@ -161,11 +166,11 @@ export async function GET(request: Request) {
         description:
           "Monarchy status (6-value enum: none / constitutional / absolute / ceremonial / elective / theocratic). Descriptive constitutional-form metadata, NOT an analytical peer lens. Provided here for filterability ('show me ceremonial monarchies').",
         values: decorateLens<MonarchyStatusKey>(monarchy, MONARCHY_STATUS_META),
-      },
+      } satisfies LensBlock,
     };
 
     return apiResponse({
-      data: lenses,
+      data: shapePeerGroupingsData(lenses),
       meta: {
         peerGrouping: {
           status: "stable",

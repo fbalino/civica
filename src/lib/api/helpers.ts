@@ -3,7 +3,9 @@ import { civicaIndex } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
 
-const CORS_HEADERS = {
+// CLM-012: exported so contract/registry.ts documents the real header
+// values instead of retyping them.
+export const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
@@ -66,8 +68,10 @@ export const PULSE_METHODOLOGY_META = Object.freeze({
   }),
 });
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 60;
+// CLM-012: exported so contract/registry.ts can document the real
+// numbers instead of a vague "best-effort" description with no figures.
+export const RATE_LIMIT_WINDOW_MS = 60_000;
+export const RATE_LIMIT_MAX = 60;
 
 function getRateLimitKey(request: Request): string {
   return getRequestIp(request);

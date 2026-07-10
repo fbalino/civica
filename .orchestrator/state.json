@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-011_complete_next_CLM-012"
+    "current_task": "CLM-012_complete_next_CLM-013"
   },
   "budget": {
     "mode": "subscription_only",
@@ -260,6 +260,33 @@
       "session_id": "15f2db81-1e01-4ebb-a6b8-b9b953a507c8",
       "subscription_first": true,
       "ownership": "read-only independent CLM-011 acceptance review; PASS"
+    },
+    "sn5_clm012_api_inventory_and_implementation": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "1833fb5a-0975-42d7-b838-c2d6758fb845",
+      "subscription_first": true,
+      "ownership": "read-only API inventory followed by single-writer CLM-012 implementation"
+    },
+    "op48_clm012_contract_adjudication": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "b139abdb-27e8-4a9c-a6ca-fd81ddbccded",
+      "subscription_first": true,
+      "ownership": "read-only response-schema and deprecation-contract adjudication"
+    },
+    "op48_clm012_acceptance_review": {
+      "status": "completed_after_primary_repair",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "52e470d7-d70d-4154-af44-e1996dd1eac6",
+      "subscription_first": true,
+      "ownership": "read-only independent acceptance review, numeric-claims blocker discovery, and repaired recheck"
     }
   },
   "manifests": [],
@@ -286,6 +313,8 @@
     "plan/evidence/CLM-010/browser-checks.md",
     "plan/evidence/CLM-011/README.md",
     "plan/evidence/CLM-011/browser-checks.md",
+    "plan/evidence/CLM-012/README.md",
+    "plan/evidence/CLM-012/browser-checks.md",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -301,11 +330,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-011: compilation, TypeScript, runtime/claim/freshness/doc-source/doc-reference/replication guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "163 full-suite tests plus 37 documentation-reference and 9 reconciliation focused fixtures, public/numeric/doc-source/content/runtime/design/freshness validators, targeted ESLint, and diff checks passed. Master plan is 11/288 complete pending final master-plan validation.",
+    "build": "npm run build passed for CLM-012: compilation, TypeScript, runtime/claim/freshness/doc-source/doc-reference/replication/API-contract guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "184/184 full-suite tests, 21 API-contract fixtures, all API/docs/public/numeric/runtime/design/freshness validators, targeted ESLint, diff checks, and the live 17-request JSON/CSV matrix passed. Master plan validates at 12/288 complete.",
     "public_claims": "29 claims cover 14/14 required surfaces across 7 canonical tiers; 35 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "CLM-011 reconciliation methodology was checked from a fresh production build at 1440x1000 light and 390x844 dark with reduced motion. Current threshold/gap prose rendered, sealed migration narratives were absent, mobile had no document overflow, and there were no console errors or HTTP failures.",
-    "visual_review": "Final CLM-011 desktop-light and mobile-dark full-page screenshots were inspected; hierarchy, contrast, sidebar/body separation, and responsive containment had no acceptance-blocking defects."
+    "browser": "CLM-012 /api-docs was checked from a fresh production build at 1440x1000 light and 390x844 dark with reduced motion. Both returned 200, all 15 rendered JSON examples parsed, mobile had no document overflow, and there were no console errors.",
+    "visual_review": "Final CLM-012 desktop-light and mobile-dark full-page screenshots were inspected; endpoint hierarchy, deprecation notices, examples, sidebar, contrast, and responsive containment had no acceptance-blocking defects."
   },
-  "updated_at": "2026-07-10T09:50:00Z"
+  "updated_at": "2026-07-10T10:54:32Z"
 }

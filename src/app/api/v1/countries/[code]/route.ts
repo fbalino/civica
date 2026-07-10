@@ -1,4 +1,4 @@
-import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
+import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { getCICountryDetail } from "@/lib/db/queries";
@@ -15,14 +15,16 @@ import { eq, sql, asc, desc } from "drizzle-orm";
 import {
   getCanonicalFactsForJurisdiction,
   buildApiProvenanceEntry,
-  FACTBOOK_RECONCILIATION_META,
   type ApiProvenanceEntry,
 } from "@/lib/factbook/reconcile/api";
-import {
-  STRUCTURAL_FAMILY_DEPRECATION_META,
-  withStructuralFamilyDeprecation,
-} from "@/lib/api/deprecation";
+import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { shapeCountryDetail, shapeCountryDetailMeta } from "@/lib/api/contract/shapes";
+import type { zCountryDetail } from "@/lib/api/contract/schemas";
+import type { z } from "zod";
+
+type CountryDetailGovernment = z.infer<typeof zCountryDetail>["government"];
+type CountryDetailBody = CountryDetailGovernment[string][number];
 
 /**
  * Phase F.4 — public-API provenance map.
@@ -59,7 +61,7 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> }
 ) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return rateLimited;
+  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
     const { code } = await params;
@@ -190,7 +192,7 @@ export async function GET(
       if (entry) provenance[flatField] = entry;
     }
 
-    const branches = bodies.reduce(
+    const branches = bodies.reduce<CountryDetailGovernment>(
       (acc, body) => {
         const branch = body.branch ?? "other";
         if (!acc[branch]) acc[branch] = [];
@@ -226,7 +228,7 @@ export async function GET(
             isRulingCoalition: p.isRulingCoalition,
           }));
 
-        acc[branch].push({
+        const entry: CountryDetailBody = {
           id: body.id,
           name: body.name,
           type: body.bodyType,
@@ -234,15 +236,16 @@ export async function GET(
           totalSeats: body.totalSeats,
           offices: bodyOffices,
           parties: bodyParties.length > 0 ? bodyParties : undefined,
-        });
+        };
+        acc[branch].push(entry);
 
         return acc;
       },
-      {} as Record<string, unknown[]>
+      {},
     );
 
     return withStructuralFamilyDeprecation(apiResponse({
-      data: {
+      data: shapeCountryDetail({
         slug: country.slug,
         name: country.name,
         iso2: country.iso2,
@@ -304,12 +307,8 @@ export async function GET(
           : null,
         // ── Phase F.4 — provenance block keyed by flat field ──
         provenance,
-      },
-      meta: {
-        reconciliation: FACTBOOK_RECONCILIATION_META,
-        methodology: CI_METHODOLOGY_META,
-        ...STRUCTURAL_FAMILY_DEPRECATION_META,
-      },
+      }),
+      meta: shapeCountryDetailMeta(),
     }));
   } catch (e) {
     console.error("API /v1/countries/[code] error:", e);

@@ -444,3 +444,16 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The public integer is the rounded Monte Carlo median. Its central input-variation range is a heuristic sensitivity summary, not a confidence interval.
 - Public presentation is neutral and grade-free. Legacy v1 remains archived for reproducibility only.
 - The G3 validation tournament decides whether this aggregation, a redesigned Index, or no composite ultimately graduates.
+
+## 2026-07-10 — Public API contracts are executable
+
+- `src/lib/api/contract/` is the canonical response-schema, endpoint-metadata,
+  example, and CSV-contract layer for the public API.
+- Public route shaping must use strict Zod `parse()` at runtime; a TypeScript
+  cast or identity helper is not a contract boundary.
+- `/api-docs` is generated from the endpoint registry, and
+  `npm run validate:api-docs` must remain a build guard.
+- Structural-family retirement headers and metadata come only from
+  `src/lib/api/deprecation.ts`. Conditional deprecation on
+  `/api/v1/index/by-government-type` applies only to the legacy
+  `taxonomy=structural|regime` branch.

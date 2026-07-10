@@ -15,6 +15,7 @@ import {
   PULSE_METHODOLOGY_META,
 } from "@/lib/api/helpers";
 import { getPulseV2EventsForCountry } from "@/lib/db/queries-pulse-v2";
+import { shapePulseEventsData } from "@/lib/api/contract/shapes";
 
 export async function GET(
   request: Request,
@@ -30,7 +31,7 @@ export async function GET(
     if (!data) return apiError("Country not found", 404);
 
     return apiResponse({
-      data,
+      data: shapePulseEventsData(data),
       meta: { methodology: PULSE_METHODOLOGY_META },
     });
   } catch (e) {

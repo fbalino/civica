@@ -1,13 +1,14 @@
-import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
+import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { jurisdictions, ciCompositeScores } from "@/lib/db/schema";
 import { eq, sql, desc, asc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
+import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
 import {
-  STRUCTURAL_FAMILY_DEPRECATION_META,
-  withStructuralFamilyDeprecation,
-} from "@/lib/api/deprecation";
+  shapeIndexRankingsItem,
+  shapeIndexRankingsMeta,
+} from "@/lib/api/contract/shapes";
 
 type ExtendedTaxonomy =
   | GovernmentTaxonomyLens
@@ -48,7 +49,7 @@ function buildPeerLensCondition(
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return rateLimited;
+  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
     const url = new URL(request.url);
@@ -99,18 +100,20 @@ export async function GET(request: Request) {
     }
 
     if (!quarter) {
+      // CLM-012 fix: this early-return branch previously omitted
+      // `taxonomy` from meta, unlike the two branches below — every
+      // /v1/index/rankings response now carries it consistently.
       return withStructuralFamilyDeprecation(
         apiResponse({
           data: [],
-          meta: {
+          meta: shapeIndexRankingsMeta({
             total: 0,
             limit,
             offset,
             hasMore: false,
             quarter: null,
-            methodology: CI_METHODOLOGY_META,
-            ...STRUCTURAL_FAMILY_DEPRECATION_META,
-          },
+            taxonomy,
+          }),
         }),
       );
     }
@@ -158,6 +161,9 @@ export async function GET(request: Request) {
       vintageLabel: ciCompositeScores.vintageLabel,
       isPartial: ciCompositeScores.isPartial,
       missingDimensions: ciCompositeScores.missingDimensions,
+      // CLM-012 addition — every sibling CI endpoint (index/[slug],
+      // index/compare) already surfaces this completeness signal.
+      dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
       methodologyVersion: ciCompositeScores.methodologyVersion,
       slug: jurisdictions.slug,
       name: jurisdictions.name,
@@ -199,6 +205,10 @@ export async function GET(request: Request) {
       const filtered = rows
         .map(({ jurisdictionId, ...row }) => ({
           ...row,
+          // Normalize null->[] to match the sibling CI endpoints
+          // (index/[slug], index/compare), which never emit a null
+          // missingDimensions array.
+          missingDimensions: row.missingDimensions ?? [],
           governmentClassification: classificationMap.get(jurisdictionId) ?? null,
         }))
         .filter((row) => {
@@ -213,17 +223,15 @@ export async function GET(request: Request) {
 
       return withStructuralFamilyDeprecation(
         apiResponse({
-          data: filtered.slice(offset, offset + limit),
-          meta: {
+          data: filtered.slice(offset, offset + limit).map(shapeIndexRankingsItem),
+          meta: shapeIndexRankingsMeta({
             total: filtered.length,
             limit,
             offset,
             hasMore: offset + limit < filtered.length,
             quarter,
             taxonomy,
-            methodology: CI_METHODOLOGY_META,
-            ...STRUCTURAL_FAMILY_DEPRECATION_META,
-          },
+          }),
         }),
       );
     }
@@ -254,20 +262,21 @@ export async function GET(request: Request) {
 
     return withStructuralFamilyDeprecation(
       apiResponse({
-        data: rows.map(({ jurisdictionId, ...row }) => ({
-          ...row,
-          governmentClassification: classificationMap.get(jurisdictionId) ?? null,
-        })),
-        meta: {
+        data: rows.map(({ jurisdictionId, ...row }) =>
+          shapeIndexRankingsItem({
+            ...row,
+            missingDimensions: row.missingDimensions ?? [],
+            governmentClassification: classificationMap.get(jurisdictionId) ?? null,
+          }),
+        ),
+        meta: shapeIndexRankingsMeta({
           total,
           limit,
           offset,
           hasMore: offset + limit < total,
           quarter,
           taxonomy,
-          methodology: CI_METHODOLOGY_META,
-          ...STRUCTURAL_FAMILY_DEPRECATION_META,
-        },
+        }),
       }),
     );
   } catch (e) {

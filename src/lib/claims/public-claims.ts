@@ -372,7 +372,11 @@ export const PUBLIC_CLAIMS = [
     methodologyVersion: "pulse-v2.1-beta",
     gate: "G3",
     source: {
-      path: "src/app/api-docs/page.tsx",
+      // CLM-012: api-docs/page.tsx renders this route's description from
+      // contract/registry.ts's `summary` field (an expression, not
+      // literal JSX text) — the claim now pins the actual source of
+      // that prose rather than its render site.
+      path: "src/lib/api/contract/registry.ts",
       fragment:
         "Returns the generated, machine-readable contract for the Pulse method currently scheduled in production.",
     },
@@ -615,7 +619,11 @@ export const PUBLIC_CLAIMS = [
     methodologyVersion: "reconciliation-v0.2-beta",
     gate: "G2",
     source: {
-      path: "src/app/api/countries/[slug]/export/route.ts",
+      // CLM-012: the CSV citation comment block (incl. this line) now
+      // comes from contract/csv.ts's buildCountryExportCsvCitation,
+      // shared with contract/registry.ts's documented example — the
+      // claim pins that shared source, not the route.ts call site.
+      path: "src/lib/api/contract/csv.ts",
       fragment: "# For full per-fact provenance, request format=json.",
     },
   },

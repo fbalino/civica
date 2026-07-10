@@ -359,25 +359,46 @@ const CLM_011_RECONCILED_CONCEPTS: DocConcept[] = [
  * CLM-009; owning task named via `deferredTo`)
  * ──────────────────────────────────────────────────────────────── */
 
-const DEFERRED_CONCEPTS: DocConcept[] = [
+const DEFERRED_CONCEPTS: DocConcept[] = [];
+
+/* ────────────────────────────────────────────────────────────────
+ * Concepts — CLM-012 resolved (promoted out of DEFERRED_CONCEPTS)
+ * ──────────────────────────────────────────────────────────────── */
+
+const CLM_012_RESOLVED_CONCEPTS: DocConcept[] = [
   {
     id: "api.v1-examples",
     title: "Public API v1 usage examples",
-    deferredTo: "CLM-012",
+    owner: "CLM-012",
     canonical: {
-      kind: "api-example",
-      path: "src/app/api-docs/page.tsx",
-      symbol: "curl / fetch example CodeBlocks",
+      kind: "source",
+      path: "src/lib/api/contract/examples.ts",
+      symbol: "EXAMPLES / renderExample",
     },
     relations: [
       {
+        kind: "api-example",
+        path: "src/app/api-docs/page.tsx",
+        symbol: "EndpointSection exampleResponse",
+        relationship: "generated",
+        note: "Every EndpointSection's exampleResponse renders renderExample(exampleId) — JSON.stringify of a fixture built through the same shape*() functions the live routes call (contract/shapes.ts) and strict-parsed against contract/schemas.ts at module load. No example is a hand-authored JSON string.",
+      },
+      {
         kind: "reader-markdown",
         path: "content/methodology-civica-index.md",
-        symbol: "citation",
+        symbol: "13.1 · API access",
         relationship: "link-only",
-        note: "§13.1 'API access' lists the same GET endpoints in a plain fenced code block (not curl/fetch examples). CLM-012 owns unifying API examples across surfaces — not repaired by CLM-009.",
+        note: "Links to /api-docs as the single generated endpoint list instead of hand-maintaining a second, independently drifting subset of GET routes.",
+      },
+      {
+        kind: "source",
+        path: "src/lib/api/contract/registry.ts",
+        symbol: "API_ROUTES",
+        relationship: "contract-test",
+        note: "The route<->docs inventory, param lists, deprecation contracts, and CORS/rate-limit numbers api-docs renders are asserted against the live route.ts files by scripts/validate-api-docs.ts and src/lib/api/contract/__tests__/contract.test.ts, not hand-synced.",
       },
     ],
+    publicClaimIds: [],
   },
 ];
 
@@ -505,6 +526,7 @@ export const DOC_CONCEPTS: DocConcept[] = [
   ...MIGRATED_CONCEPTS,
   ...ALREADY_SATISFIED_CONCEPTS,
   ...CLM_011_RECONCILED_CONCEPTS,
+  ...CLM_012_RESOLVED_CONCEPTS,
   ...DEFERRED_CONCEPTS,
 ];
 

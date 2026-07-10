@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import type { ReaderSidebarItem } from "@/components/editorial/ReaderSidebar";
+import { Banner } from "@/components/editorial/Banner";
+import { Chip } from "@/components/editorial/Pill";
 import { withOg } from "@/lib/og";
-import { createPulseRuntimeMethodSnapshot } from "@/lib/pulse/v2/runtime-contract";
+import { getRouteContract, type RouteContract, type RouteParam } from "@/lib/api/contract/registry";
+import { renderExample, renderCountryExportCsvExample, type ExampleId } from "@/lib/api/contract/examples";
 
 export const revalidate = 3600;
 
@@ -23,22 +26,20 @@ export const metadata: Metadata = {
 
 const BASE_URL = "https://civicaatlas.org/api/v1";
 const SITE_URL = "https://civicaatlas.org";
-const PULSE_METHOD_SNAPSHOT = createPulseRuntimeMethodSnapshot();
-const PULSE_METHOD_EXAMPLE_RESPONSE = JSON.stringify(
-  { data: PULSE_METHOD_SNAPSHOT },
-  null,
-  2,
-);
 
 const SECTIONS: ReaderSidebarItem[] = [
   { id: "overview", label: "Overview" },
   { id: "endpoints", label: "Endpoints" },
   { id: "countries", label: "List countries" },
   { id: "country-detail", label: "Country detail" },
+  { id: "government-types", label: "Government types (deprecated)" },
   { id: "peer-groupings", label: "Peer groupings" },
   { id: "index-rankings", label: "Index rankings" },
   { id: "index-country", label: "Index country" },
+  { id: "index-history", label: "Index country history" },
+  { id: "index-by-government-type", label: "Index by government type" },
   { id: "index-compare", label: "Index compare" },
+  { id: "index-methodology", label: "Index methodology version" },
   { id: "pulse-methodology", label: "Pulse runtime method" },
   { id: "pulse-dimensions", label: "Pulse dimensions" },
   { id: "pulse-events", label: "Pulse country events" },
@@ -55,30 +56,88 @@ function CodeBlock({ children }: { children: string }) {
   return <pre className="api-code-block">{children}</pre>;
 }
 
+/** Every endpoint's parameter table renders from `RouteContract.params`
+ *  (contract/registry.ts) rather than a hand-typed array, so a param a
+ *  handler actually reads can't silently go undocumented — see
+ *  scripts/validate-api-docs.ts's param-drift check. */
+function toDocParams(params: RouteParam[]) {
+  return params.map((p) => ({
+    name: p.name,
+    type: p.type,
+    description: p.description,
+  }));
+}
+
+function DeprecationNote({ route }: { route: RouteContract }) {
+  if (!route.deprecation || route.deprecation.wholeRoute) return null;
+  const entry = route.deprecation.meta.deprecations[0];
+  const conditional =
+    route.deprecation.appliesWhen === "taxonomy-structural-regime";
+  return (
+    <Banner variant="warn">
+      <strong>{entry.identifier}</strong> (
+      {entry.kind}) is deprecated, sunsetting {route.deprecation.sunsetIso}. Replaced by{" "}
+      {entry.replacedBy.join(", ")} — see{" "}
+      <Link href={route.deprecation.successor}>{route.deprecation.successor}</Link>.{" "}
+      {conditional ? (
+        <>
+          Requests using <code>taxonomy=structural</code> or{" "}
+          <code>taxonomy=regime</code> carry <code>Deprecation</code>/
+          <code>Sunset</code>/<code>Link</code> headers. Successful JSON
+          responses also include a <code>meta.deprecations</code> block with
+          the same information.
+        </>
+      ) : (
+        <>
+          Every response from this endpoint carries <code>Deprecation</code>/
+          <code>Sunset</code>/<code>Link</code> headers. Successful JSON
+          responses also include a <code>meta.deprecations</code> block with
+          the same information.
+        </>
+      )}
+    </Banner>
+  );
+}
+
 function EndpointSection({
   id,
+  routeId,
   method,
   path,
   description,
   parameters,
   exampleResponse,
+  deprecatedBanner,
 }: {
   id: string;
+  routeId: string;
   method: HttpMethod;
   path: string;
   description: string;
   parameters?: { name: string; type: string; description: string }[];
   exampleResponse: string;
+  deprecatedBanner?: boolean;
 }) {
+  const route = getRouteContract(routeId);
   const methodModifier = `api-method-badge--${method.toLowerCase()}`;
   return (
     <section className="api-endpoint" id={id}>
       <div className="api-endpoint-head">
         <span className={`api-method-badge ${methodModifier}`}>{method}</span>
         <code className="api-endpoint-path">{path}</code>
+        {deprecatedBanner && <Chip variant="warn">Deprecated</Chip>}
       </div>
 
       <p className="api-endpoint-desc">{description}</p>
+
+      {deprecatedBanner && route.deprecation && (
+        <Banner variant="warn">
+          This entire endpoint is deprecated, sunsetting {route.deprecation.sunsetIso}. Use{" "}
+          <Link href={route.deprecation.successor}>{route.deprecation.successor}</Link> instead. Every
+          response carries <code>Deprecation</code>/<code>Sunset</code>/<code>Link</code> headers.
+        </Banner>
+      )}
+      <DeprecationNote route={route} />
 
       {parameters && parameters.length > 0 && (
         <>
@@ -97,26 +156,18 @@ function EndpointSection({
 
       <h4 className="api-section-label">Illustrative Example Response</h4>
       <p className="api-info-card__body">
-        Values and totals shown below are illustrative; live responses may differ.
+        Values and totals shown below are illustrative; live responses may differ. The shape is generated
+        from, and validated against, the same schema the route itself is contract-tested against — see{" "}
+        <code>npm run validate:api-docs</code>.
       </p>
       <CodeBlock>{exampleResponse}</CodeBlock>
     </section>
   );
 }
 
-const BULK_EXPORT_PARAMS = [
-  {
-    name: ":slug",
-    type: "string",
-    description: 'Country slug, e.g. "france" or "united-states".',
-  },
-  {
-    name: "format",
-    type: "json | csv",
-    description:
-      "Response format. json returns flat fields, the full fact list, and a per-fact provenance block. csv returns the fact list with a self-describing citation header. Default: json.",
-  },
-];
+function docExample(exampleId: ExampleId): string {
+  return renderExample(exampleId);
+}
 
 const EMBED_PARAMS = [
   {
@@ -155,6 +206,22 @@ const EMBED_PARAMS = [
 ];
 
 export default function ApiDocsPage() {
+  const countriesRoute = getRouteContract("countries");
+  const countryDetailRoute = getRouteContract("country-detail");
+  const governmentTypesRoute = getRouteContract("government-types");
+  const peerGroupingsRoute = getRouteContract("peer-groupings");
+  const indexRankingsRoute = getRouteContract("index-rankings");
+  const indexCountryRoute = getRouteContract("index-country");
+  const indexHistoryRoute = getRouteContract("index-history");
+  const indexByGovernmentTypeRoute = getRouteContract("index-by-government-type");
+  const indexCompareRoute = getRouteContract("index-compare");
+  const indexMethodologyRoute = getRouteContract("index-methodology");
+  const pulseMethodologyRoute = getRouteContract("pulse-methodology");
+  const pulseDimensionsRoute = getRouteContract("pulse-dimensions");
+  const pulseEventsRoute = getRouteContract("pulse-events");
+  const pulseChangelogRoute = getRouteContract("pulse-changelog-v2");
+  const countryExportRoute = getRouteContract("country-export");
+
   return (
     <MethodologyLayout items={SECTIONS} contentClassName="methodology-content--wide">
       <nav className="editorial-breadcrumbs" aria-label="Breadcrumb">
@@ -168,7 +235,8 @@ export default function ApiDocsPage() {
 
         <p className="api-intro">
           The Civica API provides read-only access to government structure data for
-          sovereign states. All responses are JSON. No authentication is required.
+          sovereign states. All <code>/api/v1/*</code> responses are JSON. The bulk
+          export below also supports CSV. No authentication is required.
         </p>
 
         <div className="api-info-card">
@@ -179,15 +247,23 @@ export default function ApiDocsPage() {
           <div className="api-info-card__row">
             <h3 className="api-section-label">Rate Limits</h3>
             <p className="api-info-card__body">
-              Public endpoints apply a best-effort per-IP abuse throttle. Exceeding
-              it returns a 429 status with a Retry-After header.
+              Every <code>/api/v1/*</code> endpoint applies a best-effort per-IP throttle
+              of {countriesRoute.rateLimit?.max} requests per {(countriesRoute.rateLimit?.windowMs ?? 0) / 1000}{" "}
+              seconds (in-memory, per server instance — not a durable global counter).
+              The bulk <code>/api/countries/:slug/export</code> endpoint below has its own,
+              separate limit of {countryExportRoute.rateLimit?.max} requests per{" "}
+              {(countryExportRoute.rateLimit?.windowMs ?? 0) / 1000} seconds. Exceeding either
+              returns a 429 status with a <code>Retry-After</code> header.
             </p>
           </div>
           <div className="api-info-card__row">
             <h3 className="api-section-label">CORS</h3>
             <p className="api-info-card__body">
-              All endpoints support cross-origin requests. The API sets{" "}
-              <code>Access-Control-Allow-Origin: *</code>.
+              Every <code>/api/v1/*</code> endpoint supports cross-origin requests
+              (<code>Access-Control-Allow-Origin: *</code>). The bulk{" "}
+              <code>/api/countries/:slug/export</code> endpoint does not send CORS
+              headers — it is designed for server-side/CLI pulls, not in-browser
+              <code>fetch</code>.
             </p>
           </div>
           <div className="api-info-card__row">
@@ -224,455 +300,143 @@ export default function ApiDocsPage() {
 
         <EndpointSection
           id="countries"
+          routeId="countries"
           method="GET"
-          path="/api/v1/countries"
-          description="Returns a paginated list of sovereign states with basic metadata. Filter by continent or by a typed peer lens: region, income, V-Dem regime, CGV regime, or monarchy status."
-          parameters={[
-            {
-              name: "continent",
-              type: "string",
-              description: 'Filter by continent (e.g. "Africa", "Europe")',
-            },
-            {
-              name: "taxonomy",
-              type: "string",
-              description:
-                "Filter lens. Accepts: raw | region | income | vdem | cgv | monarchy. When non-raw, pair with `government_type` to filter by lens value.",
-            },
-            {
-              name: "government_type",
-              type: "string",
-              description:
-                'Lens value. With taxonomy=region: "Sub-Saharan Africa". With taxonomy=vdem: "Liberal Democracy". With taxonomy=raw: partial match against the CIA prose. See /api/v1/peer-groupings for the full list of valid values per lens.',
-            },
-            {
-              name: "limit",
-              type: "integer",
-              description: "Results per page (default 50, max 250)",
-            },
-            {
-              name: "offset",
-              type: "integer",
-              description: "Number of results to skip (default 0)",
-            },
-          ]}
-          exampleResponse={`{
-  "data": [
-    {
-      "slug": "united-states",
-      "name": "United States",
-      "iso2": "US",
-      "iso3": "USA",
-      "continent": "North America",
-      "capital": "Washington, DC",
-      "population": 339996563,
-      "governmentType": "presidential republic",
-      "governmentTypeDetail": "constitutional federal republic",
-      "governmentClassification": {
-        "rawLabel": "constitutional federal republic",
-        "regimeType": "presidential_democracy",
-        "regimeSource": "Bjornskov-Rode / CGV (QoG Standard)",
-        "regimeYear": 2025,
-        "primitives": {
-          "isFederal": true,
-          "isMonarchy": false,
-          "executiveStructure": "single_executive",
-          "governmentDependency": "fixed_term"
-        }
-      },
-      "gdpBillions": 25.46,
-      "areaSqKm": 9833520,
-      "flagUrl": "..."
-    }
-  ],
-  "meta": {
-    "total": 195,
-    "limit": 50,
-    "offset": 0,
-    "hasMore": true
-  }
-}`}
+          path={countriesRoute.pathTemplate}
+          description={countriesRoute.summary}
+          parameters={toDocParams(countriesRoute.params)}
+          exampleResponse={docExample("countries")}
         />
 
         <EndpointSection
           id="country-detail"
+          routeId="country-detail"
           method="GET"
-          path="/api/v1/countries/:code"
-          description="Returns detailed government structure for a single country. Look up by slug, ISO 3166-1 alpha-2, or alpha-3 code."
-          parameters={[
-            {
-              name: ":code",
-              type: "string",
-              description:
-                'Country slug, ISO-2, or ISO-3 code (e.g. "us", "USA", "united-states")',
-            },
-          ]}
-          exampleResponse={`{
-  "data": {
-    "slug": "france",
-    "name": "France",
-    "iso2": "FR",
-    "iso3": "FRA",
-    "continent": "Europe",
-    "capital": "Paris",
-    "population": 68170228,
-    "governmentType": "semi-presidential republic",
-    "governmentTypeDetail": "...",
-    "governmentClassification": {
-      "rawLabel": "semi-presidential republic",
-      "regimeType": "semi_presidential_democracy",
-      "regimeSource": "Bjornskov-Rode / CGV (QoG Standard)",
-      "regimeYear": 2025,
-      "primitives": {
-        "isFederal": false,
-        "isMonarchy": false,
-        "executiveStructure": "dual_executive",
-        "governmentDependency": "mixed_dependency"
-      }
-    },
-    "gdpBillions": 2.78,
-    "areaSqKm": 643801,
-    "languages": "French",
-    "currency": "Euro (EUR)",
-    "democracyIndex": 7.99,
-    "flagUrl": "...",
-    "constitution": { "year": 1958, "yearUpdated": 2008 },
-    "government": {
-      "executive": [
-        {
-          "name": "Presidency of France",
-          "type": "head_of_state",
-          "offices": [
-            {
-              "name": "President",
-              "type": "head_of_state",
-              "currentHolder": {
-                "name": "Emmanuel Macron",
-                "party": "Renaissance",
-                "since": "2017-05-14",
-                "photoUrl": "..."
-              }
-            }
-          ]
-        }
-      ],
-      "legislative": [...]
-    }
-  }
-}`}
+          path={countryDetailRoute.pathTemplate}
+          description={countryDetailRoute.summary}
+          parameters={toDocParams(countryDetailRoute.params)}
+          exampleResponse={docExample("countryDetail")}
+        />
+
+        <EndpointSection
+          id="government-types"
+          routeId="government-types"
+          method="GET"
+          path={governmentTypesRoute.pathTemplate}
+          description={governmentTypesRoute.summary}
+          parameters={toDocParams(governmentTypesRoute.params)}
+          exampleResponse={docExample("governmentTypes")}
+          deprecatedBanner
         />
 
         <EndpointSection
           id="peer-groupings"
+          routeId="peer-groupings"
           method="GET"
-          path="/api/v1/peer-groupings"
-          description="Returns four domain-specific peer-grouping lenses (World Bank region, World Bank income group, V-Dem RoW, and BR/CGV regime) plus monarchy_status as descriptive metadata. See https://civicaatlas.org/civica-index/methodology/peer-grouping for the methodology."
-          exampleResponse={`{
-  "data": {
-    "world_bank_region": {
-      "factKey": "world_bank_region",
-      "filterParam": "region",
-      "source": "world_bank",
-      "sourceName": "World Bank",
-      "description": "World Bank Country and Lending Groups regional classification (7 regions). Default material peer lens — pair with world_bank_income_group for the canonical material cohort. Refreshed annually each July.",
-      "values": [
-        { "value": "East Asia & Pacific", "label": "East Asia & Pacific", "totalCountries": 29, "scoredCountries": 29 },
-        { "value": "Europe & Central Asia", "label": "Europe & Central Asia", "totalCountries": 52, "scoredCountries": 52 }
-      ]
-    },
-    "vdem_row": {
-      "factKey": "vdem_row",
-      "filterParam": "vdem",
-      "source": "vdem",
-      "sourceName": "V-Dem",
-      "values": [
-        { "value": "Liberal Democracy", "label": "Liberal Democracy", "totalCountries": 33, "scoredCountries": 33 }
-      ]
-    }
-  },
-  "meta": {
-    "peerGrouping": {
-      "status": "stable",
-      "version": "v1.0",
-      "versionDate": "2026-05-02",
-      "methodology": "https://civicaatlas.org/civica-index/methodology/peer-grouping"
-    }
-  }
-}`}
+          path={peerGroupingsRoute.pathTemplate}
+          description={`${peerGroupingsRoute.summary} See https://civicaatlas.org/civica-index/methodology/peer-grouping for the methodology.`}
+          parameters={toDocParams(peerGroupingsRoute.params)}
+          exampleResponse={docExample("peerGroupings")}
         />
 
         <EndpointSection
           id="index-rankings"
+          routeId="index-rankings"
           method="GET"
-          path="/api/v1/index/rankings"
-          description="Returns Civica Index rankings for the latest available quarter, or a requested quarter. Pulse is not available as a scalar ranking; its experimental outputs are named per-dimension deltas on the Pulse endpoints below."
-          parameters={[
-            {
-              name: "quarter",
-              type: "string",
-              description: 'Optional quarter label such as "2026-Q1". Defaults to latest available.',
-            },
-            {
-              name: "methodology",
-              type: "string",
-              description: 'Methodology version. Defaults to "beta".',
-            },
-            {
-              name: "limit / offset",
-              type: "integer",
-              description: "Pagination controls. limit defaults to 50 and caps at 250.",
-            },
-          ]}
-          exampleResponse={`{
-  "data": [
-    {
-      "rank": 1,
-      "score": 91.4,
-      "vintageLabel": "Civica Index 2026 Q1 (Beta)",
-      "slug": "norway",
-      "name": "Norway",
-      "governmentClassification": { "regimeType": "parliamentary_democracy" }
-    }
-  ],
-  "meta": {
-    "total": 195,
-    "limit": 50,
-    "offset": 0,
-    "quarter": "2026-Q1",
-    "methodology": { "status": "beta", "reference": "https://civicaatlas.org/civica-index/methodology" }
-  }
-}`}
+          path={indexRankingsRoute.pathTemplate}
+          description={indexRankingsRoute.summary}
+          parameters={toDocParams(indexRankingsRoute.params)}
+          exampleResponse={docExample("indexRankings")}
         />
 
         <EndpointSection
           id="index-country"
+          routeId="index-country"
           method="GET"
-          path="/api/v1/index/:country_slug"
-          description="Returns the latest research-beta Civica Index composite, Monte Carlo input-variation range, rank, completeness fields, and available dimension rows for one country. The API does not publish categorical country grades."
-          parameters={[
-            {
-              name: ":country_slug",
-              type: "string",
-              description: 'Country slug, e.g. "france" or "united-states".',
-            },
-            {
-              name: "methodology",
-              type: "string",
-              description: 'Optional methodology version. Defaults to "beta".',
-            },
-          ]}
-          exampleResponse={`{
-  "data": {
-    "slug": "france",
-    "name": "France",
-    "governmentClassification": { "regimeType": "semi_presidential_democracy" },
-    "quarter": "2026-Q1",
-    "vintageLabel": "Civica Index 2026 Q1 (Beta)",
-    "score": 83.2,
-    "scoreLower": 79.1,
-    "scoreUpper": 86.4,
-    "completenessFlag": "full",
-    "rank": 18,
-    "totalRanked": 167,
-    "isPartial": false,
-    "missingDimensions": [],
-    "dimensionsAvailable": 4,
-    "methodologyVersion": "beta",
-    "dimensions": [
-      { "dimension": "democratic_quality", "normalizedScore": 82.4, "rawValue": 0.824, "sourceId": "vdem" }
-    ]
-  },
-  "meta": { "methodology": { "status": "beta" } }
-}`}
+          path={indexCountryRoute.pathTemplate}
+          description={indexCountryRoute.summary}
+          parameters={toDocParams(indexCountryRoute.params)}
+          exampleResponse={docExample("indexCountry")}
+        />
+
+        <EndpointSection
+          id="index-history"
+          routeId="index-history"
+          method="GET"
+          path={indexHistoryRoute.pathTemplate}
+          description={indexHistoryRoute.summary}
+          parameters={toDocParams(indexHistoryRoute.params)}
+          exampleResponse={docExample("indexHistory")}
+        />
+
+        <EndpointSection
+          id="index-by-government-type"
+          routeId="index-by-government-type"
+          method="GET"
+          path={indexByGovernmentTypeRoute.pathTemplate}
+          description={indexByGovernmentTypeRoute.summary}
+          parameters={toDocParams(indexByGovernmentTypeRoute.params)}
+          exampleResponse={docExample("indexByGovernmentType")}
         />
 
         <EndpointSection
           id="index-compare"
+          routeId="index-compare"
           method="GET"
-          path="/api/v1/index/compare"
-          description="Compares up to 10 countries on the Civica Index for a given quarter. Repeat the slug query parameter for each country."
-          parameters={[
-            {
-              name: "slug",
-              type: "string[]",
-              description: 'Repeatable country slug, e.g. "?slug=france&slug=germany". Required.',
-            },
-            {
-              name: "quarter",
-              type: "string",
-              description: "Optional quarter. Defaults to each country's latest available comparison data.",
-            },
-          ]}
-          exampleResponse={`{
-  "data": [
-    {
-      "jurisdiction": {
-        "slug": "france",
-        "name": "France",
-        "iso2": "FR",
-        "iso3": "FRA",
-        "continent": "Europe",
-        "governmentType": "semi-presidential republic",
-        "governmentTypeDetail": "semi-presidential republic",
-        "governmentClassification": { "regimeType": "semi_presidential_democracy" }
-      },
-      "composite": {
-        "quarter": "2026-Q1",
-        "vintageLabel": "Civica Index 2026 Q1 (Beta)",
-        "score": 83.2,
-        "scoreLower": 79.1,
-        "scoreUpper": 86.4,
-        "completenessFlag": "full",
-        "rank": 18,
-        "totalRanked": 167,
-        "isPartial": false,
-        "missingDimensions": [],
-        "dimensionsAvailable": 4,
-        "methodologyVersion": "beta"
-      },
-      "dimensions": [
-        { "dimension": "democratic_quality", "normalizedScore": 82.4, "rawValue": 0.824, "sourceId": "vdem" }
-      ]
-    }
-  ],
-  "meta": { "quarter": null, "count": 2 }
-}`}
+          path={indexCompareRoute.pathTemplate}
+          description={indexCompareRoute.summary}
+          parameters={toDocParams(indexCompareRoute.params)}
+          exampleResponse={docExample("indexCompare")}
         />
 
-        {/* PUBLIC_CLAIM: api.pulse-runtime-contract */}
+        <EndpointSection
+          id="index-methodology"
+          routeId="index-methodology"
+          method="GET"
+          path={indexMethodologyRoute.pathTemplate}
+          description={indexMethodologyRoute.summary}
+          parameters={toDocParams(indexMethodologyRoute.params)}
+          exampleResponse={docExample("indexMethodology")}
+        />
+
         <EndpointSection
           id="pulse-methodology"
+          routeId="pulse-methodology"
           method="GET"
-          path="/api/v1/pulse/methodology"
-          description="Returns the generated, machine-readable contract for the Pulse method currently scheduled in production. It distinguishes current runtime behavior from mixed older ledger rows."
-          exampleResponse={PULSE_METHOD_EXAMPLE_RESPONSE}
+          path={pulseMethodologyRoute.pathTemplate}
+          description={pulseMethodologyRoute.summary}
+          parameters={toDocParams(pulseMethodologyRoute.params)}
+          exampleResponse={docExample("pulseMethodology")}
         />
 
         <EndpointSection
           id="pulse-dimensions"
+          routeId="pulse-dimensions"
           method="GET"
-          path="/api/v1/pulse/:country_slug/dimensions"
-          description="Returns public experimental per-dimension Pulse deltas for one country, their evidence qualifiers, and driving published events. A missing event is not evidence of stability; no scalar Pulse score is returned."
-          parameters={[
-            {
-              name: ":country_slug",
-              type: "string",
-              description: 'Country slug, e.g. "brazil".',
-            },
-          ]}
-          exampleResponse={`{
-  "data": {
-    "jurisdiction": { "id": "...", "slug": "brazil", "name": "Brazil", "iso3": "BRA" },
-    "dimensions": {
-      "rule_of_law": {
-        "dimension": "rule_of_law",
-        "delta": -1.2,
-        "contributingEventIds": ["..."],
-        "drivingEvents": [{ "id": "...", "headline": "Court ruling", "eventDate": "2026-07-01" }],
-        "evidence": { "nEvents": 1, "maxConfidence": 0.42, "allSingleSource": true },
-        "limitedSignal": true,
-        "limitedReason": "Single event"
-      }
-    },
-    "lastComputedAt": "2026-07-09T09:00:29.000Z",
-    "totalEvents": 1,
-    "pressFreedomContext": {
-      "score": 58,
-      "source": "approximate_static_2024_subset",
-      "directLookup": true,
-      "defaultApplied": false
-    }
-  },
-  "meta": { "methodology": {
-    "status": "experimental",
-    "version": "${PULSE_METHOD_SNAPSHOT.version}",
-    "presentation": { "format": "per_dimension", "public_status": "public_experimental", "scalar_pulse_score": false }
-  } }
-}`}
+          path={pulseDimensionsRoute.pathTemplate}
+          description={pulseDimensionsRoute.summary}
+          parameters={toDocParams(pulseDimensionsRoute.params)}
+          exampleResponse={docExample("pulseDimensions")}
         />
 
         <EndpointSection
           id="pulse-events"
+          routeId="pulse-events"
           method="GET"
-          path="/api/v1/pulse/:country_slug/events"
-          description="Returns published and review-queued ledger rows for one country with source attribution, review state, and whether publication followed human review. Unresolved candidates expose no substantive dimension or severity."
-          parameters={[
-            {
-              name: ":country_slug",
-              type: "string",
-              description: 'Country slug, e.g. "brazil".',
-            },
-          ]}
-          exampleResponse={`{
-  "data": {
-    "jurisdiction": { "id": "...", "slug": "brazil", "name": "Brazil" },
-    "events": [{
-      "id": "...",
-      "eventDate": "2026-07-01",
-      "category": "judicial_independence_rollback",
-      "dimension": "rule_of_law",
-      "published": true,
-      "humanReviewed": false,
-      "publicationOrigin": "auto",
-      "reviewStatus": "approved",
-      "sources": [{ "sourceId": "gdelt", "sourceType": "news" }]
-    }]
-  },
-  "meta": { "methodology": { "status": "experimental", "method_version_coverage": "mixed_legacy_unversioned" } }
-}`}
+          path={pulseEventsRoute.pathTemplate}
+          description={pulseEventsRoute.summary}
+          parameters={toDocParams(pulseEventsRoute.params)}
+          exampleResponse={docExample("pulseEvents")}
         />
 
         <EndpointSection
           id="pulse-changelog-v2"
+          routeId="pulse-changelog-v2"
           method="GET"
-          path="/api/v1/pulse/changelog/v2"
-          description="Returns the Pulse event ledger with category, dimension, severity, sources, publication origin, and review state. It is not a stream of per-event deltas and includes mixed older classifier generations."
-          parameters={[
-            {
-              name: "country",
-              type: "string",
-              description: "Optional country slug filter.",
-            },
-            {
-              name: "dimension",
-              type: "string",
-              description: "Optional Pulse dimension filter.",
-            },
-            {
-              name: "severity",
-              type: "string",
-              description: "Optional severity tier filter.",
-            },
-            {
-              name: "since",
-              type: "YYYY-MM-DD",
-              description: "Only events on or after this date.",
-            },
-            {
-              name: "published_only",
-              type: "0 | 1",
-              description: "Set to 1 to exclude events still queued for human review.",
-            },
-          ]}
-          exampleResponse={`{
-  "data": [
-    {
-      "id": "evt_...",
-      "country": { "slug": "brazil", "name": "Brazil" },
-      "dimension": "democratic_quality",
-      "severityTier": "moderate_neg",
-      "published": true,
-      "humanReviewed": false,
-      "publicationOrigin": "auto"
-    }
-  ],
-  "meta": {
-    "limit": 50,
-    "offset": 0,
-    "hasMore": false,
-    "methodology": { "status": "experimental", "version": "${PULSE_METHOD_SNAPSHOT.version}", "method_version_coverage": "mixed_legacy_unversioned" }
-  }
-}`}
+          path={pulseChangelogRoute.pathTemplate}
+          description={pulseChangelogRoute.summary}
+          parameters={toDocParams(pulseChangelogRoute.params)}
+          exampleResponse={docExample("pulseChangelog")}
         />
       </section>
 
@@ -713,28 +477,32 @@ for country in resp.json()["data"]:
           the file is traceable when opened in a spreadsheet or research tool.
         </p>
 
+        <Banner variant="info">
+          This endpoint is <strong>not</strong> part of the <code>/api/v1</code> contract —
+          it lives at <code>/api/countries/:slug/export</code>, has its own{" "}
+          {countryExportRoute.rateLimit?.max} req/{(countryExportRoute.rateLimit?.windowMs ?? 0) / 1000}s
+          rate limit, sends no CORS headers, and its JSON response has no{" "}
+          <code>data</code> envelope — every field is top-level, for back-compat
+          with existing consumers.
+        </Banner>
+
         <EndpointSection
           id="country-export"
+          routeId="country-export"
           method="GET"
-          path="/api/countries/:slug/export"
-          description="Downloads the full reconciled record for a single country — flat summary fields, the complete fact list, and, in JSON, statement-level provenance for each canonical field. Rate-limited to 30 exports per minute per IP."
-          parameters={BULK_EXPORT_PARAMS}
-          exampleResponse={`{
-  "name": "France",
-  "iso2": "FR",
-  "iso3": "FRA",
-  "capital": "Paris",
-  "population": 69082000,
-  "gdpBillions": 3732,
-  "facts": [
-    { "category": "demographics", "key": "literacy_rate", "value": "...", "numericValue": null, "unit": "%", "year": 2024 }
-  ],
-  "provenance": {
-    "population": { "sourceId": "un_data", "sourceName": "UN Statistics Division", "asOf": "2024", "license": "..." }
-  },
-  "meta": { "reconciliation": { "status": "beta", "version": "v0.2-beta", "vintage": "2026-Q1" } }
-}`}
+          path={countryExportRoute.pathTemplate}
+          description={countryExportRoute.summary}
+          parameters={toDocParams(countryExportRoute.params)}
+          exampleResponse={docExample("countryExport")}
         />
+
+        <h3 className="api-example-heading">CSV export — illustrative example</h3>
+        <p className="api-info-card__body">
+          Values shown are illustrative. Columns and the citation comment
+          header are generated by the same function the route calls — see{" "}
+          <code>src/lib/api/contract/csv.ts</code>.
+        </p>
+        <CodeBlock>{renderCountryExportCsvExample()}</CodeBlock>
 
         <h3 className="api-example-heading">Full-dataset pull (bash)</h3>
         <CodeBlock>{`# 1. Enumerate every sovereign-state slug (paginate with limit/offset until meta.hasMore is false).

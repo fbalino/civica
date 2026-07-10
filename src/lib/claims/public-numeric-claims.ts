@@ -414,7 +414,8 @@ function isClaimCandidate(
 ): boolean {
   const text = fragment.fragment;
   if (
-    fragment.file === "src/app/api-docs/page.tsx" &&
+    (fragment.file === "src/app/api-docs/page.tsx" ||
+      fragment.file === "src/lib/api/contract/examples.ts") &&
     /Illustrative Example Response/i.test(documentSource) &&
     ILLUSTRATIVE_PAYLOAD_COUNT.test(text)
   ) {
@@ -454,8 +455,12 @@ export function discoverPublicNumericClaimCandidates(
       const hasLiteralCount =
         LITERAL_COUNT_BEFORE_NOUN.test(fragment.fragment) ||
         TABLE_LITERAL_COUNT.test(fragment.fragment);
+      const generatedApiExampleIsVisiblyIllustrative =
+        fragment.file === "src/lib/api/contract/examples.ts" &&
+        /Illustrative Example Response/i.test(document.source);
       const literalExemptionIsBound =
         !hasLiteralCount ||
+        generatedApiExampleIsVisiblyIllustrative ||
         QUALIFIED_LITERAL_EXEMPTION.test(fragment.fragment);
 
       candidates.push({
@@ -470,7 +475,8 @@ export function discoverPublicNumericClaimCandidates(
           DYNAMIC_VISIBLE_FREEZE.test(fragment.fragment) ||
           STATE_VINTAGE_MARKER.test(fragment.fragment),
         hasVisibleExemption:
-          VISIBLE_EXEMPTION.test(fragment.fragment) &&
+          (generatedApiExampleIsVisiblyIllustrative ||
+            VISIBLE_EXEMPTION.test(fragment.fragment)) &&
           literalExemptionIsBound,
       });
     }
@@ -887,28 +893,49 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
   ),
   exemptClaim(
     "api-docs.country-list-example",
-    "src/app/api-docs/page.tsx",
+    "src/lib/api/contract/examples.ts",
     "/api-docs",
-    'Illustrative example response: { "data": [ { "slug": "united-states"',
-    "EndpointSection visibly labels every example response illustrative",
+    'Illustrative Example Response: {"data":[{"slug":"united-states"',
+    "EndpointSection visibly labels every generated example response illustrative",
   ),
   exemptClaim(
-    "api-docs.ranking-example",
-    "src/app/api-docs/page.tsx",
+    "api-docs.government-types-example",
+    "src/lib/api/contract/examples.ts",
     "/api-docs",
-    'Illustrative example response: { "data": [ { "rank": 1, "score": 91.4',
-    "EndpointSection visibly labels every example response illustrative",
+    'Illustrative Example Response: {"data":[{"governmentType":"Presidential republic"',
+    "EndpointSection visibly labels every generated example response illustrative",
+  ),
+  exemptClaim(
+    "api-docs.by-government-type-example",
+    "src/lib/api/contract/examples.ts",
+    "/api-docs",
+    'Illustrative Example Response: {"data":[{"key":"parliamentary_democracy"',
+    "EndpointSection visibly labels every generated example response illustrative",
   ),
   exemptClaim(
     "api-docs.compare-example",
-    "src/app/api-docs/page.tsx",
+    "src/lib/api/contract/examples.ts",
     "/api-docs",
-    'Illustrative example response: { "data": [ { "jurisdiction": { "slug": "france"',
-    "EndpointSection visibly labels every example response illustrative",
+    'Illustrative Example Response: {"data":[{"jurisdiction":{"slug":"france"',
+    "EndpointSection visibly labels every generated example response illustrative",
+  ),
+  exemptClaim(
+    "api-docs.ranking-example",
+    "src/lib/api/contract/examples.ts",
+    "/api-docs",
+    'Illustrative Example Response: {"data":[{"rank":1,"score":91.4',
+    "EndpointSection visibly labels every generated example response illustrative",
+  ),
+  exemptClaim(
+    "api-docs.peer-groupings-example",
+    "src/lib/api/contract/examples.ts",
+    "/api-docs",
+    'Illustrative Example Response: {"data":{"world_bank_region"',
+    "EndpointSection visibly labels every generated example response illustrative",
   ),
   exemptClaim(
     "api-docs.compare-limit",
-    "src/app/api-docs/page.tsx",
+    "src/lib/api/contract/registry.ts",
     "/api-docs",
     "Compares up to 10 countries",
     "documented endpoint request limit, not a coverage claim",

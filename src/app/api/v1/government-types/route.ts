@@ -16,14 +16,15 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { STRUCTURAL_GOVERNMENT_TYPES } from "@/lib/data/structural-government-types";
+import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
 import {
-  STRUCTURAL_FAMILY_DEPRECATION_META,
-  withStructuralFamilyDeprecation,
-} from "@/lib/api/deprecation";
+  shapeGovernmentTypesItem,
+  shapeGovernmentTypesMeta,
+} from "@/lib/api/contract/shapes";
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return rateLimited;
+  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
     const countries = await getAllJurisdictions();
@@ -34,7 +35,7 @@ export async function GET(request: Request) {
           country.governmentClassification?.structuralFamily === type.familyKey,
       );
 
-      return {
+      return shapeGovernmentTypesItem({
         governmentType: type.name,
         structuralFamily: type.familyKey,
         count: matches.length,
@@ -43,16 +44,13 @@ export async function GET(request: Request) {
           .sort((a, b) => (b.population ?? 0) - (a.population ?? 0))
           .slice(0, 5)
           .map((country) => country.name),
-      };
+      });
     }).filter((row) => row.count > 0);
 
     return withStructuralFamilyDeprecation(
       apiResponse({
         data,
-        meta: {
-          total: data.length,
-          ...STRUCTURAL_FAMILY_DEPRECATION_META,
-        },
+        meta: shapeGovernmentTypesMeta(data.length),
       }),
     );
   } catch (e) {

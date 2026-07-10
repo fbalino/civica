@@ -12,7 +12,6 @@ import {
   checkRegistryInvariants,
   checkSurfaceCoverage,
   checkPublicClaimIds,
-  isDeferredConcept,
   deferredConcepts,
   DOC_CONCEPTS,
   DOC_SURFACE_KINDS,
@@ -434,20 +433,16 @@ test("positive control: DOC_SURFACE_KINDS has exactly the six mandated kinds", (
   );
 });
 
-test("real DOC_CONCEPTS registers exactly the one deferred concept left after CLM-011 reconciled the other two", () => {
+test("real DOC_CONCEPTS has zero deferred concepts left after CLM-012 resolved the last one", () => {
   // CLM-011 repaired `reconciliation.material-error` and
   // `docs.schema-table-count` (both formerly deferredTo: "CLM-011") and
   // bound them to automated contract-test/validator assertions, so they
-  // no longer carry a `deferredTo`. `api.v1-examples` remains deferred
-  // to CLM-012, which CLM-011 does not own.
+  // no longer carry a `deferredTo`. `api.v1-examples` (deferredTo:
+  // "CLM-012") was the last remaining deferred concept; CLM-012 promoted
+  // it to CLM_012_RESOLVED_CONCEPTS, bound to
+  // src/lib/api/contract/examples.ts as its canonical source.
   const deferred = deferredConcepts(DOC_CONCEPTS);
-  const byId = Object.fromEntries(deferred.map((c) => [c.id, c.deferredTo]));
-  assert.deepEqual(byId, {
-    "api.v1-examples": "CLM-012",
-  });
-  for (const concept of deferred) {
-    assert.ok(isDeferredConcept(concept));
-  }
+  assert.deepEqual(deferred, []);
 });
 
 test("negative fixture: a deferred concept declaring a 'generated' relation is caught (deferred rows are excluded from CLM-009 enforcement)", () => {

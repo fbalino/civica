@@ -693,14 +693,25 @@ function validatePublicSurfaces(
     "The Pulse methodology page must materialize generated runtime-contract values",
   );
 
+  // CLM-012: api-docs/page.tsx no longer hand-imports
+  // createPulseRuntimeMethodSnapshot itself — every example (including
+  // pulse/methodology's) renders via renderExample(exampleId) from
+  // src/lib/api/contract/examples.ts, which is where the runtime
+  // snapshot is actually generated and schema-validated. Check both:
+  // examples.ts does the generation, and page.tsx wires the endpoint
+  // in without ever publishing a forbidden scalar Pulse ranking.
   const apiDocs = relative("src/app/api-docs/page.tsx");
+  const contractExamples = relative("src/lib/api/contract/examples.ts");
+  const contractRegistry = relative("src/lib/api/contract/registry.ts");
   check(
     state,
-    apiDocs.includes('/api/v1/pulse/methodology') &&
-      apiDocs.includes("createPulseRuntimeMethodSnapshot") &&
-      apiDocs.includes("PULSE_METHOD_EXAMPLE_RESPONSE") &&
+    contractRegistry.includes('/api/v1/pulse/methodology') &&
+      contractExamples.includes("createPulseRuntimeMethodSnapshot") &&
+      apiDocs.includes('"pulseMethodology"') &&
       !apiDocs.includes("sort=cp") &&
-      !apiDocs.includes("ci | cp"),
+      !apiDocs.includes("ci | cp") &&
+      !contractRegistry.includes("sort=cp") &&
+      !contractRegistry.includes("ci | cp"),
     "API docs must generate the Pulse runtime example and publish no scalar ranking contract",
   );
 

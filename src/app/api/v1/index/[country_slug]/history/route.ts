@@ -1,5 +1,6 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { getCICountryHistory } from "@/lib/db/queries";
+import { shapeIndexHistoryItem } from "@/lib/api/contract/shapes";
 
 export async function GET(
   request: Request,
@@ -17,7 +18,13 @@ export async function GET(
       return apiError("Country not found or no history available", 404);
     }
 
-    return apiResponse({ data: history });
+    // CLM-012 fix: every sibling CI endpoint (rankings, index/[slug],
+    // compare, methodology) attaches `meta.methodology`; this one had
+    // silently omitted it.
+    return apiResponse({
+      data: history.map(shapeIndexHistoryItem),
+      meta: { methodology: CI_METHODOLOGY_META },
+    });
   } catch (e) {
     console.error("API /v1/index/[country_slug]/history error:", e);
     return apiError("Internal server error", 500);

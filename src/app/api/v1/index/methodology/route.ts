@@ -1,5 +1,6 @@
 import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { getCIMethodology } from "@/lib/db/queries";
+import { shapeIndexMethodologyData } from "@/lib/api/contract/shapes";
 
 function publicMethodologyRecord<T extends { id: string; notes: string | null }>(
   row: T,
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
     }
 
     return apiResponse({
-      data: publicMethodologyRecord(methodology),
+      data: shapeIndexMethodologyData(publicMethodologyRecord(methodology)),
       meta: { methodology: CI_METHODOLOGY_META },
     });
   } catch (e) {

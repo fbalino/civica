@@ -23,6 +23,7 @@ import {
 import { getPulseV2Changelog } from "@/lib/db/queries-pulse-v2";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
 import { PULSE_DIMENSIONS } from "@/lib/pulse/v2/types";
+import { shapePulseChangelogRow } from "@/lib/api/contract/shapes";
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
@@ -56,14 +57,16 @@ export async function GET(request: Request) {
     });
 
     const publicRows = result.rows.map((row) =>
-      row.category === "none"
-        ? {
-            ...row,
-            dimension: null,
-            severityTier: null,
-            severityValue: null,
-          }
-        : row
+      shapePulseChangelogRow(
+        row.category === "none"
+          ? {
+              ...row,
+              dimension: null,
+              severityTier: null,
+              severityValue: null,
+            }
+          : row,
+      ),
     );
 
     return apiResponse({

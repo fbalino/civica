@@ -9,6 +9,7 @@ import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
+import { shapeIndexByGovernmentTypeItem } from "@/lib/api/contract/shapes";
 
 function quantile(sortedValues: number[], percentile: number): number {
   if (sortedValues.length === 0) return 0;
@@ -22,18 +23,23 @@ function quantile(sortedValues: number[], percentile: number): number {
 }
 
 export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const quarter = url.searchParams.get("quarter") ?? undefined;
+  const taxonomyParam = url.searchParams.get("taxonomy");
+  const taxonomy: GovernmentTaxonomyLens =
+    taxonomyParam === "structural" || taxonomyParam === "regime"
+      ? taxonomyParam
+      : "raw";
+  const isDeprecatedTaxonomy = taxonomy === "structural" || taxonomy === "regime";
+
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return rateLimited;
+  if (rateLimited) {
+    return isDeprecatedTaxonomy
+      ? withStructuralFamilyDeprecation(rateLimited)
+      : rateLimited;
+  }
 
   try {
-    const url = new URL(request.url);
-    const quarter = url.searchParams.get("quarter") ?? undefined;
-    const taxonomyParam = url.searchParams.get("taxonomy");
-    const taxonomy: GovernmentTaxonomyLens =
-      taxonomyParam === "structural" || taxonomyParam === "regime"
-        ? taxonomyParam
-        : "raw";
-
     const rows = await getCIByGovernmentTypeDots(quarter);
     const grouped = new Map<
       string,
@@ -56,7 +62,7 @@ export async function GET(request: Request) {
       .map(([key, bucket]) => {
         const scores = [...bucket.scores].sort((a, b) => a - b);
         const total = scores.reduce((sum, score) => sum + score, 0);
-        return {
+        return shapeIndexByGovernmentTypeItem({
           key,
           governmentType: bucket.label,
           count: scores.length,
@@ -66,11 +72,10 @@ export async function GET(request: Request) {
           medianScore: quantile(scores, 0.5),
           q1: quantile(scores, 0.25),
           q3: quantile(scores, 0.75),
-        };
+        });
       })
       .sort((a, b) => b.avgScore - a.avgScore || a.governmentType.localeCompare(b.governmentType));
 
-    const isDeprecatedTaxonomy = taxonomy === "structural" || taxonomy === "regime";
     const meta = isDeprecatedTaxonomy
       ? { quarter: quarter ?? null, taxonomy, ...STRUCTURAL_FAMILY_DEPRECATION_META }
       : { quarter: quarter ?? null, taxonomy };
@@ -79,7 +84,10 @@ export async function GET(request: Request) {
     return isDeprecatedTaxonomy ? withStructuralFamilyDeprecation(response) : response;
   } catch (e) {
     console.error("API /v1/index/by-government-type error:", e);
-    return apiError("Internal server error", 500);
+    const response = apiError("Internal server error", 500);
+    return isDeprecatedTaxonomy
+      ? withStructuralFamilyDeprecation(response)
+      : response;
   }
 }
 

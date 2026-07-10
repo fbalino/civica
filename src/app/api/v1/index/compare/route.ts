@@ -5,10 +5,11 @@ import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
+import { shapeIndexCompareResult } from "@/lib/api/contract/shapes";
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return rateLimited;
+  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
 
   try {
     const url = new URL(request.url);
@@ -40,42 +41,44 @@ export async function GET(request: Request) {
     // does NOT sum to the v2 headline; fall back to it only when raw value /
     // source is missing. Mirrors src/app/api/v1/index/[country_slug]/route.ts
     // and src/components/compare/CompareCivicaIndex.tsx.
-    const results = rows.map((row) => ({
-      jurisdiction: {
-        slug: row.jurisdiction.slug,
-        name: row.jurisdiction.name,
-        iso2: row.jurisdiction.iso2,
-        iso3: row.jurisdiction.iso3,
-        continent: row.jurisdiction.continent,
-        governmentType: row.jurisdiction.governmentType,
-        governmentTypeDetail: row.jurisdiction.governmentTypeDetail,
-        governmentClassification:
-          row.jurisdiction.governmentClassification ?? null,
-      },
-      composite: row.composite
-        ? {
-            quarter: row.composite.quarter,
-            vintageLabel: row.composite.vintageLabel,
-            score: row.composite.score,
-            scoreLower: row.composite.scoreLower,
-            scoreUpper: row.composite.scoreUpper,
-            completenessFlag: row.composite.completenessFlag,
-            rank: row.composite.rank,
-            totalRanked: row.composite.totalRanked,
-            isPartial: row.composite.isPartial,
-            missingDimensions: row.composite.missingDimensions ?? [],
-            dimensionsAvailable: row.composite.dimensionsAvailable,
-            methodologyVersion: row.composite.methodologyVersion,
-          }
-        : null,
-      dimensions: row.dimensions.map((d) => ({
-        dimension: d.dimension,
-        normalizedScore:
-          displayDimensionScore(d.rawValue, d.sourceId) ?? d.normalizedScore,
-        rawValue: d.rawValue,
-        sourceId: d.sourceId,
-      })),
-    }));
+    const results = rows.map((row) =>
+      shapeIndexCompareResult({
+        jurisdiction: {
+          slug: row.jurisdiction.slug,
+          name: row.jurisdiction.name,
+          iso2: row.jurisdiction.iso2,
+          iso3: row.jurisdiction.iso3,
+          continent: row.jurisdiction.continent,
+          governmentType: row.jurisdiction.governmentType,
+          governmentTypeDetail: row.jurisdiction.governmentTypeDetail,
+          governmentClassification:
+            row.jurisdiction.governmentClassification ?? null,
+        },
+        composite: row.composite
+          ? {
+              quarter: row.composite.quarter,
+              vintageLabel: row.composite.vintageLabel,
+              score: row.composite.score,
+              scoreLower: row.composite.scoreLower,
+              scoreUpper: row.composite.scoreUpper,
+              completenessFlag: row.composite.completenessFlag,
+              rank: row.composite.rank,
+              totalRanked: row.composite.totalRanked,
+              isPartial: row.composite.isPartial,
+              missingDimensions: row.composite.missingDimensions ?? [],
+              dimensionsAvailable: row.composite.dimensionsAvailable,
+              methodologyVersion: row.composite.methodologyVersion,
+            }
+          : null,
+        dimensions: row.dimensions.map((d) => ({
+          dimension: d.dimension,
+          normalizedScore:
+            displayDimensionScore(d.rawValue, d.sourceId) ?? d.normalizedScore,
+          rawValue: d.rawValue,
+          sourceId: d.sourceId,
+        })),
+      }),
+    );
 
     // `jurisdiction.governmentClassification` still carries the deprecated
     // `structuralFamily` / `structuralSubtype` fields — attach the same
