@@ -4,6 +4,7 @@ import { SourceDot } from "@/components/SourceDot";
 import { Reveal } from "@/components/motion/Reveal";
 import { PageHero } from "@/components/PageHero";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
+import { PROVENANCE_COVERAGE_SUMMARY } from "@/lib/claims/provenance-coverage";
 import { prettyDisplayValue } from "@/lib/data/humanize-label";
 import { getAllSources } from "@/lib/db/queries";
 import { civicaIndex, pulse } from "@/lib/content/site-state";
@@ -440,6 +441,7 @@ export default async function AboutPage() {
         <h2 className="page-heading" style={{ marginBottom: 8 }}>
           Provenance
         </h2>
+        {/* PUBLIC_CLAIM: methodology.provenance-coverage */}
         <p
           style={{
             fontFamily: "var(--font-body)",
@@ -450,9 +452,16 @@ export default async function AboutPage() {
             maxWidth: 720,
           }}
         >
-          Every data point on Civica carries a provenance indicator showing its
-          source and freshness. Multi-source reconciled facts also expose a
-          rich panel revealing every alternate source.
+          Source indicators appear on supported resolver-backed facts and data
+          tables; compact summaries do not all expose the same detail. The
+          current audit finds {PROVENANCE_COVERAGE_SUMMARY.complete} of{" "}
+          {PROVENANCE_COVERAGE_SUMMARY.total} compact renderer classes ({" "}
+          {PROVENANCE_COVERAGE_SUMMARY.percent}%) provide source, date or
+          vintage, and rights context on the surface itself. See the{" "}
+          <Link href="/methodology/approach#reader-pages">
+            measured coverage and named exceptions
+          </Link>
+          .
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

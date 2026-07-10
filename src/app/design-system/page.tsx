@@ -123,7 +123,8 @@ export default function DesignSystemPage() {
             country is governed. The atlas is primary; original measurements remain
             secondary research experiments. The system is
             built on a warm paper field, navy ink, a single editorial accent, hairline
-            rules, and provenance on every fact. Color is reserved for meaning.
+            rules, and provenance controls where the underlying renderer supports
+            them. Color is reserved for meaning.
           </p>
         </section>
 

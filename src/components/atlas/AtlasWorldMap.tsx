@@ -101,6 +101,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
       y: number;
     } | null>(null);
 
+    // PROVENANCE_COVERAGE: atlas.choropleth-layer
     // Legend rows for the active layer, plus a trailing "No data" row when
     // at least one mapped country falls back to the neutral no-data fill —
     // a country with a missing value must never inherit a real category.
@@ -635,6 +636,7 @@ export const AtlasWorldMap = forwardRef<AtlasWorldMapHandle, AtlasWorldMapProps>
             (/engravings/countries/<iso3>.webp) is shown as a small banner at
             the top of the card; CountryHoverCard hides it on a 404. The card
             stays light enough to track the cursor (plain lazy <img>). */}
+        {/* PROVENANCE_COVERAGE: atlas.hover-card */}
         {hoverCard && (
           <div
             style={{

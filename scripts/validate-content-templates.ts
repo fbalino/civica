@@ -112,6 +112,11 @@ const CTX_ALLOWLIST: Record<string, readonly string[]> = {
     "nsoActiveCount",
     "nsoActiveCountWord",
     "nsoActiveNamesProse",
+    "provenanceCoverageTotal",
+    "provenanceCoverageComplete",
+    "provenanceCoveragePercent",
+    "provenanceCoverageCompleteLabels",
+    "provenanceCoverageExceptions",
   ],
   "content/methodology-overview.md": [],
   "content/methodology-pulse.md": [

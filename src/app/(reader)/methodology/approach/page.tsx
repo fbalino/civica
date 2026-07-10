@@ -18,6 +18,7 @@ import {
   adoptedResolutionCount,
   deprecation,
 } from "@/lib/content/site-state";
+import { PROVENANCE_COVERAGE_SUMMARY } from "@/lib/claims/provenance-coverage";
 
 export const revalidate = 3600;
 
@@ -71,6 +72,13 @@ export default async function ApproachPage() {
     nsoActiveCount: nsoActive.length,
     nsoActiveCountWord: nsoActive.length,
     nsoActiveNamesProse: nsoActive.map((n) => n.name).join(", "),
+    provenanceCoverageTotal: PROVENANCE_COVERAGE_SUMMARY.total,
+    provenanceCoverageComplete: PROVENANCE_COVERAGE_SUMMARY.complete,
+    provenanceCoveragePercent: PROVENANCE_COVERAGE_SUMMARY.percent,
+    provenanceCoverageCompleteLabels:
+      PROVENANCE_COVERAGE_SUMMARY.completeLabels,
+    provenanceCoverageExceptions:
+      PROVENANCE_COVERAGE_SUMMARY.exceptionSummary,
   };
 
   // Narrowed `state` surface — the markdown only needs these slices,

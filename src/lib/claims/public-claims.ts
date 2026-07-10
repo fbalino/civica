@@ -1,4 +1,5 @@
 import type { PublicClaimTierId } from "./claim-tiers";
+import { PROVENANCE_COVERAGE_SUMMARY } from "./provenance-coverage";
 
 export const PUBLIC_CLAIM_SURFACES = [
   "home",
@@ -372,6 +373,27 @@ export const PUBLIC_CLAIMS = [
       path: "content/about.md",
       fragment:
         "without claiming that every value is already reconciled or independently reviewed.",
+    },
+  },
+  {
+    id: "methodology.provenance-coverage",
+    surface: "methodology",
+    routeOrArtifact: "/methodology/approach#reader-pages",
+    exactClaim:
+      `Across ${PROVENANCE_COVERAGE_SUMMARY.total} registered compact renderer classes on home, Atlas, rankings, and embeds, ${PROVENANCE_COVERAGE_SUMMARY.complete} (${PROVENANCE_COVERAGE_SUMMARY.percent}%) currently expose source, date/vintage, and rights context on the compact surface itself; this is not dataset-wide value coverage.`,
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/lib/claims/provenance-coverage.ts",
+      "content/data-approach.md",
+      "scripts/validate-provenance-claims.ts",
+    ],
+    implementationOwner: "Atlas provenance and reader platform",
+    methodologyVersion: "compact-provenance-coverage-v1",
+    gate: "G2",
+    source: {
+      path: "content/data-approach.md",
+      fragment: "{{ctx.provenanceCoverageComplete}}",
+      mirrors: ["src/app/about/page.tsx"],
     },
   },
   {
@@ -819,11 +841,11 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
-    id: "export.full-provenance",
+    id: "export.provenance-coverage",
     surface: "exports",
     routeOrArtifact: "/api/countries/{slug}/export?format=csv|json",
     exactClaim:
-      "The JSON country export contains full per-fact provenance; CSV contains reconciliation version, vintage, and methodology metadata.",
+      "The JSON country export adds structured provenance for supported headline fields when a canonical resolver row exists; facts[] and CSV rows do not yet contain per-row source, license, and vintage.",
     tier: "reconciled-fact",
     evidenceSources: [
       "src/app/api/countries/[slug]/export/route.ts",
@@ -838,7 +860,8 @@ export const PUBLIC_CLAIMS = [
       // shared with contract/registry.ts's documented example — the
       // claim pins that shared source, not the route.ts call site.
       path: "src/lib/api/contract/csv.ts",
-      fragment: "# For full per-fact provenance, request format=json.",
+      fragment:
+        "# JSON adds provenance for supported headline fields; facts[] rows remain without per-row provenance.",
     },
   },
   {

@@ -98,6 +98,11 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   and implements that decision.
 - Run `npm run validate:rights-claims` after changing public rights, licensing,
   download, citation, embed, code-license, or release-manifest language.
+- `src/lib/claims/provenance-coverage.ts` measures compact renderer classes on
+  home, Atlas, rankings, and embeds. Do not turn its class-level percentage
+  into a claim about all database rows or facts; DAT-005 owns that later
+  dataset-wide metric. Run `npm run validate:provenance-claims` after changing
+  public provenance copy or those four compact surfaces.
 
 ## Core environment variables
 The complete, authoritative contract (every var, required/optional, and why) is

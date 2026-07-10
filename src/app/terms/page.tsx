@@ -96,10 +96,10 @@ export default function TermsPage() {
             site combines public-domain material, openly licensed data, and
             publisher-restricted feeds. Public-domain and CC0 data can generally
             be reused freely; publisher-restricted datasets remain governed by
-            their original terms. Preserve the source names, license labels,
-            and freshness dates shown with each data point, and cite Civica
-            Atlas when reusing Civica Index, Civica Pulse, or
-            reconciliation-derived outputs.
+            their original terms. Preserve any source names, license labels,
+            and freshness dates shown with a data point; that point-of-use
+            coverage is not yet universal. Cite Civica Atlas when reusing
+            Civica Index, Civica Pulse, or reconciliation-derived outputs.
           </p>
 
           <p>

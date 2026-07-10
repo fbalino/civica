@@ -41,7 +41,7 @@ Civica integrates {{stats.activeSources | "multiple"}} source orchestrators — 
 - **Knowledge spine:** Wikidata.
 - **National statistics offices:** rolling out in waves — {{ctx.nsoActiveNamesProse}} in the first in-progress wave of {{ctx.nsoActiveCount}}.
 
-Each source has a dedicated sync orchestrator that pulls fresh data on a documented cadence (quarterly for most Tier-1 publishers, annually for some classification sources, and a daily schedule for the Pulse event pipeline). A configured schedule does not imply that every run succeeded; reader surfaces use the most recent completed computation. Each fact sync writes into a single canonical table called `country_facts`, with statement-level provenance: which source, which date the source measured the value, which license the data is shared under, which fact-key it corresponds to, and whether the row is a measurement or a forecast.
+Each source has a dedicated sync orchestrator that pulls fresh data on a documented cadence (quarterly for most Tier-1 publishers, annually for some classification sources, and a daily schedule for the Pulse event pipeline). A configured schedule does not imply that every run succeeded; reader surfaces use the most recent completed computation. Fact-oriented syncs write source rows into a single canonical table called `country_facts`, retaining the available source, observation date, license, fact-key, and measurement-or-forecast metadata on those rows.
 
 For a live count of facts, fact-keys, and multi-sourced coverage, see the [about page](/about#sources). The dataset is growing as new sources land and existing sources publish new vintages.
 
@@ -61,7 +61,7 @@ When the World Bank says one number and the IMF says another, Civica does not si
 
 ## What you see on reader pages {#reader-pages}
 
-When you load a country page on Civica — the factbook, the civica-index detail, the atlas masthead, the compare overview — every value carries a small chevron next to it. That chevron is a *FactValueDot*. Click or hover it and you see:
+On supported resolver-backed rows in the country factbook, a small chevron called a *FactValueDot* opens the available source record and alternates. Compact summaries such as homepage cards and Atlas hover cards do not yet carry that control for each value. Where a FactValueDot is present, click or hover it and you can see:
 
 - **The canonical pick.** Which source the resolver chose, the value, the as-of date.
 - **Every alternate source.** Every other publisher that has a value for this country and indicator, with their value, date, and license.
@@ -72,7 +72,10 @@ When you load a country page on Civica — the factbook, the civica-index detail
 
 Multi-year values (inflation, public debt, GDP variants, unemployment, military expenditure, current-account balance, exports, imports) get a "Civica canonical (reconciled)" row prepended above the CIA's per-year prose. The CIA's historical context is preserved; the reconciled current canonical sits at the top.
 
-This is what we mean by "every fact carries provenance." It's not a slogan. It's the reader-facing surface of a documented multi-source pipeline.
+<!-- PUBLIC_CLAIM: methodology.provenance-coverage -->
+**Measured compact-surface coverage.** Across the {{ctx.provenanceCoverageTotal}} distinct compact rendering contracts registered for the homepage, Atlas, rankings, and embeds, {{ctx.provenanceCoverageComplete}} ({{ctx.provenanceCoveragePercent}}%) currently expose source, date or vintage, and rights context on the compact surface itself. Machine-readable source and rights metadata count for the space-constrained fixed embeds. Complete today: {{ctx.provenanceCoverageCompleteLabels}}. Named exceptions: {{ctx.provenanceCoverageExceptions}}.
+
+This is **renderer-class coverage**, not a percentage of Civica's database rows or published facts. It prevents compact UI patterns from disappearing inside a site-wide average. DAT-005 owns the later dataset-wide statement/fact-key coverage report; until that exists, Civica does not claim universal per-value provenance.
 
 ## What "BETA" means here {#beta}
 
@@ -92,7 +95,7 @@ Civica is in pre-launch. The reconciliation v1 milestone (full Tier-1 publisher 
 
 Things you may notice as the rollout progresses:
 
-- **Some fact-keys are single-sourced.** {{stats.singleSourcedFactKeys | "Many"}} of {{stats.distinctFactKeys | "many"}} declared fact-keys currently have only one publisher. Reconciliation requires two sources to compare; for single-sourced facts, the reader page renders provenance but no alternates panel. As the NSO wave lands, single-sourced fact-keys gain second sources.
+- **Some fact-keys are single-sourced.** {{stats.singleSourcedFactKeys | "Many"}} of {{stats.distinctFactKeys | "many"}} declared fact-keys currently have only one publisher. Reconciliation requires two sources to compare; supported resolver-backed rows can show provenance but have no alternates when only one publisher is present. As the NSO wave lands, single-sourced fact-keys gain second sources.
 - **Some methodology pages are still being written.** Specifically, the reconciliation methodology page is being expanded as the rules formalize. Read the [methodology hub](/methodology) for the current state.
 - **Some methodology resolutions are not yet public.** Civica has {{state.adoptedResolutionCount}}+ adopted internal resolution documents covering specific decisions. Public publication of a curated subset is on the roadmap.
 

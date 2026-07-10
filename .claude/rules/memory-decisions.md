@@ -534,3 +534,14 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Keep Dataset `isAccessibleForFree: true` paired with `conditionsOfAccess`
   that states the access/reuse boundary and with the exact canonical rights URL.
 - Durable record: APR-D033 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Compact provenance coverage is not dataset-wide coverage
+
+- CLM-019 measures ten compact renderer classes across home, Atlas, rankings,
+  and embeds. A class passes only when source, vintage/date, and rights are
+  accessible on the compact surface; a generic downstream link does not pass.
+- The generated current result is 4/10 (40%): rankings cells and fixed
+  small/medium/large embeds pass; six named home/Atlas/custom-embed exceptions
+  remain public.
+- Never describe this as 40% of facts. DAT-005 owns statement/fact-key coverage
+  across the dataset. Durable record: APR-D034 in `plan/DECISIONS.md`.

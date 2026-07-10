@@ -49,7 +49,7 @@ export function buildCountryExportCsvRow(fact: CountryExportCsvFact): string {
   ].join(",");
 }
 
-// PUBLIC_CLAIM: export.full-provenance
+// PUBLIC_CLAIM: export.provenance-coverage
 /** Self-describing citation comment block prepended to the CSV body. */
 export function buildCountryExportCsvCitation(
   input: CountryExportCsvCitationInput,
@@ -59,7 +59,7 @@ export function buildCountryExportCsvCitation(
     `# Reconciliation: ${input.reconciliationStatus} ${input.reconciliationVersion}`,
     `# Vintage: ${input.reconciliationVintage}`,
     `# Methodology: ${input.reconciliationReference}`,
-    `# For full per-fact provenance, request format=json.`,
+    `# JSON adds provenance for supported headline fields; facts[] rows remain without per-row provenance.`,
   ].join("\n");
 }
 

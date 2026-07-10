@@ -104,6 +104,7 @@
     "validate:policy-surface": "tsx scripts/validate-policy-surface.ts",
     "validate:claims-docs": "tsx scripts/validate-claims-docs.ts",
     "validate:rights-claims": "tsx scripts/validate-rights-claims.ts",
+    "validate:provenance-claims": "tsx scripts/validate-provenance-claims.ts",
     "crawl:metadata": "tsx scripts/crawl-public-metadata.ts",
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",

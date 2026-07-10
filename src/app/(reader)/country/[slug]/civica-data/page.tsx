@@ -52,7 +52,7 @@ export async function generateMetadata({
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) return { title: "Country Not Found" };
   const title = `${jurisdiction.name} — Civica Index & Governance Data`;
-  const description = `The research-beta Civica Index score, governance dimensions, legislature, leaders, bills, and international memberships for ${jurisdiction.name}, with full source provenance.`;
+  const description = `The research-beta Civica Index score, governance dimensions, legislature, leaders, bills, and international memberships for ${jurisdiction.name}, with source context on supported sections.`;
   const url = `https://civicaatlas.org/country/${slug}/civica-data`;
   return {
     title,

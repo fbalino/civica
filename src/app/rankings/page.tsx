@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getRankingsMatrix } from "@/lib/db/queries";
 import { RankingsMatrix } from "./RankingsMatrix";
 import { withOg } from "@/lib/og";
 import { Reveal } from "@/components/motion/Reveal";
 import { PageHero } from "@/components/PageHero";
+import { Banner } from "@/components/editorial/Banner";
 
 export const revalidate = 3600;
 
@@ -44,7 +46,8 @@ export default async function RankingsPage() {
             by the Civica Index and its governance dimensions &mdash;
             democracy, freedom, rule of law, corruption control &mdash;
             alongside population, GDP, area, HDI, life expectancy and literacy.
-            Every column traces to its source.
+            Metric cells carry source and freshness indicators; reuse terms
+            remain source-specific.
           </>
         }
         engraving={{
@@ -54,6 +57,17 @@ export default async function RankingsPage() {
       />
 
       <div className="editorial-page editorial-page--full">
+        {/* PROVENANCE_COVERAGE: rankings.metric-cell */}
+        <Banner variant="info">
+          Each populated metric cell carries a source/freshness dot. Rights
+          vary by publisher; consult{" "}
+          <Link href="/licensing#reuse">Licensing</Link> before reuse. The{" "}
+          <Link href="/methodology/approach#reader-pages">
+            provenance coverage audit
+          </Link>{" "}
+          explains how this table compares with compact surfaces that do not
+          yet provide the same linkage.
+        </Banner>
         {rows.length > 0 ? (
           <Reveal as="section" amount={0.1}>
             <RankingsMatrix rows={rows} />

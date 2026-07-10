@@ -472,9 +472,11 @@ for country in resp.json()["data"]:
           Each sovereign state&rsquo;s full record is downloadable in one request
           as JSON or CSV. To assemble the sovereign-state dataset, enumerate
           countries with <code>/api/v1/countries</code> and pull each
-          country&rsquo;s export. The JSON export carries a per-fact provenance
-          block; the CSV export carries a self-describing citation header so
-          the file is traceable when opened in a spreadsheet or research tool.
+          country&rsquo;s export. The JSON export carries a structured provenance
+          block for supported headline fields when a canonical resolver row
+          exists; its broader <code>facts[]</code> rows do not yet carry
+          per-row source, vintage, or license fields. The CSV export carries a
+          reconciliation citation header, not per-row provenance.
         </p>
 
         <Banner variant="info">
@@ -521,8 +523,11 @@ done < slugs.txt`}</CodeBlock>
           A single frozen, versioned dataset artifact — one download for the
           entire atlas, with a persistent identifier for citation — is a planned
           addition. Until it ships, the per-country export plus the country list
-          above is the supported path for a complete sovereign-state pull, and
-          every record keeps its source, license, and vintage attached.
+          above is the supported path for a sovereign-state pull. Treat the
+          current files as incomplete provenance exports: JSON links supported
+          headline fields only, while <code>facts[]</code> and CSV rows omit
+          per-row source, license, and vintage. DAT-027 owns the canonical-plus-
+          alternates research export that closes that gap.
         </p>
       </section>
 

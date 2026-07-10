@@ -53,6 +53,7 @@ export function CountryCard({
   href,
   ctaLabel = "View country profile",
 }: CountryCardProps) {
+  // PROVENANCE_COVERAGE: home.country-card
   const engraving = iso3 ? `/engravings/countries/${iso3}.webp` : null;
   const lightClassName = engravingDarkSrc
     ? "country-card-img theme-engraving-light"

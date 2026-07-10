@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-018_complete_next_CLM-019"
+    "current_task": "CLM-019_complete_next_DAT-001"
   },
   "budget": {
     "mode": "subscription_only",
@@ -576,6 +576,8 @@
     "plan/evidence/CLM-018/README.md",
     "plan/evidence/CLM-018/browser-checks.md",
     "plan/evidence/CLM-018/op48-final-acceptance-result.json",
+    "plan/evidence/CLM-019/README.md",
+    "plan/evidence/CLM-019/browser-checks.md",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -591,11 +593,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-018: sync-freshness, replication, editorial-illustration, all twelve aggregate claims/documentation children, compilation, TypeScript, and 86 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "349/349 full-suite tests and 23/23 focused rights fixtures passed with metadata fixtures, typecheck, targeted ESLint, design-token validation, doc-reference validation, diff checks, a 308-file public-source rights sweep, and Opus 4.8 ACCEPT_WITH_NONBLOCKING_NOTES. Master plan validates at 18/288 complete.",
-    "public_claims": "40 claims cover 14/14 required surfaces across 7 canonical tiers; 45 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "Local desktop/mobile QA passed on Licensing, About, Terms, API docs, widget gallery, and all embed sizes; no horizontal overflow; fresh isolated loads were console-clean; rights metadata and visible pointers were present.",
-    "visual_review": "The medium embed was compacted and browser-proven at its exact 320x180 contract so the reuse pointer is visible rather than clipped; desktop/mobile licensing screenshots are retained under plan/evidence/CLM-018/."
+    "build": "npm run build passed for CLM-019: sync-freshness, replication, editorial-illustration, all thirteen aggregate claims/documentation children, compilation, TypeScript, and 86 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "356/356 full-suite tests and 7/7 focused provenance fixtures passed with typecheck, targeted ESLint, design-token validation, diff checks, and a 320-file public-source provenance sweep. Master plan validates at 19/288 complete (6.6%).",
+    "public_claims": "41 claims cover 14/14 required surfaces across 7 canonical tiers; 47 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims. Compact renderer provenance is generated as 4/10 (40%) with six named exceptions.",
+    "browser": "Local desktop/mobile QA passed on methodology, About, home, rankings, API docs, Atlas, and the small embed; no horizontal overflow; six fresh isolated route loads were console-clean; coverage, exceptions, links, source dots, embed vintage, and rights metadata were present as applicable.",
+    "visual_review": "The methodology coverage disclosure and the small embed vintage were browser-proven and retained under plan/evidence/CLM-019/."
   },
-  "updated_at": "2026-07-10T16:31:00Z"
+  "updated_at": "2026-07-10T20:05:05Z"
 }

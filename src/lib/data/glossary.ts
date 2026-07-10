@@ -665,7 +665,7 @@ const CURATED_GLOSSARY_TERMS: GlossaryTerm[] = [
     term: "Provenance",
     tag: "provenance",
     definition:
-      "The documented origin of a data point — which source it came from, under what licence, and when it was last refreshed. In Civica every published fact traces to a source record, and a small dot marks whether that source is live or archived, so readers can judge the evidence behind a number.",
+      "The documented origin of a data point — which source it came from, under what licence, and when it was last refreshed. Civica exposes this context on supported resolver-backed facts and data tables; compact summary surfaces still have measured gaps documented in the methodology.",
     source: {
       name: "Civica data methodology",
       url: "/methodology",

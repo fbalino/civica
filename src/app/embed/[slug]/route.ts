@@ -8,6 +8,7 @@ import {
   type CIDimensionV2,
 } from "@/lib/ci/dimensions-v2";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { getNormalizationTableRows } from "@/lib/ci/normalization-table";
 import {
   getCanonicalFactsForJurisdiction,
   FACTBOOK_RECONCILIATION_META,
@@ -34,6 +35,13 @@ const WIDGET_FACT_KEYS = [
   "gdp_ppp_usd_billions",
   "area_total_km2",
 ] as const;
+
+/** Machine-readable attribution for the four sources that feed the displayed
+ * Civica Index score. Derive it from the same canonical table that generates
+ * the public methodology rather than maintaining another source list here. */
+const CIVICA_INDEX_SOURCE_ATTRIBUTION = getNormalizationTableRows()
+  .map((row) => row.sourceLabel)
+  .join("; ");
 
 // Abuse control: each embed render hits the DB + fact resolver, so an
 // unthrottled loop is a cheap scraping / cost vector even with the CDN
@@ -409,17 +417,19 @@ function buildHtml(args: BuildHtmlArgs): string {
     })
     .join("");
 
+  // PROVENANCE_COVERAGE: embeds.small-index
   const smBody = `<a class="civica-widget small" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener">
   <div class="mark serif">C</div>
   <div class="body">
     <div class="country">${esc(jurisdiction.name)}</div>
-    <div class="meta mono">CI ${esc(ciMeta)} &middot; RESEARCH BETA</div>
+    <div class="meta mono">CI ${esc(ciMeta)} &middot; ${esc(quarterLabel)} &middot; BETA</div>
   </div>
   <div class="score serif">${esc(ciDisplay)}</div>
 </a>`;
 
   // PUBLIC_CLAIM: embed.index-score
   // PUBLIC_CLAIM: embeds.reuse-rights
+  // PROVENANCE_COVERAGE: embeds.medium-index
   const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
@@ -440,6 +450,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   </div>
 </a>`;
 
+  // PROVENANCE_COVERAGE: embeds.large-index
   const lgBody = `<a class="civica-widget large" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
@@ -500,6 +511,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     .filter(Boolean)
     .join("");
 
+  // PROVENANCE_COVERAGE: embeds.custom-facts
   const customBody = `<a class="civica-widget custom" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}" target="_blank" rel="noopener">
   <div class="cf-top">
     <div class="cf-brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
@@ -527,6 +539,7 @@ function buildHtml(args: BuildHtmlArgs): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=${width},initial-scale=1">
+<meta name="civica:sources" content="${esc(CIVICA_INDEX_SOURCE_ATTRIBUTION)}">
 <meta name="civica:rights" content="${RIGHTS_REGISTRY_URL}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

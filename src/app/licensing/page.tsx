@@ -50,7 +50,8 @@ export default function LicensingPage() {
         <Banner variant="info">
           This page is a practical reuse guide, not legal advice. For exact
           reuse obligations, follow the upstream publisher license shown with
-          each data point.
+          the specific data point where available, or check its named source
+          in the registry below when point-of-use coverage is absent.
         </Banner>
 
         <Banner variant="warn">

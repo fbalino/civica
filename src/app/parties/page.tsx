@@ -72,9 +72,10 @@ export default async function PartiesPage() {
             {countryCount > 0 ? countryCount.toLocaleString() : "the world's"}{" "}
             legislatures, placed on an economic left–right axis against an
             anti-pluralism axis. Ideology positions come from the V-Party dataset
-            (V-Dem); seat counts come from IPU Parline and Wikidata. Every value
-            traces to its source, and where no position is recorded, the party is
-            listed honestly rather than guessed.
+            (V-Dem); seat counts come from IPU Parline and Wikidata. Recorded
+            ideology positions and seat counts retain their named source; where
+            no position is recorded, the party is listed honestly rather than
+            guessed.
           </>
         }
       />

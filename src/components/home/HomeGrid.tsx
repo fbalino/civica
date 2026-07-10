@@ -164,6 +164,7 @@ export async function HomeGrid() {
               <GlobalSearch countries={countries} />
             </HeroRevealItem>
             <HeroRevealItem className="home-stats" role="group" aria-label="Coverage">
+              {/* PROVENANCE_COVERAGE: home.catalog-count */}
               <div className="home-stat">
                 <span className="home-stat-value">{catalogCount ?? "—"}</span>
                 <span className="home-stat-label">Countries &amp; territories</span>
@@ -198,8 +199,10 @@ export async function HomeGrid() {
             Explore country profiles and key facts at a glance.
           </h2>
           <p className="home-feature-desc">
-            Every country&rsquo;s government, leaders, legislature, economy, and society
-            &mdash; documented with provenance you can trace to its source.
+            Country profiles bring government, leaders, legislature, economy,
+            and society together. Resolver-backed detail pages expose source
+            context where implemented; these compact cards link onward and do
+            not claim inline provenance for each summary value.
           </p>
           <Link href="/country" className="btn btn--text">
             <span>Explore Countries</span>
@@ -294,6 +297,7 @@ export async function HomeGrid() {
         </div>
         <div className="home-feature-visual-slot">
           {top.length > 0 ? (
+            // PROVENANCE_COVERAGE: home.index-teaser
             <div className="home-index">
               <div className="home-index-head">
                 <h3 className="home-index-title">
