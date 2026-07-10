@@ -162,7 +162,7 @@ export async function ingestPulseV2(
   const totalUnmatched = reports.reduce((a, r) => a + r.unmatchedCountry, 0);
   const totalWouldWrite = reports.reduce((a, report) => a + report.wouldWrite, 0);
 
-  if (options.requireNonEmpty && totalFetched === 0) {
+  if ((options.requireNonEmpty ?? true) && totalFetched === 0) {
     throw new Error("Pulse ingestion fixture/upstream returned no rows");
   }
 

@@ -35,3 +35,18 @@ Twenty-three focused tests prove:
 DAT-012 remains open. These results cover the four registered Pulse pipelines;
 the remaining production adapter families still require the same contract and
 the final repository-wide acceptance run.
+
+## Bills implementation wave
+
+All six deployed bills adapters now use the same fail-closed runner and writer
+contract. Every cron accepts `?dryRun=1`; dry runs skip both bill-table and
+summary-cache writes. Inputs are validated as a complete batch before writing,
+duplicate source keys are rejected, and empty upstream results fail loudly.
+
+The writer now detects content-identical existing rows. A repeated fixture run
+therefore performs no update, preserves the canonical row byte-for-byte, and
+does not advance source freshness. Source-shaped fixtures cover the US, UK,
+Canada, Germany, Brazil, and France adapters; the shared runner/writer fixtures
+cover dry-run, malformed, duplicate, empty, and two-run convergence behavior.
+
+After this wave, 476/476 tests and the full production build pass.

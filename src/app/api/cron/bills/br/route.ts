@@ -14,6 +14,7 @@ async function handler(request: Request) {
   const started = new Date().toISOString();
   try {
     const summary = await runBillsSync(db, {
+      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
       jurisdictionSlug: "brazil",
       iso2: "BR",
       fetchDrafts: ({ jurisdictionId }) =>

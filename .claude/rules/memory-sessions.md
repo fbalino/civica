@@ -263,3 +263,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Twenty-three focused tests, 469 full tests, runtime/data/freshness validators,
   and the production build passed. DAT-012 remains open for the other adapter
   families.
+
+## 2026-07-10 — DAT-012 bills repeatability wave
+
+- Hardened the shared runner/writer behind all six deployed bills adapters.
+  Every cron now supports a zero-write dry run, external emptiness fails
+  closed, and whole-batch validation prevents partial malformed writes.
+- Content-identical reruns are true no-ops: no row timestamp churn and no
+  source-freshness restamp. Source-shaped fixtures exercise all six country
+  parsers twice.
+- Seven focused tests, 476 full tests, and the production build passed.
+  DAT-012 remains open for the remaining adapter families.

@@ -33,6 +33,15 @@ export interface RunBillsSyncOptions {
   fetchDrafts: (opts: {
     jurisdictionId: string;
   }) => Promise<BillIngestDraft[]>;
+  dryRun?: boolean;
+  /** Deterministic fixture seams; production callers omit these. */
+  jurisdictionId?: string;
+  readSummaries?: typeof readCachedSummaries;
+  generateSummaries?: typeof generateSummariesBatch;
+  cacheSummary?: typeof writeCachedSummary;
+  writeRows?: typeof upsertBills;
+  /** Reserved for controlled maintenance fixtures. Live external syncs fail closed on emptiness. */
+  allowEmpty?: boolean;
 }
 
 export interface RunBillsSyncSummary {
@@ -40,8 +49,11 @@ export interface RunBillsSyncSummary {
   fetched: number;
   inserted: number;
   updated: number;
+  unchanged: number;
+  wouldWrite: number;
   summarised: number;
   sourcesStamped: string[];
+  dryRun: boolean;
 }
 
 export async function runBillsSync(
@@ -49,7 +61,7 @@ export async function runBillsSync(
   opts: RunBillsSyncOptions,
 ): Promise<RunBillsSyncSummary> {
   // Resolve jurisdiction UUID by slug.
-  const j = await db
+  const j = opts.jurisdictionId ? [{ id: opts.jurisdictionId }] : await db
     .select({ id: jurisdictions.id })
     .from(jurisdictions)
     .where(eq(jurisdictions.slug, opts.jurisdictionSlug))
@@ -63,6 +75,9 @@ export async function runBillsSync(
 
   // Fetch and stage drafts.
   const drafts = await opts.fetchDrafts({ jurisdictionId });
+  if (drafts.length === 0 && !opts.allowEmpty) {
+    throw new Error(`Bills upstream returned no rows for ${opts.jurisdictionSlug}`);
+  }
 
   // Batch-summarise. Cache key uses iso2 + (longTitle || title) — same
   // shape the legacy live-fetch route uses, so cached entries carry
@@ -70,14 +85,14 @@ export async function runBillsSync(
   const cacheKeys = drafts.map((d) =>
     makeCacheKey(opts.iso2, d.longTitle ?? d.title),
   );
-  const cached = await readCachedSummaries(db, cacheKeys);
+  const cached = await (opts.readSummaries ?? readCachedSummaries)(db, cacheKeys);
   const missingIdx = cached
     .map((s, i) => (s === null ? i : -1))
     .filter((i) => i >= 0);
 
   let summarisedCount = 0;
   if (missingIdx.length > 0) {
-    const generated = await generateSummariesBatch(
+    const generated = await (opts.generateSummaries ?? generateSummariesBatch)(
       missingIdx.map((i) => ({
         promptTitle: drafts[i].longTitle ?? drafts[i].title,
       })),
@@ -87,7 +102,7 @@ export async function runBillsSync(
         const summary = generated[genIdx];
         if (summary) {
           cached[origIdx] = summary;
-          await writeCachedSummary(db, cacheKeys[origIdx], summary);
+          if (!opts.dryRun) await (opts.cacheSummary ?? writeCachedSummary)(db, cacheKeys[origIdx], summary);
           summarisedCount++;
         }
       }),
@@ -118,14 +133,17 @@ export async function runBillsSync(
     raw: d.raw,
   }));
 
-  const result = await upsertBills(db, rows);
+  const result = await (opts.writeRows ?? upsertBills)(db, rows, { dryRun: opts.dryRun });
 
   return {
     jurisdictionId,
     fetched: drafts.length,
     inserted: result.inserted,
     updated: result.updated,
+    unchanged: result.unchanged,
+    wouldWrite: result.wouldWrite,
     summarised: summarisedCount,
     sourcesStamped: result.sourcesStamped,
+    dryRun: opts.dryRun ?? false,
   };
 }
