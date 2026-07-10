@@ -605,6 +605,48 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "metadata.index-dataset",
+    surface: "metadata",
+    routeOrArtifact: "/civica-index — JSON-LD Dataset description",
+    exactClaim:
+      "A research-beta composite across {dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.",
+    tier: "research-beta-estimate",
+    evidenceSources: [
+      "src/app/(reader)/civica-index/page.tsx",
+      "src/lib/seo/jsonld.ts",
+      "src/lib/content/site-state.ts",
+    ],
+    implementationOwner: "SEO and Civica Index research lane",
+    methodologyVersion: "civica-index-v2-beta",
+    gate: "G3",
+    source: {
+      path: "src/app/(reader)/civica-index/page.tsx",
+      fragment:
+        "A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.",
+    },
+  },
+  {
+    id: "metadata.pulse-methodology",
+    surface: "metadata",
+    routeOrArtifact: "/civica-index/methodology/pulse — page metadata",
+    exactClaim:
+      "How Civica's experimental, daily-scheduled Pulse ledger ingests, classifies, reviews, and scores governance-relevant events without claiming a live or continuous governance measure.",
+    tier: "experimental-heuristic",
+    evidenceSources: [
+      "src/app/(reader)/civica-index/methodology/pulse/page.tsx",
+      "src/lib/content/site-state.ts",
+      "src/lib/pulse/v2/runtime-contract.ts",
+    ],
+    implementationOwner: "SEO and Pulse event-ledger research lane",
+    methodologyVersion: "pulse-v2.1-beta",
+    gate: "G3",
+    source: {
+      path: "src/app/(reader)/civica-index/methodology/pulse/page.tsx",
+      fragment:
+        "How Civica's experimental, daily-scheduled Pulse ledger ingests, classifies, reviews, and scores governance-relevant events without claiming a live or continuous governance measure.",
+    },
+  },
+  {
     id: "export.full-provenance",
     surface: "exports",
     routeOrArtifact: "/api/countries/{slug}/export?format=csv|json",

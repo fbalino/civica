@@ -457,3 +457,17 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   `src/lib/api/deprecation.ts`. Conditional deprecation on
   `/api/v1/index/by-government-type` applies only to the legacy
   `taxonomy=structural|regime` branch.
+
+## 2026-07-10 — Public metadata is crawled as a contract
+
+- `src/lib/site.ts` is the canonical apex origin. Never derive public
+  canonicals, OG URLs, sitemap URLs, or JSON-LD identity from `VERCEL_URL`, a
+  preview host, or request headers.
+- `npm run validate:metadata` is the DB-free build guard;
+  `npm run crawl:metadata -- --base-url=<origin>` must fetch every sitemap URL.
+- Sitemap modification dates use stored jurisdiction timestamps, blog dates,
+  comparison-member maxima, or the checked-in metadata content release date.
+  Never use an argument-less `new Date()` for public `lastModified` values.
+- Index-facing structured metadata states research-Beta posture. Pulse-facing
+  structured metadata states experimental or archived-diagnostic posture;
+  visible body chips do not satisfy the metadata contract.

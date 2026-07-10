@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-012_complete_next_CLM-013"
+    "current_task": "CLM-013_complete_next_CLM-014"
   },
   "budget": {
     "mode": "subscription_only",
@@ -287,6 +287,60 @@
       "session_id": "52e470d7-d70d-4154-af44-e1996dd1eac6",
       "subscription_first": true,
       "ownership": "read-only independent acceptance review, numeric-claims blocker discovery, and repaired recheck"
+    },
+    "sp53_clm013_metadata_inventory": {
+      "status": "terminated_unbounded_read_only_expansion",
+      "provider": "codex-cli",
+      "model_requested": "gpt-5.3-codex-spark",
+      "model_used": "gpt-5.3-codex-spark",
+      "session_id": "019f4bac-f249-72a0-8083-0a5a3fe7b5cd",
+      "subscription_first": true,
+      "ownership": "read-only CLM-013 inventory; stopped after 85 commands without a concise verdict"
+    },
+    "op48_clm013_metadata_contract": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "652202ac-f9db-4a29-bb15-3dcbf92af788",
+      "subscription_first": true,
+      "ownership": "read-only CLM-013 metadata and crawler acceptance architecture"
+    },
+    "sn5_clm013_core_contract": {
+      "status": "completed_after_bounded_restart",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "b2bb3578-0205-4553-b52b-c2e3cfb8dcd0",
+      "subscription_first": true,
+      "ownership": "single-writer core metadata origin, sitemap-date, crawler, validator, and fixture implementation"
+    },
+    "sn5_clm013_routes_and_copy": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "f001d007-ac35-4bf7-a174-075cf1c17091",
+      "subscription_first": true,
+      "ownership": "sitemap route coverage, research-posture metadata, and claim registrations"
+    },
+    "sn5_clm013_contract_hardening": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "29354ad2-937d-4785-b939-4ee3e6ee3b74",
+      "subscription_first": true,
+      "ownership": "metadata-only status, Dataset, forbidden-host, duplicate-loc, and route-family negative fixtures"
+    },
+    "op48_clm013_final_acceptance": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "275037c2-1a86-45a3-b6da-21ab4409d06b",
+      "subscription_first": true,
+      "ownership": "read-only independent CLM-013 acceptance review; ACCEPT with no blockers"
     }
   },
   "manifests": [],
@@ -315,6 +369,9 @@
     "plan/evidence/CLM-011/browser-checks.md",
     "plan/evidence/CLM-012/README.md",
     "plan/evidence/CLM-012/browser-checks.md",
+    "plan/evidence/CLM-013/README.md",
+    "plan/evidence/CLM-013/browser-checks.md",
+    "plan/evidence/CLM-013/crawl-results.md",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -330,11 +387,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-012: compilation, TypeScript, runtime/claim/freshness/doc-source/doc-reference/replication/API-contract guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "184/184 full-suite tests, 21 API-contract fixtures, all API/docs/public/numeric/runtime/design/freshness validators, targeted ESLint, diff checks, and the live 17-request JSON/CSV matrix passed. Master plan validates at 12/288 complete.",
-    "public_claims": "29 claims cover 14/14 required surfaces across 7 canonical tiers; 35 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "CLM-012 /api-docs was checked from a fresh production build at 1440x1000 light and 390x844 dark with reduced motion. Both returned 200, all 15 rendered JSON examples parsed, mobile had no document overflow, and there were no console errors.",
-    "visual_review": "Final CLM-012 desktop-light and mobile-dark full-page screenshots were inspected; endpoint hierarchy, deprecation notices, examples, sidebar, contrast, and responsive containment had no acceptance-blocking defects."
+    "build": "npm run build passed for CLM-013: compilation, TypeScript, runtime/claim/freshness/doc-source/doc-reference/replication/API/metadata guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "237/237 full-suite tests, 53 focused metadata fixtures, all build validators, targeted ESLint, and diff checks passed. The first crawl found 24 issues across 14 routes; the repaired production crawl passed 843/843 sitemap URLs. Master plan validates at 13/288 complete.",
+    "public_claims": "31 claims cover 14/14 required surfaces across 7 canonical tiers; 35 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
+    "browser": "CLM-013 metadata was inspected in production Chrome on home, Index, Pulse methodology, query comparison, France Civica Data, and France Constitution at desktop light and mobile dark widths with reduced motion. Every sample returned 200 with one canonical and matching og:url, no document overflow, and no console errors.",
+    "visual_review": "CLM-013 viewport screenshots confirm metadata-only changes did not regress the Index or Pulse reader surfaces in light/dark themes."
   },
-  "updated_at": "2026-07-10T10:54:32Z"
+  "updated_at": "2026-07-10T11:55:33Z"
 }

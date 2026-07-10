@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { absoluteUrl } from "@/lib/site";
 
 // AI training/scraper bots blocked entirely. Search-engine bots keep
 // full access to canonical pages. Admin and cron paths disallowed.
@@ -48,6 +49,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: "/",
       })),
     ],
-    sitemap: "https://civicaatlas.org/sitemap.xml",
+    sitemap: absoluteUrl("/sitemap.xml"),
   };
 }

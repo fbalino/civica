@@ -260,6 +260,7 @@ export default async function CivicaIndexPage({
   // temporalCoverage is only emitted when a real vintage label is present.
   const datasetJsonLd = buildDataset({
     name: "Civica Index",
+    // PUBLIC_CLAIM: metadata.index-dataset
     description:
       `A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.`,
     url: "https://civicaatlas.org/civica-index",

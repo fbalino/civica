@@ -12,7 +12,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Corrections — Report a Civica Index Error",
-  description: `Dispute a data error, methodology decision, or Pulse event classification. Every submission is logged publicly, with a target full disposition within ${disputeSla.fullDispositionDays} days.`,
+  description: `Report an error in the research-beta Civica Index or an experimental Pulse event classification. Every submission is logged publicly, with a target full disposition within ${disputeSla.fullDispositionDays} days.`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/corrections" },
 };
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { absoluteUrl } from "@/lib/site";
 
 // Shared Open Graph / social-share image helpers.
 //
@@ -36,6 +37,14 @@ export const OG_IMAGES = [
     alt: OG_DEFAULT_IMAGE_ALT,
   },
 ];
+
+/**
+ * Absolute apex URL for the default social-share image. JSON-LD (schema.org)
+ * fields require a fully qualified URL — unlike `metadata.openGraph`/`twitter`,
+ * they are not resolved against `metadataBase` automatically, so structured
+ * data builders (`@/lib/seo/jsonld`) import this instead of re-deriving it.
+ */
+export const OG_DEFAULT_IMAGE_ABSOLUTE = absoluteUrl(OG_DEFAULT_IMAGE);
 
 type OpenGraph = NonNullable<Metadata["openGraph"]>;
 

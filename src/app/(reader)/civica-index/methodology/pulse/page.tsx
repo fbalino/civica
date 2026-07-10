@@ -14,6 +14,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Civica Pulse Methodology — Experimental Event Ledger",
+  // PUBLIC_CLAIM: metadata.pulse-methodology
   description:
     "How Civica's experimental, daily-scheduled Pulse ledger ingests, classifies, reviews, and scores governance-relevant events without claiming a live or continuous governance measure.",
   alternates: {

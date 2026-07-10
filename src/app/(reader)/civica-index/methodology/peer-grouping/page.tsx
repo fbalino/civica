@@ -19,7 +19,7 @@ const REVIEW_STATUS_LABEL: Record<"pending" | "in-review" | "complete", string> 
 export const metadata: Metadata = {
   title: "Peer Grouping — How Countries Are Compared",
   description:
-    "Why countries are compared the way they are: World Bank region × income for material indicators, V-Dem Regimes of the World for governance, and BR/CGV as an alternate regime lens.",
+    "How the research-beta Civica Index defines comparison sets: World Bank region × income for material indicators, V-Dem Regimes of the World for governance, and BR/CGV as an alternate regime lens.",
   alternates: {
     canonical:
       "https://civicaatlas.org/civica-index/methodology/peer-grouping",

@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 import { getAllJurisdictions } from "@/lib/db/queries";
 import { getAllPosts } from "@/lib/blog";
 import { ORGANIZATIONS } from "@/lib/data/international-organizations";
+import { absoluteUrl, METADATA_CONTENT_RELEASE_DATE } from "@/lib/site";
 
-const SITE_URL = "https://civicaatlas.org";
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
 interface StaticRoute {
@@ -57,6 +57,8 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
   { path: "/about", changeFrequency: "monthly", priority: 0.4 },
   { path: "/about/advisory-board", changeFrequency: "monthly", priority: 0.4 },
+  { path: "/about/advisory-board/apply", changeFrequency: "monthly", priority: 0.3 },
+  { path: "/constitution", changeFrequency: "weekly", priority: 0.7 },
   { path: "/contact", changeFrequency: "monthly", priority: 0.4 },
   { path: "/licensing", changeFrequency: "monthly", priority: 0.4 },
   { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
@@ -64,24 +66,32 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/glossary", changeFrequency: "monthly", priority: 0.5 },
 ];
 
-function urlForPath(path: string) {
-  return path === "/" ? SITE_URL : `${SITE_URL}${path}`;
+// Checked-in fallback for every route with no real per-row timestamp
+// (static routes, organization pages, and comparison legs missing both
+// `updatedAt`/`createdAt`). Never derive this from the request-time clock —
+// `scripts/validate-metadata.ts` rejects argument-less `new Date()` here.
+const FALLBACK_LAST_MODIFIED = new Date(METADATA_CONTENT_RELEASE_DATE);
+
+type JurisdictionRow = Awaited<ReturnType<typeof getAllJurisdictions>>[number];
+
+/** Most-recent stored timestamp for a jurisdiction row, falling back to the
+ *  checked-in content-release date when neither column is populated. */
+function jurisdictionLastModified(row: Pick<JurisdictionRow, "updatedAt" | "createdAt">): Date {
+  return row.updatedAt ?? row.createdAt ?? FALLBACK_LAST_MODIFIED;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let countries: { slug: string }[] = [];
+  let countries: JurisdictionRow[] = [];
   try {
     countries = await getAllJurisdictions();
   } catch {
     // DB not available during build
   }
 
-  const lastModified = new Date();
-
   const staticPages: MetadataRoute.Sitemap = PUBLIC_STATIC_ROUTES.map(
     ({ path, changeFrequency, priority }) => ({
-      url: urlForPath(path),
-      lastModified,
+      url: absoluteUrl(path),
+      lastModified: FALLBACK_LAST_MODIFIED,
       changeFrequency,
       priority,
     })
@@ -90,36 +100,65 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // /country/[slug] is the single canonical per-country reader (Factbook ·
   // Civica Data · Constitution tabs). The legacy /factbook/[slug],
   // /countries/[slug], and /civica-index/[slug] surfaces 308-redirect here.
-  const countryPages: MetadataRoute.Sitemap = countries.map((country) => ({
-    url: `${SITE_URL}/country/${country.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.9,
-  }));
+  // Each tab is a distinct indexable URL, so all three emit one entry per
+  // country, sharing the same stored jurisdiction timestamp.
+  const countryPages: MetadataRoute.Sitemap = countries.flatMap((country) => {
+    const lastModified = jurisdictionLastModified(country);
+    return [
+      {
+        url: absoluteUrl(`/country/${country.slug}`),
+        lastModified,
+        changeFrequency: "weekly" as const,
+        priority: 0.9,
+      },
+      {
+        url: absoluteUrl(`/country/${country.slug}/civica-data`),
+        lastModified,
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      },
+      {
+        url: absoluteUrl(`/country/${country.slug}/constitution`),
+        lastModified,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      },
+    ];
+  });
 
   const organizationPages: MetadataRoute.Sitemap = ORGANIZATIONS.map((org) => ({
-    url: `${SITE_URL}/organizations/${org.slug}`,
-    lastModified: new Date(),
+    url: absoluteUrl(`/organizations/${org.slug}`),
+    lastModified: FALLBACK_LAST_MODIFIED,
     changeFrequency: "monthly" as const,
     priority: 0.5,
   }));
 
   const posts = getAllPosts();
   const blogPages: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${SITE_URL}/blog/${post.slug}`,
+    url: absoluteUrl(`/blog/${post.slug}`),
     lastModified: new Date(post.date),
     changeFrequency: "monthly" as const,
     priority: 0.6,
   }));
 
-  const comparisonPages: MetadataRoute.Sitemap = PRIORITY_COMPARISONS.map(
-    ([a, b]) => ({
-      url: `${SITE_URL}/compare?c=${encodeURIComponent(a)}&c=${encodeURIComponent(b)}`,
-      lastModified: new Date(),
+  const lastModifiedBySlug = new Map(
+    countries.map((country) => [country.slug, jurisdictionLastModified(country)])
+  );
+
+  const comparisonPages: MetadataRoute.Sitemap = PRIORITY_COMPARISONS.map(([a, b]) => {
+    const dateA = lastModifiedBySlug.get(a);
+    const dateB = lastModifiedBySlug.get(b);
+    const lastModified =
+      dateA && dateB
+        ? new Date(Math.max(dateA.getTime(), dateB.getTime()))
+        : (dateA ?? dateB ?? FALLBACK_LAST_MODIFIED);
+    return {
+      url: absoluteUrl(`/compare?c=${encodeURIComponent(a)}&c=${encodeURIComponent(b)}`),
+      lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.6,
-    })
-  );
+    };
+  });
 
   return [
     ...staticPages,

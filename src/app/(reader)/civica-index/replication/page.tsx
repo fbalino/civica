@@ -15,7 +15,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Index Replication Status",
   description:
-    "Status surface for the Civica Index replication package: no package is currently published, and every required component is listed with its individual build status and owner.",
+    "Status surface for the research-beta Civica Index replication package: no package is currently published, and every required component is listed with its individual build status and owner.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/replication" },
 };
 

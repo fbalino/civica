@@ -10,12 +10,12 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Country Rankings — Democracy, Freedom & Governance",
   description:
-    "Sort countries across governance and development metrics — the Civica Index, democracy, freedom, rule of law, corruption control, GDP, population, HDI, life expectancy and more. Sourced from the Civica Index, Wikidata, the World Bank, and the archived CIA World Factbook.",
+    "Sort countries across governance and development metrics — the research-beta Civica Index, democracy, freedom, rule of law, corruption control, GDP, population, HDI, life expectancy and more. Sourced from the Civica Index, Wikidata, the World Bank, and the archived CIA World Factbook.",
   alternates: { canonical: "https://civicaatlas.org/rankings" },
   openGraph: withOg({
     title: "Country Rankings — Democracy, Freedom & Governance · Civica Atlas",
     description:
-      "Sort countries across the Civica Index, democracy, freedom, rule of law, GDP, population, HDI and more.",
+      "Sort countries across the research-beta Civica Index, democracy, freedom, rule of law, GDP, population, HDI and more.",
     url: "https://civicaatlas.org/rankings",
   }),
 };

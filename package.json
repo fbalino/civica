@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:sync-freshness && npm run validate:public-claims && npm run validate:numeric-claims && npm run validate:pulse-runtime && npm run validate:doc-sources && npm run validate:doc-references && npm run validate:replication-surface && npm run validate:api-docs && next build",
+    "build": "npm run validate:sync-freshness && npm run validate:public-claims && npm run validate:numeric-claims && npm run validate:pulse-runtime && npm run validate:doc-sources && npm run validate:doc-references && npm run validate:replication-surface && npm run validate:api-docs && npm run validate:metadata && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -98,6 +98,8 @@
     "validate:doc-references": "tsx scripts/validate-doc-references.ts",
     "validate:replication-surface": "tsx scripts/validate-replication-surface.ts",
     "validate:api-docs": "tsx scripts/validate-api-docs.ts",
+    "validate:metadata": "tsx scripts/validate-metadata.ts",
+    "crawl:metadata": "tsx scripts/crawl-public-metadata.ts",
     "seo:indexnow": "tsx scripts/submit-indexnow.ts",
     "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "test:watch": "node --import tsx --test --watch \"src/**/*.test.ts\"",

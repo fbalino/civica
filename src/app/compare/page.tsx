@@ -86,12 +86,12 @@ export async function generateMetadata({
   return {
     title,
     description:
-      "Compare any two or three countries side by side: factbook overview, Civica Index scores, parliamentary chambers, recent elections, and international memberships.",
+      "Compare any two or three countries side by side: factbook overview, research-beta Civica Index scores, parliamentary chambers, recent elections, and international memberships.",
     alternates: { canonical },
     openGraph: withOg({
       title: `${title} · Civica Atlas`,
       description:
-        "Compare the governance, scoring, chambers, elections, and global memberships of any two or three countries side by side.",
+        "Compare the governance, research-beta scoring, chambers, elections, and global memberships of any two or three countries side by side.",
       url: canonical,
     }),
   };

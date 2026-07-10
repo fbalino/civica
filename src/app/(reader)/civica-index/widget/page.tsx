@@ -12,7 +12,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Widget Gallery — Embed a governance score anywhere",
   description:
-    "Grab a ready-to-embed Civica Index score widget for any country. Three sizes, light/dark themes, one-line iframe snippet.",
+    "Grab a ready-to-embed research-beta Civica Index score widget for any country. Three sizes, light/dark themes, one-line iframe snippet.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/widget" },
 };
 

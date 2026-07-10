@@ -9,6 +9,7 @@ import { DevDesignMount } from "@/components/dev/DevDesignMount";
 import { OG_IMAGES, OG_DEFAULT_IMAGE } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildOrganization, buildWebSite } from "@/lib/seo/jsonld";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 import "./editorial.css";
 import "./atlas.css";
@@ -37,10 +38,10 @@ const inter = Inter({
 
 // Canonical host. The apex `civicaatlas.org` is the production domain and is
 // what every other surface already declares — sitemap.ts, robots.ts,
-// api-docs, and every per-page `alternates.canonical`. Keeping the apex here
-// keeps all of those consistent. (Making the apex serve 200 instead of
-// 307-redirecting to www is a hosting/next.config concern handled separately.)
-const SITE_URL = "https://civicaatlas.org";
+// api-docs, and every per-page `alternates.canonical`. `SITE_URL` is imported
+// from `@/lib/site`, the single shared module, so this stays consistent by
+// construction. (Making the apex serve 200 instead of 307-redirecting to www
+// is a hosting/next.config concern handled separately.)
 
 // The default social-share image (1200x630) and its alt text now live in
 // `@/lib/og` so the ~17 pages that override `openGraph` can share one source
@@ -70,6 +71,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Civica Atlas",
     locale: "en_US",
+    // Relative "./" resolves against `metadataBase` the same way
+    // `alternates.canonical` does above — the current route, not a fixed
+    // root URL — so pages that inherit this default (rather than declaring
+    // their own `openGraph.url`) still emit a route-real `og:url` instead
+    // of every page claiming the homepage.
+    url: "./",
     images: OG_IMAGES,
   },
   twitter: {

@@ -31,14 +31,14 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Index by Peer Lens — Bi-Lens Explorer",
   description:
-    "Compare Civica Index scores grouped by V-Dem Regimes of the World (default) or Bjørnskov-Rode / CGV regime type (alternate).",
+    "Compare research-beta Civica Index scores grouped by V-Dem Regimes of the World (default) or Bjørnskov-Rode / CGV regime type (alternate).",
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/government-types",
   },
   openGraph: withOg({
     title: "Civica Index by Peer Lens — Bi-Lens Explorer · Civica Atlas",
     description:
-      "V-Dem Regimes of the World by default; BR/CGV regime type on demand. Distribution, spread, and trajectory for every lens cohort.",
+      "Research-beta Civica Index scores by V-Dem Regimes of the World (default) or BR/CGV regime type (alternate). Distribution, spread, and trajectory for every lens cohort.",
     url: "https://civicaatlas.org/civica-index/government-types",
   }),
 };

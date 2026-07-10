@@ -15,18 +15,21 @@
 //  - Google retired the sitelinks searchbox, so WebSite deliberately carries
 //    NO `potentialAction`/SearchAction.
 
-export const SITE_URL = "https://civicaatlas.org";
+import { SITE_URL, absoluteUrl } from "@/lib/site";
+import { OG_DEFAULT_IMAGE_ABSOLUTE } from "@/lib/og";
+
+export { SITE_URL };
 export const SITE_NAME = "Civica Atlas";
 export const SITE_ALT_NAME = "Civica";
 export const GITHUB_REPO_URL = "https://github.com/fbalino/civica";
 /** Absolute URL of the site logo used in Organization structured data. */
-export const LOGO_URL = `${SITE_URL}/og-default.png`;
+export const LOGO_URL = OG_DEFAULT_IMAGE_ABSOLUTE;
 
 /** Stable `@id` for the publishing Organization so other nodes can reference
  *  it (WebSite.publisher, Article.author, Dataset.creator) instead of inlining
  *  a duplicate Organization object. */
-export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
-export const WEBSITE_ID = `${SITE_URL}/#website`;
+export const ORGANIZATION_ID = absoluteUrl("/#organization");
+export const WEBSITE_ID = absoluteUrl("/#website");
 
 export type JsonLdNode = Record<string, unknown>;
 
@@ -110,7 +113,7 @@ export function buildBreadcrumbList(items: BreadcrumbItem[]): JsonLdNode {
       item: item.url
         ? item.url.startsWith("http")
           ? item.url
-          : `${SITE_URL}${item.url}`
+          : absoluteUrl(item.url)
         : undefined,
     })),
   });
@@ -135,9 +138,9 @@ export function buildCountry(input: CountryNodeInput): JsonLdNode | null {
   return stripUndefined({
     "@context": "https://schema.org",
     "@type": "Country",
-    "@id": `${SITE_URL}${input.path}#country`,
+    "@id": absoluteUrl(`${input.path}#country`),
     name: input.name,
-    url: `${SITE_URL}${input.path}`,
+    url: absoluteUrl(input.path),
     sameAs: [`https://www.wikidata.org/wiki/${input.wikidataQid}`],
   });
 }
