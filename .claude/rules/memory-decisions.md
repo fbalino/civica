@@ -648,3 +648,15 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The whole-source validator must retain seeded positive and negative scanner
   controls so a broken detection rule cannot silently declare the repository
   clean. Durable record: APR-D042 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Schema dictionaries combine introspection with reviewed meaning
+
+- `data/schema-data-dictionary.v1.json` is the current full-schema field map.
+- Drizzle supplies structural facts; `src/lib/data-dictionary/registry.ts`
+  supplies reviewed row grain, release scope, provenance, cadence, vintage,
+  rights, and deprecation policy.
+- Document internal/private tables as well as released tables so release scope
+  remains explicit. Never infer that a documented table is publicly releasable.
+- SQL null still collapses absence states in parts of the schema; keep that
+  limitation visible until DAT-015 changes storage and APIs. Durable record:
+  APR-D043 in `plan/DECISIONS.md`.

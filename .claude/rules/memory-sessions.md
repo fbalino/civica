@@ -218,3 +218,15 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   against three seeded forbidden writes and three safe controls.
 - No public UI changed; DAT-008 therefore required code/build evidence rather
   than browser screenshots.
+
+## 2026-07-10 — DAT-009 full-schema data dictionary
+
+- Added a deterministic dictionary for all 49 tables and 558 columns, with
+  explicit release scopes for public, Beta, support, internal, and private data.
+- Combined Drizzle introspection with a reviewed semantic registry; the build
+  now fails when schema or policy changes are not reflected in the checked
+  artifact.
+- Fixed composite-index reporting during review so a column in a multi-column
+  unique key is not labeled individually unique.
+- Six focused fixtures, TypeScript, targeted ESLint, 425 tests, and the full
+  production build passed. No rendered UI changed.

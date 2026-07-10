@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-008_complete_next_DAT-009"
+    "current_task": "DAT-009_complete_next_DAT-010"
   },
   "budget": {
     "mode": "subscription_only",
@@ -609,6 +609,9 @@
     "plan/evidence/DAT-007/README.md",
     "plan/evidence/DAT-007/browser-checks.md",
     "plan/evidence/DAT-008/README.md",
+    "plan/evidence/DAT-009/README.md",
+    "data/schema-data-dictionary.v1.json",
+    "data/SCHEMA-DATA-DICTIONARY.md",
     "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
@@ -625,11 +628,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for DAT-008: the self-testing whole-source freshness validator, all claims/documentation children, 419 tests, compilation, TypeScript, static generation, and route generation succeeded.",
-    "tests": "419/419 tests passed. Eleven focused freshness fixtures cover dry, zero-row, invalid-count, blank-ID, successful single/multi-source, invalid-time, and executor-failure behavior; scanner controls catch three forbidden writes and accept three safe cases. Master plan validates at 27/288 complete (9.4%).",
-    "public_claims": "Source freshness is now mechanically limited to successful positive-row writes through markSourcesSynced(); no public copy or route changed.",
-    "browser": "Not applicable for DAT-008 because the task changes a database helper, tests, and a build-time repository scanner without changing rendered UI.",
+    "build": "npm run build passed for DAT-009: the full-schema dictionary validator ran in the production gate, all claims/documentation children passed, 425 tests passed, and compilation, TypeScript, static generation, and route generation succeeded.",
+    "tests": "425/425 tests passed. Six focused dictionary fixtures cover schema closure, required field metadata, composite unique keys, legacy status, temporal semantics, and checked-artifact drift. Master plan validates at 28/288 complete (9.7%).",
+    "public_claims": "schema-data-dictionary/v1 documents all 49 tables and 558 columns while explicitly separating Atlas, research-Beta, support, internal, and private scopes.",
+    "browser": "Not applicable for DAT-009 because it adds a checked research artifact and CI contract without changing rendered UI.",
     "visual_review": "No rendered UI or design-system behavior changed."
   },
-  "updated_at": "2026-07-11T02:05:00Z"
+  "updated_at": "2026-07-11T02:40:00Z"
 }
