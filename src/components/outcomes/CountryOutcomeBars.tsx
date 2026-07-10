@@ -76,19 +76,14 @@ export interface CountryOutcomeBarsProps {
   showTrend?: boolean;
 }
 
-// ─── Tier classification ────────────────────────────────────────────────────
+// ─── Neutral peer position ──────────────────────────────────────────────────
 
-type Tier = "exceptional" | "strong" | "mixed" | "weak" | "failed";
-
-interface TierVerdict {
-  tier: Tier;
+interface PeerPosition {
   label: string;
-  /** "TOP QUARTILE", "BOTTOM QUARTILE", "ABOVE PEER MEDIAN", "BELOW PEER MEDIAN" */
-  shortLabel: string;
 }
 
 /**
- * Compute a tier verdict for a country on a given metric.
+ * Describe a country's relative location for a given metric.
  *
  * Preferred path: rank-based percentile (rank / totalRanked). Rank is
  * stored 1-best in `country_metrics` regardless of higherIsBetter — the
@@ -100,21 +95,21 @@ interface TierVerdict {
  *
  * Direction is honoured throughout: for `higherIsBetter: false` metrics
  * (e.g. child mortality), a value below the peer median earns the
- * top-tier verdict.
+ * upper peer position.
  */
-function classifyTier(m: MetricRow): TierVerdict | null {
+function classifyPeerPosition(m: MetricRow): PeerPosition | null {
   if (!m.peer) return null;
 
   // Rank-based path (preferred — covers most CI / outcome metrics).
   if (m.rank && m.totalRanked && m.totalRanked > 0) {
     const pct = m.rank / m.totalRanked; // 0..1, lower is better
     if (pct <= 0.25)
-      return { tier: "exceptional", label: "Exceptional", shortLabel: "Top quartile" };
+      return { label: "Top quartile" };
     if (pct <= 0.5)
-      return { tier: "strong", label: "Strong", shortLabel: "Above peer median" };
+      return { label: "Above peer median" };
     if (pct <= 0.75)
-      return { tier: "mixed", label: "Mixed", shortLabel: "Below peer median" };
-    return { tier: "failed", label: "Bottom quartile", shortLabel: "Bottom quartile" };
+      return { label: "Below peer median" };
+    return { label: "Bottom quartile" };
   }
 
   // Value-based fallback (when rank is null, e.g. only a peer-group of <5).
@@ -132,14 +127,14 @@ function classifyTier(m: MetricRow): TierVerdict | null {
   if (isBetter) {
     const beyondGoodHalf = m.higherIsBetter ? v >= goodHalf : v <= goodHalf;
     return beyondGoodHalf
-      ? { tier: "exceptional", label: "Exceptional", shortLabel: "Top quartile" }
-      : { tier: "strong", label: "Strong", shortLabel: "Above peer median" };
+      ? { label: "Top quartile" }
+      : { label: "Above peer median" };
   }
 
   const beyondBadHalf = m.higherIsBetter ? v <= badHalf : v >= badHalf;
   return beyondBadHalf
-    ? { tier: "failed", label: "Bottom quartile", shortLabel: "Bottom quartile" }
-    : { tier: "mixed", label: "Mixed", shortLabel: "Below peer median" };
+    ? { label: "Bottom quartile" }
+    : { label: "Below peer median" };
 }
 
 // ─── Category grouping ──────────────────────────────────────────────────────
@@ -357,7 +352,7 @@ interface MetricBarRowProps {
 function MetricBarRow({ metric: m, govType, showTrend }: MetricBarRowProps) {
   const noData = m.peer === null;
   const pos = m.peer ? computePositions(m.value, m.peer) : null;
-  const tier = classifyTier(m);
+  const peerPosition = classifyPeerPosition(m);
   const dek = noData
     ? "Not reported for this country in any source we have loaded."
     : generateDek(m, govType);
@@ -366,8 +361,8 @@ function MetricBarRow({ metric: m, govType, showTrend }: MetricBarRowProps) {
   // when peer comparison is "vs same-government-type peers".
   const govAccent = govType ? classifyGovernment(govType).color : null;
 
-  // Compose the inline CSS variable bag the row uses for positioning,
-  // tier colour, and the gov-accent stripe. The CSS module reads these.
+  // Compose the inline CSS variable bag the row uses for positioning and the
+  // government-type accent stripe. Score position itself stays neutral.
   const chartStyle: React.CSSProperties = pos
     ? {
         "--peer-lo": `${pos.peerLoPct.toFixed(2)}%`,
@@ -387,9 +382,6 @@ function MetricBarRow({ metric: m, govType, showTrend }: MetricBarRowProps) {
       } as React.CSSProperties);
 
   const rowStyle: React.CSSProperties = {
-    ...(tier
-      ? ({ "--tier-color": `var(--tier-${tier.tier})` } as React.CSSProperties)
-      : {}),
     ...(govAccent
       ? ({ "--gov-accent": govAccent } as React.CSSProperties)
       : {}),
@@ -407,7 +399,6 @@ function MetricBarRow({ metric: m, govType, showTrend }: MetricBarRowProps) {
     styles.cob__row,
     noData ? styles["cob__row--no-data"] : "",
     govAccent ? styles["cob__row--gov-accent"] : "",
-    tier ? styles[`cob__row--tier-${tier.tier}`] : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -447,16 +438,16 @@ function MetricBarRow({ metric: m, govType, showTrend }: MetricBarRowProps) {
           )}
           {noData ? (
             <span className={styles.cob__rank}>No data</span>
-          ) : tier ? (
+          ) : peerPosition ? (
             <Tooltip
-              content={`${tier.label}${
+              content={`${peerPosition.label}${
                 m.rank && m.totalRanked
                   ? ` · ranked ${m.rank} of ${m.totalRanked} peers`
                   : ""
               }`}
             >
               <span className={styles.cob__verdict}>
-                <span className={styles.cob__verdictLabel}>{tier.shortLabel}</span>
+                <span className={styles.cob__verdictLabel}>{peerPosition.label}</span>
                 {m.rank && m.totalRanked && (
                   <>
                     <span className={styles.cob__verdictSep}>·</span>

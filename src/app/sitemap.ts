@@ -38,7 +38,6 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/civica-index/methodology", changeFrequency: "monthly", priority: 0.7 },
   { path: "/civica-index/methodology/pca-appendix", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/methodology/peer-grouping", changeFrequency: "monthly", priority: 0.6 },
-  { path: "/civica-index/methodology/peer-grouping/migration", changeFrequency: "monthly", priority: 0.4 },
   { path: "/civica-index/methodology/pulse", changeFrequency: "monthly", priority: 0.6 },
   { path: "/civica-index/methodology/pulse/backtest", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/pulse-changelog", changeFrequency: "monthly", priority: 0.7 },

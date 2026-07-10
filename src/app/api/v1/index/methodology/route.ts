@@ -1,5 +1,17 @@
 import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
-import { getCIMethodology, getCIMethodologyHistory } from "@/lib/db/queries";
+import { getCIMethodology } from "@/lib/db/queries";
+
+function publicMethodologyRecord<T extends { id: string; notes: string | null }>(
+  row: T,
+) {
+  return {
+    ...row,
+    notes:
+      row.id === "beta"
+        ? "Research-beta composite under active validation. Numeric estimates are secondary experimental outputs and are not categorical country grades."
+        : "Archived methodology version retained for reproducibility; consult the current methodology for public interpretation guidance.",
+  };
+}
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
@@ -8,19 +20,15 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const versionId = url.searchParams.get("version") ?? undefined;
-    const history = url.searchParams.get("history") === "true";
-
-    if (history) {
-      const versions = await getCIMethodologyHistory();
-      return apiResponse({ data: versions, meta: { methodology: CI_METHODOLOGY_META } });
-    }
-
     const methodology = await getCIMethodology(versionId);
     if (!methodology) {
       return apiError("Methodology not found", 404);
     }
 
-    return apiResponse({ data: methodology, meta: { methodology: CI_METHODOLOGY_META } });
+    return apiResponse({
+      data: publicMethodologyRecord(methodology),
+      meta: { methodology: CI_METHODOLOGY_META },
+    });
   } catch (e) {
     console.error("API /v1/index/methodology error:", e);
     return apiError("Internal server error", 500);

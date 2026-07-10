@@ -29,17 +29,16 @@ import type { NextResponse } from "next/server";
  * instant returns the v1.0 hard-cut behavior.
  *
  * Used by API HTTP `Sunset:` headers. Reader pages prefer
- * `STRUCTURAL_FAMILY_SUNSET_DATE_ISO` below for prose.
+ * `STRUCTURAL_FAMILY_SUNSET_DATE_ISO` below for response metadata.
  */
 export const STRUCTURAL_FAMILY_SUNSET_DATE =
   "Wed, 31 Mar 2027 23:59:59 GMT" as const;
 
 /**
  * Sunset date in ISO-8601 calendar form (`YYYY-MM-DD`). Same date
- * as `STRUCTURAL_FAMILY_SUNSET_DATE`, formatted for reader-page
- * prose (peer-grouping methodology page, migration page) and API
- * response-body `meta.deprecations.sunset` blocks where the
- * HTTP-date format would read as machine-noise to a human.
+ * as `STRUCTURAL_FAMILY_SUNSET_DATE`, formatted for API response-body
+ * `meta.deprecations.sunset` blocks where the HTTP-date format would
+ * read as machine-noise to a human.
  *
  * Update both constants together if the sunset date ever moves
  * (which it shouldn't — the user-locked decision is calendar-
@@ -89,13 +88,9 @@ export const STRUCTURAL_FAMILY_DEPRECATION_META = Object.freeze({
         "government_form_description",
       ],
       reason:
-        "The `structural_family` taxonomy was a regex-derived heuristic. " +
-        "The 2026-05-02 peer-grouping resolution replaced it with " +
-        "domain-specific peer lenses sourced from World Bank and V-Dem. " +
+        "Use domain-specific peer lenses sourced from World Bank and V-Dem. " +
         "See https://civicaatlas.org/civica-index/methodology/peer-grouping " +
-        "for the methodology and the per-country migration table.",
-      migrationTable:
-        "/civica-index/methodology/peer-grouping/migration",
+        "for the methodology.",
     }),
   ],
 });

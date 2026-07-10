@@ -6,8 +6,7 @@
  * endpoint continues to serve the legacy shape with `Deprecation`,
  * `Sunset`, and `Link: rel="successor-version"` headers. The
  * successor is `/api/v1/peer-groupings` — see
- * /civica-index/methodology/peer-grouping for the methodology and
- * the per-country migration table.
+ * /civica-index/methodology/peer-grouping for the methodology.
  *
  * Files:
  *   Helper:  src/lib/api/deprecation.ts

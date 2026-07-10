@@ -119,44 +119,12 @@
   margin: 32px 0 14px;
 }
 
-.ci-tier-legend {
-  display: flex; gap: 0; margin: 0 0 24px;
-  border: 1px solid var(--color-card-border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+.ci-score-policy {
+  display: grid;
+  gap: var(--space-4);
 }
-.ci-tier-cell {
-  flex: 1; min-width: 0; padding: 12px 14px;
-  background: var(--color-card-bg);
-  border-right: 1px solid var(--color-card-border);
-}
-.ci-tier-cell:last-child { border-right: none; }
-@container (max-width: 800px) {
-  .ci-tier-legend { flex-direction: column; }
-  .ci-tier-cell {
-    border-right: none;
-    border-bottom: 1px solid var(--color-card-border);
-  }
-  .ci-tier-cell:last-child { border-bottom: none; }
-}
-.ci-tier-cell-range {
-  font-family: var(--font-body);
-  font-weight: var(--font-weight-medium);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wider);
-  color: var(--color-text-60);
-  display: flex; align-items: center; gap: 6px;
-  margin-bottom: 4px;
-  font-variant-numeric: tabular-nums;
-}
-.ci-tier-cell-label {
-  font-family: var(--font-heading);
-  font-size: var(--text-15);
-  color: var(--color-text-primary);
-}
-.ci-tier-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  display: inline-block;
+.ci-score-policy-position {
+  padding: var(--space-4) 0 var(--space-6);
 }
 
 .ci-controls {
@@ -272,7 +240,7 @@
   background: var(--color-grid-cell);
   padding: 12px 20px;
   display: grid;
-  grid-template-columns: 56px minmax(0, 2.2fr) 120px 140px 100px;
+  grid-template-columns: 56px minmax(0, 2.2fr) 180px 100px;
   gap: 16px; align-items: center;
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
@@ -286,7 +254,7 @@
   background: var(--color-grid-cell);
   padding: 14px 20px;
   display: grid;
-  grid-template-columns: 56px minmax(0, 2.2fr) 120px 140px 100px;
+  grid-template-columns: 56px minmax(0, 2.2fr) 180px 100px;
   gap: 16px; align-items: center;
   text-decoration: none;
   color: inherit;
@@ -294,18 +262,6 @@
   cursor: pointer;
 }
 .ci-lb-row:hover { background: var(--color-grid-cell-hover); }
-.ci-lb-row::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 2px;
-  width: var(--ci-lb-bar, 0%);
-  background-color: var(--ci-lb-bar-color, transparent);
-  opacity: 0.55;
-  pointer-events: none;
-  transition: width .2s ease;
-}
 .ci-lb-rank {
   font-family: var(--font-heading);
   font-weight: 400;
@@ -314,7 +270,6 @@
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
-.ci-lb-rank--top3 { color: var(--color-accent); }
 .ci-lb-country {
   display: flex; flex-direction: column; gap: 4px; min-width: 0;
 }
@@ -351,7 +306,15 @@
 .gov-oth  { background: color-mix(in oklab, var(--gov-other) 15%, transparent); color: var(--gov-other); }
 
 .ci-lb-score {
-  display: flex; align-items: baseline; gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.ci-lb-score-main {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
 }
 .ci-lb-score-value {
   font-family: var(--font-heading);
@@ -368,13 +331,6 @@
   color: var(--color-text-40);
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
-}
-.ci-lb-tier {
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono);
-  font-size: var(--text-12);
-  letter-spacing: var(--tracking-wider);
-  text-transform: uppercase;
 }
 .ci-lb-dims {
   font-family: var(--font-mono);
@@ -434,7 +390,7 @@
 /* Responsive */
 @media (max-width: 900px) {
   .ci-lb-header, .ci-lb-row {
-    grid-template-columns: 40px minmax(0, 2fr) 110px 100px;
+    grid-template-columns: 40px minmax(0, 2fr) 160px;
   }
   .ci-lb-header > *:nth-child(4),
   .ci-lb-row > *:nth-child(4) { display: none; }
@@ -442,20 +398,12 @@
   .ci-hero-title { font-size: var(--text-32); }
   .ci-stats-strip { gap: 20px; }
   .ci-stat-value { font-size: var(--text-20); }
-  .ci-tier-legend { flex-direction: column; }
-  .ci-tier-cell {
-    border-right: none;
-    border-bottom: 1px solid var(--color-card-border);
-  }
-  .ci-tier-cell:last-child { border-bottom: none; }
 }
 @media (max-width: 640px) {
   .ci-lb-header, .ci-lb-row {
     grid-template-columns: 32px 1fr 90px;
     padding: 12px 14px;
   }
-  .ci-lb-header > *:nth-child(5),
-  .ci-lb-row > *:nth-child(5) { display: none; }
   .ci-lb-country-name { font-size: var(--text-16); }
   .ci-lb-score-value { font-size: var(--text-20); }
   .ci-controls { flex-direction: column; }

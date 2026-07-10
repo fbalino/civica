@@ -32,8 +32,6 @@ export interface FactbookAlmanacCountry {
   incomeGroup?: string | null;
   /** Phase F V-Dem Regimes of the World — canonical human-readable string. */
   regimeType?: string | null;
-  /** Civica Index tier key (exceptional/strong/mixed/weak/failed) or null. */
-  ciTier?: string | null;
 }
 
 /* ── Region model ──────────────────────────────────────────────────────
@@ -116,13 +114,11 @@ const FILTER_PARAM: Record<FilterCategory, string> = {
   region: "f_region",
   income: "f_income",
   regime: "f_regime",
-  tier: "f_tier",
 };
 const FILTER_CATEGORIES: FilterCategory[] = [
   "region",
   "income",
   "regime",
-  "tier",
 ];
 
 /** Parse repeated `?region=` params into a Set (empty = all regions). */
@@ -142,7 +138,6 @@ function filtersFromParams(params: URLSearchParams): FilterState {
     region: new Set(params.getAll(FILTER_PARAM.region)),
     income: new Set(params.getAll(FILTER_PARAM.income)),
     regime: new Set(params.getAll(FILTER_PARAM.regime)),
-    tier: new Set(params.getAll(FILTER_PARAM.tier)),
   };
   return next;
 }
@@ -236,7 +231,6 @@ export function FactbookAlmanac({
           region: c.region ?? null,
           incomeGroup: c.incomeGroup ?? null,
           regimeType: c.regimeType ?? null,
-          ciTier: c.ciTier ?? null,
         },
         filters,
       ),

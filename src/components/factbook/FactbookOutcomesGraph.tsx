@@ -6,15 +6,15 @@ import { SourceDot } from "@/components/SourceDot";
  *
  * One row per indicator. Each row is ~44px tall and reads left-to-right:
  *
- *   Indicator label · range bar with peer-median tick + country dot · value · rank · tier dot
+ *   Indicator label · range bar with peer-median tick + country dot · value · rank · peer position
  *
  * The whole section fits ~10 indicators in the same vertical space the
  * legacy `<CountryOutcomeBars>` used for 2 — the user explicitly asked
  * for the dense graph, NOT a polish of the editorial bars.
  *
- * Tier is computed from `rank / totalRanked` percentile, direction-aware
- * via `higher_is_better`. Top quartile → olive; bottom → brick. The dot
- * fill + halo + (optional) tier chip all key off the same tier color.
+ * Peer position is computed from `rank / totalRanked` percentile,
+ * direction-aware via `higher_is_better`. It is a relative location label,
+ * not a qualitative country verdict; every marker uses neutral blue.
  *
  * Returns `null` when the country has no metrics so the parent hides
  * the entire section.
@@ -47,66 +47,54 @@ interface PeerBand {
   peerMax: number;
 }
 
-type Tier = "exceptional" | "strong" | "mixed" | "weak" | "failed";
-
-function tierFromRank(rank: number, total: number): Tier {
+function positionFromRank(rank: number, total: number): string {
   const pct = rank / total;
-  if (pct <= 0.1) return "exceptional";
-  if (pct <= 0.33) return "strong";
-  if (pct <= 0.5) return "mixed";
-  if (pct <= 0.75) return "weak";
-  return "failed";
+  if (pct <= 0.1) return "Top 10%";
+  if (pct <= 0.33) return "Above median";
+  if (pct <= 0.5) return "Upper middle";
+  if (pct <= 0.75) return "Below median";
+  return "Bottom quartile";
 }
 
-// Fallback tier derivation when `rank` is null in the DB. Uses the
+// Fallback position derivation when `rank` is null in the DB. Uses the
 // country's value position within the peer band (peerMin → peerMax)
 // adjusted for direction.
-function tierFromValue(
+function positionFromValue(
   value: number,
   peer: PeerBand,
   higherIsBetter: boolean
-): Tier {
+): string {
   const range = peer.peerMax - peer.peerMin;
-  if (range <= 0) return "mixed";
+  if (range <= 0) return "Midpoint";
   let pct = (value - peer.peerMin) / range;
   // For "lower is better" metrics (e.g. unemployment, child mortality),
   // invert so a low value reads as top-quartile.
   if (!higherIsBetter) pct = 1 - pct;
-  if (pct >= 0.9) return "exceptional";
-  if (pct >= 0.66) return "strong";
-  if (pct >= 0.5) return "mixed";
-  if (pct >= 0.25) return "weak";
-  return "failed";
+  if (pct >= 0.9) return "Top 10%";
+  if (pct >= 0.66) return "Above median";
+  if (pct >= 0.5) return "Upper middle";
+  if (pct >= 0.25) return "Below median";
+  return "Bottom quartile";
 }
 
-function tierOf(
+function peerPositionOf(
   rank: number | null,
   total: number | null,
   value: number,
   peer: PeerBand | undefined,
   higherIsBetter: boolean
-): Tier | null {
+): string | null {
   if (rank != null && total != null && total > 0) {
-    return tierFromRank(rank, total);
+    return positionFromRank(rank, total);
   }
   // Degenerate peer bands (peerCount ≤ 1, e.g. a country with a unique
   // govType like USA's "constitutional_federal_republic") collapse to a
   // single point — comparison is meaningless. Fall through to null so
-  // the row renders without a tier chip.
+  // the row renders without a peer-position label.
   if (peer && peer.peerCount > 1 && peer.peerMax > peer.peerMin) {
-    return tierFromValue(value, peer, higherIsBetter);
+    return positionFromValue(value, peer, higherIsBetter);
   }
   return null;
-}
-
-function tierLabel(t: Tier): string {
-  switch (t) {
-    case "exceptional": return "Top 10%";
-    case "strong":      return "Above median";
-    case "mixed":       return "Mid";
-    case "weak":        return "Below median";
-    case "failed":      return "Bottom quartile";
-  }
 }
 
 // Format a metric value with sensible precision per scale + unit.
@@ -165,7 +153,7 @@ export async function FactbookOutcomesGraph({
     (peerBandsRaw ?? []).map((p) => [p.metricId, p])
   );
 
-  // Stable sort: by category, then by tier (worst first within category
+  // Stable sort: by category, then by relative rank (lowest position first within category
   // — surfaces the most actionable indicators at the top of each group).
   const metrics = [...metricsRaw].sort((a, b) => {
     const ca = (a.category ?? "").toLowerCase();
@@ -183,11 +171,17 @@ export async function FactbookOutcomesGraph({
         <span>Peer range</span>
         <span>Value</span>
         <span>Rank</span>
-        <span>Tier</span>
+        <span>Position</span>
       </div>
       {metrics.map((m) => {
         const peer = peerMap.get(m.metricId);
-        const tier = tierOf(m.rank, m.totalRanked, m.value, peer, m.higherIsBetter);
+        const peerPosition = peerPositionOf(
+          m.rank,
+          m.totalRanked,
+          m.value,
+          peer,
+          m.higherIsBetter,
+        );
         // Only render the band + dot when there's a real spread to plot
         // against (more than one peer with non-zero range). Otherwise
         // the cell shows just the country's own value with no false
@@ -200,13 +194,10 @@ export async function FactbookOutcomesGraph({
         const medianPct = hasUsefulBand
           ? dotPercent(peer.peerMedian, peer.peerMin, peer.peerMax)
           : null;
-        const tierVar = tier ? `var(--tier-${tier})` : "var(--color-text-40)";
-
         return (
           <div
             key={m.metricId}
             className="factbook-outcomes-row"
-            style={{ ["--tier-color" as string]: tierVar }}
           >
             <div className="factbook-outcomes-label">
               <span className="factbook-outcomes-name">{m.name}</span>
@@ -254,8 +245,8 @@ export async function FactbookOutcomesGraph({
                 : "—"}
             </div>
 
-            <div className="factbook-outcomes-tier" aria-hidden={tier == null}>
-              {tier ? tierLabel(tier) : ""}
+            <div className="factbook-outcomes-position" aria-hidden={peerPosition == null}>
+              {peerPosition ?? ""}
               <SourceDot source="3rd-party indicator" retrievedAt={null} />
             </div>
           </div>

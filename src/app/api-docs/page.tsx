@@ -30,7 +30,6 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "country-detail", label: "Country detail" },
   { id: "government-types", label: "Government types" },
   { id: "peer-groupings", label: "Peer groupings" },
-  { id: "peer-groupings-migration", label: "Migration table" },
   { id: "index-rankings", label: "Index rankings" },
   { id: "index-country", label: "Index country" },
   { id: "index-compare", label: "Index compare" },
@@ -360,7 +359,7 @@ export default function ApiDocsPage() {
           id="government-types"
           method="GET"
           path="/api/v1/government-types"
-          description="DEPRECATED — sunsets 2027-03-31. Returns government types under the retired structural_family heuristic. Successor: /api/v1/peer-groupings (single endpoint returning all four peer-grouping lenses)."
+          description="Deprecated; scheduled for removal on 2027-03-31. Use /api/v1/peer-groupings for current domain-specific peer-lens metadata."
           exampleResponse={`{
   "data": [
     {
@@ -383,8 +382,7 @@ export default function ApiDocsPage() {
           "vdem_row",
           "monarchy_status",
           "government_form_description"
-        ],
-        "migrationTable": "/civica-index/methodology/peer-grouping/migration"
+        ]
       }
     ]
   }
@@ -395,7 +393,7 @@ export default function ApiDocsPage() {
           id="peer-groupings"
           method="GET"
           path="/api/v1/peer-groupings"
-          description="Civica's peer-grouping successor endpoint. Returns the four peer-grouping lenses (World Bank region, World Bank income group, V-Dem RoW, BR/CGV regime) plus monarchy_status as descriptive metadata, in a single response. See https://civicaatlas.org/civica-index/methodology/peer-grouping for the underlying methodology."
+          description="Returns four domain-specific peer-grouping lenses (World Bank region, World Bank income group, V-Dem RoW, and BR/CGV regime) plus monarchy_status as descriptive metadata. See https://civicaatlas.org/civica-index/methodology/peer-grouping for the methodology."
           exampleResponse={`{
   "data": {
     "world_bank_region": {
@@ -423,49 +421,8 @@ export default function ApiDocsPage() {
     "peerGrouping": {
       "status": "stable",
       "version": "v1.0",
-      "adopted": "2026-05-02",
-      "methodology": "https://civicaatlas.org/civica-index/methodology/peer-grouping",
-      "migrationTable": "/civica-index/methodology/peer-grouping/migration",
-      "replaces": "structural_family (sunset 2027-03-31)"
-    }
-  }
-}`}
-        />
-
-        <EndpointSection
-          id="peer-groupings-migration"
-          method="GET"
-          path="/api/v1/peer-groupings/migration"
-          description="Per-country migration table — bulk-rewrite source for replication scripts that join on the retired structural_family column. Returns one row per sovereign state with both the deprecated values and their peer-lens replacements. Same data the reader-facing /civica-index/methodology/peer-grouping/migration page renders."
-          exampleResponse={`{
-  "data": [
-    {
-      "slug": "united-states",
-      "name": "United States",
-      "iso2": "US",
-      "iso3": "USA",
-      "structuralFamily": "presidential_republic",
-      "structuralSubtype": "federal_presidential_republic",
-      "worldBankRegion": "North America",
-      "worldBankIncomeGroup": "High income",
-      "vdemRow": "Liberal Democracy",
-      "cgvRegime": "presidential_democracy",
-      "monarchyStatus": "none",
-      "governmentFormDescription": "constitutional federal republic"
-    }
-  ],
-  "meta": {
-    "total": 195,
-    "schema": {
-      "deprecated": ["structuralFamily", "structuralSubtype"],
-      "replacement": [
-        "worldBankRegion",
-        "worldBankIncomeGroup",
-        "vdemRow",
-        "cgvRegime",
-        "monarchyStatus",
-        "governmentFormDescription"
-      ]
+      "versionDate": "2026-05-02",
+      "methodology": "https://civicaatlas.org/civica-index/methodology/peer-grouping"
     }
   }
 }`}
@@ -503,7 +460,6 @@ export default function ApiDocsPage() {
     {
       "rank": 1,
       "score": 91.4,
-      "band": "A",
       "vintageLabel": "Civica Index 2026 Q1 (Beta)",
       "slug": "norway",
       "name": "Norway",
@@ -524,7 +480,7 @@ export default function ApiDocsPage() {
           id="index-country"
           method="GET"
           path="/api/v1/index/:country_slug"
-          description="Returns the latest research-beta Civica Index composite, Monte Carlo input-variation range, rank, completeness fields, and available dimension rows for one country."
+          description="Returns the latest research-beta Civica Index composite, Monte Carlo input-variation range, rank, completeness fields, and available dimension rows for one country. The API does not publish categorical country grades."
           parameters={[
             {
               name: ":country_slug",
@@ -547,7 +503,6 @@ export default function ApiDocsPage() {
     "score": 83.2,
     "scoreLower": 79.1,
     "scoreUpper": 86.4,
-    "band": "B",
     "completenessFlag": "full",
     "rank": 18,
     "totalRanked": 167,
@@ -599,7 +554,6 @@ export default function ApiDocsPage() {
         "score": 83.2,
         "scoreLower": 79.1,
         "scoreUpper": 86.4,
-        "band": "B",
         "completenessFlag": "full",
         "rank": 18,
         "totalRanked": 167,
@@ -704,8 +658,7 @@ export default function ApiDocsPage() {
         <h3 className="api-example-heading">curl</h3>
         <CodeBlock>{`curl "${BASE_URL}/countries?continent=Europe&limit=10"
 curl "${BASE_URL}/countries/us"
-curl "${BASE_URL}/peer-groupings"            # successor (preferred)
-curl "${BASE_URL}/peer-groupings/migration"  # per-country migration
+curl "${BASE_URL}/peer-groupings"            # peer-lens metadata
 curl "${BASE_URL}/government-types"          # DEPRECATED — sunsets 2027-03-31`}</CodeBlock>
 
         <h3 className="api-example-heading">JavaScript (fetch)</h3>

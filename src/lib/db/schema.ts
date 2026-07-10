@@ -1184,9 +1184,13 @@ export const ciCompositeScores = pgTable(
      *
      * `score_lower` and `score_upper` are the 5th and 95th percentile
      * of the Monte Carlo simulation (10,000 sims) per spec §2.5,
-     * giving a 90% confidence interval. NULL on legacy v1.0 rows.
+     * giving a central 90% input-variation range. It is a sensitivity
+     * simulation, not a calibrated statistical confidence interval. NULL on
+     * legacy v1.0 rows.
      *
-     * `band` is the A–F rank band per spec §2.6. Derived from `score`.
+     * `band` is a deprecated historical presentation field, retired
+     * 2026-07-09. Existing values are retained for private audit/replay only;
+     * current writers set NULL and public readers must never expose it.
      *
      * `completeness_flag` is the explicit successor to `is_partial`.
      * Possible values: 'full' | 'partial' | 'insufficient'. The Beta

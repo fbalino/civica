@@ -8,9 +8,8 @@
     - H1, page-meta line, beta warning callout, abstract pull-quote
     - Section 2 (Dimensions): bespoke weights-bar visualization +
       dimensions-summary table (rendered from civicaIndex.dimensions)
-    - Section 6 (Rank bands): bespoke band-scale visualization
-    - Section 14 (Versioning): version-strip metadata grid +
-      DB-driven revision history (getCIMethodologyHistory()) + cite
+    - Section 6 (Presentation policy): neutral score-position example
+    - Section 14 (Versioning): version-strip metadata grid + cite
     - footer-nav
 
   THIS file carries sections 1, 3, 4, 5, 7-13 (Scale, Normalization,
@@ -34,7 +33,7 @@
 Every Civica Index score is an integer between 0 and 100. Higher means stronger governance institutions. Every published score is accompanied by:
 
 - **A Monte Carlo input-variation range** — e.g. "central 90% of simulations: 68–76". This is a sensitivity summary under the current perturbation assumptions. It is not a confidence interval for a latent "true" country score.
-- **A rank band** — A through F, see §6. The band is the primary presentation; the integer is for researchers and API consumers who want it.
+- **A neutral numeric position** — the estimate is plotted on a 0–100 line without a letter grade or qualitative country verdict. See §6.
 - **A vintage / freshness timestamp** per underlying source. So you can see, for any score, exactly how recent each upstream dataset is.
 - **A completeness flag** — Full, Partial, or Insufficient. See §7.
 
@@ -103,7 +102,7 @@ Civica publishes these as the **Civica Conditions** companion layer at [/civica-
 | Peace & Security | Institute for Economics and Peace, Global Peace Index |
 | Economic Stability | World Bank composite (inflation, unemployment, GDP growth) |
 
-The contrast between CI and Conditions is itself informative. A poor, well-governed democracy like Botswana shows a strong CI alongside moderate Conditions. A wealthy autocracy like the UAE shows the inverse. Reading the two together tells a fuller story than either could alone.
+The contrast between CI and Conditions is itself informative. A country can have a higher numeric governance estimate alongside lower material-condition estimates, or the inverse. Reading the source dimensions together tells a fuller story than any single composite can.
 
 ## Section 9 · Government type {#gov-type}
 
@@ -111,7 +110,7 @@ Government type is descriptive metadata, not a scoring signal. It does not enter
 
 Empirical observation about how governance scores vary by government type is published as a separate analysis at [/civica-index/government-types](/civica-index/government-types) — average CI per type, distribution spread, twenty-year trajectories. The data is presented as observation, never as ranking.
 
-How Civica chooses peer sets for ranking comparisons — different lenses for material vs governance vs descriptive comparisons — is documented in [the peer-grouping methodology page](/civica-index/methodology/peer-grouping). That page replaces the retired `structural_family` heuristic per the 2026-05-02 peer-grouping resolution.
+How Civica chooses peer sets for ranking comparisons — different lenses for material, governance, and descriptive comparisons — is documented in the [peer-grouping methodology](/civica-index/methodology/peer-grouping).
 
 ## Section 10 · Civica Pulse (Beta) {#pulse}
 

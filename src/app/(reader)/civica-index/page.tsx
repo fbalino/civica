@@ -21,13 +21,14 @@ import {
 import { loadAtlasData } from "@/lib/atlas/load-atlas-data";
 import { CivicaIndexFilterBar } from "@/components/civica-index/CivicaIndexFilterBar";
 import { CountryFlag } from "@/components/CountryFlag";
-import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
 import { civicaIndex } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildDataset } from "@/lib/seo/jsonld";
 import { BetaChip } from "@/components/editorial/BetaChip";
+import { Banner } from "@/components/editorial/Banner";
+import { ScorePosition } from "@/components/editorial/ScorePosition";
 import { PageHero } from "@/components/PageHero";
 
 export const revalidate = 3600;
@@ -128,7 +129,6 @@ interface CIRankingRow {
   score: number;
   scoreLower: number | null;
   scoreUpper: number | null;
-  band: string | null;
   completenessFlag: string | null;
   vintageLabel: string | null;
   rank: number;
@@ -291,7 +291,8 @@ export default async function CivicaIndexPage({
             A secondary research experiment across {civicaIndex.dimensionCount}{" "}
             governance dimensions, with fixed-bound normalization and Monte
             Carlo input-variation ranges. It has not completed independent
-            review and may change or be retired after validation.
+            review; its construction, weights, and interpretation remain
+            subject to validation.
           </>
         }
         engraving={{
@@ -329,8 +330,8 @@ export default async function CivicaIndexPage({
               <div className="ci-stat-label">Dimensions</div>
             </div>
             <div className="ci-stat">
-              <div className="ci-stat-value">A–F</div>
-              <div className="ci-stat-label">Rank bands</div>
+              <div className="ci-stat-value">0–100</div>
+              <div className="ci-stat-label">Numeric estimate</div>
             </div>
             <div className="ci-stat">
               <div className="ci-stat-value">{currentVintage}</div>
@@ -339,22 +340,18 @@ export default async function CivicaIndexPage({
           </div>
         </section>
 
-        <section>
-          <div className="ci-section-eyebrow">The scale — 0 to 100</div>
-          <div
-            className="ci-tier-legend"
-            role="list"
-            aria-label="Score interpretation tiers"
-          >
-            {CI_TIER_LEGEND.map((t) => (
-              <div key={t.key} className="ci-tier-cell" role="listitem">
-                <div className="ci-tier-cell-range">
-                  <span className={`ci-tier-dot ${t.bgClassName}`} />
-                  {t.range}
-                </div>
-                <div className="ci-tier-cell-label">{t.description}</div>
-              </div>
-            ))}
+        <section className="ci-score-policy" aria-label="How scores are presented">
+          <div className="ci-section-eyebrow">Numeric presentation — 0 to 100</div>
+          <Banner variant="info">
+            No country grades. This number is a research-beta estimate, not a
+            verdict or a validated measure. Read it with its source dimensions,
+            input-variation range, and methodology limitations.
+          </Banner>
+          <div className="ci-score-policy-position">
+            <ScorePosition
+              value={avgCI > 0 ? Number(avgCI.toFixed(1)) : null}
+              label={hasFilter ? "Filtered average Civica Index estimate" : "Global average Civica Index estimate"}
+            />
           </div>
         </section>
 
@@ -390,13 +387,10 @@ export default async function CivicaIndexPage({
                   <div role="columnheader">Rank</div>
                   <div role="columnheader">Country</div>
                   <div role="columnheader">CI</div>
-                  <div role="columnheader">Tier</div>
                   <div role="columnheader">Dimensions</div>
                 </div>
 
                 {rawRows.map((r) => {
-                  const tier = ciTier(r.score ?? 0);
-                  const isTop3 = r.rank <= 3;
                   const govClass = govBadgeClass(r.governmentType);
                   const cachedPopulation = readCachedFieldFromRow(
                     r,
@@ -408,15 +402,9 @@ export default async function CivicaIndexPage({
                       href={`/country/${r.slug}/civica-data`}
                       className="ci-lb-row"
                       role="row"
-                      style={
-                        {
-                          "--ci-lb-bar": `${Math.max(0, Math.min(100, r.score ?? 0))}%`,
-                          "--ci-lb-bar-color": tier.cssVar,
-                        } as React.CSSProperties
-                      }
                     >
                       <div
-                        className={`ci-lb-rank${isTop3 ? " ci-lb-rank--top3" : ""}`}
+                        className="ci-lb-rank"
                         role="cell"
                       >
                         {String(r.rank).padStart(2, "0")}
@@ -439,21 +427,24 @@ export default async function CivicaIndexPage({
                       </div>
 
                       <div className="ci-lb-score" role="cell">
-                        <span className="dot frozen" aria-hidden="true" />
-                        <span
-                          className={`ci-lb-score-value ${tier.className}`}
-                        >
-                          {Math.round(r.score)}
-                        </span>
-                        {r.scoreLower != null && r.scoreUpper != null ? (
-                          <span className="ci-lb-score-interval">
-                            ({r.scoreLower}–{r.scoreUpper})
+                        <div className="ci-lb-score-main">
+                          <span className="dot frozen" aria-hidden="true" />
+                          <span className="ci-lb-score-value">
+                            {Math.round(r.score)}
                           </span>
-                        ) : null}
-                      </div>
-
-                      <div className={`ci-lb-tier ${tier.className}`} role="cell">
-                        {r.band ? `${r.band} · ${tier.label}` : tier.label}
+                          {r.scoreLower != null && r.scoreUpper != null ? (
+                            <span className="ci-lb-score-interval">
+                              ({r.scoreLower}–{r.scoreUpper})
+                            </span>
+                          ) : null}
+                        </div>
+                        <ScorePosition
+                          value={r.score}
+                          lower={r.scoreLower}
+                          upper={r.scoreUpper}
+                          label={`${r.name} Civica Index estimate`}
+                          compact
+                        />
                       </div>
 
                       <div className="ci-lb-dims" role="cell">

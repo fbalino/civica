@@ -5,19 +5,20 @@ import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
+import { ScorePosition } from "@/components/editorial/ScorePosition";
 import {
   getCIMethodology,
-  getCIMethodologyHistory,
 } from "@/lib/db/queries";
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { civicaIndex, disputeSla, pulse } from "@/lib/content/site-state";
+import { dimensionColorVar } from "@/lib/ci/dimension-colors";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Civica Index Methodology — How Governance Is Scored",
   description:
-    `The Civica Index research-beta methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, Monte Carlo input-variation ranges, A–F rank bands, and a separate Civica Conditions companion layer.${civicaIndex.status === "beta" ? " Beta — methodology in active development and not independently reviewed." : ""}`,
+    `The Civica Index research-beta methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, Monte Carlo input-variation ranges, neutral numeric presentation, and a separate Civica Conditions companion layer.${civicaIndex.status === "beta" ? " Beta — methodology in active development and not independently reviewed." : ""}`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/methodology" },
 };
 
@@ -27,7 +28,7 @@ const SECTIONS = [
   { id: "normalization", num: 3, label: "Normalization" },
   { id: "weights", num: 4, label: "Weights" },
   { id: "uncertainty", num: 5, label: "Input ranges" },
-  { id: "bands", num: 6, label: "Rank bands" },
+  { id: "presentation", num: 6, label: "Presentation policy" },
   { id: "missing", num: 7, label: "Missing data" },
   { id: "conditions", num: 8, label: "Conditions" },
   { id: "gov-type", num: 9, label: "Government type" },
@@ -41,7 +42,7 @@ const SECTIONS = [
 interface DimensionRow {
   label: string;
   weight: number;
-  tierVar: string;
+  colorVar: string;
   primary: string;
   secondary: string;
 }
@@ -56,25 +57,21 @@ interface DimensionRow {
  */
 const DIMENSION_PRESENTATION: Record<
   string,
-  Pick<DimensionRow, "tierVar" | "primary" | "secondary">
+  Pick<DimensionRow, "primary" | "secondary">
 > = {
   democratic_quality: {
-    tierVar: "var(--tier-exceptional)",
     primary: "V-Dem Liberal Democracy Index",
     secondary: "V-Dem Electoral Democracy Index",
   },
   rule_of_law: {
-    tierVar: "var(--tier-strong)",
     primary: "V-Dem Rule of Law",
     secondary: "World Bank WGI Rule of Law",
   },
   freedom_rights: {
-    tierVar: "var(--color-accent)",
     primary: "Freedom House (PR + CL combined)",
     secondary: "RSF Press Freedom Index",
   },
   corruption_control: {
-    tierVar: "var(--tier-weak)",
     primary: "Transparency International CPI",
     secondary: "World Bank WGI Control of Corruption",
   },
@@ -83,23 +80,9 @@ const DIMENSION_PRESENTATION: Record<
 const DIMENSIONS: DimensionRow[] = civicaIndex.dimensions.map((d) => ({
   label: d.label,
   weight: Math.round(d.weight * 100),
+  colorVar: dimensionColorVar(d.id),
   ...DIMENSION_PRESENTATION[d.id],
 }));
-
-/** Rank bands — see rank bands section. */
-const BANDS: Array<{
-  letter: string;
-  range: string;
-  label: string;
-  color: string;
-}> = [
-  { letter: "A", range: "85 – 100", label: "Exceptional", color: "var(--tier-exceptional)" },
-  { letter: "B", range: "70 – 84", label: "Strong", color: "var(--tier-strong)" },
-  { letter: "C", range: "55 – 69", label: "Mixed", color: "var(--tier-mixed)" },
-  { letter: "D", range: "40 – 54", label: "Weak", color: "var(--tier-weak)" },
-  { letter: "E", range: "25 – 39", label: "Very weak", color: "var(--tier-failed)" },
-  { letter: "F", range: "0 – 24", label: "Failed / authoritarian", color: "var(--tier-failed)" },
-];
 
 function formatDate(d: Date | string): string {
   return new Date(d).toLocaleDateString("en-US", {
@@ -110,12 +93,8 @@ function formatDate(d: Date | string): string {
 
 export default async function MethodologyPage() {
   let methodology: Awaited<ReturnType<typeof getCIMethodology>> | null = null;
-  let history: Awaited<ReturnType<typeof getCIMethodologyHistory>> = [];
   try {
-    [methodology, history] = await Promise.all([
-      getCIMethodology(),
-      getCIMethodologyHistory(),
-    ]);
+    methodology = await getCIMethodology();
   } catch {
     // DB not seeded
   }
@@ -123,7 +102,6 @@ export default async function MethodologyPage() {
   const lastRevision = methodology?.publishedAt
     ? formatDate(methodology.publishedAt)
     : civicaIndex.lastRevision;
-  const cutoverTarget = civicaIndex.cutoverTarget;
   const pc1VariancePct = (civicaIndex.pca.pc1VarianceExplained * 100).toFixed(
     1,
   );
@@ -154,14 +132,12 @@ export default async function MethodologyPage() {
         <span>·</span>
         <span>{lastRevision}</span>
         <span>·</span>
-        <span>Cut-over target {cutoverTarget}</span>
+        <span>Independent review pending</span>
       </div>
 
       <div className="editorial-warning">
         <strong>Beta.</strong> The methodology described on this page
-        is in active development. Civica&rsquo;s published scores will
-        be republished under these rules at cut-over (target{" "}
-        {cutoverTarget}). The current single-year PCA is published but
+        is in active development. The current single-year PCA is published but
         underpowered; the planned longitudinal, factor-analysis, and
         source-substitution tests are not complete. The provisional weights
         are documented at{" "}
@@ -215,7 +191,7 @@ export default async function MethodologyPage() {
             <div
               key={d.label}
               className="meth-weight-slice"
-              style={{ background: d.tierVar, flex: d.weight }}
+              style={{ background: d.colorVar, flex: d.weight }}
             >
               <strong>{d.weight}%</strong>
               <small>{d.label}</small>
@@ -270,44 +246,30 @@ export default async function MethodologyPage() {
         />
       </Reveal>
 
-      {/* Section 6 — Rank bands (TSX: bespoke band-scale visualization) */}
-      <Reveal as="section" id="bands" className="editorial-section">
+      {/* Section 6 — presentation policy. */}
+      <Reveal as="section" id="presentation" className="editorial-section">
         <h2>
-          <span className="meth-num">Section 6</span>Rank bands
+          <span className="meth-num">Section 6</span>Presentation policy
         </h2>
         <p>
-          The difference between rank 42 and rank 44 is, in any honest
-          reading, nothing — it&rsquo;s well within the uncertainty
-          interval of either country. Civica publishes{" "}
-          <strong>rank bands</strong> instead of exact ranks as the
-          primary presentation:
+          Civica does not publish country letter grades or qualitative score
+          labels. Those devices imply a validated categorical verdict that the
+          current research-beta methodology cannot support. Country displays,
+          APIs, and exports use the numeric estimate and its declared inputs
+          without assigning a grade.
         </p>
-
-        <div
-          className="meth-band-scale"
-          role="img"
-          aria-label="Six-band interpretation scale (A–F)"
-        >
-          {BANDS.map((b) => (
-            <div
-              key={b.letter}
-              className="meth-band-cell"
-              style={{ background: b.color }}
-            >
-              <strong>
-                {b.letter} · {b.range}
-              </strong>
-              <small>{b.label}</small>
-            </div>
-          ))}
-        </div>
-
+        <ScorePosition
+          value={72}
+          lower={68}
+          upper={76}
+          label="Illustrative Civica Index estimate"
+        />
         <p>
-          Country pages display the band prominently: e.g. &ldquo;CI
-          72 — Strong (B).&rdquo; Within a band, countries are sorted
-          alphabetically or by region rather than by exact integer
-          score. The exact integer remains available via the API for
-          researchers who want it.
+          Current surfaces show the numeric estimate on a neutral 0–100 line
+          with its input-variation range. Position communicates magnitude only;
+          blue is not a good/bad scale. Every display must also identify the
+          output as research beta and link back to the source dimensions and
+          limitations on this page.
         </p>
       </Reveal>
 
@@ -335,8 +297,7 @@ export default async function MethodologyPage() {
         />
       </Reveal>
 
-      {/* Section 14 — Versioning (TSX: bespoke version-strip + DB-driven
-          revision history). Per content-templating audit §3.4. */}
+      {/* Section 14 — Versioning (TSX: bespoke version strip). */}
       <Reveal as="section" id="versioning" className="editorial-section">
         <h2>
           <span className="meth-num">Section 14</span>Versioning
@@ -353,8 +314,8 @@ export default async function MethodologyPage() {
             <div className="meth-version-value">{lastRevision}</div>
           </div>
           <div className="meth-version-cell">
-            <div className="meth-version-label">Cut-over target</div>
-            <div className="meth-version-value">{cutoverTarget}</div>
+            <div className="meth-version-label">Independent review</div>
+            <div className="meth-version-value">Pending</div>
           </div>
           <div className="meth-version-cell">
             <div className="meth-version-label">Quarterly update</div>
@@ -369,21 +330,6 @@ export default async function MethodologyPage() {
           the original score under its original methodology,
           regardless of how the methodology evolves afterward.
         </p>
-        {history.length > 0 && (
-          <>
-            <h3>Revision history</h3>
-            <ul>
-              {history.map((h) => (
-                <li key={h.id}>
-                  <strong>
-                    {h.publishedAt ? formatDate(h.publishedAt) : "Snapshot"}
-                  </strong>
-                  {h.notes ? ` — ${h.notes}` : ""}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
       </Reveal>
     </MethodologyLayout>
   );

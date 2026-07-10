@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getCivicaConditionsForJurisdiction } from "@/lib/db/queries";
-import { scoreToBand, bandLabel, type CIBand } from "@/lib/ci/bands";
+import { ScorePosition } from "@/components/editorial/ScorePosition";
 
 // ── Dimension metadata ────────────────────────────────────────────────────────
 
@@ -27,23 +27,6 @@ const DIMENSION_META: Record<
 
 const DIMENSION_ORDER = ["human_development", "peace_security", "economic_stability"];
 
-// ── Band → CSS token mapping ──────────────────────────────────────────────────
-
-function bandToColor(band: CIBand): string {
-  // Reuse the existing --tier-* CSS vars which map to the same A–F colour
-  // intent (green → red). BAND_RANGES: A=exceptional, B=strong, C=mixed,
-  // D=weak, E=very weak, F=failed.
-  const map: Record<CIBand, string> = {
-    A: "var(--tier-exceptional)",
-    B: "var(--tier-strong)",
-    C: "var(--tier-mixed)",
-    D: "var(--tier-weak)",
-    E: "var(--tier-failed)",
-    F: "var(--tier-failed)",
-  };
-  return map[band];
-}
-
 // ── Single dimension card ─────────────────────────────────────────────────────
 
 function DimensionCard({
@@ -63,11 +46,7 @@ function DimensionCard({
     description: "",
   };
 
-  const band: CIBand | null = score != null ? scoreToBand(score) : null;
-  const color = band ? bandToColor(band) : "var(--color-text-40)";
-  const label = band ? bandLabel(band) : "Coming soon";
   const displayScore = score != null ? Math.round(score) : null;
-  const barValue = score ?? 0;
 
   return (
     <div
@@ -108,7 +87,7 @@ function DimensionCard({
             fontSize: "clamp(36px, 7vw, 52px)",
             letterSpacing: "-0.02em",
             lineHeight: 0.9,
-            color,
+            color: "var(--color-text-primary)",
           }}
         >
           {displayScore != null ? displayScore : "—"}
@@ -129,7 +108,7 @@ function DimensionCard({
         )}
       </div>
 
-      {/* Band label + bar */}
+      {/* Neutral numeric position — no grade or qualitative verdict. */}
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <div
           style={{
@@ -146,44 +125,24 @@ function DimensionCard({
               fontSize: "var(--text-12)",
               letterSpacing: "0.06em",
               textTransform: "uppercase",
-              color,
+              color: "var(--color-text-50)",
             }}
           >
-            {label}
+            {score != null ? "Numeric estimate" : "Coming soon"}
           </span>
-          {band && (
+          {score != null ? (
             <span
               style={{
-                fontFamily: "var(--font-mono)",
-                fontWeight: "var(--font-weight-mono)",
+                fontFamily: "var(--font-body)",
                 fontSize: "var(--text-12)",
                 color: "var(--color-text-30)",
-                padding: "2px 6px",
-                border: "1px solid var(--color-card-border)",
-                borderRadius: "999px",
               }}
             >
-              Band {band}
+              Research beta
             </span>
-          )}
+          ) : null}
         </div>
-        <div
-          style={{
-            height: 6,
-            borderRadius: "999px",
-            background: "var(--color-card-border)",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              width: `${Math.max(0, Math.min(barValue, 100))}%`,
-              height: "100%",
-              background: color,
-              transition: "width 0.3s ease",
-            }}
-          />
-        </div>
+        <ScorePosition value={score} label={meta.label} compact />
       </div>
 
       {/* Source / quarter meta */}

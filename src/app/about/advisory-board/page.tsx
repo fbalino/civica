@@ -7,7 +7,7 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { Banner } from "@/components/editorial/Banner";
 import { BetaChip } from "@/components/editorial/BetaChip";
 import { Button } from "@/components/editorial/Button";
-import { advisoryBoard, civicaIndex } from "@/lib/content/site-state";
+import { advisoryBoard } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
 
@@ -80,8 +80,7 @@ export default async function AdvisoryBoardPage() {
         <div style={{ display: "inline-flex", alignItems: "center", gap: "10px", padding: "12px 18px", fontFamily: "var(--font-body)", fontSize: "var(--text-13)", letterSpacing: "var(--tracking-wide)" }}>
           <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: "var(--color-status-warning)", flexShrink: 0, display: "inline-block" }} />
           {ADVISORY_BOARD_STATUS_LABEL[advisoryBoard.status] ?? advisoryBoard.status}{" "}
-          — recruitment opens {advisoryBoard.recruitmentTrigger} (target{" "}
-          {civicaIndex.cutoverTarget})
+          — recruitment follows {advisoryBoard.recruitmentTrigger}; no date is claimed.
         </div>
       </Banner>
 

@@ -12,8 +12,9 @@
  *   - government → `govColor()` (src/lib/data/government-category.ts): the
  *     existing canonical classifier → `--color-gov-*` (+ a couple of literal
  *     hues for communist/military/one-party that predate this feature).
- *   - ci        → `ciTier(score).cssVar` → `--tier-*` (exceptional…failed),
- *     pinned to methodology_version='beta' upstream.
+ *   - ci        → neutral sequential-blue numeric bins (`--ramp-indicator-*`),
+ *     pinned to methodology_version='beta' upstream. Color encodes magnitude,
+ *     not a qualitative country verdict.
  *   - regime    → `VDEM_ROW_META[value].colorVar` → `--tier-*` family
  *     (already the documented tone for V-Dem RoW in lens-metadata.ts).
  *   - income    → `WORLD_BANK_INCOME_GROUP_META[value].colorVar` →
@@ -24,7 +25,6 @@
  */
 
 import { govColor, govLabel } from "@/lib/data/government-category";
-import { ciTier, CI_TIER_LEGEND } from "@/lib/ci/tiers";
 import {
   VDEM_ROW_META,
   WORLD_BANK_INCOME_GROUP_META,
@@ -62,7 +62,7 @@ export const ATLAS_LAYER_OPTIONS: ReadonlyArray<{
 /** Legend / eyebrow title for each layer. */
 export const ATLAS_LAYER_TITLE: Record<AtlasLayerKey, string> = {
   government: "Government type",
-  ci: "Civica Index tier",
+  ci: "Civica Index score (research beta)",
   regime: "Regime type (V-Dem)",
   income: "Income group (World Bank)",
 };
@@ -77,6 +77,19 @@ export function parseLayerParam(raw: string | null | undefined): AtlasLayerKey {
 export interface LegendEntry {
   label: string;
   fill: string;
+}
+
+const CI_SCORE_BINS = [
+  { min: 80, label: "80–100", fill: "var(--ramp-indicator-5)" },
+  { min: 60, label: "60–79", fill: "var(--ramp-indicator-4)" },
+  { min: 40, label: "40–59", fill: "var(--ramp-indicator-3)" },
+  { min: 20, label: "20–39", fill: "var(--ramp-indicator-2)" },
+  { min: 0, label: "0–19", fill: "var(--ramp-indicator-1)" },
+] as const;
+
+function ciScoreFill(score: number): string {
+  const clamped = Math.max(0, Math.min(100, score));
+  return CI_SCORE_BINS.find((bin) => clamped >= bin.min)?.fill ?? NO_DATA_FILL;
 }
 
 /**
@@ -102,10 +115,7 @@ export function legendFor(layer: AtlasLayerKey): LegendEntry[] {
         { label: "Other", fill: "var(--color-gov-other)" },
       ];
     case "ci":
-      return CI_TIER_LEGEND.map((t) => ({
-        label: `${t.label} (${t.range})`,
-        fill: t.cssVar,
-      }));
+      return CI_SCORE_BINS.map(({ label, fill }) => ({ label, fill }));
     case "regime":
       return (Object.keys(VDEM_ROW_META) as VDemRowKey[])
         .sort((a, b) => VDEM_ROW_META[a].order - VDEM_ROW_META[b].order)
@@ -142,7 +152,7 @@ export function fillForLayer(
     case "ci": {
       const score = values?.ciScore;
       if (score == null) return NO_DATA_FILL;
-      return ciTier(score).cssVar;
+      return ciScoreFill(score);
     }
     case "regime": {
       const v = values?.regimeType;
@@ -172,7 +182,7 @@ export function tooltipValueForLayer(
     case "ci": {
       const score = values?.ciScore;
       if (score == null) return NO_DATA_LABEL;
-      return `${score} · ${ciTier(score).label}`;
+      return `${score} / 100 · research beta`;
     }
     case "regime":
       return values?.regimeType ?? NO_DATA_LABEL;

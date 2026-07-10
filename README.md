@@ -34,7 +34,7 @@ Country dossiers cover geography, demographics, government, economy, energy, com
 ### Civica Index — secondary research beta
 
 <!-- PUBLIC_CLAIM: readme.index-estimate -->
-A research-beta 0–100 composite across four governance dimensions: democratic quality, rule of law, freedoms & rights, and corruption control. It uses V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting inputs. Published bounds are Monte Carlo input-variation ranges under declared assumptions, not confidence intervals for a true country score. The Index is currently BETA, has not completed external methodological review, and may be redesigned, demoted, or retired after validation.
+A research-beta 0–100 composite across four governance dimensions: democratic quality, rule of law, freedoms & rights, and corruption control. It uses V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting inputs. Published bounds are Monte Carlo input-variation ranges under declared assumptions, not confidence intervals for a true country score. The Index is currently BETA and has not completed external methodological review; its construction, weights, and interpretation remain subject to validation.
 
 ### Civica Pulse — experimental event ledger
 
@@ -74,7 +74,7 @@ This is a pre-launch project. Honest snapshot:
 | External methodology review | Not yet — planned post-v1 |
 | Public launch | Pre-launch; URLs are live but no inbound traffic yet |
 
-The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in BETA, scored under the v2-Beta four-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`); the post-Beta stabilization cut-over is targeted for Sept 30, 2026 pending external academic review.
+The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in BETA, scored under the v2-Beta four-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`). Stabilization depends on longitudinal, factor-analysis, and input-variation validation plus external academic review; no launch date is claimed.
 
 For live numbers (active sources, fact counts, multi-sourced coverage), see `/about` — values are read directly from the database, not maintained as inline prose. Page values may briefly differ from the metrics above as new vintages land.
 
@@ -119,7 +119,6 @@ Public methodology pages (in approximate read order):
 | Civica Pulse — event classification + scoring | `/civica-index/methodology/pulse` |
 | Civica Pulse — backtest results | `/civica-index/methodology/pulse/backtest` |
 | Peer grouping — V-Dem RoW, World Bank region/income, regime classification | `/civica-index/methodology/peer-grouping` |
-| Peer grouping — migration table (post-`structural_family` retirement) | `/civica-index/methodology/peer-grouping/migration` |
 
 Internal methodology resolution documents (audit trail, eventually published) cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, and more. Public publication of these resolutions is a v1.x deliverable.
 

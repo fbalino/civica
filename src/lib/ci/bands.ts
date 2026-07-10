@@ -1,11 +1,9 @@
 /**
- * Civica Index — A–F rank bands per spec §2.6.
+ * DEPRECATED HISTORICAL REPLAY ONLY (retired 2026-07-09).
  *
- * The band is the primary public presentation; the integer score
- * remains available via the API for researchers. Within a band,
- * countries are sorted alphabetically or by region rather than by
- * exact integer score, since the difference between rank 42 and rank
- * 44 is well within the uncertainty interval of either country.
+ * These definitions document how already-stored legacy A–F values were
+ * produced. They must never be imported by a public UI, API, export, metadata,
+ * or current score writer. New and recomputed rows persist `band = NULL`.
  */
 
 export type CIBand = "A" | "B" | "C" | "D" | "E" | "F";
@@ -17,6 +15,7 @@ interface BandRow {
   label: string;
 }
 
+/** @deprecated Historical audit/replay only. */
 export const BAND_RANGES: readonly BandRow[] = [
   { letter: "A", min: 85, max: 100, label: "Exceptional" },
   { letter: "B", min: 70, max: 84, label: "Strong" },
@@ -30,6 +29,7 @@ export const BAND_RANGES: readonly BandRow[] = [
  * Map a 0–100 integer score to its A–F band. Inputs outside [0, 100]
  * are clamped before assignment.
  */
+/** @deprecated Historical audit/replay only. */
 export function scoreToBand(score: number): CIBand {
   const clamped = Math.max(0, Math.min(100, Math.round(score)));
   for (const row of BAND_RANGES) {
@@ -38,6 +38,7 @@ export function scoreToBand(score: number): CIBand {
   return "F"; // unreachable but TypeScript exhaustiveness
 }
 
+/** @deprecated Historical audit/replay only. */
 export function bandLabel(band: CIBand): string {
   return BAND_RANGES.find((b) => b.letter === band)?.label ?? "Unknown";
 }

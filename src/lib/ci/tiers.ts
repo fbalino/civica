@@ -1,3 +1,11 @@
+/**
+ * DEPRECATED HISTORICAL REPLAY ONLY (retired 2026-07-09).
+ *
+ * Public country surfaces no longer map numeric estimates to qualitative
+ * tiers or traffic-light colors. Keep this module only to explain and replay
+ * archived presentation; current code must use neutral numeric position.
+ */
+
 export type TierKey = "exceptional" | "strong" | "mixed" | "weak" | "failed";
 
 export interface TierInfo {
@@ -10,13 +18,8 @@ export interface TierInfo {
   description: string;
 }
 
-// Tier cutoffs are aligned to the canonical A–F band scheme in
-// `src/lib/ci/bands.ts` (the primary public presentation) so a score's
-// tier and band never disagree about which bucket it falls in. The band
-// scheme has six letters (A–F); the tier ramp has five colors, so the two
-// lowest bands (E "Very weak" 25–39 and F "Failed" 0–24) both render with
-// the "failed" tier color — consistent, since they are the two lowest
-// bands. Band boundaries (85 / 70 / 55 / 40) are the tier boundaries.
+// Exact cutoffs and labels are preserved solely so archived screenshots and
+// stored legacy values remain interpretable. Do not reuse this mapping.
 const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
   {
     min: 85,
@@ -80,6 +83,7 @@ const TIERS: ReadonlyArray<{ min: number; info: TierInfo }> = [
   },
 ];
 
+/** @deprecated Historical audit/replay only. */
 export function ciTier(score: number): TierInfo {
   for (const tier of TIERS) {
     if (score >= tier.min) return tier.info;
@@ -88,6 +92,7 @@ export function ciTier(score: number): TierInfo {
   return TIERS[TIERS.length - 1].info;
 }
 
+/** @deprecated Historical audit/replay only. */
 export const CI_TIER_LEGEND: ReadonlyArray<TierInfo> = [...TIERS]
   .reverse()
   .map((tier) => tier.info);

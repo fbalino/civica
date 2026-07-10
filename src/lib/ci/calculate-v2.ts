@@ -3,15 +3,15 @@
  *
  * Reads raw indicator values from `ci_dimension_scores` (any methodology
  * version), applies the v2 fixed-bound normalization, runs Monte Carlo
- * to derive the 90% confidence interval, applies the v2 missing-data
+ * to derive the central input-variation range, applies the v2 missing-data
  * rules, and writes the result to `ci_composite_scores` under
  * `methodology_version='beta'`.
  *
- * Critically: the v1 calculation path (scripts/calculate-ci-composite.ts)
- * is unchanged. Beta scores live alongside v1 scores in
- * `ci_composite_scores`, distinguished only by their `methodology_version`
- * column. UI cut-over (Phase 5.4) is still pending; for now this
- * pipeline just populates the DB so we can compare the two.
+ * The v1 calculation path (scripts/calculate-ci-composite.ts) is preserved for
+ * reproducibility. Current Beta scores live alongside those archived rows in
+ * `ci_composite_scores`, distinguished by `methodology_version`; public reads
+ * default to Beta and use an explicit projection that excludes historical
+ * presentation fields.
  */
 
 import { sql as dsql, eq, and } from "drizzle-orm";
@@ -26,7 +26,6 @@ import {
 } from "./dimensions-v2";
 import { normalizeV2, defaultUncertaintyV2 } from "./normalize-v2";
 import { simulateComposite, DEFAULT_SIMS } from "./monte-carlo";
-import { scoreToBand } from "./bands";
 
 const BETA_VERSION = "beta";
 
@@ -44,7 +43,6 @@ interface CompositeResult {
   scoreInteger: number;
   scoreLower: number;
   scoreUpper: number;
-  band: string;
   completeness: CompletenessFlag;
   dimensionsAvailable: number;
   missingDimensions: CIDimensionV2[];
@@ -67,7 +65,7 @@ interface CompositeResult {
  *
  * For partial CI the composite is computed using only the available
  * dimensions, with their weights re-proportioned to sum to 1.00 over
- * THOSE dimensions only — but the confidence interval is widened by
+ * THOSE dimensions only — but the input-variation range is widened by
  * 20% to reflect the added uncertainty (spec §2.7).
  */
 function classifyCompleteness(present: Set<string>): {
@@ -136,7 +134,7 @@ function computeOne(rows: DimensionRow[], sims: number): CompositeResult | null 
 
   if (mcInputs.length === 0) return null;
 
-  // Spec §2.7: partial CIs widen the confidence interval by 20%.
+  // Spec §2.7: partial estimates widen the input-variation range by 20%.
   const partialPenalty = completeness === "partial" ? 1.2 : 1.0;
   for (const input of mcInputs) {
     input.stdDev *= partialPenalty;
@@ -149,7 +147,6 @@ function computeOne(rows: DimensionRow[], sims: number): CompositeResult | null 
     scoreInteger: Math.round(mc.scoreMedian),
     scoreLower: Math.round(mc.lower),
     scoreUpper: Math.round(mc.upper),
-    band: scoreToBand(mc.scoreMedian),
     completeness,
     dimensionsAvailable: mcInputs.length,
     missingDimensions: missing,
@@ -231,7 +228,9 @@ export async function calculateCompositeV2(
         score: r.scoreInteger,
         scoreLower: r.scoreLower,
         scoreUpper: r.scoreUpper,
-        band: r.band,
+        // Public grading was retired on 2026-07-09. Keep the nullable
+        // historical column empty for every new or recomputed score.
+        band: null,
         completenessFlag: r.completeness,
         vintageLabel,
         rank: i + 1,
@@ -251,7 +250,7 @@ export async function calculateCompositeV2(
           score: r.scoreInteger,
           scoreLower: r.scoreLower,
           scoreUpper: r.scoreUpper,
-          band: r.band,
+          band: null,
           completenessFlag: r.completeness,
           vintageLabel,
           rank: i + 1,

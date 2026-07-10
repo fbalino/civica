@@ -31,7 +31,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Index by Peer Lens — Bi-Lens Explorer",
   description:
-    "Compare Civica Index scores grouped by V-Dem Regimes of the World (default) or Bjørnskov-Rode / CGV regime type (alternate). Replaces the retired structural_family lens per the 2026-05-02 peer-grouping resolution.",
+    "Compare Civica Index scores grouped by V-Dem Regimes of the World (default) or Bjørnskov-Rode / CGV regime type (alternate).",
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/government-types",
   },
@@ -431,7 +431,7 @@ export default async function GovernmentTypesPage({
         lensSummary={
           lens === "regime"
             ? "Bjørnskov-Rode / CGV is the alternate accountability lens. Six published categories distinguishing democratic systems by executive form (parliamentary / presidential / semi-presidential) and authoritarian systems by ruling-elite structure (civilian / military / royal)."
-            : "V-Dem Regimes of the World is the default governance lens (Lührmann et al. 2018). Four tiers spanning closed autocracy through liberal democracy. See methodology for why this replaced the retired structural_family heuristic."
+            : "V-Dem Regimes of the World is the default governance lens (Lührmann et al. 2018). Four tiers span closed autocracy through liberal democracy; the methodology documents the lens rationale, source vintage, and limitations."
         }
         axisLabel={
           lens === "regime"

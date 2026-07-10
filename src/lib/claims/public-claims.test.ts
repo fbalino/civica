@@ -7,6 +7,10 @@ import {
 } from "./claim-tiers";
 import { findUnqualifiedAuthorityLanguage } from "./authority-language";
 import {
+  findCountryGradeLeaks,
+  HISTORICAL_GRADE_ARCHIVE_SENTINEL,
+} from "./country-grade-language";
+import {
   PUBLIC_CLAIMS,
   PUBLIC_CLAIM_SURFACES,
   type PublicClaim,
@@ -80,4 +84,75 @@ test("authority-language audit allows explicit limitations", () => {
   );
 
   assert.deepEqual(matches, []);
+});
+
+test("country-grade audit catches deprecated helpers, implicit rows, and API fields", () => {
+  const matches = findCountryGradeLeaks(
+    `
+      import { ciTier } from "@/lib/ci/tiers";
+      const rows = await db.select().from(ciCompositeScores);
+      return { score: composite.score, band: composite.band };
+    `,
+    { filePath: "src/app/api/v1/index/example/route.ts" },
+  );
+  const ruleIds = new Set(matches.map((match) => match.ruleId));
+
+  assert.ok(ruleIds.has("deprecated-grade-module"));
+  assert.ok(ruleIds.has("deprecated-grade-helper"));
+  assert.ok(ruleIds.has("implicit-composite-select"));
+  assert.ok(ruleIds.has("legacy-band-read"));
+  assert.ok(ruleIds.has("public-grade-response-field"));
+});
+
+test("country-grade audit catches public grade copy and reconstructed verdict scales", () => {
+  const matches = findCountryGradeLeaks(
+    `
+      export const metadata = {
+        description: "Civica Index previously used A-F country grades."
+      };
+      const labels = ["Exceptional", "Strong", "Mixed", "Weak", "Failed"];
+    `,
+    {
+      filePath: "src/app/(reader)/civica-index/page.tsx",
+      scanStructure: false,
+      scanCopy: true,
+    },
+  );
+  const ruleIds = new Set(matches.map((match) => match.ruleId));
+
+  assert.ok(ruleIds.has("public-grade-history"));
+  assert.ok(ruleIds.has("public-grade-nomenclature"));
+  assert.ok(ruleIds.has("qualitative-country-scale"));
+  assert.ok(ruleIds.has("qualitative-country-verdict"));
+});
+
+test("country-grade audit preserves regime, severity, source-tier, and limitation language", () => {
+  const matches = findCountryGradeLeaks(
+    `
+      V-Dem describes an authoritarian regime and a Regimes of the World tier.
+      Pulse records a severity tier; reconciliation records a Tier 1 source.
+      The chart plots a statistical peer band.
+      Civica Index publishes a numeric research estimate with no country grade.
+    `,
+    {
+      filePath: "content/methodology-civica-index.md",
+      scanStructure: false,
+      scanCopy: true,
+    },
+  );
+
+  assert.deepEqual(matches, []);
+});
+
+test("historical grade modules require the private archive sentinel", () => {
+  const missing = findCountryGradeLeaks("export const BAND_RANGES = [];", {
+    filePath: "src/lib/ci/bands.ts",
+  });
+  assert.deepEqual(missing.map((match) => match.ruleId), ["archive-sentinel"]);
+
+  const preserved = findCountryGradeLeaks(
+    `/** ${HISTORICAL_GRADE_ARCHIVE_SENTINEL} */\nexport const BAND_RANGES = ["Exceptional", "Failed"];`,
+    { filePath: "src/lib/ci/bands.ts" },
+  );
+  assert.deepEqual(preserved, []);
 });

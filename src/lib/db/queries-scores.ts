@@ -7,7 +7,7 @@
  *   2. Civica Pulse (max-magnitude dimensional delta)
  *   3. V-Dem Liberal Democracy (native 0-1 + global rank from CI dimension)
  *   4. Freedom House status (Free / Partly Free / Not Free + score)
- *   5. RSF Press Freedom (hardcoded 2024 table)
+ *   5. RSF Press Freedom (ingested dimension history)
  *   6. UNDP HDI (0-1, with rank)
  *   7. Transparency CPI (0-100, with rank)
  *
@@ -28,10 +28,6 @@ import {
   jurisdictions,
   pulseDimensionalDeltas,
 } from "@/lib/db/schema";
-import {
-  pressFreedomScore,
-  pressFreedomTier,
-} from "@/lib/pulse/v2/press-freedom";
 
 export interface ScoreRow {
   /** Stable id used as React key + automation hook. */
@@ -110,7 +106,12 @@ async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
   // decide which value leaks into a beta-labeled row / trend arrow. Matches
   // the pin on compareCICountries / getCICountryHistory.
   const [latest] = await db
-    .select()
+    .select({
+      quarter: ciCompositeScores.quarter,
+      score: ciCompositeScores.score,
+      rank: ciCompositeScores.rank,
+      totalRanked: ciCompositeScores.totalRanked,
+    })
     .from(ciCompositeScores)
     .where(
       and(
@@ -386,33 +387,35 @@ async function buildFreedomHouseRow(jId: string): Promise<ScoreRow | null> {
   };
 }
 
-// ---- RSF (hardcoded TS module) ---------------------------------------------
+// ---- RSF Press Freedom -----------------------------------------------------
 
-const RSF_TIER_LABEL: Record<
-  ReturnType<typeof pressFreedomTier>,
-  string
-> = {
-  free: "Free press",
-  partial: "Partly free",
-  restricted: "Restricted press",
-};
-
-function buildRsfRow(iso3: string | null): ScoreRow | null {
-  if (!iso3) return null;
-  const score = pressFreedomScore(iso3);
-  const tier = pressFreedomTier(score);
+async function buildRsfRow(jId: string): Promise<ScoreRow | null> {
+  const history = await fetchDimensionHistory({
+    jId,
+    dimension: "freedom_rights",
+    sourceId: "rsf_press_freedom",
+  });
+  if (history.length === 0) return null;
+  const latest = history[history.length - 1];
+  if (latest.normalizedScore == null) return null;
+  const score = Math.round(Number(latest.normalizedScore));
+  const oldest = history[0];
+  const trendDelta =
+    history.length > 1 && oldest.normalizedScore != null
+      ? score - Number(oldest.normalizedScore)
+      : null;
   return {
     id: "rsf",
     label: "Press Freedom (RSF)",
     score,
-    scoreFormatted: `${RSF_TIER_LABEL[tier]} (${score}/100)`,
+    scoreFormatted: `${score} / 100`,
     rank: null,
     totalRanked: null,
-    trend: null,
-    trendDelta: null,
-    trendFormatted: null,
+    trend: trendBucket(trendDelta),
+    trendDelta,
+    trendFormatted: trendDelta != null ? fmtSigned(trendDelta, 1) : null,
     source: "rsf_press_freedom",
-    asOf: "2024",
+    asOf: latest.quarter,
   };
 }
 
@@ -498,6 +501,7 @@ export async function getScoresForJurisdiction(
     freedomHouse,
     hdi,
     cpi,
+    rsf,
   ] = await Promise.all([
     buildCivicaIndexRow(jur.id).catch(() => null),
     buildPulseRow(jur.id).catch(() => null),
@@ -521,9 +525,8 @@ export async function getScoresForJurisdiction(
       fractional: false,
       trendDigits: 1,
     }).catch(() => null),
+    buildRsfRow(jur.id).catch(() => null),
   ]);
-
-  const rsf = buildRsfRow(jur.iso3);
 
   // Display order is the same as the brief — most important first.
   const ordered: Array<ScoreRow | null> = [

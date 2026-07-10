@@ -4,17 +4,12 @@
  *   Adopted via:  ~/civica/plan/site-stale-content-audit-v1.md (Phase 1)
  *   Companion  :  src/lib/content/site-stats.ts (live DB-driven counters)
  *   Extended by:  ~/civica/plan/content-templating-audit-v1.md (Phase 1, §5.5)
- *                 added `deprecation.*` re-export so the markdown
- *                 templating layer's variable schema is self-contained
- *                 (the peer-grouping methodology page interpolates
- *                 `STRUCTURAL_FAMILY_SUNSET_DATE_ISO` and we want
- *                 `{{state.deprecation.structuralFamilySunsetDateIso}}`
- *                 to resolve without the markdown having to know about
- *                 the deprecation module).
+ *                 added shared project-state exports so the markdown
+ *                 templating layer's variable schema is self-contained.
  *
  * This file is the single source of truth for project-state values that
  * the reader-facing site embeds in prose: Tier-1 publisher status, NSO
- * wave progress, methodology version stamps, cut-over dates, BETA pill
+ * wave progress, methodology version stamps, BETA pill
  * flags, dispute SLAs, advisory-board status, and so on. Values that
  * can be derived from the database (active source count, total facts,
  * fact-key coverage) live in `site-stats.ts` instead.
@@ -25,7 +20,7 @@
  *
  * **Editing this file:** intended to be edited as the project advances
  * — when a new Tier-1 publisher ships, when an NSO wave rolls forward,
- * when a methodology version cuts over. Keep entries brief; the
+ * or when a methodology version changes. Keep entries brief; the
  * TypeScript types catch shape drift at build time. Aim to keep this
  * file under ~300 lines; if it grows past that, split by topic
  * (`site-state-pulse.ts`, `site-state-reconciliation.ts`, etc.).
@@ -94,16 +89,6 @@ export const civicaIndex = {
     { id: "freedom_rights",     label: "Freedoms & rights",  weight: 0.23 },
     { id: "corruption_control", label: "Corruption control", weight: 0.24 },
   ] as const,
-
-  /** Quarterly cut-over target — when the in-development methodology
-   *  graduates from in-active-development to stable-Beta. Display form
-   *  for prose ("Sept 30, 2026"); pair with `cutoverTargetIso` for
-   *  API + machine-readable consumers. */
-  cutoverTarget: "Sept 30, 2026" as const,
-  /** ISO-formatted form of `cutoverTarget`. Used by API
-   *  `meta.methodology` envelopes (src/lib/api/helpers.ts) and any
-   *  machine-readable surface. Update both fields together. */
-  cutoverTargetIso: "2026-09-30" as const,
 
   /** Last methodology-doc revision label. Pages prefer the database
    *  `methodology.publishedAt` value when present; this string is the
@@ -375,7 +360,7 @@ export const advisoryBoard = {
   status: "coming-soon" as const,
   targetSize: { min: 3, max: 5 } as const,
   reviewCadence: "quarterly" as const,
-  recruitmentTrigger: "after methodology v2 cut-over" as const,
+  recruitmentTrigger: "completion of the internal validation materials" as const,
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────
@@ -384,7 +369,6 @@ export const advisoryBoard = {
 
 export const replication = {
   status: "coming-soon" as const,
-  shipTarget: "Q3 2026" as const,
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────

@@ -10,7 +10,6 @@ import { GlobalSearch } from "@/components/GlobalSearch";
 import { CountryFlag } from "@/components/CountryFlag";
 import { CountryCard, type CountryCardStat } from "@/components/home/CountryCard";
 import { Chip } from "@/components/editorial/Pill";
-import { ciTier } from "@/lib/ci/tiers";
 import { civicaIndex } from "@/lib/content/site-state";
 import {
   Reveal,
@@ -50,7 +49,6 @@ function SpotEngraving({
 interface RankRow {
   rank: number;
   score: number;
-  band?: string | null;
   name: string;
   slug: string;
   iso2: string | null;
@@ -326,14 +324,10 @@ export async function HomeGrid() {
                       <th className="home-index-col-score" scope="col">
                         Civica Index
                       </th>
-                      <th className="home-index-col-tier" scope="col">
-                        Tier
-                      </th>
                     </tr>
                   </thead>
                   <Stagger as="tbody" amount={0.1}>
                     {top.map((r) => {
-                      const tier = ciTier(r.score);
                       return (
                         <StaggerItem as="tr" key={r.slug}>
                           <td className="home-index-col-rank">
@@ -352,16 +346,6 @@ export async function HomeGrid() {
                           </td>
                           <td className="home-index-col-score">
                             <span className="home-index-score">{Math.round(r.score)}</span>
-                          </td>
-                          <td className="home-index-col-tier">
-                            <span className="home-index-tier">
-                              <span
-                                className="home-index-tier-swatch"
-                                style={{ background: tier.cssVar }}
-                                aria-hidden="true"
-                              />
-                              {tier.label}
-                            </span>
                           </td>
                         </StaggerItem>
                       );

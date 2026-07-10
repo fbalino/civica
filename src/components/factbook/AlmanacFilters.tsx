@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { TierKey } from "@/lib/ci/tiers";
 
 /* ── Filter model ───────────────────────────────────────────────────────
    Four advanced-filter categories layered over the region quick-filter that
    already lives in the hero. Each category filters the almanac list by a
-   Phase F peer-grouping canonical fact (region / income group / regime) or
-   the Civica Index tier. Logic is AND across categories, OR within a
+   Phase F peer-grouping canonical fact (region / income group / regime).
+   Logic is AND across categories, OR within a
    category (a country matches if it satisfies at least one selected value
    in every active category). All values are the human-readable canonical
    strings written by Phase F — no snake_case slugs. */
 
 /** A category the user can filter by. */
-export type FilterCategory = "region" | "income" | "regime" | "tier";
+export type FilterCategory = "region" | "income" | "regime";
 
 /** The selected values per category (empty set = category inactive). */
 export type FilterState = Record<FilterCategory, Set<string>>;
@@ -22,7 +21,6 @@ export const EMPTY_FILTER_STATE: FilterState = {
   region: new Set(),
   income: new Set(),
   regime: new Set(),
-  tier: new Set(),
 };
 
 interface FilterOption {
@@ -57,22 +55,12 @@ const REGIME_OPTIONS: FilterOption[] = [
   { value: "Liberal Democracy", label: "Liberal Democracy", tone: "editorial-chip--sage" },
 ];
 
-/* Civica Index tier — the ciTier() keys. Values match TierKey exactly. */
-const TIER_OPTIONS: Array<FilterOption & { value: TierKey }> = [
-  { value: "exceptional", label: "Exceptional", tone: "editorial-chip--sage" },
-  { value: "strong", label: "Strong", tone: "editorial-chip--sage" },
-  { value: "mixed", label: "Mixed", tone: "editorial-chip--sand" },
-  { value: "weak", label: "Weak", tone: "editorial-chip--sand" },
-  { value: "failed", label: "Failed", tone: "editorial-chip--rose" },
-];
-
 /* The hero's multi-select region chips are the region filter; the WB-region
    dropdown was a near-duplicate lens and is intentionally NOT rendered (the
    'region' FilterCategory stays in the model for URL compat). */
 const FILTER_GROUPS: FilterGroupDef[] = [
   { category: "income", legend: "Income group", options: INCOME_OPTIONS },
   { category: "regime", legend: "Regime type", options: REGIME_OPTIONS },
-  { category: "tier", legend: "Civica Index tier", options: TIER_OPTIONS },
 ];
 
 /** True when a country satisfies the active filters (AND across categories,
@@ -83,7 +71,6 @@ export function countryMatchesFilters(
     region: string | null;
     incomeGroup: string | null;
     regimeType: string | null;
-    ciTier: string | null;
   },
   filters: FilterState,
 ): boolean {
@@ -99,8 +86,6 @@ export function countryMatchesFilters(
     !(country.regimeType && filters.regime.has(country.regimeType))
   )
     return false;
-  if (filters.tier.size > 0 && !(country.ciTier && filters.tier.has(country.ciTier)))
-    return false;
   return true;
 }
 
@@ -108,8 +93,7 @@ export function totalActiveFilters(filters: FilterState): number {
   return (
     filters.region.size +
     filters.income.size +
-    filters.regime.size +
-    filters.tier.size
+    filters.regime.size
   );
 }
 
@@ -211,7 +195,6 @@ export function AlmanacFilters({
   onToggle: (category: FilterCategory, value: string) => void;
   onClear: () => void;
 }) {
-  const activeCount = totalActiveFilters(filters);
   // One dropdown open at a time.
   const [openCategory, setOpenCategory] = useState<FilterCategory | null>(null);
 

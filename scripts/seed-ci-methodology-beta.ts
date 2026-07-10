@@ -31,7 +31,7 @@ async function main() {
       weights: V2_WEIGHTS,
       notes:
         "Beta — 4 governance dimensions, fixed-bound normalization, " +
-        "Monte Carlo confidence intervals (10k sims), A–F rank bands, " +
+        "Monte Carlo input-variation ranges (10k simulations), neutral numeric presentation, " +
         "mandatory-dimension missing-data rules. Weights provisional " +
         "until PCA / factor analysis (Phase 5.3) confirms structure. " +
         "HDI and Stability moved out to Civica Conditions companion layer.",
@@ -42,7 +42,7 @@ async function main() {
         weights: V2_WEIGHTS,
         notes:
           "Beta — 4 governance dimensions, fixed-bound normalization, " +
-          "Monte Carlo confidence intervals (10k sims), A–F rank bands, " +
+          "Monte Carlo input-variation ranges (10k simulations), neutral numeric presentation, " +
           "mandatory-dimension missing-data rules. Weights provisional " +
           "until PCA / factor analysis (Phase 5.3) confirms structure. " +
           "HDI and Stability moved out to Civica Conditions companion layer.",

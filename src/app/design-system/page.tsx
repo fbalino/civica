@@ -5,6 +5,7 @@ import { Banner } from "@/components/editorial/Banner";
 import { Pill } from "@/components/editorial/Pill";
 import { StatusDot } from "@/components/editorial/StatusDot";
 import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
+import { ScorePosition } from "@/components/editorial/ScorePosition";
 import { SourceDot } from "@/components/SourceDot";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { PageHero } from "@/components/PageHero";
@@ -26,7 +27,6 @@ const COLOR_GROUP_IDS = [
   "surface",
   "accent",
   "signal",
-  "tier",
   "gov",
   "branch",
   "peer",
@@ -408,16 +408,23 @@ export default function DesignSystemPage() {
             </div>
 
             <div className="ds-comp">
-              <h4>Country card + Index score</h4>
+              <h4>Neutral research score</h4>
               <div className="ds-card">
                 <div className="nm">Denmark</div>
                 <div className="meta">Parliamentary · Europe · 5.9M</div>
                 <div className="foot">
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-12)", color: "var(--color-text-muted)" }}>
-                    CIVICA INDEX
+                    CIVICA INDEX · RESEARCH BETA
                   </span>
-                  <span className="ds-score" style={{ color: "var(--tier-exceptional)" }}>91</span>
+                  <span className="ds-score">71</span>
                 </div>
+                <ScorePosition
+                  value={71}
+                  lower={66}
+                  upper={76}
+                  label="Example Civica Index estimate"
+                  compact
+                />
               </div>
             </div>
 

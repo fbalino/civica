@@ -170,12 +170,9 @@ export async function GET(request: Request) {
         peerGrouping: {
           status: "stable",
           version: "v1.0",
-          adopted: "2026-05-02",
+          versionDate: "2026-05-02",
           methodology:
             "https://civicaatlas.org/civica-index/methodology/peer-grouping",
-          migrationTable:
-            "/civica-index/methodology/peer-grouping/migration",
-          replaces: "structural_family (sunset 2027-03-31)",
         },
       },
     });

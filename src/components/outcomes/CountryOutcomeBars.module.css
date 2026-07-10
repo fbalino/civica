@@ -7,9 +7,8 @@
  *   --peer-median          : percent position of peer median tick
  *   --pos                  : percent position of country marker
  *
- * Per-row tier + government accent colours are injected on the row
- * itself:
- *   --tier-color   : `var(--tier-exceptional|strong|mixed|weak|failed)`
+ * Government accent colour is injected on the row itself; marker color uses
+ * the neutral sequential-blue indicator ramp:
  *   --gov-accent   : `var(--color-gov-*)` from classifyGovernment()
  *
  * All visual values use design-system tokens — no hard-coded hex / rgb /
@@ -182,11 +181,10 @@
   white-space: nowrap;
 }
 
-/* ---- Tier verdict chip --------------------------------------------------- */
+/* ---- Peer-position chip -------------------------------------------------- */
 /*
- * The verdict reads as a scorecard pill: the row's tier colour ramps the
- * border + text + a translucent fill via color-mix. Falls back to the
- * neutral card-border colour if --tier-color is absent.
+ * The label states a relative peer position. Its neutral border and fill do
+ * not encode a good/bad category.
  */
 .cob__verdict {
   display: inline-flex;
@@ -199,9 +197,9 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
-  color: var(--tier-color, var(--color-text-60));
-  background: color-mix(in oklab, var(--tier-color, transparent) 12%, transparent);
-  border: 1px solid color-mix(in oklab, var(--tier-color, var(--color-card-border)) 55%, transparent);
+  color: var(--color-text-60);
+  background: color-mix(in oklab, var(--ramp-indicator-2) 24%, transparent);
+  border: 1px solid color-mix(in oklab, var(--ramp-indicator-4) 45%, transparent);
 }
 
 .cob__verdictLabel {
@@ -277,7 +275,7 @@
 
 /*
  * Peer band: peer-min → peer-max. Replaced the heavier select-bg fill
- * with a translucent ink wash so the country dot's tier colour reads
+ * with a translucent ink wash so the neutral country marker reads
  * cleanly above it on both light and dark surfaces.
  */
 .cob__band {
@@ -319,7 +317,7 @@
 }
 
 /*
- * Country marker — full-height needle + 11px tier-coloured dot with a
+ * Country marker — full-height needle + neutral dot with a
  * glow halo. The needle is dimmed so the dot reads as the focal point.
  */
 .cob__marker {
@@ -329,7 +327,7 @@
   bottom: 0;
   width: 2px;
   transform: translateX(-50%);
-  background: color-mix(in oklab, var(--tier-color, var(--color-accent)) 55%, transparent);
+  background: color-mix(in oklab, var(--ramp-indicator-5) 55%, transparent);
   z-index: 2;
   border-radius: 1px;
 }
@@ -341,13 +339,13 @@
   left: 50%;
   width: 12px;
   height: 12px;
-  background: var(--tier-color, var(--color-accent));
+  background: var(--ramp-indicator-5);
   border: 2px solid var(--color-bg);
   border-radius: 50%;
   transform: translateX(-50%);
   box-shadow:
     0 0 0 4px
-      color-mix(in oklab, var(--tier-color, var(--color-accent)) 28%, transparent),
+      color-mix(in oklab, var(--ramp-indicator-5) 28%, transparent),
     0 1px 2px color-mix(in oklab, var(--color-text-primary) 25%, transparent);
   transition: box-shadow 180ms ease, transform 180ms ease;
 }
@@ -372,11 +370,11 @@
 }
 
 .cob__marker--outside-low::before {
-  border-right: 10px solid var(--tier-color, var(--color-accent));
+  border-right: 10px solid var(--ramp-indicator-5);
 }
 
 .cob__marker--outside-high::before {
-  border-left: 10px solid var(--tier-color, var(--color-accent));
+  border-left: 10px solid var(--ramp-indicator-5);
 }
 
 /* Axis endpoint labels (Peer low / Peer high) */
@@ -461,7 +459,7 @@
   transform: translateX(-50%) scale(1.08);
   box-shadow:
     0 0 0 6px
-      color-mix(in oklab, var(--tier-color, var(--color-accent)) 32%, transparent),
+      color-mix(in oklab, var(--ramp-indicator-5) 32%, transparent),
     0 2px 4px color-mix(in oklab, var(--color-text-primary) 30%, transparent);
 }
 

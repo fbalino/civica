@@ -5,10 +5,10 @@
   src/app/(reader)/civica-index/methodology/peer-grouping/page.tsx
   wraps it via <MarkdownContent>.
 
-  TSX shell handles: H1, subtitle, page-meta line (version + adoptedAt
+  TSX shell handles: H1, subtitle, page-meta line (version + version date
   + reviewStatusLabel), warning callout, cite section (CiteAccordion),
   footer nav. The markdown body covers every other section in document
-  order including the migration table and coverage-limitations table.
+  order including the coverage-limitations table.
 
   Footnotes use GFM syntax via remark-gfm (`[^N]` inline,
   `[^N]: text` at the bottom). Anchors via `## Heading {#anchor}`.
@@ -16,20 +16,18 @@
 
   Substitution markers:
     {{state.X}}                 typed config from site-state.ts
-                                including {{state.deprecation.structuralFamilySunsetDateIso}}
-    {{ctx.X}}                   pre-computed helpers from the TSX shell
 
   Validate with: npm run validate:content-templates
 -->
 
 ## The problem {#problem}
 
-Every comparison needs a peer set. Saying that France "ranks 12th" is meaningless without specifying the ranking universe — 12th out of what? Civica's previous peer set was the in-house `structural_family` taxonomy, which used regular-expression matching over CIA World Factbook prose to bin every country into one of ten buckets (parliamentary democracy, presidential republic, semi-presidential, constitutional monarchy, absolute monarchy, one-party state, military rule, theocracy, directorial republic, and a residual *other* category).
+Every comparison needs a peer set. Saying that France "ranks 12th" is meaningless without specifying the ranking universe — 12th out of what? No single country taxonomy is analytically appropriate for every subject, so Civica declares the comparison domain before selecting a cohort.
 
-Two examples of how the classification broke down:
+Two examples show why the domain matters:
 
 - **Material outcomes.** Defaulting peer grouping to government type would group Nigeria's Human Development Index against fellow *presidential democracies* — the United States, France, Brazil, Indonesia, the Philippines. That is not an analytically useful peer set for human development; the relevant peers are sub-Saharan Africa lower-middle-income economies.
-- **Governance outcomes.** A regime classification grouped 64 countries from China to Belarus to pre-2025 Saudi Arabia into a single *civilian dictatorship* bucket. The bucket is analytically meaningless because it conflates closed autocracies (no meaningful electoral competition) with electoral autocracies (multi-party elections that are unfair but real).
+- **Governance outcomes.** Executive-form classifications can place countries with fundamentally different levels of electoral competition in the same broad category. Governance comparisons therefore need a lens that distinguishes closed autocracies from electoral autocracies, and electoral democracies from liberal democracies.
 
 ## The principle: peer sets are domain-specific {#principle}
 
@@ -47,15 +45,15 @@ Why region+income? The World Bank publishes country-and-lending groups precisely
 
 For Civica Index dimensions (democratic quality, rule of law, freedoms and rights, corruption control), Pulse signals, and any governance-flavored ranking, the default peer set is the country's tier on V-Dem's Regimes of the World classification — one of four buckets: *closed autocracy*, *electoral autocracy*, *electoral democracy*, or *liberal democracy*.[^8]
 
-Why V-Dem RoW over Bjørnskov-Rode / CGV for the default? RoW splits autocracy along the analytically meaningful electoral / closed axis — eliminating the 64-country civilian-dictatorship blob that prompted the change — and is methodologically coherent with the Civica Index's existing V-Dem dependency.[^8] [^9]
+Why V-Dem RoW over Bjørnskov-Rode / CGV for the default? RoW splits autocracy along the analytically meaningful electoral / closed axis and is methodologically coherent with the Civica Index's existing V-Dem dependency.[^8] [^9]
 
 **Transparency note on V-Dem dependency.** The Civica Index already uses V-Dem indicators in two of its {{state.civicaIndex.dimensionCount}} dimensions (Democratic Quality, Rule of Law). Using V-Dem RoW as the governance peer set is presentational only — it determines which countries appear together in a ranking, not how their scores are computed. The CI's scoring formula is unchanged. There is no circularity, but the overlap is worth disclosing.
 
 ## Optional alternate regime lens — Bjørnskov-Rode / CGV {#alternate-regime-lens}
 
-For users who want the executive-form-of-autocracy distinction (military dictatorship vs civilian dictatorship vs royal dictatorship), Bjørnskov-Rode / CGV remains available as a user-toggleable alternate lens.[^7] [^10] [^11] [^12] CGV has six buckets: parliamentary democracy, presidential democracy, semi-presidential democracy, civilian dictatorship, military dictatorship, and royal dictatorship.
+For users who want the executive-form-of-autocracy distinction (military dictatorship vs civilian dictatorship vs royal dictatorship), Bjørnskov-Rode / CGV is available as a user-toggleable alternate lens.[^7] [^10] [^11] [^12] CGV has six buckets: parliamentary democracy, presidential democracy, semi-presidential democracy, civilian dictatorship, military dictatorship, and royal dictatorship.
 
-BR/CGV is preserved for two reasons. First, it's the taxonomy used in a substantial body of comparative political economy research, and Civica should not silently make that literature harder to cite against. Second, the executive-form distinction is sometimes the analytically relevant grouping — for example, when comparing fiscal discipline across military vs civilian autocracies. We make it accessible without making it the default.
+BR/CGV is useful for two reasons. First, it is the taxonomy used in a substantial body of comparative political economy research. Second, the executive-form distinction is sometimes the analytically relevant grouping — for example, when comparing fiscal discipline across military and civilian autocracies. Civica exposes it without making it the default.
 
 ## Constitutional form as metadata {#constitutional-form}
 
@@ -115,12 +113,6 @@ Every external classification is pinned to a specific upstream vintage. The curr
 - **Bjørnskov-Rode / CGV** — distributed via the Quality of Government dataset, refreshed annually each January.[^12]
 - **government_form_description** — CIA World Factbook, frozen January 2026. The Factbook is no longer actively maintained beyond that date; Civica may add a Wikidata cross-check in a future version, but for v1.0 the field is effectively static.[^13]
 
-## How this methodology was decided {#decision-record}
-
-Civica adopted this peer-grouping architecture on {{state.peerGrouping.adoptedAt}} after a multi-LLM deliberation panel rejected two alternatives: writing a methodology paper for the existing `structural_family` heuristic, and keeping the heuristic with a disclaimer. The full audit trail — problem framing, three-option briefing, deliberation transcript, and unanimous resolution — is preserved in the planning archive under `peer-grouping-resolution-v1.md` and `peer-grouping-deliberation-transcript.md`.[^14] [^15]
-
-Future maintainers, external reviewers, or readers who want to challenge the methodology should be able to see HOW Civica reached the decision, not just WHAT was decided. The audit trail is part of the deliverable.
-
 ## Limitations {#limitations}
 
 - **V-Dem cadence.** V-Dem updates annually. Intra-year regime transitions (a coup; a successful democratic transition) are not reflected in the peer-set classification until the next V-Dem release. Civica Pulse is scheduled to process events daily and present them separately, but it does not update the peer-set tier itself, which can lag a transition by months.
@@ -128,27 +120,9 @@ Future maintainers, external reviewers, or readers who want to challenge the met
 - **government_form_description currency.** CIA Factbook is frozen January 2026. Constitutional changes after that date are not reflected in the description until an alternative source pipeline is wired up. The field is descriptive metadata, not analytical taxonomy, so this staleness is bounded in impact.
 - **Single-lens defaults.** Each domain has one default peer lens. Power users may want to compose lenses ("electoral democracies in Sub-Saharan Africa") for finer-grained comparisons. Compound peer sets are not in v1.0; they are an explicit deferred enhancement.
 
-## Migration table {#migration-table}
-
-The full per-country mapping — old `structural_family` values to new peer-lens fields, country by country — is published as a separate page at [/civica-index/methodology/peer-grouping/migration](/civica-index/methodology/peer-grouping/migration). Replication-script maintainers can consume the same data as JSON via [/api/v1/peer-groupings/migration](/api/v1/peer-groupings/migration).
-
-The summary mapping below shows the typical replacement for each retired bucket. There are deliberately rows where the mapping is one-to-many or many-to-one — that is the point of the change. The legacy `structural_family` column and API field remain for two quarterly vintages with `Deprecation` + `Sunset` headers pointing at `{{state.deprecation.structuralFamilySunsetDateIso}}`; the hard cut lands on that date.
-
-| Old structural_family bucket | Typical V-Dem RoW | Typical CGV regime | Typical region+income |
-|---|---|---|---|
-| parliamentary_democracy | Liberal / electoral democracy | parliamentary_democracy | Distributed across many region × income cohorts |
-| presidential_republic | Liberal / electoral democracy / electoral autocracy | presidential_democracy / civilian_dictatorship | Distributed |
-| semi_presidential | Mixed | semi_presidential_democracy | Distributed |
-| constitutional_monarchy | Liberal / electoral democracy | parliamentary_democracy | Distributed (high-income Europe + Asia + Pacific) |
-| absolute_monarchy | Closed autocracy | royal_dictatorship | Mostly Middle East / Gulf |
-| one_party_state | Closed / electoral autocracy | civilian_dictatorship | Distributed |
-| military_rule | Closed / electoral autocracy | military_dictatorship | Distributed (typically lower-income) |
-| theocracy | Closed autocracy | civilian_dictatorship / royal_dictatorship | Iran, Vatican (special-case) |
-| directorial_republic | Liberal democracy | parliamentary_democracy | Switzerland (n=1; descriptive metadata only) |
-
 ## Versioning + changelog {#versioning}
 
-- **{{state.peerGrouping.version}} ({{state.peerGrouping.adoptedAt}}).** Initial publication. Adopted via peer-grouping-resolution-v1. Pending external review by a comparative-politics scholar; v1.1 entries below if material revisions return.
+- **Current version:** {{state.peerGrouping.version}}, dated {{state.peerGrouping.adoptedAt}}. External review by a comparative-politics scholar is pending. Material changes to the lens definitions, minimum-n rule, fallback chain, or source vintages create a new methodology version.
 
 ## References {#references}
 
@@ -165,5 +139,3 @@ The summary mapping below shows the typical replacement for each retired bucket.
 [^11]: Bjørnskov-Rode regime data archive [(sites.google.com/view/martinrode)](https://sites.google.com/view/martinrode/data).
 [^12]: Quality of Government Standard Dataset, distributing the BR/CGV data [(gu.se/en/quality-government)](https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset).
 [^13]: CIA World Factbook (frozen January 2026) [(cia.gov/the-world-factbook)](https://www.cia.gov/the-world-factbook/).
-[^14]: Peer-grouping resolution v1, internal Civica planning archive (`peer-grouping-resolution-v1.md`).
-[^15]: Peer-grouping deliberation transcript, internal Civica planning archive (`peer-grouping-deliberation-transcript.md`).

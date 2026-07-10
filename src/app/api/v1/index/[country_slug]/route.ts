@@ -13,11 +13,10 @@ import {
 import { and, eq, sql, desc } from "drizzle-orm";
 
 /**
- * Phase 5.4 cut-over: this endpoint now serves Beta methodology data
- * by default. Pass `?methodology=v1.0` to fetch the legacy archive (kept
- * around for transparency; not advertised). All v2 fields — score_lower,
- * score_upper, band, completeness_flag, vintage_label — are returned
- * alongside the integer score.
+ * This endpoint serves the current Beta methodology by default. Pass
+ * `?methodology=v1.0` to reproduce an internal archived calculation. Current fields include the
+ * input-variation range, completeness flag, and vintage label alongside the
+ * integer score; categorical country grades are not part of the public shape.
  */
 export async function GET(
   request: Request,
@@ -41,7 +40,20 @@ export async function GET(
     // back to whatever's available preserves the API for the handful of
     // countries still missing Beta data.
     const latestScore = await db
-      .select()
+      .select({
+        quarter: ciCompositeScores.quarter,
+        score: ciCompositeScores.score,
+        scoreLower: ciCompositeScores.scoreLower,
+        scoreUpper: ciCompositeScores.scoreUpper,
+        completenessFlag: ciCompositeScores.completenessFlag,
+        vintageLabel: ciCompositeScores.vintageLabel,
+        rank: ciCompositeScores.rank,
+        totalRanked: ciCompositeScores.totalRanked,
+        isPartial: ciCompositeScores.isPartial,
+        dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
+        missingDimensions: ciCompositeScores.missingDimensions,
+        methodologyVersion: ciCompositeScores.methodologyVersion,
+      })
       .from(ciCompositeScores)
       .where(
         and(
@@ -107,7 +119,6 @@ export async function GET(
           score: composite.score,
           scoreLower: composite.scoreLower,
           scoreUpper: composite.scoreUpper,
-          band: composite.band,
           completenessFlag: composite.completenessFlag,
           rank: composite.rank,
           totalRanked: composite.totalRanked,

@@ -140,13 +140,13 @@ export const DEV_TOKEN_GROUPS: DevTokenGroup[] = [
   },
   {
     id: "tier",
-    title: "Civica Index tier ramp",
+    title: "Non-country status ramp",
     tokens: [
-      c("--tier-exceptional", "Exceptional (Deep Teal)", "#0B4250"),
-      c("--tier-strong",      "Strong (Green)",          "#2E7D55"),
-      c("--tier-mixed",       "Mixed (Gold)",            "#C08F3E"),
-      c("--tier-weak",        "Weak (Ochre)",            "#BD7A4A"),
-      c("--tier-failed",      "Failed (Terracotta)",     "#B7512B"),
+      c("--tier-exceptional", "Status level 5 (Deep Teal)", "#0B4250"),
+      c("--tier-strong",      "Status level 4 (Green)",     "#2E7D55"),
+      c("--tier-mixed",       "Status level 3 (Gold)",      "#C08F3E"),
+      c("--tier-weak",        "Status level 2 (Ochre)",     "#BD7A4A"),
+      c("--tier-failed",      "Status level 1 (Terracotta)","#B7512B"),
     ],
   },
   {

@@ -1,4 +1,4 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { compareCICountries } from "@/lib/db/queries";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import {
@@ -59,7 +59,6 @@ export async function GET(request: Request) {
             score: row.composite.score,
             scoreLower: row.composite.scoreLower,
             scoreUpper: row.composite.scoreUpper,
-            band: row.composite.band,
             completenessFlag: row.composite.completenessFlag,
             rank: row.composite.rank,
             totalRanked: row.composite.totalRanked,
@@ -88,6 +87,7 @@ export async function GET(request: Request) {
         meta: {
           quarter: quarter ?? null,
           count: results.length,
+          methodology: CI_METHODOLOGY_META,
           ...STRUCTURAL_FAMILY_DEPRECATION_META,
         },
       }),

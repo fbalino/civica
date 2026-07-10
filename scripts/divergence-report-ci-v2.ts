@@ -32,7 +32,6 @@ async function main() {
            v2.score::numeric AS v2_score,
            v2.score_lower AS v2_lower,
            v2.score_upper AS v2_upper,
-           v2.band AS v2_band,
            v2.completeness_flag AS v2_completeness,
            v2.rank AS v2_rank
     FROM jurisdictions j
@@ -56,7 +55,6 @@ async function main() {
     v2_score: number | null;
     v2_lower: number | null;
     v2_upper: number | null;
-    v2_band: string | null;
     v2_completeness: string | null;
     v2_rank: number | null;
   };
@@ -89,7 +87,7 @@ async function main() {
     console.log(
       "  " +
         "Country".padEnd(28) +
-        "v1.0  →  Beta    Δ      Beta band · 90% CI",
+        "v1.0  →  Beta    Δ      Input-variation range",
     );
     for (const r of bigDeltas) {
       const v1 = r.v1_score == null ? "—" : Number(r.v1_score).toFixed(1);
@@ -97,7 +95,7 @@ async function main() {
       const deltaStr = (r.delta >= 0 ? "+" : "") + r.delta.toFixed(0);
       const ci = `(${r.v2_lower}–${r.v2_upper})`;
       console.log(
-        `  ${r.country.padEnd(28)}${String(v1).padStart(5)} → ${String(v2).padStart(3)}   ${deltaStr.padStart(5)}   ${r.v2_band} ${ci}`,
+        `  ${r.country.padEnd(28)}${String(v1).padStart(5)} → ${String(v2).padStart(3)}   ${deltaStr.padStart(5)}   ${ci}`,
       );
     }
     console.log();
@@ -132,7 +130,7 @@ async function main() {
     );
     for (const r of v2Only) {
       console.log(
-        `  ${r.country.padEnd(28)} Beta=${r.v2_score} ${r.v2_band} · ${r.v2_completeness}`,
+        `  ${r.country.padEnd(28)} Beta=${r.v2_score} · ${r.v2_completeness}`,
       );
     }
   }

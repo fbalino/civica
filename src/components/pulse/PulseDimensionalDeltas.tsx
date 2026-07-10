@@ -39,15 +39,6 @@ function formatDelta(d: number): string {
   return `${rounded > 0 ? "+" : ""}${rounded.toFixed(1)}`;
 }
 
-function deltaColor(d: number): string {
-  if (Math.abs(d) < SIGNIFICANCE_THRESHOLD) return "var(--color-text-40)";
-  if (d <= -5) return "var(--tier-failed)";
-  if (d <= -2) return "var(--tier-weak)";
-  if (d < 0) return "var(--tier-mixed)";
-  if (d >= 2) return "var(--tier-strong)";
-  return "var(--tier-mixed)";
-}
-
 function formatLastComputed(iso: string | null): string {
   if (!iso) return "Not yet computed";
   const d = new Date(iso);
@@ -107,10 +98,15 @@ function DimensionRowView({
   const significant = Math.abs(row.delta) >= SIGNIFICANCE_THRESHOLD;
   // A delta resting on thin evidence is shown de-emphasized — its
   // magnitude is no longer treated as an authoritative score. The
-  // CSS class supplies the muted color + lighter weight, so we drop
-  // the confident tier color inline for limited rows.
+  // CSS class supplies the muted color + lighter weight. All other deltas use
+  // neutral ink; sign and numeric magnitude communicate direction without a
+  // traffic-light country verdict.
   const limited = row.limitedSignal;
-  const color = limited ? undefined : deltaColor(row.delta);
+  const color = limited
+    ? undefined
+    : significant
+      ? "var(--color-text-primary)"
+      : "var(--color-text-40)";
 
   return (
     <div

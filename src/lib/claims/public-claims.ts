@@ -377,7 +377,7 @@ export const PUBLIC_CLAIMS = [
     surface: "readme",
     routeOrArtifact: "README.md — Civica Index section",
     exactClaim:
-      "The Civica Index is a research-beta 0–100 composite whose simulation bounds are input-variation ranges rather than confidence intervals; it may be redesigned, demoted, or retired after validation.",
+      "The Civica Index is a research-beta 0–100 composite whose simulation bounds are input-variation ranges rather than confidence intervals; its construction, weights, and interpretation remain subject to validation.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "README.template.md",
@@ -597,7 +597,8 @@ export const PUBLIC_CLAIMS = [
     id: "embed.index-score",
     surface: "embeds",
     routeOrArtifact: "/embed/{slug}",
-    exactClaim: "Civica Index {countryScore} ({rank}, {tier}, {quarter}).",
+    exactClaim:
+      "Civica Index {countryScore}/100 · research beta · {quarter}; rank may be shown where space permits.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "src/app/embed/[slug]/route.ts",

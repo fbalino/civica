@@ -1749,6 +1749,60 @@ legend.editorial-filter-label {
   border: 0;
 }
 
+/* ─── Neutral numeric position ─────────────────────────────────────
+ *
+ * Canonical replacement for categorical country grades. The sequential-blue
+ * marker communicates location on a declared numeric scale only. Optional
+ * range shading represents input variation; neither color nor position is a
+ * qualitative verdict.
+ */
+.score-position {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+}
+.score-position__track {
+  position: relative;
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-card-border);
+}
+.score-position__range {
+  position: absolute;
+  inset-block: 0;
+  left: var(--score-range-start);
+  width: var(--score-range-width);
+  border-radius: var(--radius-full);
+  background: var(--ramp-indicator-2);
+}
+.score-position__marker {
+  position: absolute;
+  top: 50%;
+  left: var(--score-position);
+  width: var(--space-5);
+  aspect-ratio: 1;
+  border: var(--space-1) solid var(--color-card-bg);
+  border-radius: var(--radius-full);
+  background: var(--ramp-indicator-5);
+  box-shadow: var(--shadow-hard);
+  transform: translate(-50%, -50%);
+}
+.score-position__scale {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-text-40);
+  font-family: var(--font-body);
+  font-size: var(--text-12);
+  font-variant-numeric: tabular-nums;
+}
+.score-position--compact .score-position__track {
+  height: var(--space-2);
+}
+.score-position--compact .score-position__marker {
+  width: var(--space-4);
+  border-width: var(--space-1);
+}
+
 /* ─── Methodology presentation primitives ──────────────────────────
  *
  * Extracted from the Civica Index methodology page's inline <style>
@@ -1764,9 +1818,7 @@ legend.editorial-filter-label {
  * - `.meth-formula`          styled <pre> code block (formulas, examples)
  * - `.meth-weights-bar`      dimension weight bar (colored segments)
  * - `.meth-weight-slice`        each segment
- * - `.meth-band-scale`       rank band ladder (A-F colored rows)
- * - `.meth-band-cell`           each row
- * - `.meth-version-strip`    4-column metadata grid (status / revision / cutover / cadence)
+ * - `.meth-version-strip`    4-column metadata grid (status / revision / review / cadence)
  * - `.meth-version-cell`        each cell
  * - `.meth-version-label`       cell label
  * - `.meth-version-value`       cell value
@@ -1851,41 +1903,6 @@ legend.editorial-filter-label {
   opacity: 0.8;
 }
 
-.meth-band-scale {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  margin: 10px 0 32px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  border: 1px solid var(--color-card-border);
-}
-
-.meth-band-cell {
-  padding: 12px 18px;
-  color: var(--color-text-primary);
-  display: flex;
-  align-items: baseline;
-  gap: 16px;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-mono, 500);
-}
-
-.meth-band-cell strong {
-  font-family: var(--font-heading);
-  font-size: var(--text-16);
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  flex: 0 0 140px;
-}
-
-.meth-band-cell small {
-  font-size: var(--text-12);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.8;
-}
-
 .meth-version-strip {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1929,21 +1946,6 @@ legend.editorial-filter-label {
   .meth-weight-slice {
     flex: 1 1 50%;
     padding: 10px;
-  }
-  .meth-band-cell strong {
-    flex: 0 0 110px;
-  }
-}
-
-@media (max-width: 600px) {
-  .meth-band-cell {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    padding: 10px 14px;
-  }
-  .meth-band-cell strong {
-    flex: none;
   }
 }
 

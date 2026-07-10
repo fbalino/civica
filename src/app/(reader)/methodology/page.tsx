@@ -68,7 +68,7 @@ const SECTIONS: MethodologySection[] = [
     id: "scoring",
     heading: "Composite scoring — the Civica Index",
     intro:
-      `The Civica Index is a secondary research-beta 0–100 composite across ${civicaIndex.dimensionCount} governance dimensions. It has not completed independent review and may be redesigned or retired after validation.`,
+      `The Civica Index is a secondary research-beta 0–100 composite across ${civicaIndex.dimensionCount} governance dimensions. It has not completed independent review; its construction, weights, and interpretation remain subject to validation.`,
     entries: [
       {
         href: "/civica-index/methodology",
@@ -119,12 +119,6 @@ const SECTIONS: MethodologySection[] = [
         title: "Peer grouping",
         blurb:
           "The peer-lens architecture, why government type is not a peer-grouping primitive, how the n ≥ 8 minimum-n rule works, the documented fallback chain.",
-      },
-      {
-        href: "/civica-index/methodology/peer-grouping/migration",
-        title: "Peer grouping — migration table",
-        blurb:
-          "The per-country migration table after the retirement of the legacy structural_family taxonomy.",
       },
     ],
   },

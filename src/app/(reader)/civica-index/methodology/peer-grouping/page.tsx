@@ -6,7 +6,7 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
-import { peerGrouping, civicaIndex, deprecation } from "@/lib/content/site-state";
+import { peerGrouping, civicaIndex } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
 
@@ -36,9 +36,7 @@ const SECTIONS = [
   { id: "minimum-n", label: "Minimum-n rule" },
   { id: "coverage-limitations", label: "Coverage limitations" },
   { id: "reference-vintage", label: "Reference vintage" },
-  { id: "decision-record", label: "Decision record" },
   { id: "limitations", label: "Limitations" },
-  { id: "migration-table", label: "Migration table" },
   { id: "versioning", label: "Versioning" },
   { id: "references", label: "References" },
   { id: "cite", label: "Cite this page" },
@@ -49,13 +47,7 @@ export default function PeerGroupingMethodologyPage() {
     REVIEW_STATUS_LABEL[peerGrouping.externalReviewStatus] ??
     "Pending external review";
 
-  // ctx values mirror values used in TSX-shell-rendered prose so the
-  // markdown body can interpolate them via {{ctx.reviewStatusLabel}}.
-  const ctx = {
-    reviewStatusLabel,
-  };
-
-  const state = { peerGrouping, civicaIndex, deprecation };
+  const state = { peerGrouping, civicaIndex };
 
   return (
     <MethodologyLayout items={SECTIONS}>
@@ -69,7 +61,7 @@ export default function PeerGroupingMethodologyPage() {
         <div className="editorial-page-meta">
           <span>Methodology {peerGrouping.version}</span>
           <span>·</span>
-          <span>Adopted {peerGrouping.adoptedAt}</span>
+          <span>Version date {peerGrouping.adoptedAt}</span>
           <span>·</span>
           <span>{reviewStatusLabel}</span>
         </div>
@@ -95,7 +87,6 @@ export default function PeerGroupingMethodologyPage() {
             file="content/methodology-peer-grouping.md"
             stats={null}
             state={state as unknown as Record<string, unknown>}
-            ctx={ctx}
           />
         </Reveal>
 

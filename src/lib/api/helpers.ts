@@ -12,25 +12,27 @@ const CORS_HEADERS = {
 /**
  * Methodology status metadata for CI + Pulse API endpoints.
  *
- * The Civica Index is in active methodology development. Published
- * scores carry a "Beta" status flag; the cut-over to the published
- * methodology described at /civica-index/methodology is targeted
- * for `civicaIndex.cutoverTarget`. Citations follow the year-quarter
- * convention (e.g. "Civica Index 2026 Q3 (Beta)") — there is no
- * public version number.
+ * The Civica Index is in active methodology development. Published scores
+ * carry a "Beta" status flag. Citations follow the year-quarter convention
+ * (e.g. "Civica Index 2026 Q3 (Beta)") — there is no public version number.
  *
  * Endpoints that surface CI or Pulse data include this object as
  * `meta.methodology` in their response envelope so machine consumers
- * can detect the development phase and the cut-over window.
+ * can detect the development phase and presentation contract.
  *
- * Drives off `state.civicaIndex.{status, lastRevisionIso, cutoverTargetIso}`
+ * Drives off `state.civicaIndex.{status,lastRevisionIso}`
  * so a single state-file edit propagates to every API endpoint.
  */
 export const CI_METHODOLOGY_META = Object.freeze({
   status: civicaIndex.status,
   last_revised: civicaIndex.lastRevisionIso,
-  cutover_target: civicaIndex.cutoverTargetIso,
   reference: "https://civicaatlas.org/civica-index/methodology",
+  presentation: Object.freeze({
+    format: "numeric_position",
+    scale: Object.freeze({ min: 0, max: 100 }),
+    input_variation_range: "central_90_percent",
+    categorical_grades: false,
+  }),
 });
 
 const RATE_LIMIT_WINDOW_MS = 60_000;

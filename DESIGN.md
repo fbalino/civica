@@ -195,8 +195,8 @@ Methodology presentation primitives (extracted from inline `<style>` blocks duri
 - `.meth-num` — "Section N" eyebrow inside an `<h2>` (numbered-section convention used by the Civica Index methodology page).
 - `.meth-formula` — styled `<pre>` block with accent left border for formulas, citation examples, API reference snippets.
 - `.meth-weights-bar` + `.meth-weight-slice` — colored horizontal bar visualizing dimension weights (currently used at `/civica-index/methodology` §2).
-- `.meth-band-scale` + `.meth-band-cell` — colored vertical ladder visualizing rank bands A–F (`/civica-index/methodology` §6).
-- `.meth-version-strip` + `.meth-version-cell` + `.meth-version-label` + `.meth-version-value` — 4-column metadata grid for status/revision/cutover/cadence (`/civica-index/methodology` §14).
+- `<ScorePosition>` — neutral sequential-blue marker on a declared numeric scale, with optional input-variation range. This is the canonical presentation for experimental country scores; it never maps countries to letter grades, qualitative verdicts, or traffic-light colors.
+- `.meth-version-strip` + `.meth-version-cell` + `.meth-version-label` + `.meth-version-value` — 4-column metadata grid for status/revision/review/cadence (`/civica-index/methodology` §14).
 - `.meth-figure` + `.meth-figure-caption` — wrapper for inline-SVG methodology charts (e.g. `<EigenvalueChart>` on the PCA appendix §4). Print-inspired card aesthetic: grid-cell background, card-border, small-caps Inter caption.
 
 Methodology charts:

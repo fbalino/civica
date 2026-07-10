@@ -69,24 +69,6 @@ const MATERIAL_COLUMNS: MetricColumn[] = [
 
 const METRIC_COLUMNS: MetricColumn[] = [...GOVERNANCE_COLUMNS, ...MATERIAL_COLUMNS];
 
-function bandColor(letter: string | null | undefined): string {
-  switch (letter) {
-    case "A":
-      return "var(--tier-exceptional)";
-    case "B":
-      return "var(--tier-strong)";
-    case "C":
-      return "var(--tier-mixed)";
-    case "D":
-      return "var(--tier-weak)";
-    case "E":
-    case "F":
-      return "var(--tier-failed)";
-    default:
-      return "var(--color-text-primary)";
-  }
-}
-
 export function RankingsMatrix({ rows }: { rows: RankingCountryRow[] }) {
   const columns: SortableColumn<RankingCountryRow>[] = [
     // Country identity column (not numeric; A→Z sort).
@@ -117,7 +99,7 @@ export function RankingsMatrix({ rows }: { rows: RankingCountryRow[] }) {
             <span
               style={
                 isCivicaIndex
-                  ? { color: bandColor(cell.band), fontWeight: "var(--font-weight-semibold)" }
+                  ? { color: "var(--color-text-primary)", fontWeight: "var(--font-weight-semibold)" }
                   : undefined
               }
             >

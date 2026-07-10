@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local agent worktrees contain their own source and generated `.next`
+    // trees; lint each worktree from its own root, never as nested input.
+    ".claude/worktrees/**",
+    "**/.venv/**",
   ]),
 ]);
 

@@ -1957,9 +1957,8 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
 /* === Outcomes peer-band graph ============================================
    Dense one-row-per-indicator layout (~44px tall). Replaces the legacy
    editorial bars on /factbook/[slug]. Each row reads:
-     label · peer range bar with country dot + median tick · value · rank · tier chip
-   The `--tier-color` CSS var is injected per-row via inline style and
-   drives the country dot + halo + tier chip text colour. */
+     label · peer range bar with country dot + median tick · value · rank · peer position
+   Country dots and position labels use a neutral sequential-blue token. */
 .factbook-outcomes-graph {
   display: flex;
   flex-direction: column;
@@ -2050,8 +2049,8 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   height: 12px;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  background: var(--tier-color);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--tier-color) 25%, transparent),
+  background: var(--ramp-indicator-5);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ramp-indicator-5) 25%, transparent),
               0 1px 2px color-mix(in oklab, var(--color-text-primary) 30%, transparent);
 }
 /* (peer min/max labels removed — kept the band visually clean per the
@@ -2078,7 +2077,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   text-align: right;
   min-width: 56px;
 }
-.factbook-outcomes-tier {
+.factbook-outcomes-position {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
@@ -2086,15 +2085,15 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   font-size: var(--text-12);
   letter-spacing: var(--tracking-wider);
   text-transform: uppercase;
-  color: var(--tier-color);
+  color: var(--color-text-60);
   padding: 2px 6px;
-  border: 1px solid var(--tier-color);
-  background: color-mix(in oklab, var(--tier-color) 10%, transparent);
+  border: 1px solid var(--ramp-indicator-4);
+  background: color-mix(in oklab, var(--ramp-indicator-2) 22%, transparent);
   border-radius: 2px;
   white-space: nowrap;
 }
 
-/* Mobile (≤768px): collapse rank + min/max labels, keep label + band + value + tier */
+/* Mobile (≤768px): collapse rank + min/max labels, keep label + band + value + position */
 @media (max-width: 768px) {
   .factbook-outcomes-graph-head {
     grid-template-columns: minmax(120px, 1fr) minmax(120px, 1.5fr) auto auto;
@@ -2112,7 +2111,7 @@ svg.factbook-legislature-hemi .factbook-legislature-seat.is-dim {
   .factbook-outcomes-rank {
     display: none;
   }
-  .factbook-outcomes-tier {
+  .factbook-outcomes-position {
     font-size: 9px;
     padding: 2px 4px;
   }

@@ -1,4 +1,4 @@
-import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
+import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { getCICountryDetail } from "@/lib/db/queries";
@@ -317,6 +317,7 @@ export async function GET(
       },
       meta: {
         reconciliation: FACTBOOK_RECONCILIATION_META,
+        methodology: CI_METHODOLOGY_META,
         ...STRUCTURAL_FAMILY_DEPRECATION_META,
       },
     }));

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { getAllJurisdictions, getAlmanacFilterFacts } from "@/lib/db/queries";
-import { ciTier } from "@/lib/ci/tiers";
 import {
   FactbookAlmanac,
   type FactbookAlmanacCountry,
@@ -29,7 +28,6 @@ export default async function CountryIndexPage() {
     ]);
     countries = rows.map((row) => {
       const facts = filterFacts[row.id];
-      const score = facts?.ciScore ?? null;
       return {
         id: row.id,
         slug: row.slug,
@@ -39,11 +37,10 @@ export default async function CountryIndexPage() {
         capital: row.capital,
         continent: row.continent,
         // Phase F peer-grouping canonical facts (human-readable strings)
-        // + Civica Index tier — drive the advanced filter bar.
+        // drive the advanced filter bar.
         region: facts?.region ?? null,
         incomeGroup: facts?.incomeGroup ?? null,
         regimeType: facts?.regimeType ?? null,
-        ciTier: score != null ? ciTier(score).key : null,
       };
     });
   } catch {

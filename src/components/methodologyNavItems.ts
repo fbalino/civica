@@ -52,9 +52,4 @@ export const METHODOLOGY_NAV_ITEMS: MethodologyNavItem[] = [
     label: "Peer Grouping",
     descriptor: "Comparison sets",
   },
-  {
-    href: "/civica-index/methodology/peer-grouping/migration",
-    label: "Migration Table",
-    descriptor: "Per-country fields",
-  },
 ];

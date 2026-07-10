@@ -36,14 +36,6 @@ export function CompareTimelineOverlay({ series }: { series: TimelineSeries[] })
   const yAt = (score: number) =>
     PAD.top + chartH - ((score - minScore) / (maxScore - minScore)) * chartH;
 
-  const bandTops = [
-    { from: 100, to: 90, color: "var(--tier-exceptional)" },
-    { from: 90, to: 75, color: "var(--tier-strong)" },
-    { from: 75, to: 50, color: "var(--tier-mixed)" },
-    { from: 50, to: 25, color: "var(--tier-weak)" },
-    { from: 25, to: 0, color: "var(--tier-failed)" },
-  ];
-
   const xLabelIdx = new Set<number>([0, quarters.length - 1]);
   if (quarters.length > 6) {
     xLabelIdx.add(Math.round(quarters.length / 3));
@@ -57,19 +49,8 @@ export function CompareTimelineOverlay({ series }: { series: TimelineSeries[] })
       style={{ width: "100%", height: 340 }}
       aria-label="Civica Index timeline overlay"
     >
-      {bandTops.map((b) => (
-        <rect
-          key={b.from}
-          x={PAD.left}
-          y={yAt(b.from)}
-          width={chartW}
-          height={yAt(b.to) - yAt(b.from)}
-          fill={b.color}
-          opacity="0.06"
-        />
-      ))}
       <g stroke="var(--color-divider)" strokeWidth="1" opacity="0.6">
-        {[90, 75, 50, 25].map((v) => (
+        {[0, 25, 50, 75, 100].map((v) => (
           <line
             key={v}
             x1={PAD.left}
@@ -79,7 +60,7 @@ export function CompareTimelineOverlay({ series }: { series: TimelineSeries[] })
           />
         ))}
       </g>
-      {[100, 90, 75, 50, 25].map((v) => (
+      {[100, 75, 50, 25, 0].map((v) => (
         <text
           key={v}
           x={4}

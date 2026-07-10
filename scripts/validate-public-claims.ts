@@ -21,6 +21,10 @@ import {
 } from "../src/lib/claims/public-claims";
 import { validatePublicClaimRegistry } from "../src/lib/claims/registry-validation";
 import { findUnqualifiedAuthorityLanguage } from "../src/lib/claims/authority-language";
+import {
+  findCountryGradeLeaks,
+  type CountryGradeLeak,
+} from "../src/lib/claims/country-grade-language";
 
 const MARKER_PATTERN = /PUBLIC_CLAIM:\s*([a-z0-9][a-z0-9.-]*)/g;
 const MARKER_SCAN_ROOTS = [
@@ -43,6 +47,17 @@ const AUTHORITY_COPY_SCAN_ROOTS = [
   "src/lib/og.ts",
 ] as const;
 const SCANNED_EXTENSIONS = new Set([".ts", ".tsx", ".md", ".cff"]);
+const GRADE_COPY_EXTENSIONS = new Set([
+  ".ts",
+  ".tsx",
+  ".md",
+  ".mdx",
+  ".cff",
+]);
+const GRADE_CODE_SCAN_ROOTS = ["src", "scripts"] as const;
+const GRADE_CODE_EXTENSIONS = new Set([".ts", ".tsx"]);
+const GRADE_SCAN_IMPLEMENTATION =
+  "src/lib/claims/country-grade-language.ts";
 const CLAIMS: readonly PublicClaim[] = PUBLIC_CLAIMS;
 
 interface MarkerLocation {
@@ -68,7 +83,10 @@ async function exists(relativePath: string): Promise<boolean> {
   }
 }
 
-async function listScannedFiles(relativePath: string): Promise<string[]> {
+async function listScannedFiles(
+  relativePath: string,
+  extensions: ReadonlySet<string> = SCANNED_EXTENSIONS,
+): Promise<string[]> {
   const absolutePath = path.resolve(process.cwd(), relativePath);
   const stat = await fs.stat(absolutePath);
   if (stat.isFile()) return [relativePath];
@@ -77,8 +95,8 @@ async function listScannedFiles(relativePath: string): Promise<string[]> {
   const files = await Promise.all(
     entries.map(async (entry) => {
       const child = path.posix.join(relativePath, entry.name);
-      if (entry.isDirectory()) return listScannedFiles(child);
-      return SCANNED_EXTENSIONS.has(path.extname(entry.name)) ? [child] : [];
+      if (entry.isDirectory()) return listScannedFiles(child, extensions);
+      return extensions.has(path.extname(entry.name)) ? [child] : [];
     }),
   );
   return files.flat();
@@ -120,6 +138,75 @@ async function validateAuthorityLanguage(): Promise<string[]> {
   }
 
   return errors;
+}
+
+interface LocatedCountryGradeLeak extends CountryGradeLeak {
+  file: string;
+  line: number;
+}
+
+function isGradeScannerFixture(file: string): boolean {
+  return (
+    file === GRADE_SCAN_IMPLEMENTATION ||
+    file.endsWith(".test.ts") ||
+    file.endsWith(".test.tsx") ||
+    file.includes("/__tests__/")
+  );
+}
+
+function isPrivateAppSurface(file: string): boolean {
+  return (
+    file.startsWith("src/app/(admin)/") ||
+    file.startsWith("src/app/api/admin/") ||
+    file.startsWith("src/app/api/cron/")
+  );
+}
+
+async function validateCountryGradePolicy(): Promise<
+  LocatedCountryGradeLeak[]
+> {
+  const leaks: LocatedCountryGradeLeak[] = [];
+  const codeFiles = (
+    await Promise.all(
+      GRADE_CODE_SCAN_ROOTS.map((root) =>
+        listScannedFiles(root, GRADE_CODE_EXTENSIONS),
+      ),
+    )
+  )
+    .flat()
+    .filter((file) => !isGradeScannerFixture(file));
+
+  for (const file of codeFiles) {
+    const content = await fs.readFile(path.resolve(process.cwd(), file), "utf8");
+    for (const leak of findCountryGradeLeaks(content, { filePath: file })) {
+      leaks.push({ ...leak, file, line: lineOf(content, leak.index) });
+    }
+  }
+
+  const copyFiles = (
+    await Promise.all(
+      MARKER_SCAN_ROOTS.map((root) =>
+        listScannedFiles(root, GRADE_COPY_EXTENSIONS),
+      ),
+    )
+  )
+    .flat()
+    .filter(
+      (file) => !isGradeScannerFixture(file) && !isPrivateAppSurface(file),
+    );
+
+  for (const file of copyFiles) {
+    const content = await fs.readFile(path.resolve(process.cwd(), file), "utf8");
+    for (const leak of findCountryGradeLeaks(content, {
+      filePath: file,
+      scanStructure: false,
+      scanCopy: true,
+    })) {
+      leaks.push({ ...leak, file, line: lineOf(content, leak.index) });
+    }
+  }
+
+  return leaks;
 }
 
 async function main(): Promise<void> {
@@ -194,6 +281,13 @@ async function main(): Promise<void> {
 
   const authorityErrors = await validateAuthorityLanguage();
   errors.push(...authorityErrors);
+  const countryGradeLeaks = await validateCountryGradePolicy();
+  errors.push(
+    ...countryGradeLeaks.map(
+      (leak) =>
+        `country-score presentation leak (${leak.ruleId}) in ${leak.file}:${leak.line} — ${JSON.stringify(leak.match)}`,
+    ),
+  );
 
   console.log("=== Civica public-claims validation ===\n");
   console.log(
@@ -204,6 +298,7 @@ async function main(): Promise<void> {
   );
   console.log(`Markers inspected: ${markers.length}`);
   console.log(`Unqualified high-authority phrases: ${authorityErrors.length}`);
+  console.log(`Country-score grade/verdict leaks: ${countryGradeLeaks.length}`);
 
   if (errors.length > 0) {
     console.error(`\nFAILED — ${errors.length} problem(s):`);

@@ -200,8 +200,6 @@ export type RankingMetricCell = {
   source: string;
   /** ISO string for the dot's freshness label, or null. */
   retrievedAt: string | null;
-  /** Civica Index rank band (A–F), on the `civica_index` cell only. */
-  band?: string;
 };
 
 export type RankingCountryRow = {
@@ -321,7 +319,7 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
   const compositeResult = await db.execute(sql`
     SELECT
       j.id AS jurisdiction_id, j.slug, j.name, j.iso2,
-      cs.score, cs.band, cs.calculated_at
+      cs.score, cs.calculated_at
     FROM ci_composite_scores cs
     JOIN jurisdictions j
       ON j.id = cs.jurisdiction_id
@@ -338,7 +336,6 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
     name: string;
     iso2: string | null;
     score: number | string | null;
-    band: string | null;
     calculated_at: string | Date | null;
   }>;
 
@@ -351,7 +348,6 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
       source: "civica_curated",
       retrievedAt: toIso(r.calculated_at),
     };
-    if (r.band) row.metrics.civica_index.band = r.band;
   }
 
   // ── Civica Index dimension scores (beta, latest quarter) ──
@@ -1094,7 +1090,7 @@ export async function getCIRankings(
     worldBankRegion?: string;
     worldBankIncomeGroup?: string;
     cgvRegime?: string;
-    /** Defaults to "beta" — Phase 5.4 cut-over. */
+    /** Defaults to the current public research-beta methodology. */
     methodologyVersion?: string;
   }
 ) {
@@ -1146,7 +1142,6 @@ export async function getCIRankings(
       cs.score,
       cs.score_lower          AS "scoreLower",
       cs.score_upper          AS "scoreUpper",
-      cs.band,
       cs.completeness_flag    AS "completenessFlag",
       cs.vintage_label        AS "vintageLabel",
       cs.rank,
@@ -1224,7 +1219,22 @@ export async function getCICountryDetail(
   const jId = jurisdiction[0].id;
 
   const [composite] = await db
-    .select()
+    .select({
+      jurisdictionId: ciCompositeScores.jurisdictionId,
+      quarter: ciCompositeScores.quarter,
+      score: ciCompositeScores.score,
+      scoreLower: ciCompositeScores.scoreLower,
+      scoreUpper: ciCompositeScores.scoreUpper,
+      completenessFlag: ciCompositeScores.completenessFlag,
+      vintageLabel: ciCompositeScores.vintageLabel,
+      rank: ciCompositeScores.rank,
+      totalRanked: ciCompositeScores.totalRanked,
+      isPartial: ciCompositeScores.isPartial,
+      dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
+      missingDimensions: ciCompositeScores.missingDimensions,
+      methodologyVersion: ciCompositeScores.methodologyVersion,
+      calculatedAt: ciCompositeScores.calculatedAt,
+    })
     .from(ciCompositeScores)
     .where(
       sql`${ciCompositeScores.jurisdictionId} = ${jId}
@@ -1386,7 +1396,22 @@ export async function compareCICountries(slugs: string[], quarter?: string) {
   // never surface a legacy v1.0 score that disagrees with the country page,
   // leaderboard, and detail API (all beta-only).
   const composites = await db
-    .select()
+    .select({
+      jurisdictionId: ciCompositeScores.jurisdictionId,
+      quarter: ciCompositeScores.quarter,
+      score: ciCompositeScores.score,
+      scoreLower: ciCompositeScores.scoreLower,
+      scoreUpper: ciCompositeScores.scoreUpper,
+      completenessFlag: ciCompositeScores.completenessFlag,
+      vintageLabel: ciCompositeScores.vintageLabel,
+      rank: ciCompositeScores.rank,
+      totalRanked: ciCompositeScores.totalRanked,
+      isPartial: ciCompositeScores.isPartial,
+      dimensionsAvailable: ciCompositeScores.dimensionsAvailable,
+      missingDimensions: ciCompositeScores.missingDimensions,
+      methodologyVersion: ciCompositeScores.methodologyVersion,
+      calculatedAt: ciCompositeScores.calculatedAt,
+    })
     .from(ciCompositeScores)
     .where(
       sql`${ciCompositeScores.jurisdictionId} IN ${jIds} AND ${ciCompositeScores.quarter} = ${q} AND ${ciCompositeScores.methodologyVersion} = ${"beta"}`
@@ -1660,13 +1685,10 @@ export async function getCivicaConditionsForJurisdiction(
  * Batch filter facts for the `/country` almanac index.
  *
  * Returns, keyed by jurisdiction id, the three Phase F peer-grouping
- * canonical facts used as list filters plus the country's Civica Index
- * composite score. All values are the human-readable canonical strings
+ * canonical facts used as list filters. All values are the human-readable canonical strings
  * ("North America", "High income", "Liberal Democracy") straight off the
  * active `country_facts` rows — no snake_case slugs (see
- * `lens-metadata.ts`). The CI score is pinned to `methodology_version='beta'`
- * at the latest available quarter; callers map it to a tier via
- * `ciTier()` in `src/lib/ci/tiers.ts`.
+ * `lens-metadata.ts`).
  *
  * One pass over the whole listed set (~200 sovereign states) — cheap
  * enough to run in the landing's server component. Provenance-free by
@@ -1680,7 +1702,6 @@ export async function getAlmanacFilterFacts(): Promise<
       region: string | null;
       incomeGroup: string | null;
       regimeType: string | null;
-      ciScore: number | null;
     }
   >
 > {
@@ -1690,14 +1711,13 @@ export async function getAlmanacFilterFacts(): Promise<
       region: string | null;
       incomeGroup: string | null;
       regimeType: string | null;
-      ciScore: number | null;
     }
   > = {};
 
   const ensure = (id: string) => {
     let entry = out[id];
     if (!entry) {
-      entry = { region: null, incomeGroup: null, regimeType: null, ciScore: null };
+      entry = { region: null, incomeGroup: null, regimeType: null };
       out[id] = entry;
     }
     return entry;
@@ -1726,25 +1746,6 @@ export async function getAlmanacFilterFacts(): Promise<
     else if (row.factKey === "world_bank_income_group")
       entry.incomeGroup = row.factValue;
     else if (row.factKey === "vdem_row") entry.regimeType = row.factValue;
-  }
-
-  // Civica Index composite scores — pinned to beta at the latest quarter.
-  const quarter = await getLatestAvailableQuarter("beta");
-  const scoreRows = await db
-    .select({
-      jurisdictionId: ciCompositeScores.jurisdictionId,
-      score: ciCompositeScores.score,
-    })
-    .from(ciCompositeScores)
-    .where(
-      and(
-        eq(ciCompositeScores.quarter, quarter),
-        eq(ciCompositeScores.methodologyVersion, "beta")
-      )
-    );
-
-  for (const row of scoreRows) {
-    ensure(row.jurisdictionId).ciScore = row.score;
   }
 
   return out;

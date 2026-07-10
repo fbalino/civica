@@ -10,7 +10,6 @@ const ROUTE_LABELS: Record<string, string> = {
   "civica-index": "Civica Index",
   factbook: "Factbook",
   methodology: "Methodology",
-  migration: "Migration table",
   "pca-appendix": "PCA appendix",
   "peer-grouping": "Peer grouping",
   pulse: "Pulse methodology",

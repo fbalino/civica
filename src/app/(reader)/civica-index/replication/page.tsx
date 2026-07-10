@@ -14,7 +14,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Index Replication Package",
   description:
-    "Reproduce every Civica Index score from primary sources: full methodology, codebook, processing logic, and downloadable outputs — coming at Beta launch.",
+    "Planned materials for reproducing Civica Index research-beta estimates from primary sources: methodology, codebook, processing logic, and downloadable outputs.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/replication" },
 };
 
@@ -60,14 +60,14 @@ export default async function ReplicationPage() {
           The Civica Index is designed to be fully reproducible. That means
           publishing not just the scores, but every formula, normalization step,
           source dataset reference, and codebook entry needed to re-derive the
-          same numbers from scratch. The replication package ships at Beta
-          cut-over (target: {replication.shipTarget}), once the PCA / factor
-          analysis and input-variation work are finalized. The contents
-          are described below.
+          same numbers from scratch. The package is not yet published. Release
+          requires completion of the longitudinal, factor-analysis, and
+          input-variation validation work described in the methodology. The
+          planned contents are listed below.
         </p>
 
         <Banner variant="warn">
-          Status: coming at Beta launch — target {civicaIndex.cutoverTarget}
+          Status: not yet published — validation and reproducibility checks are incomplete.
         </Banner>
 
         <section id="package-contents" className="editorial-section">
@@ -93,7 +93,7 @@ export default async function ReplicationPage() {
               how raw source data flows into final CI scores: ingestion,
               normalization (fixed-bound, not observed-extremes), PCA factor
               weights, composite formula, simulation-range derivation, and
-              tier classification.
+              neutral numeric presentation and completeness handling.
             </li>
             <li>
               <strong>Source references.</strong> Direct links and bibliographic
@@ -106,7 +106,7 @@ export default async function ReplicationPage() {
               ? `all ${scoredJurisdictions}`
                 : "all"}{" "}
               scored jurisdictions: CI score, Monte Carlo input-variation range, rank,
-              rank band, dimensional breakdowns, completeness flag (Full /
+              dimensional breakdowns, completeness flag (Full /
               Partial / Insufficient), and data vintage per source.
             </li>
             <li>

@@ -150,7 +150,6 @@ export async function GET(request: Request) {
       score: ciCompositeScores.score,
       scoreLower: ciCompositeScores.scoreLower,
       scoreUpper: ciCompositeScores.scoreUpper,
-      band: ciCompositeScores.band,
       completenessFlag: ciCompositeScores.completenessFlag,
       vintageLabel: ciCompositeScores.vintageLabel,
       isPartial: ciCompositeScores.isPartial,

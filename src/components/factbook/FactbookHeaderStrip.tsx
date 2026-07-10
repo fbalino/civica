@@ -12,7 +12,6 @@ import { ParallaxImage } from "@/components/motion/ParallaxImage";
 import { BetaChip } from "@/components/editorial/BetaChip";
 import type { ResolverOutput } from "@/lib/factbook/reconcile/types";
 import type { CountryBounds } from "@/lib/data/country-bounds";
-import { ciTier } from "@/lib/ci/tiers";
 
 function MetaPill({
   label,
@@ -233,7 +232,8 @@ export function FactbookHeaderStrip({
     cpDelta == null
       ? null
       : `${cpDelta > 0 ? "+" : cpDelta < 0 ? "−" : ""}${Math.abs(cpDelta).toFixed(1)}`;
-  const ciScoreColor = ciScore != null ? ciTier(ciScore).cssVar : "var(--color-accent)";
+  // Numeric research estimate: neutral ink, never a qualitative tier color.
+  const ciScoreColor = ciScore != null ? "var(--color-text-primary)" : "var(--color-accent)";
 
   const trendArrow =
     cpTrend === "up" ? "↑" : cpTrend === "down" ? "↓" : cpTrend === "flat" ? "→" : null;

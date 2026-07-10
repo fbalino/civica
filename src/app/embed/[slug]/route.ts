@@ -188,8 +188,6 @@ export async function GET(
       : null;
   const pulseDisplay = pulseScore !== null ? pulseScore.toFixed(1) : null;
 
-  const tier =
-    ciInt !== null ? getTier(ciInt) : { label: "N/A", cssVar: "--t-mixed" };
   const rank = composite?.rank ?? null;
   const totalRanked = composite?.totalRanked ?? null;
 
@@ -238,7 +236,6 @@ export async function GET(
     ciDisplay,
     ciMeta,
     pulseDisplay,
-    tier,
     rank,
     totalRanked,
     quarterLabel,
@@ -267,14 +264,6 @@ const SIZE_MAP = {
   md: { width: 320, height: 180 },
   lg: { width: 400, height: 260 },
 };
-
-function getTier(score: number): { label: string; cssVar: string } {
-  if (score >= 90) return { label: "Exceptional", cssVar: "--t-excep" };
-  if (score >= 75) return { label: "Strong", cssVar: "--t-strong" };
-  if (score >= 50) return { label: "Mixed", cssVar: "--t-mixed" };
-  if (score >= 25) return { label: "Weak", cssVar: "--t-weak" };
-  return { label: "Failed", cssVar: "--t-failed" };
-}
 
 type DimensionRow = {
   dimension: string;
@@ -372,7 +361,6 @@ interface BuildHtmlArgs {
   ciDisplay: string;
   ciMeta: string;
   pulseDisplay: string | null;
-  tier: { label: string; cssVar: string };
   rank: number | null;
   totalRanked: number | null;
   quarterLabel: string;
@@ -394,7 +382,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   const {
     size, themeParam, dims, jurisdiction,
     ciDisplay, ciMeta, pulseDisplay,
-    tier, rank, totalRanked, quarterLabel, updatedDate,
+    rank, totalRanked, quarterLabel, updatedDate,
     dimScores, width, height, include, attributionLabel,
   } = args;
 
@@ -406,9 +394,9 @@ function buildHtml(args: BuildHtmlArgs): string {
     rank && totalRanked
       ? `Rank ${rank} of ${totalRanked}`
       : "";
-  const tierPct = ciDisplay !== "—" ? Math.round(Number(ciDisplay)) : 0;
-  // Pulse is intentionally NOT on a live cron schedule, so a "· LIVE"
-  // suffix here would misrepresent the cadence. Render the score plainly.
+  const scorePct = ciDisplay !== "—" ? Math.round(Number(ciDisplay)) : 0;
+  // Pulse is computed by scheduled daily runs, not continuously. A "LIVE"
+  // suffix would misrepresent the cadence, so render the latest score plainly.
   const pulseMeta = pulseDisplay !== null ? `CP ${pulseDisplay}` : "CP unavailable";
 
   // Phase F.4 — read-only attribution line that lists the canonical
@@ -429,17 +417,17 @@ function buildHtml(args: BuildHtmlArgs): string {
     })
     .join("");
 
-  const smBody = `<a class="civica-widget small" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const smBody = `<a class="civica-widget small" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener">
   <div class="mark serif">C</div>
   <div class="body">
     <div class="country">${esc(jurisdiction.name)}</div>
-    <div class="meta mono">CI ${esc(ciMeta)} &middot; ${esc(pulseMeta)} &middot; ${esc(tier.label.toUpperCase())}</div>
+    <div class="meta mono">CI ${esc(ciMeta)} &middot; ${esc(pulseMeta)} &middot; RESEARCH BETA</div>
   </div>
   <div class="score serif">${esc(ciDisplay)}</div>
 </a>`;
 
   // PUBLIC_CLAIM: embed.index-score
-  const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const mdBody = `<a class="civica-widget medium" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
     <div class="gov mono">${esc(govType)}</div>
@@ -448,10 +436,10 @@ function buildHtml(args: BuildHtmlArgs): string {
     <div class="name serif">${esc(jurisdiction.name)}</div>
     <div class="num serif">${esc(ciDisplay)}</div>
   </div>
-  <div class="tier-row">
-    <span>${esc(tier.label)}</span><span class="mono">${esc(pulseMeta)}</span>
+  <div class="score-context">
+    <span>Research beta</span><span class="mono">${esc(pulseMeta)}</span>
   </div>
-  <div class="tier-bar"><span style="width:${tierPct}%"></span></div>
+  <div class="score-position"><span style="width:${scorePct}%"></span></div>
   ${attributionHtml}
   <div class="foot mono">
     <span>civicaatlas.org/country/${esc(jurisdiction.slug)}</span>
@@ -459,7 +447,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   </div>
 </a>`;
 
-  const lgBody = `<a class="civica-widget large" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const lgBody = `<a class="civica-widget large" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}/civica-data" target="_blank" rel="noopener">
   <div class="top">
     <div class="brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
     <div class="gov mono">${esc(govType)}</div>
@@ -471,10 +459,10 @@ function buildHtml(args: BuildHtmlArgs): string {
     </div>
     <div class="num serif">${esc(ciDisplay)}<small class="mono">/ 100</small></div>
   </div>
-  <div class="tier-label">
-    <span>${esc(tier.label)}</span><span class="mono">${esc(pulseMeta)}</span>
+  <div class="score-context">
+    <span>Research beta &middot; no country grade</span><span class="mono">${esc(pulseMeta)}</span>
   </div>
-  <div class="tier-bar"><span style="width:${tierPct}%"></span></div>
+  <div class="score-position"><span style="width:${scorePct}%"></span></div>
   ${dims ? `<div class="dims">${dimBarsHtml}</div>` : ""}
   ${attributionHtml}
   <div class="foot mono">
@@ -508,7 +496,7 @@ function buildHtml(args: BuildHtmlArgs): string {
       : null;
   const customRowsHtml = [
     includeSet.has("ci")
-      ? `<div class="cf-score-row"><span class="cf-score-label mono">CI</span><span class="cf-score-val serif" style="color:var(${tier.cssVar})">${esc(ciDisplay)}</span><span class="cf-score-meta mono">${esc(tier.label)}</span></div>`
+      ? `<div class="cf-score-row"><span class="cf-score-label mono">CI</span><span class="cf-score-val serif">${esc(ciDisplay)}</span><span class="cf-score-meta mono">RESEARCH BETA</span></div>`
       : "",
     includeSet.has("cp")
       ? pulseDisplay !== null
@@ -524,7 +512,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     .filter(Boolean)
     .join("");
 
-  const customBody = `<a class="civica-widget custom" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}" target="_blank" rel="noopener" style="--tier:var(${tier.cssVar})">
+  const customBody = `<a class="civica-widget custom" href="https://civicaatlas.org/country/${esc(jurisdiction.slug)}" target="_blank" rel="noopener">
   <div class="cf-top">
     <div class="cf-brand">Civica Index <span class="dotlabel mono"><span class="dot frozen"></span> ${esc(quarterLabel)}</span></div>
   </div>
@@ -563,9 +551,7 @@ html,body{width:${width}px;height:${height}px;overflow:hidden;-webkit-font-smoot
   --paper:#FAF7F2;--paper-2:#F3EFE6;--paper-3:#EDE9E2;
   --ink:#0B1B2D;--ink-2:#2A3648;--ink-3:#6A7688;
   --rule:#E4E1DC;--rule-soft:#EDE9E2;
-  --live:#2E7D55;--frozen:#C08F3E;
-  --t-failed:#B7512B;--t-weak:#BD7A4A;
-  --t-mixed:#C08F3E;--t-strong:#2E7D55;--t-excep:#0B4250;
+  --live:#2E7D55;--frozen:#C08F3E;--indicator:var(--ink-2);
   --shadow-hard:0 1px 2px rgba(15,23,42,.06);--shadow-hard-lg:0 4px 12px rgba(15,23,42,.10);
 }
 /* System dark override */
@@ -574,9 +560,7 @@ html,body{width:${width}px;height:${height}px;overflow:hidden;-webkit-font-smoot
     --paper:#16140f;--paper-2:#221e16;--paper-3:#2b2619;
     --ink:#ebe6d6;--ink-2:#c4bdae;--ink-3:#8a8370;
     --rule:#3d382d;--rule-soft:#2b2619;
-    --live:#5BA77E;--frozen:#D6AE63;
-    --t-failed:oklch(62% 0.14 40);--t-weak:oklch(66% 0.10 55);
-    --t-mixed:oklch(77% 0.12 78);--t-strong:oklch(64% 0.11 155);--t-excep:oklch(66% 0.09 215);
+    --live:#5BA77E;--frozen:#D6AE63;--indicator:var(--ink-2);
     --shadow-hard:0 1px 2px rgba(0,0,0,.4);--shadow-hard-lg:0 6px 16px rgba(0,0,0,.5);
   }
 }
@@ -585,18 +569,14 @@ html,body{width:${width}px;height:${height}px;overflow:hidden;-webkit-font-smoot
   --paper:#FAF7F2;--paper-2:#F3EFE6;--paper-3:#EDE9E2;
   --ink:#0B1B2D;--ink-2:#2A3648;--ink-3:#6A7688;
   --rule:#E4E1DC;--rule-soft:#EDE9E2;
-  --live:#2E7D55;--frozen:#C08F3E;
-  --t-failed:#B7512B;--t-weak:#BD7A4A;
-  --t-mixed:#C08F3E;--t-strong:#2E7D55;--t-excep:#0B4250;
+  --live:#2E7D55;--frozen:#C08F3E;--indicator:var(--ink-2);
   --shadow-hard:0 1px 2px rgba(15,23,42,.06);--shadow-hard-lg:0 4px 12px rgba(15,23,42,.10);
 }
 [data-theme="dark"]{
   --paper:#16140f;--paper-2:#221e16;--paper-3:#2b2619;
   --ink:#ebe6d6;--ink-2:#c4bdae;--ink-3:#8a8370;
   --rule:#3d382d;--rule-soft:#2b2619;
-  --live:#5BA77E;--frozen:#D6AE63;
-  --t-failed:oklch(62% 0.14 40);--t-weak:oklch(66% 0.10 55);
-  --t-mixed:oklch(77% 0.12 78);--t-strong:oklch(64% 0.11 155);--t-excep:oklch(66% 0.09 215);
+  --live:#5BA77E;--frozen:#D6AE63;--indicator:var(--ink-2);
   --shadow-hard:0 1px 2px rgba(0,0,0,.4);--shadow-hard-lg:0 6px 16px rgba(0,0,0,.5);
 }
 
@@ -624,7 +604,7 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
   transition:transform 120ms ease,box-shadow 120ms ease;
 }
 .civica-widget:hover{transform:translateY(-1px);box-shadow:var(--shadow-hard-lg)}
-.civica-widget:focus-visible{outline:2px solid var(--t-mixed);outline-offset:2px}
+.civica-widget:focus-visible{outline:2px solid var(--indicator);outline-offset:2px}
 
 /* Phase F.4 — read-only source attribution line. Sized to match the
    existing widget meta typography so it doesn't visually compete
@@ -663,9 +643,9 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
 .civica-widget.medium .country-row{display:flex;justify-content:space-between;align-items:baseline}
 .civica-widget.medium .name{font-family:'Source Serif 4',serif;font-weight:500;font-size:22px;letter-spacing:-0.015em}
 .civica-widget.medium .num{font-family:'Source Serif 4',serif;font-weight:500;font-size:46px;line-height:0.95;letter-spacing:-0.025em}
-.civica-widget.medium .tier-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-2)}
-.civica-widget.medium .tier-bar{position:relative;height:4px;background:var(--rule-soft)}
-.civica-widget.medium .tier-bar>span{position:absolute;inset:0 auto 0 0;background:var(--tier,var(--t-mixed))}
+.civica-widget.medium .score-context{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-2)}
+.civica-widget.medium .score-position{position:relative;height:4px;background:var(--rule-soft)}
+.civica-widget.medium .score-position>span{position:absolute;inset:0 auto 0 0;background:var(--indicator)}
 .civica-widget.medium .foot{display:flex;justify-content:space-between;align-items:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:var(--ink-3);padding-top:8px;border-top:1px dashed var(--rule)}
 
 /* ── Large 400×260 ── */
@@ -682,13 +662,13 @@ body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans
 .civica-widget.large .sub{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em}
 .civica-widget.large .num{font-family:'Source Serif 4',serif;font-weight:500;font-size:58px;line-height:0.9;letter-spacing:-0.03em}
 .civica-widget.large .num small{font-size:15px;color:var(--ink-3);font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:400;letter-spacing:0;display:block;margin-top:4px}
-.civica-widget.large .tier-label{display:flex;justify-content:space-between;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-2)}
-.civica-widget.large .tier-bar{position:relative;height:4px;background:var(--rule-soft)}
-.civica-widget.large .tier-bar>span{position:absolute;inset:0 auto 0 0;background:var(--tier,var(--t-mixed))}
+.civica-widget.large .score-context{display:flex;justify-content:space-between;font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-2)}
+.civica-widget.large .score-position{position:relative;height:4px;background:var(--rule-soft)}
+.civica-widget.large .score-position>span{position:absolute;inset:0 auto 0 0;background:var(--indicator)}
 .civica-widget.large .dims{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding-top:2px}
 .civica-widget.large .dim-col{display:flex;flex-direction:column;gap:4px}
 .civica-widget.large .dim-bar-wrap{height:32px;background:var(--rule-soft);position:relative;display:flex;align-items:flex-end}
-.civica-widget.large .dim-fill{width:100%;background:var(--tier,var(--ink-2))}
+.civica-widget.large .dim-fill{width:100%;background:var(--indicator)}
 .civica-widget.large .dim-lbl{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.06em;text-align:center}
 .civica-widget.large .foot{display:flex;justify-content:space-between;align-items:center;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;color:var(--ink-3);padding-top:8px;border-top:1px dashed var(--rule)}
 

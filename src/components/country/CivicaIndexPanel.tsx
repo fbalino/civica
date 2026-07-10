@@ -8,7 +8,6 @@ import {
 import {
   CIPulseScoreDisplay,
   type CIScoreData,
-  type PulseScoreData,
 } from "@/components/ci/CIPulseScoreDisplay";
 import { PulseDimensionalDeltas } from "@/components/pulse/PulseDimensionalDeltas";
 import {
@@ -20,7 +19,7 @@ import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { CountryTrendSection } from "@/components/ci/CountryTrendSection";
 import { PeerLensPanel } from "@/components/peer-grouping/PeerLensPanel";
 import { getMaterialPeerSet, getGovernancePeerSet } from "@/lib/peer-grouping";
-import { ciTier as ciTierCanonical } from "@/lib/ci/tiers";
+import { dimensionColorVar } from "@/lib/ci/dimension-colors";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { V2_WEIGHTS } from "@/lib/ci/dimensions-v2";
 import { civicaIndex } from "@/lib/content/site-state";
@@ -100,19 +99,6 @@ function findRankInList<T extends { slug?: string | null }>(
     rank: index + 1,
     total: rows.length,
   };
-}
-
-function ciTier(score: number): { label: string; color: string; bg: string } {
-  const info = ciTierCanonical(score);
-  return {
-    label: info.label,
-    color: "var(--color-text-primary)",
-    bg: info.cssVar,
-  };
-}
-
-function dimensionColor(score: number): string {
-  return ciTierCanonical(score).cssVar;
 }
 
 function pulseImpactColor(impact: number): string {
@@ -299,7 +285,9 @@ function DimensionScoreTable({
         const score =
           displayDimensionScore(d.rawValue, d.sourceId) ??
           Number(d.normalizedScore);
-        const color = dimensionColor(score);
+        // Fixed per-dimension series color: color identifies the source
+        // dimension and never grades the country's numeric value.
+        const color = dimensionColorVar(d.dimension);
         const weight = DIMENSION_WEIGHT_PCT[d.dimension] ?? 0;
         const contribution = (score * weight) / 100;
         return (
@@ -565,7 +553,6 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
           composite.scoreLower != null ? Number(composite.scoreLower) : null,
         scoreUpper:
           composite.scoreUpper != null ? Number(composite.scoreUpper) : null,
-        band: (composite.band as string | null) ?? null,
         completenessFlag:
           (composite.completenessFlag as
             | "full"

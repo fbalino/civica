@@ -11,11 +11,9 @@
  * the two remaining dimensions reuse existing tokens that are otherwise unused
  * in that palette, so all six stay visually distinct.
  *
- * NOTE: the CI dimension BAR breakdown (CivicaIndexPanel → DimensionScoreTable)
- * deliberately colors a bar by the TIER of its score, not by a fixed dimension
- * color — that is a different visual grammar (a score readout) and is left
- * unchanged. This module is for the case where the dimension IS the series
- * identity (a line among lines), which needs a stable color per dimension.
+ * The CI dimension bar breakdown also uses these fixed identity colors. Color
+ * therefore means "which source dimension," never a qualitative judgment
+ * about a country's numeric estimate.
  */
 
 import type { CIDimension } from "./types";

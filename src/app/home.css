@@ -442,23 +442,7 @@
 .home-index-score {
   font-weight: var(--font-weight-semibold);
 }
-.home-index-tier {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--text-13);
-  color: var(--color-text-60);
-}
-.home-index-tier-swatch {
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
-  flex-shrink: 0;
-}
-
 @media (max-width: 38.75rem) {
-  .home-index-table th.home-index-col-tier,
-  .home-index-table td.home-index-col-tier { display: none; }
   .home-index-table thead th,
   .home-index-table td { padding: var(--space-3) var(--space-4); }
 }

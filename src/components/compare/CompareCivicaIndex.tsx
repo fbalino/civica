@@ -6,8 +6,8 @@ import {
 } from "@/lib/ci/dimensions-v2";
 import { CompareTimelineOverlay } from "./CompareTimelineOverlay";
 import type { compareCICountries, getCICountryHistory } from "@/lib/db/queries";
-import { ciTier } from "@/lib/ci/tiers";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { ScorePosition } from "@/components/editorial/ScorePosition";
 
 /**
  * Per-dimension DISPLAY score on the v2 fixed-bound scale so /compare
@@ -114,7 +114,6 @@ export function CompareCivicaIndex({
             country.composite && country.composite.score !== null
               ? Number(country.composite.score)
               : null;
-          const tier = score != null ? ciTier(score) : null;
           const rank = country.composite?.rank ?? null;
           return (
             <div
@@ -134,9 +133,16 @@ export function CompareCivicaIndex({
                     {Math.round(score)}
                   </div>
                   <div className="compare-ci-card-meta">
-                    {tier ? tier.label : "—"}
+                    Research beta
                     {rank ? ` · rank ${rank}` : ""}
                   </div>
+                  <ScorePosition
+                    value={score}
+                    lower={country.composite?.scoreLower ?? null}
+                    upper={country.composite?.scoreUpper ?? null}
+                    label={`${country.jurisdiction.name} Civica Index estimate`}
+                    compact
+                  />
                 </>
               ) : (
                 <div className="compare-ci-card-placeholder">
@@ -166,9 +172,6 @@ export function CompareCivicaIndex({
                 {s.name}
               </span>
             ))}
-            <span style={{ color: "var(--color-text-20)" }}>
-              Tier bands shown in background
-            </span>
           </div>
         </section>
       )}
