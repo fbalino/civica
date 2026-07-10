@@ -185,3 +185,16 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Corrected public source, normalization, missingness, uncertainty, and Beta-status prose; fixed `/rankings` to use raw values through the v2 display transform rather than archived v1 normalized values.
 - Added `src/lib/ci/__tests__/worked-examples.test.ts`, seeded RNG injection, and exported pure production seams so the documentation examples are executable without a database.
 - Full tests/validators/build and desktop/mobile light/dark browser QA passed. Evidence is in `plan/evidence/CLM-008/`.
+
+## 2026-07-10 — DAT-006 reconciliation and source independence
+
+- Completed DAT-006 directly in the primary Codex session without external
+  workers.
+- Added an explicit policy for every canonical fact key and one claim-level
+  lineage function shared by the reconciliation and provenance audits.
+- The live audit maps all active source/fact relationships and the eight live
+  resolver examples pass. The stricter family rule reports 458 fact groups
+  with two-plus independent producing families.
+- Full claims/docs validation, production build, 398 tests, and desktop/mobile
+  Playwright checks passed. A pre-existing footer country-search hydration
+  warning appeared in local dev logs; DAT-006's page and API returned 200.

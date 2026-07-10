@@ -406,8 +406,12 @@ export const PUBLIC_CLAIMS = [
     evidenceSources: [
       "src/lib/provenance/fact-coverage.generated.json",
       "src/lib/provenance/fact-coverage.ts",
+      "src/lib/factbook/reconcile/reconciliation-audit.generated.json",
+      "src/lib/factbook/reconcile/source-independence.ts",
       "scripts/generate-fact-coverage-report.ts",
+      "scripts/generate-reconciliation-audit.ts",
       "scripts/validate-fact-coverage-report.ts",
+      "scripts/validate-reconciliation-audit.ts",
     ],
     implementationOwner: "Atlas provenance and reader platform",
     methodologyVersion: "fact-provenance-coverage-v1",
@@ -416,7 +420,10 @@ export const PUBLIC_CLAIMS = [
       path: "src/app/(reader)/methodology/provenance-coverage/page.tsx",
       fragment:
         "A generated audit of the source depth, linkage, disputes, and operational freshness behind Civica",
-      mirrors: ["src/app/api/provenance-coverage/route.ts"],
+      mirrors: [
+        "src/app/api/provenance-coverage/route.ts",
+        "src/app/api/reconciliation-audit/route.ts",
+      ],
     },
   },
   {

@@ -1,0 +1,2982 @@
+{
+  "schemaVersion": "reconciliation-coverage/v1",
+  "generatedAt": "2026-07-10T21:45:36.567Z",
+  "registry": {
+    "totalFactKeys": 129,
+    "supportedFactKeys": 88,
+    "unsupportedFactKeys": 41,
+    "policyCounts": {
+      "single_source_passthrough": 37,
+      "multi_source_resolver": 27,
+      "manual_review": 24,
+      "unsupported": 41
+    }
+  },
+  "lineage": {
+    "rule": "Evidence is independent only when claim-level lineage resolves to distinct producing families. Republishers share the upstream family; projections are not corroborating measurements; compilations and unknown lineage fail closed.",
+    "activeSourceFactPairs": 172,
+    "unverifiedSourceFactPairs": 0,
+    "relationships": [
+      {
+        "sourceId": "fao_faostat",
+        "factKey": "agricultural_land_km2",
+        "familyId": "fao_faostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "fao_faostat",
+        "factKey": "agricultural_land_pct",
+        "familyId": "fao_faostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "agriculture_products",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "area_land_km2",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "area_total_km2",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "birth_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "un_data",
+        "factKey": "birth_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UN Data is assigned to the named upstream statistical programme for this fact key."
+      },
+      {
+        "sourceId": "wikidata",
+        "factKey": "birth_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "birth_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "budget_expenditure",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "budget_revenue",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "climate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "co2_emissions_total_mt",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "coastline",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "unesco_uis",
+        "factKey": "completion_rate_primary_pct",
+        "familyId": "unesco_uis",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "current_account_balance_usd",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "current_account_balance_usd",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "death_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "un_data",
+        "factKey": "death_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UN Data is assigned to the named upstream statistical programme for this fact key."
+      },
+      {
+        "sourceId": "wikidata",
+        "factKey": "death_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "death_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "electricity_access",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "electricity_access",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "ilo_ilostat",
+        "factKey": "employment_pop_ratio_pct",
+        "familyId": "ilo_ilostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "ethnic_groups",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "undp_hdi",
+        "factKey": "expected_years_schooling",
+        "familyId": "unesco_uis",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UNDP republishes the upstream education or demographic input for this fact key."
+      },
+      {
+        "sourceId": "unesco_uis",
+        "factKey": "expected_years_schooling",
+        "familyId": "unesco_uis",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "export_commodities",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "export_partners",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "exports_goods_services_usd",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "exports_goods_services_usd",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "wto_stats",
+        "factKey": "exports_merchandise_usd",
+        "familyId": "wto_stats",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "un_data",
+        "factKey": "fertility_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UN Data is assigned to the named upstream statistical programme for this fact key."
+      },
+      {
+        "sourceId": "wikidata",
+        "factKey": "fertility_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "fertility_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "fiscal_balance_pct_gdp",
+        "jurisdictionIso3": "SWE",
+        "familyId": "eurostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Eurostat's harmonised series is treated as its own statistical family unless a registered claim-level NSO handoff applies."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "fiscal_balance_pct_gdp",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "For France, Eurostat republishes the INSEE observation and shares its family."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "fiscal_balance_pct_gdp",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "oecd_stat",
+        "factKey": "fiscal_balance_pct_gdp",
+        "familyId": "oecd_stat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "foreign_exchange_reserves_usd",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "fao_faostat",
+        "factKey": "forest_area_pct",
+        "familyId": "fao_faostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "gdp_growth_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "gdp_nominal_usd_billions",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "wikidata",
+        "factKey": "gdp_nominal_usd_billions",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "gdp_nominal_usd_billions",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "gdp_per_capita_ppp",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "gdp_per_capita_usd",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "gdp_per_capita_usd",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "wikidata",
+        "factKey": "gdp_per_capita_usd",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "gdp_per_capita_usd",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "gdp_ppp",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "gdp_ppp_usd_billions",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "gdp_ppp_usd_billions",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "gdp_real_growth_rate",
+        "jurisdictionIso3": "SWE",
+        "familyId": "eurostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Eurostat's harmonised series is treated as its own statistical family unless a registered claim-level NSO handoff applies."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "gdp_real_growth_rate",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "For France, Eurostat republishes the INSEE observation and shares its family."
+      },
+      {
+        "sourceId": "ibge_br",
+        "factKey": "gdp_real_growth_rate",
+        "jurisdictionIso3": "BRA",
+        "familyId": "nso:BRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "gdp_real_growth_rate",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "insee_fr",
+        "factKey": "gdp_real_growth_rate",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "ons_uk",
+        "factKey": "gdp_real_growth_rate",
+        "jurisdictionIso3": "GBR",
+        "familyId": "nso:GBR",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "stats_sa",
+        "factKey": "gdp_real_growth_rate",
+        "jurisdictionIso3": "ZAF",
+        "familyId": "nso:ZAF",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "gdp_real_growth_rate",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "unesco_uis",
+        "factKey": "gender_parity_index_literacy",
+        "familyId": "unesco_uis",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "oecd_stat",
+        "factKey": "gerd_pct_gdp",
+        "familyId": "oecd_stat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "undp_hdi",
+        "factKey": "gni_per_capita_ppp_usd",
+        "familyId": "undp_hdi",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "UNDP produces this Human Development Report indicator."
+      },
+      {
+        "sourceId": "unesco_uis",
+        "factKey": "government_education_expenditure_pct_gdp",
+        "familyId": "unesco_uis",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "government_form_description",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "unesco_uis",
+        "factKey": "gross_enrollment_ratio_primary_pct",
+        "familyId": "unesco_uis",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "unesco_uis",
+        "factKey": "gross_enrollment_ratio_secondary_pct",
+        "familyId": "unesco_uis",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "undp_hdi",
+        "factKey": "hdi_rank",
+        "familyId": "undp_hdi",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "UNDP produces this Human Development Report indicator."
+      },
+      {
+        "sourceId": "undp_hdi",
+        "factKey": "hdi_score",
+        "familyId": "undp_hdi",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "UNDP produces this Human Development Report indicator."
+      },
+      {
+        "sourceId": "oecd_stat",
+        "factKey": "health_expenditure_pct_gdp",
+        "familyId": "oecd_stat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "who_gho",
+        "factKey": "health_expenditure_pct_gdp",
+        "familyId": "who_gho",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "who_gho",
+        "factKey": "healthy_life_expectancy_years",
+        "familyId": "who_gho",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "import_partners",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "imports_goods_services_usd",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "imports_goods_services_usd",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "wto_stats",
+        "factKey": "imports_merchandise_usd",
+        "familyId": "wto_stats",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "industries",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "un_data",
+        "factKey": "infant_mortality_per_1000",
+        "familyId": "un_child_mortality_interagency",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UN Data is assigned to the named upstream statistical programme for this fact key."
+      },
+      {
+        "sourceId": "who_gho",
+        "factKey": "infant_mortality_per_1000",
+        "familyId": "who_gho",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "infant_mortality_per_1000",
+        "familyId": "un_child_mortality_interagency",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "inflation_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "inflation_rate",
+        "jurisdictionIso3": "SWE",
+        "familyId": "eurostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Eurostat's harmonised series is treated as its own statistical family unless a registered claim-level NSO handoff applies."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "inflation_rate",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "For France, Eurostat republishes the INSEE observation and shares its family."
+      },
+      {
+        "sourceId": "ibge_br",
+        "factKey": "inflation_rate",
+        "jurisdictionIso3": "BRA",
+        "familyId": "nso:BRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "inflation_rate",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "insee_fr",
+        "factKey": "inflation_rate",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "ons_uk",
+        "factKey": "inflation_rate",
+        "jurisdictionIso3": "GBR",
+        "familyId": "nso:GBR",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "statcan_ca",
+        "factKey": "inflation_rate",
+        "jurisdictionIso3": "CAN",
+        "familyId": "nso:CAN",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "stats_sa",
+        "factKey": "inflation_rate",
+        "jurisdictionIso3": "ZAF",
+        "familyId": "nso:ZAF",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "inflation_rate",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "us_census",
+        "factKey": "internet_users_pct",
+        "jurisdictionIso3": "USA",
+        "familyId": "nso:USA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "internet_users_pct",
+        "familyId": "itu",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "fao_faostat",
+        "factKey": "irrigated_land_km2",
+        "familyId": "fao_faostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "ilo_ilostat",
+        "factKey": "labor_force_participation_rate_pct",
+        "familyId": "ilo_ilostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "land_area",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "languages",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "life_expectancy",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "life_expectancy_years",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "un_data",
+        "factKey": "life_expectancy_years",
+        "familyId": "un_health_demography",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UN Data is assigned to the named upstream statistical programme for this fact key."
+      },
+      {
+        "sourceId": "undp_hdi",
+        "factKey": "life_expectancy_years",
+        "familyId": "un_health_demography",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UNDP republishes the upstream education or demographic input for this fact key."
+      },
+      {
+        "sourceId": "who_gho",
+        "factKey": "life_expectancy_years",
+        "familyId": "un_health_demography",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "wikidata",
+        "factKey": "life_expectancy_years",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "life_expectancy_years",
+        "familyId": "un_health_demography",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "literacy_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "unesco_uis",
+        "factKey": "literacy_rate",
+        "familyId": "unesco_uis",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "literacy_rate",
+        "familyId": "unesco_uis",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "who_gho",
+        "factKey": "maternal_mortality_per_100000",
+        "familyId": "who_gho",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "undp_hdi",
+        "factKey": "mean_years_schooling",
+        "familyId": "unesco_uis",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UNDP republishes the upstream education or demographic input for this fact key."
+      },
+      {
+        "sourceId": "unesco_uis",
+        "factKey": "mean_years_schooling",
+        "familyId": "unesco_uis",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "median_age",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "us_census",
+        "factKey": "median_age",
+        "jurisdictionIso3": "USA",
+        "familyId": "nso:USA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "us_census",
+        "factKey": "median_household_income_usd",
+        "jurisdictionIso3": "USA",
+        "familyId": "nso:USA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "military_branches",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "military_expenditure_pct_gdp",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "military_expenditure_pct_gdp",
+        "familyId": "sipri",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "military_service_age",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "monarchy_status",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "natural_resources",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "who_gho",
+        "factKey": "ncd_premature_mortality_pct",
+        "familyId": "who_gho",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "official_languages",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "population",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "population_growth_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "un_data",
+        "factKey": "population_growth_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UN Data is assigned to the named upstream statistical programme for this fact key."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "population_growth_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "population_total",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "ibge_br",
+        "factKey": "population_total",
+        "jurisdictionIso3": "BRA",
+        "familyId": "nso:BRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "population_total",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "insee_fr",
+        "factKey": "population_total",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "ons_uk",
+        "factKey": "population_total",
+        "jurisdictionIso3": "GBR",
+        "familyId": "nso:GBR",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "statcan_ca",
+        "factKey": "population_total",
+        "jurisdictionIso3": "CAN",
+        "familyId": "nso:CAN",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "stats_sa",
+        "factKey": "population_total",
+        "jurisdictionIso3": "ZAF",
+        "familyId": "nso:ZAF",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "un_data",
+        "factKey": "population_total",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "UN Data is assigned to the named upstream statistical programme for this fact key."
+      },
+      {
+        "sourceId": "us_census",
+        "factKey": "population_total",
+        "jurisdictionIso3": "USA",
+        "familyId": "nso:USA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "wikidata",
+        "factKey": "population_total",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "population_total",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "public_debt_pct_gdp",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "public_debt_pct_gdp",
+        "jurisdictionIso3": "SWE",
+        "familyId": "eurostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Eurostat's harmonised series is treated as its own statistical family unless a registered claim-level NSO handoff applies."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "public_debt_pct_gdp",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "For France, Eurostat republishes the INSEE observation and shares its family."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "public_debt_pct_gdp",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "insee_fr",
+        "factKey": "public_debt_pct_gdp",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "oecd_stat",
+        "factKey": "public_debt_pct_gdp",
+        "familyId": "oecd_stat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "public_debt_pct_gdp",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "ons_uk",
+        "factKey": "public_debt_psnd_pct_gdp",
+        "jurisdictionIso3": "GBR",
+        "familyId": "nso:GBR",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "religion_breakdown",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "religions",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "oecd_stat",
+        "factKey": "tax_revenue_pct_gdp",
+        "familyId": "oecd_stat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "terrain",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "total_area",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "who_gho",
+        "factKey": "under_five_mortality_per_1000",
+        "familyId": "who_gho",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "unemployment_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "unemployment_rate_pct",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "unemployment_rate_pct",
+        "jurisdictionIso3": "SWE",
+        "familyId": "eurostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Eurostat's harmonised series is treated as its own statistical family unless a registered claim-level NSO handoff applies."
+      },
+      {
+        "sourceId": "eurostat",
+        "factKey": "unemployment_rate_pct",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "For France, Eurostat republishes the INSEE observation and shares its family."
+      },
+      {
+        "sourceId": "ibge_br",
+        "factKey": "unemployment_rate_pct",
+        "jurisdictionIso3": "BRA",
+        "familyId": "nso:BRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "ilo_ilostat",
+        "factKey": "unemployment_rate_pct",
+        "familyId": "ilo_ilostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "imf_weo",
+        "factKey": "unemployment_rate_pct",
+        "familyId": "imf_weo",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "insee_fr",
+        "factKey": "unemployment_rate_pct",
+        "jurisdictionIso3": "FRA",
+        "familyId": "nso:FRA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "ons_uk",
+        "factKey": "unemployment_rate_pct",
+        "jurisdictionIso3": "GBR",
+        "familyId": "nso:GBR",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "statcan_ca",
+        "factKey": "unemployment_rate_pct",
+        "jurisdictionIso3": "CAN",
+        "familyId": "nso:CAN",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "stats_sa",
+        "factKey": "unemployment_rate_pct",
+        "jurisdictionIso3": "ZAF",
+        "familyId": "nso:ZAF",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "us_census",
+        "factKey": "unemployment_rate_pct",
+        "jurisdictionIso3": "USA",
+        "familyId": "nso:USA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "wikidata",
+        "factKey": "unemployment_rate_pct",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "unemployment_rate_pct",
+        "familyId": "ilo_ilostat",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "urbanization_rate",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "us_census",
+        "factKey": "urbanization_rate",
+        "jurisdictionIso3": "USA",
+        "familyId": "nso:USA",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "The registered national statistical office produces the country observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "urbanization_rate",
+        "familyId": "un_wpp",
+        "relationship": "republisher",
+        "independentEligible": true,
+        "basis": "World Bank indicator metadata identifies another statistical publisher as the upstream family."
+      },
+      {
+        "sourceId": "vdem",
+        "factKey": "vdem_row",
+        "familyId": "vdem",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "cia_factbook",
+        "factKey": "water_area",
+        "familyId": "unverified_secondary_compilation",
+        "relationship": "compilation",
+        "independentEligible": false,
+        "basis": "Compilation rows do not identify a claim-level origin by default."
+      },
+      {
+        "sourceId": "ilo_ilostat",
+        "factKey": "working_poor_rate_pct",
+        "familyId": "ilo_ilostat",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "Registered direct statistical publisher for this observation."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "world_bank_income_group",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      },
+      {
+        "sourceId": "world_bank",
+        "factKey": "world_bank_region",
+        "familyId": "world_bank",
+        "relationship": "originator",
+        "independentEligible": true,
+        "basis": "World Bank is treated as the producing institution for this registered indicator."
+      }
+    ]
+  },
+  "factPolicies": [
+    {
+      "factKey": "agricultural_land_km2",
+      "label": "Agricultural land area",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 194,
+      "jurisdictions": 194,
+      "sourceIds": [
+        "fao_faostat"
+      ]
+    },
+    {
+      "factKey": "agricultural_land_pct",
+      "label": "Agricultural land",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 194,
+      "jurisdictions": 194,
+      "sourceIds": [
+        "fao_faostat"
+      ]
+    },
+    {
+      "factKey": "agricultural_products",
+      "label": "Agricultural products",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "agriculture_products",
+      "label": "Agricultural products",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 227,
+      "jurisdictions": 227,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "area_land_km2",
+      "label": "Land area",
+      "group": "A",
+      "policy": "manual_review",
+      "reason": "Group A changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 246,
+      "jurisdictions": 246,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "area_total_km2",
+      "label": "Total area",
+      "group": "A",
+      "policy": "manual_review",
+      "reason": "Group A changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 247,
+      "jurisdictions": 247,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "area_water_km2",
+      "label": "Water area",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "birth_rate",
+      "label": "Birth rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 808,
+      "jurisdictions": 232,
+      "sourceIds": [
+        "cia_factbook",
+        "un_data",
+        "wikidata",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "broadband_subscriptions",
+      "label": "Fixed broadband subscriptions",
+      "group": "B",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "budget_expenditure",
+      "label": "Government expenditure",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 209,
+      "jurisdictions": 209,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "budget_revenue",
+      "label": "Government revenue",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 209,
+      "jurisdictions": 209,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "calling_code",
+      "label": "Calling code",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "capital",
+      "label": "Capital",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "capital_coordinates",
+      "label": "Capital coordinates",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "chief_of_state_title",
+      "label": "Chief of state title",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "climate",
+      "label": "Climate",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 249,
+      "jurisdictions": 249,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "climate_type",
+      "label": "Climate type",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "co2_emissions_total_mt",
+      "label": "CO₂ emissions",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 186,
+      "jurisdictions": 186,
+      "sourceIds": [
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "coastline",
+      "label": "Coastline length",
+      "group": "A",
+      "policy": "manual_review",
+      "reason": "Group A changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 248,
+      "jurisdictions": 248,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "completion_rate_primary_pct",
+      "label": "Primary education completion rate",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 157,
+      "jurisdictions": 157,
+      "sourceIds": [
+        "unesco_uis"
+      ]
+    },
+    {
+      "factKey": "currency_code",
+      "label": "Currency code (ISO 4217)",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "currency_name",
+      "label": "Currency name",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "current_account_balance_usd",
+      "label": "Current account balance",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 372,
+      "jurisdictions": 193,
+      "sourceIds": [
+        "imf_weo",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "death_rate",
+      "label": "Death rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 809,
+      "jurisdictions": 233,
+      "sourceIds": [
+        "cia_factbook",
+        "un_data",
+        "wikidata",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "dispute_text",
+      "label": "Transnational disputes",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "drives_on_side",
+      "label": "Drives on side",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "electoral_system",
+      "label": "Electoral system",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "electricity_access",
+      "label": "Access to electricity",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 413,
+      "jurisdictions": 223,
+      "sourceIds": [
+        "cia_factbook",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "electricity_consumption_kwh",
+      "label": "Electricity consumption",
+      "group": "B",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "electricity_generation_kwh",
+      "label": "Electricity generation",
+      "group": "B",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "employment_pop_ratio_pct",
+      "label": "Employment-to-population ratio",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 180,
+      "jurisdictions": 180,
+      "sourceIds": [
+        "ilo_ilostat"
+      ]
+    },
+    {
+      "factKey": "environmental_treaties_ratified",
+      "label": "Environmental treaties (ratified)",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "environmental_treaties_signed",
+      "label": "Environmental treaties (signed)",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "ethnic_groups",
+      "label": "Ethnic groups",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 233,
+      "jurisdictions": 233,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "ethnic_groups_breakdown",
+      "label": "Ethnic group breakdown",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "expected_years_schooling",
+      "label": "Expected years of schooling",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 378,
+      "jurisdictions": 194,
+      "sourceIds": [
+        "undp_hdi",
+        "unesco_uis"
+      ]
+    },
+    {
+      "factKey": "export_commodities",
+      "label": "Export commodities",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 232,
+      "jurisdictions": 232,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "export_partners",
+      "label": "Export partners",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 230,
+      "jurisdictions": 230,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "exports_goods_services_usd",
+      "label": "Exports of goods and services",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 381,
+      "jurisdictions": 214,
+      "sourceIds": [
+        "cia_factbook",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "exports_merchandise_usd",
+      "label": "Exports of merchandise",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 188,
+      "jurisdictions": 188,
+      "sourceIds": [
+        "wto_stats"
+      ]
+    },
+    {
+      "factKey": "fertility_rate",
+      "label": "Total fertility rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 583,
+      "jurisdictions": 197,
+      "sourceIds": [
+        "un_data",
+        "wikidata",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "fiscal_balance_pct_gdp",
+      "label": "Fiscal balance (general government)",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 256,
+      "jurisdictions": 191,
+      "sourceIds": [
+        "eurostat",
+        "imf_weo",
+        "oecd_stat"
+      ]
+    },
+    {
+      "factKey": "foreign_exchange_reserves_usd",
+      "label": "Foreign exchange reserves",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 173,
+      "jurisdictions": 173,
+      "sourceIds": [
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "forest_area_pct",
+      "label": "Forest area",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 192,
+      "jurisdictions": 192,
+      "sourceIds": [
+        "fao_faostat"
+      ]
+    },
+    {
+      "factKey": "formation_date",
+      "label": "Formation date",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "gdp_growth_rate",
+      "label": "Real GDP growth rate",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 214,
+      "jurisdictions": 214,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "gdp_nominal_usd_billions",
+      "label": "GDP (nominal)",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 566,
+      "jurisdictions": 195,
+      "sourceIds": [
+        "imf_weo",
+        "wikidata",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "gdp_per_capita_ppp",
+      "label": "GDP per capita (PPP)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 216,
+      "jurisdictions": 216,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "gdp_per_capita_usd",
+      "label": "GDP per capita",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 595,
+      "jurisdictions": 220,
+      "sourceIds": [
+        "cia_factbook",
+        "imf_weo",
+        "wikidata",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "gdp_ppp",
+      "label": "GDP (PPP)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 218,
+      "jurisdictions": 218,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "gdp_ppp_usd_billions",
+      "label": "GDP (PPP)",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 409,
+      "jurisdictions": 221,
+      "sourceIds": [
+        "cia_factbook",
+        "imf_weo"
+      ]
+    },
+    {
+      "factKey": "gdp_real_growth_rate",
+      "label": "Real GDP growth rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 416,
+      "jurisdictions": 195,
+      "sourceIds": [
+        "eurostat",
+        "ibge_br",
+        "imf_weo",
+        "insee_fr",
+        "ons_uk",
+        "stats_sa",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "gender_parity_index_literacy",
+      "label": "Gender parity index, adult literacy",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 155,
+      "jurisdictions": 155,
+      "sourceIds": [
+        "unesco_uis"
+      ]
+    },
+    {
+      "factKey": "gerd_pct_gdp",
+      "label": "R&D expenditure (GERD)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 46,
+      "jurisdictions": 46,
+      "sourceIds": [
+        "oecd_stat"
+      ]
+    },
+    {
+      "factKey": "gni_per_capita_ppp_usd",
+      "label": "GNI per capita (PPP, constant 2017 international $)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 192,
+      "jurisdictions": 192,
+      "sourceIds": [
+        "undp_hdi"
+      ]
+    },
+    {
+      "factKey": "government_education_expenditure_pct_gdp",
+      "label": "Government education expenditure",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 191,
+      "jurisdictions": 191,
+      "sourceIds": [
+        "unesco_uis"
+      ]
+    },
+    {
+      "factKey": "government_form_description",
+      "label": "Government form (descriptive)",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 232,
+      "jurisdictions": 232,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "government_type",
+      "label": "Government type (CIA descriptor)",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "gross_enrollment_ratio_primary_pct",
+      "label": "Gross enrollment ratio, primary",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 193,
+      "jurisdictions": 193,
+      "sourceIds": [
+        "unesco_uis"
+      ]
+    },
+    {
+      "factKey": "gross_enrollment_ratio_secondary_pct",
+      "label": "Gross enrollment ratio, secondary",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 192,
+      "jurisdictions": 192,
+      "sourceIds": [
+        "unesco_uis"
+      ]
+    },
+    {
+      "factKey": "hdi_rank",
+      "label": "HDI rank (UNDP)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 192,
+      "jurisdictions": 192,
+      "sourceIds": [
+        "undp_hdi"
+      ]
+    },
+    {
+      "factKey": "hdi_score",
+      "label": "Human Development Index (HDI)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 192,
+      "jurisdictions": 192,
+      "sourceIds": [
+        "undp_hdi"
+      ]
+    },
+    {
+      "factKey": "head_of_government_title",
+      "label": "Head of government title",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "health_expenditure_pct_gdp",
+      "label": "Current health expenditure",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 245,
+      "jurisdictions": 193,
+      "sourceIds": [
+        "oecd_stat",
+        "who_gho"
+      ]
+    },
+    {
+      "factKey": "healthy_life_expectancy_years",
+      "label": "Healthy life expectancy at birth",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 184,
+      "jurisdictions": 184,
+      "sourceIds": [
+        "who_gho"
+      ]
+    },
+    {
+      "factKey": "import_partners",
+      "label": "Import partners",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 230,
+      "jurisdictions": 230,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "imports_goods_services_usd",
+      "label": "Imports of goods and services",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 380,
+      "jurisdictions": 213,
+      "sourceIds": [
+        "cia_factbook",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "imports_merchandise_usd",
+      "label": "Imports of merchandise",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 189,
+      "jurisdictions": 189,
+      "sourceIds": [
+        "wto_stats"
+      ]
+    },
+    {
+      "factKey": "independence_date",
+      "label": "Independence date",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "industries",
+      "label": "Industries",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 231,
+      "jurisdictions": 231,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "infant_mortality_per_1000",
+      "label": "Infant mortality rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 584,
+      "jurisdictions": 197,
+      "sourceIds": [
+        "un_data",
+        "who_gho",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "inflation_rate",
+      "label": "Inflation rate (consumer prices)",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 620,
+      "jurisdictions": 215,
+      "sourceIds": [
+        "cia_factbook",
+        "eurostat",
+        "ibge_br",
+        "imf_weo",
+        "insee_fr",
+        "ons_uk",
+        "statcan_ca",
+        "stats_sa",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "inflation_rate_pct",
+      "label": "Inflation rate (consumer prices)",
+      "group": "B",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "internet_tld",
+      "label": "Internet TLD",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "internet_users_pct",
+      "label": "Internet users",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 193,
+      "jurisdictions": 192,
+      "sourceIds": [
+        "us_census",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "irrigated_land_km2",
+      "label": "Irrigated land",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 114,
+      "jurisdictions": 114,
+      "sourceIds": [
+        "fao_faostat"
+      ]
+    },
+    {
+      "factKey": "iso2",
+      "label": "ISO 3166-1 alpha-2",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "iso3",
+      "label": "ISO 3166-1 alpha-3",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "labor_force_participation_rate_pct",
+      "label": "Labour force participation rate",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 180,
+      "jurisdictions": 180,
+      "sourceIds": [
+        "ilo_ilostat"
+      ]
+    },
+    {
+      "factKey": "land_area",
+      "label": "Land area (CIA descriptor)",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 246,
+      "jurisdictions": 246,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "land_use_breakdown",
+      "label": "Land use breakdown",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "language_family",
+      "label": "Language family",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "languages",
+      "label": "Languages",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 235,
+      "jurisdictions": 235,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "legal_system_family",
+      "label": "Legal system family",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "life_expectancy",
+      "label": "Life expectancy at birth",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 225,
+      "jurisdictions": 225,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "life_expectancy_years",
+      "label": "Life expectancy at birth",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 1184,
+      "jurisdictions": 230,
+      "sourceIds": [
+        "cia_factbook",
+        "un_data",
+        "undp_hdi",
+        "who_gho",
+        "wikidata",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "literacy_rate",
+      "label": "Literacy rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 392,
+      "jurisdictions": 161,
+      "sourceIds": [
+        "cia_factbook",
+        "unesco_uis",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "maternal_mortality_per_100000",
+      "label": "Maternal mortality ratio",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 193,
+      "jurisdictions": 193,
+      "sourceIds": [
+        "who_gho"
+      ]
+    },
+    {
+      "factKey": "mean_years_schooling",
+      "label": "Mean years of schooling (adults 25+)",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 375,
+      "jurisdictions": 192,
+      "sourceIds": [
+        "undp_hdi",
+        "unesco_uis"
+      ]
+    },
+    {
+      "factKey": "median_age",
+      "label": "Median age",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 227,
+      "jurisdictions": 226,
+      "sourceIds": [
+        "cia_factbook",
+        "us_census"
+      ]
+    },
+    {
+      "factKey": "median_household_income_usd",
+      "label": "Median household income",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 1,
+      "jurisdictions": 1,
+      "sourceIds": [
+        "us_census"
+      ]
+    },
+    {
+      "factKey": "military_branches",
+      "label": "Military branches",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 216,
+      "jurisdictions": 216,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "military_expenditure_pct_gdp",
+      "label": "Military expenditure",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 325,
+      "jurisdictions": 172,
+      "sourceIds": [
+        "cia_factbook",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "military_service_age",
+      "label": "Military service age",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 175,
+      "jurisdictions": 175,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "mobile_subscriptions",
+      "label": "Mobile cellular subscriptions",
+      "group": "B",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "monarchy_status",
+      "label": "Monarchy status",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 253,
+      "jurisdictions": 253,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "national_holidays",
+      "label": "National holidays",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "natural_resources",
+      "label": "Natural resources",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 247,
+      "jurisdictions": 247,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "ncd_premature_mortality_pct",
+      "label": "NCD premature mortality (probability of dying between 30-70)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 184,
+      "jurisdictions": 184,
+      "sourceIds": [
+        "who_gho"
+      ]
+    },
+    {
+      "factKey": "neighbouring_countries",
+      "label": "Neighbouring countries",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "net_migration_rate",
+      "label": "Net migration rate",
+      "group": "B",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "official_languages",
+      "label": "Official languages",
+      "group": "A",
+      "policy": "manual_review",
+      "reason": "Group A changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 235,
+      "jurisdictions": 235,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "official_name_long",
+      "label": "Official long-form name",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "official_name_short",
+      "label": "Official short-form name",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "population",
+      "label": "Population",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 244,
+      "jurisdictions": 244,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "population_growth_rate",
+      "label": "Population growth rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 624,
+      "jurisdictions": 237,
+      "sourceIds": [
+        "cia_factbook",
+        "un_data",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "population_total",
+      "label": "Population",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 1011,
+      "jurisdictions": 248,
+      "sourceIds": [
+        "cia_factbook",
+        "ibge_br",
+        "imf_weo",
+        "insee_fr",
+        "ons_uk",
+        "statcan_ca",
+        "stats_sa",
+        "un_data",
+        "us_census",
+        "wikidata",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "public_debt_pct_gdp",
+      "label": "Public debt",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 514,
+      "jurisdictions": 202,
+      "sourceIds": [
+        "cia_factbook",
+        "eurostat",
+        "imf_weo",
+        "insee_fr",
+        "oecd_stat",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "public_debt_psnd_pct_gdp",
+      "label": "Public Sector Net Debt (excl. public sector banks)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 1,
+      "jurisdictions": 1,
+      "sourceIds": [
+        "ons_uk"
+      ]
+    },
+    {
+      "factKey": "refugee_count",
+      "label": "Refugees hosted",
+      "group": "B",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "religion_breakdown",
+      "label": "Religion breakdown",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 230,
+      "jurisdictions": 230,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "religions",
+      "label": "Religions",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 230,
+      "jurisdictions": 230,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "suffrage_age",
+      "label": "Suffrage age",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "tax_revenue_pct_gdp",
+      "label": "Tax revenue",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 38,
+      "jurisdictions": 38,
+      "sourceIds": [
+        "oecd_stat"
+      ]
+    },
+    {
+      "factKey": "terrain",
+      "label": "Terrain",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 246,
+      "jurisdictions": 246,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "terrain_summary",
+      "label": "Terrain summary",
+      "group": "C",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "time_zones",
+      "label": "Time zones",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "total_area",
+      "label": "Total area (CIA descriptor)",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 247,
+      "jurisdictions": 247,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "un_admission_date",
+      "label": "UN admission date",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "under_five_mortality_per_1000",
+      "label": "Under-five mortality rate",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 194,
+      "jurisdictions": 194,
+      "sourceIds": [
+        "who_gho"
+      ]
+    },
+    {
+      "factKey": "unemployment_rate",
+      "label": "Unemployment rate",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 189,
+      "jurisdictions": 189,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "unemployment_rate_pct",
+      "label": "Unemployment rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 839,
+      "jurisdictions": 196,
+      "sourceIds": [
+        "cia_factbook",
+        "eurostat",
+        "ibge_br",
+        "ilo_ilostat",
+        "imf_weo",
+        "insee_fr",
+        "ons_uk",
+        "statcan_ca",
+        "stats_sa",
+        "us_census",
+        "wikidata",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "urbanization_rate",
+      "label": "Urbanization rate",
+      "group": "B",
+      "policy": "multi_source_resolver",
+      "reason": "Multiple active sources are connected; the deterministic Group B resolver selects the displayed observation.",
+      "activeRows": 421,
+      "jurisdictions": 230,
+      "sourceIds": [
+        "cia_factbook",
+        "us_census",
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "vdem_row",
+      "label": "V-Dem Regimes of the World",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 172,
+      "jurisdictions": 172,
+      "sourceIds": [
+        "vdem"
+      ]
+    },
+    {
+      "factKey": "water_area",
+      "label": "Water area (CIA descriptor)",
+      "group": "C",
+      "policy": "manual_review",
+      "reason": "Group C changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 243,
+      "jurisdictions": 243,
+      "sourceIds": [
+        "cia_factbook"
+      ]
+    },
+    {
+      "factKey": "wikidata_qid",
+      "label": "Wikidata QID",
+      "group": "A",
+      "policy": "unsupported",
+      "reason": "No active observation exists; the key remains registered but is not published as covered.",
+      "activeRows": 0,
+      "jurisdictions": 0,
+      "sourceIds": []
+    },
+    {
+      "factKey": "working_poor_rate_pct",
+      "label": "Working poverty rate (SDG 1.1.1)",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 117,
+      "jurisdictions": 117,
+      "sourceIds": [
+        "ilo_ilostat"
+      ]
+    },
+    {
+      "factKey": "world_bank_income_group",
+      "label": "World Bank income group",
+      "group": "B",
+      "policy": "single_source_passthrough",
+      "reason": "Only one active source is connected; the value passes through with provenance and plausibility checks.",
+      "activeRows": 193,
+      "jurisdictions": 193,
+      "sourceIds": [
+        "world_bank"
+      ]
+    },
+    {
+      "factKey": "world_bank_region",
+      "label": "World Bank region",
+      "group": "A",
+      "policy": "manual_review",
+      "reason": "Group A changes require the incumbent rule and reviewer signoff for overrides.",
+      "activeRows": 195,
+      "jurisdictions": 195,
+      "sourceIds": [
+        "world_bank"
+      ]
+    }
+  ]
+}

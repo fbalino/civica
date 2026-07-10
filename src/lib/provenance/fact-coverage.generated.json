@@ -1,26 +1,26 @@
 {
   "schemaVersion": "fact-provenance-coverage/v1",
-  "generatedAt": "2026-07-10T21:33:53.204Z",
+  "generatedAt": "2026-07-10T21:45:39.133Z",
   "staleness": {
     "liveRowThresholdDays": 180,
     "frozenSourcesExcluded": true,
     "rule": "An active row is stale when its retrieval timestamp is more than 180 days before report generation and its source is not registered as a frozen archive."
   },
   "independence": {
-    "rule": "Count distinct native publisher source IDs. When a fact has any native publisher, CIA Factbook, Wikidata, and UN Data compilation rows do not add an independent family; secondary-only evidence counts as one family.",
+    "rule": "Count distinct claim-level producing families among measured observations. Republishers collapse into their upstream family; projections do not corroborate measurements; compilations and unknown lineage fail closed.",
     "secondaryOrAggregatorSources": [
       "cia_factbook",
       "un_data",
       "wikidata"
     ],
-    "limitation": "This is a conservative source-family screen, not a claim-level origin audit. DAT-006 must map republishers and common upstream families before Civica treats the count as final independence evidence."
+    "limitation": "The checked lineage registry covers every active source/fact relationship. New or unmapped relationships remain visible but cannot add an independent family until reviewed."
   },
   "facts": {
     "activeRows": 25824,
     "total": 17516,
     "sourceLinked": 17516,
     "oneSource": 13201,
-    "twoPlusIndependentSources": 2349,
+    "twoPlusIndependentSources": 458,
     "unresolvedDisputes": 0,
     "staleRows": 0,
     "distinctJurisdictions": 253,
@@ -66,7 +66,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -86,7 +86,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -96,7 +96,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -116,7 +116,7 @@
       "facts": 69,
       "sourceLinkedFacts": 69,
       "oneSourceFacts": 51,
-      "twoPlusIndependentSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -126,7 +126,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -156,7 +156,7 @@
       "facts": 75,
       "sourceLinkedFacts": 75,
       "oneSourceFacts": 55,
-      "twoPlusIndependentSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -166,7 +166,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -176,7 +176,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -206,7 +206,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 3,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -216,7 +216,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -226,7 +226,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -236,7 +236,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -256,7 +256,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -266,7 +266,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -276,7 +276,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -286,7 +286,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -296,7 +296,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -306,7 +306,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -326,7 +326,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -336,7 +336,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 8,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -346,7 +346,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -356,7 +356,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -376,7 +376,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 6,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -396,7 +396,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -406,7 +406,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 5,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -416,7 +416,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -426,7 +426,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 63,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -436,7 +436,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -446,7 +446,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -456,7 +456,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -466,7 +466,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -476,7 +476,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 6,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -496,7 +496,7 @@
       "facts": 52,
       "sourceLinkedFacts": 52,
       "oneSourceFacts": 37,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -506,7 +506,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -516,7 +516,7 @@
       "facts": 86,
       "sourceLinkedFacts": 86,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 15,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -526,7 +526,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -566,7 +566,7 @@
       "facts": 86,
       "sourceLinkedFacts": 86,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 15,
+      "twoPlusIndependentSourceFacts": 3,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -576,7 +576,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -586,7 +586,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -616,7 +616,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -626,7 +626,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -636,7 +636,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 5,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -646,7 +646,7 @@
       "facts": 79,
       "sourceLinkedFacts": 79,
       "oneSourceFacts": 63,
-      "twoPlusIndependentSourceFacts": 6,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -666,7 +666,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 5,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -676,7 +676,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -686,7 +686,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -706,7 +706,7 @@
       "facts": 78,
       "sourceLinkedFacts": 78,
       "oneSourceFacts": 57,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -716,7 +716,7 @@
       "facts": 70,
       "sourceLinkedFacts": 70,
       "oneSourceFacts": 53,
-      "twoPlusIndependentSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -726,7 +726,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -736,7 +736,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -746,7 +746,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -756,7 +756,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -766,7 +766,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -776,7 +776,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 66,
-      "twoPlusIndependentSourceFacts": 5,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -786,7 +786,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -796,7 +796,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -806,7 +806,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -836,7 +836,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -846,7 +846,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -856,7 +856,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 8,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -886,7 +886,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -906,7 +906,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -916,7 +916,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -926,7 +926,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -946,7 +946,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -966,7 +966,7 @@
       "facts": 73,
       "sourceLinkedFacts": 73,
       "oneSourceFacts": 56,
-      "twoPlusIndependentSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -986,7 +986,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1006,7 +1006,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1016,7 +1016,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1026,7 +1026,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 63,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1036,7 +1036,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1066,7 +1066,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1086,7 +1086,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1096,7 +1096,7 @@
       "facts": 80,
       "sourceLinkedFacts": 80,
       "oneSourceFacts": 57,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 6,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1106,7 +1106,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1116,7 +1116,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1126,7 +1126,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1136,7 +1136,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1146,7 +1146,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 57,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1166,7 +1166,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1176,7 +1176,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 15,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1186,7 +1186,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 64,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1206,7 +1206,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1226,7 +1226,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1236,7 +1236,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1246,7 +1246,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1256,7 +1256,7 @@
       "facts": 74,
       "sourceLinkedFacts": 74,
       "oneSourceFacts": 53,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1276,7 +1276,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1286,7 +1286,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1296,7 +1296,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1306,7 +1306,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1316,7 +1316,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 8,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1326,7 +1326,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1336,7 +1336,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 63,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1346,7 +1346,7 @@
       "facts": 79,
       "sourceLinkedFacts": 79,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1356,7 +1356,7 @@
       "facts": 59,
       "sourceLinkedFacts": 59,
       "oneSourceFacts": 45,
-      "twoPlusIndependentSourceFacts": 5,
+      "twoPlusIndependentSourceFacts": 0,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1366,7 +1366,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1376,7 +1376,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1396,7 +1396,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1406,7 +1406,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1416,7 +1416,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1426,7 +1426,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1436,7 +1436,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1446,7 +1446,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 5,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1456,7 +1456,7 @@
       "facts": 71,
       "sourceLinkedFacts": 71,
       "oneSourceFacts": 50,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1466,7 +1466,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1476,7 +1476,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1486,7 +1486,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 15,
+      "twoPlusIndependentSourceFacts": 3,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1496,7 +1496,7 @@
       "facts": 43,
       "sourceLinkedFacts": 43,
       "oneSourceFacts": 31,
-      "twoPlusIndependentSourceFacts": 8,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1506,7 +1506,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1516,7 +1516,7 @@
       "facts": 52,
       "sourceLinkedFacts": 52,
       "oneSourceFacts": 41,
-      "twoPlusIndependentSourceFacts": 3,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1526,7 +1526,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1536,7 +1536,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1556,7 +1556,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1566,7 +1566,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1576,7 +1576,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1586,7 +1586,7 @@
       "facts": 71,
       "sourceLinkedFacts": 71,
       "oneSourceFacts": 51,
-      "twoPlusIndependentSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1606,7 +1606,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1616,7 +1616,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1636,7 +1636,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 3,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1646,7 +1646,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1656,7 +1656,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1666,7 +1666,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 63,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1696,7 +1696,7 @@
       "facts": 62,
       "sourceLinkedFacts": 62,
       "oneSourceFacts": 51,
-      "twoPlusIndependentSourceFacts": 4,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1706,7 +1706,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1726,7 +1726,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 5,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1736,7 +1736,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1746,7 +1746,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 3,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1756,7 +1756,7 @@
       "facts": 71,
       "sourceLinkedFacts": 71,
       "oneSourceFacts": 50,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1766,7 +1766,7 @@
       "facts": 44,
       "sourceLinkedFacts": 44,
       "oneSourceFacts": 32,
-      "twoPlusIndependentSourceFacts": 6,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1776,7 +1776,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1786,7 +1786,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1806,7 +1806,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1816,7 +1816,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1826,7 +1826,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1846,7 +1846,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1856,7 +1856,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1876,7 +1876,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1886,7 +1886,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 57,
-      "twoPlusIndependentSourceFacts": 15,
+      "twoPlusIndependentSourceFacts": 5,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1896,7 +1896,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1906,7 +1906,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1926,7 +1926,7 @@
       "facts": 69,
       "sourceLinkedFacts": 69,
       "oneSourceFacts": 52,
-      "twoPlusIndependentSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1936,7 +1936,7 @@
       "facts": 77,
       "sourceLinkedFacts": 77,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1966,7 +1966,7 @@
       "facts": 76,
       "sourceLinkedFacts": 76,
       "oneSourceFacts": 57,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1976,7 +1976,7 @@
       "facts": 78,
       "sourceLinkedFacts": 78,
       "oneSourceFacts": 56,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1986,7 +1986,7 @@
       "facts": 71,
       "sourceLinkedFacts": 71,
       "oneSourceFacts": 50,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -1996,7 +1996,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2006,7 +2006,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2016,7 +2016,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2026,7 +2026,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2036,7 +2036,7 @@
       "facts": 79,
       "sourceLinkedFacts": 79,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2046,7 +2046,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2056,7 +2056,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2076,7 +2076,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2086,7 +2086,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2096,7 +2096,7 @@
       "facts": 80,
       "sourceLinkedFacts": 80,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2106,7 +2106,7 @@
       "facts": 80,
       "sourceLinkedFacts": 80,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2116,7 +2116,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 6,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2136,7 +2136,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 3,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2146,7 +2146,7 @@
       "facts": 80,
       "sourceLinkedFacts": 80,
       "oneSourceFacts": 64,
-      "twoPlusIndependentSourceFacts": 6,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2156,7 +2156,7 @@
       "facts": 85,
       "sourceLinkedFacts": 85,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 15,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2176,7 +2176,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 8,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2186,7 +2186,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2196,7 +2196,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 64,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2216,7 +2216,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2226,7 +2226,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 6,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2236,7 +2236,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2246,7 +2246,7 @@
       "facts": 58,
       "sourceLinkedFacts": 58,
       "oneSourceFacts": 48,
-      "twoPlusIndependentSourceFacts": 1,
+      "twoPlusIndependentSourceFacts": 0,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2256,7 +2256,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2266,7 +2266,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2276,7 +2276,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2286,7 +2286,7 @@
       "facts": 78,
       "sourceLinkedFacts": 78,
       "oneSourceFacts": 57,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2296,7 +2296,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2306,7 +2306,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2316,7 +2316,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2326,7 +2326,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2346,7 +2346,7 @@
       "facts": 81,
       "sourceLinkedFacts": 81,
       "oneSourceFacts": 59,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2356,7 +2356,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2366,7 +2366,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2376,7 +2376,7 @@
       "facts": 86,
       "sourceLinkedFacts": 86,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 15,
+      "twoPlusIndependentSourceFacts": 3,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2386,7 +2386,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2406,7 +2406,7 @@
       "facts": 71,
       "sourceLinkedFacts": 71,
       "oneSourceFacts": 53,
-      "twoPlusIndependentSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2416,7 +2416,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2426,7 +2426,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2436,7 +2436,7 @@
       "facts": 50,
       "sourceLinkedFacts": 50,
       "oneSourceFacts": 34,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2446,7 +2446,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2456,7 +2456,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 58,
-      "twoPlusIndependentSourceFacts": 16,
+      "twoPlusIndependentSourceFacts": 7,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2466,7 +2466,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2476,7 +2476,7 @@
       "facts": 84,
       "sourceLinkedFacts": 84,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2486,7 +2486,7 @@
       "facts": 79,
       "sourceLinkedFacts": 79,
       "oneSourceFacts": 57,
-      "twoPlusIndependentSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2496,7 +2496,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 11,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2506,7 +2506,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2566,7 +2566,7 @@
       "facts": 82,
       "sourceLinkedFacts": 82,
       "oneSourceFacts": 62,
-      "twoPlusIndependentSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2576,7 +2576,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 61,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 2,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2586,7 +2586,7 @@
       "facts": 83,
       "sourceLinkedFacts": 83,
       "oneSourceFacts": 60,
-      "twoPlusIndependentSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 1,
       "unresolvedDisputes": 0,
       "staleRows": 0
     }
@@ -2718,7 +2718,7 @@
       "facts": 193,
       "sourceLinkedFacts": 193,
       "oneSourceFacts": 14,
-      "twoPlusIndependentSourceFacts": 179,
+      "twoPlusIndependentSourceFacts": 5,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2768,7 +2768,7 @@
       "facts": 194,
       "sourceLinkedFacts": 194,
       "oneSourceFacts": 10,
-      "twoPlusIndependentSourceFacts": 184,
+      "twoPlusIndependentSourceFacts": 0,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2828,7 +2828,7 @@
       "facts": 191,
       "sourceLinkedFacts": 191,
       "oneSourceFacts": 148,
-      "twoPlusIndependentSourceFacts": 43,
+      "twoPlusIndependentSourceFacts": 22,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2868,7 +2868,7 @@
       "facts": 195,
       "sourceLinkedFacts": 195,
       "oneSourceFacts": 4,
-      "twoPlusIndependentSourceFacts": 188,
+      "twoPlusIndependentSourceFacts": 6,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2888,7 +2888,7 @@
       "facts": 220,
       "sourceLinkedFacts": 220,
       "oneSourceFacts": 28,
-      "twoPlusIndependentSourceFacts": 185,
+      "twoPlusIndependentSourceFacts": 5,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -2918,7 +2918,7 @@
       "facts": 195,
       "sourceLinkedFacts": 195,
       "oneSourceFacts": 8,
-      "twoPlusIndependentSourceFacts": 187,
+      "twoPlusIndependentSourceFacts": 38,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -3088,7 +3088,7 @@
       "facts": 215,
       "sourceLinkedFacts": 215,
       "oneSourceFacts": 23,
-      "twoPlusIndependentSourceFacts": 181,
+      "twoPlusIndependentSourceFacts": 39,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -3158,7 +3158,7 @@
       "facts": 230,
       "sourceLinkedFacts": 230,
       "oneSourceFacts": 34,
-      "twoPlusIndependentSourceFacts": 194,
+      "twoPlusIndependentSourceFacts": 0,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -3168,7 +3168,7 @@
       "facts": 161,
       "sourceLinkedFacts": 161,
       "oneSourceFacts": 43,
-      "twoPlusIndependentSourceFacts": 116,
+      "twoPlusIndependentSourceFacts": 0,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -3188,7 +3188,7 @@
       "facts": 192,
       "sourceLinkedFacts": 192,
       "oneSourceFacts": 9,
-      "twoPlusIndependentSourceFacts": 183,
+      "twoPlusIndependentSourceFacts": 0,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -3308,7 +3308,7 @@
       "facts": 248,
       "sourceLinkedFacts": 248,
       "oneSourceFacts": 51,
-      "twoPlusIndependentSourceFacts": 190,
+      "twoPlusIndependentSourceFacts": 12,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -3318,7 +3318,7 @@
       "facts": 202,
       "sourceLinkedFacts": 202,
       "oneSourceFacts": 16,
-      "twoPlusIndependentSourceFacts": 91,
+      "twoPlusIndependentSourceFacts": 34,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },
@@ -3408,7 +3408,7 @@
       "facts": 196,
       "sourceLinkedFacts": 196,
       "oneSourceFacts": 16,
-      "twoPlusIndependentSourceFacts": 180,
+      "twoPlusIndependentSourceFacts": 49,
       "unresolvedDisputes": 0,
       "staleRows": 0
     },

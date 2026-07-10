@@ -21,10 +21,12 @@ async function main() {
                cf.jurisdiction_id AS "jurisdictionId",
                j.slug AS "jurisdictionSlug",
                j.name AS "jurisdictionName",
+               j.iso3 AS "jurisdictionIso3",
                cf.fact_key AS "factKey",
                cf.source_id AS "sourceId",
                cf.source_url AS "sourceUrl",
-               cf.retrieved_at::text AS "retrievedAt"
+               cf.retrieved_at::text AS "retrievedAt",
+               cf.value_type AS "valueType"
         FROM country_facts cf
         JOIN jurisdictions j ON j.id = cf.jurisdiction_id
         WHERE cf.status = 'active'

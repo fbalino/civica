@@ -1,4 +1,5 @@
 import { FROZEN_SOURCES } from "@/lib/data/sources";
+import { countIndependentFamilies } from "@/lib/factbook/reconcile/source-independence";
 
 export const FACT_COVERAGE_VERSION = "fact-provenance-coverage/v1" as const;
 export const FACT_COVERAGE_STALE_AFTER_DAYS = 180;
@@ -18,6 +19,8 @@ export type CoverageFactRow = {
   sourceId: string;
   sourceUrl: string | null;
   retrievedAt: string;
+  jurisdictionIso3?: string | null;
+  valueType?: string | null;
 };
 
 export type CoverageStatementRow = {
@@ -86,10 +89,6 @@ export type FactCoverageReport = {
   byFactKey: CoverageBreakdown[];
 };
 
-// These sources are useful evidence paths but are compilations or aggregators.
-// Until DAT-006 maps claim-level origin/republisher relationships, multiple
-// secondary sources never establish two independent source families by
-// themselves, and a primary publisher supersedes them in the family count.
 export const SECONDARY_OR_AGGREGATOR_SOURCE_IDS = new Set([
   "cia_factbook",
   "un_data",
@@ -123,14 +122,6 @@ function isStale(
     generatedAtMs - retrievedAtMs >
     FACT_COVERAGE_STALE_AFTER_DAYS * 24 * 60 * 60 * 1000
   );
-}
-
-function independentFamilyCount(sourceIds: ReadonlySet<string>) {
-  const primary = [...sourceIds].filter(
-    (sourceId) => !SECONDARY_OR_AGGREGATOR_SOURCE_IDS.has(sourceId),
-  );
-  if (primary.length > 0) return new Set(primary).size;
-  return sourceIds.size > 0 ? 1 : 0;
 }
 
 export function buildFactCoverageReport(input: {
@@ -184,7 +175,7 @@ export function buildFactCoverageReport(input: {
         sourceLinkedFacts++;
       }
       if (sourceIds.size === 1) oneSourceFacts++;
-      if (independentFamilyCount(sourceIds) >= 2) {
+      if (countIndependentFamilies(group.rows) >= 2) {
         twoPlusIndependentSourceFacts++;
       }
       if (unresolved.has(groupKey(group.countryId, group.factKey))) {
@@ -263,12 +254,12 @@ export function buildFactCoverageReport(input: {
       rule: "An active row is stale when its retrieval timestamp is more than 180 days before report generation and its source is not registered as a frozen archive.",
     },
     independence: {
-      rule: "Count distinct native publisher source IDs. When a fact has any native publisher, CIA Factbook, Wikidata, and UN Data compilation rows do not add an independent family; secondary-only evidence counts as one family.",
+      rule: "Count distinct claim-level producing families among measured observations. Republishers collapse into their upstream family; projections do not corroborate measurements; compilations and unknown lineage fail closed.",
       secondaryOrAggregatorSources: [
         ...SECONDARY_OR_AGGREGATOR_SOURCE_IDS,
       ].sort(),
       limitation:
-        "This is a conservative source-family screen, not a claim-level origin audit. DAT-006 must map republishers and common upstream families before Civica treats the count as final independence evidence.",
+        "The checked lineage registry covers every active source/fact relationship. New or unmapped relationships remain visible but cannot add an independent family until reviewed.",
     },
     facts: {
       activeRows: input.facts.length,

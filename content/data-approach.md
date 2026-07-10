@@ -77,7 +77,7 @@ Multi-year values (inflation, public debt, GDP variants, unemployment, military 
 
 This is **renderer-class coverage**, not a percentage of Civica's database rows or published facts. It prevents compact UI patterns from disappearing inside a site-wide average.
 
-**Dataset-wide provenance coverage is measured separately.** The generated [fact provenance coverage report](/methodology/provenance-coverage) counts active country/fact-key groups, source-linked facts, single-source facts, facts with two or more conservatively screened native publisher families, unresolved disputes, stale live rows, and coverage by country and fact key. Its machine-readable form is published at `/api/provenance-coverage`. The report's source-independence count remains explicitly provisional until the DAT-006 claim-level source-family audit is complete.
+**Dataset-wide provenance coverage is measured separately.** The generated [fact provenance coverage report](/methodology/provenance-coverage) counts active country/fact-key groups, source-linked facts, single-source facts, facts with two or more claim-level producing families, unresolved disputes, stale live rows, and coverage by country and fact key. Republishers share the family of the upstream producer; projections do not corroborate measurements; compilations and unknown lineage fail closed. The provenance report is published at `/api/provenance-coverage`, and the complete fact-key policy and lineage audit is published at `/api/reconciliation-audit`.
 
 ## What "BETA" means here {#beta}
 

@@ -10,6 +10,8 @@ import {
 import { SmartBreadcrumbs } from "@/components/editorial/SmartBreadcrumbs";
 import rawReport from "@/lib/provenance/fact-coverage.generated.json";
 import type { FactCoverageReport } from "@/lib/provenance/fact-coverage";
+import rawReconciliationAudit from "@/lib/factbook/reconcile/reconciliation-audit.generated.json";
+import type { ReconciliationAuditReport } from "@/lib/factbook/reconcile/reconciliation-audit";
 
 export const metadata: Metadata = {
   title: "Fact Provenance Coverage — Methodology",
@@ -21,6 +23,7 @@ export const metadata: Metadata = {
 };
 
 const report = rawReport as FactCoverageReport;
+const reconciliationAudit = rawReconciliationAudit as ReconciliationAuditReport;
 const number = new Intl.NumberFormat("en-US");
 const percent = (value: number, denominator: number) =>
   denominator === 0 ? "—" : `${((value / denominator) * 100).toFixed(1)}%`;
@@ -29,6 +32,7 @@ const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "snapshot", label: "Current snapshot" },
   { id: "definitions", label: "Definitions" },
   { id: "statements", label: "Statement ledger" },
+  { id: "reconciliation", label: "Reconciliation policies" },
   { id: "fact-keys", label: "By fact key" },
   { id: "countries", label: "By country or area" },
   { id: "limitations", label: "Limitations" },
@@ -59,7 +63,7 @@ const summaryRows = [
   [
     "Two-plus independent-source facts",
     report.facts.twoPlusIndependentSources,
-    "Groups passing the conservative native-publisher family rule.",
+    "Groups with at least two distinct claim-level producing families after republishers are collapsed.",
   ],
   [
     "Unresolved disputes",
@@ -176,6 +180,67 @@ export default function ProvenanceCoveragePage() {
           </p>
         </section>
 
+        <section id="reconciliation" className="editorial-section">
+          <h2>Reconciliation policy coverage</h2>
+          <p>
+            Every canonical fact key has an explicit operating policy. Group A
+            and C changes require manual review; Group B keys either pass
+            through one source or enter the deterministic multi-source
+            resolver. A registered key with no active observations is marked
+            unsupported rather than presented as covered.
+          </p>
+          <DataTable>
+            <thead>
+              <tr>
+                <th>Policy</th>
+                <th className="num">Fact keys</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Single-source passthrough</td>
+                <td className="num">
+                  {number.format(
+                    reconciliationAudit.registry.policyCounts
+                      .single_source_passthrough,
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td>Multi-source resolver</td>
+                <td className="num">
+                  {number.format(
+                    reconciliationAudit.registry.policyCounts
+                      .multi_source_resolver,
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td>Manual review</td>
+                <td className="num">
+                  {number.format(
+                    reconciliationAudit.registry.policyCounts.manual_review,
+                  )}
+                </td>
+              </tr>
+              <tr>
+                <td>Unsupported</td>
+                <td className="num">
+                  {number.format(
+                    reconciliationAudit.registry.policyCounts.unsupported,
+                  )}
+                </td>
+              </tr>
+            </tbody>
+          </DataTable>
+          <p>
+            The complete audit lists the policy, reason, active rows,
+            jurisdictions, source IDs, and lineage relationship for every key.
+            Active source/fact relationships without a lineage rule cannot add
+            an independent family.
+          </p>
+        </section>
+
         <section id="fact-keys" className="editorial-section">
           <h2>Coverage by fact key</h2>
           <DataTable>
@@ -272,8 +337,13 @@ export default function ProvenanceCoveragePage() {
             <Link href="/api/provenance-coverage">
               <code>/api/provenance-coverage</code>
             </Link>
-            . Regenerate it with <code>npm run generate:fact-coverage</code> and
-            verify it with <code>npm run validate:fact-coverage</code>.
+            . The complete policy and lineage audit is available at{" "}
+            <Link href="/api/reconciliation-audit">
+              <code>/api/reconciliation-audit</code>
+            </Link>
+            . Regenerate them with <code>npm run generate:fact-coverage</code>{" "}
+            and <code>npm run generate:reconciliation-audit</code>, then run the
+            matching validation commands.
           </p>
         </section>
       </article>

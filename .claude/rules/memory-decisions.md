@@ -613,3 +613,16 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Never present the 4/10 compact-renderer audit as database fact coverage or
   the dataset-wide report as point-of-use UI coverage. Durable record:
   APR-D039 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Source independence follows the producing family
+
+- `reconciliation-coverage/v1` assigns all 129 registered fact keys one of
+  four explicit policies: single-source passthrough, multi-source resolver,
+  manual review, or unsupported.
+- Count distinct producing families among measured observations. Republishers
+  share the upstream family, projections do not corroborate measurements, and
+  compilations or unknown lineage fail closed.
+- `src/lib/factbook/reconcile/source-independence.ts` is the single lineage
+  implementation used by both the reconciliation audit and fact coverage.
+- `/api/reconciliation-audit` publishes the checked policy and relationship
+  inventory. Durable record: APR-D040 in `plan/DECISIONS.md`.
