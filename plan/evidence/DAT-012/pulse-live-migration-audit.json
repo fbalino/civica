@@ -1,0 +1,16 @@
+{
+  "migration": "drizzle/migrations/0022_pulse_event_idempotency.sql",
+  "appliedTransactionally": true,
+  "statements": 5,
+  "auditedAt": "2026-07-10",
+  "preflight": {
+    "duplicateRawEventGroups": 0
+  },
+  "postflight": {
+    "eventRows": 384,
+    "nullClusterIds": 0,
+    "duplicateRawEventGroups": 0,
+    "expectedUniqueIndexes": 2,
+    "observedUniqueIndexes": 2
+  }
+}

@@ -252,3 +252,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   instructions preserve the reconstruction path.
 - Seven focused fixtures, 446 tests, targeted ESLint, TypeScript, and the full
   production build passed. No rendered UI changed.
+
+## 2026-07-10 — DAT-012 Pulse v2 repeatability wave
+
+- Added deterministic, zero-write dry-run and fixture seams to all five Pulse
+  stages: ingest, cluster, classify, corroborate, and score.
+- Added cluster/source uniqueness constraints so retries converge instead of
+  duplicating classified events or source links; migration 0022 is live and
+  its postflight audit is clean.
+- Twenty-three focused tests, 469 full tests, runtime/data/freshness validators,
+  and the production build passed. DAT-012 remains open for the other adapter
+  families.

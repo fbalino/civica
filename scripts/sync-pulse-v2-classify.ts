@@ -7,6 +7,7 @@
  * Usage:
  *   npm run pulse:v2:classify
  *   npm run pulse:v2:classify -- --limit 50
+ *   npm run pulse:v2:classify -- --dry-run --limit 5
  */
 import { config } from "dotenv";
 config({ path: ".env.local", override: true });
@@ -17,6 +18,7 @@ import * as schema from "../src/lib/db/schema";
 import { classifyClusters } from "../src/lib/pulse/v2/classify";
 
 async function main() {
+  const dryRun = process.argv.includes("--dry-run");
   const limitArg = process.argv.find((a) => a === "--limit");
   const limit = limitArg
     ? parseInt(process.argv[process.argv.indexOf(limitArg) + 1] ?? "200")
@@ -26,10 +28,11 @@ async function main() {
   const db = drizzle({ client: sqlClient, schema });
 
   const start = Date.now();
-  const summary = await classifyClusters(db, { limit });
+  const summary = await classifyClusters(db, { limit, dryRun });
   const elapsedMs = Date.now() - start;
 
   console.log("\nClassification complete:");
+  console.log(`  mode:                ${summary.dryRun ? "DRY RUN — zero writes" : "apply"}`);
   console.log(`  clusters examined:   ${summary.clustersExamined}`);
   console.log(`  classified:          ${summary.classified}`);
   console.log(`    auto-published:    ${summary.publishedAuto}`);

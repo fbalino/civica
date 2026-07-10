@@ -8,6 +8,7 @@
  * Usage:
  *   npm run pulse:v2:cluster           # run on all unclustered rows
  *   npm run pulse:v2:cluster -- --limit 100
+ *   npm run pulse:v2:cluster -- --dry-run
  */
 import { config } from "dotenv";
 config({ path: ".env.local", override: true });
@@ -19,6 +20,7 @@ import * as schema from "../src/lib/db/schema";
 import { runClustering } from "../src/lib/pulse/v2/cluster";
 
 async function main() {
+  const dryRun = process.argv.includes("--dry-run");
   const limitArg = process.argv.find((a) => a.startsWith("--limit"));
   const limit = limitArg
     ? parseInt(limitArg.split("=")[1] ?? process.argv[process.argv.indexOf(limitArg) + 1] ?? "1000")
@@ -28,10 +30,11 @@ async function main() {
   const db = drizzle({ client: sqlClient, schema });
 
   const start = Date.now();
-  const summary = await runClustering(db, { limit });
+  const summary = await runClustering(db, { limit, dryRun });
   const elapsedMs = Date.now() - start;
 
   console.log("\nClustering complete:");
+  console.log(`  mode:                 ${summary.dryRun ? "DRY RUN — zero writes" : "apply"}`);
   console.log(`  candidates:           ${summary.candidates}`);
   console.log(`  clustered:            ${summary.clustered}`);
   console.log(`  clusters created:     ${summary.clustersCreated}`);
@@ -40,6 +43,7 @@ async function main() {
   console.log(`  elapsed:              ${(elapsedMs / 1000).toFixed(1)}s`);
 
   // Sample a few clusters for visual confirmation
+  if (dryRun) return;
   const result = await db.execute(sql`
     SELECT r.cluster_id, j.name AS country, r.title, r.source_id AS source
     FROM raw_events r

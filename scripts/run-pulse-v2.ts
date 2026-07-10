@@ -20,41 +20,42 @@ import { corroborateEvents } from "../src/lib/pulse/v2/corroborate";
 import { calculateDimensionalDeltas } from "../src/lib/pulse/v2/score";
 
 async function main() {
+  const dryRun = process.argv.includes("--dry-run");
   const sqlClient = neon(process.env.DATABASE_URL!);
   const db = drizzle({ client: sqlClient, schema });
 
   const start = Date.now();
 
   console.log("\n────────  STAGE 1: INGEST  ────────");
-  const ingest = await ingestPulseV2(db);
+  const ingest = await ingestPulseV2(db, { dryRun });
   console.log(
     `  ${ingest.totalFetched} fetched · ${ingest.totalInserted} inserted · ${ingest.totalSkipped} dup · ${ingest.totalUnmatched} unmatched`
   );
 
   console.log("\n────────  STAGE 2: CLUSTER  ────────");
-  const cluster = await runClustering(db);
+  const cluster = await runClustering(db, { dryRun });
   console.log(
     `  ${cluster.candidates} candidates → ${cluster.clustersCreated} clusters · ${cluster.multiSourceClusters} multi-source`
   );
 
   console.log("\n────────  STAGE 3: CLASSIFY  ────────");
-  const classify = await classifyClusters(db);
+  const classify = await classifyClusters(db, { dryRun });
   console.log(
     `  ${classify.clustersExamined} examined · ${classify.classified} classified · ${classify.publishedAuto} auto-published · ${classify.flaggedForReview} review-flagged · ${classify.noneCategory} skipped (none) · ${classify.failed} failed`
   );
 
   console.log("\n────────  STAGE 4: CORROBORATE + SCORE  ────────");
-  const corro = await corroborateEvents(db);
-  const score = await calculateDimensionalDeltas(db);
+  const corro = await corroborateEvents(db, { dryRun });
+  const score = await calculateDimensionalDeltas(db, { dryRun });
   console.log(
-    `  corroboration: ${corro.examined} events updated, avg conf ${corro.averageConfidence.toFixed(3)}`
+    `  corroboration: ${corro.examined} events ${dryRun ? "planned" : "updated"}, avg conf ${corro.averageConfidence.toFixed(3)}`
   );
   console.log(
     `  scoring:       ${score.eventsConsidered} events × ${score.countriesScored} countries → ${score.dimensionRowsWritten} dim rows · ${score.significantDeltas} significant`
   );
 
   // Summary view
-  const result = await db.execute(sql`
+  const result = dryRun ? [] : await db.execute(sql`
     SELECT j.name AS country, pdd.dimension, pdd.delta_value
     FROM pulse_dimensional_deltas pdd
     JOIN jurisdictions j ON j.id = pdd.jurisdiction_id

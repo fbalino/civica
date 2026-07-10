@@ -2,10 +2,10 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "5eafcb1605034979ad25c51dce1015a146c603618fe7113444a79b83fe86fbf9",
+  "schemaFingerprint": "29892a0f33d0f8a1d0f0f4b88df42b8d147cd14f30a9f97fae7f702f49c4811d",
   "summary": {
     "tables": 49,
-    "columns": 570,
+    "columns": 571,
     "publicAtlasTables": 18,
     "researchBetaTables": 14,
     "supportTables": 9,
@@ -13223,6 +13223,35 @@
           }
         },
         {
+          "name": "cluster_id",
+          "propertyName": "clusterId",
+          "definition": "Cluster id recorded for the deduplicated event cluster about one subject jurisdiction.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": true,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_v2_cluster_unique"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_v2_cluster_unique"
+            ]
+          },
+          "sourceOrDerivation": "Multi-provider classification, verification, subject attribution, and human review over raw_events.",
+          "cadence": "Daily pipeline with subsequent review/correction.",
+          "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
+          "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "corroboration_confidence",
           "propertyName": "corroborationConfidence",
           "definition": "Corroboration confidence recorded for the deduplicated event cluster about one subject jurisdiction.",
@@ -14036,11 +14065,15 @@
           "unit": "not applicable",
           "key": {
             "primary": false,
-            "unique": false,
-            "indexed": false,
+            "unique": true,
+            "indexed": true,
             "foreignKey": "raw_events.id",
-            "indexGroups": [],
-            "uniqueGroups": []
+            "indexGroups": [
+              "idx_pulse_sources_raw_event_unique"
+            ],
+            "uniqueGroups": [
+              "idx_pulse_sources_raw_event_unique"
+            ]
           },
           "sourceOrDerivation": "Relational identifier referencing raw_events.id; substantive provenance follows this table's source contract.",
           "cadence": "During daily clustering and corroboration.",

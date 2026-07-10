@@ -34,9 +34,11 @@ export interface ScoreSummary {
   dimensionRowsWritten: number;
   /** distinct (country, dimension) tuples with non-trivial deltas (|δ| ≥ 1) */
   significantDeltas: number;
+  dryRun: boolean;
+  planned: DimensionalDeltaPlan[];
 }
 
-interface PublishedEvent {
+export interface PublishedEvent {
   id: string;
   jurisdictionId: string;
   dimension: PulseDimension;
@@ -49,25 +51,37 @@ interface PublishedEvent {
   sourceIds: string[];
 }
 
+export interface DimensionalDeltaPlan {
+  jurisdictionId: string;
+  dimension: PulseDimension;
+  deltaValue: number;
+  contributingEventIds: string[];
+  derivationVersionKey: string;
+  derivationVersions: DerivationVersionEnvelope;
+}
+
+export interface ScoreOptions {
+  dryRun?: boolean;
+  events?: PublishedEvent[];
+  existingJurisdictionIds?: string[];
+  write?: (db: Db, plan: DimensionalDeltaPlan) => Promise<void>;
+  now?: Date;
+}
+
 export async function calculateDimensionalDeltas(
-  db: Db
+  db: Db,
+  options: ScoreOptions = {},
 ): Promise<ScoreSummary> {
-  const today = new Date();
+  const today = options.now ?? new Date();
   const windowStart = new Date(
     today.getTime() - SCORE_WINDOW_DAYS * 24 * 60 * 60 * 1000
   )
     .toISOString()
     .slice(0, 10);
 
-  const events = await loadPublishedEvents(db, windowStart);
-  const existingDeltaRows = await db.execute(sql`
-    SELECT DISTINCT jurisdiction_id
-    FROM pulse_dimensional_deltas
-  `);
-  const existingJurisdictionIds = (
-    ((existingDeltaRows as unknown as { rows?: unknown[] }).rows ??
-      existingDeltaRows) as Array<Record<string, unknown>>
-  ).map((row) => String(row.jurisdiction_id));
+  const events = options.events ?? await loadPublishedEvents(db, windowStart);
+  validatePublishedEvents(events);
+  const existingJurisdictionIds = options.existingJurisdictionIds ?? await loadExistingJurisdictionIds(db);
 
   // Bucket by (jurisdictionId, dimension)
   type Key = string; // `${jurisdictionId}::${dimension}`
@@ -106,6 +120,7 @@ export async function calculateDimensionalDeltas(
   let written = 0;
   let significant = 0;
   const countriesSeen = new Set<string>();
+  const planned: DimensionalDeltaPlan[] = [];
 
   // Walk every (country, dim) to clear stale rows where all events
   // have decayed away. Pull all jurisdictionIds with any event in
@@ -130,30 +145,20 @@ export async function calculateDimensionalDeltas(
         bucket?.sourceIds ?? [],
       );
 
-      await db
-        .insert(pulseDimensionalDeltas)
-        .values({
-          jurisdictionId,
-          dimension: dim,
-          deltaValue: clamped,
-          contributingEventIds: eventIds,
-          derivationVersionKey: versions.key,
-          derivationVersions: versions.envelope,
-        })
-        .onConflictDoUpdate({
-          target: [
-            pulseDimensionalDeltas.jurisdictionId,
-            pulseDimensionalDeltas.dimension,
-          ],
-          set: {
-            deltaValue: clamped,
-            contributingEventIds: eventIds,
-            derivationVersionKey: versions.key,
-            derivationVersions: versions.envelope,
-            lastComputedAt: new Date(),
-          },
-        });
-      written++;
+      const plan = {
+        jurisdictionId,
+        dimension: dim,
+        deltaValue: clamped,
+        contributingEventIds: eventIds,
+        derivationVersionKey: versions.key,
+        derivationVersions: versions.envelope,
+      };
+      planned.push(plan);
+      if (!options.dryRun) {
+        if (options.write) await options.write(db, plan);
+        else await writeDimensionalDelta(db, plan, today);
+        written++;
+      }
       if (Math.abs(clamped) >= 1) significant++;
     }
   }
@@ -163,7 +168,50 @@ export async function calculateDimensionalDeltas(
     countriesScored: countriesSeen.size,
     dimensionRowsWritten: written,
     significantDeltas: significant,
+    dryRun: options.dryRun ?? false,
+    planned: planned.sort((a, b) => `${a.jurisdictionId}:${a.dimension}`.localeCompare(`${b.jurisdictionId}:${b.dimension}`)),
   };
+}
+
+function validatePublishedEvents(events: PublishedEvent[]): void {
+  const ids = new Set<string>();
+  for (const event of events) {
+    if (!event.id.trim() || !event.jurisdictionId.trim()) throw new Error("score fixture has a blank event or jurisdiction id");
+    if (!PULSE_DIMENSIONS.includes(event.dimension)) throw new Error(`score fixture has an invalid dimension: ${event.dimension}`);
+    if (!Number.isFinite(event.severityValue) || !Number.isFinite(event.corroborationConfidence)) throw new Error(`score fixture has invalid numeric input: ${event.id}`);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(event.eventDate)) throw new Error(`score fixture has an invalid event date: ${event.id}`);
+    if (ids.has(event.id)) throw new Error(`duplicate score event id: ${event.id}`);
+    ids.add(event.id);
+  }
+}
+
+async function loadExistingJurisdictionIds(db: Db): Promise<string[]> {
+  const result = await db.execute(sql`SELECT DISTINCT jurisdiction_id FROM pulse_dimensional_deltas`);
+  return (((result as unknown as { rows?: unknown[] }).rows ?? result) as Array<Record<string, unknown>>)
+    .map((row) => String(row.jurisdiction_id));
+}
+
+async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Date): Promise<void> {
+  await db
+    .insert(pulseDimensionalDeltas)
+    .values({
+      jurisdictionId: plan.jurisdictionId,
+      dimension: plan.dimension,
+      deltaValue: plan.deltaValue,
+      contributingEventIds: plan.contributingEventIds,
+      derivationVersionKey: plan.derivationVersionKey,
+      derivationVersions: plan.derivationVersions,
+    })
+    .onConflictDoUpdate({
+      target: [pulseDimensionalDeltas.jurisdictionId, pulseDimensionalDeltas.dimension],
+      set: {
+        deltaValue: plan.deltaValue,
+        contributingEventIds: plan.contributingEventIds,
+        derivationVersionKey: plan.derivationVersionKey,
+        derivationVersions: plan.derivationVersions,
+        lastComputedAt: now,
+      },
+    });
 }
 
 async function loadPublishedEvents(

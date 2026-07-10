@@ -23,6 +23,8 @@ import { fetchAcled } from "./sources/acled";
 import { fetchVdemPulse } from "./sources/vdem-pulse";
 import { fetchGdelt } from "./sources/gdelt";
 import { fetchReutersAp } from "./sources/reuters-ap";
+import type { RawEventInput } from "./types";
+import type { JurisdictionMap } from "./country-resolver";
 
 export function createDb() {
   const sql = neon(process.env.DATABASE_URL!);
@@ -36,6 +38,9 @@ export interface ConnectorReport {
   inserted: number;
   skippedDuplicate: number;
   unmatchedCountry: number;
+  /** Rows this connector would submit to the writer. Equals inserted only
+   * when every submitted row is new; remains populated during dry runs. */
+  wouldWrite: number;
   /** Set when the connector raised. Other connectors continue. */
   error?: string;
 }
@@ -46,87 +51,120 @@ export interface IngestSummary {
   totalInserted: number;
   totalSkipped: number;
   totalUnmatched: number;
+  totalWouldWrite: number;
+  dryRun: boolean;
 }
 
-export async function ingestPulseV2(db: Db): Promise<IngestSummary> {
-  const map = await buildJurisdictionMap(db);
+export interface PulseConnectorResult {
+  rows: RawEventInput[];
+  fetched: number;
+  unmatchedCountry: number;
+}
+
+export interface PulseConnectorJob {
+  source: string;
+  fetcher: () => Promise<PulseConnectorResult>;
+}
+
+export interface PulseIngestOptions {
+  dryRun?: boolean;
+  /** Fixture seam. Production callers omit this and use the live connectors. */
+  jobs?: readonly PulseConnectorJob[];
+  jurisdictionMap?: JurisdictionMap;
+  writeRows?: (db: Db, rows: RawEventInput[]) => Promise<UpsertResult>;
+  /** Fixture/diagnostic fail-closed controls; production preserves partial
+   * connector availability unless the caller explicitly requests strictness. */
+  failOnConnectorError?: boolean;
+  requireNonEmpty?: boolean;
+}
+
+function liveConnectorJobs(map: JurisdictionMap): PulseConnectorJob[] {
+  return [
+    { source: "civicus", fetcher: () => fetchCivicus(map) },
+    { source: "rsf", fetcher: () => fetchRsf(map) },
+    { source: "hrw_amnesty", fetcher: () => fetchHrwAmnesty(map) },
+    { source: "ipu", fetcher: () => fetchIpuActions(map) },
+    {
+      source: "acled",
+      fetcher: () =>
+        fetchAcled(map).then((result) => ({
+          rows: result.rows,
+          fetched: result.fetched,
+          unmatchedCountry: result.unmatchedCountry,
+        })),
+    },
+    {
+      source: "vdem_pulse",
+      fetcher: () =>
+        fetchVdemPulse(map).then((result) => ({
+          rows: result.rows,
+          fetched: result.fetched,
+          unmatchedCountry: 0,
+        })),
+    },
+    { source: "gdelt", fetcher: () => fetchGdelt(map) },
+    { source: "reuters_ap", fetcher: () => fetchReutersAp(map) },
+  ];
+}
+
+export async function ingestPulseV2(
+  db: Db,
+  options: PulseIngestOptions = {},
+): Promise<IngestSummary> {
+  const map = options.jurisdictionMap ?? (await buildJurisdictionMap(db));
+  const jobs = options.jobs ?? liveConnectorJobs(map);
+  const writeRows = options.writeRows ?? upsertRawEvents;
   const reports: ConnectorReport[] = [];
 
-  async function runOne<R extends {
-    rows: { sourceId?: string; sourceType?: string }[];
-    fetched: number;
-    unmatchedCountry: number;
-  }>(
-    source: string,
-    fetcher: () => Promise<R>
-  ) {
+  async function runOne(job: PulseConnectorJob) {
     try {
-      const r = await fetcher();
+      const result = await job.fetcher();
       let upsert: UpsertResult = {
         inserted: 0,
         skippedDuplicate: 0,
         sourcesStamped: [],
       };
-      if (r.rows.length) {
-        // Cast through unknown — each connector emits well-typed
-        // RawEventInput already; the constraint above is a lower bound.
-        upsert = await upsertRawEvents(
-          db,
-          r.rows as unknown as Parameters<typeof upsertRawEvents>[1]
-        );
+      if (result.rows.length && !options.dryRun) {
+        upsert = await writeRows(db, result.rows);
       }
       reports.push({
-        source,
-        fetched: r.fetched,
+        source: job.source,
+        fetched: result.fetched,
         inserted: upsert.inserted,
         skippedDuplicate: upsert.skippedDuplicate,
-        unmatchedCountry: r.unmatchedCountry,
+        unmatchedCountry: result.unmatchedCountry,
+        wouldWrite: result.rows.length,
       });
     } catch (err) {
-      console.error(`[ingest:${source}] failed:`, err);
+      const message = err instanceof Error ? err.message : String(err);
+      if (options.failOnConnectorError) {
+        throw new Error(`Pulse connector ${job.source} failed: ${message}`);
+      }
+      console.error(`[ingest:${job.source}] failed:`, err);
       reports.push({
-        source,
+        source: job.source,
         fetched: 0,
         inserted: 0,
         skippedDuplicate: 0,
         unmatchedCountry: 0,
-        error: err instanceof Error ? err.message : String(err),
+        wouldWrite: 0,
+        error: message,
       });
     }
   }
 
-  // Specialist feeds (run in parallel — independent HTTP fetches)
-  await Promise.all([
-    runOne("civicus", () => fetchCivicus(map)),
-    runOne("rsf", () => fetchRsf(map)),
-    runOne("hrw_amnesty", () => fetchHrwAmnesty(map)),
-    runOne("ipu", () => fetchIpuActions(map)),
-    runOne("acled", () =>
-      fetchAcled(map).then((r) => ({
-        rows: r.rows,
-        fetched: r.fetched,
-        unmatchedCountry: r.unmatchedCountry,
-      }))
-    ),
-    runOne("vdem_pulse", () =>
-      fetchVdemPulse(map).then((r) => ({
-        rows: r.rows,
-        fetched: r.fetched,
-        unmatchedCountry: 0,
-      }))
-    ),
-  ]);
+  await Promise.all(jobs.map(runOne));
 
-  // News feeds
-  await Promise.all([
-    runOne("gdelt", () => fetchGdelt(map)),
-    runOne("reuters_ap", () => fetchReutersAp(map)),
-  ]);
-
+  reports.sort((left, right) => left.source.localeCompare(right.source));
   const totalFetched = reports.reduce((a, r) => a + r.fetched, 0);
   const totalInserted = reports.reduce((a, r) => a + r.inserted, 0);
   const totalSkipped = reports.reduce((a, r) => a + r.skippedDuplicate, 0);
   const totalUnmatched = reports.reduce((a, r) => a + r.unmatchedCountry, 0);
+  const totalWouldWrite = reports.reduce((a, report) => a + report.wouldWrite, 0);
+
+  if (options.requireNonEmpty && totalFetched === 0) {
+    throw new Error("Pulse ingestion fixture/upstream returned no rows");
+  }
 
   return {
     reports,
@@ -134,5 +172,7 @@ export async function ingestPulseV2(db: Db): Promise<IngestSummary> {
     totalInserted,
     totalSkipped,
     totalUnmatched,
+    totalWouldWrite,
+    dryRun: options.dryRun ?? false,
   };
 }

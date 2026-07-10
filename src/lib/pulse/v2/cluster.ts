@@ -20,7 +20,7 @@
  * stay in the staging table for human review or later auto-resolution.
  */
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { and, eq, isNull, sql } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { rawEvents } from "@/lib/db/schema";
@@ -51,9 +51,11 @@ export interface ClusterRunSummary {
   countryBuckets: number;
   /** Rows with multi-source clusters (proves dedup) */
   multiSourceClusters: number;
+  dryRun: boolean;
+  assignments: Array<{ clusterId: string; memberIds: string[] }>;
 }
 
-interface CandidateRow {
+export interface CandidateRow {
   id: string;
   jurisdictionId: string;
   eventDate: string | null;
@@ -62,34 +64,69 @@ interface CandidateRow {
   sourceId: string;
 }
 
+export interface ClusterRunOptions {
+  limit?: number;
+  dryRun?: boolean;
+  /** Fixture seam: bypasses the database candidate read. */
+  candidates?: CandidateRow[];
+  /** Fixture seam: null forces lexical clustering; an array supplies vectors. */
+  embeddingResult?: number[][] | null;
+  now?: Date;
+  clusterIdFactory?: (memberIds: readonly string[]) => string;
+}
+
+function deterministicFixtureClusterId(memberIds: readonly string[]): string {
+  const hash = createHash("sha256")
+    .update([...memberIds].sort().join("\n"))
+    .digest("hex");
+  return `${hash.slice(0, 8)}-${hash.slice(8, 12)}-4${hash.slice(13, 16)}-8${hash.slice(17, 20)}-${hash.slice(20, 32)}`;
+}
+
+function validateCandidates(candidates: readonly CandidateRow[]): void {
+  const ids = new Set<string>();
+  for (const [index, candidate] of candidates.entries()) {
+    if (!candidate.id.trim() || !candidate.jurisdictionId.trim() || !candidate.title.trim()) {
+      throw new Error(`Invalid cluster candidate at index ${index}: id, jurisdictionId, and title are required`);
+    }
+    if (ids.has(candidate.id)) {
+      throw new Error(`Invalid cluster fixture: duplicate candidate id ${candidate.id}`);
+    }
+    ids.add(candidate.id);
+  }
+}
+
 /**
  * Run the clustering pipeline against all unclustered rows. Returns
  * a summary of what changed.
  */
 export async function runClustering(
   db: Db,
-  opts: { limit?: number } = {}
+  opts: ClusterRunOptions = {},
 ): Promise<ClusterRunSummary> {
   const limit = opts.limit ?? 1000;
 
   // Pull candidates: unclustered, with a resolved jurisdiction id.
-  const candidates: CandidateRow[] = (await db
-    .select({
-      id: rawEvents.id,
-      jurisdictionId: rawEvents.jurisdictionId,
-      eventDate: rawEvents.eventDate,
-      title: rawEvents.title,
-      body: rawEvents.body,
-      sourceId: rawEvents.sourceId,
-    })
-    .from(rawEvents)
-    .where(
-      and(
-        isNull(rawEvents.clusterId),
-        sql`${rawEvents.jurisdictionId} IS NOT NULL`
+  const candidates: CandidateRow[] =
+    opts.candidates ??
+    ((await db
+      .select({
+        id: rawEvents.id,
+        jurisdictionId: rawEvents.jurisdictionId,
+        eventDate: rawEvents.eventDate,
+        title: rawEvents.title,
+        body: rawEvents.body,
+        sourceId: rawEvents.sourceId,
+      })
+      .from(rawEvents)
+      .where(
+        and(
+          isNull(rawEvents.clusterId),
+          sql`${rawEvents.jurisdictionId} IS NOT NULL`,
+        ),
       )
-    )
-    .limit(limit)) as CandidateRow[];
+      .limit(limit)) as CandidateRow[]);
+
+  validateCandidates(candidates);
 
   if (candidates.length === 0) {
     return {
@@ -98,6 +135,8 @@ export async function runClustering(
       clustersCreated: 0,
       countryBuckets: 0,
       multiSourceClusters: 0,
+      dryRun: opts.dryRun ?? false,
+      assignments: [],
     };
   }
 
@@ -110,7 +149,10 @@ export async function runClustering(
   );
   // Semantic embeddings when the local model loads; null on serverless where
   // the ONNX native runtime is absent — then similarity is lexical (Jaccard).
-  const embeddings = await tryEmbedBatch(texts);
+  const embeddings =
+    "embeddingResult" in opts
+      ? (opts.embeddingResult ?? null)
+      : await tryEmbedBatch(texts);
   const useEmbeddings = embeddings !== null;
   console.log(
     `[cluster] similarity mode: ${useEmbeddings ? "semantic embeddings" : "lexical (embedding model unavailable)"}`
@@ -128,7 +170,8 @@ export async function runClustering(
   let clustered = 0;
   let clustersCreated = 0;
   let multiSourceClusters = 0;
-  const now = new Date();
+  const now = opts.now ?? new Date();
+  const assignments: ClusterRunSummary["assignments"] = [];
 
   for (const [jurisdictionId, indexes] of buckets) {
     // Within a country, greedy union-find on (date proximity & embedding sim).
@@ -182,20 +225,26 @@ export async function runClustering(
 
     // Assign cluster ids and write back
     for (const [, members] of groups) {
-      const clusterId = randomUUID();
+      const memberIds = members.map((idx) => candidates[idx].id).sort();
+      const clusterId =
+        opts.clusterIdFactory?.(memberIds) ??
+        (opts.dryRun ? deterministicFixtureClusterId(memberIds) : randomUUID());
+      assignments.push({ clusterId, memberIds });
       const sourceIds = new Set(members.map((idx) => candidates[idx].sourceId));
       if (sourceIds.size > 1) multiSourceClusters++;
 
       // Per-row update with the embedding + cluster_id stamped
       for (const idx of members) {
-        await db
-          .update(rawEvents)
-          .set({
-            embedding: useEmbeddings ? embeddings![idx] : null,
-            clusterId,
-            clusteredAt: now,
-          })
-          .where(eq(rawEvents.id, candidates[idx].id));
+        if (!opts.dryRun) {
+          await db
+            .update(rawEvents)
+            .set({
+              embedding: useEmbeddings ? embeddings![idx] : null,
+              clusterId,
+              clusteredAt: now,
+            })
+            .where(eq(rawEvents.id, candidates[idx].id));
+        }
       }
       clustered += members.length;
       clustersCreated++;
@@ -210,6 +259,8 @@ export async function runClustering(
     clustersCreated,
     countryBuckets: buckets.size,
     multiSourceClusters,
+    dryRun: opts.dryRun ?? false,
+    assignments: assignments.sort((left, right) => left.clusterId.localeCompare(right.clusterId)),
   };
 }
 

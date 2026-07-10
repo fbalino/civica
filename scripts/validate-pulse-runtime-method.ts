@@ -378,12 +378,17 @@ function validateClassifierAndReview(
       "Classifier writes must distinguish auto-published and queued states",
     ],
     [
-      "const subject = await resolveSubjectJurisdiction(",
+      "const subject = await resolveSubject(",
       "Current classifications must run subject-country attribution",
     ],
   ] as const) {
     check(state, classify.includes(fragment), message);
   }
+  check(
+    state,
+    classify.includes("opts.resolveSubject ?? resolveSubjectJurisdiction"),
+    "Production classification must default to the subject-country attribution implementation",
+  );
 
   check(
     state,
@@ -492,9 +497,9 @@ function validateConnectors(
   snapshot: PulseRuntimeMethodSnapshot,
 ): void {
   const ingest = relative("src/lib/pulse/v2/ingest.ts");
-  const scheduledConnectorIds = sorted(
-    [...ingest.matchAll(/runOne\("([a-z_]+)"/g)].map((match) => match[1]),
-  );
+  const scheduledConnectorIds = sorted([
+    ...ingest.matchAll(/\{\s*source:\s*"([a-z_]+)",\s*fetcher:/g),
+  ].map((match) => match[1]));
   const contractConnectorIds = sorted(
     snapshot.feeds.connectors.map((connector) => connector.connectorId),
   );
@@ -582,7 +587,8 @@ function validateClusteringAndScoring(
   );
   check(
     state,
-    cluster.includes("const embeddings = await tryEmbedBatch(texts)") &&
+    cluster.includes("? (opts.embeddingResult ?? null)") &&
+      cluster.includes(": await tryEmbedBatch(texts)") &&
       cluster.includes("const useEmbeddings = embeddings !== null") &&
       cluster.includes(": lexicalSimilarity(texts[ia], texts[ib])"),
     "Clustering must retain semantic embeddings with lexical fallback",

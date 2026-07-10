@@ -1605,6 +1605,9 @@ export const pulseEventsV2 = pgTable(
   "pulse_events_v2",
   {
     id: uuid("id").primaryKey().defaultRandom(),
+    /** Stable idempotency key from raw_events.cluster_id. Legacy rows are
+     * backfilled to their event id by migration 0022. */
+    clusterId: uuid("cluster_id").notNull(),
     jurisdictionId: uuid("jurisdiction_id")
       .references(() => jurisdictions.id)
       .notNull(),
@@ -1671,6 +1674,7 @@ export const pulseEventsV2 = pgTable(
     index("idx_pulse_v2_published").on(table.published, table.reviewStatus),
     index("idx_pulse_v2_dimension").on(table.dimension, table.eventDate),
     index("idx_pulse_v2_derivation_version").on(table.derivationVersionKey),
+    uniqueIndex("idx_pulse_v2_cluster_unique").on(table.clusterId),
   ]
 );
 
@@ -1700,6 +1704,9 @@ export const pulseSources = pgTable(
   (table) => [
     index("idx_pulse_sources_event").on(table.eventId),
     index("idx_pulse_sources_source").on(table.sourceId),
+    uniqueIndex("idx_pulse_sources_raw_event_unique")
+      .on(table.rawEventId)
+      .where(dsql`${table.rawEventId} IS NOT NULL`),
   ]
 );
 

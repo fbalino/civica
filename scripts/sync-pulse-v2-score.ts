@@ -18,26 +18,27 @@ import { corroborateEvents } from "../src/lib/pulse/v2/corroborate";
 import { calculateDimensionalDeltas } from "../src/lib/pulse/v2/score";
 
 async function main() {
+  const dryRun = process.argv.includes("--dry-run");
   const sqlClient = neon(process.env.DATABASE_URL!);
   const db = drizzle({ client: sqlClient, schema });
 
   const start = Date.now();
 
   console.log("Pass 1 — corroboration confidence + press-freedom pin…");
-  const corro = await corroborateEvents(db);
+  const corro = await corroborateEvents(db, { dryRun });
   console.log(`  examined: ${corro.examined}`);
-  console.log(`  updated:  ${corro.updated}`);
+  console.log(`  ${dryRun ? "would update" : "updated"}:  ${dryRun ? corro.planned.length : corro.updated}`);
   console.log(`  avg confidence: ${corro.averageConfidence.toFixed(3)}`);
 
   console.log("\nPass 2 — dimensional deltas…");
-  const score = await calculateDimensionalDeltas(db);
+  const score = await calculateDimensionalDeltas(db, { dryRun });
   console.log(`  events considered:   ${score.eventsConsidered}`);
   console.log(`  countries scored:    ${score.countriesScored}`);
-  console.log(`  dim rows written:    ${score.dimensionRowsWritten}`);
+  console.log(`  dim rows ${dryRun ? "planned" : "written"}:    ${dryRun ? score.planned.length : score.dimensionRowsWritten}`);
   console.log(`  significant deltas:  ${score.significantDeltas}`);
 
   // Show top deltas
-  const result = await db.execute(sql`
+  const result = dryRun ? [] : await db.execute(sql`
     SELECT j.name AS country, pdd.dimension, pdd.delta_value
     FROM pulse_dimensional_deltas pdd
     JOIN jurisdictions j ON j.id = pdd.jurisdiction_id

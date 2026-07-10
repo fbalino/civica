@@ -27,6 +27,25 @@ export interface UpsertResult {
   sourcesStamped: string[];
 }
 
+export function rawEventInputErrors(row: RawEventInput): string[] {
+  const errors: string[] = [];
+  if (!row.sourceId.trim()) errors.push("sourceId is required");
+  if (row.sourceType !== "specialist" && row.sourceType !== "news") {
+    errors.push("sourceType must be specialist or news");
+  }
+  if (!row.title.trim()) errors.push("title is required");
+  if (!row.externalId?.trim() && !row.sourceUrl?.trim()) {
+    errors.push("externalId or sourceUrl is required for idempotent ingestion");
+  }
+  if (row.eventDate && !/^\d{4}-\d{2}-\d{2}$/.test(row.eventDate)) {
+    errors.push("eventDate must use YYYY-MM-DD");
+  }
+  if (!row.raw || typeof row.raw !== "object" || Array.isArray(row.raw)) {
+    errors.push("raw must be a JSON object");
+  }
+  return errors;
+}
+
 /**
  * Insert raw events into the staging table. Existing rows (matched by
  * externalId where present) are left alone — we treat the staging table
@@ -39,6 +58,13 @@ export async function upsertRawEvents(
 ): Promise<UpsertResult> {
   if (rows.length === 0) {
     return { inserted: 0, skippedDuplicate: 0, sourcesStamped: [] };
+  }
+
+  for (const [index, row] of rows.entries()) {
+    const errors = rawEventInputErrors(row);
+    if (errors.length) {
+      throw new Error(`Invalid raw event at index ${index}: ${errors.join("; ")}`);
+    }
   }
 
   let inserted = 0;

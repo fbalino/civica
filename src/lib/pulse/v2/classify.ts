@@ -159,6 +159,44 @@ export interface ClassifySummary {
   flaggedForReview: number;
   noneCategory: number;
   failed: number;
+  dryRun: boolean;
+  planned: Array<{
+    clusterId: string;
+    jurisdictionId: string;
+    category: string;
+    autoPublished: boolean;
+  }>;
+}
+
+type ClassifierResult =
+  | ClassifyOneResult
+  | { category: "none" }
+  | null;
+
+export interface ClassifyClustersOptions {
+  limit?: number;
+  dryRun?: boolean;
+  clusters?: ClusterToClassify[];
+  classify?: (cluster: ClusterToClassify) => Promise<ClassifierResult>;
+  resolveSubject?: typeof resolveSubjectJurisdiction;
+  write?: typeof writeEvent;
+  failOnError?: boolean;
+}
+
+function validateClusterFixtures(clusters: readonly ClusterToClassify[]): void {
+  const ids = new Set<string>();
+  for (const [index, cluster] of clusters.entries()) {
+    if (!cluster.clusterId.trim() || !cluster.jurisdictionId.trim() || !cluster.title.trim()) {
+      throw new Error(`Invalid classification cluster at index ${index}: clusterId, jurisdictionId, and title are required`);
+    }
+    if (!cluster.rawEventIds.length || cluster.rawEventIds.length !== cluster.attributions.length) {
+      throw new Error(`Invalid classification cluster ${cluster.clusterId}: raw-event attribution is incomplete`);
+    }
+    if (ids.has(cluster.clusterId)) {
+      throw new Error(`Invalid classification fixture: duplicate cluster id ${cluster.clusterId}`);
+    }
+    ids.add(cluster.clusterId);
+  }
 }
 
 /**
@@ -167,11 +205,15 @@ export interface ClassifySummary {
  */
 export async function classifyClusters(
   db: Db,
-  opts: { limit?: number } = {}
+  opts: ClassifyClustersOptions = {},
 ): Promise<ClassifySummary> {
   const limit = opts.limit ?? 200;
 
-  const clusters = await loadUnclassifiedClusters(db, limit);
+  const clusters = opts.clusters ?? (await loadUnclassifiedClusters(db, limit));
+  validateClusterFixtures(clusters);
+  const classify = opts.classify ?? classifyOne;
+  const resolveSubject = opts.resolveSubject ?? resolveSubjectJurisdiction;
+  const write = opts.write ?? writeEvent;
 
   const summary: ClassifySummary = {
     clustersExamined: clusters.length,
@@ -180,11 +222,13 @@ export async function classifyClusters(
     flaggedForReview: 0,
     noneCategory: 0,
     failed: 0,
+    dryRun: opts.dryRun ?? false,
+    planned: [],
   };
 
   for (const cluster of clusters) {
     try {
-      const result = await classifyOne(cluster);
+      const result = await classify(cluster);
       if (!result) {
         summary.failed++;
         continue;
@@ -206,22 +250,30 @@ export async function classifyClusters(
       // language resolver, which mis-files e.g. a Chinese-language story
       // about US redistricting under Taiwan. Re-attribute by subject so
       // the scored/displayed event lands on the right country.
-      const subject = await resolveSubjectJurisdiction(
+      const subject = await resolveSubject(
         db,
         ok.classified.headline,
         ok.classified.description
       );
       if (subject) ok.classified.jurisdictionId = subject.jurisdictionId;
-      await writeEvent(db, cluster, ok);
+      summary.planned.push({
+        clusterId: cluster.clusterId,
+        jurisdictionId: ok.classified.jurisdictionId,
+        category: ok.classified.category,
+        autoPublished: ok.autoPublished,
+      });
+      if (!opts.dryRun) await write(db, cluster, ok);
       summary.classified++;
       if (ok.autoPublished) summary.publishedAuto++;
       else summary.flaggedForReview++;
     } catch (err) {
+      if (opts.failOnError) throw err;
       console.error(`[classify] cluster ${cluster.clusterId} failed:`, err);
       summary.failed++;
     }
   }
 
+  summary.planned.sort((left, right) => left.clusterId.localeCompare(right.clusterId));
   return summary;
 }
 
@@ -762,6 +814,7 @@ export async function writeEvent(
   const eventRows = await db
     .insert(pulseEventsV2)
     .values({
+      clusterId: cluster.clusterId,
       jurisdictionId: result.classified.jurisdictionId,
       eventDate: result.classified.eventDate,
       category: result.classified.category,
@@ -778,21 +831,33 @@ export async function writeEvent(
       headline: result.classified.headline,
       description: result.classified.description,
     })
+    .onConflictDoNothing({ target: pulseEventsV2.clusterId })
     .returning({ id: pulseEventsV2.id });
 
-  const eventId = eventRows[0]?.id;
+  let eventId = eventRows[0]?.id;
+  if (!eventId) {
+    const existing = await db
+      .select({ id: pulseEventsV2.id })
+      .from(pulseEventsV2)
+      .where(eq(pulseEventsV2.clusterId, cluster.clusterId))
+      .limit(1);
+    eventId = existing[0]?.id;
+  }
   if (!eventId) return;
 
   // Insert pulse_sources rows for every contributing raw_event
   for (const attr of cluster.attributions) {
-    await db.insert(pulseSources).values({
-      eventId,
-      sourceId: attr.sourceId,
-      sourceType: attr.sourceType,
-      sourceName: attr.sourceName,
-      sourceUrl: attr.sourceUrl,
-      rawEventId: attr.rawEventId,
-    });
+    await db
+      .insert(pulseSources)
+      .values({
+        eventId,
+        sourceId: attr.sourceId,
+        sourceType: attr.sourceType,
+        sourceName: attr.sourceName,
+        sourceUrl: attr.sourceUrl,
+        rawEventId: attr.rawEventId,
+      })
+      .onConflictDoNothing();
   }
 
   // NOTE: freshness is stamped ONLY at ingest time (upsert.ts), gated on

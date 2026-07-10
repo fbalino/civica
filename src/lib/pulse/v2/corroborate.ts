@@ -43,9 +43,11 @@ export interface CorroborateSummary {
   examined: number;
   updated: number;
   averageConfidence: number;
+  dryRun: boolean;
+  planned: CorroborationPlan[];
 }
 
-interface EventRow {
+export interface EventRow {
   id: string;
   jurisdictionId: string;
   iso3: string | null;
@@ -55,22 +57,41 @@ interface EventRow {
   pressPinned: number | null;
 }
 
-interface SourceCounts {
+export interface SourceCounts {
   specialist: Set<string>;
   news: Set<string>;
 }
 
+export interface CorroborationPlan {
+  eventId: string;
+  confidence: number;
+  pressFreedomScore: number | null;
+}
+
+export interface CorroborateOptions {
+  onlyUnpinned?: boolean;
+  dryRun?: boolean;
+  events?: EventRow[];
+  sourceCounts?: ReadonlyMap<string, SourceCounts>;
+  write?: (db: Db, plan: CorroborationPlan) => Promise<void>;
+  now?: Date;
+}
+
 export async function corroborateEvents(
   db: Db,
-  opts: { onlyUnpinned?: boolean } = {}
+  opts: CorroborateOptions = {}
 ): Promise<CorroborateSummary> {
-  const events = await loadEvents(db, opts);
+  const events = opts.events ?? await loadEvents(db, opts);
+  validateEvents(events);
 
   let updated = 0;
   let totalConfidence = 0;
+  const planned: CorroborationPlan[] = [];
 
   for (const event of events) {
-    const counts = await loadSourceCounts(db, event.id);
+    const fixtureCounts = opts.sourceCounts?.get(event.id);
+    if (opts.sourceCounts && !fixtureCounts) throw new Error(`missing source-count fixture for event: ${event.id}`);
+    const counts = fixtureCounts ?? await loadSourceCounts(db, event.id);
     const press = pressFreedomScore(event.iso3);
     const tier = pressFreedomTier(press);
 
@@ -100,23 +121,42 @@ export async function corroborateEvents(
 
     confidence = Math.max(0, Math.min(1, confidence));
     totalConfidence += confidence;
-
-    await db
-      .update(pulseEventsV2)
-      .set({
-        corroborationConfidence: confidence,
-        pressFreedomScoreAtClassification: press,
-        updatedAt: new Date(),
-      })
-      .where(eq(pulseEventsV2.id, event.id));
-    updated++;
+    const plan = { eventId: event.id, confidence, pressFreedomScore: press };
+    planned.push(plan);
+    if (!opts.dryRun) {
+      if (opts.write) await opts.write(db, plan);
+      else await writeCorroboration(db, plan, opts.now ?? new Date());
+      updated++;
+    }
   }
 
   return {
     examined: events.length,
     updated,
     averageConfidence: events.length ? totalConfidence / events.length : 0,
+    dryRun: opts.dryRun ?? false,
+    planned: planned.sort((a, b) => a.eventId.localeCompare(b.eventId)),
   };
+}
+
+function validateEvents(events: EventRow[]): void {
+  const ids = new Set<string>();
+  for (const event of events) {
+    if (!event.id.trim() || !event.jurisdictionId.trim()) throw new Error("corroboration fixture has a blank event or jurisdiction id");
+    if (ids.has(event.id)) throw new Error(`duplicate corroboration event id: ${event.id}`);
+    ids.add(event.id);
+  }
+}
+
+async function writeCorroboration(db: Db, plan: CorroborationPlan, now: Date): Promise<void> {
+  await db
+    .update(pulseEventsV2)
+    .set({
+      corroborationConfidence: plan.confidence,
+      pressFreedomScoreAtClassification: plan.pressFreedomScore,
+      updatedAt: now,
+    })
+    .where(eq(pulseEventsV2.id, plan.eventId));
 }
 
 function baselineConfidence(
