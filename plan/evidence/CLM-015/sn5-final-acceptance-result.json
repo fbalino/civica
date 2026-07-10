@@ -1,0 +1,32 @@
+{
+  "status": "completed",
+  "provider": "claude-code",
+  "model_requested": "claude-sonnet-5",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 12680,
+      "outputTokens": 2138,
+      "cacheReadInputTokens": 902195,
+      "cacheCreationInputTokens": 45144,
+      "webSearchRequests": 0,
+      "costUSD": 0.6116325,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000
+    }
+  },
+  "session_id": "b27f20ba-4cf0-40cd-a578-7ab490986616",
+  "subscription_first": true,
+  "result": {
+    "status": "completed",
+    "summary": "CLM-015 acceptance review complete via static code inspection (Bash execution was denied in this session, so tests/validator were not actually run \u2014 only read).\n\nVerdict: ACCEPT\n\nBlocking findings: None\n\nNon-blocking notes:\n1. Could not execute `npm run validate:terminology` or the test file in this session (Bash denied) \u2014 recommend a follow-up run to confirm runtime behavior matches static analysis before final sign-off.\n2. `validate-research-terminology.ts:97` treats \"linked\" vs \"conformant\" surface status as informational only (not gated) \u2014 fine since the lint itself already enforces the real constraint, but worth noting it's not a strict requirement that every surface link to /glossary.\n3. Regexes (`CIVICA_RESEARCH_SUBJECT`, replication/confidence allow-lists) are reasonably narrow and well-tested, but as with any regex lint, novel phrasings not covered by the affirmative patterns could still slip through \u2014 acceptable for a v1 given the stated \"narrow by design\" scope.\n\nChecks run: none (read-only file inspection only; Bash tool was denied by the harness)",
+    "artifacts": [],
+    "changed_files": [],
+    "commands_run": [],
+    "verification": "Read src/lib/research-terminology.ts (14 terms, registry validator, lint rules with allow-patterns), src/lib/data/glossary.ts (deriveResearchGlossaryTerms generates entries from RESEARCH_TERMS, no duplicate prose), scripts/validate-research-terminology.ts (deterministic, fs-only, checks registry/glossary parity, glossary page anchors, and lints all 8 registered surfaces), src/lib/docs/doc-concepts.ts (CLM_015_CONCEPTS registers research-terminology.ts as canonical source with correct relations), package.json (validate:terminology wired into build script), src/app/glossary/page.tsx (renders id={term.id} anchors), and src/lib/research-terminology.test.ts (covers positive/negative/false-positive-resistant fixtures for all four prohibited-usage rules plus registry/glossary parity).",
+    "needs_user": false,
+    "next_action": "User may want to run `npm test` / `npm run validate:terminology` directly to confirm runtime pass, since Bash was unavailable in this session."
+  },
+  "duration_ms": 41103,
+  "num_turns": 11,
+  "returncode": 0
+}

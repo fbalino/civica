@@ -1,0 +1,34 @@
+{
+  "status": "completed",
+  "provider": "claude-code",
+  "model_requested": "claude-sonnet-5",
+  "model_usage": {
+    "claude-sonnet-5": {
+      "inputTokens": 598,
+      "outputTokens": 1332,
+      "cacheReadInputTokens": 91584,
+      "cacheCreationInputTokens": 566,
+      "webSearchRequests": 0,
+      "costUSD": 0.0526452,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000
+    }
+  },
+  "session_id": "d0ca4b05-d7ca-4c3a-a3b7-c5aa2fcc0db0",
+  "subscription_first": true,
+  "result": {
+    "status": "completed",
+    "summary": "Verdict: ACCEPT\n\nBlocking findings: None\n\nNon-blocking notes:\n1. src/lib/research-terminology.ts:310 \u2014 `NO_ALLOWANCE = /$^/` (a never-matching regex) is a slightly opaque idiom for \"no allowance pattern\"; a named boolean/comment would be clearer for future maintainers, but it works correctly today.\n2. The prohibited-usage lint (src/lib/research-terminology.ts:321-369) covers 4 rule shapes (validated, peer-reviewed, confidence interval, replicated) against 8 registered surfaces; this is a narrow, high-precision lint by design rather than an exhaustive overclaim detector \u2014 acceptable per the \"narrow by design\" module doc, but future terms/claims (e.g. \"corroborated,\" \"verified\") are not yet covered if they become load-bearing claims later.\n3. scripts/validate-research-terminology.ts:97 treats `/glossary#id` presence as \"linked\" purely for reporting/logging; it does not gate pass/fail on whether a surface is linked vs. conformant, which is correct per the \"done when\" criteria (glossary link OR conformance) but worth knowing it's informational only.\n\nVerification performed: read src/lib/research-terminology.ts, src/lib/research-terminology.test.ts, src/lib/data/glossary.ts (registry-to-glossary derivation), scripts/validate-research-terminology.ts, src/lib/docs/doc-concepts.ts (CLM-015 registration), and package.json (`validate:terminology` wired into `npm run build`). Ran `npx tsx scripts/validate-research-terminology.ts` directly \u2014 PASS, 14/14 terms present, glossary generates all 14 without drift, all 8 registered surfaces (6 reader-markdown + 2 reader-tsx) conformant with zero lint violations. Test file contains 14 tests covering: exact 14-term registry, glossary generation fidelity, structural-validation error detection (duplicate/missing/incomplete), sentence-splitter behavior, affirmative-claim rejection for all 4 rule types, negation/implementation/external-context allowances, adjacent-plan-language resistance (doesn't let nearby words excuse a false claim), and a blanket-ban resistance test confirming ordinary scholarly vocabulary passes clean. All 6 acceptance criteria are satisfied: (1) registry has exactly the 14 required concepts with cautious, non-overclaiming definitions; (2) /glossary derives from GLOSSARY_TERMS via deriveResearchGlossaryTerms(), never retyping prose; (3) validator is deterministic/fs-only (no network/DB) and checks registry structure, glossary fidelity, stable anchors, and all 8 surfaces; (4) lint rules target the 4 specific overclaim shapes with narrow same-sentence allow-patterns rather than banning terms outright; (5) tests include both positive (violation caught) and false-positive-resistant (external/negated/implementation usage permitted) fixtures; (6) doc-concepts.ts registers research-terminology as a CLM-015-owned canonical concept with correct relations, and validate:terminology is wired into the build pipeline (package.json:7).",
+    "artifacts": [],
+    "changed_files": [],
+    "commands_run": [
+      "npx tsx scripts/validate-research-terminology.ts"
+    ],
+    "verification": "See summary.",
+    "needs_user": false,
+    "next_action": "None."
+  },
+  "duration_ms": 15992,
+  "num_turns": 2,
+  "returncode": 0
+}

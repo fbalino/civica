@@ -550,6 +550,52 @@ const CLM_014_CONCEPTS: DocConcept[] = [
   },
 ];
 
+const CLM_015_CONCEPTS: DocConcept[] = [
+  {
+    id: "research-terminology",
+    title: "Normative research terminology",
+    owner: "CLM-015",
+    canonical: {
+      kind: "source",
+      path: "src/lib/research-terminology.ts",
+      symbol: "RESEARCH_TERMS",
+    },
+    relations: [
+      {
+        kind: "source",
+        path: "src/lib/data/glossary.ts",
+        relationship: "interpolated",
+        note: "The public glossary imports and reshapes the canonical definitions; it never retypes them.",
+      },
+      ...[
+        "content/methodology-overview.md",
+        "content/data-approach.md",
+        "content/methodology-civica-index.md",
+        "content/methodology-peer-grouping.md",
+        "content/methodology-pulse.md",
+        "content/methodology-pca-appendix.md",
+      ].map<DocRelation>((path) => ({
+        kind: "reader-markdown",
+        path,
+        relationship: "contract-test",
+        note: "The terminology validator checks this canonical reader surface for prohibited ambiguous research claims.",
+      })),
+      {
+        kind: "reader-tsx",
+        path: "src/app/(reader)/country/methodology/reconciliation/page.tsx",
+        relationship: "contract-test",
+        note: "The terminology validator checks the current TSX-owned reconciliation prose.",
+      },
+      {
+        kind: "reader-tsx",
+        path: "src/app/(reader)/civica-index/replication/page.tsx",
+        relationship: "contract-test",
+        note: "The terminology validator checks replication status language against the fail-closed definition.",
+      },
+    ],
+  },
+];
+
 export const DOC_CONCEPTS: DocConcept[] = [
   ...MIGRATED_CONCEPTS,
   ...ALREADY_SATISFIED_CONCEPTS,
@@ -557,6 +603,7 @@ export const DOC_CONCEPTS: DocConcept[] = [
   ...CLM_012_RESOLVED_CONCEPTS,
   ...DEFERRED_CONCEPTS,
   ...CLM_014_CONCEPTS,
+  ...CLM_015_CONCEPTS,
 ];
 
 /* ────────────────────────────────────────────────────────────────

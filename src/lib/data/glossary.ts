@@ -8,9 +8,11 @@
 // link to the relevant methodology page. `tag` attaches a small tinted category
 // label rendered as an `.editorial-chip`-style pill on the page.
 //
-// This is the single source of truth for the /glossary page. Terms are sorted
-// and grouped by first letter at render time, so insertion order here doesn't
-// matter — keep the array readable instead.
+// This is the source of truth for the curated governance entries. The 14
+// normative research terms are generated from `src/lib/research-terminology.ts`
+// so their published definitions and the terminology lint cannot drift.
+
+import { RESEARCH_TERMS } from "@/lib/research-terminology";
 
 /** Tonal category of a term, mapped to a tinted tag colour on the page. */
 export type GlossaryTag =
@@ -51,7 +53,31 @@ export interface GlossaryTerm {
   source?: GlossarySource;
 }
 
-export const GLOSSARY_TERMS: GlossaryTerm[] = [
+/**
+ * Generates the 14 research-vocabulary glossary entries (source,
+ * observation, fact, reconciliation, estimate, indicator, index,
+ * signal, event, confidence, uncertainty, validation, replication,
+ * peer review) from `RESEARCH_TERMS`, the canonical registry in
+ * `src/lib/research-terminology.ts`. Definitions are never re-typed
+ * here — this only reshapes the registry's fields into `GlossaryTerm`.
+ */
+function deriveResearchGlossaryTerms(): GlossaryTerm[] {
+  return RESEARCH_TERMS.map((researchTerm) => ({
+    id: researchTerm.id,
+    term: researchTerm.term,
+    definition: researchTerm.definition,
+    seeAlso: researchTerm.methodLinks.map((link) => ({
+      label: `${link.label} →`,
+      href: link.href,
+    })),
+    source: {
+      name: "Civica research terminology contract",
+      url: "/methodology",
+    },
+  }));
+}
+
+const CURATED_GLOSSARY_TERMS: GlossaryTerm[] = [
   {
     id: "accountability",
     term: "Accountability",
@@ -917,6 +943,11 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
       { label: "Quorum", href: "#quorum" },
     ],
   },
+];
+
+export const GLOSSARY_TERMS: GlossaryTerm[] = [
+  ...CURATED_GLOSSARY_TERMS,
+  ...deriveResearchGlossaryTerms(),
 ];
 
 /** A letter group: an uppercase letter and its alphabetically sorted terms. */

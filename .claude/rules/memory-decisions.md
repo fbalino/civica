@@ -1,5 +1,16 @@
 # Project Memory Decisions
 
+## 2026-07-10 — Research terminology is an executable contract
+
+The 14 normative research definitions live only in
+`src/lib/research-terminology.ts`; the public glossary imports them. Registered
+research surfaces must link or conform, and unsupported claims that Civica's
+outputs are validated, peer reviewed, calibrated confidence intervals, or
+independently replicated must fail `npm run validate:terminology`. Extend the
+targeted contract when a new load-bearing claim shape appears rather than
+banning ordinary scholarly vocabulary. Durable record: APR-D030 in
+`plan/DECISIONS.md`.
+
 ## 2026-07-10 — Operational documentation is executable current truth
 
 `README.template.md` is the authored source for generated `README.md`; both
