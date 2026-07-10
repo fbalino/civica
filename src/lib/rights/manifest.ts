@@ -287,6 +287,18 @@ export const RELEASE_ARTIFACT_RIGHTS: readonly ReleaseArtifactRights[] = [
       "The artifact contains Civica-authored provenance metadata and hashes only. It excludes all publisher files and observation rows.",
     derivationVersions: CI_BETA_RELEASE_DERIVATION_VERSIONS,
   },
+  {
+    releaseId: "ci-beta-2024-Q4",
+    artifactPath:
+      "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json",
+    artifactKind: "metadata-only",
+    includedSources: CI_BETA_RELEASE_SOURCE_IDS,
+    excludedSourcePayloads: CI_BETA_RELEASE_SOURCE_IDS,
+    publicDistribution: "allowed",
+    governingTerms:
+      "The artifact contains hashes, retrieval metadata, rights records, and reconstruction instructions only. It excludes all publisher files and observation rows.",
+    derivationVersions: CI_BETA_RELEASE_DERIVATION_VERSIONS,
+  },
 ] as const;
 
 export interface ExportRightsDecision {

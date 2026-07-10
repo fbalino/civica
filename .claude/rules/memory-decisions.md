@@ -672,3 +672,14 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   selection. New derived-table writers must register with the DAT-010 scanner.
 - Current bulk exports remain rights-blocked and future export contracts require
   a derivation envelope. Durable record: APR-D044 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Release inputs use rights-safe reconstruction records
+
+- `raw-input-retention/v1` maps every named released value group to an exact
+  publisher-byte hash, retrieval metadata, adapter version, rights record, and
+  semantic output checksum.
+- Do not commit restricted publisher payloads. Reacquire them under publisher
+  terms and require an exact hash match; a mismatch is a different input.
+- Do not create retrospective capture records for Atlas G2 or Pulse until they
+  have a real frozen release cut. Durable record: APR-D045 in
+  `plan/DECISIONS.md`.

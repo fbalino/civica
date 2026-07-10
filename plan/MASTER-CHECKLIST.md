@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 29
-- **Remaining:** 259
-- **Progress:** 10.1%
+- **Completed:** 30
+- **Remaining:** 258
+- **Progress:** 10.4%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -48,7 +48,7 @@ Source: `plan/03-data-provenance-and-reproducibility.md`
 - [x] **DAT-008** (P0) Verify and repair source freshness semantics across every sync/ingest path. _Done when: `npm run validate:sync-freshness` covers all production writers; only `markSourcesSynced()` can stamp freshness; dry, failed, and zero-row runs leave freshness unchanged; successful row-writing fixtures stamp the correct source._
 - [x] **DAT-009** (P1) Create a complete schema/data dictionary and field-level provenance map. _Done when: every released table/column has definition, type, unit, nullable meaning, key, source/derivation, cadence, vintage semantics, rights, and deprecation status, and schema changes fail CI without dictionary updates._
 - [x] **DAT-010** (P0) Add transformation/methodology version fields to every derived research row that can change interpretation. _Done when: Index dimensions/scores, Pulse classifications/events/deltas, reconciled facts, taxonomy derivations, and release exports retain algorithm/prompt/taxonomy/source-basket versions and can be filtered/rebuilt by version._
-- [ ] **DAT-011** (P0) Preserve immutable raw/source snapshots or compliant hashes and retrieval metadata for released observations. _Done when: each released derived value can identify the exact raw snapshot or legally compliant reconstruction record; mutable upstream pages cannot silently change a past release; restricted inputs use verified hashes/access instructions._
+- [x] **DAT-011** (P0) Preserve immutable raw/source snapshots or compliant hashes and retrieval metadata for released observations. _Done when: each released derived value can identify the exact raw snapshot or legally compliant reconstruction record; mutable upstream pages cannot silently change a past release; restricted inputs use verified hashes/access instructions._
 - [ ] **DAT-012** (P1) Make every ingestion/sync idempotent, dry-runnable, and fixture-testable. _Done when: running each adapter twice against fixtures yields identical canonical state and no duplicate rows; dry run produces a diff/report with zero writes; malformed/empty/upstream-changed fixtures fail loudly without freshness updates._
 - [ ] **DAT-013** (P1) Establish schema migration and production-data-change discipline. _Done when: every schema/data migration has checked-in forward SQL/Drizzle artifact, rollback or compensating plan, dry-run row counts, invariant tests, and release-note linkage; `db:push` is not the undocumented production history._
 - [ ] **DAT-014** (P0) Add release data-quality invariants and anomaly reports. _Done when: one command checks identifier uniqueness, jurisdiction coverage, impossible ranges, unit/vintage consistency, orphan provenance, duplicate canonical facts, missing required fields, unexpected row deltas, and source-age thresholds; seeded anomalies fail with actionable output._

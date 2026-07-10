@@ -54,11 +54,12 @@ test("unknown products and pending sources fail closed", () => {
 });
 
 test("release artifacts name included and excluded publisher payloads", () => {
-  assert.equal(RELEASE_ARTIFACT_RIGHTS.length, 1);
-  const [artifact] = RELEASE_ARTIFACT_RIGHTS;
-  assert.equal(artifact.artifactKind, "metadata-only");
-  assert.equal(artifact.publicDistribution, "allowed");
-  assert.deepEqual(artifact.includedSources, artifact.excludedSourcePayloads);
+  assert.equal(RELEASE_ARTIFACT_RIGHTS.length, 2);
+  for (const artifact of RELEASE_ARTIFACT_RIGHTS) {
+    assert.equal(artifact.artifactKind, "metadata-only");
+    assert.equal(artifact.publicDistribution, "allowed");
+    assert.deepEqual(artifact.includedSources, artifact.excludedSourcePayloads);
+  }
 });
 
 test("machine-readable manifest contains source, product, field, and release levels", () => {

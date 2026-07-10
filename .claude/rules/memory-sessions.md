@@ -242,3 +242,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   hash after the writer change.
 - Fourteen focused fixtures, 439 tests, TypeScript, targeted ESLint, and the full
   production build passed. No rendered UI changed.
+
+## 2026-07-10 — DAT-011 immutable input reconstruction records
+
+- Added a self-hashed retention manifest for the frozen 2024-Q4 Index metadata
+  release: four raw capture records, five value groups, and composite lineage.
+- Publisher payloads remain excluded. Exact byte hashes, retrieval metadata,
+  rights, adapter versions, semantic checksums, and fail-closed reacquisition
+  instructions preserve the reconstruction path.
+- Seven focused fixtures, 446 tests, targeted ESLint, TypeScript, and the full
+  production build passed. No rendered UI changed.
