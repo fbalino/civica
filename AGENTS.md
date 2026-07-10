@@ -54,7 +54,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 <!-- END:nextjs-agent-rules -->
 
 ## Database
-- Schema: `src/lib/db/schema.ts` — **45 tables** across government structure, factbook, Civica Index scoring, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **49 tables** across government structure, factbook, Civica Index scoring, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
@@ -86,12 +86,15 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 - V-Dem, World Bank WGI, UNDP HDI, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index — feed the Civica Index
 - Pulse production-active feeds are the observed source IDs in `src/lib/pulse/v2/runtime-method.generated.json`; connector presence alone does not make a feed active
 
-## Environment variables (all in `.env.local`, documented in `.env.example`)
+## Core environment variables
+The complete, authoritative contract (every var, required/optional, and why) is
+`.env.example` — read it rather than trusting a partial list here. Headline
+variables:
 - `DATABASE_URL` — Neon Postgres connection (required)
 - `ANTHROPIC_API_KEY_CHAT` — required for `/api/chat`
 - `DEEPSEEK_API_KEY`, `GLM_API_KEY`, `ANTHROPIC_API_KEY_PULSE_CLASSIFIER` — default Pulse voters, verification, and subject attribution
 - `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET` — required admin-login credentials for `/admin` and `/api/admin/*`; routes fail closed if any are unset
-- `CRON_SECRET` — bearer token for Vercel cron endpoints at `/api/cron/pulse/*`
+- `CRON_SECRET` — bearer token Vercel Cron sends to every scheduled `/api/cron/*` route (bills, factbook syncs, Pulse)
 - `CONGRESS_API_KEY` — optional, legacy US-legislative sync
 
 ## Scripts
@@ -120,11 +123,9 @@ Seven `content/*.md` files are now the rendered prose source of truth for their 
 - **Any methodology number cited in `content/*.md` is a `{{state.*}}` or `{{stats.*}}` interpolation, not a hardcode.** Drift between the rendered page and the live DB is caught by `npm run validate:content-templates`. New hardcoded numbers in markdown are a bug.
 - **Sidebar anchors are stable ids written `## Heading {#anchor-id}` in markdown.** The `remark-civica-anchors` plugin assigns the id; renaming the heading prose doesn't break the sidebar link.
 - **Soft-fail every `{{stats.*}}` reference** with a `| "fallback"` arg. Pages must render coherently when `getSiteStats()` throws (e.g., DB unreachable). Mirror the try/catch in `src/app/(reader)/methodology/approach/page.tsx`.
-- **The seventh file (`content/methodology-reconciliation.md`) is deferred** until the `<WorkedExample>` editorial primitive lands (per `~/civica/plan/content-templating-implementation-v1.md` §3.2). Its TSX page at `src/app/(reader)/country/methodology/reconciliation/page.tsx` remains the prose source of truth in the meantime.
+- **The seventh file (`content/methodology-reconciliation.md`) is deferred** until the `<WorkedExample>` editorial primitive lands. Its TSX page at `src/app/(reader)/country/methodology/reconciliation/page.tsx` remains the prose source of truth in the meantime; a contract test keeps the deferred markdown's worked-example prose in sync with the reconciliation fact-key thresholds in the interim (`src/lib/factbook/reconcile/__tests__/reconciliation-worked-examples.test.ts`).
 - **Discipline before push:** when editing methodology prose, run `npm run validate:content-templates` and verify the affected page renders correctly on `localhost:3000`. Add `ctx.*` keys to the validator's `CTX_ALLOWLIST` whenever a markdown file references a new pre-computed helper.
 - **Mutable public counts are registered claims.** A current coverage/count claim in public prose or UI must resolve from runtime state with a nonnumeric soft fallback, or be visibly tied to a dated frozen release. Register it in `PUBLIC_NUMERIC_CLAIMS` (`src/lib/claims/public-numeric-claims.ts`) and run `npm run validate:numeric-claims`; do not restore convenient literals such as `195 countries` or `250+ countries`.
-
-Full architecture documented at `~/civica/plan/content-templating-implementation-v1.md` (substitution engine, slice prop, soft-fail discipline, per-page strategy, `<WorkedExample>` follow-up).
 
 ## Footer invariants
 These links MUST survive any header/footer refactor:

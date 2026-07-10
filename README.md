@@ -5,6 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
+  Template SHA-256: 7ba6710c8e1ff53c234e54615176a326a18542b2917e06ecd3295826d916e8de
+  Generated body SHA-256: d8d96315535084b3a32c232b504fc13809c99adb4bfcbf0ef8f833b2c93e1bb6
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -93,17 +95,18 @@ High-level data flow:
 │  UN, WHO, etc.)   │    │   value_type)    │    │  dispute guard)  │
 └───────────────────┘    └──────────────────┘    └────────┬─────────┘
                                                           ▼
-                                       ┌──────────────────────────────┐
-                                       │ Reader surfaces              │
-                                       │   /factbook/[country]        │
-                                       │   /civica-index/[country]    │
-                                       │   /atlas/[country]/[tab]     │
-                                       │   /api/v1/...                │
-                                       │ (FactValueDot per fact)      │
-                                       └──────────────────────────────┘
+                                       ┌────────────────────────────────┐
+                                       │ Reader surfaces                │
+                                       │   /country/[slug]              │
+                                       │   /country/[slug]/civica-data  │
+                                       │   /country/[slug]/constitution │
+                                       │   /atlas                       │
+                                       │   /api/v1/...                  │
+                                       │ (FactValueDot per fact)        │
+                                       └────────────────────────────────┘
 ```
 
-Detailed architecture: see [Methodology — Reconciliation](https://civicaatlas.org/factbook/methodology/reconciliation).
+Detailed architecture: see [Methodology — Reconciliation](https://civicaatlas.org/country/methodology/reconciliation).
 
 ## Methodology
 
@@ -113,7 +116,7 @@ Public methodology pages (in approximate read order):
 |---|---|
 | **How we approach data** (intro, plain English) | `/methodology/approach` |
 | **Methodology hub** (index of every methodology page) | `/methodology` |
-| Reconciliation — multi-source resolver, dispute rules, provenance | `/factbook/methodology/reconciliation` |
+| Reconciliation — multi-source resolver, dispute rules, provenance | `/country/methodology/reconciliation` |
 | Civica Index — composite scoring, dimensions, weights | `/civica-index/methodology` |
 | Civica Index — PCA appendix (the math) | `/civica-index/methodology/pca-appendix` |
 | Civica Pulse — event classification + experimental effects | `/civica-index/methodology/pulse` |
@@ -169,7 +172,7 @@ Required env vars (documented in `.env.example`):
 - `ANTHROPIC_API_KEY_CHAT` — required for `/api/chat`
 - `DEEPSEEK_API_KEY`, `GLM_API_KEY`, and `ANTHROPIC_API_KEY_PULSE_CLASSIFIER` — required by the default Pulse ensemble, verifier, and subject-attribution pass
 - `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` — the admin-login credentials for the `/admin` back office and `/api/admin/*` routes (all three required; routes fail closed if unset). Generate the password hash with `npm run admin:set-password`.
-- `CRON_SECRET` — bearer token for the Vercel cron endpoints
+- `CRON_SECRET` — bearer token for the Vercel cron endpoints at `/api/cron/*`
 
 Common npm scripts:
 
@@ -178,7 +181,7 @@ npm run db:generate              # Drizzle schema migration
 npm run db:push                  # Push schema to Neon
 npm run seed:sources             # Seed the sources table
 npm run seed:factbook            # Import the CIA Factbook archive
-npm run sync:factbook:wb-wdi     # World Bank WDI sync
+npm run sync:factbook:wdi        # World Bank WDI sync
 npm run sync:factbook:imf-weo    # IMF WEO sync
 npm run sync:factbook:un-data    # UN Data sync
 # ... one sync orchestrator per source; see package.json

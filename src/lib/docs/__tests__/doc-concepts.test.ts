@@ -434,12 +434,15 @@ test("positive control: DOC_SURFACE_KINDS has exactly the six mandated kinds", (
   );
 });
 
-test("real DOC_CONCEPTS registers exactly the three deferred concepts named in the bounded-repair brief, each with one owner", () => {
+test("real DOC_CONCEPTS registers exactly the one deferred concept left after CLM-011 reconciled the other two", () => {
+  // CLM-011 repaired `reconciliation.material-error` and
+  // `docs.schema-table-count` (both formerly deferredTo: "CLM-011") and
+  // bound them to automated contract-test/validator assertions, so they
+  // no longer carry a `deferredTo`. `api.v1-examples` remains deferred
+  // to CLM-012, which CLM-011 does not own.
   const deferred = deferredConcepts(DOC_CONCEPTS);
   const byId = Object.fromEntries(deferred.map((c) => [c.id, c.deferredTo]));
   assert.deepEqual(byId, {
-    "reconciliation.material-error": "CLM-011",
-    "docs.schema-table-count": "CLM-011",
     "api.v1-examples": "CLM-012",
   });
   for (const concept of deferred) {

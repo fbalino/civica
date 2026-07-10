@@ -6,6 +6,7 @@ import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { BetaChip } from "@/components/editorial/BetaChip";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
+import { getFactKey } from "@/lib/factbook/reconcile/fact-keys";
 import {
   reconciliation,
   tier1Publishers,
@@ -16,6 +17,36 @@ import {
 } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
+
+// Worked Example 1 (Argentina inflation) derives its threshold from the
+// fact-keys registry rather than retyping it, so the prose can never drift
+// from the actual resolver guard. Fails loudly at build time if the
+// registry entry disappears, rather than silently falling back to a
+// hardcoded number.
+const INFLATION_MATERIAL_ERROR_PP_THRESHOLD =
+  getFactKey("inflation_rate")?.materialErrorPpThreshold;
+const PUBLIC_DEBT_MATERIAL_ERROR_PP_THRESHOLD = getFactKey(
+  "public_debt_pct_gdp",
+)?.materialErrorPpThreshold;
+if (
+  INFLATION_MATERIAL_ERROR_PP_THRESHOLD === undefined ||
+  PUBLIC_DEBT_MATERIAL_ERROR_PP_THRESHOLD === undefined
+) {
+  throw new Error(
+    "Reconciliation methodology page expects inflation_rate and public_debt_pct_gdp to declare materialErrorPpThreshold in fact-keys.ts",
+  );
+}
+
+// Frozen worked-example rows (methodology v0.2-beta, vintage 2026-Q1) —
+// named so the resolver-outcome prose can compute the gap rather than
+// retyping it.
+const ARGENTINA_INFLATION_WORLD_BANK_PCT_2024 = 219.88;
+const ARGENTINA_INFLATION_CIA_PCT_2022 = 73.1;
+const ARGENTINA_INFLATION_GAP_PP =
+  Math.round(
+    (ARGENTINA_INFLATION_WORLD_BANK_PCT_2024 - ARGENTINA_INFLATION_CIA_PCT_2022) *
+      100,
+  ) / 100;
 
 const tier1Shipped = tier1Publishers.filter((p) => p.shipped);
 const nsoActive = nsoWave1.filter((n) => n.status === "in-progress");
@@ -526,8 +557,7 @@ export default async function ReconciliationMethodologyPage() {
             differing from the older one by more than a per-category
             &ldquo;impossible&rdquo; threshold (population &gt; 50%
             in a year, GDP nominal in USD &gt; 80%, inflation and
-            public-debt ratios &gt; 300 percentage points after the
-            5 May 2026 hyperinflation hot-fix) is rejected as likely
+            public-debt ratios &gt; 300 percentage points) is rejected as likely
             data corruption or a unit-of-measure error. A dispute row
             is created and the prior canonical value remains until
             reviewed.
@@ -566,41 +596,55 @@ export default async function ReconciliationMethodologyPage() {
         </p>
 
         <h3 id="example-argentina-inflation">
-          Worked example 1 — Argentina inflation, hyperinflation hot-fix
+          Worked example 1 — Argentina inflation, a hyperinflation-scale
+          swing
         </h3>
         <p>
-          <strong>Pattern.</strong> Group B fresher-source-wins after
-          the post-canonical-pick-investigation material-error
-          threshold raise (50 pp → 300 pp for{" "}
-          <code>inflation_rate</code> and{" "}
-          <code>public_debt_pct_gdp</code>).
+          <strong>Pattern.</strong> Group B fresher-source-wins under an
+          elevated material-error threshold reserved for high-volatility
+          fact-keys. <code>inflation_rate</code> and{" "}
+          <code>public_debt_pct_gdp</code> both carry a{" "}
+          {INFLATION_MATERIAL_ERROR_PP_THRESHOLD}{" "}
+          percentage-point
+          material-error ceiling — wider than the ceiling on most
+          Group B percentage fact-keys — because genuine hyperinflation
+          and sovereign-debt-crisis episodes can move a country&rsquo;s
+          reading by more than 100 percentage points in a single year
+          without that swing being a data error.
         </p>
         <p>
-          <strong>Frozen example rows.</strong> The World Bank reports 219.88%
-          (2024). The IMF World Economic Outlook reports 7.5% (2031,
-          tagged as a projection). The CIA World Factbook reports
-          73.1% (2022, frozen).
+          <strong>Frozen example rows.</strong> The World Bank reports{" "}
+          {ARGENTINA_INFLATION_WORLD_BANK_PCT_2024}% (2024). The IMF
+          World Economic Outlook reports 7.5% (2031, tagged as a
+          projection). The CIA World Factbook reports{" "}
+          {ARGENTINA_INFLATION_CIA_PCT_2022}% (2022, frozen).
         </p>
         <p>
-          <strong>Resolver outcome.</strong> The World Bank&rsquo;s
-          219.88% (2024) wins canonical with{" "}
+          <strong>Resolver outcome.</strong> The World Bank&rsquo;s{" "}
+          {ARGENTINA_INFLATION_WORLD_BANK_PCT_2024}% (2024) wins
+          canonical with{" "}
           <code>decisionReason=&apos;fresher_winner&apos;</code>. The
-          CIA value moves to alternate.
+          gap between the World Bank&rsquo;s reading and the CIA&rsquo;s
+          frozen {ARGENTINA_INFLATION_CIA_PCT_2022}% reading is{" "}
+          {ARGENTINA_INFLATION_GAP_PP} percentage points — within the{" "}
+          {INFLATION_MATERIAL_ERROR_PP_THRESHOLD} pp threshold for this
+          fact-key, so the fresher reading is accepted rather than
+          rejected as implausible. The CIA value moves to alternate.
         </p>
         <p>
-          <strong>Story.</strong> Before 5 May 2026, the resolver
-          picked the CIA&rsquo;s 73.1% (2022) as canonical because
-          the material-error guard rejected the World Bank&rsquo;s
-          219.88% (2024) reading as a &ldquo;data error&rdquo; — the
-          gap of 146.78 percentage points exceeded the original 50 pp
-          threshold. But Argentina&rsquo;s inflation really did go
-          from ~73% in 2022 to ~220% by 2024 during a hyperinflation
-          episode. A targeted investigation raised the threshold to
-          300 pp specifically for high-volatility fact-keys. After
-          the raise, the World Bank&rsquo;s 2024 reading wins
-          canonical correctly. Two material-error disputes from
-          prior runs were auto-closed by the disputes-triage cron
-          with status <code>resolved_auto_stale</code>.
+          <strong>Story.</strong> Argentina&rsquo;s inflation went from
+          about {ARGENTINA_INFLATION_CIA_PCT_2022}% in 2022 to about{" "}
+          {ARGENTINA_INFLATION_WORLD_BANK_PCT_2024}% by 2024 during a
+          real hyperinflation episode, not a data-entry mistake.{" "}
+          <code>inflation_rate</code> and{" "}
+          <code>public_debt_pct_gdp</code> carry the wider{" "}
+          {INFLATION_MATERIAL_ERROR_PP_THRESHOLD} pp ceiling specifically
+          so that genuine hyperinflation- and debt-crisis-scale swings
+          clear the material-error guard instead of pinning the
+          canonical pick to a stale reading. Under this rule the
+          resolver accepts the World Bank&rsquo;s fresher measurement
+          and moves the CIA&rsquo;s outdated reading to the alternates
+          panel.
         </p>
 
         <h3 id="example-usa-life-expectancy">
@@ -829,23 +873,17 @@ export default async function ReconciliationMethodologyPage() {
           <code>(2025 est.)</code> stamp intact.
         </p>
         <p>
-          <strong>Story.</strong> Before the 4 May 2026 fix, the
-          IMF&rsquo;s 2031 projection was winning Argentina&rsquo;s
-          canonical race against UN/WB 2024 measurements because the
-          freshness comparator treated future <code>as_of</code> dates
-          the same as past ones. The fix added an explicit{" "}
-          <code>value_type</code> enum to <code>country_facts</code>{" "}
-          (<code>measured</code> | <code>projected</code>) and a
-          year-based discriminator at IMF sync time:{" "}
+          <strong>Story.</strong> An explicit <code>value_type</code>{" "}
+          enum on <code>country_facts</code> (<code>measured</code> |{" "}
+          <code>projected</code>) prevents a future-dated forecast from
+          outranking a current measurement. IMF sync classifies rows with a
+          year-based discriminator:{" "}
           <code>fact_year &gt; current_year → projected</code>. The
-          resolver&rsquo;s candidate pool now filters to{" "}
+          resolver&rsquo;s candidate pool filters to{" "}
           <code>value_type=&apos;measured&apos;</code> first; IMF
           projections appear in the alternates panel with a
-          projection flag. The documented 4 May 2026 migration tagged
-          1,716 IMF rows as <code>projected</code> and un-flipped 1,396
-          (jurisdiction, fact-key) pairs to the correct measurement. The underlying
-          methodology is documented further in the &ldquo;Measurement
-          vs projection&rdquo; section below.
+          projection flag. The underlying methodology is documented further
+          in the &ldquo;Measurement vs projection&rdquo; section below.
         </p>
 
         <h3 id="example-brazil-population">
@@ -1437,13 +1475,9 @@ export default async function ReconciliationMethodologyPage() {
           A daily auto-resolve cron at 02:30 UTC re-evaluates every
           open <code>material_error</code> dispute against the current
           resolver output. If the resolver no longer proposes the
-          dispute (because thresholds have been refined or because
-          the underlying values have shifted), the cron marks it{" "}
-          <code>resolved_auto_stale</code> with an audit-log row. The
-          stale-cleanup pattern accounts for the empirical observation
-          that, at the methodology {reconciliation.version} cut on{" "}
-          {reconciliation.lastUpdated}, 31 of 33 disputes were stale
-          by-products of pre-threshold-raise resolver runs. Group A,
+          dispute because the governing threshold or underlying values
+          no longer produce a conflict, the cron marks it{" "}
+          <code>resolved_auto_stale</code> with an audit-log row. Group A,
           Group C, and plausibility-envelope disputes are{" "}
           <em>never</em> auto-resolved — identity and categorical
           conflicts always require human eyes.
@@ -1549,7 +1583,7 @@ export default async function ReconciliationMethodologyPage() {
           methodology calls, including peer grouping, the
           forecast-vs-measurement partition, the
           trade-aggregate two-fact-key split, the canonical-pick
-          threshold raise, and the vintage cadence framework. These records improve internal
+          material-error thresholds, and the vintage cadence framework. These records improve internal
           auditability but have not all been published or independently reviewed.
         </p>
         <p>

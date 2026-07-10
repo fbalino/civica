@@ -1,7 +1,7 @@
 ---
 name: Civica Design System
 version: 0.2
-updated: 2026-06-28
+updated: 2026-07-10
 source: src/app/globals.css
 canonical_preview: /design-system
 tokens:
@@ -129,7 +129,7 @@ Page type drives the layout, not the prose length. **Do not default to `width="n
 |---|---|---|---|---|
 | Methodology page or methodology subpage | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/country/methodology/reconciliation`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse` |
 | Legal / policy / ANY multi-section document page | `<EditorialPage className="methodology-layout">` + `<ReaderSidebar>` | 1200px | Yes (left, sticky, section anchors) | `/privacy`, `/terms` |
-| Filterable list / changelog | `<EditorialPage width="wide">` | 960px | No | `/civica-index/changelog`, `/civica-index/pulse-changelog` |
+| Filterable list / changelog | `<EditorialPage width="wide">` | 960px | No | `/civica-index/pulse-changelog` |
 | Standard product/editorial page | `<EditorialPage width="full">` | 1200px | No | Atlas-scale layouts |
 | Short-form editorial / blog | `<EditorialPage>` (default `width="narrow"`) | 760px | No | Single-topic blog posts, short essays |
 
@@ -209,7 +209,7 @@ Civica's canonical SVG-construction reference is `src/components/factbook/Factbo
 
 Markdown rendering primitive:
 
-- **`<MarkdownContent>`** (`src/components/content/MarkdownContent.tsx`) — server component that reads a `content/*.md` file, runs Phase 5 substitutions (`{{state.X}}`, `{{stats.X | "fallback"}}`, `{{ctx.X}}`), and pipes through `react-markdown` with `remark-gfm` (tables + footnotes + GFM features) and a custom `remark-civica-anchors` plugin (for `## Heading {#anchor-id}` syntax). Used by every reader-style page whose prose lives under `content/`. Wrap the markdown body in `<section className="editorial-section">` so descendant `<h2>`/`<p>`/`<ul>`/`<table>` inherit editorial typography automatically. Optional `slice={{ from?, to? }}` prop renders only the lines between two heading anchors (used when interleaving markdown with TSX-only rich blocks). Full architecture documented at `~/civica/plan/content-templating-implementation-v1.md`.
+- **`<MarkdownContent>`** (`src/components/content/MarkdownContent.tsx`) — server component that reads a `content/*.md` file, runs Phase 5 substitutions (`{{state.X}}`, `{{stats.X | "fallback"}}`, `{{ctx.X}}`), and pipes through `react-markdown` with `remark-gfm` (tables + footnotes + GFM features) and a custom `remark-civica-anchors` plugin (for `## Heading {#anchor-id}` syntax). Used by every reader-style page whose prose lives under `content/`. Wrap the markdown body in `<section className="editorial-section">` so descendant `<h2>`/`<p>`/`<ul>`/`<table>` inherit editorial typography automatically. Optional `slice={{ from?, to? }}` prop renders only the lines between two heading anchors (used when interleaving markdown with TSX-only rich blocks).
 
 These classes are typed only against role tokens (`var(--color-*)`, `var(--text-*)`, `var(--space-*)`, `var(--radius-*)`, `var(--font-*)`). Read the file for the exact set; extend with new classes when a new pattern is needed.
 

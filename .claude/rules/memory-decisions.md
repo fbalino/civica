@@ -1,5 +1,14 @@
 # Project Memory Decisions
 
+## 2026-07-10 — Operational documentation is executable current truth
+
+`README.template.md` is the authored source for generated `README.md`; both
+template drift and direct generated-body edits fail `npm run
+validate:doc-references`. That validator also checks operational/project-memory
+commands and file pointers, direct routes, schema count, CRON scope, and sealed
+runtime-memory claims. Public methodology describes the current rule, not
+pre-launch fix history. Durable record: APR-D026 in `plan/DECISIONS.md`.
+
 ## 2026-07-10 — Replication route is status-only until all gates pass
 
 `/civica-index/replication` is a fail-closed status ledger, not a package. G2

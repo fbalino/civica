@@ -1,6 +1,6 @@
 # Factbook Reconciliation
 
-<!-- Source: src/app/(reader)/factbook/methodology/reconciliation/page.tsx · Rewritten 2026-05-05 (Phase R.23) -->
+<!-- Deferred mirror of src/app/(reader)/country/methodology/reconciliation/page.tsx -->
 <!-- Values mirror src/lib/content/site-state.ts as of 2026-05-05; refresh in lockstep with state updates. -->
 
 *How Civica picks one canonical value per country fact when multiple sources disagree, and how readers can audit the choice. Methodology v0.2-beta — perpetual-beta posture; the rules continue to refine, but vintaged data is stable.*
@@ -113,22 +113,22 @@ For Groups A and C, when sources agree within tolerance (within 2% for counts, w
 
 When sources disagree, two guards apply for Group B:
 
-- **Material-error rejection.** A fresher value differing from the older one by more than a per-category "impossible" threshold (population > 50% in a year, GDP nominal in USD > 80%, inflation and public-debt ratios > 300 percentage points after the 5 May 2026 hyperinflation hot-fix) is rejected as likely data corruption or a unit-of-measure error. A dispute row is created and the prior canonical value remains until reviewed.
+- **Material-error rejection.** A fresher value differing from the older one by more than a per-category "impossible" threshold (population > 50% in a year, GDP nominal in USD > 80%, inflation and public-debt ratios > 300 percentage points) is rejected as likely data corruption or a unit-of-measure error. A dispute row is created and the prior canonical value remains until reviewed.
 - **Reference-quality floor.** The fresher source must have at least one Tier-1 or Tier-2 reference. A Wikidata claim whose references are all rejected per the allowlist cannot win even if it is fresher.
 
 **Frozen worked examples — methodology v0.2-beta, vintage 2026-Q1.** The eight examples that follow record the rows and resolver outcomes from that frozen release; they are not live database readouts. Each illustrates a distinct reconciliation pattern, and every value was probed against the resolver before this page shipped.
 
 *Vintage note. Specific numerical values cited below reflect Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1. The exact figures are release-bound; the methodologically relevant claim in each example is the pattern of canonical/alternate attribution.*
 
-### Worked example 1 — Argentina inflation, hyperinflation hot-fix
+### Worked example 1 — Argentina inflation, a hyperinflation-scale swing
 
-**Pattern.** Group B fresher-source-wins after the post-canonical-pick-investigation material-error threshold raise (50 pp → 300 pp for `inflation_rate` and `public_debt_pct_gdp`).
+**Pattern.** Group B fresher-source-wins under an elevated material-error threshold reserved for high-volatility fact-keys. `inflation_rate` and `public_debt_pct_gdp` both carry a 300 percentage-point material-error ceiling — wider than the ceiling on most Group B percentage fact-keys — because genuine hyperinflation and sovereign-debt-crisis episodes can move a country's reading by more than 100 percentage points in a single year without that swing being a data error.
 
 **Frozen example rows.** The World Bank reports 219.88% (2024). The IMF World Economic Outlook reports 7.5% (2031, tagged as a projection). The CIA World Factbook reports 73.1% (2022, frozen).
 
-**Resolver outcome.** The World Bank's 219.88% (2024) wins canonical with `decisionReason='fresher_winner'`. The CIA value moves to alternate.
+**Resolver outcome.** The World Bank's 219.88% (2024) wins canonical with `decisionReason='fresher_winner'`. The gap between the World Bank's reading and the CIA's frozen 73.1% reading is 146.78 percentage points — within the 300 pp threshold for this fact-key, so the fresher reading is accepted rather than rejected as implausible. The CIA value moves to alternate.
 
-**Story.** Before 5 May 2026, the resolver picked the CIA's 73.1% (2022) as canonical because the material-error guard rejected the World Bank's 219.88% (2024) reading as a "data error" — the gap of 146.78 percentage points exceeded the original 50 pp threshold. But Argentina's inflation really did go from ~73% in 2022 to ~220% by 2024 during a hyperinflation episode. A targeted investigation raised the threshold to 300 pp specifically for high-volatility fact-keys. After the raise, the World Bank's 2024 reading wins canonical correctly. Two material-error disputes from prior runs were auto-closed by the disputes-triage cron with status `resolved_auto_stale`.
+**Story.** Argentina's inflation went from about 73% in 2022 to about 220% by 2024 during a real hyperinflation episode, not a data-entry mistake. `inflation_rate` and `public_debt_pct_gdp` carry the wider 300 pp ceiling specifically so that genuine hyperinflation- and debt-crisis-scale swings clear the material-error guard instead of pinning the canonical pick to a stale reading. Under this rule the resolver accepts the World Bank's fresher measurement and moves the CIA's outdated reading to the alternates panel.
 
 ### Worked example 2 — United States life expectancy, editorial canonical vs freshest
 
@@ -178,7 +178,7 @@ When sources disagree, two guards apply for Group B:
 
 **Resolver outcome.** Two partitions decide this fact. First, the IMF's 50.4 M (2031 projection) is excluded from the candidate pool by the measurement-vs-projection partition; it surfaces in the alternates panel labelled *(projected)*. Second, among the surviving measurements the CIA's `(2025 est.)` nowcast is aged to its 2024 measurement vintage, so it no longer outranks the UN WPP 2024 reading it was derived from. UN WPP's 45,696,160 (2024) wins canonical with `decisionReason='fresher_winner'` (the World Bank republishes the identical value); the CIA reading moves to the alternates panel with its published `(2025 est.)` stamp intact.
 
-**Story.** Before the 4 May 2026 fix, the IMF's 2031 projection was winning Argentina's canonical race against UN/WB 2024 measurements because the freshness comparator treated future `as_of` dates the same as past ones. The fix added an explicit `value_type` enum to `country_facts` (`measured` | `projected`) and a year-based discriminator at IMF sync time: `fact_year > current_year → projected`. The resolver's candidate pool now filters to `value_type='measured'` first; IMF projections appear in the alternates panel with a projection flag. The documented 4 May 2026 migration tagged 1,716 IMF rows as `projected` and un-flipped 1,396 (jurisdiction, fact-key) pairs to the correct measurement. The underlying methodology is documented further in the "Measurement vs projection" section below.
+**Story.** An explicit `value_type` enum on `country_facts` (`measured` | `projected`) prevents a future-dated forecast from outranking a current measurement. IMF sync classifies rows with a year-based discriminator: `fact_year > current_year → projected`. The resolver's candidate pool filters to `value_type='measured'` first; IMF projections appear in the alternates panel with a projection flag. The underlying methodology is documented further in the "Measurement vs projection" section below.
 
 ### Worked example 7 — Brazil population, six publishers, IBGE override
 
@@ -295,13 +295,13 @@ A reader who sees two canonical labels next to one fact is looking at the second
 
 A dispute row is opened automatically when a numeric disagreement exceeds the material-error guard, when a Group A or Group C silent-override would have been required, when a claim is rejected per the plausibility envelope, or when a Wikidata claim flips from non-deprecated to deprecated rank for an existing canonical value.
 
-The full dispute log is published as a public read-only surface at [/factbook/methodology/reconciliation/disputes](https://civicaatlas.org/factbook/methodology/reconciliation/disputes) — every open dispute, every resolved dispute, the system actions taken on each, and the methodology rationale where one was recorded. Reviewer identity is redacted; submitter PII is stripped. The Marshall Islands population case (Worked Example 8 above) is a live entry in that log.
+The full dispute log is published as a public read-only surface at [/country/methodology/reconciliation/disputes](https://civicaatlas.org/country/methodology/reconciliation/disputes) — every open dispute, every resolved dispute, the system actions taken on each, and the methodology rationale where one was recorded. Reviewer identity is redacted; submitter PII is stripped. The Marshall Islands population case (Worked Example 8 above) is a live entry in that log.
 
 Readers can also file a dispute manually. The unified corrections form at [/civica-index/corrections](https://civicaatlas.org/civica-index/corrections) accepts factbook fact disputes; per-fact "report this fact" links pre-fill the country and fact key for you, which substantially improves submission quality. Each submission becomes a row in the operator queue.
 
 Operators review through an admin shell. They see both values, both citations, both measurement dates, a diff highlight, the resolver's proposed action and rationale, and three buttons: accept the proposal, override and pick a specific source, or hold for further investigation. Every action writes to an audit log with before-and-after JSON snapshots, the reviewer's identity, the action, and any notes.
 
-A daily auto-resolve cron at 02:30 UTC re-evaluates every open `material_error` dispute against the current resolver output. If the resolver no longer proposes the dispute (because thresholds have been refined or because the underlying values have shifted), the cron marks it `resolved_auto_stale` with an audit-log row. At the methodology v0.2-beta cut on 5 May 2026, 31 of 33 disputes were stale by-products of pre-threshold-raise resolver runs. Group A, Group C, and plausibility-envelope disputes are *never* auto-resolved — identity and categorical conflicts always require human eyes.
+A daily auto-resolve cron at 02:30 UTC re-evaluates every open `material_error` dispute against the current resolver output. If the resolver no longer proposes the dispute because the governing threshold or underlying values no longer produce a conflict, the cron marks it `resolved_auto_stale` with an audit-log row. Group A, Group C, and plausibility-envelope disputes are *never* auto-resolved — identity and categorical conflicts always require human eyes.
 
 Resolution targets — these are targets, not gates; the fact continues to render the prior canonical value while the dispute is open:
 
@@ -327,13 +327,13 @@ The deterministic inputs are:
 
 Crucially, the resolver does not call a language model. Fact reconciliation is rule-based — that is the entire point of the design. A language model can summarise a dispute for an operator, and a deterministic LLM call is used at sync time for the Stats SA PDF-extraction case (Worked Example 5 above), but the canonical resolver output is deterministic boolean and numeric logic only.
 
-A full replication recipe — including SQL snapshots and a worked walk-through that re-derives a vintage's values from the artefacts — is on the v1.1 roadmap as a future page at `/factbook/methodology/reconciliation/replication` (not yet shipped). For the present, the inputs above are load-bearing in their git-tagged form, and an external reviewer with access to the repository can replay the v0.2-beta vintage 2026-Q1 cut by running the sync scripts against the archived payloads and the snapshot script against the resulting rows.
+A full replication recipe — including SQL snapshots and a worked walk-through that re-derives a vintage's values from the artefacts — is on the v1.1 roadmap as a future page at `/country/methodology/reconciliation/replication` (not yet shipped). For the present, the inputs above are load-bearing in their git-tagged form, and an external reviewer with access to the repository can replay the v0.2-beta vintage 2026-Q1 cut by running the sync scripts against the archived payloads and the snapshot script against the resulting rows.
 
 ---
 
 ## Version policy and the perpetual-beta posture
 
-Civica maintains versioned working records for load-bearing methodology calls (peer grouping, the forecast-vs-measurement partition, the trade-aggregate two-fact-key split, the canonical-pick threshold raise, and the vintage cadence framework). These records improve internal auditability but have not all been published or independently reviewed.
+Civica maintains versioned working records for load-bearing methodology calls (peer grouping, the forecast-vs-measurement partition, the trade-aggregate two-fact-key split, the canonical-pick material-error thresholds, and the vintage cadence framework). These records improve internal auditability but have not all been published or independently reviewed.
 
 The methodology version stamp stays in beta indefinitely. Version bumps (`v0.2-beta` → `v0.3-beta` → `v0.4-beta`) signal a methodology refinement; they do not signal a graduation event. Civica's posture is that the reconciliation rules will continue to refine as new publishers ship, new fact-keys are added, and external reviewers contribute feedback. There is no calendar gate at which the methodology stops being beta.
 
@@ -351,7 +351,7 @@ Three citation forms cover the common cases. Every form embeds the methodology v
 
 ### Citing the methodology page itself
 
-*Civica Atlas Reconciliation Methodology v0.2-beta. Civica Atlas, 2026. [https://civicaatlas.org/factbook/methodology/reconciliation](https://civicaatlas.org/factbook/methodology/reconciliation). Retrieved [date].*
+*Civica Atlas Reconciliation Methodology v0.2-beta. Civica Atlas, 2026. [https://civicaatlas.org/country/methodology/reconciliation](https://civicaatlas.org/country/methodology/reconciliation). Retrieved [date].*
 
 ### Citing a single reconciled fact
 
@@ -363,10 +363,10 @@ Worked example, the Argentina inflation case (Worked Example 1 above):
 
 ### Citing a frozen vintage of the entire reconciled atlas
 
-*Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1. Civica Atlas, 2026. [https://civicaatlas.org/factbook/methodology/reconciliation](https://civicaatlas.org/factbook/methodology/reconciliation). Cut date: 5 May 2026. Methodology version v0.2-beta.*
+*Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1. Civica Atlas, 2026. [https://civicaatlas.org/country/methodology/reconciliation](https://civicaatlas.org/country/methodology/reconciliation). Cut date: 5 May 2026. Methodology version v0.2-beta.*
 
 The interactive `<CiteAccordion>` widget on the live page generates APA, BibTeX, and Chicago citations for this page in one click, each stamped with the reconciled vintage's cut date as the data date.
 
 ---
 
-*Related pages: [Methodology hub](https://civicaatlas.org/methodology) · [How we approach data](https://civicaatlas.org/methodology/approach) · [Factbook](https://civicaatlas.org/factbook) · [Disputes log](https://civicaatlas.org/factbook/methodology/reconciliation/disputes) · [Civica Index methodology](https://civicaatlas.org/civica-index/methodology) · [Pulse methodology](https://civicaatlas.org/civica-index/methodology/pulse) · [Corrections form](https://civicaatlas.org/civica-index/corrections)*
+*Related pages: [Methodology hub](https://civicaatlas.org/methodology) · [How we approach data](https://civicaatlas.org/methodology/approach) · [Country atlas](https://civicaatlas.org/country) · [Disputes log](https://civicaatlas.org/country/methodology/reconciliation/disputes) · [Civica Index methodology](https://civicaatlas.org/civica-index/methodology) · [Pulse methodology](https://civicaatlas.org/civica-index/methodology/pulse) · [Corrections form](https://civicaatlas.org/civica-index/corrections)*

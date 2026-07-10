@@ -297,15 +297,16 @@ const MIGRATED_CONCEPTS: DocConcept[] = [
 ];
 
 /* ────────────────────────────────────────────────────────────────
- * Concepts — DEFERRED (registered now, content NOT repaired by
- * CLM-009; owning task named via `deferredTo`)
+ * Concepts — CLM-011 "RECONCILED" (previously deferred to CLM-011 by
+ * CLM-009; content repaired and now bound by an automated contract
+ * test / validator assertion rather than left as bare prose)
  * ──────────────────────────────────────────────────────────────── */
 
-const DEFERRED_CONCEPTS: DocConcept[] = [
+const CLM_011_RECONCILED_CONCEPTS: DocConcept[] = [
   {
     id: "reconciliation.material-error",
     title: "Reconciliation material-error dispute thresholds",
-    deferredTo: "CLM-011",
+    owner: "CLM-011",
     canonical: {
       kind: "source",
       path: "src/lib/factbook/reconcile/fact-keys.ts",
@@ -315,21 +316,27 @@ const DEFERRED_CONCEPTS: DocConcept[] = [
       {
         kind: "reader-tsx",
         path: "src/app/(reader)/country/methodology/reconciliation/page.tsx",
-        relationship: "link-only",
-        note: "Prose narrates the material-error guard, including specific threshold values (e.g. the 50pp→300pp Argentina-inflation worked example). CLM-011 owns reconciling this prose against fact-keys.ts — not repaired by CLM-009.",
+        relationship: "interpolated",
+        note: "Worked Example 1 (Argentina inflation) derives its stated threshold from getFactKey('inflation_rate')/getFactKey('public_debt_pct_gdp') rather than a bare literal, and fails at build time if the registry entry disappears.",
       },
       {
         kind: "reader-markdown",
         path: "content/methodology-reconciliation.md",
-        relationship: "link-only",
-        note: "Deferred markdown mirror (per AGENTS.md, gated on the <WorkedExample> primitive); also narrates material-error thresholds. Same CLM-011 ownership as the TSX page.",
+        relationship: "contract-test",
+        note: "Deferred markdown mirror (per AGENTS.md, gated on the <WorkedExample> primitive) restates the threshold as static frozen prose rather than importing it, so it is asserted equal by a test instead of interpolated.",
+      },
+      {
+        kind: "source",
+        path: "src/lib/factbook/reconcile/__tests__/reconciliation-worked-examples.test.ts",
+        relationship: "contract-test",
+        note: "DB-free contract test (CLM-011) asserting: (a) inflation_rate/public_debt_pct_gdp both carry a 300pp threshold in fact-keys.ts, (b) the TSX page reads that threshold via getFactKey() rather than a literal, (c) the markdown mirror's stated threshold/gap match the registry value, and (d) neither surface narrates the threshold as a past migration event (no before/after theater).",
       },
     ],
   },
   {
     id: "docs.schema-table-count",
     title: "Database schema table count cited in AGENTS.md",
-    deferredTo: "CLM-011",
+    owner: "CLM-011",
     canonical: {
       kind: "source",
       path: "src/lib/db/schema.ts",
@@ -340,11 +347,19 @@ const DEFERRED_CONCEPTS: DocConcept[] = [
         kind: "runbook",
         path: "AGENTS.md",
         symbol: "## Database",
-        relationship: "link-only",
-        note: "States a specific table count ('45 tables') in prose. CLM-011 owns verifying/reconciling this count against schema.ts — not repaired by CLM-009. Declaring this path is allowed; CLM-009 does not edit AGENTS.md.",
+        relationship: "contract-test",
+        note: "States a specific table count ('49 tables') in prose, independently authored (not generated/imported). scripts/validate-doc-references.ts asserts this literal equals the live pgTable(...) declaration count in schema.ts and fails the build on drift.",
       },
     ],
   },
+];
+
+/* ────────────────────────────────────────────────────────────────
+ * Concepts — DEFERRED (registered now, content NOT repaired by
+ * CLM-009; owning task named via `deferredTo`)
+ * ──────────────────────────────────────────────────────────────── */
+
+const DEFERRED_CONCEPTS: DocConcept[] = [
   {
     id: "api.v1-examples",
     title: "Public API v1 usage examples",
@@ -489,6 +504,7 @@ const ALREADY_SATISFIED_CONCEPTS: DocConcept[] = [
 export const DOC_CONCEPTS: DocConcept[] = [
   ...MIGRATED_CONCEPTS,
   ...ALREADY_SATISFIED_CONCEPTS,
+  ...CLM_011_RECONCILED_CONCEPTS,
   ...DEFERRED_CONCEPTS,
 ];
 

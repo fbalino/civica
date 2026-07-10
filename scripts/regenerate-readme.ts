@@ -57,6 +57,7 @@ dotenvConfig({ path: ".env.local", override: true });
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 
 // ─────────────────────────────────────────────────────────────────────
 // CLI args
@@ -534,7 +535,17 @@ async function main(): Promise<void> {
   //    embedding a render timestamp because it would introduce
   //    spurious git noise on every regeneration; the only state
   //    that should appear in the banner is "this file is generated".
+  //    The template hash is different: it's a pure function of
+  //    README.template.md's bytes, so it stays byte-identical across
+  //    regenerations unless the template itself actually changed — no
+  //    spurious noise, and `validate:doc-references` (CLM-011) uses it
+  //    to catch a stale README.md (template edited without
+  //    regenerating, or README.md hand-edited directly).
   const bannerStrippedOutput = result.output;
+  const templateHash = createHash("sha256").update(templateText, "utf8").digest("hex");
+  const generatedBodyHash = createHash("sha256")
+    .update(bannerStrippedOutput, "utf8")
+    .digest("hex");
   const generatedBanner = `<!--
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   This file is GENERATED from README.template.md by
@@ -542,6 +553,8 @@ async function main(): Promise<void> {
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
+  Template SHA-256: ${templateHash}
+  Generated body SHA-256: ${generatedBodyHash}
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 `;

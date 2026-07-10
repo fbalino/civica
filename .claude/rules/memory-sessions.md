@@ -21,8 +21,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   GONE; pages are full-width reader pages under `(reader)`. KEPT: `src/lib/shell/events.ts`
   (the `civica:ask` window-event bus — still used by the factbook CivicaAIDrawer / bills /
   atlas) and `src/app/shell.css` (`.atlas-resizer`, used by `/compare`). Atlas is one
-  self-contained `/atlas` map page. Redirects in `next.config.ts` (308):
-  `/atlas/:slug(/:tab)`→`/factbook/:slug`, `/atlas/compare`→`/compare`,
+  self-contained `/atlas` map page. Redirects in `src/lib/routing/redirects.ts`
+  (imported by `next.config.ts`, all 308):
+  `/atlas/:slug(/:tab)`→`/country/:slug`, `/atlas/compare`→`/compare`,
   `/atlas/organizations*`→`/organizations*`.
 - **Country page IA (Wave 1b, 2026-06-30):** the canonical country page is **`/country/[slug]`** — a
   3-tab page. Shared `country/[slug]/layout.tsx` = masthead (`FactbookHeaderStrip`, which now takes an
