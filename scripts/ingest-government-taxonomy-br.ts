@@ -11,6 +11,7 @@ import {
   DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
   deriveRegimeTypeCgv,
 } from "../src/lib/government-taxonomy";
+import { governmentTaxonomyVersionEnvelope } from "../src/lib/government-taxonomy/versioning";
 
 const QOG_CS_CSV_URL = "https://www.qogdata.pol.gu.se/data/qog_std_cs_jan26.csv";
 const QOG_LATEST_REGIME_YEAR = 2025;
@@ -189,6 +190,7 @@ async function main() {
 
   let matched = 0;
   let skipped = 0;
+  const versions = governmentTaxonomyVersionEnvelope();
 
   for (const latest of latestByIso3.values()) {
     const jurisdiction = jurisdictionByIso3.get(latest.iso3);
@@ -216,6 +218,8 @@ async function main() {
       .values({
         jurisdictionId: jurisdiction.id,
         taxonomyVersion: DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
+        derivationVersionKey: versions.key,
+        derivationVersions: versions.envelope,
         regimeTypeCgv: derived.regimeTypeCgv,
         regimeDatasetVersion: derived.regimeDatasetVersion,
         regimeYear: derived.regimeYear,
@@ -245,6 +249,8 @@ async function main() {
             ...(existing?.provenance ?? {}),
             regime: derived.provenance,
           },
+          derivationVersionKey: versions.key,
+          derivationVersions: versions.envelope,
           updatedAt: syncTime,
         },
       });

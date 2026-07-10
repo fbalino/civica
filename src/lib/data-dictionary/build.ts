@@ -107,6 +107,8 @@ const FIELD_DEFINITIONS: Readonly<Record<string, string>> = {
   last_sync_at: "Timestamp of the latest successful positive-row sync for this source.",
   last_synced_at: "Timestamp when this record was last refreshed by its source adapter.",
   methodology_version: "Version of the Civica method that produced or interprets this row.",
+  derivation_version_key: "Stable content-derived identifier for the complete row-level derivation-version envelope.",
+  derivation_versions: "Structured row-level versions for methodology, algorithm, prompt, taxonomy, and source basket, including explicit legacy or not-applicable states.",
   source_version: "Publisher release/version identifier captured for the source input.",
   data_year: "Reference or observation year of the source data.",
   data_vintage_year: "Underlying measurement/reference year used for freshness comparison.",

@@ -1,0 +1,14 @@
+{
+  "migration": "drizzle/migrations/0021_derivation_version_envelopes.sql",
+  "appliedTransactionally": true,
+  "statements": 36,
+  "auditedAt": "2026-07-11T03:25:00Z",
+  "tables": [
+    { "table": "country_fact_vintages", "rows": 17506, "missingEnvelopes": 0, "algorithmState": "legacy_unversioned" },
+    { "table": "government_taxonomies", "rows": 249, "missingEnvelopes": 0, "algorithmState": "legacy_unversioned" },
+    { "table": "ci_dimension_scores", "rows": 1142, "missingEnvelopes": 0, "algorithmState": "legacy_unversioned" },
+    { "table": "ci_composite_scores", "rows": 286, "missingEnvelopes": 0, "algorithmState": "legacy_unversioned" },
+    { "table": "pulse_events_v2", "rows": 384, "missingEnvelopes": 0, "algorithmState": "legacy_unversioned" },
+    { "table": "pulse_dimensional_deltas", "rows": 325, "missingEnvelopes": 0, "algorithmState": "legacy_unversioned" }
+  ]
+}

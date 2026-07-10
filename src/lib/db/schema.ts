@@ -1,4 +1,5 @@
 import { sql as dsql } from "drizzle-orm";
+import type { DerivationVersionEnvelope } from "@/lib/research/derivation-version";
 import {
   pgTable,
   uuid,
@@ -669,6 +670,10 @@ export const countryFactVintages = pgTable(
     asOf: date("as_of"),
     sourceId: text("source_id").notNull(),
     methodologyVersion: text("methodology_version").notNull(),
+    derivationVersionKey: text("derivation_version_key").notNull(),
+    derivationVersions: jsonb("derivation_versions")
+      .$type<DerivationVersionEnvelope>()
+      .notNull(),
     snapshotAt: timestamp("snapshot_at").defaultNow().notNull(),
     /** R.22 — cut-batch timestamp. Distinct from `snapshotAt`
      *  (per-row insert time): all rows in the same vintage cut
@@ -697,6 +702,7 @@ export const countryFactVintages = pgTable(
       table.vintageLabel
     ),
     index("idx_fact_vintage_label").on(table.vintageLabel),
+    index("idx_fact_vintage_derivation_version").on(table.derivationVersionKey),
     index("idx_fact_vintage_jurisdiction").on(
       table.jurisdictionId,
       table.vintageLabel
@@ -867,6 +873,10 @@ export const governmentTaxonomies = pgTable(
       .references(() => jurisdictions.id)
       .notNull(),
     taxonomyVersion: text("taxonomy_version").notNull(),
+    derivationVersionKey: text("derivation_version_key").notNull(),
+    derivationVersions: jsonb("derivation_versions")
+      .$type<DerivationVersionEnvelope>()
+      .notNull(),
     regimeTypeCgv: text("regime_type_cgv"),
     regimeDatasetVersion: text("regime_dataset_version"),
     regimeYear: integer("regime_year"),
@@ -887,6 +897,9 @@ export const governmentTaxonomies = pgTable(
       table.taxonomyVersion
     ),
     index("idx_government_taxonomies_version").on(table.taxonomyVersion),
+    index("idx_government_taxonomies_derivation_version").on(
+      table.derivationVersionKey,
+    ),
     index("idx_government_taxonomies_regime").on(
       table.taxonomyVersion,
       table.regimeTypeCgv
@@ -1093,6 +1106,10 @@ export const ciDimensionScores = pgTable(
     // a no-op (the truncated new name == the existing DB name). Pinning
     // the name here matches the live DB and keeps `push` clean.
     methodologyVersion: text("methodology_version").notNull(),
+    derivationVersionKey: text("derivation_version_key").notNull(),
+    derivationVersions: jsonb("derivation_versions")
+      .$type<DerivationVersionEnvelope>()
+      .notNull(),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
@@ -1104,6 +1121,9 @@ export const ciDimensionScores = pgTable(
     ),
     index("idx_ci_dimension_scores_quarter").on(table.quarter),
     index("idx_ci_dimension_scores_jurisdiction").on(table.jurisdictionId),
+    index("idx_ci_dimension_scores_derivation_version").on(
+      table.derivationVersionKey,
+    ),
     foreignKey({
       name: "ci_dimension_scores_methodology_version_ci_methodology_versions",
       columns: [table.methodologyVersion],
@@ -1221,6 +1241,10 @@ export const ciCompositeScores = pgTable(
     // explicit named foreignKey() below, not inline .references(), because
     // Drizzle's auto-generated name truncates past Postgres's 63-byte limit.
     methodologyVersion: text("methodology_version").notNull(),
+    derivationVersionKey: text("derivation_version_key").notNull(),
+    derivationVersions: jsonb("derivation_versions")
+      .$type<DerivationVersionEnvelope>()
+      .notNull(),
     calculatedAt: timestamp("calculated_at").defaultNow().notNull(),
   },
   (table) => [
@@ -1231,6 +1255,9 @@ export const ciCompositeScores = pgTable(
     ),
     index("idx_ci_composite_quarter_rank").on(table.quarter, table.rank),
     index("idx_ci_composite_jurisdiction").on(table.jurisdictionId),
+    index("idx_ci_composite_derivation_version").on(
+      table.derivationVersionKey,
+    ),
     foreignKey({
       name: "ci_composite_scores_methodology_version_ci_methodology_versions",
       columns: [table.methodologyVersion],
@@ -1606,6 +1633,10 @@ export const pulseEventsV2 = pgTable(
      *  rows map verify confidence to these compatibility labels; older rows
      *  are mixed and unversioned. */
     classifierAgreement: text("classifier_agreement").notNull(),
+    derivationVersionKey: text("derivation_version_key").notNull(),
+    derivationVersions: jsonb("derivation_versions")
+      .$type<DerivationVersionEnvelope>()
+      .notNull(),
     humanReviewed: boolean("human_reviewed").notNull().default(false),
     reviewerId: text("reviewer_id"),
     reviewNotes: text("review_notes"),
@@ -1639,6 +1670,7 @@ export const pulseEventsV2 = pgTable(
     ),
     index("idx_pulse_v2_published").on(table.published, table.reviewStatus),
     index("idx_pulse_v2_dimension").on(table.dimension, table.eventDate),
+    index("idx_pulse_v2_derivation_version").on(table.derivationVersionKey),
   ]
 );
 
@@ -1693,6 +1725,10 @@ export const pulseDimensionalDeltas = pgTable(
     deltaValue: real("delta_value").notNull(),
     /** Event ids contributing non-trivially (≥0.1 abs decayed impact) */
     contributingEventIds: uuid("contributing_event_ids").array().notNull(),
+    derivationVersionKey: text("derivation_version_key").notNull(),
+    derivationVersions: jsonb("derivation_versions")
+      .$type<DerivationVersionEnvelope>()
+      .notNull(),
     lastComputedAt: timestamp("last_computed_at").defaultNow().notNull(),
   },
   (table) => [
@@ -1701,6 +1737,7 @@ export const pulseDimensionalDeltas = pgTable(
       table.dimension
     ),
     index("idx_pulse_dim_jurisdiction").on(table.jurisdictionId),
+    index("idx_pulse_dim_derivation_version").on(table.derivationVersionKey),
   ]
 );
 

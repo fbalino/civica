@@ -6,6 +6,7 @@ import {
   ciCompositeScores,
   ciMethodologyVersions,
 } from "../db/schema";
+import { CI_COMPOSITE_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 
 const ALL_DIMENSIONS: CIDimension[] = [
   "democratic_quality",
@@ -22,6 +23,7 @@ interface DimensionRow {
   jurisdictionId: string;
   dimension: string;
   normalizedScore: number;
+  sourceId: string;
 }
 
 interface CompositeResult {
@@ -101,6 +103,7 @@ export async function calculateCompositeScores(
       jurisdictionId: ciDimensionScores.jurisdictionId,
       dimension: ciDimensionScores.dimension,
       normalizedScore: ciDimensionScores.normalizedScore,
+      sourceId: ciDimensionScores.sourceId,
     })
     .from(ciDimensionScores)
     .where(
@@ -134,6 +137,12 @@ export async function calculateCompositeScores(
   const totalRanked = results.length;
   for (let i = 0; i < results.length; i++) {
     const r = results[i];
+    const sourceIds = [...new Set((byJurisdiction.get(r.jurisdictionId) ?? []).map((row) => row.sourceId))];
+    const versions = ciVersionEnvelope({
+      methodologyVersion: versionId,
+      algorithmVersion: CI_COMPOSITE_ALGORITHM_VERSION,
+      sourceIds,
+    });
     await db
       .insert(ciCompositeScores)
       .values({
@@ -146,6 +155,8 @@ export async function calculateCompositeScores(
         dimensionsAvailable: r.dimensionsAvailable,
         missingDimensions: r.missingDimensions,
         methodologyVersion: versionId,
+        derivationVersionKey: versions.key,
+        derivationVersions: versions.envelope,
       })
       .onConflictDoUpdate({
         target: [
@@ -160,6 +171,8 @@ export async function calculateCompositeScores(
           isPartial: r.isPartial,
           dimensionsAvailable: r.dimensionsAvailable,
           missingDimensions: r.missingDimensions,
+          derivationVersionKey: versions.key,
+          derivationVersions: versions.envelope,
           calculatedAt: dsql`NOW()`,
         },
       });

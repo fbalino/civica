@@ -93,6 +93,7 @@ import {
   singleEngineRequiresReview,
   verifierObjects,
 } from "./publication-gate";
+import { pulseEventVersionEnvelope } from "./versioning";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
@@ -756,6 +757,7 @@ export async function writeEvent(
       : result.classified.classifierAgreement === "two_of_three"
         ? 0.65
         : 0.4;
+  const versions = pulseEventVersionEnvelope(cluster.sourceIds);
 
   const eventRows = await db
     .insert(pulseEventsV2)
@@ -769,6 +771,8 @@ export async function writeEvent(
       corroborationConfidence: provisionalConfidence,
       classifierRuns: result.classified.classifierRuns,
       classifierAgreement: result.classified.classifierAgreement,
+      derivationVersionKey: versions.key,
+      derivationVersions: versions.envelope,
       reviewStatus: result.autoPublished ? "approved" : "pending",
       published: result.autoPublished,
       headline: result.classified.headline,

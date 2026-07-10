@@ -26,6 +26,7 @@ import {
 } from "./dimensions-v2";
 import { normalizeV2, defaultUncertaintyV2 } from "./normalize-v2";
 import { simulateComposite, DEFAULT_SIMS } from "./monte-carlo";
+import { CI_BETA_COMPOSITE_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 
 export const BETA_VERSION = "beta";
 
@@ -246,6 +247,12 @@ export async function calculateCompositeV2(
 
   for (let i = 0; i < results.length; i++) {
     const r = results[i];
+    const sourceIds = [...new Set([...(byJurisdiction.get(r.jurisdictionId)?.values() ?? [])].map((row) => row.sourceId))];
+    const versions = ciVersionEnvelope({
+      methodologyVersion: BETA_VERSION,
+      algorithmVersion: CI_BETA_COMPOSITE_ALGORITHM_VERSION,
+      sourceIds,
+    });
     await db
       .insert(ciCompositeScores)
       .values({
@@ -265,6 +272,8 @@ export async function calculateCompositeV2(
         dimensionsAvailable: r.dimensionsAvailable,
         missingDimensions: r.missingDimensions,
         methodologyVersion: BETA_VERSION,
+        derivationVersionKey: versions.key,
+        derivationVersions: versions.envelope,
       })
       .onConflictDoUpdate({
         target: [
@@ -283,6 +292,8 @@ export async function calculateCompositeV2(
           totalRanked,
           isPartial: r.completeness === "partial",
           dimensionsAvailable: r.dimensionsAvailable,
+          derivationVersionKey: versions.key,
+          derivationVersions: versions.envelope,
           missingDimensions: r.missingDimensions,
           calculatedAt: dsql`NOW()`,
         },

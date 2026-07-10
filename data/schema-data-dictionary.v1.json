@@ -2,10 +2,10 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "b215219008c9c1b058d2e7b1e8c9d1a7f7f607a95544240992f757796235ab3b",
+  "schemaFingerprint": "5eafcb1605034979ad25c51dce1015a146c603618fe7113444a79b83fe86fbf9",
   "summary": {
     "tables": 49,
-    "columns": 558,
+    "columns": 570,
     "publicAtlasTables": 18,
     "researchBetaTables": 14,
     "supportTables": 9,
@@ -2089,6 +2089,58 @@
           }
         },
         {
+          "name": "derivation_version_key",
+          "propertyName": "derivationVersionKey",
+          "definition": "Stable content-derived identifier for the complete row-level derivation-version envelope.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_ci_composite_derivation_version"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned composite calculation from ci_dimension_scores.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at is computation time; methodology_version fixes interpretation.",
+          "rights": "Derived output subject to the combined rights of included inputs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_versions",
+          "propertyName": "derivationVersions",
+          "definition": "Structured row-level versions for methodology, algorithm, prompt, taxonomy, and source basket, including explicit legacy or not-applicable states.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned composite calculation from ci_dimension_scores.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at is computation time; methodology_version fixes interpretation.",
+          "rights": "Derived output subject to the combined rights of included inputs.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "dimensions_available",
           "propertyName": "dimensionsAvailable",
           "definition": "Dimensions available recorded for the jurisdiction, data year, and methodology version.",
@@ -2465,6 +2517,58 @@
           "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Versioned transform of registered Index input observations with source metadata.",
           "cadence": "Per named Index rebuild/release.",
           "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_version_key",
+          "propertyName": "derivationVersionKey",
+          "definition": "Stable content-derived identifier for the complete row-level derivation-version envelope.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_ci_dimension_scores_derivation_version"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_versions",
+          "propertyName": "derivationVersions",
+          "definition": "Structured row-level versions for methodology, algorithm, prompt, taxonomy, and source basket, including explicit legacy or not-applicable states.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
           "rights": "Derived output remains constrained by included source rights and release manifest.",
           "deprecation": {
             "status": "active"
@@ -4609,6 +4713,58 @@
           "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Snapshot of a country_facts selection plus resolver decision metadata.",
+          "cadence": "Immutable per named release cut.",
+          "vintageSemantics": "vintage names the Civica release cut; data year and as-of fields retain upstream observation time.",
+          "rights": "Inherits the selected source row's rights and release-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_version_key",
+          "propertyName": "derivationVersionKey",
+          "definition": "Stable content-derived identifier for the complete row-level derivation-version envelope.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_fact_vintage_derivation_version"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Snapshot of a country_facts selection plus resolver decision metadata.",
+          "cadence": "Immutable per named release cut.",
+          "vintageSemantics": "vintage names the Civica release cut; data year and as-of fields retain upstream observation time.",
+          "rights": "Inherits the selected source row's rights and release-manifest restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_versions",
+          "propertyName": "derivationVersions",
+          "definition": "Structured row-level versions for methodology, algorithm, prompt, taxonomy, and source basket, including explicit legacy or not-applicable states.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
           "key": {
             "primary": false,
             "unique": false,
@@ -8224,6 +8380,58 @@
           "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Bjørnskov-Rode/CGV source variables plus versioned Civica structural derivation.",
           "cadence": "Per taxonomy release and derivation-version update.",
           "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Source taxonomy terms apply to source variables; Civica derivations retain source attribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_version_key",
+          "propertyName": "derivationVersionKey",
+          "definition": "Stable content-derived identifier for the complete row-level derivation-version envelope.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_government_taxonomies_derivation_version"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Bjørnskov-Rode/CGV source variables plus versioned Civica structural derivation.",
+          "cadence": "Per taxonomy release and derivation-version update.",
+          "vintageSemantics": "reference year belongs to the source classification; ingestion timestamps and derivation version are separate.",
+          "rights": "Source taxonomy terms apply to source variables; Civica derivations retain source attribution.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_versions",
+          "propertyName": "derivationVersions",
+          "definition": "Structured row-level versions for methodology, algorithm, prompt, taxonomy, and source basket, including explicit legacy or not-applicable states.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Bjørnskov-Rode/CGV source variables plus versioned Civica structural derivation.",
+          "cadence": "Per taxonomy release and derivation-version update.",
+          "vintageSemantics": "reference year belongs to the source classification; ingestion timestamps and derivation version are separate.",
           "rights": "Source taxonomy terms apply to source variables; Civica derivations retain source attribution.",
           "deprecation": {
             "status": "active"
@@ -12278,6 +12486,58 @@
           }
         },
         {
+          "name": "derivation_version_key",
+          "propertyName": "derivationVersionKey",
+          "definition": "Stable content-derived identifier for the complete row-level derivation-version envelope.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_dim_derivation_version"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
+          "cadence": "Daily after classification/corroboration and on rescore.",
+          "vintageSemantics": "created_at is scoring time; method_version fixes the scoring interpretation.",
+          "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_versions",
+          "propertyName": "derivationVersions",
+          "definition": "Structured row-level versions for methodology, algorithm, prompt, taxonomy, and source basket, including explicit legacy or not-applicable states.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned experimental scoring from verified Pulse v2 event classifications.",
+          "cadence": "Daily after classification/corroboration and on rescore.",
+          "vintageSemantics": "created_at is scoring time; method_version fixes the scoring interpretation.",
+          "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "dimension",
           "propertyName": "dimension",
           "definition": "Dimension recorded for the event, Civica Index dimension, and scoring method version.",
@@ -13007,6 +13267,58 @@
           "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Multi-provider classification, verification, subject attribution, and human review over raw_events.",
           "cadence": "Daily pipeline with subsequent review/correction.",
           "vintageSemantics": "Civica row-creation time; not an observation or publisher vintage.",
+          "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_version_key",
+          "propertyName": "derivationVersionKey",
+          "definition": "Stable content-derived identifier for the complete row-level derivation-version envelope.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_v2_derivation_version"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Multi-provider classification, verification, subject attribution, and human review over raw_events.",
+          "cadence": "Daily pipeline with subsequent review/correction.",
+          "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
+          "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "derivation_versions",
+          "propertyName": "derivationVersions",
+          "definition": "Structured row-level versions for methodology, algorithm, prompt, taxonomy, and source basket, including explicit legacy or not-applicable states.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Multi-provider classification, verification, subject attribution, and human review over raw_events.",
+          "cadence": "Daily pipeline with subsequent review/correction.",
+          "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
           "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
           "deprecation": {
             "status": "active"

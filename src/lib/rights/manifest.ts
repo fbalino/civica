@@ -1,6 +1,12 @@
 /** DAT-003 machine-readable source, product, field, and release rights. */
 
 import { SOURCE_INPUT_SPECS } from "../data/source-input-manifest";
+import {
+  buildDerivationVersionEnvelope,
+  notApplicable,
+  versioned,
+  type DerivationVersionEnvelope,
+} from "../research/derivation-version";
 
 export const RIGHTS_MANIFEST_VERSION = "rights-manifest/v1";
 export const RIGHTS_MANIFEST_PATH = "/api/rights-manifest";
@@ -187,6 +193,7 @@ export interface ProductRightsRecord {
   publicBulkExport: "allowed" | "blocked";
   fields: readonly ProductFieldRights[];
   reason: string;
+  requiresDerivationVersions: boolean;
 }
 
 export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
@@ -218,6 +225,7 @@ export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
     ],
     reason:
       "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-017/DAT-027 will replace it with rights-filtered canonical-plus-alternates exports.",
+    requiresDerivationVersions: true,
   },
   {
     productId: "index-bulk-release",
@@ -237,6 +245,7 @@ export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
     ],
     reason:
       "No standalone license has been selected for Civica-derived Index outputs, and two current inputs remain pending source-specific rights review.",
+    requiresDerivationVersions: true,
   },
 ] as const;
 
@@ -248,28 +257,35 @@ export interface ReleaseArtifactRights {
   excludedSourcePayloads: readonly string[];
   publicDistribution: "allowed" | "blocked";
   governingTerms: string;
+  derivationVersions: DerivationVersionEnvelope;
 }
+
+const CI_BETA_RELEASE_SOURCE_IDS = [
+  "freedom_house",
+  "transparency_intl",
+  "vdem",
+  "worldbank_wgi",
+] as const;
+
+const CI_BETA_RELEASE_DERIVATION_VERSIONS = buildDerivationVersionEnvelope({
+  methodology: versioned("ci-beta-2024-Q4/source-input-manifest-v1"),
+  algorithm: notApplicable("This release artifact contains captured-input metadata and hashes, not calculated scores."),
+  prompt: notApplicable("The release artifact is generated deterministically without a model prompt."),
+  taxonomy: notApplicable("The release artifact does not classify observations into a research taxonomy."),
+  sourceIds: CI_BETA_RELEASE_SOURCE_IDS,
+});
 
 export const RELEASE_ARTIFACT_RIGHTS: readonly ReleaseArtifactRights[] = [
   {
     releaseId: "ci-beta-2024-Q4",
     artifactPath: "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",
     artifactKind: "metadata-only",
-    includedSources: [
-      "freedom_house",
-      "transparency_intl",
-      "vdem",
-      "worldbank_wgi",
-    ],
-    excludedSourcePayloads: [
-      "freedom_house",
-      "transparency_intl",
-      "vdem",
-      "worldbank_wgi",
-    ],
+    includedSources: CI_BETA_RELEASE_SOURCE_IDS,
+    excludedSourcePayloads: CI_BETA_RELEASE_SOURCE_IDS,
     publicDistribution: "allowed",
     governingTerms:
       "The artifact contains Civica-authored provenance metadata and hashes only. It excludes all publisher files and observation rows.",
+    derivationVersions: CI_BETA_RELEASE_DERIVATION_VERSIONS,
   },
 ] as const;
 

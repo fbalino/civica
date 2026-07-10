@@ -2,7 +2,9 @@
   "schemaVersion": "source-input-manifest/v1",
   "releaseId": "ci-beta-2024-Q4",
   "generatedFrom": "checked-in-captures",
-  "pipelineIds": ["index.current-beta"],
+  "pipelineIds": [
+    "index.current-beta"
+  ],
   "inputs": [
     {
       "pipelineId": "index.current-beta",
@@ -15,7 +17,7 @@
       "upstreamVintage": "2024 edition",
       "expectedCoverage": "country rows matched to the Civica release universe",
       "redistributionPosture": "restricted-no-redistribution",
-      "adapterVersion": "sha256:a0ba9348b7a67db5df4b3545c5bc7edb62c8bb1cf5c4259b123be4cd9c3c1ec3"
+      "adapterVersion": "sha256:28684d136fff33f9494892c496a39969ab3d83caeb7acbc8b4e9a0fcfbf4b954"
     },
     {
       "pipelineId": "index.current-beta",
@@ -28,7 +30,7 @@
       "upstreamVintage": "2024 edition",
       "expectedCoverage": "country rows matched to the Civica release universe",
       "redistributionPosture": "restricted-no-redistribution",
-      "adapterVersion": "sha256:a0ba9348b7a67db5df4b3545c5bc7edb62c8bb1cf5c4259b123be4cd9c3c1ec3"
+      "adapterVersion": "sha256:28684d136fff33f9494892c496a39969ab3d83caeb7acbc8b4e9a0fcfbf4b954"
     },
     {
       "pipelineId": "index.current-beta",
@@ -41,7 +43,7 @@
       "upstreamVintage": "2024 observations for the frozen Index; source year retained elsewhere",
       "expectedCoverage": "country rows matched to the Civica release universe",
       "redistributionPosture": "open-with-attribution",
-      "adapterVersion": "sha256:a0ba9348b7a67db5df4b3545c5bc7edb62c8bb1cf5c4259b123be4cd9c3c1ec3"
+      "adapterVersion": "sha256:28684d136fff33f9494892c496a39969ab3d83caeb7acbc8b4e9a0fcfbf4b954"
     },
     {
       "pipelineId": "index.current-beta",
@@ -54,7 +56,7 @@
       "upstreamVintage": "2024 observations",
       "expectedCoverage": "country rows matched to the Civica release universe",
       "redistributionPosture": "open-with-attribution",
-      "adapterVersion": "sha256:a0ba9348b7a67db5df4b3545c5bc7edb62c8bb1cf5c4259b123be4cd9c3c1ec3"
+      "adapterVersion": "sha256:28684d136fff33f9494892c496a39969ab3d83caeb7acbc8b4e9a0fcfbf4b954"
     }
   ]
 }

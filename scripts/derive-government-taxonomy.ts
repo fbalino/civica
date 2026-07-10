@@ -8,9 +8,11 @@ import {
   DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
   deriveStructuralTaxonomy,
 } from "../src/lib/government-taxonomy";
+import { governmentTaxonomyVersionEnvelope } from "../src/lib/government-taxonomy/versioning";
 
 async function main() {
   const syncTime = new Date();
+  const versions = governmentTaxonomyVersionEnvelope();
 
   const jurisdictionRows = await db
     .select({
@@ -51,6 +53,8 @@ async function main() {
       .values({
         jurisdictionId: jurisdiction.id,
         taxonomyVersion: DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
+        derivationVersionKey: versions.key,
+        derivationVersions: versions.envelope,
         regimeTypeCgv: existing?.regimeTypeCgv ?? null,
         regimeDatasetVersion: existing?.regimeDatasetVersion ?? null,
         regimeYear: existing?.regimeYear ?? null,
@@ -84,6 +88,8 @@ async function main() {
             ...(existing?.provenance ?? {}),
             structural: structural.provenance,
           },
+          derivationVersionKey: versions.key,
+          derivationVersions: versions.envelope,
           updatedAt: syncTime,
         },
       });

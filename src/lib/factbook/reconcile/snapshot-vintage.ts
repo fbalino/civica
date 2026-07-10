@@ -43,6 +43,7 @@ import { resolveFromRows } from "./resolver";
 import { getFactKey } from "./fact-keys";
 import type { FactRow, ResolverOutput } from "./types";
 import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
+import { reconciliationVersionEnvelope } from "./versioning";
 
 type Db = typeof defaultDb;
 
@@ -491,6 +492,10 @@ export async function snapshotCurrentVintage(
         asOf: result.canonical.asOf,
         methodologyVersion: result.canonical.methodologyVersion,
       });
+      const versions = reconciliationVersionEnvelope({
+        methodologyVersion: result.canonical.methodologyVersion,
+        sourceIds: rows.map((row) => row.sourceId),
+      });
 
       if (options.dryRun) {
         onProgress(
@@ -514,6 +519,8 @@ export async function snapshotCurrentVintage(
           asOf: result.canonical.asOf,
           sourceId: result.canonical.sourceId,
           methodologyVersion: result.canonical.methodologyVersion,
+          derivationVersionKey: versions.key,
+          derivationVersions: versions.envelope,
           cutAtTimestamp: cutDate,
           contentHash,
           isDisputedAtCut,
@@ -533,6 +540,8 @@ export async function snapshotCurrentVintage(
             asOf: result.canonical.asOf,
             sourceId: result.canonical.sourceId,
             methodologyVersion: result.canonical.methodologyVersion,
+            derivationVersionKey: versions.key,
+            derivationVersions: versions.envelope,
             snapshotAt: new Date(),
             cutAtTimestamp: cutDate,
             contentHash,

@@ -230,3 +230,15 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   unique key is not labeled individually unique.
 - Six focused fixtures, TypeScript, targeted ESLint, 425 tests, and the full
   production build passed. No rendered UI changed.
+
+## 2026-07-10 — DAT-010 row-level derivation versions
+
+- Added shared typed version envelopes to six derived research tables and all
+  eight production writers, plus version requirements for release artifacts and
+  future exports.
+- Applied migration 0021 transactionally to production. All live rows have
+  non-null envelopes; historical rows are explicitly legacy unversioned.
+- Regenerated the schema dictionary (570 columns) and the frozen Index adapter
+  hash after the writer change.
+- Fourteen focused fixtures, 439 tests, TypeScript, targeted ESLint, and the full
+  production build passed. No rendered UI changed.

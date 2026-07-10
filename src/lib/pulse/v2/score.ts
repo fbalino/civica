@@ -23,6 +23,8 @@ import {
 } from "./taxonomy";
 import { PULSE_DIMENSIONS, type PulseDimension } from "./types";
 import { isPulseClassificationValid } from "./review-validation";
+import { pulseDeltaVersionEnvelope } from "./versioning";
+import type { DerivationVersionEnvelope } from "@/lib/research/derivation-version";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -43,6 +45,8 @@ interface PublishedEvent {
   severityValue: number;
   corroborationConfidence: number;
   eventDate: string;
+  derivationVersions: DerivationVersionEnvelope;
+  sourceIds: string[];
 }
 
 export async function calculateDimensionalDeltas(
@@ -69,7 +73,12 @@ export async function calculateDimensionalDeltas(
   type Key = string; // `${jurisdictionId}::${dimension}`
   const buckets = new Map<
     Key,
-    { totalImpact: number; eventIds: string[] }
+    {
+      totalImpact: number;
+      eventIds: string[];
+      versionEnvelopes: DerivationVersionEnvelope[];
+      sourceIds: string[];
+    }
   >();
 
   for (const e of events) {
@@ -81,9 +90,16 @@ export async function calculateDimensionalDeltas(
       e.category
     );
     const key = `${e.jurisdictionId}::${e.dimension}`;
-    const bucket = buckets.get(key) ?? { totalImpact: 0, eventIds: [] };
+    const bucket = buckets.get(key) ?? {
+      totalImpact: 0,
+      eventIds: [],
+      versionEnvelopes: [],
+      sourceIds: [],
+    };
     bucket.totalImpact += impact;
     if (Math.abs(impact) >= 0.1) bucket.eventIds.push(e.id);
+    bucket.versionEnvelopes.push(e.derivationVersions);
+    bucket.sourceIds.push(...e.sourceIds);
     buckets.set(key, bucket);
   }
 
@@ -109,6 +125,10 @@ export async function calculateDimensionalDeltas(
         Math.min(DELTA_UPPER_BOUND, totalImpact)
       );
       const eventIds = bucket?.eventIds ?? [];
+      const versions = pulseDeltaVersionEnvelope(
+        bucket?.versionEnvelopes ?? [],
+        bucket?.sourceIds ?? [],
+      );
 
       await db
         .insert(pulseDimensionalDeltas)
@@ -117,6 +137,8 @@ export async function calculateDimensionalDeltas(
           dimension: dim,
           deltaValue: clamped,
           contributingEventIds: eventIds,
+          derivationVersionKey: versions.key,
+          derivationVersions: versions.envelope,
         })
         .onConflictDoUpdate({
           target: [
@@ -126,6 +148,8 @@ export async function calculateDimensionalDeltas(
           set: {
             deltaValue: clamped,
             contributingEventIds: eventIds,
+            derivationVersionKey: versions.key,
+            derivationVersions: versions.envelope,
             lastComputedAt: new Date(),
           },
         });
@@ -155,7 +179,14 @@ async function loadPublishedEvents(
       severity_tier,
       severity_value,
       corroboration_confidence,
-      event_date
+      event_date,
+      derivation_versions,
+      ARRAY(
+        SELECT DISTINCT ps.source_id
+        FROM pulse_sources ps
+        WHERE ps.event_id = pulse_events_v2.id
+        ORDER BY ps.source_id
+      ) AS source_ids
     FROM pulse_events_v2
     WHERE published = true
       AND review_status IN ('approved', 'edited')
@@ -174,6 +205,8 @@ async function loadPublishedEvents(
       severityValue: Number(r.severity_value),
       corroborationConfidence: Number(r.corroboration_confidence),
       eventDate: String(r.event_date),
+      derivationVersions: r.derivation_versions as DerivationVersionEnvelope,
+      sourceIds: Array.isArray(r.source_ids) ? r.source_ids.map(String) : [],
     }))
     .filter((event) => isPulseClassificationValid(event));
 }

@@ -10,6 +10,7 @@ import {
 import { markSourcesSynced } from "../db/source-freshness";
 import { normalize, yearToQuarter } from "./normalize";
 import type { IngestionResult } from "./types";
+import { CI_INGEST_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 
 export function createDb() {
   const sqlClient = neon(process.env.DATABASE_URL!);
@@ -108,6 +109,11 @@ export async function runIngestion(
       result.globalMaxObserved,
       record.isInverted,
     );
+    const versions = ciVersionEnvelope({
+      methodologyVersion,
+      algorithmVersion: CI_INGEST_ALGORITHM_VERSION,
+      sourceIds: [result.sourceId],
+    });
 
     await db
       .insert(ciDimensionScores)
@@ -120,6 +126,8 @@ export async function runIngestion(
         sourceId: result.sourceId,
         ingestionId: ingestion.id,
         methodologyVersion,
+        derivationVersionKey: versions.key,
+        derivationVersions: versions.envelope,
       })
       .onConflictDoUpdate({
         target: [
@@ -133,6 +141,8 @@ export async function runIngestion(
           rawValue: record.rawValue,
           sourceId: result.sourceId,
           ingestionId: ingestion.id,
+          derivationVersionKey: versions.key,
+          derivationVersions: versions.envelope,
         },
       });
 

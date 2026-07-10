@@ -660,3 +660,15 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - SQL null still collapses absence states in parts of the schema; keep that
   limitation visible until DAT-015 changes storage and APIs. Durable record:
   APR-D043 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Derived rows retain complete version envelopes
+
+- Use `derivation-version-envelope/v1` for methodology, algorithm, prompt,
+  taxonomy, source basket, and normalized source IDs on interpretation-bearing
+  research rows and release artifacts.
+- Every axis is explicitly versioned, not applicable, or legacy unversioned.
+  Never infer historical versions merely to fill a migration.
+- Persist the content-derived version key for indexed filtering and rebuild
+  selection. New derived-table writers must register with the DAT-010 scanner.
+- Current bulk exports remain rights-blocked and future export contracts require
+  a derivation envelope. Durable record: APR-D044 in `plan/DECISIONS.md`.
