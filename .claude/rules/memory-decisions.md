@@ -638,3 +638,13 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   stable tie-break; database row order must never choose the value.
 - Every canonical ResolverOutput and public API provenance entry includes the
   six-step `decisionTrace`. Durable record: APR-D041 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Freshness follows successful committed writes
+
+- Only `markSourcesSynced()` may change `sources.last_sync_at`.
+- It requires a non-dry run, a positive safe-integer write count, normalized
+  nonempty source IDs, and a valid timestamp, and reports success only after its
+  single update statement succeeds.
+- The whole-source validator must retain seeded positive and negative scanner
+  controls so a broken detection rule cannot silently declare the repository
+  clean. Durable record: APR-D042 in `plan/DECISIONS.md`.

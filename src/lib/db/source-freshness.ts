@@ -92,18 +92,23 @@ export async function markSourcesSynced(
   const { rowsWritten, dryRun = false, at, executor = db } = opts;
 
   // A dry run or an empty/failed sync must never advance freshness.
-  if (dryRun || rowsWritten <= 0) return [];
+  if (dryRun || !Number.isSafeInteger(rowsWritten) || rowsWritten <= 0) {
+    return [];
+  }
 
   const ids = Array.from(
     new Set(
-      (Array.isArray(sourceIds) ? sourceIds : [sourceIds]).filter(
-        (id): id is string => Boolean(id),
-      ),
+      (Array.isArray(sourceIds) ? sourceIds : [sourceIds])
+        .map((id) => id.trim())
+        .filter((id): id is string => Boolean(id)),
     ),
   );
   if (ids.length === 0) return [];
 
   const stampedAt = at ?? new Date();
+  if (!Number.isFinite(stampedAt.getTime())) {
+    throw new RangeError("markSourcesSynced received an invalid timestamp");
+  }
 
   await executor
     .update(sources)

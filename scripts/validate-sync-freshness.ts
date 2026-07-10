@@ -52,6 +52,7 @@ import path from "node:path";
 
 const ALLOWLIST = new Set<string>([
   "src/lib/db/source-freshness.ts",
+  "scripts/validate-sync-freshness.ts",
 ]);
 
 /** Directories scanned for sync code. */
@@ -291,6 +292,29 @@ function scanFile(content: string): Offender[] {
   return offenders.sort((a, b) => a.line - b.line);
 }
 
+function verifyScannerFixtures(): void {
+  const bad = [
+    "db.update(sources).set({ lastSyncAt: new Date() })",
+    "db.insert(sources).onConflictDoUpdate({ set: { lastSyncAt: stamp } })",
+    "UPDATE sources SET last_sync_at = NOW()",
+  ];
+  for (const fixture of bad) {
+    if (scanFile(fixture).length === 0) {
+      throw new Error(`freshness scanner missed seeded violation: ${fixture}`);
+    }
+  }
+  const safe = [
+    "db.insert(sources).values({ lastSyncAt: null })",
+    "const row = { lastSyncAt: sources.lastSyncAt }",
+    "// db.update(sources).set({ lastSyncAt: new Date() })",
+  ];
+  for (const fixture of safe) {
+    if (scanFile(fixture).length > 0) {
+      throw new Error(`freshness scanner rejected safe fixture: ${fixture}`);
+    }
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // File discovery
 // ─────────────────────────────────────────────────────────────────────
@@ -319,8 +343,10 @@ async function walk(dir: string, acc: string[]): Promise<void> {
 
 async function main(): Promise<void> {
   parseArgs(process.argv);
+  verifyScannerFixtures();
 
   console.log("=== Civica sources.last_sync_at write-path validation ===\n");
+  console.log("Scanner fixtures: 3 violations caught; 3 safe controls accepted.\n");
 
   const cwd = process.cwd();
   const files: string[] = [];

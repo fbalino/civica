@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-007_complete_next_DAT-008"
+    "current_task": "DAT-008_complete_next_DAT-009"
   },
   "budget": {
     "mode": "subscription_only",
@@ -608,6 +608,7 @@
     "plan/evidence/DAT-006/browser-checks.md",
     "plan/evidence/DAT-007/README.md",
     "plan/evidence/DAT-007/browser-checks.md",
+    "plan/evidence/DAT-008/README.md",
     "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
@@ -624,11 +625,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for DAT-007: source-precedence contract and validator, strict API decision schemas, reconciliation/fact coverage, jurisdiction status, rights/source-input/adapter closure, sync freshness, replication, editorial illustration, all claims/documentation children, 408 tests, compilation, TypeScript, and route generation succeeded.",
-    "tests": "408/408 tests passed plus all eight live resolver worked examples. Ten focused precedence fixtures cover measurement/projection, effective vintage, native offices, direct publishers, republication, CIA Group A, material-error guards, and versioned traces. Master plan validates at 26/288 complete (9%).",
-    "public_claims": "The current reconciliation methodology names source-precedence/v1 and the public country API returns a strict six-step decision trace for every selected canonical value.",
-    "browser": "Desktop 1440x1000 and mobile 390x844 Playwright checks passed for /country/methodology/reconciliation. /api/v1/countries/ARG returned un_data with all six ordered trace steps and a versioned final selection. A pre-existing footer search caret-style hydration warning remains in local dev logs.",
-    "visual_review": "The methodology update is prose-only inside the canonical reader layout and introduces no new styling or Fable-level design decision."
+    "build": "npm run build passed for DAT-008: the self-testing whole-source freshness validator, all claims/documentation children, 419 tests, compilation, TypeScript, static generation, and route generation succeeded.",
+    "tests": "419/419 tests passed. Eleven focused freshness fixtures cover dry, zero-row, invalid-count, blank-ID, successful single/multi-source, invalid-time, and executor-failure behavior; scanner controls catch three forbidden writes and accept three safe cases. Master plan validates at 27/288 complete (9.4%).",
+    "public_claims": "Source freshness is now mechanically limited to successful positive-row writes through markSourcesSynced(); no public copy or route changed.",
+    "browser": "Not applicable for DAT-008 because the task changes a database helper, tests, and a build-time repository scanner without changing rendered UI.",
+    "visual_review": "No rendered UI or design-system behavior changed."
   },
-  "updated_at": "2026-07-11T01:20:00Z"
+  "updated_at": "2026-07-11T02:05:00Z"
 }

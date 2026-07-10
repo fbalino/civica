@@ -209,3 +209,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Ten focused fixtures, all eight live worked examples, 408 tests, the full
   claims gate, TypeScript, production build, and desktop/mobile methodology
   screenshots passed. The unrelated footer search hydration warning persists.
+
+## 2026-07-10 — DAT-008 source freshness semantics
+
+- Hardened the sole source-freshness helper so only successful positive-row
+  writes with valid source IDs and timestamps can stamp `last_sync_at`.
+- Added 11 behavioral fixtures and made the repository scanner prove itself
+  against three seeded forbidden writes and three safe controls.
+- No public UI changed; DAT-008 therefore required code/build evidence rather
+  than browser screenshots.
