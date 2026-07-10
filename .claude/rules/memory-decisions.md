@@ -596,3 +596,20 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - ATL-006 owns Fable-led rendering across public surfaces; DAT-004 establishes
   the canonical data and display-policy contract. Durable record: APR-D038 in
   `plan/DECISIONS.md`.
+
+## 2026-07-10 — Fact coverage and renderer coverage stay separate
+
+- `src/lib/provenance/fact-coverage.generated.json` is the checked current
+  `fact-provenance-coverage/v1` snapshot. Reader and JSON surfaces are
+  `/methodology/provenance-coverage` and `/api/provenance-coverage`.
+- The fact denominator is one active jurisdiction/fact-key group. A group is
+  source-linked only when every active observation resolves to a source row,
+  license, and row- or source-level URL.
+- Single-source uses distinct source IDs. The provisional independence screen
+  discounts CIA Factbook, Wikidata, and UN Data when native publishers exist;
+  DAT-006 owns claim-level source-family and republication mapping.
+- A non-frozen active row is operationally stale after 180 days since
+  retrieval. Frozen archives are reported as archives, not stale live rows.
+- Never present the 4/10 compact-renderer audit as database fact coverage or
+  the dataset-wide report as point-of-use UI coverage. Durable record:
+  APR-D039 in `plan/DECISIONS.md`.

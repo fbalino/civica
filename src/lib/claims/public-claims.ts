@@ -397,6 +397,29 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "methodology.dataset-provenance-coverage",
+    surface: "methodology",
+    routeOrArtifact: "/methodology/provenance-coverage",
+    exactClaim:
+      "A generated audit reports the source depth, linkage, disputes, and operational freshness behind Civica's country fact-key and statement ledgers.",
+    tier: "derived-descriptive-metric",
+    evidenceSources: [
+      "src/lib/provenance/fact-coverage.generated.json",
+      "src/lib/provenance/fact-coverage.ts",
+      "scripts/generate-fact-coverage-report.ts",
+      "scripts/validate-fact-coverage-report.ts",
+    ],
+    implementationOwner: "Atlas provenance and reader platform",
+    methodologyVersion: "fact-provenance-coverage-v1",
+    gate: "G2",
+    source: {
+      path: "src/app/(reader)/methodology/provenance-coverage/page.tsx",
+      fragment:
+        "A generated audit of the source depth, linkage, disputes, and operational freshness behind Civica",
+      mirrors: ["src/app/api/provenance-coverage/route.ts"],
+    },
+  },
+  {
     id: "licensing.mixed-rights",
     surface: "licensing",
     routeOrArtifact: "/licensing",

@@ -717,6 +717,20 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "getSiteStats single-sourced and distinct fact-key counts with generic fallbacks",
   ),
   runtimeClaim(
+    "provenance-report.scope",
+    "src/app/(reader)/methodology/provenance-coverage/page.tsx",
+    "/methodology/provenance-coverage",
+    "It covers {number.format(report.facts.distinctJurisdictions)} country or area records",
+    "checked fact-coverage.generated.json produced from the live database",
+  ),
+  runtimeClaim(
+    "provenance-report.statement-coverage",
+    "src/app/(reader)/methodology/provenance-coverage/page.tsx",
+    "/methodology/provenance-coverage",
+    "Total: {number.format(report.statements.sourceLinked)} of {number.format(report.statements.total)} statement rows",
+    "checked fact-coverage.generated.json produced from the live database",
+  ),
+  runtimeClaim(
     "index-methodology.pca-headline",
     "content/methodology-civica-index.md",
     "reader:methodology-civica-index",

@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 23
-- **Remaining:** 265
-- **Progress:** 8%
+- **Completed:** 24
+- **Remaining:** 264
+- **Progress:** 8.3%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -42,7 +42,7 @@ Source: `plan/03-data-provenance-and-reproducibility.md`
 - [x] **DAT-002** (P0) Build a versioned source-input manifest for every ingestion and reconciliation pipeline. _Done when: each source records canonical URL/access method, upstream version/vintage, retrieval time, content hash, format, expected coverage, redistribution posture, and adapter version, and release generation fails when a required manifest entry is missing._
 - [x] **DAT-003** (P0) Build a machine-readable rights manifest at source, field/product, and release-artifact level. _Done when: every exported table/field traces to an allowed license/terms record, restricted/non-commercial inputs are flagged, generated release artifacts list included/excluded sources, and a rights test blocks an incompatible export._
 - [x] **DAT-004** (P0) Declare and enforce a jurisdiction/entity-status taxonomy separate from casual country naming. _Done when: sovereign states, dependencies/territories, disputed/limited-recognition entities, and aggregates have sourced status fields and display policy; no blanket default silently labels all 253 rows sovereign states; tests cover known edge cases._
-- [ ] **DAT-005** (P0) Publish statement/fact-key provenance coverage metrics instead of implying universal reconciliation. _Done when: a generated report shows total facts, source-linked facts, facts with one source, facts with two-plus independent sources, unresolved disputes, stale rows, and coverage by country/fact key; public language matches the report._
+- [x] **DAT-005** (P0) Publish statement/fact-key provenance coverage metrics instead of implying universal reconciliation. _Done when: a generated report shows total facts, source-linked facts, facts with one source, facts with two-plus independent sources, unresolved disputes, stale rows, and coverage by country/fact key; public language matches the report._
 - [ ] **DAT-006** (P0) Create a reconciliation coverage and source-independence audit. _Done when: every canonical fact key has an explicit policy (single-source passthrough, multi-source resolver, manual review, or unsupported), source families/republishers are not counted as independent by default, and eight worked examples plus edge fixtures pass._
 - [ ] **DAT-007** (P1) Formalize source-precedence, native-publisher, freshness, projection/estimate, and republication rules. _Done when: an adopted methodology resolution covers conflicting vintages and CIA/secondary republication cases, resolver fixtures encode each rule, and every selected canonical value explains the decision path._
 - [ ] **DAT-008** (P0) Verify and repair source freshness semantics across every sync/ingest path. _Done when: `npm run validate:sync-freshness` covers all production writers; only `markSourcesSynced()` can stamp freshness; dry, failed, and zero-row runs leave freshness unchanged; successful row-writing fixtures stamp the correct source._

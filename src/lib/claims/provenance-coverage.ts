@@ -8,8 +8,9 @@
  * context are available on that compact surface itself. A downstream country
  * link is useful, but it does not count as point-of-use coverage.
  *
- * DAT-005 owns the later dataset-wide statement/fact-key coverage report. Do
- * not present this class-level percentage as a percentage of Civica's values.
+ * DAT-005 publishes the separate dataset-wide statement/fact-key coverage
+ * report. Do not present this class-level percentage as a percentage of
+ * Civica's values.
  */
 
 export const PROVENANCE_SURFACE_IDS = [

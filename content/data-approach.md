@@ -75,7 +75,9 @@ Multi-year values (inflation, public debt, GDP variants, unemployment, military 
 <!-- PUBLIC_CLAIM: methodology.provenance-coverage -->
 **Measured compact-surface coverage.** Across the {{ctx.provenanceCoverageTotal}} distinct compact rendering contracts registered for the homepage, Atlas, rankings, and embeds, {{ctx.provenanceCoverageComplete}} ({{ctx.provenanceCoveragePercent}}%) currently expose source, date or vintage, and rights context on the compact surface itself. Machine-readable source and rights metadata count for the space-constrained fixed embeds. Complete today: {{ctx.provenanceCoverageCompleteLabels}}. Named exceptions: {{ctx.provenanceCoverageExceptions}}.
 
-This is **renderer-class coverage**, not a percentage of Civica's database rows or published facts. It prevents compact UI patterns from disappearing inside a site-wide average. DAT-005 owns the later dataset-wide statement/fact-key coverage report; until that exists, Civica does not claim universal per-value provenance.
+This is **renderer-class coverage**, not a percentage of Civica's database rows or published facts. It prevents compact UI patterns from disappearing inside a site-wide average.
+
+**Dataset-wide provenance coverage is measured separately.** The generated [fact provenance coverage report](/methodology/provenance-coverage) counts active country/fact-key groups, source-linked facts, single-source facts, facts with two or more conservatively screened native publisher families, unresolved disputes, stale live rows, and coverage by country and fact key. Its machine-readable form is published at `/api/provenance-coverage`. The report's source-independence count remains explicitly provisional until the DAT-006 claim-level source-family audit is complete.
 
 ## What "BETA" means here {#beta}
 

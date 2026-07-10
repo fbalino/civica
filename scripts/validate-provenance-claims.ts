@@ -121,8 +121,8 @@ async function main(): Promise<void> {
     });
   }
 
-  // The generated public statement must keep its denominator and DAT-005
-  // boundary visible in the canonical methodology prose.
+  // The generated public statement must keep its renderer-class denominator
+  // and the separate DAT-005 dataset report visible in canonical prose.
   const approachPath = "content/data-approach.md";
   const approach = (await read(approachPath)) ?? "";
   for (const marker of [
@@ -140,11 +140,16 @@ async function main(): Promise<void> {
       });
     }
   }
-  if (!/renderer[- ]class coverage/i.test(approach) || !/DAT-005/.test(approach)) {
+  if (
+    !/renderer[- ]class coverage/i.test(approach) ||
+    !/\/methodology\/provenance-coverage/.test(approach) ||
+    !/measured separately/i.test(approach)
+  ) {
     problems.push({
       category: "public-summary",
       file: approachPath,
-      detail: "must say renderer-class coverage and defer dataset-wide metrics to DAT-005",
+      detail:
+        "must distinguish renderer-class coverage and link the separate dataset-wide report",
     });
   }
 

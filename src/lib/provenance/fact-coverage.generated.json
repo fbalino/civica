@@ -1,0 +1,3476 @@
+{
+  "schemaVersion": "fact-provenance-coverage/v1",
+  "generatedAt": "2026-07-10T21:33:53.204Z",
+  "staleness": {
+    "liveRowThresholdDays": 180,
+    "frozenSourcesExcluded": true,
+    "rule": "An active row is stale when its retrieval timestamp is more than 180 days before report generation and its source is not registered as a frozen archive."
+  },
+  "independence": {
+    "rule": "Count distinct native publisher source IDs. When a fact has any native publisher, CIA Factbook, Wikidata, and UN Data compilation rows do not add an independent family; secondary-only evidence counts as one family.",
+    "secondaryOrAggregatorSources": [
+      "cia_factbook",
+      "un_data",
+      "wikidata"
+    ],
+    "limitation": "This is a conservative source-family screen, not a claim-level origin audit. DAT-006 must map republishers and common upstream families before Civica treats the count as final independence evidence."
+  },
+  "facts": {
+    "activeRows": 25824,
+    "total": 17516,
+    "sourceLinked": 17516,
+    "oneSource": 13201,
+    "twoPlusIndependentSources": 2349,
+    "unresolvedDisputes": 0,
+    "staleRows": 0,
+    "distinctJurisdictions": 253,
+    "distinctFactKeys": 88
+  },
+  "statements": {
+    "total": 7875,
+    "sourceLinked": 7875,
+    "unlinked": 0,
+    "distinctGroups": 6745,
+    "bySubjectTable": [
+      {
+        "subjectTable": "constitutions",
+        "total": 20,
+        "sourceLinked": 20
+      },
+      {
+        "subjectTable": "elections",
+        "total": 1236,
+        "sourceLinked": 1236
+      },
+      {
+        "subjectTable": "jurisdictions",
+        "total": 1270,
+        "sourceLinked": 1270
+      },
+      {
+        "subjectTable": "legislature_parties",
+        "total": 351,
+        "sourceLinked": 351
+      },
+      {
+        "subjectTable": "terms",
+        "total": 4998,
+        "sourceLinked": 4998
+      }
+    ]
+  },
+  "byCountry": [
+    {
+      "id": "afghanistan",
+      "label": "Afghanistan",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "akrotiri",
+      "label": "Akrotiri",
+      "facts": 9,
+      "sourceLinkedFacts": 9,
+      "oneSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "albania",
+      "label": "Albania",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "algeria",
+      "label": "Algeria",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "american-samoa",
+      "label": "American Samoa",
+      "facts": 37,
+      "sourceLinkedFacts": 37,
+      "oneSourceFacts": 37,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "andorra",
+      "label": "Andorra",
+      "facts": 69,
+      "sourceLinkedFacts": 69,
+      "oneSourceFacts": 51,
+      "twoPlusIndependentSourceFacts": 10,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "angola",
+      "label": "Angola",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "anguilla",
+      "label": "Anguilla",
+      "facts": 40,
+      "sourceLinkedFacts": 40,
+      "oneSourceFacts": 40,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "antarctica",
+      "label": "Antarctica",
+      "facts": 10,
+      "sourceLinkedFacts": 10,
+      "oneSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "antigua-and-barbuda",
+      "label": "Antigua and Barbuda",
+      "facts": 75,
+      "sourceLinkedFacts": 75,
+      "oneSourceFacts": 55,
+      "twoPlusIndependentSourceFacts": 10,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "argentina",
+      "label": "Argentina",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "armenia",
+      "label": "Armenia",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "aruba",
+      "label": "Aruba",
+      "facts": 43,
+      "sourceLinkedFacts": 43,
+      "oneSourceFacts": 43,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "ashmore-and-cartier-islands",
+      "label": "Ashmore and Cartier Islands",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "australia",
+      "label": "Australia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "austria",
+      "label": "Austria",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "azerbaijan",
+      "label": "Azerbaijan",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "bahrain",
+      "label": "Bahrain",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "baker-island-howland-island-jarvis-island-johnston-atoll-kingman-reef-midway-islands-palmyra-atoll",
+      "label": "Baker Island, Howland Island, Jarvis Island, Johnston Atoll, Kingman Reef, Midway Islands, Palmyra Atoll",
+      "facts": 7,
+      "sourceLinkedFacts": 7,
+      "oneSourceFacts": 7,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "bangladesh",
+      "label": "Bangladesh",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "barbados",
+      "label": "Barbados",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "belarus",
+      "label": "Belarus",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "belgium",
+      "label": "Belgium",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "belize",
+      "label": "Belize",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "benin",
+      "label": "Benin",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "bermuda",
+      "label": "Bermuda",
+      "facts": 43,
+      "sourceLinkedFacts": 43,
+      "oneSourceFacts": 43,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "bhutan",
+      "label": "Bhutan",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "bolivia",
+      "label": "Bolivia",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "bosnia-and-herzegovina",
+      "label": "Bosnia and Herzegovina",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "botswana",
+      "label": "Botswana",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "bouvet-island",
+      "label": "Bouvet Island",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "brazil",
+      "label": "Brazil",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "british-virgin-islands",
+      "label": "British Virgin Islands",
+      "facts": 38,
+      "sourceLinkedFacts": 38,
+      "oneSourceFacts": 38,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "brunei",
+      "label": "Brunei",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "bulgaria",
+      "label": "Bulgaria",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "burkina-faso",
+      "label": "Burkina Faso",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "burma",
+      "label": "Burma",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 63,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "burundi",
+      "label": "Burundi",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "cabo-verde",
+      "label": "Cabo Verde",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "cambodia",
+      "label": "Cambodia",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "cameroon",
+      "label": "Cameroon",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "canada",
+      "label": "Canada",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "cayman-islands",
+      "label": "Cayman Islands",
+      "facts": 42,
+      "sourceLinkedFacts": 42,
+      "oneSourceFacts": 42,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "central-african-republic",
+      "label": "Central African Republic",
+      "facts": 52,
+      "sourceLinkedFacts": 52,
+      "oneSourceFacts": 37,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "chad",
+      "label": "Chad",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "chile",
+      "label": "Chile",
+      "facts": 86,
+      "sourceLinkedFacts": 86,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 15,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "china",
+      "label": "China",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "christmas-island",
+      "label": "Christmas Island",
+      "facts": 24,
+      "sourceLinkedFacts": 24,
+      "oneSourceFacts": 24,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "clipperton-island",
+      "label": "Clipperton Island",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "cocos-keeling-islands",
+      "label": "Cocos (Keeling) Islands",
+      "facts": 25,
+      "sourceLinkedFacts": 25,
+      "oneSourceFacts": 25,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "colombia",
+      "label": "Colombia",
+      "facts": 86,
+      "sourceLinkedFacts": 86,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 15,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "comoros",
+      "label": "Comoros",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "congo-brazzaville",
+      "label": "Congo (Brazzaville)",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "cook-islands",
+      "label": "Cook Islands",
+      "facts": 39,
+      "sourceLinkedFacts": 39,
+      "oneSourceFacts": 39,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "coral-sea-islands",
+      "label": "Coral Sea Islands",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "costa-rica",
+      "label": "Costa Rica",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "c-te-d-ivoire",
+      "label": "Côte d'Ivoire",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "croatia",
+      "label": "Croatia",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "cuba",
+      "label": "Cuba",
+      "facts": 79,
+      "sourceLinkedFacts": 79,
+      "oneSourceFacts": 63,
+      "twoPlusIndependentSourceFacts": 6,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "curacao",
+      "label": "Curacao",
+      "facts": 40,
+      "sourceLinkedFacts": 40,
+      "oneSourceFacts": 40,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "cyprus",
+      "label": "Cyprus",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "czechia",
+      "label": "Czechia",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "denmark",
+      "label": "Denmark",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "dhekelia",
+      "label": "Dhekelia",
+      "facts": 10,
+      "sourceLinkedFacts": 10,
+      "oneSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "djibouti",
+      "label": "Djibouti",
+      "facts": 78,
+      "sourceLinkedFacts": 78,
+      "oneSourceFacts": 57,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "dominica",
+      "label": "Dominica",
+      "facts": 70,
+      "sourceLinkedFacts": 70,
+      "oneSourceFacts": 53,
+      "twoPlusIndependentSourceFacts": 9,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "drc",
+      "label": "DRC",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "ecuador",
+      "label": "Ecuador",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "egypt",
+      "label": "Egypt",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "el-salvador",
+      "label": "El Salvador",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "equatorial-guinea",
+      "label": "Equatorial Guinea",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 9,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "eritrea",
+      "label": "Eritrea",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 66,
+      "twoPlusIndependentSourceFacts": 5,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "estonia",
+      "label": "Estonia",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "eswatini",
+      "label": "Eswatini",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "ethiopia",
+      "label": "Ethiopia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "falkland-islands-islas-malvinas",
+      "label": "Falkland Islands (Islas Malvinas)",
+      "facts": 32,
+      "sourceLinkedFacts": 32,
+      "oneSourceFacts": 32,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "faroe-islands",
+      "label": "Faroe Islands",
+      "facts": 39,
+      "sourceLinkedFacts": 39,
+      "oneSourceFacts": 39,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "fiji",
+      "label": "Fiji",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "finland",
+      "label": "Finland",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "france",
+      "label": "France",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "french-polynesia",
+      "label": "French Polynesia",
+      "facts": 42,
+      "sourceLinkedFacts": 42,
+      "oneSourceFacts": 42,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "french-southern-and-antarctic-lands",
+      "label": "French Southern and Antarctic Lands",
+      "facts": 10,
+      "sourceLinkedFacts": 10,
+      "oneSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gabon",
+      "label": "Gabon",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 10,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gaza-gaza-strip",
+      "label": "Gaza, Gaza Strip",
+      "facts": 43,
+      "sourceLinkedFacts": 43,
+      "oneSourceFacts": 43,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "georgia",
+      "label": "Georgia",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "germany",
+      "label": "Germany",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "ghana",
+      "label": "Ghana",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gibraltar",
+      "label": "Gibraltar",
+      "facts": 32,
+      "sourceLinkedFacts": 32,
+      "oneSourceFacts": 32,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "greece",
+      "label": "Greece",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "greenland",
+      "label": "Greenland",
+      "facts": 41,
+      "sourceLinkedFacts": 41,
+      "oneSourceFacts": 41,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "grenada",
+      "label": "Grenada",
+      "facts": 73,
+      "sourceLinkedFacts": 73,
+      "oneSourceFacts": 56,
+      "twoPlusIndependentSourceFacts": 9,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "guam",
+      "label": "Guam",
+      "facts": 42,
+      "sourceLinkedFacts": 42,
+      "oneSourceFacts": 42,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "guatemala",
+      "label": "Guatemala",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "guernsey",
+      "label": "Guernsey",
+      "facts": 34,
+      "sourceLinkedFacts": 34,
+      "oneSourceFacts": 34,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "guinea",
+      "label": "Guinea",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "guinea-bissau",
+      "label": "Guinea-Bissau",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "guyana",
+      "label": "Guyana",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 63,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "haiti",
+      "label": "Haiti",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "heard-island-and-mcdonald-islands",
+      "label": "Heard Island and McDonald Islands",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "holy-see-vatican-city",
+      "label": "Holy See (Vatican City)",
+      "facts": 29,
+      "sourceLinkedFacts": 29,
+      "oneSourceFacts": 27,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "honduras",
+      "label": "Honduras",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "hong-kong",
+      "label": "Hong Kong",
+      "facts": 45,
+      "sourceLinkedFacts": 45,
+      "oneSourceFacts": 45,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "hungary",
+      "label": "Hungary",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "iceland",
+      "label": "Iceland",
+      "facts": 80,
+      "sourceLinkedFacts": 80,
+      "oneSourceFacts": 57,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "india",
+      "label": "India",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "indonesia",
+      "label": "Indonesia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "iran",
+      "label": "Iran",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "iraq",
+      "label": "Iraq",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "ireland",
+      "label": "Ireland",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 57,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "isle-of-man",
+      "label": "Isle of Man",
+      "facts": 32,
+      "sourceLinkedFacts": 32,
+      "oneSourceFacts": 32,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "israel",
+      "label": "Israel",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "italy",
+      "label": "Italy",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 15,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "jamaica",
+      "label": "Jamaica",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 64,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "jan-mayen",
+      "label": "Jan Mayen",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "japan",
+      "label": "Japan",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "jersey",
+      "label": "Jersey",
+      "facts": 36,
+      "sourceLinkedFacts": 36,
+      "oneSourceFacts": 36,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "jordan",
+      "label": "Jordan",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "kazakhstan",
+      "label": "Kazakhstan",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "kenya",
+      "label": "Kenya",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "kiribati",
+      "label": "Kiribati",
+      "facts": 74,
+      "sourceLinkedFacts": 74,
+      "oneSourceFacts": 53,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "kosovo",
+      "label": "Kosovo",
+      "facts": 54,
+      "sourceLinkedFacts": 54,
+      "oneSourceFacts": 41,
+      "twoPlusIndependentSourceFacts": 1,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "kuwait",
+      "label": "Kuwait",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "kyrgyzstan",
+      "label": "Kyrgyzstan",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "laos",
+      "label": "Laos",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "latvia",
+      "label": "Latvia",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "lebanon",
+      "label": "Lebanon",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "lesotho",
+      "label": "Lesotho",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "liberia",
+      "label": "Liberia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 63,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "libya",
+      "label": "Libya",
+      "facts": 79,
+      "sourceLinkedFacts": 79,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 10,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "liechtenstein",
+      "label": "Liechtenstein",
+      "facts": 59,
+      "sourceLinkedFacts": 59,
+      "oneSourceFacts": 45,
+      "twoPlusIndependentSourceFacts": 5,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "lithuania",
+      "label": "Lithuania",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "luxembourg",
+      "label": "Luxembourg",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "macau",
+      "label": "Macau",
+      "facts": 45,
+      "sourceLinkedFacts": 45,
+      "oneSourceFacts": 45,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "madagascar",
+      "label": "Madagascar",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "malawi",
+      "label": "Malawi",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "malaysia",
+      "label": "Malaysia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "maldives",
+      "label": "Maldives",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "mali",
+      "label": "Mali",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "malta",
+      "label": "Malta",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "marshall-islands",
+      "label": "Marshall Islands",
+      "facts": 71,
+      "sourceLinkedFacts": 71,
+      "oneSourceFacts": 50,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "mauritania",
+      "label": "Mauritania",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "mauritius",
+      "label": "Mauritius",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "mexico",
+      "label": "Mexico",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 15,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "micronesia",
+      "label": "Micronesia",
+      "facts": 43,
+      "sourceLinkedFacts": 43,
+      "oneSourceFacts": 31,
+      "twoPlusIndependentSourceFacts": 8,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "moldova",
+      "label": "Moldova",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "monaco",
+      "label": "Monaco",
+      "facts": 52,
+      "sourceLinkedFacts": 52,
+      "oneSourceFacts": 41,
+      "twoPlusIndependentSourceFacts": 3,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "mongolia",
+      "label": "Mongolia",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "montenegro",
+      "label": "Montenegro",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "montserrat",
+      "label": "Montserrat",
+      "facts": 40,
+      "sourceLinkedFacts": 40,
+      "oneSourceFacts": 40,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "morocco",
+      "label": "Morocco",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "mozambique",
+      "label": "Mozambique",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "namibia",
+      "label": "Namibia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "nauru",
+      "label": "Nauru",
+      "facts": 71,
+      "sourceLinkedFacts": 71,
+      "oneSourceFacts": 51,
+      "twoPlusIndependentSourceFacts": 9,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "navassa-island",
+      "label": "Navassa Island",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "nepal",
+      "label": "Nepal",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "netherlands",
+      "label": "Netherlands",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "new-caledonia",
+      "label": "New Caledonia",
+      "facts": 45,
+      "sourceLinkedFacts": 45,
+      "oneSourceFacts": 45,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "new-zealand",
+      "label": "New Zealand",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "nicaragua",
+      "label": "Nicaragua",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "niger",
+      "label": "Niger",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "nigeria",
+      "label": "Nigeria",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 63,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "niue",
+      "label": "Niue",
+      "facts": 31,
+      "sourceLinkedFacts": 31,
+      "oneSourceFacts": 31,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "norfolk-island",
+      "label": "Norfolk Island",
+      "facts": 24,
+      "sourceLinkedFacts": 24,
+      "oneSourceFacts": 24,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "north-korea",
+      "label": "North Korea",
+      "facts": 62,
+      "sourceLinkedFacts": 62,
+      "oneSourceFacts": 51,
+      "twoPlusIndependentSourceFacts": 4,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "north-macedonia",
+      "label": "North Macedonia",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "northern-mariana-islands",
+      "label": "Northern Mariana Islands",
+      "facts": 38,
+      "sourceLinkedFacts": 38,
+      "oneSourceFacts": 38,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "norway",
+      "label": "Norway",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "oman",
+      "label": "Oman",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "pakistan",
+      "label": "Pakistan",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "palau",
+      "label": "Palau",
+      "facts": 71,
+      "sourceLinkedFacts": 71,
+      "oneSourceFacts": 50,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "palestine",
+      "label": "Palestine",
+      "facts": 44,
+      "sourceLinkedFacts": 44,
+      "oneSourceFacts": 32,
+      "twoPlusIndependentSourceFacts": 6,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "panama",
+      "label": "Panama",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "papua-new-guinea",
+      "label": "Papua New Guinea",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "paracel-islands",
+      "label": "Paracel Islands",
+      "facts": 13,
+      "sourceLinkedFacts": 13,
+      "oneSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "paraguay",
+      "label": "Paraguay",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "peru",
+      "label": "Peru",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "philippines",
+      "label": "Philippines",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "pitcairn-islands",
+      "label": "Pitcairn Islands",
+      "facts": 24,
+      "sourceLinkedFacts": 24,
+      "oneSourceFacts": 24,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "poland",
+      "label": "Poland",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "portugal",
+      "label": "Portugal",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "puerto-rico",
+      "label": "Puerto Rico",
+      "facts": 46,
+      "sourceLinkedFacts": 46,
+      "oneSourceFacts": 46,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "qatar",
+      "label": "Qatar",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "romania",
+      "label": "Romania",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 57,
+      "twoPlusIndependentSourceFacts": 15,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "russia",
+      "label": "Russia",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "rwanda",
+      "label": "Rwanda",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "saint-barthelemy",
+      "label": "Saint Barthelemy",
+      "facts": 25,
+      "sourceLinkedFacts": 25,
+      "oneSourceFacts": 25,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "saint-kitts-and-nevis",
+      "label": "Saint Kitts and Nevis",
+      "facts": 69,
+      "sourceLinkedFacts": 69,
+      "oneSourceFacts": 52,
+      "twoPlusIndependentSourceFacts": 9,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "saint-lucia",
+      "label": "Saint Lucia",
+      "facts": 77,
+      "sourceLinkedFacts": 77,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "saint-martin",
+      "label": "Saint Martin",
+      "facts": 30,
+      "sourceLinkedFacts": 30,
+      "oneSourceFacts": 30,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "saint-pierre-and-miquelon",
+      "label": "Saint Pierre and Miquelon",
+      "facts": 32,
+      "sourceLinkedFacts": 32,
+      "oneSourceFacts": 32,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "saint-vincent-and-the-grenadines",
+      "label": "Saint Vincent and the Grenadines",
+      "facts": 76,
+      "sourceLinkedFacts": 76,
+      "oneSourceFacts": 57,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "samoa",
+      "label": "Samoa",
+      "facts": 78,
+      "sourceLinkedFacts": 78,
+      "oneSourceFacts": 56,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "san-marino",
+      "label": "San Marino",
+      "facts": 71,
+      "sourceLinkedFacts": 71,
+      "oneSourceFacts": 50,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "sao-tome-and-principe",
+      "label": "Sao Tome and Principe",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "saudi-arabia",
+      "label": "Saudi Arabia",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "senegal",
+      "label": "Senegal",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "serbia",
+      "label": "Serbia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "seychelles",
+      "label": "Seychelles",
+      "facts": 79,
+      "sourceLinkedFacts": 79,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 10,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "sierra-leone",
+      "label": "Sierra Leone",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "singapore",
+      "label": "Singapore",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "sint-maarten",
+      "label": "Sint Maarten",
+      "facts": 40,
+      "sourceLinkedFacts": 40,
+      "oneSourceFacts": 40,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "slovakia",
+      "label": "Slovakia",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "slovenia",
+      "label": "Slovenia",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "solomon-islands",
+      "label": "Solomon Islands",
+      "facts": 80,
+      "sourceLinkedFacts": 80,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "somalia",
+      "label": "Somalia",
+      "facts": 80,
+      "sourceLinkedFacts": 80,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 9,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "south-africa",
+      "label": "South Africa",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "south-georgia-and-south-sandwich-islands",
+      "label": "South Georgia and South Sandwich Islands",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "south-korea",
+      "label": "South Korea",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "south-sudan",
+      "label": "South Sudan",
+      "facts": 80,
+      "sourceLinkedFacts": 80,
+      "oneSourceFacts": 64,
+      "twoPlusIndependentSourceFacts": 6,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "spain",
+      "label": "Spain",
+      "facts": 85,
+      "sourceLinkedFacts": 85,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 15,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "spratly-islands",
+      "label": "Spratly Islands",
+      "facts": 12,
+      "sourceLinkedFacts": 12,
+      "oneSourceFacts": 12,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "sri-lanka",
+      "label": "Sri Lanka",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "sudan",
+      "label": "Sudan",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "suriname",
+      "label": "Suriname",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 64,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "svalbard-sometimes-referred-to-as-spitsbergen-the-largest-island-in-the-archipelago",
+      "label": "Svalbard (sometimes referred to as Spitsbergen, the largest island in the archipelago)",
+      "facts": 18,
+      "sourceLinkedFacts": 18,
+      "oneSourceFacts": 18,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "sweden",
+      "label": "Sweden",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "switzerland",
+      "label": "Switzerland",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "syria",
+      "label": "Syria",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "taiwan",
+      "label": "Taiwan",
+      "facts": 58,
+      "sourceLinkedFacts": 58,
+      "oneSourceFacts": 48,
+      "twoPlusIndependentSourceFacts": 1,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "tajikistan",
+      "label": "Tajikistan",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "tanzania",
+      "label": "Tanzania",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "thailand",
+      "label": "Thailand",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "the-bahamas",
+      "label": "The Bahamas",
+      "facts": 78,
+      "sourceLinkedFacts": 78,
+      "oneSourceFacts": 57,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "the-dominican",
+      "label": "The Dominican",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "the-gambia",
+      "label": "The Gambia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "timor-leste",
+      "label": "Timor-Leste",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "togo",
+      "label": "Togo",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "tokelau",
+      "label": "Tokelau",
+      "facts": 33,
+      "sourceLinkedFacts": 33,
+      "oneSourceFacts": 33,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "tonga",
+      "label": "Tonga",
+      "facts": 81,
+      "sourceLinkedFacts": 81,
+      "oneSourceFacts": 59,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "trinidad-and-tobago",
+      "label": "Trinidad and Tobago",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "tunisia",
+      "label": "Tunisia",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "turkey",
+      "label": "Turkey",
+      "facts": 86,
+      "sourceLinkedFacts": 86,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 15,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "turkmenistan",
+      "label": "Turkmenistan",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 10,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "turks-and-caicos-islands",
+      "label": "Turks and Caicos Islands",
+      "facts": 41,
+      "sourceLinkedFacts": 41,
+      "oneSourceFacts": 41,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "tuvalu",
+      "label": "Tuvalu",
+      "facts": 71,
+      "sourceLinkedFacts": 71,
+      "oneSourceFacts": 53,
+      "twoPlusIndependentSourceFacts": 9,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "uganda",
+      "label": "Uganda",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "ukraine",
+      "label": "Ukraine",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "united-arab-emirates",
+      "label": "United Arab Emirates",
+      "facts": 50,
+      "sourceLinkedFacts": 50,
+      "oneSourceFacts": 34,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "united-kingdom",
+      "label": "United Kingdom",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 14,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "united-states",
+      "label": "United States",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 58,
+      "twoPlusIndependentSourceFacts": 16,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "uruguay",
+      "label": "Uruguay",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "uzbekistan",
+      "label": "Uzbekistan",
+      "facts": 84,
+      "sourceLinkedFacts": 84,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "vanuatu",
+      "label": "Vanuatu",
+      "facts": 79,
+      "sourceLinkedFacts": 79,
+      "oneSourceFacts": 57,
+      "twoPlusIndependentSourceFacts": 13,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "venezuela",
+      "label": "Venezuela",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 11,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "vietnam",
+      "label": "Vietnam",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "virgin-islands",
+      "label": "Virgin Islands",
+      "facts": 44,
+      "sourceLinkedFacts": 44,
+      "oneSourceFacts": 44,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "wake-island",
+      "label": "Wake Island",
+      "facts": 13,
+      "sourceLinkedFacts": 13,
+      "oneSourceFacts": 13,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "wallis-and-futuna",
+      "label": "Wallis and Futuna",
+      "facts": 33,
+      "sourceLinkedFacts": 33,
+      "oneSourceFacts": 33,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "west-bank",
+      "label": "West Bank",
+      "facts": 46,
+      "sourceLinkedFacts": 46,
+      "oneSourceFacts": 46,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "western-sahara",
+      "label": "Western Sahara",
+      "facts": 30,
+      "sourceLinkedFacts": 30,
+      "oneSourceFacts": 30,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "yemen",
+      "label": "Yemen",
+      "facts": 82,
+      "sourceLinkedFacts": 82,
+      "oneSourceFacts": 62,
+      "twoPlusIndependentSourceFacts": 9,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "zambia",
+      "label": "Zambia",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 61,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "zimbabwe",
+      "label": "Zimbabwe",
+      "facts": 83,
+      "sourceLinkedFacts": 83,
+      "oneSourceFacts": 60,
+      "twoPlusIndependentSourceFacts": 12,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    }
+  ],
+  "byFactKey": [
+    {
+      "id": "agricultural_land_km2",
+      "label": "agricultural_land_km2",
+      "facts": 194,
+      "sourceLinkedFacts": 194,
+      "oneSourceFacts": 194,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "agricultural_land_pct",
+      "label": "agricultural_land_pct",
+      "facts": 194,
+      "sourceLinkedFacts": 194,
+      "oneSourceFacts": 194,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "agriculture_products",
+      "label": "agriculture_products",
+      "facts": 227,
+      "sourceLinkedFacts": 227,
+      "oneSourceFacts": 227,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "area_land_km2",
+      "label": "area_land_km2",
+      "facts": 246,
+      "sourceLinkedFacts": 246,
+      "oneSourceFacts": 246,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "area_total_km2",
+      "label": "area_total_km2",
+      "facts": 247,
+      "sourceLinkedFacts": 247,
+      "oneSourceFacts": 247,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "birth_rate",
+      "label": "birth_rate",
+      "facts": 232,
+      "sourceLinkedFacts": 232,
+      "oneSourceFacts": 36,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "budget_expenditure",
+      "label": "budget_expenditure",
+      "facts": 209,
+      "sourceLinkedFacts": 209,
+      "oneSourceFacts": 209,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "budget_revenue",
+      "label": "budget_revenue",
+      "facts": 209,
+      "sourceLinkedFacts": 209,
+      "oneSourceFacts": 209,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "climate",
+      "label": "climate",
+      "facts": 249,
+      "sourceLinkedFacts": 249,
+      "oneSourceFacts": 249,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "co2_emissions_total_mt",
+      "label": "co2_emissions_total_mt",
+      "facts": 186,
+      "sourceLinkedFacts": 186,
+      "oneSourceFacts": 186,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "coastline",
+      "label": "coastline",
+      "facts": 248,
+      "sourceLinkedFacts": 248,
+      "oneSourceFacts": 248,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "completion_rate_primary_pct",
+      "label": "completion_rate_primary_pct",
+      "facts": 157,
+      "sourceLinkedFacts": 157,
+      "oneSourceFacts": 157,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "current_account_balance_usd",
+      "label": "current_account_balance_usd",
+      "facts": 193,
+      "sourceLinkedFacts": 193,
+      "oneSourceFacts": 14,
+      "twoPlusIndependentSourceFacts": 179,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "death_rate",
+      "label": "death_rate",
+      "facts": 233,
+      "sourceLinkedFacts": 233,
+      "oneSourceFacts": 37,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "electricity_access",
+      "label": "electricity_access",
+      "facts": 223,
+      "sourceLinkedFacts": 223,
+      "oneSourceFacts": 33,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "employment_pop_ratio_pct",
+      "label": "employment_pop_ratio_pct",
+      "facts": 180,
+      "sourceLinkedFacts": 180,
+      "oneSourceFacts": 180,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "ethnic_groups",
+      "label": "ethnic_groups",
+      "facts": 233,
+      "sourceLinkedFacts": 233,
+      "oneSourceFacts": 233,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "expected_years_schooling",
+      "label": "expected_years_schooling",
+      "facts": 194,
+      "sourceLinkedFacts": 194,
+      "oneSourceFacts": 10,
+      "twoPlusIndependentSourceFacts": 184,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "export_commodities",
+      "label": "export_commodities",
+      "facts": 232,
+      "sourceLinkedFacts": 232,
+      "oneSourceFacts": 232,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "export_partners",
+      "label": "export_partners",
+      "facts": 230,
+      "sourceLinkedFacts": 230,
+      "oneSourceFacts": 230,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "exports_goods_services_usd",
+      "label": "exports_goods_services_usd",
+      "facts": 214,
+      "sourceLinkedFacts": 214,
+      "oneSourceFacts": 47,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "exports_merchandise_usd",
+      "label": "exports_merchandise_usd",
+      "facts": 188,
+      "sourceLinkedFacts": 188,
+      "oneSourceFacts": 188,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "fertility_rate",
+      "label": "fertility_rate",
+      "facts": 197,
+      "sourceLinkedFacts": 197,
+      "oneSourceFacts": 2,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "fiscal_balance_pct_gdp",
+      "label": "fiscal_balance_pct_gdp",
+      "facts": 191,
+      "sourceLinkedFacts": 191,
+      "oneSourceFacts": 148,
+      "twoPlusIndependentSourceFacts": 43,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "foreign_exchange_reserves_usd",
+      "label": "foreign_exchange_reserves_usd",
+      "facts": 173,
+      "sourceLinkedFacts": 173,
+      "oneSourceFacts": 173,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "forest_area_pct",
+      "label": "forest_area_pct",
+      "facts": 192,
+      "sourceLinkedFacts": 192,
+      "oneSourceFacts": 192,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gdp_growth_rate",
+      "label": "gdp_growth_rate",
+      "facts": 214,
+      "sourceLinkedFacts": 214,
+      "oneSourceFacts": 214,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gdp_nominal_usd_billions",
+      "label": "gdp_nominal_usd_billions",
+      "facts": 195,
+      "sourceLinkedFacts": 195,
+      "oneSourceFacts": 4,
+      "twoPlusIndependentSourceFacts": 188,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gdp_per_capita_ppp",
+      "label": "gdp_per_capita_ppp",
+      "facts": 216,
+      "sourceLinkedFacts": 216,
+      "oneSourceFacts": 216,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gdp_per_capita_usd",
+      "label": "gdp_per_capita_usd",
+      "facts": 220,
+      "sourceLinkedFacts": 220,
+      "oneSourceFacts": 28,
+      "twoPlusIndependentSourceFacts": 185,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gdp_ppp",
+      "label": "gdp_ppp",
+      "facts": 218,
+      "sourceLinkedFacts": 218,
+      "oneSourceFacts": 218,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gdp_ppp_usd_billions",
+      "label": "gdp_ppp_usd_billions",
+      "facts": 221,
+      "sourceLinkedFacts": 221,
+      "oneSourceFacts": 33,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gdp_real_growth_rate",
+      "label": "gdp_real_growth_rate",
+      "facts": 195,
+      "sourceLinkedFacts": 195,
+      "oneSourceFacts": 8,
+      "twoPlusIndependentSourceFacts": 187,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gender_parity_index_literacy",
+      "label": "gender_parity_index_literacy",
+      "facts": 155,
+      "sourceLinkedFacts": 155,
+      "oneSourceFacts": 155,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gerd_pct_gdp",
+      "label": "gerd_pct_gdp",
+      "facts": 46,
+      "sourceLinkedFacts": 46,
+      "oneSourceFacts": 46,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gni_per_capita_ppp_usd",
+      "label": "gni_per_capita_ppp_usd",
+      "facts": 192,
+      "sourceLinkedFacts": 192,
+      "oneSourceFacts": 192,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "government_education_expenditure_pct_gdp",
+      "label": "government_education_expenditure_pct_gdp",
+      "facts": 191,
+      "sourceLinkedFacts": 191,
+      "oneSourceFacts": 191,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "government_form_description",
+      "label": "government_form_description",
+      "facts": 232,
+      "sourceLinkedFacts": 232,
+      "oneSourceFacts": 232,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gross_enrollment_ratio_primary_pct",
+      "label": "gross_enrollment_ratio_primary_pct",
+      "facts": 193,
+      "sourceLinkedFacts": 193,
+      "oneSourceFacts": 193,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "gross_enrollment_ratio_secondary_pct",
+      "label": "gross_enrollment_ratio_secondary_pct",
+      "facts": 192,
+      "sourceLinkedFacts": 192,
+      "oneSourceFacts": 192,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "hdi_rank",
+      "label": "hdi_rank",
+      "facts": 192,
+      "sourceLinkedFacts": 192,
+      "oneSourceFacts": 192,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "hdi_score",
+      "label": "hdi_score",
+      "facts": 192,
+      "sourceLinkedFacts": 192,
+      "oneSourceFacts": 192,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "health_expenditure_pct_gdp",
+      "label": "health_expenditure_pct_gdp",
+      "facts": 193,
+      "sourceLinkedFacts": 193,
+      "oneSourceFacts": 141,
+      "twoPlusIndependentSourceFacts": 52,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "healthy_life_expectancy_years",
+      "label": "healthy_life_expectancy_years",
+      "facts": 184,
+      "sourceLinkedFacts": 184,
+      "oneSourceFacts": 184,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "import_partners",
+      "label": "import_partners",
+      "facts": 230,
+      "sourceLinkedFacts": 230,
+      "oneSourceFacts": 230,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "imports_goods_services_usd",
+      "label": "imports_goods_services_usd",
+      "facts": 213,
+      "sourceLinkedFacts": 213,
+      "oneSourceFacts": 46,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "imports_merchandise_usd",
+      "label": "imports_merchandise_usd",
+      "facts": 189,
+      "sourceLinkedFacts": 189,
+      "oneSourceFacts": 189,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "industries",
+      "label": "industries",
+      "facts": 231,
+      "sourceLinkedFacts": 231,
+      "oneSourceFacts": 231,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "infant_mortality_per_1000",
+      "label": "infant_mortality_per_1000",
+      "facts": 197,
+      "sourceLinkedFacts": 197,
+      "oneSourceFacts": 3,
+      "twoPlusIndependentSourceFacts": 194,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "inflation_rate",
+      "label": "inflation_rate",
+      "facts": 215,
+      "sourceLinkedFacts": 215,
+      "oneSourceFacts": 23,
+      "twoPlusIndependentSourceFacts": 181,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "internet_users_pct",
+      "label": "internet_users_pct",
+      "facts": 192,
+      "sourceLinkedFacts": 192,
+      "oneSourceFacts": 191,
+      "twoPlusIndependentSourceFacts": 1,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "irrigated_land_km2",
+      "label": "irrigated_land_km2",
+      "facts": 114,
+      "sourceLinkedFacts": 114,
+      "oneSourceFacts": 114,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "labor_force_participation_rate_pct",
+      "label": "labor_force_participation_rate_pct",
+      "facts": 180,
+      "sourceLinkedFacts": 180,
+      "oneSourceFacts": 180,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "land_area",
+      "label": "land_area",
+      "facts": 246,
+      "sourceLinkedFacts": 246,
+      "oneSourceFacts": 246,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "languages",
+      "label": "languages",
+      "facts": 235,
+      "sourceLinkedFacts": 235,
+      "oneSourceFacts": 235,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "life_expectancy",
+      "label": "life_expectancy",
+      "facts": 225,
+      "sourceLinkedFacts": 225,
+      "oneSourceFacts": 225,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "life_expectancy_years",
+      "label": "life_expectancy_years",
+      "facts": 230,
+      "sourceLinkedFacts": 230,
+      "oneSourceFacts": 34,
+      "twoPlusIndependentSourceFacts": 194,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "literacy_rate",
+      "label": "literacy_rate",
+      "facts": 161,
+      "sourceLinkedFacts": 161,
+      "oneSourceFacts": 43,
+      "twoPlusIndependentSourceFacts": 116,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "maternal_mortality_per_100000",
+      "label": "maternal_mortality_per_100000",
+      "facts": 193,
+      "sourceLinkedFacts": 193,
+      "oneSourceFacts": 193,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "mean_years_schooling",
+      "label": "mean_years_schooling",
+      "facts": 192,
+      "sourceLinkedFacts": 192,
+      "oneSourceFacts": 9,
+      "twoPlusIndependentSourceFacts": 183,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "median_age",
+      "label": "median_age",
+      "facts": 226,
+      "sourceLinkedFacts": 226,
+      "oneSourceFacts": 225,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "median_household_income_usd",
+      "label": "median_household_income_usd",
+      "facts": 1,
+      "sourceLinkedFacts": 1,
+      "oneSourceFacts": 1,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "military_branches",
+      "label": "military_branches",
+      "facts": 216,
+      "sourceLinkedFacts": 216,
+      "oneSourceFacts": 216,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "military_expenditure_pct_gdp",
+      "label": "military_expenditure_pct_gdp",
+      "facts": 172,
+      "sourceLinkedFacts": 172,
+      "oneSourceFacts": 19,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "military_service_age",
+      "label": "military_service_age",
+      "facts": 175,
+      "sourceLinkedFacts": 175,
+      "oneSourceFacts": 175,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "monarchy_status",
+      "label": "monarchy_status",
+      "facts": 253,
+      "sourceLinkedFacts": 253,
+      "oneSourceFacts": 253,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "natural_resources",
+      "label": "natural_resources",
+      "facts": 247,
+      "sourceLinkedFacts": 247,
+      "oneSourceFacts": 247,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "ncd_premature_mortality_pct",
+      "label": "ncd_premature_mortality_pct",
+      "facts": 184,
+      "sourceLinkedFacts": 184,
+      "oneSourceFacts": 184,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "official_languages",
+      "label": "official_languages",
+      "facts": 235,
+      "sourceLinkedFacts": 235,
+      "oneSourceFacts": 235,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "population",
+      "label": "population",
+      "facts": 244,
+      "sourceLinkedFacts": 244,
+      "oneSourceFacts": 244,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "population_growth_rate",
+      "label": "population_growth_rate",
+      "facts": 237,
+      "sourceLinkedFacts": 237,
+      "oneSourceFacts": 40,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "population_total",
+      "label": "population_total",
+      "facts": 248,
+      "sourceLinkedFacts": 248,
+      "oneSourceFacts": 51,
+      "twoPlusIndependentSourceFacts": 190,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "public_debt_pct_gdp",
+      "label": "public_debt_pct_gdp",
+      "facts": 202,
+      "sourceLinkedFacts": 202,
+      "oneSourceFacts": 16,
+      "twoPlusIndependentSourceFacts": 91,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "public_debt_psnd_pct_gdp",
+      "label": "public_debt_psnd_pct_gdp",
+      "facts": 1,
+      "sourceLinkedFacts": 1,
+      "oneSourceFacts": 1,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "religion_breakdown",
+      "label": "religion_breakdown",
+      "facts": 230,
+      "sourceLinkedFacts": 230,
+      "oneSourceFacts": 230,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "religions",
+      "label": "religions",
+      "facts": 230,
+      "sourceLinkedFacts": 230,
+      "oneSourceFacts": 230,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "tax_revenue_pct_gdp",
+      "label": "tax_revenue_pct_gdp",
+      "facts": 38,
+      "sourceLinkedFacts": 38,
+      "oneSourceFacts": 38,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "terrain",
+      "label": "terrain",
+      "facts": 246,
+      "sourceLinkedFacts": 246,
+      "oneSourceFacts": 246,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "total_area",
+      "label": "total_area",
+      "facts": 247,
+      "sourceLinkedFacts": 247,
+      "oneSourceFacts": 247,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "under_five_mortality_per_1000",
+      "label": "under_five_mortality_per_1000",
+      "facts": 194,
+      "sourceLinkedFacts": 194,
+      "oneSourceFacts": 194,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "unemployment_rate",
+      "label": "unemployment_rate",
+      "facts": 189,
+      "sourceLinkedFacts": 189,
+      "oneSourceFacts": 189,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "unemployment_rate_pct",
+      "label": "unemployment_rate_pct",
+      "facts": 196,
+      "sourceLinkedFacts": 196,
+      "oneSourceFacts": 16,
+      "twoPlusIndependentSourceFacts": 180,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "urbanization_rate",
+      "label": "urbanization_rate",
+      "facts": 230,
+      "sourceLinkedFacts": 230,
+      "oneSourceFacts": 40,
+      "twoPlusIndependentSourceFacts": 1,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "vdem_row",
+      "label": "vdem_row",
+      "facts": 172,
+      "sourceLinkedFacts": 172,
+      "oneSourceFacts": 172,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "water_area",
+      "label": "water_area",
+      "facts": 243,
+      "sourceLinkedFacts": 243,
+      "oneSourceFacts": 243,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "working_poor_rate_pct",
+      "label": "working_poor_rate_pct",
+      "facts": 117,
+      "sourceLinkedFacts": 117,
+      "oneSourceFacts": 117,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "world_bank_income_group",
+      "label": "world_bank_income_group",
+      "facts": 193,
+      "sourceLinkedFacts": 193,
+      "oneSourceFacts": 193,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    },
+    {
+      "id": "world_bank_region",
+      "label": "world_bank_region",
+      "facts": 195,
+      "sourceLinkedFacts": 195,
+      "oneSourceFacts": 195,
+      "twoPlusIndependentSourceFacts": 0,
+      "unresolvedDisputes": 0,
+      "staleRows": 0
+    }
+  ]
+}
