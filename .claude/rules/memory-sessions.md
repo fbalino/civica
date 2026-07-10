@@ -5,6 +5,12 @@ non-git-recoverable gotchas and constraints. Per-feature "what shipped" history
 lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelogs.
 
 ## Current architecture state
+- **Replication status (CLM-010).** `replicationPackage` in
+  `src/lib/content/site-state.ts` is the canonical nine-component inventory
+  for `/civica-index/replication`. `npm run validate:replication-surface`
+  forbids pre-G2 availability/links, incomplete published state, missing rows,
+  and availability language. Actual artifacts remain owned by DAT-022,
+  IDX-028, GOV-021, and QA-020.
 - **Documentation-source registry (CLM-009).** `src/lib/docs/doc-concepts.ts`
   names the canonical path/symbol and synchronization mode for methodology and
   release concepts across reader markdown, TSX, API examples, runbooks, memory,

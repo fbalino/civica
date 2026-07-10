@@ -213,6 +213,28 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "replication.package-status",
+    surface: "methodology",
+    routeOrArtifact: "/civica-index/replication",
+    exactClaim:
+      "No replication package is currently published. The components below are individually marked with their build status.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/lib/content/site-state.ts",
+      "src/lib/content/replication-surface.ts",
+      "plan/00-mission-and-operating-rules.md",
+      "plan/MASTER-CHECKLIST.md",
+    ],
+    implementationOwner: "Civica Index research lane and release packaging (DAT-022)",
+    methodologyVersion: "replication-status-v1",
+    gate: "G1",
+    source: {
+      path: "src/app/(reader)/civica-index/replication/page.tsx",
+      fragment:
+        "No replication package is currently published. The components below are individually marked with their build status.",
+    },
+  },
+  {
     id: "about.atlas-positioning",
     surface: "about",
     routeOrArtifact: "/about",

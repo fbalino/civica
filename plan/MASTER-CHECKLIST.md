@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 9
-- **Remaining:** 279
-- **Progress:** 3.1%
+- **Completed:** 10
+- **Remaining:** 278
+- **Progress:** 3.5%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -23,7 +23,7 @@ Source: `plan/02-positioning-claims-and-documentation.md`
 - [x] **CLM-007** (P0) Reconcile Pulse public documentation with the actual production cadence, active source set, classifier ensemble, review behavior, and scoring status. _Done when: a generated runtime-method snapshot and every Pulse-facing page/API/doc agree on providers by role, active feeds, cadence, review gates, methodology version, and whether numeric deltas are public or experimental._
 - [x] **CLM-008** (P0) Reconcile Index public documentation with the exact canonical ingestion, normalization, missingness, weighting, uncertainty, panel analysis, neutral presentation contract, and release status. _Done when: an executable documentation fixture recomputes all published formula examples from the same library used in production and zero documented rule contradicts code or stored metadata._
 - [x] **CLM-009** (P1) Establish a single documentation-source registry for reader markdown, TSX-owned rich blocks, API examples, operational runbooks, project memory, and generated README sections. _Done when: every methodology/release concept has one named source of truth, duplicate prose is generated or link-only, and a validator fails on a newly duplicated canonical formula or stale route._
-- [ ] **CLM-010** (P0) Make the replication-package route an honest status and artifact surface. _Done when: before G2 it lists exact incomplete components without implying availability; after G2 it links to versioned code, data manifest, codebook, checksums, environment, commands, expected outputs, and DOI, all verified by a clean-room test._
+- [x] **CLM-010** (P0) Make the replication-package route an honest status and artifact surface. _Done when: before G2 it lists exact incomplete components without implying availability; after G2 it links to versioned code, data manifest, codebook, checksums, environment, commands, expected outputs, and DOI, all verified by a clean-room test._
 - [ ] **CLM-011** (P1) Repair README, AGENTS, DESIGN, project memory, route examples, cron descriptions, and active-plan pointers against current runtime. _Done when: automated route/link/command checks pass, all named files exist, all documented npm commands resolve, and sealed stale statements from the audit are absent._
 - [ ] **CLM-012** (P1) Generate or contract-test public API documentation and examples from actual response schemas. _Done when: every documented endpoint example validates against a live fixture or generated schema, deprecated fields carry consistent headers/dates, and undocumented public response fields are either documented or intentionally removed._
 - [ ] **CLM-013** (P1) Align structured metadata, canonical URLs, sitemaps, Open Graph, social cards, and machine-readable dataset metadata with claim tiers and route reality. _Done when: a crawler test reports one canonical per indexable route, no stale preview/domain canonical, correct experimental labels, valid dataset metadata, and stable release dates rather than request-time fabricated modification dates._

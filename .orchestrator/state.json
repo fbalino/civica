@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-009_complete_next_CLM-010"
+    "current_task": "CLM-010_complete_next_CLM-011"
   },
   "budget": {
     "mode": "subscription_only",
@@ -197,6 +197,33 @@
       "session_id": "019f4b1d-ef6e-7071-8fb8-71893416cfd1",
       "subscription_first": true,
       "ownership": "production browser QA only; final viewport/theme measurements were replaced by primary Codex"
+    },
+    "ln56_clm010_route_inventory": {
+      "status": "completed",
+      "provider": "codex-cli",
+      "model_requested": "gpt-5.6-luna",
+      "model_used": "gpt-5.6-luna",
+      "session_id": "019f4b26-eda0-7451-9374-0de12e2b5de9",
+      "subscription_first": true,
+      "ownership": "read-only CLM-010 route and artifact inventory"
+    },
+    "op48_clm010_contract_and_review": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "93c9ea08-2267-4d40-8dfe-1084f641a38f",
+      "subscription_first": true,
+      "ownership": "binding CLM-010 publication contract and independent acceptance review"
+    },
+    "sn5_clm010_implementation": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "1e65d792-42f5-44e2-939e-610aaaedb600",
+      "subscription_first": true,
+      "ownership": "single writer for CLM-010 implementation files"
     }
   },
   "manifests": [],
@@ -219,6 +246,8 @@
     "plan/evidence/CLM-008/browser-checks.md",
     "plan/evidence/CLM-009/README.md",
     "plan/evidence/CLM-009/browser-checks.md",
+    "plan/evidence/CLM-010/README.md",
+    "plan/evidence/CLM-010/browser-checks.md",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -234,11 +263,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-009: compilation, TypeScript, runtime/claim/freshness/doc-source guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "149 tests, deterministic generator checks, doc-source/content/public/numeric/runtime/design/freshness validators, targeted ESLint, and diff checks passed. Master plan is 9/288 complete pending final master-plan validation.",
-    "public_claims": "28 claims cover 14/14 required surfaces across 7 canonical tiers; 34 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "CLM-009 methodology, PCA appendix, and peer grouping were checked from a fresh production build at 1440x1000 and 390x844. Invisible markers stayed absent, every wide table scrolled inside the shared wrapper, theme toggle/state worked on every route, and there was no document overflow, console error, or HTTP 4xx/5xx response.",
-    "visual_review": "Final CLM-009 light mobile and dark desktop screenshots were inspected; no acceptance-blocking marker text, overlap, or clipping remained."
+    "build": "npm run build passed for CLM-010: compilation, TypeScript, runtime/claim/freshness/doc-source/replication guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "161 tests, replication-surface negative and future-published fixtures, public/numeric/doc-source/runtime/design/freshness validators, targeted ESLint, and diff checks passed. Master plan is 10/288 complete pending final master-plan validation.",
+    "public_claims": "29 claims cover 14/14 required surfaces across 7 canonical tiers; 35 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
+    "browser": "CLM-010 replication status was checked from a fresh production build at 1440x1000 and 390x844 in light/dark with reduced motion. The Not published warning and nine status rows rendered, zero artifact links appeared, the table scrolled without document overflow, and there were no console errors or HTTP 4xx/5xx responses.",
+    "visual_review": "Final CLM-010 desktop/mobile light/dark screenshots were inspected; the warning precedes the contained status table with no acceptance-blocking overlap or clipping."
   },
-  "updated_at": "2026-07-10T08:35:00Z"
+  "updated_at": "2026-07-10T09:02:00Z"
 }

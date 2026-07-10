@@ -1,31 +1,57 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Banner } from "@/components/editorial/Banner";
-import { BetaChip } from "@/components/editorial/BetaChip";
+import { Chip } from "@/components/editorial/Pill";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
-import { replication, civicaIndex } from "@/lib/content/site-state";
+import { civicaIndex, replicationPackage } from "@/lib/content/site-state";
+import type { ReplicationComponentStatus } from "@/lib/content/site-state";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Civica Index Replication Package",
+  title: "Civica Index Replication Status",
   description:
-    "Planned materials for reproducing Civica Index research-beta estimates from primary sources: methodology, codebook, processing logic, and downloadable outputs.",
+    "Status surface for the Civica Index replication package: no package is currently published, and every required component is listed with its individual build status and owner.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/replication" },
 };
 
 const SECTIONS = [
-  { id: "package-contents", label: "Package contents" },
+  { id: "component-status", label: "Component status" },
   { id: "cite", label: "Cite this page" },
 ];
 
-const REPLICATION_STATUS_LABEL: Record<string, string> = {
-  "coming-soon": "Coming soon",
-  shipped: "Shipped",
+const PAGE_STATUS_LABEL: Record<typeof replicationPackage.pageStatus, string> = {
+  "unpublished-pre-g2": "Not published",
+  published: "Published",
+};
+
+const PAGE_STATUS_VARIANT: Record<
+  typeof replicationPackage.pageStatus,
+  "sand" | "sage"
+> = {
+  "unpublished-pre-g2": "sand",
+  published: "sage",
+};
+
+const COMPONENT_STATUS_LABEL: Record<ReplicationComponentStatus, string> = {
+  available: "Available",
+  "in-progress": "In progress",
+  planned: "Planned",
+  deferred: "Deferred",
+};
+
+const COMPONENT_STATUS_VARIANT: Record<
+  ReplicationComponentStatus,
+  "sage" | "blue" | "neutral" | "sand"
+> = {
+  available: "sage",
+  "in-progress": "blue",
+  planned: "neutral",
+  deferred: "sand",
 };
 
 export default async function ReplicationPage() {
@@ -43,86 +69,94 @@ export default async function ReplicationPage() {
         <nav className="editorial-breadcrumbs">
           <Link href="/civica-index">← Civica Index</Link>
           <span>/</span>
-          Replication package
+          Replication status
         </nav>
 
-        <h1 className="editorial-page-title">
-          Replication package
-          <BetaChip inHeading>
-            {REPLICATION_STATUS_LABEL[replication.status]}
-          </BetaChip>
-        </h1>
+        <h1 className="editorial-page-title">Replication status</h1>
         <p className="editorial-page-subtitle">
-          Reproduce every Civica Index score from primary sources.
+          <Chip
+            variant={PAGE_STATUS_VARIANT[replicationPackage.pageStatus]}
+            size="sm"
+          >
+            {PAGE_STATUS_LABEL[replicationPackage.pageStatus]}
+          </Chip>{" "}
+          Tracking what still has to exist before a Civica Index score can be
+          independently reproduced from source.
         </p>
 
         <p>
-          The Civica Index is designed to be fully reproducible. That means
-          publishing not just the scores, but every formula, normalization step,
-          source dataset reference, and codebook entry needed to re-derive the
-          same numbers from scratch. The package is not yet published. Release
-          requires completion of the longitudinal, factor-analysis, and
-          input-variation validation work described in the methodology. The
-          planned contents are listed below.
+          The broader atlas release package is a G2 milestone in the master
+          plan: a clean environment reproducing the frozen release, checksums,
+          a coverage report, a codebook, a rights manifest, and citation
+          metadata. That complete bundle does not yet exist. Whether the
+          current Index is reproduced, redesigned, or retired is decided by
+          the later G3 validation tournament and its IDX-028 replication
+          packet. This page tracks the shared release components without
+          implying either milestone has passed.
         </p>
 
+        {/* PUBLIC_CLAIM: replication.package-status */}
         <Banner variant="warn">
-          Status: not yet published — validation and reproducibility checks are incomplete.
+          No replication package is currently published. The components
+          below are individually marked with their build status.
         </Banner>
 
-        <section id="package-contents" className="editorial-section">
+        <section id="component-status" className="editorial-section">
           <SectionHeader
             eyebrow="Replication"
-            title="Package contents"
-            dek="Everything needed to reproduce a Civica Index score from scratch."
+            title="Component status"
+            dek="Every component the eventual replication package needs, its current build status, the owning master-checklist task, and what remains."
           />
-          <ul>
-            <li>
-              <strong>Full methodology document.</strong> An expanded version of
-              the published methodology, including worked examples and
-              edge-case decisions.
-            </li>
-            <li>
-              <strong>Codebook.</strong> Every variable, every source, every
-              formula — documented in a single reference table. Includes
-              native-scale definitions and normalization bounds for each
-              dimension.
-            </li>
-            <li>
-              <strong>Processing logic.</strong> Step-by-step description of
-              how raw source data flows into final CI scores: ingestion,
-              normalization (fixed-bound, not observed-extremes), PCA factor
-              weights, composite formula, simulation-range derivation, and
-              neutral numeric presentation and completeness handling.
-            </li>
-            <li>
-              <strong>Source references.</strong> Direct links and bibliographic
-              citations for every upstream dataset, including dataset version,
-              release date, and coverage notes.
-            </li>
-            <li>
-              <strong>Downloadable outputs.</strong> Country-level CSV covering{" "}
-              {scoredJurisdictions !== null
-                ? `the ${scoredJurisdictions} jurisdictions with a current Beta score`
-                : "jurisdictions with a current Beta score"}
-              : CI score, Monte Carlo input-variation range, rank,
-              dimensional breakdowns, completeness flag (Full /
-              Partial / Insufficient), and data vintage per source.
-            </li>
-            <li>
-              <strong>Code (where legally permissible).</strong> The ingestion
-              and normalization scripts from this codebase, published under an
-              open license. Restricted upstream datasets are not redistributed
-              — only the processing code that consumes them.
-            </li>
-          </ul>
+          <div className="editorial-table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Status</th>
+                  <th>Owner</th>
+                  <th>What remains</th>
+                </tr>
+              </thead>
+              <tbody>
+                {replicationPackage.components.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      {c.status === "available" && c.href ? (
+                        <Link href={c.href}>{c.label}</Link>
+                      ) : (
+                        c.label
+                      )}
+                    </td>
+                    <td>
+                      <Chip variant={COMPONENT_STATUS_VARIANT[c.status]} size="sm">
+                        {COMPONENT_STATUS_LABEL[c.status]}
+                      </Chip>
+                    </td>
+                    <td>{c.owner}</td>
+                    <td>{c.whatRemains}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            For live-site context only — not a released replication output —
+            the Civica Index currently scores{" "}
+            {scoredJurisdictions !== null
+              ? `the ${scoredJurisdictions} jurisdictions with a current Beta score`
+              : "jurisdictions with a current Beta score"}
+            . That running count is not a codebook, checksum, or reproducible
+            bundle; it exists only to show the current scope the replication
+            package will eventually need to cover.
+          </p>
         </section>
 
         <section id="cite" className="editorial-section">
           <h2>Cite this page</h2>
           <CiteAccordion
-            subject="Civica Atlas Methodology — Civica Index replication package"
-            pageTitle="Civica Index replication package"
+            subject="Civica Atlas Methodology — Civica Index replication status"
+            pageTitle="Civica Index replication status"
             url="https://civicaatlas.org/civica-index/replication"
             dataVintage={civicaIndex.lastRevisionIso}
           />
@@ -130,15 +164,9 @@ export default async function ReplicationPage() {
 
         <footer className="editorial-footer-nav">
           <Link href="/civica-index/methodology">← Back to methodology</Link>
-          <div>
-            <Link href="/civica-index/corrections">
-              Report a data issue or methodology concern
-            </Link>
-            <p style={{ margin: "4px 0 0", fontSize: "var(--text-14)", color: "var(--color-text-30)", fontFamily: "var(--font-body)" }}>
-              Found a problem before the replication package is live? Submit it
-              via the corrections form.
-            </p>
-          </div>
+          <Link href="/civica-index/corrections">
+            Report a data issue or methodology concern
+          </Link>
         </footer>
       </EditorialPage>
     </MethodologyLayout>

@@ -1,5 +1,13 @@
 # Project Memory Decisions
 
+## 2026-07-10 — Replication route is status-only until all gates pass
+
+`/civica-index/replication` is a fail-closed status ledger, not a package. G2
+owns the broader atlas release bundle; G3/IDX-028 decides whether the current
+Index is reproduced, redesigned, or retired. Do not add an artifact link or
+flip the route to `published` until every required component is available and
+validated. Durable record: APR-D025 in `plan/DECISIONS.md`.
+
 ## 2026-07-10 — One canonical source per methodology/release concept
 
 Methodology and release concepts have exactly one named canonical path/symbol

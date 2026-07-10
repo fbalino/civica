@@ -382,11 +382,137 @@ export const advisoryBoard = {
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────
-// Replication package (planned)
+// Replication package status surface (CLM-010)
 // ─────────────────────────────────────────────────────────────────────
 
-export const replication = {
-  status: "coming-soon" as const,
+/** Page-level status. `unpublished-pre-g2` means no replication package
+ *  exists yet — the route is a status/inventory surface, not a package.
+ *  Flip to `published` only once G2 ("Reproducible atlas RC", see
+ *  `plan/00-mission-and-operating-rules.md`) has actually shipped a
+ *  frozen, checksummed, independently-reproducible bundle. */
+export const REPLICATION_PAGE_STATUSES = [
+  "unpublished-pre-g2",
+  "published",
+] as const;
+export type ReplicationPageStatus = (typeof REPLICATION_PAGE_STATUSES)[number];
+
+/** Per-component build status. `available` requires a real href (the
+ *  component actually exists at a stable path); the other three never
+ *  carry an href. See `src/lib/content/replication-surface.ts` for the
+ *  validator that enforces this pairing. */
+export const REPLICATION_COMPONENT_STATUSES = [
+  "available",
+  "in-progress",
+  "planned",
+  "deferred",
+] as const;
+export type ReplicationComponentStatus =
+  (typeof REPLICATION_COMPONENT_STATUSES)[number];
+
+export interface ReplicationComponent {
+  /** Stable kebab-case id, referenced by the validator's required-
+   *  inventory check. */
+  id: string;
+  label: string;
+  status: ReplicationComponentStatus;
+  /** Master-checklist task id(s) — see `plan/MASTER-CHECKLIST.md`. */
+  owner: string;
+  /** What still has to happen before this component ships. */
+  whatRemains: string;
+  /** Only ever set when `status === "available"`. */
+  href?: string;
+}
+
+export interface ReplicationPackageState {
+  pageStatus: ReplicationPageStatus;
+  components: readonly ReplicationComponent[];
+}
+
+/** Canonical replication-package inventory (CLM-010). The route at
+ *  `/civica-index/replication` renders entirely from this object — it
+ *  is a status surface, not a package: no component is `available` and
+ *  none carries an `href` while `pageStatus` is `unpublished-pre-g2`.
+ *  Component order is the display order of the editorial table.
+ *  Owners are DAT-022 (G2 release packaging), IDX-028 (replication/
+ *  external-review packet), GOV-021 (DOI/archive registration), and
+ *  QA-020 (machine-readable readiness reports) per
+ *  `plan/MASTER-CHECKLIST.md`. */
+export const replicationPackage: ReplicationPackageState = {
+  pageStatus: "unpublished-pre-g2",
+  components: [
+    {
+      id: "versioned-code",
+      label: "Versioned code",
+      status: "in-progress",
+      owner: "DAT-022",
+      whatRemains:
+        "Tag and publish the exact commit the frozen G2 release runs from — today the pipeline runs from an unpinned working branch.",
+    },
+    {
+      id: "data-input-manifest",
+      label: "Data / input manifest",
+      status: "planned",
+      owner: "DAT-022",
+      whatRemains:
+        "Enumerate every frozen input dataset, vintage, and license needed to rerun the pipeline from scratch.",
+    },
+    {
+      id: "codebook",
+      label: "Codebook",
+      status: "planned",
+      owner: "DAT-022 / IDX-028",
+      whatRemains:
+        "Publish the single reference table of every variable, source, and formula, with native-scale definitions and normalization bounds.",
+    },
+    {
+      id: "checksums",
+      label: "Checksums",
+      status: "planned",
+      owner: "DAT-022",
+      whatRemains:
+        "Generate and publish checksums for the frozen release bundle so a rebuild can be verified byte-for-byte.",
+    },
+    {
+      id: "environment",
+      label: "Environment",
+      status: "planned",
+      owner: "DAT-022",
+      whatRemains:
+        "Document the exact runtime, dependency versions, and configuration needed to reproduce a run in a clean environment.",
+    },
+    {
+      id: "reproduction-commands",
+      label: "Reproduction commands",
+      status: "in-progress",
+      owner: "DAT-022",
+      whatRemains:
+        "Finish testing the exact command sequence end to end from a clean checkout before publishing it.",
+    },
+    {
+      id: "expected-outputs",
+      label: "Expected outputs",
+      status: "planned",
+      owner: "DAT-022 / IDX-028",
+      whatRemains:
+        "Publish the reference output set a correct rerun should produce, so reviewers can diff their own results against it.",
+    },
+    {
+      id: "doi-archive",
+      label: "DOI / archive",
+      status: "deferred",
+      owner: "GOV-021",
+      whatRemains:
+        "Deferred until the frozen G2/G5 bundle is ready to register with an archival repository and receive a DOI.",
+    },
+    {
+      id: "clean-room-evidence",
+      label: "Clean-room evidence",
+      status: "planned",
+      owner: "DAT-022 / QA-020",
+      whatRemains:
+        "Run and document an independent clean-room rebuild that verifies the published package actually reproduces the release.",
+    },
+  ] as const,
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────
