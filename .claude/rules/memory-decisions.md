@@ -579,3 +579,20 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - The old mixed-source country JSON/CSV export stays withheld with HTTP 503
   until DAT-017/DAT-027 ships a field-level rights-filtered replacement.
 - Durable record: APR-D037 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Atlas inclusion is not a sovereignty judgment
+
+- `src/lib/jurisdictions/status-taxonomy.ts` owns
+  `jurisdiction-status/v1`: sovereign state, associated state,
+  dependency/territory, disputed/limited-recognition, and aggregate/special
+  area.
+- Only `sovereign_state` enters sovereign-state totals. The closed current
+  inventory is 194: 193 UN members plus the Holy See on a separate sourced
+  rule. The other 59 Atlas entries retain explicit non-sovereign classes.
+- Every live row stores status sources, review date, note, administering ISO3
+  where applicable, and a dispute flag. Unknown entries fail closed.
+- Cook Islands and Niue are associated states, not flattened into dependencies.
+  Statistical codes and Atlas inclusion never establish sovereignty.
+- ATL-006 owns Fable-led rendering across public surfaces; DAT-004 establishes
+  the canonical data and display-policy contract. Durable record: APR-D038 in
+  `plan/DECISIONS.md`.

@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-003_complete_next_DAT-004"
+    "current_task": "DAT-004_complete_next_DAT-005"
   },
   "budget": {
     "mode": "subscription_only",
@@ -600,6 +600,8 @@
     "plan/evidence/DAT-002/README.md",
     "plan/evidence/DAT-003/README.md",
     "plan/evidence/DAT-003/browser-checks.md",
+    "plan/evidence/DAT-004/README.md",
+    "plan/evidence/DAT-004/browser-checks.md",
     "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
@@ -616,11 +618,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for DAT-003: rights-manifest validation, source-input and adapter closure, sync freshness, replication, editorial illustration, all thirteen claims/documentation children, 375 tests, compilation, TypeScript, and route generation succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "375/375 tests passed. The rights contract covers 43 sources, two products, public field classes, and one release artifact; six sources are verified and 37 pending/restricted sources fail closed. Master plan validates at 22/288 complete (7.6%).",
-    "public_claims": "Licensing publishes rights-manifest/v1 and its machine-readable endpoint. The legacy country export truthfully returns 503 until DAT-017/DAT-027 provides a rights-filtered replacement.",
-    "browser": "Desktop and 390x844 checks passed for /licensing#rights-manifest and /api-docs#bulk-data; shared DataTable containers scroll internally on mobile with no page overflow. API checks returned 200 for the 43-source manifest and 503 for the legacy France export.",
-    "visual_review": "Licensing follows the existing editorial table system; desktop layout is clean and the mobile table clipping found during QA was repaired in the shared DataTable primitive."
+    "build": "npm run build passed for DAT-004: jurisdiction-status, rights/source-input/adapter closure, sync freshness, replication, editorial illustration, all thirteen claims/documentation children, 383 tests, compilation, TypeScript, and route generation succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "383/383 tests passed. The closed taxonomy and live audit agree on all 253 rows: 194 sovereign states, 47 dependencies/territories, two associated states, eight disputed/limited-recognition entries, and two aggregate/special areas. Master plan validates at 23/288 complete (8.0%).",
+    "public_claims": "Sovereign-state counts now resolve from the 194-row sourced class rather than all 253 reference entries. Atlas inclusion, ISO/M49 coding, and profile availability are explicitly not sovereignty judgments.",
+    "browser": "Local /country rendered without Puerto Rico in the sovereign catalog and retained France; /country/cook-islands remained directly available. /api/v1/countries?limit=250 returned 194 rows and total=194. No browser errors or page overflow were observed.",
+    "visual_review": "No new status UI was introduced. DAT-004 establishes type-specific display rules as data; ATL-006 remains the Fable-led cross-surface presentation task."
   },
-  "updated_at": "2026-07-10T21:45:00Z"
+  "updated_at": "2026-07-10T23:05:00Z"
 }

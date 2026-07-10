@@ -59,6 +59,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
 - Government taxonomy helper layer: `src/lib/db/government-taxonomy.ts` + `src/lib/government-taxonomy/*`
+- Entity status is separate from government form: `src/lib/jurisdictions/status-taxonomy.ts` owns the closed `jurisdiction-status/v1` contract. Only `sovereign_state` enters sovereign-state totals; unknown rows fail closed. Run `npm run validate:jurisdiction-status` after code/schema changes and `npm run audit:jurisdiction-status:live` after applying the targeted migration.
 
 ## Design System (authoritative)
 **See `https://www.civicaatlas.org/design-system` for the live reference.** Code lives in `src/app/globals.css`, `src/app/atlas.css`, and `src/app/design-system/page.tsx`.

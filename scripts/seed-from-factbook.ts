@@ -13,6 +13,8 @@ import {
   countryFacts,
   statements,
 } from "../src/lib/db/schema";
+import { classifyJurisdictionStatus } from "../src/lib/jurisdictions/status-taxonomy";
+import countryGalleries from "../src/lib/data/country-galleries.generated.json";
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: sql });
@@ -20,6 +22,21 @@ const db = drizzle({ client: sql });
 const REPO_URL = "https://github.com/factbook/factbook.json.git";
 const DATA_DIR = "/tmp/factbook-json";
 const RETRIEVED_AT = new Date("2026-01-23");
+
+const FACTBOOK_SLUG_ISO3_OVERRIDES: Record<string, string> = {
+  burma: "MMR",
+  "cabo-verde": "CPV",
+  china: "CHN",
+  "congo-brazzaville": "COG",
+  czechia: "CZE",
+  "c-te-d-ivoire": "CIV",
+  drc: "COD",
+  "holy-see-vatican-city": "VAT",
+  micronesia: "FSM",
+  netherlands: "NLD",
+  palestine: "PSE",
+  "the-dominican": "DOM",
+};
 
 const REGIONS = [
   "africa",
@@ -528,12 +545,44 @@ async function processCountryFile(
   const slug = slugify(profile.name);
   const continent = REGION_TO_CONTINENT[region] ?? "Unknown";
 
+  const dependencyStatus =
+    (gov["Dependency status"] as { text?: string } | undefined)?.text
+      ?.replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim() ?? null;
+
   // Upsert jurisdiction
   const existing = await db
-    .select({ id: jurisdictions.id })
+    .select({ id: jurisdictions.id, iso3: jurisdictions.iso3 })
     .from(jurisdictions)
     .where(eq(jurisdictions.slug, slug))
     .limit(1);
+
+  const catalogIso3 =
+    existing[0]?.iso3 ??
+    FACTBOOK_SLUG_ISO3_OVERRIDES[slug] ??
+    countryGalleries.slugIndex[
+      slug as keyof typeof countryGalleries.slugIndex
+    ] ??
+    null;
+  const status = classifyJurisdictionStatus({
+    slug,
+    iso3: catalogIso3,
+    dependencyStatus,
+  });
+  const statusFields = {
+    type: status.type,
+    statusSourceIds: status.sourceIds,
+    statusReviewedAt: status.reviewedAt,
+    statusNote: status.note,
+    administeringJurisdictionIso3: status.administeringJurisdictionIso3,
+    statusDisputed: status.disputed,
+    iso3:
+      status.type === "sovereign_state" ||
+      status.type === "disputed_or_limited_recognition"
+        ? catalogIso3
+        : existing[0]?.iso3 ?? null,
+  };
 
   let jurisdictionId: string;
 
@@ -544,7 +593,7 @@ async function processCountryFile(
       .set({
         ...profile,
         continent,
-        type: "sovereign_state",
+        ...statusFields,
         updatedAt: new Date(),
       })
       .where(eq(jurisdictions.id, jurisdictionId));
@@ -555,7 +604,7 @@ async function processCountryFile(
         slug,
         ...profile,
         continent,
-        type: "sovereign_state",
+        ...statusFields,
       })
       .returning({ id: jurisdictions.id });
     jurisdictionId = inserted[0].id;
