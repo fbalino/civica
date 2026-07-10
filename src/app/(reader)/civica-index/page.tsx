@@ -68,15 +68,15 @@ function decorateOptions<K extends string>(
 }
 
 export const metadata: Metadata = {
-  title: "Civica Index — Governance Scores for 190+ Countries",
+  title: "Civica Index — Research-Beta Governance Composite",
   // PUBLIC_CLAIM: index.composite-estimate
   description:
-    `An original governance score for 190+ sovereign states across ${civicaIndex.dimensionCount} dimensions, with empirically-derived weights, fixed-bound normalization, and 90% confidence intervals.${civicaIndex.status === "beta" ? " Beta methodology." : ""}`,
+    `A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. Not independently reviewed.${civicaIndex.status === "beta" ? " Beta methodology." : ""}`,
   alternates: { canonical: "https://civicaatlas.org/civica-index" },
   openGraph: withOg({
-    title: "Civica Index — Governance Scores for 190+ Countries · Civica Atlas",
+    title: "Civica Index — Research-Beta Governance Composite · Civica Atlas",
     description:
-      "The governance health of every country. Quarterly structural scores across 190+ sovereign states, with published confidence intervals.",
+      "A secondary research experiment comparing four governance dimensions. Methodology and outputs remain beta and have not completed independent review.",
     url: "https://civicaatlas.org/civica-index",
   }),
 };
@@ -261,7 +261,7 @@ export default async function CivicaIndexPage({
   const datasetJsonLd = buildDataset({
     name: "Civica Index",
     description:
-      `An original composite governance score for 190+ sovereign states across ${civicaIndex.dimensionCount} dimensions, with empirically-derived weights, fixed-bound normalization, and 90% confidence intervals.`,
+      `A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.`,
     url: "https://civicaatlas.org/civica-index",
     license: "https://civicaatlas.org/licensing",
     temporalCoverage: realVintage ?? undefined,
@@ -285,14 +285,13 @@ export default async function CivicaIndexPage({
         className="ci-landing-hero"
         eyebrow="Civica Index"
         titleId="ci-hero-title"
-        title="The governance health of every country."
+        title="A research-beta governance composite."
         description={
           <>
-            A composite governance score for every sovereign state and
-            territory. {civicaIndex.dimensionCount} governance dimensions,
-            empirically-derived weights, fixed-bound normalization, and
-            published 90% confidence intervals. The Civica Pulse layers event
-            sensitivity on top.
+            A secondary research experiment across {civicaIndex.dimensionCount}{" "}
+            governance dimensions, with fixed-bound normalization and Monte
+            Carlo input-variation ranges. It has not completed independent
+            review and may change or be retired after validation.
           </>
         }
         engraving={{

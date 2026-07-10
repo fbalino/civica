@@ -1,5 +1,15 @@
 # Project Memory Decisions
 
+## 2026-07-09 — Public uncertainty and Pulse cadence terminology
+
+- The current Civica Index Monte Carlo bounds are input-variation ranges under
+  declared perturbation assumptions, not confidence intervals for a latent
+  true score.
+- Pulse v2 is scheduled daily in `vercel.json`, but public copy distinguishes
+  schedule from successful completion and from live/continuous measurement.
+  Reader surfaces should expose the most recent completed computation.
+- The durable records are APR-D016 and APR-D017 in `plan/DECISIONS.md`.
+
 ## 2026-07-09 — One evidence tier per public claim
 
 Every headline public claim must be registered and assigned exactly one of

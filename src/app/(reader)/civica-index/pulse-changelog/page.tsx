@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: "Civica Pulse Changelog — Classified Events (Beta)",
   // PUBLIC_CLAIM: pulse.event-ledger
   description:
-    "Every governance event classified by the Civica Pulse Beta pipeline, filterable by country, dimension, and severity, with full source attribution and human-review status.",
+    "An experimental ledger of published and review-queued governance-event classifications, filterable by country, dimension, and severity, with recorded source links and review state.",
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/pulse-changelog",
   },
@@ -64,17 +64,16 @@ export default async function PulseChangelogPage() {
     // Keep the public changelog shell renderable during DB outages.
   }
 
-  // Honest freshness label. The automated daily Pulse refresh is
-  // currently paused, so surface the date of the most recent classified
-  // event (the real as-of value) instead of implying a live daily feed.
-  // Falls back to neutral phrasing when no events are loaded (DB outage).
+  // Honest freshness label: surface the date of the most recent classified
+  // event instead of inferring cadence or claiming a live feed. Falls back to
+  // neutral phrasing when no events are loaded (DB outage).
   const mostRecentEventDate = events.reduce<string | null>((latest, e) => {
     if (!e.eventDate) return latest;
     return !latest || e.eventDate > latest ? e.eventDate : latest;
   }, null);
   const freshnessNote = mostRecentEventDate
-    ? `The automated daily refresh is currently paused; the most recent classified event is dated ${formatAsOfDate(mostRecentEventDate)}.`
-    : "The automated daily refresh is currently paused; showing the latest available data.";
+    ? `The most recent classified event in this result set is dated ${formatAsOfDate(mostRecentEventDate)}.`
+    : "No classified-event date is available in the current result set.";
 
   return (
     <>
@@ -92,18 +91,17 @@ export default async function PulseChangelogPage() {
         }
         description={
           <>
-            Every governance event classified by the Civica Pulse Beta pipeline.
-            {freshnessNote}
+            Experimental, model-assisted governance-event classifications. {freshnessNote}
           </>
         }
       />
 
       <EditorialPage width="wide">
       <div className="editorial-warning">
-        The Civica Pulse Beta is an event-sensitive governance shock monitor
-        under active validation. Its automated daily refresh is currently
-        paused, so the events below reflect the most recent computation rather
-        than a live feed. Events queued for human review (
+        The Civica Pulse Beta is an experimental event ledger, not a live or
+        continuous measure of governance change. The entries below reflect the
+        most recent completed data available to this page. Under the current
+        pipeline contract, events queued for human review (
         <strong>severe and catastrophic severity tiers</strong>, plus events
         where the classifier didn&apos;t reach consensus) do{" "}
         <strong>not</strong> drive published Pulse scores until a reviewer

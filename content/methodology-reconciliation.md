@@ -13,7 +13,7 @@
 
 ## What this is
 
-Civica's factbook draws on multiple sources for the same underlying fact. The CIA World Factbook is comprehensive but stopped updating in January 2026. Wikidata is fresh but its claims vary in quality. Multilateral statistical agencies (the World Bank, IMF, UN, WHO, and seven others) are authoritative but cover narrower fact sets. National statistical offices (US Census, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) are authoritative for their own country and ship faster than any multilateral. For any given country and fact — Argentina's inflation, Brazil's population, the United Kingdom's consumer-price index — Civica may hold three, five, or even twelve candidate values from different sources, each with its own measurement date and reference chain.
+Civica's factbook draws on multiple sources for the same underlying fact. The CIA World Factbook is comprehensive but stopped updating in January 2026. Wikidata is fresh but its claims vary in quality. Multilateral statistical agencies (the World Bank, IMF, UN, WHO, and seven others) publish official or established international series but cover narrower fact sets. National statistical offices (US Census, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, Stats SA) publish official national statistics and often release them faster than multilateral datasets. For any given country and fact — Argentina's inflation, Brazil's population, the United Kingdom's consumer-price index — Civica may hold three, five, or even twelve candidate values from different sources, each with its own measurement date and reference chain.
 
 The reconciliation layer is the rule-based system that picks one value to display, preserves the rest for transparency, and escalates disagreements that look like data errors or contested changes. The rules are deterministic: no language model, no confidence scores, no convergence loops. A third party with our inputs and the source allowlist must be able to reproduce the choice.
 
@@ -80,7 +80,7 @@ The International Energy Agency was scoped for v1 and **scrapped on 4 May 2026**
 
 ### Tier 2 — National statistical offices (6 of 8 active)
 
-The methodology page enumerated 8 NSOs by name during early design. 6 are live in v1 and 2 are deferred with specific blockers (see per-NSO entries below). New NSOs are added on demand — when a fact-key for a specific country has no Tier-1 coverage, an NSO is its authoritative source, or readers ask for it. The long-term goal is roughly 30–40 NSO domains, which subsequent NSO waves will pursue. Every addition triggers a methodology version bump.
+The methodology page enumerated 8 NSOs by name during early design. 6 are live in v1 and 2 are deferred with specific blockers (see per-NSO entries below). New NSOs are added on demand — when a fact-key for a specific country has no Tier-1 coverage, an NSO publishes the relevant official national series, or readers ask for it. The long-term goal is roughly 30–40 NSO domains, which subsequent NSO waves will pursue. Every addition triggers a methodology version bump.
 
 - **US Census Bureau** (live) — ACS 1-Year + Decennial; population, unemployment, urbanisation indicators for the United States.
 - **ONS-UK** (live) — public time-series API; population, CPIH inflation, GDP real growth, unemployment for the United Kingdom.
@@ -212,7 +212,7 @@ Because of this partition, the alternates panel always shows the IMF projection 
 
 ## Multi-canonical with scope predicate
 
-Sometimes two or three publishers are concurrently authoritative for the same fact-key, each at a different scope. Eurostat is canonical for EU-27 + EFTA-4 jurisdictions on macroeconomic indicators; the IMF is canonical globally. ONS-UK is canonical for the United Kingdom; the World Bank is canonical globally. IBGE is canonical for Brazil; the IMF and World Bank stay canonical globally. Civica resolves this with a per-row `civicaRole` tag scoped by jurisdiction predicate, rather than forcing one publisher to alternate for the same fact-key.
+Sometimes two or three publishers are designated canonical for the same fact-key at different scopes. Eurostat is canonical for EU-27 + EFTA-4 jurisdictions on specified macroeconomic indicators; the IMF is canonical globally. ONS-UK is canonical for the United Kingdom; the World Bank is canonical globally. IBGE is canonical for Brazil; the IMF and World Bank stay canonical globally. Civica records those editorial scope rules with a per-row `civicaRole` tag and jurisdiction predicate, rather than forcing one publisher to alternate for every use.
 
 The pattern matters because the alternates panel will sometimes show two or three rows tagged *canonical*, each labelled with its scope. A reader inspecting Germany's GDP growth sees Eurostat tagged canonical (EU+EFTA), the World Bank tagged canonical (global), and the IMF row tagged as a projection. None of this requires resolver schema changes — the resolver itself remains a freshness-driven engine; the editorial role tags are layered metadata that the alternates panel surfaces.
 
@@ -264,7 +264,7 @@ On factbook reader pages, multi-year series (inflation, public debt, GDP variant
 
 Sometimes the source Civica regards as the editorial authority for a fact is not the source whose number ends up on the country page. This is intentional. Civica separates two questions:
 
-- **Who measured this?** The editorial canonical — the publisher Civica trusts as the authoritative reference for the fact. For health facts like life expectancy and infant mortality, that is the World Health Organization (WHO). For trade (merchandise), the World Trade Organization. For unemployment, the International Labour Organization. For literacy, UNESCO. For HDI, UNDP. Civica records this as a tag (`civicaRole: "canonical"`) on the source row.
+- **Who measured this?** The editorial canonical — the publisher Civica designates for the fact and documented scope. For health facts like life expectancy and infant mortality, that is the World Health Organization (WHO). For trade (merchandise), the World Trade Organization. For unemployment, the International Labour Organization. For literacy, UNESCO. For HDI, UNDP. Civica records this editorial rule as a tag (`civicaRole: "canonical"`) on the source row.
 - **What's the most recent measurement?** The displayed value — the freshest within-envelope row from any allow-listed source. The resolver picks this by date. The alternates panel surfaces the editorial canonical alongside, clearly labelled.
 
 When the editorial canonical happens to also be the freshest source, both questions resolve to the same row and there is nothing to explain. But canonical publishers often release on slow cycles — the UN Population Division refreshes its World Population Prospects dataset every two years, and the WHO GHO ships life-expectancy on a similar slow cadence. While that cycle runs, fresher data from the CIA, the World Bank, or an NSO may sit on the same fact and win on freshness. The country page shows the freshest value; the alternates panel shows the editorial canonical alongside. Worked Example 2 above (United States life expectancy, where UN WPP's 77.05 (2024) wins display while WHO's 76.37 (2021) is editorially canonical) is the textbook case.
@@ -333,7 +333,7 @@ A full replication recipe — including SQL snapshots and a worked walk-through 
 
 ## Version policy and the perpetual-beta posture
 
-Civica is operating as a research lab. Methodology decisions are first-class citable artefacts; each load-bearing call (peer grouping, the forecast-vs-measurement partition, the trade-aggregate two-fact-key split, the canonical-pick threshold raise, the vintage cadence framework) is documented as a resolution document and reviewed before implementation. The corpus contains roughly 25 such documents and grows as new sources land.
+Civica maintains versioned working records for load-bearing methodology calls (peer grouping, the forecast-vs-measurement partition, the trade-aggregate two-fact-key split, the canonical-pick threshold raise, and the vintage cadence framework). These records improve internal auditability but have not all been published or independently reviewed.
 
 The methodology version stamp stays in beta indefinitely. Version bumps (`v0.2-beta` → `v0.3-beta` → `v0.4-beta`) signal a methodology refinement; they do not signal a graduation event. Civica's posture is that the reconciliation rules will continue to refine as new publishers ship, new fact-keys are added, and external reviewers contribute feedback. There is no calendar gate at which the methodology stops being beta.
 

@@ -12,9 +12,9 @@ import { pulse, disputeSla } from "@/lib/content/site-state";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Civica Pulse Methodology — Event Scoring (Beta)",
+  title: "Civica Pulse Methodology — Experimental Event Ledger",
   description:
-    "How the Civica Pulse Beta detects, classifies, and scores governance events between quarterly index updates: source taxonomy, classify-and-verify confidence, asymmetric scoring, and decay.",
+    "How Civica's experimental, daily-scheduled Pulse ledger ingests, classifies, reviews, and scores governance-relevant events without claiming a live or continuous governance measure.",
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/methodology/pulse",
   },
@@ -24,7 +24,7 @@ const SECTIONS = [
   { id: "what-pulse-is", label: "What the Pulse is" },
   { id: "what-pulse-is-not", label: "What the Pulse is not" },
   { id: "sources", label: "Sources" },
-  { id: "daily-pipeline", label: "Daily pipeline" },
+  { id: "daily-pipeline", label: "Scheduled pipeline" },
   { id: "event-categories", label: "Event categories" },
   { id: "disambiguation", label: "Disambiguation" },
   { id: "cascade-model", label: "Cascade model" },
@@ -40,7 +40,6 @@ const SECTIONS = [
 ];
 
 export default function PulseMethodologyPage() {
-  const taxonomy = pulse.taxonomy;
   const backtestCount = pulse.backtest.cases.length;
   const graduationRatio = pulse.backtest.graduationThresholdRatio;
   const graduationPct = Math.round(graduationRatio * 100);
@@ -66,16 +65,17 @@ export default function PulseMethodologyPage() {
           {pulse.status === "beta" ? <BetaChip inHeading /> : null}
         </h1>
         <p className="editorial-page-subtitle">
-          An event-sensitive governance shock monitor layered on top of the
-          quarterly Civica Index. It refreshes on a daily cadence; because it
-          runs as a scheduled job, published values reflect the most recent
-          completed run rather than a live feed. Beta — methodology under active
-          validation.
+          An experimental ledger of governance-relevant events, model-assisted
+          classifications, source links, review state, and optional numeric
+          effects. The pipeline is scheduled daily; published values reflect
+          the most recent completed run rather than a live or continuous
+          governance measure.
         </p>
 
         <div className="editorial-warning">
-          <strong>This is an experimental system.</strong> Pulse values are not
-          yet peer-reviewed and should not be cited as authoritative. The
+          <strong>This is an experimental system.</strong> Pulse classifications
+          and numeric effects have not completed independent review and should
+          not be treated as established measurements. The
           pipeline is under active validation; backtesting against historical
           governance shocks is in progress, with at least {graduationPct}% (
           {graduationCount} of {backtestCount}) of the named test cases

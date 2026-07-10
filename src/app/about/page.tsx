@@ -12,14 +12,15 @@ import { withOg } from "@/lib/og";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "About — Open Reference Atlas of World Governments",
+  title: "About — A Provenance-First Reference Atlas",
+  // PUBLIC_CLAIM: about.metadata-positioning
   description:
-    "Civica Atlas is an academic-grade reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.",
+    "Civica Atlas is a provenance-first comparative reference to how every country is governed. The atlas is primary; the Civica Index and Pulse are secondary research experiments.",
   alternates: { canonical: "https://civicaatlas.org/about" },
   openGraph: withOg({
-    title: "About Civica Atlas — Open Reference Atlas of World Governments",
+    title: "About Civica Atlas — A Provenance-First Reference Atlas",
     description:
-      "An academic-grade reference atlas of the world's countries, governments, and governance outcomes — multi-source reconciliation, statement-level provenance, and published methodology.",
+      "A provenance-first comparative reference to how every country is governed, with explicitly experimental Index and Pulse research outputs.",
     url: "https://civicaatlas.org/about",
   }),
 };
@@ -108,9 +109,8 @@ export default async function AboutPage() {
         title="About Civica Atlas"
         description={
           <>
-            An open reference atlas of the world&rsquo;s countries, governments,
-            and governance outcomes &mdash; built on multi-source reconciliation,
-            statement-level provenance, and published methodology.
+            A provenance-first comparative reference to how every country is
+            governed.
           </>
         }
         engraving={{
@@ -159,8 +159,9 @@ export default async function AboutPage() {
             maxWidth: 720,
           }}
         >
-          We do three things, each addressing a different question a serious
-          reader might ask about a country.
+          The country atlas is Civica&rsquo;s primary publication. The Index and
+          Pulse are secondary research experiments, shown here with their beta
+          status and limitations.
         </p>
 
         <div
@@ -210,9 +211,8 @@ export default async function AboutPage() {
             >
               Country dossiers — geography, demographics, government, economy,
               energy, environment, military, and more. Each fact is reconciled
-              across multiple authoritative sources where coverage exists, with
-              per-fact provenance revealing every alternate source, freshness
-              date, and license.
+              across multiple named sources where coverage exists, with source,
+              freshness, and license context attached where available.
             </p>
           </div>
 
@@ -250,15 +250,16 @@ export default async function AboutPage() {
                 margin: 0,
               }}
             >
-              An original composite governance score (0&ndash;100) computed
-              quarterly across {civicaIndex.dimensionCount} governance
+              A secondary research-beta composite (0&ndash;100) computed across{" "}
+              {civicaIndex.dimensionCount} governance
               dimensions:{" "}
               {civicaIndex.dimensions.map((d) => d.label.toLowerCase()).join(", ")}.
               Material outcomes (human development, peace &amp; security,
               economic stability) live on the separate Civica Conditions
               companion layer at <Link href="/civica-conditions">/civica-conditions</Link>.
-              PCA-derived weights, frozen reference periods, Monte Carlo
-              uncertainty intervals.
+              PCA-derived weights, frozen reference periods, and Monte Carlo
+              input-variation ranges. These ranges are sensitivity summaries,
+              not confidence intervals for a true country score.
               {civicaIndex.status === "beta"
                 ? " Currently in BETA pending external review."
                 : ""}
@@ -299,14 +300,11 @@ export default async function AboutPage() {
                 margin: 0,
               }}
             >
-              An event-driven directional signal layered on the Index. Its
-              automated daily refresh is currently paused, so published values
-              reflect the most recent completed run rather than a live feed.
-              Two-pass LLM classification (classify, then adversarially
-              verify), asymmetric corroboration rules, severity-tier human
-              review.
-              Backtested against {pulse.backtest.cases.length} named historical
-              governance shocks.
+              An experimental governance-event ledger with model-assisted
+              classification. The public feed reflects the most recent completed
+              run and does not establish a continuous measure of governance
+              change. Numeric effects remain experimental pending representative
+              validation and independent review.
               {pulse.status === "beta" ? " Currently in BETA." : ""}
             </p>
           </div>
@@ -353,8 +351,9 @@ export default async function AboutPage() {
             marginBottom: 24,
           }}
         >
-          Civica draws from {sourcesForDisplay.length} authoritative sources.
-          Every data point carries statement-level provenance.
+          Civica currently catalogues {sourcesForDisplay.length} source records.
+          Reader surfaces show source and freshness context where the underlying
+          record carries it.
         </p>
         <div
           style={{

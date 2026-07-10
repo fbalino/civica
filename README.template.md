@@ -14,7 +14,7 @@
 # Civica Atlas
 
 <!-- PUBLIC_CLAIM: readme.positioning -->
-An open reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.
+Civica Atlas is a provenance-first comparative reference to how every country is governed.
 
 [civicaatlas.org](https://civicaatlas.org)
 
@@ -25,25 +25,25 @@ An open reference atlas of the world's countries, governments, and governance ou
 
 ## What this is
 
-Civica Atlas is a research-lab-grade reference work for every country in the world. It is built in the same posture as [Our World in Data](https://ourworldindata.org), the [V-Dem Institute](https://v-dem.net), and the World Bank's statistical division — an academic publication with a UI on top, not a website that happens to have data. Every fact carries provenance, every methodology decision is documented in a citable resolution, and every disagreement between sources is surfaced rather than hidden.
+Civica Atlas brings country profiles, political institutions, constitutions, elections, and source-linked facts into one browsable reference. The atlas is the primary product. The Civica Index and Civica Pulse are secondary research experiments and remain beta while their constructs, methods, sensitivity, usefulness, and failure modes are tested.
 
-The project's near-term goal is to be the visual, interactive successor to the CIA World Factbook (which was sunset on 4 February 2026), but the long-term project is bigger: a unified, methodologically defensible reference layer that academics, journalists, NGOs, and the public can cite without disclaimer.
+The near-term goal is to preserve and extend the comparative-reference role of the CIA World Factbook, which was sunset on 4 February 2026. Civica aims to publish a transparent reference layer that researchers, journalists, NGOs, students, and the public can inspect, correct, and cite with its stated limitations.
 
-## Three flagship outputs
+## Primary atlas and research experiments
 
-### Civica Factbook — `/factbook/[country]`
+### Country atlas — primary reference surface
 
-Country dossiers covering geography, demographics, government, economy, energy, communications, transport, environment, military, and transnational issues for ~200 countries and territories. Each fact is reconciled across multiple authoritative sources (where coverage exists) and carries a per-fact provenance dot revealing every alternate source, freshness date, and license.
+Country dossiers cover geography, demographics, government, economy, energy, communications, transport, environment, military, and transnational issues. Facts retain upstream source, vintage, and rights context; multi-source reconciliation and alternate-source panels appear where the current resolver has coverage.
 
-### Civica Index — `/civica-index`
+### Civica Index — secondary research beta
 
 <!-- PUBLIC_CLAIM: readme.index-estimate -->
-An original composite governance score on a 0–100 scale, computed quarterly across {{ctx.civicaIndexDimensionCountWord}} governance dimensions: {{ctx.civicaIndexDimensionLabelsProse}}. Material conditions (human development, peace & security, economic stability) live on the separate `/civica-conditions` companion layer. Built on V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting indices. PCA-derived weights ({{ctx.civicaIndexWeightsString}}), frozen reference periods, Monte Carlo uncertainty intervals. Currently in {{ctx.civicaIndexStatusUpper}} pending external methodological review.
+A research-beta 0–100 composite across {{ctx.civicaIndexDimensionCountWord}} governance dimensions: {{ctx.civicaIndexDimensionLabelsProse}}. It uses V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting inputs. Published bounds are Monte Carlo input-variation ranges under declared assumptions, not confidence intervals for a true country score. The Index is currently {{ctx.civicaIndexStatusUpper}}, has not completed external methodological review, and may be redesigned, demoted, or retired after validation.
 
-### Civica Pulse — `/civica-index/pulse-changelog`
+### Civica Pulse — experimental event ledger
 
 <!-- PUBLIC_CLAIM: readme.pulse-signal -->
-A daily directional signal layered on top of the Index. Ingests governance-relevant events from CIVICUS Monitor, Human Rights Watch, Amnesty International, ACLED, IPU, GDELT, and others. Multi-run LLM classifier with three-temperature agreement scoring. Asymmetric corroboration (positive events require specialist sources; restricted-press countries require multi-source confirmation). Backtested against {{state.pulse.backtest.cases.length}} named historical governance shocks ({{ctx.pulseBacktestCasesProse}}). Currently in {{ctx.pulseStatusUpper}}.
+An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state. It is not a continuous measure of governance change, and no detected event does not mean stability. Numeric effects remain experimental pending representative evaluation and independent review. Current status: {{ctx.pulseStatusUpper}}.
 
 ## What makes this different
 
@@ -53,13 +53,13 @@ Civica's pipeline is built on opposite premises:
 
 - **Multi-source reconciliation.** Currently {{stats.activeSources | "20"}} active source orchestrators (CIA Factbook archive; the {{ctx.tier1ShippedCountWord}} Tier-1 publishers — {{ctx.tier1ShippedFullNamesProse}}; V-Dem; Wikidata; and {{ctx.nsoInProgressCountWord}} national statistics offices already syncing — {{ctx.nsoInProgressNamesProse}}) writing into a canonical `country_facts` table. ~{{ctx.totalFactsRoundedThousands | "26,000"}} reconciled facts across {{stats.distinctFactKeys | "88"}} declared fact-keys. v1 target is {{ctx.tier1ShippedCount}} Tier-1 publishers (live, IEA scrapped due to license incompatibility) plus {{state.nsoTarget.min}}–{{state.nsoTarget.max}} national statistics offices (first wave: {{ctx.nsoInProgressCount}} in progress; {{ctx.nsoDeferredNamesProse}}).
 
-- <!-- PUBLIC_CLAIM: readme.per-value-provenance --> **Per-fact provenance.** Every value on every reader-facing page renders a `<FactValueDot>` chevron. Click it and you see the canonical pick, every alternate source, the as-of date per source, the publisher's license, and the freshness winner. Disagreements above a configurable threshold create disputes routed to a human review queue.
+- <!-- PUBLIC_CLAIM: readme.per-value-provenance --> **Per-fact provenance where implemented.** Resolver-backed values can render a `<FactValueDot>` chevron showing the selected source, available alternatives, observation dates, and license metadata. Civica does not yet claim universal per-value coverage.
 
 - **Forecast vs measurement.** The resolver distinguishes measured rows from projected rows (IMF WEO ships forecasts to 2030; ILO publishes nowcasts beyond the current year). Canonical picks come from measured rows when both exist. See [`forecast-vs-measurement-v1.md`](./docs/methodology-decisions.md#forecast-vs-measurement).
 
-- **Multi-canonical with scope predicate.** When two Tier-1 publishers are concurrently authoritative for a fact-key in a defined scope (e.g., Eurostat + IMF + OECD all canonical for European public debt), the system honors all three rather than forcing one into "alternate."
+- **Multi-canonical with scope predicate.** When several publishers are designated canonical for different documented scopes (for example, Eurostat, IMF, and OECD coverage of European public debt), the system preserves the scoped observations rather than forcing one into "alternate."
 
-- **Citable methodology.** Every load-bearing methodology decision is documented as a resolution document with citations to peer institutions and academic literature. Currently {{state.adoptedResolutionCount}}+ adopted resolutions covering peer grouping, reconciliation rules, fact-key registry expansions, source allowlist, classification taxonomy, dispute thresholds, NSO source decisions (per-country), and more.
+- **Versioned methodology.** Load-bearing research and reconciliation decisions are documented with citations and revision history. Documentation improves auditability but is not evidence of independent review or validity.
 
 - **Honest beta posture.** Novel Civica-asserted methodologies (the Civica Index composite, the Pulse classifier, the reconciliation rules) ship with a BETA pill until external academic review. Civica-cited external methodologies (V-Dem Regimes of the World, World Bank classifications, Bjørnskov-Rode regime taxonomy) inherit the source's standing without a beta marker.
 
@@ -131,8 +131,8 @@ Internal methodology resolution documents (audit trail, eventually published) co
 
 Civica's data and posture are deeply indebted to the institutions whose work it cites and integrates:
 
-- [Our World in Data](https://ourworldindata.org) — the canonical model for academic-grade public data presentation; Civica's reconciliation patterns mirror OWID's source-domain conventions.
-- [V-Dem Institute](https://v-dem.net) — Varieties of Democracy data + Regimes of the World classification; the methodological gold standard for comparative-politics regime classification.
+- [Our World in Data](https://ourworldindata.org) — an important reference for transparent public-data presentation and source documentation.
+- [V-Dem Institute](https://v-dem.net) — Varieties of Democracy data and the widely used Regimes of the World classification.
 - [World Bank](https://data.worldbank.org) — World Development Indicators, Worldwide Governance Indicators, country & lending classifications.
 - [International Monetary Fund](https://www.imf.org/en/Publications/WEO) — World Economic Outlook macroeconomic data and projections.
 - [United Nations Statistics Division](https://unstats.un.org), [UN Population Division](https://population.un.org), [UNDP](https://hdr.undp.org), [WHO Global Health Observatory](https://www.who.int/data/gho), [UNESCO Institute for Statistics](https://uis.unesco.org), [OECD.Stat](https://stats.oecd.org), [FAO FAOSTAT](https://www.fao.org/faostat), [ILO ILOSTAT](https://ilostat.ilo.org), [Eurostat](https://ec.europa.eu/eurostat), [WTO Stats](https://stats.wto.org).
@@ -209,4 +209,4 @@ For development conventions and project memory, see [AGENTS.md](./AGENTS.md) and
 
 ---
 
-*Civica Atlas is a research-lab-grade reference work in active development. The data layer is real; the methodology is documented; the academic posture is taken seriously. None of that is the same as "finished." If you spot a methodological gap, a data error, or a documentation inconsistency, please open an issue or get in touch.*
+*Civica Atlas is an actively developed comparative reference. Its methods, source coverage, and experimental outputs remain open to correction and review. If you spot a methodological gap, data error, or documentation inconsistency, please open an issue or get in touch.*

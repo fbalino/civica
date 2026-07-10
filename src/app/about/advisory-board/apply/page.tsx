@@ -8,14 +8,14 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Apply to the Advisory Board",
   description:
-    "Apply to join the independent academic advisory board that reviews the Civica Index methodology — for scholars in governance measurement, political methodology, and comparative politics.",
+    "Express interest in a planned independent advisory board for the Civica Index methodology. No board review or endorsement has occurred yet.",
   alternates: {
     canonical: "https://civicaatlas.org/about/advisory-board/apply",
   },
   openGraph: withOg({
     title: "Apply to the Advisory Board · Civica Atlas",
     description:
-      "Apply to join the independent academic advisory board that reviews the Civica Index methodology.",
+      "Express interest in a planned independent advisory board for the Civica Index methodology.",
     url: "https://civicaatlas.org/about/advisory-board/apply",
   }),
 };

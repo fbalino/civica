@@ -19,8 +19,9 @@ import type { Metadata } from "next";
  */
 export const OG_DEFAULT_IMAGE = "/og-default.png";
 
+// PUBLIC_CLAIM: metadata.social-card-positioning
 export const OG_DEFAULT_IMAGE_ALT =
-  "Civica — an interactive atlas of world government structures and the Civica Index, with governance data for 250+ nations.";
+  "Civica Atlas — a provenance-first comparative reference to how every country is governed.";
 
 /**
  * Default Open Graph `images` array (descriptor form, with dimensions + alt).

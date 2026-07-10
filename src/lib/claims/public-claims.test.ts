@@ -5,6 +5,7 @@ import {
   PUBLIC_CLAIM_TIERS,
   PUBLIC_CLAIM_TIER_IDS,
 } from "./claim-tiers";
+import { findUnqualifiedAuthorityLanguage } from "./authority-language";
 import {
   PUBLIC_CLAIMS,
   PUBLIC_CLAIM_SURFACES,
@@ -53,4 +54,30 @@ test("registry validation rejects a missing required surface", () => {
   assert.ok(
     result.errors.includes("required surface has no registered claim: embeds"),
   );
+});
+
+test("authority-language audit catches standing and confidence overclaims", () => {
+  const matches = findUnqualifiedAuthorityLanguage(
+    "An academically citable governance health score with a 90% confidence interval. Pulse is a daily governance monitor. All data is free to use in the most comprehensive open reference.",
+  );
+
+  assert.deepEqual(
+    matches.map((match) => match.ruleId).sort(),
+    [
+      "academic-standing",
+      "blanket-reuse-rights",
+      "daily-governance-measure",
+      "latent-governance-health",
+      "unsupported-comprehensiveness",
+      "unsupported-confidence-interval",
+    ],
+  );
+});
+
+test("authority-language audit allows explicit limitations", () => {
+  const matches = findUnqualifiedAuthorityLanguage(
+    "This Monte Carlo input-variation range is not a confidence interval. The experiment has not completed independent review.",
+  );
+
+  assert.deepEqual(matches, []);
 });

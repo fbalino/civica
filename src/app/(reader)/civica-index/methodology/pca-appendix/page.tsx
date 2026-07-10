@@ -13,7 +13,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "PCA Appendix — Civica Index Weight Derivation",
-  description: `Empirical justification for the Civica Index Beta dimension weights: PCA on the ${civicaIndex.dimensionCount} governance dimensions confirms one dominant latent factor, and weights derive from the squared first-component loadings.`,
+  description: `A limited single-year PCA used to inform the provisional Civica Index Beta weights across ${civicaIndex.dimensionCount} governance dimensions, with the underpowered panel and missing longitudinal tests stated explicitly.`,
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/methodology/pca-appendix",
   },

@@ -16,7 +16,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Methodology — How Civica Builds Its Data",
   description:
-    "Index of Civica Atlas methodology documents: reconciliation, composite scoring, event classification, peer grouping, and the academic disciplines behind every methodology decision.",
+    "Index of Civica Atlas methodology documents covering reconciliation, composite scoring, event classification, peer grouping, current limitations, and review status.",
   alternates: { canonical: "https://civicaatlas.org/methodology" },
 };
 
@@ -53,7 +53,7 @@ const SECTIONS: MethodologySection[] = [
     id: "reconciliation",
     heading: "Data reconciliation",
     intro:
-      "How Civica integrates and reconciles data from multiple authoritative publishers, what the resolver does when sources disagree, and what provenance signals mean on reader pages.",
+      "How Civica integrates and reconciles data from multiple official and established publishers, what the resolver does when sources disagree, and what provenance signals mean on reader pages.",
     entries: [
       {
         href: "/country/methodology/reconciliation",
@@ -68,13 +68,13 @@ const SECTIONS: MethodologySection[] = [
     id: "scoring",
     heading: "Composite scoring — the Civica Index",
     intro:
-      `The Civica Index is an original 0–100 composite governance score covering ${civicaIndex.dimensionCount} governance dimensions, computed quarterly. Its methodology covers indicator selection, weighting, reference periods, and uncertainty.`,
+      `The Civica Index is a secondary research-beta 0–100 composite across ${civicaIndex.dimensionCount} governance dimensions. It has not completed independent review and may be redesigned or retired after validation.`,
     entries: [
       {
         href: "/civica-index/methodology",
         title: "Civica Index methodology",
         blurb:
-          `The composite specification — ${civicaIndex.dimensionCount} governance dimensions, indicator basket, sources, frozen reference periods, weighting approach, uncertainty intervals.`,
+          `The research-beta composite specification — ${civicaIndex.dimensionCount} governance dimensions, indicator basket, sources, frozen reference periods, weighting approach, and Monte Carlo input-variation ranges.`,
         beta: true,
       },
       {
@@ -90,7 +90,7 @@ const SECTIONS: MethodologySection[] = [
     id: "pulse",
     heading: "Event-driven scoring — the Civica Pulse",
     intro:
-      "The Pulse is an event-driven directional signal layered on the Index. It ingests governance-relevant events from multiple source feeds, classifies each via a multi-run LLM consensus, applies asymmetric corroboration rules, and decays impacts over time. Its automated daily refresh is currently paused, so published values reflect the most recent computation rather than a live feed.",
+      "The Pulse is an experimental event ledger with optional directional effects. Its pipeline is scheduled daily, but published values reflect the most recent completed computation rather than a live or continuous governance measure.",
     entries: [
       {
         href: "/civica-index/methodology/pulse",
@@ -157,10 +157,9 @@ export default function MethodologyHubPage() {
         <h1 className="editorial-page-title">Methodology</h1>
         {/* PUBLIC_CLAIM: methodology.decision-coverage */}
         <p className="editorial-page-subtitle">
-          Every load-bearing methodology decision in Civica is documented as a
-          citable resolution before the corresponding code ships. This page
-          indexes every published methodology document on the site, organized
-          by domain.
+          Load-bearing research and reconciliation decisions are documented as
+          versioned records alongside the implementation they describe. This
+          page indexes the methodology documents currently published on the site.
         </p>
 
         {SECTIONS.map((section) => (

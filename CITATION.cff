@@ -13,11 +13,11 @@
 cff-version: 1.2.0
 message: "If you use Civica Atlas data or code, please cite it using the metadata below."
 title: "Civica Atlas"
-# PUBLIC_CLAIM: citation.academic-standing
+# PUBLIC_CLAIM: citation.atlas-positioning
 # PUBLIC_CLAIM: citation.index-estimate
 # PUBLIC_CLAIM: citation.pulse-signal
 # PUBLIC_CLAIM: citation.provenance-coverage
-abstract: "An academically citable, interactive reference atlas of world government structures and governance outcomes — the Civica Index (a 0–100 governance composite) and the Civica Pulse (an event-sensitive governance signal) — with statement-level provenance for every data point."
+abstract: "A provenance-first comparative reference to how every country is governed, combining source-linked country profiles with the explicitly experimental Civica Index and Civica Pulse research outputs."
 type: dataset
 authors:
   - name: "Civica Atlas"

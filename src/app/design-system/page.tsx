@@ -36,7 +36,7 @@ const COLOR_GROUP_IDS = [
 
 const TYPE_SCALE = [
   { lab: "Display / H1", text: "Every government.", family: "var(--font-heading)", size: "var(--text-56)", weight: 600, lh: 1.05, tr: "var(--tracking-tight)", spec: "Source Serif 4 · 600 · 56/64" },
-  { lab: "H2", text: "The governance health of every country.", family: "var(--font-heading)", size: "var(--text-40)", weight: 600, lh: 1.1, tr: "var(--tracking-tight)", spec: "Source Serif 4 · 600 · 40/48" },
+  { lab: "H2", text: "How every country is governed.", family: "var(--font-heading)", size: "var(--text-40)", weight: 600, lh: 1.1, tr: "var(--tracking-tight)", spec: "Source Serif 4 · 600 · 40/48" },
   { lab: "H3", text: "Parliament, live.", family: "var(--font-heading)", size: "var(--text-28)", weight: 600, lh: 1.2, tr: "var(--tracking-snug)", spec: "Source Serif 4 · 600 · 28/36" },
   { lab: "Lead / dek", text: "A semi-presidential republic in Western Europe.", family: "var(--font-heading)", size: "var(--text-22)", weight: 400, lh: 1.36, tr: "0", spec: "Source Serif 4 · 400 · 22/30" },
   { lab: "Body", text: "Hover any seat to meet the member. Compare two countries side by side.", family: "var(--font-body)", size: "var(--text-16)", weight: 400, lh: 1.625, tr: "0", spec: "Inter · 400 · 16/26" },
@@ -119,8 +119,9 @@ export default function DesignSystemPage() {
             </span>
           </div>
           <p style={{ fontFamily: "var(--font-body)", fontSize: "var(--text-16)", color: "var(--color-text-secondary)", maxWidth: "64ch", lineHeight: "var(--leading-normal)", margin: 0 }}>
-            Civica is a visual successor to the CIA World Factbook: an atlas of the
-            world&rsquo;s governments with an original governance index. The system is
+            Civica Atlas is a provenance-first comparative reference to how every
+            country is governed. The atlas is primary; original measurements remain
+            secondary research experiments. The system is
             built on a warm paper field, navy ink, a single editorial accent, hairline
             rules, and provenance on every fact. Color is reserved for meaning.
           </p>
@@ -425,7 +426,9 @@ export default function DesignSystemPage() {
               <div style={{ display: "grid", gap: "var(--space-3)" }}>
                 <Banner variant="info">Methodology in active development.</Banner>
                 <Banner variant="success">All sources synced this quarter.</Banner>
-                <Banner variant="warn">Pulse is paused — scores may be stale.</Banner>
+                <Banner variant="warn">
+                  Pulse is experimental — check the last completed computation.
+                </Banner>
                 <Banner variant="danger">This figure failed reconciliation.</Banner>
               </div>
             </div>

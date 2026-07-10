@@ -169,21 +169,22 @@ export async function SiteFooter() {
     <footer className="site-footer">
       <section
         className="site-footer__trust"
-        aria-label="Civica commitments and trusted sources"
+        aria-label="Civica commitments and source publishers"
       >
         <div className="site-footer__trust-inner">
           <div className="site-footer__trust-copy">
-            <h2>Open. Transparent. Nonpartisan.</h2>
+            <h2>Open. Traceable. Nonpartisan.</h2>
             <p>
-              Civica Atlas is an open knowledge initiative. All data is free to
-              use with proper attribution.
+              Civica Atlas is an open knowledge initiative. Access and reuse
+              terms vary by source; see Licensing for attribution and
+              restrictions.
             </p>
           </div>
 
           <div className="site-footer__trust-rule" aria-hidden="true" />
 
           <div className="site-footer__sources-feature">
-            <p>Trusted sources include:</p>
+            <p>Source publishers include:</p>
             <Image
               className="site-footer__source-logo-strip theme-engraving-light"
               src="/engravings/trusted-source-logos.webp"
@@ -211,9 +212,9 @@ export async function SiteFooter() {
             </div>
 
             <p className="site-footer__mission">
-              An open, citable reference for how every country on Earth is
-              governed — government structures, constitutions, elections, and
-              the Civica Index.
+              {/* PUBLIC_CLAIM: home.visible-positioning */}
+              Civica Atlas is a provenance-first comparative reference to how
+              every country is governed.
             </p>
 
             <div className="site-footer__search">
@@ -260,7 +261,7 @@ export async function SiteFooter() {
 
         <div className="site-footer__bottom">
           <p className="site-footer__copyright">
-            © 2026 Civica Atlas · Open data, free to use with attribution.
+            © 2026 Civica Atlas · Source-linked data with per-source reuse terms.
           </p>
           <div className="site-footer__legal">
             <Link href="/privacy">Privacy</Link>

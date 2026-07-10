@@ -55,7 +55,7 @@ The methodology spec considers adding a fifth dimension — *Administrative Capa
 
 ## Section 7 · Limitations {#limitations}
 
-**Sample size.** The methodology spec envisions a panel of 2000–2024 country-years (thousands of observations). The current panel is {{state.civicaIndex.pca.panelSize}} countries from a single year — statistically usable but underpowered. Final weights will be re-validated when the historical panel is ingested. The structural decision ({{state.civicaIndex.dimensionCount}}-dim core, near-equal weights) is unlikely to change because the underlying correlation structure of these indicators is well-documented in the governance-measurement literature, but the precise magnitudes might shift.
+**Sample size.** The methodology spec envisions a panel of 2000–2024 country-years (thousands of observations). The current panel is {{state.civicaIndex.pca.panelSize}} countries from a single year and is underpowered for a stable cross-time weighting claim. The weights must be recomputed and compared when the historical panel is ingested; the current result does not establish that the same structure will hold across years or broader country coverage.
 
 **Single-year panel.** A cross-sectional PCA captures shared variance at one moment in time. It does not test whether the same factor structure holds over decades. The historical panel will address this.
 

@@ -20,6 +20,7 @@ import {
   type PublicClaim,
 } from "../src/lib/claims/public-claims";
 import { validatePublicClaimRegistry } from "../src/lib/claims/registry-validation";
+import { findUnqualifiedAuthorityLanguage } from "../src/lib/claims/authority-language";
 
 const MARKER_PATTERN = /PUBLIC_CLAIM:\s*([a-z0-9][a-z0-9.-]*)/g;
 const MARKER_SCAN_ROOTS = [
@@ -28,6 +29,18 @@ const MARKER_SCAN_ROOTS = [
   "CITATION.cff",
   "content",
   "src/app",
+  "src/components",
+  "src/lib/og.ts",
+] as const;
+const AUTHORITY_COPY_SCAN_ROOTS = [
+  "README.md",
+  "README.template.md",
+  "CITATION.cff",
+  "content",
+  "src/app",
+  "src/components/home",
+  "src/components/ci/CIPulseScoreDisplay.tsx",
+  "src/lib/og.ts",
 ] as const;
 const SCANNED_EXTENSIONS = new Set([".ts", ".tsx", ".md", ".cff"]);
 const CLAIMS: readonly PublicClaim[] = PUBLIC_CLAIMS;
@@ -87,6 +100,26 @@ async function collectMarkers(): Promise<MarkerLocation[]> {
   }
 
   return markers;
+}
+
+async function validateAuthorityLanguage(): Promise<string[]> {
+  const files = (
+    await Promise.all(
+      AUTHORITY_COPY_SCAN_ROOTS.map((root) => listScannedFiles(root)),
+    )
+  ).flat();
+  const errors: string[] = [];
+
+  for (const file of files) {
+    const content = await fs.readFile(path.resolve(process.cwd(), file), "utf8");
+    for (const match of findUnqualifiedAuthorityLanguage(content)) {
+      errors.push(
+        `unqualified authority language (${match.ruleId}) in ${file}:${lineOf(content, match.index)} — ${JSON.stringify(match.match)}`,
+      );
+    }
+  }
+
+  return errors;
 }
 
 async function main(): Promise<void> {
@@ -159,6 +192,9 @@ async function main(): Promise<void> {
     }
   }
 
+  const authorityErrors = await validateAuthorityLanguage();
+  errors.push(...authorityErrors);
+
   console.log("=== Civica public-claims validation ===\n");
   console.log(
     `Claims: ${CLAIMS.length}; required surfaces: ${structural.coveredSurfaces.length}/${PUBLIC_CLAIM_SURFACES.length}`,
@@ -167,6 +203,7 @@ async function main(): Promise<void> {
     `Tiers: ${PUBLIC_CLAIM_TIER_IDS.length}; definitions: ${Object.keys(PUBLIC_CLAIM_TIERS).length}`,
   );
   console.log(`Markers inspected: ${markers.length}`);
+  console.log(`Unqualified high-authority phrases: ${authorityErrors.length}`);
 
   if (errors.length > 0) {
     console.error(`\nFAILED — ${errors.length} problem(s):`);

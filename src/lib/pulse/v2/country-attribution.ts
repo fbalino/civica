@@ -15,14 +15,10 @@
  *     jurisdiction_id on each pulse_events_v2 row, and
  *   - scripts/reattribute-pulse-country.ts — to retro-fix existing rows.
  *
- * NOTE on cost: when the (paid, API-billed) pipeline runs, this adds one
- * Claude call per classified cluster. The pipeline is currently paused;
- * the daily refresh is intended to run via a Claude Code subscription
- * routine (see ~/.claude rules / scripts/pulse-daily-refresh.ts) rather
- * than API billing. For a future cost-optimized API path, fold the
- * `subject_iso3` field into the classify pass's output instead of issuing
- * this extra call (the subscription path already does this — its agent
- * returns `subjectIso3` alongside the classification).
+ * NOTE on cost: the scheduled API pipeline invokes this pass, adding one
+ * Claude call per classified cluster. A future cost-optimized path can fold a
+ * validated `subject_iso3` field into the ensemble output instead of issuing
+ * this extra call.
  */
 import Anthropic from "@anthropic-ai/sdk";
 import { sql } from "drizzle-orm";

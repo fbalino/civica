@@ -524,7 +524,7 @@ export default function ApiDocsPage() {
           id="index-country"
           method="GET"
           path="/api/v1/index/:country_slug"
-          description="Returns the latest Civica Index composite, uncertainty interval, rank, completeness fields, and available dimension rows for one country."
+          description="Returns the latest research-beta Civica Index composite, Monte Carlo input-variation range, rank, completeness fields, and available dimension rows for one country."
           parameters={[
             {
               name: ":country_slug",

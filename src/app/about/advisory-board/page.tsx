@@ -18,8 +18,8 @@ const ADVISORY_BOARD_STATUS_LABEL: Record<string, string> = {
 };
 
 export const metadata: Metadata = {
-  title: "Advisory Board — Independent Academic Review",
-  description: `Independent academic review for the Civica Index methodology: ${advisoryBoard.targetSize.min}–${advisoryBoard.targetSize.max} scholars in governance measurement, political methodology, and comparative politics.`,
+  title: "Planned Advisory Board — Recruitment",
+  description: `Recruitment information for a planned independent advisory board of ${advisoryBoard.targetSize.min}–${advisoryBoard.targetSize.max} scholars. No board review or endorsement has occurred yet.`,
   alternates: { canonical: "https://civicaatlas.org/about/advisory-board" },
 };
 
@@ -61,19 +61,19 @@ export default async function AdvisoryBoardPage() {
           </BetaChip>
         </h1>
         <p className="editorial-page-subtitle">
-          Independent review for the Civica Index methodology.
+          Recruitment for planned independent review of the Civica Index methodology.
         </p>
       </header>
 
       {/* PUBLIC_CLAIM: advisory.independent-review-plan */}
       <p className="editorial-page-subtitle" style={{ margin: "0 0 32px" }}>
-        Per the v2 methodology specification, the Civica Index will be reviewed
-        by an independent academic advisory board of{" "}
+        Civica plans to invite an independent academic advisory board of{" "}
         {advisoryBoard.targetSize.min}–{advisoryBoard.targetSize.max} scholars
         with expertise in governance measurement, political methodology, or
-        comparative politics. The board reviews the methodology{" "}
-        {advisoryBoard.reviewCadence} and has named authority to request
-        changes. Their role is credibility infrastructure, not marketing.
+        comparative politics. If appointed, its planned remit is to review the
+        methodology {advisoryBoard.reviewCadence} and request changes.
+        Recruitment does not mean a board exists, a review has occurred, or any
+        scholar endorses Civica.
       </p>
 
       <Banner variant="warn">

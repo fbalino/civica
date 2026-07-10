@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { HomeGrid } from "@/components/home/HomeGrid";
-import { civicaIndex } from "@/lib/content/site-state";
 import { withOg } from "@/lib/og";
 
 export const revalidate = 3600;
@@ -12,12 +11,12 @@ export const metadata: Metadata = {
   title: { absolute: "Civica Atlas — How Every Country Is Governed" },
   // PUBLIC_CLAIM: home.reference-scope
   description:
-    `An interactive reference for how every country is governed: government structures, constitutions, and elections for 250+ nations, plus the Civica Index across ${civicaIndex.dimensionCount} governance dimensions.`,
+    "Civica Atlas is a provenance-first comparative reference to how every country is governed, with country profiles covering institutions, constitutions, elections, and source-linked facts.",
   alternates: { canonical: "https://civicaatlas.org" },
   openGraph: withOg({
     title: "Civica Atlas — How Every Country Is Governed",
     description:
-      `An interactive reference for how every country is governed: government structures, constitutions, and elections for 250+ nations, plus the Civica Index.`,
+      "A provenance-first comparative reference to how every country is governed, with country profiles covering institutions, constitutions, elections, and source-linked facts.",
     url: "https://civicaatlas.org",
     type: "website",
   }),

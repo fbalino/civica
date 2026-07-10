@@ -33,7 +33,7 @@
 
 Every Civica Index score is an integer between 0 and 100. Higher means stronger governance institutions. Every published score is accompanied by:
 
-- **A 90% confidence interval** — e.g. "CI 72 (90% CI: 68–76)". This is the range within which the "true" score is likely to fall, given the uncertainty of the underlying data.
+- **A Monte Carlo input-variation range** — e.g. "central 90% of simulations: 68–76". This is a sensitivity summary under the current perturbation assumptions. It is not a confidence interval for a latent "true" country score.
 - **A rank band** — A through F, see §6. The band is the primary presentation; the integer is for researchers and API consumers who want it.
 - **A vintage / freshness timestamp** per underlying source. So you can see, for any score, exactly how recent each upstream dataset is.
 - **A completeness flag** — Full, Partial, or Insufficient. See §7.
@@ -56,17 +56,17 @@ For sources without natural theoretical bounds, the methodology uses an **anchor
 
 ## Section 4 · Weight determination {#weights}
 
-Weights are derived from the data itself rather than asserted, using two standard statistical techniques:
+The current beta weights are PCA-informed estimates, not externally reviewed parameters. The completed analysis uses a single-year, {{state.civicaIndex.pca.panelSize}}-country panel; the planned historical and substitution tests below have not yet been completed:
 
-- **Principal component analysis (PCA)** on the full country-year panel of normalized indicators (V-Dem components, WGI, CPI, Freedom House, RSF) for 2000–2024. PCA tells us how many genuinely distinct dimensions exist in the data.
-- **Factor analysis with varimax rotation** to map each source onto its primary latent factor. This is what tells us whether Administrative Capacity is its own dimension or just another face of Rule of Law.
-- **Source-substitution sensitivity testing**: swap each primary source for its secondary, recompute, and confirm that scores stay stable within their published uncertainty intervals.
+- **Completed:** principal component analysis (PCA) on the currently ingested complete-case panel. The appendix reports its sample, data vintage, and limitations.
+- **Planned:** a longitudinal country-year panel and factor analysis with varimax rotation to test whether Administrative Capacity is distinct from Rule of Law.
+- **Planned:** source-substitution sensitivity testing that swaps primary and secondary indicators and measures how much results move.
 
 The full PCA results — eigenvalues, scree plot, factor loadings, and decision rationale — are published as a separate appendix at [/civica-index/methodology/pca-appendix](/civica-index/methodology/pca-appendix). Headline finding: the {{state.civicaIndex.dimensionCount}} governance dimensions are highly correlated (r = {{ctx.corrLow}} to {{ctx.corrHigh}}), one dominant latent factor explains {{ctx.pc1VariancePct}}% of the variance, and weights proportional to the squared first-component loadings come out near-equal — close enough to the provisional values that rankings barely move under the revision.
 
-## Section 5 · Uncertainty intervals {#uncertainty}
+## Section 5 · Input-variation ranges {#uncertainty}
 
-Every score publishes a 90% confidence interval. The interval is computed via **Monte Carlo simulation**:
+Every score can publish a Monte Carlo input-variation range. The current code perturbs inputs under declared assumptions and reports the central 90% of simulated composite values:
 
 ```
 for each country:
@@ -75,19 +75,19 @@ for each country:
       published-uncertainty distribution
     recompute the CI
 
-  90% CI  =  [5th percentile, 95th percentile]
-                of the 10,000 simulated CIs
+  input-variation range = [5th percentile, 95th percentile]
+                          of the 10,000 simulated composites
 ```
 
-Most academic sources (V-Dem in particular) publish uncertainty information directly. For sources that do not, a conservative ±5% of the normalized range is used as the indicator's spread. This will be documented in the replication package (in preparation, targeted for Q3 2026).
+Some inputs, including V-Dem, publish uncertainty information directly. For sources that do not, the current implementation applies a fixed ±5% perturbation on the normalized range. That fallback is a heuristic sensitivity assumption, not an estimated sampling distribution. Until a defensible statistical model is specified and validated, Civica does not describe these bounds as confidence intervals or as the probable location of a true score.
 
 ## Section 7 · Missing data {#missing}
 
 Different countries have different data coverage. Civica enforces three rules to handle missing data without distorting the score:
 
 - **Mandatory dimensions.** Democratic Quality and Rule of Law are required. If either is missing, no CI is published for that country — the page reads "Insufficient data for governance index" with an explanation of which dimensions are missing.
-- **Partial CI.** If the mandatory dimensions are present but one of the others (Freedoms & Rights or Corruption Control) is missing, a partial CI is published — flagged visually, with the confidence interval widened by 20% to reflect the added uncertainty.
-- **Complete CI.** All {{state.civicaIndex.dimensionCount}} dimensions present. No flag.
+- **Partial estimate.** If the mandatory dimensions are present but one of the others (Freedoms & Rights or Corruption Control) is missing, a partial estimate is published and flagged visually. The simulation range receives a fixed 20% widening; this is an explicit heuristic sensitivity adjustment, not a statistical confidence correction.
+- **Complete estimate.** All {{state.civicaIndex.dimensionCount}} dimensions present. No missing-dimension flag.
 
 Re-proportioning weights to fill in missing data is explicitly avoided — that approach silently biases the scores of fragile states upward, since the dimensions most likely to be missing are the ones that would have scored lowest.
 
@@ -117,11 +117,11 @@ How Civica chooses peer sets for ranking comparisons — different lenses for ma
 
 The Civica Pulse is the event-sensitive layer that sits on top of the structural CI. It publishes **dimensional deltas** — separate impact values on each CI dimension — driven by classified events from specialist feeds (ACLED, CIVICUS, RSF alerts, V-Dem pulse, HRW / Amnesty) corroborated by general news. Decay is category-specific: a coup persists for a year; a journalist arrest decays in two months. Positive events require stronger corroboration than negative events to resist gaming.
 
-The Pulse is currently a clearly labelled *Beta* — experimental, not yet citable as authoritative. Its methodology is documented in detail at [/civica-index/methodology/pulse](/civica-index/methodology/pulse). That page is the sister document to this one and should be read alongside. The full event feed is at [/civica-index/pulse-changelog](/civica-index/pulse-changelog).
+The Pulse is currently a clearly labelled *Beta* experiment. Its classifications and numeric effects have not completed representative validation or independent review. Its methodology is documented in detail at [/civica-index/methodology/pulse](/civica-index/methodology/pulse), and the event ledger is at [/civica-index/pulse-changelog](/civica-index/pulse-changelog).
 
 ## Section 11 · Update frequency & vintages {#vintages}
 
-The Civica Index updates **quarterly** — March, June, September, December — to align with source publication cycles and to avoid spurious between-quarter movement. Mid-quarter source releases are staged for the next quarterly publication. The Pulse is the only layer designed to move daily, but its automated daily refresh is currently paused, so it reflects the most recent computation rather than a live feed.
+The Civica Index is designed for **quarterly** vintages aligned with source publication cycles. Mid-quarter source releases are staged for the next published computation. Pulse is designed for scheduled event-ingestion runs, but the public ledger always reflects the most recent completed computation rather than a live or continuous measure.
 
 To reconcile citation stability with longitudinal comparability, every score is preserved in two parallel historical series:
 
@@ -138,7 +138,7 @@ Both series are accessible via the API. See §13 for citation format.
 
 **Construct narrowing.** By design, the CI measures governing institutions only. If a reader wants to ask "is this country a good place to live?" — a different and broader question — the CI alone does not answer that. Read it together with [Civica Conditions](/civica-conditions).
 
-**PCA panel underpowered.** The PCA in §4 was run on n = {{state.civicaIndex.pca.panelSize}} countries from a single year ({{state.civicaIndex.pca.dataVintage}}). Final weights will be re-validated when the historical panel is ingested. The structural decision ({{state.civicaIndex.dimensionCount}}-dim core, near-equal weights) is unlikely to change because the underlying correlation structure is well-documented in the literature, but precise magnitudes might shift.
+**PCA panel underpowered.** The PCA in §4 was run on n = {{state.civicaIndex.pca.panelSize}} countries from a single year ({{state.civicaIndex.pca.dataVintage}}). The weights must be recomputed and compared when the historical panel is ingested. The current result does not establish that the same structure will hold across years or broader country coverage.
 
 ## Section 13 · Citation {#citation}
 

@@ -17,7 +17,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Index Methodology — How Governance Is Scored",
   description:
-    `The Civica Index methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, Monte Carlo uncertainty intervals, A–F rank bands, and a separate Civica Conditions companion layer.${civicaIndex.status === "beta" ? " Beta — methodology in active development." : ""}`,
+    `The Civica Index research-beta methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, Monte Carlo input-variation ranges, A–F rank bands, and a separate Civica Conditions companion layer.${civicaIndex.status === "beta" ? " Beta — methodology in active development and not independently reviewed." : ""}`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/methodology" },
 };
 
@@ -26,7 +26,7 @@ const SECTIONS = [
   { id: "dimensions", num: 2, label: "Dimensions" },
   { id: "normalization", num: 3, label: "Normalization" },
   { id: "weights", num: 4, label: "Weights" },
-  { id: "uncertainty", num: 5, label: "Uncertainty" },
+  { id: "uncertainty", num: 5, label: "Input ranges" },
   { id: "bands", num: 6, label: "Rank bands" },
   { id: "missing", num: 7, label: "Missing data" },
   { id: "conditions", num: 8, label: "Conditions" },
@@ -161,9 +161,10 @@ export default async function MethodologyPage() {
         <strong>Beta.</strong> The methodology described on this page
         is in active development. Civica&rsquo;s published scores will
         be republished under these rules at cut-over (target{" "}
-        {cutoverTarget}). The empirical factor analysis described in
-        §4 has shipped — the dimension weights below are the
-        PCA-derived adopted values, documented in detail at{" "}
+        {cutoverTarget}). The current single-year PCA is published but
+        underpowered; the planned longitudinal, factor-analysis, and
+        source-substitution tests are not complete. The provisional weights
+        are documented at{" "}
         <Link href="/civica-index/methodology/pca-appendix">
           /civica-index/methodology/pca-appendix
         </Link>
@@ -171,11 +172,11 @@ export default async function MethodologyPage() {
       </div>
 
       <p className="meth-abstract">
-        The Civica Index measures the quality of governing
-        institutions in every country on a 0–100 scale, with explicit
-        uncertainty, rank bands, and full transparency on sources. It
-        is the scoring layer of Civica Atlas — useful for orientation,
-        honestly presented, never oversold as definitive.
+        The Civica Index is a research-beta composite of four governance
+        dimensions. It is a secondary experiment, not a settled measure of a
+        country&rsquo;s overall governance quality. Current outputs include
+        explicit source inputs and sensitivity ranges, with known coverage and
+        validation gaps documented below.
       </p>
 
       {/* Section 1 — Scale (markdown body). Slice ends at the
@@ -258,7 +259,7 @@ export default async function MethodologyPage() {
         </p>
       </Reveal>
 
-      {/* Sections 3-5 (markdown body): Normalization, Weights, Uncertainty */}
+      {/* Sections 3-5 (markdown body): Normalization, Weights, input ranges */}
       <Reveal as="section" className="editorial-section">
         <MarkdownContent
           file="content/methodology-civica-index.md"

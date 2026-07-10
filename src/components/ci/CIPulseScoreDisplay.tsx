@@ -1,8 +1,8 @@
 /**
  * Civica Index score display — Beta methodology.
  *
- * Renders a single editorial pane showing the CI score, 90%
- * confidence interval, A–F band, and completeness flag.
+ * Renders a single editorial pane showing the CI score, Monte Carlo
+ * input-variation range, A–F band, and completeness flag.
  *
  * Phase 5.4 added Beta methodology display.
  * Phase 5.6 dropped the merged-scalar Pulse pane entirely. The
@@ -240,7 +240,7 @@ function ScorePane({
         </span>
       </div>
 
-      {/* Confidence interval — directly below the headline number. */}
+      {/* Monte Carlo input-variation range — not a confidence interval. */}
       {intervalLine ? (
         <span
           style={{
@@ -342,7 +342,7 @@ export function CIPulseScoreDisplay({
 
   const ciIntervalLine =
     ciScore && ciScore.scoreLower != null && ciScore.scoreUpper != null
-      ? `90% CI: ${ciScore.scoreLower}–${ciScore.scoreUpper}`
+      ? `Central 90% of simulations: ${ciScore.scoreLower}–${ciScore.scoreUpper}`
       : null;
 
   const ciFooter = ciScore

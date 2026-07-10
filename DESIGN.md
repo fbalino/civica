@@ -219,7 +219,9 @@ Do use the live `/design-system` page before building UI.
 
 Do use role tokens instead of raw colors and fonts.
 
-Do keep Civica Index and Civica Pulse visually prominent.
+Do keep the reference atlas visually primary. Present the Civica Index and
+Civica Pulse as clearly labelled secondary research experiments until their
+validation gates pass.
 
 Don't create local page themes.
 

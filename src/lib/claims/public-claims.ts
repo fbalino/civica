@@ -65,7 +65,7 @@ export const PUBLIC_CLAIMS = [
     surface: "home",
     routeOrArtifact: "/",
     exactClaim:
-      "An interactive reference for how every country is governed: government structures, constitutions, and elections for 250+ nations.",
+      "Civica Atlas is a provenance-first comparative reference to how every country is governed, with country profiles covering institutions, constitutions, elections, and source-linked facts.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/app/page.tsx",
@@ -78,7 +78,50 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/page.tsx",
       fragment:
-        "An interactive reference for how every country is governed: government structures, constitutions, and elections for 250+ nations",
+        "Civica Atlas is a provenance-first comparative reference to how every country is governed, with country profiles covering institutions, constitutions, elections, and source-linked facts.",
+    },
+  },
+  {
+    id: "home.visible-positioning",
+    surface: "home",
+    routeOrArtifact: "/ — visible hero",
+    exactClaim:
+      "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/components/home/HomeGrid.tsx",
+      "plan/DECISIONS.md",
+      "plan/MASTER-PLAN-OVERVIEW.md",
+    ],
+    implementationOwner: "Atlas editorial",
+    methodologyVersion: "atlas-positioning-v1",
+    gate: "G1",
+    source: {
+      path: "src/components/home/HomeGrid.tsx",
+      fragment:
+        "A provenance-first comparative reference to how every country is governed.",
+      mirrors: ["src/components/SiteFooter.tsx"],
+    },
+  },
+  {
+    id: "home.secondary-research",
+    surface: "home",
+    routeOrArtifact: "/ — Civica Index feature",
+    exactClaim:
+      "The Civica Index and Pulse are secondary research experiments whose methods and outputs remain beta while validity, sensitivity, and usefulness are tested.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "src/components/home/HomeGrid.tsx",
+      "plan/DECISIONS.md",
+      "plan/MASTER-CHECKLIST.md",
+    ],
+    implementationOwner: "Atlas editorial and research methods",
+    methodologyVersion: "atlas-positioning-v1",
+    gate: "G1",
+    source: {
+      path: "src/components/home/HomeGrid.tsx",
+      fragment:
+        "The Civica Index and Pulse are secondary research experiments.",
     },
   },
   {
@@ -107,7 +150,7 @@ export const PUBLIC_CLAIMS = [
     surface: "index",
     routeOrArtifact: "/civica-index",
     exactClaim:
-      "An original governance score for 190+ sovereign states across {dimensionCount} dimensions, with empirically-derived weights, fixed-bound normalization, and 90% confidence intervals.",
+      "The Civica Index is a research-beta composite across {dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges; it has not completed independent review.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "src/lib/ci/calculate-v2.ts",
@@ -121,7 +164,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/(reader)/civica-index/page.tsx",
       fragment:
-        "An original governance score for 190+ sovereign states across ${civicaIndex.dimensionCount} dimensions, with empirically-derived weights, fixed-bound normalization, and 90% confidence intervals.",
+        "A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. Not independently reviewed.",
     },
   },
   {
@@ -129,7 +172,7 @@ export const PUBLIC_CLAIMS = [
     surface: "pulse",
     routeOrArtifact: "/civica-index/pulse-changelog",
     exactClaim:
-      "Every governance event classified by the Civica Pulse Beta pipeline is filterable by country, dimension, and severity, with full source attribution and human-review status.",
+      "Civica Pulse is an experimental ledger of published and review-queued governance-event classifications, with recorded source links and review state.",
     tier: "experimental-heuristic",
     evidenceSources: [
       "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
@@ -143,7 +186,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
       fragment:
-        "Every governance event classified by the Civica Pulse Beta pipeline, filterable by country, dimension, and severity, with full source attribution and human-review status.",
+        "An experimental ledger of published and review-queued governance-event classifications, filterable by country, dimension, and severity, with recorded source links and review state.",
     },
   },
   {
@@ -151,7 +194,7 @@ export const PUBLIC_CLAIMS = [
     surface: "methodology",
     routeOrArtifact: "/methodology",
     exactClaim:
-      "Every load-bearing methodology decision in Civica is documented as a citable resolution before the corresponding code ships.",
+      "Load-bearing research and reconciliation decisions are documented as versioned records alongside the implementation they describe.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/app/(reader)/methodology/page.tsx",
@@ -165,7 +208,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/(reader)/methodology/page.tsx",
       fragment:
-        "Every load-bearing methodology decision in Civica is documented as a citable resolution before the corresponding code ships.",
+        "Load-bearing research and reconciliation decisions are documented as versioned records alongside the implementation they describe.",
     },
   },
   {
@@ -173,7 +216,7 @@ export const PUBLIC_CLAIMS = [
     surface: "about",
     routeOrArtifact: "/about",
     exactClaim:
-      "Civica Atlas is an open reference atlas of the world's countries, governments, and governance outcomes.",
+      "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
     tier: "institutional-posture",
     evidenceSources: ["content/about.md", "src/app/about/page.tsx"],
     implementationOwner: "Atlas editorial",
@@ -182,7 +225,24 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "content/about.md",
       fragment:
-        "Civica Atlas is an open reference atlas of the world's countries, governments, and governance outcomes.",
+        "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
+    },
+  },
+  {
+    id: "about.metadata-positioning",
+    surface: "about",
+    routeOrArtifact: "/about — metadata",
+    exactClaim:
+      "Civica Atlas is a provenance-first comparative reference to how every country is governed. The atlas is primary; the Civica Index and Pulse are secondary research experiments.",
+    tier: "institutional-posture",
+    evidenceSources: ["src/app/about/page.tsx", "plan/DECISIONS.md"],
+    implementationOwner: "Atlas editorial",
+    methodologyVersion: "atlas-positioning-v1",
+    gate: "G1",
+    source: {
+      path: "src/app/about/page.tsx",
+      fragment:
+        "Civica Atlas is a provenance-first comparative reference to how every country is governed. The atlas is primary; the Civica Index and Pulse are secondary research experiments.",
     },
   },
   {
@@ -190,7 +250,7 @@ export const PUBLIC_CLAIMS = [
     surface: "about",
     routeOrArtifact: "/about",
     exactClaim:
-      "Every fact carries provenance, every methodology decision is documented, and every disagreement between sources is surfaced rather than hidden.",
+      "Civica publishes methods and aims to expose source disagreement without claiming that every value is already reconciled or independently reviewed.",
     tier: "reconciled-fact",
     evidenceSources: [
       "content/about.md",
@@ -204,7 +264,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "content/about.md",
       fragment:
-        "Every fact carries provenance, every methodology decision is documented, and every disagreement between sources is surfaced rather than hidden.",
+        "without claiming that every value is already reconciled or independently reviewed.",
     },
   },
   {
@@ -234,7 +294,7 @@ export const PUBLIC_CLAIMS = [
     surface: "advisory-board",
     routeOrArtifact: "/about/advisory-board",
     exactClaim:
-      "The Civica Index will be reviewed by an independent academic advisory board of {min}–{max} scholars with relevant expertise.",
+      "Civica plans to invite an independent advisory board of {min}–{max} scholars; recruitment does not mean a board exists, a review has occurred, or any scholar endorses Civica.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/app/about/advisory-board/page.tsx",
@@ -248,7 +308,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/about/advisory-board/page.tsx",
       fragment:
-        "the Civica Index will be reviewed by an independent academic advisory board of",
+        "Recruitment does not mean a board exists, a review has occurred, or any scholar endorses Civica.",
     },
   },
   {
@@ -277,7 +337,7 @@ export const PUBLIC_CLAIMS = [
     surface: "readme",
     routeOrArtifact: "README.md",
     exactClaim:
-      "An open reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.",
+      "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
     tier: "institutional-posture",
     evidenceSources: ["README.template.md", "README.md", "src/app/about/page.tsx"],
     implementationOwner: "Repository editorial",
@@ -286,7 +346,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "README.template.md",
       fragment:
-        "An open reference atlas of the world's countries, governments, and governance outcomes — built on multi-source reconciliation, statement-level provenance, and published methodology.",
+        "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
       mirrors: ["README.md"],
     },
   },
@@ -317,7 +377,7 @@ export const PUBLIC_CLAIMS = [
     surface: "readme",
     routeOrArtifact: "README.md — Civica Index section",
     exactClaim:
-      "The Civica Index is an original 0–100 composite governance score computed quarterly across {dimensionCount} governance dimensions and is currently beta pending external methodological review.",
+      "The Civica Index is a research-beta 0–100 composite whose simulation bounds are input-variation ranges rather than confidence intervals; it may be redesigned, demoted, or retired after validation.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "README.template.md",
@@ -331,7 +391,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "README.template.md",
       fragment:
-        "An original composite governance score on a 0–100 scale, computed quarterly across {{ctx.civicaIndexDimensionCountWord}} governance dimensions",
+        "A research-beta 0–100 composite across {{ctx.civicaIndexDimensionCountWord}} governance dimensions",
       mirrors: ["README.md"],
     },
   },
@@ -340,7 +400,7 @@ export const PUBLIC_CLAIMS = [
     surface: "readme",
     routeOrArtifact: "README.md — Civica Pulse section",
     exactClaim:
-      "The Civica Pulse is a daily directional signal layered on top of the Index, produced from governance-relevant events by an LLM classifier and currently in beta.",
+      "The Civica Pulse is an experimental ledger of governance-relevant events with model-assisted classification; it is not a continuous measure of governance change.",
     tier: "experimental-heuristic",
     evidenceSources: [
       "README.template.md",
@@ -353,7 +413,8 @@ export const PUBLIC_CLAIMS = [
     gate: "G3",
     source: {
       path: "README.template.md",
-      fragment: "A daily directional signal layered on top of the Index.",
+      fragment:
+        "An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state.",
       mirrors: ["README.md"],
     },
   },
@@ -362,7 +423,7 @@ export const PUBLIC_CLAIMS = [
     surface: "readme",
     routeOrArtifact: "README.md — Per-fact provenance section",
     exactClaim:
-      "Every value on every reader-facing page renders a FactValueDot that reveals the canonical pick, alternate sources, dates, licenses, and freshness winner.",
+      "Resolver-backed values can show the selected source, available alternatives, observation dates, and license metadata; Civica does not yet claim universal per-value coverage.",
     tier: "reconciled-fact",
     evidenceSources: [
       "README.template.md",
@@ -375,15 +436,16 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "README.template.md",
       fragment:
-        "Every value on every reader-facing page renders a `<FactValueDot>` chevron.",
+        "Civica does not yet claim universal per-value coverage.",
       mirrors: ["README.md"],
     },
   },
   {
-    id: "citation.academic-standing",
+    id: "citation.atlas-positioning",
     surface: "citation",
     routeOrArtifact: "CITATION.cff — abstract",
-    exactClaim: "Civica Atlas is academically citable.",
+    exactClaim:
+      "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
     tier: "institutional-posture",
     evidenceSources: [
       "CITATION.cff",
@@ -392,17 +454,18 @@ export const PUBLIC_CLAIMS = [
     ],
     implementationOwner: "Publication and citation",
     methodologyVersion: "citation-metadata-v1",
-    gate: "G5",
+    gate: "G1",
     source: {
       path: "CITATION.cff",
-      fragment: "An academically citable, interactive reference atlas",
+      fragment:
+        "A provenance-first comparative reference to how every country is governed",
     },
   },
   {
     id: "citation.index-estimate",
     surface: "citation",
     routeOrArtifact: "CITATION.cff — abstract",
-    exactClaim: "The Civica Index is a 0–100 governance composite.",
+    exactClaim: "The Civica Index is an explicitly experimental research output.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "CITATION.cff",
@@ -414,14 +477,15 @@ export const PUBLIC_CLAIMS = [
     gate: "G3",
     source: {
       path: "CITATION.cff",
-      fragment: "the Civica Index (a 0–100 governance composite)",
+      fragment:
+        "the explicitly experimental Civica Index and Civica Pulse research outputs.",
     },
   },
   {
     id: "citation.pulse-signal",
     surface: "citation",
     routeOrArtifact: "CITATION.cff — abstract",
-    exactClaim: "The Civica Pulse is an event-sensitive governance signal.",
+    exactClaim: "The Civica Pulse is an explicitly experimental research output.",
     tier: "experimental-heuristic",
     evidenceSources: ["CITATION.cff", "src/lib/pulse/v2", "content/methodology-pulse.md"],
     implementationOwner: "Pulse event-ledger research lane",
@@ -429,14 +493,15 @@ export const PUBLIC_CLAIMS = [
     gate: "G3",
     source: {
       path: "CITATION.cff",
-      fragment: "the Civica Pulse (an event-sensitive governance signal)",
+      fragment:
+        "the explicitly experimental Civica Index and Civica Pulse research outputs.",
     },
   },
   {
     id: "citation.provenance-coverage",
     surface: "citation",
     routeOrArtifact: "CITATION.cff — abstract",
-    exactClaim: "Civica Atlas provides statement-level provenance for every data point.",
+    exactClaim: "Civica Atlas combines source-linked country profiles.",
     tier: "reconciled-fact",
     evidenceSources: [
       "CITATION.cff",
@@ -448,7 +513,7 @@ export const PUBLIC_CLAIMS = [
     gate: "G2",
     source: {
       path: "CITATION.cff",
-      fragment: "with statement-level provenance for every data point.",
+      fragment: "combining source-linked country profiles",
     },
   },
   {
@@ -456,7 +521,7 @@ export const PUBLIC_CLAIMS = [
     surface: "metadata",
     routeOrArtifact: "Root metadata default",
     exactClaim:
-      "Civica Atlas is an interactive atlas of government structures, constitutions, elections, and governance data for every country.",
+      "Civica Atlas is a provenance-first comparative reference to how every country is governed, with source-linked country profiles, institutions, constitutions, and elections.",
     tier: "institutional-posture",
     evidenceSources: ["src/app/layout.tsx", "src/lib/seo/jsonld.ts"],
     implementationOwner: "SEO and atlas editorial",
@@ -465,26 +530,28 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/layout.tsx",
       fragment:
-        "Interactive atlas of government structures, constitutions, elections, and governance data for every country",
+        "Civica Atlas is a provenance-first comparative reference to how every country is governed, with source-linked country profiles, institutions, constitutions, and elections.",
     },
   },
   {
-    id: "metadata.default-index-score",
+    id: "metadata.social-card-positioning",
     surface: "metadata",
-    routeOrArtifact: "Root metadata default",
-    exactClaim: "The Civica Index is an original governance score.",
-    tier: "research-beta-estimate",
+    routeOrArtifact: "Default Open Graph and social card alt text",
+    exactClaim:
+      "Civica Atlas is a provenance-first comparative reference to how every country is governed.",
+    tier: "institutional-posture",
     evidenceSources: [
-      "src/app/layout.tsx",
-      "src/lib/ci/calculate-v2.ts",
-      "content/methodology-civica-index.md",
+      "src/lib/og.ts",
+      "public/og-default.png",
+      "plan/DECISIONS.md",
     ],
-    implementationOwner: "SEO and Civica Index research lane",
-    methodologyVersion: "civica-index-v2-beta",
-    gate: "G3",
+    implementationOwner: "SEO and atlas editorial",
+    methodologyVersion: "metadata-policy-v1",
+    gate: "G1",
     source: {
-      path: "src/app/layout.tsx",
-      fragment: "with the Civica Index, an original governance score.",
+      path: "src/lib/og.ts",
+      fragment:
+        "Civica Atlas — a provenance-first comparative reference to how every country is governed.",
     },
   },
   {

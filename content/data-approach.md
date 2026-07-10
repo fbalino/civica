@@ -29,7 +29,7 @@ The CIA World Factbook was sunset on 4 February 2026. Its last vintage is frozen
 
 Worse, single-source sites tend to hide the limitation. When the source goes stale, the staleness propagates silently. When two reasonable people would draw on different sources, the choice gets made invisibly. When sources disagree, the disagreement gets buried.
 
-Civica's approach is to integrate multiple authoritative publishers, expose the disagreements, and document the rules.
+Civica's approach is to integrate multiple official and established publishers, expose the disagreements, and document the rules.
 
 ## Multi-source reconciliation {#multi-source}
 
@@ -41,7 +41,7 @@ Civica integrates {{stats.activeSources | "multiple"}} source orchestrators — 
 - **Knowledge spine:** Wikidata.
 - **National statistics offices:** rolling out in waves — {{ctx.nsoActiveNamesProse}} in the first in-progress wave of {{ctx.nsoActiveCount}}.
 
-Each source has a dedicated sync orchestrator that pulls fresh data on a documented cadence (quarterly for most Tier-1 publishers, annually for some classification sources, and a daily cadence for the Pulse event ingest when active — that automated refresh is currently paused). Each sync writes into a single canonical table called `country_facts`, with statement-level provenance: which source, which date the source measured the value, which license the data is shared under, which fact-key it corresponds to, and whether the row is a measurement or a forecast.
+Each source has a dedicated sync orchestrator that pulls fresh data on a documented cadence (quarterly for most Tier-1 publishers, annually for some classification sources, and a daily schedule for the Pulse event pipeline). A configured schedule does not imply that every run succeeded; reader surfaces use the most recent completed computation. Each fact sync writes into a single canonical table called `country_facts`, with statement-level provenance: which source, which date the source measured the value, which license the data is shared under, which fact-key it corresponds to, and whether the row is a measurement or a forecast.
 
 For a live count of facts, fact-keys, and multi-sourced coverage, see the [about page](/about#sources). The dataset is growing as new sources land and existing sources publish new vintages.
 
@@ -55,7 +55,7 @@ When the World Bank says one number and the IMF says another, Civica does not si
 
 **Forecasts vs measurements.** The IMF World Economic Outlook publishes both historical measurements and projections out to 2030. The ILO publishes nowcasts that extend beyond the current year. Civica tags rows distinctly: `value_type = 'measured'` for actuals and `value_type = 'projected'` for forecasts. The resolver requires canonical = measured whenever any measured row exists. Forecasts only win canonical when no measurement exists.
 
-**Multi-canonical with scope predicate.** When two publishers are concurrently authoritative for a fact-key in a defined scope — for example, Eurostat is canonical for European Union public debt while the IMF is canonical globally — the system honors all three (Eurostat + IMF + OECD) with the scope predicate documented. Readers see all three; the methodology page explains the multi-canonical pattern.
+**Multi-canonical with scope predicate.** When several publishers are designated canonical for different documented scopes — for example, Eurostat for European Union public debt and the IMF globally — the system preserves the scoped observations (Eurostat + IMF + OECD) instead of forcing one into an undifferentiated alternate role. Readers see the available observations; the methodology page explains the scope rules.
 
 **Disputes when sources materially disagree.** When two sources disagree by more than a configurable threshold, the resolver creates a dispute record routed to a human review queue. This protects against typos, unit-confusion bugs (a "$440B vs $4,400B" mistake), and methodology mismatches (CIA's central-government debt vs IMF's general-government debt) without silently picking one.
 
@@ -108,4 +108,4 @@ Things you may notice as the rollout progresses:
 
 ## Get in touch {#contact}
 
-If you spot a data error, a methodological gap, or a documentation inconsistency, please [contact us](/contact). We treat external feedback as load-bearing — the project's academic standing depends on it.
+If you spot a data error, a methodological gap, or a documentation inconsistency, please [contact us](/contact). External feedback is load-bearing because the project has not yet completed independent review.

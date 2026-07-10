@@ -41,7 +41,7 @@ Civica adopts the same domain-specific architecture. Material and governance ind
 
 For Civica Conditions, the Human Development Index, GDP-based measures, demographics, and health outcomes, the default peer set is the country's World Bank region intersected with its World Bank income group. That gives seven regions × four income tiers = up to 28 cohorts; in practice only ~18 are populated.[^5]
 
-Why region+income? The World Bank publishes country-and-lending groups precisely because policy-relevant material comparisons generally need both axes. A high-income East Asian economy (Singapore, Japan) has structurally different material outcomes from a low-income East Asian economy (Cambodia, Lao PDR), even though both share regional context. Conversely, a high-income economy in Sub-Saharan Africa (Seychelles) faces different material conditions from a high-income economy in North America (United States), even at matched income. Civica takes the World Bank's convention as authoritative here.[^4] [^5]
+Why region+income? The World Bank publishes country-and-lending groups precisely because policy-relevant material comparisons generally need both axes. A high-income East Asian economy (Singapore, Japan) has structurally different material outcomes from a low-income East Asian economy (Cambodia, Lao PDR), even though both share regional context. Conversely, a high-income economy in Sub-Saharan Africa (Seychelles) faces different material conditions from a high-income economy in North America (United States), even at matched income. Civica uses the World Bank's published convention for this material-outcome comparison.[^4] [^5]
 
 ## Governance outcomes — V-Dem Regimes of the World {#governance-outcomes}
 
@@ -123,7 +123,7 @@ Future maintainers, external reviewers, or readers who want to challenge the met
 
 ## Limitations {#limitations}
 
-- **V-Dem cadence.** V-Dem updates annually. Intra-year regime transitions (a coup; a successful democratic transition) are not reflected in the peer-set classification until the next V-Dem release. Civica Pulse is intended to capture these events at a daily cadence and present them separately, but its automated daily refresh is currently paused and the peer-set tier itself lags by months regardless.
+- **V-Dem cadence.** V-Dem updates annually. Intra-year regime transitions (a coup; a successful democratic transition) are not reflected in the peer-set classification until the next V-Dem release. Civica Pulse is scheduled to process events daily and present them separately, but it does not update the peer-set tier itself, which can lag a transition by months.
 - **Non-sovereign jurisdictions.** Coverage gaps (Taiwan, Kosovo, Palestine, Western Sahara, Vatican City) are documented above. Civica falls back to global comparison or marks the lens unavailable rather than silently mapping to a near-peer.
 - **government_form_description currency.** CIA Factbook is frozen January 2026. Constitutional changes after that date are not reflected in the description until an alternative source pipeline is wired up. The field is descriptive metadata, not analytical taxonomy, so this staleness is bounded in impact.
 - **Single-lens defaults.** Each domain has one default peer lens. Power users may want to compose lenses ("electoral democracies in Sub-Saharan Africa") for finer-grained comparisons. Compound peer sets are not in v1.0; they are an explicit deferred enhancement.

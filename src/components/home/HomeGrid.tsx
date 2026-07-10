@@ -160,9 +160,10 @@ export async function HomeGrid() {
             <HeroRevealItem as="h1" id="home-title" className="home-hero-title">
               Civica Atlas
             </HeroRevealItem>
+            {/* PUBLIC_CLAIM: home.visible-positioning */}
             <HeroRevealItem as="p" className="home-hero-dek">
-              An open reference atlas of the world&rsquo;s countries, governments, and
-              governance outcomes.
+              A provenance-first comparative reference to how every country is
+              governed.
             </HeroRevealItem>
             <HeroRevealItem className="home-hero-search">
               <GlobalSearch countries={countries} />
@@ -180,7 +181,7 @@ export async function HomeGrid() {
                 <span className="home-stat-mark" aria-hidden="true">
                   &#9670;
                 </span>
-                <span className="home-stat-label">Open data &amp; provenance</span>
+                <span className="home-stat-label">Source links &amp; provenance</span>
               </div>
               <div className="home-stat home-stat--mark">
                 <span className="home-stat-mark" aria-hidden="true">
@@ -282,11 +283,12 @@ export async function HomeGrid() {
         <div className="home-feature-num">03</div>
         <div className="home-feature-main">
           <div className="home-eyebrow">Civica Index</div>
-          <h2 className="home-feature-title">Rank nations. Reveal futures.</h2>
+          <h2 className="home-feature-title">Test comparative measures.</h2>
+          {/* PUBLIC_CLAIM: home.secondary-research */}
           <p className="home-feature-desc">
-            A composite governance score for every country across{" "}
-            {civicaIndex.dimensionCount} dimensions, with the Civica Pulse layering
-            event sensitivity on top.
+            The Civica Index and Pulse are secondary research experiments. Their
+            methods and outputs remain beta while Civica tests their validity,
+            sensitivity, and usefulness.
           </p>
           <Link href="/civica-index" className="btn btn--text">
             <span>Explore the Index</span>
@@ -310,7 +312,7 @@ export async function HomeGrid() {
                   </span>
                 </Link>
                 <p className="home-index-sub">
-                  Composite ranking of governance outcomes and institutional strength.
+                  Research-beta composite; methodology under active review.
                 </p>
               </div>
               <div className="home-index-table-wrap">

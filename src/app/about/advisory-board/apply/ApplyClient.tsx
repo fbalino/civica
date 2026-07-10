@@ -84,7 +84,7 @@ function FieldLabel({
   );
 }
 
-function SuccessPanel({ onReset }: { onReset: () => void }) {
+function SuccessPanel() {
   return (
     <div className="contact-card" role="status" aria-live="polite">
       <div className="contact-success-head">
@@ -137,13 +137,6 @@ export default function ApplyClient() {
       if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
-  const reset = () => {
-    setValues(EMPTY);
-    setErrors({});
-    setServerError(null);
-    setState("idle");
-  };
-
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const next = validate(values);
@@ -192,16 +185,17 @@ export default function ApplyClient() {
     >
       <section className="editorial-section">
         <p className="editorial-page-subtitle">
-          The Civica Index is reviewed by an independent academic advisory board
-          of scholars in governance measurement, political methodology, and
-          comparative politics. If that&rsquo;s your field, tell us about
-          yourself &mdash; a human on the team reads every application.
+          Civica is collecting expressions of interest for a planned independent
+          advisory board in governance measurement, political methodology, and
+          comparative politics. No board review or endorsement has occurred yet.
+          If that&rsquo;s your field, tell us about yourself &mdash; a human on
+          the team reads every application.
         </p>
       </section>
 
       <section className="editorial-section">
         {state === "success" ? (
-          <SuccessPanel onReset={reset} />
+          <SuccessPanel />
         ) : (
           <form className="contact-card" onSubmit={submit} noValidate>
             {/* Honeypot — visually hidden, off the tab order, hidden from AT.

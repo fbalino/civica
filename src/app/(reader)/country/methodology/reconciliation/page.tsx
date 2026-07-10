@@ -166,10 +166,10 @@ export default async function ReconciliationMethodologyPage() {
           underlying fact. The CIA World Factbook is comprehensive but
           stopped updating in January 2026. Wikidata is fresh but its
           claims vary in quality. Multilateral statistical agencies
-          ({tier1HeadlineProse}) are
-          authoritative but cover narrower fact sets. National
-          statistical offices ({nsoActiveNamesProse}) are authoritative for their own
-          country and ship faster than any multilateral. For any
+          ({tier1HeadlineProse}) publish official or established international
+          series but cover narrower fact sets. National statistical offices
+          ({nsoActiveNamesProse}) publish official national statistics and
+          often release them faster than multilateral datasets. For any
           given country and fact — Argentina&apos;s inflation,
           Brazil&apos;s population, the United Kingdom&apos;s
           consumer-price index — Civica may hold three, five, or even
@@ -412,7 +412,8 @@ export default async function ReconciliationMethodologyPage() {
           {nsoDeferred.length} are deferred with specific blockers (see
           per-NSO entries below). New NSOs are added on demand — when a
           fact-key for a specific country has no Tier-1 coverage, an NSO
-          is its authoritative source, or readers ask for it. The
+          publishes the relevant official national series, or readers ask for
+          it. The
           long-term goal is roughly {nsoTarget.min}–{nsoTarget.max} NSO
           domains, which subsequent NSO waves will pursue. Every addition
           triggers a methodology version bump.
@@ -1039,9 +1040,9 @@ export default async function ReconciliationMethodologyPage() {
       <section className="editorial-section" id="multi-canonical">
         <h2>Multi-canonical with scope predicate</h2>
         <p>
-          Sometimes two or three publishers are concurrently
-          authoritative for the same fact-key, each at a different
-          scope. Eurostat is canonical for EU-27 + EFTA-4
+          Sometimes two or three publishers are designated canonical
+          for the same fact-key at different documented scopes. Eurostat is
+          canonical for EU-27 + EFTA-4
           jurisdictions on macroeconomic indicators; the IMF is
           canonical globally. ONS-UK is canonical for the United
           Kingdom; the World Bank is canonical globally. IBGE is
@@ -1234,8 +1235,8 @@ export default async function ReconciliationMethodologyPage() {
         <ul>
           <li>
             <strong>Who measured this?</strong> The editorial
-            canonical — the publisher Civica trusts as the
-            authoritative reference for the fact. For health facts
+            canonical — the publisher Civica designates for the fact and
+            documented scope. For health facts
             like life expectancy and infant mortality, that is the
             World Health Organization (WHO). For trade
             (merchandise), the World Trade Organization. For
@@ -1542,14 +1543,12 @@ export default async function ReconciliationMethodologyPage() {
       <section className="editorial-section" id="version-policy">
         <h2>Version policy and the perpetual-beta posture</h2>
         <p>
-          Civica is operating as a research lab. Methodology decisions
-          are first-class citable artefacts; each load-bearing call
-          (peer grouping, the forecast-vs-measurement partition, the
+          Civica maintains versioned working records for load-bearing
+          methodology calls, including peer grouping, the
+          forecast-vs-measurement partition, the
           trade-aggregate two-fact-key split, the canonical-pick
-          threshold raise, the vintage cadence framework) is
-          documented as a resolution document and reviewed before
-          implementation. The corpus contains roughly 25 such
-          documents and grows as new sources land.
+          threshold raise, and the vintage cadence framework. These records improve internal
+          auditability but have not all been published or independently reviewed.
         </p>
         <p>
           The methodology version stamp stays in beta indefinitely.

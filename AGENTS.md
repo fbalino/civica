@@ -1,7 +1,7 @@
 # Civica — Agent Instructions
 
 ## Project Overview
-Civica is a modern, visual replacement for the CIA World Factbook — an interactive platform visualizing government structures for every country, with an original governance scoring system (the Civica Index) that blends quarterly structural data with daily event-sensitive signals (the Civica Pulse). The goal is academic citability plus a beautiful, shareable, editorial reading experience.
+Civica Atlas is a provenance-first comparative reference to how every country is governed. Country profiles, institutional data, constitutions, elections, source trails, reconciliation, exports, and citation are the primary product. The Civica Index and Civica Pulse are secondary research experiments and must remain visibly beta until the master plan's validation and external-review gates are satisfied.
 
 Domain: `civicaatlas.org`.
 
@@ -25,7 +25,7 @@ Domain: `civicaatlas.org`.
 
 ## North stars
 - **Design system is canonical.** Before creating any new page or component, consult [`/design-system`](https://www.civicaatlas.org/design-system). Any styling that drifts from those tokens is a bug.
-- **Civica Index and Civica Pulse are the product.** Everything else (countries, elections, compare, outcomes) is evidence for them. When in doubt, make features reinforce that identity.
+- **The atlas is the primary product.** Country profiles, institutional evidence, source provenance, reconciliation, exports, and citation lead. Index and Pulse remain secondary research experiments until they earn stronger standing through the active master plan.
 - **Provenance is load-bearing.** Every data point traces to a source row with a license and `last_sync_at`. Sync scripts MUST stamp `sources.last_sync_at = NOW()` on success.
 - **Academic legitimacy matters.** The Bjornskov-Rode / CGV regime taxonomy and BR/CGV attribution is already integrated — keep it prominent.
 

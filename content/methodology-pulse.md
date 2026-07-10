@@ -28,7 +28,7 @@ On every country page you see five rows — one per dimension — each showing t
 
 - Not a co-equal score alongside the CI. There is no single "Pulse number" that competes with the CI composite.
 - Not a citable standard at launch. Treat values as experimental indicators, not ground truth.
-- Not an attempt to outperform specialised sources. ACLED is still the authority on conflict events; V-Dem is still the authority on democratic trajectory. The Pulse aggregates and scores; it does not claim original empirical authority.
+- Not an attempt to outperform specialised sources. ACLED publishes specialist conflict-event data, while V-Dem publishes long-run democracy measures. The Pulse aggregates and scores; it does not claim original empirical measurement.
 - Not a foreign-policy tracker. Inter-state acts — sanctions, embargoes, diplomatic expulsions — are a *sender's* foreign-policy decision, not a change to the *target's* own domestic governance, so they are out of scope (descriptive context at most, never a delta). The Pulse scores a country's own domestic institutions; a sanction's downstream effects inside the target are scored only if they surface as domestic events (a crackdown, unrest). This matches how the established event datasets keep inter-state acts as a directed sender→target relation rather than a property of one country.
 - Not fully automated. High-severity events and low-confidence classifications require human review before they affect published scores.
 
@@ -48,15 +48,15 @@ A governance monitor built on general news alone hits the **media-asymmetry prob
 ### Secondary (news, corroboration)
 
 - **GDELT** — global structured event records drawn from news.
-- **Reuters and AP wire** — authoritative breaking news.
+- **Reuters and AP wire** — major international wire reporting.
 
 **Current coverage (Beta).** Not every connector is active yet. The feeds running today are CIVICUS Monitor, Human Rights Watch, Amnesty International, and GDELT; the ACLED, RSF, wire-service, and V-Dem connectors are built but depend on access (paid APIs or feeds) that is not currently enabled, and IPU coverage is sparse. Until the specialist stack is fully wired, news (GDELT) carries more of the signal than the specialist-first design intends — which makes the corroboration and press-freedom weightings below (they discount news-only signal, heavily so in closed regimes) load-bearing, and the [coverage limitations](#coverage-limitations) correspondingly larger.
 
 An event seen only in news, without specialist corroboration, is scored at reduced confidence; in low-press-freedom countries that discount is severe — see the press-freedom rule below.
 
-## Daily pipeline {#daily-pipeline}
+## Scheduled pipeline {#daily-pipeline}
 
-The Pulse runs on a daily cadence (Beta). Because it runs as a scheduled job rather than a live stream, published values always reflect the most recent completed run — the per-country panels and the [Pulse changelog](/civica-index/pulse-changelog) show data as of that last computation.
+The pipeline is scheduled to ingest, cluster, classify, and score once per day. A schedule is not proof that every run completed: published values reflect the most recent successful computation, not a live stream or a continuous governance measure. The per-country panels and the [Pulse changelog](/civica-index/pulse-changelog) show the date of that computation when one is available.
 
 1. **Ingest.** Pull the trailing window of records from every active feed and write them to a staging table.
 2. **Cluster.** Embed each record with a sentence transformer (all-MiniLM-L6-v2, 384-dim). Group records by country and ±48-hour window using cosine similarity ≥ 0.75, so one real-world event covered by many sources collapses to a single cluster.
@@ -249,7 +249,7 @@ When the quarterly CI absorbs an event via updated source data (e.g. a coup from
 
 The Pulse depends on observable, reportable events. For countries with severely restricted press freedom (RSF Press Freedom score below 30) or where international monitoring organisations have limited access — North Korea, Eritrea, Turkmenistan, parts of contemporary Afghanistan — the Pulse will systematically **under-detect** events and may show artificially stable dimensional deltas.
 
-This is a known limitation of any real-time governance monitor that depends on documented evidence. For these countries, the structural [Civica Index](/civica-index) remains the primary signal — it draws on expert assessments aggregated annually (V-Dem, Freedom House, etc.) and does not depend on observable real-time events.
+This is a known limitation of any event-monitoring system that depends on documented evidence. For these countries, the structural [Civica Index](/civica-index) draws on expert assessments aggregated annually (V-Dem, Freedom House, etc.) and therefore does not depend on observable event reports. The Index remains a separate research beta, not a substitute for missing Pulse evidence.
 
 Country pages where the country's RSF score falls below 30 surface this caveat directly on the Pulse panel.
 
@@ -260,7 +260,7 @@ Country pages where the country's RSF score falls below 30 surface this caveat d
 - LLM classification is imperfect. Every classification is logged with each model's answer and rationale, the runner-up, the cross-model agreement level, and the verification result, and is subject to correction via the disputes process below.
 - Positive events require stronger corroboration than negative events. This is intentional anti-gaming. In free-press environments it has minimal effect; in closed regimes it means state-originated positive claims are discounted unless independently verified.
 - Dimensional deltas are bounded. A single event cannot produce more than −15 or +10 points of movement on any single dimension. This prevents extremes from distorting comparisons but may understate truly catastrophic situations.
-- The Pulse is not yet peer-reviewed and should not be cited as authoritative.
+- Pulse classifications and numeric effects have not completed independent review and should not be treated as established measurements.
 
 ## Corrections and disputes {#corrections}
 

@@ -15,12 +15,12 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Terms of Use",
   description:
-    "The plain-language terms for using Civica Atlas — a free, open reference for how every country is governed. Data is free to reuse with attribution.",
+    "Plain-language terms for accessing Civica Atlas and reusing its mixed-source data under the applicable upstream licenses.",
   alternates: { canonical: "https://civicaatlas.org/terms" },
   openGraph: withOg({
     title: "Terms of Use · Civica Atlas",
     description:
-      "Plain-language terms for using Civica Atlas, a free and open reference for how every country is governed.",
+      "Plain-language terms for accessing Civica Atlas and reusing its mixed-source data under the applicable upstream licenses.",
     url: "https://civicaatlas.org/terms",
   }),
 };
@@ -92,13 +92,13 @@ export default function TermsPage() {
           />
 
           <p>
-            Civica data is free to use with attribution, but the site combines
-            public-domain material, openly licensed data, and
-            publisher-restricted feeds. Public-domain and CC0 data can
-            generally be reused freely; publisher-restricted datasets remain
-            governed by their original terms. Preserve the source names,
-            license labels, and freshness dates shown with each data point,
-            and cite Civica Atlas when reusing Civica Index, Civica Pulse, or
+            Access to Civica Atlas is free, but reuse rights vary because the
+            site combines public-domain material, openly licensed data, and
+            publisher-restricted feeds. Public-domain and CC0 data can generally
+            be reused freely; publisher-restricted datasets remain governed by
+            their original terms. Preserve the source names, license labels,
+            and freshness dates shown with each data point, and cite Civica
+            Atlas when reusing Civica Index, Civica Pulse, or
             reconciliation-derived outputs.
           </p>
 
@@ -148,12 +148,13 @@ export default function TermsPage() {
           <SectionHeader
             eyebrow="Beta methodology"
             title="The Civica Index is in beta"
-            dek="An original score carries an original disclaimer."
+            dek="Experimental outputs require explicit limits."
           />
 
           <p>
-            The Civica Index and Civica Pulse are original composite measures
-            under active methodological development and marked as beta. Their{" "}
+            The Civica Index is a research-beta composite and Civica Pulse is an
+            experimental event-classification system. Neither has completed
+            independent review. Their{" "}
             <Link href="/civica-index/methodology">methodology</Link> is
             published for scrutiny. Use them as one lens among the externally
             attested sources on each country, not as a settled verdict.

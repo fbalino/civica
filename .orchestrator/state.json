@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-003"
+    "current_task": "CLM-005"
   },
   "budget": {
     "mode": "subscription_only",
@@ -73,6 +73,9 @@
     "plan/decisions/claim-tier-v1.md",
     "plan/evidence/CLM-001/README.md",
     "plan/evidence/CLM-002/README.md",
+    "plan/evidence/CLM-003/README.md",
+    "plan/evidence/CLM-004/README.md",
+    "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
     "plan/PROGRESS.md"
@@ -87,11 +90,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-001/002 after the validator type fix; the known Turbopack broad-trace warning remains.",
-    "tests": "npm test, validate:public-claims, validate:content-templates, targeted ESLint, README regeneration, and master-plan validation passed for CLM-001/002. Master plan is 2/288 complete.",
-    "public_claims": "24 claims cover 14/14 required surfaces across 7 canonical tiers; 29 source/mirror markers inspected; 0 unregistered headline claims.",
-    "browser": "Live site audited across representative routes, themes, viewports, keyboard/touch states, embeds, advisory flow, and asset geometry; root browser session finalized with no open tabs.",
+    "build": "npm run build passed for CLM-003/004: compilation, TypeScript, and 86 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "npm test, validate:public-claims, validate:content-templates, validate:design-tokens, validate:sync-freshness, targeted ESLint, README regeneration, and master-plan validation passed for CLM-003/004. Master plan is 4/288 complete.",
+    "public_claims": "27 claims cover 14/14 required surfaces across 7 canonical tiers; 33 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
+    "browser": "The real local app was audited across 10 public routes, light/dark desktop and 390px mobile; no prohibited rendered phrase, visible registry marker, horizontal overflow, or console warning/error remained. Root browser session finalized with no open tabs.",
     "visual_review": "Targeted art/caption/menu audit plus sealed blind module and 266-pair asset audit completed; findings mapped to objective tasks."
   },
-  "updated_at": "2026-07-09T23:50:11Z"
+  "updated_at": "2026-07-10T01:06:14Z"
 }

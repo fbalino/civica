@@ -62,7 +62,7 @@ export default async function ReplicationPage() {
           source dataset reference, and codebook entry needed to re-derive the
           same numbers from scratch. The replication package ships at Beta
           cut-over (target: {replication.shipTarget}), once the PCA / factor
-          analysis and confidence-interval work are finalized. The contents
+          analysis and input-variation work are finalized. The contents
           are described below.
         </p>
 
@@ -92,7 +92,7 @@ export default async function ReplicationPage() {
               <strong>Processing logic.</strong> Step-by-step description of
               how raw source data flows into final CI scores: ingestion,
               normalization (fixed-bound, not observed-extremes), PCA factor
-              weights, composite formula, confidence interval derivation, and
+              weights, composite formula, simulation-range derivation, and
               tier classification.
             </li>
             <li>
@@ -103,9 +103,9 @@ export default async function ReplicationPage() {
             <li>
               <strong>Downloadable outputs.</strong> Country-level CSV covering{" "}
               {scoredJurisdictions !== null
-                ? `all ${scoredJurisdictions}`
+              ? `all ${scoredJurisdictions}`
                 : "all"}{" "}
-              scored jurisdictions: CI score, 90% confidence interval, rank,
+              scored jurisdictions: CI score, Monte Carlo input-variation range, rank,
               rank band, dimensional breakdowns, completeness flag (Full /
               Partial / Insufficient), and data vintage per source.
             </li>

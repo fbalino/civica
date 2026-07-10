@@ -54,9 +54,8 @@ export const metadata: Metadata = {
     template: "%s · Civica Atlas",
   },
   // PUBLIC_CLAIM: metadata.default-atlas-scope
-  // PUBLIC_CLAIM: metadata.default-index-score
   description:
-    "Interactive atlas of government structures, constitutions, elections, and governance data for every country — with the Civica Index, an original governance score.",
+    "Civica Atlas is a provenance-first comparative reference to how every country is governed, with source-linked country profiles, institutions, constitutions, and elections.",
   // Default self-referencing canonical on the apex host. The relative "./"
   // resolves to the CURRENT route against `metadataBase` (Next runs it through
   // `path.posix.resolve(pathname, "./")`), so every page that doesn't set its
