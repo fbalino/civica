@@ -86,6 +86,13 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 - V-Dem, World Bank WGI, UNDP HDI, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index — feed the Civica Index
 - Pulse production-active feeds are the observed source IDs in `src/lib/pulse/v2/runtime-method.generated.json`; connector presence alone does not make a feed active
 
+## Source-input manifests
+
+- `src/lib/data/source-input-manifest.ts` is the canonical pipeline/source input contract. It distinguishes stable specifications from captured release inputs.
+- A release input is valid only with an exact access URL, retrieval timestamp, SHA-256 content hash, upstream version/vintage, format, expected coverage, redistribution posture, and adapter-version hash.
+- `npm run validate:source-input-manifest` closes every scheduled/manual production pipeline and fails if the checked-in release manifest drifts. `npm run generate:source-input-manifest -- --release-id=<id> --pipelines=<id,id>` fails closed when a required capture is absent.
+- The current pre-G2 atlas is not a frozen release. Do not fill missing historical input hashes with output hashes, `last_sync_at`, estimates, or invented retrieval times.
+
 ## Rights-language discipline
 
 - Free/no-account access, a citation, a download, and permission to use a

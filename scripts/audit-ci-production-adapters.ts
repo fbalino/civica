@@ -88,6 +88,7 @@ async function main(): Promise<void> {
   }
   const datasetYear = CI_RELEASE_DATASET_YEAR;
   const quarter = `${datasetYear}-Q4`;
+  const retrievalStartedAt = new Date().toISOString();
   const db = createDb();
   const [
     iso3Map,
@@ -115,6 +116,7 @@ async function main(): Promise<void> {
         CI_PRODUCTION_SOURCE_URLS.transparencyCpi,
     ),
   ]);
+  const retrievalFinishedAt = new Date().toISOString();
 
   const vdem = applyFrozenReleaseCoverage(
     parseVdemCore(vdemBytes, datasetYear),
@@ -254,6 +256,8 @@ async function main(): Promise<void> {
     readOnly: true,
     datasetYear,
     quarter,
+    retrievalStartedAt,
+    retrievalFinishedAt,
     tolerance: {
       rowCount: "exact",
       rawValue:

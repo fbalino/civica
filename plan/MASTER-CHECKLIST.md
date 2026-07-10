@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 20
-- **Remaining:** 268
-- **Progress:** 6.9%
+- **Completed:** 21
+- **Remaining:** 267
+- **Progress:** 7.3%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -39,7 +39,7 @@ Source: `plan/02-positioning-claims-and-documentation.md`
 Source: `plan/03-data-provenance-and-reproducibility.md`
 
 - [x] **DAT-001** (P0) Move or reimplement every production data adapter needed for the live atlas and Index on canonical `main`; remove dependence on unmerged/private branch behavior. _Done when: a clean clone of `main` contains the adapter used for every released source, no production table depends on code absent from the release commit, and clean-room reproduction reaches declared row/checksum tolerances._
-- [ ] **DAT-002** (P0) Build a versioned source-input manifest for every ingestion and reconciliation pipeline. _Done when: each source records canonical URL/access method, upstream version/vintage, retrieval time, content hash, format, expected coverage, redistribution posture, and adapter version, and release generation fails when a required manifest entry is missing._
+- [x] **DAT-002** (P0) Build a versioned source-input manifest for every ingestion and reconciliation pipeline. _Done when: each source records canonical URL/access method, upstream version/vintage, retrieval time, content hash, format, expected coverage, redistribution posture, and adapter version, and release generation fails when a required manifest entry is missing._
 - [ ] **DAT-003** (P0) Build a machine-readable rights manifest at source, field/product, and release-artifact level. _Done when: every exported table/field traces to an allowed license/terms record, restricted/non-commercial inputs are flagged, generated release artifacts list included/excluded sources, and a rights test blocks an incompatible export._
 - [ ] **DAT-004** (P0) Declare and enforce a jurisdiction/entity-status taxonomy separate from casual country naming. _Done when: sovereign states, dependencies/territories, disputed/limited-recognition entities, and aggregates have sourced status fields and display policy; no blanket default silently labels all 253 rows sovereign states; tests cover known edge cases._
 - [ ] **DAT-005** (P0) Publish statement/fact-key provenance coverage metrics instead of implying universal reconciliation. _Done when: a generated report shows total facts, source-linked facts, facts with one source, facts with two-plus independent sources, unresolved disputes, stale rows, and coverage by country/fact key; public language matches the report._

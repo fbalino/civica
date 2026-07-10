@@ -556,3 +556,14 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   the G3 tournament decides whether it has incremental value.
 - HDI and GPI are Conditions inputs, not current Index dimensions. Durable
   record: APR-D035 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Input specifications are not release captures
+
+- `source-input-manifest/v1` closes every deployed pipeline/source contract,
+  but only exact retrieved bytes with a timestamp and SHA-256 may enter a
+  named release manifest.
+- Never substitute `last_sync_at`, an output-table hash, an estimate, or a
+  reconstructed timestamp for a missing input capture.
+- The frozen Index has four valid captures. The pre-G2 Atlas must continue to
+  fail release generation until its remaining captures exist. Durable record:
+  APR-D036 in `plan/DECISIONS.md`.

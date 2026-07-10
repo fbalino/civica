@@ -5,7 +5,10 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
-import { MANUAL_PRODUCTION_ADAPTERS } from "../src/lib/data/production-adapter-registry";
+import {
+  MANUAL_PRODUCTION_ADAPTERS,
+  SCHEDULED_PRODUCTION_ADAPTERS,
+} from "../src/lib/data/production-adapter-registry";
 
 const ROOT = process.cwd();
 const args = new Map(
@@ -57,6 +60,9 @@ const registeredFiles = new Set(
   ]),
 );
 for (const route of scheduledRoutes) registeredFiles.add(route.file);
+for (const adapter of SCHEDULED_PRODUCTION_ADAPTERS) {
+  for (const file of adapter.implementationPaths) registeredFiles.add(file);
+}
 
 const problems: Problem[] = [];
 for (const file of registeredFiles) {

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "source-input-manifest/v1",
+  "releaseId": "ci-beta-2024-Q4",
+  "generatedFrom": "checked-in-captures",
+  "pipelineIds": ["index.current-beta"],
+  "inputs": [
+    {
+      "pipelineId": "index.current-beta",
+      "sourceId": "freedom_house",
+      "accessUrl": "https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx",
+      "retrievedAt": "2026-07-10T20:56:16.125Z",
+      "contentSha256": "d6ac861af6e7dcea7e870e39ddbcd2925730a653c1466f8992a7d0005f53be88",
+      "format": "xlsx",
+      "upstreamVersion": "Freedom in the World workbook through 2024",
+      "upstreamVintage": "2024 edition",
+      "expectedCoverage": "country rows matched to the Civica release universe",
+      "redistributionPosture": "restricted-no-redistribution",
+      "adapterVersion": "sha256:a0ba9348b7a67db5df4b3545c5bc7edb62c8bb1cf5c4259b123be4cd9c3c1ec3"
+    },
+    {
+      "pipelineId": "index.current-beta",
+      "sourceId": "transparency_intl",
+      "accessUrl": "https://images.transparencycdn.org/images/CPI2024-Results-and-trends.xlsx",
+      "retrievedAt": "2026-07-10T20:56:16.125Z",
+      "contentSha256": "34d1c16eb3c5b04cad2cf116c852dfc4ab8144b1c66cb37c74011848639f5736",
+      "format": "xlsx",
+      "upstreamVersion": "CPI 2024 results workbook",
+      "upstreamVintage": "2024 edition",
+      "expectedCoverage": "country rows matched to the Civica release universe",
+      "redistributionPosture": "restricted-no-redistribution",
+      "adapterVersion": "sha256:a0ba9348b7a67db5df4b3545c5bc7edb62c8bb1cf5c4259b123be4cd9c3c1ec3"
+    },
+    {
+      "pipelineId": "index.current-beta",
+      "sourceId": "vdem",
+      "accessUrl": "https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v15_csv.zip",
+      "retrievedAt": "2026-07-10T20:56:16.125Z",
+      "contentSha256": "bd6430d6b78785c7422acee7d75bef1b852f2ce1baa5f673ae40ffca64ffe51b",
+      "format": "zip-csv",
+      "upstreamVersion": "V-Dem Country-Year Core v15",
+      "upstreamVintage": "2024 observations for the frozen Index; source year retained elsewhere",
+      "expectedCoverage": "country rows matched to the Civica release universe",
+      "redistributionPosture": "open-with-attribution",
+      "adapterVersion": "sha256:a0ba9348b7a67db5df4b3545c5bc7edb62c8bb1cf5c4259b123be4cd9c3c1ec3"
+    },
+    {
+      "pipelineId": "index.current-beta",
+      "sourceId": "worldbank_wgi",
+      "accessUrl": "https://www.worldbank.org/content/dam/sites/govindicators/doc/wgidataset_with_sourcedata-2025.xlsx",
+      "retrievedAt": "2026-07-10T20:56:16.125Z",
+      "contentSha256": "25a2f9eabb90b0092973392c0b31571aa58b691cc5786292e504b52f693e1eb8",
+      "format": "xlsx",
+      "upstreamVersion": "WGI 2025 revision",
+      "upstreamVintage": "2024 observations",
+      "expectedCoverage": "country rows matched to the Civica release universe",
+      "redistributionPosture": "open-with-attribution",
+      "adapterVersion": "sha256:a0ba9348b7a67db5df4b3545c5bc7edb62c8bb1cf5c4259b123be4cd9c3c1ec3"
+    }
+  ]
+}
