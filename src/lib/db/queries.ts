@@ -1,5 +1,6 @@
 import { eq, and, desc, asc, sql } from "drizzle-orm";
 import { db } from "./index";
+import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import {
   buildGovernmentClassificationMap,
   type JurisdictionTaxonomyInput,
@@ -209,6 +210,27 @@ export type RankingCountryRow = {
   metrics: Record<string, RankingMetricCell>;
 };
 
+/**
+ * Build one Beta CI-dimension ranking cell from a raw `ci_dimension_scores`
+ * row's `raw_value` + `source_id`, using the same v2 fixed-bound transform
+ * as the headline composite (`displayDimensionScore`). Returns null when the
+ * raw value is missing or the source isn't in the v2 bounds table — the
+ * caller must hide the cell rather than fall back to the legacy
+ * `normalized_score` column, which does not reconcile with the Beta
+ * headline. Pure and DB-free so it is directly regression-testable.
+ */
+export function rankingDimensionCell(
+  rawValue: number | string | null | undefined,
+  sourceId: string,
+  createdAt: string | Date | null,
+): RankingMetricCell | null {
+  const numeric =
+    rawValue === null || rawValue === undefined ? null : Number(rawValue);
+  const value = displayDimensionScore(numeric, sourceId);
+  if (value === null) return null;
+  return { value, source: sourceId, retrievedAt: toIso(createdAt) };
+}
+
 /** country_facts fact keys surfaced as ranking columns, keyed by the
  *  column id the page uses. Kept here so the pivot and the page agree. */
 const RANKING_FACT_KEYS: Record<string, string> = {
@@ -354,10 +376,16 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
   // dimension scores but no composite and no ranking country_facts still SEEDS
   // its own row (via ensure) instead of being silently dropped. Today every CI
   // country also has a composite, so this is defensive, not corrective.
+  //
+  // Reads raw_value + source_id and normalizes via displayDimensionScore()
+  // (the same v2 fixed-bound transform the headline composite uses) rather
+  // than the stored normalized_score column, which is the legacy v1
+  // observed-min-max value and does not reconcile with the Beta headline —
+  // see src/lib/ci/normalize-v2.ts.
   const dimensionResult = await db.execute(sql`
     SELECT
       ds.jurisdiction_id, j.slug, j.name, j.iso2,
-      ds.dimension, ds.normalized_score,
+      ds.dimension, ds.raw_value,
       ds.source_id, ds.created_at
     FROM ci_dimension_scores ds
     JOIN jurisdictions j
@@ -377,7 +405,7 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
     name: string;
     iso2: string | null;
     dimension: string;
-    normalized_score: number | string | null;
+    raw_value: number | string | null;
     source_id: string;
     created_at: string | Date | null;
   }>;
@@ -385,16 +413,12 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
   for (const r of dimensionRows) {
     const column = dimensionToColumn.get(r.dimension);
     if (!column) continue;
-    const value = Number(r.normalized_score);
-    if (!Number.isFinite(value)) continue;
+    const cell = rankingDimensionCell(r.raw_value, r.source_id, r.created_at);
+    if (cell === null) continue;
     // Seed the row if this country wasn't introduced by facts/composite, so a
     // dimension-only country is never silently dropped from the matrix.
     const row = ensure(r.jurisdiction_id, r.slug, r.name, r.iso2);
-    row.metrics[column] = {
-      value,
-      source: r.source_id,
-      retrievedAt: toIso(r.created_at),
-    };
+    row.metrics[column] = cell;
   }
 
   return [...byId.values()].map(({ id: _id, ...row }) => row);

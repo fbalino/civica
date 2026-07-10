@@ -1,14 +1,18 @@
 /**
- * Civica Index — Monte Carlo confidence interval simulator.
+ * Civica Index — Monte Carlo input-variation range simulator.
  *
- * Per spec §2.5: every score publishes a 90% confidence interval,
- * computed by:
+ * Per spec §2.5: every score publishes a central-90% input-variation
+ * range, computed by:
  *   1. Sampling each indicator from a distribution centered on its
  *      reported value with spread equal to its published uncertainty
  *      (or a conservative ±5% default when not published).
- *   2. Recomputing the CI 10,000 times.
+ *   2. Recomputing the composite 10,000 times.
  *   3. Reporting the 5th and 95th percentile of the 10,000 simulated
- *      CIs as the [lower, upper] bound.
+ *      composites as the [lower, upper] bound.
+ *
+ * This is a sensitivity summary under declared perturbation
+ * assumptions, not a calibrated confidence interval for a latent true
+ * score — do not describe it as one in code, prose, or API output.
  *
  * For the Beta phase the implementation uses a normal distribution
  * with mean = the dimension's normalized score and standard deviation
@@ -23,18 +27,25 @@ export const DEFAULT_SIMS = 10_000;
 /**
  * Sample once from a normal distribution N(mean, stdDev) using the
  * Box-Muller transform. Returns a single sample.
+ *
+ * `rng` defaults to `Math.random` (production behavior, unchanged).
+ * Tests inject a seeded generator for deterministic assertions.
  */
-export function sampleNormal(mean: number, stdDev: number): number {
+export function sampleNormal(
+  mean: number,
+  stdDev: number,
+  rng: () => number = Math.random,
+): number {
   // Box-Muller: two uniforms → one standard normal.
   let u1 = 0;
   let u2 = 0;
-  while (u1 === 0) u1 = Math.random();
-  while (u2 === 0) u2 = Math.random();
+  while (u1 === 0) u1 = rng();
+  while (u2 === 0) u2 = rng();
   const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
   return mean + stdDev * z;
 }
 
-interface DimensionInput {
+export interface DimensionInput {
   /** Dimension key, e.g. "democratic_quality". */
   key: string;
   /** Mean (the country's normalized score for this dimension). */
@@ -45,7 +56,7 @@ interface DimensionInput {
   weight: number;
 }
 
-interface MonteCarloResult {
+export interface MonteCarloResult {
   /** Median of the simulation (used as the published point estimate). */
   scoreMedian: number;
   /** 5th percentile of the 10,000-sim distribution. */
@@ -67,10 +78,15 @@ interface MonteCarloResult {
  * Inputs whose `mean` is outside [0, 100] are clamped after sampling
  * (a normal sample can drift below 0 or above 100; clamping prevents
  * the composite from going negative).
+ *
+ * `rng` defaults to `Math.random` (production behavior, unchanged).
+ * Tests inject a seeded generator so the median/lower/upper are
+ * reproducible.
  */
 export function simulateComposite(
   dimensions: DimensionInput[],
   sims: number = DEFAULT_SIMS,
+  rng: () => number = Math.random,
 ): MonteCarloResult {
   const samples: number[] = new Array(sims);
   for (let i = 0; i < sims; i++) {
@@ -78,7 +94,7 @@ export function simulateComposite(
     for (const d of dimensions) {
       const sampled = Math.max(
         0,
-        Math.min(100, sampleNormal(d.mean, d.stdDev)),
+        Math.min(100, sampleNormal(d.mean, d.stdDev, rng)),
       );
       composite += sampled * d.weight;
     }

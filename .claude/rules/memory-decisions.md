@@ -409,3 +409,12 @@ geographic renames (e.g. Denali/Mt. McKinley) must be evaluated case-by-case
 against the same international-reference standard (IHO / UN / major
 encyclopedias and wire services) before being added to the phrase map — they
 must NOT be auto-applied just because a U.S. executive order changed them.
+
+## 2026-07-10 — Civica Index Beta/v2 is the canonical current method
+
+- Keep the Index active as a secondary research-Beta aggregation; CLM-008 does not retire or redesign it.
+- The live contract is fixed-bound normalization of four headline inputs: V-Dem Democratic Quality, World Bank WGI Rule of Law, Freedom House rights, and Transparency CPI.
+- Democratic Quality and Rule of Law are mandatory. Partial estimates re-proportion the available weights and widen the sensitivity assumptions; disclose the upward-bias risk.
+- The public integer is the rounded Monte Carlo median. Its central input-variation range is a heuristic sensitivity summary, not a confidence interval.
+- Public presentation is neutral and grade-free. Legacy v1 remains archived for reproducibility only.
+- The G3 validation tournament decides whether this aggregation, a redesigned Index, or no composite ultimately graduates.

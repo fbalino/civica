@@ -27,18 +27,28 @@ import {
 import { normalizeV2, defaultUncertaintyV2 } from "./normalize-v2";
 import { simulateComposite, DEFAULT_SIMS } from "./monte-carlo";
 
-const BETA_VERSION = "beta";
+export const BETA_VERSION = "beta";
 
-interface DimensionRow {
+/**
+ * Spec §2.7: a partial estimate (mandatory dimensions present, one
+ * optional dimension missing) widens the Monte Carlo input-variation
+ * range by this multiplier, applied to each present dimension's
+ * `stdDev` before simulation. This is a heuristic sensitivity
+ * adjustment, not a statistical correction — see `classifyCompleteness`
+ * for the upward-bias limitation it does not fully offset.
+ */
+export const PARTIAL_WIDENING_FACTOR = 1.2;
+
+export interface DimensionRow {
   jurisdictionId: string;
   dimension: string;
   rawValue: number | null;
   sourceId: string;
 }
 
-type CompletenessFlag = "full" | "partial" | "insufficient";
+export type CompletenessFlag = "full" | "partial" | "insufficient";
 
-interface CompositeResult {
+export interface CompositeResult {
   jurisdictionId: string;
   scoreInteger: number;
   scoreLower: number;
@@ -58,17 +68,20 @@ interface CompositeResult {
  *                    the optional ones is missing
  *   - "full"         if all 4 dimensions are present
  *
- * v2 explicitly does NOT re-proportion missing weight onto remaining
- * dimensions, because that approach silently biases fragile states
- * upward (the dimensions most likely to be missing are the ones that
- * would have scored lowest).
- *
  * For partial CI the composite is computed using only the available
- * dimensions, with their weights re-proportioned to sum to 1.00 over
- * THOSE dimensions only — but the input-variation range is widened by
- * 20% to reflect the added uncertainty (spec §2.7).
+ * dimensions, with their weights re-proportioned (see `adjustedWeights`)
+ * to sum to 1.00 over THOSE dimensions only, and the Monte Carlo
+ * input-variation range is widened by `PARTIAL_WIDENING_FACTOR` (spec
+ * §2.7) to reflect the added uncertainty.
+ *
+ * KNOWN LIMITATION: re-proportioning can bias a partial score upward,
+ * because the dimension most likely to be missing for a fragile or
+ * low-capacity state is often the one that would have scored lowest.
+ * The 20% widened range is a heuristic mitigation, not a validated
+ * statistical correction for that bias. See published methodology §7
+ * and §12.
  */
-function classifyCompleteness(present: Set<string>): {
+export function classifyCompleteness(present: Set<string>): {
   completeness: CompletenessFlag;
   missing: CIDimensionV2[];
 } {
@@ -84,7 +97,7 @@ function classifyCompleteness(present: Set<string>): {
 }
 
 /** Re-proportion v2 weights to sum to 1.00 over the dimensions present. */
-function adjustedWeights(
+export function adjustedWeights(
   present: CIDimensionV2[],
 ): Record<CIDimensionV2, number> {
   const total = present.reduce((s, d) => s + V2_WEIGHTS[d], 0);
@@ -102,8 +115,20 @@ function adjustedWeights(
 /**
  * Compute one country's v2 composite. Returns null if completeness is
  * insufficient (caller skips).
+ *
+ * Pure and DB-free — production's `calculateCompositeV2` and the
+ * documentation fixture (`src/lib/ci/__tests__/worked-examples.test.ts`)
+ * both call this same function, so the published worked examples can
+ * never drift from the scoring code that runs in production.
+ *
+ * `rng` defaults to `Math.random` (production behavior, unchanged).
+ * Tests inject a seeded generator for deterministic assertions.
  */
-function computeOne(rows: DimensionRow[], sims: number): CompositeResult | null {
+export function computeOne(
+  rows: DimensionRow[],
+  sims: number,
+  rng: () => number = Math.random,
+): CompositeResult | null {
   // Reduce to v2 dimensions only — drop human_development and
   // stability_security (those go to Civica Conditions).
   const v2Rows = rows.filter((r) => isV2Dimension(r.dimension));
@@ -134,13 +159,14 @@ function computeOne(rows: DimensionRow[], sims: number): CompositeResult | null 
 
   if (mcInputs.length === 0) return null;
 
-  // Spec §2.7: partial estimates widen the input-variation range by 20%.
-  const partialPenalty = completeness === "partial" ? 1.2 : 1.0;
+  // Spec §2.7: partial estimates widen the input-variation range.
+  const partialPenalty =
+    completeness === "partial" ? PARTIAL_WIDENING_FACTOR : 1.0;
   for (const input of mcInputs) {
     input.stdDev *= partialPenalty;
   }
 
-  const mc = simulateComposite(mcInputs, sims);
+  const mc = simulateComposite(mcInputs, sims, rng);
 
   return {
     jurisdictionId: rows[0].jurisdictionId,

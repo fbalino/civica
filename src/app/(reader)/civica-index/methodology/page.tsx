@@ -64,8 +64,8 @@ const DIMENSION_PRESENTATION: Record<
     secondary: "V-Dem Electoral Democracy Index",
   },
   rule_of_law: {
-    primary: "V-Dem Rule of Law",
-    secondary: "World Bank WGI Rule of Law",
+    primary: "World Bank WGI Rule of Law",
+    secondary: "V-Dem Rule of Law",
   },
   freedom_rights: {
     primary: "Freedom House (PR + CL combined)",
@@ -205,7 +205,7 @@ export default async function MethodologyPage() {
               <th>Dimension</th>
               <th>Weight</th>
               <th>Primary source</th>
-              <th>Secondary / cross-check</th>
+              <th>Candidate cross-check (not currently ingested)</th>
             </tr>
           </thead>
           <tbody>

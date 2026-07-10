@@ -165,3 +165,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   `/civica-conditions`; what remains deferred is the per-country outcome peer-band panel
   (component built, unwired), pending the peer-comparison methodology extension to material
   outcomes.
+
+## 2026-07-10 — CLM-008 Index method reconciliation
+
+- Completed CLM-008 with subscription-authenticated `gpt-5.3-codex-spark`, Claude Opus 4.8, and Claude Sonnet 5 workers under a one-writer/review-repair loop.
+- Corrected public source, normalization, missingness, uncertainty, and Beta-status prose; fixed `/rankings` to use raw values through the v2 display transform rather than archived v1 normalized values.
+- Added `src/lib/ci/__tests__/worked-examples.test.ts`, seeded RNG injection, and exported pure production seams so the documentation examples are executable without a database.
+- Full tests/validators/build and desktop/mobile light/dark browser QA passed. Evidence is in `plan/evidence/CLM-008/`.

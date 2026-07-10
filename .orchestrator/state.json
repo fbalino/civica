@@ -5,9 +5,9 @@
     "name": "Civica Academic Publication Readiness",
     "root": "/Users/fernandobalino/Projects/civica",
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
-    "status": "paused",
+    "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-007_complete"
+    "current_task": "CLM-008_complete"
   },
   "budget": {
     "mode": "subscription_only",
@@ -70,6 +70,51 @@
       "subscription_first": true,
       "ownership": "read-only CLM-007 acceptance review",
       "result_artifact": "plan/evidence/CLM-007/sonnet-final-review.json"
+    },
+    "sp53_clm008_recon": {
+      "status": "completed",
+      "provider": "codex-cli",
+      "model_requested": "gpt-5.3-codex-spark",
+      "model_used": "gpt-5.3-codex-spark",
+      "session_id": "019f4a9e-55e1-70d2-aabb-2eafa7a7c37a",
+      "subscription_first": true,
+      "ownership": "read-only CLM-008 reconnaissance"
+    },
+    "op48_clm008_contract": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "ebb6f311-59e1-439b-b945-3b8aab4f99e1",
+      "subscription_first": true,
+      "ownership": "read-only CLM-008 methodology adjudication"
+    },
+    "sn5_clm008_fixture_architecture": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "9b0d3a35-8478-4da0-98b4-c8bcc590cc2d",
+      "subscription_first": true,
+      "ownership": "read-only executable-fixture architecture"
+    },
+    "sn5_clm008_implementation": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "fe258bf9-e0f0-4f63-868f-7e1318e4f47d",
+      "subscription_first": true,
+      "ownership": "single writer for CLM-008 implementation files"
+    },
+    "op48_clm008_final_review": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "opus",
+      "model_used": "claude-opus-4-8",
+      "session_id": "ebb6f311-59e1-439b-b945-3b8aab4f99e1",
+      "subscription_first": true,
+      "ownership": "read-only CLM-008 acceptance review"
     }
   },
   "manifests": [],
@@ -88,6 +133,8 @@
     "plan/evidence/CLM-007/README.md",
     "plan/evidence/CLM-007/browser-checks.md",
     "plan/evidence/CLM-007/sonnet-final-review.json",
+    "plan/evidence/CLM-008/README.md",
+    "plan/evidence/CLM-008/browser-checks.md",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -103,11 +150,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-007: compilation, TypeScript, runtime/claim/freshness guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "94 tests, content templates, 544 offline and 546 live Pulse contract checks, public/numeric claims, design tokens, sync freshness, targeted ESLint, diff checks, and master-plan validation passed. Master plan is 7/288 complete.",
+    "build": "npm run build passed for CLM-008: compilation, TypeScript, runtime/claim/freshness guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "104 tests, the executable Index worked-examples fixture, content templates, public/numeric claims, design tokens, sync freshness, targeted ESLint, and diff checks passed. Master plan is 8/288 complete pending final plan validation.",
     "public_claims": "28 claims cover 14/14 required surfaces across 7 canonical tiers; 34 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "CLM-007 public methodology, API docs, changelog, archived backtest, Brazil populated Pulse, and Liechtenstein empty Pulse were checked on desktop/mobile with zero console errors, no horizontal overflow, keyboard focus, and reduced-motion verification.",
-    "visual_review": "Final CLM-007 screenshots were inspected; no acceptance-blocking overlap, scalar Pulse, or fabricated no-event zero remained."
+    "browser": "CLM-008 Index methodology and rankings were checked on desktop/mobile in light/dark themes with zero console warnings/errors and no document-level horizontal overflow; the corrected source, missingness, median, candidate-source, and v2 ranking values rendered.",
+    "visual_review": "Final CLM-008 methodology screenshots were inspected in both themes; no acceptance-blocking overlap or contrast issue remained."
   },
-  "updated_at": "2026-07-10T05:46:03Z"
+  "updated_at": "2026-07-10T07:09:00Z"
 }

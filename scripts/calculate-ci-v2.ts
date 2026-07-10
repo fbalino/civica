@@ -1,11 +1,13 @@
 /**
- * Phase 5.2 — Run the Beta CI calculation pipeline.
+ * Run the Beta (v2) CI calculation pipeline — the canonical live scoring
+ * path.
  *
  * Reads existing dimension data (any methodology version), applies the
- * v2 fixed-bound normalization, runs Monte Carlo to derive confidence
- * intervals, and writes the result to ci_composite_scores under
- * methodology_version='beta'. Live displays still show v1.0 — the
- * Beta rows just sit alongside until cut-over (Phase 5.4).
+ * v2 fixed-bound normalization, runs Monte Carlo to derive the central
+ * 90% input-variation range (a sensitivity summary, not a confidence
+ * interval), and writes the result to ci_composite_scores under
+ * methodology_version='beta'. Public reads default to Beta; the archived
+ * v1.0 rows remain in the same table for reproducibility only.
  *
  * Usage:
  *   tsx scripts/calculate-ci-v2.ts                    # latest quarter

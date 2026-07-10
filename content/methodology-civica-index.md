@@ -41,17 +41,14 @@ Scores are integers, not decimals. The underlying data is not precise enough to 
 
 ## Section 3 · Normalization {#normalization}
 
-Every source uses a different native scale. Civica normalizes them to 0–100 using **fixed theoretical bounds** rather than observed minimums and maximums, so scores remain comparable across years and aren't shifted by changes elsewhere in the dataset:
+Every source uses a different native scale. Civica normalizes them to 0–100 using **fixed theoretical bounds** rather than observed minimums and maximums, so scores remain comparable across years and aren't shifted by changes elsewhere in the dataset. The current implementation is a hard-coded lookup table, one row per source actually ingested into the four headline dimensions — there is no fallback transform for a source outside this table; the dimension is simply skipped:
 
-| Source | Native scale | Transform to 0–100 |
-|---|---|---|
-| V-Dem (libdem, polyarchy, rule) | 0.0 – 1.0 | score × 100 |
-| World Bank WGI | −2.5 to +2.5 | ((score + 2.5) / 5.0) × 100 |
-| Transparency International CPI | 0 – 100 | score (already on target scale) |
-| Freedom House (PR + CL) | 2 – 14 (sum, inverted) | ((14 − score) / 12) × 100 |
-| RSF Press Freedom | 0 – 100 (varies by year) | see annual RSF methodology |
-
-For sources without natural theoretical bounds, the methodology uses an **anchored z-score transform**: compute z-scores against the global distribution of a fixed reference period (2020–2024), then convert via the cumulative normal distribution to 0–100. The reference period, mean, and standard deviation are documented and frozen — never re-anchored — so historical scores remain comparable.
+| Dimension | Source | Native scale | Transform to 0–100 |
+|---|---|---|---|
+| Democratic quality | V-Dem Liberal Democracy Index | 0.0 – 1.0 | score × 100 |
+| Rule of law | World Bank WGI Rule of Law | −2.5 to +2.5 | ((score + 2.5) / 5.0) × 100 |
+| Freedoms & rights | Freedom House (PR + CL, combined) | 2 – 14 (sum, inverted) | ((14 − score) / 12) × 100 |
+| Corruption control | Transparency International CPI | 0 – 100 | score (already on target scale) |
 
 ## Section 4 · Weight determination {#weights}
 
@@ -72,11 +69,13 @@ for each country:
   for sim in 1 .. 10,000:
     sample each indicator from its
       published-uncertainty distribution
-    recompute the CI
+    recompute the weighted composite
 
   input-variation range = [5th percentile, 95th percentile]
                           of the 10,000 simulated composites
 ```
+
+The published point estimate is the **median** of those simulated composites, rounded to the nearest integer — not the raw (unperturbed) weighted sum. The displayed input-variation range uses the lower and upper percentiles described above from that same simulated distribution.
 
 Some inputs, including V-Dem, publish uncertainty information directly. For sources that do not, the current implementation applies a fixed ±5% perturbation on the normalized range. That fallback is a heuristic sensitivity assumption, not an estimated sampling distribution. Until a defensible statistical model is specified and validated, Civica does not describe these bounds as confidence intervals or as the probable location of a true score.
 
@@ -85,10 +84,10 @@ Some inputs, including V-Dem, publish uncertainty information directly. For sour
 Different countries have different data coverage. Civica enforces three rules to handle missing data without distorting the score:
 
 - **Mandatory dimensions.** Democratic Quality and Rule of Law are required. If either is missing, no CI is published for that country — the page reads "Insufficient data for governance index" with an explanation of which dimensions are missing.
-- **Partial estimate.** If the mandatory dimensions are present but one of the others (Freedoms & Rights or Corruption Control) is missing, a partial estimate is published and flagged visually. The simulation range receives a fixed 20% widening; this is an explicit heuristic sensitivity adjustment, not a statistical confidence correction.
+- **Partial estimate.** If the mandatory dimensions are present but one of the others (Freedoms & Rights or Corruption Control) is missing, a partial estimate is published and flagged visually. The weights of the dimensions actually present are re-proportioned to carry the full composite weight, and the simulation range receives a fixed 20% widening; the widening is an explicit heuristic sensitivity adjustment, not a statistical confidence correction.
 - **Complete estimate.** All {{state.civicaIndex.dimensionCount}} dimensions present. No missing-dimension flag.
 
-Re-proportioning weights to fill in missing data is explicitly avoided — that approach silently biases the scores of fragile states upward, since the dimensions most likely to be missing are the ones that would have scored lowest.
+**Upward-bias risk.** Re-proportioning weights onto the dimensions that are present can push a partial score upward, because the dimension most likely to be missing for a fragile or low-capacity state is often the one that would have scored lowest. The 20% widened range is a heuristic mitigation, not a validated statistical correction for this bias — see §12.
 
 ## Section 8 · Civica Conditions {#conditions}
 
@@ -134,6 +133,8 @@ Both series are accessible via the API. See §13 for citation format.
 **Source lag.** The CI is only as current as its slowest-updating source. Some upstream indices publish 12–18 months behind real-world developments. Pulse is a separate experiment testing whether an event ledger can add timely context; its incremental value has not yet been established.
 
 **Coverage gaps.** Some countries have insufficient source coverage to compute even a partial CI. Those pages display "Insufficient data" rather than guess. The full list will accompany the replication package (in preparation, targeted for Q3 2026).
+
+**Partial-estimate upward bias.** Re-proportioning weights over the dimensions present (§7) can bias a partial score upward relative to what the country would score with full coverage, since the missing dimension is often the weakest one for a fragile or low-capacity state. The widened input-variation range is a heuristic sensitivity adjustment, not a validated statistical correction for this bias.
 
 **Construct narrowing.** By design, the CI measures governing institutions only. If a reader wants to ask "is this country a good place to live?" — a different and broader question — the CI alone does not answer that. Read it together with [Civica Conditions](/civica-conditions).
 
