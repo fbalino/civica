@@ -25,7 +25,6 @@ import {
   ciDimensionScores,
   ciMethodologyVersions,
   indicatorHistory,
-  pulseDailyScores,
   bills,
   organizations,
   organizationMemberships,
@@ -1259,13 +1258,6 @@ export async function getCICountryDetail(
       sql`${ciDimensionScores.jurisdictionId} = ${jId} AND ${ciDimensionScores.quarter} = ${q} AND ${ciDimensionScores.methodologyVersion} = ${methodologyVersion}`
     );
 
-  const pulseLatest = await db
-    .select()
-    .from(pulseDailyScores)
-    .where(eq(pulseDailyScores.jurisdictionId, jId))
-    .orderBy(desc(pulseDailyScores.scoreDate))
-    .limit(1);
-
   const classificationMap = await buildGovernmentClassificationMap([
     jurisdiction[0],
   ]);
@@ -1278,7 +1270,6 @@ export async function getCICountryDetail(
     },
     composite: composite ?? null,
     dimensions,
-    pulse: pulseLatest[0] ?? null,
   };
 }
 

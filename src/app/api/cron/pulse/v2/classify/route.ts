@@ -7,19 +7,25 @@ import { classifyClusters } from "@/lib/pulse/v2/classify";
 import {
   providerKeyEnvName,
   providerKeyPresent,
+  resolveClassifyEnsemble,
+  resolveEnsembleVerifyConfig,
   resolveProviderConfig,
 } from "@/lib/pulse/v2/provider";
+import {
+  SUBJECT_ATTRIBUTION_MODEL,
+  SUBJECT_ATTRIBUTION_PROVIDER,
+} from "@/lib/pulse/v2/country-attribution";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// Two LLM calls per cluster (classify + verify) — allow generous time.
+// Multiple parallel classify voters, one adversarial verify call, and one
+// subject-country attribution call per accepted cluster.
 export const maxDuration = 800;
 
 // ENABLE SEQUENCE (owner/main session, via the Vercel API):
-//   1. Set DEEPSEEK_API_KEY (or GLM_API_KEY) in the Vercel project env.
-//   2. Optionally set PULSE_CLASSIFY_PROVIDER / PULSE_CLASSIFY_MODEL and
-//      PULSE_VERIFY_PROVIDER / PULSE_VERIFY_MODEL to override the DeepSeek
-//      defaults. See .env.example and plan/pulse-classifier-cost-resolution-v1.md.
+//   1. Set the API keys required by every configured ensemble voter, the
+//      verifier, and the subject-country attribution pass.
+//   2. Optionally set PULSE_CLASSIFY_ENSEMBLE and PULSE_ENSEMBLE_VERIFY.
 //   3. Redeploy so the new env reaches this route.
 // Until the configured provider's key is present this route no-ops with a
 // logged notice and HTTP 200 — so the cron can be deployed safely BEFORE
@@ -31,12 +37,23 @@ async function handler(request: Request) {
 
   const started = new Date().toISOString();
 
-  // Guard: both passes need their provider key present. If either is
-  // missing, skip cleanly rather than throwing (a thrown classify call
-  // would 500 the cron and could partially spend on the pass that IS keyed).
-  const classifyCfg = resolveProviderConfig("classify");
-  const verifyCfg = resolveProviderConfig("verify");
-  const missing = [classifyCfg.provider, verifyCfg.provider]
+  // Guard the configuration that classify.ts actually runs. Subject-country
+  // attribution is a separate Anthropic pass and must be keyed even when the
+  // voter/verifier configuration does not otherwise include Anthropic.
+  const classifyEnsemble = resolveClassifyEnsemble();
+  const ensembleMode = classifyEnsemble.length > 1;
+  const classifyConfigs = ensembleMode
+    ? classifyEnsemble
+    : [classifyEnsemble[0]];
+  const verifyCfg = ensembleMode
+    ? resolveEnsembleVerifyConfig()
+    : resolveProviderConfig("verify");
+  const requiredProviders = [
+    ...classifyConfigs.map((cfg) => cfg.provider),
+    verifyCfg.provider,
+    SUBJECT_ATTRIBUTION_PROVIDER,
+  ];
+  const missing = requiredProviders
     .filter((p, i, a) => a.indexOf(p) === i)
     .filter((p) => !providerKeyPresent(p));
   if (missing.length > 0) {
@@ -52,8 +69,11 @@ async function handler(request: Request) {
       skipped: true,
       reason: "provider_key_absent",
       missingProviders: missing,
-      classifyProvider: `${classifyCfg.provider}/${classifyCfg.model}`,
+      classifyProviders: classifyConfigs.map(
+        (cfg) => `${cfg.provider}/${cfg.model}`,
+      ),
       verifyProvider: `${verifyCfg.provider}/${verifyCfg.model}`,
+      subjectAttributionProvider: `${SUBJECT_ATTRIBUTION_PROVIDER}/${SUBJECT_ATTRIBUTION_MODEL}`,
       started,
       finished: new Date().toISOString(),
     });

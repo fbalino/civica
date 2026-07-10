@@ -30,6 +30,7 @@ import {
 } from "@/lib/db/schema";
 import { getAdminSession } from "@/lib/admin/session";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
+import { validatePulseClassification } from "@/lib/pulse/v2/review-validation";
 
 type Action = "approve" | "edit" | "reject";
 
@@ -140,6 +141,20 @@ export async function POST(
     // reject
     published = false;
     reviewStatus = "rejected";
+  }
+
+  if (body.action !== "reject") {
+    const validation = validatePulseClassification({
+      category,
+      dimension,
+      severityTier,
+      severityValue,
+    });
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 });
+    }
+    ({ category, dimension, severityTier, severityValue } =
+      validation.classification);
   }
 
   const after = {

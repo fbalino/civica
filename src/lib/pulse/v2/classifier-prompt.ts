@@ -1,19 +1,19 @@
 /**
  * Shared classifier prompts — classify, then verify.
  *
- * Single source of truth for the prompts sent to Claude during both
- * production classification (`classify.ts`) and backtesting
+ * Single source of truth for the prompts sent to configured providers during
+ * production classification (`classify.ts`) and the selected backtest engine
  * (`backtest.ts`). Keeping them aligned prevents prompt drift —
  * a class of subtle bugs where the backtest harness uses a slightly
  * different prompt than production and validates the wrong thing.
  *
  * The confidence model is the one published in
  * `content/methodology-pulse.md` (§ "Classification confidence —
- * classify, then verify"): two genuinely independent reasoning passes,
+ * classify, then verify"): two separate reasoning calls,
  * NOT repeated sampling of one prompt at different temperatures.
  *   1. CLASSIFIER_SYSTEM_PROMPT — assign category, severity, and the
  *      runner-up category considered.
- *   2. VERIFY_SYSTEM_PROMPT — a second independent pass that actively
+ *   2. VERIFY_SYSTEM_PROMPT — a separate pass that actively
  *      tries to REFUTE the first, yielding a high/medium/low confidence.
  *
  * Disambiguation rules live here so they apply to both paths
@@ -158,7 +158,7 @@ Respond with JSON ONLY, no preamble:
 })();
 
 /**
- * Verify (refute) prompt — the second, independent reasoning pass.
+ * Verify (refute) prompt — the separate adversarial reasoning pass.
  *
  * Per the published methodology, this pass re-reads the source and
  * actively tries to REFUTE the first classification rather than merely
@@ -172,9 +172,10 @@ Respond with JSON ONLY, no preamble:
  *
  * confidence is "high" or "medium" ONLY when the classification survives
  * this scrutiny and the call is unambiguous; otherwise "low". Low-
- * confidence events route to human review rather than auto-publishing.
+ * confidence is a verifier objection; in ensemble mode it routes to review
+ * only when the non-unanimous majority is also weak or degraded.
  */
-export const VERIFY_SYSTEM_PROMPT = `You are the VERIFIER for Civica's Pulse Beta. You receive a governance event, a first-pass classification of it, and the runner-up category the classifier considered. Your job is NOT to re-classify from scratch — it is to independently try to REFUTE the first pass and report how much it survives scrutiny.
+export const VERIFY_SYSTEM_PROMPT = `You are the VERIFIER for Civica's Pulse Beta. You receive a governance event, a first-pass classification of it, and the runner-up category the classifier considered. Your job is NOT to re-classify from scratch — it is to separately try to REFUTE the first pass and report how much it survives scrutiny.
 
 Actively challenge the first-pass classification on four axes:
 1. CATEGORY — Is the chosen category genuinely the best fit, or is the named runner-up (or some other category) at least as good? Apply the same dimension-specificity precedence the classifier uses (the more dimension-specific category beats a generic procedural one).
@@ -239,7 +240,11 @@ export function parseClassify(text: string): ClassifyResultLite | null {
   const cleaned = stripFences(text);
   let parsed: Record<string, unknown>;
   try {
-    parsed = JSON.parse(cleaned) as Record<string, unknown>;
+    const value = JSON.parse(cleaned) as unknown;
+    if (value == null || typeof value !== "object" || Array.isArray(value)) {
+      return null;
+    }
+    parsed = value as Record<string, unknown>;
   } catch {
     return null;
   }
@@ -254,27 +259,44 @@ export function parseClassify(text: string): ClassifyResultLite | null {
       rationale: typeof parsed.rationale === "string" ? parsed.rationale : "",
     };
   }
+  const severityValue = parsed.severity_value;
+  const selfConfidence = parsed.self_confidence;
+  if (
+    typeof severityValue !== "number" ||
+    !Number.isFinite(severityValue) ||
+    typeof selfConfidence !== "number" ||
+    !Number.isFinite(selfConfidence) ||
+    selfConfidence < 0 ||
+    selfConfidence > 1
+  ) {
+    return null;
+  }
   return {
     category: String(parsed.category),
     runnerUp:
       typeof parsed.runner_up === "string" ? parsed.runner_up : "none",
     severityTier: parsed.severity_tier as SeverityTier,
-    severityValue: Number(parsed.severity_value ?? 0),
-    selfConfidence: Number(parsed.self_confidence ?? 0),
+    severityValue,
+    selfConfidence,
     rationale: String(parsed.rationale ?? ""),
   };
 }
 
 /**
- * Parse the verify-pass JSON. Returns null when unparseable. A malformed
- * or missing confidence is treated conservatively as "low" (routes to
- * human review) rather than silently auto-publishing.
+ * Parse the verify-pass JSON. Returns null when unparseable or when the
+ * verdict/boolean axes are missing or malformed. A malformed or missing
+ * confidence is treated conservatively as "low" rather than silently
+ * auto-publishing through a weak-consensus gate.
  */
 export function parseVerify(text: string): VerifyResultLite | null {
   const cleaned = stripFences(text);
   let parsed: Record<string, unknown>;
   try {
-    parsed = JSON.parse(cleaned) as Record<string, unknown>;
+    const value = JSON.parse(cleaned) as unknown;
+    if (value == null || typeof value !== "object" || Array.isArray(value)) {
+      return null;
+    }
+    parsed = value as Record<string, unknown>;
   } catch {
     return null;
   }
@@ -286,14 +308,27 @@ export function parseVerify(text: string): VerifyResultLite | null {
     parsed.verdict === "revised" ||
     parsed.verdict === "rejected"
       ? parsed.verdict
-      : "confirmed";
+      : null;
+  const categoryOk = parsed.category_ok;
+  const severityOk = parsed.severity_ok;
+  const subjectOk = parsed.subject_ok;
+  const isEvent = parsed.is_event;
+  if (
+    verdict == null ||
+    typeof categoryOk !== "boolean" ||
+    typeof severityOk !== "boolean" ||
+    typeof subjectOk !== "boolean" ||
+    typeof isEvent !== "boolean"
+  ) {
+    return null;
+  }
   return {
     verdict,
     confidence,
-    categoryOk: parsed.category_ok !== false,
-    severityOk: parsed.severity_ok !== false,
-    subjectOk: parsed.subject_ok !== false,
-    isEvent: parsed.is_event !== false,
+    categoryOk,
+    severityOk,
+    subjectOk,
+    isEvent,
     rationale: String(parsed.rationale ?? ""),
   };
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { civicaIndex } from "@/lib/content/site-state";
+import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
 
 const CORS_HEADERS = {
@@ -32,6 +33,36 @@ export const CI_METHODOLOGY_META = Object.freeze({
     scale: Object.freeze({ min: 0, max: 100 }),
     input_variation_range: "central_90_percent",
     categorical_grades: false,
+  }),
+});
+
+/** Pulse-specific machine contract. Never reuse CI's 0–100 presentation
+ * metadata for event-ledger or dimensional-delta responses. */
+export const PULSE_METHODOLOGY_META = Object.freeze({
+  status: CURRENT_PULSE_RUNTIME_METHOD.status,
+  version: CURRENT_PULSE_RUNTIME_METHOD.version,
+  taxonomy_version: CURRENT_PULSE_RUNTIME_METHOD.taxonomy.version,
+  reference: "https://civicaatlas.org/civica-index/methodology/pulse",
+  runtime_snapshot: "/api/v1/pulse/methodology",
+  method_version_coverage: CURRENT_PULSE_RUNTIME_METHOD.mixed_legacy_unversioned
+    ? "mixed_legacy_unversioned"
+    : "current",
+  presentation: Object.freeze({
+    format: CURRENT_PULSE_RUNTIME_METHOD.numericDeltas.shape,
+    public_status: CURRENT_PULSE_RUNTIME_METHOD.numericDeltas.publicStatus,
+    scalar_pulse_score: false,
+    trailing_window_days:
+      CURRENT_PULSE_RUNTIME_METHOD.numericDeltas.trailingWindowDays,
+    bounds_per_dimension: Object.freeze({
+      ...CURRENT_PULSE_RUNTIME_METHOD.numericDeltas.boundsPerDimension,
+    }),
+  }),
+  evaluation: Object.freeze({
+    current_production_backtest_complete:
+      CURRENT_PULSE_RUNTIME_METHOD.evaluation
+        .currentProductionValidatedByExistingBacktest,
+    independent_validation:
+      CURRENT_PULSE_RUNTIME_METHOD.evaluation.externalValidation,
   }),
 });
 

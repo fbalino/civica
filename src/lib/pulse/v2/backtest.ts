@@ -3,18 +3,18 @@
  *
  * For a given backtest case:
  *   1. Load the curated events (`backtest_events` rows for the case).
- *   2. Run each through the classify→verify classifier (the same logic
- *      as classify.ts, inline so we don't need raw_events cluster
- *      scaffolding).
+ *   2. Run each through a deliberately separate single-engine diagnostic
+ *      classifier. This is not the production ensemble.
  *   3. Build a trajectory by sampling decayed dimensional impact
- *      every 30 days from event_date−180 to event_date+365.
+ *      every 30 days from event_date−180 to event_date+360.
  *   4. Compute a verdict against the case's expected directions.
  *   5. Insert one `backtest_runs` row.
  *
- * The classifier here is identical to the production v2 classifier
- * (same classify + verify prompts, same confidence semantics). We do not
- * need to write to pulse_events_v2 — the harness keeps everything scoped
- * to its own tables so a backtest doesn't pollute production data.
+ * The harness shares prompts and parsers with production, but not its
+ * multi-vendor voting, subject attribution, source mix, clustering, review
+ * behavior, or full corroboration path. It is a regression smoke test only.
+ * Results must never be presented as representative validation of the
+ * production runtime.
  */
 
 import { eq, sql } from "drizzle-orm";
@@ -27,10 +27,8 @@ import {
 import type * as schema from "@/lib/db/schema";
 import {
   EVENT_CATEGORY_INDEX,
-  HUMAN_REVIEW_TIERS,
   SEVERITY_TIER_RANGES,
   halfLifeFor,
-  EVENT_CATEGORIES,
   DELTA_LOWER_BOUND,
   DELTA_UPPER_BOUND,
 } from "./taxonomy";
@@ -52,11 +50,9 @@ import {
   parseVerify,
   type VerifyConfidence,
 } from "./classifier-prompt";
-// Provider abstraction (env-driven engine). The backtest is the published
-// quality floor, so it defaults to Anthropic — NOT the cheap classify
-// default the production path uses. Override with PULSE_BACKTEST_PROVIDER /
-// PULSE_BACKTEST_MODEL only when deliberately re-validating a candidate
-// engine's backtest verdicts (plan/pulse-classifier-cost-resolution-v1.md §6.3).
+import { verifierObjects } from "./publication-gate";
+// Provider abstraction for the diagnostic harness. It defaults to Anthropic
+// and remains intentionally separate from the production ensemble.
 import {
   callClassifier,
   PROVIDER_DEFAULT_MODEL,
@@ -65,7 +61,7 @@ import {
 } from "./provider";
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
-/** Backtest engine: Anthropic by default (the validated quality floor),
+/** Diagnostic engine: Anthropic by default,
  *  overridable via PULSE_BACKTEST_PROVIDER / PULSE_BACKTEST_MODEL. Kept
  *  separate from the production classify defaults so a cheap production
  *  swap never silently changes what the backtest validates against. */
@@ -164,7 +160,8 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
   const verifyText = verifyResp?.text ?? "";
   const verify = verifyText ? parseVerify(verifyText) : null;
   const confidence: VerifyConfidence = verify?.confidence ?? "low";
-  const agreement = agreementFromConfidence(confidence);
+  const effectiveConfidence = verifierObjects(verify) ? "low" : confidence;
+  const agreement = agreementFromConfidence(effectiveConfidence);
 
   // Corroboration confidence (simplified — single source per event in
   // our seed data, so we lean on the classify→verify confidence).
@@ -178,10 +175,9 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
   if (tier === "restricted") conf *= 0.7; // single specialist source assumed
   conf = Math.max(0, Math.min(1, conf));
 
-  // Skip events that would route to human review in production —
-  // backtest assumes a perfect reviewer who would approve them.
-  // (We still apply the corroboration penalty above.)
-  void HUMAN_REVIEW_TIERS;
+  // The diagnostic keeps candidates that would route to human review and
+  // effectively assumes approval, but verifier objections retain the low
+  // agreement/corroboration signal above.
 
   return {
     eventDate: "", // filled by caller
@@ -226,7 +222,7 @@ interface ExpectedRow {
 
 interface VerdictDetail {
   expected: ExpectedRow;
-  /** True peak |delta| within ±90d of the case eventDate */
+  /** True peak |delta| from day −30 through day +90 */
   peakDelta: number;
   /** Days from case eventDate to peak */
   peakDay: number;
@@ -246,8 +242,8 @@ function buildTrajectory(
   classified: Array<ClassifiedBacktestEvent & { eventDate: string }>
 ): TrajectorySample[] {
   const samples: TrajectorySample[] = [];
-  // Sample every 30 days from -180 to +365
-  for (let off = -180; off <= 365; off += 30) {
+  // Sample every 30 days from -180 to +360.
+  for (let off = -180; off <= 360; off += 30) {
     const sampleDate = new Date(caseDate.getTime() + off * 86400000);
     for (const dim of PULSE_DIMENSIONS) {
       let total = 0;

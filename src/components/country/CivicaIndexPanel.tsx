@@ -6,7 +6,7 @@ import {
   getRelatedCountries,
 } from "@/lib/db/queries";
 import {
-  CIPulseScoreDisplay,
+  CIScoreDisplay,
   type CIScoreData,
 } from "@/components/ci/CIPulseScoreDisplay";
 import { PulseDimensionalDeltas } from "@/components/pulse/PulseDimensionalDeltas";
@@ -15,6 +15,7 @@ import {
   getPulseV2Changelog,
 } from "@/lib/db/queries-pulse-v2";
 import { categoryLabel } from "@/lib/pulse/v2/labels";
+import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
 import { GovernmentTaxonomyBlock } from "@/components/GovernmentTaxonomyBlock";
 import { CountryTrendSection } from "@/components/ci/CountryTrendSection";
 import { PeerLensPanel } from "@/components/peer-grouping/PeerLensPanel";
@@ -388,15 +389,17 @@ function PulseEventCard({ event }: { event: PulseEvent }) {
               event.lowConfidence ? " is-low" : ""
             }`}
           >
-            {event.lowConfidence ? "Low confidence · " : "Confidence "}
-            {Math.round(event.confidence * 100)}%
+            Corroboration weight {event.confidence.toFixed(2)} · heuristic,
+            not a probability
           </div>
         ) : null}
         <div
           className={event.severity >= 0 ? "impact-pos" : "impact-neg"}
           style={{ color: pulseImpactColor(event.severity) }}
         >
-          {event.isActive ? "Active event" : "Archived event"}
+          {event.isActive
+            ? "Published in current evidence window"
+            : "Outside current evidence window"}
         </div>
       </div>
     </>
@@ -448,7 +451,8 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
       // country we render a clean empty state below; we do NOT fall back.
       const changelog = await getPulseV2Changelog({
         country: slug,
-        publishedOnly: true,
+        deltaEligibleOnly: true,
+        withinDays: SCORE_WINDOW_DAYS,
         limit: 20,
       }).catch(() => ({ rows: [] as Awaited<
         ReturnType<typeof getPulseV2Changelog>
@@ -520,7 +524,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
   const populationFact = reconciledFacts["population_total"] ?? null;
   const capitalFact = reconciledFacts["capital"] ?? null;
 
-  const { jurisdiction, composite, dimensions, pulse } = detail;
+  const { jurisdiction, composite, dimensions } = detail;
   const taxonomy = jurisdiction.governmentClassification ?? null;
   // Count the governance dimensions actually rendered in the breakdown —
   // partial countries (Nauru, Tonga) carry only 3 of the 4 headline
@@ -659,7 +663,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
 
         {ciScoreData || pulseV2 ? (
           <div id="ci-score" className="ci-country-score-shell">
-            <CIPulseScoreDisplay
+            <CIScoreDisplay
               ciScore={ciScoreData}
               ciChangeText={ciChangeText}
               dimensionCount={renderedDimensionCount}
@@ -879,12 +883,12 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
               {pulseEvents.length > 0
                 ? `${pulseEvents.length} published event${
                     pulseEvents.length === 1 ? "" : "s"
-                  } · trailing 365 days`
-                : "trailing 365 days"}
+                  } · trailing ${SCORE_WINDOW_DAYS} days`
+                : `trailing ${SCORE_WINDOW_DAYS} days`}
             </small>
           </div>
           <h3 className="ci-country-section-title">
-            What&apos;s moved the score lately.
+            Recent classified governance events.
           </h3>
           {pulseEvents.length > 0 ? (
             <div className="ci-country-event-list">
@@ -895,9 +899,10 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
           ) : (
             <div className="cv-card">
               <p className="ci-country-empty-copy">
-                No published Pulse events yet for {jurisdiction.name}. The Beta
-                pipeline classifies events into governance dimensions; entries
-                queued for human review do not yet appear here. See the{" "}
+                No published Pulse events were detected for {jurisdiction.name}{" "}
+                in the current evidence window. This is not evidence that
+                governance was stable. Entries queued for human review do not
+                appear here. See the{" "}
                 <Link href="/civica-index/pulse-changelog">
                   global Pulse changelog
                 </Link>{" "}
@@ -909,7 +914,6 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
 
         {score === null &&
         dimensions.length === 0 &&
-        !pulse &&
         pulseEvents.length === 0 ? (
           <div className="cv-card">
             <p className="ci-country-empty-copy">

@@ -5,9 +5,9 @@
     "name": "Civica Academic Publication Readiness",
     "root": "/Users/fernandobalino/Projects/civica",
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
-    "status": "active",
+    "status": "paused",
     "phase": "phase_0_truthful_beta",
-    "current_task": "CLM-005"
+    "current_task": "CLM-007_complete"
   },
   "budget": {
     "mode": "subscription_only",
@@ -60,6 +60,16 @@
       "status": "completed",
       "provider": "codex-subagent",
       "ownership": "read-only module ledger and visual recall audit"
+    },
+    "sn5_clm007_final_review": {
+      "status": "completed",
+      "provider": "claude-code",
+      "model_requested": "sonnet",
+      "model_used": "claude-sonnet-5",
+      "session_id": "8e41ae32-c887-4d2d-b896-8a1715e69fae",
+      "subscription_first": true,
+      "ownership": "read-only CLM-007 acceptance review",
+      "result_artifact": "plan/evidence/CLM-007/sonnet-final-review.json"
     }
   },
   "manifests": [],
@@ -75,6 +85,9 @@
     "plan/evidence/CLM-002/README.md",
     "plan/evidence/CLM-003/README.md",
     "plan/evidence/CLM-004/README.md",
+    "plan/evidence/CLM-007/README.md",
+    "plan/evidence/CLM-007/browser-checks.md",
+    "plan/evidence/CLM-007/sonnet-final-review.json",
     "plan/reviewer-brief.md",
     "plan/DECISIONS.md",
     "plan/MANUAL-CHECKS.md",
@@ -90,11 +103,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for CLM-003/004: compilation, TypeScript, and 86 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
-    "tests": "npm test, validate:public-claims, validate:content-templates, validate:design-tokens, validate:sync-freshness, targeted ESLint, README regeneration, and master-plan validation passed for CLM-003/004. Master plan is 4/288 complete.",
-    "public_claims": "27 claims cover 14/14 required surfaces across 7 canonical tiers; 33 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
-    "browser": "The real local app was audited across 10 public routes, light/dark desktop and 390px mobile; no prohibited rendered phrase, visible registry marker, horizontal overflow, or console warning/error remained. Root browser session finalized with no open tabs.",
-    "visual_review": "Targeted art/caption/menu audit plus sealed blind module and 266-pair asset audit completed; findings mapped to objective tasks."
+    "build": "npm run build passed for CLM-007: compilation, TypeScript, runtime/claim/freshness guards, and 85 generated static pages succeeded; the known Turbopack broad-trace warning remains.",
+    "tests": "94 tests, content templates, 544 offline and 546 live Pulse contract checks, public/numeric claims, design tokens, sync freshness, targeted ESLint, diff checks, and master-plan validation passed. Master plan is 7/288 complete.",
+    "public_claims": "28 claims cover 14/14 required surfaces across 7 canonical tiers; 34 source/mirror markers inspected; 0 unqualified high-authority phrases and 0 unregistered headline claims.",
+    "browser": "CLM-007 public methodology, API docs, changelog, archived backtest, Brazil populated Pulse, and Liechtenstein empty Pulse were checked on desktop/mobile with zero console errors, no horizontal overflow, keyboard focus, and reduced-motion verification.",
+    "visual_review": "Final CLM-007 screenshots were inspected; no acceptance-blocking overlap, scalar Pulse, or fabricated no-event zero remained."
   },
-  "updated_at": "2026-07-10T01:06:14Z"
+  "updated_at": "2026-07-10T05:46:03Z"
 }

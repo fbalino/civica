@@ -302,16 +302,6 @@ export async function GET(
               })),
             }
           : null,
-        civicaPulse: ciDetail?.pulse
-          ? {
-              scoreDate: ciDetail.pulse.scoreDate,
-              pulseScore: ciDetail.pulse.pulseScore,
-              ciBaseline: ciDetail.pulse.ciBaseline,
-              eventImpact: ciDetail.pulse.eventImpact,
-              activeEvents: ciDetail.pulse.activeEvents,
-              isLowConfidence: ciDetail.pulse.isLowConfidence,
-            }
-          : null,
         // ── Phase F.4 — provenance block keyed by flat field ──
         provenance,
       },

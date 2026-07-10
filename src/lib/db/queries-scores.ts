@@ -4,12 +4,11 @@
  * Pulls the canonical governance / democracy / freedom score rows for a
  * single country, in display order:
  *   1. Civica Index (composite, 0-100)
- *   2. Civica Pulse (max-magnitude dimensional delta)
- *   3. V-Dem Liberal Democracy (native 0-1 + global rank from CI dimension)
- *   4. Freedom House status (Free / Partly Free / Not Free + score)
- *   5. RSF Press Freedom (ingested dimension history)
- *   6. UNDP HDI (0-1, with rank)
- *   7. Transparency CPI (0-100, with rank)
+ *   2. V-Dem Liberal Democracy (native 0-1 + global rank from CI dimension)
+ *   3. Freedom House status (Free / Partly Free / Not Free + score)
+ *   4. RSF Press Freedom (ingested dimension history)
+ *   5. UNDP HDI (0-1, with rank)
+ *   6. Transparency CPI (0-100, with rank)
  *
  * Trend = current value vs the oldest comparable value we have, capped at
  * "4y trend" — when ≥ 4 years of history exist we compare to the value
@@ -26,7 +25,6 @@ import {
   ciDimensionScores,
   countryMetrics,
   jurisdictions,
-  pulseDimensionalDeltas,
 } from "@/lib/db/schema";
 
 export interface ScoreRow {
@@ -179,51 +177,6 @@ async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
     trendFormatted: trendDelta != null ? fmtSigned(trendDelta, 1) : null,
     source: "civica_curated",
     asOf: latest.quarter,
-  };
-}
-
-// ---- Civica Pulse ----------------------------------------------------------
-
-async function buildPulseRow(jId: string): Promise<ScoreRow | null> {
-  const rows = await db
-    .select()
-    .from(pulseDimensionalDeltas)
-    .where(eq(pulseDimensionalDeltas.jurisdictionId, jId));
-
-  // Pick the headline delta = max-magnitude dimension. This matches the
-  // factbook header strip's `cpDelta` selection so the row reads
-  // consistently with the page hero.
-  let headline:
-    | (typeof rows)[number]
-    | null = null;
-  for (const r of rows) {
-    if (
-      headline == null ||
-      Math.abs(Number(r.deltaValue)) > Math.abs(Number(headline.deltaValue))
-    ) {
-      headline = r;
-    }
-  }
-  if (!headline) return null;
-
-  const delta = Number(headline.deltaValue);
-  return {
-    id: "civica-pulse",
-    label: "Civica Pulse",
-    score: delta,
-    scoreFormatted: fmtSigned(delta, 1),
-    rank: null,
-    totalRanked: null,
-    // For Pulse the "score" itself encodes direction — flatness covers
-    // the no-signal case.
-    trend:
-      Math.abs(delta) < 0.5 ? "flat" : delta > 0 ? "up" : "down",
-    trendDelta: null,
-    trendFormatted: null,
-    source: "gdelt",
-    asOf: headline.lastComputedAt
-      ? new Date(headline.lastComputedAt).toISOString().slice(0, 10)
-      : null,
   };
 }
 
@@ -496,7 +449,6 @@ export async function getScoresForJurisdiction(
   // Run all data fetches in parallel — none depend on each other.
   const [
     civicaIndex,
-    pulse,
     vdem,
     freedomHouse,
     hdi,
@@ -504,7 +456,6 @@ export async function getScoresForJurisdiction(
     rsf,
   ] = await Promise.all([
     buildCivicaIndexRow(jur.id).catch(() => null),
-    buildPulseRow(jur.id).catch(() => null),
     buildVDemRow(jur.id).catch(() => null),
     buildFreedomHouseRow(jur.id).catch(() => null),
     buildMetricRow({
@@ -531,7 +482,6 @@ export async function getScoresForJurisdiction(
   // Display order is the same as the brief — most important first.
   const ordered: Array<ScoreRow | null> = [
     civicaIndex,
-    pulse,
     vdem,
     freedomHouse,
     rsf,

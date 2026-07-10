@@ -114,7 +114,7 @@ How Civica chooses peer sets for ranking comparisons — different lenses for ma
 
 ## Section 10 · Civica Pulse (Beta) {#pulse}
 
-The Civica Pulse is the event-sensitive layer that sits on top of the structural CI. It publishes **dimensional deltas** — separate impact values on each CI dimension — driven by classified events from specialist feeds (ACLED, CIVICUS, RSF alerts, V-Dem pulse, HRW / Amnesty) corroborated by general news. Decay is category-specific: a coup persists for a year; a journalist arrest decays in two months. Positive events require stronger corroboration than negative events to resist gaming.
+The Civica Pulse is a separate experimental event ledger. It publishes **public experimental dimensional deltas** — never a merged Pulse score or ranking. The current production source basket is generated from observed staging rows and enumerated on the [Pulse methodology page](/civica-index/methodology/pulse#sources); a connector's presence in the code does not make it active. A single-source event can currently affect a delta at reduced heuristic weight, so “corroboration” must not be read as proof of independent confirmation.
 
 The Pulse is currently a clearly labelled *Beta* experiment. Its classifications and numeric effects have not completed representative validation or independent review. Its methodology is documented in detail at [/civica-index/methodology/pulse](/civica-index/methodology/pulse), and the event ledger is at [/civica-index/pulse-changelog](/civica-index/pulse-changelog).
 
@@ -131,7 +131,7 @@ Both series are accessible via the API. See §13 for citation format.
 
 ## Section 12 · Limitations {#limitations}
 
-**Source lag.** The CI is only as current as its slowest-updating source. Some upstream indices publish 12–18 months behind real-world developments. Quarterly updates partially smooth this, but the Pulse exists specifically to fill the gap between structural updates.
+**Source lag.** The CI is only as current as its slowest-updating source. Some upstream indices publish 12–18 months behind real-world developments. Pulse is a separate experiment testing whether an event ledger can add timely context; its incremental value has not yet been established.
 
 **Coverage gaps.** Some countries have insufficient source coverage to compute even a partial CI. Those pages display "Insufficient data" rather than guess. The full list will accompany the replication package (in preparation, targeted for Q3 2026).
 
@@ -163,7 +163,7 @@ GET /api/v1/pulse/{country_slug}/events       (Beta)
 GET /api/v1/pulse/changelog/v2                 (Beta)
 ```
 
-Every CI API response includes a `meta.methodology` block describing the methodology revision date and the Beta status — so machine consumers can detect the development phase programmatically.
+Every CI API response includes a CI-specific `meta.methodology` block describing the methodology revision date and Beta status. Pulse endpoints carry a separate Pulse runtime-method block because their version, output shape, and experimental status differ.
 
 ### 13.2 · Disputes & corrections
 

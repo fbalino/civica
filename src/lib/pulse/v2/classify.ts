@@ -3,13 +3,13 @@
  *
  * For each unclassified cluster (a `cluster_id` in raw_events that
  * doesn't yet have a `pulse_events_v2` row), build a representative
- * title+body, then run the two independent reasoning passes published
+ * title+body, then run the two separate reasoning passes published
  * in `content/methodology-pulse.md` (§ "Classification confidence —
  * classify, then verify"):
  *
- *   1. CLASSIFY — one pass assigns category, severity, subject country,
- *      and the runner-up category it considered.
- *   2. VERIFY (refute) — a second, independent pass re-reads the source
+ *   1. CLASSIFY — one pass assigns category, severity, and the runner-up
+ *      category it considered.
+ *   2. VERIFY (refute) — a separate pass re-reads the source
  *      and actively tries to refute the first (right category vs.
  *      runner-up? severity justified? subject country correct? is it a
  *      discrete governance event at all?), yielding a high/medium/low
@@ -22,17 +22,17 @@
  *
  * Auto-publish gating:
  *   - Severity tier in HUMAN_REVIEW_TIERS  → review required (absolute)
- *   - verify refuted/low on a WEAK consensus (bare majority with low
+ *   - verify failed/refuted/low on a WEAK consensus (bare majority with low
  *     self-confidence, or a degraded run) → review; confident majorities
  *     and unanimous verdicts publish over a lone refuter
  *   - otherwise                            → auto-publish
  *
  * The persisted `classifier_agreement` column is retained for schema and
- * downstream compatibility (corroborate.ts, the review UI, the changelog):
- * the verify confidence maps onto it as high→"all", medium→"two_of_three",
- * low→"none", which lines up with the confidence boost/penalty those
- * readers already apply. The `classifier_runs` jsonb preserves both passes
- * for audit.
+ * downstream compatibility (corroborate.ts, the review UI, the changelog).
+ * Ensemble mode stores voter agreement; retired/single-engine paths map verify
+ * confidence onto the compatibility labels. `classifier_runs` preserves the
+ * successful classify runs and verification result for audit. A separate
+ * subject-country attribution call runs afterward.
  *
  * The review queue is `pulse_events_v2` rows where `published = false`.
  */
@@ -49,7 +49,6 @@ import type * as schema from "@/lib/db/schema";
 import {
   EVENT_CATEGORIES,
   EVENT_CATEGORY_INDEX,
-  HUMAN_REVIEW_TIERS,
   SEVERITY_TIER_RANGES,
 } from "./taxonomy";
 import type {
@@ -88,12 +87,19 @@ import {
 } from "./provider";
 import { clampSeverityToTier, computeConsensus } from "./ensemble";
 import type { EnsembleRun } from "./ensemble";
+import {
+  ensembleRequiresReview,
+  normalizeInvalidConsensusForReview,
+  singleEngineRequiresReview,
+  verifierObjects,
+} from "./publication-gate";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
 // Resolve the classify ENSEMBLE once per module load (lazy client init
 // happens inside the provider layer). Owner decision 2026-07-05: the classify
-// pass runs one call per independent vendor so their errors are uncorrelated.
+// pass runs one call per configured vendor to diversify error sources;
+// statistical independence is not established.
 // Default set: DeepSeek v4-flash + GLM 4.7 + Anthropic Haiku 4.5 (the
 // flashx tier was disqualified on latency — 60s+ per call stalls the cron).
 // Overridable via PULSE_CLASSIFY_ENSEMBLE (comma list of provider:model). When
@@ -106,7 +112,7 @@ const IS_ENSEMBLE = CLASSIFY_ENSEMBLE.length > 1;
 // (defaults preserved from the cost-resolution work via PULSE_VERIFY_*).
 const CLASSIFY_CONFIG: ResolvedProviderConfig = IS_ENSEMBLE
   ? CLASSIFY_ENSEMBLE[0]
-  : resolveProviderConfig("classify");
+  : CLASSIFY_ENSEMBLE[0];
 const SINGLE_VERIFY_CONFIG: ResolvedProviderConfig =
   resolveProviderConfig("verify");
 
@@ -276,7 +282,9 @@ async function classifyOneSingle(
   // A failed verify pass is conservative: treat as low confidence so the
   // event routes to human review rather than auto-publishing unverified.
   const confidence = verify?.confidence ?? "low";
-  const agreement: ClassifierAgreement = agreementFromConfidence(confidence);
+  const effectiveConfidence = verifierObjects(verify) ? "low" : confidence;
+  const agreement: ClassifierAgreement =
+    agreementFromConfidence(effectiveConfidence);
 
   const classifyRun: ClassifierRun = {
     run: 1,
@@ -321,10 +329,13 @@ async function classifyOneSingle(
     description: cluster.body.slice(0, 1500),
   };
 
-  // Auto-publish gate: low-confidence events and review-gated severity
-  // tiers always route to the human review queue.
-  const requiresReview =
-    confidence === "low" || HUMAN_REVIEW_TIERS.has(first.severityTier);
+  // Auto-publish gate: every verifier objection and review-gated severity
+  // tier routes to the human review queue. Single-engine mode has no
+  // independent majority signal that can outweigh an objection.
+  const requiresReview = singleEngineRequiresReview(
+    first.severityTier,
+    verify,
+  );
 
   return {
     classified,
@@ -339,8 +350,8 @@ async function classifyOneSingle(
  * (`Promise.allSettled` — one engine erroring degrades to the survivors,
  * recorded), computes the consensus, then places the verify pass by the
  * published-gate semantics:
- *   - 'all' consensus       → verify STILL runs (one engine) as the
- *     adversarial check; a low confidence still routes to review.
+ *   - 'all' consensus       → verify STILL runs as an adversarial signal;
+ *     verifier-only objections do not override a full-panel unanimity.
  *   - 'two_of_three'        → verify runs; a refuted verdict downgrades to
  *     review ONLY when the majority is weak (low self-confidence or a
  *     degraded run) — the verifier is a signal, not a veto.
@@ -419,11 +430,16 @@ async function classifyOneEnsemble(
     console.warn(
       `[classify] cluster ${cluster.clusterId}: consensus category "${consensus.category}" not in taxonomy → review`
     );
-    return buildEnsembleResult(cluster, consensus, classifyRuns, {
-      verify: null,
-      verifySkipped: true,
-      forceReview: true,
-    });
+    return buildEnsembleResult(
+      cluster,
+      normalizeInvalidConsensusForReview(consensus),
+      classifyRuns,
+      {
+        verify: null,
+        verifySkipped: true,
+        forceReview: true,
+      },
+    );
   }
   // If the consensus tier isn't allowed for the category, snap to the nearest
   // allowed tier rather than dropping the whole (agreed-upon) event.
@@ -488,11 +504,6 @@ function buildEnsembleResult(
   const verifyConfidence = opts.verifySkipped
     ? null
     : (verify?.confidence ?? "low");
-  const verifyRefuted =
-    !opts.verifySkipped &&
-    verify != null &&
-    (verify.isEvent === false || verify.verdict === "rejected");
-
   const allClassifierRuns: ClassifierRun[] = [...classifyRuns];
   if (!opts.verifySkipped) {
     allClassifierRuns.push({
@@ -536,14 +547,10 @@ function buildEnsembleResult(
   // verdicts and confident majorities publish over a lone refuter. The
   // severe-tier human gate stays absolute (published methodology promise),
   // as do deadlock/no-quorum routes.
-  const weakConsensus =
-    consensus.agreement !== "all" &&
-    (consensus.selfConfidence < 0.7 || consensus.degraded);
-  const verifierObjects = verifyConfidence === "low" || verifyRefuted;
-  const requiresReview =
-    opts.forceReview ||
-    HUMAN_REVIEW_TIERS.has(consensus.severityTier) ||
-    (verifierObjects && weakConsensus);
+  const requiresReview = ensembleRequiresReview(consensus, verify, {
+    forceReview: opts.forceReview,
+    verifySkipped: opts.verifySkipped,
+  });
 
   return { classified, autoPublished: !requiresReview };
 }

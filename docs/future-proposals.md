@@ -171,6 +171,12 @@ runs for at least one quarter, evaluate:
 
 ## Other deferred items (non-taxonomy)
 
+> **Pulse status note (July 2026):** the feed and scalar descriptions below
+> began as April planning notes. Current runtime truth lives in
+> `src/lib/pulse/v2/runtime-method.generated.json`. IPU has no observed Pulse
+> staging rows in that snapshot, and the public contract has no scalar Pulse
+> score or ranking.
+
 ### Specialist feed integration — Phase 5.9 (deferred)
 
 Per the locked decision (2026-04-28), licensing audit + advisory board
@@ -179,11 +185,10 @@ complete. Specialist feeds requiring licensing (ACLED, CIVICUS in
 its commercial mode, RSF for full content) remain in graceful no-op
 state until the licensing audit happens.
 
-Currently working specialist feeds:
+Feeds observed in the current Pulse staging snapshot:
 - HRW (RSS, attribution)
 - Amnesty International (RSS, attribution)
 - CIVICUS Monitor (RSS, CC-BY-SA)
-- IPU Parline (existing client, non-commercial)
 - GDELT (open data, news fallback)
 
 Currently dormant (env-gated, no public RSS):
@@ -197,16 +202,15 @@ for API access, and verify Reuters / AP RSS endpoints.
 
 ### Pulse merged-scalar score
 
-Per spec § 6.5, deferred to post-Beta-graduation. The Pulse
-intentionally publishes dimensional deltas only during Beta. A single
-merged number may be reintroduced post-Beta if user research confirms
-demand and the dimensional model has had time to stabilise.
+The current public contract deliberately has no merged Pulse score or ranking.
+Any future scalar would require a new construct, representative validation,
+and an explicit decision; it is not an assumed post-Beta feature.
 
 ### Embeddable Pulse widgets
 
-Per spec § 6.5, also deferred to post-graduation. The CI widgets exist
-and ship with embed buttons; Pulse-equivalent embeds wait for
-graduation.
+The CI widgets exist and ship with embed buttons. Pulse-equivalent embeds
+require a separate dimensional-ledger design and validation decision; there is
+no automatic post-graduation scalar widget.
 
 ### Multi-language methodology translations
 

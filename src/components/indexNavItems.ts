@@ -27,7 +27,7 @@ export const INDEX_NAV_ITEMS: IndexNavItem[] = [
   {
     href: "/civica-index/pulse-changelog",
     label: "Pulse Changelog",
-    descriptor: "Daily changes",
+    descriptor: "Experimental event ledger",
   },
   {
     href: "/civica-index/replication",

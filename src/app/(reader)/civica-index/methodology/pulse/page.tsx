@@ -8,6 +8,7 @@ import { CiteAccordion } from "@/components/cite/CiteAccordion";
 import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
 import { pulse, disputeSla } from "@/lib/content/site-state";
+import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 
 export const revalidate = 3600;
 
@@ -39,18 +40,76 @@ const SECTIONS = [
   { id: "cite", label: "Cite this page" },
 ];
 
-export default function PulseMethodologyPage() {
-  const backtestCount = pulse.backtest.cases.length;
-  const graduationRatio = pulse.backtest.graduationThresholdRatio;
-  const graduationPct = Math.round(graduationRatio * 100);
-  const graduationCount = Math.ceil(backtestCount * graduationRatio);
+const SOURCE_LABELS: Record<string, string> = {
+  amnesty: "Amnesty International",
+  civicus_monitor: "CIVICUS Monitor",
+  gdelt: "GDELT",
+  hrw: "Human Rights Watch",
+};
 
+const PROVIDER_LABELS: Record<string, string> = {
+  anthropic: "Anthropic",
+  deepseek: "DeepSeek",
+  glm: "Zhipu GLM",
+  openai: "OpenAI",
+};
+
+const REVIEW_TIER_LABELS: Record<string, string> = {
+  high_pos: "high-positive classifications",
+  severe_neg: "severe-negative classifications",
+  catastrophic_neg: "catastrophic-negative classifications",
+};
+
+function proseList(values: string[]): string {
+  if (values.length <= 1) return values[0] ?? "";
+  if (values.length === 2) return `${values[0]} and ${values[1]}`;
+  return `${values.slice(0, -1).join(", ")}, and ${values.at(-1)}`;
+}
+
+function engineProse(engine: { provider: string; model: string }): string {
+  return `${PROVIDER_LABELS[engine.provider] ?? engine.provider} \`${engine.model}\``;
+}
+
+function cronTime(cron: string): string {
+  const [minute, hour] = cron.split(/\s+/).map(Number);
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+}
+
+export default function PulseMethodologyPage() {
+  const method = CURRENT_PULSE_RUNTIME_METHOD;
   // Pre-computed helpers materialised at the call site (Phase 5
   // §3.2). Keys must match the validator's per-file allowlist in
   // scripts/validate-content-templates.ts.
   const ctx = {
-    graduationPct,
-    graduationCount,
+    methodologyVersion: method.version,
+    observedThrough: method.feeds.activeProduction.observedThrough,
+    activeFeedsProse: proseList(
+      method.feeds.activeProduction.sourceIds.map(
+        (id) => SOURCE_LABELS[id] ?? id,
+      ),
+    ),
+    classifyVotersProse: proseList(
+      method.providers.classify.engines.map(engineProse),
+    ),
+    verifierProse: engineProse(method.providers.verify.engine),
+    subjectAttributorProse: engineProse(method.providers.subject.engine),
+    reviewTiersProse: proseList(
+      method.publicationPolicy.reviewGates.absoluteSeverityTiers.map(
+        (tier) => REVIEW_TIER_LABELS[tier] ?? tier,
+      ),
+    ),
+    weakConfidenceThreshold:
+      method.publicationPolicy.reviewGates.verifierObjectionWithWeakConsensus
+        .selfConfidenceBelow,
+    scheduleProse: proseList(
+      method.cadence.stages.map((stage) => {
+        const operation = stage.operations.join("/").replaceAll("_", " ");
+        return `${operation} at ${cronTime(stage.cron)}`;
+      }),
+    ),
+    scoreWindowDays: method.numericDeltas.trailingWindowDays,
+    deltaLowerBound: method.numericDeltas.boundsPerDimension.lower,
+    deltaUpperBound: `+${method.numericDeltas.boundsPerDimension.upper}`,
   };
 
   const state = { pulse, disputeSla };
@@ -66,8 +125,8 @@ export default function PulseMethodologyPage() {
         </h1>
         <p className="editorial-page-subtitle">
           An experimental ledger of governance-relevant events, model-assisted
-          classifications, source links, review state, and optional numeric
-          effects. The pipeline is scheduled daily; published values reflect
+          classifications, source links, review state, and public experimental
+          per-dimension effects. The pipeline is scheduled daily; published values reflect
           the most recent completed run rather than a live or continuous
           governance measure.
         </p>
@@ -76,11 +135,9 @@ export default function PulseMethodologyPage() {
           <strong>This is an experimental system.</strong> Pulse classifications
           and numeric effects have not completed independent review and should
           not be treated as established measurements. The
-          pipeline is under active validation; backtesting against historical
-          governance shocks is in progress, with at least {graduationPct}% (
-          {graduationCount} of {backtestCount}) of the named test cases
-          required to match expert consensus before the Pulse graduates to
-          publishable status.
+          current production ensemble has not completed representative
+          evaluation or independent review. The published historical smoke
+          test predates the current classifier and is not a graduation result.
         </div>
 
         {/* Markdown body — content/methodology-pulse.md is the prose
@@ -104,9 +161,7 @@ export default function PulseMethodologyPage() {
             pageTitle="Pulse methodology"
             url="https://civicaatlas.org/civica-index/methodology/pulse"
             dataVintage={
-              pulse.taxonomy.versionHistory.find(
-                (v) => v.version === pulse.taxonomy.version,
-              )?.ranAt
+              method.feeds.activeProduction.observedThrough
             }
           />
         </Reveal>

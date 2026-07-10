@@ -99,16 +99,17 @@ export async function GET(
     : null) as "light" | "dark" | null;
   const dims = searchParams.get("dims") === "1";
 
-  // Phase G — custom builder. ?include=ci,cp,capital,gov,pop,gdp,area
+  // Phase G — custom builder. ?include=ci,capital,gov,pop,gdp,area
   // controls which datapoints render inside the size=custom widget.
   // ?w= and ?h= are user-tunable dimensions. Defaults give a tall card
   // sized for a sidebar.
   const includeRaw = searchParams.get("include") ?? "";
+  const allowedInclude = new Set(["ci", "capital", "gov", "pop", "gdp", "area"]);
   const include = new Set(
     includeRaw
       .split(",")
       .map((s) => s.trim().toLowerCase())
-      .filter(Boolean),
+      .filter((s) => allowedInclude.has(s)),
   );
   const customW = clampInt(searchParams.get("w"), 280, 600, 360);
   const customH = clampInt(searchParams.get("h"), 120, 800, 320);
@@ -182,11 +183,6 @@ export async function GET(
   const ciInt = ciScore !== null ? Math.round(ciScore) : null;
   const ciDisplay = ciInt !== null ? String(ciInt) : "—";
   const ciMeta = ciScore !== null ? ciScore.toFixed(1) : "—";
-  const pulseScore =
-    typeof detail.pulse?.pulseScore === "number"
-      ? detail.pulse.pulseScore
-      : null;
-  const pulseDisplay = pulseScore !== null ? pulseScore.toFixed(1) : null;
 
   const rank = composite?.rank ?? null;
   const totalRanked = composite?.totalRanked ?? null;
@@ -235,7 +231,6 @@ export async function GET(
     },
     ciDisplay,
     ciMeta,
-    pulseDisplay,
     rank,
     totalRanked,
     quarterLabel,
@@ -360,7 +355,6 @@ interface BuildHtmlArgs {
   };
   ciDisplay: string;
   ciMeta: string;
-  pulseDisplay: string | null;
   rank: number | null;
   totalRanked: number | null;
   quarterLabel: string;
@@ -381,7 +375,7 @@ interface BuildHtmlArgs {
 function buildHtml(args: BuildHtmlArgs): string {
   const {
     size, themeParam, dims, jurisdiction,
-    ciDisplay, ciMeta, pulseDisplay,
+    ciDisplay, ciMeta,
     rank, totalRanked, quarterLabel, updatedDate,
     dimScores, width, height, include, attributionLabel,
   } = args;
@@ -395,9 +389,6 @@ function buildHtml(args: BuildHtmlArgs): string {
       ? `Rank ${rank} of ${totalRanked}`
       : "";
   const scorePct = ciDisplay !== "—" ? Math.round(Number(ciDisplay)) : 0;
-  // Pulse is computed by scheduled daily runs, not continuously. A "LIVE"
-  // suffix would misrepresent the cadence, so render the latest score plainly.
-  const pulseMeta = pulseDisplay !== null ? `CP ${pulseDisplay}` : "CP unavailable";
 
   // Phase F.4 — read-only attribution line that lists the canonical
   // sources backing the visible reconciled facts (population, GDP,
@@ -421,7 +412,7 @@ function buildHtml(args: BuildHtmlArgs): string {
   <div class="mark serif">C</div>
   <div class="body">
     <div class="country">${esc(jurisdiction.name)}</div>
-    <div class="meta mono">CI ${esc(ciMeta)} &middot; ${esc(pulseMeta)} &middot; RESEARCH BETA</div>
+    <div class="meta mono">CI ${esc(ciMeta)} &middot; RESEARCH BETA</div>
   </div>
   <div class="score serif">${esc(ciDisplay)}</div>
 </a>`;
@@ -437,7 +428,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     <div class="num serif">${esc(ciDisplay)}</div>
   </div>
   <div class="score-context">
-    <span>Research beta</span><span class="mono">${esc(pulseMeta)}</span>
+    <span>Research beta</span><span class="mono">NO COUNTRY GRADE</span>
   </div>
   <div class="score-position"><span style="width:${scorePct}%"></span></div>
   ${attributionHtml}
@@ -460,7 +451,7 @@ function buildHtml(args: BuildHtmlArgs): string {
     <div class="num serif">${esc(ciDisplay)}<small class="mono">/ 100</small></div>
   </div>
   <div class="score-context">
-    <span>Research beta &middot; no country grade</span><span class="mono">${esc(pulseMeta)}</span>
+    <span>Research beta &middot; no country grade</span><span class="mono">QUARTERLY CI</span>
   </div>
   <div class="score-position"><span style="width:${scorePct}%"></span></div>
   ${dims ? `<div class="dims">${dimBarsHtml}</div>` : ""}
@@ -472,7 +463,7 @@ function buildHtml(args: BuildHtmlArgs): string {
 </a>`;
 
   // Phase G — custom widget. Stacks rows for whichever datapoints the
-  // builder selected. CI/CP show as score chips when real values exist;
+  // builder selected. CI shows as a score chip when a real value exists;
   // everything else shows
   // as a label/value row. If `include` is empty, fall back to a sensible
   // default (CI + capital + government type).
@@ -497,11 +488,6 @@ function buildHtml(args: BuildHtmlArgs): string {
   const customRowsHtml = [
     includeSet.has("ci")
       ? `<div class="cf-score-row"><span class="cf-score-label mono">CI</span><span class="cf-score-val serif">${esc(ciDisplay)}</span><span class="cf-score-meta mono">RESEARCH BETA</span></div>`
-      : "",
-    includeSet.has("cp")
-      ? pulseDisplay !== null
-        ? `<div class="cf-score-row"><span class="cf-score-label mono">CP</span><span class="cf-score-val serif">${esc(pulseDisplay)}</span><span class="cf-score-meta mono">PULSE</span></div>`
-        : factRow("Civica Pulse", "Unavailable")
       : "",
     includeSet.has("capital") ? factRow("Capital", jurisdiction.capital) : "",
     includeSet.has("gov") ? factRow("Government", govType || null) : "",

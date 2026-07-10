@@ -4,12 +4,8 @@
  * Renders a single editorial pane showing the CI score, Monte Carlo
  * input-variation range, neutral numeric position, and completeness flag.
  *
- * Phase 5.4 added Beta methodology display.
- * Phase 5.6 dropped the merged-scalar Pulse pane entirely. The
- * dimensional-delta replacement is `<PulseDimensionalDeltas>` —
- * consumers render it below this CI pane. The legacy `pulseScore`
- * prop remains accepted (and ignored) so callers can migrate at
- * their own pace, but new code should not pass it.
+ * Pulse is rendered separately as named experimental dimensional deltas;
+ * this component has no scalar Pulse contract.
  */
 
 import { civicaIndex } from "@/lib/content/site-state";
@@ -28,23 +24,8 @@ export interface CIScoreData {
   isPartial: boolean;
 }
 
-export interface PulseScoreData {
-  pulseScore: number;
-  eventImpact: number;
-  activeEvents: number;
-  scoreDate: string;
-  isLowConfidence: boolean;
-}
-
-interface CIPulseScoreDisplayProps {
+interface CIScoreDisplayProps {
   ciScore: CIScoreData | null;
-  /**
-   * @deprecated Phase 5.6 removed the merged-scalar Pulse pane.
-   * The replacement is the `<PulseDimensionalDeltas>` component
-   * rendered alongside this one. This prop is accepted for
-   * backwards compatibility and ignored at render time.
-   */
-  pulseScore?: PulseScoreData | null;
   ciChangeText?: string | null;
   /**
    * Number of governance dimensions actually rendered in the breakdown.
@@ -283,11 +264,11 @@ function ScorePane({
   );
 }
 
-export function CIPulseScoreDisplay({
+export function CIScoreDisplay({
   ciScore,
   ciChangeText,
   dimensionCount,
-}: CIPulseScoreDisplayProps) {
+}: CIScoreDisplayProps) {
   // Prefer the caller's rendered-dimension count; fall back to the static
   // count when it's absent or 0 (never print "Composite of 0 dimensions").
   const dimCount =

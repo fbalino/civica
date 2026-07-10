@@ -19,6 +19,7 @@ export const DIMENSION_LABELS: Record<string, string> = {
   freedom_rights: "Rights & Freedoms",
   corruption_control: "Corruption Control",
   stability: "Stability",
+  unresolved: "Unresolved",
 };
 
 export const SEVERITY_TIER_LABELS: Record<string, string> = {

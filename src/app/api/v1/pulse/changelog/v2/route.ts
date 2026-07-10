@@ -18,7 +18,7 @@ import {
   apiError,
   corsOptions,
   withRateLimit,
-  CI_METHODOLOGY_META,
+  PULSE_METHODOLOGY_META,
 } from "@/lib/api/helpers";
 import { getPulseV2Changelog } from "@/lib/db/queries-pulse-v2";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
@@ -55,10 +55,21 @@ export async function GET(request: Request) {
       offset,
     });
 
+    const publicRows = result.rows.map((row) =>
+      row.category === "none"
+        ? {
+            ...row,
+            dimension: null,
+            severityTier: null,
+            severityValue: null,
+          }
+        : row
+    );
+
     return apiResponse({
-      data: result.rows,
+      data: publicRows,
       meta: {
-        methodology: CI_METHODOLOGY_META,
+        methodology: PULSE_METHODOLOGY_META,
         limit,
         offset,
         hasMore: result.hasMore,

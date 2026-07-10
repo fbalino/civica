@@ -3,8 +3,9 @@
  * License: attribution required (both).
  *
  * Both organisations publish daily reports of human-rights violations
- * worldwide. Each gets its own row in `sources` (`hrw`, `amnesty`)
- * because corroboration confidence treats them as independent.
+ * worldwide. Each gets its own row in `sources` (`hrw`, `amnesty`). The
+ * current heuristic counts distinct source IDs; it does not establish
+ * source-family independence or detect republication.
  */
 
 import { fetchRss, rssItemToEventDate } from "../rss";
@@ -72,7 +73,7 @@ async function fetchOne(
 export async function fetchHrwAmnesty(
   map: JurisdictionMap
 ): Promise<HrwAmnestyFetchResult> {
-  // Fan out both fetches in parallel — independent feeds.
+  // Fan out both separately identified feeds in parallel.
   const [hrw, amnesty] = await Promise.all([
     fetchOne(HRW_URL, "hrw", map),
     fetchOne(AMNESTY_URL, "amnesty", map),

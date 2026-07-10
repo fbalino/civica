@@ -17,7 +17,7 @@ const CATEGORIES = [
   { value: "ci_data_error", label: "CI data error — wrong value in a score" },
   { value: "ci_methodology", label: "CI methodology — disagree with the approach" },
   { value: "pulse_misclassification", label: "Pulse — event misclassified" },
-  { value: "pulse_severity", label: "Pulse — severity score is wrong" },
+  { value: "pulse_severity", label: "Pulse — severity value is wrong" },
   { value: "pulse_false_positive", label: "Pulse — event should not have been included" },
   { value: "pulse_missing_event", label: "Pulse — significant event is missing" },
   { value: "pulse_duplicate", label: "Pulse — duplicate event" },

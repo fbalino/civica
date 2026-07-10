@@ -36,14 +36,15 @@
  * validated against it.
  *
  * Ensemble note: the cross-model ensemble (`classify.ts`,
- * `PULSE_CLASSIFY_ENSEMBLE`) runs ONE classify pass per independent vendor
- * so their errors are uncorrelated. This provider layer is still the single
+ * `PULSE_CLASSIFY_ENSEMBLE`) runs ONE classify pass per configured vendor to
+ * diversify error sources; statistical independence is not established. This
+ * provider layer is still the single
  * seam — the ensemble just calls `callClassifier` once per configured
  * provider+model.
  *
  * Env-driven config (documented in `.env.example`):
- *   PULSE_CLASSIFY_PROVIDER / PULSE_CLASSIFY_MODEL   — the classify pass
- *   PULSE_VERIFY_PROVIDER   / PULSE_VERIFY_MODEL     — the verify pass
+ *   PULSE_CLASSIFY_ENSEMBLE                         — classify voters
+ *   PULSE_VERIFY_PROVIDER / PULSE_VERIFY_MODEL      — single-engine verify
  *   DEEPSEEK_API_KEY, GLM_API_KEY, ANTHROPIC_API_KEY_PULSE_CLASSIFIER
  *
  * Robustness mirrors the rest of the pipeline: JSON-mode / structured
@@ -60,8 +61,8 @@ import Anthropic from "@anthropic-ai/sdk";
 
 export type ClassifierProvider = "anthropic" | "deepseek" | "glm" | "openai";
 
-/** The two passes this provider layer serves. */
-export type ClassifierPass = "classify" | "verify";
+/** Legacy/single-engine configuration is retained only for verification. */
+export type ClassifierPass = "verify";
 
 /** A single provider call: system prompt + user content → raw text.
  *  `expectJson` opts the OpenAI-compatible providers into JSON mode. */
@@ -165,25 +166,19 @@ export function parseProvider(
 }
 
 /**
- * Resolve the provider + model for a given pass from the environment.
- * Defaults: both passes on DeepSeek's best current general model
- * (`deepseek-v4-flash`) per the owner's 2026-07-05 decision. A GLM
- * alternative is documented inline in `.env.example`. If a provider is
- * set without an explicit model, the provider's default model is used.
+ * Resolve the verifier for retained single-engine mode. Classification is
+ * configured exclusively through `PULSE_CLASSIFY_ENSEMBLE`; these legacy
+ * verifier overrides do not select a classify engine. If a provider is set
+ * without an explicit model, that provider's default model is used.
  */
 export function resolveProviderConfig(
   pass: ClassifierPass
 ): ResolvedProviderConfig {
-  const providerEnv =
-    pass === "classify"
-      ? process.env.PULSE_CLASSIFY_PROVIDER
-      : process.env.PULSE_VERIFY_PROVIDER;
-  const modelEnv =
-    pass === "classify"
-      ? process.env.PULSE_CLASSIFY_MODEL
-      : process.env.PULSE_VERIFY_MODEL;
+  void pass;
+  const providerEnv = process.env.PULSE_VERIFY_PROVIDER;
+  const modelEnv = process.env.PULSE_VERIFY_MODEL;
 
-  // Default provider is DeepSeek for both passes (owner decision 2026-07-05).
+  // Retained single-engine verification defaults to DeepSeek.
   const provider = parseProvider(providerEnv, "deepseek");
   const model =
     (modelEnv ?? "").trim() || PROVIDER_DEFAULT_MODEL[provider];
@@ -191,8 +186,9 @@ export function resolveProviderConfig(
 }
 
 /**
- * The default ensemble: three heterogeneous vendors so their errors are
- * independent (owner decision 2026-07-05).
+ * The default ensemble: three heterogeneous vendors to diversify error
+ * sources. Their errors are not assumed independent (owner decision
+ * 2026-07-05).
  *
  * GLM tier: the owner's instruction was to default to the cheap fast tier
  * `glm-4.7-flashx` and fall back to flagship `glm-4.7` if flashx disappoints
@@ -490,9 +486,9 @@ async function callOpenAiCompat(
 /**
  * Run one classifier call against the given provider+model. Returns the
  * raw text (for parseClassify/parseVerify) plus token usage. Throws on a
- * hard failure so callers can treat a thrown call as a failed pass
- * (classify.ts already routes failed passes to human review — the
- * conservative default).
+ * hard failure so callers can treat a thrown call as a failed pass. Ensemble
+ * mode may continue with the surviving voters; review then follows the
+ * declared quorum, consensus, severity-tier, and verification gates.
  */
 export async function callClassifier(
   config: ResolvedProviderConfig,

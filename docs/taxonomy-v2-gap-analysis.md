@@ -1,6 +1,7 @@
 # Civica Pulse Taxonomy v2 — Gap Analysis
 
-**Status:** proposal under review · do not implement until approved
+**Status:** implemented derivation record for taxonomy v2.0; not the current
+runtime-method contract (see `src/lib/pulse/v2/runtime-method.generated.json`)
 **Author:** Phase 5.8 closeout review (2026-04-30)
 **Predecessor:** `src/lib/pulse/v2/taxonomy.ts` (30 categories, locked
 2026-04-29 per commit `5dbd8c3` — see "TAXONOMY DECISION" comment)

@@ -1,0 +1,399 @@
+{
+  "cadence": {
+    "continuous": false,
+    "frequency": "daily",
+    "stages": [
+      {
+        "cron": "0 8 * * *",
+        "operations": [
+          "ingest"
+        ],
+        "route": "/api/cron/pulse/v2/ingest",
+        "stage": "ingest"
+      },
+      {
+        "cron": "20 8 * * *",
+        "operations": [
+          "cluster"
+        ],
+        "route": "/api/cron/pulse/v2/cluster",
+        "stage": "cluster"
+      },
+      {
+        "cron": "40 8 * * *",
+        "operations": [
+          "classify",
+          "verify",
+          "subject_attribute"
+        ],
+        "route": "/api/cron/pulse/v2/classify",
+        "stage": "classify"
+      },
+      {
+        "cron": "0 9 * * *",
+        "operations": [
+          "corroborate",
+          "score"
+        ],
+        "route": "/api/cron/pulse/v2/score",
+        "stage": "score"
+      }
+    ],
+    "timezone": "UTC"
+  },
+  "clustering": {
+    "countryPartitioned": true,
+    "dateWindowHours": 48,
+    "lexicalFallback": {
+      "condition": "embedding_model_unavailable",
+      "metric": "jaccard_token_similarity",
+      "threshold": 0.5
+    },
+    "semantic": {
+      "metric": "cosine_similarity",
+      "threshold": 0.75
+    },
+    "strategy": "semantic_or_lexical_fallback"
+  },
+  "contractHash": "967f7f5397952524e207a762cf2ccdc2976ee2c36d3c186beae075361bb9236f",
+  "evaluation": {
+    "backtestMatchesCurrentProduction": false,
+    "currentProductionValidatedByExistingBacktest": false,
+    "externalValidation": "not_completed",
+    "statusReason": "Numeric Pulse deltas are public experiments, not validated measurements; the current ensemble still requires a method-matched replay, calibration, and external review."
+  },
+  "feeds": {
+    "activeDefinition": "A production-active feed is a source ID observed in raw_events by the stated evidence cut. A connector, configured source, or sync in another Civica pipeline does not qualify by itself.",
+    "activeProduction": {
+      "observedThrough": "2026-07-09",
+      "sourceIds": [
+        "amnesty",
+        "civicus_monitor",
+        "gdelt",
+        "hrw"
+      ]
+    },
+    "connectors": [
+      {
+        "activation": "Requires licensed academic API access and a registered account email.",
+        "connectorId": "acled",
+        "defaultEnabled": false,
+        "feedId": "acled",
+        "observedInProduction": false,
+        "role": "specialist",
+        "sourceIds": [
+          "acled"
+        ],
+        "status": "access_gated"
+      },
+      {
+        "activation": "Default Amnesty International RSS feed.",
+        "connectorId": "hrw_amnesty",
+        "defaultEnabled": true,
+        "feedId": "amnesty",
+        "observedInProduction": true,
+        "role": "specialist",
+        "sourceIds": [
+          "amnesty"
+        ],
+        "status": "active_observed"
+      },
+      {
+        "activation": "No working default feed; requires an explicitly configured feed URL.",
+        "connectorId": "reuters_ap",
+        "defaultEnabled": false,
+        "feedId": "ap",
+        "observedInProduction": false,
+        "role": "news",
+        "sourceIds": [
+          "ap_wire"
+        ],
+        "status": "configuration_gated"
+      },
+      {
+        "activation": "Default CIVICUS Monitor RSS feed.",
+        "connectorId": "civicus",
+        "defaultEnabled": true,
+        "feedId": "civicus",
+        "observedInProduction": true,
+        "role": "specialist",
+        "sourceIds": [
+          "civicus_monitor"
+        ],
+        "status": "active_observed"
+      },
+      {
+        "activation": "Default GDELT document API query with best-effort article enrichment.",
+        "connectorId": "gdelt",
+        "defaultEnabled": true,
+        "feedId": "gdelt",
+        "observedInProduction": true,
+        "role": "news",
+        "sourceIds": [
+          "gdelt"
+        ],
+        "status": "active_observed"
+      },
+      {
+        "activation": "Default Human Rights Watch RSS feed.",
+        "connectorId": "hrw_amnesty",
+        "defaultEnabled": true,
+        "feedId": "hrw",
+        "observedInProduction": true,
+        "role": "specialist",
+        "sourceIds": [
+          "hrw"
+        ],
+        "status": "active_observed"
+      },
+      {
+        "activation": "Scheduled elections-endpoint scaffold; no daily parliamentary-actions feed exists.",
+        "connectorId": "ipu",
+        "defaultEnabled": true,
+        "feedId": "ipu",
+        "observedInProduction": false,
+        "role": "specialist",
+        "sourceIds": [
+          "ipu_parline"
+        ],
+        "status": "sparse_scaffold"
+      },
+      {
+        "activation": "No working default feed; requires an explicitly configured feed URL.",
+        "connectorId": "reuters_ap",
+        "defaultEnabled": false,
+        "feedId": "reuters",
+        "observedInProduction": false,
+        "role": "news",
+        "sourceIds": [
+          "reuters_wire"
+        ],
+        "status": "configuration_gated"
+      },
+      {
+        "activation": "No public feed is configured; requires an approved ingestion surface.",
+        "connectorId": "rsf",
+        "defaultEnabled": false,
+        "feedId": "rsf",
+        "observedInProduction": false,
+        "role": "specialist",
+        "sourceIds": [
+          "rsf_alerts"
+        ],
+        "status": "configuration_gated"
+      },
+      {
+        "activation": "Placeholder returns no rows because V-Dem has no daily Pulse feed.",
+        "connectorId": "vdem_pulse",
+        "defaultEnabled": true,
+        "feedId": "vdem",
+        "observedInProduction": false,
+        "role": "specialist",
+        "sourceIds": [],
+        "status": "placeholder"
+      }
+    ]
+  },
+  "ledgerHistory": {
+    "comparisonWarning": "Do not treat the full historical ledger as a homogeneous sample of the current method.",
+    "currentRows": "Current classifier runs record provider and model for each ensemble vote and verify pass.",
+    "legacyRows": "The stored ledger also contains older single-model, temperature-variant, and agent-generated rows without a row-level method version."
+  },
+  "methodology": {
+    "currentContractScope": "New classifications produced by the declared scheduled Pulse v2 pipeline; not a retroactive description of every stored ledger row.",
+    "id": "civica-pulse",
+    "name": "Civica Pulse"
+  },
+  "mixed_legacy_unversioned": true,
+  "numericDeltas": {
+    "absorbedIntoIndexPolicy": "non_durable_zero_then_daily_recompute_can_restore",
+    "boundsPerDimension": {
+      "lower": -15,
+      "upper": 10
+    },
+    "dimensions": [
+      "democratic_quality",
+      "rule_of_law",
+      "freedom_rights",
+      "corruption_control",
+      "stability"
+    ],
+    "impactFormula": "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)",
+    "includedEvents": "published_only",
+    "inputMethodCoverage": "mixed_legacy_unversioned",
+    "publicStatus": "public_experimental",
+    "scalar": "none",
+    "scoreStageOrder": [
+      "corroborate",
+      "score"
+    ],
+    "shape": "per_dimension",
+    "trailingWindowDays": 365
+  },
+  "providers": {
+    "backtest": {
+      "differences": [
+        "The existing backtest uses one engine for classify and verify rather than the current cross-vendor classify ensemble.",
+        "It uses curated single-source events rather than production ingestion, clustering, and source attribution.",
+        "It simplifies corroboration and assumes review-gated events receive perfect approval."
+      ],
+      "engine": {
+        "model": "claude-sonnet-4-6",
+        "provider": "anthropic"
+      },
+      "matchesCurrentProduction": false,
+      "mode": "single_engine_classify_verify"
+    },
+    "classify": {
+      "categoryConsensus": "strict_majority_of_successful_voters",
+      "configuredProviderSetPersisted": false,
+      "decode": "deterministic",
+      "degradedRunsRecorded": false,
+      "engines": [
+        {
+          "model": "deepseek-v4-flash",
+          "provider": "deepseek"
+        },
+        {
+          "model": "glm-4.7",
+          "provider": "glm"
+        },
+        {
+          "model": "claude-haiku-4-5",
+          "provider": "anthropic"
+        }
+      ],
+      "invalidSelfConfidencePolicy": "reject_response_as_unusable",
+      "minimumQuorum": 2,
+      "mode": "cross_vendor_ensemble",
+      "providerFailuresPersisted": false,
+      "selfConfidenceRange": {
+        "lower": 0,
+        "upper": 1
+      },
+      "severityValuePolicy": "require_finite_number_then_tier_clamp",
+      "successfulProviderRunsRecorded": true
+    },
+    "reviewSummary": {
+      "affectsClassification": false,
+      "affectsNumericDelta": false,
+      "engine": {
+        "model": "claude-haiku-4-5-20251001",
+        "provider": "anthropic"
+      },
+      "role": "optional_cached_admin_and_public_ledger_summary_aid"
+    },
+    "subject": {
+      "acceptedConfidence": [
+        "high",
+        "medium"
+      ],
+      "acceptedScopes": [
+        "single"
+      ],
+      "engine": {
+        "model": "claude-sonnet-4-6",
+        "provider": "anthropic"
+      },
+      "failurePolicy": "retain_ingest_attribution",
+      "responseValidation": "strict_scope_confidence_and_iso3_shape",
+      "role": "attribute_event_by_subject_country",
+      "runsAfterClassification": true
+    },
+    "verify": {
+      "engine": {
+        "model": "claude-haiku-4-5",
+        "provider": "anthropic"
+      },
+      "invalidConfidencePolicy": "coerce_to_low_confidence_objection",
+      "malformedVerdictOrAxesPolicy": "reject_as_failed_objection",
+      "role": "adversarial_signal_not_absolute_veto",
+      "runsForAgreement": [
+        "all",
+        "two_of_three"
+      ],
+      "skippedFor": [
+        "deadlock_or_no_quorum",
+        "invalid_consensus_category"
+      ]
+    }
+  },
+  "publicationPolicy": {
+    "majorityNone": "drop_not_governance_event",
+    "numericSeverityAggregation": "median_of_winning_category_voters_then_tier_clamp",
+    "reviewGates": {
+      "absoluteSeverityTiers": [
+        "catastrophic_neg",
+        "high_pos",
+        "severe_neg"
+      ],
+      "deadlock": true,
+      "invalidConsensusCategory": true,
+      "invalidConsensusCategoryPersistence": "normalize_to_none_unresolved",
+      "noQuorum": true,
+      "verifierObjectionWithWeakConsensus": {
+        "degradedRunAlsoWeak": true,
+        "selfConfidenceAggregation": "maximum_among_winning_category_voters",
+        "selfConfidenceBelow": 0.7,
+        "verifierObjectionIncludes": [
+          "low_confidence",
+          "failed",
+          "verdict_revised",
+          "verdict_rejected",
+          "category_not_ok",
+          "severity_not_ok",
+          "subject_not_ok",
+          "not_event"
+        ],
+        "weakConsensusRequiresNonUnanimous": true
+      }
+    },
+    "severityAggregation": "majority_with_ties_to_more_severe",
+    "states": {
+      "autoPublished": {
+        "humanReviewed": false,
+        "published": true,
+        "reviewStatus": "approved"
+      },
+      "humanApproved": {
+        "humanReviewed": true,
+        "published": true,
+        "reviewStatus": "approved"
+      },
+      "humanEdited": {
+        "humanReviewed": true,
+        "published": true,
+        "reviewStatus": "edited"
+      },
+      "humanRejected": {
+        "humanReviewed": true,
+        "published": false,
+        "reviewStatus": "rejected"
+      },
+      "legacyRejectedUnverified": {
+        "humanReviewed": false,
+        "published": false,
+        "reviewStatus": "rejected"
+      },
+      "queuedForReview": {
+        "humanReviewed": false,
+        "published": false,
+        "reviewStatus": "pending"
+      }
+    }
+  },
+  "schemaVersion": "1.0.0",
+  "status": "experimental",
+  "taxonomy": {
+    "categoryCount": 61,
+    "dimensions": [
+      "democratic_quality",
+      "rule_of_law",
+      "freedom_rights",
+      "corruption_control",
+      "stability"
+    ],
+    "version": "v2.0"
+  },
+  "version": "pulse-v2.1-beta"
+}

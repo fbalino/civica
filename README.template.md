@@ -43,7 +43,7 @@ A research-beta 0–100 composite across {{ctx.civicaIndexDimensionCountWord}} g
 ### Civica Pulse — experimental event ledger
 
 <!-- PUBLIC_CLAIM: readme.pulse-signal -->
-An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state. It is not a continuous measure of governance change, and no detected event does not mean stability. Numeric effects remain experimental pending representative evaluation and independent review. Current status: {{ctx.pulseStatusUpper}}.
+An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state. It is not a continuous measure of governance change, and no detected event does not mean stability. Public numeric effects are experimental, named per-dimension deltas; Civica does not publish a merged Pulse score or Pulse ranking. The current production ensemble has not completed representative evaluation or independent review. Current status: {{ctx.pulseStatusUpper}}.
 
 ## What makes this different
 
@@ -120,8 +120,8 @@ Public methodology pages (in approximate read order):
 | Reconciliation — multi-source resolver, dispute rules, provenance | `/factbook/methodology/reconciliation` |
 | Civica Index — composite scoring, dimensions, weights | `/civica-index/methodology` |
 | Civica Index — PCA appendix (the math) | `/civica-index/methodology/pca-appendix` |
-| Civica Pulse — event classification + scoring | `/civica-index/methodology/pulse` |
-| Civica Pulse — backtest results | `/civica-index/methodology/pulse/backtest` |
+| Civica Pulse — event classification + experimental effects | `/civica-index/methodology/pulse` |
+| Civica Pulse — archived diagnostic smoke test | `/civica-index/methodology/pulse/backtest` |
 | Peer grouping — V-Dem RoW, World Bank region/income, regime classification | `/civica-index/methodology/peer-grouping` |
 
 Internal methodology resolution documents (audit trail, eventually published) cover decisions like the Wikidata claim-selection policy, the forecast-vs-measurement value-type column, the trade-aggregate goods-vs-merchandise split, the fact-key registry expansion strategy, and more. Public publication of these resolutions is a v1.x deliverable.
@@ -148,7 +148,8 @@ A complete list of sources, licenses, and last-sync timestamps is at [/about](ht
 - **[Neon](https://neon.tech)** (serverless Postgres) via `@neondatabase/serverless`
 - **[Drizzle ORM](https://orm.drizzle.team)** (type-safe schema in `src/lib/db/schema.ts`)
 - **Tailwind CSS v4** + hand-authored editorial CSS with a strict design-token discipline (no hex literals in component code)
-- **[Anthropic SDK](https://docs.anthropic.com)** — Claude powers `/api/chat` and the Pulse event classifier
+- **Multi-provider Pulse classifier** — DeepSeek, GLM, and Anthropic voters with an Anthropic adversarial verifier; successful providers are recorded per event
+- **[Anthropic SDK](https://docs.anthropic.com)** — Claude powers `/api/chat`, Pulse verification/subject attribution, and selected review tools
 - **[Vercel](https://vercel.com)** for hosting and cron orchestration
 
 The full design system reference lives at [/design-system](https://civicaatlas.org/design-system) on the running site.
@@ -160,7 +161,7 @@ git clone https://github.com/fbalino/civica.git
 cd civica
 npm install
 cp .env.example .env.local
-# Fill in DATABASE_URL, ANTHROPIC_API_KEY, ADMIN_USERNAME/ADMIN_PASSWORD_HASH/ADMIN_SESSION_SECRET, CRON_SECRET
+# Fill in DATABASE_URL, ANTHROPIC_API_KEY_CHAT, the Pulse provider keys, ADMIN_USERNAME/ADMIN_PASSWORD_HASH/ADMIN_SESSION_SECRET, CRON_SECRET
 npm run dev
 ```
 
@@ -169,7 +170,8 @@ Open [http://localhost:3000](http://localhost:3000).
 Required env vars (documented in `.env.example`):
 
 - `DATABASE_URL` — Neon Postgres connection string
-- `ANTHROPIC_API_KEY` — required for `/api/chat` and Pulse event classification
+- `ANTHROPIC_API_KEY_CHAT` — required for `/api/chat`
+- `DEEPSEEK_API_KEY`, `GLM_API_KEY`, and `ANTHROPIC_API_KEY_PULSE_CLASSIFIER` — required by the default Pulse ensemble, verifier, and subject-attribution pass
 - `ADMIN_USERNAME` / `ADMIN_PASSWORD_HASH` / `ADMIN_SESSION_SECRET` — the admin-login credentials for the `/admin` back office and `/api/admin/*` routes (all three required; routes fail closed if unset). Generate the password hash with `npm run admin:set-password`.
 - `CRON_SECRET` — bearer token for the Vercel cron endpoints
 
@@ -184,7 +186,7 @@ npm run sync:factbook:wb-wdi     # World Bank WDI sync
 npm run sync:factbook:imf-weo    # IMF WEO sync
 npm run sync:factbook:un-data    # UN Data sync
 # ... one sync orchestrator per source; see package.json
-npm run pulse:v2:all             # Run the full Pulse pipeline (ingest → cluster → classify → score)
+npm run pulse:v2:all             # Run the full Pulse pipeline (ingest → cluster → classify → corroborate → score)
 npm run regenerate:readme        # Regenerate README.md from README.template.md
 ```
 

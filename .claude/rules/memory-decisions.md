@@ -79,8 +79,8 @@ ensemble agreement as validation, or says Pulse is paused.
 ## 2026-07-05 — Pulse classifier: CROSS-MODEL ENSEMBLE (owner decision; supersedes both the 3-temperature scheme and the brief single-engine plan)
 
 The classify pass runs once each on THREE heterogeneous engines (DeepSeek
-v4-flash, GLM, Haiku 4.5; optional 4th voter gpt-4.1-mini when an OpenAI key
-exists) — the owner's own proposal, and stronger than the retired
+v4-flash, GLM, Haiku 4.5; optional 4th voter gpt-4.1-mini only when explicitly
+named in `PULSE_CLASSIFY_ENSEMBLE` and its OpenAI key exists) — the owner's own proposal, and stronger than the retired
 same-model 3-temperature vote because the voters are more heterogeneous. Their
 errors are **not** assumed independent; shared prompts, sources, taxonomy, and
 training ecosystems can correlate them.

@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 6
-- **Remaining:** 282
-- **Progress:** 2.1%
+- **Completed:** 7
+- **Remaining:** 281
+- **Progress:** 2.4%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -20,7 +20,7 @@ Source: `plan/02-positioning-claims-and-documentation.md`
 - [x] **CLM-004** (P0) Remove or qualify academic-authority claims that outrun the current release. _Done when: repository and rendered-site searches find no unqualified “academically citable,” “authoritative,” “validated,” “confidence interval,” “daily governance,” or equivalent claim for an artifact that has not passed its gate; each remaining use links to supporting evidence._
 - [x] **CLM-005** (P0) Remove judgmental A–F country grading and categorical labels from target UI, API, exports, metadata, and prose. _Done when: a repository/API/browser audit finds no public country letter grade or “failed/authoritarian” score-band label, historical data is migrated or explicitly deprecated, and neutral replacement presentation passes design-system/browser tests._
 - [x] **CLM-006** (P0) Replace hardcoded live statistics and coverage numbers in public prose with registered state/template values or dated release facts. _Done when: `npm run validate:content-templates` plus a new numeric-claim audit passes, and every current coverage/count claim either resolves from runtime state with a soft fallback or names a frozen release/date._
-- [ ] **CLM-007** (P0) Reconcile Pulse public documentation with the actual production cadence, active source set, classifier ensemble, review behavior, and scoring status. _Done when: a generated runtime-method snapshot and every Pulse-facing page/API/doc agree on providers by role, active feeds, cadence, review gates, methodology version, and whether numeric deltas are public or experimental._
+- [x] **CLM-007** (P0) Reconcile Pulse public documentation with the actual production cadence, active source set, classifier ensemble, review behavior, and scoring status. _Done when: a generated runtime-method snapshot and every Pulse-facing page/API/doc agree on providers by role, active feeds, cadence, review gates, methodology version, and whether numeric deltas are public or experimental._
 - [ ] **CLM-008** (P0) Reconcile Index public documentation with the exact canonical ingestion, normalization, missingness, weighting, uncertainty, panel analysis, neutral presentation contract, and release status. _Done when: an executable documentation fixture recomputes all published formula examples from the same library used in production and zero documented rule contradicts code or stored metadata._
 - [ ] **CLM-009** (P1) Establish a single documentation-source registry for reader markdown, TSX-owned rich blocks, API examples, operational runbooks, project memory, and generated README sections. _Done when: every methodology/release concept has one named source of truth, duplicate prose is generated or link-only, and a validator fails on a newly duplicated canonical formula or stale route._
 - [ ] **CLM-010** (P0) Make the replication-package route an honest status and artifact surface. _Done when: before G2 it lists exact incomplete components without implying availability; after G2 it links to versioned code, data manifest, codebook, checksums, environment, commands, expected outputs, and DOI, all verified by a clean-room test._

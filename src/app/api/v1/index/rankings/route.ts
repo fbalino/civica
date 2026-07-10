@@ -1,7 +1,7 @@
 import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
-import { jurisdictions, ciCompositeScores, pulseDailyScores } from "@/lib/db/schema";
+import { jurisdictions, ciCompositeScores } from "@/lib/db/schema";
 import { eq, sql, desc, asc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import {
@@ -54,6 +54,12 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const quarterParam = url.searchParams.get("quarter");
     const sort = url.searchParams.get("sort") ?? "ci";
+    if (sort !== "ci") {
+      return apiError(
+        "Unsupported sort. Civica Pulse is published only as named per-dimension experimental deltas, not as a scalar score or ranking.",
+        400,
+      );
+    }
     const continent = url.searchParams.get("continent");
     const governmentType = url.searchParams.get("government_type");
     const taxonomyParam = url.searchParams.get("taxonomy");
@@ -142,8 +148,6 @@ export async function GET(request: Request) {
 
     const where = sql.join(conditions, sql` AND `);
 
-    const isCpSort = sort === "cp";
-
     const baseSelect = {
       jurisdictionId: jurisdictions.id,
       rank: ciCompositeScores.rank,
@@ -164,37 +168,12 @@ export async function GET(request: Request) {
       governmentTypeDetail: jurisdictions.governmentTypeDetail,
     };
 
-    const cpSelect = isCpSort
-      ? {
-          ...baseSelect,
-          pulseScore: pulseDailyScores.pulseScore,
-          eventImpact: pulseDailyScores.eventImpact,
-          activeEvents: pulseDailyScores.activeEvents,
-          isLowConfidence: pulseDailyScores.isLowConfidence,
-          pulseDate: pulseDailyScores.scoreDate,
-        }
-      : baseSelect;
-
-    let rowsQuery = db
-      .select(cpSelect)
+    const rowsQuery = db
+      .select(baseSelect)
       .from(ciCompositeScores)
       .innerJoin(jurisdictions, eq(ciCompositeScores.jurisdictionId, jurisdictions.id))
       .$dynamic();
-
-    if (isCpSort) {
-      rowsQuery = rowsQuery.leftJoin(
-        pulseDailyScores,
-        sql`${pulseDailyScores.jurisdictionId} = ${ciCompositeScores.jurisdictionId}
-          AND ${pulseDailyScores.scoreDate} = (
-            SELECT MAX(score_date) FROM pulse_daily_scores
-            WHERE jurisdiction_id = ${ciCompositeScores.jurisdictionId}
-          )`
-      );
-    }
-
-    const orderCol = isCpSort
-      ? sql`${pulseDailyScores.pulseScore} DESC NULLS LAST`
-      : asc(ciCompositeScores.rank);
+    const orderCol = asc(ciCompositeScores.rank);
 
     // Legacy slow path — `?taxonomy=structural|regime` + governmentType
     // text-match in memory against the classification labels. Retained

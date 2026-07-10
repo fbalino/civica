@@ -13,6 +13,8 @@ import {
 } from "@/lib/db/queries";
 import { getLegislatureForJurisdiction } from "@/lib/factbook/legislature";
 import { getScoresForJurisdiction } from "@/lib/db/queries-scores";
+import { getPulseV2Changelog } from "@/lib/db/queries-pulse-v2";
+import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
 import { FactbookGovOrgChart } from "@/components/factbook/FactbookGovOrgChart";
 import { FactbookSidebar } from "@/components/factbook/FactbookSidebar";
 import { buildOrgChartFromGovernmentStructure } from "@/lib/factbook/gov-org-chart";
@@ -161,6 +163,7 @@ export default async function CountryCivicaDataTab({
   // 500-ing the whole tab.
   const [
     ciDetail,
+    pulseChangelog,
     govStructure,
     leadersRows,
     legislatureData,
@@ -172,6 +175,12 @@ export default async function CountryCivicaDataTab({
     countryOptions,
   ] = await Promise.all([
     getCICountryDetail(slug).catch(() => null),
+    getPulseV2Changelog({
+      country: slug,
+      deltaEligibleOnly: true,
+      withinDays: SCORE_WINDOW_DAYS,
+      limit: 2500,
+    }).catch(() => ({ rows: [], hasMore: false })),
     getGovernmentStructure(jurisdiction.id).catch(
       () => ({ bodies: [], offices: [], currentTerms: [] }) as Awaited<
         ReturnType<typeof getGovernmentStructure>
@@ -261,7 +270,8 @@ export default async function CountryCivicaDataTab({
   };
 
   // Civica Index section: composite (frozen quarterly vintage → amber via
-  // civica_curated) + its dimension upstreams + GDELT (the Pulse upstream).
+  // civica_curated), its dimension upstreams, and only the Pulse sources
+  // actually attached to this country's published in-window events.
   const civicaIndexSources: SectionSource[] = [];
   if (hasCivicaIndex) {
     civicaIndexSources.push({
@@ -278,7 +288,10 @@ export default async function CountryCivicaDataTab({
       (ciDetail?.dimensions ?? []).map((d) => d.sourceId).filter(Boolean)
     );
     for (const id of dimIds) civicaIndexSources.push(sourceEntry(id));
-    civicaIndexSources.push(sourceEntry("gdelt"));
+    const pulseSourceIds = dedup(
+      pulseChangelog.rows.flatMap((event) => event.sources),
+    );
+    for (const id of pulseSourceIds) civicaIndexSources.push(sourceEntry(id));
   }
 
   // Government structure + leaders are Wikidata-derived; legislature seat
@@ -301,7 +314,7 @@ export default async function CountryCivicaDataTab({
     ? [sourceEntry("wikidata")]
     : [];
   // Rankings rows each carry a `.source` (V-Dem, Freedom House, HDI, CPI,
-  // RSF, plus the Civica Index + Pulse composites).
+  // RSF, plus the Civica Index composite).
   const rankingsSources: SectionSource[] = hasRankings
     ? dedup(scoresRows.map((r) => r.source)).map((id) =>
         id === "civica_curated"

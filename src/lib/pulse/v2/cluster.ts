@@ -8,7 +8,9 @@
  *     jurisdictions — events in different countries are different
  *     events even if textually similar)
  *   - event dates within ±48h of each other
- *   - cosine similarity above CLUSTER_SIM_THRESHOLD on the embeddings
+ *   - cosine similarity above CLUSTER_SIM_THRESHOLD on the embeddings;
+ *     when embeddings are unavailable, lexical Jaccard similarity is used
+ *     with the separate LEXICAL_SIM_THRESHOLD fallback
  *
  * Algorithm: per-country bucket, then union-find with greedy
  * pairwise similarity. O(N²) per bucket, which is fine — buckets

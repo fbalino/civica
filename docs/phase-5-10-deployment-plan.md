@@ -1,5 +1,14 @@
 # Phase 5.10 — Production cut-over deployment plan
 
+> [!WARNING]
+> **Frozen historical plan (30 April 2026).** This document preserves the
+> proposed cut-over state from that date; it is not an operational runbook and
+> its cadence, feed, classifier, validation, API, and rollback claims are
+> superseded. The current source of truth is
+> `src/lib/pulse/v2/runtime-method.generated.json`, exposed at
+> `/api/v1/pulse/methodology` and explained at
+> `/civica-index/methodology/pulse`. Do not deploy or roll back from this file.
+
 **Status:** awaiting reviewer sign-off · DO NOT DEPLOY until approved
 **Author:** Phase 5.10 planning (2026-04-30)
 **Predecessor:** v2.0 taxonomy approved + tagged `pulse-taxonomy-v2.0`

@@ -15,12 +15,21 @@ import {
   pulseSources,
 } from "@/lib/db/schema";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
-import { pressFreedomScore } from "@/lib/pulse/v2/press-freedom";
+import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
+import {
+  pressFreedomScore,
+  RSF_SCORES_2024,
+} from "@/lib/pulse/v2/press-freedom";
+import {
+  publicationOriginFor,
+  type PulsePublicationOrigin,
+} from "@/lib/pulse/v2/review-validation";
 
 /** A row in the per-country dimensional-delta panel. */
 export interface DimensionRow {
   dimension: PulseDimension;
-  delta: number;
+  /** Null when no eligible published event supports this dimension now. */
+  delta: number | null;
   contributingEventIds: string[];
   /** 0–2 driving event headlines for the panel, sorted by absolute decayed impact. */
   drivingEvents: Array<{
@@ -66,17 +75,21 @@ export interface PulseV2ForCountry {
   lastComputedAt: string | null;
   /** Total published events feeding the deltas. */
   totalEvents: number;
-  /** RSF Press Freedom score at the time of fetch — surfaces the
-   *  closed-regime caveat on the country panel when score < 30. */
-  pressFreedomScore: number;
+  /** Provisional context heuristic used by the current weighting code.
+   * This is not a complete or live RSF dataset. */
+  pressFreedomContext: {
+    score: number;
+    source: "approximate_static_2024_subset";
+    directLookup: boolean;
+    defaultApplied: boolean;
+  };
 }
 
 /**
  * Pull the current dimensional deltas for a country, plus the top
  * driving events per dimension. Returns null when the country isn't
- * found. When the country exists but has no v2 data yet, returns
- * a zero-filled deltas object so callers can render a "no signal yet"
- * state without an extra null check.
+ * found. When the country exists but has no eligible v2 event for a dimension,
+ * returns `delta: null` so callers render non-observation rather than zero.
  */
 export async function getPulseV2ForCountry(
   slug: string
@@ -97,16 +110,20 @@ export async function getPulseV2ForCountry(
   const jurisdiction = jurisdictionRows[0];
   if (!jurisdiction) return null;
   const press = pressFreedomScore(jurisdiction.iso3);
+  const directPressLookup = Boolean(
+    jurisdiction.iso3 && RSF_SCORES_2024[jurisdiction.iso3.toUpperCase()] != null,
+  );
 
-  // Pull all 5 dimension rows (or however many exist). Missing
-  // dimensions get a zero default below.
+  // Pull all stored dimension rows. Missing or not-yet-computed dimensions
+  // remain unobserved (`delta: null`) below.
   const deltaRows = await db
     .select()
     .from(pulseDimensionalDeltas)
     .where(eq(pulseDimensionalDeltas.jurisdictionId, jurisdiction.id));
 
-  // Pull driving events per dimension — published rows in the
-  // trailing 365d, sorted by absolute severity desc.
+  // Pull driving events per dimension — only the same trailing 365-day
+  // window used by the scoring pipeline. Older published rows remain in the
+  // ledger but must not inflate the country panel's event count or evidence.
   const eventRows = await db
     .select({
       id: pulseEventsV2.id,
@@ -121,7 +138,11 @@ export async function getPulseV2ForCountry(
     .where(
       and(
         eq(pulseEventsV2.jurisdictionId, jurisdiction.id),
-        eq(pulseEventsV2.published, true)
+        eq(pulseEventsV2.published, true),
+        sql`${pulseEventsV2.reviewStatus} IN ('approved', 'edited')`,
+        sql`${pulseEventsV2.category} <> 'none'`,
+        sql`${pulseEventsV2.eventDate} >= CURRENT_DATE - (${SCORE_WINDOW_DAYS} * INTERVAL '1 day')`,
+        sql`${pulseEventsV2.eventDate} <= CURRENT_DATE`,
       )
     )
     .orderBy(desc(sql`ABS(${pulseEventsV2.severityValue})`));
@@ -202,7 +223,8 @@ export async function getPulseV2ForCountry(
     // event, every event single-sourced, or low max confidence. Only a
     // delta that actually moved (|δ| ≥ 0.5) can read as a "limited" signal;
     // a flat dimension has its own treatment and needs no qualifier.
-    const moved = Math.abs(deltaRow?.deltaValue ?? 0) >= 0.5;
+    const moved =
+      nEvents > 0 && Math.abs(deltaRow?.deltaValue ?? 0) >= 0.5;
     const limitedSignal =
       moved &&
       nEvents > 0 &&
@@ -218,7 +240,7 @@ export async function getPulseV2ForCountry(
 
     dimensions[dim] = {
       dimension: dim,
-      delta: deltaRow?.deltaValue ?? 0,
+      delta: nEvents > 0 && deltaRow ? deltaRow.deltaValue : null,
       contributingEventIds: contributingIds,
       drivingEvents: driving,
       evidence: {
@@ -238,7 +260,12 @@ export async function getPulseV2ForCountry(
     dimensions,
     lastComputedAt,
     totalEvents: eventRows.length,
-    pressFreedomScore: press,
+    pressFreedomContext: {
+      score: press,
+      source: "approximate_static_2024_subset",
+      directLookup: directPressLookup,
+      defaultApplied: !directPressLookup,
+    },
   };
 }
 
@@ -269,6 +296,7 @@ export async function getPulseV2EventsForCountry(slug: string) {
       severityValue: pulseEventsV2.severityValue,
       corroborationConfidence: pulseEventsV2.corroborationConfidence,
       classifierAgreement: pulseEventsV2.classifierAgreement,
+      humanReviewed: pulseEventsV2.humanReviewed,
       published: pulseEventsV2.published,
       reviewStatus: pulseEventsV2.reviewStatus,
       headline: pulseEventsV2.headline,
@@ -315,6 +343,13 @@ export async function getPulseV2EventsForCountry(slug: string) {
     jurisdiction,
     events: events.map((e) => ({
       ...e,
+      // A deadlocked ensemble is stored in the current non-null schema with
+      // category="none" and a compatibility dimension. Do not expose that
+      // placeholder as a substantive Stability classification.
+      dimension: e.category === "none" ? null : e.dimension,
+      severityTier: e.category === "none" ? null : e.severityTier,
+      severityValue: e.category === "none" ? null : e.severityValue,
+      publicationOrigin: publicationOriginFor(e),
       sources: sourceMap.get(e.id) ?? [],
     })),
   };
@@ -325,6 +360,10 @@ export interface PulseV2ChangelogFilters {
   dimension?: PulseDimension;
   severityTier?: string;
   sinceDate?: string;
+  /** Database-relative lookback, avoiding render-clock-derived dates. */
+  withinDays?: number;
+  /** Restrict to rows that can feed the current experimental-delta window. */
+  deltaEligibleOnly?: boolean;
   publishedOnly?: boolean;
   limit?: number;
   offset?: number;
@@ -358,12 +397,14 @@ export interface PulseV2ChangelogRow {
   country: { slug: string; name: string };
   category: string;
   dimension: string;
-  severityTier: string;
-  severityValue: number;
+  severityTier: string | null;
+  severityValue: number | null;
   classifierAgreement: string;
   classifierRuns: PulseV2ClassifierRun[];
   corroborationConfidence: number;
   pressFreedomScoreAtClassification: number | null;
+  humanReviewed: boolean;
+  publicationOrigin: PulsePublicationOrigin;
   published: boolean;
   reviewStatus: string;
   headline: string;
@@ -388,13 +429,27 @@ export async function getPulseV2Changelog(
     wheres.push(sql`LOWER(j.slug) = ${filters.country.toLowerCase()}`);
   }
   if (filters.dimension) {
-    wheres.push(sql`p.dimension = ${filters.dimension}`);
+    wheres.push(
+      sql`p.dimension = ${filters.dimension} AND p.category <> 'none'`,
+    );
   }
   if (filters.severityTier) {
-    wheres.push(sql`p.severity_tier = ${filters.severityTier}`);
+    wheres.push(
+      sql`p.severity_tier = ${filters.severityTier} AND p.category <> 'none'`,
+    );
   }
   if (filters.sinceDate) {
     wheres.push(sql`p.event_date >= ${filters.sinceDate}`);
+  }
+  if (filters.withinDays && filters.withinDays > 0) {
+    const days = Math.min(Math.floor(filters.withinDays), 3650);
+    wheres.push(sql`p.event_date >= CURRENT_DATE - (${days} * INTERVAL '1 day')`);
+    wheres.push(sql`p.event_date <= CURRENT_DATE`);
+  }
+  if (filters.deltaEligibleOnly) {
+    wheres.push(sql`p.published = true`);
+    wheres.push(sql`p.review_status IN ('approved', 'edited')`);
+    wheres.push(sql`p.category <> 'none'`);
   }
   if (filters.publishedOnly) {
     wheres.push(sql`p.published = true`);
@@ -419,6 +474,7 @@ export async function getPulseV2Changelog(
       p.classifier_runs,
       p.corroboration_confidence,
       p.press_freedom_score_at_classification,
+      p.human_reviewed,
       p.published,
       p.review_status,
       p.headline,
@@ -494,6 +550,9 @@ export async function getPulseV2Changelog(
     const pressFreedomScoreAtClassification =
       rsfRaw === null || rsfRaw === undefined ? null : Number(rsfRaw);
 
+    const category = String(r.category);
+    const published = Boolean(r.published);
+    const humanReviewed = Boolean(r.human_reviewed);
     return {
       id: String(r.id),
       eventDate: String(r.event_date),
@@ -501,15 +560,23 @@ export async function getPulseV2Changelog(
         slug: String(r.country_slug),
         name: String(r.country_name),
       },
-      category: String(r.category),
-      dimension: String(r.dimension),
-      severityTier: String(r.severity_tier),
-      severityValue: Number(r.severity_value),
+      category,
+      dimension: category === "none" ? "unresolved" : String(r.dimension),
+      severityTier:
+        category === "none" ? null : String(r.severity_tier),
+      severityValue:
+        category === "none" ? null : Number(r.severity_value),
       classifierAgreement: String(r.classifier_agreement),
       classifierRuns: runs,
       corroborationConfidence: Number(r.corroboration_confidence),
       pressFreedomScoreAtClassification,
-      published: Boolean(r.published),
+      humanReviewed,
+      publicationOrigin: publicationOriginFor({
+        published,
+        humanReviewed,
+        reviewStatus: String(r.review_status),
+      }),
+      published,
       reviewStatus: String(r.review_status),
       headline: String(r.headline),
       description: String(r.description),

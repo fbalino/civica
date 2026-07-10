@@ -3,7 +3,7 @@
  *
  * ── --ensemble (owner decision 2026-07-05) ────────────────────────────
  * Runs the CONFIGURED cross-model ensemble (PULSE_CLASSIFY_ENSEMBLE —
- * default DeepSeek v4-flash + GLM 4.7-flashx + Anthropic Haiku 4.5) over N
+ * default DeepSeek v4-flash + GLM 4.7 + Anthropic Haiku 4.5) over N
  * historical clusters (default 200) and reports the AGREEMENT DISTRIBUTION:
  * unanimous %, two-of-three %, deadlock %, the engine-pair agreement matrix,
  * per-engine "none"-category rate, verify-refutation rate on majorities, the
@@ -351,7 +351,7 @@ function pct(n: number, d: number): number {
 /*  clusters and reports the AGREEMENT DISTRIBUTION. There is no       */
 /*  scoring against stored labels — the owner's position is that past  */
 /*  approvals were smoke tests, not gold. Consensus quality is         */
-/*  measured by how often the independent engines agree.               */
+/*  measured by cross-vendor agreement; independence is not assumed.   */
 /* ================================================================== */
 
 /** Assumed clustered daily volume for projections — midpoint of the

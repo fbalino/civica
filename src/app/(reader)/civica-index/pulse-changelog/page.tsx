@@ -101,11 +101,19 @@ export default async function PulseChangelogPage() {
         The Civica Pulse Beta is an experimental event ledger, not a live or
         continuous measure of governance change. The entries below reflect the
         most recent completed data available to this page. Under the current
-        pipeline contract, events queued for human review (
-        <strong>severe and catastrophic severity tiers</strong>, plus events
-        where the classifier didn&apos;t reach consensus) do{" "}
-        <strong>not</strong> drive published Pulse scores until a reviewer
-        confirms them. See the{" "}
+        pipeline contract, high-positive, severe-negative, and
+        catastrophic-negative classifications; deadlocks/no quorum; and weak
+        or degraded majorities paired with a verifier objection (low
+        confidence; a revised/rejected verdict; a negative category, severity,
+        subject, or event check; or failed/unavailable verification) are
+        queued for human review. Queued
+        and rejected rows do <strong>not</strong> affect public experimental
+        deltas. Other entries may be auto-published, so “published” does not
+        mean “human-reviewed.” For some older rejected rows, the legacy
+        rejection origin is unverified because no reviewer audit record is
+        available. The ledger also contains older, unversioned classifier
+        generations; agreement labels are displayed conservatively when a
+        literal voter count cannot be proven. See the{" "}
         <Link href="/civica-index/methodology/pulse">Pulse methodology</Link>{" "}
         for the full pipeline.
       </div>

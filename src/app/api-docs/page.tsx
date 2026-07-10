@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import type { ReaderSidebarItem } from "@/components/editorial/ReaderSidebar";
 import { withOg } from "@/lib/og";
+import { createPulseRuntimeMethodSnapshot } from "@/lib/pulse/v2/runtime-contract";
 
 export const revalidate = 3600;
 
@@ -22,6 +23,12 @@ export const metadata: Metadata = {
 
 const BASE_URL = "https://civicaatlas.org/api/v1";
 const SITE_URL = "https://civicaatlas.org";
+const PULSE_METHOD_SNAPSHOT = createPulseRuntimeMethodSnapshot();
+const PULSE_METHOD_EXAMPLE_RESPONSE = JSON.stringify(
+  { data: PULSE_METHOD_SNAPSHOT },
+  null,
+  2,
+);
 
 const SECTIONS: ReaderSidebarItem[] = [
   { id: "overview", label: "Overview" },
@@ -32,7 +39,9 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "index-rankings", label: "Index rankings" },
   { id: "index-country", label: "Index country" },
   { id: "index-compare", label: "Index compare" },
+  { id: "pulse-methodology", label: "Pulse runtime method" },
   { id: "pulse-dimensions", label: "Pulse dimensions" },
+  { id: "pulse-events", label: "Pulse country events" },
   { id: "pulse-changelog-v2", label: "Pulse changelog" },
   { id: "usage-examples", label: "Usage examples" },
   { id: "bulk-data", label: "Bulk data" },
@@ -131,7 +140,7 @@ const EMBED_PARAMS = [
     name: "include",
     type: "comma list",
     description:
-      "size=custom only. Datapoints to render, in order: ci, cp, capital, gov, pop, gdp, area. Default when omitted: ci,capital,gov.",
+      "size=custom only. Datapoints to render, in order: ci, capital, gov, pop, gdp, area. Default when omitted: ci,capital,gov.",
   },
   {
     name: "w",
@@ -396,7 +405,7 @@ export default function ApiDocsPage() {
           id="index-rankings"
           method="GET"
           path="/api/v1/index/rankings"
-          description="Returns Civica Index rankings for the latest available quarter, or a requested quarter. Use sort=ci for the structural Index ranking and sort=cp for Pulse-sensitive ordering when Pulse rows are available."
+          description="Returns Civica Index rankings for the latest available quarter, or a requested quarter. Pulse is not available as a scalar ranking; its experimental outputs are named per-dimension deltas on the Pulse endpoints below."
           parameters={[
             {
               name: "quarter",
@@ -407,11 +416,6 @@ export default function ApiDocsPage() {
               name: "methodology",
               type: "string",
               description: 'Methodology version. Defaults to "beta".',
-            },
-            {
-              name: "sort",
-              type: "ci | cp",
-              description: "Sort by Civica Index rank or Pulse score.",
             },
             {
               name: "limit / offset",
@@ -535,11 +539,20 @@ export default function ApiDocsPage() {
 }`}
         />
 
+        {/* PUBLIC_CLAIM: api.pulse-runtime-contract */}
+        <EndpointSection
+          id="pulse-methodology"
+          method="GET"
+          path="/api/v1/pulse/methodology"
+          description="Returns the generated, machine-readable contract for the Pulse method currently scheduled in production. It distinguishes current runtime behavior from mixed older ledger rows."
+          exampleResponse={PULSE_METHOD_EXAMPLE_RESPONSE}
+        />
+
         <EndpointSection
           id="pulse-dimensions"
           method="GET"
           path="/api/v1/pulse/:country_slug/dimensions"
-          description="Returns the dimensional Civica Pulse view for one country, including per-dimension deltas and the driving events used by the Pulse v2 scoring pipeline."
+          description="Returns public experimental per-dimension Pulse deltas for one country, their evidence qualifiers, and driving published events. A missing event is not evidence of stability; no scalar Pulse score is returned."
           parameters={[
             {
               name: ":country_slug",
@@ -549,16 +562,63 @@ export default function ApiDocsPage() {
           ]}
           exampleResponse={`{
   "data": {
-    "country": { "slug": "brazil", "name": "Brazil" },
-    "dimensions": [
-      {
+    "jurisdiction": { "id": "...", "slug": "brazil", "name": "Brazil", "iso3": "BRA" },
+    "dimensions": {
+      "rule_of_law": {
         "dimension": "rule_of_law",
         "delta": -1.2,
-        "events": [{ "headline": "Court ruling", "published": true }]
+        "contributingEventIds": ["..."],
+        "drivingEvents": [{ "id": "...", "headline": "Court ruling", "eventDate": "2026-07-01" }],
+        "evidence": { "nEvents": 1, "maxConfidence": 0.42, "allSingleSource": true },
+        "limitedSignal": true,
+        "limitedReason": "Single event"
       }
-    ]
+    },
+    "lastComputedAt": "2026-07-09T09:00:29.000Z",
+    "totalEvents": 1,
+    "pressFreedomContext": {
+      "score": 58,
+      "source": "approximate_static_2024_subset",
+      "directLookup": true,
+      "defaultApplied": false
+    }
   },
-  "meta": { "methodology": { "status": "beta" } }
+  "meta": { "methodology": {
+    "status": "experimental",
+    "version": "${PULSE_METHOD_SNAPSHOT.version}",
+    "presentation": { "format": "per_dimension", "public_status": "public_experimental", "scalar_pulse_score": false }
+  } }
+}`}
+        />
+
+        <EndpointSection
+          id="pulse-events"
+          method="GET"
+          path="/api/v1/pulse/:country_slug/events"
+          description="Returns published and review-queued ledger rows for one country with source attribution, review state, and whether publication followed human review. Unresolved candidates expose no substantive dimension or severity."
+          parameters={[
+            {
+              name: ":country_slug",
+              type: "string",
+              description: 'Country slug, e.g. "brazil".',
+            },
+          ]}
+          exampleResponse={`{
+  "data": {
+    "jurisdiction": { "id": "...", "slug": "brazil", "name": "Brazil" },
+    "events": [{
+      "id": "...",
+      "eventDate": "2026-07-01",
+      "category": "judicial_independence_rollback",
+      "dimension": "rule_of_law",
+      "published": true,
+      "humanReviewed": false,
+      "publicationOrigin": "auto",
+      "reviewStatus": "approved",
+      "sources": [{ "sourceId": "gdelt", "sourceType": "news" }]
+    }]
+  },
+  "meta": { "methodology": { "status": "experimental", "method_version_coverage": "mixed_legacy_unversioned" } }
 }`}
         />
 
@@ -566,7 +626,7 @@ export default function ApiDocsPage() {
           id="pulse-changelog-v2"
           method="GET"
           path="/api/v1/pulse/changelog/v2"
-          description="Returns the dimensional Pulse changelog — per-event, per-dimension deltas with severity tiers and driving sources."
+          description="Returns the Pulse event ledger with category, dimension, severity, sources, publication origin, and review state. It is not a stream of per-event deltas and includes mixed older classifier generations."
           parameters={[
             {
               name: "country",
@@ -601,14 +661,16 @@ export default function ApiDocsPage() {
       "country": { "slug": "brazil", "name": "Brazil" },
       "dimension": "democratic_quality",
       "severityTier": "moderate_neg",
-      "published": true
+      "published": true,
+      "humanReviewed": false,
+      "publicationOrigin": "auto"
     }
   ],
   "meta": {
     "limit": 50,
     "offset": 0,
     "hasMore": false,
-    "methodology": { "status": "beta" }
+    "methodology": { "status": "experimental", "version": "${PULSE_METHOD_SNAPSHOT.version}", "method_version_coverage": "mixed_legacy_unversioned" }
   }
 }`}
         />
@@ -750,7 +812,7 @@ done < slugs.txt`}</CodeBlock>
           <p className="api-embed-size-label">
             Custom — pick your datapoints and dimensions
           </p>
-          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=custom&include=ci,cp,capital,pop&w=360&h=320"
+          <CodeBlock>{`<iframe src="https://civicaatlas.org/embed/brazil?size=custom&include=ci,capital,pop&w=360&h=320"
         width="360" height="320" loading="lazy"
         title="Civica Index — Brazil"></iframe>`}</CodeBlock>
         </div>

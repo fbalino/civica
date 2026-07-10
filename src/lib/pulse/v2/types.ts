@@ -67,7 +67,7 @@ export interface RawEventInput {
  *   - Single-engine classify→verify: run 1 = classify, run 2 = verify;
  *     `temp` is 0.
  *   - Cross-model ENSEMBLE (owner decision 2026-07-05): one classify run per
- *     independent vendor engine (`run` 1..N), plus a single verify run
+ *     configured vendor engine (`run` 1..N), plus a single verify run
  *     (`run` 10). `provider` names the vendor; `model` the model id;
  *     `confidence` carries the verify pass's high/medium/low verdict on the
  *     verify row. `temp` stays 0 (deterministic decode).
@@ -122,4 +122,3 @@ export interface ClassifiedEvent {
   headline: string;
   description: string;
 }
-

@@ -11,12 +11,13 @@
  *      higher than news).
  *   3. Combines with classifier_agreement to produce a baseline
  *      corroboration_confidence in [0, 1].
- *   4. Applies the asymmetric rule for positive-direction events
- *      (penalises state-only-source positives, requires non-state
- *      corroboration).
+ *   4. Applies the asymmetric rule for positive-direction events using
+ *      distinct recorded source IDs. State ownership and source-family
+ *      relationships are not represented by the current data model.
  *   5. Applies the press-freedom rule using the country's iso3 ↔
  *      RSF score lookup.
- *   6. Pins press_freedom_score_at_classification.
+ *   6. Stores the latest provisional press-freedom context applied by this
+ *      recomputation. Scheduled runs may overwrite the prior value.
  *
  * Updates only — no inserts. Run after classify.ts.
  */
@@ -82,10 +83,11 @@ export async function corroborateEvents(
     if (isPositiveTier(event.severityTier)) {
       // Positive events without specialist corroboration get penalised
       if (counts.specialist.size === 0) confidence *= 0.6;
-      // In low-press-freedom environments, require ≥2 non-state sources
+      // In low-press-freedom environments, require ≥2 recorded source IDs.
+      // This is not a state-origin or source-independence test.
       if (tier === "restricted") {
-        const totalNonState = counts.specialist.size + counts.news.size;
-        if (totalNonState < 2) confidence *= 0.5;
+        const distinctRecordedSources = counts.specialist.size + counts.news.size;
+        if (distinctRecordedSources < 2) confidence *= 0.5;
       }
     }
 

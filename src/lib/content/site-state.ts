@@ -118,7 +118,7 @@ export const civicaIndex = {
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────
-// Civica Pulse — daily directional signal
+// Civica Pulse — experimental governance-event ledger
 // ─────────────────────────────────────────────────────────────────────
 
 export const pulse = {
@@ -143,12 +143,10 @@ export const pulse = {
     ] as const,
   },
 
-  /** Backtest cases per spec §5.3 (Pulse methodology launch checklist).
-   *  10 named historical governance shocks. Page-display counts read
-   *  `length`; the named list drives prose enumeration on the
-   *  methodology hub. The graduation-threshold-ratio (0.8 = 8 of 10
-   *  must pass) is locked methodology — do not change without a
-   *  resolution doc. */
+  /** Archived diagnostic cases from the earlier single-model harness.
+   * Page-display counts read `length`; these hand-curated scenarios are
+   * regression fixtures, not a graduation gate or representative validation
+   * of the current production ensemble. */
   backtest: {
     cases: [
       { country: "Myanmar",     year: 2021,   label: "Myanmar 2021" },
@@ -162,8 +160,6 @@ export const pulse = {
       { country: "Colombia",    year: 2016,   label: "Colombia 2016" },
       { country: "Poland",      year: 2023,   label: "Poland 2023" },
     ] as const,
-    /** 8 of 10 — locked methodology, see Pulse spec §6.4. */
-    graduationThresholdRatio: 0.8 as const,
   },
 } as const;
 

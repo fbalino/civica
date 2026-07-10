@@ -121,9 +121,11 @@ export default async function PulseReviewQueuePage({ searchParams }: PageProps) 
       <header className="admin-page-head">
         <h1 className="admin-title">Pulse review</h1>
         <p className="admin-subtitle">
-          Pending Pulse events awaiting a reviewer decision. Severe and
-          catastrophic events, plus events without classifier consensus, land
-          here automatically.
+          Pending Pulse events awaiting a reviewer decision. High-positive,
+          severe-negative, and catastrophic-negative classifications;
+          deadlocks or no quorum; and weak/degraded majorities paired with
+          low-confidence, refuted, or failed verification land here
+          automatically.
         </p>
         <p className="admin-meta">
           <span className="admin-meta-num">{totalPending}</span>

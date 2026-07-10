@@ -6,9 +6,9 @@
  * window. Clamp to [-15, +10] per spec §4.3. Upsert into
  * `pulse_dimensional_deltas`.
  *
- * Trailing window is per spec §4.2 — 365 days because some
- * categories (coup, state collapse) have year-plus half-lives.
- * Events past their half-life decay below noise floor naturally.
+ * The trailing window is 365 days. Category decay is applied only inside that
+ * window, so configured half-lives longer than the window are truncated when
+ * the event ages out.
  */
 
 import { sql } from "drizzle-orm";
@@ -22,6 +22,7 @@ import {
   SCORE_WINDOW_DAYS,
 } from "./taxonomy";
 import { PULSE_DIMENSIONS, type PulseDimension } from "./types";
+import { isPulseClassificationValid } from "./review-validation";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -38,6 +39,7 @@ interface PublishedEvent {
   jurisdictionId: string;
   dimension: PulseDimension;
   category: string;
+  severityTier: string;
   severityValue: number;
   corroborationConfidence: number;
   eventDate: string;
@@ -54,6 +56,14 @@ export async function calculateDimensionalDeltas(
     .slice(0, 10);
 
   const events = await loadPublishedEvents(db, windowStart);
+  const existingDeltaRows = await db.execute(sql`
+    SELECT DISTINCT jurisdiction_id
+    FROM pulse_dimensional_deltas
+  `);
+  const existingJurisdictionIds = (
+    ((existingDeltaRows as unknown as { rows?: unknown[] }).rows ??
+      existingDeltaRows) as Array<Record<string, unknown>>
+  ).map((row) => String(row.jurisdiction_id));
 
   // Bucket by (jurisdictionId, dimension)
   type Key = string; // `${jurisdictionId}::${dimension}`
@@ -85,6 +95,9 @@ export async function calculateDimensionalDeltas(
   // have decayed away. Pull all jurisdictionIds with any event in
   // the window first.
   for (const e of events) countriesSeen.add(e.jurisdictionId);
+  for (const jurisdictionId of existingJurisdictionIds) {
+    countriesSeen.add(jurisdictionId);
+  }
 
   for (const jurisdictionId of countriesSeen) {
     for (const dim of PULSE_DIMENSIONS) {
@@ -139,22 +152,28 @@ async function loadPublishedEvents(
       jurisdiction_id,
       dimension,
       category,
+      severity_tier,
       severity_value,
       corroboration_confidence,
       event_date
     FROM pulse_events_v2
     WHERE published = true
+      AND review_status IN ('approved', 'edited')
+      AND category <> 'none'
       AND event_date >= ${sinceDate}
       AND event_date <= CURRENT_DATE
   `);
   const rows = (result as unknown as { rows?: unknown[] }).rows ?? result;
-  return (rows as Array<Record<string, unknown>>).map((r) => ({
-    id: String(r.id),
-    jurisdictionId: String(r.jurisdiction_id),
-    dimension: r.dimension as PulseDimension,
-    category: String(r.category),
-    severityValue: Number(r.severity_value),
-    corroborationConfidence: Number(r.corroboration_confidence),
-    eventDate: String(r.event_date),
-  }));
+  return (rows as Array<Record<string, unknown>>)
+    .map((r) => ({
+      id: String(r.id),
+      jurisdictionId: String(r.jurisdiction_id),
+      dimension: r.dimension as PulseDimension,
+      category: String(r.category),
+      severityTier: String(r.severity_tier),
+      severityValue: Number(r.severity_value),
+      corroborationConfidence: Number(r.corroboration_confidence),
+      eventDate: String(r.event_date),
+    }))
+    .filter((event) => isPulseClassificationValid(event));
 }

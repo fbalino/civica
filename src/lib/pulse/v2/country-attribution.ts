@@ -27,7 +27,8 @@ import type * as schema from "@/lib/db/schema";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
-const MODEL = "claude-sonnet-4-6";
+export const SUBJECT_ATTRIBUTION_PROVIDER = "anthropic" as const;
+export const SUBJECT_ATTRIBUTION_MODEL = "claude-sonnet-4-6" as const;
 
 export const SUBJECT_ATTRIBUTION_SYSTEM_PROMPT = `You are a geopolitical news classifier for a governance-data platform.
 Given ONE news/event headline and description, identify the single sovereign country whose
@@ -64,6 +65,61 @@ export interface SubjectVerdict {
   reasoning: string;
 }
 
+/** Parse and validate the subject-attribution model's strict wire contract. */
+export function parseSubjectVerdict(text: string): SubjectVerdict | null {
+  let parsed: Record<string, unknown>;
+  try {
+    const value = JSON.parse(
+      text
+        .trim()
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/```\s*$/i, "")
+        .trim(),
+    ) as unknown;
+    if (value == null || typeof value !== "object" || Array.isArray(value)) {
+      return null;
+    }
+    parsed = value as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+
+  const scope = parsed.scope;
+  const confidence = parsed.confidence;
+  if (
+    (scope !== "single" &&
+      scope !== "supranational" &&
+      scope !== "multi" &&
+      scope !== "unclear") ||
+    (confidence !== "high" &&
+      confidence !== "medium" &&
+      confidence !== "low")
+  ) {
+    return null;
+  }
+
+  const iso3 = parsed.iso3;
+  if (scope === "single") {
+    if (typeof iso3 !== "string" || !/^[A-Z]{3}$/.test(iso3)) return null;
+  } else if (iso3 !== null) {
+    return null;
+  }
+  if (
+    (parsed.country !== null && typeof parsed.country !== "string") ||
+    typeof parsed.reasoning !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    iso3,
+    country: parsed.country,
+    scope,
+    confidence,
+    reasoning: parsed.reasoning,
+  };
+}
+
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
   if (!_anthropic) {
@@ -85,7 +141,7 @@ export async function classifySubjectCountry(
 ): Promise<SubjectVerdict | null> {
   try {
     const resp = await getAnthropic().messages.create({
-      model: MODEL,
+      model: SUBJECT_ATTRIBUTION_MODEL,
       max_tokens: 300,
       system: SUBJECT_ATTRIBUTION_SYSTEM_PROMPT,
       messages: [
@@ -98,12 +154,8 @@ export async function classifySubjectCountry(
     const text = resp.content
       .filter((c): c is Anthropic.TextBlock => c.type === "text")
       .map((c) => c.text)
-      .join("")
-      .trim()
-      .replace(/^```(?:json)?/i, "")
-      .replace(/```$/, "")
-      .trim();
-    return JSON.parse(text) as SubjectVerdict;
+      .join("");
+    return parseSubjectVerdict(text);
   } catch {
     return null;
   }

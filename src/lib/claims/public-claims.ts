@@ -172,16 +172,17 @@ export const PUBLIC_CLAIMS = [
     surface: "pulse",
     routeOrArtifact: "/civica-index/pulse-changelog",
     exactClaim:
-      "Civica Pulse is an experimental ledger of published and review-queued governance-event classifications, with recorded source links and review state.",
+      "Civica Pulse is an experimental ledger of published and review-queued governance-event classifications, with source links, review state, and publication origin; published does not necessarily mean human-reviewed.",
     tier: "experimental-heuristic",
     evidenceSources: [
       "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
       "src/lib/db/queries-pulse-v2.ts",
       "src/lib/pulse/v2",
+      "src/lib/pulse/v2/runtime-method.generated.json",
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.0-beta",
+    methodologyVersion: "pulse-v2.1-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
@@ -333,6 +334,28 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "api.pulse-runtime-contract",
+    surface: "api-docs",
+    routeOrArtifact: "/api/v1/pulse/methodology",
+    exactClaim:
+      "The Pulse API publishes a generated current-runtime contract; numeric outputs are public experimental per-dimension deltas, no scalar Pulse score or ranking exists, and older ledger rows have mixed unversioned method history.",
+    tier: "experimental-heuristic",
+    evidenceSources: [
+      "src/lib/pulse/v2/runtime-contract.ts",
+      "src/lib/pulse/v2/runtime-method.generated.json",
+      "src/app/api/v1/pulse/methodology/route.ts",
+      "scripts/validate-pulse-runtime-method.ts",
+    ],
+    implementationOwner: "Pulse event-ledger research lane",
+    methodologyVersion: "pulse-v2.1-beta",
+    gate: "G3",
+    source: {
+      path: "src/app/api-docs/page.tsx",
+      fragment:
+        "Returns the generated, machine-readable contract for the Pulse method currently scheduled in production.",
+    },
+  },
+  {
     id: "readme.positioning",
     surface: "readme",
     routeOrArtifact: "README.md",
@@ -400,16 +423,17 @@ export const PUBLIC_CLAIMS = [
     surface: "readme",
     routeOrArtifact: "README.md — Civica Pulse section",
     exactClaim:
-      "The Civica Pulse is an experimental ledger of governance-relevant events with model-assisted classification; it is not a continuous measure of governance change.",
+      "The Civica Pulse is an experimental event ledger, not a continuous governance measure; its public numeric outputs are named per-dimension experimental deltas, never a scalar Pulse score or ranking.",
     tier: "experimental-heuristic",
     evidenceSources: [
       "README.template.md",
       "src/lib/content/site-state.ts",
       "src/lib/pulse/v2",
+      "src/lib/pulse/v2/runtime-method.generated.json",
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.0-beta",
+    methodologyVersion: "pulse-v2.1-beta",
     gate: "G3",
     source: {
       path: "README.template.md",
@@ -489,7 +513,7 @@ export const PUBLIC_CLAIMS = [
     tier: "experimental-heuristic",
     evidenceSources: ["CITATION.cff", "src/lib/pulse/v2", "content/methodology-pulse.md"],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.0-beta",
+    methodologyVersion: "pulse-v2.1-beta",
     gate: "G3",
     source: {
       path: "CITATION.cff",

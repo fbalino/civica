@@ -6,17 +6,15 @@
  *   - score ≥ 70 (free press)        : full confidence
  *   - score 50–69 (partially free)   : −20% confidence; specialist
  *                                      corroboration preferred
- *   - score < 50 (restricted press)  : news-only signals do NOT
- *                                      trigger classification on
- *                                      their own; held in pending
- *                                      review state
+ *   - score < 50 (restricted press)  : news-only weights are multiplied
+ *                                      by 0.3; this is not a review gate
  *
  * The full RSF country index is loaded into Civica via
  * `rsf_press_freedom` source ingestion in the CI pipeline. For the
- * Pulse, we keep a static fallback table of recent (2024) RSF scores
- * for the most-covered countries, refreshed annually. If a country
- * isn't in the table we default to 50 (partially-free) which is the
- * neutral midpoint.
+ * Pulse currently uses an incomplete static fallback table of approximate
+ * 2024 values. If a country is absent, code defaults to 50. This is a known,
+ * unvalidated heuristic limitation and public responses expose whether the
+ * default was applied; it must not be presented as a complete live RSF feed.
  *
  * To refresh: pull the latest RSF index, copy the country → score
  * pairs into the map below, bump LAST_UPDATED.
@@ -117,7 +115,7 @@ export const RSF_SCORES_2024: Record<string, number> = {
   SAU: 18,
 };
 
-/** Conservative midpoint for unknown countries. */
+/** Heuristic midpoint for unknown countries; not a sourced observation. */
 const DEFAULT_SCORE = 50;
 
 /** Given a jurisdiction (by iso3 or by lookup), return the press

@@ -18,7 +18,8 @@ import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { pulseEventsV2 } from "@/lib/db/schema";
 
-const SUMMARY_MODEL = "claude-haiku-4-5-20251001";
+export const PULSE_REVIEW_SUMMARY_PROVIDER = "anthropic" as const;
+export const PULSE_REVIEW_SUMMARY_MODEL = "claude-haiku-4-5-20251001" as const;
 
 let _anthropic: Anthropic | null = null;
 function getAnthropic(): Anthropic {
@@ -65,7 +66,7 @@ export async function generatePulseSummary(
 
   try {
     const response = await anthropic.messages.create({
-      model: SUMMARY_MODEL,
+      model: PULSE_REVIEW_SUMMARY_MODEL,
       max_tokens: 280,
       temperature: 0.2,
       system: SYSTEM_PROMPT,

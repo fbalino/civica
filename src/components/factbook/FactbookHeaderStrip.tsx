@@ -107,8 +107,6 @@ interface FactbookHeaderStripProps {
   population: number | null;
   gdp?: number | null;
   ciScore?: number | null;
-  cpDelta?: number | null;
-  cpTrend?: "up" | "down" | "flat" | null;
   mapImages?: LightboxImage[];
   photos: LightboxImage[];
   /** Country bounding box + centroid (from country-bounds). When present, the
@@ -180,8 +178,6 @@ export function FactbookHeaderStrip({
   population,
   gdp,
   ciScore,
-  cpDelta,
-  cpTrend,
   mapImages = [],
   photos,
   bounds = null,
@@ -228,21 +224,8 @@ export function FactbookHeaderStrip({
       : gdp
   );
 
-  const cpDisplay =
-    cpDelta == null
-      ? null
-      : `${cpDelta > 0 ? "+" : cpDelta < 0 ? "−" : ""}${Math.abs(cpDelta).toFixed(1)}`;
   // Numeric research estimate: neutral ink, never a qualitative tier color.
   const ciScoreColor = ciScore != null ? "var(--color-text-primary)" : "var(--color-accent)";
-
-  const trendArrow =
-    cpTrend === "up" ? "↑" : cpTrend === "down" ? "↓" : cpTrend === "flat" ? "→" : null;
-  const trendColor =
-    cpTrend === "up"
-      ? "var(--color-success)"
-      : cpTrend === "down"
-      ? "var(--color-danger)"
-      : "var(--color-text-40)";
 
   const lightboxImages: LightboxImage[] =
     lbMode === "map"
@@ -410,41 +393,6 @@ export function FactbookHeaderStrip({
                 >
                   {Math.round(ciScore)}
                 </span>
-                <BetaTag />
-              </Link>
-              </Tooltip>
-            )}
-            {cpDisplay !== null && (
-              <Tooltip content="View Civica Pulse detail">
-              <Link
-                href={`/country/${slug}/civica-data#civica-index`}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  fontSize: "var(--text-15)",
-                  lineHeight: 1,
-                  color: "var(--color-text-60)",
-                  textDecoration: "none",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                <span style={{ color: "var(--color-text-40)", fontSize: "var(--text-15)" }}>CP</span>
-                <span style={{ color: "var(--color-text-primary)", lineHeight: 1 }}>{cpDisplay}</span>
-                {trendArrow && (
-                  <span
-                    aria-label={`trending ${cpTrend}`}
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: "var(--text-13)",
-                      lineHeight: 1,
-                      marginLeft: 2,
-                      color: trendColor,
-                    }}
-                  >
-                    {trendArrow}
-                  </span>
-                )}
                 <BetaTag />
               </Link>
               </Tooltip>

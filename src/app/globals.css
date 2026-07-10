@@ -4296,7 +4296,7 @@ a {
 
 /* ============================================================
    Provenance dots — frozen (static amber) + live (pulsing green)
-   Used across all CI/CP number displays.
+   Used across Civica Index number displays.
    ============================================================ */
 .dot {
   display: inline-block;

@@ -3,11 +3,11 @@
  *
  * Owner decision (2026-07-05,
  * `plan/pulse-ensemble-classifier-implementation-2026-07-05.md`): the paid
- * classify pass runs ONE classify call per independent vendor engine
- * (DeepSeek, GLM, Anthropic Haiku by default), so classification errors are
- * uncorrelated — unlike the retired same-model 3-temperature scheme, which
- * only measured one model's decoding randomness. Confidence is now measured
- * by AGREEMENT across those heterogeneous models.
+ * classify pass runs ONE classify call per configured vendor engine
+ * (DeepSeek, GLM, Anthropic Haiku by default) to diversify error sources.
+ * Cross-vendor agreement does not establish statistically independent or
+ * uncorrelated errors. This is still more heterogeneous than the retired
+ * same-model 3-temperature scheme, which measured decoding randomness.
  *
  * This module is pure: it takes the parsed classify outputs of the engines
  * that returned successfully and computes the consensus. It performs no I/O,
@@ -30,7 +30,8 @@
  * the label caps at "two_of_three" (a run that lost a voter never claims the
  * unanimous "all"); a split is "none". With <2 survivors there is no quorum —
  * the caller routes to review. `voterCount`/`agreeingCount`/`degraded` are
- * returned so the caller can record the degradation.
+ * returned for review gating. The caller currently persists successful runs,
+ * not a separate degradation flag or failed-provider record.
  */
 
 import { SEVERITY_TIER_RANGES } from "./taxonomy";

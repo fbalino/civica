@@ -88,22 +88,22 @@ const SECTIONS: MethodologySection[] = [
   },
   {
     id: "pulse",
-    heading: "Event-driven scoring — the Civica Pulse",
+    heading: "Experimental event classification — the Civica Pulse",
     intro:
-      "The Pulse is an experimental event ledger with optional directional effects. Its pipeline is scheduled daily, but published values reflect the most recent completed computation rather than a live or continuous governance measure.",
+      "The Pulse is an experimental event ledger with public experimental per-dimension effects and no merged score or ranking. Its pipeline is scheduled daily, but published values reflect stored results rather than a live or continuous governance measure.",
     entries: [
       {
         href: "/civica-index/methodology/pulse",
         title: "Pulse methodology",
         blurb:
-          "The full pipeline — source taxonomy, multi-run classifier, severity tiers, corroboration rules, press-freedom modulation, decay function, double-counting prevention.",
+          "The current runtime contract — operating feeds, classifier roles, review gates, heuristic weighting, decay, public outputs, and known limitations.",
         beta: true,
       },
       {
         href: "/civica-index/methodology/pulse/backtest",
         title: "Pulse backtest",
         blurb:
-          `Backtest results against ${pulse.backtest.cases.length} named historical governance shocks (${pulse.backtest.cases.map((c) => c.label).join(", ")}).`,
+          `Archived smoke-test results for ${pulse.backtest.cases.length} hand-curated historical scenarios. The displayed run predates the current production ensemble and is not representative validation.`,
         beta: true,
       },
     ],

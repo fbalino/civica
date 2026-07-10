@@ -12,7 +12,7 @@ import {
   apiError,
   corsOptions,
   withRateLimit,
-  CI_METHODOLOGY_META,
+  PULSE_METHODOLOGY_META,
 } from "@/lib/api/helpers";
 import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 
@@ -31,7 +31,7 @@ export async function GET(
 
     return apiResponse({
       data,
-      meta: { methodology: CI_METHODOLOGY_META },
+      meta: { methodology: PULSE_METHODOLOGY_META },
     });
   } catch (e) {
     console.error("API /v1/pulse/[country_slug]/dimensions error:", e);

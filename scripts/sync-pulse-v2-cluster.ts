@@ -1,8 +1,9 @@
 /**
  * Phase 5.5 — Pulse v2 clustering runner.
  *
- * Pulls unclustered raw_events rows, embeds them, groups by country
- * + 48h window + cosine similarity. Run after sync-pulse-v2-ingest.
+ * Pulls unclustered raw_events rows and groups by country + 48h window.
+ * It uses embedding cosine similarity when available and the declared lexical
+ * Jaccard fallback otherwise. Run after sync-pulse-v2-ingest.
  *
  * Usage:
  *   npm run pulse:v2:cluster           # run on all unclustered rows

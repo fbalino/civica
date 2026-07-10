@@ -96,6 +96,7 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
     event.description,
     event.headline
   );
+  const unresolved = event.category === "none";
 
   const severityVariant: "danger" | "success" | "warn" =
     event.severityValue < 0
@@ -344,14 +345,22 @@ export default async function PulseReviewDetailPage({ params }: PageProps) {
             />
 
             <div className="admin-actions admin-actions--full">
-              <button
-                type="submit"
-                name="action"
-                value="approve"
-                className="btn btn--sm admin-btn-success"
-              >
-                ✓ Approve as-is
-              </button>
+              {unresolved ? (
+                <span className="admin-hint">
+                  Unresolved candidates must be edited to a valid taxonomy
+                  category, dimension, severity tier, and value before
+                  publication.
+                </span>
+              ) : (
+                <button
+                  type="submit"
+                  name="action"
+                  value="approve"
+                  className="btn btn--sm admin-btn-success"
+                >
+                  ✓ Approve as-is
+                </button>
+              )}
               <button
                 type="submit"
                 name="action"

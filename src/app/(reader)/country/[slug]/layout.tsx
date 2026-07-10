@@ -7,7 +7,6 @@ import {
   getJurisdictionBySlug,
   getCICountryDetail,
 } from "@/lib/db/queries";
-import { getPulseV2ForCountry } from "@/lib/db/queries-pulse-v2";
 import { reconciliation } from "@/lib/content/site-state";
 import {
   darkEngravingCaption,
@@ -90,9 +89,8 @@ export default async function CountryLayout({
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) notFound();
 
-  const [ciDetail, pulseV2, headerFacts] = await Promise.all([
+  const [ciDetail, headerFacts] = await Promise.all([
     getCICountryDetail(slug).catch(() => null),
-    getPulseV2ForCountry(slug).catch(() => null),
     // Resolver batch for the two masthead pills (Pop + GDP).
     getCanonicalFactsForJurisdiction(jurisdiction.id, [
       "population_total",
@@ -106,22 +104,6 @@ export default async function CountryLayout({
     ciDetail?.composite?.score != null
       ? Number(ciDetail.composite.score)
       : null;
-
-  // Pulse delta: pick the largest-magnitude dimension as the headline.
-  // Always show CP when pulseV2 returned (zero-flat is a meaningful state).
-  let cpDelta: number | null = null;
-  let cpTrend: "up" | "down" | "flat" | null = null;
-  if (pulseV2 && pulseV2.dimensions) {
-    const allDims = Object.values(pulseV2.dimensions);
-    const sorted = [...allDims].sort(
-      (a, b) =>
-        Math.abs(Number(b.delta ?? 0)) - Math.abs(Number(a.delta ?? 0))
-    );
-    const top = sorted[0];
-    const d = Number(top?.delta ?? 0);
-    cpDelta = d;
-    cpTrend = d > 0.5 ? "up" : d < -0.5 ? "down" : "flat";
-  }
 
   const govLabel =
     formatGovernmentType(
@@ -233,8 +215,6 @@ export default async function CountryLayout({
         populationResolver={headerFacts["population_total"] ?? null}
         gdpResolver={headerFacts["gdp_ppp_usd_billions"] ?? null}
         ciScore={ciScore}
-        cpDelta={cpDelta}
-        cpTrend={cpTrend}
         mapImages={mapImages}
         photos={photos}
         bounds={bounds}

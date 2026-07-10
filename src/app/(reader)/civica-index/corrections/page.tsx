@@ -12,7 +12,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Corrections — Report a Civica Index Error",
-  description: `Dispute a data error, methodology decision, or Pulse event classification. Every submission is logged publicly and reviewed within ${disputeSla.fullDispositionDays} days.`,
+  description: `Dispute a data error, methodology decision, or Pulse event classification. Every submission is logged publicly, with a target full disposition within ${disputeSla.fullDispositionDays} days.`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/corrections" },
 };
 
@@ -148,7 +148,7 @@ export default async function CorrectionsPage({ searchParams }: PageProps) {
         <ul>
           <li><strong>CI data errors</strong> — a source value was ingested incorrectly, or the underlying dataset has been revised.</li>
           <li><strong>CI methodology disagreements</strong> — you believe a dimension weight, normalization choice, or composite formula is wrong.</li>
-          <li><strong>Pulse event issues</strong> — an event was misclassified, its severity score is too high or low, it does not belong in the index, it is a duplicate, or a significant event is missing entirely.</li>
+          <li><strong>Pulse event issues</strong> — an event was misclassified, its severity value is too high or low, it does not belong in the Pulse ledger, it is a duplicate, or a significant event is missing entirely.</li>
         </ul>
         <p style={{ marginTop: "var(--space-3)", marginBottom: 0 }}>
           Governments, researchers, NGOs, journalists, and any affected party may submit.

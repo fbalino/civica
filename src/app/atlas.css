@@ -1803,7 +1803,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
 
 /* =============================================================
    Phase A — Country Masthead
-   Layout: hero row (eyebrow + name + CI/CP big scores)
+   Layout: hero row (eyebrow + name + CI score)
            5-column fact grid (full width)
            chip strip (HDI / DQ / ROL / FNR / CC / SS)
    ============================================================= */
@@ -1848,7 +1848,7 @@ svg.atlas-hemi .seat.dim { opacity: 0.12; }
   margin: 0;
 }
 
-/* BigScore — CI / CP next to the country name */
+/* BigScore — CI next to the country name */
 .cm-bigscore {
   display: grid;
   grid-template-columns: auto auto;

@@ -19,7 +19,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Pulse Backtest Report (Beta)",
   description:
-    "How the Civica Pulse Beta pipeline performs against named historical governance shocks: per-case trajectories, expected versus computed outcomes, and pass/fail verdicts.",
+    "Archived diagnostic results from ten hand-curated Pulse scenarios. These results do not validate the current production ensemble.",
   alternates: {
     canonical:
       "https://civicaatlas.org/civica-index/methodology/pulse/backtest",
@@ -59,7 +59,7 @@ function formatDate(d: string): string {
   });
 }
 
-/** SVG sparkline of the trajectory for one dimension. ±90-day
+/** SVG sparkline of the trajectory for one dimension. The −30 through +90
  *  highlight band makes the verdict window obvious. */
 function TrajectorySparkline({
   samples,
@@ -98,7 +98,7 @@ function TrajectorySparkline({
 
   // Day-0 marker
   const x0 = xScale(0);
-  // ±90 day window highlight
+  // Day −30 through +90 verdict-window highlight.
   const xLo = xScale(-30);
   const xHi = xScale(90);
 
@@ -217,7 +217,7 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
         >
           {caseRow.latest ? (
             <Pill variant={VERDICT_VARIANT[caseRow.latest.verdict]}>
-              {VERDICT_LABEL[caseRow.latest.verdict]}
+              Earlier harness: {VERDICT_LABEL[caseRow.latest.verdict]}
             </Pill>
           ) : (
             <Pill>Not yet run</Pill>
@@ -273,9 +273,9 @@ function CaseSection({ caseRow }: { caseRow: BacktestSnapshotCase }) {
         <>
           <h3>Trajectories</h3>
           <p>
-            Sampled every 30 days from −180 to +365. Vertical accent
+            Sampled every 30 days from −180 to +360. Vertical accent
             line marks the case event date; the lighter band is the
-            ±90-day verdict window. Dashed grid lines mark ±1 (the
+            −30 through +90 day verdict window. Dashed grid lines mark ±1 (the
             moderate threshold).
           </p>
           <div
@@ -369,15 +369,6 @@ export default async function BacktestReportPage() {
     // Keep methodology readable when Neon is unavailable.
   }
 
-  const passingCases = stats.passCount;
-  const totalRunCases =
-    stats.passCount + stats.partialCount + stats.failCount;
-  const ratio =
-    totalRunCases > 0 ? Math.round((passingCases / totalRunCases) * 100) : 0;
-  const backtestCount = pulse.backtest.cases.length;
-  const graduationCount = Math.ceil(
-    backtestCount * pulse.backtest.graduationThresholdRatio
-  );
   const sidebarItems = [
     { id: "summary", label: "Summary" },
     { id: "verdict-thresholds", label: "Verdict thresholds" },
@@ -398,22 +389,22 @@ export default async function BacktestReportPage() {
         {pulse.status === "beta" ? <BetaChip inHeading /> : null}
       </h1>
       <p className="editorial-page-subtitle">
-        How the Pulse Beta pipeline performs against named historical
-        governance shocks per spec § 5.3. Updated on every harness run.
+        An internal smoke-test archive over hand-curated historical scenarios.
+        It is useful for regression debugging, not as evidence that the current
+        production ensemble is accurate.
       </p>
 
       <div className="editorial-warning">
-        <strong>This is the publicly-readable status of beta validation.</strong>{" "}
-        Per the launch checklist, the Pulse cannot graduate from Beta
-        until backtesting matches expert consensus on at least{" "}
-        {graduationCount} of {backtestCount} named cases. Current standing:{" "}
-        <strong>{passingCases} pass</strong> / {totalRunCases} run /{" "}
-        {stats.totalCases} total cases ({ratio}% pass rate among the cases
-        run so far).
+        <strong>These are not current-runtime validation results.</strong>{" "}
+        The displayed run predates the cross-vendor production ensemble and
+        used an earlier single-model architecture. The scenarios are
+        hand-curated rather than a representative, independently labelled
+        sample. Their pass/partial/fail labels therefore do not establish
+        accuracy, expert consensus, or readiness to graduate from Beta.
       </div>
 
       <Reveal as="section" className="editorial-section" id="summary" amount={0.3}>
-        <h2>Summary</h2>
+        <h2>Archived diagnostic summary</h2>
         <table>
           <thead>
             <tr>
@@ -427,15 +418,15 @@ export default async function BacktestReportPage() {
               <td className="editorial-td-num">{stats.totalCases}</td>
             </tr>
             <tr>
-              <td>Pass</td>
+              <td>Earlier-harness pass</td>
               <td className="editorial-td-num">{stats.passCount}</td>
             </tr>
             <tr>
-              <td>Partial</td>
+              <td>Earlier-harness partial</td>
               <td className="editorial-td-num">{stats.partialCount}</td>
             </tr>
             <tr>
-              <td>Fail</td>
+              <td>Earlier-harness fail</td>
               <td className="editorial-td-num">{stats.failCount}</td>
             </tr>
             <tr>
@@ -443,7 +434,7 @@ export default async function BacktestReportPage() {
               <td className="editorial-td-num">{stats.unrunCount}</td>
             </tr>
             <tr>
-              <td>Last harness run</td>
+              <td>Last diagnostic run</td>
               <td className="editorial-td-num">
                 {stats.lastRunAt
                   ? formatDate(stats.lastRunAt)
@@ -458,7 +449,7 @@ export default async function BacktestReportPage() {
         <h2>Verdict thresholds</h2>
         <p>
           For each expected (dimension, direction) row, the case passes
-          if the absolute peak |Δ| within the ±90 day verdict window
+          if the absolute peak |Δ| from day −30 through day +90
           (relative to the case&apos;s event date) reaches the magnitude
           threshold in the right direction. Magnitudes:
         </p>
@@ -485,11 +476,7 @@ export default async function BacktestReportPage() {
           subject="Civica Atlas Methodology — Pulse backtest report (Beta)"
           pageTitle="Pulse backtest report"
           url="https://civicaatlas.org/civica-index/methodology/pulse/backtest"
-          dataVintage={
-            pulse.taxonomy.versionHistory.find(
-              (v) => v.version === pulse.taxonomy.version,
-            )?.ranAt
-          }
+          dataVintage={stats.lastRunAt ?? undefined}
         />
       </Reveal>
 

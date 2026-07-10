@@ -41,7 +41,8 @@ unless it has been imported into the master checklist with a stable task ID.
 - **Neon** (serverless Postgres via `@neondatabase/serverless`)
 - **Drizzle ORM** (type-safe, schema in `src/lib/db/schema.ts`)
 - **Tailwind CSS v4** + hand-authored editorial CSS (`src/app/globals.css`, `src/app/atlas.css`, design tokens)
-- **Anthropic SDK 0.90** — `claude-sonnet-4-6` powers `/api/chat` and Pulse event classification
+- **Multi-provider Pulse classifier** — DeepSeek V4 Flash, GLM 4.7, and Claude Haiku 4.5 voters; Claude Haiku verifies and Claude Sonnet performs separate subject-country attribution
+- **Anthropic SDK 0.90** — Claude powers `/api/chat`, Pulse verification/subject attribution, and selected review tools
 
 <!-- BEGIN:nextjs-agent-rules -->
 ## Next.js 16 Rules
@@ -83,12 +84,13 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 - Constitute Project (non-commercial only)
 - Bjornskov-Rode / CGV regime taxonomy (QoG Standard Jan 2026) — underpins government classification
 - V-Dem, World Bank WGI, UNDP HDI, Freedom House, Transparency CPI, Global Peace Index, Fragile States Index — feed the Civica Index
-- GDELT (news events) — feeds the Civica Pulse daily via Anthropic classification
+- Pulse production-active feeds are the observed source IDs in `src/lib/pulse/v2/runtime-method.generated.json`; connector presence alone does not make a feed active
 
 ## Environment variables (all in `.env.local`, documented in `.env.example`)
 - `DATABASE_URL` — Neon Postgres connection (required)
-- `ANTHROPIC_API_KEY` — required for `/api/chat` + Pulse classification
-- `ADMIN_API_KEY` — bearer token for `/api/admin/*` (401 if unset)
+- `ANTHROPIC_API_KEY_CHAT` — required for `/api/chat`
+- `DEEPSEEK_API_KEY`, `GLM_API_KEY`, `ANTHROPIC_API_KEY_PULSE_CLASSIFIER` — default Pulse voters, verification, and subject attribution
+- `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET` — required admin-login credentials for `/admin` and `/api/admin/*`; routes fail closed if any are unset
 - `CRON_SECRET` — bearer token for Vercel cron endpoints at `/api/cron/pulse/*`
 - `CONGRESS_API_KEY` — optional, legacy US-legislative sync
 
@@ -102,13 +104,15 @@ Canonical npm scripts (in `package.json`):
 - `npm run sync:government-taxonomy` — ingest Bjornskov-Rode + derive structural taxonomy
 - `npm run ingest:government-taxonomy:br` — BR/CGV ingestion only
 - `npm run derive:government-taxonomy` — structural derivation only
-- `npm run ingest:pulse:events` — pull latest GDELT events (→ classification → scoring pipeline)
+- `npm run pulse:v2:all` — run Pulse v2 ingest → cluster → classify/verify/subject attribution → corroborate/score
+- `npm run pulse:v2:{ingest,cluster,classify,score}` — run one Pulse v2 stage
+- `npm run snapshot:pulse-runtime` / `npm run validate:pulse-runtime:live` — regenerate or validate the public runtime-method contract
 - `npm run db:generate` / `npm run db:push` — Drizzle migrations
 
 ## Civica Index pipeline (manual today; cron target in the plan)
 1. `tsx scripts/ingest-ci-all.ts` — runs all 6 dimension adapters (V-Dem, WGI, HDI, Freedom House, CPI, GPI)
 2. `tsx scripts/calculate-ci-composite.ts` — computes composite scores and ranks
-3. For Pulse: `tsx scripts/ingest-pulse-events.ts` → `tsx scripts/classify-pulse-events.ts` → `tsx scripts/calculate-pulse-scores.ts`
+3. For Pulse v2: `npm run pulse:v2:ingest` → `npm run pulse:v2:cluster` → `npm run pulse:v2:classify` → `npm run pulse:v2:score` (the score step corroborates first, then writes experimental per-dimension deltas)
 
 ## Reader-page prose lives in `content/*.md`, not TSX
 Seven `content/*.md` files are now the rendered prose source of truth for their paired pages (`/about`, `/methodology`, `/methodology/approach`, `/civica-index/methodology`, `/civica-index/methodology/peer-grouping`, `/civica-index/methodology/pulse`, `/civica-index/methodology/pca-appendix`). The TSX shells wrap the markdown via `<MarkdownContent>` from `src/components/content/`. Edit prose in the markdown file, NOT the TSX. The TSX shell only owns layout, rich components (weights bar, neutral score-position example, version strip, source-card grids, eigenvalue chart), DB-driven blocks (revision history, source list), CiteAccordion invocations, and footer nav.

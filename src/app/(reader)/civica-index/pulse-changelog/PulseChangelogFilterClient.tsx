@@ -71,7 +71,9 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
     return events.filter((e) => {
       if (country && e.country?.slug?.toLowerCase() !== country) return false;
       if (dimension && e.dimension !== dimension) return false;
-      if (severity && e.severityTier !== severity) return false;
+      if (severity && (e.category === "none" || e.severityTier !== severity)) {
+        return false;
+      }
       if (!showReview && !e.published) return false;
       return true;
     });
@@ -220,7 +222,7 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
               }}
               active={showReview}
             >
-              Show review queue
+              Show review outcomes
             </FilterChip>
           </div>
         </fieldset>
@@ -235,8 +237,8 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
         </h2>
         <p className="editorial-results-dek">
           {showReview
-            ? "Including events queued for human review. These do not drive published scores yet."
-            : "Published events only. Toggle status above to include the review queue."}
+            ? "Including candidates queued for review and rejected rows. Older rejection origins may be unverified; none of these rows affects public experimental deltas."
+            : "Published events only. Toggle status above to include queued and rejected rows."}
         </p>
       </div>
 

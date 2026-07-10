@@ -71,6 +71,24 @@ export function PulseEventDetailCard({
     event.description,
     event.headline
   );
+  const providerTaggedClassifyRuns = event.classifierRuns.filter(
+    (run) => run.provider && run.model && !run.confidence,
+  );
+  const currentEnsembleShape =
+    providerTaggedClassifyRuns.length >= 2 &&
+    event.classifierRuns.some((run) => run.confidence !== undefined);
+  const agreementLabel = currentEnsembleShape
+    ? event.classifierAgreement === "all"
+      ? `${providerTaggedClassifyRuns.length}/${providerTaggedClassifyRuns.length} classify consensus`
+      : event.classifierAgreement === "two_of_three"
+        ? `Majority classify consensus`
+        : "No classify consensus"
+    : event.classifierAgreement === "all"
+      ? "Recorded agreement: high"
+      : event.classifierAgreement === "two_of_three"
+        ? "Recorded agreement: partial"
+        : "Recorded agreement: unresolved";
+  const unresolved = event.category === "none";
 
   return (
     <article
@@ -88,20 +106,38 @@ export function PulseEventDetailCard({
           </span>
           <span className="editorial-card-pills pulse-event-result-pills">
             <Pill>{dimensionLabel(event.dimension)}</Pill>
-            <Pill variant={severityVariant(event.severityValue)}>
-              {severityTierLabel(event.severityTier)} ·{" "}
-              {signedSeverity(event.severityValue)}
-            </Pill>
-            {event.classifierAgreement === "all" ? (
-              <Pill variant="success">3/3 agree</Pill>
-            ) : event.classifierAgreement === "two_of_three" ? (
-              <Pill>2/3 agree</Pill>
-            ) : (
-              <Pill variant="warn">No consensus</Pill>
-            )}
-            {!event.published ? (
-              <Pill variant="warn">Queued for review</Pill>
+            {!unresolved &&
+            event.severityTier !== null &&
+            event.severityValue !== null ? (
+              <Pill variant={severityVariant(event.severityValue)}>
+                {severityTierLabel(event.severityTier)} ·{" "}
+                {signedSeverity(event.severityValue)}
+              </Pill>
             ) : null}
+            <Pill
+              variant={
+                event.classifierAgreement === "all"
+                  ? "success"
+                  : event.classifierAgreement === "none"
+                    ? "warn"
+                    : "default"
+              }
+            >
+              {agreementLabel}
+            </Pill>
+            {event.publicationOrigin === "human_rejected" ? (
+              <Pill variant="danger">Human rejected</Pill>
+            ) : event.publicationOrigin === "legacy_rejected_unverified" ? (
+              <Pill variant="warn">Rejected · origin unverified</Pill>
+            ) : event.publicationOrigin === "queued" ? (
+              <Pill variant="warn">Queued for review</Pill>
+            ) : event.publicationOrigin === "human_edited" ? (
+              <Pill variant="success">Human edited</Pill>
+            ) : event.publicationOrigin === "human_approved" ? (
+              <Pill variant="success">Human approved</Pill>
+            ) : (
+              <Pill>Auto-published</Pill>
+            )}
           </span>
         </summary>
 
@@ -191,12 +227,14 @@ export function PulseEventDetailCard({
 
           <footer className="editorial-card-foot">
             <span>
-              Confidence {(event.corroborationConfidence ?? 0).toFixed(2)}
+              Corroboration weight{" "}
+              {(event.corroborationConfidence ?? 0).toFixed(2)} · heuristic,
+              not a probability
               {event.pressFreedomScoreAtClassification != null
-                ? ` · RSF ${event.pressFreedomScoreAtClassification.toFixed(0)}`
+                ? " · provisional press-context adjustment recorded"
                 : ""}
             </span>
-            <span>{categoryLabel(event.category)}</span>
+            <span>{unresolved ? "Unresolved candidate" : categoryLabel(event.category)}</span>
           </footer>
         </div>
       </details>

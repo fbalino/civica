@@ -14,6 +14,7 @@ import { Pill } from "@/components/editorial/Pill";
 import { Tooltip } from "@/components/editorial/Tooltip";
 import type { PulseV2ForCountry, DimensionRow } from "@/lib/db/queries-pulse-v2";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
+import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
 import { pulse } from "@/lib/content/site-state";
 import "./PulseDimensionalDeltas.css";
 
@@ -25,8 +26,7 @@ const DIMENSION_LABELS: Record<PulseDimension, string> = {
   stability: "Stability",
 };
 
-/** A delta is "significant" enough to show its event chips when |δ| ≥ 0.5.
- *  Below that, the row collapses to a "Flat" status without driving events. */
+/** A delta is large enough to show its event links when |δ| ≥ 0.5. */
 const SIGNIFICANCE_THRESHOLD = 0.5;
 
 interface Props {
@@ -95,7 +95,11 @@ function DimensionRowView({
   row: DimensionRow;
   countrySlug: string;
 }) {
-  const significant = Math.abs(row.delta) >= SIGNIFICANCE_THRESHOLD;
+  const hasEvidence = row.evidence.nEvents > 0;
+  const significant =
+    hasEvidence &&
+    row.delta !== null &&
+    Math.abs(row.delta) >= SIGNIFICANCE_THRESHOLD;
   // A delta resting on thin evidence is shown de-emphasized — its
   // magnitude is no longer treated as an authoritative score. The
   // CSS class supplies the muted color + lighter weight. All other deltas use
@@ -129,9 +133,14 @@ function DimensionRowView({
           fontWeight: 500,
         }}
       >
-        {DIMENSION_LABELS[row.dimension]}
+        <span className="pulse-dimension-name">
+          {DIMENSION_LABELS[row.dimension]}
+        </span>
         {limited && row.limitedReason ? (
-          <Tooltip content="This delta rests on thin evidence — read it as a provisional signal, not a confident score.">
+          <Tooltip
+            content="This delta rests on thin evidence — read it as a provisional signal, not a confident score."
+            className="pulse-dimension-limited-tooltip"
+          >
             <span className="pulse-dimension-limited-tag">
               <span className="pulse-dimension-limited-dot" aria-hidden="true" />
               Limited signal · {row.limitedReason}
@@ -156,7 +165,7 @@ function DimensionRowView({
           letterSpacing: "0.02em",
         }}
       >
-        {formatDelta(row.delta)}
+        {hasEvidence && row.delta !== null ? formatDelta(row.delta) : "—"}
       </div>
 
       <div style={{ minWidth: 0 }}>
@@ -227,7 +236,9 @@ function DimensionRowView({
               color: "var(--color-text-40)",
             }}
           >
-            Flat — no significant signal
+            {hasEvidence
+              ? "Experimental effect below ±0.5"
+              : "No published event detected"}
           </span>
         )}
       </div>
@@ -239,7 +250,10 @@ export function PulseDimensionalDeltas({ data }: Props) {
   const { jurisdiction, dimensions, lastComputedAt, totalEvents } = data;
   const dimensionRows = Object.values(dimensions);
   const significantCount = dimensionRows.filter(
-    (r) => Math.abs(r.delta) >= SIGNIFICANCE_THRESHOLD
+    (r) =>
+      r.evidence.nEvents > 0 &&
+      r.delta !== null &&
+      Math.abs(r.delta) >= SIGNIFICANCE_THRESHOLD
   ).length;
 
   return (
@@ -299,7 +313,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
               color: "var(--color-text-30)",
             }}
           >
-            Trailing 365 days
+            Trailing {SCORE_WINDOW_DAYS} days
           </span>
         </div>
 
@@ -319,20 +333,20 @@ export function PulseDimensionalDeltas({ data }: Props) {
         </Link>
       </header>
 
-      {data.pressFreedomScore < 30 ? (
+      {data.pressFreedomContext.directLookup &&
+      data.pressFreedomContext.score < 30 ? (
         <div
           className="editorial-warning"
           style={{ margin: "8px 0 16px" }}
         >
-          <strong>Coverage caveat.</strong> {jurisdiction.name} has
-          severely restricted press freedom (RSF score{" "}
-          {data.pressFreedomScore}). The Pulse depends on observable
+          <strong>Coverage caveat.</strong> Civica&apos;s provisional,
+          incomplete 2024 press-freedom context lookup flags a severely
+          restricted information environment for {jurisdiction.name}. The
+          Pulse depends on observable
           events; in restricted-press environments it systematically
-          under-detects and may show artificially stable deltas. The{" "}
-          <Link href="/civica-index" style={{ color: "var(--color-accent)" }}>
-            structural Civica Index
-          </Link>{" "}
-          remains the primary signal. See the{" "}
+          under-detects events, and the lookup itself is not a complete or
+          current RSF dataset. Consult the underlying country evidence and
+          named sources. See the{" "}
           <Link
             href="/civica-index/methodology/pulse#coverage-limitations"
             style={{ color: "var(--color-accent)" }}
@@ -353,9 +367,10 @@ export function PulseDimensionalDeltas({ data }: Props) {
             lineHeight: 1.5,
           }}
         >
-          No published Pulse events for {jurisdiction.name} in the trailing
-          window. The Beta pipeline is in active rollout — events queued for
-          human review do not yet contribute to the score. See the{" "}
+          No published Pulse events were detected for {jurisdiction.name} in
+          the current evidence window. This is not evidence that governance
+          was stable. Events queued for human review do not contribute to the
+          public experimental deltas. See the{" "}
           <Link
             href="/civica-index/pulse-changelog"
             style={{ color: "var(--color-accent)" }}
@@ -369,7 +384,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
           >
             methodology
           </Link>{" "}
-          for how this is computed.
+          for how the ledger and experimental effects are computed.
         </p>
       ) : (
         <div>
@@ -401,8 +416,10 @@ export function PulseDimensionalDeltas({ data }: Props) {
         }}
       >
         <span>
-          {significantCount === 0
-            ? "Net Pulse impact: flat"
+          {totalEvents === 0
+            ? "No experimental delta available"
+            : significantCount === 0
+              ? `${totalEvents} published event${totalEvents === 1 ? "" : "s"} · effects below ±0.5`
             : `${significantCount} dimension${significantCount === 1 ? "" : "s"} moving · ${totalEvents} event${totalEvents === 1 ? "" : "s"} in window`}
         </span>
         <span>Last computed {formatLastComputed(lastComputedAt)}</span>

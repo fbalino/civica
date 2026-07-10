@@ -1566,8 +1566,8 @@ export const rawEvents = pgTable(
  * represents a single real-world event (e.g. "Niger 2023 coup")
  * regardless of how many source records describe it.
  *
- * Unpublished rows (`published=false`) are pending human review per
- * spec §5.1. Reviewer UI lands in Phase 5.7.
+ * Unpublished rows (`published=false`) are either queued for review or
+ * rejected. The review state and origin must be read alongside `published`.
  */
 export const pulseEventsV2 = pgTable(
   "pulse_events_v2",
@@ -1590,23 +1590,26 @@ export const pulseEventsV2 = pgTable(
     severityValue: real("severity_value").notNull(),
     /** Computed by the corroboration step, range [0, 1] */
     corroborationConfidence: real("corroboration_confidence").notNull(),
-    /** Reasoning passes preserved for audit. The classify→verify
-     *  classifier records two (classify + verify); the subscription path
-     *  records one agent pass; legacy rows may hold three. Shape:
+    /** Reasoning passes preserved for audit. Current ensemble rows contain
+     *  one entry per successful classify voter plus the verify entry;
+     *  retained single-engine rows contain classify + verify; older agent and
+     *  temperature-variant rows use other unversioned shapes. Shape:
      *  [{run, temp, model, category, dimension, severity, confidence, raw}, ...] */
     classifierRuns: jsonb("classifier_runs").notNull(),
     /** 'all' | 'two_of_three' | 'none' — drives confidence boost/penalty.
-     *  The published classify→verify confidence maps onto it: high→'all',
-     *  medium→'two_of_three', low→'none'. */
+     *  Current ensemble rows store voter consensus. Retained single-engine
+     *  rows map verify confidence to these compatibility labels; older rows
+     *  are mixed and unversioned. */
     classifierAgreement: text("classifier_agreement").notNull(),
     humanReviewed: boolean("human_reviewed").notNull().default(false),
     reviewerId: text("reviewer_id"),
     reviewNotes: text("review_notes"),
     /** pending | approved | rejected | edited */
     reviewStatus: text("review_status").notNull().default("pending"),
-    /** True only when verify confidence is not low AND the severity tier
-     *  is not review-gated, OR a human reviewer has approved it.
-     *  Score-driving. */
+    /** Public/scoring eligibility flag. Automatic publication follows the
+     *  current ensemble and review-gate policy; a human may approve a valid
+     *  queued classification. See `pulse/v2/runtime-contract.ts` for the
+     *  exact versioned policy rather than inferring it from this column. */
     published: boolean("published").notNull().default(false),
     headline: text("headline").notNull(),
     description: text("description").notNull(),
@@ -1615,8 +1618,9 @@ export const pulseEventsV2 = pgTable(
      *  review-detail page; null until then. See
      *  `src/lib/pulse/v2/summarize.ts`. */
     aiSummary: text("ai_summary"),
-    /** RSF press freedom score for the country at classification time —
-     *  pinned for reproducibility per spec §3.5 */
+    /** Latest provisional press-freedom context score applied by the
+     *  corroboration pass. Scheduled recomputation may overwrite it; this is
+     *  not an immutable at-classification snapshot. */
     pressFreedomScoreAtClassification: real(
       "press_freedom_score_at_classification"
     ),

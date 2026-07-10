@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:sync-freshness && npm run validate:public-claims && npm run validate:numeric-claims && next build",
+    "build": "npm run validate:sync-freshness && npm run validate:public-claims && npm run validate:numeric-claims && npm run validate:pulse-runtime && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -86,6 +86,9 @@
     "regenerate:readme": "tsx scripts/regenerate-readme.ts",
     "validate:content-templates": "tsx scripts/validate-content-templates.ts",
     "validate:numeric-claims": "tsx scripts/validate-public-numeric-claims.ts",
+    "snapshot:pulse-runtime": "tsx scripts/generate-pulse-runtime-method.ts",
+    "validate:pulse-runtime": "tsx scripts/validate-pulse-runtime-method.ts",
+    "validate:pulse-runtime:live": "tsx scripts/validate-pulse-runtime-method.ts --live",
     "validate:public-claims": "tsx scripts/validate-public-claims.ts",
     "validate:sync-freshness": "tsx scripts/validate-sync-freshness.ts",
     "validate:territory-engravings": "tsx scripts/validate-territory-engravings.ts",
