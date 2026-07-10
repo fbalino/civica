@@ -198,3 +198,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Full claims/docs validation, production build, 398 tests, and desktop/mobile
   Playwright checks passed. A pre-existing footer country-search hydration
   warning appeared in local dev logs; DAT-006's page and API returned 200.
+
+## 2026-07-10 — DAT-007 deterministic source precedence
+
+- Adopted `source-precedence/v1`, added public decision traces, and made the
+  public provenance schema strict about decision-reason and trace enums.
+- Browser/API verification exposed database-order nondeterminism between an
+  equal-vintage UN population row and its World Bank republisher. The resolver
+  now uses lineage-aware precedence plus a stable source-ID tie-break.
+- Ten focused fixtures, all eight live worked examples, 408 tests, the full
+  claims gate, TypeScript, production build, and desktop/mobile methodology
+  screenshots passed. The unrelated footer search hydration warning persists.

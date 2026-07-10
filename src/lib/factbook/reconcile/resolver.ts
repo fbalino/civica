@@ -21,17 +21,26 @@ import {
 } from "@/lib/factbook/reconcile/fact-keys";
 import { isAllowedReference } from "@/lib/factbook/reconcile/source-allowlist";
 import { isNsoForJurisdiction } from "@/lib/factbook/reconcile/nso-overrides";
+import { resolveSourceLineage } from "@/lib/factbook/reconcile/source-independence";
 import {
   resolveGrowthMethodology,
   isAnnualYoy,
 } from "@/lib/data/growth-methodology";
 import type {
   DecisionReason,
+  DecisionTraceStep,
   FactRow,
   FactRowStatus,
   ProposedDispute,
   ResolverOutput,
 } from "@/lib/factbook/reconcile/types";
+
+export const SOURCE_PRECEDENCE_VERSION = "source-precedence/v1" as const;
+
+type CoreResolverOutput = Omit<
+  ResolverOutput,
+  "jurisdictionId" | "factKey" | "isDisputed" | "decisionTrace"
+>;
 
 /** Methodology version this build of the resolver implements.
  *  Stamped on every row written by sync scripts. */
@@ -86,6 +95,14 @@ export async function resolveFact(
       all: [],
       isDisputed: false,
       decisionReason: "no_active_rows",
+      decisionTrace: [
+        {
+          code: "row_eligibility",
+          outcome: "unsupported_fact_key",
+          detail: `No canonical policy is registered for fact key '${factKey}'.`,
+          sourceIds: [],
+        },
+      ],
       proposedDisputes: [],
       canonicalIsProjection: false,
     };
@@ -129,6 +146,18 @@ export function resolveFromRows(
   def: FactKeyDefinition,
   jurisdictionIso3?: string | null
 ): Omit<ResolverOutput, "jurisdictionId" | "factKey" | "isDisputed"> {
+  const core = resolveFromRowsCore(rows, def, jurisdictionIso3);
+  return {
+    ...core,
+    decisionTrace: buildDecisionTrace(rows, def, core, jurisdictionIso3),
+  };
+}
+
+function resolveFromRowsCore(
+  rows: FactRow[],
+  def: FactKeyDefinition,
+  jurisdictionIso3?: string | null
+): CoreResolverOutput {
   const all = [...rows];
 
   // §3.6 plausibility envelope — treat envelope-violators as
@@ -223,7 +252,7 @@ function resolveGroupA(
   all: FactRow[],
   def: FactKeyDefinition,
   base: ProposedDispute[]
-): Omit<ResolverOutput, "jurisdictionId" | "factKey" | "isDisputed"> {
+): CoreResolverOutput {
   // §3.4 — CIA wins by default. Wikidata can win ONLY if CIA empty.
   if (cia && hasValue(cia)) {
     const disputes = nonCia
@@ -265,7 +294,7 @@ function resolveGroupC(
   all: FactRow[],
   def: FactKeyDefinition,
   base: ProposedDispute[]
-): Omit<ResolverOutput, "jurisdictionId" | "factKey" | "isDisputed"> {
+): CoreResolverOutput {
   // §3.5 — CIA wins, full stop. Always emit a dispute on
   // disagreement; the operator UI can dismiss it as not-meaningful
   // (e.g. the Vatican religion 100% vs 99% editorial-colour case).
@@ -292,7 +321,7 @@ function resolveGroupB(
   def: FactKeyDefinition,
   base: ProposedDispute[],
   jurisdictionIso3?: string | null
-): Omit<ResolverOutput, "jurisdictionId" | "factKey" | "isDisputed"> {
+): CoreResolverOutput {
   // §3.3 — fresher allow-listed source wins, with two guards.
   // Prior canonical is CIA when available, else the freshest active
   // row that passes the reference-quality floor.
@@ -300,7 +329,15 @@ function resolveGroupB(
     cia ??
     [...active]
       .filter(passesReferenceFloor)
-      .sort((a, b) => freshness(b) - freshness(a))[0] ??
+      .sort((a, b) => {
+        const df = freshness(b) - freshness(a);
+        if (df !== 0) return df;
+        const priority =
+          sourcePrecedenceRank(a, def, jurisdictionIso3) -
+          sourcePrecedenceRank(b, def, jurisdictionIso3);
+        if (priority !== 0) return priority;
+        return a.sourceId.localeCompare(b.sourceId);
+      })[0] ??
     lowestTierFirst(active);
 
   // Sort challengers freshest-first; on tie, prefer the row with the
@@ -319,22 +356,16 @@ function resolveGroupB(
   // For countries without a registered NSO, NSO-tier is never
   // assigned (isNsoForJurisdiction returns false), so the old
   // 3-tier behaviour is preserved exactly.
-  const sourcePriority = (r: FactRow): number => {
-    // Tier 0 — NSO for own country (deterministic NSO-prefer for tied dates)
-    if (isNsoForJurisdiction(r.sourceId, jurisdictionIso3)) return 0;
-    // Tier 3 — least preference for ties (CIA Factbook is frozen Jan 2026)
-    if (r.sourceId === "cia_factbook") return 3;
-    // Tier 2 — Wikidata is the identity spine, not a primary measurement source
-    if (r.sourceId === "wikidata") return 2;
-    // Tier 1 — direct primary publishers (World Bank, IMF, UN, OECD, Eurostat, ...)
-    return 1;
-  };
+  const sourcePriority = (r: FactRow): number =>
+    sourcePrecedenceRank(r, def, jurisdictionIso3);
   const challengers = active
     .filter((r) => r.id !== prior.id)
     .sort((a, b) => {
       const df = freshness(b) - freshness(a);
       if (df !== 0) return df;
-      return sourcePriority(a) - sourcePriority(b);
+      const priority = sourcePriority(a) - sourcePriority(b);
+      if (priority !== 0) return priority;
+      return a.sourceId.localeCompare(b.sourceId);
     });
 
   let winner = prior;
@@ -402,6 +433,30 @@ function resolveGroupB(
         : "incumbent_held"
       : "fresher_winner";
   return finalize(winner, active, all, finalReason, disputes);
+}
+
+function sourcePrecedenceRank(
+  row: FactRow,
+  def: FactKeyDefinition,
+  jurisdictionIso3?: string | null,
+): number {
+  if (isNsoForJurisdiction(row.sourceId, jurisdictionIso3)) return 0;
+  if (row.sourceId === "cia_factbook") return 5;
+  if (row.sourceId === "wikidata") return 4;
+  const lineage = resolveSourceLineage({
+    sourceId: row.sourceId,
+    factKey: def.key,
+    jurisdictionIso3,
+  });
+  // UN Data is Civica's registered direct access path to UN WPP/UNSD
+  // outputs. It wins an equal-vintage tie against downstream republishers
+  // in the same family without being mislabeled as their statistical
+  // originator.
+  if (row.sourceId === "un_data") return 1;
+  if (lineage.relationship === "originator") return 1;
+  if (lineage.relationship === "republisher") return 2;
+  if (lineage.relationship === "compilation") return 3;
+  return 4;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -481,7 +536,7 @@ function finalize(
   all: FactRow[],
   decisionReason: DecisionReason,
   proposedDisputes: ProposedDispute[]
-): Omit<ResolverOutput, "jurisdictionId" | "factKey" | "isDisputed"> {
+): CoreResolverOutput {
   // Bug 1 — alternates includes BOTH measured + projected active rows
   // so the alternate-values panel can render the full source set.
   // The decision logic above already chose `canonical` from the
@@ -507,6 +562,92 @@ function finalize(
     proposedDisputes,
     canonicalIsProjection,
   };
+}
+
+function buildDecisionTrace(
+  inputRows: FactRow[],
+  def: FactKeyDefinition,
+  output: CoreResolverOutput,
+  jurisdictionIso3?: string | null,
+): DecisionTraceStep[] {
+  const trace: DecisionTraceStep[] = [];
+  const active = output.all.filter((row) => row.status === "active");
+  const rejected = output.all.filter((row) => row.status === "rejected");
+  trace.push({
+    code: "row_eligibility",
+    outcome: active.length > 0 ? "eligible_rows_found" : "no_active_rows",
+    detail: `${active.length} active row(s) remained from ${inputRows.length}; ${rejected.length} rejected row(s) were retained for audit.`,
+    sourceIds: [...new Set(active.map((row) => row.sourceId))].sort(),
+  });
+  if (!output.canonical) return trace;
+
+  const measured = active.filter((row) => row.valueType !== "projected");
+  const projected = active.filter((row) => row.valueType === "projected");
+  trace.push({
+    code: "measurement_partition",
+    outcome: measured.length > 0 ? "measurements_preferred" : "projection_fallback",
+    detail:
+      measured.length > 0
+        ? `${measured.length} measured row(s) formed the candidate pool; ${projected.length} projection(s) remained visible as alternates.`
+        : `No measured row was available; ${projected.length} projected row(s) formed the fallback candidate pool.`,
+    sourceIds: [...new Set((measured.length > 0 ? measured : projected).map((row) => row.sourceId))].sort(),
+  });
+
+  const lineage = resolveSourceLineage({
+    sourceId: output.canonical.sourceId,
+    factKey: def.key,
+    jurisdictionIso3,
+  });
+  trace.push({
+    code: "source_lineage",
+    outcome: lineage.relationship,
+    detail: `Selected source belongs to producing family '${lineage.familyId}'. ${lineage.basis}`,
+    sourceIds: [output.canonical.sourceId],
+  });
+
+  const precedenceDetail: Record<DecisionReason, string> = {
+    single_source: "One eligible candidate remained after partitioning and guards.",
+    agreement: "Eligible Group A/C rows agreed within the registered tolerance; the declared incumbent wording rule applied.",
+    fresher_winner: "A challenger won on measurement freshness, an equal-vintage source-priority tie, or the registered growth-comparability rule.",
+    incumbent_held: "The incumbent remained at least as fresh and no eligible challenger displaced it.",
+    cia_default_group_a: "Group A identity policy retained the CIA incumbent; disagreement requires reviewer signoff.",
+    cia_default_group_c: "Group C narrative/structural policy retained the CIA incumbent; disagreement remains reviewable.",
+    no_active_rows: "No canonical row was selected.",
+  };
+  trace.push({
+    code: "precedence_rule",
+    outcome: output.decisionReason,
+    detail: precedenceDetail[output.decisionReason],
+    sourceIds: [output.canonical.sourceId],
+  });
+
+  const materialErrors = output.proposedDisputes.filter(
+    (row) => row.kind === "material_error" || row.kind === "plausibility_envelope",
+  );
+  trace.push({
+    code: "guard_result",
+    outcome: materialErrors.length > 0 ? "challenger_rejected" : "guards_passed",
+    detail:
+      materialErrors.length > 0
+        ? `${materialErrors.length} candidate guard failure(s) were retained as proposed disputes.`
+        : "The selected row passed the plausibility, material-error, and reference-quality guards.",
+    sourceIds: [output.canonical.sourceId],
+  });
+
+  const vintage = output.canonical.dataVintageYear
+    ? `data vintage ${output.canonical.dataVintageYear}`
+    : output.canonical.asOf
+      ? `as of ${output.canonical.asOf}`
+      : output.canonical.factYear
+        ? `fact year ${output.canonical.factYear}`
+        : `retrieved ${output.canonical.retrievedAt}`;
+  trace.push({
+    code: "canonical_selection",
+    outcome: "selected",
+    detail: `${output.canonical.sourceId} was selected as the ${output.canonical.valueType} canonical (${vintage}) under ${SOURCE_PRECEDENCE_VERSION}.`,
+    sourceIds: [output.canonical.sourceId],
+  });
+  return trace;
 }
 
 function hasValue(row: FactRow): boolean {

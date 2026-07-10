@@ -136,13 +136,16 @@ export function resolveSourceLineage(input: {
 
   const nsoIso3 = NSO_ISO3[sourceId];
   if (nsoIso3) {
+    const inScope = jurisdictionIso3 === nsoIso3;
     return {
       ...identity,
       jurisdictionIso3,
-      familyId: `nso:${nsoIso3}`,
-      relationship: "originator",
-      independentEligible: true,
-      basis: "The registered national statistical office produces the country observation.",
+      familyId: inScope ? `nso:${nsoIso3}` : "unverified_lineage",
+      relationship: inScope ? "originator" : "unverified",
+      independentEligible: inScope,
+      basis: inScope
+        ? "The registered national statistical office produces the country observation."
+        : "A national statistical office is an originator only for its registered jurisdiction; missing or mismatched scope fails closed.",
     };
   }
 

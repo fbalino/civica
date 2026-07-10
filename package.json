@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:rights-manifest && npm run validate:jurisdiction-status && npm run validate:fact-coverage && npm run validate:reconciliation-audit && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
+    "build": "npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:rights-manifest && npm run validate:jurisdiction-status && npm run validate:fact-coverage && npm run validate:reconciliation-audit && npm run validate:source-precedence && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -116,6 +116,7 @@
     "validate:jurisdiction-status": "tsx scripts/validate-jurisdiction-status.ts",
     "validate:fact-coverage": "tsx scripts/validate-fact-coverage-report.ts",
     "validate:reconciliation-audit": "tsx scripts/validate-reconciliation-audit.ts",
+    "validate:source-precedence": "tsx scripts/validate-source-precedence.ts",
     "audit:jurisdiction-status:live": "tsx scripts/audit-jurisdiction-status-live.ts",
     "validate:provenance-claims": "tsx scripts/validate-provenance-claims.ts",
     "crawl:metadata": "tsx scripts/crawl-public-metadata.ts",

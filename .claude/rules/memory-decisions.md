@@ -626,3 +626,15 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   implementation used by both the reconciliation audit and fact coverage.
 - `/api/reconciliation-audit` publishes the checked policy and relationship
   inventory. Durable record: APR-D040 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Canonical fact picks carry a deterministic trace
+
+- `source-precedence/v1` is the adopted order for eligibility,
+  measurement/projection partitioning, Group A/C incumbency, Group B
+  freshness, equal-vintage precedence, guards, and GDP-growth comparability.
+- Equal-vintage Group B ties prefer the country's NSO, then a producing
+  institution or registered UN direct-access path, then republishers,
+  compilations, Wikidata, and the frozen CIA archive. Source ID is the final
+  stable tie-break; database row order must never choose the value.
+- Every canonical ResolverOutput and public API provenance entry includes the
+  six-step `decisionTrace`. Durable record: APR-D041 in `plan/DECISIONS.md`.

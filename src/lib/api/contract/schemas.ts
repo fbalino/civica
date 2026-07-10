@@ -160,7 +160,32 @@ export const zApiProvenanceEntry = z
     sourceName: z.string(),
     asOf: z.string().nullable(),
     vintageLabel: z.string().nullable(),
-    decisionReason: z.string(),
+    decisionReason: z.enum([
+      "single_source",
+      "agreement",
+      "fresher_winner",
+      "incumbent_held",
+      "cia_default_group_a",
+      "cia_default_group_c",
+      "no_active_rows",
+    ]),
+    decisionTrace: z.array(
+      z
+        .object({
+          code: z.enum([
+            "row_eligibility",
+            "measurement_partition",
+            "source_lineage",
+            "precedence_rule",
+            "guard_result",
+            "canonical_selection",
+          ]),
+          outcome: z.string(),
+          detail: z.string(),
+          sourceIds: z.array(z.string()),
+        })
+        .strict(),
+    ),
     isDisputed: z.boolean(),
     alternates: z.array(zApiAlternate),
     valueType: z.enum(["measured", "projected"]),

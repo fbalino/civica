@@ -116,6 +116,8 @@ When sources disagree, two guards apply for Group B:
 - **Material-error rejection.** A fresher value differing from the older one by more than a per-category "impossible" threshold (population > 50% in a year, GDP nominal in USD > 80%, inflation and public-debt ratios > 300 percentage points) is rejected as likely data corruption or a unit-of-measure error. A dispute row is created and the prior canonical value remains until reviewed.
 - **Reference-quality floor.** The fresher source must have at least one Tier-1 or Tier-2 reference. A Wikidata claim whose references are all rejected per the allowlist cannot win even if it is fresher.
 
+These ordered rules are versioned as `source-precedence/v1`. Every canonical selection carries a machine-readable decision trace covering row eligibility, the measurement/projection partition, source family, precedence, guards, and the effective vintage used for the final choice. Public API provenance returns the same trace, so `fresher_winner` is not the only explanation available to a reader.
+
 **Frozen worked examples — methodology v0.2-beta, vintage 2026-Q1.** The eight examples that follow record the rows and resolver outcomes from that frozen release; they are not live database readouts. Each illustrates a distinct reconciliation pattern, and every value was probed against the resolver before this page shipped.
 
 *Vintage note. Specific numerical values cited below reflect Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1. The exact figures are release-bound; the methodologically relevant claim in each example is the pattern of canonical/alternate attribution.*
@@ -152,13 +154,13 @@ When sources disagree, two guards apply for Group B:
 
 ### Worked example 4 — United Kingdom inflation, NSO override
 
-**Pattern.** NSO-as-canonical-override via freshness alone. The same multi-canonical-with-scope-predicate pattern, extended to country-singleton scope.
+**Pattern.** A national statistical office wins on a fresher measurement and also wins an equal-vintage tie for its own country.
 
 **Frozen example rows.** ONS-UK reports 3.9% CPIH (2025). The World Bank reports 3.27% (2024). The IMF reports 2.0% (2031, projected). The CIA reports 3.3% (2024, frozen).
 
 **Resolver outcome.** ONS-UK's 3.9% (2025) wins canonical with `decisionReason='fresher_winner'`. CPIH (the UK's statistical concept that includes owner-occupied housing) has been the ONS headline measure since 2017.
 
-**Story.** ONS publishes UK inflation 3–9 months ahead of the World Bank or IMF. The resolver's freshness primitive picks ONS without any schema change — `civicaRole='canonical'` is editorial metadata, not a resolver input. The methodology resolution for ONS-UK explicitly chose "freshness alone implements the NSO override" rather than introducing an NSO priority tier. The same pattern applies to all six NSOs in v1: US Census, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, and Stats SA. CPI as a separate ONS measure is deferred to v1.1 with a future `inflation_rate_cpi` fact-key extension; for v1, only CPIH ships.
+**Story.** ONS publishes UK inflation 3–9 months ahead of the World Bank or IMF, so freshness decides this example. When dates are equal, the registered national statistical office takes the tie for its own country; `civicaRole='canonical'` remains editorial metadata rather than a resolver input. The same rule applies to the active national offices: US Census, ONS-UK, INSEE-FR, Statistics Canada, IBGE-BR, and Stats SA. CPI as a separate ONS measure is deferred to v1.1 with a future `inflation_rate_cpi` fact-key extension; for v1, only CPIH ships.
 
 ### Worked example 5 — South Africa unemployment, PDF-extraction NSO
 

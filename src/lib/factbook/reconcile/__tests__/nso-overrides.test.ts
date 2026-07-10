@@ -168,8 +168,8 @@ test("INSEE 2025 ties Eurostat 2025 for FRA → INSEE wins (Eurozone coexistence
   assert.equal(out.canonical!.sourceId, "insee_fr", "INSEE should win the tie");
   assert.equal(
     out.decisionReason,
-    "fresher_winner",
-    `expected fresher_winner, got ${out.decisionReason}`
+    "incumbent_held",
+    `deterministic precedence should seed INSEE as the incumbent, got ${out.decisionReason}`
   );
   assert.equal(out.alternates.length, 2, "both rows should appear in alternates");
 });

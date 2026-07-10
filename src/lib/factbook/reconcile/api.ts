@@ -29,7 +29,12 @@ import { countryFacts, jurisdictions, dataDisputes } from "@/lib/db/schema";
 import { reconciliation } from "@/lib/content/site-state";
 import { resolveFromRows } from "./resolver";
 import { getFactKey } from "./fact-keys";
-import type { FactRow, ResolverOutput } from "./types";
+import type {
+  DecisionReason,
+  DecisionTraceStep,
+  FactRow,
+  ResolverOutput,
+} from "./types";
 import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
 
 /**
@@ -204,7 +209,8 @@ export interface ApiProvenanceEntry {
   sourceName: string;
   asOf: string | null;
   vintageLabel: string | null;
-  decisionReason: string;
+  decisionReason: DecisionReason;
+  decisionTrace: DecisionTraceStep[];
   isDisputed: boolean;
   alternates: ApiAlternate[];
   /** Bug 1 — `'measured'` (default) or `'projected'`. The canonical
@@ -280,11 +286,26 @@ export function buildApiProvenanceEntry(
     asOf: canonical.asOf,
     vintageLabel: canonical.upstreamVintageLabel,
     decisionReason: output.decisionReason,
+    decisionTrace: output.decisionTrace,
     isDisputed: output.isDisputed,
     alternates,
     valueType: canonical.valueType,
     canonicalIsProjection: output.canonicalIsProjection,
   };
+}
+
+function unsupportedFactTrace(
+  factKey: string,
+  active: FactRow[],
+): DecisionTraceStep[] {
+  return [
+    {
+      code: "row_eligibility",
+      outcome: "unsupported_fact_key",
+      detail: `Fact key '${factKey}' has no registered reconciliation policy; ${active.length} active row(s) remain visible but are not treated as a reconciled selection.`,
+      sourceIds: [...new Set(active.map((row) => row.sourceId))].sort(),
+    },
+  ];
 }
 
 /**
@@ -325,6 +346,7 @@ export async function getCanonicalFact(
         all: [],
         isDisputed: false,
         decisionReason: "no_active_rows",
+        decisionTrace: unsupportedFactTrace(factKey, []),
         proposedDisputes: [],
         canonicalIsProjection: false,
       };
@@ -339,12 +361,22 @@ export async function getCanonicalFact(
       all: rows,
       isDisputed: false,
       decisionReason: active.length > 0 ? "single_source" : "no_active_rows",
+      decisionTrace: unsupportedFactTrace(factKey, active),
       proposedDisputes: [],
       canonicalIsProjection: canonical?.valueType === "projected",
     };
   }
 
-  const resolution = resolveFromRows(rows, factKeyDef);
+  const jurisdictionRows = await db
+    .select({ iso3: jurisdictions.iso3 })
+    .from(jurisdictions)
+    .where(eq(jurisdictions.id, jurisdictionId))
+    .limit(1);
+  const resolution = resolveFromRows(
+    rows,
+    factKeyDef,
+    jurisdictionRows[0]?.iso3 ?? null,
+  );
 
   // Check the dispute queue.
   const openDisputes = await db
@@ -417,6 +449,12 @@ export async function getCanonicalFactsForJurisdiction(
       )
     );
   const disputedKeys = new Set(disputeRows.map((d) => d.factKey));
+  const jurisdictionRows = await db
+    .select({ iso3: jurisdictions.iso3 })
+    .from(jurisdictions)
+    .where(eq(jurisdictions.id, jurisdictionId))
+    .limit(1);
+  const jurisdictionIso3 = jurisdictionRows[0]?.iso3 ?? null;
 
   const out: Record<string, ResolverOutput> = {};
   for (const factKey of factKeys) {
@@ -434,13 +472,14 @@ export async function getCanonicalFactsForJurisdiction(
         isDisputed: disputedKeys.has(factKey),
         decisionReason:
           active.length > 0 ? "single_source" : "no_active_rows",
+        decisionTrace: unsupportedFactTrace(factKey, active),
         proposedDisputes: [],
         canonicalIsProjection: canonical?.valueType === "projected",
       };
       continue;
     }
 
-    const resolution = resolveFromRows(rows, factKeyDef);
+    const resolution = resolveFromRows(rows, factKeyDef, jurisdictionIso3);
     out[factKey] = {
       jurisdictionId,
       factKey,
@@ -512,6 +551,13 @@ export async function getCanonicalFactsForJurisdictions(
   const disputedKeys = new Set(
     disputeRows.map((d) => `${d.jurisdictionId}|${d.factKey}`)
   );
+  const jurisdictionRows = await db
+    .select({ id: jurisdictions.id, iso3: jurisdictions.iso3 })
+    .from(jurisdictions)
+    .where(inArray(jurisdictions.id, jurisdictionIds));
+  const iso3ByJurisdiction = new Map(
+    jurisdictionRows.map((row) => [row.id, row.iso3]),
+  );
 
   const out: Record<string, Record<string, ResolverOutput>> = {};
   for (const jurisdictionId of jurisdictionIds) {
@@ -534,13 +580,18 @@ export async function getCanonicalFactsForJurisdictions(
           isDisputed,
           decisionReason:
             active.length > 0 ? "single_source" : "no_active_rows",
+          decisionTrace: unsupportedFactTrace(factKey, active),
           proposedDisputes: [],
           canonicalIsProjection: canonical?.valueType === "projected",
         };
         continue;
       }
 
-      const resolution = resolveFromRows(rows, factKeyDef);
+      const resolution = resolveFromRows(
+        rows,
+        factKeyDef,
+        iso3ByJurisdiction.get(jurisdictionId) ?? null,
+      );
       out[jurisdictionId][factKey] = {
         jurisdictionId,
         factKey,

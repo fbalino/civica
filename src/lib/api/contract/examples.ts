@@ -154,7 +154,21 @@ const exampleProvenanceEntry = {
   sourceName: "UN Statistics Division",
   asOf: "2024",
   vintageLabel: "UN World Population Prospects 2024 revision",
-  decisionReason: "native_publisher_precedence",
+  decisionReason: "fresher_winner" as const,
+  decisionTrace: [
+    {
+      code: "row_eligibility" as const,
+      outcome: "eligible_rows_found",
+      detail: "Two active rows remained eligible.",
+      sourceIds: ["cia_factbook", "un_data"],
+    },
+    {
+      code: "canonical_selection" as const,
+      outcome: "selected",
+      detail: "un_data was selected under source-precedence/v1.",
+      sourceIds: ["un_data"],
+    },
+  ],
   isDisputed: false,
   alternates: [
     {

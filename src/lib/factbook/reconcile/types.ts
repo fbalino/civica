@@ -173,6 +173,22 @@ export type DecisionReason =
   | "cia_default_group_c"
   | "no_active_rows";
 
+export type DecisionTraceCode =
+  | "row_eligibility"
+  | "measurement_partition"
+  | "source_lineage"
+  | "precedence_rule"
+  | "guard_result"
+  | "canonical_selection";
+
+/** One ordered, machine-readable explanation step for a canonical pick. */
+export interface DecisionTraceStep {
+  code: DecisionTraceCode;
+  outcome: string;
+  detail: string;
+  sourceIds: string[];
+}
+
 /**
  * A dispute the resolver believes SHOULD exist given the row set.
  *
@@ -213,6 +229,9 @@ export interface ResolverOutput {
   isDisputed: boolean;
   /** Why this row won. */
   decisionReason: DecisionReason;
+  /** Ordered explanation of eligibility, partition, precedence, guards, and
+   *  final selection under `source-precedence/v1`. */
+  decisionTrace: DecisionTraceStep[];
   /** Disputes the resolver would create if asked to materialize. */
   proposedDisputes: ProposedDispute[];
   /** Bug 1 — true when the canonical row is a `projected` (forecast)

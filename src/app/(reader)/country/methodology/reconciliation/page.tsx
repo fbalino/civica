@@ -570,6 +570,16 @@ export default async function ReconciliationMethodologyPage() {
           </li>
         </ul>
         <p>
+          These ordered rules are versioned as{" "}
+          <code>source-precedence/v1</code>. Every canonical selection now
+          carries a machine-readable decision trace covering row eligibility,
+          the measurement/projection partition, the selected source family,
+          the precedence rule, guard results, and the effective vintage used
+          for the final choice. Public API provenance returns the same trace,
+          so <code>fresher_winner</code> is no longer the only explanation a
+          reader receives.
+        </p>
+        <p>
           <strong>
             Frozen worked examples — methodology {reconciliation.version},
             vintage {reconciliation.firstVintage}.
@@ -755,9 +765,9 @@ export default async function ReconciliationMethodologyPage() {
           Worked example 4 — United Kingdom inflation, NSO override
         </h3>
         <p>
-          <strong>Pattern.</strong> NSO-as-canonical-override via
-          freshness alone. The same multi-canonical-with-scope-predicate
-          pattern, extended to country-singleton scope.
+          <strong>Pattern.</strong> A national statistical office wins on a
+          fresher measurement and also wins an equal-vintage tie for its own
+          country.
         </p>
         <p>
           <strong>Frozen example rows.</strong> ONS-UK reports 3.9% CPIH (2025).
@@ -774,14 +784,12 @@ export default async function ReconciliationMethodologyPage() {
         </p>
         <p>
           <strong>Story.</strong> ONS publishes UK inflation 3–9 months
-          ahead of the World Bank or IMF. The resolver&rsquo;s
-          freshness primitive picks ONS without any schema change —{" "}
+          ahead of the World Bank or IMF, so freshness decides this example.{" "}
           <code>civicaRole=&apos;canonical&apos;</code> is editorial
-          metadata, not a resolver input. The methodology resolution
-          for ONS-UK explicitly chose &ldquo;freshness alone
-          implements the NSO override&rdquo; rather than introducing
-          an NSO priority tier. The same pattern applies to all{" "}
-          {nsoActive.length} NSOs in v1: {nsoActiveNamesProse}. CPI as a separate ONS measure is
+          metadata, not a resolver input. When dates are equal, the registered
+          national statistical office takes the tie for its own country. The
+          same rule applies to the active national offices:{" "}
+          {nsoActiveNamesProse}. CPI as a separate ONS measure is
           deferred to v1.1 with a future <code>inflation_rate_cpi</code>{" "}
           fact-key extension; for v1, only CPIH ships.
         </p>
