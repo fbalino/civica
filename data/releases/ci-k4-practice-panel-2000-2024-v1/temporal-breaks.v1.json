@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "ci-k4-practice-temporal-breaks/v1",
+  "releaseId": "ci-k4-practice-panel-2000-2024-v1",
+  "breaks": [
+    {
+      "sourceId": "vdem",
+      "period": "release 15, through 2024",
+      "treatment": "current harmonized backcast; never label values as originally published in a historical year"
+    },
+    {
+      "sourceId": "vdem",
+      "indicatorId": "v2xel_frefair",
+      "period": "within election-regime periods",
+      "treatment": "retain publisher repetition/backfill and disclose it; do not interpret each year as a new election"
+    },
+    {
+      "sourceId": "vdem",
+      "period": "future releases",
+      "treatment": "new release requires a new Civica release id and hashes; completed v1 remains immutable"
+    }
+  ]
+}

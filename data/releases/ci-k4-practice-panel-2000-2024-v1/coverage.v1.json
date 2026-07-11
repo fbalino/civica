@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "ci-k4-practice-coverage/v1",
+  "releaseId": "ci-k4-practice-panel-2000-2024-v1",
+  "coverage": [
+    {
+      "indicatorId": "v2x_freexp_altinf",
+      "expected": 4850,
+      "observed": 4289,
+      "missing": 561
+    },
+    {
+      "indicatorId": "v2juhcind",
+      "expected": 4850,
+      "observed": 4289,
+      "missing": 561
+    },
+    {
+      "indicatorId": "v2xel_frefair",
+      "expected": 4850,
+      "observed": 4289,
+      "missing": 561
+    }
+  ]
+}

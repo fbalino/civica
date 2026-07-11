@@ -19,8 +19,20 @@ None is specific enough to serve as the practice counterpart for a constitutiona
 
 The prototype emits no pairings from these fields. This prevents a broad country judgment from being relabelled as evidence about one constitutional promise.
 
-## Required input work
+## Frozen input decision
 
-K4 needs a small frozen set of practice-specific publisher indicators with exact definitions, source vintages, uncertainty where published, rights, hashes, missingness, and temporal breaks. Candidate mappings must be written before values are inspected. Examples may include a publisher-defined freedom-of-expression indicator, high-court independence indicator, and clean-election indicator, but their exact identifiers require codebook review and semantic justification.
+The prerequisite is now satisfied by `ci-k4-practice-panel-2000-2024-v1`, captured from the exact V-Dem Country-Year Core v15 publisher archive. It contains three preregistered mappings:
+
+| Constitutional topic key(s) | Practice construct | Frozen publisher indicator |
+|---|---|---|
+| `express`, `press`, `opinion` | Expression in practice | `v2x_freexp_altinf` |
+| `judind` | High-court decisional independence | `v2juhcind` |
+| `freeelec` | Clean elections in practice | `v2xel_frefair` |
+
+The release retains V-Dem's published lower and upper credible bounds. Missing cells remain missing, and the private release contains no imputation. Exact values stay in the research database because public redistribution rights have not been cleared. The checked artifacts expose the archive and codebook hashes, indicator definitions, coverage, missingness, temporal caveats, and release hash.
+
+The clean-elections series requires special care: V-Dem repeats election estimates within election-regime periods and can backfill the first observed election. K4 therefore cannot call every annual value a new election observation.
+
+## Remaining K4 work
 
 After ingestion, two blinded coders apply the mapping codebook to the frozen sample. The constitutional-scholar fairness review remains a separate external gate. Agent agreement can screen candidate mappings but cannot satisfy either threshold.
