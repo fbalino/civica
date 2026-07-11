@@ -50,9 +50,10 @@ test("a future record cannot reuse unchanged docs, registry, notes, migration, o
 
 test("version and validation sets fail closed", () => {
   const broken = structuredClone(registry) as IndexChangeRegistry;
-  broken.entries[0].toVersion = broken.entries[0].fromVersion;
-  broken.entries[0].validations = [];
-  const errors = indexChangeControlErrors(broken, broken.entries[0].protectedFiles);
+  const latest = broken.entries.at(-1)!;
+  latest.toVersion = latest.fromVersion;
+  latest.validations = [];
+  const errors = indexChangeControlErrors(broken, latest.protectedFiles);
   assert.ok(errors.some((error) => error.includes("methodology version did not advance")));
   assert.ok(errors.some((error) => error.includes("declared validation set is incomplete")));
 });

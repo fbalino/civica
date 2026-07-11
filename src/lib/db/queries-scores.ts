@@ -25,7 +25,8 @@ import {
   countryMetrics,
   jurisdictions,
 } from "@/lib/db/schema";
-import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
+import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
+import { resolveCiRelease } from "@/lib/ci/release-selection";
 
 export interface ScoreRow {
   /** Stable id used as React key + automation hook. */
@@ -96,7 +97,8 @@ function trendBucket(delta: number | null): "up" | "down" | "flat" | null {
 
 // ---- Civica Index ----------------------------------------------------------
 
-const CI_METHODOLOGY_VERSION = CURRENT_CI_METHODOLOGY_VERSION;
+const CI_RELEASE = resolveCiRelease(CURRENT_CI_RELEASE_ID);
+const CI_METHODOLOGY_VERSION = CI_RELEASE.methodologyVersion;
 
 async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
   // Pin the methodology version (beta) — 47 jurisdictions carry both v1.0
@@ -115,6 +117,7 @@ async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
       and(
         eq(ciCompositeScores.jurisdictionId, jId),
         eq(ciCompositeScores.methodologyVersion, CI_METHODOLOGY_VERSION),
+        eq(ciCompositeScores.quarter, CI_RELEASE.quarter),
       ),
     )
     .orderBy(desc(ciCompositeScores.quarter))
@@ -139,6 +142,7 @@ async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
         and(
           eq(ciCompositeScores.jurisdictionId, jId),
           eq(ciCompositeScores.methodologyVersion, CI_METHODOLOGY_VERSION),
+          eq(ciCompositeScores.quarter, CI_RELEASE.quarter),
           sql`${ciCompositeScores.quarter} <= ${fourYearTarget}`,
         ),
       )
@@ -155,6 +159,7 @@ async function buildCivicaIndexRow(jId: string): Promise<ScoreRow | null> {
         and(
           eq(ciCompositeScores.jurisdictionId, jId),
           eq(ciCompositeScores.methodologyVersion, CI_METHODOLOGY_VERSION),
+          eq(ciCompositeScores.quarter, CI_RELEASE.quarter),
         ),
       )
       .orderBy(asc(ciCompositeScores.quarter))

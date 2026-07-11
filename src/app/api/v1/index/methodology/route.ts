@@ -2,6 +2,7 @@ import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META 
 import { getCIMethodology } from "@/lib/db/queries";
 import { shapeIndexMethodologyData } from "@/lib/api/contract/shapes";
 import { retiredIndexApiResponse, withIndexDispositionDeprecation } from "@/lib/api/deprecation";
+import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 
 function publicMethodologyRecord<T extends { id: string; notes: string | null }>(
   row: T,
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
 
   try {
     const url = new URL(request.url);
-    const versionId = url.searchParams.get("version") ?? undefined;
+    const versionId = url.searchParams.get("version") ?? CURRENT_CI_METHODOLOGY_VERSION;
     const methodology = await getCIMethodology(versionId);
     if (!methodology) {
       return withIndexDispositionDeprecation(apiError("Methodology not found", 404));

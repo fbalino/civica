@@ -12,6 +12,8 @@ import {
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { shapeIndexByGovernmentTypeItem } from "@/lib/api/contract/shapes";
+import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
+import { resolveCiRelease } from "@/lib/ci/release-selection";
 
 function quantile(sortedValues: number[], percentile: number): number {
   if (sortedValues.length === 0) return 0;
@@ -40,7 +42,8 @@ export async function GET(request: Request) {
   if (retired) return retired;
 
   try {
-    const rows = await getCIByGovernmentTypeDots(quarter);
+    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
+    const rows = await getCIByGovernmentTypeDots(quarter, release.releaseId);
     const grouped = new Map<
       string,
       { label: string; scores: number[] }

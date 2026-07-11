@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 292
-- **Completed:** 88
-- **Remaining:** 204
-- **Progress:** 30.1%
+- **Completed:** 89
+- **Remaining:** 203
+- **Progress:** 30.5%
 - **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -110,7 +110,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-032** (P1) Prototype a Measurement Concordance candidate that measures rater disagreement rather than country quality. _Done when: independent-rater criteria, construct families, common-coverage/percentile method, minimum source count, within-source uncertainty, source-dependence caveat, midpoint-artifact test, drop-one-source stability, expert contested/consensus validation plan, and “does not mean” presentation are preregistered and computed on frozen data._
 - [x] **IDX-033** (P1) Prototype a Power and Transfer Ledger candidate from dated institutional facts. _Done when: a public rulebook defines executive identity, electoral transfer/alternation, coalition/person changes, tenure, term-limit status, collective/interim/disputed cases and nonclaims; every prototype row cites statements; historical/freshness/intercoder validation is preregistered; no facts are aggregated into a country-quality score._
 - [ ] **IDX-034** (P2) Prototype constitution-to-practice pairings as a nonaggregated research track. _Done when: a versioned mapping codebook joins a small justified set of constitutional commitments to external practice indicators, shows source text and published uncertainty, passes blinded coder/scholar fairness thresholds, and cannot produce a hypocrisy/gap rank or composite._
-- [ ] **IDX-035** (P0) Prevent methodology/source versions from mixing in calculations, APIs, peers, and display transforms. _Done when: every query pins a complete release/method/indicator/source set, v1/Beta rows may coexist without cross-selection, display transformations are version-specific, and an integration fixture with overlapping methods reproduces only the requested release._
+- [x] **IDX-035** (P0) Prevent methodology/source versions from mixing in calculations, APIs, peers, and display transforms. _Done when: every query pins a complete release/method/indicator/source set, v1/Beta rows may coexist without cross-selection, display transformations are version-specific, and an integration fixture with overlapping methods reproduces only the requested release._
 - [ ] **IDX-036** (P0) Distinguish genuinely as-published releases from later harmonized backcasts. _Done when: schema/API/UI/export record `series_type`, original publication/cut time, calculation time, and method; a 2026 computation over 2023 inputs cannot call itself a 2023 as-published vintage; both series are separately queryable and cited._
 - [ ] **IDX-037** (P0) Replace the n=46 freshest-cross-section PCA artifact or narrow every claim to it. _Done when: a frozen full temporal panel and declared method produce reproducible PCA/factor/rotation/sensitivity outputs with source/method/year controls and fifth-dimension decision, or public prose/weights state the actual cross-sectional limitation without claiming unrun analysis._
 - [x] **IDX-038** (P0) Correct the tournament panel's exact K1 input identities before outcome analysis. _Done when: a superseding immutable panel uses the hash-pinned `pr_cl_total` publisher series rather than `fh_total_score`, includes the exact WGI Voice & Accountability fallback alongside V-Dem, structural gaps and selection precedence remain explicit, the preregistration and baselines advance to corrected hashes, prior releases remain preserved, and exact live reproduction passes._

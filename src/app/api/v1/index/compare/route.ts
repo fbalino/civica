@@ -1,6 +1,7 @@
 import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { compareCICountries } from "@/lib/db/queries";
-import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { displayCiReleaseDimensionScore, resolveCiRelease } from "@/lib/ci/release-selection";
+import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
@@ -20,6 +21,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const slugsParam = url.searchParams.getAll("slug");
     const quarter = url.searchParams.get("quarter") ?? undefined;
+    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
 
     if (slugsParam.length === 0) {
       return withIndexDispositionDeprecation(apiError("At least one `slug` query parameter is required", 400));
@@ -29,7 +31,7 @@ export async function GET(request: Request) {
     }
 
     const slugs = slugsParam.map((s) => s.toLowerCase());
-    const rows = await compareCICountries(slugs, quarter);
+    const rows = await compareCICountries(slugs, quarter, release.releaseId);
 
     // Curate a public response shape rather than spreading the raw DB rows.
     // `compareCICountries` returns the full `jurisdictions` row (internal
@@ -79,7 +81,7 @@ export async function GET(request: Request) {
         dimensions: row.dimensions.map((d) => ({
           dimension: d.dimension,
           normalizedScore:
-            displayDimensionScore(d.rawValue, d.sourceId) ?? d.normalizedScore,
+            displayCiReleaseDimensionScore(d, release.releaseId) ?? d.normalizedScore,
           rawValue: d.rawValue,
           sourceId: d.sourceId,
           valueStatus: "observed" as const,

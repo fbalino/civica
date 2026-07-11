@@ -2,24 +2,25 @@
  * Run the Beta (v2) CI calculation pipeline — the canonical live scoring
  * path.
  *
- * Reads one methodology's dimension data, applies fixed-bound normalization,
- * computes a deterministic weighted composite, and writes it under the same
- * version. Current rows publish no generic uncertainty range.
+ * Reads one registered release's exact dimension set, applies its declared
+ * normalization, computes the bound composite algorithm, and writes under the
+ * same release coordinates. Current rows publish no generic uncertainty range.
  *
  * Usage:
- *   tsx scripts/calculate-ci-v2.ts                    # latest quarter
- *   tsx scripts/calculate-ci-v2.ts 2023-Q4            # specific quarter
+ *   tsx scripts/calculate-ci-v2.ts
+ *   tsx scripts/calculate-ci-v2.ts --release=ci-beta-r5-2024-Q4
  */
 
 import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
 import { createDb } from "../src/lib/ci/ingest";
-import { calculateCompositeV2, latestQuarter } from "../src/lib/ci/calculate-v2";
+import { calculateCompositeV2 } from "../src/lib/ci/calculate-v2";
 import { decoupleAbsorbedEvents } from "../src/lib/pulse/v2/decouple";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "../src/lib/db/schema";
-import { CURRENT_CI_METHODOLOGY_VERSION, SUPERSEDED_CI_VINTAGE_LABEL } from "../src/lib/ci/current-release";
+import { CURRENT_CI_RELEASE_ID, SUPERSEDED_CI_VINTAGE_LABEL } from "../src/lib/ci/current-release";
+import { resolveCiRelease } from "../src/lib/ci/release-selection";
 
 async function main() {
   const db = createDb();
@@ -29,24 +30,14 @@ async function main() {
   const decoupleDryRun = process.argv.includes("--decouple-dry-run");
 
   const positional = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
-  let quarter = positional[0];
-  const methodologyVersion = process.argv.find((arg) => arg.startsWith("--methodology-version="))?.split("=").slice(1).join("=") ?? CURRENT_CI_METHODOLOGY_VERSION;
+  const releaseId = process.argv.find((arg) => arg.startsWith("--release="))?.split("=").slice(1).join("=") ?? CURRENT_CI_RELEASE_ID;
+  const release = resolveCiRelease(releaseId);
+  const quarter = positional[0] ?? release.quarter;
+  const methodologyVersion = release.methodologyVersion;
   const supersedesVintageLabel = process.argv.find((arg) => arg.startsWith("--supersedes="))?.split("=").slice(1).join("=") ?? SUPERSEDED_CI_VINTAGE_LABEL;
 
-  if (!quarter) {
-    quarter = (await latestQuarter(db)) ?? "";
-    if (!quarter) {
-      console.error("No dimension data found. Run an ingest first.");
-      process.exit(1);
-    }
-    console.log(`Using latest quarter from DB: ${quarter}`);
-  }
-
-  // Vintage label is the public citation handle. Convention:
-  // "Civica Index 2023 Q4 (Beta)".
-  const [year, q] = quarter.split("-Q");
-  const publishedVersion = methodologyVersion === "beta" ? "Beta" : methodologyVersion.replace(/^beta-r/i, "Beta-R");
-  const vintageLabel = `Civica Index ${year} Q${q} (${publishedVersion})`;
+  if (quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain ${quarter}`);
+  const vintageLabel = release.vintageLabel;
 
   console.log(`\n=== Civica Index — Beta calculation ===`);
   console.log(`Quarter:        ${quarter}`);
@@ -56,6 +47,7 @@ async function main() {
   const summary = await calculateCompositeV2(db, quarter, {
     vintageLabel,
     methodologyVersion,
+    releaseId: release.releaseId,
     supersedesVintageLabel,
   });
 

@@ -25,7 +25,8 @@ import {
 import { normalizeV2 } from "./normalize-v2";
 import { CI_BETA_COMPOSITE_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 import { assertSupersession, indexContentHash, parseIndexVintageLabel, stableStringify } from "../data/frozen-vintage";
-import { CURRENT_CI_METHODOLOGY_VERSION } from "./current-release";
+import { CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_RELEASE_ID } from "./current-release";
+import { resolveCiRelease, selectCiReleaseDimensionRows } from "./release-selection";
 import {
   assessCiCompleteness,
   type CiCompletenessFlag,
@@ -172,10 +173,17 @@ interface RunSummary {
 export async function calculateCompositeV2(
   db: Db,
   quarter: string,
-  opts: { vintageLabel?: string; supersedesVintageLabel?: string; methodologyVersion?: string } = {},
+  opts: { vintageLabel?: string; supersedesVintageLabel?: string; methodologyVersion?: string; releaseId?: string } = {},
 ): Promise<RunSummary> {
+  const release = resolveCiRelease(opts.releaseId ?? CURRENT_CI_RELEASE_ID);
   const vintageLabel = opts.vintageLabel ?? null;
-  const methodologyVersion = opts.methodologyVersion ?? BETA_VERSION;
+  const methodologyVersion = opts.methodologyVersion ?? release.methodologyVersion;
+  if (quarter !== release.quarter || methodologyVersion !== release.methodologyVersion) {
+    throw new Error(`${release.releaseId} requires ${release.methodologyVersion}/${release.quarter}, not ${methodologyVersion}/${quarter}.`);
+  }
+  if (release.compositeAlgorithmVersion !== CI_BETA_COMPOSITE_ALGORITHM_VERSION) {
+    throw new Error(`${release.releaseId} requires archived algorithm ${release.compositeAlgorithmVersion}; current calculator cannot rewrite it.`);
+  }
   const identity = vintageLabel ? parseIndexVintageLabel(vintageLabel) : null;
   if (identity && identity.period !== quarter) {
     throw new Error(`${vintageLabel} publishes ${identity.period}, not requested quarter ${quarter}.`);
@@ -188,18 +196,27 @@ export async function calculateCompositeV2(
     .select({
       jurisdictionId: ciDimensionScores.jurisdictionId,
       dimension: ciDimensionScores.dimension,
+      normalizedScore: ciDimensionScores.normalizedScore,
       rawValue: ciDimensionScores.rawValue,
       sourceId: ciDimensionScores.sourceId,
+      indicatorId: ciDimensionScores.indicatorId,
+      quarter: ciDimensionScores.quarter,
+      methodologyVersion: ciDimensionScores.methodologyVersion,
+      transformationId: ciDimensionScores.transformationId,
+      methodVersion: ciDimensionScores.methodVersion,
+      artifactHash: ciDimensionScores.artifactHash,
     })
     .from(ciDimensionScores)
     .where(and(eq(ciDimensionScores.quarter, quarter), eq(ciDimensionScores.methodologyVersion, methodologyVersion)));
+
+  const releaseRows = selectCiReleaseDimensionRows(rows, release.releaseId);
 
   // Group rows by jurisdiction. The dimension table can have multiple
   // rows for the same (jurisdiction, dimension) under different
   // methodology versions — dedup by keeping the first non-null
   // rawValue per (jurisdiction, dimension).
   const byJurisdiction = new Map<string, Map<string, DimensionRow>>();
-  for (const r of rows) {
+  for (const r of releaseRows) {
     if (r.rawValue === null) continue;
     const j = byJurisdiction.get(r.jurisdictionId) ?? new Map();
     if (!j.has(r.dimension)) {

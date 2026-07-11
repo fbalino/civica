@@ -244,10 +244,10 @@ export const API_ROUTES: RouteContract[] = [
         description: 'Country slug, e.g. "france" or "united-states".',
       },
       {
-        name: "methodology",
+        name: "release",
         in: "query",
         type: "string",
-        description: 'Optional methodology version. Defaults to "beta".',
+        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
     ],
     cors: true,
@@ -273,6 +273,12 @@ export const API_ROUTES: RouteContract[] = [
         type: "string",
         description: 'Country slug, e.g. "france".',
       },
+      {
+        name: "release",
+        in: "query",
+        type: "string",
+        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
+      },
     ],
     cors: true,
     corsHeaders: CORS_HEADERS,
@@ -296,7 +302,13 @@ export const API_ROUTES: RouteContract[] = [
         in: "query",
         type: "string",
         description:
-          'Optional quarter label such as "2026-Q1". Defaults to latest available.',
+          "Optional assertion that must equal the selected release quarter.",
+      },
+      {
+        name: "release",
+        in: "query",
+        type: "string",
+        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
       {
         name: "taxonomy",
@@ -337,7 +349,13 @@ export const API_ROUTES: RouteContract[] = [
         in: "query",
         type: "string",
         description:
-          "Optional quarter. Defaults to each country's latest available comparison data.",
+          "Optional assertion that must equal the selected release quarter.",
+      },
+      {
+        name: "release",
+        in: "query",
+        type: "string",
+        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
     ],
     cors: true,
@@ -387,13 +405,13 @@ export const API_ROUTES: RouteContract[] = [
         in: "query",
         type: "string",
         description:
-          'Optional quarter label such as "2026-Q1". Defaults to latest available.',
+          "Optional assertion that must equal the selected release quarter.",
       },
       {
-        name: "methodology",
+        name: "release",
         in: "query",
         type: "string",
-        description: 'Methodology version. Defaults to "beta".',
+        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
       {
         name: "sort",

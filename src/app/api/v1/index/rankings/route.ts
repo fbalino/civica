@@ -2,10 +2,11 @@ import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/hel
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { jurisdictions, ciCompositeScores } from "@/lib/db/schema";
-import { eq, sql, desc, asc } from "drizzle-orm";
+import { eq, sql, asc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
 import { retiredIndexApiResponse, withIndexDispositionDeprecation, withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
-import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
+import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
+import { resolveCiRelease } from "@/lib/ci/release-selection";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
   shapeIndexRankingsItem,
@@ -88,20 +89,12 @@ export async function GET(request: Request) {
 
     const limit = Math.min(Math.max(parseInt(limitParam ?? "50", 10) || 50, 1), 250);
     const offset = Math.max(parseInt(offsetParam ?? "0", 10) || 0, 0);
-    const methodologyVersion = url.searchParams.get("methodology") ?? CURRENT_CI_METHODOLOGY_VERSION;
-
-    // Resolve the target quarter: explicit param or latest available for
-    // the requested methodology version.
-    let quarter = quarterParam;
-    if (!quarter) {
-      const latest = await db
-        .select({ quarter: ciCompositeScores.quarter })
-        .from(ciCompositeScores)
-        .where(eq(ciCompositeScores.methodologyVersion, methodologyVersion))
-        .orderBy(desc(ciCompositeScores.quarter))
-        .limit(1);
-      quarter = latest[0]?.quarter ?? null;
+    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
+    const methodologyVersion = release.methodologyVersion;
+    if (quarterParam && quarterParam !== release.quarter) {
+      return withIndexDispositionDeprecation(apiError(`${release.releaseId} does not contain quarter ${quarterParam}`, 400));
     }
+    const quarter = release.quarter;
 
     if (!quarter) {
       // CLM-012 fix: this early-return branch previously omitted

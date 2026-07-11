@@ -128,6 +128,8 @@ The research design proposed two historical series:
 
 Neither series was certified as complete and reproducible. The deprecated history API contains research-beta records, not a finished as-published or back-cast archive, and will stop serving composite data at the announced sunset.
 
+Every preserved Beta read now names one closed release rather than asking for a methodology or “latest” quarter independently. The release contract binds the quarter, methodology, five permitted source-indicator identities, publisher artifact hashes, ingestion transform, composite algorithm, and display transform. When V-Dem and the disclosed WGI coverage fallback both exist, the contract selects V-Dem deterministically. Rows from another Beta revision can coexist in storage but cannot enter the requested release. Unknown sources, artifacts, transforms, and unregistered release coordinates fail closed.
+
 ## Section 12 · Limitations {#limitations}
 
 **Source lag.** The CI is only as current as its slowest-updating source. Some upstream indices publish 12–18 months behind real-world developments. Pulse is a separate experiment testing whether an event ledger can add timely context; its incremental value has not yet been established.
@@ -154,7 +156,7 @@ If a future candidate passes the preregistered validation gates, it will receive
 
 ### 13.1 · API access
 
-The generated endpoint list lives at [/api-docs](/api-docs). Legacy Civica Index score, ranking, comparison, history, and methodology endpoints are marked deprecated, name the [Governance Evidence Dashboard](/governance-evidence) as their successor, and return `410 Gone` after the announced sunset. Pulse endpoints remain separate and carry their own experimental runtime-method contract.
+The generated endpoint list lives at [/api-docs](/api-docs). Before sunset, legacy score, ranking, comparison, and history reads accept only a registered exact `release` id; a methodology label or latest-quarter lookup cannot assemble a mixed result. The endpoints name the [Governance Evidence Dashboard](/governance-evidence) as their successor and return `410 Gone` after the announced sunset. Pulse endpoints remain separate and carry their own experimental runtime-method contract.
 
 ### 13.2 · Disputes & corrections
 

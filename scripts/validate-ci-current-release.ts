@@ -31,7 +31,11 @@ assert.match(manifest.composites.sha256, /^[a-f0-9]{64}$/);
 
 for (const path of requiredResearchConsumers) {
   const source = readFileSync(path, "utf8");
-  assert.match(source, /CURRENT_CI_METHODOLOGY_VERSION/, `${path} must consume the pinned current release`);
+  assert.match(
+    source,
+    /CURRENT_CI_(?:METHODOLOGY_VERSION|RELEASE_ID)/,
+    `${path} must consume the pinned current release or its exact methodology coordinate`,
+  );
 }
 
 const atlasLoader = readFileSync("src/lib/atlas/load-atlas-data.ts", "utf8");

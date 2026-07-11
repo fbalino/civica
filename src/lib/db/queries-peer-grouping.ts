@@ -24,7 +24,7 @@
 import { sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
-import { getLatestAvailableQuarter } from "@/lib/db/queries";
+import { resolveCiRelease } from "@/lib/ci/release-selection";
 import type { TemporalMetadata } from "@/lib/data/temporal-metadata";
 
 export interface LensDistributionEntry {
@@ -115,13 +115,15 @@ export async function getVDemRowDistribution(
 export async function getCgvRegimeDistribution(
   quarter?: string,
 ): Promise<LensDistributionEntry[]> {
-  const q = quarter ?? (await getLatestAvailableQuarter());
+  const release = resolveCiRelease();
+  if (quarter && quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
+  const q = release.quarter;
   const result = await db.execute(sql`
     SELECT
       gt.regime_type_cgv AS key,
       COUNT(DISTINCT gt.jurisdiction_id)::int AS "totalCount",
       COUNT(DISTINCT cs.jurisdiction_id) FILTER (
-        WHERE cs.quarter = ${q} AND cs.score IS NOT NULL
+        WHERE cs.quarter = ${q} AND cs.methodology_version = ${release.methodologyVersion} AND cs.score IS NOT NULL
       )::int AS "scoredCount"
     FROM government_taxonomies gt
     JOIN jurisdictions j
@@ -215,13 +217,15 @@ async function distributionForFactKey(
   factKey: string,
   quarter?: string,
 ): Promise<LensDistributionEntry[]> {
-  const q = quarter ?? (await getLatestAvailableQuarter());
+  const release = resolveCiRelease();
+  if (quarter && quarter !== release.quarter) throw new Error(`${release.releaseId} does not contain quarter ${quarter}`);
+  const q = release.quarter;
   const result = await db.execute(sql`
     SELECT
       cf.fact_value AS key,
       COUNT(DISTINCT cf.jurisdiction_id)::int AS "totalCount",
       COUNT(DISTINCT cs.jurisdiction_id) FILTER (
-        WHERE cs.quarter = ${q} AND cs.score IS NOT NULL
+        WHERE cs.quarter = ${q} AND cs.methodology_version = ${release.methodologyVersion} AND cs.score IS NOT NULL
       )::int AS "scoredCount"
     FROM country_facts cf
     JOIN jurisdictions j

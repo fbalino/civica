@@ -5,21 +5,21 @@ import {
   ciCompositeScores,
   ciDimensionScores,
 } from "@/lib/db/schema";
-import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { displayCiReleaseDimensionScore, resolveCiRelease, selectCiReleaseDimensionRows } from "@/lib/ci/release-selection";
 import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
   retiredIndexApiResponse,
   withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
-import { and, eq, sql, desc } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { shapeIndexCountryData } from "@/lib/api/contract/shapes";
-import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
+import { CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 
 /**
- * This endpoint serves the current Beta methodology by default. Pass
- * `?methodology=v1.0` to reproduce an internal archived calculation. Current fields include the
+ * This endpoint serves the current closed release by default. Pass an exact
+ * registered `?release=...` to reproduce an archived calculation. Current fields include the
  * uncertainty posture, completeness flag, and vintage label alongside the
  * integer score; categorical country grades are not part of the public shape.
  */
@@ -36,17 +36,17 @@ export async function GET(
     const { country_slug } = await params;
     const slug = country_slug.toLowerCase();
     const url = new URL(request.url);
-    const methodologyVersion = url.searchParams.get("methodology") ?? CURRENT_CI_METHODOLOGY_VERSION;
+    const release = resolveCiRelease(url.searchParams.get("release") ?? CURRENT_CI_RELEASE_ID);
+    const methodologyVersion = release.methodologyVersion;
 
     const jurisdiction = await getJurisdictionBySlug(slug);
     if (!jurisdiction) {
       return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Country not found", 404)));
     }
 
-    // Fetch the latest score under the requested methodology. Falling
-    // back to whatever's available preserves the API for the handful of
-    // countries still missing Beta data.
-    const latestScore = await db
+    // The release contract chooses one exact methodology/quarter coordinate.
+    // Missing data stays missing; this endpoint never falls through to another release.
+    const releaseScore = await db
       .select({
         quarter: ciCompositeScores.quarter,
         score: ciCompositeScores.score,
@@ -66,16 +66,16 @@ export async function GET(
         and(
           eq(ciCompositeScores.jurisdictionId, jurisdiction.id),
           eq(ciCompositeScores.methodologyVersion, methodologyVersion),
+          eq(ciCompositeScores.quarter, release.quarter),
         ),
       )
-      .orderBy(desc(ciCompositeScores.quarter))
       .limit(1);
 
-    const composite = latestScore[0];
+    const composite = releaseScore[0];
     if (!composite) {
       return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
         apiError(
-          `No CI data available for this country under methodology "${methodologyVersion}".`,
+          `No CI data available for this country in release "${release.releaseId}".`,
           404,
         ),
       ));
@@ -83,15 +83,23 @@ export async function GET(
 
     const dimensionRows = await db
       .select({
+        jurisdictionId: ciDimensionScores.jurisdictionId,
         dimension: ciDimensionScores.dimension,
         normalizedScore: ciDimensionScores.normalizedScore,
         rawValue: ciDimensionScores.rawValue,
         sourceId: ciDimensionScores.sourceId,
+        indicatorId: ciDimensionScores.indicatorId,
+        quarter: ciDimensionScores.quarter,
+        methodologyVersion: ciDimensionScores.methodologyVersion,
+        transformationId: ciDimensionScores.transformationId,
+        methodVersion: ciDimensionScores.methodVersion,
+        artifactHash: ciDimensionScores.artifactHash,
       })
       .from(ciDimensionScores)
       .where(
         sql`${ciDimensionScores.jurisdictionId} = ${jurisdiction.id}
-          AND ${ciDimensionScores.quarter} = ${composite.quarter}`,
+          AND ${ciDimensionScores.quarter} = ${release.quarter}
+          AND ${ciDimensionScores.methodologyVersion} = ${release.methodologyVersion}`,
       );
 
     // Emit the per-dimension DISPLAY score on the SAME v2 fixed-bound
@@ -100,10 +108,10 @@ export async function GET(
     // card, and /api/v1/countries. The stored `normalized_score` column
     // is the legacy v1 observed-min-max value and does NOT sum to the v2
     // headline; fall back to it only when raw value / source is missing.
-    const dimensions = dimensionRows.map((d) => ({
+    const dimensions = selectCiReleaseDimensionRows(dimensionRows, release.releaseId).map((d) => ({
       dimension: d.dimension,
       normalizedScore:
-        displayDimensionScore(d.rawValue, d.sourceId) ?? d.normalizedScore,
+        displayCiReleaseDimensionScore(d, release.releaseId) ?? d.normalizedScore,
       rawValue: d.rawValue,
       sourceId: d.sourceId,
       valueStatus: "observed" as const,

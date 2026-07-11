@@ -17,12 +17,16 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/ci/current-release.ts", category: "input" },
   { path: "src/lib/ci/production-source-adapters.ts", category: "input" },
   { path: "src/lib/ci/research-panel.ts", category: "input" },
+  { path: "src/lib/ci/release-selection.ts", category: "input" },
   { path: "src/lib/ci/k1-uncertainty-inputs.ts", category: "input" },
   { path: "src/lib/ci/k4-practice-inputs.ts", category: "input" },
   { path: "src/lib/ci/history-adapters.ts", category: "input" },
   { path: "src/lib/ci/ingest.ts", category: "input" },
   { path: "src/lib/ci/longitudinal-validation-inputs.ts", category: "input" },
   { path: "src/lib/ci/source-utils.ts", category: "input" },
+  { path: "src/lib/db/queries.ts", category: "input" },
+  { path: "src/lib/db/queries-peer-grouping.ts", category: "input" },
+  { path: "src/lib/db/queries-scores.ts", category: "input" },
   { path: "src/lib/ci/normalize.ts", category: "transform" },
   { path: "src/lib/ci/normalize-v2.ts", category: "transform" },
   { path: "src/lib/ci/calculate.ts", category: "transform" },
@@ -30,6 +34,7 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/ci/normalization-table.ts", category: "transform" },
   { path: "src/lib/ci/reproduce-current-release.ts", category: "transform" },
   { path: "src/lib/ci/versioning.ts", category: "transform" },
+  { path: "scripts/calculate-ci-v2.ts", category: "transform" },
   { path: "src/lib/ci/dimensions-v2.ts", category: "weight_or_model" },
   { path: "src/lib/ci/candidate-specifications.ts", category: "weight_or_model" },
   { path: "src/lib/ci/dimensionality-analysis.ts", category: "weight_or_model" },
@@ -75,6 +80,13 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/atlas/map-layers.ts", category: "presentation" },
   { path: "src/app/embed/[slug]/route.ts", category: "presentation" },
   { path: "src/lib/ci/quarantine-contract.ts", category: "presentation" },
+  { path: "src/lib/api/contract/registry.ts", category: "presentation" },
+  { path: "src/app/api/v1/index/[country_slug]/route.ts", category: "presentation" },
+  { path: "src/app/api/v1/index/[country_slug]/history/route.ts", category: "presentation" },
+  { path: "src/app/api/v1/index/by-government-type/route.ts", category: "presentation" },
+  { path: "src/app/api/v1/index/compare/route.ts", category: "presentation" },
+  { path: "src/app/api/v1/index/methodology/route.ts", category: "presentation" },
+  { path: "src/app/api/v1/index/rankings/route.ts", category: "presentation" },
   { path: "content/methodology-civica-index.md", category: "presentation" },
 ] as const;
 
@@ -127,7 +139,7 @@ export type IndexChangeRegistry = {
 };
 
 const REQUIRED_VALIDATIONS: Record<IndexChangeCategory, readonly string[]> = {
-  input: ["validate:ci-current-release", "validate:ci-research-panel"],
+  input: ["validate:ci-current-release", "validate:ci-release-selection", "validate:ci-research-panel"],
   transform: ["validate:index-research-archive"],
   weight_or_model: ["validate:index-research-archive"],
   missingness: ["validate:ci-missingness"],
@@ -195,13 +207,15 @@ export function indexChangeControlErrors(
   for (let index = 0; index < registry.entries.length; index += 1) {
     const entry = registry.entries[index];
     const prior = registry.entries[index - 1];
+    const isLatest = index === registry.entries.length - 1;
     if (!entry.id.trim()) errors.push(`entry ${index} has no id`);
     if (!entry.fromVersion.trim() || !entry.toVersion.trim() || entry.fromVersion === entry.toVersion) errors.push(`${entry.id}: methodology version did not advance`);
-    if (!sameMembers(entry.protectedFiles.map((row) => row.path), protectedPaths)) errors.push(`${entry.id}: protected file inventory is incomplete`);
+    if (new Set(entry.protectedFiles.map((row) => row.path)).size !== entry.protectedFiles.length) errors.push(`${entry.id}: protected file inventory contains duplicates`);
+    if (entry.protectedFiles.some((row) => !INDEX_CHANGE_CATEGORIES.includes(row.category))) errors.push(`${entry.id}: protected file has an invalid category`);
     if (entry.snapshotSha256 !== indexSnapshotSha256(entry.protectedFiles)) errors.push(`${entry.id}: snapshot hash drifted`);
     if (!prior) {
       if (entry.parentSnapshotSha256 !== null) errors.push(`${entry.id}: baseline parent must be null`);
-      if (!sameMembers(entry.changedPaths, protectedPaths)) errors.push(`${entry.id}: baseline must bind every protected path`);
+      if (!sameMembers(entry.changedPaths, entry.protectedFiles.map((row) => row.path))) errors.push(`${entry.id}: baseline must bind every protected path`);
     } else {
       if (entry.parentSnapshotSha256 !== prior.snapshotSha256) errors.push(`${entry.id}: snapshot chain is broken`);
       if (entry.fromVersion !== prior.toVersion) errors.push(`${entry.id}: version chain is broken`);
@@ -215,16 +229,20 @@ export function indexChangeControlErrors(
     }
     for (const role of INDEX_CHANGE_EVIDENCE_ROLES) {
       if (entry.evidence[role].length === 0) errors.push(`${entry.id}: ${role} evidence is missing`);
-      for (const file of entry.evidence[role]) {
-        try {
-          if (sha256(readFileSync(file.path)) !== file.sha256) errors.push(`${entry.id}: ${role} evidence drifted at ${file.path}`);
-        } catch {
-          errors.push(`${entry.id}: ${role} evidence is missing at ${file.path}`);
+      // Historical hashes remain authenticated by the append-only registry and Git;
+      // only the head may point at intentionally mutable live documentation/tests.
+      if (isLatest) {
+        for (const file of entry.evidence[role]) {
+          try {
+            if (sha256(readFileSync(file.path)) !== file.sha256) errors.push(`${entry.id}: ${role} evidence drifted at ${file.path}`);
+          } catch {
+            errors.push(`${entry.id}: ${role} evidence is missing at ${file.path}`);
+          }
         }
       }
     }
     const required = requiredIndexValidations(entry.categories);
-    if (!required.every((command) => entry.validations.includes(command))) errors.push(`${entry.id}: declared validation set is incomplete`);
+    if (isLatest && !required.every((command) => entry.validations.includes(command))) errors.push(`${entry.id}: declared validation set is incomplete`);
     if (
       prior &&
       entry.categories.some((category) => category === "transform" || category === "weight_or_model") &&
@@ -237,6 +255,7 @@ export function indexChangeControlErrors(
   if (latest) {
     if (registry.currentSnapshotSha256 !== latest.snapshotSha256) errors.push("registry head does not match latest entry");
     if (!sameMembers(currentFiles.map((row) => `${row.path}:${row.sha256}`), latest.protectedFiles.map((row) => `${row.path}:${row.sha256}`))) errors.push("protected Index files changed without a new change record");
+    if (!sameMembers(latest.protectedFiles.map((row) => row.path), protectedPaths)) errors.push("latest protected file inventory is incomplete");
   }
   return errors;
 }
