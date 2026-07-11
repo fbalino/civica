@@ -338,6 +338,18 @@ export interface IbgeSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  jurisdiction?: IbgeJurisdiction;
+  fetchIndicator?: typeof fetchIndicator;
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface IbgeJurisdiction {
+  id: string;
+  slug: string;
+  iso2: string | null;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -668,7 +680,7 @@ export async function syncIbgeBr(
   // Resolve the BRA jurisdiction once. R.18 writes for a single
   // jurisdiction; if the lookup fails, ship a clean error rather
   // than silently no-op.
-  const jurisdictionRows = await db
+  const jurisdictionRows = options.jurisdiction ? [options.jurisdiction] : await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -730,7 +742,7 @@ export async function syncIbgeBr(
     let periodCode: string;
     let periodName: string;
     try {
-      const r = await fetchIndicator(config);
+      const r = await (options.fetchIndicator ?? fetchIndicator)(config);
       rows = r.rows;
       latest = r.latest;
       periodCode = r.periodCode;
@@ -987,7 +999,7 @@ export async function syncIbgeBr(
     );
   }
 
-  await markSourcesSynced("ibge_br", {
+  await (options.markSynced ?? markSourcesSynced)("ibge_br", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -1006,7 +1018,7 @@ export async function syncIbgeBr(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;

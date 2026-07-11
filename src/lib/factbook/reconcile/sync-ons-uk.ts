@@ -288,7 +288,7 @@ export const ONS_INDICATORS: readonly OnsUkIndicatorConfig[] = [
  * concurrently in a flat envelope; R.14 reads only the `years[]`
  * array since all 5 R.14 fact-keys are annual-cadence in Civica.
  */
-interface OnsYearPoint {
+export interface OnsYearPoint {
   /** 4-digit year string from `date` field (e.g. "2025"). */
   year: number;
   /** Numeric value parsed from string `value` field. ONS ships
@@ -362,6 +362,19 @@ export interface OnsSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  ensureSource?: typeof ensureSourceRow;
+  jurisdiction?: OnsJurisdiction;
+  fetchIndicator?: typeof fetchIndicator;
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface OnsJurisdiction {
+  id: string;
+  slug: string;
+  iso2: string | null;
+  iso3: string | null;
 }
 
 function freshCounters(factKey: string, cdid: string): PerOnsCounters {
@@ -585,7 +598,7 @@ export async function syncOnsUk(
   let sourceRowInserted = false;
   if (!options.dryRun) {
     try {
-      sourceRowInserted = await ensureSourceRow(db, log);
+      sourceRowInserted = await (options.ensureSource ?? ensureSourceRow)(db, log);
     } catch (err) {
       errors.push(
         `ensureSourceRow failed: ${
@@ -598,7 +611,7 @@ export async function syncOnsUk(
   }
 
   // Resolve the GBR jurisdiction once. Single-country NSO scope.
-  const jrows = await db
+  const jrows = options.jurisdiction ? [options.jurisdiction] : await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -657,7 +670,7 @@ export async function syncOnsUk(
     let rejectedNoValue = 0;
     let upstreamReleaseDate: string | null = null;
     try {
-      const result = await fetchIndicator(config);
+      const result = await (options.fetchIndicator ?? fetchIndicator)(config);
       latest = result.latest;
       observationCount = result.observationCount;
       rejectedNoValue = result.rejectedNoValue;
@@ -882,7 +895,7 @@ export async function syncOnsUk(
     );
   }
 
-  await markSourcesSynced(ONS_SOURCE_ID, {
+  await (options.markSynced ?? markSourcesSynced)(ONS_SOURCE_ID, {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -901,7 +914,7 @@ export async function syncOnsUk(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;

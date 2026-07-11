@@ -258,7 +258,7 @@ export const WTO_STATS_INDICATORS: readonly WtoStatsIndicatorConfig[] = [
  *  22. ValueFlag (English label)
  *  23. Value (numeric)
  */
-interface WtoCsvRow {
+export interface WtoCsvRow {
   iso3: string;
   reporterName: string;
   partnerCode: string;
@@ -323,6 +323,18 @@ export interface WtoStatsSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  runMigration?: typeof runLegacyMigration;
+  fetchArchive?: typeof fetchAndParseMerchandiseCsv;
+  jurisdictions?: WtoStatsJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface WtoStatsJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -710,7 +722,7 @@ export async function syncWtoStats(
   log("→ R.12 legacy trade-aggregate fact-key migration…");
   let legacyMigration: WtoStatsSyncSummary["legacyMigration"];
   try {
-    legacyMigration = await runLegacyMigration(
+    legacyMigration = await (options.runMigration ?? runLegacyMigration)(
       db,
       log,
       options.dryRun ?? false,
@@ -730,7 +742,7 @@ export async function syncWtoStats(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -751,7 +763,7 @@ export async function syncWtoStats(
   let allRows: WtoCsvRow[];
   let archiveBytes = 0;
   try {
-    const result = await fetchAndParseMerchandiseCsv(log);
+    const result = await (options.fetchArchive ?? fetchAndParseMerchandiseCsv)(log);
     allRows = result.rows;
     archiveBytes = result.archiveBytes;
     log(`  parsed ${allRows.length} CSV rows (after filter)`);
@@ -1001,7 +1013,7 @@ export async function syncWtoStats(
     );
   }
 
-  await markSourcesSynced("wto_stats", {
+  await (options.markSynced ?? markSourcesSynced)("wto_stats", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -1023,7 +1035,7 @@ export async function syncWtoStats(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;

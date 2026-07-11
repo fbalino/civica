@@ -264,7 +264,7 @@ export const UNESCO_UIS_INDICATORS: readonly UnescoUisIndicatorConfig[] = [
  * One row as returned by the UIS data endpoint. Field names are
  * case-sensitive and match the upstream JSON exactly.
  */
-interface UisDataPoint {
+export interface UisDataPoint {
   indicatorId: string;
   /** ISO3 for sovereign states; non-ISO3 string for regional
    *  aggregates (e.g. "AIMS: South and West Asia"). */
@@ -354,6 +354,19 @@ export interface UnescoUisSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchVersion?: typeof fetchDefaultVersion;
+  fetchIndicator?: typeof fetchIndicator;
+  jurisdictions?: UnescoUisJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+  updateSourceLicense?: (db: Db) => Promise<void>;
+}
+
+export interface UnescoUisJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -521,7 +534,7 @@ export async function syncUnescoUis(
   // (e.g. "August 2026 Data Release") automatically without code
   // changes.
   const { handle: versionHandle, label: vintageLabel } =
-    await fetchDefaultVersion();
+    await (options.fetchVersion ?? fetchDefaultVersion)();
   log(
     `Resolved UIS vintage: "${vintageLabel}"` +
       (versionHandle ? ` (version=${versionHandle})` : " (fallback)"),
@@ -529,7 +542,7 @@ export async function syncUnescoUis(
 
   // Build iso3 → jurisdictionId map once; reused across all
   // indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -578,7 +591,7 @@ export async function syncUnescoUis(
 
     let rows: UisDataPoint[];
     try {
-      rows = await fetchIndicator(
+      rows = await (options.fetchIndicator ?? fetchIndicator)(
         config,
         startYear,
         endYear,
@@ -786,19 +799,22 @@ export async function syncUnescoUis(
     );
   }
 
-  if (!options.dryRun) {
+  if (!options.dryRun && errors.length === 0) {
     // Correct the seeded license string (CC-BY-3.0-IGO → CC-BY-SA-4.0)
     // per resolution Q1. This correction is applied on every non-dry
     // run regardless of whether rows were written — it is NOT a
     // freshness stamp, so it stays a direct `sources` update.
-    await db
-      .update(sources)
-      .set({ license: "CC-BY-SA-4.0" })
-      .where(eq(sources.id, "unesco_uis"));
+    if (options.updateSourceLicense) await options.updateSourceLicense(db);
+    else {
+      await db
+        .update(sources)
+        .set({ license: "CC-BY-SA-4.0" })
+        .where(eq(sources.id, "unesco_uis"));
+    }
   }
   // Freshness stamp routed through the sole sanctioned helper, which
   // stamps `last_sync_at` only when the run actually wrote rows.
-  await markSourcesSynced("unesco_uis", {
+  await (options.markSynced ?? markSourcesSynced)("unesco_uis", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -817,7 +833,7 @@ export async function syncUnescoUis(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose

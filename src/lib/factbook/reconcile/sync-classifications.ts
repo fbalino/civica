@@ -30,6 +30,19 @@ import { payloadHash } from "./_sync-common";
 
 type Db = typeof import("@/lib/db").db;
 
+export interface ClassificationJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
+}
+
+export interface GovernmentFormJurisdiction {
+  id: string;
+  slug: string;
+  governmentTypeDetail: string | null;
+  governmentType: string | null;
+}
+
 /* ────────────────────────────────────────────────────────────────
  * 1. World Bank classifications
  * ──────────────────────────────────────────────────────────────── */
@@ -47,7 +60,7 @@ export interface WbClassificationsSummary {
   dryRun: boolean;
 }
 
-interface WbCountry {
+export interface WbCountry {
   id: string; // iso3
   iso2Code: string;
   name: string;
@@ -91,6 +104,9 @@ export async function syncWorldBankClassifications(
   options: {
     dryRun?: boolean;
     onProgress?: (line: string) => void;
+    fetchCountries?: typeof fetchWbCountries;
+    jurisdictions?: ClassificationJurisdiction[];
+    markSynced?: typeof markSourcesSynced;
   } = {}
 ): Promise<WbClassificationsSummary> {
   const startedAtMs = Date.now();
@@ -100,7 +116,7 @@ export async function syncWorldBankClassifications(
 
   let wbCountries: WbCountry[] = [];
   try {
-    wbCountries = await fetchWbCountries();
+    wbCountries = await (options.fetchCountries ?? fetchWbCountries)();
     log(`Fetched ${wbCountries.length} non-aggregate WB country rows.`);
   } catch (err) {
     errors.push(`fetch failed: ${err instanceof Error ? err.message : err}`);
@@ -124,7 +140,7 @@ export async function syncWorldBankClassifications(
   }
 
   // Match WB rows to civica jurisdictions by iso3.
-  const civicaJurisdictions = await db
+  const civicaJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -332,7 +348,7 @@ export async function syncWorldBankClassifications(
     }
   }
 
-  await markSourcesSynced("world_bank", {
+  await (options.markSynced ?? markSourcesSynced)("world_bank", {
     rowsWritten: errors.length === 0 ? regionWritten + incomeWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -452,7 +468,7 @@ function toNumber(value: string | undefined): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-interface VdemRowCsvRow {
+export interface VdemRowCsvRow {
   iso3: string;
   v2xRegime: number | null;
 }
@@ -512,7 +528,13 @@ async function fetchVdemRowFromQog(): Promise<Map<string, VdemRowCsvRow>> {
 
 export async function syncVdemRow(
   db: Db,
-  options: { dryRun?: boolean; onProgress?: (line: string) => void } = {}
+  options: {
+    dryRun?: boolean;
+    onProgress?: (line: string) => void;
+    fetchRows?: typeof fetchVdemRowFromQog;
+    jurisdictions?: ClassificationJurisdiction[];
+    markSynced?: typeof markSourcesSynced;
+  } = {}
 ): Promise<VdemRowSummary> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
@@ -521,7 +543,7 @@ export async function syncVdemRow(
 
   let qogByIso3 = new Map<string, VdemRowCsvRow>();
   try {
-    qogByIso3 = await fetchVdemRowFromQog();
+    qogByIso3 = await (options.fetchRows ?? fetchVdemRowFromQog)();
     log(`Loaded ${qogByIso3.size} QoG rows.`);
   } catch (err) {
     errors.push(`QoG fetch: ${err instanceof Error ? err.message : err}`);
@@ -538,7 +560,7 @@ export async function syncVdemRow(
     };
   }
 
-  const civicaJurisdictions = await db
+  const civicaJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -658,7 +680,7 @@ export async function syncVdemRow(
     }
   }
 
-  await markSourcesSynced("vdem", {
+  await (options.markSynced ?? markSourcesSynced)("vdem", {
     rowsWritten: errors.length === 0 ? written : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -830,7 +852,12 @@ function deriveMonarchyStatus(
 
 export async function syncMonarchyAndGovernmentForm(
   db: Db,
-  options: { dryRun?: boolean; onProgress?: (line: string) => void } = {}
+  options: {
+    dryRun?: boolean;
+    onProgress?: (line: string) => void;
+    jurisdictions?: GovernmentFormJurisdiction[];
+    markSynced?: typeof markSourcesSynced;
+  } = {}
 ): Promise<MonarchySummary> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
@@ -856,7 +883,7 @@ export async function syncMonarchyAndGovernmentForm(
     };
   }
 
-  const civicaJurisdictions = await db
+  const civicaJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -999,7 +1026,7 @@ export async function syncMonarchyAndGovernmentForm(
     }
   }
 
-  await markSourcesSynced("cia_factbook", {
+  await (options.markSynced ?? markSourcesSynced)("cia_factbook", {
     rowsWritten: errors.length === 0 ? monarchyWritten + formWritten : 0,
     dryRun: options.dryRun,
     executor: db,

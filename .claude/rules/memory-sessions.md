@@ -295,3 +295,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   stamp freshness.
 - Twelve focused tests, 491 full tests, and the production build passed.
   Factbook fixture coverage is 4 of 18 external adapters.
+
+## 2026-07-10 — DAT-012 factbook publisher-fixture completion
+
+- Completed bounded production seams and repeatability fixtures for all 18
+  external factbook publisher adapters, including Stats SA's injected PDF and
+  model-extraction boundary and the combined classifications pipeline.
+- Fifty-four focused tests prove two-run semantic convergence, stable
+  zero-write dry runs, and fail-closed freshness behavior across the family.
+- The full suite passes 533/533, source-freshness validation passes, and the
+  production build passes. DAT-012 remains open for other factbook jobs and
+  manual Atlas/Index/Conditions entrypoints.

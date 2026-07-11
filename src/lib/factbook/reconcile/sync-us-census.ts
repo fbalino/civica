@@ -370,6 +370,19 @@ export interface UsCensusSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  jurisdiction?: UsCensusJurisdiction;
+  fetchValues?: typeof fetchIndicatorValues;
+  fetchUrbanization?: typeof fetchUrbanizationRate;
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface UsCensusJurisdiction {
+  id: string;
+  slug: string;
+  iso2: string | null;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -534,7 +547,7 @@ export async function syncUsCensus(
 
   // Resolve the USA jurisdiction once; the sync is single-jurisdiction
   // by design (Census Bureau scope is US-only).
-  const usaRows = await db
+  const usaRows = options.jurisdiction ? [options.jurisdiction] : await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -594,11 +607,11 @@ export async function syncUsCensus(
     try {
       if (config.factKey === "urbanization_rate") {
         // Two-dataset composition for urbanization rate.
-        const composed = await fetchUrbanizationRate();
+        const composed = await (options.fetchUrbanization ?? fetchUrbanizationRate)();
         rawCells = [composed];
         numericValue = composed;
       } else {
-        rawCells = await fetchIndicatorValues(
+        rawCells = await (options.fetchValues ?? fetchIndicatorValues)(
           config.dataset,
           config.vintage,
           config.variables,
@@ -805,7 +818,7 @@ export async function syncUsCensus(
     }
   }
 
-  await markSourcesSynced("us_census", {
+  await (options.markSynced ?? markSourcesSynced)("us_census", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -824,7 +837,7 @@ export async function syncUsCensus(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;

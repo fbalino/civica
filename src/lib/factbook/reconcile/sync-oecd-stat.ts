@@ -433,6 +433,17 @@ export interface OecdStatSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchIndicator?: typeof fetchIndicator;
+  jurisdictions?: OecdStatJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface OecdStatJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -635,7 +646,7 @@ export async function syncOecdStat(
   // indicators. Filter to OECD members up-front so the iso3 lookup
   // misses cleanly count as `skipped_no_jurisdiction` (which Israel
   // will trigger in v1 until R.7.0 lands).
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -712,7 +723,7 @@ export async function syncOecdStat(
     let observationCount = 0;
     let nonMemberCount = 0;
     try {
-      const result = await fetchIndicator(config, startYear, endYear);
+      const result = await (options.fetchIndicator ?? fetchIndicator)(config, startYear, endYear);
       latestByIso3 = result.latestByIso3;
       observationCount = result.observationCount;
       nonMemberCount = result.nonMemberCount;
@@ -926,7 +937,7 @@ export async function syncOecdStat(
     );
   }
 
-  await markSourcesSynced("oecd_stat", {
+  await (options.markSynced ?? markSourcesSynced)("oecd_stat", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -945,7 +956,7 @@ export async function syncOecdStat(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose

@@ -80,3 +80,20 @@ writable rows. Twelve focused tests pass. The other factbook publishers remain
 in progress.
 
 After this tranche, 491/491 tests and the full production build pass.
+
+## Factbook publisher-fixture completion
+
+The remaining fourteen external factbook adapters now use the same bounded
+fixture contract: UNESCO UIS, UNDP HDI, OECD, FAO, ILO, Eurostat, WTO, INSEE,
+US Census, ONS, IBGE, StatCan, Stats SA, and the combined World Bank/V-Dem/CIA
+classifications pipeline. Stats SA fixtures inject the fetched PDF and parsed
+extraction result, so the production normalization/write path is exercised
+without spending model credits or weakening its fail-closed extraction rules.
+
+Across all 18 external factbook adapters, 54 focused tests prove semantic
+canonical convergence after two applications, stable zero-write dry runs, and
+failure behavior that cannot advance source freshness. The full unit suite is
+533/533, the source-freshness validator passes, and the production build passes.
+
+DAT-012 remains open for the three other external factbook jobs, four derived
+factbook jobs, and the ten manual Atlas/Index/Conditions entrypoints.

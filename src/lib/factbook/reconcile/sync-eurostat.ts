@@ -403,6 +403,18 @@ export interface EurostatSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchIndicator?: typeof fetchIndicator;
+  jurisdictions?: EurostatJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface EurostatJurisdiction {
+  id: string;
+  slug: string;
+  iso2: string | null;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -705,7 +717,7 @@ export async function syncEurostat(
   // Eurostat sync uses ISO2 (not ISO3) lookup because Eurostat's
   // geo codes are ISO2 with two well-documented anomalies handled
   // at the fetcher layer.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -775,7 +787,7 @@ export async function syncEurostat(
     let nonMemberCount = 0;
     let upstreamUpdated: string | null = null;
     try {
-      const result = await fetchIndicator(config);
+      const result = await (options.fetchIndicator ?? fetchIndicator)(config);
       latestByIso2 = result.latestByIso2;
       observationCount = result.observationCount;
       nonMemberCount = result.nonMemberCount;
@@ -998,7 +1010,7 @@ export async function syncEurostat(
     );
   }
 
-  await markSourcesSynced("eurostat", {
+  await (options.markSynced ?? markSourcesSynced)("eurostat", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -1017,7 +1029,7 @@ export async function syncEurostat(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;

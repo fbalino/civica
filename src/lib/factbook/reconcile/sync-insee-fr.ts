@@ -296,6 +296,18 @@ export interface InseeSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  jurisdiction?: InseeJurisdiction;
+  fetchIndicator?: typeof fetchIndicator;
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface InseeJurisdiction {
+  id: string;
+  slug: string;
+  iso2: string | null;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -333,7 +345,7 @@ function buildDataUrl(idbank: string): string {
 /**
  * Parsed Series block from the SDMX-Compact XML response.
  */
-interface InseeSeries {
+export interface InseeSeries {
   idbank: string;
   freq: string | null;
   refArea: string | null;
@@ -583,7 +595,7 @@ export async function syncInseeFr(
   // Resolve the FRA jurisdiction once. R.15 writes for a single
   // jurisdiction; if the lookup fails, ship a clean error rather
   // than silently no-op.
-  const jurisdictionRows = await db
+  const jurisdictionRows = options.jurisdiction ? [options.jurisdiction] : await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -643,7 +655,7 @@ export async function syncInseeFr(
     let series: InseeSeries;
     let latest: InseeSeries["obs"][number];
     try {
-      const r = await fetchIndicator(config);
+      const r = await (options.fetchIndicator ?? fetchIndicator)(config);
       series = r.series;
       latest = r.latest;
       counter.observations = r.observationCount;
@@ -877,7 +889,7 @@ export async function syncInseeFr(
     );
   }
 
-  await markSourcesSynced("insee_fr", {
+  await (options.markSynced ?? markSourcesSynced)("insee_fr", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -896,7 +908,7 @@ export async function syncInseeFr(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;

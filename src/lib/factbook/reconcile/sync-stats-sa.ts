@@ -443,6 +443,20 @@ export interface StatsSaSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Bounded fixture seams used by repeatability tests. */
+  jurisdiction?: StatsSaJurisdiction;
+  ensureSource?: typeof ensureSourceRow;
+  fetchPdf?: typeof fetchLatestPdf;
+  extractPdf?: typeof extractFromPdf;
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface StatsSaJurisdiction {
+  id: string;
+  slug: string;
+  iso2: string | null;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -592,7 +606,7 @@ function enumerateCandidateUrls(
  * One fetched PDF — buffer + URL + status — ready for Anthropic
  * extraction.
  */
-interface FetchedPdf {
+export interface FetchedPdf {
   url: string;
   status: number;
   bytes: number;
@@ -1121,7 +1135,7 @@ export async function syncStatsSa(
   let sourceRowInserted = false;
   if (!options.dryRun) {
     try {
-      sourceRowInserted = await ensureSourceRow(db, log);
+      sourceRowInserted = await (options.ensureSource ?? ensureSourceRow)(db, log);
     } catch (err) {
       errors.push(
         `ensureSourceRow failed: ${
@@ -1134,7 +1148,7 @@ export async function syncStatsSa(
   }
 
   // Resolve the ZAF jurisdiction once. Single-country NSO scope.
-  const jrows = await db
+  const jurisdiction = options.jurisdiction ?? (await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -1143,8 +1157,7 @@ export async function syncStatsSa(
     })
     .from(jurisdictions)
     .where(eq(jurisdictions.iso3, STATS_SA_TARGET_ISO3))
-    .limit(1);
-  const jurisdiction = jrows[0] ?? null;
+    .limit(1))[0] ?? null;
   if (!jurisdiction) {
     return {
       startedAt,
@@ -1168,7 +1181,7 @@ export async function syncStatsSa(
 
   // Pre-flight: missing ANTHROPIC_API_KEY_RECONCILIATION should fail fast
   // rather than per-indicator. If unset, skip the whole sync gracefully.
-  if (!process.env.ANTHROPIC_API_KEY_RECONCILIATION) {
+  if (!options.extractPdf && !process.env.ANTHROPIC_API_KEY_RECONCILIATION) {
     return {
       startedAt,
       finishedAt: new Date().toISOString(),
@@ -1218,7 +1231,7 @@ export async function syncStatsSa(
     const candidates = enumerateCandidateUrls(config, now);
     log(`  candidate URLs (${candidates.length}): trying newest first.`);
     const maxPages = config.maxPages ?? 30;
-    const pdf = await fetchLatestPdf(candidates, maxPages, log);
+    const pdf = await (options.fetchPdf ?? fetchLatestPdf)(candidates, maxPages, log);
     if (!pdf) {
       counter.rejected_no_pdf++;
       errors.push(
@@ -1235,7 +1248,7 @@ export async function syncStatsSa(
     log(
       `  extracting via ${STATS_SA_EXTRACTION_MODEL} (tool-use, temp 0)…`,
     );
-    const ext = await extractFromPdf(config, pdf, log);
+    const ext = await (options.extractPdf ?? extractFromPdf)(config, pdf, log);
     if (!ext) {
       counter.rejected_extraction++;
       errors.push(
@@ -1528,7 +1541,7 @@ export async function syncStatsSa(
     );
   }
 
-  await markSourcesSynced(STATS_SA_SOURCE_ID, {
+  await (options.markSynced ?? markSourcesSynced)(STATS_SA_SOURCE_ID, {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -1547,7 +1560,7 @@ export async function syncStatsSa(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;

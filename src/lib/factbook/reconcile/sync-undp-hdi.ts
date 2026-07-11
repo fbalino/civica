@@ -295,6 +295,17 @@ export interface UndpHdiSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchCsv?: typeof fetchAndParseCsv;
+  jurisdictions?: UndpHdiJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface UndpHdiJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -461,7 +472,7 @@ export async function syncUndpHdi(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -484,7 +495,7 @@ export async function syncUndpHdi(
   let columnIndex: Map<string, number>;
   let countryRows: string[][];
   try {
-    ({ columnIndex, countryRows } = await fetchAndParseCsv());
+    ({ columnIndex, countryRows } = await (options.fetchCsv ?? fetchAndParseCsv)());
   } catch (err) {
     errors.push(
       `CSV fetch/parse failed: ${err instanceof Error ? err.message : err}`,
@@ -737,7 +748,7 @@ export async function syncUndpHdi(
     );
   }
 
-  await markSourcesSynced("undp_hdi", {
+  await (options.markSynced ?? markSourcesSynced)("undp_hdi", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -756,7 +767,7 @@ export async function syncUndpHdi(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose

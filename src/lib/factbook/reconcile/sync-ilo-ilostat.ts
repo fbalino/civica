@@ -200,7 +200,7 @@ export const ILO_ILOSTAT_INDICATORS: readonly IloIndicatorConfig[] = [
 ];
 
 /** ILO TOC row (subset — only fields the sync needs). */
-interface IloIndicatorTocRow {
+export interface IloIndicatorTocRow {
   /** Indicator id, e.g. "UNE_2EAP_SEX_AGE_RT_A". */
   id: string;
   /** Indicator base code without frequency suffix. */
@@ -214,7 +214,7 @@ interface IloIndicatorTocRow {
 }
 
 /** Parsed ILO data CSV row. */
-interface IloDataRow {
+export interface IloDataRow {
   refArea: string;
   /** ILO internal source ID, e.g. "XA:1868" (ILOEST) or "BA:150"
    *  (Argentina household survey). Persisted as forensic metadata. */
@@ -272,6 +272,18 @@ export interface IloSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchToc?: typeof fetchIndicatorToc;
+  fetchIndicator?: typeof fetchIndicator;
+  jurisdictions?: IloJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface IloJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(factKey: string, iloCode: string): PerIloCounters {
@@ -528,7 +540,7 @@ export async function syncIloIlostat(
   };
   let toc: Map<string, IloIndicatorTocRow> | null = null;
   try {
-    toc = await fetchIndicatorToc();
+    toc = await (options.fetchToc ?? fetchIndicatorToc)();
     log(`ILO TOC loaded (${toc.size} indicators)`);
     for (const t of targets) {
       const tocRow = toc.get(t.iloCode);
@@ -546,7 +558,7 @@ export async function syncIloIlostat(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -597,7 +609,7 @@ export async function syncIloIlostat(
 
     let rows: IloDataRow[];
     try {
-      rows = await fetchIndicator(config);
+      rows = await (options.fetchIndicator ?? fetchIndicator)(config);
     } catch (err) {
       errors.push(
         `${config.iloCode} fetch failed: ${
@@ -841,7 +853,7 @@ export async function syncIloIlostat(
     );
   }
 
-  await markSourcesSynced("ilo_ilostat", {
+  await (options.markSynced ?? markSourcesSynced)("ilo_ilostat", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -860,7 +872,7 @@ export async function syncIloIlostat(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose

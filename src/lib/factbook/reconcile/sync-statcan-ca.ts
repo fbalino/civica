@@ -355,6 +355,18 @@ export interface StatCanSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  jurisdiction?: StatCanJurisdiction;
+  fetchObservations?: typeof fetchVectorObservations;
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface StatCanJurisdiction {
+  id: string;
+  slug: string;
+  iso2: string | null;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -580,7 +592,7 @@ export async function syncStatCanCa(
 
   // Resolve the Canada jurisdiction once; the sync is single-jurisdiction
   // by design (Statistics Canada scope is Canada-only).
-  const canRows = await db
+  const canRows = options.jurisdiction ? [options.jurisdiction] : await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -641,7 +653,7 @@ export async function syncStatCanCa(
     let observations: StatCanObservation[];
     let numericValue: number;
     try {
-      observations = await fetchVectorObservations(
+      observations = await (options.fetchObservations ?? fetchVectorObservations)(
         config.vectorId,
         config.latestN,
       );
@@ -850,7 +862,7 @@ export async function syncStatCanCa(
     }
   }
 
-  await markSourcesSynced("statcan_ca", {
+  await (options.markSynced ?? markSourcesSynced)("statcan_ca", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -869,7 +881,7 @@ export async function syncStatCanCa(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;

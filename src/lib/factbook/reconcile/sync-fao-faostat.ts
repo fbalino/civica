@@ -274,7 +274,7 @@ export const FAO_FAOSTAT_INDICATORS: readonly FaoFaostatIndicatorConfig[] = [
  *  12. Flag (e.g. "A", "E", "I" — see file header)
  *  13. Note (free-text annotation, usually empty)
  */
-interface FaoCsvRow {
+export interface FaoCsvRow {
   m49Code: number;
   areaName: string;
   itemCode: number;
@@ -329,6 +329,17 @@ export interface FaoFaostatSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchArchive?: typeof fetchAndParseLandUseCsv;
+  jurisdictions?: FaoFaostatJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface FaoFaostatJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -572,7 +583,7 @@ export async function syncFaoFaostat(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -595,7 +606,7 @@ export async function syncFaoFaostat(
   let allRows: FaoCsvRow[];
   let archiveBytes = 0;
   try {
-    const result = await fetchAndParseLandUseCsv(log);
+    const result = await (options.fetchArchive ?? fetchAndParseLandUseCsv)(log);
     allRows = result.rows;
     archiveBytes = result.archiveBytes;
     log(`  parsed ${allRows.length} CSV rows (after empty-value filter)`);
@@ -855,7 +866,7 @@ export async function syncFaoFaostat(
     );
   }
 
-  await markSourcesSynced("fao_faostat", {
+  await (options.markSynced ?? markSourcesSynced)("fao_faostat", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -874,7 +885,7 @@ export async function syncFaoFaostat(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose
