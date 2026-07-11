@@ -14,6 +14,7 @@ import {
 } from "../src/lib/ci/source-utils";
 
 const db = createDb();
+const DRY_RUN = process.argv.includes("--dry-run");
 
 async function main() {
   const datasetYear = Number(
@@ -39,7 +40,7 @@ async function main() {
     parsed.ingestion,
     "freedom_house.freedom_rights",
   );
-  const { ingested, skipped } = await runIngestion(db, result);
+  const { ingested, skipped } = await runIngestion(db, result, { dryRun: DRY_RUN });
   console.log(
     `Done: ${ingested} countries ingested, ${skipped} skipped (no jurisdiction match)`,
   );

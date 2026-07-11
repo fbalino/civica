@@ -318,3 +318,16 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - The read-only reconciliation verifier retains its 24-case suite. All 25
   scheduled factbook jobs are now covered; 551/551 full tests and the
   production build pass. DAT-012 remains open for ten manual pipelines.
+
+## 2026-07-10 — DAT-012 completed across all production pipelines
+
+- Closed the ten manual Atlas/Index/Conditions families. All 23 underlying
+  scripts expose explicit dry-run, and shared validated writers now own CIA
+  seed, constitution, election, legislature-composition, V-Party/history,
+  taxonomy, metric, Index, and Conditions persistence.
+- Twenty-nine manual checks prove applied reruns converge, dry runs write
+  nothing, and malformed/empty/duplicate fixtures fail before freshness. This
+  completes all 45 registered pipelines (35 scheduled + 10 manual).
+- Final acceptance: 580/580 tests, TypeScript, targeted ESLint, freshness,
+  production-adapter, source-input, raw-retention, derivation-version,
+  claims/docs, and production build pass. DAT-012 is complete; DAT-013 is next.

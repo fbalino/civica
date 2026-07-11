@@ -40,10 +40,11 @@ config({ path: ".env.local" });
 
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { and, eq, ilike, sql } from "drizzle-orm";
-import { jurisdictions, elections, statements } from "../src/lib/db/schema";
+import { sql } from "drizzle-orm";
+import { jurisdictions } from "../src/lib/db/schema";
 import { sparqlQuery, extractQid } from "../src/lib/data/wikidata";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeElection } from "../src/lib/elections/writer";
 
 const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
@@ -313,101 +314,15 @@ async function main() {
       continue;
     }
 
-    // Idempotent match: prefer the Wikidata QID (stable per election entity);
-    // fall back to (jurisdiction, date, type) so a QID-less legacy hand-seeded
-    // row for the same election is superseded rather than duplicated.
-    const existingByQid = await db
-      .select({ id: elections.id })
-      .from(elections)
-      .where(eq(elections.wikidataQid, r.qid))
-      .limit(1);
-    let match = existingByQid[0]?.id ?? null;
-    if (!match) {
-      const existingByNatural = await db
-        .select({ id: elections.id })
-        .from(elections)
-        .where(
-          and(
-            eq(elections.jurisdictionId, r.jurisdictionId),
-            eq(elections.electionDate, r.date),
-            ilike(elections.electionType, r.type)
-          )
-        )
-        .limit(1);
-      match = existingByNatural[0]?.id ?? null;
-    }
-
-    let electionRowId: string;
-    if (match) {
-      electionRowId = match;
-      await db
-        .update(elections)
-        .set({
-          electionType: r.type,
-          electionName,
-          wikidataQid: r.qid,
-          dateConfidence: "confirmed",
-        })
-        .where(eq(elections.id, electionRowId));
-      updated++;
-    } else {
-      const ins = await db
-        .insert(elections)
-        .values({
-          jurisdictionId: r.jurisdictionId,
-          electionDate: r.date,
-          electionType: r.type,
-          electionName,
-          wikidataQid: r.qid,
-          dateConfidence: "confirmed",
-        })
-        .returning({ id: elections.id });
-      electionRowId = ins[0].id;
-      inserted++;
-    }
-
-    // Provenance statement (per-field, CC0).
-    const existingStmt = await db
-      .select({ id: statements.id })
-      .from(statements)
-      .where(
-        and(
-          eq(statements.subjectTable, "elections"),
-          eq(statements.subjectId, electionRowId),
-          eq(statements.predicate, "wikidata_election_date")
-        )
-      )
-      .limit(1);
     const stmtValue = JSON.stringify({
       wikidata_qid: r.qid,
       election_date: r.date,
       election_type: r.type,
       date_precision: r.precision,
     });
-    if (existingStmt.length > 0) {
-      await db
-        .update(statements)
-        .set({
-          objectValue: stmtValue,
-          sourceId: SOURCE_ID,
-          sourceUrl,
-          sourceLicense: SOURCE_LICENSE,
-          retrievedAt: RETRIEVED_AT,
-        })
-        .where(eq(statements.id, existingStmt[0].id));
-    } else {
-      await db.insert(statements).values({
-        subjectTable: "elections",
-        subjectId: electionRowId,
-        predicate: "wikidata_election_date",
-        objectValue: stmtValue,
-        sourceId: SOURCE_ID,
-        sourceUrl,
-        sourceLicense: SOURCE_LICENSE,
-        retrievedAt: RETRIEVED_AT,
-        confidence: 1.0,
-      });
-    }
+    const outcome = await writeElection(db as never, { election: { jurisdictionId: r.jurisdictionId, electionDate: r.date, electionType: r.type, electionName, wikidataQid: r.qid, dateConfidence: "confirmed" }, provenance: { predicate: "wikidata_election_date", objectValue: stmtValue, sourceId: SOURCE_ID, sourceUrl, sourceLicense: SOURCE_LICENSE } });
+    inserted += outcome.inserted;
+    updated += outcome.updated;
   }
 
   const rowsWritten = inserted + updated;

@@ -6,16 +6,15 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { eq, sql } from "drizzle-orm";
 import {
   governmentBodies,
-  legislatureParties,
-  statements,
 } from "../src/lib/db/schema";
 import { sparqlQuery, extractQid } from "../src/lib/data/wikidata";
+import { writeLegislatureComposition, type PartyCompositionRow } from "../src/lib/legislatures/composition-writer";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const neonSql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: neonSql });
 
-const RETRIEVED_AT = new Date();
+const DRY_RUN = process.argv.includes("--dry-run");
 
 // Query Wikidata for party seat composition of a specific legislature
 // Uses P4100 (legislative body) membership on parliamentary group items
@@ -161,6 +160,7 @@ SELECT ?state ?stateLabel ?leg ?legLabel WHERE {
         continue;
       }
 
+      const proposed: PartyCompositionRow[] = [];
       for (const b of bindings) {
         const partyName = b.partyLabel?.value ?? extractQid(b.party.value);
         const seats = parseInt(b.seats?.value ?? "0", 10);
@@ -168,27 +168,9 @@ SELECT ?state ?stateLabel ?leg ?legLabel WHERE {
 
         if (seats <= 0 || /^Q\d+$/.test(partyName)) continue;
 
-        await db.insert(legislatureParties).values({
-          bodyId: body.id,
-          partyName,
-          partyColor: color,
-          seatCount: seats,
-        });
+        proposed.push({ partyName, partyColor: color, seatCount: seats });
       }
-
-      await db.insert(statements).values({
-        subjectTable: "legislature_parties",
-        subjectId: body.id,
-        predicate: "seats_per_parties",
-        objectValue: JSON.stringify(bindings.map((b) => ({
-          party: b.partyLabel?.value,
-          seats: b.seats?.value,
-        }))),
-        sourceId: "wikidata",
-        sourceUrl: `https://www.wikidata.org/wiki/${body.wikidata_qid}`,
-        sourceLicense: "CC0",
-        retrievedAt: RETRIEVED_AT,
-      });
+      await writeLegislatureComposition(db as never, { bodyId: body.id, parties: proposed, sourceId: "wikidata", sourceUrl: `https://www.wikidata.org/wiki/${body.wikidata_qid}`, sourceLicense: "CC0", rawPayload: bindings.map((b) => ({ party: b.partyLabel?.value, seats: b.seats?.value })) }, { dryRun: DRY_RUN, stampFreshness: false });
 
       synced++;
       console.log(`    Added ${bindings.length} parties`);
@@ -204,14 +186,11 @@ SELECT ?state ?stateLabel ?leg ?legLabel WHERE {
   console.log(`  Synced: ${synced}`);
   console.log(`  Failed/skipped: ${failed}`);
 
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually synced rows (AGENTS.md provenance invariant). The
-  // helper applies the same `synced > 0` gate internally. `at: RETRIEVED_AT`
-  // keeps the stamp aligned with the provenance statements written above.
   await markSourcesSynced("wikidata", {
-    rowsWritten: synced,
-    at: RETRIEVED_AT,
+    rowsWritten: failed === 0 ? synced : 0,
+    dryRun: DRY_RUN,
   });
+
 }
 
 main().catch((err) => {

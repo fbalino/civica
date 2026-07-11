@@ -7,9 +7,8 @@ import { eq, sql, and } from "drizzle-orm";
 import {
   jurisdictions,
   governmentBodies,
-  legislatureParties,
-  statements,
 } from "../src/lib/db/schema";
+import { writeLegislatureComposition, type PartyCompositionRow } from "../src/lib/legislatures/composition-writer";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
 
 const neonSql = neon(process.env.DATABASE_URL!);
@@ -18,7 +17,7 @@ const db = drizzle({ client: neonSql });
 const IPU_BASE = "https://api.data.ipu.org/v1";
 const PAGE_SIZE = 50;
 const SOURCE_ID = "ipu_parline";
-const RETRIEVED_AT = new Date();
+const DRY_RUN = process.argv.includes("--dry-run");
 
 interface IpuValue<T> {
   value: T;
@@ -68,8 +67,6 @@ interface IpuParty {
   party_name: { en: string; fr: string };
   political_party_country: string;
 }
-
-const COUNTRY_CODE_TO_ISO2: Record<string, string> = {};
 
 async function ipuFetch<T>(path: string): Promise<T> {
   const url = `${IPU_BASE}${path}`;
@@ -307,10 +304,7 @@ async function main() {
       const partyResults = extractLatestValue(spp);
 
       if (partyResults && partyResults.length > 0) {
-        // Clear existing parties for this body
-        await db
-          .delete(legislatureParties)
-          .where(eq(legislatureParties.bodyId, bodyId));
+        const proposed: PartyCompositionRow[] = [];
 
         for (const result of partyResults) {
           const partyCode = result.party;
@@ -324,26 +318,12 @@ async function main() {
 
           if (seats <= 0) continue;
 
-          await db.insert(legislatureParties).values({
-            bodyId,
-            partyName,
-            seatCount: seats,
-          });
-          partiesInserted++;
+          proposed.push({ partyName, seatCount: seats });
         }
-
-        // Add provenance statement
-        await db.insert(statements).values({
-          subjectTable: "legislature_parties",
-          subjectId: bodyId,
-          predicate: "seats_per_parties",
-          objectValue: JSON.stringify(partyResults),
-          sourceId: SOURCE_ID,
-          sourceUrl: `${IPU_BASE}/elections/${electionId}`,
-          sourceLicense: "CC-BY-NC-SA-4.0",
-          retrievedAt: RETRIEVED_AT,
-          confidence: 1.0,
-        });
+        if (proposed.length > 0) {
+          await writeLegislatureComposition(db as never, { bodyId, parties: proposed, sourceId: SOURCE_ID, sourceUrl: `${IPU_BASE}/elections/${electionId}`, sourceLicense: "CC-BY-NC-SA-4.0", rawPayload: partyResults }, { dryRun: DRY_RUN, stampFreshness: false });
+          partiesInserted += proposed.length;
+        }
       }
     } catch {
       electionsFailed++;
@@ -358,14 +338,9 @@ async function main() {
     await sleep(200);
   }
 
-  // Stamp source freshness via the single sanctioned helper — only when
-  // this run actually processed chambers (AGENTS.md provenance invariant).
-  // Was previously an unconditional stamp that faked freshness on an
-  // empty/failed run. `at: RETRIEVED_AT` keeps the stamp aligned with the
-  // provenance statements written during this run.
   await markSourcesSynced(SOURCE_ID, {
-    rowsWritten: chambersProcessed,
-    at: RETRIEVED_AT,
+    rowsWritten: electionsFailed === 0 ? partiesInserted : 0,
+    dryRun: DRY_RUN,
   });
 
   console.log(`\n=== IPU Parline Sync Complete ===`);

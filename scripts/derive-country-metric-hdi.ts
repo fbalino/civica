@@ -14,7 +14,8 @@ config({ path: ".env.local" });
 import { sql } from "drizzle-orm";
 
 import { db } from "../src/lib/db";
-import { countryMetrics } from "../src/lib/db/schema";
+import { writeCountryMetrics, type CountryMetricInput } from "../src/lib/metrics/ingest";
+const DRY_RUN = process.argv.includes("--dry-run");
 
 interface HdiRow {
   jurisdiction_id: string;
@@ -72,11 +73,10 @@ async function main(): Promise<void> {
   }
   const ranks = competitionRanks(rows);
   let written = 0;
+  const output: CountryMetricInput[] = [];
   for (const row of rows) {
     if (!row.year || !Number.isFinite(Number(row.value))) continue;
-    await db
-      .insert(countryMetrics)
-      .values({
+    output.push({
         jurisdictionId: row.jurisdiction_id,
         metricId: "hdi",
         year: row.year,
@@ -85,25 +85,11 @@ async function main(): Promise<void> {
         totalRanked: rows.length,
         sourceId: "undp_hdi",
         sourceUrl: row.source_url,
-      })
-      .onConflictDoUpdate({
-        target: [
-          countryMetrics.jurisdictionId,
-          countryMetrics.metricId,
-          countryMetrics.year,
-        ],
-        set: {
-          value: Number(row.value),
-          rank: ranks.get(row.jurisdiction_id),
-          totalRanked: rows.length,
-          sourceId: "undp_hdi",
-          sourceUrl: row.source_url,
-          updatedAt: new Date(),
-        },
       });
     written += 1;
   }
-  console.log(`Derived ${written} HDI country-metric rows from canonical facts.`);
+  await writeCountryMetrics(db, output, { dryRun: DRY_RUN, stampFreshness: false });
+  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Derived"} ${written} HDI country-metric rows from canonical facts.`);
 }
 
 main().catch((error) => {

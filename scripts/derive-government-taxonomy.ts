@@ -9,6 +9,8 @@ import {
   deriveStructuralTaxonomy,
 } from "../src/lib/government-taxonomy";
 import { governmentTaxonomyVersionEnvelope } from "../src/lib/government-taxonomy/versioning";
+import { writeGovernmentTaxonomies, type GovernmentTaxonomyInput } from "../src/lib/government-taxonomy/writer";
+const DRY_RUN = process.argv.includes("--dry-run");
 
 async function main() {
   const syncTime = new Date();
@@ -38,6 +40,7 @@ async function main() {
   const existingByJurisdictionId = new Map(
     existingRows.map((row) => [row.jurisdictionId, row]),
   );
+  const output: GovernmentTaxonomyInput[] = [];
 
   for (const jurisdiction of jurisdictionRows) {
     const existing = existingByJurisdictionId.get(jurisdiction.id);
@@ -48,9 +51,7 @@ async function main() {
       governmentTypeDetail: jurisdiction.governmentTypeDetail,
     });
 
-    await db
-      .insert(governmentTaxonomies)
-      .values({
+    output.push({
         jurisdictionId: jurisdiction.id,
         taxonomyVersion: DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
         derivationVersionKey: versions.key,
@@ -70,30 +71,10 @@ async function main() {
           structural: structural.provenance,
         },
         updatedAt: syncTime,
-      })
-      .onConflictDoUpdate({
-        target: [
-          governmentTaxonomies.jurisdictionId,
-          governmentTaxonomies.taxonomyVersion,
-        ],
-        set: {
-          structuralFamily: structural.structuralFamily,
-          structuralSubtype: structural.structuralSubtype,
-          isFederal: structural.isFederal,
-          isMonarchy: structural.isMonarchy,
-          executiveStructure: structural.executiveStructure,
-          governmentDependency: structural.governmentDependency,
-          overrideNote: structural.overrideNote,
-          provenance: {
-            ...(existing?.provenance ?? {}),
-            structural: structural.provenance,
-          },
-          derivationVersionKey: versions.key,
-          derivationVersions: versions.envelope,
-          updatedAt: syncTime,
-        },
       });
   }
+
+  await writeGovernmentTaxonomies(db, output, { dryRun: DRY_RUN });
 
   console.log(
     `Derived structural taxonomy for ${jurisdictionRows.length} sovereign-state jurisdictions.`,

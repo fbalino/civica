@@ -14,14 +14,15 @@ import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
 import { db } from "../src/lib/db";
-import { civicaConditionsScores, ciDimensionScores } from "../src/lib/db/schema";
+import { ciDimensionScores } from "../src/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeConditionScores, type ConditionScoreInput } from "../src/lib/conditions/ingest";
 
 const METHODOLOGY_VERSION = "beta";
 const SOURCE_ID = "undp_hdi";
 const CI_DIMENSION = "human_development";
 const CONDITIONS_DIMENSION = "human_development";
+const DRY_RUN = process.argv.includes("--dry-run");
 
 async function main() {
   console.log("=== Civica Conditions — Human Development (HDI) ===\n");
@@ -40,6 +41,7 @@ async function main() {
   console.log(`Found ${ciRows.length} HDI rows in ci_dimension_scores.`);
 
   let inserted = 0;
+  const output: ConditionScoreInput[] = [];
 
   for (const row of ciRows) {
     // spec §2.3 fixed bound: HDI is 0–1, so score × 100 = normalized score
@@ -51,9 +53,7 @@ async function main() {
     const quarter = row.quarter;
     const datasetYear = parseInt(quarter.split("-")[0], 10);
 
-    await db
-      .insert(civicaConditionsScores)
-      .values({
+    output.push({
         jurisdictionId: row.jurisdictionId,
         dimension: CONDITIONS_DIMENSION,
         quarter,
@@ -62,19 +62,6 @@ async function main() {
         sourceId: SOURCE_ID,
         datasetYear,
         methodologyVersion: METHODOLOGY_VERSION,
-      })
-      .onConflictDoUpdate({
-        target: [
-          civicaConditionsScores.jurisdictionId,
-          civicaConditionsScores.dimension,
-          civicaConditionsScores.quarter,
-          civicaConditionsScores.methodologyVersion,
-        ],
-        set: {
-          normalizedScore,
-          rawValue,
-          datasetYear,
-        },
       });
 
     inserted++;
@@ -83,9 +70,9 @@ async function main() {
   // Stamp source freshness via the single sanctioned helper — only when
   // this run actually upserted rows (AGENTS.md provenance invariant). The
   // helper applies the same `inserted > 0` gate internally.
-  await markSourcesSynced(SOURCE_ID, { rowsWritten: inserted });
+  await writeConditionScores(db, output, { dryRun: DRY_RUN });
 
-  console.log(`Done: ${inserted} rows upserted into civica_conditions_scores.`);
+  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${inserted} rows ${DRY_RUN ? "with zero writes" : "upserted into civica_conditions_scores"}.`);
   console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);
 }
 

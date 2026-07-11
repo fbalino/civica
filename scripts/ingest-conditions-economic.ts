@@ -20,13 +20,14 @@ import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
 import { db } from "../src/lib/db";
-import { civicaConditionsScores, jurisdictions } from "../src/lib/db/schema";
+import { jurisdictions } from "../src/lib/db/schema";
 import { isNotNull } from "drizzle-orm";
-import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeConditionScores, type ConditionScoreInput } from "../src/lib/conditions/ingest";
 
 const METHODOLOGY_VERSION = "beta";
 const SOURCE_ID = "worldbank_economic";
 const CONDITIONS_DIMENSION = "economic_stability";
+const DRY_RUN = process.argv.includes("--dry-run");
 
 const WB_BASE = "https://api.worldbank.org/v2";
 const DATE_RANGE = "2020:2024";
@@ -200,6 +201,7 @@ async function main() {
 
   // --- Compute composite z-score and map to 0–100 ---
   let upserted = 0;
+  const output: ConditionScoreInput[] = [];
 
   for (const obs of observations) {
     const zComponents: number[] = [];
@@ -236,9 +238,7 @@ async function main() {
     // Raw value: store composite z-score as the "raw" for transparency
     const rawValue = Math.round(compositeZ * 1000) / 1000;
 
-    await db
-      .insert(civicaConditionsScores)
-      .values({
+    output.push({
         jurisdictionId: obs.jurisdictionId,
         dimension: CONDITIONS_DIMENSION,
         quarter,
@@ -247,19 +247,6 @@ async function main() {
         sourceId: SOURCE_ID,
         datasetYear: obs.datasetYear,
         methodologyVersion: METHODOLOGY_VERSION,
-      })
-      .onConflictDoUpdate({
-        target: [
-          civicaConditionsScores.jurisdictionId,
-          civicaConditionsScores.dimension,
-          civicaConditionsScores.quarter,
-          civicaConditionsScores.methodologyVersion,
-        ],
-        set: {
-          normalizedScore,
-          rawValue,
-          datasetYear: obs.datasetYear,
-        },
       });
 
     upserted++;
@@ -268,9 +255,9 @@ async function main() {
   // Stamp source freshness via the single sanctioned helper — only when
   // this run actually upserted rows (AGENTS.md provenance invariant). The
   // helper applies the same `upserted > 0` gate internally.
-  await markSourcesSynced(SOURCE_ID, { rowsWritten: upserted });
+  await writeConditionScores(db, output, { dryRun: DRY_RUN });
 
-  console.log(`\nDone: ${upserted} rows upserted into civica_conditions_scores.`);
+  console.log(`\n${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${upserted} rows ${DRY_RUN ? "with zero writes" : "upserted into civica_conditions_scores"}.`);
   console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);
   console.log(`Skipped entirely (< 2 indicators): ${fetchErrors}`);
 }

@@ -19,6 +19,7 @@ import { fetchBuffer } from "../src/lib/ci/source-utils";
 import { ciDimensionScores, jurisdictions } from "../src/lib/db/schema";
 
 const db = createDb();
+const DRY_RUN = process.argv.includes("--dry-run");
 
 async function main() {
   const datasetYear = Number(
@@ -59,7 +60,7 @@ async function main() {
     console.log("No WGI fallback rows needed.");
     return;
   }
-  const { ingested, skipped } = await runIngestion(db, result);
+  const { ingested, skipped } = await runIngestion(db, result, { dryRun: DRY_RUN });
   console.log(
     `Done: ${ingested} fallback countries ingested, ${skipped} skipped (no jurisdiction match)`,
   );

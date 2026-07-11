@@ -4,7 +4,7 @@ config({ path: ".env.local" });
 import { eq, sql } from "drizzle-orm";
 import { db } from "../src/lib/db";
 import { governmentTaxonomies, jurisdictions, sources } from "../src/lib/db/schema";
-import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeGovernmentTaxonomies, type GovernmentTaxonomyInput } from "../src/lib/government-taxonomy/writer";
 import {
   BJORNKSKOV_RODE_DATASET_VERSION,
   BJORNKSKOV_RODE_SOURCE_ID,
@@ -15,6 +15,7 @@ import { governmentTaxonomyVersionEnvelope } from "../src/lib/government-taxonom
 
 const QOG_CS_CSV_URL = "https://www.qogdata.pol.gu.se/data/qog_std_cs_jan26.csv";
 const QOG_LATEST_REGIME_YEAR = 2025;
+const DRY_RUN = process.argv.includes("--dry-run");
 
 type BjornskovRodeCsvRow = {
   iso3: string;
@@ -153,7 +154,7 @@ async function main() {
     `Fetched ${latestByIso3.size} latest country rows from the QoG Jan26 cross-section.`,
   );
 
-  await ensureSource();
+  if (!DRY_RUN) await ensureSource();
 
   const jurisdictionRows = await db
     .select({
@@ -191,6 +192,7 @@ async function main() {
   let matched = 0;
   let skipped = 0;
   const versions = governmentTaxonomyVersionEnvelope();
+  const output: GovernmentTaxonomyInput[] = [];
 
   for (const latest of latestByIso3.values()) {
     const jurisdiction = jurisdictionByIso3.get(latest.iso3);
@@ -213,9 +215,7 @@ async function main() {
       brCom: latest.brCom,
     });
 
-    await db
-      .insert(governmentTaxonomies)
-      .values({
+    output.push({
         jurisdictionId: jurisdiction.id,
         taxonomyVersion: DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
         derivationVersionKey: versions.key,
@@ -235,24 +235,6 @@ async function main() {
           regime: derived.provenance,
         },
         updatedAt: syncTime,
-      })
-      .onConflictDoUpdate({
-        target: [
-          governmentTaxonomies.jurisdictionId,
-          governmentTaxonomies.taxonomyVersion,
-        ],
-        set: {
-          regimeTypeCgv: derived.regimeTypeCgv,
-          regimeDatasetVersion: derived.regimeDatasetVersion,
-          regimeYear: derived.regimeYear,
-          provenance: {
-            ...(existing?.provenance ?? {}),
-            regime: derived.provenance,
-          },
-          derivationVersionKey: versions.key,
-          derivationVersions: versions.envelope,
-          updatedAt: syncTime,
-        },
       });
 
     matched += 1;
@@ -268,10 +250,7 @@ async function main() {
   // invariant). Previously ensureSource() stamped last_sync_at
   // unconditionally before any data was written. `at: syncTime` aligns the
   // stamp with the row `updatedAt` values written in the loop above.
-  await markSourcesSynced(BJORNKSKOV_RODE_SOURCE_ID, {
-    rowsWritten: matched,
-    at: syncTime,
-  });
+  await writeGovernmentTaxonomies(db, output, { dryRun: DRY_RUN, sourceId: BJORNKSKOV_RODE_SOURCE_ID });
 }
 
 main().catch((error) => {

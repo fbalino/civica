@@ -340,6 +340,7 @@ export const MANUAL_PRODUCTION_ADAPTERS: readonly ProductionAdapterEntrypoint[] 
         "scripts/ingest-government-taxonomy-br.ts",
         "scripts/derive-government-taxonomy.ts",
         "src/lib/government-taxonomy/index.ts",
+        "src/lib/government-taxonomy/writer.ts",
       ],
     },
     {

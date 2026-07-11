@@ -66,8 +66,7 @@ import { join } from "node:path";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 
-import { partyPositions } from "../src/lib/db/schema";
-import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writePartyPositions, type PartyPositionInput } from "../src/lib/research/manual-writers";
 
 const SOURCE_ID = "vparty";
 const CSV_PATH = join(process.cwd(), "scripts", "data", "vparty-positions-v2.csv");
@@ -599,18 +598,10 @@ async function main() {
     `  Non-competitive → review   : ${nonCompetitive} (one-party / non-electoral legislatures)`,
   );
 
-  if (DRY_RUN) {
-    console.log("\nDry run — no rows written. Re-run with --apply to persist.");
-    return;
-  }
-
-  // ── Write party_positions (upsert on legislature_party_id) ─────────────────
-  let written = 0;
+  const output: PartyPositionInput[] = [];
   for (const { party, match, confidence } of landed) {
     const v = match.vparty;
-    await db
-      .insert(partyPositions)
-      .values({
+    output.push({
         legislaturePartyId: party.id,
         sourceId: SOURCE_ID,
         vpartyId: v.vpartyId,
@@ -622,37 +613,19 @@ async function main() {
         codedYear: v.year,
         matchMethod: match.method,
         matchConfidence: confidence,
-      })
-      .onConflictDoUpdate({
-        target: partyPositions.legislaturePartyId,
-        set: {
-          sourceId: SOURCE_ID,
-          vpartyId: v.vpartyId,
-          vpartyNameEn: v.nameEn || null,
-          economicLeftRight: v.econLR,
-          economicLrOrd: v.econLROrd,
-          antiPluralism: v.antiPlural,
-          populism: v.populism,
-          codedYear: v.year,
-          matchMethod: match.method,
-          matchConfidence: confidence,
-        },
       });
-    written += 1;
   }
+  const write = await writePartyPositions(db as never, output, { dryRun: DRY_RUN });
+  const written = write.written;
 
   console.log(`\nWrote ${written} party_positions rows.`);
 
   // Freshness stamped ONLY when rows were actually written (the helper applies
   // the same `rowsWritten > 0` gate internally). Never on a dry run.
-  const stamped = await markSourcesSynced(SOURCE_ID, { rowsWritten: written });
-  console.log(
-    stamped.length > 0
-      ? `Stamped sources.last_sync_at for: ${stamped.join(", ")}`
-      : "No freshness stamp (nothing written).",
-  );
+  if (DRY_RUN) console.log("Dry run — no rows written. Re-run with --apply to persist.");
 
   // Sanity: total rows now present.
+  if (DRY_RUN) return;
   const [{ n }] = (await neonSql`SELECT count(*)::int AS n FROM party_positions`) as Array<{
     n: number;
   }>;

@@ -112,3 +112,31 @@ derived.
 Across this wave, 18 new focused checks pass. The full unit suite is 551/551,
 the freshness/type/lint gates pass, and the production build passes. DAT-012
 remains open for the ten manual Atlas/Index/Conditions entrypoints.
+
+## Manual Atlas, Index, and Conditions completion
+
+All 23 scripts behind the ten manual production entrypoints now expose an
+explicit `--dry-run` path. Shared, validated writers own canonical writes for
+CIA atlas seed data, constitutions, elections/results/provenance, legislature
+composition, V-Party positions, indicator history, government taxonomy,
+country metrics, current-beta Index dimensions, and Conditions.
+
+The manual acceptance suite contains 29 focused checks. Applied fixtures run
+twice and converge without duplicate facts, sections, statements, elections,
+results, party compositions, positions, history observations, taxonomy rows,
+metrics, Index ingestion/score rows, or Conditions rows. Dry-run fixtures are
+stable and write nothing. Empty, duplicate, malformed, and upstream-changed
+fixtures fail before writes or freshness.
+
+The hardening changed the frozen Index adapter hash, so the sanctioned
+generators refreshed its source-input and raw-retention manifests; both drift
+validators pass with the original four immutable input captures unchanged.
+
+## Final acceptance
+
+DAT-012 is complete across all 45 registered production pipelines: 35
+scheduled jobs and ten manual Atlas/Index/Conditions entrypoints. At least 131
+focused repeatability checks cover the family-specific contracts. The final
+unit suite passes 580/580; TypeScript, targeted ESLint, production-adapter,
+source-input, raw-retention, derivation-version, freshness, claims/docs, and
+the full production build all pass.

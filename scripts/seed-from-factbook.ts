@@ -2,26 +2,25 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { execSync } from "child_process";
-import { readdirSync, readFileSync, existsSync, mkdirSync } from "fs";
+import { readdirSync, readFileSync, existsSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq } from "drizzle-orm";
 import {
   jurisdictions,
-  countryFactbookSections,
-  countryFacts,
-  statements,
 } from "../src/lib/db/schema";
 import { classifyJurisdictionStatus } from "../src/lib/jurisdictions/status-taxonomy";
 import countryGalleries from "../src/lib/data/country-galleries.generated.json";
+import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeAtlasCountry, type AtlasSectionInput } from "../src/lib/factbook/atlas-seed-writer";
 
 const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: sql });
 
 const REPO_URL = "https://github.com/factbook/factbook.json.git";
 const DATA_DIR = "/tmp/factbook-json";
-const RETRIEVED_AT = new Date("2026-01-23");
+const DRY_RUN = process.argv.includes("--dry-run");
 
 const FACTBOOK_SLUG_ISO3_OVERRIDES: Record<string, string> = {
   burma: "MMR",
@@ -584,34 +583,8 @@ async function processCountryFile(
         : existing[0]?.iso3 ?? null,
   };
 
-  let jurisdictionId: string;
-
-  if (existing.length > 0) {
-    jurisdictionId = existing[0].id;
-    await db
-      .update(jurisdictions)
-      .set({
-        ...profile,
-        continent,
-        ...statusFields,
-        updatedAt: new Date(),
-      })
-      .where(eq(jurisdictions.id, jurisdictionId));
-  } else {
-    const inserted = await db
-      .insert(jurisdictions)
-      .values({
-        slug,
-        ...profile,
-        continent,
-        ...statusFields,
-      })
-      .returning({ id: jurisdictions.id });
-    jurisdictionId = inserted[0].id;
-  }
-
-  // Import all sections as JSONB
   const sectionKeys = Object.keys(data);
+  const sectionInputs: AtlasSectionInput[] = [];
   for (const sectionKey of sectionKeys) {
     const normalizedSection = normalizeKey(sectionKey);
     const sectionData = data[sectionKey];
@@ -619,75 +592,15 @@ async function processCountryFile(
 
     const displayOrder = SECTION_ORDER[normalizedSection] ?? 99;
 
-    await db
-      .insert(countryFactbookSections)
-      .values({
-        jurisdictionId,
-        sectionName: normalizedSection,
-        sectionData,
-        displayOrder,
-        importPhase: 1,
-      })
-      .onConflictDoUpdate({
-        target: [
-          countryFactbookSections.jurisdictionId,
-          countryFactbookSections.sectionName,
-        ],
-        set: {
-          sectionData,
-          displayOrder,
-          updatedAt: new Date(),
-        },
-      });
+    sectionInputs.push({ sectionName: normalizedSection, sectionData, displayOrder });
     stats.sections++;
   }
 
   // Extract queryable facts
   const facts = extractFacts(data);
-  for (const fact of facts) {
-    if (!fact.factValue) continue;
-
-    // Phase F: country_facts is now multi-source. CIA seed always
-    // uses source_id='cia_factbook' (the schema default); the
-    // conflict target now includes source_id.
-    await db
-      .insert(countryFacts)
-      .values({
-        jurisdictionId,
-        sourceId: "cia_factbook",
-        ...fact,
-      })
-      .onConflictDoUpdate({
-        target: [
-          countryFacts.jurisdictionId,
-          countryFacts.factKey,
-          countryFacts.sourceId,
-        ],
-        set: {
-          factValue: fact.factValue,
-          factValueNumeric: fact.factValueNumeric,
-          factUnit: fact.factUnit,
-          factYear: fact.factYear,
-          // Recompute on every re-sync so the CIA vintage correction
-          // survives (5 demographic keys → factYear-1; else null).
-          dataVintageYear: fact.dataVintageYear,
-          sourceNote: fact.sourceNote,
-          retrievedAt: new Date(),
-        },
-      });
-    stats.facts++;
-  }
-
-  // Provenance statement for the jurisdiction
-  await db.insert(statements).values({
-    subjectTable: "jurisdictions",
-    subjectId: jurisdictionId,
-    predicate: "factbook_import",
-    objectValue: `Imported from CIA World Factbook archive`,
-    sourceId: "cia_factbook",
-    sourceLicense: "public_domain",
-    retrievedAt: RETRIEVED_AT,
-  });
+  const validFacts = facts.filter((fact) => Boolean(fact.factValue));
+  stats.facts += validFacts.length;
+  await writeAtlasCountry(db as never, { existingId: existing[0]?.id ?? null, jurisdiction: { slug, ...profile, continent, ...statusFields }, sections: sectionInputs, facts: validFacts }, { dryRun: DRY_RUN });
 
   stats.countries++;
   console.log(
@@ -716,6 +629,8 @@ async function main() {
       await processCountryFile(join(regionDir, file), region, stats);
     }
   }
+
+  await markSourcesSynced("cia_factbook", { rowsWritten: stats.facts, dryRun: DRY_RUN });
 
   console.log("\n=== Import Complete ===");
   console.log(`Countries: ${stats.countries}`);

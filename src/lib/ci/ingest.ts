@@ -57,11 +57,33 @@ export async function runIngestion(
      * seed script ran. Defaults to NOW() when omitted.
      */
     vintageAt?: Date;
+    dryRun?: boolean;
+    markSynced?: typeof markSourcesSynced;
   },
 ): Promise<{ ingested: number; skipped: number }> {
   const iso3Map = await buildIso3Map(db);
   const methodologyVersion = await getLatestMethodologyVersion(db);
   const quarter = yearToQuarter(result.datasetYear);
+
+  if (result.records.length === 0) {
+    throw new Error(`${result.sourceId}/${result.dimension}: upstream produced zero records`);
+  }
+
+  if (opts?.dryRun) {
+    let ingested = 0;
+    let skipped = 0;
+    for (const record of result.records) {
+      if (!iso3Map.has(record.iso3.toUpperCase())) {
+        skipped++;
+        continue;
+      }
+      normalize(record.rawValue, result.globalMinObserved, result.globalMaxObserved, record.isInverted);
+      ciVersionEnvelope({ methodologyVersion, algorithmVersion: CI_INGEST_ALGORITHM_VERSION, sourceIds: [result.sourceId] });
+      ingested++;
+    }
+    await (opts.markSynced ?? markSourcesSynced)(result.sourceId, { rowsWritten: ingested, dryRun: true });
+    return { ingested, skipped };
+  }
 
   const [ingestion] = await db
     .insert(ciSourceIngestions)
@@ -154,8 +176,9 @@ export async function runIngestion(
   // sanctioned path and applies the stamp iff rowsWritten > 0.
   // Pass vintageAt when the data is a frozen snapshot so the stamp
   // reflects the data vintage rather than today's run date.
-  await markSourcesSynced(result.sourceId, {
+  await (opts?.markSynced ?? markSourcesSynced)(result.sourceId, {
     rowsWritten: ingested,
+    dryRun: opts?.dryRun,
     ...(opts?.vintageAt ? { at: opts.vintageAt } : {}),
   });
 

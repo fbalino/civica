@@ -11,6 +11,7 @@ import {
 import { fetchBuffer } from "../src/lib/ci/source-utils";
 
 const db = createDb();
+const DRY_RUN = process.argv.includes("--dry-run");
 
 async function main() {
   const datasetYear = Number(
@@ -24,7 +25,7 @@ async function main() {
     parseTransparencyCpi(await fetchBuffer(url), datasetYear),
     "transparency_intl.corruption_control",
   );
-  const { ingested, skipped } = await runIngestion(db, result);
+  const { ingested, skipped } = await runIngestion(db, result, { dryRun: DRY_RUN });
   console.log(
     `Done: ${ingested} countries ingested, ${skipped} skipped (no jurisdiction match)`,
   );

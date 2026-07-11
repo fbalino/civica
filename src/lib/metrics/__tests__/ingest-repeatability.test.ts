@@ -1,0 +1,8 @@
+import assert from "node:assert/strict"; import test from "node:test";
+import { writeCountryMetrics, type CountryMetricInput } from "../ingest";
+const fixture: CountryMetricInput = { jurisdictionId: "j1", metricId: "cpi", year: 2024, value: 75, rank: 12, totalRanked: 180, sourceId: "transparency_intl", sourceUrl: "https://example.invalid" };
+function harness(){const rows=new Map<string,Record<string,unknown>>();let writes=0;const db={insert:()=>({values:(v:Record<string,unknown>)=>({onConflictDoUpdate:async()=>{rows.set(`${v.jurisdictionId}:${v.metricId}:${v.year}`,structuredClone(v));writes++;}})})};return{db:db as never,rows,writes:()=>writes};}
+const mark=(async()=>[]) as never;
+test("country-metric fixtures converge",async()=>{const s=harness();await writeCountryMetrics(s.db,[fixture],{markSynced:mark});const first=structuredClone([...s.rows]);await writeCountryMetrics(s.db,[fixture],{markSynced:mark});assert.deepEqual([...s.rows],first);assert.equal(s.rows.size,1);});
+test("country-metric dry-run writes nothing",async()=>{const s=harness();assert.deepEqual(await writeCountryMetrics(s.db,[fixture],{dryRun:true,markSynced:mark}),await writeCountryMetrics(s.db,[fixture],{dryRun:true,markSynced:mark}));assert.equal(s.writes(),0);});
+test("country-metric malformed and duplicate batches fail before writes",async()=>{const s=harness();let stamps=0;const m=(async()=>{stamps++;return[];}) as never;await assert.rejects(writeCountryMetrics(s.db,[fixture,fixture],{markSynced:m}),/Duplicate/);await assert.rejects(writeCountryMetrics(s.db,[{...fixture,value:Number.NaN}],{markSynced:m}),/Invalid/);assert.equal(s.writes(),0);assert.equal(stamps,0);});

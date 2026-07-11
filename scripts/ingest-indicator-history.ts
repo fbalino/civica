@@ -2,11 +2,9 @@ import { config } from "dotenv";
 config({ path: ".env.local" });
 
 import { createDb, buildIso3Map } from "../src/lib/ci/ingest";
-import { indicatorHistory } from "../src/lib/db/schema";
-import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeIndicatorHistory, type IndicatorHistoryInput } from "../src/lib/research/manual-writers";
 import { HISTORY_ADAPTERS } from "../src/lib/ci/history-adapters";
 import type { HistoryAdapter } from "../src/lib/ci/history-adapters";
-import { sql as dsql } from "drizzle-orm";
 
 /**
  * ingest-indicator-history — backfill the long-run `indicator_history`
@@ -29,8 +27,6 @@ const db = createDb();
 
 // Neon HTTP has a per-request size ceiling; keep batches modest. Each row is
 // ~10 small columns, so 1000 rows/insert is comfortably under the limit.
-const BATCH_SIZE = 1000;
-
 function parseArgs(argv: string[]): { dryRun: boolean; source: string | null } {
   let dryRun = false;
   let source: string | null = null;
@@ -88,7 +84,7 @@ async function runAdapter(
 
   // Build the row set, mapping ISO3 → jurisdiction id and dropping
   // unmatched codes (OWID/WB carry territories Civica does not track).
-  const rows: (typeof indicatorHistory.$inferInsert)[] = [];
+  const rows: IndicatorHistoryInput[] = [];
   const seenCountries = new Set<string>();
   for (const obs of result.observations) {
     const jurisdictionId = iso3Map.get(obs.iso3.toUpperCase());
@@ -122,41 +118,8 @@ async function runAdapter(
     return summary;
   }
 
-  if (dryRun) {
-    summary.written = 0;
-    return summary;
-  }
-
-  // Batched idempotent upsert.
-  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
-    const batch = rows.slice(i, i + BATCH_SIZE);
-    await db
-      .insert(indicatorHistory)
-      .values(batch)
-      .onConflictDoUpdate({
-        target: [
-          indicatorHistory.jurisdictionId,
-          indicatorHistory.indicator,
-          indicatorHistory.year,
-        ],
-        set: {
-          dimension: dsql`excluded.dimension`,
-          value: dsql`excluded.value`,
-          nativeMin: dsql`excluded.native_min`,
-          nativeMax: dsql`excluded.native_max`,
-          isInverted: dsql`excluded.is_inverted`,
-          sourceId: dsql`excluded.source_id`,
-          updatedAt: dsql`NOW()`,
-        },
-      });
-    summary.written += batch.length;
-  }
-
-  // Stamp freshness ONLY when this source wrote rows (the sanctioned path).
-  await markSourcesSynced(result.sourceId, {
-    rowsWritten: summary.written,
-    dryRun,
-  });
+  const write = await writeIndicatorHistory(db as never, rows, { dryRun });
+  summary.written = write.written;
 
   return summary;
 }

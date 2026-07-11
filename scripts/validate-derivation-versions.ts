@@ -18,6 +18,7 @@ const WRITERS = [
   "src/lib/factbook/reconcile/snapshot-vintage.ts",
   "scripts/derive-government-taxonomy.ts",
   "scripts/ingest-government-taxonomy-br.ts",
+  "src/lib/government-taxonomy/writer.ts",
   "src/lib/ci/ingest.ts",
   "src/lib/ci/calculate.ts",
   "src/lib/ci/calculate-v2.ts",

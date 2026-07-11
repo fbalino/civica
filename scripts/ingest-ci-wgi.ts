@@ -11,6 +11,7 @@ import {
 import { fetchBuffer } from "../src/lib/ci/source-utils";
 
 const db = createDb();
+const DRY_RUN = process.argv.includes("--dry-run");
 
 async function main() {
   const datasetYear = Number(
@@ -23,7 +24,7 @@ async function main() {
     parseWgiRuleOfLaw(await fetchBuffer(url), datasetYear),
     "worldbank_wgi.rule_of_law",
   );
-  const { ingested, skipped } = await runIngestion(db, result);
+  const { ingested, skipped } = await runIngestion(db, result, { dryRun: DRY_RUN });
   console.log(
     `Done: ${ingested} countries ingested, ${skipped} skipped (no jurisdiction match)`,
   );

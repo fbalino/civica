@@ -6,9 +6,8 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { sql as dsql } from "drizzle-orm";
 import {
   jurisdictions,
-  countryMetrics,
 } from "../src/lib/db/schema";
-import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeCountryMetrics, type CountryMetricInput } from "../src/lib/metrics/ingest";
 
 const sqlClient = neon(process.env.DATABASE_URL!);
 const db = drizzle({ client: sqlClient });
@@ -26,6 +25,7 @@ const BASE_URL = "https://api.worldbank.org/v2";
 const PER_PAGE = 500;
 const START_YEAR = 2015;
 const END_YEAR = 2024;
+const DRY_RUN = process.argv.includes("--dry-run");
 
 interface WBDataPoint {
   country: { id: string; value: string };
@@ -80,6 +80,7 @@ async function main() {
 
   let totalInserted = 0;
   let totalSkipped = 0;
+  const output: CountryMetricInput[] = [];
 
   for (const [wbCode, metricId] of Object.entries(WORLD_BANK_INDICATORS)) {
     console.log(`Fetching ${metricId} (${wbCode})...`);
@@ -101,26 +102,13 @@ async function main() {
       const year = parseInt(d.date, 10);
       if (isNaN(year) || d.value === null) continue;
 
-      await db
-        .insert(countryMetrics)
-        .values({
+      output.push({
           jurisdictionId,
           metricId,
           year,
           value: d.value,
           sourceId: SOURCE_ID,
           sourceUrl: `${BASE_URL}/country/${d.country.id}/indicator/${wbCode}`,
-        })
-        .onConflictDoUpdate({
-          target: [
-            countryMetrics.jurisdictionId,
-            countryMetrics.metricId,
-            countryMetrics.year,
-          ] as [typeof countryMetrics.jurisdictionId, typeof countryMetrics.metricId, typeof countryMetrics.year],
-          set: {
-            value: d.value,
-            updatedAt: new Date(),
-          },
         });
       inserted++;
     }
@@ -134,7 +122,7 @@ async function main() {
   // this run actually upserted rows (AGENTS.md provenance invariant). Was
   // previously an unconditional stamp that faked freshness on an
   // empty/failed run.
-  await markSourcesSynced(SOURCE_ID, { rowsWritten: totalInserted });
+  await writeCountryMetrics(db as never, output, { dryRun: DRY_RUN });
 
   console.log(`\nDone. Total inserted: ${totalInserted}, skipped: ${totalSkipped}`);
 }

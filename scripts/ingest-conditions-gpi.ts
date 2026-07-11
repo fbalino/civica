@@ -16,15 +16,16 @@ import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
 import { db } from "../src/lib/db";
-import { civicaConditionsScores, ciDimensionScores } from "../src/lib/db/schema";
+import { ciDimensionScores } from "../src/lib/db/schema";
 import { and, eq } from "drizzle-orm";
-import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeConditionScores, type ConditionScoreInput } from "../src/lib/conditions/ingest";
 
 const METHODOLOGY_VERSION = "beta";
 const SOURCE_ID = "global_peace_index";
 // GPI is stored under stability_security in the CI pipeline
 const CI_DIMENSION = "stability_security";
 const CONDITIONS_DIMENSION = "peace_security";
+const DRY_RUN = process.argv.includes("--dry-run");
 
 function normalizeGpi(raw: number): number {
   // GPI scale 1–5, inverted: 1.0 = most peaceful (best), 5.0 = least peaceful (worst)
@@ -55,6 +56,7 @@ async function main() {
   console.log(`Found ${ciRows.length} GPI rows in ci_dimension_scores.`);
 
   let upserted = 0;
+  const output: ConditionScoreInput[] = [];
 
   for (const row of ciRows) {
     const rawValue = row.rawValue ?? null;
@@ -67,9 +69,7 @@ async function main() {
     const quarter = row.quarter;
     const datasetYear = parseInt(quarter.split("-")[0], 10);
 
-    await db
-      .insert(civicaConditionsScores)
-      .values({
+    output.push({
         jurisdictionId: row.jurisdictionId,
         dimension: CONDITIONS_DIMENSION,
         quarter,
@@ -78,19 +78,6 @@ async function main() {
         sourceId: SOURCE_ID,
         datasetYear,
         methodologyVersion: METHODOLOGY_VERSION,
-      })
-      .onConflictDoUpdate({
-        target: [
-          civicaConditionsScores.jurisdictionId,
-          civicaConditionsScores.dimension,
-          civicaConditionsScores.quarter,
-          civicaConditionsScores.methodologyVersion,
-        ],
-        set: {
-          normalizedScore,
-          rawValue,
-          datasetYear,
-        },
       });
 
     upserted++;
@@ -99,9 +86,9 @@ async function main() {
   // Stamp source freshness via the single sanctioned helper — only when
   // this run actually upserted rows (AGENTS.md provenance invariant). The
   // helper applies the same `upserted > 0` gate internally.
-  await markSourcesSynced(SOURCE_ID, { rowsWritten: upserted });
+  await writeConditionScores(db, output, { dryRun: DRY_RUN });
 
-  console.log(`Done: ${upserted} rows upserted into civica_conditions_scores.`);
+  console.log(`${DRY_RUN ? "[DRY RUN] proposed" : "Done:"} ${upserted} rows ${DRY_RUN ? "with zero writes" : "upserted into civica_conditions_scores"}.`);
   console.log(`Dimension: ${CONDITIONS_DIMENSION} | Source: ${SOURCE_ID} | Version: ${METHODOLOGY_VERSION}`);
 }
 

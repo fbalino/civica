@@ -23,13 +23,15 @@ const ADAPTERS = [
 
 const SCRIPTS_DIR = path.dirname(fileURLToPath(import.meta.url));
 
+const DRY_RUN = process.argv.includes("--dry-run");
+
 function runAdapter(name: string, script: string): boolean {
   const scriptPath = path.join(SCRIPTS_DIR, script);
   console.log(`\n${"=".repeat(60)}`);
   console.log(`Adapter: ${name}`);
   console.log("=".repeat(60));
   try {
-    execFileSync("npx", ["tsx", scriptPath], { stdio: "inherit" });
+    execFileSync("npx", ["tsx", scriptPath, ...(DRY_RUN ? ["--dry-run"] : [])], { stdio: "inherit" });
     return true;
   } catch {
     console.error(`\n[FAILED] ${name}`);

@@ -55,15 +55,15 @@ config({ path: ".env.local" });
 
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
   jurisdictions,
   governmentBodies,
   elections,
-  electionResults,
   statements,
 } from "../src/lib/db/schema";
 import { markSourcesSynced } from "../src/lib/db/source-freshness";
+import { writeElection, type ElectionResultInput } from "../src/lib/elections/writer";
 import {
   IPU_SUBTYPE_LABEL,
   IPU_FAMILY_LABEL,
@@ -366,56 +366,8 @@ async function main() {
       continue;
     }
 
-    // Upsert the elections row, keyed idempotently on (jurisdiction, body, date).
-    const existing = await db
-      .select({ id: elections.id })
-      .from(elections)
-      .where(
-        and(
-          eq(elections.jurisdictionId, body.jurisdictionId),
-          eq(elections.bodyId, body.bodyId),
-          eq(elections.electionDate, electionDate)
-        )
-      )
-      .limit(1);
-
-    let electionRowId: string;
-    if (existing.length > 0) {
-      electionRowId = existing[0].id;
-      await db
-        .update(elections)
-        .set({
-          electionType: "legislative",
-          electionName,
-          electoralSystem: systemLabel,
-          dateConfidence: "confirmed",
-        })
-        .where(eq(elections.id, electionRowId));
-      electionsUpdated++;
-    } else {
-      const inserted = await db
-        .insert(elections)
-        .values({
-          jurisdictionId: body.jurisdictionId,
-          bodyId: body.bodyId,
-          electionDate,
-          electionType: "legislative",
-          electionName,
-          electoralSystem: systemLabel,
-          dateConfidence: "confirmed",
-        })
-        .returning({ id: elections.id });
-      electionRowId = inserted[0].id;
-      electionsInserted++;
-    }
-    electionsUpserted++;
-
-    // Replace this election's result rows deterministically from IPU seats.
+    const resultRows: ElectionResultInput[] = [];
     if (partyResults && partyResults.length > 0) {
-      await db
-        .delete(electionResults)
-        .where(eq(electionResults.electionId, electionRowId));
-
       const totalSeats = partyResults.reduce(
         (sum, r) => sum + seatsForParty(r),
         0
@@ -436,8 +388,7 @@ async function main() {
         if (seats <= 0) continue;
         const isWinner = !winnerAssigned && seats === maxSeats;
         if (isWinner) winnerAssigned = true;
-        await db.insert(electionResults).values({
-          electionId: electionRowId,
+        resultRows.push({
           partyName,
           seatsWon: seats,
           // Derive a seat-share % so the results bar renders (IPU has no vote %).
@@ -445,51 +396,18 @@ async function main() {
             totalSeats > 0 ? Math.round((seats / totalSeats) * 1000) / 10 : null,
           isWinner,
         });
-        resultsWritten++;
       }
     }
-
-    // Provenance: one statement per election (subjectTable "elections").
-    const existingStmt = await db
-      .select({ id: statements.id })
-      .from(statements)
-      .where(
-        and(
-          eq(statements.subjectTable, "elections"),
-          eq(statements.subjectId, electionRowId),
-          eq(statements.predicate, "ipu_last_election")
-        )
-      )
-      .limit(1);
     const stmtValue = JSON.stringify({
       election_date: electionDate,
       electoral_system: subsystem ?? family,
       seats_per_parties: partyResults ?? [],
     });
-    if (existingStmt.length > 0) {
-      await db
-        .update(statements)
-        .set({
-          objectValue: stmtValue,
-          sourceId: SOURCE_ID,
-          sourceUrl,
-          sourceLicense: SOURCE_LICENSE,
-          retrievedAt: RETRIEVED_AT,
-        })
-        .where(eq(statements.id, existingStmt[0].id));
-    } else {
-      await db.insert(statements).values({
-        subjectTable: "elections",
-        subjectId: electionRowId,
-        predicate: "ipu_last_election",
-        objectValue: stmtValue,
-        sourceId: SOURCE_ID,
-        sourceUrl,
-        sourceLicense: SOURCE_LICENSE,
-        retrievedAt: RETRIEVED_AT,
-        confidence: 1.0,
-      });
-    }
+    const outcome = await writeElection(db as never, { election: { jurisdictionId: body.jurisdictionId, bodyId: body.bodyId, electionDate, electionType: "legislative", electionName, electoralSystem: systemLabel, dateConfidence: "confirmed" }, results: resultRows, provenance: { predicate: "ipu_last_election", objectValue: stmtValue, sourceId: SOURCE_ID, sourceUrl, sourceLicense: SOURCE_LICENSE } });
+    electionsInserted += outcome.inserted;
+    electionsUpdated += outcome.updated;
+    electionsUpserted += outcome.written;
+    resultsWritten += outcome.resultsWritten;
 
     if (samples.length < 12) {
       samples.push(

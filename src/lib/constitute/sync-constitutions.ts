@@ -608,7 +608,7 @@ async function resolveCountry(
  * jurisdictionId — one constitution per country). Never duplicates rows.
  * Returns the constitution id.
  */
-async function upsertConstitution(
+export async function upsertConstitution(
   db: ConstituteSyncDb,
   jurisdictionId: string,
   values: {

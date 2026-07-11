@@ -1,8 +1,7 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
-import { markSourcesSynced } from "../src/lib/db/source-freshness";
-import { countryMetrics } from "../src/lib/db/schema";
+import { writeCountryMetrics, type CountryMetricInput } from "../src/lib/metrics/ingest";
 import { buildIso3Map, createDb } from "../src/lib/ci/ingest";
 import {
   CI_PRODUCTION_SOURCE_URLS,
@@ -14,6 +13,7 @@ import { fetchBuffer } from "../src/lib/ci/source-utils";
 const db = createDb();
 const SOURCE_ID = "transparency_intl";
 const METRIC_ID = "cpi";
+const DRY_RUN = process.argv.includes("--dry-run");
 
 function competitionRanks(
   rows: readonly { iso3: string; score: number }[],
@@ -49,10 +49,9 @@ async function main() {
   const ranks = competitionRanks(eligible);
 
   let written = 0;
+  const output: CountryMetricInput[] = [];
   for (const record of eligible) {
-    await db
-      .insert(countryMetrics)
-      .values({
+    output.push({
         jurisdictionId: iso3Map.get(record.iso3)!,
         metricId: METRIC_ID,
         year: datasetYear,
@@ -61,26 +60,11 @@ async function main() {
         totalRanked: eligible.length,
         sourceId: SOURCE_ID,
         sourceUrl: `https://www.transparency.org/en/cpi/${datasetYear}`,
-      })
-      .onConflictDoUpdate({
-        target: [
-          countryMetrics.jurisdictionId,
-          countryMetrics.metricId,
-          countryMetrics.year,
-        ],
-        set: {
-          value: record.score,
-          rank: ranks.get(record.iso3),
-          totalRanked: eligible.length,
-          sourceId: SOURCE_ID,
-          sourceUrl: `https://www.transparency.org/en/cpi/${datasetYear}`,
-          updatedAt: new Date(),
-        },
       });
     written += 1;
   }
 
-  await markSourcesSynced(SOURCE_ID, { rowsWritten: written });
+  await writeCountryMetrics(db as never, output, { dryRun: DRY_RUN });
   console.log(`Done. Inserted/updated: ${written}; source rows: ${result.records.length}`);
 }
 
