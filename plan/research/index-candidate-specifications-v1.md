@@ -2,7 +2,7 @@
 
 **Adopted:** 2026-07-11
 
-**Contract:** `civica-index-candidate-set/v2`
+**Contract:** `civica-index-candidate-set/v3`
 
 **Governing charter:** `civica-original-measurement-charter/v1`
 
@@ -25,7 +25,7 @@ K0 manufactures no Civica measurement. It shows established indicators on native
 
 ## K1 — Hardened Four-Input Composite
 
-K1 is the current Index's strongest fair tournament form, not the preferred outcome. It uses the four exact current inputs, including Freedom House's combined Political Rights and Civil Liberties ratings rather than the separate 0–100 total score, plus versioned transforms and aggregation, the existing explicit missingness rule, and source-specific uncertainty only when it can be retained and modeled with dependence. It must beat the single-source, equal-weight, factor, and dashboard baselines on a preregistered reader task. Failure of information novelty or meaningful utility retires it. A different input construct would be a new candidate.
+K1 is the current Index's strongest fair tournament form, not the preferred outcome. It uses the exact current source rules: V-Dem LDI is primary for Democratic Quality and WGI Voice & Accountability is used only when V-Dem is absent; Freedom House uses combined Political Rights and Civil Liberties ratings rather than the separate 0–100 total score. It retains versioned transforms and aggregation, the existing explicit missingness rule, and source-specific uncertainty only when it can be retained and modeled with dependence. It must beat the single-source, equal-weight, factor, and dashboard baselines on a preregistered reader task. Failure of information novelty or meaningful utility retires it. A different input construct would be a new candidate.
 
 ## K2 — Measurement Concordance
 

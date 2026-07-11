@@ -1,6 +1,6 @@
 import { INDEX_RESEARCH_CHARTER_VERSION } from "./research-charter";
 
-export const INDEX_CANDIDATE_SPEC_VERSION = "civica-index-candidate-set/v2";
+export const INDEX_CANDIDATE_SPEC_VERSION = "civica-index-candidate-set/v3";
 
 export type CandidateKind = "no-score-reference" | "derivative-benchmark" | "meta-measurement" | "fact-ledger" | "evidence-pairing" | "institutional-structure";
 
@@ -64,7 +64,7 @@ export const INDEX_CANDIDATE_SPECIFICATIONS: readonly IndexCandidateSpecificatio
     cadence: "Annual source-aligned release; no synthetic quarterly change",
     claim: "A research-beta weighted summary of four named upstream governance judgments.",
     nonclaims: ["Not an independent Civica observation", "Not causal", "Not an authoritative country verdict"],
-    inputs: ["V-Dem Liberal Democracy Index", "WGI Rule of Law", "Freedom House PR + CL ratings sum (2–14, inverted)", "Transparency International CPI"],
+    inputs: ["V-Dem Liberal Democracy Index, with WGI Voice & Accountability only where V-Dem is absent", "WGI Rule of Law", "Freedom House PR + CL ratings sum (2–14, inverted)", "Transparency International CPI"],
     transforms: ["Versioned native-to-common-scale transforms", "Fixed preregistered aggregation", "Competition ranking only if ranking survives the tournament"],
     missingness: "Apply ci-missingness/v1; label partial estimates and withhold insufficient cases.",
     uncertainty: "Use retained source-specific uncertainty and an explicit dependence model or publish no interval.",
