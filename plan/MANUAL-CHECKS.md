@@ -26,5 +26,6 @@ This queue contains checks an agent cannot honestly complete. Preparing the mate
 
 - Confirm DOI registration and metadata display in the chosen repository.
 - Confirm advisory-board and contact submissions arrive, retain required audit data, and produce the promised acknowledgement using real external delivery.
-- Confirm production backup restoration in an isolated environment without affecting the live database.
+- **DAT-021 · Owner/platform:** run one provider-managed Neon PITR restore into a disposable branch after documenting the plan's retention window, RPO, cost, branch-deletion procedure, and management credential. Compare the DAT-021 schema/data hashes, then delete only the disposable branch. The local PostgreSQL 17 logical restore and named WAL recovery point are already verified; this remaining check is provider-specific.
+- **DAT-021 · Owner/platform:** decide whether externally hosted Wikimedia Commons country/portrait images require a compliant independent archive or whether periodic URL/license availability checks are sufficient for the release recovery objective.
 - Confirm search-engine recrawl, stale-preview removal, redirects, and social-card previews after release.

@@ -750,3 +750,11 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   thresholds per domain; assess each source timestamp separately.
 - Keep warnings visible without turning a partial baseline into a release claim.
   Durable record: APR-D053 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Recovery proof separates local PostgreSQL from Neon controls
+
+- Enforce read-only production snapshotting and restore only to a new loopback
+  PostgreSQL 17 cluster; compare schema, counts, and critical table hashes.
+- Prove local WAL PITR at a named point and restore releases separately by BOM.
+- Keep provider retention/branch restore and external media in the manual queue.
+  Durable record: APR-D054 in `plan/DECISIONS.md`.

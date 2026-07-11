@@ -416,3 +416,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   and eleven threshold alerts; missing organization-run provenance stays open.
 - Live regeneration, 622/622 tests, all gates, the production build, and
   desktop/light/dark/mobile browser checks pass. DAT-021 is next.
+
+## 2026-07-11 — DAT-021 backup and recovery drill completed
+
+- Restored a production-read-only PostgreSQL 17 dump into a disposable local
+  cluster; 50-table schema, counts, and critical source/data hashes matched.
+- Replayed archived WAL to a named pre-mutation point and independently restored
+  the frozen Atlas archive against its BOM. Verified restore time was 3.319s.
+- Recorded provider PITR/media gaps, deleted all temporary recovery material,
+  and added a build validator. DAT-022 is next.

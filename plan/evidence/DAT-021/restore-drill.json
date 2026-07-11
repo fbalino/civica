@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "backup-restore-drill/v1",
+  "executedAt": "2026-07-11T03:49:07Z",
+  "recoveryPoint": {
+    "logicalSnapshotCompletedAt": "2026-07-11T03:46:12Z",
+    "logicalSnapshotSha256": "1d1abbfb38c8f62d7eef7c1fed288e7b8922d59f33e38f0c006945df5bf4c5ef",
+    "localPitrTargetName": "dat021_before_destructive_probe",
+    "localPitrTargetLsn": "0/C000090",
+    "localPitrTargetAt": "2026-07-11T03:47:47.518570Z"
+  },
+  "sourceSafety": {
+    "database": "Neon PostgreSQL 17.10",
+    "client": "PostgreSQL 17.9",
+    "connection": "direct endpoint, default_transaction_read_only=on",
+    "operations": [
+      "pg_dump custom-format snapshot",
+      "read-only count and checksum queries"
+    ],
+    "productionWrites": 0,
+    "restoreTarget": "new loopback-only PostgreSQL cluster under /tmp"
+  },
+  "logicalBackup": {
+    "format": "PostgreSQL custom",
+    "byteLength": 44258308,
+    "sha256": "1d1abbfb38c8f62d7eef7c1fed288e7b8922d59f33e38f0c006945df5bf4c5ef",
+    "committed": false
+  },
+  "restoredDatabase": {
+    "tableCounts": {
+      "publicBaseTables": 50,
+      "jurisdictions": 253,
+      "countryFacts": 25827,
+      "sources": 56,
+      "statements": 7891,
+      "researchEvidenceHistory": 0
+    },
+    "sourceCountsMatched": true,
+    "hashes": {
+      "schema": "021295234762d8419aefc97bac022013",
+      "jurisdictions": "b170c8a15bfedc712dc2eb629e0eaa78",
+      "sources": "1b0babd3d0003e6a3b5261a70f3b1566",
+      "countryFacts": "54e7f68ccc95d3e9d0e5539f240d86da",
+      "statements": "017e5e87fe343a536624bc603d30f043"
+    },
+    "sourceHashesMatched": true,
+    "logicalRestoreMs": 3247,
+    "verificationMs": 72,
+    "availableDumpToVerifiedDatabaseMs": 3319
+  },
+  "pointInTimeRecovery": {
+    "engine": "local PostgreSQL 17 WAL archive replay",
+    "baseBackupMs": 1164,
+    "recoveryStartupMs": 193,
+    "targetReached": true,
+    "beforeTargetMarkerPresent": true,
+    "afterTargetMarkerAbsent": true,
+    "sourceHashesMatchedAfterRecovery": true,
+    "recoveredCounts": {
+      "publicBaseTablesExcludingProbe": 50,
+      "jurisdictions": 253,
+      "countryFacts": 25827,
+      "sources": 56,
+      "statements": 7891,
+      "researchEvidenceHistory": 0
+    }
+  },
+  "releaseArchive": {
+    "releaseId": "atlas-2026-07-11",
+    "fileSha256": "b704a564766cbda54d37be4c34211dc707af9aa98e9551b66a171d7b8789892b",
+    "semanticSha256": "cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1",
+    "fileByteLength": 1206302,
+    "uncompressedByteLength": 14600640,
+    "rowCounts": {
+      "jurisdictions": 253,
+      "facts": 16451,
+      "sources": 3
+    },
+    "billOfMaterialsMatched": true
+  },
+  "missingExternalAssets": [
+    "Neon provider-side PITR retention and disposable-branch restore are not exercised without a management credential and reviewed cost/retention contract.",
+    "Vercel environment variables, provider credentials, and deployment settings are not database or release-archive contents.",
+    "Restricted publisher payloads remain excluded and must be reacquired under their recorded access and hash instructions.",
+    "Wikimedia Commons country and portrait image bytes are externally hosted and require a separate availability check or compliant archive."
+  ],
+  "result": "pass"
+}
