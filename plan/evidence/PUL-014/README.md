@@ -14,7 +14,7 @@ Famous historical cases remain regression fixtures and are excluded from estimat
 
 A conservative binary-proportion calculation requires 385 independent cases for a two-sided 95% interval with five-percentage-point half-width. Each probability frame plans for 482 valid cases after a 1.25 design effect and initially draws 536 for up to 10% unusable evidence. The analysis must replace the planning design effect with the observed design and must distinguish frozen-benchmark accuracy from generalized accuracy.
 
-Primary strata determine selection probabilities and inverse-probability weights. Separate marginal constraints cover geography, dates, 11 observed languages including unknown, specialist/news source type, six BR/CGV regime families plus unclassified, and three retained media-evidence environments. The frozen country-day population contains 5 multi-family/five-document days, 379 observed-below-threshold days, and 17,076 days with no retained documents. Political media context remains missing rather than receiving an invented proxy.
+Primary strata determine initial draw fractions and base weights. Separate marginal constraints cover geography, dates, 11 observed languages including unknown, specialist/news source type, six BR/CGV regime families plus unclassified, and three retained media-evidence environments. The frozen country-day population contains 5 multi-family/five-document days, 379 observed-below-threshold days, and 17,076 days with no retained documents. Deterministic repair of those margins requires calibrated analysis weights; the base weights are retained for sensitivity analysis and are not presented as final. Political media context remains missing rather than receiving an invented proxy.
 
 ## Reproducibility
 

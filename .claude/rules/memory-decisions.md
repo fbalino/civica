@@ -909,5 +909,11 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 ## 2026-07-11 — Pulse evaluation uses three mutually exclusive frames
 
 - `pulse-evaluation-sampling-frame/v1` combines a frozen event-candidate census with weighted negative/unresolved and country-day probability samples.
-- Selection is label-blind, deterministic, margin-balanced, reserve-backed, and analyzed with design-aware uncertainty.
+- Selection is label-blind, deterministic, margin-balanced, and reserve-backed. Primary-stratum values are base weights; deliberate margin repair requires calibration to frozen population totals plus sensitivity estimates.
 - Famous historical cases never enter estimation. Durable record: APR-D122.
+
+## 2026-07-11 — Pulse absence requires evidence, not an empty row
+
+- `pulse-country-day-evaluation-set/v1` links random country-days to retained evidence identities and three frozen search families before any label exists.
+- Search silence does not prove a true negative; coders distinguish events, misses, insufficient observation, and out-of-scope cases.
+- The checked repository retains rights-safe result metadata rather than publisher text. Durable record: APR-D123.

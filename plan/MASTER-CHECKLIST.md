@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 292
-- **Completed:** 105
-- **Remaining:** 187
-- **Progress:** 36%
+- **Completed:** 106
+- **Remaining:** 186
+- **Progress:** 36.3%
 - **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -136,7 +136,7 @@ Source: `plan/05-pulse-event-ledger-and-validation.md`
 - [x] **PUL-012** (P0) Rework jurisdiction/subject attribution with explicit evidence and multi-country support. _Done when: events can name primary and affected jurisdictions with rationales, aliases/entities are versioned, the classifier receives human-readable country/entity context rather than only UUIDs, and cross-border fixtures pass._
 - [x] **PUL-013** (P0) Retain rejected, duplicate, non-event, insufficient-evidence, and refuted items for evaluation. _Done when: the pipeline no longer destroys negative evidence; every exclusion has reason/version/actor/time; evaluation queries can sample false-positive and false-negative candidates without production-table archaeology._
 - [x] **PUL-014** (P0) Design a representative evaluation sampling frame before collecting gold labels. _Done when: a preregistered protocol samples countries, dates, source languages/types, regime/media environments, event and no-event strata, and retrieval misses using a power/sample-size rationale; famous historical cases are a separate regression set only._
-- [ ] **PUL-015** (P0) Build a random no-event and low-observability evaluation set. _Done when: sampled country-days include source documents and search traces needed to judge true negatives, missed events, and insufficient observation; the set cannot be constructed only from already-published Pulse events._
+- [x] **PUL-015** (P0) Build a random no-event and low-observability evaluation set. _Done when: sampled country-days include source documents and search traces needed to judge true negatives, missed events, and insufficient observation; the set cannot be constructed only from already-published Pulse events._
 - [ ] **PUL-016** (P1) Create independent coder instructions, training examples, and adjudication rules without using prior owner approvals as gold truth. _Done when: a blinded pilot lets two coders apply the codebook; instructions cover uncertainty and abstention; disagreements remain visible; the owner/model does not define the answer key._
 - [ ] **PUL-017** (P1) Build or adapt an annotation/review tool for double coding. _Done when: two independent coders cannot see each other's labels before submission, adjudication is separate, evidence snapshots and codebook version are shown, all decisions are exportable, and audit/access controls pass tests._
 - [ ] **PUL-018** (P0) Evaluate the current production ensemble end to end against the locked representative set. _Done when: the exact ingestion→retrieval→clustering→attribution→classification→publication pipeline runs with frozen versions and reports uncertainty around event retrieval, cluster, label, severity, attribution, abstention, and publication performance._

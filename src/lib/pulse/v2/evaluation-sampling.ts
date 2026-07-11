@@ -85,9 +85,12 @@ export const PULSE_EVALUATION_SAMPLING_PROTOCOL = Object.freeze({
   selection: {
     seed: "pulse-evaluation-sampling-frame/v1|2026-07-11",
     allocator: "bounded_minimum_plus_largest_remainder/v1",
+    secondaryMarginRepair:
+      "same-primary-stratum deterministic swaps until declared marginal minima are met; population, primary quotas, seed, and primary base weights remain fixed",
     withinStratumOrder: "sha256(seed|frame|stratum|unit_id)",
     replacement: "next hash-ranked reserve in the same primary stratum",
-    weight: "primary_stratum_population/primary_stratum_valid_sample",
+    weight:
+      "primary-stratum draw fractions define base weights; analysis calibrates them to the frozen media-evidence population totals after secondary-margin repair",
     prohibited: [
       "labels_or_model_correctness_in_selection",
       "owner_approval_as_gold",
@@ -101,6 +104,8 @@ export const PULSE_EVALUATION_SAMPLING_PROTOCOL = Object.freeze({
     generalizedAccuracy:
       "requires design weights plus item/country clustering or a declared mixed model",
     variance: "Taylor linearization or replicate-weight equivalent",
+    secondaryMarginAdjustment:
+      "report calibrated-weight results against unweighted and primary-base-weight sensitivity estimates; secondary-margin repair is not ignorable simple random sampling",
     rareMargins: "report insufficient evidence when valid n is below 30",
     multiplicity: "headline overall metrics primary; subgroup results descriptive with intervals",
   },

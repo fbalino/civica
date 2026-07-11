@@ -665,5 +665,11 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 ## 2026-07-11 — PUL-014 sampling preregistration completed
 
 - Frozen a 384-event census plus 482-valid-case negative and country-day probability frames before labels.
-- The frame balances geography, time, language, source type, regime, and retained media-evidence conditions with design weights.
+- The frame balances geography, time, language, source type, regime, and retained media-evidence conditions. Primary-stratum values are base weights; deterministic margin repair requires calibrated analysis weights.
 - Famous cases remain regression-only; executable population hash is frozen. PUL-015 is next.
+
+## 2026-07-11 — PUL-015 country-day evaluation set completed
+
+- Frozen 536 unlabeled country-day packets across 181 jurisdictions: 482 analysis candidates and 54 same-primary-stratum reserves.
+- Every packet carries three exact search families; 1,608 traces retain 6,086 rights-safe result records, while five all-zero packets remain evidence rather than true-negative labels.
+- Population, sample, trace, and packet hashes link exactly; 811 tests, claims, and the 98-page build pass. PUL-016 is next.
