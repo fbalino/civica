@@ -3,8 +3,8 @@
  *
  * GET /api/v1/pulse/[country_slug]/dimensions
  *
- * Returns the per-dimension Pulse delta with driving events, plus
- * the methodology meta block all v2 endpoints carry.
+ * Returns the per-dimension experimental heuristic with driving events, plus
+ * the exact publication policy, method version, and limitations in metadata.
  */
 
 import {

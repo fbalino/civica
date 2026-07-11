@@ -110,7 +110,7 @@ const SECTIONS: MethodologySection[] = [
     id: "pulse",
     heading: "Experimental event classification — the Civica Pulse",
     intro:
-      "The Pulse is an experimental event ledger with public experimental per-dimension effects and no merged score or ranking. Its pipeline is scheduled daily, but published values reflect stored results rather than a live or continuous governance measure.",
+      "The Pulse is an experimental event ledger with API-only experimental per-dimension effects and no reader delta panel, bulk export, merged score, or ranking. Its pipeline is scheduled daily, but published values reflect stored results rather than a live or continuous governance measure.",
     entries: [
       {
         href: "/civica-index/methodology/pulse",

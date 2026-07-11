@@ -15,6 +15,7 @@ import { Tooltip } from "@/components/editorial/Tooltip";
 import type { PulseV2ForCountry, DimensionRow } from "@/lib/db/queries-pulse-v2";
 import type { PulseDimension } from "@/lib/pulse/v2/types";
 import { SCORE_WINDOW_DAYS } from "@/lib/pulse/v2/taxonomy";
+import { CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY } from "@/lib/pulse/v2/public-numeric-policy";
 import { pulse } from "@/lib/content/site-state";
 import "./PulseDimensionalDeltas.css";
 
@@ -259,7 +260,7 @@ export function PulseDimensionalDeltas({ data }: Props) {
   return (
     <section
       className="pulse-dimensions-panel"
-      aria-label={`Civica Pulse Beta dimensional impact for ${jurisdiction.name}`}
+      aria-label={`Civica Pulse experimental heuristic dimensional effects for ${jurisdiction.name}`}
       style={{
         background: "var(--color-card-bg)",
         border: "1px solid var(--color-card-border)",
@@ -332,6 +333,19 @@ export function PulseDimensionalDeltas({ data }: Props) {
           See all events →
         </Link>
       </header>
+
+      <p className="editorial-warning">
+        <strong>{CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.label}</strong>
+        {" · method "}
+        <code>{CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.methodVersion}</code>.
+        These deltas are not a validated measure of governance change and are
+        not comparable country scores or rankings. Coverage, calibration, and
+        independent-review limitations remain. Read the{" "}
+        <Link href="/civica-index/methodology/pulse#known-limitations">
+          known limitations
+        </Link>
+        .
+      </p>
 
       {data.pressFreedomContext.directLookup &&
       data.pressFreedomContext.score < 30 ? (

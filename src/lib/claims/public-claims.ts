@@ -608,7 +608,7 @@ export const PUBLIC_CLAIMS = [
     surface: "api-docs",
     routeOrArtifact: "/api/v1/pulse/methodology",
     exactClaim:
-      "The Pulse API publishes a generated current-runtime contract; numeric outputs are public experimental per-dimension deltas, no scalar Pulse score or ranking exists, and older ledger rows have mixed unversioned method history.",
+      "The Pulse API publishes a generated current-runtime contract; numeric outputs are API-only experimental per-dimension deltas, no reader UI, bulk export, scalar Pulse score, or ranking exists, and older ledger rows have mixed unversioned method history.",
     tier: "experimental-heuristic",
     evidenceSources: [
       "src/lib/pulse/v2/runtime-contract.ts",
@@ -701,7 +701,7 @@ export const PUBLIC_CLAIMS = [
     surface: "readme",
     routeOrArtifact: "README.md — Civica Pulse section",
     exactClaim:
-      "The Civica Pulse is an experimental event ledger, not a continuous governance measure; its public numeric outputs are named per-dimension experimental deltas, never a scalar Pulse score or ranking.",
+      "The Civica Pulse is an experimental event ledger, not a continuous governance measure; numeric outputs are API-only per-dimension experimental deltas omitted from reader UI and bulk exports, never a scalar Pulse score or ranking.",
     tier: "experimental-heuristic",
     evidenceSources: [
       "README.template.md",

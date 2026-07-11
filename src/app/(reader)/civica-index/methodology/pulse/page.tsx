@@ -9,6 +9,7 @@ import { MarkdownContent } from "@/components/content/MarkdownContent";
 import { Reveal } from "@/components/motion/Reveal";
 import { pulse, disputeSla } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
+import { CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY } from "@/lib/pulse/v2/public-numeric-policy";
 
 export const revalidate = 3600;
 
@@ -19,6 +20,14 @@ export const metadata: Metadata = {
     "How Civica's experimental, daily-scheduled Pulse ledger ingests, classifies, reviews, and scores governance-relevant events without claiming a live or continuous governance measure.",
   alternates: {
     canonical: "https://civicaatlas.org/civica-index/methodology/pulse",
+  },
+  other: {
+    "civica:pulse-numeric-policy":
+      CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.id,
+    "civica:methodology-version":
+      CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.methodVersion,
+    "civica:numeric-standing":
+      CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.publicStatus,
   },
 };
 
@@ -126,10 +135,12 @@ export default function PulseMethodologyPage() {
         </h1>
         <p className="editorial-page-subtitle">
           An experimental ledger of governance-relevant events, model-assisted
-          classifications, source links, review state, and public experimental
-          per-dimension effects. The pipeline is scheduled daily; published values reflect
-          the most recent completed run rather than a live or continuous
-          governance measure.
+          classifications, source links, and review state. API-only
+          per-dimension effects use method{" "}
+          <code>{CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.methodVersion}</code>{" "}
+          and are published only as experimental heuristics. The pipeline is
+          scheduled daily; published values reflect the most recent completed
+          run rather than a live or continuous governance measure.
         </p>
 
         <div className="editorial-warning">

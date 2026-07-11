@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: cf34b6be0714deaf70dfcf709cc5a93a39a2716cf27b91f9ecef8d93fb22fe80
-  Generated body SHA-256: 4fddc288904c71f4f4b32a7129e5e3280da0d36bea1ce66217dde571f41f3a78
+  Template SHA-256: 211a998fa9f012e95b7ebc433a63c4365d7834e5be52dd7cb667662128225263
+  Generated body SHA-256: e12c01c525aa41c69d23e03c1108f501bbdc83d905a4b3dd15cd6ea20c30c4a7
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -41,7 +41,7 @@ The selected public comparison product presents V-Dem, World Bank Worldwide Gove
 ### Civica Pulse — experimental event ledger
 
 <!-- PUBLIC_CLAIM: readme.pulse-signal -->
-An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state. It is not a continuous measure of governance change, and no detected event does not mean stability. Public numeric effects are experimental, named per-dimension deltas; Civica does not publish a merged Pulse score or Pulse ranking. The current production ensemble has not completed representative evaluation or independent review. Current status: BETA.
+An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state. It is not a continuous measure of governance change, and no detected event does not mean stability. Numeric effects are API-only experimental, named per-dimension deltas; reader pages and bulk exports omit them, and Civica does not publish a merged Pulse score or Pulse ranking. The current production ensemble has not completed representative evaluation or independent review. Current status: BETA.
 
 ## What makes this different
 

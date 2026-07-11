@@ -42,7 +42,7 @@ The selected public comparison product presents V-Dem, World Bank Worldwide Gove
 ### Civica Pulse — experimental event ledger
 
 <!-- PUBLIC_CLAIM: readme.pulse-signal -->
-An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state. It is not a continuous measure of governance change, and no detected event does not mean stability. Public numeric effects are experimental, named per-dimension deltas; Civica does not publish a merged Pulse score or Pulse ranking. The current production ensemble has not completed representative evaluation or independent review. Current status: {{ctx.pulseStatusUpper}}.
+An experimental ledger of governance-relevant events with model-assisted classification, source links, and review state. It is not a continuous measure of governance change, and no detected event does not mean stability. Numeric effects are API-only experimental, named per-dimension deltas; reader pages and bulk exports omit them, and Civica does not publish a merged Pulse score or Pulse ranking. The current production ensemble has not completed representative evaluation or independent review. Current status: {{ctx.pulseStatusUpper}}.
 
 ## What makes this different
 

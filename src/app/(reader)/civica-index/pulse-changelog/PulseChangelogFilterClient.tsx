@@ -237,7 +237,7 @@ export function PulseChangelogFilterClient({ events, countries }: Props) {
         </h2>
         <p className="editorial-results-dek">
           {showReview
-            ? "Including candidates queued for review and rejected rows. Older rejection origins may be unverified; none of these rows affects public experimental deltas."
+            ? "Including candidates queued for review and rejected rows. Older rejection origins may be unverified; none of these rows affects API-only experimental deltas."
             : "Published events only. Toggle status above to include queued and rejected rows."}
         </p>
       </div>

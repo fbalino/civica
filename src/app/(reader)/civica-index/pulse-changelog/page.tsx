@@ -107,7 +107,7 @@ export default async function PulseChangelogPage() {
           confidence; a revised/rejected verdict; a negative category, severity,
           subject, or event check; or failed/unavailable verification) are
           queued for human review. Queued and rejected rows do <strong>not</strong>{" "}
-          affect public experimental deltas. Other entries may be auto-published,
+          affect API-only experimental deltas. Other entries may be auto-published,
           so “published” does not mean “human-reviewed.” For some older rejected
           rows, the legacy rejection origin is unverified because no reviewer
           audit record is available. The ledger also contains older, unversioned

@@ -25,7 +25,7 @@ The Civica Pulse is a model-assisted ledger designed to test whether documented 
 
 The current generated runtime contract is **{{ctx.methodologyVersion}}**. It describes new classifications produced by the declared scheduled pipeline; it is not retroactively assigned to older unversioned ledger rows.
 
-Where a country has published events in the scoring window, its Civica Data page shows five named dimension rows and up to two driving events per row. A missing event is not converted into evidence of stability: countries with no detected published event receive an explicit no-observation state rather than a scalar zero.
+Numeric deltas are available only through the versioned country-dimensions API. Active reader pages show the event ledger and do not render the dormant delta panel. A missing event is not converted into evidence of stability: the API returns an explicit non-observation rather than a scalar zero when no published event supports a dimension.
 
 ## What the Pulse is not {#what-pulse-is-not}
 
@@ -69,7 +69,7 @@ The pipeline is scheduled once per day in UTC: {{ctx.scheduleProse}}. The score 
 4. **Verify and attribute.** {{ctx.verifierProse}} makes a separate adversarial call against the majority verdict. The same model also participates as one voter, so this is a separate call rather than an independent model family. Subject-country attribution is another pass, currently {{ctx.subjectAttributorProse}}, run after classification; if it fails, the ingest-time attribution remains. That attribution verdict is not yet persisted as a separately versioned audit row.
 5. **Weight.** Count distinct specialist and news source IDs, combine that diversity with the stored agreement label, and apply asymmetric and provisional press-context multipliers. The resulting “corroboration weight” is a hand-set heuristic in [0, 1], not a calibrated probability of correctness and not a publication minimum.
 6. **Review or publish.** {{ctx.reviewTiersProse}}, deadlocks/no quorum, and weak or degraded majorities paired with a verifier objection route to review. An objection includes low confidence, a revised or rejected verdict, a negative category/severity/subject/event check, or failed/unavailable verification. Other events may be auto-published. Queued and rejected events do not affect public deltas.
-7. **Score.** For published events in the trailing {{ctx.scoreWindowDays}}-day window, multiply severity by the heuristic weight, apply category-specific exponential decay, sum by country and dimension, clamp to [{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}], and write public experimental deltas.
+7. **Score.** For published events in the trailing {{ctx.scoreWindowDays}}-day window, multiply severity by the heuristic weight, apply category-specific exponential decay, sum by country and dimension, clamp to [{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}], and write API-only experimental deltas.
 
 ## Event categories — the {{state.pulse.taxonomy.version}} taxonomy {#event-categories}
 
@@ -210,7 +210,7 @@ The experimental weighting applies stronger discounts to positive events to redu
 
 (The classifier is instructed to drop un-enacted announcements and symbolic claims, but this behavior has not completed representative evaluation.)
 
-Negative events do not receive the positive-event multipliers. There is currently no minimum such as “one specialist plus one news source” or “two distinct news source IDs”: a single-source event can affect a public experimental delta at reduced weight. Source-family independence and republication detection are not yet implemented.
+Negative events do not receive the positive-event multipliers. There is currently no minimum such as “one specialist plus one news source” or “two distinct news source IDs”: a single-source event can affect an API-only experimental delta at reduced weight. Source-family independence and republication detection are not yet implemented.
 
 ## Press-freedom rule {#press-freedom-rule}
 

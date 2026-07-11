@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { civicaIndex } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
+import { CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY } from "@/lib/pulse/v2/public-numeric-policy";
 import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
 import { CURRENT_CI_UNCERTAINTY_POLICY } from "@/lib/ci/uncertainty-policy";
 import { CURRENT_CI_RANK_POLICY } from "@/lib/ci/rank-policy";
@@ -88,7 +89,7 @@ export const PULSE_METHODOLOGY_META = Object.freeze({
     : "current",
   presentation: Object.freeze({
     format: CURRENT_PULSE_RUNTIME_METHOD.numericDeltas.shape,
-    public_status: CURRENT_PULSE_RUNTIME_METHOD.numericDeltas.publicStatus,
+    public_status: CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.publicStatus,
     scalar_pulse_score: false,
     trailing_window_days:
       CURRENT_PULSE_RUNTIME_METHOD.numericDeltas.trailingWindowDays,
