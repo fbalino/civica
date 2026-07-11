@@ -597,3 +597,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   production weights, missingness, null uncertainty, and competition ranks.
 - It emits 3,659 hashed private outputs and exactly reproduces all 190 current
   Beta-R5 composites. TypeScript and 688/688 tests pass. IDX-013 next.
+
+## 2026-07-11 — IDX-032 K2 concordance prototype completed
+
+- K2 computes named three-rater common-coverage percentiles and dispersion for
+  3,260 private profiles; final holdouts and expert labels remain sealed.
+- Development rejects the midpoint-artifact concern but shows 65.65% drop-one
+  tercile instability, so the highlighted summary remains fragile. IDX-033 next.
