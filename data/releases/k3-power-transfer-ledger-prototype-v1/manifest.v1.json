@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "k3-ledger-prototype-manifest/v1",
+  "releaseId": "k3-power-transfer-ledger-prototype-v1",
+  "candidateId": "K3",
+  "methodVersion": "k3-power-transfer-ledger/v1",
+  "protocolVersion": "civica-index-tournament-preregistration/v3",
+  "asOf": "2026-07-11",
+  "contractSha256": "0c765c97f7b020717cf3df6cd421f41c7b46a012cadcb9ee4c14c96f0ac5242b",
+  "inputTerms": 382,
+  "prototypeRows": 168,
+  "observedExecutiveIdentity": 117,
+  "contestedExecutiveIdentity": 51,
+  "sovereignJurisdictionsWithoutPrototypeRow": 26,
+  "transferStatesComputed": 0,
+  "termLimitStatesComputed": 0,
+  "everyRowHasStatementCitation": true,
+  "outputSha256": "6fd57f03799fd171dd1dfc7cbb92a574fb35ef07b761cfdc481fb2354916c153",
+  "publicRulebook": "/civica-index/methodology/power-transfer-ledger",
+  "publicCountryRows": false,
+  "validationStatus": "preregistered_not_executed",
+  "valuesLocation": "private_reproducible_from_sourced_terms",
+  "publicValuesIncluded": false
+}

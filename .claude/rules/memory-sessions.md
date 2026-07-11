@@ -604,3 +604,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   3,260 private profiles; final holdouts and expert labels remain sealed.
 - Development rejects the midpoint-artifact concern but shows 65.65% drop-one
   tercile instability, so the highlighted summary remains fragile. IDX-033 next.
+
+## 2026-07-11 — IDX-033 K3 ledger prototype completed
+
+- Published the rulebook and generated 168 private statement-cited current
+  executive rows; 51 remain contested and 26 jurisdictions lack eligible data.
+- Historical transfer and term-limit claims remain uncomputed. Validation is
+  preregistered, claims/design gates and browser checks pass. IDX-034 next.
