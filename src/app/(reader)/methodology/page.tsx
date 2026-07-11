@@ -65,6 +65,26 @@ const SECTIONS: MethodologySection[] = [
     ],
   },
   {
+    id: "coverage",
+    heading: "Coverage audits",
+    intro:
+      "Generated audits separate fact-level provenance depth from domain-level operational coverage, freshness, completeness, and known gaps.",
+    entries: [
+      {
+        href: "/methodology/provenance-coverage",
+        title: "Fact provenance coverage",
+        blurb:
+          "Source linkage, independent-source depth, disputes, and staleness across country fact keys and statement records.",
+      },
+      {
+        href: "/methodology/source-coverage",
+        title: "Source coverage by domain",
+        blurb:
+          "Freshness, sovereign-state coverage, field completeness, source families, known gaps, and threshold alerts across nine Atlas domains.",
+      },
+    ],
+  },
+  {
     id: "scoring",
     heading: "Composite scoring — the Civica Index",
     intro:
@@ -147,6 +167,7 @@ const SECTIONS: MethodologySection[] = [
 const SIDEBAR_ITEMS: ReaderSidebarItem[] = [
   { id: "start-here", label: "Start here" },
   { id: "reconciliation", label: "Reconciliation" },
+  { id: "coverage", label: "Coverage audits" },
   { id: "scoring", label: "Civica Index" },
   { id: "pulse", label: "Civica Pulse" },
   { id: "peer-grouping", label: "Peer grouping" },

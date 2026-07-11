@@ -427,6 +427,29 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "methodology.domain-source-coverage",
+    surface: "methodology",
+    routeOrArtifact: "/methodology/source-coverage",
+    exactClaim:
+      "A generated operational report publishes freshness, sovereign-state coverage, field completeness, source families, known gaps, and threshold alerts for nine Atlas domains.",
+    tier: "derived-descriptive-metric",
+    evidenceSources: [
+      "src/lib/provenance/domain-coverage.generated.json",
+      "src/lib/provenance/domain-coverage.ts",
+      "scripts/generate-domain-coverage.ts",
+      "scripts/validate-domain-coverage.ts",
+    ],
+    implementationOwner: "Atlas provenance and reader platform",
+    methodologyVersion: "atlas-domain-coverage-v1",
+    gate: "G2",
+    source: {
+      path: "src/app/(reader)/methodology/source-coverage/page.tsx",
+      fragment:
+        "A generated operational view of where Civica has records, how complete",
+      mirrors: ["src/app/api/source-coverage/route.ts"],
+    },
+  },
+  {
     id: "licensing.mixed-rights",
     surface: "licensing",
     routeOrArtifact: "/licensing",

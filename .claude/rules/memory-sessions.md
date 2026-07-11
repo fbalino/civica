@@ -407,3 +407,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   closed. The runbook explicitly does not claim full uncaptured-input replay.
 - A credential- and cache-free temporary checkout passed strict reproduction,
   619/619 tests, every validator, and the production build. DAT-020 is next.
+
+## 2026-07-11 — DAT-020 domain source coverage completed
+
+- Published one generated dashboard/API for all nine required Atlas domains,
+  scoped to 194 sovereign-state rows with per-domain field and source rules.
+- The checked snapshot reports three current domains, six needing attention,
+  and eleven threshold alerts; missing organization-run provenance stays open.
+- Live regeneration, 622/622 tests, all gates, the production build, and
+  desktop/light/dark/mobile browser checks pass. DAT-021 is next.

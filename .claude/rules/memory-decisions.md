@@ -741,3 +741,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Require exact bytes and no database/model credentials or runtime network.
 - Do not describe it as full Atlas reconstruction while historical source
   inputs remain uncaptured. Durable record: APR-D052 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Domain coverage uses one scope and domain-specific measures
+
+- Use `jurisdiction-status/v1` sovereign states as the shared country-coverage
+  denominator for all nine operational domains.
+- Declare record grain, measured fields, source families, freshness, gaps, and
+  thresholds per domain; assess each source timestamp separately.
+- Keep warnings visible without turning a partial baseline into a release claim.
+  Durable record: APR-D053 in `plan/DECISIONS.md`.

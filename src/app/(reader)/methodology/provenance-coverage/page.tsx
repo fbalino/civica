@@ -327,6 +327,14 @@ export default function ProvenanceCoveragePage() {
             </Link>{" "}
             measures that presentation question.
           </p>
+          <p>
+            The separate{" "}
+            <Link href="/methodology/source-coverage">
+              domain source-coverage dashboard
+            </Link>{" "}
+            reports operational freshness, country coverage, field completeness,
+            source families, and known gaps for nine Atlas domains.
+          </p>
         </section>
 
         <section id="machine-readable" className="editorial-section">

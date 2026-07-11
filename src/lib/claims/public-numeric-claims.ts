@@ -731,6 +731,13 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "checked fact-coverage.generated.json produced from the live database",
   ),
   runtimeClaim(
+    "domain-source-coverage.rows",
+    "src/app/(reader)/methodology/source-coverage/page.tsx",
+    "/methodology/source-coverage",
+    "{number.format(domain.recordCount)} {domain.recordLabel}",
+    "checked domain-coverage.generated.json produced from the live database",
+  ),
+  runtimeClaim(
     "index-methodology.pca-headline",
     "content/methodology-civica-index.md",
     "reader:methodology-civica-index",

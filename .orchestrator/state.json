@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-020_source_coverage_dashboards"
+    "current_task": "DAT-021_backup_and_restoration_drill"
   },
   "budget": {
     "mode": "subscription_only",
@@ -647,11 +647,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "A fresh credential- and cache-free checkout passed every validator and the production build for DAT-019 without a database or model key.",
-    "tests": "619/619 tests passed. Strict clean-room reproduction matched exact fixture/export hashes and counts. Master plan is 38/288 complete (13.2%).",
+    "build": "npm run build passed for DAT-020: domain coverage, claims/documentation, design, metadata, compilation, TypeScript, static generation, and route generation succeeded.",
+    "tests": "622/622 tests passed. Live generation reproduced all nine domain rows and eleven threshold alerts exactly. Master plan is 39/288 complete (13.5%).",
     "public_claims": "No new empirical claim was added. API documentation now links the checked BOM and states its concrete contents beside the registered Atlas release claim.",
     "browser": "Local API documentation rendered the BOM link and tool-version description with zero console errors. The manifest route returned HTTP 200 JSON, immutable caching, and an attachment filename.",
     "visual_review": "The BOM link composes the existing API-docs editorial typography; no new visual component or token was introduced."
   },
-  "updated_at": "2026-07-11T03:28:15Z"
+  "updated_at": "2026-07-11T03:43:00Z"
 }

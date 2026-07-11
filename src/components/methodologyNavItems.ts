@@ -28,6 +28,16 @@ export const METHODOLOGY_NAV_ITEMS: MethodologyNavItem[] = [
     descriptor: "Multi-source resolver",
   },
   {
+    href: "/methodology/provenance-coverage",
+    label: "Provenance Coverage",
+    descriptor: "Fact-level audit",
+  },
+  {
+    href: "/methodology/source-coverage",
+    label: "Source Coverage",
+    descriptor: "Domain-level audit",
+  },
+  {
     href: "/civica-index/methodology",
     label: "Civica Index",
     descriptor: "Composite scoring",
