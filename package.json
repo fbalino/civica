@@ -66,6 +66,8 @@
     "validate:index-longitudinal-preregistration": "tsx scripts/validate-index-longitudinal-preregistration.ts",
     "generate:index-longitudinal": "tsx scripts/generate-index-longitudinal-analysis.ts",
     "validate:index-longitudinal": "tsx scripts/validate-index-longitudinal-analysis.ts",
+    "generate:index-oos-validation": "tsx scripts/generate-index-oos-validation.ts",
+    "validate:index-oos-validation": "tsx scripts/validate-index-oos-validation.ts",
     "validate:ci-tournament-panel:v3": "tsx scripts/validate-ci-tournament-panel-v3.ts",
     "validate:ci-tournament-panel:v3:live": "tsx scripts/validate-ci-tournament-panel-v3.ts --live",
     "validate:ci-tournament-panel:v2": "tsx scripts/validate-ci-tournament-panel-v2.ts",

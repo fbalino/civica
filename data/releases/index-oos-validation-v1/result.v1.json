@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "civica-index-oos-validation/v1",
+  "releaseId": "index-oos-validation-v1",
+  "protocolVersion": "civica-index-tournament-preregistration/v3",
+  "splitContract": {
+    "temporal": {
+      "development": [
+        2000,
+        2016
+      ],
+      "validation": [
+        2017,
+        2020
+      ],
+      "finalHoldout": [
+        2021,
+        2024
+      ],
+      "rule": "No final-holdout metric may be inspected before every candidate and parameter is frozen from development and validation data."
+    },
+    "geographic": {
+      "method": "sha256-v1",
+      "salt": "civica-index-geographic-holdout-v1",
+      "assignment": "first_uint32_be(sha256(salt + ':' + upper_iso3)) % 10",
+      "developmentBuckets": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "validationBuckets": [
+        7,
+        8
+      ],
+      "finalHoldoutBuckets": [
+        9
+      ],
+      "rule": "Geographic folds are assigned without outcomes; candidate fitting and threshold selection exclude final-holdout jurisdictions."
+    },
+    "nonPanelCandidates": "Fact, pairing, and structure candidates use the same geographic hash. Event time is split at 2020-12-31 and 2022-12-31 into development, validation, and final holdout; evidence published after the event remains permitted only for citation verification, never feature construction."
+  },
+  "openedAfterCandidateFreezeCommit": "4e15744",
+  "artifacts": {
+    "K0": {
+      "splitCounts": {
+        "development": 2193,
+        "validation": 1356,
+        "final_holdout": 1301
+      },
+      "status": "reference_coverage_only"
+    },
+    "K1": {
+      "splitCounts": {
+        "development": 1406,
+        "validation": 1106,
+        "final_holdout": 1147
+      },
+      "finalCommonSample": 901,
+      "publicInputReproductionR2": 0.999847164869575,
+      "interval": {
+        "lower95": 0.9998091745762511,
+        "upper95": 0.9998725944206361
+      },
+      "status": "fails_original_information"
+    },
+    "K2": {
+      "splitCounts": {
+        "development": 1208,
+        "validation": 1004,
+        "final_holdout": 1048
+      },
+      "finalDropOneTercileChangeRate": 0.6316793893129771,
+      "interval": {
+        "iterationsRequested": 2000,
+        "iterationsValid": 2000,
+        "lower95": 0.5603190428713859,
+        "upper95": 0.7004282646309632,
+        "bootstrapSha256": "f2ac94d127aa87c988e14fca550f497279290c992740acac68c3e5559119020e"
+      },
+      "threshold": 0.15,
+      "status": "fails_stability"
+    },
+    "K3": {
+      "splitCounts": {
+        "development": 113,
+        "validation": 34,
+        "final_holdout": 21
+      },
+      "status": "insufficient_external_labels"
+    },
+    "K4": {
+      "splitCounts": {
+        "development": 387,
+        "validation": 120,
+        "final_holdout": 75
+      },
+      "status": "insufficient_blinded_labels"
+    },
+    "K5": {
+      "splitCounts": {
+        "development": 1488,
+        "validation": 383,
+        "final_holdout": 267
+      },
+      "status": "insufficient_adjudicated_labels"
+    }
+  },
+  "geographicFinalHoldout": {
+    "jurisdictions": 25,
+    "byRegion": [
+      {
+        "group": "Africa",
+        "n": 12,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "Asia",
+        "n": 4,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "Europe",
+        "n": 7,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "North America",
+        "n": 2,
+        "performanceEstimateAllowed": false
+      }
+    ],
+    "byRegime": [
+      {
+        "group": "civilian_dictatorship",
+        "n": 11,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "parliamentary_democracy",
+        "n": 6,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "presidential_democracy",
+        "n": 3,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "royal_dictatorship",
+        "n": 1,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "semi_presidential_democracy",
+        "n": 3,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "unknown",
+        "n": 1,
+        "performanceEstimateAllowed": false
+      }
+    ],
+    "minimumSubgroupN": 30
+  },
+  "temporalFinalHoldout": {
+    "years": [
+      2021,
+      2024
+    ]
+  },
+  "uncertaintyPolicy": "K1 and K2 report cluster intervals; candidates without labels report insufficiency rather than an interval",
+  "winnerSelected": false,
+  "resultSha256": "8cd1f8c218b5ccf080168c2c896d7f5dc07673001801291924e2396f2a55ba45"
+}
