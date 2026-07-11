@@ -72,6 +72,8 @@
     "validate:k1-uncertainty-inputs": "tsx scripts/validate-k1-uncertainty-inputs.ts",
     "generate:index-sensitivity": "tsx scripts/generate-index-sensitivity-analysis.ts",
     "validate:index-sensitivity": "tsx scripts/validate-index-sensitivity-analysis.ts",
+    "generate:index-source-dependence": "tsx scripts/generate-index-source-dependence.ts",
+    "validate:index-source-dependence": "tsx scripts/validate-index-source-dependence.ts",
     "validate:ci-tournament-panel:v3": "tsx scripts/validate-ci-tournament-panel-v3.ts",
     "validate:ci-tournament-panel:v3:live": "tsx scripts/validate-ci-tournament-panel-v3.ts --live",
     "validate:ci-tournament-panel:v2": "tsx scripts/validate-ci-tournament-panel-v2.ts",

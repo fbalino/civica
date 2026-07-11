@@ -1,0 +1,259 @@
+{
+  "schemaVersion": "civica-index-source-dependence-result/v1",
+  "releaseId": "index-source-dependence-v1",
+  "panelReleaseId": "ci-research-panel-2000-2024-v3",
+  "ecosystemMap": {
+    "schemaVersion": "civica-index-source-ecosystem-map/v1",
+    "units": [
+      {
+        "id": "vdem",
+        "publisher": "V-Dem Institute",
+        "product": "Liberal Democracy Index",
+        "evidenceType": "expert-coded latent-construct estimate",
+        "civicaObservation": false,
+        "upstreamFamilies": [
+          "country_experts",
+          "vdem_measurement_model"
+        ]
+      },
+      {
+        "id": "worldbank_wgi",
+        "publisher": "World Bank",
+        "product": "Worldwide Governance Indicators",
+        "evidenceType": "aggregate of surveys and expert assessments",
+        "civicaObservation": false,
+        "upstreamFamilies": [
+          "vdem",
+          "freedom_house",
+          "eiu",
+          "bertelsmann",
+          "other_wgi_sources"
+        ]
+      },
+      {
+        "id": "freedom_house",
+        "publisher": "Freedom House",
+        "product": "Freedom in the World",
+        "evidenceType": "expert assessment",
+        "civicaObservation": false,
+        "upstreamFamilies": [
+          "freedom_house_analysts",
+          "country_experts"
+        ]
+      },
+      {
+        "id": "transparency_intl",
+        "publisher": "Transparency International",
+        "product": "Corruption Perceptions Index",
+        "evidenceType": "aggregate of corruption-perception sources",
+        "civicaObservation": false,
+        "upstreamFamilies": [
+          "freedom_house",
+          "eiu",
+          "bertelsmann",
+          "other_cpi_sources"
+        ]
+      }
+    ],
+    "documentedEdges": [
+      {
+        "from": "vdem",
+        "to": "worldbank_wgi",
+        "code": "VDM",
+        "kind": "constituent_source"
+      },
+      {
+        "from": "freedom_house",
+        "to": "worldbank_wgi",
+        "code": "FRH",
+        "kind": "constituent_source"
+      },
+      {
+        "from": "freedom_house",
+        "to": "transparency_intl",
+        "code": "Freedom House Nations in Transit",
+        "kind": "same_publisher_family"
+      },
+      {
+        "from": "eiu",
+        "to": "worldbank_wgi",
+        "code": "EIU",
+        "kind": "shared_upstream_source"
+      },
+      {
+        "from": "eiu",
+        "to": "transparency_intl",
+        "code": "Economist Intelligence Unit Country Ratings",
+        "kind": "shared_upstream_source"
+      },
+      {
+        "from": "bertelsmann",
+        "to": "worldbank_wgi",
+        "code": "BTI",
+        "kind": "shared_upstream_source"
+      },
+      {
+        "from": "bertelsmann",
+        "to": "transparency_intl",
+        "code": "Bertelsmann Transformation Index",
+        "kind": "shared_upstream_source"
+      }
+    ],
+    "evidence": [
+      {
+        "artifact": "WGI 2025 dataset with source data",
+        "sha256": "25a2f9eabb90b0092973392c0b31571aa58b691cc5786292e504b52f693e1eb8",
+        "url": "https://www.worldbank.org/content/dam/sites/govindicators/doc/wgidataset_with_sourcedata-2025.xlsx",
+        "inspectedFields": [
+          "FRH mean",
+          "VDM mean",
+          "EIU mean",
+          "BTI mean"
+        ]
+      },
+      {
+        "artifact": "CPI 2024 Results and trends",
+        "sha256": "34d1c16eb3c5b04cad2cf116c852dfc4ab8144b1c66cb37c74011848639f5736",
+        "url": "https://images.transparencycdn.org/images/CPI2024-Results-and-trends.xlsx",
+        "inspectedFields": [
+          "Freedom House Nations in Transit",
+          "Economist Intelligence Unit Country Ratings",
+          "Bertelsmann Foundation Transformation Index"
+        ]
+      }
+    ],
+    "independenceRule": "Publisher separation is not evidence independence. Direct inputs and upstream source families must both be disclosed.",
+    "deletionLimit": "WGI and CPI do not expose recomputed aggregate estimates with each shared upstream family removed; upstream-family deletion is therefore not identifiable from the captured releases."
+  },
+  "publisherLayer": {
+    "nominalPublisherCount": 4,
+    "civicaObservedInputCount": 0,
+    "leaveOnePublisherOut": [
+      {
+        "id": "drop_democratic_quality",
+        "category": "indicator_inclusion",
+        "note": "leave out democratic_quality",
+        "common": 177,
+        "coverage": 177,
+        "scoreSpearman": 0.9926782056935414,
+        "rankSpearman": 0.9926782056935414,
+        "medianAbsoluteRankShift": 14,
+        "p95AbsoluteRankShift": 25.19999999999999,
+        "maxAbsoluteRankShift": 38,
+        "topDecileJaccard": 1,
+        "comparisonSha256": "3407e5b0e2055d10a194df3fc57354db28ae70ba4514f278b4949bfd1883afce"
+      },
+      {
+        "id": "drop_rule_of_law",
+        "category": "indicator_inclusion",
+        "note": "leave out rule_of_law",
+        "common": 177,
+        "coverage": 177,
+        "scoreSpearman": 0.9951917067587509,
+        "rankSpearman": 0.9951917067587509,
+        "medianAbsoluteRankShift": 14,
+        "p95AbsoluteRankShift": 23,
+        "maxAbsoluteRankShift": 26,
+        "topDecileJaccard": 0.8947368421052632,
+        "comparisonSha256": "87ca996b5bba90dacce5ad7112f0590f30bf570602be35f9cf5b2099f950ca33"
+      },
+      {
+        "id": "drop_freedom_rights",
+        "category": "indicator_inclusion",
+        "note": "leave out freedom_rights",
+        "common": 177,
+        "coverage": 177,
+        "scoreSpearman": 0.9859116945673853,
+        "rankSpearman": 0.9859116945673853,
+        "medianAbsoluteRankShift": 13,
+        "p95AbsoluteRankShift": 33.19999999999999,
+        "maxAbsoluteRankShift": 51,
+        "topDecileJaccard": 1,
+        "comparisonSha256": "36236ffebdb13eee97bfc670b1772c537e9626e59281f9e09cae2ae336fc35ed"
+      },
+      {
+        "id": "drop_corruption_control",
+        "category": "indicator_inclusion",
+        "note": "leave out corruption_control",
+        "common": 193,
+        "coverage": 193,
+        "scoreSpearman": 0.995153351400263,
+        "rankSpearman": 0.995153351400263,
+        "medianAbsoluteRankShift": 3,
+        "p95AbsoluteRankShift": 10.399999999999977,
+        "maxAbsoluteRankShift": 22,
+        "topDecileJaccard": 0.8181818181818182,
+        "comparisonSha256": "8bdd2349607b7a9d0bced39a0ad45f7189a0a9090ba24ba645f3fa7a6f4d5559"
+      }
+    ],
+    "interpretation": "Removing one published input changes some ranks substantially, but does not create independent Civica information in the remaining derivative score."
+  },
+  "upstreamLayer": {
+    "sharedFamilies": [
+      "vdem",
+      "freedom_house",
+      "eiu",
+      "bertelsmann"
+    ],
+    "leaveOneFamilyOut": "not_identifiable_from_published_aggregates",
+    "reason": "WGI and CPI do not expose recomputed aggregate estimates with each shared upstream family removed; upstream-family deletion is therefore not identifiable from the captured releases.",
+    "safeInference": "The four publisher labels are an upper bound, not a count of independent evidence streams."
+  },
+  "similarityDecomposition": {
+    "completePanelN": 2270,
+    "pairwiseInputCorrelation": [
+      [
+        0.999999999999998,
+        0.8233775439410584,
+        0.9363547965216198,
+        0.764078735119925
+      ],
+      [
+        0.8233775439410584,
+        0.9999999999999946,
+        0.7858794010899517,
+        0.9570634813955562
+      ],
+      [
+        0.9363547965216198,
+        0.7858794010899517,
+        0.9999999999999831,
+        0.7147277960517013
+      ],
+      [
+        0.764078735119925,
+        0.9570634813955562,
+        0.7147277960517013,
+        1.0000000000000042
+      ]
+    ],
+    "firstComponentExplainedVariance": 0.8729159403889765,
+    "firstComponentLoadings": [
+      0.5046492144840047,
+      0.5109675258184334,
+      0.4919748606334133,
+      0.49214031981173684
+    ],
+    "publicInputReconstructionR2": 0.999847164869575,
+    "originalityThreshold": 0.9,
+    "passesOriginality": false,
+    "deterministicInputShare": 1,
+    "civicaObservationShare": 0,
+    "interpretation": "The score is a deterministic transform of four public inputs; a linear model reconstructs it almost exactly and a single common level factor explains most complete-panel variance."
+  },
+  "claimRules": {
+    "independentCorroborationAllowed": false,
+    "allowedDescription": "a Civica transformation of overlapping third-party governance assessments",
+    "prohibitedDescriptions": [
+      "four independent sources",
+      "independent corroboration",
+      "original country measurement"
+    ]
+  },
+  "limitations": [
+    "Shared source names prove overlap, but do not reveal country-level coder overlap or the covariance attributable to each upstream source.",
+    "WGI and CPI would need publisher-side recomputation to estimate true leave-one-upstream-family-out effects.",
+    "High correlations alone do not prove shared errors; the deterministic construction and documented source reuse establish the narrower dependence claim."
+  ],
+  "resultSha256": "1ec636ae39cce86e10bea561f84b3b0d6e7bd9aeafc3926a862799fd98170bc6"
+}
