@@ -1,0 +1,198 @@
+{
+  "schemaVersion": "civica-index-longitudinal-result/v1",
+  "releaseId": "index-longitudinal-analysis-v1",
+  "protocolVersion": "civica-index-longitudinal-validation/v1",
+  "inputReleaseId": "ci-longitudinal-validation-labels-2000-2022-v2",
+  "responsiveness": {
+    "events": 55,
+    "directionAccuracy": 0.7454545454545455,
+    "directionInterval": {
+      "iterationsRequested": 2000,
+      "iterationsValid": 2000,
+      "lower95": 0.632597604259095,
+      "upper95": 0.8500265957446806,
+      "bootstrapSha256": "3ef2c6f989d6e54dd0f48e29cd41c94a3a7a34ff92337d72843c27d54d2b6934"
+    },
+    "medianSignedMovement": 5,
+    "movementInterval": {
+      "iterationsRequested": 2000,
+      "iterationsValid": 2000,
+      "lower95": 3,
+      "upper95": 7,
+      "bootstrapSha256": "2f9572d1669d1e4ad09eeb810462a34c505486cdcefcaff1166c95408a8498e6"
+    },
+    "passesDirection": true,
+    "passesMagnitude": true
+  },
+  "leadLag": {
+    "rows": [
+      {
+        "lag": -2,
+        "n": 47,
+        "meanSignedMovement": -0.48936170212765956,
+        "medianSignedMovement": 0
+      },
+      {
+        "lag": -1,
+        "n": 52,
+        "meanSignedMovement": 0.46153846153846156,
+        "medianSignedMovement": 0
+      },
+      {
+        "lag": 0,
+        "n": 55,
+        "meanSignedMovement": 4.363636363636363,
+        "medianSignedMovement": 3
+      },
+      {
+        "lag": 1,
+        "n": 58,
+        "meanSignedMovement": 1.1379310344827587,
+        "medianSignedMovement": 1
+      },
+      {
+        "lag": 2,
+        "n": 58,
+        "meanSignedMovement": -0.017241379310344827,
+        "medianSignedMovement": 0
+      }
+    ],
+    "peakAbsoluteMeanLag": 0,
+    "passes": true
+  },
+  "quiet": {
+    "n": 2890,
+    "medianAbsoluteChange": 1,
+    "p95AbsoluteChange": 4,
+    "medianInterval": {
+      "iterationsRequested": 2000,
+      "iterationsValid": 2000,
+      "lower95": 1,
+      "upper95": 1,
+      "bootstrapSha256": "8b0fb854f7cdb38d05d03d66162f6aca7e8f23d1dba1281a7bf3b7c3d8e03dcd"
+    },
+    "eventToQuietMedianRatio": 5,
+    "passesMedian": true,
+    "passesP95": true,
+    "passesEventRatio": true
+  },
+  "autocorrelation": {
+    "levelLag1": 0.996495108719767,
+    "levelPairs": 3466,
+    "changeLag1": 0.11066706331142782,
+    "changePairs": 3273
+  },
+  "revision": {
+    "qog": {
+      "jan24VsJan26": {
+        "commonStart": 1946,
+        "commonEnd": 2023,
+        "a": 219,
+        "b": 258,
+        "intersection": 219,
+        "union": 258,
+        "jaccard": 0.8488372093023255,
+        "bEventsAfterCommonEnd": 6
+      },
+      "jan25VsJan26": {
+        "commonStart": 1946,
+        "commonEnd": 2024,
+        "a": 260,
+        "b": 260,
+        "intersection": 259,
+        "union": 261,
+        "jaccard": 0.9923371647509579,
+        "bEventsAfterCommonEnd": 4
+      }
+    },
+    "qogPasses": false,
+    "vdem": {
+      "comparableScores": 3088,
+      "medianAbsoluteK1Shift": 0,
+      "p95AbsoluteK1Shift": 1,
+      "maxAbsoluteK1Shift": 2,
+      "nonzeroShifts": 526,
+      "shiftsAboveThreePoints": 0,
+      "largestShifts": [
+        {
+          "iso3": "AFG",
+          "year": 2006,
+          "oldScore": 21,
+          "revisedScore": 23,
+          "absoluteShift": 2
+        },
+        {
+          "iso3": "AFG",
+          "year": 2007,
+          "oldScore": 21,
+          "revisedScore": 23,
+          "absoluteShift": 2
+        },
+        {
+          "iso3": "AFG",
+          "year": 2008,
+          "oldScore": 21,
+          "revisedScore": 22,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2009,
+          "oldScore": 19,
+          "revisedScore": 20,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2010,
+          "oldScore": 16,
+          "revisedScore": 17,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2011,
+          "oldScore": 16,
+          "revisedScore": 17,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2012,
+          "oldScore": 14,
+          "revisedScore": 15,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2013,
+          "oldScore": 15,
+          "revisedScore": 16,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2015,
+          "oldScore": 16,
+          "revisedScore": 17,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2016,
+          "oldScore": 17,
+          "revisedScore": 18,
+          "absoluteShift": 1
+        }
+      ],
+      "shiftSha256": "c149f2d3e6f2fdac2c8014424eff3957b49e7e64bff3fb48d38efe7125c15ee4"
+    },
+    "vdemPasses": true
+  },
+  "exclusions": {
+    "labelsMissing": 105,
+    "eventEndpointsMissing": 209
+  },
+  "noCausalClaim": true,
+  "resultSha256": "cccb941f868e4366ceb118d3780d8dc619a5c02ec3ffdcdbbf7ded7245c191d4"
+}

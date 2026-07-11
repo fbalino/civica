@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 291
-- **Completed:** 73
-- **Remaining:** 218
-- **Progress:** 25.1%
+- **Completed:** 74
+- **Remaining:** 217
+- **Progress:** 25.4%
 - **Priority mix:** P0 182 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -92,7 +92,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-014** (P0) Test dimensionality across cross-sectional, between-country, within-country, change, region/regime, and time slices. _Done when: PCA/factor or justified alternatives report sample/assumptions/loadings/variance/stability for each level, distinguish a global level factor from longitudinal change, and reproduce all figures/tables from the frozen panel._
 - [x] **IDX-015** (P0) Test convergent and discriminant validity against declared external constructs. _Done when: hypotheses are preregistered, expected/undesired associations and uncertainty are reported, same-source mechanical correlations are separated, and no candidate passes merely by resembling one of its inputs._
 - [x] **IDX-016** (P0) Test incremental information beyond established indicators and simple dashboards. _Done when: held-out prediction/explanation or justified decision-utility tests compare nested baselines, effect sizes/uncertainty are reported, and a candidate fails if added complexity produces less than the preregistered meaningful gain._
-- [ ] **IDX-017** (P0) Test longitudinal sensitivity and responsiveness without rewarding noise. _Done when: candidates are evaluated on known/independently coded changes, lead/lag, revision sensitivity, autocorrelation, stability under quiet periods, and source-update artifacts; level accuracy cannot substitute for change validity._
+- [x] **IDX-017** (P0) Test longitudinal sensitivity and responsiveness without rewarding noise. _Done when: candidates are evaluated on known/independently coded changes, lead/lag, revision sensitivity, autocorrelation, stability under quiet periods, and source-update artifacts; level accuracy cannot substitute for change validity._
 - [ ] **IDX-018** (P0) Run temporal and geographic out-of-sample validation. _Done when: held-out years and countries/regions remain untouched until final evaluation, all candidates/baselines use identical splits, uncertainty and subgroup sample limits are reported, and results reproduce from the preregistration artifact._
 - [ ] **IDX-019** (P0) Run full sensitivity and uncertainty analysis. _Done when: indicator inclusion, source substitution, vintages, normalization, weights/model parameters, aggregation, missingness/imputation, uncertainty/covariance, outliers, and country coverage are varied; rank/decision stability and dominant choices are published._
 - [ ] **IDX-020** (P0) Measure source/ecosystem dependence and apparent novelty. _Done when: overlapping source families/experts/constructs are mapped, leave-one-source-family-out results are reported, established-indicator similarity is decomposed, and Civica does not claim independent corroboration from repackaged inputs._
