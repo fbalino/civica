@@ -1,0 +1,9 @@
+{"command":"npm run generate:index-tournament-evaluation-suite","exitCode":0}
+> civica@0.1.0 generate:index-tournament-evaluation-suite
+> tsx scripts/generate-tournament-evaluation-suite.ts
+
+{
+  "interfaceVersion": "civica-tournament-evaluation-interface/v1",
+  "artifacts": 6,
+  "suiteSha256": "9f82c970c1aa4d8b94702bf3da5d1a2c4ae7d10b9e37a8e3477bd8ef471759ca"
+}

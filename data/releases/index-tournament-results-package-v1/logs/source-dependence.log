@@ -1,0 +1,5 @@
+{"command":"npm run generate:index-source-dependence","exitCode":0}
+> civica@0.1.0 generate:index-source-dependence
+> tsx scripts/generate-index-source-dependence.ts
+
+Wrote data/releases/index-source-dependence-v1/result.v1.json (1ec636ae39cce86e10bea561f84b3b0d6e7bd9aeafc3926a862799fd98170bc6)

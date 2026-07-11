@@ -1,0 +1,49 @@
+{"command":"npm run generate:index-validity","exitCode":0}
+> civica@0.1.0 generate:index-validity
+> tsx scripts/generate-index-validity-analysis.ts
+
+{
+  "resultSha256": "6b7f3642f135b8ca217b47ae6c44f8bbd98fa3edd1e7448b99f6927266cd5b03",
+  "hypotheses": [
+    {
+      "id": "H1",
+      "n": 191,
+      "estimate": 0.6668506608104687,
+      "lower": 0.5736577733830952,
+      "upper": 0.7468307564211264,
+      "pass": true
+    },
+    {
+      "id": "H2",
+      "n": 2281,
+      "estimate": 0.6578836132491834,
+      "lower": 0.5537700965404939,
+      "upper": 0.7419513242153875,
+      "pass": true
+    },
+    {
+      "id": "H3",
+      "n": 2089,
+      "estimate": 0.018618473897296674,
+      "lower": -0.027206996223109226,
+      "upper": 0.06400265587591958,
+      "pass": true
+    },
+    {
+      "id": "H4",
+      "n": 2041,
+      "estimate": -0.07825662031162206,
+      "lower": -0.1860304374502715,
+      "upper": 0.0360522494019674,
+      "pass": true
+    }
+  ],
+  "candidateValidity": {
+    "K0": "not_applicable_reference_fidelity",
+    "K1": "limited_external_checks_pass",
+    "K2": "undesired_association_check_passes_but_expert_validity_pending",
+    "K3": "insufficient_external_labels",
+    "K4": "insufficient_blinded_scholar_labels",
+    "K5": "insufficient_double_coded_expert_labels"
+  }
+}

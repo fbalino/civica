@@ -1,0 +1,37 @@
+{"command":"npm run generate:k2-concordance-prototype -- --write","exitCode":0}
+> civica@0.1.0 generate:k2-concordance-prototype
+> tsx scripts/generate-k2-concordance-prototype.ts --write
+
+{
+  "schemaVersion": "k2-concordance-prototype-manifest/v1",
+  "releaseId": "k2-concordance-prototype-v1",
+  "candidateId": "K2",
+  "methodVersion": "k2-measurement-concordance/v1",
+  "protocolVersion": "civica-index-tournament-preregistration/v3",
+  "panelReleaseId": "ci-research-panel-2000-2024-v3",
+  "contractSha256": "08207ef8c9a5eb7ca3a79e6d8390fdb39b6fa13fd1503799b6f9292133454f1f",
+  "inputCells": 14550,
+  "outputs": {
+    "total": 3260,
+    "development": 1208,
+    "validation": 1004,
+    "finalHoldout": 1048,
+    "outputSha256": "b99d95495b1b0fb2633e3b960a1e3b13ea7573c569f28b5deced4545300324cf"
+  },
+  "developmentDiagnostics": {
+    "developmentRows": 1208,
+    "midpointArtifactR2": 0.09837770653340672,
+    "dropOneSourceAnyTercileChangeRate": 0.6564569536423841,
+    "tercileThresholds": [
+      6.432748538011708,
+      11.111111111111114
+    ],
+    "diagnosticSha256": "91516d8a0f1708d5ae17a117549d34a2dd141eb25fd8b47898ca4477f9221a38"
+  },
+  "confirmatoryHoldoutInspected": false,
+  "expertKnownCaseStatus": "pending_external_expert_list",
+  "withinSourceUncertainty": "not_retained",
+  "valuesLocation": "private_reproducible_from_ci_research_panel_rows",
+  "publicValuesIncluded": false,
+  "rightsPosture": "private_internal_research_only_pending_source_terms"
+}

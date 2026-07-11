@@ -1,0 +1,712 @@
+{
+  "schemaVersion": "civica-index-tournament-results-package/v1",
+  "releaseId": "civica-index-tournament-results-v1",
+  "protocolVersion": "civica-index-tournament-preregistration/v3",
+  "protocolSha256": "532adc167d808bfbb532579f319cedbf6049be130f31f37f787ca330c3ecf986",
+  "readerProtocolSha256": "5ffba28942f25a9f427e12a0c84e92603b6542ccd27bc59d0c83e0299ff10fb6",
+  "environment": {
+    "node": "v25.4.0",
+    "npm": "11.7.0",
+    "platform": "darwin",
+    "platformRelease": "25.5.0",
+    "arch": "arm64",
+    "packageLockSha256": "d71b55dbb2a75caa0c1c7c63cb31382b80dd682f851bbb4495c6704b60d23927"
+  },
+  "seeds": [
+    "civica-index-validity-bootstrap-v1",
+    "civica-index-incremental-bootstrap-v1",
+    "civica-longitudinal-bootstrap-v1",
+    "index-reader-task-protocol-v1"
+  ],
+  "code": {
+    "files": [
+      {
+        "path": "scripts/generate-index-dimensionality-analysis.ts",
+        "sha256": "67e2a15b3a80f92774202e4e945aad01cabd7997a8d13f7661fe7943e9b3a070"
+      },
+      {
+        "path": "scripts/generate-index-longitudinal-analysis.ts",
+        "sha256": "ca72adde391232c43c1f107d62f743cc60f4a5d8a241aed27d04320f29d433a8"
+      },
+      {
+        "path": "scripts/generate-index-misuse-audit.ts",
+        "sha256": "6a09467a2a3bb87710cfbf83497740aa5b17fe6a721996e799f3aacbf2be84d0"
+      },
+      {
+        "path": "scripts/generate-index-oos-validation.ts",
+        "sha256": "90644c3b28f97c1575703c9ad2af0e34460fd8ee207e4ead71fc480a6ff7b8ca"
+      },
+      {
+        "path": "scripts/generate-index-sensitivity-analysis.ts",
+        "sha256": "ff1ea5f6d27a0001906b46c845f1b03027499e380f23d7468a4bdd85c7ab98a7"
+      },
+      {
+        "path": "scripts/generate-index-source-dependence.ts",
+        "sha256": "432d2ddb11878f36ca6aab7494bd2c5b761093a0e1e89870d214ff9d0f4acef4"
+      },
+      {
+        "path": "scripts/generate-index-subgroup-fairness.ts",
+        "sha256": "65cfe26feead23244ef2ee949450360b819740312b2e7a38abaa3b2a57a974ae"
+      },
+      {
+        "path": "scripts/generate-index-tournament-baselines.ts",
+        "sha256": "a0ebf89aa99fa6ac802b001d690685b04ec02347a58abf670dedb29390fa7f63"
+      },
+      {
+        "path": "scripts/generate-index-validity-analysis.ts",
+        "sha256": "1f45f3f2852eb0f1fd02931e550e0f71e980c26754a7705cb951ce829866c827"
+      },
+      {
+        "path": "scripts/generate-k1-tournament-candidate.ts",
+        "sha256": "b7e6ce41aa457a77106b2797973fec5c9d56e96086e5bcc202c96b92406cb214"
+      },
+      {
+        "path": "scripts/generate-k1-uncertainty-inputs.ts",
+        "sha256": "35a62ff018fefcfdea140f9e635d1763e79a79667880e24d7ede8a72759ac599"
+      },
+      {
+        "path": "scripts/generate-k2-concordance-prototype.ts",
+        "sha256": "26ba55e558cfd9557585e8ef411400bcbd9c5593ffc5e43838a3225aed5c1d00"
+      },
+      {
+        "path": "scripts/generate-k3-ledger-prototype.ts",
+        "sha256": "9734f282366a2f63a2a8cb56ac420d6d0c00d0ac08c4cddce6ea9e396920d24e"
+      },
+      {
+        "path": "scripts/generate-k4-pairing-prototype.ts",
+        "sha256": "d7144347f5cf2644d7c364e9ffd5597c4fcbe123fc997287138fcf6c03a0df64"
+      },
+      {
+        "path": "scripts/generate-k5-relation-candidates.ts",
+        "sha256": "e0463f3f3be073a601c1f61368e4aa006036296e45050a8717192b134c98ae23"
+      },
+      {
+        "path": "scripts/generate-tournament-evaluation-suite.ts",
+        "sha256": "835f3622f4031eb7ac6cbb127938b2e23ee395b9480395833728fec72b963a46"
+      },
+      {
+        "path": "scripts/reproduce-index-tournament-package.ts",
+        "sha256": "b802dfdcf0c665c6b4be8922b001c26dd29df4087beb06d4e7aed5bfa21cda1e"
+      },
+      {
+        "path": "scripts/validate-governance-evidence-dashboard.ts",
+        "sha256": "32502cecb1d274d64fd7f96ffea37dfd9a3fd8457d0ee4842dce089a69e7d609"
+      },
+      {
+        "path": "scripts/validate-index-tournament-package.ts",
+        "sha256": "e3f466ad41b89caf1040b4f4224618f40537b740b758d8236cf76bb7ea90496e"
+      },
+      {
+        "path": "src/lib/ci/atomic-ingestion.ts",
+        "sha256": "f0f41800307261d604badc6450d6b7360119ef1246b7dc6f6b889adadea6e66a"
+      },
+      {
+        "path": "src/lib/ci/bands.ts",
+        "sha256": "7f0d893da21789b6c9c00beb43542619e2a1e1e3a8441bd4cde73d4c11d2d69c"
+      },
+      {
+        "path": "src/lib/ci/calculate-v2.ts",
+        "sha256": "4b57bf6a7bb43f305a18b8fba2644ec8d37489508b864e9105da87e74a812c73"
+      },
+      {
+        "path": "src/lib/ci/calculate.ts",
+        "sha256": "49714714bcaefda70de5a0b0a2279c7783630f8969ec9a32eeb974f4619b693a"
+      },
+      {
+        "path": "src/lib/ci/candidate-specifications.ts",
+        "sha256": "9d99fdeaaf8d689285991cfafbdce6eb4490b723afa256ebc94ef222a0fcc234"
+      },
+      {
+        "path": "src/lib/ci/claims-docs-gate.ts",
+        "sha256": "44aa57e4a4481d9c71b22b54441a956213be9a5fe558fc2abb52c0adb38090dd"
+      },
+      {
+        "path": "src/lib/ci/current-release.ts",
+        "sha256": "31b002ad7416fde22cfd2c7a8b3f60bbce2f938f1585acce953790c793a8dd8a"
+      },
+      {
+        "path": "src/lib/ci/dimension-colors.ts",
+        "sha256": "e8d753397ae82990646ccdf6db2ea704b34d20e77bf54922fed20ba44891712c"
+      },
+      {
+        "path": "src/lib/ci/dimensionality-analysis.ts",
+        "sha256": "3760a51940e1725927e33be42764ebc9bceb22cd6872ccfdd6d90c9c9ae615e1"
+      },
+      {
+        "path": "src/lib/ci/dimensions-v2.ts",
+        "sha256": "5607e976c2889b7e9d558cb55eedd35dec717a4a826d1ecc01b14606f648e2e3"
+      },
+      {
+        "path": "src/lib/ci/governance-evidence.ts",
+        "sha256": "5174855f9b5ed486cdf17b2bb1327a57c56a342f4bf70d2f043ea759e2acdf7a"
+      },
+      {
+        "path": "src/lib/ci/history-adapters.ts",
+        "sha256": "75a4a013abffa1e89a33f7e009c6655e98b9546bdf0f5b38178182b5114df02a"
+      },
+      {
+        "path": "src/lib/ci/incremental-information-analysis.ts",
+        "sha256": "42dafc16a8b8e99ebac38f04b8d2c587312eb88a3cdfb1c14c62b633038e4036"
+      },
+      {
+        "path": "src/lib/ci/incremental-information-preregistration.ts",
+        "sha256": "cde8795fadb3e5f61ed82b294883f0cbe72cb200216228441a156f2a30058c71"
+      },
+      {
+        "path": "src/lib/ci/ingest.ts",
+        "sha256": "cd8e226bbaf26ccfd8961ec8b5d30f632bd8088530958510fb00b6114dd25534"
+      },
+      {
+        "path": "src/lib/ci/k1-uncertainty-inputs.ts",
+        "sha256": "d7efe443224ec254a093c36c514058bda57ebde7202b642eae7527214b4cc864"
+      },
+      {
+        "path": "src/lib/ci/k4-practice-inputs.ts",
+        "sha256": "ac3fc1df3fc22a3569cadde3fb1938d64f44ab77f7f3f1f8d4b2d27d07329405"
+      },
+      {
+        "path": "src/lib/ci/longitudinal-analysis.ts",
+        "sha256": "32a2b0f64f7c364c051b0c592199a8d0432c50f83b69513675040a6bf77d483a"
+      },
+      {
+        "path": "src/lib/ci/longitudinal-preregistration.ts",
+        "sha256": "3325b99738f757a794fda1428a6cbe04f0203b3e7031c9c7ab3c828404aacea0"
+      },
+      {
+        "path": "src/lib/ci/longitudinal-validation-inputs.ts",
+        "sha256": "5e8a986acd2cf1a334e8e32ded0ece7157042c322582b1ea4f0e161459348939"
+      },
+      {
+        "path": "src/lib/ci/missingness-policy.ts",
+        "sha256": "7d9e2697abb5cf5375b5d0149956feba31e35a17829f808417f737dcc6965594"
+      },
+      {
+        "path": "src/lib/ci/misuse-audit.ts",
+        "sha256": "14062f75f625a40bdfe971ba114e225bb2302df609e81f87ae06d09bf6f5b515"
+      },
+      {
+        "path": "src/lib/ci/monte-carlo.ts",
+        "sha256": "2621526cfc04b95f2d1cabdcea35c5cb7fefb9065b0ac1789885a79bc6382000"
+      },
+      {
+        "path": "src/lib/ci/normalization-table.ts",
+        "sha256": "9d27f4ef51911a08898943e1fb31d110fc8878909ba9542913b3fe73b6871f6c"
+      },
+      {
+        "path": "src/lib/ci/normalize-v2.ts",
+        "sha256": "185a04bd4ac235f31202b5c38aa50c671483485e74a10d310963a633ac39b40c"
+      },
+      {
+        "path": "src/lib/ci/normalize.ts",
+        "sha256": "28d4970f0097b25a2347d28d4b043e11640d825d3a6f500aa292500c9abae512"
+      },
+      {
+        "path": "src/lib/ci/pca-analysis.ts",
+        "sha256": "efab3a4c64b117eed8367f329f1a9d115026a70911ba296df8fe4522d602237c"
+      },
+      {
+        "path": "src/lib/ci/production-source-adapters.ts",
+        "sha256": "6630049f39b2eeb2886879210026ae802f31ad70abed7eb60dbb3d5411be1b82"
+      },
+      {
+        "path": "src/lib/ci/quarantine-contract.ts",
+        "sha256": "86c54aad24ee9ff01f6787738124325641298a54ada19f8352a719d07daedf57"
+      },
+      {
+        "path": "src/lib/ci/rank-policy.ts",
+        "sha256": "d06873999c72e69d3720953380fef110290b41ca61278c6c5af2e39680011d2c"
+      },
+      {
+        "path": "src/lib/ci/reader-task-protocol.ts",
+        "sha256": "72020711b924f3300de430f731146169a884943bcb891fc9cf3988a77a06fb08"
+      },
+      {
+        "path": "src/lib/ci/reproduce-current-release.ts",
+        "sha256": "6cfdf010f4de81861a18a4ac2a79aa340509dca2ed82ee4425b8fab48d3726fb"
+      },
+      {
+        "path": "src/lib/ci/research-charter.ts",
+        "sha256": "7185961930cd345ae3fcc211824db5b85ee342733c0da9ced8fbadbdfe181619"
+      },
+      {
+        "path": "src/lib/ci/research-panel.ts",
+        "sha256": "db61bc83d1c2b48c1952e3078e926529ccd7c738a3f20fab4223e1336cdfdc57"
+      },
+      {
+        "path": "src/lib/ci/sensitivity-analysis.ts",
+        "sha256": "e1cefef801855a0951f27caa2483f67fa6c8f8b10b76a043fd3a4ad64ba91f27"
+      },
+      {
+        "path": "src/lib/ci/source-ecosystem-dependence.ts",
+        "sha256": "3ee13c6441f204ef90935903cbb7a0348d9f7444f3a6bd335e85ccf0273aec1a"
+      },
+      {
+        "path": "src/lib/ci/source-utils.ts",
+        "sha256": "4aa706cf288dd4897ee42caa1fa0c08443221079e45f1796e8885319c8280c75"
+      },
+      {
+        "path": "src/lib/ci/subgroup-fairness.ts",
+        "sha256": "2327dfd3de8a77681b83f2f09c4d779bca1f3797e400f316e08f3edf8f9e0f81"
+      },
+      {
+        "path": "src/lib/ci/tiers.ts",
+        "sha256": "02bf8cee3b51155410eb70fd3d3a5c27dfecc36532b0b37333fe333ca15b85cc"
+      },
+      {
+        "path": "src/lib/ci/tournament-baselines.ts",
+        "sha256": "7a4254489d9ea78e00658785c461466faeae931a7bf90371f35127ef17b3a1f8"
+      },
+      {
+        "path": "src/lib/ci/tournament-candidate-k1.ts",
+        "sha256": "e72caf0ff53c97c98b483d0cb5392d26b20b58a6556a471f252c7f13bfbe3c00"
+      },
+      {
+        "path": "src/lib/ci/tournament-candidate-k2.ts",
+        "sha256": "5fa234498ce7d0c4a578f705316d44f7b72a0978d86eee70ed94600f8198042f"
+      },
+      {
+        "path": "src/lib/ci/tournament-candidate-k3.ts",
+        "sha256": "2711a26cdfff490b04bb977e1cfc34631aba55c8ab808b46745518b4255f91e6"
+      },
+      {
+        "path": "src/lib/ci/tournament-candidate-k4.ts",
+        "sha256": "8b63eae64ca335ed868b188f40d760113c0003c164b47358fecfcb8a778f8ac9"
+      },
+      {
+        "path": "src/lib/ci/tournament-candidate-k5.ts",
+        "sha256": "9c2cb14429668f433f90c0a798a44279ead6d62cc0c158e9cb1ae561945497a3"
+      },
+      {
+        "path": "src/lib/ci/tournament-evaluation-interface.ts",
+        "sha256": "6460ac00b54ef65003e9d168c0a8b994225afc92eb4eee028e094f7fcdc1dcba"
+      },
+      {
+        "path": "src/lib/ci/tournament-preregistration.ts",
+        "sha256": "356a0e6fba6a31af73d26303d40acf6bef74cedd7bfb4282b67671a6f5891295"
+      },
+      {
+        "path": "src/lib/ci/tournament-results-package.ts",
+        "sha256": "9eb8107cc2a086ec63cbce9398ca7540a14c4ef2a9a1430cae2ce22e4e534389"
+      },
+      {
+        "path": "src/lib/ci/types.ts",
+        "sha256": "7ad4bb4a71900ba071eb07a3d18fafc4d92c5e29bf379f1a0a1f948fc2493fc8"
+      },
+      {
+        "path": "src/lib/ci/uncertainty-policy.ts",
+        "sha256": "cf3d7064b6b9b70d2bf7d372a42f6b8b356bb0db353cbfe22fddf1e1419e3a3d"
+      },
+      {
+        "path": "src/lib/ci/validity-analysis.ts",
+        "sha256": "9b634ff923d79527c4a47b71ee0ea4bf99a7708203f0fa3c8c5d5f58ef607b72"
+      },
+      {
+        "path": "src/lib/ci/validity-preregistration.ts",
+        "sha256": "d94eb6cdb6fb944dffd620861d189b5effa7ec8aa62bbcfe7777ed50621bc22f"
+      },
+      {
+        "path": "src/lib/ci/versioning.ts",
+        "sha256": "9ef6876543377898e0f502352b02fdce5b51b73e2867861e2b934aafa0e15ad1"
+      }
+    ],
+    "treeSha256": "8baa2528c8effc49fcd6035274e3589e48b6b65b8ae345dee58aa1938e659ff9"
+  },
+  "artifacts": [
+    {
+      "id": "panel-manifest",
+      "path": "data/releases/ci-research-panel-2000-2024-v3/manifest.v3.json",
+      "role": "panel",
+      "analysisClass": "not_an_analysis",
+      "bytes": 2236,
+      "sha256": "f9f83964c34693cc17944e418818f0092c2a03f158f32e5e3adddfa50bfe0c84"
+    },
+    {
+      "id": "preregistered-protocol",
+      "path": "plan/research/index-tournament-preregistration-v3.md",
+      "role": "protocol",
+      "analysisClass": "not_an_analysis",
+      "bytes": 793,
+      "sha256": "3a831c23cbc3a01d3b292da429f4d662c10e8225afd341222b4633e2c894f31a"
+    },
+    {
+      "id": "panel-coverage",
+      "path": "data/releases/ci-research-panel-2000-2024-v3/coverage.v3.json",
+      "role": "panel",
+      "analysisClass": "not_an_analysis",
+      "bytes": 721,
+      "sha256": "3134aa8aa70c102dd3421ae396fbb6777d646fb02630588cdc1cadddb3ef9a94"
+    },
+    {
+      "id": "baselines",
+      "path": "data/releases/ci-index-baselines-v3/manifest.v3.json",
+      "role": "baseline",
+      "analysisClass": "not_an_analysis",
+      "bytes": 2302,
+      "sha256": "b33e849ec082e8042a90b274aabdb4b694342d2aa5ce44ad1a9317b4ea129cce"
+    },
+    {
+      "id": "k0",
+      "path": "plan/evidence/IDX-031/README.md",
+      "role": "candidate",
+      "analysisClass": "not_an_analysis",
+      "bytes": 1849,
+      "sha256": "6bd51fcef1c3729aedc07b5dbcfc9c40161b03223b3e023e52e74c2fb8eee251"
+    },
+    {
+      "id": "k1",
+      "path": "data/releases/k1-current-composite-tournament-v1/manifest.v1.json",
+      "role": "candidate",
+      "analysisClass": "not_an_analysis",
+      "bytes": 3343,
+      "sha256": "0e6c24d58dc59710deebe47fadbeb4c12e2879440cfad9137628653cfa994e5b"
+    },
+    {
+      "id": "k2",
+      "path": "data/releases/k2-concordance-prototype-v1/manifest.v1.json",
+      "role": "candidate",
+      "analysisClass": "not_an_analysis",
+      "bytes": 1287,
+      "sha256": "3b355c2491a31321b9bfd2c92ea501991110f295271d32b3fdc486dd7b623e35"
+    },
+    {
+      "id": "k3",
+      "path": "data/releases/k3-power-transfer-ledger-prototype-v1/manifest.v1.json",
+      "role": "candidate",
+      "analysisClass": "not_an_analysis",
+      "bytes": 1061,
+      "sha256": "a630c639941b009d56fc84674d31ac32baca52cbced631b3d623d2a79c65519d"
+    },
+    {
+      "id": "k4",
+      "path": "data/releases/k4-constitution-practice-pairings-2024-v1/manifest.v1.json",
+      "role": "candidate",
+      "analysisClass": "not_an_analysis",
+      "bytes": 1110,
+      "sha256": "9ac2e28a6ae8061cd31e1d0dd70148069e803a33bbc3e9597917f5ed44da3bb0"
+    },
+    {
+      "id": "k5",
+      "path": "data/releases/k5-institutional-relation-candidates-v1/manifest.v1.json",
+      "role": "candidate",
+      "analysisClass": "not_an_analysis",
+      "bytes": 1804,
+      "sha256": "f45cbe8a1c612a0583080fb5dfcacc36974698e158572df1543f2bdf216481cb"
+    },
+    {
+      "id": "evaluation-suite",
+      "path": "data/releases/index-tournament-evaluation-suite-v1/manifest.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 7005,
+      "sha256": "e52bf0dc6c3a12489f19098a2842113b54c6c61c93488d177129d8a22868c09e"
+    },
+    {
+      "id": "dimensionality",
+      "path": "data/releases/index-dimensionality-analysis-v1/result.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 36589,
+      "sha256": "da3e54a515814e829287abb2600f52edd0eb02daf5920b1ebe2cc3aa63801e9f"
+    },
+    {
+      "id": "dimensionality-table",
+      "path": "data/releases/index-dimensionality-analysis-v1/table.v1.csv",
+      "role": "table",
+      "analysisClass": "confirmatory",
+      "bytes": 3512,
+      "sha256": "d5d2ec2279a4affd063cfe4caccf2c76f7f345b5bbd05a15975807485506b381"
+    },
+    {
+      "id": "dimensionality-figure",
+      "path": "data/releases/index-dimensionality-analysis-v1/pc1-level-comparison.v1.svg",
+      "role": "figure",
+      "analysisClass": "confirmatory",
+      "bytes": 1699,
+      "sha256": "7dafa5b35f0e99e105e349cf295a936f4b5dda51d8d149ca1e3f7d82ddb4de35"
+    },
+    {
+      "id": "validity",
+      "path": "data/releases/index-validity-analysis-v1/result.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 4629,
+      "sha256": "4ecc0c9a985d4eee07911136ec031d511d288fd0b0d961ed4aef358951ba4e9e"
+    },
+    {
+      "id": "longitudinal",
+      "path": "data/releases/index-longitudinal-analysis-v1/result.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 4941,
+      "sha256": "fbca344ee15d3039010732a00a820c7e76b0726c8a812f9dc2419d88250423fd"
+    },
+    {
+      "id": "out-of-sample",
+      "path": "data/releases/index-oos-validation-v1/result.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 4681,
+      "sha256": "279d8379df018d59345b747375e62b1d5787dbeef6c43b7800e2ffb58c8623af"
+    },
+    {
+      "id": "uncertainty-inputs",
+      "path": "data/releases/ci-k1-uncertainty-inputs-2024-v2/manifest.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 3002,
+      "sha256": "15e2fa5ec8fa00bbdfcf10fe93ae9d49d79c666dce9418dd7fc15e10bce9fb99"
+    },
+    {
+      "id": "sensitivity",
+      "path": "data/releases/index-sensitivity-analysis-v1/result.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 13052,
+      "sha256": "5d6676552e34e12bd3b75ab7f514ac508557e692c6fa7582bbcd08911f5b4f39"
+    },
+    {
+      "id": "source-dependence",
+      "path": "data/releases/index-source-dependence-v1/result.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 9061,
+      "sha256": "b34ff36c5e82f4b50fa71eb3f349ef0224848a3fb1141aef9e4fb86e64ffa14f"
+    },
+    {
+      "id": "subgroup-fairness",
+      "path": "data/releases/index-subgroup-fairness-v1/result.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 14679,
+      "sha256": "1108c521d1fa6131fc379c6f3b60132eae5a77e0c97c33582b09694643e18a30"
+    },
+    {
+      "id": "misuse-audit",
+      "path": "data/releases/index-misuse-audit-v1/result.v1.json",
+      "role": "result",
+      "analysisClass": "confirmatory",
+      "bytes": 6722,
+      "sha256": "983e9b38f283b3b9503dbb70946fc70f9a2105f322f92c67be6387737d403e83"
+    }
+  ],
+  "tables": [
+    "data/releases/index-dimensionality-analysis-v1/table.v1.csv",
+    "data/releases/index-tournament-results-package-v1/artifact-inventory.v1.csv"
+  ],
+  "figures": [
+    "data/releases/index-dimensionality-analysis-v1/pc1-level-comparison.v1.svg"
+  ],
+  "errorLedger": {
+    "path": "data/releases/index-tournament-results-package-v1/error-ledger.v1.json",
+    "sha256": "0c05913b949bb92feb56cf3c593bfe6fa54d9a4c3fe182391f622450d5882a86",
+    "entries": 9
+  },
+  "reproduction": {
+    "command": "npm run reproduce:index-tournament-package",
+    "commands": [
+      {
+        "id": "k0",
+        "script": "validate:governance-evidence",
+        "args": []
+      },
+      {
+        "id": "baselines",
+        "script": "generate:index-tournament-baselines",
+        "args": [
+          "--write"
+        ]
+      },
+      {
+        "id": "k1",
+        "script": "generate:k1-tournament-candidate",
+        "args": [
+          "--write"
+        ]
+      },
+      {
+        "id": "k2",
+        "script": "generate:k2-concordance-prototype",
+        "args": [
+          "--write"
+        ]
+      },
+      {
+        "id": "k3",
+        "script": "generate:k3-ledger-prototype",
+        "args": [
+          "--write"
+        ]
+      },
+      {
+        "id": "k4",
+        "script": "generate:k4-pairing-prototype",
+        "args": []
+      },
+      {
+        "id": "k5",
+        "script": "generate:k5-relation-candidates",
+        "args": []
+      },
+      {
+        "id": "evaluation-suite",
+        "script": "generate:index-tournament-evaluation-suite",
+        "args": []
+      },
+      {
+        "id": "dimensionality",
+        "script": "generate:index-dimensionality",
+        "args": []
+      },
+      {
+        "id": "validity",
+        "script": "generate:index-validity",
+        "args": []
+      },
+      {
+        "id": "longitudinal",
+        "script": "generate:index-longitudinal",
+        "args": []
+      },
+      {
+        "id": "out-of-sample",
+        "script": "generate:index-oos-validation",
+        "args": []
+      },
+      {
+        "id": "uncertainty",
+        "script": "generate:k1-uncertainty-inputs",
+        "args": []
+      },
+      {
+        "id": "sensitivity",
+        "script": "generate:index-sensitivity",
+        "args": []
+      },
+      {
+        "id": "source-dependence",
+        "script": "generate:index-source-dependence",
+        "args": []
+      },
+      {
+        "id": "subgroup-fairness",
+        "script": "generate:index-subgroup-fairness",
+        "args": []
+      },
+      {
+        "id": "misuse-audit",
+        "script": "generate:index-misuse-audit",
+        "args": []
+      }
+    ],
+    "logs": [
+      {
+        "id": "k0",
+        "path": "data/releases/index-tournament-results-package-v1/logs/k0.log",
+        "sha256": "5604add8b26eba1602ef6a05808af3a668e6339296ab1a76f7778c9026a1e307"
+      },
+      {
+        "id": "baselines",
+        "path": "data/releases/index-tournament-results-package-v1/logs/baselines.log",
+        "sha256": "478f9fd995e4636b9e3c771a7e9d396f9a19fe686147092678d5ce885e1ab32e"
+      },
+      {
+        "id": "k1",
+        "path": "data/releases/index-tournament-results-package-v1/logs/k1.log",
+        "sha256": "2dee4ad1f5488092235782e21ebf31b8c055e0386da5150f1cd97dc5f8b52e91"
+      },
+      {
+        "id": "k2",
+        "path": "data/releases/index-tournament-results-package-v1/logs/k2.log",
+        "sha256": "1c71445a88323be9c149307f453173769cfaaf15a5cb62f69038010291b412e1"
+      },
+      {
+        "id": "k3",
+        "path": "data/releases/index-tournament-results-package-v1/logs/k3.log",
+        "sha256": "fc9ea91c97eac4044c1409e06cf12cb6296f69627fd17ce49951cce7df2f3a9e"
+      },
+      {
+        "id": "k4",
+        "path": "data/releases/index-tournament-results-package-v1/logs/k4.log",
+        "sha256": "fb9e919e47e284a8c385d5603501f3fe399cfa7d051a08356f1c682d1a027ac8"
+      },
+      {
+        "id": "k5",
+        "path": "data/releases/index-tournament-results-package-v1/logs/k5.log",
+        "sha256": "2d9557b7cc97def69081ddda605717a951e98a971d1b65da5e129f101b2a3b65"
+      },
+      {
+        "id": "evaluation-suite",
+        "path": "data/releases/index-tournament-results-package-v1/logs/evaluation-suite.log",
+        "sha256": "1d59db8ab8f529d0f1363b70eaff5679ea2f662e5873b446c35d83b5b925c8c2"
+      },
+      {
+        "id": "dimensionality",
+        "path": "data/releases/index-tournament-results-package-v1/logs/dimensionality.log",
+        "sha256": "bbacc0cb03820344bee6229b17e90bd483a68312f028238a0959db2e827797ba"
+      },
+      {
+        "id": "validity",
+        "path": "data/releases/index-tournament-results-package-v1/logs/validity.log",
+        "sha256": "a20aaad0310ca17c61bc596ecc0153c7fbe762c86034e6772b70569dd649f7bf"
+      },
+      {
+        "id": "longitudinal",
+        "path": "data/releases/index-tournament-results-package-v1/logs/longitudinal.log",
+        "sha256": "0a2acfdf89b3d0859c97860ee7f1f25093bc2ed781e1f6c3aceabc9345f071fd"
+      },
+      {
+        "id": "out-of-sample",
+        "path": "data/releases/index-tournament-results-package-v1/logs/out-of-sample.log",
+        "sha256": "3a00922b2639eb45ebe9382c5d1f1b20aa1b76e09cb679cb1ff082a5ee134a18"
+      },
+      {
+        "id": "uncertainty",
+        "path": "data/releases/index-tournament-results-package-v1/logs/uncertainty.log",
+        "sha256": "db57e18ab288dbc2775c2b4bbc717b6d961b9109d572a0f1768d0272f9533313"
+      },
+      {
+        "id": "sensitivity",
+        "path": "data/releases/index-tournament-results-package-v1/logs/sensitivity.log",
+        "sha256": "0eeef45d1a45da5cebef5b96103cb60749d68b03870f041e993068f597ef0fec"
+      },
+      {
+        "id": "source-dependence",
+        "path": "data/releases/index-tournament-results-package-v1/logs/source-dependence.log",
+        "sha256": "a19a8024ed77c029c0e7425566aec91b3d9e456355a721f9945c27ce5d2f35de"
+      },
+      {
+        "id": "subgroup-fairness",
+        "path": "data/releases/index-tournament-results-package-v1/logs/subgroup-fairness.log",
+        "sha256": "be227bb3856f36ac2065d68d92c2a0293044756f294dab6a6028606c52b3406f"
+      },
+      {
+        "id": "misuse-audit",
+        "path": "data/releases/index-tournament-results-package-v1/logs/misuse-audit.log",
+        "sha256": "cb772e57443ebadb0a5e2cee18507bb3b5ddb35b498185869158497aa7dc0cae"
+      }
+    ]
+  },
+  "analysisSeparation": {
+    "confirmatoryArtifacts": [
+      "evaluation-suite",
+      "dimensionality",
+      "dimensionality-table",
+      "dimensionality-figure",
+      "validity",
+      "longitudinal",
+      "out-of-sample",
+      "uncertainty-inputs",
+      "sensitivity",
+      "source-dependence",
+      "subgroup-fairness",
+      "misuse-audit"
+    ],
+    "exploratoryArtifacts": [],
+    "policy": "Only preregistered confirmatory artifacts enter this release. Any threshold or analysis added after results must ship in a separately labelled exploratory release and cannot replace these files."
+  },
+  "rights": {
+    "publicValuesIncluded": false,
+    "posture": "Manifests, aggregate results, tables, and figures only; restricted country-level source values remain private."
+  },
+  "winnerSelected": false
+}

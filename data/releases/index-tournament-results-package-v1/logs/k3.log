@@ -1,0 +1,32 @@
+{"command":"npm run generate:k3-ledger-prototype -- --write","exitCode":0}
+> civica@0.1.0 generate:k3-ledger-prototype
+> tsx scripts/generate-k3-ledger-prototype.ts --write
+
+{
+  "schemaVersion": "k3-ledger-prototype-manifest/v1",
+  "releaseId": "k3-power-transfer-ledger-prototype-v1",
+  "candidateId": "K3",
+  "methodVersion": "k3-power-transfer-ledger/v1",
+  "protocolVersion": "civica-index-tournament-preregistration/v3",
+  "asOf": "2026-07-11",
+  "contractSha256": "0c765c97f7b020717cf3df6cd421f41c7b46a012cadcb9ee4c14c96f0ac5242b",
+  "inputTerms": 382,
+  "prototypeRows": 168,
+  "bySplit": {
+    "development": 113,
+    "validation": 34,
+    "final_holdout": 21
+  },
+  "observedExecutiveIdentity": 117,
+  "contestedExecutiveIdentity": 51,
+  "sovereignJurisdictionsWithoutPrototypeRow": 26,
+  "transferStatesComputed": 0,
+  "termLimitStatesComputed": 0,
+  "everyRowHasStatementCitation": true,
+  "outputSha256": "cc8963b042dd613e62dcba2f1d1f959330b36d42a9db7d9bb39e15684155bb63",
+  "publicRulebook": "/civica-index/methodology/power-transfer-ledger",
+  "publicCountryRows": false,
+  "validationStatus": "preregistered_not_executed",
+  "valuesLocation": "private_reproducible_from_sourced_terms",
+  "publicValuesIncluded": false
+}

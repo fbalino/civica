@@ -1,0 +1,5 @@
+{"command":"npm run generate:index-subgroup-fairness","exitCode":0}
+> civica@0.1.0 generate:index-subgroup-fairness
+> tsx scripts/generate-index-subgroup-fairness.ts
+
+Wrote 11ab6e662191099ef399f710a9ff15751dac25f87d7f1790c382338b1411ac1c

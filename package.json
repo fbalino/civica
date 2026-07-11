@@ -81,6 +81,8 @@
     "generate:index-misuse-audit": "tsx scripts/generate-index-misuse-audit.ts",
     "validate:index-misuse-audit": "tsx scripts/validate-index-misuse-audit.ts",
     "validate:governance-evidence": "tsx scripts/validate-governance-evidence-dashboard.ts",
+    "reproduce:index-tournament-package": "tsx scripts/reproduce-index-tournament-package.ts",
+    "validate:index-tournament-package": "tsx scripts/validate-index-tournament-package.ts",
     "validate:ci-tournament-panel:v3": "tsx scripts/validate-ci-tournament-panel-v3.ts",
     "validate:ci-tournament-panel:v3:live": "tsx scripts/validate-ci-tournament-panel-v3.ts --live",
     "validate:ci-tournament-panel:v2": "tsx scripts/validate-ci-tournament-panel-v2.ts",

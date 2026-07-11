@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "civica-index-tournament-error-ledger/v1",
+  "releaseId": "civica-index-tournament-results-v1",
+  "entries": [
+    {
+      "id": "K1-G1-originality",
+      "candidate": "K1",
+      "state": "failed",
+      "evidence": "index-oos-validation-v1",
+      "detail": "Public inputs reproduce K1 above the preregistered originality-failure boundary."
+    },
+    {
+      "id": "K1-G5-reader-utility",
+      "candidate": "K1",
+      "state": "pending_humans",
+      "evidence": "index-reader-task-protocol-v1",
+      "detail": "Qualified-reader crossover is preregistered and K0 is available, but final instrumentation and human responses remain pending."
+    },
+    {
+      "id": "K1-G5-misuse",
+      "candidate": "K1",
+      "state": "failed_current_presentation",
+      "evidence": "index-misuse-audit-v1",
+      "detail": "The current default league-table presentation fails misuse resistance."
+    },
+    {
+      "id": "K2-stability",
+      "candidate": "K2",
+      "state": "failed",
+      "evidence": "index-oos-validation-v1",
+      "detail": "Drop-one-rater classification instability exceeds the frozen boundary."
+    },
+    {
+      "id": "K2-expert-labels",
+      "candidate": "K2",
+      "state": "pending_humans",
+      "evidence": "k2-concordance-prototype-v1",
+      "detail": "Contested and consensus known-case labels remain externally unreviewed."
+    },
+    {
+      "id": "K3-historical-validation",
+      "candidate": "K3",
+      "state": "insufficient_evidence",
+      "evidence": "k3-power-transfer-ledger-prototype-v1",
+      "detail": "Historical transfers and term-limit states are not yet computable from the current input history."
+    },
+    {
+      "id": "K4-coding",
+      "candidate": "K4",
+      "state": "pending_humans",
+      "evidence": "k4-constitution-practice-pairings-2024-v1",
+      "detail": "Two blinded coders and constitutional-scholar fairness review remain pending."
+    },
+    {
+      "id": "K5-coding",
+      "candidate": "K5",
+      "state": "pending_humans",
+      "evidence": "k5-institutional-relation-candidates-v1",
+      "detail": "Double-blind relation coding and external expert review remain pending; zero graph edges are published."
+    },
+    {
+      "id": "subgroup-performance",
+      "candidate": "all",
+      "state": "insufficient_evidence",
+      "evidence": "index-subgroup-fairness-v1",
+      "detail": "Small final-holdout subgroup cells are suppressed and cannot establish subgroup accuracy."
+    }
+  ]
+}

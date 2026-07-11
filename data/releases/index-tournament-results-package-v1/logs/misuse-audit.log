@@ -1,0 +1,5 @@
+{"command":"npm run generate:index-misuse-audit","exitCode":0}
+> civica@0.1.0 generate:index-misuse-audit
+> tsx scripts/generate-index-misuse-audit.ts
+
+Wrote 7bb620bbf3c4664717c08ebe4756868394d995fb32b598301cfe1451a1c5257b

@@ -1,0 +1,96 @@
+{"command":"npm run generate:index-oos-validation","exitCode":0}
+> civica@0.1.0 generate:index-oos-validation
+> tsx scripts/generate-index-oos-validation.ts
+
+{
+  "resultSha256": "8cd1f8c218b5ccf080168c2c896d7f5dc07673001801291924e2396f2a55ba45",
+  "K1": {
+    "splitCounts": {
+      "development": 1406,
+      "validation": 1106,
+      "final_holdout": 1147
+    },
+    "finalCommonSample": 901,
+    "publicInputReproductionR2": 0.999847164869575,
+    "interval": {
+      "lower95": 0.9998091745762511,
+      "upper95": 0.9998725944206361
+    },
+    "status": "fails_original_information"
+  },
+  "K2": {
+    "splitCounts": {
+      "development": 1208,
+      "validation": 1004,
+      "final_holdout": 1048
+    },
+    "finalDropOneTercileChangeRate": 0.6316793893129771,
+    "interval": {
+      "iterationsRequested": 2000,
+      "iterationsValid": 2000,
+      "lower95": 0.5603190428713859,
+      "upper95": 0.7004282646309632,
+      "bootstrapSha256": "f2ac94d127aa87c988e14fca550f497279290c992740acac68c3e5559119020e"
+    },
+    "threshold": 0.15,
+    "status": "fails_stability"
+  },
+  "geographic": {
+    "jurisdictions": 25,
+    "byRegion": [
+      {
+        "group": "Africa",
+        "n": 12,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "Asia",
+        "n": 4,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "Europe",
+        "n": 7,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "North America",
+        "n": 2,
+        "performanceEstimateAllowed": false
+      }
+    ],
+    "byRegime": [
+      {
+        "group": "civilian_dictatorship",
+        "n": 11,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "parliamentary_democracy",
+        "n": 6,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "presidential_democracy",
+        "n": 3,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "royal_dictatorship",
+        "n": 1,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "semi_presidential_democracy",
+        "n": 3,
+        "performanceEstimateAllowed": false
+      },
+      {
+        "group": "unknown",
+        "n": 1,
+        "performanceEstimateAllowed": false
+      }
+    ],
+    "minimumSubgroupN": 30
+  }
+}

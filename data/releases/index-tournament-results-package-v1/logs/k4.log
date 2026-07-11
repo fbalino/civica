@@ -1,0 +1,32 @@
+{"command":"npm run generate:k4-pairing-prototype","exitCode":0}
+> civica@0.1.0 generate:k4-pairing-prototype
+> tsx scripts/generate-k4-pairing-prototype.ts
+
+{
+  "schemaVersion": "k4-pairing-prototype-manifest/v1",
+  "releaseId": "k4-constitution-practice-pairings-2024-v1",
+  "candidateId": "K4",
+  "methodVersion": "k4-constitution-practice-pairings/v1",
+  "contractSha256": "5c058be5de1c6978ecbc774cf3577e7683250303036fa0bc4e105156b9624548",
+  "inputReleaseId": "ci-k4-practice-panel-2000-2024-v1",
+  "practiceYear": 2024,
+  "outputRows": 582,
+  "bySplit": {
+    "development": 387,
+    "validation": 120,
+    "final_holdout": 75
+  },
+  "candidateTaggedRows": 329,
+  "noTaggedExcerptRows": 253,
+  "observedPracticeRows": 516,
+  "outputSha256": "3be3e129be1bcbc711b61a550d4db60e45cb212d9a4f3b8b0abf9998b59f4092",
+  "valuesLocation": "private_reproducible_from_constitution_topic_excerpts_and_ci_research_panel_rows",
+  "confirmatoryLabelsInspected": false,
+  "validationStatus": "pending_two_blinded_coders_and_constitutional_scholar_review",
+  "prohibitedOutputs": [
+    "no subtraction of text presence from practice value",
+    "no hypocrisy or gap label",
+    "no aggregation across constructs",
+    "no country score, grade, rank, tier, or traffic light"
+  ]
+}

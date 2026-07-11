@@ -1,0 +1,161 @@
+{"command":"npm run generate:k1-tournament-candidate -- --write","exitCode":0}
+> civica@0.1.0 generate:k1-tournament-candidate
+> tsx scripts/generate-k1-tournament-candidate.ts --write
+
+{
+  "schemaVersion": "k1-tournament-candidate-manifest/v1",
+  "releaseId": "k1-current-composite-tournament-v1",
+  "candidateId": "K1",
+  "methodVersion": "k1-current-composite-tournament/v1",
+  "protocolVersion": "civica-index-tournament-preregistration/v3",
+  "panelReleaseId": "ci-research-panel-2000-2024-v3",
+  "contractSha256": "00c636cd7ac2e7cd04aa55e48f3e028d6d7191fdb566dc1b9dfa8c2b41e92040",
+  "inputCells": 24250,
+  "observedInputs": 19471,
+  "outputs": {
+    "scored": 3659,
+    "full": 2270,
+    "partial": 1389,
+    "bySplit": {
+      "development": 1406,
+      "validation": 1106,
+      "final_holdout": 1147
+    },
+    "byYear": {
+      "2000": {
+        "scored": 0,
+        "full": 0,
+        "partial": 0
+      },
+      "2001": {
+        "scored": 0,
+        "full": 0,
+        "partial": 0
+      },
+      "2002": {
+        "scored": 0,
+        "full": 0,
+        "partial": 0
+      },
+      "2003": {
+        "scored": 0,
+        "full": 0,
+        "partial": 0
+      },
+      "2004": {
+        "scored": 0,
+        "full": 0,
+        "partial": 0
+      },
+      "2005": {
+        "scored": 0,
+        "full": 0,
+        "partial": 0
+      },
+      "2006": {
+        "scored": 190,
+        "full": 0,
+        "partial": 190
+      },
+      "2007": {
+        "scored": 192,
+        "full": 0,
+        "partial": 192
+      },
+      "2008": {
+        "scored": 192,
+        "full": 0,
+        "partial": 192
+      },
+      "2009": {
+        "scored": 192,
+        "full": 0,
+        "partial": 192
+      },
+      "2010": {
+        "scored": 192,
+        "full": 0,
+        "partial": 192
+      },
+      "2011": {
+        "scored": 192,
+        "full": 0,
+        "partial": 192
+      },
+      "2012": {
+        "scored": 193,
+        "full": 172,
+        "partial": 21
+      },
+      "2013": {
+        "scored": 193,
+        "full": 173,
+        "partial": 20
+      },
+      "2014": {
+        "scored": 193,
+        "full": 171,
+        "partial": 22
+      },
+      "2015": {
+        "scored": 193,
+        "full": 165,
+        "partial": 28
+      },
+      "2016": {
+        "scored": 193,
+        "full": 173,
+        "partial": 20
+      },
+      "2017": {
+        "scored": 193,
+        "full": 177,
+        "partial": 16
+      },
+      "2018": {
+        "scored": 193,
+        "full": 177,
+        "partial": 16
+      },
+      "2019": {
+        "scored": 193,
+        "full": 177,
+        "partial": 16
+      },
+      "2020": {
+        "scored": 193,
+        "full": 177,
+        "partial": 16
+      },
+      "2021": {
+        "scored": 193,
+        "full": 177,
+        "partial": 16
+      },
+      "2022": {
+        "scored": 193,
+        "full": 177,
+        "partial": 16
+      },
+      "2023": {
+        "scored": 193,
+        "full": 177,
+        "partial": 16
+      },
+      "2024": {
+        "scored": 193,
+        "full": 177,
+        "partial": 16
+      }
+    },
+    "outputSha256": "9c8a6c2354a40a52b82e7fc782d0df0c9198007496aa0fd035ecc8fa0aadceb3"
+  },
+  "uncertainty": {
+    "lowerUpperPublished": false,
+    "covarianceModel": "not_available",
+    "status": "not_estimable_without_retained_source_uncertainty_and_dependence"
+  },
+  "valuesLocation": "private_reproducible_from_ci_research_panel_rows",
+  "publicValuesIncluded": false,
+  "rightsPosture": "private_internal_research_only_pending_source_terms"
+}

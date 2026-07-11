@@ -1,0 +1,5 @@
+{"command":"npm run validate:governance-evidence","exitCode":0}
+> civica@0.1.0 validate:governance-evidence
+> tsx scripts/validate-governance-evidence-dashboard.ts
+
+PASS — dashboard preserves all 970 native release cells; Japan fixture is exact and restricted exports fail closed.
