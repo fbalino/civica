@@ -43,4 +43,22 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "85f2603f1e13235b07b5cb20228e5b1eb02bdc542220d45dde615f03a87a4088",
     baseline: false,
   },
+  {
+    id: "0007_slippery_warhawk",
+    path: "drizzle/authoritative/0007_slippery_warhawk.sql",
+    sha256: "24f9a4633386177aa556b21f1c4a95e49fe8e8d1457a8853eff086de722c23bf",
+    baseline: false,
+  },
+  {
+    id: "0008_material_wildside",
+    path: "drizzle/authoritative/0008_material_wildside.sql",
+    sha256: "80e413e417af4cd33c40beff3c38da4a58f3bce4b9ca7c651dd35f75a9070f16",
+    baseline: false,
+  },
+  {
+    id: "0009_ambiguous_maverick",
+    path: "drizzle/authoritative/0009_ambiguous_maverick.sql",
+    sha256: "bdeca05751fd26c59251bf26661ab6f70bebc01bf1752b664aebcdff6b24db36",
+    baseline: false,
+  },
 ] as const;

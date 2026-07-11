@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T06:44:04.420Z",
-  "sha256": "22ea9db0d3ca41998e305b04ae364465c09b2ab596f39d08a55954431ed1e03c",
+  "generatedAt": "2026-07-11T07:20:38.629Z",
+  "sha256": "a985b2a0b2036a8186a7d013f00d0127366248fa48f64656fb009cbe75c81cb4",
   "schema": {
     "columns": [
       {
@@ -959,6 +959,87 @@
         "position": 12
       },
       {
+        "udt": "text",
+        "name": "indicator_id",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "upstream_release",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "artifact_hash",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "artifact_kind",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "temporal_coverage",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "license_url",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "transformation_id",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "substitution_reason",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "YES",
+        "position": 20
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "ci_dimension_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 21
+      },
+      {
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
@@ -1238,6 +1319,87 @@
         "position": 13
       },
       {
+        "udt": "text",
+        "name": "indicator_id",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "upstream_release",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "artifact_hash",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "artifact_kind",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "temporal_coverage",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "license_url",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "transformation_id",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "NO",
+        "position": 20
+      },
+      {
+        "udt": "text",
+        "name": "substitution_reason",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "YES",
+        "position": 21
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "ci_source_ingestions",
+        "default": null,
+        "nullable": "NO",
+        "position": 22
+      },
+      {
         "udt": "uuid",
         "name": "id",
         "type": "uuid",
@@ -1326,6 +1488,87 @@
         "default": "now()",
         "nullable": "NO",
         "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "indicator_id",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 11
+      },
+      {
+        "udt": "text",
+        "name": "upstream_release",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "text",
+        "name": "artifact_hash",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 13
+      },
+      {
+        "udt": "text",
+        "name": "artifact_kind",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "temporal_coverage",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "license_url",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "transformation_id",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "substitution_reason",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "YES",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "civica_conditions_scores",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
       },
       {
         "udt": "uuid",
@@ -3603,6 +3846,78 @@
         "default": null,
         "nullable": "YES",
         "position": 14
+      },
+      {
+        "udt": "text",
+        "name": "upstream_release",
+        "type": "text",
+        "table": "indicator_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 15
+      },
+      {
+        "udt": "text",
+        "name": "artifact_hash",
+        "type": "text",
+        "table": "indicator_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 16
+      },
+      {
+        "udt": "text",
+        "name": "artifact_kind",
+        "type": "text",
+        "table": "indicator_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 17
+      },
+      {
+        "udt": "text",
+        "name": "temporal_coverage",
+        "type": "text",
+        "table": "indicator_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 18
+      },
+      {
+        "udt": "text",
+        "name": "license_url",
+        "type": "text",
+        "table": "indicator_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 19
+      },
+      {
+        "udt": "text",
+        "name": "transformation_id",
+        "type": "text",
+        "table": "indicator_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 20
+      },
+      {
+        "udt": "text",
+        "name": "substitution_reason",
+        "type": "text",
+        "table": "indicator_history",
+        "default": null,
+        "nullable": "YES",
+        "position": 21
+      },
+      {
+        "udt": "text",
+        "name": "method_version",
+        "type": "text",
+        "table": "indicator_history",
+        "default": null,
+        "nullable": "NO",
+        "position": 22
       },
       {
         "udt": "uuid",
@@ -6009,7 +6324,7 @@
       {
         "name": "idx_ci_dimension_scores_unique",
         "table": "ci_dimension_scores",
-        "definition": "CREATE UNIQUE INDEX idx_ci_dimension_scores_unique ON public.ci_dimension_scores USING btree (jurisdiction_id, dimension, quarter, methodology_version)"
+        "definition": "CREATE UNIQUE INDEX idx_ci_dimension_scores_unique ON public.ci_dimension_scores USING btree (jurisdiction_id, dimension, quarter, methodology_version, source_id, indicator_id)"
       },
       {
         "name": "ci_ingestion_runs_pkey",
@@ -6039,7 +6354,7 @@
       {
         "name": "idx_ci_source_ingestions_unique",
         "table": "ci_source_ingestions",
-        "definition": "CREATE UNIQUE INDEX idx_ci_source_ingestions_unique ON public.ci_source_ingestions USING btree (source_id, dimension, dataset_year)"
+        "definition": "CREATE UNIQUE INDEX idx_ci_source_ingestions_unique ON public.ci_source_ingestions USING btree (source_id, dimension, dataset_year, indicator_id)"
       },
       {
         "name": "civica_conditions_scores_pkey",
@@ -6059,7 +6374,7 @@
       {
         "name": "idx_conditions_unique",
         "table": "civica_conditions_scores",
-        "definition": "CREATE UNIQUE INDEX idx_conditions_unique ON public.civica_conditions_scores USING btree (jurisdiction_id, dimension, quarter, methodology_version)"
+        "definition": "CREATE UNIQUE INDEX idx_conditions_unique ON public.civica_conditions_scores USING btree (jurisdiction_id, dimension, quarter, methodology_version, source_id, indicator_id)"
       },
       {
         "name": "constitution_topic_excerpts_pkey",
@@ -6344,7 +6659,7 @@
       {
         "name": "idx_indicator_history_unique",
         "table": "indicator_history",
-        "definition": "CREATE UNIQUE INDEX idx_indicator_history_unique ON public.indicator_history USING btree (jurisdiction_id, indicator, year)"
+        "definition": "CREATE UNIQUE INDEX idx_indicator_history_unique ON public.indicator_history USING btree (jurisdiction_id, indicator, year, source_id)"
       },
       {
         "name": "indicator_history_pkey",
@@ -7442,6 +7757,12 @@
         "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
       },
       {
+        "name": "ci_dimension_scores_lineage_check",
+        "type": "c",
+        "table": "ci_dimension_scores",
+        "definition": "CHECK (artifact_hash ~ '^[a-f0-9]{64}$'::text AND (artifact_kind = ANY (ARRAY['publisher_bytes'::text, 'normalized_batch'::text])) AND license_url ~~ 'https://%'::text)"
+      },
+      {
         "name": "ci_dimension_scores_methodology_version_ci_methodology_versions",
         "type": "f",
         "table": "ci_dimension_scores",
@@ -7484,6 +7805,12 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "ci_source_ingestions_lineage_check",
+        "type": "c",
+        "table": "ci_source_ingestions",
+        "definition": "CHECK (artifact_hash ~ '^[a-f0-9]{64}$'::text AND (artifact_kind = ANY (ARRAY['publisher_bytes'::text, 'normalized_batch'::text])) AND license_url ~~ 'https://%'::text)"
+      },
+      {
         "name": "ci_source_ingestions_pkey",
         "type": "p",
         "table": "ci_source_ingestions",
@@ -7500,6 +7827,12 @@
         "type": "f",
         "table": "civica_conditions_scores",
         "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
+      },
+      {
+        "name": "civica_conditions_scores_lineage_check",
+        "type": "c",
+        "table": "civica_conditions_scores",
+        "definition": "CHECK (artifact_hash ~ '^[a-f0-9]{64}$'::text AND (artifact_kind = ANY (ARRAY['publisher_bytes'::text, 'normalized_batch'::text])) AND license_url ~~ 'https://%'::text)"
       },
       {
         "name": "civica_conditions_scores_pkey",
@@ -7860,6 +8193,12 @@
         "type": "f",
         "table": "indicator_history",
         "definition": "FOREIGN KEY (jurisdiction_id) REFERENCES jurisdictions(id)"
+      },
+      {
+        "name": "indicator_history_lineage_check",
+        "type": "c",
+        "table": "indicator_history",
+        "definition": "CHECK (artifact_hash ~ '^[a-f0-9]{64}$'::text AND (artifact_kind = ANY (ARRAY['publisher_bytes'::text, 'normalized_batch'::text])) AND license_url ~~ 'https://%'::text)"
       },
       {
         "name": "indicator_history_pkey",

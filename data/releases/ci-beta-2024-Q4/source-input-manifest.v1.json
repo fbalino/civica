@@ -17,7 +17,7 @@
       "upstreamVintage": "2024 edition",
       "expectedCoverage": "country rows matched to the Civica release universe",
       "redistributionPosture": "restricted-no-redistribution",
-      "adapterVersion": "sha256:3f792910973fd0594bbd05cd5f8f4cabbc532c4f76b13272a178e8eb6bc554da"
+      "adapterVersion": "sha256:83338d8f40f1f5f5c6ecca5de407ac2ef8310cdbf58c00b7589fbe8afcc0c867"
     },
     {
       "pipelineId": "index.current-beta",
@@ -30,7 +30,7 @@
       "upstreamVintage": "2024 edition",
       "expectedCoverage": "country rows matched to the Civica release universe",
       "redistributionPosture": "restricted-no-redistribution",
-      "adapterVersion": "sha256:3f792910973fd0594bbd05cd5f8f4cabbc532c4f76b13272a178e8eb6bc554da"
+      "adapterVersion": "sha256:83338d8f40f1f5f5c6ecca5de407ac2ef8310cdbf58c00b7589fbe8afcc0c867"
     },
     {
       "pipelineId": "index.current-beta",
@@ -43,7 +43,7 @@
       "upstreamVintage": "2024 observations for the frozen Index; source year retained elsewhere",
       "expectedCoverage": "country rows matched to the Civica release universe",
       "redistributionPosture": "open-with-attribution",
-      "adapterVersion": "sha256:3f792910973fd0594bbd05cd5f8f4cabbc532c4f76b13272a178e8eb6bc554da"
+      "adapterVersion": "sha256:83338d8f40f1f5f5c6ecca5de407ac2ef8310cdbf58c00b7589fbe8afcc0c867"
     },
     {
       "pipelineId": "index.current-beta",
@@ -56,7 +56,7 @@
       "upstreamVintage": "2024 observations",
       "expectedCoverage": "country rows matched to the Civica release universe",
       "redistributionPosture": "open-with-attribution",
-      "adapterVersion": "sha256:3f792910973fd0594bbd05cd5f8f4cabbc532c4f76b13272a178e8eb6bc554da"
+      "adapterVersion": "sha256:83338d8f40f1f5f5c6ecca5de407ac2ef8310cdbf58c00b7589fbe8afcc0c867"
     }
   ]
 }

@@ -2,10 +2,10 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "d7612068d2880bbdc4fdc1ed16cf2a185e6c5264847049d6d073d8b8392197cd",
+  "schemaFingerprint": "4daef2fe319a3cd474a9691ba1ff53ce82d28ee2e6b543675f15f16fd805e596",
   "summary": {
     "tables": 53,
-    "columns": 645,
+    "columns": 680,
     "publicAtlasTables": 18,
     "researchBetaTables": 14,
     "supportTables": 11,
@@ -2548,6 +2548,56 @@
       },
       "columns": [
         {
+          "name": "artifact_hash",
+          "propertyName": "artifactHash",
+          "definition": "Artifact hash recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "artifact_kind",
+          "propertyName": "artifactKind",
+          "definition": "Artifact kind recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "created_at",
           "propertyName": "createdAt",
           "definition": "Timestamp when Civica created this row.",
@@ -2679,6 +2729,35 @@
           }
         },
         {
+          "name": "indicator_id",
+          "propertyName": "indicatorId",
+          "definition": "Indicator id recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_ci_dimension_scores_unique"
+            ],
+            "uniqueGroups": [
+              "idx_ci_dimension_scores_unique"
+            ]
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "ingestion_id",
           "propertyName": "ingestionId",
           "definition": "Ingestion id; relational link to ci_source_ingestions.id.",
@@ -2728,6 +2807,56 @@
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
           "cadence": "Per named Index rebuild/release.",
           "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "license_url",
+          "propertyName": "licenseUrl",
+          "definition": "License url recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
           "rights": "Derived output remains constrained by included source rights and release manifest.",
           "deprecation": {
             "status": "active"
@@ -2854,12 +2983,116 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": false,
+            "indexed": true,
             "foreignKey": "sources.id",
+            "indexGroups": [
+              "idx_ci_dimension_scores_unique"
+            ],
+            "uniqueGroups": [
+              "idx_ci_dimension_scores_unique"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "substitution_reason",
+          "propertyName": "substitutionReason",
+          "definition": "Substitution reason recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "temporal_coverage",
+          "propertyName": "temporalCoverage",
+          "definition": "Temporal coverage recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "transformation_id",
+          "propertyName": "transformationId",
+          "definition": "Transformation id recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
+          "cadence": "Per named Index rebuild/release.",
+          "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
+          "rights": "Derived output remains constrained by included source rights and release manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_release",
+          "propertyName": "upstreamRelease",
+          "definition": "Upstream release recorded for the jurisdiction, dimension, data year, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of registered Index input observations with source metadata.",
           "cadence": "Per named Index rebuild/release.",
           "vintageSemantics": "data_year describes inputs; calculated_at describes computation; methodology_version controls interpretation.",
           "rights": "Derived output remains constrained by included source rights and release manifest.",
@@ -3374,6 +3607,56 @@
       },
       "columns": [
         {
+          "name": "artifact_hash",
+          "propertyName": "artifactHash",
+          "definition": "Artifact hash recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "artifact_kind",
+          "propertyName": "artifactKind",
+          "definition": "Artifact kind recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "countries_covered",
           "propertyName": "countriesCovered",
           "definition": "Countries covered recorded for the source ingestion run for one source, year, and methodology context.",
@@ -3557,6 +3840,35 @@
           }
         },
         {
+          "name": "indicator_id",
+          "propertyName": "indicatorId",
+          "definition": "Indicator id recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_ci_source_ingestions_unique"
+            ],
+            "uniqueGroups": [
+              "idx_ci_source_ingestions_unique"
+            ]
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "ingested_at",
           "propertyName": "ingestedAt",
           "definition": "Timestamp when the item entered the Civica pipeline.",
@@ -3601,6 +3913,56 @@
           "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
           "cadence": "Per Index source release or manual rebuild.",
           "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "license_url",
+          "propertyName": "licenseUrl",
+          "definition": "License url recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
           "rights": "Source rights follow source_id; run metadata is Civica-authored.",
           "deprecation": {
             "status": "active"
@@ -3709,6 +4071,106 @@
           "deprecation": {
             "status": "active"
           }
+        },
+        {
+          "name": "substitution_reason",
+          "propertyName": "substitutionReason",
+          "definition": "Substitution reason recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "temporal_coverage",
+          "propertyName": "temporalCoverage",
+          "definition": "Temporal coverage recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "transformation_id",
+          "propertyName": "transformationId",
+          "definition": "Transformation id recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_release",
+          "propertyName": "upstreamRelease",
+          "definition": "Upstream release recorded for the source ingestion run for one source, year, and methodology context.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Generated by Index adapters from source retrieval and run results.",
+          "cadence": "Per Index source release or manual rebuild.",
+          "vintageSemantics": "data_year/upstream version identify source vintage; started/completed timestamps identify execution.",
+          "rights": "Source rights follow source_id; run metadata is Civica-authored.",
+          "deprecation": {
+            "status": "active"
+          }
         }
       ]
     },
@@ -3726,6 +4188,56 @@
         "status": "active"
       },
       "columns": [
+        {
+          "name": "artifact_hash",
+          "propertyName": "artifactHash",
+          "definition": "Artifact hash recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "artifact_kind",
+          "propertyName": "artifactKind",
+          "definition": "Artifact kind recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
         {
           "name": "created_at",
           "propertyName": "createdAt",
@@ -3831,6 +4343,35 @@
           }
         },
         {
+          "name": "indicator_id",
+          "propertyName": "indicatorId",
+          "definition": "Indicator id recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_conditions_unique"
+            ],
+            "uniqueGroups": [
+              "idx_conditions_unique"
+            ]
+          },
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "jurisdiction_id",
           "propertyName": "jurisdictionId",
           "definition": "Identifier of the jurisdiction represented by this row.",
@@ -3855,6 +4396,56 @@
           "sourceOrDerivation": "Relational identifier referencing jurisdictions.id; substantive provenance follows this table's source contract.",
           "cadence": "Per upstream annual/source release.",
           "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "license_url",
+          "propertyName": "licenseUrl",
+          "definition": "License url recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
           "deprecation": {
             "status": "active"
@@ -3981,12 +4572,116 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": false,
+            "indexed": true,
             "foreignKey": "sources.id",
+            "indexGroups": [
+              "idx_conditions_unique"
+            ],
+            "uniqueGroups": [
+              "idx_conditions_unique"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "substitution_reason",
+          "propertyName": "substitutionReason",
+          "definition": "Substitution reason recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "temporal_coverage",
+          "propertyName": "temporalCoverage",
+          "definition": "Temporal coverage recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "transformation_id",
+          "propertyName": "transformationId",
+          "definition": "Transformation id recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
+          "cadence": "Per upstream annual/source release.",
+          "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
+          "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_release",
+          "propertyName": "upstreamRelease",
+          "definition": "Upstream release recorded for the jurisdiction, metric, data year, source, and methodology version.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Versioned transform of HDI, GPI, and World Bank economic inputs.",
           "cadence": "Per upstream annual/source release.",
           "vintageSemantics": "data_year is observation/reference year; calculated_at is computation time.",
           "rights": "Resolved per source_id; derived display positions inherit input restrictions.",
@@ -10404,6 +11099,56 @@
       },
       "columns": [
         {
+          "name": "artifact_hash",
+          "propertyName": "artifactHash",
+          "definition": "Artifact hash recorded for the jurisdiction, indicator, and observation year.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "artifact_kind",
+          "propertyName": "artifactKind",
+          "definition": "Artifact kind recorded for the jurisdiction, indicator, and observation year.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "created_at",
           "propertyName": "createdAt",
           "definition": "Timestamp when Civica created this row.",
@@ -10566,6 +11311,56 @@
           }
         },
         {
+          "name": "license_url",
+          "propertyName": "licenseUrl",
+          "definition": "License url recorded for the jurisdiction, indicator, and observation year.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "method_version",
+          "propertyName": "methodVersion",
+          "definition": "Method version recorded for the jurisdiction, indicator, and observation year.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "Interpretation/version identifier; not a source observation date.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "native_max",
           "propertyName": "nativeMax",
           "definition": "Native max recorded for the jurisdiction, indicator, and observation year.",
@@ -10627,12 +11422,91 @@
           "key": {
             "primary": false,
             "unique": false,
-            "indexed": false,
+            "indexed": true,
             "foreignKey": "sources.id",
+            "indexGroups": [
+              "idx_indicator_history_unique"
+            ],
+            "uniqueGroups": [
+              "idx_indicator_history_unique"
+            ]
+          },
+          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "substitution_reason",
+          "propertyName": "substitutionReason",
+          "definition": "Substitution reason recorded for the jurisdiction, indicator, and observation year.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
             "indexGroups": [],
             "uniqueGroups": []
           },
-          "sourceOrDerivation": "Relational identifier referencing sources.id; substantive provenance follows this table's source contract.",
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "temporal_coverage",
+          "propertyName": "temporalCoverage",
+          "definition": "Temporal coverage recorded for the jurisdiction, indicator, and observation year.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "transformation_id",
+          "propertyName": "transformationId",
+          "definition": "Transformation id recorded for the jurisdiction, indicator, and observation year.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
           "cadence": "Per upstream panel release.",
           "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
           "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
@@ -10660,6 +11534,31 @@
           "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Normalized historical observations from registered Index/conditions publishers.",
           "cadence": "Per upstream panel release.",
           "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "upstream_release",
+          "propertyName": "upstreamRelease",
+          "definition": "Upstream release recorded for the jurisdiction, indicator, and observation year.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
           "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
           "deprecation": {
             "status": "active"

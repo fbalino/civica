@@ -1,9 +1,10 @@
 import { civicaConditionsScores } from "@/lib/db/schema";
 import { markSourcesSynced } from "@/lib/db/source-freshness";
+import { indicatorLineageErrors, type IndicatorLineage } from "@/lib/indicators/lineage";
 
 type Db = typeof import("@/lib/db").db;
 
-export interface ConditionScoreInput {
+export interface ConditionScoreInput extends IndicatorLineage {
   jurisdictionId: string;
   dimension: string;
   quarter: string;
@@ -22,9 +23,11 @@ export async function writeConditionScores(
   if (rows.length === 0) throw new Error("Conditions input produced zero rows");
   const keys = new Set<string>();
   for (const row of rows) {
-    const key = `${row.jurisdictionId}:${row.dimension}:${row.quarter}:${row.methodologyVersion}`;
+    const key = `${row.jurisdictionId}:${row.dimension}:${row.quarter}:${row.methodologyVersion}:${row.sourceId}:${row.indicatorId}`;
     if (keys.has(key)) throw new Error(`Duplicate Conditions row: ${key}`);
     keys.add(key);
+    const lineageErrors = indicatorLineageErrors(row);
+    if (lineageErrors.length) throw new Error(`Invalid Conditions lineage for ${key}: ${lineageErrors.join(", ")}`);
     if (!Number.isFinite(row.normalizedScore) || row.normalizedScore < 0 || row.normalizedScore > 100) {
       throw new Error(`Invalid Conditions score for ${key}: ${row.normalizedScore}`);
     }
@@ -33,8 +36,8 @@ export async function writeConditionScores(
   if (!options.dryRun) {
     for (const row of rows) {
       await db.insert(civicaConditionsScores).values(row).onConflictDoUpdate({
-        target: [civicaConditionsScores.jurisdictionId, civicaConditionsScores.dimension, civicaConditionsScores.quarter, civicaConditionsScores.methodologyVersion],
-        set: { normalizedScore: row.normalizedScore, rawValue: row.rawValue, datasetYear: row.datasetYear, sourceId: row.sourceId },
+        target: [civicaConditionsScores.jurisdictionId, civicaConditionsScores.dimension, civicaConditionsScores.quarter, civicaConditionsScores.methodologyVersion, civicaConditionsScores.sourceId, civicaConditionsScores.indicatorId],
+        set: { ...row },
       });
     }
   }

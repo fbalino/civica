@@ -50,6 +50,27 @@
       "when": 1783752200000,
       "tag": "0006_staged_candidate_publication",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783753917084,
+      "tag": "0007_slippery_warhawk",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783754213710,
+      "tag": "0008_material_wildside",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783754384313,
+      "tag": "0009_ambiguous_maverick",
+      "breakpoints": true
     }
   ]
 }

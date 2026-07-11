@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { CIDimension } from "./types";
+import type { IndicatorLineage } from "@/lib/indicators/lineage";
 
 export const REQUIRED_CI_ADAPTERS = [
   "vdem:democratic_quality",
@@ -17,7 +18,7 @@ export const MINIMUM_CI_STAGE_COVERAGE: Record<(typeof REQUIRED_CI_ADAPTERS)[num
   "transparency_intl:corruption_control": 170,
 };
 
-export interface StagedCiRow {
+export interface StagedCiRow extends IndicatorLineage {
   jurisdictionId: string;
   iso3: string;
   normalizedScore: number;
@@ -72,12 +73,12 @@ export function validateStagedCiRelease(stages: StagedCiAdapter[]): string[] {
     if (stage.rows.length === 0 || stage.countriesCovered !== stage.rows.length) errors.push(`${stage.adapterKey}: empty or inconsistent coverage`);
     const minimum = MINIMUM_CI_STAGE_COVERAGE[stage.adapterKey as keyof typeof MINIMUM_CI_STAGE_COVERAGE];
     if (minimum == null || stage.rows.length < minimum) errors.push(`${stage.adapterKey}: coverage ${stage.rows.length} below required ${minimum ?? "unknown"}`);
-    if (stage.rows.some((row) => !/^[A-Z]{3}$/.test(row.iso3) || row.sourceId !== stage.sourceId || row.dimension !== stage.dimension || row.quarter !== stage.quarter || row.methodologyVersion !== stage.methodologyVersion)) errors.push(`${stage.adapterKey}: row metadata drift`);
+    if (stage.rows.some((row) => !/^[A-Z]{3}$/.test(row.iso3) || row.sourceId !== stage.sourceId || row.dimension !== stage.dimension || row.quarter !== stage.quarter || row.methodologyVersion !== stage.methodologyVersion || !row.indicatorId || !row.artifactHash)) errors.push(`${stage.adapterKey}: row metadata drift`);
     if (new Set(stage.rows.map((row) => row.jurisdictionId)).size !== stage.rows.length) errors.push(`${stage.adapterKey}: duplicate jurisdiction rows`);
   }
   const scoreKeys = new Set<string>();
   for (const stage of stages) for (const row of stage.rows) {
-    const key = `${row.jurisdictionId}:${row.dimension}`;
+    const key = `${row.jurisdictionId}:${row.dimension}:${row.sourceId}:${row.indicatorId}`;
     if (scoreKeys.has(key)) errors.push(`overlapping staged score identity: ${key}`);
     scoreKeys.add(key);
   }

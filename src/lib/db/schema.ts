@@ -1226,6 +1226,15 @@ export const ciSourceIngestions = pgTable(
       .references(() => sources.id)
       .notNull(),
     dimension: text("dimension").notNull(),
+    indicatorId: text("indicator_id").notNull(),
+    upstreamRelease: text("upstream_release").notNull(),
+    artifactHash: text("artifact_hash").notNull(),
+    artifactKind: text("artifact_kind").notNull(),
+    temporalCoverage: text("temporal_coverage").notNull(),
+    licenseUrl: text("license_url").notNull(),
+    transformationId: text("transformation_id").notNull(),
+    substitutionReason: text("substitution_reason"),
+    methodVersion: text("method_version").notNull(),
     datasetYear: integer("dataset_year").notNull(),
     nativeScaleMin: real("native_scale_min").notNull(),
     nativeScaleMax: real("native_scale_max").notNull(),
@@ -1241,8 +1250,10 @@ export const ciSourceIngestions = pgTable(
     uniqueIndex("idx_ci_source_ingestions_unique").on(
       table.sourceId,
       table.dimension,
-      table.datasetYear
+      table.datasetYear,
+      table.indicatorId,
     ),
+    check("ci_source_ingestions_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
   ]
 );
 
@@ -1260,6 +1271,15 @@ export const ciDimensionScores = pgTable(
     sourceId: text("source_id")
       .references(() => sources.id)
       .notNull(),
+    indicatorId: text("indicator_id").notNull(),
+    upstreamRelease: text("upstream_release").notNull(),
+    artifactHash: text("artifact_hash").notNull(),
+    artifactKind: text("artifact_kind").notNull(),
+    temporalCoverage: text("temporal_coverage").notNull(),
+    licenseUrl: text("license_url").notNull(),
+    transformationId: text("transformation_id").notNull(),
+    substitutionReason: text("substitution_reason"),
+    methodVersion: text("method_version").notNull(),
     ingestionId: uuid("ingestion_id").references(() => ciSourceIngestions.id),
     // NOTE: methodology_version's FK is declared as an explicit named
     // foreignKey() below (not inline .references()) because Drizzle's
@@ -1280,7 +1300,9 @@ export const ciDimensionScores = pgTable(
       table.jurisdictionId,
       table.dimension,
       table.quarter,
-      table.methodologyVersion
+      table.methodologyVersion,
+      table.sourceId,
+      table.indicatorId,
     ),
     index("idx_ci_dimension_scores_quarter").on(table.quarter),
     index("idx_ci_dimension_scores_jurisdiction").on(table.jurisdictionId),
@@ -1292,6 +1314,7 @@ export const ciDimensionScores = pgTable(
       columns: [table.methodologyVersion],
       foreignColumns: [ciMethodologyVersions.id],
     }),
+    check("ci_dimension_scores_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
   ]
 );
 
@@ -1344,6 +1367,14 @@ export const indicatorHistory = pgTable(
     sourceId: text("source_id")
       .references(() => sources.id)
       .notNull(),
+    upstreamRelease: text("upstream_release").notNull(),
+    artifactHash: text("artifact_hash").notNull(),
+    artifactKind: text("artifact_kind").notNull(),
+    temporalCoverage: text("temporal_coverage").notNull(),
+    licenseUrl: text("license_url").notNull(),
+    transformationId: text("transformation_id").notNull(),
+    substitutionReason: text("substitution_reason"),
+    methodVersion: text("method_version").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -1351,7 +1382,8 @@ export const indicatorHistory = pgTable(
     uniqueIndex("idx_indicator_history_unique").on(
       table.jurisdictionId,
       table.indicator,
-      table.year
+      table.year,
+      table.sourceId,
     ),
     // Hot path: "give me every year of every indicator for this country".
     index("idx_indicator_history_jur_dim").on(
@@ -1359,6 +1391,7 @@ export const indicatorHistory = pgTable(
       table.dimension
     ),
     index("idx_indicator_history_indicator").on(table.indicator),
+    check("indicator_history_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
   ]
 );
 
@@ -1599,6 +1632,15 @@ export const civicaConditionsScores = pgTable(
     sourceId: text("source_id")
       .references(() => sources.id)
       .notNull(),
+    indicatorId: text("indicator_id").notNull(),
+    upstreamRelease: text("upstream_release").notNull(),
+    artifactHash: text("artifact_hash").notNull(),
+    artifactKind: text("artifact_kind").notNull(),
+    temporalCoverage: text("temporal_coverage").notNull(),
+    licenseUrl: text("license_url").notNull(),
+    transformationId: text("transformation_id").notNull(),
+    substitutionReason: text("substitution_reason"),
+    methodVersion: text("method_version").notNull(),
     /** Vintage of the upstream dataset (calendar year) */
     datasetYear: integer("dataset_year").notNull(),
     /** Methodology version tag — "beta" during the v2 rebuild */
@@ -1610,10 +1652,13 @@ export const civicaConditionsScores = pgTable(
       table.jurisdictionId,
       table.dimension,
       table.quarter,
-      table.methodologyVersion
+      table.methodologyVersion,
+      table.sourceId,
+      table.indicatorId,
     ),
     index("idx_conditions_quarter").on(table.quarter),
     index("idx_conditions_jurisdiction").on(table.jurisdictionId),
+    check("civica_conditions_scores_lineage_check", dsql`${table.artifactHash} ~ '^[a-f0-9]{64}$' AND ${table.artifactKind} IN ('publisher_bytes','normalized_batch') AND ${table.licenseUrl} LIKE 'https://%'`),
   ]
 );
 

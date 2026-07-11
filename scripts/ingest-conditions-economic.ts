@@ -23,6 +23,7 @@ import { db } from "../src/lib/db";
 import { jurisdictions } from "../src/lib/db/schema";
 import { isNotNull } from "drizzle-orm";
 import { writeConditionScores, type ConditionScoreInput } from "../src/lib/conditions/ingest";
+import { buildIndicatorLineage } from "../src/lib/indicators/lineage";
 
 const METHODOLOGY_VERSION = "beta";
 const SOURCE_ID = "worldbank_economic";
@@ -200,6 +201,15 @@ async function main() {
   console.log(`  GDP growth:    μ=${gdpMu.toFixed(2)}%, σ=${gdpSd.toFixed(2)}`);
 
   // --- Compute composite z-score and map to 0–100 ---
+  const lineage = buildIndicatorLineage({
+    sourceId: SOURCE_ID,
+    dimension: CONDITIONS_DIMENSION,
+    upstreamRelease: `World Bank API indicators ${DATE_RANGE}`,
+    temporalCoverage: DATE_RANGE.replace(":", "/"),
+    transformationId: "conditions-economic-equal-z-cdf/v1",
+    methodVersion: METHODOLOGY_VERSION,
+    rows: observations,
+  });
   let upserted = 0;
   const output: ConditionScoreInput[] = [];
 
@@ -247,6 +257,7 @@ async function main() {
         sourceId: SOURCE_ID,
         datasetYear: obs.datasetYear,
         methodologyVersion: METHODOLOGY_VERSION,
+        ...lineage,
       });
 
     upserted++;

@@ -5,7 +5,7 @@ import { canonicalStageChecksum, MINIMUM_CI_STAGE_COVERAGE, REQUIRED_CI_ADAPTERS
 function stages(): StagedCiAdapter[] {
   return REQUIRED_CI_ADAPTERS.map((adapterKey, index) => {
     const [sourceId, dimension] = adapterKey.split(":") as [string, StagedCiAdapter["dimension"]];
-    const rows = Array.from({ length: MINIMUM_CI_STAGE_COVERAGE[adapterKey] }, (_, rowIndex) => ({ jurisdictionId: `j${index}-${rowIndex}`, iso3: `AA${String.fromCharCode(65 + (rowIndex % 26))}`, normalizedScore: 50, rawValue: 50, sourceId, dimension, quarter: "2024-Q4", methodologyVersion: "ci-v2-beta", derivationVersionKey: "v1", derivationVersions: { schemaVersion: "fixture" } }));
+    const rows = Array.from({ length: MINIMUM_CI_STAGE_COVERAGE[adapterKey] }, (_, rowIndex) => ({ jurisdictionId: `j${index}-${rowIndex}`, iso3: `AA${String.fromCharCode(65 + (rowIndex % 26))}`, normalizedScore: 50, rawValue: 50, sourceId, dimension, quarter: "2024-Q4", methodologyVersion: "ci-v2-beta", derivationVersionKey: "v1", derivationVersions: { schemaVersion: "fixture" }, indicatorId: `${sourceId}_indicator`, upstreamRelease: "fixture", artifactHash: "a".repeat(64), artifactKind: "normalized_batch" as const, temporalCoverage: "2024", licenseUrl: "https://example.test/terms", transformationId: "fixture/v1", substitutionReason: null, methodVersion: "ci-v2-beta" }));
     return {
       schemaVersion: "ci-atomic-stage/v1", adapterKey, sourceId, dimension,
       datasetYear: 2024, quarter: "2024-Q4", methodologyVersion: "ci-v2-beta",
@@ -26,7 +26,7 @@ test("missing adapter, metadata drift, empty coverage, and overlap fail closed",
   assert.match(validateStagedCiRelease(drift).join(" "), /disagree|metadata drift/);
   const empty = stages(); empty[0].rows = []; empty[0].countriesCovered = 0;
   assert.match(validateStagedCiRelease(empty).join(" "), /empty/);
-  const overlap = stages(); overlap[1].rows[0].jurisdictionId = overlap[0].rows[0].jurisdictionId; overlap[1].rows[0].dimension = overlap[0].rows[0].dimension;
+  const overlap = stages(); overlap[1].rows[0] = { ...overlap[1].rows[0], jurisdictionId: overlap[0].rows[0].jurisdictionId, dimension: overlap[0].rows[0].dimension, sourceId: overlap[0].rows[0].sourceId, indicatorId: overlap[0].rows[0].indicatorId };
   assert.match(validateStagedCiRelease(overlap).join(" "), /overlapping/);
 });
 

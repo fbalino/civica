@@ -13,6 +13,7 @@ import { normalize, yearToQuarter } from "./normalize";
 import type { IngestionResult } from "./types";
 import { CI_INGEST_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
 import type { StagedCiAdapter, StagedCiRow } from "./atomic-ingestion";
+import { buildIndicatorLineage, frozenCiPublisherHash } from "@/lib/indicators/lineage";
 
 export function createDb() {
   const sqlClient = neon(process.env.DATABASE_URL!);
@@ -66,6 +67,20 @@ export async function runIngestion(
   const iso3Map = await buildIso3Map(db);
   const methodologyVersion = await getLatestMethodologyVersion(db);
   const quarter = yearToQuarter(result.datasetYear);
+  const substitutionReason = result.sourceId === "worldbank_wgi" && result.dimension === "democratic_quality"
+    ? "Coverage substitution where the primary V-Dem indicator has no jurisdiction row."
+    : null;
+  const lineage = buildIndicatorLineage({
+    sourceId: result.sourceId,
+    dimension: result.dimension,
+    upstreamRelease: `${result.sourceId} ${result.datasetYear} release`,
+    temporalCoverage: String(result.datasetYear),
+    transformationId: `${CI_INGEST_ALGORITHM_VERSION}:${result.dimension}`,
+    methodVersion: methodologyVersion,
+    rows: result.records,
+    publisherArtifactHash: frozenCiPublisherHash(result.sourceId, result.datasetYear),
+    substitutionReason,
+  });
 
   if (result.records.length === 0) {
     throw new Error(`${result.sourceId}/${result.dimension}: upstream produced zero records`);
@@ -96,7 +111,7 @@ export async function runIngestion(
       if (!jurisdictionId) { skipped++; continue; }
       const normalizedScore = normalize(record.rawValue, result.globalMinObserved, result.globalMaxObserved, record.isInverted);
       const versions = ciVersionEnvelope({ methodologyVersion, algorithmVersion: CI_INGEST_ALGORITHM_VERSION, sourceIds: [result.sourceId] });
-      rows.push({ jurisdictionId, iso3: record.iso3.toUpperCase(), normalizedScore, rawValue: record.rawValue, sourceId: result.sourceId, dimension: result.dimension, quarter, methodologyVersion, derivationVersionKey: versions.key, derivationVersions: versions.envelope });
+      rows.push({ jurisdictionId, iso3: record.iso3.toUpperCase(), normalizedScore, rawValue: record.rawValue, sourceId: result.sourceId, dimension: result.dimension, quarter, methodologyVersion, derivationVersionKey: versions.key, derivationVersions: versions.envelope, ...lineage });
     }
     if (rows.length === 0) throw new Error(`${result.sourceId}/${result.dimension}: staging produced zero matched rows`);
     const stage: StagedCiAdapter = {
@@ -104,6 +119,7 @@ export async function runIngestion(
       adapterKey: `${result.sourceId}:${result.dimension}`,
       sourceId: result.sourceId,
       dimension: result.dimension,
+      ...lineage,
       datasetYear: result.datasetYear,
       quarter,
       methodologyVersion,
@@ -125,6 +141,7 @@ export async function runIngestion(
     .values({
       sourceId: result.sourceId,
       dimension: result.dimension,
+      ...lineage,
       datasetYear: result.datasetYear,
       nativeScaleMin: result.records[0]?.nativeMin ?? 0,
       nativeScaleMax: result.records[0]?.nativeMax ?? 1,
@@ -139,11 +156,13 @@ export async function runIngestion(
         ciSourceIngestions.sourceId,
         ciSourceIngestions.dimension,
         ciSourceIngestions.datasetYear,
+        ciSourceIngestions.indicatorId,
       ],
       set: {
         globalMinObserved: result.globalMinObserved,
         globalMaxObserved: result.globalMaxObserved,
         countriesCovered: result.records.length,
+        ...lineage,
         ingestedAt: dsql`NOW()`,
         status: "completed",
       },
@@ -181,6 +200,7 @@ export async function runIngestion(
         normalizedScore,
         rawValue: record.rawValue,
         sourceId: result.sourceId,
+        ...lineage,
         ingestionId: ingestion.id,
         methodologyVersion,
         derivationVersionKey: versions.key,
@@ -192,11 +212,14 @@ export async function runIngestion(
           ciDimensionScores.dimension,
           ciDimensionScores.quarter,
           ciDimensionScores.methodologyVersion,
+          ciDimensionScores.sourceId,
+          ciDimensionScores.indicatorId,
         ],
         set: {
           normalizedScore,
           rawValue: record.rawValue,
           sourceId: result.sourceId,
+          ...lineage,
           ingestionId: ingestion.id,
           derivationVersionKey: versions.key,
           derivationVersions: versions.envelope,

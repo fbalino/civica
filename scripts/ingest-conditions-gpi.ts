@@ -78,6 +78,15 @@ async function main() {
         sourceId: SOURCE_ID,
         datasetYear,
         methodologyVersion: METHODOLOGY_VERSION,
+        indicatorId: row.indicatorId,
+        upstreamRelease: row.upstreamRelease,
+        artifactHash: row.artifactHash,
+        artifactKind: row.artifactKind as "publisher_bytes" | "normalized_batch",
+        temporalCoverage: row.temporalCoverage,
+        licenseUrl: row.licenseUrl,
+        transformationId: "conditions-gpi-fixed-bound/v1",
+        substitutionReason: null,
+        methodVersion: METHODOLOGY_VERSION,
       });
 
     upserted++;

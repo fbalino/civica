@@ -50,6 +50,8 @@
     "validate:migrations": "tsx scripts/validate-migrations.ts",
     "validate:authoritative-migrations": "tsx scripts/validate-authoritative-migrations.ts",
     "validate:authoritative-migrations:live": "tsx scripts/validate-authoritative-migrations.ts --live",
+    "validate:indicator-lineage": "tsx scripts/validate-indicator-lineage.ts",
+    "validate:indicator-lineage:live": "tsx scripts/validate-indicator-lineage.ts --live",
     "validate:statement-provenance": "tsx scripts/validate-statement-provenance.ts",
     "validate:statement-provenance:live": "tsx scripts/validate-statement-provenance.ts --live",
     "validate:numeric-quarantine": "tsx scripts/validate-numeric-quarantine.ts",

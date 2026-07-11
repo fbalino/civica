@@ -5,6 +5,7 @@ import { createDb, buildIso3Map } from "../src/lib/ci/ingest";
 import { writeIndicatorHistory, type IndicatorHistoryInput } from "../src/lib/research/manual-writers";
 import { HISTORY_ADAPTERS } from "../src/lib/ci/history-adapters";
 import type { HistoryAdapter } from "../src/lib/ci/history-adapters";
+import { buildIndicatorLineage } from "../src/lib/indicators/lineage";
 
 /**
  * ingest-indicator-history — backfill the long-run `indicator_history`
@@ -81,6 +82,17 @@ async function runAdapter(
   }
 
   summary.fetched = result.observations.length;
+  const years = result.observations.map((observation) => observation.year);
+  const lineage = buildIndicatorLineage({
+    sourceId: result.sourceId,
+    dimension: result.dimension,
+    indicatorId: result.indicator,
+    upstreamRelease: `${adapter.label} fetched ${new Date().toISOString().slice(0, 10)}`,
+    temporalCoverage: years.length ? `${Math.min(...years)}/${Math.max(...years)}` : "empty",
+    transformationId: "source-native-history/v1",
+    methodVersion: "indicator-history/v1",
+    rows: result.observations,
+  });
 
   // Build the row set, mapping ISO3 → jurisdiction id and dropping
   // unmatched codes (OWID/WB carry territories Civica does not track).
@@ -107,6 +119,14 @@ async function runAdapter(
       nativeMax: result.nativeMax,
       isInverted: result.isInverted,
       sourceId: result.sourceId,
+      upstreamRelease: lineage.upstreamRelease,
+      artifactHash: lineage.artifactHash,
+      artifactKind: lineage.artifactKind,
+      temporalCoverage: lineage.temporalCoverage,
+      licenseUrl: lineage.licenseUrl,
+      transformationId: lineage.transformationId,
+      substitutionReason: lineage.substitutionReason,
+      methodVersion: lineage.methodVersion,
     });
   }
   summary.countries = seenCountries.size;
