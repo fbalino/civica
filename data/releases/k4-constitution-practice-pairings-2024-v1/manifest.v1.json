@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "k4-pairing-prototype-manifest/v1",
+  "releaseId": "k4-constitution-practice-pairings-2024-v1",
+  "candidateId": "K4",
+  "methodVersion": "k4-constitution-practice-pairings/v1",
+  "contractSha256": "5c058be5de1c6978ecbc774cf3577e7683250303036fa0bc4e105156b9624548",
+  "inputReleaseId": "ci-k4-practice-panel-2000-2024-v1",
+  "practiceYear": 2024,
+  "outputRows": 582,
+  "candidateTaggedRows": 329,
+  "noTaggedExcerptRows": 253,
+  "observedPracticeRows": 516,
+  "outputSha256": "5b02d0cff1b43cfd4c72fda04fb13ac08a31812e1a7a8fc2448ee710bc7a503a",
+  "valuesLocation": "private_reproducible_from_constitution_topic_excerpts_and_ci_research_panel_rows",
+  "confirmatoryLabelsInspected": false,
+  "validationStatus": "pending_two_blinded_coders_and_constitutional_scholar_review",
+  "prohibitedOutputs": [
+    "no subtraction of text presence from practice value",
+    "no hypocrisy or gap label",
+    "no aggregation across constructs",
+    "no country score, grade, rank, tier, or traffic light"
+  ]
+}
