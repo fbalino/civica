@@ -6,7 +6,8 @@ The prototype computes zero historical transfers and zero term-limit states. The
 
 The rulebook is published at `/civica-index/methodology/power-transfer-ledger`. `plan/research/k3-ledger-validation-protocol-v1.md` freezes independent coding, citation-audit, Archigos/NELDA overlap, and prospective freshness procedures. The tests have not run and country rows remain private.
 
-- Output SHA-256: `6fd57f03799fd171dd1dfc7cbb92a574fb35ef07b761cfdc481fb2354916c153`
+- Preregistered geographic split: 113 development, 34 validation, 21 final holdout
+- Output SHA-256: `cc8963b042dd613e62dcba2f1d1f959330b36d42a9db7d9bb39e15684155bb63`
 - `npm run validate:k3-ledger-prototype:live` reproduces the manifest exactly.
 - Focused rule/edge fixtures, TypeScript, design-token validation, content templates, and the aggregate claims/documentation gate pass.
 - Desktop and mobile browser captures are stored beside this file.

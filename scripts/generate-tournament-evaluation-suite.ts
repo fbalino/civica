@@ -1,0 +1,7 @@
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
+import { buildTournamentEvaluationSuite, tournamentEvaluationErrors } from "../src/lib/ci/tournament-evaluation-interface";
+
+const read = (path: string) => JSON.parse(readFileSync(path, "utf8"));
+export function buildCheckedTournamentEvaluationSuite() { const suite = buildTournamentEvaluationSuite({ baselines: read("data/releases/ci-index-baselines-v3/manifest.v3.json"), k1: read("data/releases/k1-current-composite-tournament-v1/manifest.v1.json"), k2: read("data/releases/k2-concordance-prototype-v1/manifest.v1.json"), k3: read("data/releases/k3-power-transfer-ledger-prototype-v1/manifest.v1.json"), k4: read("data/releases/k4-constitution-practice-pairings-2024-v1/manifest.v1.json"), k5: read("data/releases/k5-institutional-relation-candidates-v1/manifest.v1.json") }); const errors = tournamentEvaluationErrors(suite); if (errors.length) throw new Error(errors.join("\n")); return suite; }
+if (import.meta.url === pathToFileURL(process.argv[1]).href) { const suite = buildCheckedTournamentEvaluationSuite(); const dir = "data/releases/index-tournament-evaluation-suite-v1"; mkdirSync(dir, { recursive: true }); writeFileSync(`${dir}/manifest.v1.json`, `${JSON.stringify(suite, null, 2)}\n`); console.log(JSON.stringify({ interfaceVersion: suite.interfaceVersion, artifacts: suite.artifacts.length, suiteSha256: suite.suiteSha256 }, null, 2)); }

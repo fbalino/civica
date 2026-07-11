@@ -7,10 +7,15 @@
   "inputReleaseId": "ci-k4-practice-panel-2000-2024-v1",
   "practiceYear": 2024,
   "outputRows": 582,
+  "bySplit": {
+    "development": 387,
+    "validation": 120,
+    "final_holdout": 75
+  },
   "candidateTaggedRows": 329,
   "noTaggedExcerptRows": 253,
   "observedPracticeRows": 516,
-  "outputSha256": "5b02d0cff1b43cfd4c72fda04fb13ac08a31812e1a7a8fc2448ee710bc7a503a",
+  "outputSha256": "3be3e129be1bcbc711b61a550d4db60e45cb212d9a4f3b8b0abf9998b59f4092",
   "valuesLocation": "private_reproducible_from_constitution_topic_excerpts_and_ci_research_panel_rows",
   "confirmatoryLabelsInspected": false,
   "validationStatus": "pending_two_blinded_coders_and_constitutional_scholar_review",

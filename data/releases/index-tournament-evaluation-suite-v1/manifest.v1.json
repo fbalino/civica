@@ -1,0 +1,201 @@
+{
+  "schemaVersion": "civica-tournament-evaluation-suite/v1",
+  "interfaceVersion": "civica-tournament-evaluation-interface/v1",
+  "protocolVersion": "civica-index-tournament-preregistration/v3",
+  "artifacts": [
+    {
+      "artifactId": "K0",
+      "methodVersion": "civica-index-baselines/v3",
+      "outputKind": "native_dashboard",
+      "unit": "jurisdiction-year native-source dashboard row",
+      "inputReleaseIds": [
+        "ci-research-panel-2000-2024-v3"
+      ],
+      "possibleUnits": 4850,
+      "emittedUnits": 4850,
+      "withheldOrMissingUnits": 0,
+      "splitCoverage": {
+        "development": 2193,
+        "validation": 1356,
+        "finalHoldout": 1301
+      },
+      "evidenceCoverage": {
+        "panelInputCells": 24250,
+        "observedInputCells": 19471
+      },
+      "uncertainty": {
+        "mode": "not_retained",
+        "boundedUnits": 0,
+        "note": "Native observations remain separate; upstream uncertainty is not standardized in baseline v3."
+      },
+      "outputSha256": "38314d92dcf33fa999e2983b22bff10ea2485dc9c9dd2f36837ab78bcc2c85f0",
+      "valuesLocation": "private_reproducible_from_ci_research_panel_rows",
+      "publicValuesIncluded": false,
+      "heldoutLabelAccess": "not_applicable_no_labels_used",
+      "validationState": "implemented"
+    },
+    {
+      "artifactId": "K1",
+      "methodVersion": "k1-current-composite-tournament/v1",
+      "outputKind": "score_estimate",
+      "unit": "jurisdiction-year composite estimate",
+      "inputReleaseIds": [
+        "ci-research-panel-2000-2024-v3"
+      ],
+      "possibleUnits": 4850,
+      "emittedUnits": 3659,
+      "withheldOrMissingUnits": 1191,
+      "splitCoverage": {
+        "development": 1406,
+        "validation": 1106,
+        "finalHoldout": 1147
+      },
+      "evidenceCoverage": {
+        "full": 2270,
+        "partial": 1389,
+        "observedInputCells": 19471
+      },
+      "uncertainty": {
+        "mode": "not_estimable",
+        "boundedUnits": 0,
+        "note": "not_estimable_without_retained_source_uncertainty_and_dependence"
+      },
+      "outputSha256": "9c8a6c2354a40a52b82e7fc782d0df0c9198007496aa0fd035ecc8fa0aadceb3",
+      "valuesLocation": "private_reproducible_from_ci_research_panel_rows",
+      "publicValuesIncluded": false,
+      "heldoutLabelAccess": "not_applicable_no_labels_used",
+      "validationState": "implemented"
+    },
+    {
+      "artifactId": "K2",
+      "methodVersion": "k2-measurement-concordance/v1",
+      "outputKind": "concordance_profile",
+      "unit": "jurisdiction-year three-rater profile",
+      "inputReleaseIds": [
+        "ci-research-panel-2000-2024-v3"
+      ],
+      "possibleUnits": 4850,
+      "emittedUnits": 3260,
+      "withheldOrMissingUnits": 1590,
+      "splitCoverage": {
+        "development": 1208,
+        "validation": 1004,
+        "finalHoldout": 1048
+      },
+      "evidenceCoverage": {
+        "commonCoverageProfiles": 3260,
+        "inputCells": 14550
+      },
+      "uncertainty": {
+        "mode": "not_retained",
+        "boundedUnits": 0,
+        "note": "not_retained"
+      },
+      "outputSha256": "b99d95495b1b0fb2633e3b960a1e3b13ea7573c569f28b5deced4545300324cf",
+      "valuesLocation": "private_reproducible_from_ci_research_panel_rows",
+      "publicValuesIncluded": false,
+      "heldoutLabelAccess": "sealed_not_inspected",
+      "validationState": "development_gate_failed"
+    },
+    {
+      "artifactId": "K3",
+      "methodVersion": "k3-power-transfer-ledger/v1",
+      "outputKind": "ledger_state",
+      "unit": "sovereign jurisdiction current-executive state",
+      "inputReleaseIds": [
+        "2026-07-11"
+      ],
+      "possibleUnits": 194,
+      "emittedUnits": 168,
+      "withheldOrMissingUnits": 26,
+      "splitCoverage": {
+        "development": 113,
+        "validation": 34,
+        "finalHoldout": 21
+      },
+      "evidenceCoverage": {
+        "observedIdentity": 117,
+        "contestedIdentity": 51,
+        "transferStates": 0,
+        "termLimitStates": 0
+      },
+      "uncertainty": {
+        "mode": "categorical_state",
+        "boundedUnits": 0,
+        "note": "Observed, contested, and unknown states are separate; no probability is asserted."
+      },
+      "outputSha256": "cc8963b042dd613e62dcba2f1d1f959330b36d42a9db7d9bb39e15684155bb63",
+      "valuesLocation": "private_reproducible_from_sourced_terms",
+      "publicValuesIncluded": false,
+      "heldoutLabelAccess": "not_applicable_no_labels_used",
+      "validationState": "external_gates_pending"
+    },
+    {
+      "artifactId": "K4",
+      "methodVersion": "k4-constitution-practice-pairings/v1",
+      "outputKind": "evidence_pair",
+      "unit": "jurisdiction-construct pairing candidate",
+      "inputReleaseIds": [
+        "ci-k4-practice-panel-2000-2024-v1"
+      ],
+      "possibleUnits": 582,
+      "emittedUnits": 582,
+      "withheldOrMissingUnits": 0,
+      "splitCoverage": {
+        "development": 387,
+        "validation": 120,
+        "finalHoldout": 75
+      },
+      "evidenceCoverage": {
+        "candidateTaggedExcerpt": 329,
+        "noTaggedExcerpt": 253,
+        "observedPractice": 516
+      },
+      "uncertainty": {
+        "mode": "publisher_bounds",
+        "boundedUnits": 516,
+        "note": "Every observed V-Dem practice value retains its published lower and upper credible bounds."
+      },
+      "outputSha256": "3be3e129be1bcbc711b61a550d4db60e45cb212d9a4f3b8b0abf9998b59f4092",
+      "valuesLocation": "private_reproducible_from_constitution_topic_excerpts_and_ci_research_panel_rows",
+      "publicValuesIncluded": false,
+      "heldoutLabelAccess": "sealed_not_inspected",
+      "validationState": "external_gates_pending"
+    },
+    {
+      "artifactId": "K5",
+      "methodVersion": "k5-institutional-constraint-map/v1",
+      "outputKind": "relation_candidate",
+      "unit": "candidate constitutional passage for a formal relation",
+      "inputReleaseIds": [
+        "k5-institutional-relation-candidates-v1"
+      ],
+      "possibleUnits": null,
+      "emittedUnits": 2138,
+      "withheldOrMissingUnits": null,
+      "splitCoverage": {
+        "development": 1488,
+        "validation": 383,
+        "finalHoldout": 267
+      },
+      "evidenceCoverage": {
+        "candidatePassages": 2138,
+        "representedJurisdictions": 181,
+        "assertedGraphEdges": 0
+      },
+      "uncertainty": {
+        "mode": "pending_coder_reliability",
+        "boundedUnits": 0,
+        "note": "pending_double_blind_coding_external_expert_and_citation_audit"
+      },
+      "outputSha256": "007b297d145c5bf453e8b450bb9aeb9d8649d5de420abbd3d3c52db53d8c978e",
+      "valuesLocation": "private_reproducible_from_constitution_topic_excerpts",
+      "publicValuesIncluded": false,
+      "heldoutLabelAccess": "sealed_not_inspected",
+      "validationState": "external_gates_pending"
+    }
+  ],
+  "suiteSha256": "9f82c970c1aa4d8b94702bf3da5d1a2c4ae7d10b9e37a8e3477bd8ef471759ca",
+  "heldoutOutcomeMetricsComputed": false,
+  "winnerSelected": false
+}

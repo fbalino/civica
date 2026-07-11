@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 290
-- **Completed:** 68
-- **Remaining:** 222
-- **Progress:** 23.4%
+- **Completed:** 69
+- **Remaining:** 221
+- **Progress:** 23.8%
 - **Priority mix:** P0 181 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -88,7 +88,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-010** (P0) Preregister the candidate tournament before winner-selecting analyses. _Done when: protocol freezes panel split, candidates, simple baselines, metrics, subgroup/sensitivity tests, decision thresholds, multiplicity/exploration handling, missingness, exclusions, code commit, input hashes, and “no candidate wins” rule in a timestamped artifact._
 - [x] **IDX-011** (P0) Define and implement simple baselines. _Done when: best single established indicator, transparent equal-weight aggregate where coherent, first common factor/latent baseline where coherent, and source-native dashboard/no-score baseline are reproducible and receive the same evaluation as Civica candidates._
 - [x] **IDX-012** (P1) Reimplement the current four-dimension composite as a fully specified tournament candidate. _Done when: canonical inputs, fixed transforms, dependency-aware uncertainty, missingness, rank/tie rules, version, and exact reproduction tests exist; no special threshold or favorable dataset is reserved for it._
-- [ ] **IDX-013** (P1) Implement each approved alternative candidate in isolated research code with a shared evaluation interface. _Done when: candidate code reads the same frozen panel/manifests, emits standardized predictions/summaries/uncertainty/coverage, has unit/golden tests, and cannot inspect held-out labels during fitting/tuning._
+- [x] **IDX-013** (P1) Implement each approved alternative candidate in isolated research code with a shared evaluation interface. _Done when: candidate code reads the same frozen panel/manifests, emits standardized predictions/summaries/uncertainty/coverage, has unit/golden tests, and cannot inspect held-out labels during fitting/tuning._
 - [ ] **IDX-014** (P0) Test dimensionality across cross-sectional, between-country, within-country, change, region/regime, and time slices. _Done when: PCA/factor or justified alternatives report sample/assumptions/loadings/variance/stability for each level, distinguish a global level factor from longitudinal change, and reproduce all figures/tables from the frozen panel._
 - [ ] **IDX-015** (P0) Test convergent and discriminant validity against declared external constructs. _Done when: hypotheses are preregistered, expected/undesired associations and uncertainty are reported, same-source mechanical correlations are separated, and no candidate passes merely by resembling one of its inputs._
 - [ ] **IDX-016** (P0) Test incremental information beyond established indicators and simple dashboards. _Done when: held-out prediction/explanation or justified decision-utility tests compare nested baselines, effect sizes/uncertainty are reported, and a candidate fails if added complexity produces less than the preregistered meaningful gain._

@@ -1,4 +1,5 @@
 import { researchPanelHash } from "./research-panel";
+import { geographicTournamentBucket } from "./tournament-preregistration";
 
 export const K3_LEDGER_METHOD_VERSION = "k3-power-transfer-ledger/v1";
 export const K3_LEDGER_AS_OF = "2026-07-11";
@@ -26,7 +27,9 @@ export const K3_LEDGER_CONTRACT = Object.freeze({
 
 export interface K3Citation { sourceId: string; sourceUrl: string; sourceHash: string | null; sourceLicense: string | null; retrievedAt: string; predicate: string }
 export interface K3TermInput { iso3: string; jurisdictionId: string; executiveStructure: string; termId: string; officeType: "head_of_state" | "head_of_government"; officeName: string; personId: string; personName: string; partyName: string | null; startDate: string | null; citations: readonly K3Citation[] }
-export interface K3LedgerOutput { candidateId: "K3"; unitId: string; iso3: string; asOf: typeof K3_LEDGER_AS_OF; executiveIdentityStatus: "observed" | "contested"; executive: null | { personId: string; personName: string; officeType: string; officeName: string; partyName: string | null; startDate: string; tenureDays: number }; contestedCandidates: readonly { personId: string; personName: string; officeType: string }[]; latestElectoralTransfer: { state: "not_computable"; reason: "no_predecessor_history_or_election_linkage" }; termLimitStatus: { state: "unknown"; reason: "constitutional_rule_and_prior_terms_not_coded" }; citations: readonly K3Citation[]; methodVersion: typeof K3_LEDGER_METHOD_VERSION }
+export interface K3LedgerOutput { candidateId: "K3"; unitId: string; iso3: string; split: "development" | "validation" | "final_holdout"; asOf: typeof K3_LEDGER_AS_OF; executiveIdentityStatus: "observed" | "contested"; executive: null | { personId: string; personName: string; officeType: string; officeName: string; partyName: string | null; startDate: string; tenureDays: number }; contestedCandidates: readonly { personId: string; personName: string; officeType: string }[]; latestElectoralTransfer: { state: "not_computable"; reason: "no_predecessor_history_or_election_linkage" }; termLimitStatus: { state: "unknown"; reason: "constitutional_rule_and_prior_terms_not_coded" }; citations: readonly K3Citation[]; methodVersion: typeof K3_LEDGER_METHOD_VERSION }
+
+function geographicSplit(iso3: string): K3LedgerOutput["split"] { const bucket = geographicTournamentBucket(iso3); return bucket <= 6 ? "development" : bucket <= 8 ? "validation" : "final_holdout"; }
 
 const CABINET_STRUCTURES = new Set(["cabinet_executive", "monarchic_head_of_state", "dual_monarchic_head_of_state"]);
 const COLLECTIVE_STRUCTURES = new Set(["collegial_head_of_state", "collegial_executive", "military_council"]);
@@ -49,7 +52,7 @@ export function runK3LedgerPrototype(rows: readonly K3TermInput[]): K3LedgerOutp
     const selected = !collective && people.size === 1 ? candidates.sort((a, b) => a.officeType.localeCompare(b.officeType))[0] : null;
     const citations = [...new Map(candidates.flatMap((row) => row.citations).map((citation) => [`${citation.sourceId}:${citation.predicate}:${citation.sourceUrl}`, citation])).values()];
     if (citations.length === 0) return [];
-    return [{ candidateId: "K3" as const, unitId: `${iso3}:${K3_LEDGER_AS_OF}`, iso3, asOf: K3_LEDGER_AS_OF,
+    return [{ candidateId: "K3" as const, unitId: `${iso3}:${K3_LEDGER_AS_OF}`, iso3, split: geographicSplit(iso3), asOf: K3_LEDGER_AS_OF,
       executiveIdentityStatus: selected ? "observed" as const : "contested" as const,
       executive: selected ? { personId: selected.personId, personName: selected.personName, officeType: selected.officeType, officeName: selected.officeName, partyName: selected.partyName, startDate: selected.startDate!, tenureDays: daysBetween(selected.startDate!, K3_LEDGER_AS_OF) } : null,
       contestedCandidates: selected ? [] : candidates.map((row) => ({ personId: row.personId, personName: row.personName, officeType: row.officeType })),
