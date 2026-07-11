@@ -151,7 +151,7 @@ export const PUBLIC_CLAIMS = [
     surface: "index",
     routeOrArtifact: "/civica-index",
     exactClaim:
-      "The Civica Index is a research-beta composite across {dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges; it has not completed independent review.",
+      "The Civica Index is a research-beta composite across {dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band; it has not completed independent review.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "src/lib/ci/calculate-v2.ts",
@@ -165,7 +165,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/(reader)/civica-index/page.tsx",
       fragment:
-        "A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. Not independently reviewed.",
+        "A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band. Not independently reviewed.",
     },
   },
   {
@@ -677,7 +677,7 @@ export const PUBLIC_CLAIMS = [
     surface: "readme",
     routeOrArtifact: "README.md — Civica Index section",
     exactClaim:
-      "The Civica Index is a research-beta 0–100 composite whose simulation bounds are input-variation ranges rather than confidence intervals; its construction, weights, and interpretation remain subject to validation.",
+      "The Civica Index is a research-beta 0–100 composite with no published composite uncertainty band because the current release retains no usable source-specific uncertainty model; its construction, weights, and interpretation remain subject to validation.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "README.template.md",
@@ -865,7 +865,7 @@ export const PUBLIC_CLAIMS = [
     surface: "metadata",
     routeOrArtifact: "/civica-index — JSON-LD Dataset description",
     exactClaim:
-      "A research-beta composite across {dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.",
+      "A research-beta composite across {dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band. The methodology has not completed independent review.",
     tier: "research-beta-estimate",
     evidenceSources: [
       "src/app/(reader)/civica-index/page.tsx",
@@ -878,7 +878,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/(reader)/civica-index/page.tsx",
       fragment:
-        "A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.",
+        "A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band. The methodology has not completed independent review.",
     },
   },
   {

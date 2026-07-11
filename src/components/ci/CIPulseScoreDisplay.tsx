@@ -2,7 +2,7 @@
  * Civica Index score display — Beta methodology.
  *
  * Renders a single editorial pane showing the CI score, Monte Carlo
- * input-variation range, neutral numeric position, and completeness flag.
+ * neutral numeric position, uncertainty posture, and completeness flag.
  *
  * Pulse is rendered separately as named experimental dimensional deltas;
  * this component has no scalar Pulse contract.
@@ -193,7 +193,7 @@ function ScorePane({
         </span>
       </div>
 
-      {/* Monte Carlo input-variation range — not a confidence interval. */}
+      {/* Bounds render only for archived rows that actually carry them. */}
       {intervalLine ? (
         <span
           style={{
@@ -282,7 +282,7 @@ export function CIScoreDisplay({
       : civicaIndex.dimensionCount;
   const ciIntervalLine =
     ciScore && ciScore.scoreLower != null && ciScore.scoreUpper != null
-      ? `Central 90% of simulations: ${ciScore.scoreLower}–${ciScore.scoreUpper}`
+      ? `Archived input-variation range: ${ciScore.scoreLower}–${ciScore.scoreUpper}`
       : null;
   const missingDimensionLabels = (ciScore?.missingDimensions ?? []).map(
     (dimension) =>

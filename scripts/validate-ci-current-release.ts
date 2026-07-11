@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import manifest from "../data/releases/ci-beta-r3-2024-Q4/reproduction-manifest.v1.json";
+import manifest from "../data/releases/ci-beta-r4-2024-Q4/reproduction-manifest.v1.json";
 import {
   CURRENT_CI_METHODOLOGY_VERSION,
   CURRENT_CI_QUARTER,
@@ -38,6 +38,7 @@ for (const path of requiredConsumers) {
 const calculator = readFileSync("src/lib/ci/calculate-v2.ts", "utf8");
 assert.match(calculator, /eq\(ciDimensionScores\.methodologyVersion, methodologyVersion\)/);
 assert.match(calculator, /orderedDims = \[\.\.\.dims\.values\(\)\]\.sort/);
-assert.match(calculator, /seededRng\(/);
+assert.match(calculator, /const score = compositeInputs\.reduce/);
+assert.doesNotMatch(calculator, /simulateComposite\(/);
 
 console.log(`PASS — ${CURRENT_CI_RELEASE_ID} is pinned across ${requiredConsumers.length} production consumers; checked manifest covers ${manifest.dimensions.rows} dimensions and ${manifest.composites.rows} composites.`);

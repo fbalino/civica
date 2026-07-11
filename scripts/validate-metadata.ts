@@ -139,7 +139,7 @@ function checkSampleDatasetNode(): string[] {
   const node = buildDataset({
     name: "Civica Index",
     description:
-      "A research-beta composite across four governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.",
+      "A research-beta composite across four governance dimensions, with fixed-bound normalization and no published composite uncertainty band. The methodology has not completed independent review.",
     url: canonical,
     license: RIGHTS_REGISTRY_URL,
     distributionUrl: absoluteUrl("/api/v1/index/rankings"),

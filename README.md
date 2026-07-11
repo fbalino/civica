@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: f3e04c50aedf4d5183ef052b05388491c658d5ad06cc961861613d0c9f4734a2
-  Generated body SHA-256: 43973dcdfda952daa3b2cc53a0722fe442999a7b6da0fecc5afdcc108fe008b0
+  Template SHA-256: 54a8664a4e7a0b779fc217e76c76b1cef9075d4235ccff93ea108cbdefd53fd1
+  Generated body SHA-256: d94ac8cd4ab6487b6ac9451ca95553ea2a088fdabfd59c0f062d74341bc75739
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -36,7 +36,7 @@ Country dossiers cover geography, demographics, government, economy, energy, com
 ### Civica Index — secondary research beta
 
 <!-- PUBLIC_CLAIM: readme.index-estimate -->
-A research-beta 0–100 composite across four governance dimensions: democratic quality, rule of law, freedoms & rights, and corruption control. It uses V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting inputs. Published bounds are Monte Carlo input-variation ranges under declared assumptions, not confidence intervals for a true country score. The Index is currently BETA and has not completed external methodological review; its construction, weights, and interpretation remain subject to validation.
+A research-beta 0–100 composite across four governance dimensions: democratic quality, rule of law, freedoms & rights, and corruption control. It uses V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting inputs. The current release publishes no composite uncertainty band because its adapters retain no usable source-specific uncertainty model. The Index is currently BETA and has not completed external methodological review; its construction, weights, and interpretation remain subject to validation.
 
 ### Civica Pulse — experimental event ledger
 
@@ -76,7 +76,7 @@ This is a pre-launch project. Honest snapshot:
 | External methodology review | Not yet — planned post-v1 |
 | Public launch | Pre-launch; URLs are live but no inbound traffic yet |
 
-The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in BETA, scored under the v2-Beta four-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`). Stabilization depends on longitudinal, factor-analysis, and input-variation validation plus external academic review; no launch date is claimed.
+The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in BETA, scored under the v2-Beta four-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`). Stabilization depends on longitudinal and factor analysis, retained source-specific uncertainty, dependence and calibration work, and external academic review; no launch date is claimed.
 
 For live source and fact-layer totals, see `/country/methodology/reconciliation` — those values are read directly from the database rather than maintained as inline prose. Page values may briefly differ from this generated README as new vintages land.
 

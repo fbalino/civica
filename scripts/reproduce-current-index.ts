@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
 import sourceManifest from "../data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json";
-import spineArtifact from "../data/releases/ci-beta-r3-2024-Q4/jurisdiction-spine.v1.json";
+import spineArtifact from "../data/releases/ci-beta-r4-2024-Q4/jurisdiction-spine.v1.json";
 import {
   applyFrozenReleaseCoverage, parseFreedomHouse, parseTransparencyCpi, parseVdemCore,
   parseWgiRuleOfLaw, parseWgiVoiceAccountability, wgiFallbackRecords,
@@ -13,7 +13,7 @@ import { reproduceCurrentCiRelease, type CiSpineRow } from "../src/lib/ci/reprod
 import { CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_QUARTER, CURRENT_CI_RELEASE_ID, CURRENT_CI_VINTAGE_LABEL } from "../src/lib/ci/current-release";
 
 config({ path: ".env.local" });
-const outputPath = "data/releases/ci-beta-r3-2024-Q4/reproduction-manifest.v1.json";
+const outputPath = "data/releases/ci-beta-r4-2024-Q4/reproduction-manifest.v1.json";
 const sha256 = (value: Buffer | string) => createHash("sha256").update(value).digest("hex");
 const inputs = sourceManifest.inputs;
 const capture = (id: string) => { const row = inputs.find((input) => input.sourceId === id); if (!row) throw new Error(`Missing source capture ${id}`); return row; };
@@ -44,8 +44,8 @@ async function main() {
     schemaVersion: "ci-clean-room-reproduction/v1", releaseId: CURRENT_CI_RELEASE_ID,
     quarter: CURRENT_CI_QUARTER, methodologyVersion: CURRENT_CI_METHODOLOGY_VERSION, vintageLabel: CURRENT_CI_VINTAGE_LABEL,
     inputManifest: "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json", inputSha256: inputHashes,
-    jurisdictionSpine: { path: "data/releases/ci-beta-r3-2024-Q4/jurisdiction-spine.v1.json", rowCount: spine.length, sha256: spineArtifact.sha256 },
-    algorithm: { simulations: 10_000, randomization: "deterministic per-jurisdiction Mulberry32 seed over release, period, identity, ordered dimensions, sources, and raw values" },
+    jurisdictionSpine: { path: "data/releases/ci-beta-r4-2024-Q4/jurisdiction-spine.v1.json", rowCount: spine.length, sha256: spineArtifact.sha256 },
+    algorithm: { simulations: 0, randomization: "none; deterministic weighted composite" },
     dimensions: { rows: reproduction.dimensions.length, sha256: reproduction.dimensionSha256 },
     composites: { rows: reproduction.composites.length, sha256: reproduction.compositeSha256 },
     tolerance: { identities: "exact", rawAndNormalizedDimensions: "absolute difference <= 0.00001 for PostgreSQL real storage", compositeFields: "exact" },

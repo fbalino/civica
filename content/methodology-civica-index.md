@@ -32,7 +32,7 @@
 
 Every Civica Index score is an integer between 0 and 100. Higher means stronger governance institutions. Every published score is accompanied by:
 
-- **A Monte Carlo input-variation range** — e.g. "central 90% of simulations: 68–76". This is a sensitivity summary under the current perturbation assumptions. It is not a confidence interval for a latent "true" country score.
+- **No composite uncertainty band.** The current release retains no usable per-country uncertainty field and has no cross-source covariance model. It therefore publishes the deterministic weighted point estimate without lower or upper bounds.
 - **A neutral numeric position** — the estimate is plotted on a 0–100 line without a letter grade or qualitative country verdict. See §6.
 - **A vintage / freshness timestamp** per underlying source. So you can see, for any score, exactly how recent each upstream dataset is.
 - **A completeness flag** — Full, Partial, or Insufficient. See §7.
@@ -67,24 +67,13 @@ The current beta weights are PCA-informed estimates, not externally reviewed par
 
 The full PCA results — eigenvalues, scree plot, factor loadings, and decision rationale — are published as a separate appendix at [/civica-index/methodology/pca-appendix](/civica-index/methodology/pca-appendix). Headline finding: the {{state.civicaIndex.dimensionCount}} governance dimensions are highly correlated (r = {{ctx.corrLow}} to {{ctx.corrHigh}}), one dominant latent factor explains {{ctx.pc1VariancePct}}% of the variance, and weights proportional to the squared first-component loadings come out near-equal — close enough to the provisional values that rankings barely move under the revision.
 
-## Section 5 · Input-variation ranges {#uncertainty}
+## Section 5 · Uncertainty posture {#uncertainty}
 
-Every score can publish a Monte Carlo input-variation range. The current code perturbs inputs under declared assumptions and reports the central 90% of simulated composite values:
+The current release publishes **no composite uncertainty or input-variation range**. Its point estimate is the rounded weighted sum of the normalized source values. No random draw enters that estimate.
 
-```
-for each country:
-  for sim in 1 .. 10,000:
-    sample each indicator from its
-      published-uncertainty distribution
-    recompute the weighted composite
+This is a data limitation, not evidence that the estimate is precise. V-Dem publishes posterior intervals for its modeled indicators, and the World Bank publishes model-based standard errors for WGI. Civica's current release adapters retain neither quantity. Freedom House publishes consensus-reviewed scores without a per-country probability distribution. Transparency International publishes source-agreement and significance information, but Civica currently retains only the CPI point score. Across the released Index input table, usable uncertainty coverage is {{state.civicaIndex.uncertainty.usableReleasedUncertaintyRows}} of {{state.civicaIndex.uncertainty.releasedDimensionRows}} rows.
 
-  input-variation range = [5th percentile, 95th percentile]
-                          of the 10,000 simulated composites
-```
-
-The published point estimate is the **median** of those simulated composites, rounded to the nearest integer — not the raw (unperturbed) weighted sum. The displayed input-variation range uses the lower and upper percentiles described above from that same simulated distribution.
-
-Some inputs, including V-Dem, publish uncertainty information directly. For sources that do not, the current implementation applies a fixed ±5% perturbation on the normalized range. That fallback is a heuristic sensitivity assumption, not an estimated sampling distribution. Until a defensible statistical model is specified and validated, Civica does not describe these bounds as confidence intervals or as the probable location of a true score.
+The four source families also overlap in concepts, expert communities, and underlying evidence. Civica has not estimated a covariance model for those dependencies. Treating the inputs as independent and assigning the same invented spread to each one would understate some dependencies and manufacture precision elsewhere. A future range may return only with retained source-specific uncertainty, an explicit dependence model, empirical calibration checks where a repeated-observation target exists, and a new methodology version.
 
 ## Section 7 · Missing data {#missing}
 
@@ -92,10 +81,10 @@ Different countries have different data coverage. Civica enforces three rules to
 
 - **Mandatory dimensions.** Democratic Quality and Rule of Law are required. Democratic Quality uses V-Dem when present and the disclosed WGI Voice & Accountability coverage fallback otherwise. If either mandatory dimension is still missing, no CI is published for that country.
 - **Publication threshold.** A composite requires at least {{state.civicaIndex.missingness.minimumDimensionsForPublication}} of the {{state.civicaIndex.dimensionCount}} dimensions, including both mandatory dimensions. A country with the mandatory dimensions alone receives no composite; the page identifies the missing dimensions rather than substituting a score.
-- **Partial estimate.** If both mandatory dimensions are present and exactly one optional dimension (Freedoms & Rights or Corruption Control) is missing, a partial estimate is published and flagged visually. The weights of the dimensions actually present are re-proportioned to carry the full composite weight, and the simulation range receives a fixed {{ctx.partialRangeWideningPct}}% widening. The widening is an explicit heuristic sensitivity adjustment, not a statistical confidence correction. Partial estimates retain their missing-dimension label and should not be compared with full estimates as if coverage were equal.
+- **Partial estimate.** If both mandatory dimensions are present and exactly one optional dimension (Freedoms & Rights or Corruption Control) is missing, a partial estimate is published and flagged visually. The weights of the dimensions actually present are re-proportioned to carry the full composite weight. Partial estimates retain their missing-dimension label and should not be compared with full estimates as if coverage were equal.
 - **Complete estimate.** All {{state.civicaIndex.dimensionCount}} dimensions present. No missing-dimension flag.
 
-**Upward-bias risk.** Re-proportioning weights onto the dimensions that are present can push a partial score upward, because the dimension most likely to be missing for a fragile or low-capacity state is often the one that would have scored lowest. The {{ctx.partialRangeWideningPct}}% widened range is a heuristic mitigation, not a validated statistical correction for this bias — see §12.
+**Upward-bias risk.** Re-proportioning weights onto the dimensions that are present can push a partial score upward, because the dimension most likely to be missing for a fragile or low-capacity state is often the one that would have scored lowest. No generic range is shown as a correction for this bias — see §12.
 
 ## Section 8 · Civica Conditions {#conditions}
 
@@ -142,7 +131,7 @@ Both series are accessible via the API. See §13 for citation format.
 
 **Coverage gaps.** Some countries have insufficient source coverage to compute even a partial CI. Those pages display "Insufficient data" rather than guess. The full list will accompany the replication package (in preparation, targeted for Q3 2026).
 
-**Partial-estimate upward bias.** Re-proportioning weights over the dimensions present (§7) can bias a partial score upward relative to what the country would score with full coverage, since the missing dimension is often the weakest one for a fragile or low-capacity state. The widened input-variation range is a heuristic sensitivity adjustment, not a validated statistical correction for this bias.
+**Partial-estimate upward bias.** Re-proportioning weights over the dimensions present (§7) can bias a partial score upward relative to what the country would score with full coverage, since the missing dimension is often the weakest one for a fragile or low-capacity state. The partial label identifies this limitation; no generic uncertainty band is presented as a correction.
 
 **Construct narrowing.** By design, the CI measures governing institutions only. If a reader wants to ask "is this country a good place to live?" — a different and broader question — the CI alone does not answer that. Read it together with [Civica Conditions](/civica-conditions).
 

@@ -10,7 +10,7 @@ export type CiCompletenessFlag = "full" | "partial" | "insufficient";
 /** The complete, version-bound publication policy for current Index rows. */
 export const CURRENT_CI_MISSINGNESS_POLICY = Object.freeze({
   schemaVersion: "ci-missingness-policy/v1" as const,
-  id: `ci-missingness/${CURRENT_CI_METHODOLOGY_VERSION}` as const,
+  id: "ci-missingness/v1" as const,
   methodologyVersion: CURRENT_CI_METHODOLOGY_VERSION,
   dimensions: V2_DIMENSIONS,
   mandatoryDimensions: V2_MANDATORY,
@@ -20,7 +20,7 @@ export const CURRENT_CI_MISSINGNESS_POLICY = Object.freeze({
   minimumDimensionsForPublication: 3 as const,
   maximumMissingOptionalDimensions: 1 as const,
   partialWeightTreatment: "renormalize_present_weights_to_one" as const,
-  partialRangeMultiplier: 1.2 as const,
+  partialRangeMultiplier: null,
   partialComparability:
     "not_directly_comparable_to_full_estimates_without_the_missingness_flag" as const,
   insufficientTreatment: "withhold_composite" as const,

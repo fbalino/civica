@@ -267,18 +267,31 @@ export const zCiMethodologyMeta = z
         partial_weight_treatment: z.literal(
           "renormalize_present_weights_to_one",
         ),
-        partial_range_multiplier: z.literal(1.2),
+        partial_range_multiplier: z.null(),
         partial_comparability: z.literal(
           "not_directly_comparable_to_full_estimates_without_the_missingness_flag",
         ),
         insufficient_treatment: z.literal("withhold_composite"),
       })
       .strict(),
+    uncertainty: z
+      .object({
+        policy_id: z.string(),
+        point_estimate: z.literal("deterministic_weighted_composite"),
+        displayed_range: z.literal("not_published"),
+        covariance_model: z.literal("not_available"),
+        usable_released_uncertainty_rows: z.literal(0),
+        released_dimension_rows: z.literal(745),
+        disposition: z.literal(
+          "removed_until_source_specific_uncertainty_and_dependence_are_retained_and_validated",
+        ),
+      })
+      .strict(),
     presentation: z
       .object({
         format: z.literal("numeric_position"),
         scale: z.object({ min: z.literal(0), max: z.literal(100) }).strict(),
-        input_variation_range: z.literal("central_90_percent"),
+        input_variation_range: z.literal("not_published"),
         categorical_grades: z.literal(false),
       })
       .strict(),

@@ -18,7 +18,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Index Methodology — How Governance Is Scored",
   description:
-    `The Civica Index research-beta methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, Monte Carlo input-variation ranges, neutral numeric presentation, and a separate Civica Conditions companion layer.${civicaIndex.status === "beta" ? " Beta — methodology in active development and not independently reviewed." : ""}`,
+    `The Civica Index research-beta methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, deterministic weighted point estimates, no published composite uncertainty band, neutral numeric presentation, and a separate Civica Conditions companion layer.${civicaIndex.status === "beta" ? " Beta — methodology in active development and not independently reviewed." : ""}`,
   alternates: { canonical: "https://civicaatlas.org/civica-index/methodology" },
 };
 
@@ -119,8 +119,6 @@ export default async function MethodologyPage() {
     pc1VariancePct,
     corrLow,
     corrHigh,
-    partialRangeWideningPct:
-      (civicaIndex.missingness.partialRangeMultiplier - 1) * 100,
   };
 
   const state = { civicaIndex, disputeSla, pulse };
@@ -264,16 +262,14 @@ export default async function MethodologyPage() {
         </p>
         <ScorePosition
           value={72}
-          lower={68}
-          upper={76}
           label="Illustrative Civica Index estimate"
         />
         <p>
-          Current surfaces show the numeric estimate on a neutral 0–100 line
-          with its input-variation range. Position communicates magnitude only;
-          blue is not a good/bad scale. Every display must also identify the
-          output as research beta and link back to the source dimensions and
-          limitations on this page.
+          Current surfaces show the numeric estimate on a neutral 0–100 line.
+          Position communicates magnitude only; blue is not a good/bad scale.
+          No composite uncertainty band is shown. Every display must identify
+          the output as research beta and link back to the source dimensions
+          and limitations on this page.
         </p>
       </Reveal>
 

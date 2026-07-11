@@ -32,8 +32,7 @@ async function main() {
       weights: V2_WEIGHTS,
       notes:
         `Research beta ${CURRENT_CI_METHODOLOGY_VERSION} — 4 governance dimensions, fixed-bound normalization, ` +
-        "Monte Carlo input-variation ranges (10k simulations), neutral numeric presentation, " +
-        "deterministic per-jurisdiction PRNG seeds, " +
+        "deterministic weighted point estimates with no generic uncertainty band, neutral numeric presentation, " +
         "versioned three-of-four missing-data rules. Weights provisional " +
         "until PCA / factor analysis (Phase 5.3) confirms structure. " +
         "HDI and Stability moved out to Civica Conditions companion layer.",
@@ -44,8 +43,7 @@ async function main() {
         weights: V2_WEIGHTS,
         notes:
           `Research beta ${CURRENT_CI_METHODOLOGY_VERSION} — 4 governance dimensions, fixed-bound normalization, ` +
-          "Monte Carlo input-variation ranges (10k simulations), neutral numeric presentation, " +
-          "deterministic per-jurisdiction PRNG seeds, " +
+          "deterministic weighted point estimates with no generic uncertainty band, neutral numeric presentation, " +
           "versioned three-of-four missing-data rules. Weights provisional " +
           "until PCA / factor analysis (Phase 5.3) confirms structure. " +
           "HDI and Stability moved out to Civica Conditions companion layer.",

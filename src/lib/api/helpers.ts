@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { civicaIndex } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
+import { CURRENT_CI_UNCERTAINTY_POLICY } from "@/lib/ci/uncertainty-policy";
 
 // CLM-012: exported so contract/registry.ts documents the real header
 // values instead of retyping them.
@@ -46,10 +47,21 @@ export const CI_METHODOLOGY_META = Object.freeze({
     partial_comparability: civicaIndex.missingness.partialComparability,
     insufficient_treatment: civicaIndex.missingness.insufficientTreatment,
   }),
+  uncertainty: Object.freeze({
+    policy_id: CURRENT_CI_UNCERTAINTY_POLICY.id,
+    point_estimate: CURRENT_CI_UNCERTAINTY_POLICY.pointEstimate,
+    displayed_range: CURRENT_CI_UNCERTAINTY_POLICY.displayedRange,
+    covariance_model: CURRENT_CI_UNCERTAINTY_POLICY.covarianceModel,
+    usable_released_uncertainty_rows:
+      CURRENT_CI_UNCERTAINTY_POLICY.usableReleasedUncertaintyRows,
+    released_dimension_rows:
+      CURRENT_CI_UNCERTAINTY_POLICY.releasedDimensionRows,
+    disposition: CURRENT_CI_UNCERTAINTY_POLICY.disposition,
+  }),
   presentation: Object.freeze({
     format: "numeric_position",
     scale: Object.freeze({ min: 0, max: 100 }),
-    input_variation_range: "central_90_percent",
+    input_variation_range: "not_published",
     categorical_grades: false,
   }),
 });

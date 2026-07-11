@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "ci-uncertainty-audit/v1",
+  "releaseId": "ci-beta-r4-2024-Q4",
+  "methodologyVersion": "beta-r4",
+  "releasedDimensionRows": 745,
+  "usableReleasedUncertaintyRows": 0,
+  "covarianceModel": "not_available",
+  "pointEstimate": "deterministic_weighted_composite",
+  "displayedRange": "not_published",
+  "disposition": "removed_until_source_specific_uncertainty_and_dependence_are_retained_and_validated",
+  "sourceAudit": [
+    {
+      "sourceId": "vdem",
+      "upstreamUncertainty": "posterior_intervals_available",
+      "retainedInRelease": false,
+      "reference": "https://www.v-dem.net/documents/56/methodology.pdf"
+    },
+    {
+      "sourceId": "worldbank_wgi",
+      "upstreamUncertainty": "model_based_standard_errors_available",
+      "retainedInRelease": false,
+      "reference": "https://www.worldbank.org/en/publication/worldwide-governance-indicators/documentation"
+    },
+    {
+      "sourceId": "freedom_house",
+      "upstreamUncertainty": "no_per_country_probability_distribution_published",
+      "retainedInRelease": false,
+      "reference": "https://freedomhouse.org/reports/freedom-world/freedom-world-research-methodology"
+    },
+    {
+      "sourceId": "transparency_intl",
+      "upstreamUncertainty": "source_agreement_and_significance_information_not_retained_as_a_distribution",
+      "retainedInRelease": false,
+      "reference": "https://www.transparency.org/en/news/how-cpi-scores-are-calculated"
+    }
+  ]
+}

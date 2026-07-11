@@ -1,8 +1,7 @@
 /**
- * Civica Index — Monte Carlo input-variation range simulator.
+ * Archived Civica Index Beta-R3 Monte Carlo simulator.
  *
- * Per spec §2.5: every score publishes a central-90% input-variation
- * range, computed by:
+ * Historical releases used a central-90% input-variation range, computed by:
  *   1. Sampling each indicator from a distribution centered on its
  *      reported value with spread equal to its published uncertainty
  *      (or a conservative ±5% default when not published).
@@ -14,11 +13,9 @@
  * assumptions, not a calibrated confidence interval for a latent true
  * score — do not describe it as one in code, prose, or API output.
  *
- * For the Beta phase the implementation uses a normal distribution
- * with mean = the dimension's normalized score and standard deviation
- * = the source's defaultUncertainty (in 0–100 points). When sources
- * begin publishing per-country uncertainty (V-Dem already does), the
- * caller can pass an explicit `stdDev` per dimension.
+ * Beta-R4 removed this model because its generic spreads and independence
+ * assumption were not supported by released source uncertainty data. Current
+ * production code must not import this module.
  */
 
 /** Default number of simulations. Spec §2.5 calls for 10,000. */
@@ -28,13 +25,12 @@ export const DEFAULT_SIMS = 10_000;
  * Sample once from a normal distribution N(mean, stdDev) using the
  * Box-Muller transform. Returns a single sample.
  *
- * `rng` defaults to `Math.random` (production behavior, unchanged).
- * Tests inject a seeded generator for deterministic assertions.
+ * Historical replay must provide an explicit seeded generator.
  */
 export function sampleNormal(
   mean: number,
   stdDev: number,
-  rng: () => number = Math.random,
+  rng: () => number,
 ): number {
   // Box-Muller: two uniforms → one standard normal.
   let u1 = 0;
@@ -79,14 +75,12 @@ export interface MonteCarloResult {
  * (a normal sample can drift below 0 or above 100; clamping prevents
  * the composite from going negative).
  *
- * `rng` defaults to `Math.random` (production behavior, unchanged).
- * Tests inject a seeded generator so the median/lower/upper are
- * reproducible.
+ * Historical replay must provide an explicit seeded generator.
  */
 export function simulateComposite(
   dimensions: DimensionInput[],
-  sims: number = DEFAULT_SIMS,
-  rng: () => number = Math.random,
+  sims: number,
+  rng: () => number,
 ): MonteCarloResult {
   const samples: number[] = new Array(sims);
   for (let i = 0; i < sims; i++) {

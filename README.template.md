@@ -37,7 +37,7 @@ Country dossiers cover geography, demographics, government, economy, energy, com
 ### Civica Index — secondary research beta
 
 <!-- PUBLIC_CLAIM: readme.index-estimate -->
-A research-beta 0–100 composite across {{ctx.civicaIndexDimensionCountWord}} governance dimensions: {{ctx.civicaIndexDimensionLabelsProse}}. It uses V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting inputs. Published bounds are Monte Carlo input-variation ranges under declared assumptions, not confidence intervals for a true country score. The Index is currently {{ctx.civicaIndexStatusUpper}} and has not completed external methodological review; its construction, weights, and interpretation remain subject to validation.
+A research-beta 0–100 composite across {{ctx.civicaIndexDimensionCountWord}} governance dimensions: {{ctx.civicaIndexDimensionLabelsProse}}. It uses V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting inputs. The current release publishes no composite uncertainty band because its adapters retain no usable source-specific uncertainty model. The Index is currently {{ctx.civicaIndexStatusUpper}} and has not completed external methodological review; its construction, weights, and interpretation remain subject to validation.
 
 ### Civica Pulse — experimental event ledger
 
@@ -77,7 +77,7 @@ This is a pre-launch project. Honest snapshot:
 | External methodology review | {{ctx.externalReviewStatusProse}} |
 | Public launch | Pre-launch; URLs are live but no inbound traffic yet |
 
-The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in {{ctx.civicaIndexStatusUpper}}, scored under the v2-Beta {{ctx.civicaIndexDimensionCountWord}}-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`). Stabilization depends on longitudinal, factor-analysis, and input-variation validation plus external academic review; no launch date is claimed.
+The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in {{ctx.civicaIndexStatusUpper}}, scored under the v2-Beta {{ctx.civicaIndexDimensionCountWord}}-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`). Stabilization depends on longitudinal and factor analysis, retained source-specific uncertainty, dependence and calibration work, and external academic review; no launch date is claimed.
 
 For live source and fact-layer totals, see `/country/methodology/reconciliation` — those values are read directly from the database rather than maintained as inline prose. Page values may briefly differ from this generated README as new vintages land.
 

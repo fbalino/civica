@@ -30,10 +30,6 @@ interface SourceBounds {
   nativeMax: number;
   /** True if higher native value = WORSE outcome (e.g. GPI: 1.0 = most peaceful). */
   isInverted: boolean;
-  /** Default ±uncertainty (in normalized 0–100 points) for Monte Carlo
-   * sampling when the source doesn't publish per-country uncertainty.
-   * Spec §2.5 recommends a conservative ±5%. */
-  defaultUncertainty: number;
 }
 
 /**
@@ -47,38 +43,32 @@ const BOUNDS: Record<CISourceId, SourceBounds> = {
     nativeMin: 0.0,
     nativeMax: 1.0,
     isInverted: false,
-    defaultUncertainty: 5,
   },
   vdem_polyarchy: {
     nativeMin: 0.0,
     nativeMax: 1.0,
     isInverted: false,
-    defaultUncertainty: 5,
   },
   vdem_rule: {
     nativeMin: 0.0,
     nativeMax: 1.0,
     isInverted: false,
-    defaultUncertainty: 5,
   },
   worldbank_wgi: {
     nativeMin: -2.5,
     nativeMax: 2.5,
     isInverted: false,
-    defaultUncertainty: 5,
   },
   worldbank_wgi_corruption: {
     nativeMin: -2.5,
     nativeMax: 2.5,
     isInverted: false,
-    defaultUncertainty: 5,
   },
   transparency_intl: {
     // CPI is 0–100, already on target scale.
     nativeMin: 0,
     nativeMax: 100,
     isInverted: false,
-    defaultUncertainty: 5,
   },
   freedom_house: {
     // Freedom House Political Rights + Civil Liberties combined: sum of
@@ -87,13 +77,11 @@ const BOUNDS: Record<CISourceId, SourceBounds> = {
     nativeMin: 2,
     nativeMax: 14,
     isInverted: true,
-    defaultUncertainty: 5,
   },
   rsf_press_freedom: {
     nativeMin: 0,
     nativeMax: 100,
     isInverted: false,
-    defaultUncertainty: 5,
   },
   global_peace_index: {
     // GPI 1.0–5.0, lower = more peaceful (used in Civica Conditions,
@@ -101,14 +89,12 @@ const BOUNDS: Record<CISourceId, SourceBounds> = {
     nativeMin: 1.0,
     nativeMax: 5.0,
     isInverted: true,
-    defaultUncertainty: 5,
   },
   undp_hdi: {
     // HDI 0.0–1.0 (used in Civica Conditions).
     nativeMin: 0.0,
     nativeMax: 1.0,
     isInverted: false,
-    defaultUncertainty: 5,
   },
 };
 
@@ -168,15 +154,6 @@ export function displayDimensionScore(
 }
 
 /**
- * Look up the default uncertainty (in normalized 0–100 points) for a
- * given source. Used by the Monte Carlo simulator when a per-country
- * uncertainty isn't published.
- */
-export function defaultUncertaintyV2(sourceId: string): number {
-  return BOUNDS[sourceId as CISourceId]?.defaultUncertainty ?? 5;
-}
-
-/**
  * A single source's normalization descriptor, read-only. Mirrors
  * `SourceBounds` plus the `sourceId` it was looked up under, so a
  * consumer never needs its own copy of the `BOUNDS` table.
@@ -186,7 +163,6 @@ export interface NormalizationDescriptor {
   nativeMin: number;
   nativeMax: number;
   isInverted: boolean;
-  defaultUncertainty: number;
 }
 
 /**

@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 55
-- **Remaining:** 233
-- **Progress:** 19.1%
+- **Completed:** 56
+- **Remaining:** 232
+- **Progress:** 19.4%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -79,7 +79,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-001** (P0) Quarantine the current Index as a research-beta candidate rather than the atlas's identity. _Done when: claim registry, UI/API/export/metadata/navigation and release artifacts consistently mark the current method/version experimental, no authoritative grade/rank claim remains, and atlas use does not require an Index row._
 - [x] **IDX-002** (P0) Reproduce the exact live current Index from canonical `main` before evaluating it. _Done when: clean-room code and declared input snapshots recreate every released dimension/score/completeness/rank/interval within declared deterministic tolerances; unexplained production-only rows or branch dependencies are zero._
 - [x] **IDX-003** (P0) Resolve the public/code missing-data contradiction with one versioned policy. _Done when: mandatory/optional dimensions, publication threshold, reweighting or nonreweighting, partial-score comparability, uncertainty, UI/API labels, and fixtures agree; existing partial rows are migrated or version-separated._
-- [ ] **IDX-004** (P0) Replace the current generic/unseeded uncertainty display with an honest sensitivity/uncertainty model or remove it. _Done when: upstream uncertainty/covariance and model assumptions are documented and reproducible with fixed seeds, coverage is empirically checked where possible, wording matches the estimand, and “confidence interval for the true score” is absent unless justified._
+- [x] **IDX-004** (P0) Replace the current generic/unseeded uncertainty display with an honest sensitivity/uncertainty model or remove it. _Done when: upstream uncertainty/covariance and model assumptions are documented and reproducible with fixed seeds, coverage is empirically checked where possible, wording matches the estimand, and “confidence interval for the true score” is absent unless justified._
 - [ ] **IDX-005** (P0) Correct score ties, rank semantics, and ranking uncertainty. _Done when: equal published scores receive an adopted competition/dense/equal-rank policy, deterministic tie fixtures pass, rank intervals or instability are shown when warranted, and ordinal ranks do not create distinctions unsupported by score precision._
 - [ ] **IDX-006** (P0) Build and freeze the complete longitudinal research panel from native source observations. _Done when: country-year/period rows have source/vintage/unit/transform/uncertainty/missingness/revision flags, temporal breaks are documented, panel hashes are frozen, and a coverage report explains exclusions without freshest-value substitution._
 - [ ] **IDX-007** (P0) Adopt a research charter defining what an original Civica measurement must contribute. _Done when: the charter specifies target users/decisions, unit/cadence, construct/nonclaims, expected causal or descriptive role, novelty criterion versus V-Dem/WGI/Freedom House/native dashboard, misuse risks, and falsification/retirement conditions._

@@ -2,9 +2,9 @@
  * Civica Index — Beta calculation orchestrator.
  *
  * Reads raw indicator values from `ci_dimension_scores` for one explicit
- * version), applies the v2 fixed-bound normalization, runs Monte Carlo
- * to derive the central input-variation range, applies the v2 missing-data
- * rules, and writes the result under the pinned current methodology version.
+ * methodology version, applies fixed-bound normalization and the versioned
+ * missing-data policy, computes a deterministic weighted composite, and
+ * writes the result under that same methodology version.
  *
  * The v1 calculation path (scripts/calculate-ci-composite.ts) is preserved for
  * reproducibility. Current Beta scores live alongside those archived rows in
@@ -22,29 +22,16 @@ import {
   isV2Dimension,
   type CIDimensionV2,
 } from "./dimensions-v2";
-import { normalizeV2, defaultUncertaintyV2 } from "./normalize-v2";
-import { simulateComposite, DEFAULT_SIMS } from "./monte-carlo";
+import { normalizeV2 } from "./normalize-v2";
 import { CI_BETA_COMPOSITE_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
-import { assertSupersession, frozenContentHash, indexContentHash, parseIndexVintageLabel, stableStringify } from "../data/frozen-vintage";
+import { assertSupersession, indexContentHash, parseIndexVintageLabel, stableStringify } from "../data/frozen-vintage";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "./current-release";
 import {
   assessCiCompleteness,
-  CURRENT_CI_MISSINGNESS_POLICY,
   type CiCompletenessFlag,
 } from "./missingness-policy";
 
 export const BETA_VERSION = CURRENT_CI_METHODOLOGY_VERSION;
-
-/**
- * Spec §2.7: a partial estimate (mandatory dimensions present, one
- * optional dimension missing) widens the Monte Carlo input-variation
- * range by this multiplier, applied to each present dimension's
- * `stdDev` before simulation. This is a heuristic sensitivity
- * adjustment, not a statistical correction — see `classifyCompleteness`
- * for the upward-bias limitation it does not fully offset.
- */
-export const PARTIAL_WIDENING_FACTOR =
-  CURRENT_CI_MISSINGNESS_POLICY.partialRangeMultiplier;
 
 export interface DimensionRow {
   jurisdictionId: string;
@@ -58,8 +45,8 @@ export type CompletenessFlag = CiCompletenessFlag;
 export interface CompositeResult {
   jurisdictionId: string;
   scoreInteger: number;
-  scoreLower: number;
-  scoreUpper: number;
+  scoreLower: null;
+  scoreUpper: null;
   completeness: CompletenessFlag;
   dimensionsAvailable: number;
   missingDimensions: CIDimensionV2[];
@@ -77,16 +64,15 @@ export interface CompositeResult {
  *
  * For partial CI the composite is computed using only the available
  * dimensions, with their weights re-proportioned (see `adjustedWeights`)
- * to sum to 1.00 over THOSE dimensions only, and the Monte Carlo
- * input-variation range is widened by `PARTIAL_WIDENING_FACTOR` (spec
- * §2.7) to reflect the added uncertainty.
+ * to sum to 1.00 over those dimensions only. The partial status remains
+ * explicit because re-proportioning changes the
+ * estimand and limits direct comparison with complete rows.
  *
  * KNOWN LIMITATION: re-proportioning can bias a partial score upward,
  * because the dimension most likely to be missing for a fragile or
  * low-capacity state is often the one that would have scored lowest.
- * The 20% widened range is a heuristic mitigation, not a validated
- * statistical correction for that bias. See published methodology §7
- * and §12.
+ * No generic simulation range is used to disguise that bias. See published
+ * methodology §7 and §12.
  */
 export function classifyCompleteness(present: Set<string>): {
   completeness: CompletenessFlag;
@@ -121,13 +107,10 @@ export function adjustedWeights(
  * both call this same function, so the published worked examples can
  * never drift from the scoring code that runs in production.
  *
- * Callers must provide a seeded generator. An implicit random generator would
- * make a named release impossible to reproduce.
+ * No random generator enters the current point estimate.
  */
 export function computeOne(
   rows: DimensionRow[],
-  sims: number,
-  rng: () => number,
 ): CompositeResult | null {
   // Reduce to v2 dimensions only — drop human_development and
   // stability_security (those go to Civica Conditions).
@@ -140,41 +123,34 @@ export function computeOne(
   const presentList = V2_DIMENSIONS.filter((d) => present.has(d));
   const weights = adjustedWeights(presentList);
 
-  // Build Monte Carlo inputs. Skip rows whose source isn't in the
+  // Build deterministic composite inputs. Skip rows whose source isn't in the
   // fixed-bound table (defensive — should be a no-op in practice).
-  const mcInputs = v2Rows
+  const compositeInputs = v2Rows
     .map((r) => {
       if (r.rawValue === null) return null;
       const normalized = normalizeV2(r.rawValue, r.sourceId);
       if (normalized === null) return null;
-      const stdDev = defaultUncertaintyV2(r.sourceId);
       return {
         key: r.dimension,
         mean: normalized,
-        stdDev,
         weight: weights[r.dimension as CIDimensionV2] ?? 0,
       };
     })
     .filter((x): x is NonNullable<typeof x> => x !== null);
 
-  if (mcInputs.length === 0) return null;
-
-  // Spec §2.7: partial estimates widen the input-variation range.
-  const partialPenalty =
-    completeness === "partial" ? PARTIAL_WIDENING_FACTOR : 1.0;
-  for (const input of mcInputs) {
-    input.stdDev *= partialPenalty;
-  }
-
-  const mc = simulateComposite(mcInputs, sims, rng);
+  if (compositeInputs.length === 0) return null;
+  const score = compositeInputs.reduce(
+    (sum, input) => sum + input.mean * input.weight,
+    0,
+  );
 
   return {
     jurisdictionId: rows[0].jurisdictionId,
-    scoreInteger: Math.round(mc.scoreMedian),
-    scoreLower: Math.round(mc.lower),
-    scoreUpper: Math.round(mc.upper),
+    scoreInteger: Math.round(score),
+    scoreLower: null,
+    scoreUpper: null,
     completeness,
-    dimensionsAvailable: mcInputs.length,
+    dimensionsAvailable: compositeInputs.length,
     missingDimensions: missing,
   };
 }
@@ -195,9 +171,8 @@ interface RunSummary {
 export async function calculateCompositeV2(
   db: Db,
   quarter: string,
-  opts: { sims?: number; vintageLabel?: string; supersedesVintageLabel?: string; methodologyVersion?: string } = {},
+  opts: { vintageLabel?: string; supersedesVintageLabel?: string; methodologyVersion?: string } = {},
 ): Promise<RunSummary> {
-  const sims = opts.sims ?? DEFAULT_SIMS;
   const vintageLabel = opts.vintageLabel ?? null;
   const methodologyVersion = opts.methodologyVersion ?? BETA_VERSION;
   const identity = vintageLabel ? parseIndexVintageLabel(vintageLabel) : null;
@@ -238,11 +213,7 @@ export async function calculateCompositeV2(
     const orderedDims = [...dims.values()].sort((a, b) =>
       `${a.dimension}:${a.sourceId}`.localeCompare(`${b.dimension}:${b.sourceId}`),
     );
-    const result = computeOne(
-      orderedDims,
-      sims,
-      seededRng(`${vintageLabel ?? "live"}|${quarter}|${orderedDims[0]?.jurisdictionId}|${orderedDims.map((row) => row.dimension).join("|")}|${orderedDims.map((row) => `${row.sourceId}:${row.rawValue}`).sort().join("|")}`),
-    );
+    const result = computeOne(orderedDims);
     if (!result) {
       insufficient++;
       continue;
@@ -386,18 +357,6 @@ export async function calculateCompositeV2(
     partial: results.filter((r) => r.completeness === "partial").length,
     insufficient,
     totalCountries: byJurisdiction.size,
-  };
-}
-
-/** Small deterministic generator: a named release must reproduce byte-for-byte. */
-export function seededRng(seed: string): () => number {
-  let state = Number.parseInt(frozenContentHash(seed).slice(0, 8), 16) >>> 0;
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0;
-    let value = state;
-    value = Math.imul(value ^ (value >>> 15), value | 1);
-    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
 }
 

@@ -264,9 +264,9 @@ export default async function AboutPage() {
               Material outcomes (human development, peace &amp; security,
               economic stability) live on the separate Civica Conditions
               companion layer at <Link href="/civica-conditions">/civica-conditions</Link>.
-              PCA-derived weights, frozen reference periods, and Monte Carlo
-              input-variation ranges. These ranges are sensitivity summaries,
-              not confidence intervals for a true country score.
+              PCA-derived weights and frozen reference periods. The current
+              release publishes no composite uncertainty band because its
+              adapters retain no usable source-specific uncertainty model.
               {civicaIndex.status === "beta"
                 ? " Currently in BETA pending external review."
                 : ""}

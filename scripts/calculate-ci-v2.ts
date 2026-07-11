@@ -2,17 +2,13 @@
  * Run the Beta (v2) CI calculation pipeline — the canonical live scoring
  * path.
  *
- * Reads existing dimension data (any methodology version), applies the
- * v2 fixed-bound normalization, runs Monte Carlo to derive the central
- * 90% input-variation range (a sensitivity summary, not a confidence
- * interval), and writes the result to ci_composite_scores under
- * methodology_version='beta'. Public reads default to Beta; the archived
- * v1.0 rows remain in the same table for reproducibility only.
+ * Reads one methodology's dimension data, applies fixed-bound normalization,
+ * computes a deterministic weighted composite, and writes it under the same
+ * version. Current rows publish no generic uncertainty range.
  *
  * Usage:
  *   tsx scripts/calculate-ci-v2.ts                    # latest quarter
  *   tsx scripts/calculate-ci-v2.ts 2023-Q4            # specific quarter
- *   tsx scripts/calculate-ci-v2.ts 2023-Q4 1000       # 1k sims (default 10k)
  */
 
 import { config } from "dotenv";
@@ -34,7 +30,6 @@ async function main() {
 
   const positional = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   let quarter = positional[0];
-  const sims = positional[1] ? parseInt(positional[1], 10) : undefined;
   const methodologyVersion = process.argv.find((arg) => arg.startsWith("--methodology-version="))?.split("=").slice(1).join("=") ?? CURRENT_CI_METHODOLOGY_VERSION;
   const supersedesVintageLabel = process.argv.find((arg) => arg.startsWith("--supersedes="))?.split("=").slice(1).join("=") ?? SUPERSEDED_CI_VINTAGE_LABEL;
 
@@ -55,11 +50,10 @@ async function main() {
 
   console.log(`\n=== Civica Index — Beta calculation ===`);
   console.log(`Quarter:        ${quarter}`);
-  console.log(`Sims:           ${sims ?? "10,000 (default)"}`);
+  console.log("Randomization:  none");
   console.log(`Vintage label:  ${vintageLabel}\n`);
 
   const summary = await calculateCompositeV2(db, quarter, {
-    sims,
     vintageLabel,
     methodologyVersion,
     supersedesVintageLabel,

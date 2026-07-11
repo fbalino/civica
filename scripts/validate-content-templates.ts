@@ -141,7 +141,6 @@ const CTX_ALLOWLIST: Record<string, readonly string[]> = {
     "pc1VariancePct",
     "corrLow",
     "corrHigh",
-    "partialRangeWideningPct",
   ],
   "content/methodology-pca-appendix.md": [
     "pc1VariancePct",

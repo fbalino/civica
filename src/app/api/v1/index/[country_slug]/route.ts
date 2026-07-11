@@ -18,7 +18,7 @@ import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 /**
  * This endpoint serves the current Beta methodology by default. Pass
  * `?methodology=v1.0` to reproduce an internal archived calculation. Current fields include the
- * input-variation range, completeness flag, and vintage label alongside the
+ * uncertainty posture, completeness flag, and vintage label alongside the
  * integer score; categorical country grades are not part of the public shape.
  */
 export async function GET(

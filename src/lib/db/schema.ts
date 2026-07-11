@@ -1408,9 +1408,9 @@ export const ciCompositeScores = pgTable(
      * Phase 5.2 — Beta methodology additions.
      *
      * `score_lower` and `score_upper` are the 5th and 95th percentile
-     * of the Monte Carlo simulation (10,000 sims) per spec §2.5,
-     * giving a central 90% input-variation range. It is a sensitivity
-     * simulation, not a calibrated statistical confidence interval. NULL on
+     * Historical Beta through Beta-R3 stored a central input-variation range.
+     * Current releases leave these fields NULL until source-specific
+     * uncertainty and dependence are retained and validated. NULL on
      * legacy v1.0 rows.
      *
      * `band` is a deprecated historical presentation field, retired

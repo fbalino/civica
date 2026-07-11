@@ -759,6 +759,13 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "versioned site-state Civica Index missingness policy",
   ),
   runtimeClaim(
+    "index-methodology.uncertainty-coverage",
+    "content/methodology-civica-index.md",
+    "reader:methodology-civica-index",
+    "usable uncertainty coverage is {{state.civicaIndex.uncertainty.usableReleasedUncertaintyRows}} of {{state.civicaIndex.uncertainty.releasedDimensionRows}} rows",
+    "checked Beta-R4 uncertainty audit exposed through site-state.civicaIndex.uncertainty",
+  ),
+  runtimeClaim(
     "index-methodology.pca-panel",
     "content/methodology-civica-index.md",
     "reader:methodology-civica-index",

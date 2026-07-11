@@ -94,7 +94,7 @@ const SECTIONS: MethodologySection[] = [
         href: "/civica-index/methodology",
         title: "Civica Index methodology",
         blurb:
-          `The research-beta composite specification — ${civicaIndex.dimensionCount} governance dimensions, indicator basket, sources, frozen reference periods, weighting approach, and Monte Carlo input-variation ranges.`,
+          `The research-beta composite specification — ${civicaIndex.dimensionCount} governance dimensions, indicator basket, sources, frozen reference periods, deterministic weighting, and the current no-band uncertainty posture.`,
         beta: true,
       },
       {

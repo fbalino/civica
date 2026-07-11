@@ -65,6 +65,7 @@ export const currentVintage =
 import { getPcaAnalysisSummary as PCA_ANALYSIS_SUMMARY_FN } from "@/lib/ci/pca-analysis";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import { CURRENT_CI_MISSINGNESS_POLICY } from "@/lib/ci/missingness-policy";
+import { CURRENT_CI_UNCERTAINTY_POLICY } from "@/lib/ci/uncertainty-policy";
 /** Computed once at module load — pure, DB-free, no clock. See
  *  `civicaIndex.pca` below. */
 const PCA_ANALYSIS_SUMMARY = PCA_ANALYSIS_SUMMARY_FN();
@@ -81,6 +82,7 @@ export const civicaIndex = {
   status: "beta" as const,
   methodologyVersion: CURRENT_CI_METHODOLOGY_VERSION,
   missingness: CURRENT_CI_MISSINGNESS_POLICY,
+  uncertainty: CURRENT_CI_UNCERTAINTY_POLICY,
   scaleMin: 0,
   scaleMax: 100,
 

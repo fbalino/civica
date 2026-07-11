@@ -19,7 +19,6 @@ import assert from "node:assert/strict";
 import {
   normalizeV2,
   displayDimensionScore,
-  defaultUncertaintyV2,
 } from "../normalize-v2";
 import {
   V2_DIMENSIONS,
@@ -31,33 +30,14 @@ import {
   computeOne,
   classifyCompleteness,
   adjustedWeights,
-  PARTIAL_WIDENING_FACTOR,
   BETA_VERSION,
   type DimensionRow,
 } from "../calculate-v2";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "../current-release";
-import { simulateComposite } from "../monte-carlo";
 import { civicaIndex } from "@/lib/content/site-state";
 import { CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { DEFAULT_MIN_N } from "@/lib/peer-grouping";
 import { rankingDimensionCell } from "@/lib/db/queries";
-
-// ─────────────────────────────────────────────────────────────────────
-// Seeded RNG (test-only determinism seam; NOT part of the methodology).
-// mulberry32 — small, fast, well-distributed for test purposes.
-// ─────────────────────────────────────────────────────────────────────
-function mulberry32(seed: number): () => number {
-  let a = seed;
-  return function () {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-const SEED = 424242;
-const seededRng = () => mulberry32(SEED);
 
 function assertClose(
   actual: number | null,
@@ -152,7 +132,7 @@ test("§14 beta/release presentation: methodology-version constant and beta stat
   assert.equal(CI_METHODOLOGY_META.presentation.format, "numeric_position");
   assert.equal(
     CI_METHODOLOGY_META.presentation.input_variation_range,
-    "central_90_percent",
+    "not_published",
   );
   assert.equal(CI_METHODOLOGY_META.presentation.categorical_grades, false);
   assert.equal(
@@ -167,12 +147,9 @@ test("§14 beta/release presentation: methodology-version constant and beta stat
 
 // ─────────────────────────────────────────────────────────────────────
 // §7 Missing data — mandatory-dimension exclusion, full composite,
-// partial re-proportioning + widening. Every composite value below is
-// cross-checked against a manual composition of the SAME exported
-// primitives (adjustedWeights, normalizeV2, defaultUncertaintyV2,
-// PARTIAL_WIDENING_FACTOR, simulateComposite) fed an identically-seeded
-// RNG — so a bit-exact match proves computeOne performs re-proportioning
-// and widening exactly as published, not merely "close enough."
+// partial re-proportioning. Every composite value below is cross-checked
+// against a manual composition of the same exported primitives
+// (adjustedWeights and normalizeV2).
 // ─────────────────────────────────────────────────────────────────────
 
 const FULL_RAW: Record<(typeof V2_DIMENSIONS)[number], number> = {
@@ -209,7 +186,7 @@ test("mandatory-dimension exclusion: missing rule_of_law yields insufficient / n
     ["democratic_quality", "freedom_rights", "corruption_control"],
     "test-insufficient",
   );
-  assert.equal(computeOne(rows, 500, seededRng()), null);
+  assert.equal(computeOne(rows), null);
 });
 
 test("publication threshold: two mandatory dimensions alone remain insufficient", () => {
@@ -225,45 +202,41 @@ test("publication threshold: two mandatory dimensions alone remain insufficient"
     "freedom_rights",
     "corruption_control",
   ]);
-  assert.equal(computeOne(rows, 500, seededRng()), null);
+  assert.equal(computeOne(rows), null);
 });
 
 test("full composite: computeOne matches manual composition of the same production primitives", () => {
   const rows = buildRows(V2_DIMENSIONS, "test-full");
-  const actual = computeOne(rows, 2000, seededRng());
+  const actual = computeOne(rows);
   assert.ok(actual !== null);
   assert.equal(actual.completeness, "full");
   assert.equal(actual.dimensionsAvailable, 4);
   assert.deepEqual(actual.missingDimensions, []);
 
   const weights = adjustedWeights([...V2_DIMENSIONS]);
-  const mcInputs = V2_DIMENSIONS.map((d) => ({
-    key: d,
-    mean: normalizeV2(FULL_RAW[d], HEADLINE_SOURCE[d])!,
-    stdDev: defaultUncertaintyV2(HEADLINE_SOURCE[d]),
-    weight: weights[d],
-  }));
-  const expected = simulateComposite(mcInputs, 2000, seededRng());
+  const expected = V2_DIMENSIONS.reduce(
+    (sum, d) =>
+      sum + normalizeV2(FULL_RAW[d], HEADLINE_SOURCE[d])! * weights[d],
+    0,
+  );
 
-  assert.equal(actual.scoreInteger, Math.round(expected.scoreMedian));
-  assert.equal(actual.scoreLower, Math.round(expected.lower));
-  assert.equal(actual.scoreUpper, Math.round(expected.upper));
+  assert.equal(actual.scoreInteger, Math.round(expected));
+  assert.equal(actual.scoreLower, null);
+  assert.equal(actual.scoreUpper, null);
   assert.ok(actual.scoreInteger >= 0 && actual.scoreInteger <= 100);
-  assert.ok(actual.scoreLower <= actual.scoreInteger);
-  assert.ok(actual.scoreInteger <= actual.scoreUpper);
   // No categorical grade of any kind on the composite result.
   assert.ok(!("band" in actual));
   assert.ok(!("grade" in actual));
 });
 
-test("partial composite: available dimensions are re-proportioned to sum to 1 and the range widens by PARTIAL_WIDENING_FACTOR", () => {
+test("partial composite: available dimensions are re-proportioned without an invented range", () => {
   const presentDims = [
     "democratic_quality",
     "rule_of_law",
     "freedom_rights",
   ] as const;
   const rows = buildRows(presentDims, "test-partial");
-  const actual = computeOne(rows, 2000, seededRng());
+  const actual = computeOne(rows);
   assert.ok(actual !== null);
   assert.equal(actual.completeness, "partial");
   assert.equal(actual.dimensionsAvailable, 3);
@@ -280,45 +253,28 @@ test("partial composite: available dimensions are re-proportioned to sum to 1 an
   const rawWeightSum = presentDims.reduce((s, d) => s + V2_WEIGHTS[d], 0);
   assert.ok(rawWeightSum < 0.999, "raw weights over 3 dims should be < 1");
 
-  assert.equal(PARTIAL_WIDENING_FACTOR, 1.2);
-  const mcInputs = presentDims.map((d) => ({
-    key: d,
-    mean: normalizeV2(FULL_RAW[d], HEADLINE_SOURCE[d])!,
-    stdDev: defaultUncertaintyV2(HEADLINE_SOURCE[d]) * PARTIAL_WIDENING_FACTOR,
-    weight: weights[d],
-  }));
-  const expected = simulateComposite(mcInputs, 2000, seededRng());
+  const expected = presentDims.reduce(
+    (sum, d) =>
+      sum + normalizeV2(FULL_RAW[d], HEADLINE_SOURCE[d])! * weights[d],
+    0,
+  );
 
-  assert.equal(actual.scoreInteger, Math.round(expected.scoreMedian));
-  assert.equal(actual.scoreLower, Math.round(expected.lower));
-  assert.equal(actual.scoreUpper, Math.round(expected.upper));
+  assert.equal(actual.scoreInteger, Math.round(expected));
+  assert.equal(actual.scoreLower, null);
+  assert.equal(actual.scoreUpper, null);
 });
 
 // ─────────────────────────────────────────────────────────────────────
-// §5 Input-variation ranges — deterministic Monte Carlo median/P5/P95.
+// §5 Uncertainty disposition — no generic range is published.
 // ─────────────────────────────────────────────────────────────────────
 
-test("§5 Monte Carlo: identical seed reproduces the exact median/P5/P95; result is internally monotonic", () => {
-  const dims = V2_DIMENSIONS.map((d) => ({
-    key: d,
-    mean: normalizeV2(FULL_RAW[d], HEADLINE_SOURCE[d])!,
-    stdDev: defaultUncertaintyV2(HEADLINE_SOURCE[d]),
-    weight: V2_WEIGHTS[d],
-  }));
-
-  const a = simulateComposite(dims, 3000, mulberry32(7));
-  const b = simulateComposite(dims, 3000, mulberry32(7));
-  assert.equal(a.scoreMedian, b.scoreMedian);
-  assert.equal(a.lower, b.lower);
-  assert.equal(a.upper, b.upper);
-  assert.ok(a.lower <= a.scoreMedian);
-  assert.ok(a.scoreMedian <= a.upper);
-
-  const c = simulateComposite(dims, 3000, mulberry32(99));
-  assert.ok(
-    a.scoreMedian !== c.scoreMedian || a.lower !== c.lower || a.upper !== c.upper,
-    "a different seed should shift the simulated distribution",
-  );
+test("§5 current point estimate is deterministic and publishes no range", () => {
+  const rows = buildRows(V2_DIMENSIONS, "test-no-range");
+  assert.deepEqual(computeOne(rows), computeOne([...rows].reverse()));
+  const result = computeOne(rows);
+  assert.ok(result);
+  assert.equal(result.scoreLower, null);
+  assert.equal(result.scoreUpper, null);
 });
 
 // ─────────────────────────────────────────────────────────────────────

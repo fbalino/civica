@@ -1,14 +1,14 @@
 import { createHash } from "node:crypto";
 import { stableStringify } from "@/lib/data/frozen-vintage";
 import { normalize } from "./normalize";
-import { computeOne, seededRng } from "./calculate-v2";
+import { computeOne } from "./calculate-v2";
 import { CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_QUARTER, CURRENT_CI_VINTAGE_LABEL } from "./current-release";
 import type { IngestionResult } from "./types";
 import { indicatorIdFor } from "@/lib/indicators/lineage";
 
 export interface CiSpineRow { id: string; name: string; iso3: string }
 export interface ReproducedDimensionRow { jurisdictionId: string; iso3: string; dimension: string; indicatorId: string; sourceId: string; rawValue: number; normalizedScore: number; quarter: string; methodologyVersion: string }
-export interface ReproducedCompositeRow { jurisdictionId: string; iso3: string; score: number; scoreLower: number; scoreUpper: number; completenessFlag: string; rank: number; totalRanked: number; isPartial: boolean; dimensionsAvailable: number; missingDimensions: string[]; quarter: string; methodologyVersion: string; vintageLabel: string }
+export interface ReproducedCompositeRow { jurisdictionId: string; iso3: string; score: number; scoreLower: null; scoreUpper: null; completenessFlag: string; rank: number; totalRanked: number; isPartial: boolean; dimensionsAvailable: number; missingDimensions: string[]; quarter: string; methodologyVersion: string; vintageLabel: string }
 
 function hashRows(rows: readonly unknown[]): string {
   return createHash("sha256").update(stableStringify(rows)).digest("hex");
@@ -30,7 +30,7 @@ export function postgresRealRoundTrip(value: number): number {
   return Number(stored.toPrecision(9));
 }
 
-export function reproduceCurrentCiRelease(spine: readonly CiSpineRow[], inputs: readonly IngestionResult[], sims = 10_000) {
+export function reproduceCurrentCiRelease(spine: readonly CiSpineRow[], inputs: readonly IngestionResult[]) {
   const byIso3 = new Map(spine.map((row) => [row.iso3.toUpperCase(), row]));
   const dimensions: ReproducedDimensionRow[] = [];
   for (const input of inputs) for (const record of input.records) {
@@ -49,8 +49,7 @@ export function reproduceCurrentCiRelease(spine: readonly CiSpineRow[], inputs: 
   const computed: Array<ReturnType<typeof computeOne> & { iso3: string }> = [];
   for (const rows of grouped.values()) {
     const ordered = [...rows].sort((a, b) => `${a.dimension}:${a.sourceId}`.localeCompare(`${b.dimension}:${b.sourceId}`));
-    const seed = `${CURRENT_CI_VINTAGE_LABEL}|${CURRENT_CI_QUARTER}|${ordered[0].jurisdictionId}|${ordered.map((row) => row.dimension).join("|")}|${ordered.map((row) => `${row.sourceId}:${row.rawValue}`).sort().join("|")}`;
-    const result = computeOne(ordered, sims, seededRng(seed));
+    const result = computeOne(ordered);
     if (result) computed.push(Object.assign(result, { iso3: ordered[0].iso3 }));
   }
   computed.sort((a, b) => b!.scoreInteger - a!.scoreInteger || a!.jurisdictionId.localeCompare(b!.jurisdictionId));

@@ -211,7 +211,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/[country_slug]/route.ts",
     versioned: true,
     summary:
-      "Latest research-beta Civica Index composite, Monte Carlo input-variation range, rank, completeness fields, and available dimension rows for one country. No categorical country grades.",
+      "Latest research-beta Civica Index deterministic point estimate, rank, completeness fields, and available dimension rows for one country. No composite uncertainty band or categorical country grades.",
     params: [
       {
         name: ":country_slug",

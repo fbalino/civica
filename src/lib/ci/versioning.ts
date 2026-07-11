@@ -8,7 +8,7 @@ import {
 
 export const CI_INGEST_ALGORITHM_VERSION = "ci-ingest-normalization/minmax-v1" as const;
 export const CI_COMPOSITE_ALGORITHM_VERSION = "ci-composite/weighted-v1" as const;
-export const CI_BETA_COMPOSITE_ALGORITHM_VERSION = "ci-composite/fixed-bounds-monte-carlo-v2" as const;
+export const CI_BETA_COMPOSITE_ALGORITHM_VERSION = "ci-composite/fixed-bounds-weighted-v3" as const;
 
 export function ciVersionEnvelope(input: {
   methodologyVersion: string;

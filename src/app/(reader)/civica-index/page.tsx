@@ -77,7 +77,7 @@ export const metadata: Metadata = {
   title: "Civica Index — Research-Beta Governance Composite",
   // PUBLIC_CLAIM: index.composite-estimate
   description:
-    `A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. Not independently reviewed.${civicaIndex.status === "beta" ? " Beta methodology." : ""}`,
+    `A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band. Not independently reviewed.${civicaIndex.status === "beta" ? " Beta methodology." : ""}`,
   alternates: { canonical: "https://civicaatlas.org/civica-index" },
   openGraph: withOg({
     title: "Civica Index — Research-Beta Governance Composite · Civica Atlas",
@@ -267,7 +267,7 @@ export default async function CivicaIndexPage({
     name: "Civica Index",
     // PUBLIC_CLAIM: metadata.index-dataset
     description:
-      `A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and Monte Carlo input-variation ranges. The methodology has not completed independent review.`,
+      `A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band. The methodology has not completed independent review.`,
     url: "https://civicaatlas.org/civica-index",
     license: RIGHTS_REGISTRY_URL,
     temporalCoverage: realVintage ?? undefined,
@@ -295,8 +295,8 @@ export default async function CivicaIndexPage({
         description={
           <>
             A secondary research experiment across {civicaIndex.dimensionCount}{" "}
-            governance dimensions, with fixed-bound normalization and Monte
-            Carlo input-variation ranges. It has not completed independent
+            governance dimensions, with fixed-bound normalization and no
+            published composite uncertainty band. It has not completed independent
             review; its construction, weights, and interpretation remain
             subject to validation.
           </>
@@ -350,8 +350,9 @@ export default async function CivicaIndexPage({
           <div className="ci-section-eyebrow">Numeric presentation — 0 to 100</div>
           <Banner variant="info">
             No country grades. This number is a research-beta estimate, not a
-            verdict or a validated measure. Read it with its source dimensions,
-            input-variation range, and methodology limitations.
+            verdict or a validated measure. Read it with its source dimensions
+            and methodology limitations; no composite uncertainty band is
+            currently published.
           </Banner>
           <div className="ci-score-policy-position">
             <ScorePosition
