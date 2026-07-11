@@ -220,6 +220,7 @@ export const reconciliation = {
 // ─────────────────────────────────────────────────────────────────────
 
 import { DEFAULT_MIN_N as PEER_GROUPING_DEFAULT_MIN_N } from "@/lib/peer-grouping/constants";
+import { BJORNKSKOV_RODE_CROSS_SECTION_REFERENCE_YEAR, BJORNKSKOV_RODE_DATASET_VERSION, BJORNKSKOV_RODE_SOURCE_DATASET_VERSION } from "@/lib/government-taxonomy";
 
 export const peerGrouping = {
   version: "v1.0" as const,
@@ -230,6 +231,9 @@ export const peerGrouping = {
    *  `@/lib/peer-grouping`, which imports the database) so this
    *  DB-free config file stays DB-free. */
   defaultMinN: PEER_GROUPING_DEFAULT_MIN_N,
+  brCgvReferenceYear: BJORNKSKOV_RODE_CROSS_SECTION_REFERENCE_YEAR,
+  brCgvSourceDatasetVersion: BJORNKSKOV_RODE_SOURCE_DATASET_VERSION,
+  brCgvDistributionRelease: BJORNKSKOV_RODE_DATASET_VERSION,
   /** Page-version changelog. Each revision documents what changed
    *  and why. */
   versionHistory: [

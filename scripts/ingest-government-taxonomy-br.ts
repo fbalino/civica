@@ -7,14 +7,16 @@ import { governmentTaxonomies, jurisdictions, sources } from "../src/lib/db/sche
 import { writeGovernmentTaxonomies, type GovernmentTaxonomyInput } from "../src/lib/government-taxonomy/writer";
 import {
   BJORNKSKOV_RODE_DATASET_VERSION,
+  BJORNKSKOV_RODE_SOURCE_DATASET_VERSION,
+  BJORNKSKOV_RODE_CROSS_SECTION_REFERENCE_YEAR,
   BJORNKSKOV_RODE_SOURCE_ID,
   DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
   deriveRegimeTypeCgv,
 } from "../src/lib/government-taxonomy";
 import { governmentTaxonomyVersionEnvelope } from "../src/lib/government-taxonomy/versioning";
+import { assertReferenceYear } from "../src/lib/data/temporal-metadata";
 
 const QOG_CS_CSV_URL = "https://www.qogdata.pol.gu.se/data/qog_std_cs_jan26.csv";
-const QOG_LATEST_REGIME_YEAR = 2025;
 const DRY_RUN = process.argv.includes("--dry-run");
 
 type BjornskovRodeCsvRow = {
@@ -208,12 +210,18 @@ async function main() {
       governmentType: jurisdiction.governmentType,
       governmentTypeDetail: jurisdiction.governmentTypeDetail,
       regimeDatasetVersion: BJORNKSKOV_RODE_DATASET_VERSION,
-      regimeYear: QOG_LATEST_REGIME_YEAR,
+      regimeYear: BJORNKSKOV_RODE_CROSS_SECTION_REFERENCE_YEAR,
       brDem: latest.brDem,
       brPres: latest.brPres,
       brMon: latest.brMon,
       brCom: latest.brCom,
     });
+    assertReferenceYear({
+      observationReferenceYear: derived.regimeYear,
+      upstreamDatasetRelease: `${BJORNKSKOV_RODE_SOURCE_DATASET_VERSION} via ${BJORNKSKOV_RODE_DATASET_VERSION}`,
+      retrievedAt: syncTime.toISOString(),
+      civicaPublicationVersion: DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
+    }, BJORNKSKOV_RODE_CROSS_SECTION_REFERENCE_YEAR, "BR/CGV cross-section");
 
     output.push({
         jurisdictionId: jurisdiction.id,
@@ -222,7 +230,10 @@ async function main() {
         derivationVersions: versions.envelope,
         regimeTypeCgv: derived.regimeTypeCgv,
         regimeDatasetVersion: derived.regimeDatasetVersion,
+        regimeSourceDatasetVersion: BJORNKSKOV_RODE_SOURCE_DATASET_VERSION,
         regimeYear: derived.regimeYear,
+        regimeRetrievedAt: syncTime,
+        civicaPublicationVersion: DEFAULT_GOVERNMENT_TAXONOMY_VERSION,
         structuralFamily: existing?.structuralFamily ?? null,
         structuralSubtype: existing?.structuralSubtype ?? null,
         isFederal: existing?.isFederal ?? null,

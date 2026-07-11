@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { buildAtlasExport, buildAtlasReleaseBom, serializeAtlasExport, ATLAS_EXPORT_VINTAGE_LABEL, frozenSnapshotExportFact } from "./atlas-release";
 
 const jurisdiction = { id: "j1", slug: "example", name: "Example" };
-const fact = (source_id: string, id = "f1") => ({ id, canonical_fact_id: `canonical-${id}`, jurisdiction_id: "j1", fact_key: "population", source_id, value_status: "observed", fact_value_numeric: 0, vintage_label: ATLAS_EXPORT_VINTAGE_LABEL, methodology_version: "v0.2-beta", content_hash: "a".repeat(64), cut_at_timestamp: "2026-05-05T22:54:22.775Z" });
+const fact = (source_id: string, id = "f1") => ({ id, canonical_fact_id: `canonical-${id}`, jurisdiction_id: "j1", fact_key: "population", source_id, value_status: "observed", fact_value_numeric: 0, vintage_label: ATLAS_EXPORT_VINTAGE_LABEL, civica_publication_version: ATLAS_EXPORT_VINTAGE_LABEL, methodology_version: "v0.2-beta", content_hash: "a".repeat(64), cut_at_timestamp: "2026-05-05T22:54:22.775Z" });
 
 test("export ordering and serialization are deterministic", () => {
   const a = buildAtlasExport({ jurisdictions: [jurisdiction], facts: [fact("wikidata", "z"), fact("cia_factbook", "a")] });
@@ -61,6 +61,7 @@ test("a post-cut source-row change cannot replace frozen citation fields", () =>
     snapshot_source_id: "world_bank", snapshot_value_text: "100", snapshot_value_numeric: 100,
     snapshot_value_unit: "people", snapshot_value_json: null, snapshot_as_of: "2024-01-01",
     snapshot_methodology_version: "v0.2-beta", vintage_label: ATLAS_EXPORT_VINTAGE_LABEL,
+    civica_publication_version: ATLAS_EXPORT_VINTAGE_LABEL,
     cut_at_timestamp: "2026-05-05T22:54:22.775Z", content_hash: "a".repeat(64),
     current_source_id: "wikidata", current_fact_value: "999", current_fact_value_numeric: 999,
     current_methodology_version: "future-method",

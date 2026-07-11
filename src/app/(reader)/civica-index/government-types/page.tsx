@@ -430,7 +430,7 @@ export default async function GovernmentTypesPage({
         }
         lensSummary={
           lens === "regime"
-            ? "Bjørnskov-Rode / CGV is the alternate accountability lens. Six published categories distinguishing democratic systems by executive form (parliamentary / presidential / semi-presidential) and authoritarian systems by ruling-elite structure (civilian / military / royal)."
+            ? "Bjørnskov-Rode / CGV is the alternate accountability lens. The current view uses reference year 2022 from Bjørnskov-Rode regime data v6.1 as distributed in QoG Standard Jan26; Civica retrieved that release in 2026. Six published categories distinguish democratic systems by executive form and authoritarian systems by ruling-elite structure."
             : "V-Dem Regimes of the World is the default governance lens (Lührmann et al. 2018). Four tiers span closed autocracy through liberal democracy; the methodology documents the lens rationale, source vintage, and limitations."
         }
         axisLabel={

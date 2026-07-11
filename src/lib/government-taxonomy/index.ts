@@ -4,6 +4,8 @@ import { GOVERNMENT_TAXONOMY_OVERRIDES } from "./overrides";
 export const DEFAULT_GOVERNMENT_TAXONOMY_VERSION = "2026_v1";
 export const BJORNKSKOV_RODE_SOURCE_ID = "bjornskov_rode";
 export const BJORNKSKOV_RODE_DATASET_VERSION = "QoG Standard Jan26";
+export const BJORNKSKOV_RODE_SOURCE_DATASET_VERSION = "Bjørnskov-Rode regime data v6.1";
+export const BJORNKSKOV_RODE_CROSS_SECTION_REFERENCE_YEAR = 2022;
 
 export type GovernmentTaxonomyLens = "raw" | "structural" | "regime";
 

@@ -663,6 +663,14 @@ export const countryFactVintages = pgTable(
     vintageLabel: text("vintage_label").notNull(),
     /** Required on corrected cuts of an already-published period. */
     supersedesVintageLabel: text("supersedes_vintage_label"),
+    /** Observation/reference year of the frozen source value. */
+    observationReferenceYear: integer("observation_reference_year"),
+    /** Publisher/distributor dataset release captured for this row. */
+    upstreamDatasetRelease: text("upstream_dataset_release"),
+    /** Retrieval time of the selected source row, when known at/before cut. */
+    sourceRetrievedAt: timestamp("source_retrieved_at"),
+    /** Civica's named publication handle, distinct from source release. */
+    civicaPublicationVersion: text("civica_publication_version"),
     /** The country_facts.id that won the resolver at vintage time. */
     canonicalFactId: uuid("canonical_fact_id")
       .references(() => countryFacts.id)
@@ -917,7 +925,13 @@ export const governmentTaxonomies = pgTable(
       .notNull(),
     regimeTypeCgv: text("regime_type_cgv"),
     regimeDatasetVersion: text("regime_dataset_version"),
+    /** Original BR dataset release, distinct from the QoG distribution. */
+    regimeSourceDatasetVersion: text("regime_source_dataset_version"),
     regimeYear: integer("regime_year"),
+    /** When Civica retrieved/ingested the distributed dataset. */
+    regimeRetrievedAt: timestamp("regime_retrieved_at"),
+    /** Civica taxonomy publication/version, not an observation year. */
+    civicaPublicationVersion: text("civica_publication_version"),
     structuralFamily: text("structural_family"),
     structuralSubtype: text("structural_subtype"),
     isFederal: boolean("is_federal"),

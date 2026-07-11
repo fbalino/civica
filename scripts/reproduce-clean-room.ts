@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { buildAtlasExport, serializeAtlasExport } from "../src/lib/exports/atlas-release";
+import { ATLAS_EXPORT_VINTAGE_LABEL, buildAtlasExport, serializeAtlasExport } from "../src/lib/exports/atlas-release";
 
 const fixturePath = "data/fixtures/clean-room/atlas-input.v1.json";
 const expectedPath = "data/fixtures/clean-room/expected.v1.json";
@@ -19,7 +19,18 @@ const fixtureBytes = readFileSync(fixturePath);
 const fixture = JSON.parse(fixtureBytes.toString("utf8"));
 const expected = JSON.parse(readFileSync(expectedPath, "utf8"));
 const fixtureSha256 = createHash("sha256").update(fixtureBytes).digest("hex");
-const release = buildAtlasExport({ jurisdictions: fixture.jurisdictions, facts: fixture.facts });
+const release = buildAtlasExport({
+  jurisdictions: fixture.jurisdictions,
+  facts: fixture.facts.map((row: Record<string, unknown>) => ({
+    ...row,
+    observation_reference_year:
+      row.data_vintage_year ?? row.fact_year ??
+      (typeof row.as_of === "string" ? Number(row.as_of.slice(0, 4)) : null),
+    upstream_dataset_release: row.upstream_vintage_label ?? null,
+    source_retrieved_at: row.retrieved_at ?? null,
+    civica_publication_version: ATLAS_EXPORT_VINTAGE_LABEL,
+  })),
+});
 const serialized = serializeAtlasExport(release);
 const exportSemanticSha256 = createHash("sha256").update(serialized).digest("hex");
 

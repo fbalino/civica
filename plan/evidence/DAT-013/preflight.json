@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-11T04:15:10.129Z",
+  "generatedAt": "2026-07-11T04:45:52.791Z",
   "plans": [
     {
       "id": "0000_smooth_kylun",
@@ -102,7 +102,7 @@
       "invariantPlan": "npm run db:plan -- --id=0002_purple_rachel_grey --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bill_summary_cache": 6220,
+        "bill_summary_cache": 6269,
         "contact_submissions": 1,
         "country_metrics": 7449,
         "election_results": 1351,
@@ -168,7 +168,7 @@
       "invariantPlan": "npm run db:plan -- --id=0004_gray_mojo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
-        "bills": 6890
+        "bills": 6940
       },
       "writesPerformed": 0
     },
@@ -642,7 +642,7 @@
         "pulse_review_audit_log": 13,
         "pulse_sources": 529,
         "raw_events": 1122,
-        "research_evidence_history": 237,
+        "research_evidence_history": 424,
         "statements": 7891,
         "terms": 5475
       },
@@ -666,6 +666,31 @@
       "liveRowCounts": {
         "ci_composite_scores": 286,
         "country_fact_vintages": 17506
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0026_temporal_metadata",
+      "artifact": "drizzle/migrations/0026_temporal_metadata.sql",
+      "kind": "mixed",
+      "historyStatus": "journaled",
+      "sha256": "1d76406bc21805bdafb42f85612bd1c23c347ba6126fb3722f83bdb03dd52197",
+      "affectedRelations": [
+        "country_fact_vintages",
+        "country_facts",
+        "government_taxonomies",
+        "sources"
+      ],
+      "statementCount": 10,
+      "destructiveStatementCount": 1,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0026_temporal_metadata-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0026_temporal_metadata --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_fact_vintages": 17506,
+        "country_facts": 25827,
+        "government_taxonomies": 249,
+        "sources": 56
       },
       "writesPerformed": 0
     },

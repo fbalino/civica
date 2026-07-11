@@ -240,6 +240,10 @@ export interface ExistingFrozenFactRow {
   factKey: string;
   vintageLabel: string;
   supersedesVintageLabel: string | null;
+  observationReferenceYear: number | null;
+  upstreamDatasetRelease: string | null;
+  sourceRetrievedAt: Date | string | null;
+  civicaPublicationVersion: string | null;
   canonicalFactId: string;
   valueText: string | null;
   valueNumeric: number | null;
@@ -486,6 +490,10 @@ export async function snapshotCurrentVintage(
       factKey: countryFactVintages.factKey,
       vintageLabel: countryFactVintages.vintageLabel,
       supersedesVintageLabel: countryFactVintages.supersedesVintageLabel,
+      observationReferenceYear: countryFactVintages.observationReferenceYear,
+      upstreamDatasetRelease: countryFactVintages.upstreamDatasetRelease,
+      sourceRetrievedAt: countryFactVintages.sourceRetrievedAt,
+      civicaPublicationVersion: countryFactVintages.civicaPublicationVersion,
       canonicalFactId: countryFactVintages.canonicalFactId,
       valueText: countryFactVintages.valueText,
       valueNumeric: countryFactVintages.valueNumeric,
@@ -581,6 +589,13 @@ export async function snapshotCurrentVintage(
           factKey: pair.factKey,
           vintageLabel,
           supersedesVintageLabel: options.supersedesVintageLabel ?? null,
+          observationReferenceYear:
+            result.canonical.dataVintageYear ??
+            result.canonical.factYear ??
+            (result.canonical.asOf ? Number(result.canonical.asOf.slice(0, 4)) : null),
+          upstreamDatasetRelease: result.canonical.upstreamVintageLabel,
+          sourceRetrievedAt: new Date(result.canonical.retrievedAt),
+          civicaPublicationVersion: vintageLabel,
           canonicalFactId: result.canonical.id,
           valueText: result.canonical.factValue,
           valueNumeric: result.canonical.factValueNumeric,
@@ -602,6 +617,9 @@ export async function snapshotCurrentVintage(
           cutAtTimestamp: value.cutAtTimestamp instanceof Date
             ? value.cutAtTimestamp.toISOString()
             : value.cutAtTimestamp,
+          sourceRetrievedAt: value.sourceRetrievedAt instanceof Date
+            ? value.sourceRetrievedAt.toISOString()
+            : value.sourceRetrievedAt,
         });
         if (stableStringify(normalize(existing)) !== stableStringify(normalize(frozenValue))) {
           throw new Error(`Frozen vintage conflict for ${vintageLabel}; publish a new superseding version instead.`);

@@ -40,6 +40,7 @@ export function buildAtlasExport(input: AtlasExportInput) {
   const identity = parseAtlasVintageLabel(ATLAS_EXPORT_VINTAGE_LABEL);
   const invalidVintageRows = facts.filter((row) =>
     row.vintage_label !== ATLAS_EXPORT_VINTAGE_LABEL ||
+    row.civica_publication_version !== ATLAS_EXPORT_VINTAGE_LABEL ||
     row.methodology_version !== identity.methodologyVersion ||
     typeof row.content_hash !== "string" || !/^[a-f0-9]{64}$/.test(row.content_hash),
   );
@@ -109,8 +110,8 @@ export function buildAtlasExport(input: AtlasExportInput) {
         },
         facts: {
           id: "Stable frozen-vintage row UUID.", canonical_fact_id: "Source-observation row selected at the cutoff.", jurisdiction_id: "Foreign key to jurisdictions.id.", fact_key: "Stable Civica fact identifier.", fact_group: "Reconciliation group A, B, or C.", category: "Reader-facing fact category.",
-          source_id: "Foreign key to sources.sourceId.", source_url: "Direct upstream record URL when captured.", fact_value: "Source display value.", fact_value_numeric: "Numeric form when available; zero is observed, not missing.", fact_unit: "Unit attached to the value.", fact_year: "Year stated by the publisher.", value_json: "Structured value when scalar columns are insufficient.",
-          value_status: "Closed data-value-state/v1 status.", value_status_reason: "Required explanation for non-observed states.", as_of: "Upstream observation/reference date.", data_vintage_year: "Underlying measurement year when different from the publisher stamp.", retrieved_at: "Civica retrieval timestamp.", upstream_vintage_label: "Publisher dataset/version label.", methodology_version: "Published Civica vintage-method version.", value_type: "Measured or projected source value.", growth_methodology: "Growth-rate basis where applicable.", vintage_label: "Immutable Civica citation handle.", cut_at_timestamp: "Shared publication cutoff for the vintage.", content_hash: "SHA-256 of the frozen value, source, date, and method recipe.", is_disputed_at_cut: "Whether the canonical selection was disputed when frozen.", supersedes_vintage_label: "Earlier release replaced by this version, when applicable.",
+          source_id: "Foreign key to sources.sourceId.", source_url: "Direct upstream record URL when captured.", fact_value: "Source display value.", fact_value_numeric: "Numeric form when available; zero is observed, not missing.", fact_unit: "Unit attached to the value.", value_json: "Structured value when scalar columns are insufficient.",
+          value_status: "Closed data-value-state/v1 status.", value_status_reason: "Required explanation for non-observed states.", as_of: "Upstream observation/reference date.", observation_reference_year: "Year the observation describes; never an ingestion or release year.", upstream_dataset_release: "Publisher/distributor dataset edition, distinct from observation year.", source_retrieved_at: "When Civica retrieved the selected source row, when retained at or before the cut.", civica_publication_version: "Civica's named publication handle.", methodology_version: "Published Civica method version.", value_type: "Measured or projected source value.", growth_methodology: "Growth-rate basis where applicable.", vintage_label: "Immutable Civica citation handle.", cut_at_timestamp: "Shared Civica publication cutoff for the vintage.", content_hash: "SHA-256 of the frozen value, source, date, and method recipe.", is_disputed_at_cut: "Whether the canonical selection was disputed when frozen.", supersedes_vintage_label: "Earlier release replaced by this version, when applicable.",
         },
         sources: {
           sourceId: "Stable source identifier.", licenseId: "Source license or legal designation.", termsUrl: "Publisher terms URL.", reviewStatus: "Civica rights-review status.", reviewedAt: "Rights review date.", publicExport: "Bulk-export permission decision.", commercialUse: "Whether source terms allow commercial use.", derivatives: "Whether source terms allow derivatives.", attributionRequired: "Whether source terms require attribution.", shareAlikeRequired: "Whether share-alike applies.", restrictions: "Source-specific cautions and conditions.",
@@ -145,9 +146,9 @@ export function buildAtlasReleaseBom(input: {
     const rows = release.tables.facts.filter(
       (fact) => fact.source_id === source.sourceId,
     );
-    const labels = [...new Set(rows.map((row) => row.upstream_vintage_label).filter(Boolean).map(String))].sort();
-    const years = rows.flatMap((row) => [row.data_vintage_year, row.fact_year]).filter((value): value is number => typeof value === "number");
-    const retrieved = rows.map((row) => String(row.retrieved_at)).sort();
+    const labels = [...new Set(rows.map((row) => row.upstream_dataset_release).filter(Boolean).map(String))].sort();
+    const years = rows.map((row) => row.observation_reference_year).filter((value): value is number => typeof value === "number");
+    const retrieved = rows.map((row) => row.source_retrieved_at).filter(Boolean).map(String).sort();
     return {
       sourceId: source.sourceId,
       rowCount: rows.length,
@@ -216,14 +217,14 @@ export function frozenSnapshotExportFact(row: Record<string, unknown>) {
     fact_value: row.snapshot_value_text,
     fact_value_numeric: row.snapshot_value_numeric,
     fact_unit: row.snapshot_value_unit,
-    fact_year: row.fact_year,
     value_json: row.snapshot_value_json,
     value_status: row.value_status,
     value_status_reason: row.value_status_reason,
     as_of: row.snapshot_as_of,
-    data_vintage_year: row.data_vintage_year,
-    retrieved_at: row.retrieved_at,
-    upstream_vintage_label: row.upstream_vintage_label,
+    observation_reference_year: row.observation_reference_year,
+    upstream_dataset_release: row.upstream_dataset_release,
+    source_retrieved_at: row.source_retrieved_at,
+    civica_publication_version: row.civica_publication_version,
     methodology_version: row.snapshot_methodology_version,
     value_type: row.value_type,
     growth_methodology: row.growth_methodology,
@@ -250,10 +251,11 @@ export async function loadAtlasExportInput(): Promise<AtlasExportInput> {
              cf.fact_group, cf.category, v.source_id AS snapshot_source_id, cf.source_url,
              v.value_text AS snapshot_value_text,
              v.value_numeric AS snapshot_value_numeric,
-             v.value_unit AS snapshot_value_unit, cf.fact_year,
+             v.value_unit AS snapshot_value_unit,
              v.value_json AS snapshot_value_json,
              cf.value_status, cf.value_status_reason, v.as_of AS snapshot_as_of,
-             cf.data_vintage_year, cf.retrieved_at, cf.upstream_vintage_label,
+             v.observation_reference_year, v.upstream_dataset_release,
+             v.source_retrieved_at, v.civica_publication_version,
              v.methodology_version AS snapshot_methodology_version,
              cf.value_type, cf.growth_methodology,
              v.vintage_label, v.cut_at_timestamp, v.content_hash,

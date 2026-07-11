@@ -25,6 +25,8 @@ import {
   getVDemRowDistribution,
   getCgvRegimeDistribution,
   getMonarchyStatusDistribution,
+  getPeerLensTemporalMetadata,
+  type LensTemporalMetadata,
 } from "@/lib/db/queries-peer-grouping";
 import {
   WORLD_BANK_REGION_META,
@@ -77,6 +79,8 @@ interface LensBlock {
   sourceName: string;
   /** Brief description of the lens for API consumers. */
   description: string;
+  /** Four separate clocks; null means the source does not expose one uniform value. */
+  temporal: LensTemporalMetadata;
   /** Sorted list of canonical values + their cohort sizes. */
   values: LensValue[];
 }
@@ -106,12 +110,13 @@ export async function GET(request: Request) {
   if (rateLimited) return rateLimited;
 
   try {
-    const [region, income, vdem, cgv, monarchy] = await Promise.all([
+    const [region, income, vdem, cgv, monarchy, temporal] = await Promise.all([
       getWorldBankRegionDistribution(),
       getWorldBankIncomeGroupDistribution(),
       getVDemRowDistribution(),
       getCgvRegimeDistribution(),
       getMonarchyStatusDistribution(),
+      getPeerLensTemporalMetadata(),
     ]);
 
     // No explicit `Record<string, LensBlock>` annotation — this object
@@ -126,6 +131,7 @@ export async function GET(request: Request) {
         sourceName: SOURCE_NAMES[PEER_LENS_SOURCE_ID.world_bank_region],
         description:
           "World Bank Country and Lending Groups regional classification (7 regions). Default material peer lens — pair with `world_bank_income_group` for the canonical material cohort. Refreshed annually each July.",
+        temporal: temporal.world_bank_region,
         values: decorateLens<WorldBankRegionKey>(region, WORLD_BANK_REGION_META),
       } satisfies LensBlock,
       world_bank_income_group: {
@@ -135,6 +141,7 @@ export async function GET(request: Request) {
         sourceName: SOURCE_NAMES[PEER_LENS_SOURCE_ID.world_bank_income_group],
         description:
           "World Bank income group classification (4 tiers, low → high). Pairs with `world_bank_region` for the canonical material cohort. Refreshed annually each July.",
+        temporal: temporal.world_bank_income_group,
         values: decorateLens<WorldBankIncomeGroupKey>(
           income,
           WORLD_BANK_INCOME_GROUP_META,
@@ -147,6 +154,7 @@ export async function GET(request: Request) {
         sourceName: SOURCE_NAMES[PEER_LENS_SOURCE_ID.vdem_row],
         description:
           "V-Dem Regimes of the World (Lührmann, Tannenberg & Lindberg 2018). Default governance peer lens — 4 tiers spanning closed autocracy through liberal democracy. Annual cadence.",
+        temporal: temporal.vdem_row,
         values: decorateLens<VDemRowKey>(vdem, VDEM_ROW_META),
       } satisfies LensBlock,
       cgv_regime: {
@@ -155,7 +163,8 @@ export async function GET(request: Request) {
         source: PEER_LENS_SOURCE_ID.cgv_regime,
         sourceName: SOURCE_NAMES[PEER_LENS_SOURCE_ID.cgv_regime],
         description:
-          "Bjørnskov-Rode / Cheibub-Gandhi-Vreeland regime classification (6 categories). Optional alternate governance lens distinguishing democracies by executive form and authoritarian systems by ruling-elite structure.",
+          "Bjørnskov-Rode / Cheibub-Gandhi-Vreeland regime classification (6 categories), reference year 2022 in the QoG Jan26 cross-section. Optional alternate governance lens distinguishing democracies by executive form and authoritarian systems by ruling-elite structure.",
+        temporal: temporal.regime_type_cgv,
         values: decorateLens<CGVRegimeTypeKey>(cgv, CGV_REGIME_TYPE_META),
       } satisfies LensBlock,
       monarchy_status: {
@@ -165,6 +174,7 @@ export async function GET(request: Request) {
         sourceName: SOURCE_NAMES[PEER_LENS_SOURCE_ID.monarchy_status],
         description:
           "Monarchy status (6-value enum: none / constitutional / absolute / ceremonial / elective / theocratic). Descriptive constitutional-form metadata, NOT an analytical peer lens. Provided here for filterability ('show me ceremonial monarchies').",
+        temporal: temporal.monarchy_status,
         values: decorateLens<MonarchyStatusKey>(monarchy, MONARCHY_STATUS_META),
       } satisfies LensBlock,
     };

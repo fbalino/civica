@@ -110,7 +110,7 @@ Every external classification is pinned to a specific upstream vintage. The curr
 
 - **World Bank region + income** — World Bank Country and Lending Groups, refreshed annually each July. Civica pulls the latest at the next quarterly cut.[^5]
 - **V-Dem Regimes of the World** — V-Dem dataset, refreshed annually each spring. The pinned-vintage label appears on every Civica surface that displays a V-Dem-derived cohort.[^9]
-- **Bjørnskov-Rode / CGV** — distributed via the Quality of Government dataset, refreshed annually each January.[^12]
+- **Bjørnskov-Rode / CGV** — observation/reference year {{state.peerGrouping.brCgvReferenceYear}}, original {{state.peerGrouping.brCgvSourceDatasetVersion}}, distributed as {{state.peerGrouping.brCgvDistributionRelease}}. The API reports Civica's retrieval timestamp and publication version separately. These are four separate clocks; none substitutes for the regime observation year.[^12]
 - **government_form_description** — CIA World Factbook, frozen January 2026. The Factbook is no longer actively maintained beyond that date; Civica may add a Wikidata cross-check in a future version, but for v1.0 the field is effectively static.[^13]
 
 ## Limitations {#limitations}

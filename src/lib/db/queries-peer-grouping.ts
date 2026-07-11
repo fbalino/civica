@@ -25,12 +25,52 @@ import { sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { getLatestAvailableQuarter } from "@/lib/db/queries";
+import type { TemporalMetadata } from "@/lib/data/temporal-metadata";
 
 export interface LensDistributionEntry {
   /** Canonical value string from `country_facts` (e.g. `liberal_democracy`). */
   key: string;
   totalCount: number;
   scoredCount: number;
+}
+
+export type LensTemporalMetadata = TemporalMetadata;
+
+export async function getPeerLensTemporalMetadata(): Promise<Record<string, LensTemporalMetadata>> {
+  const factResult = await db.execute(sql`
+    SELECT fact_key,
+      CASE WHEN COUNT(DISTINCT COALESCE(data_vintage_year, fact_year, EXTRACT(YEAR FROM as_of)::int)) = 1
+        THEN MIN(COALESCE(data_vintage_year, fact_year, EXTRACT(YEAR FROM as_of)::int)) END::int AS observation_year,
+      CASE WHEN COUNT(DISTINCT upstream_vintage_label) = 1 THEN MIN(upstream_vintage_label) END AS upstream_release,
+      MAX(retrieved_at)::text AS retrieved_at,
+      CASE WHEN COUNT(DISTINCT methodology_version) = 1 THEN MIN(methodology_version) END AS civica_version
+    FROM country_facts
+    WHERE status = 'active' AND fact_key IN ('world_bank_region','world_bank_income_group','vdem_row','monarchy_status')
+    GROUP BY fact_key
+  `);
+  const taxonomyResult = await db.execute(sql`
+    SELECT regime_year AS observation_year,
+      regime_source_dataset_version || ' via ' || regime_dataset_version AS upstream_release,
+      regime_retrieved_at::text AS retrieved_at,
+      civica_publication_version AS civica_version
+    FROM government_taxonomies WHERE regime_type_cgv IS NOT NULL LIMIT 1
+  `);
+  const rows = queryRows(factResult);
+  const output: Record<string, LensTemporalMetadata> = {};
+  for (const row of rows) output[String(row.fact_key)] = {
+    observationReferenceYear: row.observation_year === null ? null : Number(row.observation_year),
+    upstreamDatasetRelease: row.upstream_release ? String(row.upstream_release) : null,
+    retrievedAt: row.retrieved_at ? String(row.retrieved_at) : null,
+    civicaPublicationVersion: row.civica_version ? String(row.civica_version) : null,
+  };
+  const cgv = queryRows(taxonomyResult)[0];
+  output.regime_type_cgv = cgv ? {
+    observationReferenceYear: Number(cgv.observation_year),
+    upstreamDatasetRelease: String(cgv.upstream_release),
+    retrievedAt: String(cgv.retrieved_at),
+    civicaPublicationVersion: String(cgv.civica_version),
+  } : { observationReferenceYear: null, upstreamDatasetRelease: null, retrievedAt: null, civicaPublicationVersion: null };
+  return output;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -199,9 +239,7 @@ async function distributionForFactKey(
 }
 
 function rowsToDistribution(result: unknown): LensDistributionEntry[] {
-  const rows = Array.isArray(result)
-    ? result
-    : ((result as { rows?: unknown[] }).rows ?? []);
+  const rows = queryRows(result);
   return (rows as Array<{ key: string; totalCount: number; scoredCount: number }>)
     .filter((r) => typeof r.key === "string" && r.key.length > 0)
     .map((row) => ({
@@ -209,4 +247,10 @@ function rowsToDistribution(result: unknown): LensDistributionEntry[] {
       totalCount: Number(row.totalCount ?? 0),
       scoredCount: Number(row.scoredCount ?? 0),
     }));
+}
+
+function queryRows(result: unknown): Array<Record<string, unknown>> {
+  return (Array.isArray(result)
+    ? result
+    : ((result as { rows?: unknown[] }).rows ?? [])) as Array<Record<string, unknown>>;
 }

@@ -741,6 +741,12 @@ export const zPeerLensBlock = z
     source: z.string(),
     sourceName: z.string(),
     description: z.string(),
+    temporal: z.object({
+      observationReferenceYear: z.number().int().nullable(),
+      upstreamDatasetRelease: z.string().nullable(),
+      retrievedAt: z.string().nullable(),
+      civicaPublicationVersion: z.string().nullable(),
+    }).strict(),
     values: z.array(zPeerLensValue),
   })
   .strict();
