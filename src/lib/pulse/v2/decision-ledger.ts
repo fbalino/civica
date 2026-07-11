@@ -51,6 +51,23 @@ export interface PulseDecisionPayloads {
     status: "single" | "multiple" | "unresolved";
     primaryJurisdictionId: string | null;
     affectedJurisdictionIds: string[];
+    attributionVersion?: string;
+    entityCatalogVersion?: string;
+    entityCatalogHash?: string | null;
+    aliasVersion?: string;
+    attributions?: Array<{
+      jurisdictionId: string;
+      role: "primary" | "affected";
+      rationale: string;
+      evidenceRefs: string[];
+      entity: {
+        canonicalName: string;
+        iso2: string | null;
+        iso3: string | null;
+        slug: string;
+        aliases: string[];
+      };
+    }>;
   };
   category_labels: {
     categoryIds: string[];
@@ -152,6 +169,19 @@ function normalizePayload<K extends PulseDecisionKind>(
     return {
       ...value,
       affectedJurisdictionIds: uniqueSorted(value.affectedJurisdictionIds),
+      attributions: value.attributions
+        ?.map((row) => ({
+          ...row,
+          evidenceRefs: uniqueSorted(row.evidenceRefs),
+          entity: { ...row.entity, aliases: uniqueSorted(row.entity.aliases) },
+        }))
+        .sort((left, right) =>
+          left.role === right.role
+            ? left.jurisdictionId.localeCompare(right.jurisdictionId)
+            : left.role === "primary"
+              ? -1
+              : 1,
+        ),
     } as PulseDecisionPayloads[K];
   }
   if (kind === "category_labels") {
@@ -213,6 +243,42 @@ function validatePayload(input: PulseDecisionInput): void {
       !(payload.affectedJurisdictionIds as unknown[]).includes(primary)
     ) {
       throw new Error("primary jurisdiction must appear in the affected set");
+    }
+    if (payload.attributionVersion !== undefined) {
+      if (
+        typeof payload.attributionVersion !== "string" ||
+        typeof payload.entityCatalogVersion !== "string" ||
+        typeof payload.entityCatalogHash !== "string" ||
+        typeof payload.aliasVersion !== "string" ||
+        !Array.isArray(payload.attributions)
+      ) {
+        throw new Error("versioned attribution requires catalog metadata and rows");
+      }
+      const rows = payload.attributions as Array<Record<string, unknown>>;
+      const rowIds = rows.map((row) => row.jurisdictionId);
+      if (
+        new Set(rowIds).size !== rowIds.length ||
+        rows.some(
+          (row) =>
+            typeof row.jurisdictionId !== "string" ||
+            (row.role !== "primary" && row.role !== "affected") ||
+            typeof row.rationale !== "string" ||
+            !row.rationale ||
+            !Array.isArray(row.evidenceRefs) ||
+            !row.entity ||
+            typeof row.entity !== "object",
+        ) ||
+        rows.filter((row) => row.role === "primary").length !==
+          (primary === null ? 0 : 1) ||
+        rows.some(
+          (row) =>
+            !(payload.affectedJurisdictionIds as unknown[]).includes(
+              row.jurisdictionId,
+            ),
+        )
+      ) {
+        throw new Error("versioned attribution rows do not match the decision");
+      }
     }
   } else if (input.kind === "category_labels") {
     const categories = payload.categoryIds;

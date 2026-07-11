@@ -1308,6 +1308,41 @@ export const zPulseCountryEvent = z
     reviewStatus: z.string(),
     headline: z.string(),
     description: z.string(),
+    subjectAttribution: z
+      .object({
+        standing: z.enum(["versioned", "legacy_projection", "unresolved"]),
+        attributionVersion: z.string().nullable(),
+        entityCatalogVersion: z.string().nullable(),
+        entityCatalogHash: z.string().nullable(),
+        aliasVersion: z.string().nullable(),
+        requestedJurisdictionRole: z.enum(["primary", "affected", "unresolved"]),
+        primary: z
+          .object({
+            jurisdictionId: z.string(),
+            name: z.string(),
+            iso3: z.string().nullable(),
+            slug: z.string(),
+            role: z.literal("primary"),
+            rationale: z.string(),
+            evidenceRefs: z.array(z.string()),
+          })
+          .strict()
+          .nullable(),
+        affected: z.array(
+          z
+            .object({
+              jurisdictionId: z.string(),
+              name: z.string(),
+              iso3: z.string().nullable(),
+              slug: z.string(),
+              role: z.literal("affected"),
+              rationale: z.string(),
+              evidenceRefs: z.array(z.string()),
+            })
+            .strict(),
+        ),
+      })
+      .strict(),
     publicationOrigin: zPulsePublicationOrigin,
     versionIdentity: z
       .object({

@@ -890,3 +890,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   projection. Generic confidence payloads are prohibited.
 - Calibration remains not calibrated and corroboration remains a heuristic.
   Durable record: APR-D119 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Pulse keeps primary and affected jurisdictions separate
+
+- `pulse-jurisdiction-attribution/v2` records one primary plus affected roles,
+  each with rationale, evidence references, and a frozen entity snapshot.
+- The prompt receives a content-hashed human-readable entity/alias context;
+  unresolved or primary-less results cannot auto-publish.
+- Only primary roles feed the current experimental projection. Retained rows
+  remain explicit legacy projections. Durable record: APR-D120.

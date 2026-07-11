@@ -163,12 +163,42 @@ test("classification persists each judgment and verifier axis separately", () =>
       rationale: "category and subject need review",
     },
     subjectAttribution: {
-      jurisdictionId: "jurisdiction-1",
+      attributionVersion: "pulse-jurisdiction-attribution/v2",
+      entityCatalogVersion: "pulse-jurisdiction-entities/v1",
+      aliasVersion: "pulse-jurisdiction-aliases/v1",
+      entityCatalogHash:
+        "pulse-jurisdiction-entities/sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      promptContext: "Japan (JPN)",
+      status: "single",
+      primaryJurisdictionId: "jurisdiction-1",
+      rationale: "The event concerns Japan's domestic institutions.",
+      attributions: [
+        {
+          jurisdictionId: "jurisdiction-1",
+          role: "primary",
+          rationale: "The event concerns Japan's domestic institutions.",
+          evidenceRefs: ["headline"],
+          entity: {
+            jurisdictionId: "jurisdiction-1",
+            canonicalName: "Japan",
+            iso2: "JP",
+            iso3: "JPN",
+            slug: "japan",
+            aliases: [],
+          },
+        },
+      ],
       verdict: {
-        iso3: "JPN",
-        country: "Japan",
         scope: "single",
-        confidence: "high",
+        primaryIso3: "JPN",
+        attributions: [
+          {
+            iso3: "JPN",
+            role: "primary",
+            rationale: "The event concerns Japan's domestic institutions.",
+            evidenceRefs: ["headline"],
+          },
+        ],
         reasoning: "The event concerns Japan's domestic institutions.",
       },
     },

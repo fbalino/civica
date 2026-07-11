@@ -1,0 +1,17 @@
+PUL-012 production-shaped database fixture
+
+primary roles materialized: 1
+affected roles materialized: 1
+append-only update: rejected
+fixture transaction: deliberately rolled back
+retained fixture decisions: 0
+
+Live migration
+
+events covered: 384/384
+latest primary roles: 384
+affected roles in retained legacy history: 0
+v2 decisions created by migration: 0
+explicit legacy projections: 384
+invalid version envelopes: 0
+primary/event projection mismatches: 0

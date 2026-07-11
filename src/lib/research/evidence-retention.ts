@@ -48,7 +48,6 @@ export type RetainedEvidenceRelation =
 export const DESTRUCTIVE_WRITE_PATHS = [
   { path: "scripts/ingest-ci-all.ts", relations: ["ci_dimension_scores"] },
   { path: "scripts/cleanup-bad-offices.ts", relations: ["government_bodies", "offices", "persons", "terms"] },
-  { path: "scripts/reattribute-pulse-country.ts", relations: ["pulse_dimensional_deltas"] },
   { path: "scripts/seed-backtest-cases.ts", relations: ["backtest_events"] },
   { path: "scripts/seed-organizations.ts", relations: ["organization_memberships"] },
   { path: "scripts/sync-elections-ipu.ts", relations: ["elections"] },

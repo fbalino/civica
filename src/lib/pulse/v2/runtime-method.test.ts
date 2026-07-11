@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.7-beta");
+  assert.equal(method.version, "pulse-v2.8-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -97,6 +97,15 @@ test("current contract states the non-negotiable publication boundaries", () => 
     method.decisionLedger.currentEventRowRole,
     "current_state_projection_not_decision_history",
   );
+  assert.equal(
+    method.providers.subject.attributionVersion,
+    "pulse-jurisdiction-attribution/v2",
+  );
+  assert.deepEqual(method.providers.subject.acceptedScopes, ["single", "multi"]);
+  assert.equal(
+    method.providers.subject.inputContext,
+    "human_readable_versioned_entity_candidates",
+  );
 });
 
 test("the runtime snapshot distinguishes observed evidence from operating state", () => {
@@ -139,7 +148,11 @@ test("provider roles distinguish current ensemble, subject pass, review aid, and
   });
   assert.equal(
     providers.subject.responseValidation,
-    "strict_scope_confidence_and_iso3_shape",
+    "strict_scope_roles_iso3_rationale_and_evidence_shape",
+  );
+  assert.equal(
+    providers.subject.failurePolicy,
+    "unresolved_no_automatic_publication",
   );
   assert.equal(providers.reviewSummary.affectsClassification, false);
   assert.equal(providers.reviewSummary.affectsNumericDelta, false);
@@ -292,7 +305,7 @@ test("contract hash omits its own field and changes when contract content change
 
   const changed: PulseRuntimeMethodContract = {
     ...CURRENT_PULSE_RUNTIME_METHOD,
-    version: "pulse-v2.7-beta-test-change",
+    version: "pulse-v2.8-beta-test-change",
   };
   assert.notEqual(pulseContractHash(changed), snapshot.contractHash);
 });

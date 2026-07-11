@@ -75,6 +75,14 @@ async function loadPulseRunMap(runIds: readonly string[]) {
   );
 }
 
+function resultRows(result: unknown): Array<Record<string, unknown>> {
+  return (Array.isArray(result)
+    ? result
+    : ((result as { rows?: unknown[] }).rows ?? [])) as Array<
+    Record<string, unknown>
+  >;
+}
+
 /** A row in the per-country dimensional-delta panel. */
 export interface DimensionRow {
   dimension: PulseDimension;
@@ -342,6 +350,7 @@ export async function getPulseV2EventsForCountry(slug: string) {
   const events = await db
     .select({
       id: pulseEventsV2.id,
+      jurisdictionId: pulseEventsV2.jurisdictionId,
       eventDate: pulseEventsV2.eventDate,
       category: pulseEventsV2.category,
       dimension: pulseEventsV2.dimension,
@@ -359,7 +368,26 @@ export async function getPulseV2EventsForCountry(slug: string) {
       corroborationRunId: pulseEventsV2.corroborationRunId,
     })
     .from(pulseEventsV2)
-    .where(eq(pulseEventsV2.jurisdictionId, jurisdiction.id))
+    .where(sql`
+      ${pulseEventsV2.jurisdictionId} = ${jurisdiction.id}
+      OR EXISTS (
+        SELECT 1
+        FROM pulse_event_jurisdictions pej
+        JOIN pulse_event_decisions ped ON ped.decision_key = pej.decision_key
+        WHERE pej.event_id = ${pulseEventsV2.id}
+          AND pej.jurisdiction_id = ${jurisdiction.id}
+          AND ped.actor->>'type' <> 'verifier'
+          AND ped.decision_key = (
+            SELECT latest.decision_key
+            FROM pulse_event_decisions latest
+            WHERE latest.event_id = ${pulseEventsV2.id}
+              AND latest.kind = 'subject_attribution'
+              AND latest.actor->>'type' <> 'verifier'
+            ORDER BY latest.decided_at DESC, latest.created_at DESC
+            LIMIT 1
+          )
+      )
+    `)
     .orderBy(desc(pulseEventsV2.eventDate));
 
   const eventIds = events.map((e) => e.id);
@@ -380,7 +408,83 @@ export async function getPulseV2EventsForCountry(slug: string) {
       evidenceIdentity: PulseEvidenceIdentityDetail;
     }>
   >();
+  type PublicAttributionRow = {
+    jurisdictionId: string;
+    name: string;
+    iso3: string | null;
+    slug: string;
+    role: "primary" | "affected";
+    rationale: string;
+    evidenceRefs: string[];
+  };
+  const attributionMap = new Map<
+    string,
+    {
+      standing: "versioned" | "legacy_projection";
+      attributionVersion: string;
+      entityCatalogVersion: string;
+      entityCatalogHash: string;
+      aliasVersion: string;
+      rows: PublicAttributionRow[];
+    }
+  >();
   if (eventIds.length) {
+    const attributionRows = resultRows(
+      await db.execute(sql`
+        WITH latest AS (
+          SELECT DISTINCT ON (event_id)
+            event_id, decision_key
+          FROM pulse_event_decisions
+          WHERE event_id IN ${eventIds}
+            AND kind = 'subject_attribution'
+            AND actor->>'type' <> 'verifier'
+          ORDER BY event_id, decided_at DESC, created_at DESC
+        )
+        SELECT
+          pej.event_id,
+          pej.jurisdiction_id,
+          pej.role,
+          pej.rationale,
+          pej.evidence_refs,
+          pej.attribution_version,
+          pej.entity_catalog_version,
+          pej.entity_catalog_hash,
+          pej.alias_version,
+          j.name,
+          j.iso3,
+          j.slug
+        FROM latest
+        JOIN pulse_event_jurisdictions pej
+          ON pej.decision_key = latest.decision_key
+        JOIN jurisdictions j ON j.id = pej.jurisdiction_id
+        ORDER BY pej.event_id, CASE WHEN pej.role = 'primary' THEN 0 ELSE 1 END, j.iso3
+      `),
+    );
+    for (const row of attributionRows) {
+      const eventId = String(row.event_id);
+      const current = attributionMap.get(eventId) ?? {
+        standing:
+          row.attribution_version === "pulse-jurisdiction-attribution/v2"
+            ? "versioned" as const
+            : "legacy_projection" as const,
+        attributionVersion: String(row.attribution_version),
+        entityCatalogVersion: String(row.entity_catalog_version),
+        entityCatalogHash: String(row.entity_catalog_hash),
+        aliasVersion: String(row.alias_version),
+        rows: [],
+      };
+      current.rows.push({
+        jurisdictionId: String(row.jurisdiction_id),
+        name: String(row.name),
+        iso3: row.iso3 == null ? null : String(row.iso3),
+        slug: String(row.slug),
+        role: row.role === "primary" ? "primary" : "affected",
+        rationale: String(row.rationale),
+        evidenceRefs: (row.evidence_refs as string[]) ?? [],
+      });
+      attributionMap.set(eventId, current);
+    }
+
     const sourceRows = await db
       .select({
         eventId: pulseSources.eventId,
@@ -426,11 +530,25 @@ export async function getPulseV2EventsForCountry(slug: string) {
     jurisdiction,
     events: events.map((e) => {
       const {
+        jurisdictionId,
         classificationRunId,
         publicationRunId,
         corroborationRunId,
         ...publicEvent
       } = e;
+      const attribution = attributionMap.get(e.id);
+      const requested = attribution?.rows.find(
+        (row) => row.jurisdictionId === jurisdiction.id,
+      );
+      const primaryRow =
+        attribution?.rows.find((row) => row.role === "primary") ?? null;
+      const primary = primaryRow
+        ? { ...primaryRow, role: "primary" as const }
+        : null;
+      const requestedJurisdictionRole:
+        | "primary"
+        | "affected"
+        | "unresolved" = requested?.role ?? "unresolved";
       return {
         ...publicEvent,
         // A deadlocked ensemble is stored in the current non-null schema with
@@ -440,6 +558,30 @@ export async function getPulseV2EventsForCountry(slug: string) {
         severityTier: e.category === "none" ? null : e.severityTier,
         severityValue: e.category === "none" ? null : e.severityValue,
         publicationOrigin: publicationOriginFor(e),
+        subjectAttribution: attribution
+          ? {
+              standing: attribution.standing,
+              attributionVersion: attribution.attributionVersion,
+              entityCatalogVersion: attribution.entityCatalogVersion,
+              entityCatalogHash: attribution.entityCatalogHash,
+              aliasVersion: attribution.aliasVersion,
+              requestedJurisdictionRole,
+              primary,
+              affected: attribution.rows
+                .filter((row) => row.role === "affected")
+                .map((row) => ({ ...row, role: "affected" as const })),
+            }
+          : {
+              standing: "unresolved" as const,
+              attributionVersion: null,
+              entityCatalogVersion: null,
+              entityCatalogHash: null,
+              aliasVersion: null,
+              requestedJurisdictionRole:
+                jurisdictionId === jurisdiction.id ? "unresolved" as const : "unresolved" as const,
+              primary: null,
+              affected: [],
+            },
         versionIdentity: {
           classification: runMap.get(classificationRunId) ?? null,
           publication: publicationRunId

@@ -646,3 +646,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   events; migration replay, upgrade fixtures, 799 tests, claims, and build pass.
 - Public methodology and light/dark browser checks match the runtime contract.
   PUL-012 is next.
+
+## 2026-07-11 — PUL-012 jurisdiction attribution completed
+
+- Runtime method `pulse-v2.8-beta` supports one primary plus affected roles
+  with rationales, evidence references, and versioned human-readable entities.
+- Live migration covers 384/384 retained events as explicit legacy projections;
+  it did not call a model or invent historical multi-country judgments.
+- Cross-border DB fixtures, 801 tests, claims, build, and responsive light/dark
+  checks pass. PUL-013 is next.

@@ -61,7 +61,7 @@
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "5fa79a043353506f07dd578e575727e9309ccee0dcb65ee8a54ac234d640db82",
+  "contractHash": "13f501eef681b9561163869e8da7f889ff5a8542a23865f0660817912b1a2769",
   "corroboration": {
     "countingUnit": "independent_evidence_group",
     "informationEnvironment": {
@@ -432,20 +432,24 @@
       "role": "optional_cached_admin_and_public_ledger_summary_aid"
     },
     "subject": {
-      "acceptedConfidence": [
-        "high",
-        "medium"
-      ],
       "acceptedScopes": [
-        "single"
+        "single",
+        "multi"
       ],
+      "aliasVersion": "pulse-jurisdiction-aliases/v1",
+      "attributionVersion": "pulse-jurisdiction-attribution/v2",
       "engine": {
         "model": "claude-sonnet-4-6",
         "provider": "anthropic"
       },
-      "failurePolicy": "retain_ingest_attribution",
-      "responseValidation": "strict_scope_confidence_and_iso3_shape",
-      "role": "attribute_event_by_subject_country",
+      "entityCatalogVersion": "pulse-jurisdiction-entities/v1",
+      "failurePolicy": "unresolved_no_automatic_publication",
+      "inputContext": "human_readable_versioned_entity_candidates",
+      "legacyRule": "Retained single-jurisdiction rows remain explicit legacy projections without invented historical alias/entity inputs.",
+      "output": "one_primary_zero_or_more_affected_with_rationales_and_evidence_refs",
+      "projectionRule": "primary_only_affected_are_descriptive_not_scored",
+      "responseValidation": "strict_scope_roles_iso3_rationale_and_evidence_shape",
+      "role": "attribute_primary_and_affected_jurisdictions",
       "runsAfterClassification": true
     },
     "verify": {
@@ -530,7 +534,7 @@
       }
     }
   },
-  "schemaVersion": "1.6.0",
+  "schemaVersion": "1.7.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -543,5 +547,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.7-beta"
+  "version": "pulse-v2.8-beta"
 }

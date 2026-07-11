@@ -127,6 +127,13 @@
       "when": 1783794000000,
       "tag": "0017_validate_decision_supersession",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1783794533547,
+      "tag": "0018_rich_phalanx",
+      "breakpoints": true
     }
   ]
 }

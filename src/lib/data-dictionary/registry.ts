@@ -711,6 +711,21 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
       "Civica-generated research metadata; evidence references retain their publisher-specific rights restrictions.",
     deprecation: active,
   },
+  pulse_event_jurisdictions: {
+    definition:
+      "Append-only, queryable primary and affected jurisdiction roles derived from versioned subject-attribution decisions.",
+    rowGrain:
+      "One jurisdiction role in one Pulse subject-attribution decision.",
+    releaseScope: "research_beta",
+    sourceOrDerivation:
+      "Database-trigger projection of the typed subject-attribution decision payload, with a frozen entity snapshot, rationale, evidence references, and catalog/alias versions; retained rows use an explicit legacy projection identity.",
+    cadence: "Append-only when a subject-attribution decision is stored.",
+    vintageSemantics:
+      "created_at is projection storage time; decision_key points to the authoritative decision and its decided_at time.",
+    rights:
+      "Civica-generated attribution metadata; referenced source evidence retains publisher-specific restrictions.",
+    deprecation: active,
+  },
   pulse_sources: {
     definition:
       "Evidence-source links between Pulse v2 events and raw publisher items.",

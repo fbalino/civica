@@ -13,6 +13,7 @@ import type {
   PulseEvidenceRetentionSnapshot,
   PulseEvidenceRightsSnapshot,
 } from "@/lib/pulse/v2/evidence-identity";
+import type { JurisdictionEntitySnapshot } from "@/lib/pulse/v2/jurisdiction-entities";
 import {
   pgTable,
   uuid,
@@ -2225,6 +2226,59 @@ export const pulseEventDecisions = pgTable(
     check(
       "pulse_event_decisions_contract_check",
       dsql`${table.schemaVersion} = 'pulse-decision-ledger/v1' AND ${table.decisionKey} ~ '^pulse-decision/sha256:[a-f0-9]{64}$' AND ${table.kind} IN ('event_existence','subject_attribution','category_labels','severity','calibration','corroboration','publication') AND ${table.verdict} IN ('affirmed','refuted','abstained','unresolved') AND ${table.rationale} <> '' AND jsonb_typeof(${table.payload}) = 'object' AND NOT (${table.payload} ? 'confidence') AND ((${table.kind} = 'event_existence' AND ${table.payload} ? 'disposition') OR (${table.kind} = 'subject_attribution' AND ${table.payload} ?& ARRAY['status','primaryJurisdictionId','affectedJurisdictionIds']) OR (${table.kind} = 'category_labels' AND ${table.payload} ?& ARRAY['categoryIds','dimensionIds']) OR (${table.kind} = 'severity' AND ${table.payload} ?& ARRAY['tier','value','direction']) OR (${table.kind} = 'calibration' AND ${table.payload} ?& ARRAY['standing','signals','targetDecisionKinds','validationReleaseId'] AND ${table.payload}->>'standing' = 'not_calibrated') OR (${table.kind} = 'corroboration' AND ${table.payload} ?& ARRAY['independentEvidenceGroups','contributingReports','confidenceWeight','calibrationStanding'] AND ${table.payload}->>'calibrationStanding' = 'heuristic_not_probability') OR (${table.kind} = 'publication' AND ${table.payload} ?& ARRAY['eligible','origin','gateReasons'])) AND jsonb_typeof(${table.actor}) = 'object' AND ${table.actor}->>'type' IN ('classifier','verifier','subject_attributor','calibration_assessor','corroborator','publication_gate','human_reviewer','legacy_projection')`,
+    ),
+  ],
+);
+
+/**
+ * Queryable projection of every resolved jurisdiction named by a
+ * subject-attribution decision. A database trigger derives these rows from
+ * the decision payload in the same transaction; callers never maintain a
+ * second competing attribution record.
+ */
+export const pulseEventJurisdictions = pgTable(
+  "pulse_event_jurisdictions",
+  {
+    decisionKey: text("decision_key")
+      .references(() => pulseEventDecisions.decisionKey, {
+        onDelete: "restrict",
+      })
+      .notNull(),
+    eventId: uuid("event_id")
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
+      .notNull(),
+    clusterId: uuid("cluster_id").notNull(),
+    jurisdictionId: uuid("jurisdiction_id")
+      .references(() => jurisdictions.id, { onDelete: "restrict" })
+      .notNull(),
+    role: text("role").$type<"primary" | "affected">().notNull(),
+    rationale: text("rationale").notNull(),
+    evidenceRefs: text("evidence_refs").array().notNull(),
+    entitySnapshot: jsonb("entity_snapshot")
+      .$type<JurisdictionEntitySnapshot>()
+      .notNull(),
+    attributionVersion: text("attribution_version").notNull(),
+    entityCatalogVersion: text("entity_catalog_version").notNull(),
+    entityCatalogHash: text("entity_catalog_hash").notNull(),
+    aliasVersion: text("alias_version").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.decisionKey, table.jurisdictionId] }),
+    uniqueIndex("idx_pulse_event_jurisdictions_one_primary")
+      .on(table.decisionKey)
+      .where(dsql`${table.role} = 'primary'`),
+    index("idx_pulse_event_jurisdictions_event_role").on(
+      table.eventId,
+      table.role,
+    ),
+    index("idx_pulse_event_jurisdictions_jurisdiction_role").on(
+      table.jurisdictionId,
+      table.role,
+    ),
+    check(
+      "pulse_event_jurisdictions_contract_check",
+      dsql`${table.role} IN ('primary','affected') AND ${table.rationale} <> '' AND cardinality(${table.evidenceRefs}) > 0 AND jsonb_typeof(${table.entitySnapshot}) = 'object' AND ((${table.attributionVersion} = 'pulse-jurisdiction-attribution/v2' AND ${table.entityCatalogVersion} = 'pulse-jurisdiction-entities/v1' AND ${table.aliasVersion} = 'pulse-jurisdiction-aliases/v1' AND ${table.entityCatalogHash} ~ '^pulse-jurisdiction-entities/sha256:[a-f0-9]{64}$') OR (${table.attributionVersion} = 'pulse-jurisdiction-attribution/legacy-projection-v1' AND ${table.entityCatalogVersion} = 'legacy-unversioned' AND ${table.aliasVersion} = 'legacy-unversioned' AND ${table.entityCatalogHash} = 'legacy-unversioned'))`,
     ),
   ],
 );

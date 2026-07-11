@@ -40,6 +40,11 @@ import {
   SUBJECT_ATTRIBUTION_PROVIDER,
 } from "./country-attribution";
 import {
+  PULSE_JURISDICTION_ATTRIBUTION_VERSION,
+  PULSE_JURISDICTION_ENTITY_VERSION,
+} from "./jurisdiction-entities";
+import { PULSE_JURISDICTION_ALIAS_VERSION } from "./country-resolver";
+import {
   PULSE_REVIEW_SUMMARY_MODEL,
   PULSE_REVIEW_SUMMARY_PROVIDER,
 } from "./summarize";
@@ -67,8 +72,8 @@ import {
   type PulseDecisionKind,
 } from "./decision-ledger";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.6.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.7-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.7.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.8-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
 export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
@@ -203,12 +208,18 @@ export interface PulseRuntimeMethodContract {
     };
     subject: {
       engine: PulseProviderRef;
-      role: "attribute_event_by_subject_country";
+      role: "attribute_primary_and_affected_jurisdictions";
       runsAfterClassification: true;
-      acceptedScopes: ["single"];
-      acceptedConfidence: ["high", "medium"];
-      responseValidation: "strict_scope_confidence_and_iso3_shape";
-      failurePolicy: "retain_ingest_attribution";
+      attributionVersion: typeof PULSE_JURISDICTION_ATTRIBUTION_VERSION;
+      entityCatalogVersion: typeof PULSE_JURISDICTION_ENTITY_VERSION;
+      aliasVersion: typeof PULSE_JURISDICTION_ALIAS_VERSION;
+      inputContext: "human_readable_versioned_entity_candidates";
+      acceptedScopes: ["single", "multi"];
+      output: "one_primary_zero_or_more_affected_with_rationales_and_evidence_refs";
+      responseValidation: "strict_scope_roles_iso3_rationale_and_evidence_shape";
+      failurePolicy: "unresolved_no_automatic_publication";
+      projectionRule: "primary_only_affected_are_descriptive_not_scored";
+      legacyRule: string;
     };
     reviewSummary: {
       engine: PulseProviderRef;
@@ -546,12 +557,21 @@ export function buildPulseRuntimeMethod(
       },
       subject: {
         engine: { ...facts.subjectEngine },
-        role: "attribute_event_by_subject_country",
+        role: "attribute_primary_and_affected_jurisdictions",
         runsAfterClassification: true,
-        acceptedScopes: ["single"],
-        acceptedConfidence: ["high", "medium"],
-        responseValidation: "strict_scope_confidence_and_iso3_shape",
-        failurePolicy: "retain_ingest_attribution",
+        attributionVersion: PULSE_JURISDICTION_ATTRIBUTION_VERSION,
+        entityCatalogVersion: PULSE_JURISDICTION_ENTITY_VERSION,
+        aliasVersion: PULSE_JURISDICTION_ALIAS_VERSION,
+        inputContext: "human_readable_versioned_entity_candidates",
+        acceptedScopes: ["single", "multi"],
+        output:
+          "one_primary_zero_or_more_affected_with_rationales_and_evidence_refs",
+        responseValidation:
+          "strict_scope_roles_iso3_rationale_and_evidence_shape",
+        failurePolicy: "unresolved_no_automatic_publication",
+        projectionRule: "primary_only_affected_are_descriptive_not_scored",
+        legacyRule:
+          "Retained single-jurisdiction rows remain explicit legacy projections without invented historical alias/entity inputs.",
       },
       reviewSummary: {
         engine: { ...facts.reviewSummaryEngine },

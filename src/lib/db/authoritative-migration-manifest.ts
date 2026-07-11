@@ -109,4 +109,10 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "5a8d4cf62a6fbc29d5360cba7098a83239c267965e90c82771231401eb80fa36",
     baseline: false,
   },
+  {
+    id: "0018_rich_phalanx",
+    path: "drizzle/authoritative/0018_rich_phalanx.sql",
+    sha256: "707a399eedd5aed194c0812c99d50ffa61c72ccf2c74a3c0d2e897e0bbb7b80c",
+    baseline: false,
+  },
 ] as const;

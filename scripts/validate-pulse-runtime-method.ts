@@ -368,9 +368,10 @@ function validateClassifierAndReview(
     state,
     subject.includes("export function parseSubjectVerdict") &&
       subject.includes("/^[A-Z]{3}$/") &&
+      subject.includes('candidate.evidence_refs.length === 0') &&
       snapshot.providers.subject.responseValidation ===
-        "strict_scope_confidence_and_iso3_shape",
-    "Subject attribution must validate the declared scope, confidence, and ISO3 wire contract",
+        "strict_scope_roles_iso3_rationale_and_evidence_shape",
+    "Subject attribution must validate scope, roles, ISO3, rationale, and evidence references",
   );
 
   for (const [fragment, message] of [
@@ -448,6 +449,7 @@ function validateProviderRoles(
   snapshot: PulseRuntimeMethodSnapshot,
 ): void {
   const subject = relative("src/lib/pulse/v2/country-attribution.ts");
+  const entities = relative("src/lib/pulse/v2/jurisdiction-entities.ts");
   const summary = relative("src/lib/pulse/v2/summarize.ts");
   const backtest = relative("src/lib/pulse/v2/backtest.ts");
 
@@ -463,9 +465,13 @@ function validateProviderRoles(
   );
   check(
     state,
-    subject.includes('verdict.scope !== "single"') &&
-      subject.includes('verdict.confidence === "low"'),
-    "Subject attribution must accept only a single-country, non-low-confidence result",
+    subject.includes('input.verdict.scope === "unclear"') &&
+      subject.includes('input.verdict.scope === "supranational"') &&
+      subject.includes('input.verdict.scope === "multi"') &&
+      entities.includes("humanReadableJurisdictionContext") &&
+      snapshot.providers.subject.inputContext ===
+        "human_readable_versioned_entity_candidates",
+    "Subject attribution must support cross-border roles, abstain explicitly, and receive human-readable versioned entity context",
   );
   check(
     state,

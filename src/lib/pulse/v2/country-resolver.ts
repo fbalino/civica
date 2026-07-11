@@ -21,7 +21,10 @@ export type JurisdictionMap = Map<string, string>;
  * HRW, and Amnesty observed labels. Add new variants here as they
  * surface in `raw_events.raw_country_name` diagnostics.
  */
-const COUNTRY_ALIASES: Record<string, string> = {
+export const PULSE_JURISDICTION_ALIAS_VERSION =
+  "pulse-jurisdiction-aliases/v1" as const;
+
+export const COUNTRY_ALIASES: Readonly<Record<string, string>> = {
   // English variants
   "UNITED STATES OF AMERICA": "UNITED STATES",
   USA: "UNITED STATES",

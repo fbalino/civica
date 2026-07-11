@@ -1140,6 +1140,25 @@ const pulseEventsExampleResponse = zPulseEventsResponse.strict().parse({
         headline: "Court ruling narrows judicial review",
         description:
           "A high court decision curtails judicial review of executive decrees.",
+        subjectAttribution: {
+          standing: "versioned",
+          attributionVersion: "pulse-jurisdiction-attribution/v2",
+          entityCatalogVersion: "pulse-jurisdiction-entities/v1",
+          entityCatalogHash:
+            "pulse-jurisdiction-entities/sha256:3333333333333333333333333333333333333333333333333333333333333333",
+          aliasVersion: "pulse-jurisdiction-aliases/v1",
+          requestedJurisdictionRole: "primary",
+          primary: {
+            jurisdictionId: "jur-bra",
+            name: "Brazil",
+            iso3: "BRA",
+            slug: "brazil",
+            role: "primary",
+            rationale: "The ruling changes Brazil's domestic judicial review.",
+            evidenceRefs: ["headline", "description"],
+          },
+          affected: [],
+        },
         publicationOrigin: "auto",
         versionIdentity: {
           classification: pulseVersionIdentityExample("classify"),

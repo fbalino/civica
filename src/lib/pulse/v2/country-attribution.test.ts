@@ -1,66 +1,110 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { parseSubjectVerdict } from "./country-attribution";
+import {
+  parseSubjectVerdict,
+  resolveSubjectVerdict,
+  subjectAttributionDecisionPayload,
+} from "./country-attribution";
+import { buildJurisdictionEntityCatalog } from "./jurisdiction-entities";
 
-const VALID_SINGLE = {
-  iso3: "USA",
-  country: "United States",
+const catalog = buildJurisdictionEntityCatalog([
+  { id: "jur-us", name: "United States", iso2: "US", iso3: "USA", slug: "united-states" },
+  { id: "jur-ca", name: "Canada", iso2: "CA", iso3: "CAN", slug: "canada" },
+]);
+
+const SINGLE = {
   scope: "single",
-  confidence: "high",
-  reasoning: "The event concerns United States institutions.",
+  primary_iso3: "USA",
+  attributions: [
+    {
+      iso3: "USA",
+      role: "primary",
+      rationale: "The event changes United States institutions.",
+      evidence_refs: ["headline"],
+    },
+  ],
+  reasoning: "The United States is the central domestic subject.",
 };
 
-test("subject verdict parser accepts only the declared scope and confidence enums", () => {
-  assert.deepEqual(parseSubjectVerdict(JSON.stringify(VALID_SINGLE)), VALID_SINGLE);
-
-  for (const [field, value] of [
-    ["scope", "domestic"],
-    ["scope", undefined],
-    ["confidence", "certain"],
-    ["confidence", undefined],
-  ] as const) {
-    const payload = { ...VALID_SINGLE } as Record<string, unknown>;
-    if (value === undefined) delete payload[field];
-    else payload[field] = value;
-    assert.equal(
-      parseSubjectVerdict(JSON.stringify(payload)),
-      null,
-      `accepted invalid ${field}`,
-    );
-  }
-});
-
-test("subject verdict parser rejects non-object JSON", () => {
-  for (const text of ["null", "[]", '"USA"']) {
-    assert.equal(parseSubjectVerdict(text), null);
-  }
-});
-
-test("single-country verdict requires an exact uppercase ISO3 code", () => {
-  for (const iso3 of [null, "US", "USAA", "usa", "U1A", undefined]) {
-    const payload = { ...VALID_SINGLE } as Record<string, unknown>;
-    if (iso3 === undefined) delete payload.iso3;
-    else payload.iso3 = iso3;
-    assert.equal(
-      parseSubjectVerdict(JSON.stringify(payload)),
-      null,
-      `accepted invalid ISO3 ${String(iso3)}`,
-    );
-  }
-});
-
-test("non-single verdicts require null ISO3 and retain valid confidence", () => {
-  const multi = {
-    iso3: null,
-    country: null,
-    scope: "multi",
-    confidence: "medium",
-    reasoning: "No single country is primary.",
-  };
-  assert.deepEqual(parseSubjectVerdict(JSON.stringify(multi)), multi);
+test("single-country verdict requires one matching primary and evidence", () => {
+  const parsed = parseSubjectVerdict(JSON.stringify(SINGLE));
+  assert.equal(parsed?.primaryIso3, "USA");
+  assert.equal(parsed?.attributions[0].role, "primary");
   assert.equal(
-    parseSubjectVerdict(JSON.stringify({ ...multi, iso3: "USA" })),
+    parseSubjectVerdict(
+      JSON.stringify({ ...SINGLE, attributions: [{ ...SINGLE.attributions[0], evidence_refs: [] }] }),
+    ),
+    null,
+  );
+});
+
+test("cross-border verdict retains one primary and affected jurisdictions", () => {
+  const parsed = parseSubjectVerdict(
+    JSON.stringify({
+      scope: "multi",
+      primary_iso3: "USA",
+      attributions: [
+        ...SINGLE.attributions,
+        {
+          iso3: "CAN",
+          role: "affected",
+          rationale: "The same measure applies to Canadian institutions.",
+          evidence_refs: ["description"],
+        },
+      ],
+      reasoning: "A United States measure materially affects Canada.",
+    }),
+  );
+  assert.ok(parsed);
+  const resolved = resolveSubjectVerdict({
+    verdict: parsed,
+    catalog,
+    promptContext: "United States (USA); Canada (CAN)",
+  });
+  assert.equal(resolved.status, "multiple");
+  assert.equal(resolved.primaryJurisdictionId, "jur-us");
+  assert.deepEqual(
+    resolved.attributions.map((row) => [row.entity.iso3, row.role]),
+    [["USA", "primary"], ["CAN", "affected"]],
+  );
+  const payload = subjectAttributionDecisionPayload(resolved);
+  assert.equal(payload.status, "multiple");
+  assert.deepEqual(payload.affectedJurisdictionIds, ["jur-us", "jur-ca"]);
+  assert.equal(payload.attributions?.[1].rationale, "The same measure applies to Canadian institutions.");
+});
+
+test("unresolved and supranational verdicts abstain without a provisional projection", () => {
+  for (const scope of ["unclear", "supranational"] as const) {
+    const parsed = parseSubjectVerdict(
+      JSON.stringify({ scope, primary_iso3: null, attributions: [], reasoning: "No domestic primary." }),
+    );
+    assert.ok(parsed);
+    assert.equal(
+      resolveSubjectVerdict({ verdict: parsed, catalog, promptContext: "none" })
+        .primaryJurisdictionId,
+      null,
+    );
+  }
+});
+
+test("unknown ISO3 and malformed multi-country outputs fail closed", () => {
+  const unknown = parseSubjectVerdict(
+    JSON.stringify({
+      ...SINGLE,
+      primary_iso3: "ZZZ",
+      attributions: [{ ...SINGLE.attributions[0], iso3: "ZZZ" }],
+    }),
+  );
+  assert.ok(unknown);
+  assert.equal(
+    resolveSubjectVerdict({ verdict: unknown, catalog, promptContext: "none" }).status,
+    "unresolved",
+  );
+  assert.equal(
+    parseSubjectVerdict(
+      JSON.stringify({ ...SINGLE, scope: "multi" }),
+    ),
     null,
   );
 });

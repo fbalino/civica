@@ -74,6 +74,7 @@ import {
 } from "./classifier-prompt";
 import {
   resolveSubjectJurisdiction,
+  subjectAttributionDecisionPayload,
   SUBJECT_ATTRIBUTION_MODEL,
   SUBJECT_ATTRIBUTION_PROVIDER,
 } from "./country-attribution";
@@ -197,7 +198,14 @@ export interface ClassifyClustersOptions {
   dryRun?: boolean;
   clusters?: ClusterToClassify[];
   classify?: (cluster: ClusterToClassify) => Promise<ClassifierResult>;
-  resolveSubject?: typeof resolveSubjectJurisdiction;
+  resolveSubject?: (
+    db: Db,
+    headline: string,
+    description: string,
+    provisionalJurisdictionId?: string | null,
+  ) => Promise<
+    Awaited<ReturnType<typeof resolveSubjectJurisdiction>> | null
+  >;
   write?: typeof writeEvent;
   runRef?: PulsePipelineRunRef;
   failOnError?: boolean;
@@ -317,9 +325,14 @@ export async function classifyClusters(
         db,
         ok.classified.headline,
         ok.classified.description,
+        cluster.jurisdictionId,
       );
       ok.subjectAttribution = subject;
-      if (subject) ok.classified.jurisdictionId = subject.jurisdictionId;
+      if (subject?.primaryJurisdictionId) {
+        ok.classified.jurisdictionId = subject.primaryJurisdictionId;
+      } else {
+        ok.autoPublished = false;
+      }
       summary.planned.push({
         clusterId: cluster.clusterId,
         jurisdictionId: ok.classified.jurisdictionId,
@@ -369,7 +382,9 @@ export interface ClassifyOneResult {
   classified: ClassifiedEvent;
   autoPublished: boolean;
   verification: VerifyResultLite | null;
-  subjectAttribution?: Awaited<ReturnType<typeof resolveSubjectJurisdiction>>;
+  subjectAttribution?:
+    | Awaited<ReturnType<typeof resolveSubjectJurisdiction>>
+    | null;
 }
 
 async function classifyOne(
@@ -951,18 +966,7 @@ function payloadForDecisionKind(
 ): PulseDecisionPayloads[typeof kind] {
   if (kind === "event_existence") return { disposition: "event" };
   if (kind === "subject_attribution") {
-    const subject = result.subjectAttribution;
-    return subject
-      ? {
-          status: "single",
-          primaryJurisdictionId: subject.jurisdictionId,
-          affectedJurisdictionIds: [subject.jurisdictionId],
-        }
-      : {
-          status: "unresolved",
-          primaryJurisdictionId: null,
-          affectedJurisdictionIds: [],
-        };
+    return subjectAttributionDecisionPayload(result.subjectAttribution);
   }
   if (kind === "category_labels") {
     return {
@@ -1067,7 +1071,9 @@ export function classificationDecisionInputs(input: {
       clusterId: cluster.clusterId,
       eventId,
       kind: "subject_attribution",
-      verdict: result.subjectAttribution ? "affirmed" : "unresolved",
+      verdict: result.subjectAttribution?.primaryJurisdictionId
+        ? "affirmed"
+        : "unresolved",
       payload: payloadForDecisionKind("subject_attribution", result),
       actor: {
         type: "subject_attributor",
@@ -1078,7 +1084,7 @@ export function classificationDecisionInputs(input: {
       stageRunId: runId,
       methodVersion: PULSE_RUNTIME_METHOD_VERSION,
       rationale:
-        result.subjectAttribution?.verdict.reasoning ??
+        result.subjectAttribution?.rationale ??
         "Subject-country pass did not resolve a supported single jurisdiction; the provisional projection was retained.",
       evidenceRefs,
       decidedAt,
@@ -1092,9 +1098,10 @@ export function classificationDecisionInputs(input: {
         eligible: result.autoPublished,
         origin: result.autoPublished ? "auto" : "queued",
         gateReasons: [
-          result.autoPublished
-            ? "automatic_gate_passed"
-            : "human_review_required",
+          ...(result.autoPublished ? ["automatic_gate_passed"] : ["human_review_required"]),
+          ...(!result.subjectAttribution?.primaryJurisdictionId
+            ? ["subject_attribution_unresolved"]
+            : []),
         ],
       },
       actor: {

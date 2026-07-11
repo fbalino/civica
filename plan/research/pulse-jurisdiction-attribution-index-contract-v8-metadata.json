@@ -1,0 +1,37 @@
+{
+  "id": "pulse-jurisdiction-attribution-contract",
+  "toVersion": "civica-index-api-contract-pulse-jurisdiction-attribution-v8",
+  "evidence": {
+    "documentation": [
+      "content/methodology-pulse.md",
+      "plan/research/pulse-jurisdiction-attribution-v2.md"
+    ],
+    "registry": ["src/lib/claims/public-claims.ts"],
+    "release_note": [
+      "plan/research/pulse-jurisdiction-attribution-index-contract-v8-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/research/pulse-jurisdiction-attribution-index-contract-v8-migration.md"
+    ],
+    "golden_test": [
+      "src/lib/pulse/v2/country-attribution.test.ts",
+      "src/lib/pulse/v2/jurisdiction-entities.test.ts"
+    ],
+    "contract_test": [
+      "src/lib/pulse/v2/runtime-method.test.ts",
+      "src/lib/api/contract/__tests__/contract.test.ts"
+    ]
+  },
+  "validations": [
+    "validate:ci-current-release",
+    "validate:ci-release-selection",
+    "validate:ci-series-provenance",
+    "validate:ci-research-panel",
+    "validate:index-research-archive",
+    "validate:index-quarantine",
+    "validate:claims-docs",
+    "validate:index-disposition",
+    "validate:governance-evidence-review-packet",
+    "validate:index-pulse-jurisdiction-attribution"
+  ]
+}
