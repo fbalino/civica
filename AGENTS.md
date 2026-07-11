@@ -54,7 +54,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 <!-- END:nextjs-agent-rules -->
 
 ## Database
-- Schema: `src/lib/db/schema.ts` — **49 tables** across government structure, factbook, Civica Index scoring, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **50 tables** across government structure, factbook, Civica Index scoring, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)
@@ -117,6 +117,21 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   into a claim about all database rows or facts; DAT-005 owns that later
   dataset-wide metric. Run `npm run validate:provenance-claims` after changing
   public provenance copy or those four compact surfaces.
+
+## Research evidence retention
+
+- `research-evidence-retention/v1` protects 29 evidence-bearing relations with
+  synchronous UPDATE/DELETE history triggers. The ledger is append-only and
+  records complete before/after state, reason, actor, operation, and time.
+- Pulse negative classifications remain in `raw_events` with a terminal
+  disposition. Query `pulse_evaluation_evidence` and
+  `reconciliation_evaluation_evidence` for internal error studies; neither view
+  changes the underlying source rights.
+- Run `npm run validate:research-evidence-retention` after changing protected
+  writers or schema, and the `:live` variant after applying its migration.
+- The contract begins at migration `0024`; never imply that it reconstructed
+  evidence deleted before that point. Full policy:
+  `data/RESEARCH-EVIDENCE-RETENTION.md`.
 
 ## Core environment variables
 The complete, authoritative contract (every var, required/optional, and why) is

@@ -366,3 +366,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Seven focused end-to-end fixtures, 607/607 repository tests, TypeScript,
   ESLint, claims/docs, the production build, and clean browser checks pass.
   Work is paused at the owner's request; DAT-016 has not started.
+
+## 2026-07-10 — DAT-016 research evidence retention completed
+
+- Applied migration `0024`: 29 evidence-bearing relations now write complete
+  UPDATE/DELETE history before mutation, and the history ledger is append-only.
+- Pulse classifier negatives remain in `raw_events`; source and reviewer audit
+  rows cannot cascade away. Internal Pulse and reconciliation views expose 14
+  and 36 current evaluation records respectively.
+- Seven focused fixtures, 614/614 tests, TypeScript, ESLint, live migration and
+  query checks, documentation, claims, and the production build pass. DAT-017
+  is next.

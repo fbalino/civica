@@ -842,6 +842,38 @@ export const dataFactsAuditLog = pgTable(
   ]
 );
 
+/**
+ * DAT-016 append-only row history for research and reference evidence.
+ * Database triggers write the complete pre-mutation row for every UPDATE or
+ * DELETE on the closed protected-table registry. Application code may query
+ * this ledger but may never update or delete it.
+ */
+export const researchEvidenceHistory = pgTable(
+  "research_evidence_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    entityTable: text("entity_table").notNull(),
+    entityId: text("entity_id").notNull(),
+    operation: text("operation").notNull(),
+    before: jsonb("before").notNull(),
+    after: jsonb("after"),
+    reason: text("reason").notNull(),
+    actorId: text("actor_id").notNull(),
+    recordedAt: timestamp("recorded_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_research_evidence_entity").on(
+      table.entityTable,
+      table.entityId,
+      table.recordedAt,
+    ),
+    index("idx_research_evidence_operation").on(
+      table.operation,
+      table.recordedAt,
+    ),
+  ],
+);
+
 export const statements = pgTable("statements", {
   id: uuid("id").primaryKey().defaultRandom(),
   subjectTable: text("subject_table").notNull(),
@@ -1558,7 +1590,9 @@ export const advisoryApplications = pgTable("advisory_applications", {
  * One row per source-record. Drained by the clustering step which
  * groups near-duplicate records into governance-event clusters.
  *
- * Rows are retained for 7 days post-clustering then garbage-collected.
+ * DAT-016 retains examined rows and their terminal classifier disposition for
+ * false-positive/false-negative evaluation. Pending rows remain classifiable;
+ * terminal rows leave the queue but are not deleted.
  */
 export const rawEvents = pgTable(
   "raw_events",
@@ -1588,6 +1622,14 @@ export const rawEvents = pgTable(
     /** Set when row joins a cluster; null until then */
     clusterId: uuid("cluster_id"),
     clusteredAt: timestamp("clustered_at"),
+    /** pending | event | non_governance | invalid. Rejected classifier input
+     * remains queryable for prospective false-negative studies. */
+    classificationDisposition: text("classification_disposition")
+      .notNull()
+      .default("pending"),
+    classificationReason: text("classification_reason"),
+    classificationDecision: jsonb("classification_decision"),
+    classifiedAt: timestamp("classified_at"),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
@@ -1700,7 +1742,7 @@ export const pulseSources = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     eventId: uuid("event_id")
-      .references(() => pulseEventsV2.id, { onDelete: "cascade" })
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
       .notNull(),
     sourceId: text("source_id")
       .references(() => sources.id)
@@ -1773,7 +1815,7 @@ export const pulseReviewAuditLog = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     eventId: uuid("event_id")
-      .references(() => pulseEventsV2.id, { onDelete: "cascade" })
+      .references(() => pulseEventsV2.id, { onDelete: "restrict" })
       .notNull(),
     /** Operator name supplied at sign-in. Initially the user types
      *  their own name; multi-operator support comes later. */

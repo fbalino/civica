@@ -705,3 +705,13 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Keep storage, public APIs, shared rendering, indicator grouping, and future
   exports on the same contract. Rights-based withholding takes public
   precedence. Durable record: APR-D048 in `plan/DECISIONS.md`.
+
+## 2026-07-10 — Research evidence history is database-enforced
+
+- `research-evidence-retention/v1` protects the closed 29-relation registry
+  with synchronous UPDATE/DELETE triggers. The history ledger is append-only.
+- Retain full before/after state, operation, reason, actor, and time. Pulse
+  negative decisions remain queryable and only pending rows re-enter the queue.
+- Rate-limit counters are the sole deletion exemption. The contract starts at
+  migration `0024`; do not imply that earlier deleted evidence was recovered.
+  Durable record: APR-D049 in `plan/DECISIONS.md`.

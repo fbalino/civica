@@ -5,9 +5,9 @@
     "name": "Civica Academic Publication Readiness",
     "root": "/Users/fernandobalino/Projects/civica",
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
-    "status": "paused",
+    "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "paused_after_DAT-015_owner_requested"
+    "current_task": "DAT-017_versioned_rights_filtered_atlas_export"
   },
   "budget": {
     "mode": "subscription_only",
@@ -619,6 +619,9 @@
     "plan/evidence/DAT-014/README.md",
     "plan/evidence/DAT-015/README.md",
     "drizzle/migrations/0023_data_value_states.sql",
+    "plan/evidence/DAT-016/README.md",
+    "drizzle/migrations/0024_research_evidence_retention.sql",
+    "data/RESEARCH-EVIDENCE-RETENTION.md",
     "data/release-quality-report.v1.json",
     "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json",
     "data/schema-data-dictionary.v1.json",
@@ -639,11 +642,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for DAT-015: value-state, API, migration/preflight, dictionary, source/freshness, release/version, claims/documentation, compilation, TypeScript, static generation, and route-generation gates succeeded with 607 tests.",
-    "tests": "607/607 tests passed. Seven DAT-015 fixtures cover every storage shape, zero/blank rejection, country API precedence, indicator grouping, future exports, shared rendering, and constraints on all three tables. The live validator found zero invalid combinations after migration. Master plan is 34/288 complete (11.8%).",
-    "public_claims": "API documentation now publishes the seven-state availability contract and its zero/null boundary. The country API exposes explicit status metadata; the Index and Pulse remain secondary experiments.",
-    "browser": "The design-system availability gallery, API documentation, and France Civica Data page rendered locally. A clean browser tab reported zero console errors or warnings on the reader and documentation pages.",
-    "visual_review": "All seven value states render distinctly through the shared DataValueState component and canonical Chip variants."
+    "build": "npm run build passed for DAT-016: retention, migration/preflight, data dictionary, Pulse runtime, source/adapter, release/version, claims/documentation, compilation, TypeScript, static generation, and route-generation gates succeeded with 614 tests.",
+    "tests": "614/614 tests passed. Seven DAT-016 fixtures cover protected-relation closure, append-only enforcement, actor/reason/time fields, cascade prevention, Pulse negative retention, both evaluation views, and the sole ephemeral deletion exemption. Master plan is 35/288 complete (12.2%).",
+    "public_claims": "No reader-facing empirical claim changed. The internal policy explicitly discloses that retention starts at migration 0024 and cannot reconstruct earlier deletions.",
+    "browser": "Not required for DAT-016 because no reader UI or rendered design-system behavior changed.",
+    "visual_review": "Not applicable; DAT-016 changed database retention, internal query surfaces, and operational documentation only."
   },
-  "updated_at": "2026-07-11T01:37:52Z"
+  "updated_at": "2026-07-11T02:35:00Z"
 }

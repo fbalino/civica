@@ -22,7 +22,7 @@ import { config } from "dotenv";
 config({ path: ".env.local", override: true });
 
 import { readFile } from "node:fs/promises";
-import { sql, and, inArray } from "drizzle-orm";
+import { sql, eq } from "drizzle-orm";
 import { rawEvents } from "../src/lib/db/schema";
 import { createDb } from "../src/lib/pulse/v2/ingest";
 import {
@@ -75,6 +75,22 @@ async function main() {
     skipped = 0,
     invalid = 0;
 
+  async function retainDisposition(
+    decision: Decision,
+    disposition: "event" | "non_governance" | "invalid",
+    reason: string,
+  ) {
+    await db
+      .update(rawEvents)
+      .set({
+        classificationDisposition: disposition,
+        classificationReason: reason,
+        classificationDecision: decision,
+        classifiedAt: new Date(),
+      })
+      .where(eq(rawEvents.clusterId, decision.clusterId));
+  }
+
   for (const d of decisions) {
     const cluster = byId.get(d.clusterId);
     if (!cluster) {
@@ -82,12 +98,22 @@ async function main() {
       continue;
     }
     if (!d.isGovernanceEvent || d.category === "none") {
+      await retainDisposition(
+        d,
+        "non_governance",
+        "classifier determined that the cluster was not a governance event",
+      );
       skipped++;
       continue;
     }
     const cat = EVENT_CATEGORY_INDEX[d.category];
     if (!cat || !cat.allowedTiers.includes(d.severityTier)) {
       console.warn(`  ! invalid category/tier for cluster ${d.clusterId}: ${d.category}/${d.severityTier}`);
+      await retainDisposition(
+        d,
+        "invalid",
+        `invalid category/tier: ${d.category}/${d.severityTier}`,
+      );
       invalid++;
       continue;
     }
@@ -156,23 +182,10 @@ async function main() {
     `  scoring: ${score.eventsConsidered} events × ${score.countriesScored} countries → ${score.significantDeltas} significant deltas`
   );
 
-  // Self-clean: drop staging rows for examined clusters that produced no
-  // event (non-governance / dropped), so the daily routine doesn't keep
-  // re-classifying the same noise. Written events keep their raw_events
-  // (they are referenced by pulse_sources, which the NOT EXISTS guards).
-  const examinedIds = Array.from(new Set(decisions.map((d) => d.clusterId)));
-  if (examinedIds.length) {
-    const cleaned = await db
-      .delete(rawEvents)
-      .where(
-        and(
-          inArray(rawEvents.clusterId, examinedIds),
-          sql`NOT EXISTS (SELECT 1 FROM pulse_sources ps WHERE ps.raw_event_id = ${rawEvents.id})`
-        )
-      )
-      .returning({ id: rawEvents.id });
-    console.log(`  cleaned ${cleaned.length} dropped staging cluster row(s).`);
-  }
+  // DAT-016: examined non-events stay in raw_events with their decision and
+  // reason. They are excluded from the unclassified queue by disposition and
+  // remain available for prospective false-negative studies.
+  console.log(`  retained ${skipped + invalid} rejected/invalid cluster decision(s) for evaluation.`);
   console.log("DONE.");
   process.exit(0);
 }

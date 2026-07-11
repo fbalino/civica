@@ -18,7 +18,8 @@ Every ID below resolves to the checked forward artifact and policy metadata in
 0015_contact_messages_status · 0016_indicator_history · 0017_party_positions ·
 0018_data_vintage_year · 0019_growth_methodology ·
 0020_jurisdiction_status_taxonomy · 0021_derivation_version_envelopes ·
-0022_pulse_event_idempotency · 0023_data_value_states
+0022_pulse_event_idempotency · 0023_data_value_states ·
+0024_research_evidence_retention
 
 ## Operational data changes
 

@@ -49,8 +49,9 @@ export function rawEventInputErrors(row: RawEventInput): string[] {
 /**
  * Insert raw events into the staging table. Existing rows (matched by
  * externalId where present) are left alone — we treat the staging table
- * as append-only to keep the embedding + clustering work cheap. The
- * cleanup script drops rows older than 7 days post-clustering.
+ * as append-only to keep the embedding + clustering work cheap. DAT-016 keeps
+ * examined rows with an explicit terminal disposition instead of deleting
+ * negative classifier evidence.
  */
 export async function upsertRawEvents(
   db: Db,

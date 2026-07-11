@@ -18,7 +18,7 @@ Create an exhaustive, repository-grounded master plan that makes Civica Atlas th
 - Brand assets: Civica Atlas identity and engraving corpus under `public/`; canonical design language in `DESIGN.md` and `/design-system`
 - Copy/content: Reader prose under `content/*.md`; methodology pages, Record articles, licensing, citation metadata, API docs, and advisory-board content in the repository
 - Reference sites: Current production site at `https://civicaatlas.org`; primary methodological peers and source institutions documented in the master plan
-- Existing code/project: Next.js 16.2, React 19.2, Neon/Postgres, Drizzle, 49-table schema, substantial ingestion/reconciliation/Index/Pulse pipelines, tests, APIs, embeds, cron jobs, and admin review tools
+- Existing code/project: Next.js 16.2, React 19.2, Neon/Postgres, Drizzle, 50-table schema, substantial ingestion/reconciliation/Index/Pulse pipelines, tests, APIs, embeds, cron jobs, and admin review tools
 - Existing MCP-dependent workflows: Claude Code subscription worker for a bounded Fable Index design-space study; Codex subagents for blind read-only audit lanes; browser QA for later execution
 
 ## Constraints

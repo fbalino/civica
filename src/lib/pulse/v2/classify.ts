@@ -235,12 +235,13 @@ export async function classifyClusters(
       }
       if ("category" in result && result.category === "none") {
         summary.noneCategory++;
-        // A cluster_examined_at table would let us mark "none" clusters as
-        // examined so they aren't re-tried, but it's out of scope here. The
-        // loadUnclassified query excludes clusters that already have a
-        // pulse_events_v2 row, so re-runs retry "none" clusters — fine
-        // because a dropped cluster costs only the single classify call
-        // (the verify + subject-attribution calls never fire for "none").
+        if (!opts.dryRun) {
+          await markClusterDisposition(db, cluster.clusterId, {
+            disposition: "non_governance",
+            reason: "classifier returned category none",
+            decision: result,
+          });
+        }
         continue;
       }
       // Narrowed: result is ClassifyOneResult here
@@ -728,6 +729,7 @@ export async function loadUnclassifiedClusters(
     FROM raw_events r
     WHERE r.cluster_id IS NOT NULL
       AND r.jurisdiction_id IS NOT NULL
+      AND r.classification_disposition = 'pending'
       AND NOT EXISTS (
         SELECT 1 FROM pulse_sources ps
         WHERE ps.raw_event_id = r.id
@@ -860,10 +862,38 @@ export async function writeEvent(
       .onConflictDoNothing();
   }
 
+  await markClusterDisposition(db, cluster.clusterId, {
+    disposition: "event",
+    reason: "classification admitted as a Pulse event",
+    decision: result.classified,
+  });
+
   // NOTE: freshness is stamped ONLY at ingest time (upsert.ts), gated on
   // rows actually written. The classifier pass performs no upstream fetch,
   // so it must NOT advance sources.last_sync_at — doing so overstates how
   // fresh the underlying source data is (a load-bearing provenance signal).
+}
+
+export async function markClusterDisposition(
+  db: Db,
+  clusterId: string,
+  input: {
+    disposition: "event" | "non_governance" | "invalid";
+    reason: string;
+    decision: unknown;
+  },
+): Promise<number> {
+  const rows = await db
+    .update(rawEvents)
+    .set({
+      classificationDisposition: input.disposition,
+      classificationReason: input.reason,
+      classificationDecision: input.decision,
+      classifiedAt: new Date(),
+    })
+    .where(eq(rawEvents.clusterId, clusterId))
+    .returning({ id: rawEvents.id });
+  return rows.length;
 }
 
 // Suppress unused imports the build doesn't strip:

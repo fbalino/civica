@@ -348,7 +348,7 @@ const CLM_011_RECONCILED_CONCEPTS: DocConcept[] = [
         path: "AGENTS.md",
         symbol: "## Database",
         relationship: "contract-test",
-        note: "States a specific table count ('49 tables') in prose, independently authored (not generated/imported). scripts/validate-doc-references.ts asserts this literal equals the live pgTable(...) declaration count in schema.ts and fails the build on drift.",
+        note: "States a specific table count ('50 tables') in prose, independently authored (not generated/imported). scripts/validate-doc-references.ts asserts this literal equals the live pgTable(...) declaration count in schema.ts and fails the build on drift.",
       },
     ],
   },
