@@ -28,6 +28,9 @@ export const CORS_HEADERS = {
  */
 export const CI_METHODOLOGY_META = Object.freeze({
   status: civicaIndex.status,
+  standing: "secondary_research_experiment" as const,
+  independent_validation: false as const,
+  atlas_dependency: false as const,
   last_revised: civicaIndex.lastRevisionIso,
   reference: "https://civicaatlas.org/civica-index/methodology",
   presentation: Object.freeze({

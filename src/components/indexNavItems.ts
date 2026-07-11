@@ -18,7 +18,7 @@ export type IndexNavItem = {
  * for non-methodology Index sub-pages only.
  */
 export const INDEX_NAV_ITEMS: IndexNavItem[] = [
-  { href: "/civica-index", label: "Overview", descriptor: "Index home" },
+  { href: "/civica-index", label: "Overview", descriptor: "Research-beta home" },
   {
     href: "/civica-index/government-types",
     label: "Government Types",
@@ -32,7 +32,7 @@ export const INDEX_NAV_ITEMS: IndexNavItem[] = [
   {
     href: "/civica-index/replication",
     label: "Replication",
-    descriptor: "Academic use",
+    descriptor: "Replication status",
   },
   { href: "/civica-index/widget", label: "Widgets", descriptor: "Embeds" },
   {

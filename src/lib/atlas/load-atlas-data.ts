@@ -829,6 +829,10 @@ async function _loadAtlasLayerData(): Promise<Record<string, AtlasLayerValues>> 
     return entry;
   };
 
+  // Every Atlas jurisdiction exists independently of optional research layers.
+  // Missing Index, regime, or income observations remain explicit nulls.
+  for (const jurisdiction of juris) ensure(jurisdiction.iso3!.toLowerCase());
+
   const factRows = await db
     .select({
       jurisdictionId: countryFacts.jurisdictionId,

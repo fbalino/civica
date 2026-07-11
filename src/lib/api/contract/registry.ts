@@ -241,7 +241,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/[country_slug]/history/route.ts",
     versioned: true,
     summary:
-      "Quarter-by-quarter Civica Index composite history for one country (beta methodology): quarter, score, rank, totalRanked, isPartial.",
+      "Quarter-by-quarter research-beta Civica Index composite history for one country: quarter, score, rank, totalRanked, isPartial.",
     params: [
       {
         name: ":country_slug",
@@ -265,7 +265,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/by-government-type/route.ts",
     versioned: true,
     summary:
-      "Civica Index score distribution (count, avg/min/max/median, quartiles) grouped by government-type bucket, for the requested or latest quarter.",
+      "Research-beta Civica Index score distribution (count, avg/min/max/median, quartiles) grouped by government-type bucket, for the requested or latest quarter.",
     params: [
       {
         name: "quarter",
@@ -302,7 +302,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/compare/route.ts",
     versioned: true,
     summary:
-      "Compares up to 10 countries on the Civica Index for a given quarter.",
+      "Compares up to 10 countries on the research-beta Civica Index for a given quarter.",
     params: [
       {
         name: "slug",
@@ -334,7 +334,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/methodology/route.ts",
     versioned: true,
     summary:
-      "Published Civica Index methodology version record (weights, notes, publish date). Defaults to the latest version.",
+      "Published research-beta Civica Index methodology version record (weights, notes, publish date). Defaults to the latest version.",
     params: [
       {
         name: "version",
@@ -359,7 +359,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/rankings/route.ts",
     versioned: true,
     summary:
-      "Civica Index rankings for the latest available quarter, or a requested quarter. Pulse is not available as a scalar ranking.",
+      "Research-beta Civica Index rankings for the latest available quarter, or a requested quarter. Pulse is not available as a scalar ranking.",
     params: [
       {
         name: "quarter",

@@ -380,6 +380,9 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
   meta: {
     methodology: {
       status: "beta",
+      standing: "secondary_research_experiment",
+      independent_validation: false,
+      atlas_dependency: false,
       last_revised: "2026-07-01",
       reference: "https://civicaatlas.org/civica-index/methodology",
       presentation: {
@@ -433,6 +436,9 @@ const indexHistoryExampleResponse = zIndexHistoryResponse.strict().parse({
   meta: {
     methodology: {
       status: "beta",
+      standing: "secondary_research_experiment",
+      independent_validation: false,
+      atlas_dependency: false,
       last_revised: "2026-07-01",
       reference: "https://civicaatlas.org/civica-index/methodology",
       presentation: {
@@ -566,6 +572,9 @@ const indexCompareExampleResponse = zIndexCompareResponse.parse({
     count: 2,
     methodology: {
       status: "beta",
+      standing: "secondary_research_experiment",
+      independent_validation: false,
+      atlas_dependency: false,
       last_revised: "2026-07-01",
       reference: "https://civicaatlas.org/civica-index/methodology",
       presentation: {
@@ -618,6 +627,9 @@ const indexMethodologyExampleResponse = zIndexMethodologyResponse
     meta: {
       methodology: {
         status: "beta",
+        standing: "secondary_research_experiment",
+        independent_validation: false,
+        atlas_dependency: false,
         last_revised: "2026-07-01",
         reference: "https://civicaatlas.org/civica-index/methodology",
         presentation: {

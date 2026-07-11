@@ -252,6 +252,9 @@ export const zDeprecationHeaders = z
 export const zCiMethodologyMeta = z
   .object({
     status: z.string(),
+    standing: z.literal("secondary_research_experiment"),
+    independent_validation: z.literal(false),
+    atlas_dependency: z.literal(false),
     last_revised: z.string(),
     reference: z.literal("https://civicaatlas.org/civica-index/methodology"),
     presentation: z

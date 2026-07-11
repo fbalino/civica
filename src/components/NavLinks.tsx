@@ -173,14 +173,14 @@ export function NavLinks() {
           }`}
           style={{ textDecoration: "none" }}
         >
-          Index
+          Index · Beta
           <ChevronDown
             className="nav-dropdown-chevron"
             aria-hidden="true"
             focusable="false"
           />
         </Link>
-        <div className="nav-dropdown-menu" aria-label="Index sections">
+        <div className="nav-dropdown-menu" aria-label="Research-beta Index sections">
           {INDEX_NAV_ITEMS.map((item) => (
             <Link
               key={item.href}
