@@ -1,0 +1,167 @@
+{
+  "schemaVersion": "civica-index-validity-result/v1",
+  "releaseId": "index-validity-analysis-v1",
+  "protocolVersion": "civica-index-validity-preregistration/v1",
+  "protocol": {
+    "panelReleaseId": "ci-research-panel-2000-2024-v3",
+    "k1Method": "k1-current-composite-tournament/v1",
+    "k2Method": "k2-measurement-concordance/v1",
+    "externalConstruct": "undp_hdi:hdi",
+    "externalConstructRole": "human-development correlate that is related to governance levels but not a governance-quality criterion",
+    "period": "2012-2023 common complete coverage"
+  },
+  "panelReleaseId": "ci-research-panel-2000-2024-v3",
+  "hypotheses": [
+    {
+      "id": "H1",
+      "n": 191,
+      "estimate": 0.6668506608104687,
+      "interval": {
+        "iterationsRequested": 2000,
+        "iterationsValid": 2000,
+        "lower95": 0.5736577733830952,
+        "upper95": 0.7468307564211264,
+        "bootstrapSha256": "37577aef80d1065e8f984b06d256524a5cd5fd26af5e7a11014dd04de460ad4c"
+      },
+      "pass": true
+    },
+    {
+      "id": "H2",
+      "n": 2281,
+      "estimate": 0.6578836132491834,
+      "interval": {
+        "iterationsRequested": 2000,
+        "iterationsValid": 2000,
+        "lower95": 0.5537700965404939,
+        "upper95": 0.7419513242153875,
+        "bootstrapSha256": "5606db947e5a09fd044cf071bfc6e5f6367cb94c7bc47d8fdaf2e47b866440ba"
+      },
+      "annual": [
+        {
+          "year": 2012,
+          "n": 190,
+          "rho": 0.6631135466849457
+        },
+        {
+          "year": 2013,
+          "n": 190,
+          "rho": 0.670604849100162
+        },
+        {
+          "year": 2014,
+          "n": 190,
+          "rho": 0.658311985672313
+        },
+        {
+          "year": 2015,
+          "n": 190,
+          "rho": 0.6580716825082926
+        },
+        {
+          "year": 2016,
+          "n": 190,
+          "rho": 0.6575393900486187
+        },
+        {
+          "year": 2017,
+          "n": 190,
+          "rho": 0.6460308695685728
+        },
+        {
+          "year": 2018,
+          "n": 190,
+          "rho": 0.6479561472736294
+        },
+        {
+          "year": 2019,
+          "n": 190,
+          "rho": 0.6468198934236957
+        },
+        {
+          "year": 2020,
+          "n": 190,
+          "rho": 0.658573714768994
+        },
+        {
+          "year": 2021,
+          "n": 190,
+          "rho": 0.6576955439900742
+        },
+        {
+          "year": 2022,
+          "n": 190,
+          "rho": 0.6568988196849398
+        },
+        {
+          "year": 2023,
+          "n": 191,
+          "rho": 0.6642139429445867
+        }
+      ],
+      "pass": true
+    },
+    {
+      "id": "H3",
+      "n": 2089,
+      "estimate": 0.018618473897296674,
+      "interval": {
+        "iterationsRequested": 2000,
+        "iterationsValid": 2000,
+        "lower95": -0.027206996223109226,
+        "upper95": 0.06400265587591958,
+        "bootstrapSha256": "96ef7344b8c6c0535ef5bcedc18776f5e92db707ac31ca1bd605d1467fbf7553"
+      },
+      "pass": true
+    },
+    {
+      "id": "H4",
+      "n": 2041,
+      "estimate": -0.07825662031162206,
+      "interval": {
+        "iterationsRequested": 2000,
+        "iterationsValid": 2000,
+        "lower95": -0.1860304374502715,
+        "upper95": 0.0360522494019674,
+        "bootstrapSha256": "630a15a3447f99233091315f71bd094eac4e43da8d5d8ef75ef0412bb35d434b"
+      },
+      "pass": true
+    }
+  ],
+  "mechanicalAssociations": [
+    {
+      "dimension": "democratic_quality",
+      "n": 2316,
+      "rho": 0.9595075882204751,
+      "interpretation": "mechanical_input_association_not_validity"
+    },
+    {
+      "dimension": "rule_of_law",
+      "n": 2316,
+      "rho": 0.9286243684979639,
+      "interpretation": "mechanical_input_association_not_validity"
+    },
+    {
+      "dimension": "freedom_rights",
+      "n": 2316,
+      "rho": 0.9598492307847519,
+      "interpretation": "mechanical_input_association_not_validity"
+    },
+    {
+      "dimension": "corruption_control",
+      "n": 2093,
+      "rho": 0.8795319148820944,
+      "interpretation": "mechanical_input_association_not_validity"
+    }
+  ],
+  "candidateValidity": {
+    "K0": "not_applicable_reference_fidelity",
+    "K1": "limited_external_checks_pass",
+    "K2": "undesired_association_check_passes_but_expert_validity_pending",
+    "K3": "insufficient_external_labels",
+    "K4": "insufficient_blinded_scholar_labels",
+    "K5": "insufficient_double_coded_expert_labels"
+  },
+  "noCandidatePassesFromInputSimilarity": true,
+  "confirmatoryExternalLabelsInspected": false,
+  "resultSha256": "6b7f3642f135b8ca217b47ae6c44f8bbd98fa3edd1e7448b99f6927266cd5b03"
+}
