@@ -801,3 +801,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   on an exact full-catalog fingerprint; later hash-pinned migrations run once.
 - Deployment migrates before build and fails on unknown IDs, changed hashes, or
   schema drift. Durable record: APR-D059 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Country exports preserve resolver meaning before rights filtering
+
+- One shared document builder feeds JSON and CSV with one canonical row per
+  exported fact and separate alternate, projection, and rejected evidence.
+- Apply source rights after resolution. Omit disallowed rows; if the selected
+  canonical is restricted, withhold the fact rather than promote an alternate.
+- Every emitted row retains source, license, temporal, status, method, decision,
+  and dispute metadata. Durable record: APR-D060 in `plan/DECISIONS.md`.

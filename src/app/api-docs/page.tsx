@@ -540,17 +540,17 @@ for country in resp.json()["data"]:
         </p>
 
         <p className="api-intro">
-          Per-country JSON and CSV downloads are still withheld. The previous
-          response mixed cached fields, derived classifications, and source
-          rows without a license record for every field. DAT-027 owns its
-          canonical-plus-alternates replacement.
+          Per-country JSON and CSV downloads contain one resolver-selected
+          canonical observation for each exported fact key. Alternate
+          measurements, projections, and rejected rows are separate records.
         </p>
 
         <Banner variant="info">
-          The route remains at <code>/api/countries/:slug/export</code> so
-          callers receive an explicit 503 status, the rights-manifest location,
-          and the replacement gate. It is not part of the <code>/api/v1</code>{" "}
-          contract.
+          Every observation carries its source URL, license, dates, value type,
+          lifecycle status, method, selection trace, and dispute state. Rows
+          without verified public-export terms are omitted. If the selected
+          canonical source is restricted, the fact is withheld instead of
+          assigning a different source as canonical.
         </Banner>
 
         <EndpointSection
@@ -563,13 +563,13 @@ for country in resp.json()["data"]:
           exampleResponse={docExample("countryExport")}
         />
 
-        <h3 className="api-example-heading">CSV status</h3>
+        <h3 className="api-example-heading">CSV header and sample row</h3>
         <CodeBlock>{renderCountryExportCsvExample()}</CodeBlock>
 
         <p className="api-info-card__body">
-          The bulk package contains the as-published canonical selection, not
-          current values or alternate observations. DAT-027 owns the richer
-          canonical-plus-alternates per-country replacement.
+          JSON and CSV use the same observation rows. The CSV
+          <code> record_class </code> column distinguishes canonical,
+          alternate, projection, and rejected evidence.
         </p>
       </section>
 

@@ -335,7 +335,7 @@ test("negative fixture: a re-inlined CSV header string is flagged", () => {
   assert.equal(usesSharedCsvBuilder(regressed), false);
 });
 
-test("the real export route is rights-blocked and emits no legacy attachment", async () => {
+test("the real export route uses the rights-filtered shared CSV builder", async () => {
   const { readFile } = await import("node:fs/promises");
   const path = await import("node:path");
   const source = await readFile(
@@ -343,8 +343,8 @@ test("the real export route is rights-blocked and emits no legacy attachment", a
     "utf8",
   );
   assert.equal(hasInlineCsvHeader(source), false);
-  assert.equal(usesSharedCsvBuilder(source), false);
-  assert.equal(isRightsBlockedExport(source), true);
+  assert.equal(usesSharedCsvBuilder(source), true);
+  assert.equal(isRightsBlockedExport(source), false);
 });
 
 // ─────────────────────────────────────────────────────────────────────

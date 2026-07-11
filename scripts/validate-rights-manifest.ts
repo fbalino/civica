@@ -51,15 +51,10 @@ const exportRoute = readFileSync(exportRoutePath, "utf8");
 if (!exportRoute.includes('evaluatePublicExport("country-export-json-csv"')) {
   problems.push("country export route does not call the rights gate");
 }
-if (!exportRoute.includes("status: 503")) {
-  problems.push("country export route does not return 503 while blocked");
-}
-if (/Content-Disposition|attachment;/.test(exportRoute)) {
-  problems.push("blocked country export still emits an attachment");
-}
-if (evaluatePublicExport("country-export-json-csv", ["wikidata"]).allowed) {
-  problems.push("country export gate unexpectedly allows an export");
-}
+if (!exportRoute.includes("buildCountryResearchExport")) problems.push("country export does not use the DAT-027 research export builder");
+if (!exportRoute.includes("countryResearchExportCsv")) problems.push("country export JSON/CSV implementations are not shared");
+if (!evaluatePublicExport("country-export-json-csv", ["wikidata"]).allowed) problems.push("country export unexpectedly blocks a verified source");
+if (evaluatePublicExport("country-export-json-csv", ["vdem"]).allowed) problems.push("country export unexpectedly permits a pending source");
 
 const machineRoute = readFileSync(
   "src/app/api/rights-manifest/route.ts",

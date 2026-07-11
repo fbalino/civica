@@ -907,8 +907,8 @@ export const PUBLIC_CLAIMS = [
     surface: "exports",
     routeOrArtifact: "/api/countries/{slug}/export?format=csv|json",
     exactClaim:
-      "Country JSON and CSV downloads remain withheld until DAT-027 replaces the mixed-source route with a rights-filtered canonical-plus-alternates export.",
-    tier: "retired-deprecated-output",
+      "Country JSON and CSV downloads expose one resolver-selected canonical observation per exported fact key, with separately typed rights-cleared alternates, projections, and rejected evidence.",
+    tier: "reconciled-fact",
     evidenceSources: [
       "src/app/api/countries/[slug]/export/route.ts",
       "src/lib/rights/manifest.ts",
@@ -918,7 +918,7 @@ export const PUBLIC_CLAIMS = [
     gate: "G2",
     source: {
       path: "src/app/api/countries/[slug]/export/route.ts",
-      fragment: "Country data export is not published.",
+      fragment: "buildCountryResearchExport",
     },
   },
   {

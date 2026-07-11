@@ -133,17 +133,21 @@ test("export rows preserve all states instead of collapsing absent values to zer
   for (const status of DATA_VALUE_STATUSES) {
     const hasValue = status === "observed" || status === "disputed";
     const row = zCountryExportFact.parse({
+      recordClass: "alternate",
+      rowId: `row-${status}`,
+      factKey: `fixture_${status}`,
+      factGroup: "B",
       category: "demographics",
-      key: `fixture_${status}`,
-      value: hasValue ? "0" : null,
-      numericValue: hasValue ? 0 : null,
-      unit: "people",
-      year: 2025,
-      valueStatus: status,
-      valueStatusReason: status === "observed" ? null : REASON[status],
+      value: { text: hasValue ? "0" : null, numeric: hasValue ? 0 : null, structured: null, unit: "people", status, statusReason: status === "observed" ? null : REASON[status], type: "measured" },
+      source: { id: "fixture", name: "Fixture", url: "https://example.test/value", license: "fixture", termsUrl: "https://example.test/terms", lastSyncedAt: null },
+      freshness: { asOf: "2025-01-01", observationYear: 2025, dataVintageYear: 2025, retrievedAt: "2026-01-01T00:00:00.000Z", upstreamVintage: "fixture" },
+      lifecycle: { status: "active", reason: null },
+      method: { rowMethodologyVersion: "fixture", reconciliationVersion: "source-precedence/v1", growthMethodology: null },
+      decision: { reason: "single_source", trace: [] },
+      dispute: { openOrInReview: status === "disputed" },
     });
-    assert.equal(row.valueStatus, status);
-    assert.equal(row.numericValue, hasValue ? 0 : null);
+    assert.equal(row.value.status, status);
+    assert.equal(row.value.numeric, hasValue ? 0 : null);
   }
 });
 

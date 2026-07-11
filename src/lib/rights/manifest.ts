@@ -225,31 +225,26 @@ export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
   {
     productId: "country-export-json-csv",
     routeOrArtifact: "/api/countries/{slug}/export?format=json|csv",
-    publicBulkExport: "blocked",
+    publicBulkExport: "allowed",
     fields: [
       {
-        fieldPattern: "facts[]",
+        fieldPattern: "facts[].canonical",
         lineage: "source-row",
         exportRule: "source-permission",
       },
       {
-        fieldPattern: "provenance.*",
+        fieldPattern: "facts[].alternates|projections|rejected",
         lineage: "source-row",
         exportRule: "source-permission",
       },
       {
-        fieldPattern: "flat headline fields",
-        lineage: "mixed-unresolved",
-        exportRule: "blocked",
-      },
-      {
-        fieldPattern: "government/index fields",
+        fieldPattern: "jurisdiction|decision|dispute|method|withheld",
         lineage: "civica-derived",
-        exportRule: "blocked",
+        exportRule: "source-permission",
       },
     ],
     reason:
-      "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; the bulk Atlas package separately publishes rights-cleared canonical rows from an immutable snapshot.",
+      "The country research export contains resolver-selected canonical observations and separately typed alternates, projections, and rejected rows. Every emitted observation must have verified public-export terms; restricted rows are omitted, and a fact is withheld rather than reassigned when its selected canonical source cannot be distributed.",
     requiresDerivationVersions: true,
   },
   {

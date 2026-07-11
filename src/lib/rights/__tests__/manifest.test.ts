@@ -33,14 +33,16 @@ test("only verified source records can permit public export", () => {
   }
 });
 
-test("the legacy country export is blocked even for otherwise open sources", () => {
+test("the country export permits verified sources and blocks pending ones", () => {
   const decision = evaluatePublicExport("country-export-json-csv", [
     "cia_factbook",
     "wikidata",
   ]);
-  assert.equal(decision.allowed, false);
+  assert.equal(decision.allowed, true);
   assert.deepEqual(decision.blockedSources, []);
-  assert.match(decision.reason, /cannot prove an allowed terms record/i);
+  const blocked = evaluatePublicExport("country-export-json-csv", ["vdem"]);
+  assert.equal(blocked.allowed, false);
+  assert.deepEqual(blocked.blockedSources, ["vdem"]);
 });
 
 test("unknown products and pending sources fail closed", () => {

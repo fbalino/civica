@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "country-research-export-audit/v1",
+  "checkedAt": "2026-07-11T05:23:13Z",
+  "endpoint": "/api/countries/france/export",
+  "jsonStatus": 200,
+  "csvStatus": 200,
+  "invalidFormatStatus": 400,
+  "missingCountryStatus": 404,
+  "jurisdiction": {
+    "slug": "france",
+    "iso3": "FRA",
+    "status": "sovereign_state"
+  },
+  "exportedFacts": 46,
+  "jsonObservationRows": 53,
+  "csvObservationRows": 53,
+  "classes": {
+    "canonical": 46,
+    "alternate": 7,
+    "projection": 0,
+    "rejected": 0
+  },
+  "allowedSourceIds": [
+    "cia_factbook",
+    "wikidata",
+    "world_bank"
+  ],
+  "withheldFactKeys": 36,
+  "withheldObservations": 84,
+  "populationTotalWithheld": true,
+  "oneCanonicalPerExportedFact": true,
+  "requiredMetadataPresentOnEveryObservation": true,
+  "restrictedSourceRowsEmitted": 0,
+  "fixtureSemanticParity": true,
+  "fixtureClasses": [
+    "canonical",
+    "alternate",
+    "projection",
+    "rejected"
+  ],
+  "browser": {
+    "page": "/api-docs#country-export",
+    "contractVisible": true,
+    "rightsBoundaryVisible": true,
+    "recordClassesVisible": true,
+    "consoleErrors": 0
+  }
+}

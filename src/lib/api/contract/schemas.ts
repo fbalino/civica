@@ -1021,60 +1021,43 @@ export const zPulseMethodologyResponse = z
   })
   .strict();
 
-/* ────────────────────────────────────────────────────────────────
- * /api/countries/[slug]/export (non-/v1, documented "Bulk Data")
- *
- * The legacy success schemas remain for the DAT-027 replacement design, but
- * the current route returns only zCountryExportBlocked.
- * ──────────────────────────────────────────────────────────────── */
+/* /api/countries/[slug]/export — rights-filtered research export. */
+const zDecisionTraceStep = z.object({
+  code: z.enum(["row_eligibility", "measurement_partition", "source_lineage", "precedence_rule", "guard_result", "canonical_selection"]),
+  outcome: z.string(),
+  detail: z.string(),
+  sourceIds: z.array(z.string()),
+}).strict();
 
-export const zCountryExportFact = z
+const zCountryExportObservation = z
   .object({
-    category: z.string().nullable(),
-    key: z.string(),
-    value: z.string().nullable(),
-    numericValue: z.number().nullable(),
-    unit: z.string().nullable(),
-    year: z.number().nullable(),
-    valueStatus: zDataValueStatus,
-    valueStatusReason: z.string().nullable(),
+    recordClass: z.enum(["canonical", "alternate", "projection", "rejected"]),
+    rowId: z.string(), factKey: z.string(), factGroup: z.string(), category: z.string(),
+    value: z.object({ text: z.string().nullable(), numeric: z.number().nullable(), structured: z.unknown().nullable(), unit: z.string().nullable(), status: z.string(), statusReason: z.string().nullable(), type: z.string() }).strict(),
+    source: z.object({ id: z.string(), name: z.string(), url: z.string().url(), license: z.string(), termsUrl: z.string().url(), lastSyncedAt: z.string().datetime().nullable() }).strict(),
+    freshness: z.object({ asOf: z.string().nullable(), observationYear: z.number().int().nullable(), dataVintageYear: z.number().int().nullable(), retrievedAt: z.string().datetime(), upstreamVintage: z.string().nullable() }).strict(),
+    lifecycle: z.object({ status: z.string(), reason: z.string().nullable() }).strict(),
+    method: z.object({ rowMethodologyVersion: z.string(), reconciliationVersion: z.literal("source-precedence/v1"), growthMethodology: z.string().nullable() }).strict(),
+    decision: z.object({ reason: z.string(), trace: z.array(zDecisionTraceStep) }).strict(),
+    dispute: z.object({ openOrInReview: z.boolean() }).strict(),
   })
   .strict();
+
+export const zCountryExportFact = zCountryExportObservation;
 
 export const zCountryExportJson = z
   .object({
-    name: z.string(),
-    iso2: z.string().nullable(),
-    iso3: z.string().nullable(),
-    continent: z.string().nullable(),
-    capital: z.string().nullable(),
-    population: z.number().nullable(),
-    gdpBillions: z.number().nullable(),
-    areaSqKm: z.number().nullable(),
-    languages: z.string().nullable(),
-    currency: z.string().nullable(),
-    governmentType: z.string().nullable(),
-    governmentTypeDetail: z.string().nullable(),
-    governmentClassification: zGovernmentClassification.nullable(),
-    democracyIndex: z.number().nullable(),
-    worldBankRegion: z.string().nullable(),
-    worldBankIncomeGroup: z.string().nullable(),
-    vdemRow: z.string().nullable(),
-    monarchyStatus: z.string().nullable(),
-    governmentFormDescription: z.string().nullable(),
-    facts: z.array(zCountryExportFact),
-    provenance: z.record(z.string(), zApiProvenanceEntry),
-    meta: z.object({ reconciliation: zFactbookReconciliationMeta }).strict(),
-  })
-  .strict();
-
-export const zCountryExportBlocked = z
-  .object({
-    error: z.literal("Country data export is not published."),
-    code: z.literal("EXPORT_RIGHTS_BLOCKED"),
-    country: z.string(),
-    reason: z.string(),
-    rightsManifest: z.literal("/api/rights-manifest"),
-    replacementGate: z.literal("DAT-027"),
+    schemaVersion: z.literal("country-research-export/v1"),
+    generatedAt: z.string().datetime(),
+    jurisdiction: z.object({ id: z.string(), slug: z.string(), name: z.string(), iso2: z.string().nullable(), iso3: z.string().nullable(), status: z.string() }).strict(),
+    facts: z.array(z.object({
+      factKey: z.string(),
+      canonical: zCountryExportObservation.refine((row) => row.recordClass === "canonical"),
+      alternates: z.array(zCountryExportObservation.refine((row) => row.recordClass === "alternate")),
+      projections: z.array(zCountryExportObservation.refine((row) => row.recordClass === "projection")),
+      rejected: z.array(zCountryExportObservation.refine((row) => row.recordClass === "rejected")),
+    }).strict()),
+    withheld: z.object({ factKeys: z.array(z.string()), observationCount: z.number().int().nonnegative(), reason: z.string() }).strict(),
+    rights: z.object({ manifest: z.literal("/api/rights-manifest"), policy: z.literal("source-row-filtered") }).strict(),
   })
   .strict();

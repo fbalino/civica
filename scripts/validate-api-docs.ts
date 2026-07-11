@@ -401,7 +401,7 @@ export function hasInlineCsvHeader(source: string): boolean {
 }
 
 export function usesSharedCsvBuilder(source: string): boolean {
-  return source.includes("buildCountryExportCsv");
+  return source.includes("countryResearchExportCsv");
 }
 
 export function isRightsBlockedExport(source: string): boolean {
@@ -422,7 +422,7 @@ async function checkCsvContract(report: Report): Promise<void> {
   }
   if (!usesSharedCsvBuilder(source)) {
     report.errors.push(
-      `[csv-contract] ${EXPORT_ROUTE_FILE} no longer calls buildCountryExportCsv (contract/csv.ts) — the CSV header/citation format may have been re-inlined and can drift from the documented contract`,
+      `[csv-contract] ${EXPORT_ROUTE_FILE} no longer calls countryResearchExportCsv — JSON/CSV observation semantics may drift`,
     );
   }
   if (hasInlineCsvHeader(source)) {
@@ -434,7 +434,7 @@ async function checkCsvContract(report: Report): Promise<void> {
     report.errors.filter((e) => e.startsWith("[csv-contract]")).length === 0
   ) {
     report.info.push(
-      `[csv-contract] ${EXPORT_ROUTE_FILE} sources its CSV header/citation from contract/csv.ts`,
+      `[csv-contract] ${EXPORT_ROUTE_FILE} uses the shared DAT-027 JSON/CSV export builder`,
     );
   }
 }

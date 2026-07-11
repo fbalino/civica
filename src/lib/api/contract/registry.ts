@@ -561,7 +561,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/countries/[slug]/export/route.ts",
     versioned: false,
     summary:
-      "Returns 503 while the former mixed-source country download is withheld for source/field rights closure. DAT-027 owns its rights-filtered per-country replacement.",
+      "Downloads one resolver-selected canonical observation per fact key, with separately typed alternates, projections, and rejected rows filtered by source rights.",
     params: [
       {
         name: ":slug",
@@ -569,11 +569,17 @@ export const API_ROUTES: RouteContract[] = [
         type: "string",
         description: 'Country slug, e.g. "france" or "united-states".',
       },
+      {
+        name: "format",
+        in: "query",
+        type: "string",
+        description: '"json" (default) or "csv".',
+      },
     ],
     cors: false,
     corsHeaders: null,
     rateLimit: null,
-    errorStatuses: [503],
+    errorStatuses: [400, 404, 500, 503],
     deprecation: null,
     exampleId: "countryExport",
   },

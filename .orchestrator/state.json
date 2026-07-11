@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-027_canonical_plus_alternates_exports"
+    "current_task": "DAT-028_statement_provenance_repair"
   },
   "budget": {
     "mode": "subscription_only",
@@ -634,6 +634,8 @@
     "plan/evidence/DAT-025/live-temporal-audit.json",
     "plan/evidence/DAT-026/README.md",
     "plan/evidence/DAT-026/fresh-and-upgrade-result.json",
+    "plan/evidence/DAT-027/README.md",
+    "plan/evidence/DAT-027/live-france-export-audit.json",
     "drizzle/authoritative/0000_authoritative_baseline.sql",
     "data/authoritative-schema-fingerprint.v1.json",
     "drizzle/migrations/0026_temporal_metadata.sql",
@@ -659,11 +661,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "Every authoritative-migration, data, release, rights, claims/documentation, TypeScript, and production-build gate passed for DAT-026.",
-    "tests": "633/633 tests passed. Fresh PostgreSQL 17 and production-shaped adoption match the checked full-catalog fingerprint; rerun has 0 pending and 0 planned writes. Master plan is 45/288 complete (15.6%).",
-    "public_claims": "The deployable schema history is now a checked 50-table baseline plus ordered hash-pinned migrations; the incomplete legacy journal is explicitly archival.",
-    "browser": "Not applicable: DAT-026 changes database deployment machinery and internal documentation, with no reader-facing UI change.",
-    "visual_review": "Not applicable: no UI or design-system surface changed."
+    "build": "Every export, rights, data, release, claims/documentation, TypeScript, and production-build gate passed for DAT-027.",
+    "tests": "636/636 tests passed. France fixtures prove JSON/CSV parity across canonical, alternate, projection, and rejected evidence; live France has 53 matching rows. Master plan is 46/288 complete (16.0%).",
+    "public_claims": "Country JSON/CSV now publish rights-filtered resolver evidence with one canonical per exported fact and explicit withholding when the selected source cannot be distributed.",
+    "browser": "Local /api-docs#country-export rendered the current contract, rights boundary, and four record classes with zero console errors; JSON/CSV returned 200, invalid format 400, and unknown country 404.",
+    "visual_review": "The API documentation uses existing editorial/API components; no design-system CSS or component styling changed."
   },
-  "updated_at": "2026-07-11T05:08:36Z"
+  "updated_at": "2026-07-11T05:23:13Z"
 }

@@ -35,7 +35,7 @@ import {
   zPulseDimensionsResponse,
   zPulseEventsResponse,
   zPulseChangelogResponse,
-  zCountryExportBlocked,
+  zCountryExportJson,
   type GovernmentClassificationShape,
 } from "./schemas";
 import {
@@ -1025,14 +1025,26 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
  * /api/countries/[slug]/export
  * ──────────────────────────────────────────────────────────────── */
 
-const countryExportJsonExample = zCountryExportBlocked.parse({
-  error: "Country data export is not published.",
-  code: "EXPORT_RIGHTS_BLOCKED",
-  country: "france",
-  reason:
-    "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; DAT-017 separately publishes a frozen Atlas source-observation package.",
-  rightsManifest: "/api/rights-manifest",
-  replacementGate: "DAT-027",
+const countryExportJsonExample = zCountryExportJson.parse({
+  schemaVersion: "country-research-export/v1",
+  generatedAt: "2026-07-11T00:00:00.000Z",
+  jurisdiction: { id: "example-france-id", slug: "france", name: "France", iso2: "FR", iso3: "FRA", status: "sovereign_state" },
+  facts: [{
+    factKey: "population_total",
+    canonical: {
+      recordClass: "canonical", rowId: "example-population-row", factKey: "population_total", factGroup: "B", category: "People",
+      value: { text: "68,170,000", numeric: 68170000, structured: null, unit: "people", status: "observed", statusReason: null, type: "measured" },
+      source: { id: "world_bank", name: "World Bank", url: "https://data.worldbank.org/indicator/SP.POP.TOTL?locations=FR", license: "CC-BY-4.0", termsUrl: "https://datacatalog.worldbank.org/public-licenses", lastSyncedAt: "2026-07-01T00:00:00.000Z" },
+      freshness: { asOf: "2024-01-01", observationYear: 2024, dataVintageYear: 2024, retrievedAt: "2026-04-01T00:00:00.000Z", upstreamVintage: "WDI 2026.04" },
+      lifecycle: { status: "active", reason: null },
+      method: { rowMethodologyVersion: "v0.2-beta", reconciliationVersion: "source-precedence/v1", growthMethodology: null },
+      decision: { reason: "fresher_winner", trace: [{ code: "canonical_selection", outcome: "selected", detail: "The resolver selected this row.", sourceIds: ["world_bank"] }] },
+      dispute: { openOrInReview: false },
+    },
+    alternates: [], projections: [], rejected: [],
+  }],
+  withheld: { factKeys: [], observationCount: 0, reason: "Rows whose source terms do not permit public export are omitted." },
+  rights: { manifest: "/api/rights-manifest", policy: "source-row-filtered" },
 });
 
 /* ────────────────────────────────────────────────────────────────
@@ -1066,9 +1078,8 @@ export function renderExample(id: ExampleId): string {
   return JSON.stringify(EXAMPLES[id], null, 2);
 }
 
-/** Plain status text shown beside the blocked JSON response. */
 export function renderCountryExportCsvExample(): string {
-  return "CSV export is withheld until DAT-027 publishes a rights-filtered per-country artifact.";
+  return `${COUNTRY_EXPORT_CSV_HEADER}\ncountry-research-export/v1,example-france-id,france,France,FR,FRA,sovereign_state,population_total,canonical,…`;
 }
 
 export { COUNTRY_EXPORT_CSV_HEADER };

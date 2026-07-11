@@ -471,3 +471,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   fingerprint; the production adoption replayed no public DDL or data writes.
 - 633/633 tests, live validation, all gates, and the production build pass.
   DAT-027 is next.
+
+## 2026-07-11 — DAT-027 country research exports completed
+
+- Replaced the blocked mixed-source route with `country-research-export/v1`:
+  one canonical per exported fact plus typed alternates, projections, and
+  rejected evidence, with complete provenance and resolver metadata.
+- Rights filtering never changes the empirical winner. Restricted canonical
+  facts are withheld; France JSON/CSV live rows match 53-to-53, while fixtures
+  prove all four classes and population semantic parity.
+- 636/636 tests, browser/API checks, all gates, and the production build pass.
+  DAT-028 is next.
