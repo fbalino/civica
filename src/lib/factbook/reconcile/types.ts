@@ -1,3 +1,5 @@
+import type { DataValueStatus } from "@/lib/data/value-state";
+
 /**
  * Phase F — shared types for the per-fact reconciliation resolver.
  *
@@ -113,6 +115,8 @@ export interface FactRow {
   factUnit: string | null;
   factYear: number | null;
   valueJson: unknown;
+  valueStatus?: DataValueStatus;
+  valueStatusReason?: string | null;
   asOf: string | null; // ISO date YYYY-MM-DD
   /**
    * Real underlying measurement year, when it differs from the

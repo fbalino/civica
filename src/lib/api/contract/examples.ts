@@ -179,10 +179,13 @@ const exampleProvenanceEntry = {
       vintageLabel: "CIA World Factbook, archived January 2026",
       url: null,
       valueType: "measured" as const,
+      valueStatus: "observed" as const,
+      valueStatusReason: null,
     },
   ],
   valueType: "measured" as const,
   canonicalIsProjection: false,
+  valueStatus: "observed" as const,
 };
 
 /* ────────────────────────────────────────────────────────────────
@@ -296,11 +299,25 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
           dimension: "democratic_quality",
           normalizedScore: 82.4,
           rawValue: 0.824,
+          valueStatus: "observed",
         },
       ],
     },
     provenance: {
       population: exampleProvenanceEntry,
+    },
+    valueStatus: {
+      capital: { status: "observed", reason: null },
+      population: { status: "observed", reason: null },
+      gdpBillions: { status: "observed", reason: null },
+      areaSqKm: { status: "observed", reason: null },
+      languages: { status: "observed", reason: null },
+      currency: { status: "observed", reason: null },
+      worldBankRegion: { status: "observed", reason: null },
+      worldBankIncomeGroup: { status: "observed", reason: null },
+      vdemRow: { status: "observed", reason: null },
+      monarchyStatus: { status: "observed", reason: null },
+      governmentFormDescription: { status: "observed", reason: null },
     },
   }),
   meta: shapeCountryDetailMeta(),
@@ -355,6 +372,7 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
         normalizedScore: 82.4,
         rawValue: 0.824,
         sourceId: "vdem",
+        valueStatus: "observed",
       },
     ],
   }),
@@ -484,6 +502,7 @@ const indexCompareResultA = shapeIndexCompareResult({
       normalizedScore: 82.4,
       rawValue: 0.824,
       sourceId: "vdem",
+      valueStatus: "observed",
     },
   ],
 });
@@ -534,6 +553,7 @@ const indexCompareResultB = shapeIndexCompareResult({
       normalizedScore: 85.1,
       rawValue: 0.851,
       sourceId: "vdem",
+      valueStatus: "observed",
     },
   ],
 });

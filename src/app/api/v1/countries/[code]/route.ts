@@ -15,7 +15,9 @@ import { eq, sql, asc, desc } from "drizzle-orm";
 import {
   getCanonicalFactsForJurisdiction,
   buildApiProvenanceEntry,
+  buildApiDataValueStatus,
   type ApiProvenanceEntry,
+  type ApiDataValueStatus,
 } from "@/lib/factbook/reconcile/api";
 import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
@@ -176,6 +178,26 @@ export async function GET(
     const monarchyResolver = resolverValueFor("monarchyStatus");
     const govFormResolver = resolverValueFor("governmentFormDescription");
 
+    const flatValues: Record<FlatFieldName, string | number | null> = {
+      capital: capitalResolver.text ?? country.capital,
+      population:
+        popResolver.numeric != null
+          ? Math.round(popResolver.numeric)
+          : country.population,
+      gdpBillions: gdpResolver.numeric ?? country.gdpBillions,
+      areaSqKm:
+        areaResolver.numeric != null
+          ? Math.round(areaResolver.numeric)
+          : country.areaSqKm,
+      languages: languagesResolver.text ?? country.languages,
+      currency: currencyResolver.text ?? country.currency,
+      worldBankRegion: wbRegionResolver.text,
+      worldBankIncomeGroup: wbIncomeResolver.text,
+      vdemRow: vdemRowResolver.text,
+      monarchyStatus: monarchyResolver.text,
+      governmentFormDescription: govFormResolver.text,
+    };
+
     /**
      * Build the provenance block — one entry per flat field where
      * the resolver returned a canonical row. Fields with no
@@ -183,10 +205,15 @@ export async function GET(
      * fact) are omitted from `provenance` entirely.
      */
     const provenance: Record<string, ApiProvenanceEntry> = {};
+    const valueStatus: Record<string, ApiDataValueStatus> = {};
     for (const [flatField, factKey] of Object.entries(FACT_FIELDS) as Array<
       [FlatFieldName, string]
     >) {
       const out = facts[factKey];
+      valueStatus[flatField] = buildApiDataValueStatus(
+        out,
+        flatValues[flatField],
+      );
       if (!out) continue;
       const entry = buildApiProvenanceEntry(factKey, out);
       if (entry) provenance[flatField] = entry;
@@ -255,25 +282,20 @@ export async function GET(
         // precedence over the `jurisdictions` cache; cache is the
         // back-compat fallback for fields the resolver doesn't
         // cover yet.
-        capital: capitalResolver.text ?? country.capital,
-        population:
-          popResolver.numeric != null
-            ? Math.round(popResolver.numeric)
-            : country.population,
-        gdpBillions: gdpResolver.numeric ?? country.gdpBillions,
-        areaSqKm:
-          areaResolver.numeric != null
-            ? Math.round(areaResolver.numeric)
-            : country.areaSqKm,
-        languages: languagesResolver.text ?? country.languages,
-        currency: currencyResolver.text ?? country.currency,
+        capital: flatValues.capital as string | null,
+        population: flatValues.population as number | null,
+        gdpBillions: flatValues.gdpBillions as number | null,
+        areaSqKm: flatValues.areaSqKm as number | null,
+        languages: flatValues.languages as string | null,
+        currency: flatValues.currency as string | null,
         democracyIndex: country.democracyIndex,
         // ── Phase F.4 — peer-grouping classifications (new fields).
-        worldBankRegion: wbRegionResolver.text,
-        worldBankIncomeGroup: wbIncomeResolver.text,
-        vdemRow: vdemRowResolver.text,
-        monarchyStatus: monarchyResolver.text,
-        governmentFormDescription: govFormResolver.text,
+        worldBankRegion: flatValues.worldBankRegion as string | null,
+        worldBankIncomeGroup: flatValues.worldBankIncomeGroup as string | null,
+        vdemRow: flatValues.vdemRow as string | null,
+        monarchyStatus: flatValues.monarchyStatus as string | null,
+        governmentFormDescription:
+          flatValues.governmentFormDescription as string | null,
         // ── Existing fields ──
         governmentType: country.governmentType,
         governmentTypeDetail: country.governmentTypeDetail,
@@ -302,11 +324,13 @@ export async function GET(
                   displayDimensionScore(d.rawValue, d.sourceId) ??
                   d.normalizedScore,
                 rawValue: d.rawValue,
+                valueStatus: "observed",
               })),
             }
           : null,
         // ── Phase F.4 — provenance block keyed by flat field ──
         provenance,
+        valueStatus,
       }),
       meta: shapeCountryDetailMeta(),
     }));

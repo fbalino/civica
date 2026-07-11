@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:migrations && npm run validate:migration-preflight && npm run validate:release-quality-report && npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:raw-retention && npm run validate:rights-manifest && npm run validate:jurisdiction-status && npm run validate:fact-coverage && npm run validate:reconciliation-audit && npm run validate:source-precedence && npm run validate:data-dictionary && npm run validate:derivation-versions && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
+    "build": "npm run validate:migrations && npm run validate:migration-preflight && npm run validate:release-quality-report && npm run validate:data-value-states && npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:raw-retention && npm run validate:rights-manifest && npm run validate:jurisdiction-status && npm run validate:fact-coverage && npm run validate:reconciliation-audit && npm run validate:source-precedence && npm run validate:data-dictionary && npm run validate:derivation-versions && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -42,6 +42,8 @@
     "validate:migration-preflight": "tsx scripts/validate-migration-preflight.ts",
     "validate:release-quality": "tsx scripts/audit-release-quality.ts --write",
     "validate:release-quality-report": "tsx scripts/validate-release-quality-report.ts",
+    "validate:data-value-states": "tsx scripts/validate-data-value-states.ts",
+    "validate:data-value-states:live": "tsx scripts/validate-data-value-states.ts --live",
     "ingest:indicator-history": "tsx scripts/ingest-indicator-history.ts",
     "ingest:vparty": "tsx scripts/ingest-vparty-positions.ts --apply",
     "calculate:ci": "tsx scripts/calculate-ci-composite.ts",

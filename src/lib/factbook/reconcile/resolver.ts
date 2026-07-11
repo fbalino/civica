@@ -34,6 +34,7 @@ import type {
   ProposedDispute,
   ResolverOutput,
 } from "@/lib/factbook/reconcile/types";
+import { parseDataValueStatus } from "@/lib/data/value-state";
 
 export const SOURCE_PRECEDENCE_VERSION = "source-precedence/v1" as const;
 
@@ -172,7 +173,13 @@ function resolveFromRowsCore(
     return r;
   });
 
-  const active = enforced.filter((r) => r.status === "active");
+  const active = enforced.filter((r) => {
+    const valueStatus = parseDataValueStatus(r.valueStatus);
+    return (
+      r.status === "active" &&
+      (valueStatus === "observed" || valueStatus === "disputed")
+    );
+  });
   const proposedDisputes: ProposedDispute[] = envelopeFailed.map((r) => ({
     kind: "plausibility_envelope",
     factIdA: r.id,

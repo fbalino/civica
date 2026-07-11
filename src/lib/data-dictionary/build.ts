@@ -130,6 +130,8 @@ const FIELD_DEFINITIONS: Readonly<Record<string, string>> = {
   fact_unit: "Unit declared for the fact value.",
   value_json: "Structured representation used when a scalar text or numeric value is insufficient.",
   value_type: "Whether the observation is measured, projected, estimated, or another declared value class.",
+  value_status: "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
+  value_status_reason: "Required explanation for every non-observed data-availability state; null only for observed values.",
   references: "Structured upstream references captured with the source claim.",
   event_date: "Date on which the represented event occurred.",
   published_at: "Publisher timestamp for the source item.",
@@ -167,6 +169,17 @@ function capitalize(value: string): string {
 
 function isNamedColumn(value: unknown): value is NamedColumn {
   return Boolean(value && typeof value === "object" && "name" in value && typeof (value as { name?: unknown }).name === "string");
+}
+
+function nullableMeaningFor(table: string, column: string) {
+  const stateful = new Set(["country_facts", "indicator_history", "country_metrics"]);
+  if (stateful.has(table) && ["fact_value", "fact_value_numeric", "value_json", "value"].includes(column)) {
+    return "Null is interpreted through value_status and value_status_reason; it is never a substitute for zero or an unlabeled unknown value.";
+  }
+  if (stateful.has(table) && column === "value_status_reason") {
+    return "Null is permitted only when value_status is observed; every other state requires a non-empty reason.";
+  }
+  return "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.";
 }
 
 function definitionFor(name: string, policy: TablePolicy, key: DictionaryKey): string {
@@ -293,7 +306,7 @@ export function buildSchemaDataDictionary(): SchemaDataDictionary {
         sqlType,
         nullable,
         nullableMeaning: nullable
-          ? "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present."
+          ? nullableMeaningFor(config.name, column.name)
           : "Not nullable; every stored row must supply this field or a database default.",
         hasDefault: Boolean(column.hasDefault),
         unit: unitFor(column.name, sqlType),
@@ -348,7 +361,7 @@ export function buildSchemaDataDictionary(): SchemaDataDictionary {
       privateTables: count("private_submission"),
       legacyTables: tables.filter((table) => table.deprecation.status === "legacy").length,
     },
-    nullSemanticsLimitation: "Nullable meaning is documented field by field. The current schema generally uses SQL null for several absence states; DAT-015 owns their normalized separation across database, API, UI, and export.",
+    nullSemanticsLimitation: "Country facts, indicator history, and country metrics use the closed value_status/value_status_reason contract. Other nullable fields retain field-specific meanings and must not be inferred as zero, unknown, or not applicable without an explicit companion contract.",
     tables,
   };
 }

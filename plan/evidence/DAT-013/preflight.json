@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-11T01:03:00.315Z",
+  "generatedAt": "2026-07-11T01:30:18.910Z",
   "plans": [
     {
       "id": "0000_smooth_kylun",
@@ -24,7 +24,7 @@
       "statementCount": 27,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0000_smooth_kylun-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0000_smooth_kylun must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0000_smooth_kylun --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "constitutions": 186,
@@ -54,7 +54,7 @@
       "statementCount": 1,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0001_contact_submissions-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0001_contact_submissions must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0001_contact_submissions --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "contact_submissions": 1
@@ -73,7 +73,7 @@
       "statementCount": 6,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0002_pulse_events-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0002_pulse_events must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0002_pulse_events --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_events": 462
@@ -99,7 +99,7 @@
       "statementCount": 21,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0002_purple_rachel_grey-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0002_purple_rachel_grey must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0002_purple_rachel_grey --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "bill_summary_cache": 6141,
@@ -126,7 +126,7 @@
       "statementCount": 11,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0003_international_organizations-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0003_international_organizations must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0003_international_organizations --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "organization_memberships": 1713,
@@ -146,7 +146,7 @@
       "statementCount": 6,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0003_soft_shinko_yamashiro-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0003_soft_shinko_yamashiro must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0003_soft_shinko_yamashiro --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "government_taxonomies": 249
@@ -165,7 +165,7 @@
       "statementCount": 6,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0004_gray_mojo-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0004_gray_mojo must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0004_gray_mojo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "bills": 6811
@@ -185,7 +185,7 @@
       "statementCount": 3,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0005_wet_longshot-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0005_wet_longshot must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0005_wet_longshot --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "advisory_board_members": 0,
@@ -205,7 +205,7 @@
       "statementCount": 5,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0006_gigantic_quasimodo-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0006_gigantic_quasimodo must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0006_gigantic_quasimodo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "ci_composite_scores": 286
@@ -224,7 +224,7 @@
       "statementCount": 6,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0007_stiff_hobgoblin-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0007_stiff_hobgoblin must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0007_stiff_hobgoblin --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "civica_conditions_scores": 331
@@ -247,7 +247,7 @@
       "statementCount": 25,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0008_violet_robin_chapel-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0008_violet_robin_chapel must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0008_violet_robin_chapel --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_corrections": 0,
@@ -270,7 +270,7 @@
       "statementCount": 4,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0009_colossal_zaladane-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0009_colossal_zaladane must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0009_colossal_zaladane --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_review_audit_log": 13
@@ -291,7 +291,7 @@
       "statementCount": 7,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0010_careless_dakota_north-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0010_careless_dakota_north must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0010_careless_dakota_north --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "backtest_cases": 10,
@@ -312,7 +312,7 @@
       "statementCount": 1,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0011_tidy_mordo-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0011_tidy_mordo must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0011_tidy_mordo --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_events_v2": 384
@@ -331,7 +331,7 @@
       "statementCount": 3,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0012_bug1_value_type-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0012_bug1_value_type must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0012_bug1_value_type --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "country_facts": 25827
@@ -350,7 +350,7 @@
       "statementCount": 2,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0013_electoral_systems-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0013_electoral_systems must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0013_electoral_systems --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "government_bodies": 483
@@ -369,7 +369,7 @@
       "statementCount": 1,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0014_advisory_applications-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0014_advisory_applications must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0014_advisory_applications --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "advisory_applications": 0
@@ -388,7 +388,7 @@
       "statementCount": 1,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0015_contact_messages_status-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0015_contact_messages_status must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0015_contact_messages_status --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "contact_submissions": 1
@@ -409,7 +409,7 @@
       "statementCount": 10,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0016_indicator_history-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0016_indicator_history must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0016_indicator_history --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "indicator_history": 46215,
@@ -432,7 +432,7 @@
       "statementCount": 12,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0017_party_positions-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0017_party_positions must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0017_party_positions --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "legislature_parties": 1548,
@@ -453,7 +453,7 @@
       "statementCount": 1,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0018_data_vintage_year-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0018_data_vintage_year must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0018_data_vintage_year --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "country_facts": 25827
@@ -472,7 +472,7 @@
       "statementCount": 1,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0019_growth_methodology-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0019_growth_methodology must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0019_growth_methodology --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "country_facts": 25827
@@ -491,7 +491,7 @@
       "statementCount": 15,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0020_jurisdiction_status_taxonomy-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0020_jurisdiction_status_taxonomy must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0020_jurisdiction_status_taxonomy --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "jurisdictions": 253
@@ -515,7 +515,7 @@
       "statementCount": 36,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0021_derivation_version_envelopes-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0021_derivation_version_envelopes must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0021_derivation_version_envelopes --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "ci_composite_scores": 286,
@@ -540,11 +540,34 @@
       "statementCount": 5,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0022_pulse_event_idempotency-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0022_pulse_event_idempotency must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=0022_pulse_event_idempotency --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "pulse_events_v2": 384,
         "pulse_sources": 529
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0023_data_value_states",
+      "artifact": "drizzle/migrations/0023_data_value_states.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "817b80e86b4806ebec728fe4be507c3b22975e70120a23ab30ecddf1c45701c6",
+      "affectedRelations": [
+        "country_facts",
+        "country_metrics",
+        "indicator_history"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0023_data_value_states-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run db:plan -- --id=0023_data_value_states --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25827,
+        "country_metrics": 7449,
+        "indicator_history": 46215
       },
       "writesPerformed": 0
     },
@@ -560,7 +583,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-cia-vintage-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-cia-vintage must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-cia-vintage --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "sources": 56
@@ -581,7 +604,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-election-results-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-election-results must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-election-results --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "election_results": 1351,
@@ -602,7 +625,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-growth-methodology-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-growth-methodology must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-growth-methodology --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "sources": 56
@@ -621,7 +644,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-methodology-version-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-methodology-version must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-methodology-version --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "country_facts": 25827
@@ -640,7 +663,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-territory-iso2-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-territory-iso2 must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-territory-iso2 --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "jurisdictions": 253
@@ -659,7 +682,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-upstream-vintage-labels-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-upstream-vintage-labels must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-backfill-upstream-vintage-labels --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "country_facts": 25827
@@ -680,7 +703,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-bridge-cia-legacy-to-canonical-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-bridge-cia-legacy-to-canonical must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-bridge-cia-legacy-to-canonical --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "country_facts": 25827,
@@ -703,7 +726,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-cleanup-bad-offices-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-cleanup-bad-offices must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-cleanup-bad-offices --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "offices": 5305,
@@ -724,7 +747,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-create-rate-limits-table-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-create-rate-limits-table must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-create-rate-limits-table --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "rate_limits": 13
@@ -746,7 +769,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-reseed-bug3-corrupted-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-reseed-bug3-corrupted must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-reseed-bug3-corrupted --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "country_factbook_sections": 2889,
@@ -769,7 +792,7 @@
       "statementCount": 0,
       "destructiveStatementCount": 0,
       "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-restore-overdemoted-disputes-compensation; never reverse production DDL/data implicitly.",
-      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-restore-overdemoted-disputes must also retain its task-specific schema/data validator before production apply.",
+      "invariantPlan": "npm run db:plan -- --id=data-restore-overdemoted-disputes --live verifies affected-relation presence and exact row counts without writes; npm run validate:migrations verifies registry/history/policy closure.",
       "releaseNote": "data/migrations/CHANGELOG.md",
       "liveRowCounts": {
         "jurisdictions": 253,

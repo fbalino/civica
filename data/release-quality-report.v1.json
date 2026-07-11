@@ -1,6 +1,6 @@
 {
   "schemaVersion": "release-data-quality/v1",
-  "generatedAt": "2026-07-11T01:20:43.341Z",
+  "generatedAt": "2026-07-11T01:30:48.774Z",
   "status": "fail",
   "policy": {
     "sourceMaxAgeDays": 180,

@@ -14,6 +14,8 @@ import Link from "next/link";
 import type { FactRow, ResolverOutput } from "@/lib/factbook/reconcile/types";
 import { reconciliation } from "@/lib/content/site-state";
 import { growthMethodologyLabel } from "@/lib/data/growth-methodology";
+import { DataValueState } from "@/components/DataValueState";
+import { parseDataValueStatus } from "@/lib/data/value-state";
 
 const SOURCE_LABELS: Record<string, string> = {
   cia_factbook: "CIA World Factbook",
@@ -225,7 +227,12 @@ export function FactValuePanel({
                 )}
               </div>
               <div className="fact-value-row-value">
-                {value}
+                <DataValueState
+                  status={parseDataValueStatus(row.valueStatus)}
+                  reason={row.valueStatusReason}
+                >
+                  {value}
+                </DataValueState>
               </div>
               <div className="fact-value-row-meta">
                 As of {formatAsOf(row)}

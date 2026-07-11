@@ -2,10 +2,10 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "29892a0f33d0f8a1d0f0f4b88df42b8d147cd14f30a9f97fae7f702f49c4811d",
+  "schemaFingerprint": "06650f8be287fbddfe086420336c071fc62a5b1980f9d0a84eaff2aa594128d5",
   "summary": {
     "tables": 49,
-    "columns": 571,
+    "columns": 577,
     "publicAtlasTables": 18,
     "researchBetaTables": 14,
     "supportTables": 9,
@@ -13,7 +13,7 @@
     "privateTables": 2,
     "legacyTables": 3
   },
-  "nullSemanticsLimitation": "Nullable meaning is documented field by field. The current schema generally uses SQL null for several absence states; DAT-015 owns their normalized separation across database, API, UI, and export.",
+  "nullSemanticsLimitation": "Country facts, indicator history, and country metrics use the closed value_status/value_status_reason contract. Other nullable fields retain field-specific meanings and must not be inferred as zero, unknown, or not applicable without an explicit companion contract.",
   "tables": [
     {
       "name": "advisory_applications",
@@ -60,7 +60,7 @@
           "definition": "Cv url recorded for the submitted application.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -210,7 +210,7 @@
           "definition": "Ip address recorded for the submitted application.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -235,7 +235,7 @@
           "definition": "Links recorded for the submitted application.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -376,7 +376,7 @@
           "definition": "Bio md recorded for the advisory-board member profile.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -551,7 +551,7 @@
           "definition": "Photo url recorded for the advisory-board member profile.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -592,7 +592,7 @@
           "definition": "Country iso3 recorded for the labeled evaluation case.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -783,7 +783,7 @@
           "definition": "Body recorded for the expected event annotation in one backtest case.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -885,7 +885,7 @@
           "definition": "Hint category recorded for the expected event annotation in one backtest case.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -910,7 +910,7 @@
           "definition": "Hint dimension recorded for the expected event annotation in one backtest case.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -935,7 +935,7 @@
           "definition": "Hint severity tier recorded for the expected event annotation in one backtest case.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1416,7 +1416,7 @@
           "definition": "Body id; relational link to government_bodies.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1520,7 +1520,7 @@
           "definition": "Introduced date recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -1599,7 +1599,7 @@
           "definition": "Last action text recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1624,7 +1624,7 @@
           "definition": "Long title recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1649,7 +1649,7 @@
           "definition": "Raw recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1674,7 +1674,7 @@
           "definition": "Raw status recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1728,7 +1728,7 @@
           "definition": "Sponsor name recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1753,7 +1753,7 @@
           "definition": "Sponsor party recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1803,7 +1803,7 @@
           "definition": "Summary recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1828,7 +1828,7 @@
           "definition": "Text url recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1928,7 +1928,7 @@
           "definition": "Vote abstain recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1953,7 +1953,7 @@
           "definition": "Vote no recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -1978,7 +1978,7 @@
           "definition": "Vote yes recorded for the bill in one jurisdiction and legislative source.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2019,7 +2019,7 @@
           "definition": "Band recorded for the jurisdiction, data year, and methodology version.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2069,7 +2069,7 @@
           "definition": "Completeness flag recorded for the jurisdiction, data year, and methodology version.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2280,7 +2280,7 @@
           "definition": "Missing dimensions recorded for the jurisdiction, data year, and methodology version.",
           "sqlType": "text[]",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2335,7 +2335,7 @@
           "definition": "Rank recorded for the jurisdiction, data year, and methodology version.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -2387,7 +2387,7 @@
           "definition": "Score lower recorded for the jurisdiction, data year, and methodology version.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "dimensionless; scale defined by the linked methodology or source",
           "key": {
@@ -2412,7 +2412,7 @@
           "definition": "Score upper recorded for the jurisdiction, data year, and methodology version.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "dimensionless; scale defined by the linked methodology or source",
           "key": {
@@ -2437,7 +2437,7 @@
           "definition": "Total ranked recorded for the jurisdiction, data year, and methodology version.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2462,7 +2462,7 @@
           "definition": "Vintage label recorded for the jurisdiction, data year, and methodology version.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2503,7 +2503,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -2634,7 +2634,7 @@
           "definition": "Ingestion id; relational link to ci_source_ingestions.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2773,7 +2773,7 @@
           "definition": "Raw value recorded for the jurisdiction, dimension, data year, and methodology version.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2839,7 +2839,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -2889,7 +2889,7 @@
           "definition": "Free-text notes recorded for review or interpretation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -2980,7 +2980,7 @@
           "definition": "Countries covered recorded for the source ingestion run for one source, year, and methodology context.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3063,7 +3063,7 @@
           "definition": "Error message recorded for the source ingestion run for one source, year, and methodology context.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3088,7 +3088,7 @@
           "definition": "Global max observed recorded for the source ingestion run for one source, year, and methodology context.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3113,7 +3113,7 @@
           "definition": "Global min observed recorded for the source ingestion run for one source, year, and methodology context.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3551,7 +3551,7 @@
           "definition": "Raw value recorded for the jurisdiction, metric, data year, source, and methodology version.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3617,7 +3617,7 @@
           "definition": "Article label recorded for the Constitute topic assigned to one parsed constitution section.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3744,7 +3744,7 @@
           "definition": "Section id recorded for the Constitute topic assigned to one parsed constitution section.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3837,7 +3837,7 @@
           "definition": "Constitute project id recorded for the constitution document for one jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3862,7 +3862,7 @@
           "definition": "Full text html recorded for the constitution document for one jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3937,7 +3937,7 @@
           "definition": "Last fetched recorded for the constitution document for one jurisdiction.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -3962,7 +3962,7 @@
           "definition": "Structured articles recorded for the constitution document for one jurisdiction.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -3987,7 +3987,7 @@
           "definition": "Year recorded for the constitution document for one jurisdiction.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "Gregorian calendar year",
           "key": {
@@ -4012,7 +4012,7 @@
           "definition": "Year updated recorded for the constitution document for one jurisdiction.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4128,7 +4128,7 @@
           "definition": "Ip address recorded for the submitted contact message.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4294,7 +4294,7 @@
           "definition": "Country id; relational link to jurisdictions.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4344,7 +4344,7 @@
           "definition": "Dimension recorded for the correction action for one affected artifact/record.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4369,7 +4369,7 @@
           "definition": "Disposition recorded for the correction action for one affected artifact/record.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4419,7 +4419,7 @@
           "definition": "Internal notes recorded for the correction action for one affected artifact/record.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4469,7 +4469,7 @@
           "definition": "Resolved at recorded for the correction action for one affected artifact/record.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -4544,7 +4544,7 @@
           "definition": "Submitter affiliation recorded for the correction action for one affected artifact/record.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4569,7 +4569,7 @@
           "definition": "Submitter email recorded for the correction action for one affected artifact/record.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4594,7 +4594,7 @@
           "definition": "Submitter name recorded for the correction action for one affected artifact/record.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4635,7 +4635,7 @@
           "definition": "Upstream effective or observation date for the value.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -4685,7 +4685,7 @@
           "definition": "Hash of the captured content used for deduplication and replay identity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4710,7 +4710,7 @@
           "definition": "Cut at timestamp recorded for the canonical jurisdiction/fact selection in one named vintage.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -4841,7 +4841,7 @@
           "definition": "Is disputed at cut recorded for the canonical jurisdiction/fact selection in one named vintage.",
           "sqlType": "boolean",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4971,7 +4971,7 @@
           "definition": "Structured representation used when a scalar text or numeric value is insufficient.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -4996,7 +4996,7 @@
           "definition": "Value numeric recorded for the canonical jurisdiction/fact selection in one named vintage.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5021,7 +5021,7 @@
           "definition": "Value text recorded for the canonical jurisdiction/fact selection in one named vintage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5046,7 +5046,7 @@
           "definition": "Value unit recorded for the canonical jurisdiction/fact selection in one named vintage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5118,7 +5118,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -5143,7 +5143,7 @@
           "definition": "Display order recorded for the CIA Factbook section for one jurisdiction and import phase.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -5193,7 +5193,7 @@
           "definition": "Import phase recorded for the CIA Factbook section for one jurisdiction and import phase.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "not applicable",
           "key": {
@@ -5301,7 +5301,7 @@
           "definition": "Timestamp when Civica last updated this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -5342,7 +5342,7 @@
           "definition": "Upstream effective or observation date for the value.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -5394,7 +5394,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -5419,7 +5419,7 @@
           "definition": "Underlying measurement/reference year used for freshness comparison.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "Gregorian calendar year",
           "key": {
@@ -5503,7 +5503,7 @@
           "definition": "Unit declared for the fact value.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5528,7 +5528,7 @@
           "definition": "Human-readable representation of the source observation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null is interpreted through value_status and value_status_reason; it is never a substitute for zero or an unlabeled unknown value.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5553,7 +5553,7 @@
           "definition": "Numeric representation of the source observation when the concept is numeric.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null is interpreted through value_status and value_status_reason; it is never a substitute for zero or an unlabeled unknown value.",
           "hasDefault": false,
           "unit": "record-specific; see fact_unit",
           "key": {
@@ -5580,7 +5580,7 @@
           "definition": "Year label assigned to the fact by its upstream publisher.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "Gregorian calendar year",
           "key": {
@@ -5605,7 +5605,7 @@
           "definition": "Growth methodology recorded for the jurisdiction, fact key, source, and observation candidate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5710,7 +5710,7 @@
           "definition": "Structured upstream references captured with the source claim.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5760,7 +5760,7 @@
           "definition": "Snapshot id recorded for the jurisdiction, fact key, source, and observation candidate.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5785,7 +5785,7 @@
           "definition": "Stable hash of the captured upstream payload/value used for change detection and replay.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5839,7 +5839,7 @@
           "definition": "Source note recorded for the jurisdiction, fact key, source, and observation candidate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5864,7 +5864,7 @@
           "definition": "Direct upstream URL captured for this record when available.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5916,7 +5916,7 @@
           "definition": "Reason recorded for the current status.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5941,7 +5941,7 @@
           "definition": "Timestamp when Civica last updated this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -5966,7 +5966,7 @@
           "definition": "Publisher-supplied release or vintage label retained verbatim.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -5991,7 +5991,57 @@
           "definition": "Structured representation used when a scalar text or numeric value is insufficient.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null is interpreted through value_status and value_status_reason; it is never a substitute for zero or an unlabeled unknown value.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-row observation with explicit source ID, retrieval metadata, value type, and methodology version.",
+          "cadence": "Per-source scheduled sync; varies from daily to annual/source release.",
+          "vintageSemantics": "Separates upstream as-of/year, underlying measurement vintage, retrieval time, and Civica methodology version.",
+          "rights": "Resolved per source_id through the rights manifest; mixed-source bulk export is fail-closed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status",
+          "propertyName": "valueStatus",
+          "definition": "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source-row observation with explicit source ID, retrieval metadata, value type, and methodology version.",
+          "cadence": "Per-source scheduled sync; varies from daily to annual/source release.",
+          "vintageSemantics": "Separates upstream as-of/year, underlying measurement vintage, retrieval time, and Civica methodology version.",
+          "rights": "Resolved per source_id through the rights manifest; mixed-source bulk export is fail-closed.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status_reason",
+          "propertyName": "valueStatusReason",
+          "definition": "Required explanation for every non-observed data-availability state; null only for observed values.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null is permitted only when value_status is observed; every other state requires a non-empty reason.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6043,7 +6093,7 @@
           "definition": "Wikidata property identifier retained for claim linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6068,7 +6118,7 @@
           "definition": "Wikidata entity identifier retained for source linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6093,7 +6143,7 @@
           "definition": "Wikidata rank recorded for the jurisdiction, fact key, source, and observation candidate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -6134,7 +6184,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -6244,7 +6294,7 @@
           "definition": "Rank recorded for the jurisdiction, metric, year, source, and methodology version.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -6294,7 +6344,7 @@
           "definition": "Direct upstream URL captured for this record when available.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6319,7 +6369,7 @@
           "definition": "Total ranked recorded for the jurisdiction, metric, year, source, and methodology version.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6344,7 +6394,7 @@
           "definition": "Timestamp when Civica last updated this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -6368,8 +6418,58 @@
           "propertyName": "value",
           "definition": "Value recorded for the jurisdiction, metric, year, source, and methodology version.",
           "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null is interpreted through value_status and value_status_reason; it is never a substitute for zero or an unlabeled unknown value.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source observation or versioned Civica derivation linked to metric_definitions and sources.",
+          "cadence": "Per upstream source release or derivation refresh.",
+          "vintageSemantics": "year is the observation/reference year; fetched_at is retrieval time; methodology_version controls derivation.",
+          "rights": "Resolved per source_id and field class through the rights manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status",
+          "propertyName": "valueStatus",
+          "definition": "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
+          "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Source observation or versioned Civica derivation linked to metric_definitions and sources.",
+          "cadence": "Per upstream source release or derivation refresh.",
+          "vintageSemantics": "year is the observation/reference year; fetched_at is retrieval time; methodology_version controls derivation.",
+          "rights": "Resolved per source_id and field class through the rights manifest.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status_reason",
+          "propertyName": "valueStatusReason",
+          "definition": "Required explanation for every non-observed data-availability state; null only for observed values.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null is permitted only when value_status is observed; every other state requires a non-empty reason.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6465,7 +6565,7 @@
           "definition": "Description recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6542,7 +6642,7 @@
           "definition": "Fact id a; relational link to country_facts.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6567,7 +6667,7 @@
           "definition": "Fact id b; relational link to country_facts.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6696,7 +6796,7 @@
           "definition": "Proposed action recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6721,7 +6821,7 @@
           "definition": "Resolution action recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6746,7 +6846,7 @@
           "definition": "Resolved at recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -6771,7 +6871,7 @@
           "definition": "Reviewer id recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6796,7 +6896,7 @@
           "definition": "Reviewer notes recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6848,7 +6948,7 @@
           "definition": "Submitter affiliation recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6873,7 +6973,7 @@
           "definition": "Submitter email recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6898,7 +6998,7 @@
           "definition": "Submitter name recorded for the dispute for one jurisdiction/fact key and candidate set.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -6991,7 +7091,7 @@
           "definition": "After recorded for the mutation or review action.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7016,7 +7116,7 @@
           "definition": "Before recorded for the mutation or review action.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7068,7 +7168,7 @@
           "definition": "Dispute id; relational link to data_disputes.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7095,7 +7195,7 @@
           "definition": "Stable Civica identifier for the asserted fact concept.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7147,7 +7247,7 @@
           "definition": "Identifier of the jurisdiction represented by this row.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7174,7 +7274,7 @@
           "definition": "Free-text notes recorded for review or interpretation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7215,7 +7315,7 @@
           "definition": "Candidate name recorded for the party/candidate result in one election.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7290,7 +7390,7 @@
           "definition": "Is winner recorded for the party/candidate result in one election.",
           "sqlType": "boolean",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "not applicable",
           "key": {
@@ -7315,7 +7415,7 @@
           "definition": "Party color recorded for the party/candidate result in one election.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7340,7 +7440,7 @@
           "definition": "Party name recorded for the party/candidate result in one election.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7365,7 +7465,7 @@
           "definition": "Party wikidata qid recorded for the party/candidate result in one election.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7390,7 +7490,7 @@
           "definition": "Seats won recorded for the party/candidate result in one election.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7415,7 +7515,7 @@
           "definition": "Votes count recorded for the party/candidate result in one election.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -7440,7 +7540,7 @@
           "definition": "Votes percent recorded for the party/candidate result in one election.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "percentage points (0–100 unless source documentation states otherwise)",
           "key": {
@@ -7481,7 +7581,7 @@
           "definition": "Body id; relational link to government_bodies.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7506,7 +7606,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -7531,7 +7631,7 @@
           "definition": "Date confidence recorded for the election event in one jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "dimensionless; scale defined by the linked methodology or source",
           "key": {
@@ -7556,7 +7656,7 @@
           "definition": "Election date recorded for the election event in one jurisdiction.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -7581,7 +7681,7 @@
           "definition": "Election name recorded for the election event in one jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7606,7 +7706,7 @@
           "definition": "Election type recorded for the election event in one jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7631,7 +7731,7 @@
           "definition": "Electoral system recorded for the election event in one jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7706,7 +7806,7 @@
           "definition": "Registered voters recorded for the election event in one jurisdiction.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7731,7 +7831,7 @@
           "definition": "Total valid votes recorded for the election event in one jurisdiction.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -7756,7 +7856,7 @@
           "definition": "Turnout percent recorded for the election event in one jurisdiction.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "percentage points (0–100 unless source documentation states otherwise)",
           "key": {
@@ -7781,7 +7881,7 @@
           "definition": "Wikidata entity identifier retained for source linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -7984,7 +8084,7 @@
           "definition": "Publisher-supplied release or vintage label retained verbatim.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8050,7 +8150,7 @@
           "definition": "Branch recorded for the government body or chamber.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8075,7 +8175,7 @@
           "definition": "Chamber type recorded for the government body or chamber.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8100,7 +8200,7 @@
           "definition": "Electoral subsystem recorded for the government body or chamber.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8125,7 +8225,7 @@
           "definition": "Electoral system family recorded for the government body or chamber.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8150,7 +8250,7 @@
           "definition": "Hierarchy level recorded for the government body or chamber.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8200,7 +8300,7 @@
           "definition": "Ipu parline id recorded for the government body or chamber.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8275,7 +8375,7 @@
           "definition": "Parent body id recorded for the government body or chamber.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8300,7 +8400,7 @@
           "definition": "Total seats recorded for the government body or chamber.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -8325,7 +8425,7 @@
           "definition": "Wikidata entity identifier retained for source linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8366,7 +8466,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -8443,7 +8543,7 @@
           "definition": "Executive structure recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8468,7 +8568,7 @@
           "definition": "Government dependency recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8518,7 +8618,7 @@
           "definition": "Is federal recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "boolean",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8543,7 +8643,7 @@
           "definition": "Is monarchy recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "boolean",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8597,7 +8697,7 @@
           "definition": "Override note recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8622,7 +8722,7 @@
           "definition": "Provenance recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8647,7 +8747,7 @@
           "definition": "Regime dataset version recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8672,7 +8772,7 @@
           "definition": "Regime type cgv recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8699,7 +8799,7 @@
           "definition": "Regime year recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "Gregorian calendar year",
           "key": {
@@ -8724,7 +8824,7 @@
           "definition": "Structural family recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8751,7 +8851,7 @@
           "definition": "Structural subtype recorded for the jurisdiction and taxonomy observation/derivation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -8808,7 +8908,7 @@
           "definition": "Timestamp when Civica last updated this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -9110,8 +9210,58 @@
           "propertyName": "value",
           "definition": "Value recorded for the jurisdiction, indicator, and observation year.",
           "sqlType": "real",
+          "nullable": true,
+          "nullableMeaning": "Null is interpreted through value_status and value_status_reason; it is never a substitute for zero or an unlabeled unknown value.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status",
+          "propertyName": "valueStatus",
+          "definition": "Closed data-availability state: observed, missing, unknown, not applicable, not observed, disputed, or withheld.",
+          "sqlType": "text",
           "nullable": false,
           "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Normalized historical observations from registered Index/conditions publishers.",
+          "cadence": "Per upstream panel release.",
+          "vintageSemantics": "year is the observation year; source_version and fetched_at identify captured release/retrieval.",
+          "rights": "Resolved per source_id; several research inputs are non-commercial or redistribution-restricted.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "value_status_reason",
+          "propertyName": "valueStatusReason",
+          "definition": "Required explanation for every non-observed data-availability state; null only for observed values.",
+          "sqlType": "text",
+          "nullable": true,
+          "nullableMeaning": "Null is permitted only when value_status is observed; every other state requires a non-empty reason.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9181,7 +9331,7 @@
           "definition": "Administering jurisdiction iso3 recorded for the jurisdiction or special geographic entity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9206,7 +9356,7 @@
           "definition": "Area sq km recorded for the jurisdiction or special geographic entity.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "square kilometres",
           "key": {
@@ -9233,7 +9383,7 @@
           "definition": "Capital recorded for the jurisdiction or special geographic entity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9260,7 +9410,7 @@
           "definition": "Continent recorded for the jurisdiction or special geographic entity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9285,7 +9435,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -9310,7 +9460,7 @@
           "definition": "Currency recorded for the jurisdiction or special geographic entity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9337,7 +9487,7 @@
           "definition": "Democracy index recorded for the jurisdiction or special geographic entity.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "dimensionless; scale defined by the linked methodology or source",
           "key": {
@@ -9364,7 +9514,7 @@
           "definition": "Fact cache refreshed at recorded for the jurisdiction or special geographic entity.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -9389,7 +9539,7 @@
           "definition": "Flag url recorded for the jurisdiction or special geographic entity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9414,7 +9564,7 @@
           "definition": "Gdp billions recorded for the jurisdiction or special geographic entity.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "billions of current US dollars",
           "key": {
@@ -9441,7 +9591,7 @@
           "definition": "Government type recorded for the jurisdiction or special geographic entity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9466,7 +9616,7 @@
           "definition": "Government type detail recorded for the jurisdiction or special geographic entity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9516,7 +9666,7 @@
           "definition": "ISO-style two-letter geographic code when assigned.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9541,7 +9691,7 @@
           "definition": "ISO-style three-letter geographic code when assigned.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9566,7 +9716,7 @@
           "definition": "Languages recorded for the jurisdiction or special geographic entity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9618,7 +9768,7 @@
           "definition": "Population recorded for the jurisdiction or special geographic entity.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -9795,7 +9945,7 @@
           "definition": "Timestamp when Civica last updated this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -9820,7 +9970,7 @@
           "definition": "Wikidata entity identifier retained for source linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -9911,7 +10061,7 @@
           "definition": "Is ruling coalition recorded for the party in one legislature seat snapshot.",
           "sqlType": "boolean",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "not applicable",
           "key": {
@@ -9936,7 +10086,7 @@
           "definition": "Party color recorded for the party in one legislature seat snapshot.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10011,7 +10161,7 @@
           "definition": "Wikidata entity identifier retained for source linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10077,7 +10227,7 @@
           "definition": "Default source id; relational link to sources.id.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10102,7 +10252,7 @@
           "definition": "Description recorded for the metric definition and methodology version.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10202,7 +10352,7 @@
           "definition": "Unit recorded for the metric definition and methodology version.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10227,7 +10377,7 @@
           "definition": "Value max recorded for the metric definition and methodology version.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10252,7 +10402,7 @@
           "definition": "Value min recorded for the metric definition and methodology version.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10318,7 +10468,7 @@
           "definition": "Display order recorded for the office in one government body.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -10368,7 +10518,7 @@
           "definition": "Is elected recorded for the office in one government body.",
           "sqlType": "boolean",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10443,7 +10593,7 @@
           "definition": "Reports to office id recorded for the office in one government body.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10468,7 +10618,7 @@
           "definition": "Wikidata entity identifier retained for source linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10509,7 +10659,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -10559,7 +10709,7 @@
           "definition": "Join date recorded for the jurisdiction-organization membership.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -10644,7 +10794,7 @@
           "definition": "Role recorded for the jurisdiction-organization membership.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10685,7 +10835,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -10710,7 +10860,7 @@
           "definition": "Extra recorded for the organization.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10735,7 +10885,7 @@
           "definition": "Founded year recorded for the organization.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "Gregorian calendar year",
           "key": {
@@ -10785,7 +10935,7 @@
           "definition": "Hq country recorded for the organization.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -10835,7 +10985,7 @@
           "definition": "Member count recorded for the organization.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "count",
           "key": {
@@ -10935,7 +11085,7 @@
           "definition": "Timestamp when Civica last updated this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -10960,7 +11110,7 @@
           "definition": "Wikidata entity identifier retained for source linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11101,7 +11251,7 @@
           "definition": "Economic lr ord recorded for the V-Party estimate matched to one legislature-party row.",
           "sqlType": "integer",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11230,7 +11380,7 @@
           "definition": "Populism recorded for the V-Party estimate matched to one legislature-party row.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11307,7 +11457,7 @@
           "definition": "Vparty name en recorded for the V-Party estimate matched to one legislature-party row.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11348,7 +11498,7 @@
           "definition": "Date of birth recorded for the person identity.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -11423,7 +11573,7 @@
           "definition": "Parline person code recorded for the person identity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11448,7 +11598,7 @@
           "definition": "Photo credit recorded for the person identity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11473,7 +11623,7 @@
           "definition": "Photo license recorded for the person identity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11498,7 +11648,7 @@
           "definition": "Photo url recorded for the person identity.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11523,7 +11673,7 @@
           "definition": "Wikidata entity identifier retained for source linkage.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11566,7 +11716,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -11802,7 +11952,7 @@
           "definition": "Country id; relational link to jurisdictions.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11852,7 +12002,7 @@
           "definition": "Disposition recorded for the correction action for one Pulse event.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11877,7 +12027,7 @@
           "definition": "Event id; relational link to pulse_events_v2.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11927,7 +12077,7 @@
           "definition": "Internal notes recorded for the correction action for one Pulse event.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -11977,7 +12127,7 @@
           "definition": "Resolved at recorded for the correction action for one Pulse event.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -12052,7 +12202,7 @@
           "definition": "Submitter affiliation recorded for the correction action for one Pulse event.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -12077,7 +12227,7 @@
           "definition": "Submitter email recorded for the correction action for one Pulse event.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -12102,7 +12252,7 @@
           "definition": "Submitter name recorded for the correction action for one Pulse event.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -12726,7 +12876,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -12783,7 +12933,7 @@
           "definition": "Expires at recorded for the legacy classified article/event candidate.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -12977,7 +13127,7 @@
           "definition": "Llm request id recorded for the legacy classified article/event candidate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -13004,7 +13154,7 @@
           "definition": "Raw event data recorded for the legacy classified article/event candidate.",
           "sqlType": "jsonb",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -13058,7 +13208,7 @@
           "definition": "Source name recorded for the legacy classified article/event candidate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -13085,7 +13235,7 @@
           "definition": "Direct upstream URL captured for this record when available.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -13128,7 +13278,7 @@
           "definition": "Ai summary recorded for the deduplicated event cluster about one subject jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -13541,7 +13691,7 @@
           "definition": "Press freedom score at classification recorded for the deduplicated event cluster about one subject jurisdiction.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "dimensionless; scale defined by the linked methodology or source",
           "key": {
@@ -13593,7 +13743,7 @@
           "definition": "Review notes recorded for the deduplicated event cluster about one subject jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -13645,7 +13795,7 @@
           "definition": "Reviewer id recorded for the deduplicated event cluster about one subject jurisdiction.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -13915,7 +14065,7 @@
           "definition": "Free-text notes recorded for review or interpretation.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -13983,7 +14133,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -14060,7 +14210,7 @@
           "definition": "Raw event id; relational link to raw_events.id.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14166,7 +14316,7 @@
           "definition": "Direct upstream URL captured for this record when available.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14300,7 +14450,7 @@
           "definition": "Body recorded for the fetched publisher item or deduplicated article candidate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14325,7 +14475,7 @@
           "definition": "Cluster id recorded for the fetched publisher item or deduplicated article candidate.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14352,7 +14502,7 @@
           "definition": "Clustered at recorded for the fetched publisher item or deduplicated article candidate.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -14379,7 +14529,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -14404,7 +14554,7 @@
           "definition": "Embedding recorded for the fetched publisher item or deduplicated article candidate.",
           "sqlType": "real[]",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14429,7 +14579,7 @@
           "definition": "Date on which the represented event occurred.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -14456,7 +14606,7 @@
           "definition": "External id recorded for the fetched publisher item or deduplicated article candidate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14510,7 +14660,7 @@
           "definition": "Identifier of the jurisdiction represented by this row.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14562,7 +14712,7 @@
           "definition": "Raw country name recorded for the fetched publisher item or deduplicated article candidate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14666,7 +14816,7 @@
           "definition": "Direct upstream URL captured for this record when available.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14732,7 +14882,7 @@
           "definition": "Base url recorded for the upstream source or dataset family.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14807,7 +14957,7 @@
           "definition": "Timestamp of the latest successful positive-row sync for this source.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -14898,7 +15048,7 @@
           "definition": "Confidence recorded for the sourced assertion about one subject and predicate.",
           "sqlType": "real",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "dimensionless; scale defined by the linked methodology or source",
           "key": {
@@ -14923,7 +15073,7 @@
           "definition": "Timestamp when Civica created this row.",
           "sqlType": "timestamp",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "UTC timestamp (database type currently omits timezone)",
           "key": {
@@ -14973,7 +15123,7 @@
           "definition": "Object entity id recorded for the sourced assertion about one subject and predicate.",
           "sqlType": "uuid",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -14998,7 +15148,7 @@
           "definition": "Object value recorded for the sourced assertion about one subject and predicate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -15073,7 +15223,7 @@
           "definition": "Stable hash of the captured upstream payload/value used for change detection and replay.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -15123,7 +15273,7 @@
           "definition": "Source license recorded for the sourced assertion about one subject and predicate.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -15148,7 +15298,7 @@
           "definition": "Direct upstream URL captured for this record when available.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -15223,7 +15373,7 @@
           "definition": "Beginning of the assertion's declared validity interval.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -15248,7 +15398,7 @@
           "definition": "End of the assertion's declared validity interval.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -15289,7 +15439,7 @@
           "definition": "End date recorded for the person-office term interval.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {
@@ -15339,7 +15489,7 @@
           "definition": "Is current recorded for the person-office term interval.",
           "sqlType": "boolean",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": true,
           "unit": "not applicable",
           "key": {
@@ -15389,7 +15539,7 @@
           "definition": "Party color recorded for the person-office term interval.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -15414,7 +15564,7 @@
           "definition": "Party name recorded for the person-office term interval.",
           "sqlType": "text",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "not applicable",
           "key": {
@@ -15464,7 +15614,7 @@
           "definition": "Start date recorded for the person-office term interval.",
           "sqlType": "date",
           "nullable": true,
-          "nullableMeaning": "Null means no value is stored. Until DAT-015, this column alone does not distinguish unknown, not applicable, not observed, disputed, or withheld; use a companion status/reason field where present.",
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
           "hasDefault": false,
           "unit": "ISO 8601 calendar date",
           "key": {

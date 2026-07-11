@@ -46,6 +46,7 @@ export const MIGRATION_ARTIFACTS: readonly MigrationArtifact[] = [
   shared("0020_jurisdiction_status_taxonomy", "drizzle/migrations/0020_jurisdiction_status_taxonomy.sql", "mixed", "legacy_unjournaled"),
   shared("0021_derivation_version_envelopes", "drizzle/migrations/0021_derivation_version_envelopes.sql", "mixed", "legacy_unjournaled"),
   shared("0022_pulse_event_idempotency", "drizzle/migrations/0022_pulse_event_idempotency.sql", "mixed", "legacy_unjournaled"),
+  shared("0023_data_value_states", "drizzle/migrations/0023_data_value_states.sql", "schema", "journaled"),
   ...[
     "backfill-cia-vintage", "backfill-election-results", "backfill-growth-methodology",
     "backfill-methodology-version", "backfill-territory-iso2", "backfill-upstream-vintage-labels",

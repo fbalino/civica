@@ -14,7 +14,8 @@ export async function writeCountryMetrics(db: Db, rows: CountryMetricInput[], op
     if (!Number.isFinite(row.value) || !Number.isSafeInteger(row.year)) throw new Error(`Invalid country metric: ${key}`);
   }
   if (!options.dryRun) for (const row of rows) {
-    await db.insert(countryMetrics).values(row).onConflictDoUpdate({ target: [countryMetrics.jurisdictionId, countryMetrics.metricId, countryMetrics.year], set: { value: row.value, rank: row.rank, totalRanked: row.totalRanked, sourceId: row.sourceId, sourceUrl: row.sourceUrl, updatedAt: new Date() } });
+    const observedRow = { ...row, valueStatus: "observed", valueStatusReason: null };
+    await db.insert(countryMetrics).values(observedRow).onConflictDoUpdate({ target: [countryMetrics.jurisdictionId, countryMetrics.metricId, countryMetrics.year], set: { value: row.value, valueStatus: "observed", valueStatusReason: null, rank: row.rank, totalRanked: row.totalRanked, sourceId: row.sourceId, sourceUrl: row.sourceUrl, updatedAt: new Date() } });
   }
   if (options.stampFreshness !== false) {
     const counts = new Map<string, number>(); for (const row of rows) counts.set(row.sourceId, (counts.get(row.sourceId) ?? 0) + 1);

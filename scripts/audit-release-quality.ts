@@ -68,6 +68,8 @@ async function collectSnapshot(): Promise<ReleaseQualitySnapshot> {
                data_vintage_year AS "dataVintageYear",
                value_json AS "valueJson",
                value_type AS "valueType"
+               , value_status AS "valueStatus"
+               , value_status_reason AS "valueStatusReason"
         FROM country_facts
         WHERE status = 'active'
         ORDER BY jurisdiction_id, fact_key, source_id`,

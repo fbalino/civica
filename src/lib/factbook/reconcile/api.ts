@@ -36,6 +36,11 @@ import type {
   ResolverOutput,
 } from "./types";
 import { resolveGrowthMethodology } from "@/lib/data/growth-methodology";
+import {
+  parseDataValueStatus,
+  publicDataValueStatus,
+  type DataValueStatus,
+} from "@/lib/data/value-state";
 
 /**
  * Phase F.4 / R.22 — public-API metadata block.
@@ -192,6 +197,13 @@ export interface ApiAlternate {
    *  visual badge (e.g. amber "projected" pill) when the value is a
    *  forecast/projection. See `~/civica/plan/forecast-vs-measurement-v1.md`. */
   valueType: "measured" | "projected";
+  valueStatus: DataValueStatus;
+  valueStatusReason: string | null;
+}
+
+export interface ApiDataValueStatus {
+  status: DataValueStatus;
+  reason: string | null;
 }
 
 /**
@@ -225,6 +237,40 @@ export interface ApiProvenanceEntry {
    *  'projected'`; broken out for callers that prefer a flag-shaped
    *  boolean over an enum check. */
   canonicalIsProjection: boolean;
+  valueStatus: DataValueStatus;
+}
+
+export function buildApiDataValueStatus(
+  output: ResolverOutput | undefined,
+  displayedValue?: unknown,
+): ApiDataValueStatus {
+  if (output?.isDisputed) {
+    return {
+      status: "disputed",
+      reason: "An unresolved evidence conflict is recorded for this fact.",
+    };
+  }
+  const explicit = output?.all.find(
+    (row) => parseDataValueStatus(row.valueStatus) !== "observed",
+  );
+  if (explicit) {
+    return {
+      status: parseDataValueStatus(explicit.valueStatus),
+      reason: explicit.valueStatusReason?.trim() || null,
+    };
+  }
+  if (
+    output?.canonical ||
+    (displayedValue !== null &&
+      displayedValue !== undefined &&
+      displayedValue !== "")
+  ) {
+    return { status: "observed", reason: null };
+  }
+  return {
+    status: "not_observed",
+    reason: "No source observation is stored for this field.",
+  };
 }
 
 function buildAlternateUrl(row: FactRow): string | null {
@@ -271,6 +317,8 @@ export function buildApiProvenanceEntry(
         // Bug 1 — surface the per-row valueType so consumers can
         // render a "projected" badge on alternate rows.
         valueType: row.valueType,
+        valueStatus: parseDataValueStatus(row.valueStatus),
+        valueStatusReason: row.valueStatusReason?.trim() || null,
       };
       if (row.status === "rejected") {
         entry.rejected = true;
@@ -291,6 +339,10 @@ export function buildApiProvenanceEntry(
     alternates,
     valueType: canonical.valueType,
     canonicalIsProjection: output.canonicalIsProjection,
+    valueStatus: publicDataValueStatus({
+      storedStatus: canonical.valueStatus,
+      disputed: output.isDisputed,
+    }),
   };
 }
 
@@ -306,6 +358,14 @@ function unsupportedFactTrace(
       sourceIds: [...new Set(active.map((row) => row.sourceId))].sort(),
     },
   ];
+}
+
+function isValueEligible(row: FactRow) {
+  const valueStatus = parseDataValueStatus(row.valueStatus);
+  return (
+    row.status === "active" &&
+    (valueStatus === "observed" || valueStatus === "disputed")
+  );
 }
 
 /**
@@ -351,7 +411,7 @@ export async function getCanonicalFact(
         canonicalIsProjection: false,
       };
     }
-    const active = rows.filter((r) => r.status === "active");
+    const active = rows.filter(isValueEligible);
     const canonical = active[0] ?? null;
     return {
       jurisdictionId,
@@ -461,7 +521,7 @@ export async function getCanonicalFactsForJurisdiction(
     const rows = byKey.get(factKey) ?? [];
     const factKeyDef = getFactKey(factKey);
     if (!factKeyDef) {
-      const active = rows.filter((r) => r.status === "active");
+      const active = rows.filter(isValueEligible);
       const canonical = active[0] ?? null;
       out[factKey] = {
         jurisdictionId,
@@ -569,7 +629,7 @@ export async function getCanonicalFactsForJurisdictions(
       const isDisputed = disputedKeys.has(`${jurisdictionId}|${factKey}`);
 
       if (!factKeyDef) {
-        const active = rows.filter((r) => r.status === "active");
+        const active = rows.filter(isValueEligible);
         const canonical = active[0] ?? null;
         out[jurisdictionId][factKey] = {
           jurisdictionId,
@@ -792,6 +852,8 @@ interface CountryFactDbRow {
   factUnit: string | null;
   factYear: number | null;
   valueJson: unknown;
+  valueStatus?: string | null;
+  valueStatusReason?: string | null;
   asOf: string | null;
   /** Real measurement year when it differs from the prose stamp;
    *  drives resolver freshness. See resolver `freshness()`. */
@@ -833,6 +895,8 @@ export function dbRowToFactRow(row: CountryFactDbRow): FactRow {
     factUnit: row.factUnit,
     factYear: row.factYear,
     valueJson: row.valueJson,
+    valueStatus: parseDataValueStatus(row.valueStatus),
+    valueStatusReason: row.valueStatusReason?.trim() || null,
     asOf: row.asOf,
     dataVintageYear: row.dataVintageYear ?? null,
     retrievedAt:

@@ -355,3 +355,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Corrected legacy plausibility minima so real microstate and territory values
   are valid. Twelve focused fixtures, 600/600 tests, TypeScript, ESLint,
   documentation, claims, and the production build pass. DAT-015 is next.
+
+## 2026-07-10 — DAT-015 explicit data-value states completed
+
+- Added one seven-state availability contract across country facts, indicator
+  history, and country metrics. Database constraints, APIs, shared UI,
+  indicator grouping, future exports, and the data dictionary preserve it.
+- Applied migration `0023` transactionally to 79,491 live rows; all legacy
+  values became observed and the live validator found zero invalid rows.
+- Seven focused end-to-end fixtures, 607/607 repository tests, TypeScript,
+  ESLint, claims/docs, the production build, and clean browser checks pass.
+  Work is paused at the owner's request; DAT-016 has not started.

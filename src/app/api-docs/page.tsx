@@ -316,6 +316,18 @@ export default function ApiDocsPage() {
               Check current API status on our status page ↗
             </a>
           </div>
+          <div className="api-info-card__row">
+            <h3 className="api-section-label">Value availability</h3>
+            <p className="api-info-card__body">
+              Country-detail facts include a matching <code>valueStatus</code>
+              entry. Its closed states are <code>observed</code>,{" "}
+              <code>missing</code>, <code>unknown</code>,{" "}
+              <code>not_applicable</code>, <code>not_observed</code>,{" "}
+              <code>disputed</code>, and <code>withheld</code>. A zero remains
+              an observed number; null never stands in for zero. Non-observed
+              states include a reason.
+            </p>
+          </div>
         </div>
       </section>
 

@@ -100,6 +100,7 @@ export async function GET(
         displayDimensionScore(d.rawValue, d.sourceId) ?? d.normalizedScore,
       rawValue: d.rawValue,
       sourceId: d.sourceId,
+      valueStatus: "observed" as const,
     }));
 
     // This endpoint surfaces `governmentClassification`, which still

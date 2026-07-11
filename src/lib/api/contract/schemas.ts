@@ -97,6 +97,23 @@ export const zPulseDimension = z.enum([
   "stability",
 ]);
 
+export const zDataValueStatus = z.enum([
+  "observed",
+  "missing",
+  "unknown",
+  "not_applicable",
+  "not_observed",
+  "disputed",
+  "withheld",
+]);
+
+export const zApiDataValueStatus = z
+  .object({
+    status: zDataValueStatus,
+    reason: z.string().nullable(),
+  })
+  .strict();
+
 /* ────────────────────────────────────────────────────────────────
  * Shared building blocks
  * ──────────────────────────────────────────────────────────────── */
@@ -149,6 +166,8 @@ export const zApiAlternate = z
     rejected: z.literal(true).optional(),
     rejectionReason: z.string().optional(),
     valueType: z.enum(["measured", "projected"]),
+    valueStatus: zDataValueStatus,
+    valueStatusReason: z.string().nullable(),
   })
   .strict();
 
@@ -190,6 +209,7 @@ export const zApiProvenanceEntry = z
     alternates: z.array(zApiAlternate),
     valueType: z.enum(["measured", "projected"]),
     canonicalIsProjection: z.boolean(),
+    valueStatus: zDataValueStatus,
   })
   .strict();
 
@@ -395,6 +415,7 @@ export const zCountryDetailCivicaIndex = z
           dimension: z.string(),
           normalizedScore: z.number().nullable(),
           rawValue: z.number().nullable(),
+          valueStatus: zDataValueStatus,
         })
         .strict(),
     ),
@@ -434,6 +455,7 @@ export const zCountryDetail = z
     government: z.record(z.string(), z.array(zGovernmentBody)),
     civicaIndex: zCountryDetailCivicaIndex.nullable(),
     provenance: z.record(z.string(), zApiProvenanceEntry),
+    valueStatus: z.record(z.string(), zApiDataValueStatus),
   })
   .strict();
 
@@ -486,6 +508,7 @@ export const zCiDimensionRow = z
     normalizedScore: z.number().nullable(),
     rawValue: z.number().nullable(),
     sourceId: z.string().nullable(),
+    valueStatus: zDataValueStatus,
   })
   .strict();
 
@@ -1007,6 +1030,8 @@ export const zCountryExportFact = z
     numericValue: z.number().nullable(),
     unit: z.string().nullable(),
     year: z.number().nullable(),
+    valueStatus: zDataValueStatus,
+    valueStatusReason: z.string().nullable(),
   })
   .strict();
 

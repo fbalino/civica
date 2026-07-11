@@ -1,6 +1,7 @@
 import { eq, and, desc, asc, sql } from "drizzle-orm";
 import { db } from "./index";
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
+import { parseDataValueStatus } from "@/lib/data/value-state";
 import {
   buildGovernmentClassificationMap,
   type JurisdictionTaxonomyInput,
@@ -1347,6 +1348,58 @@ export interface IndicatorHistorySeries {
   nativeMax: number;
   isInverted: boolean;
   points: Array<{ year: number; value: number }>;
+  availability: Array<{
+    year: number;
+    status: import("@/lib/data/value-state").DataValueStatus;
+    reason: string | null;
+  }>;
+}
+
+type IndicatorHistoryValueRow = {
+  dimension: string;
+  indicator: string;
+  sourceId: string;
+  nativeMin: number;
+  nativeMax: number;
+  isInverted: boolean;
+  year: number;
+  value: number | null;
+  valueStatus: string | null;
+  valueStatusReason: string | null;
+};
+
+export function buildIndicatorHistorySeries(
+  rows: IndicatorHistoryValueRow[],
+): IndicatorHistorySeries[] {
+  const byIndicator = new Map<string, IndicatorHistorySeries>();
+  for (const r of rows) {
+    let series = byIndicator.get(r.indicator);
+    if (!series) {
+      series = {
+        dimension: r.dimension,
+        indicator: r.indicator,
+        sourceId: r.sourceId,
+        nativeMin: r.nativeMin,
+        nativeMax: r.nativeMax,
+        isInverted: r.isInverted,
+        points: [],
+        availability: [],
+      };
+      byIndicator.set(r.indicator, series);
+    }
+    const status = parseDataValueStatus(r.valueStatus);
+    if ((status === "observed" || status === "disputed") && r.value != null) {
+      series.points.push({ year: r.year, value: r.value });
+    }
+    if (status !== "observed") {
+      series.availability.push({
+        year: r.year,
+        status,
+        reason: r.valueStatusReason?.trim() || null,
+      });
+    }
+  }
+  return Array.from(byIndicator.values());
 }
 
 export async function getIndicatorHistoryForCountry(
@@ -1369,30 +1422,14 @@ export async function getIndicatorHistoryForCountry(
       isInverted: indicatorHistory.isInverted,
       year: indicatorHistory.year,
       value: indicatorHistory.value,
+      valueStatus: indicatorHistory.valueStatus,
+      valueStatusReason: indicatorHistory.valueStatusReason,
     })
     .from(indicatorHistory)
     .where(eq(indicatorHistory.jurisdictionId, jurisdiction[0].id))
     .orderBy(asc(indicatorHistory.indicator), asc(indicatorHistory.year));
 
-  // Group into one series per (indicator).
-  const byIndicator = new Map<string, IndicatorHistorySeries>();
-  for (const r of rows) {
-    let series = byIndicator.get(r.indicator);
-    if (!series) {
-      series = {
-        dimension: r.dimension,
-        indicator: r.indicator,
-        sourceId: r.sourceId,
-        nativeMin: r.nativeMin,
-        nativeMax: r.nativeMax,
-        isInverted: r.isInverted,
-        points: [],
-      };
-      byIndicator.set(r.indicator, series);
-    }
-    series.points.push({ year: r.year, value: r.value });
-  }
-  return Array.from(byIndicator.values());
+  return buildIndicatorHistorySeries(rows);
 }
 
 export async function compareCICountries(slugs: string[], quarter?: string) {

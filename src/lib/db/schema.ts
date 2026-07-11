@@ -439,6 +439,10 @@ export const countryFacts = pgTable(
     /** Free-form structured value where neither text nor numeric
      *  fits — religion / ethnic / language breakdowns. Phase F. */
     valueJson: jsonb("value_json"),
+    /** Closed availability semantics. Values are present only for observed or
+     * disputed rows; every other state records why no public value exists. */
+    valueStatus: text("value_status").notNull().default("observed"),
+    valueStatusReason: text("value_status_reason"),
 
     // ── Vintaging / freshness (Phase F additions) ──
     /** Full date the upstream assigned, where finer than year. */
@@ -1024,7 +1028,11 @@ export const countryMetrics = pgTable(
       .references(() => metricDefinitions.id)
       .notNull(),
     year: integer("year").notNull(),
-    value: real("value").notNull(),
+    value: real("value"),
+    /** observed | missing | unknown | not_applicable | not_observed |
+     * disputed | withheld — see src/lib/data/value-state.ts. */
+    valueStatus: text("value_status").notNull().default("observed"),
+    valueStatusReason: text("value_status_reason"),
     rank: integer("rank"),
     totalRanked: integer("total_ranked"),
     sourceId: text("source_id")
@@ -1167,7 +1175,11 @@ export const indicatorHistory = pgTable(
     /** Calendar year of the observation. */
     year: integer("year").notNull(),
     /** Observation in the source's native published scale. */
-    value: real("value").notNull(),
+    value: real("value"),
+    /** observed | missing | unknown | not_applicable | not_observed |
+     * disputed | withheld — see src/lib/data/value-state.ts. */
+    valueStatus: text("value_status").notNull().default("observed"),
+    valueStatusReason: text("value_status_reason"),
     /** Native scale bounds + orientation, so consumers can normalise for display. */
     nativeMin: real("native_min").notNull(),
     nativeMax: real("native_max").notNull(),

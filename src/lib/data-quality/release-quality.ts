@@ -1,4 +1,8 @@
 import { getFactKey } from "../factbook/reconcile/fact-keys";
+import {
+  parseDataValueStatus,
+  validateDataValueState,
+} from "../data/value-state";
 
 export const RELEASE_QUALITY_SCHEMA = "release-data-quality/v1" as const;
 
@@ -58,6 +62,8 @@ export type QualityFact = {
   dataVintageYear: number | null;
   valueJson: unknown;
   valueType: string | null;
+  valueStatus?: string | null;
+  valueStatusReason?: string | null;
 };
 
 export type QualityVintage = {
@@ -247,6 +253,27 @@ export function evaluateReleaseQuality(
     const factKey = normalized(fact.factKey);
     const sourceId = normalized(fact.sourceId);
     const def = factKey ? getFactKey(factKey) : undefined;
+    const valueStatus = parseDataValueStatus(fact.valueStatus);
+    const hasValue =
+      fact.factValue != null ||
+      fact.factValueNumeric != null ||
+      hasJsonValue(fact.valueJson);
+    for (const stateError of validateDataValueState({
+      status: valueStatus,
+      hasValue,
+      reason: fact.valueStatusReason,
+    })) {
+      add({
+        checkId: "fact.value_status",
+        category: "missing_required",
+        severity: "error",
+        entity: fact.id,
+        detail: `Fact availability state is invalid: ${stateError}.`,
+        observed: valueStatus,
+        expected: "value/status/reason shape defined by data-value-status/v1",
+        remediation: "Correct the stored value status, reason, or value fields before release.",
+      });
+    }
     const identity = `${fact.jurisdictionId}\u0000${factKey}\u0000${sourceId}`;
     const sameIdentity = activeFactKeys.get(identity) ?? [];
     sameIdentity.push(fact);
@@ -342,13 +369,13 @@ export function evaluateReleaseQuality(
       ["category", normalized(fact.category)],
       ["source_id", sourceId],
     ].filter(([, value]) => !value).map(([field]) => field);
-    if (missingFields.length || (fact.factValue == null && fact.factValueNumeric == null && !hasJsonValue(fact.valueJson))) {
+    if (missingFields.length) {
       add({
         checkId: "fact.required",
         category: "missing_required",
         severity: "error",
         entity: fact.id,
-        detail: `Active fact is missing ${[...missingFields, ...(fact.factValue == null && fact.factValueNumeric == null && !hasJsonValue(fact.valueJson) ? ["value"] : [])].join(", ")}.`,
+        detail: `Active fact is missing ${missingFields.join(", ")}.`,
         observed: "missing",
         expected: "complete active fact",
         remediation: `Populate the required fields or reject country_facts row ${fact.id}.`,

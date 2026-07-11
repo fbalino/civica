@@ -694,3 +694,14 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   outrank generic percent fallbacks. DAT-028 owns statement-subject orphans;
   DAT-029 owns active numeric-envelope corruption. Durable record: APR-D047 in
   `plan/DECISIONS.md`.
+
+## 2026-07-10 — Absence is a typed data state
+
+- Use `data-value-state/v1` for observed, missing, unknown, not applicable, not
+  observed, disputed, and withheld values.
+- Observed and disputed rows require a real value. Every absence state forbids
+  a value and requires a reason. Zero is an observed value; blank strings and
+  dashes are never storage substitutes.
+- Keep storage, public APIs, shared rendering, indicator grouping, and future
+  exports on the same contract. Rights-based withholding takes public
+  precedence. Durable record: APR-D048 in `plan/DECISIONS.md`.

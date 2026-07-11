@@ -7,6 +7,7 @@ import { StatusDot } from "@/components/editorial/StatusDot";
 import { Tooltip, InfoTip } from "@/components/editorial/Tooltip";
 import { ScorePosition } from "@/components/editorial/ScorePosition";
 import { SourceDot } from "@/components/SourceDot";
+import { DataValueState } from "@/components/DataValueState";
 import { CountrySearchCombobox } from "@/components/CountrySearchCombobox";
 import { PageHero } from "@/components/PageHero";
 import { SegmentedControlDemo } from "./SegmentedControlDemo";
@@ -291,6 +292,19 @@ export default function DesignSystemPage() {
                 <Pill variant="rose">Fragile</Pill>
                 <Pill variant="blue">EU Member</Pill>
                 <Pill variant="accent">Accent</Pill>
+              </div>
+            </div>
+
+            <div className="ds-comp ds-comp--wide">
+              <h4>Data availability states (real)</h4>
+              <div className="ds-row">
+                <DataValueState status="observed">42</DataValueState>
+                <DataValueState status="missing" reason="Expected import row is absent." />
+                <DataValueState status="unknown" reason="Publisher reports unknown." />
+                <DataValueState status="not_applicable" reason="Indicator does not apply." />
+                <DataValueState status="not_observed" reason="No observation for this period." />
+                <DataValueState status="disputed" reason="Sources conflict.">42</DataValueState>
+                <DataValueState status="withheld" reason="Release rights are restricted." />
               </div>
             </div>
 

@@ -5,6 +5,7 @@ import {
 } from "@/lib/db/queries";
 import { SourceDot } from "@/components/SourceDot";
 import { sourceLabel } from "@/lib/data/sources";
+import { DataValueState } from "@/components/DataValueState";
 import {
   IndicatorTrendChart,
   type TrendSeriesInput,
@@ -41,7 +42,14 @@ export async function CountryTrendSection({ slug }: { slug: string }) {
   } catch {}
 
   const drawable = series.filter((s) => s.points.length >= 2);
-  if (drawable.length === 0) return null;
+  const availability = series.flatMap((item) =>
+    item.availability.map((state) => ({
+      ...state,
+      indicator: item.indicator,
+      sourceId: item.sourceId,
+    })),
+  );
+  if (drawable.length === 0 && availability.length === 0) return null;
 
   const chartSeries: TrendSeriesInput[] = drawable.map((s) => ({
     dimension: s.dimension,
@@ -60,7 +68,10 @@ export async function CountryTrendSection({ slug }: { slug: string }) {
   );
 
   // Overall span across every series, for the eyebrow summary.
-  const allYears = drawable.flatMap((s) => s.points.map((p) => p.year));
+  const allYears = [
+    ...drawable.flatMap((s) => s.points.map((p) => p.year)),
+    ...availability.map((item) => item.year),
+  ];
   const minYear = Math.min(...allYears);
   const maxYear = Math.max(...allYears);
 
@@ -69,14 +80,25 @@ export async function CountryTrendSection({ slug }: { slug: string }) {
       <div className="ci-country-section-eyebrow">
         <span>Long-run indicators · source history</span>
         <small>
-          {drawable.length} series · {minYear}–{maxYear}
+          {drawable.length} drawable series · {minYear}–{maxYear}
         </small>
       </div>
       <h3 className="ci-country-section-title">
         How the underlying indicators have moved over the decades.
       </h3>
 
-      <IndicatorTrendChart series={chartSeries} />
+      {chartSeries.length > 0 ? <IndicatorTrendChart series={chartSeries} /> : null}
+
+      {availability.length > 0 ? (
+        <ul className="ci-country-long-run-sources" aria-label="Indicator availability states">
+          {availability.map((item) => (
+            <li key={`${item.indicator}-${item.year}-${item.status}`} className="ci-country-long-run-source">
+              <span>{item.indicator} · {item.year}</span>
+              <DataValueState status={item.status} reason={item.reason} />
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       <div className="ci-country-long-run-sources">
         {distinctSources.map((sourceId) => (
