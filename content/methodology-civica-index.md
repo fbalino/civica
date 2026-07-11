@@ -61,14 +61,14 @@ The frozen 2024-Q4 Beta release uses **World Bank WGI Voice & Accountability as 
 
 ## Section 4 · Weight determination {#weights}
 
-The current beta weights are PCA-informed estimates, not externally reviewed parameters. The completed analysis uses a single-year, {{state.civicaIndex.pca.panelSize}}-country panel. Civica has since frozen a private 2000–2024 native-scale research panel with explicit missing cells, but has not yet run the preregistered historical factor and substitution analyses:
+The deployed beta weights came from a single-year, {{state.civicaIndex.pca.panelSize}}-country PCA and remain externally unreviewed. Civica subsequently froze a private native-scale historical panel and completed the preregistered dimensionality, substitution, and sensitivity analyses:
 
-- **Completed:** principal component analysis (PCA) on the currently ingested complete-case panel. The appendix reports its sample, data vintage, and limitations.
-- **Completed data foundation:** the 2000–2024 country-year panel is frozen with source, vintage-status, unit, identity transform, uncertainty status, missingness reason, revision status, temporal-break registry, and semantic hashes. Exact values remain private because source rights are mixed.
-- **Planned analysis:** factor analysis with justified rotation and source/method controls to test whether Administrative Capacity is distinct from Rule of Law.
-- **Planned:** source-substitution sensitivity testing that swaps primary and secondary indicators and measures how much results move.
+- **Deployed-weight record:** the appendix preserves the complete-case cross-sectional PCA that produced the current near-equal weights.
+- **Historical panel:** the frozen country-year panel retains source identity, vintage, native unit, uncertainty status, missingness reason, revision state, temporal breaks, and semantic hashes. Exact observations remain private because source rights are mixed.
+- **Dimensionality result:** governance ratings share a strong between-country level factor, but the factor is materially weaker for within-country variation and annual changes. The level result cannot validate one longitudinal change construct.
+- **Sensitivity result:** source inclusion, normalization, and aggregation choices move country positions much more than small changes among the near-equal weights. The public inputs also reproduce the composite almost exactly.
 
-The full PCA results — eigenvalues, scree plot, factor loadings, and decision rationale — are published as a separate appendix at [/civica-index/methodology/pca-appendix](/civica-index/methodology/pca-appendix). Headline finding: the {{state.civicaIndex.dimensionCount}} governance dimensions are highly correlated (r = {{ctx.corrLow}} to {{ctx.corrHigh}}), one dominant latent factor explains {{ctx.pc1VariancePct}}% of the variance, and weights proportional to the squared first-component loadings come out near-equal — close enough to the provisional values that rankings barely move under the revision.
+The deployed PCA record — eigenvalues, scree plot, factor loadings, and decision rationale — is published at [/civica-index/methodology/pca-appendix](/civica-index/methodology/pca-appendix). In that cross-section, the {{state.civicaIndex.dimensionCount}} dimensions are highly correlated (r = {{ctx.corrLow}} to {{ctx.corrHigh}}), and the first component explains {{ctx.pc1VariancePct}}% of the variance. The later tournament evidence shows why that result is too narrow to justify an original Civica measurement or a recommended country ranking.
 
 ## Section 5 · Uncertainty posture {#uncertainty}
 
@@ -121,24 +121,24 @@ The Pulse is currently a clearly labelled *Beta* experiment. Its classifications
 
 The Civica Index is designed for **quarterly** vintages aligned with source publication cycles. Mid-quarter source releases are staged for the next published computation. Pulse is designed for scheduled event-ingestion runs, but the public ledger always reflects the most recent completed computation rather than a live or continuous measure.
 
-To reconcile citation stability with longitudinal comparability, every score is preserved in two parallel historical series:
+The research design distinguishes two historical series:
 
 - **As-published vintages.** Every quarterly snapshot is preserved permanently. Cited values like "Civica Index 2026 Q3" resolve to that frozen value forever, regardless of how the methodology evolves afterward.
 - **Harmonized back-cast.** Every country's historical CI is recomputed annually under the current methodology and published as a separate time series — for researchers who want apples-to-apples comparisons across years. Always clearly labelled as back-cast.
 
-Both series are accessible via the API. See §13 for citation format.
+The current public API does not yet certify both series as separately complete and reproducible. Until that versioning gate passes, readers should treat current history responses as research-beta records rather than a finished as-published/back-cast archive. See §13 for citation guidance.
 
 ## Section 12 · Limitations {#limitations}
 
 **Source lag.** The CI is only as current as its slowest-updating source. Some upstream indices publish 12–18 months behind real-world developments. Pulse is a separate experiment testing whether an event ledger can add timely context; its incremental value has not yet been established.
 
-**Coverage gaps.** Some countries have insufficient source coverage to compute even a partial CI. Those pages display "Insufficient data" rather than guess. The full list will accompany the replication package (in preparation, targeted for Q3 2026).
+**Coverage gaps.** Some countries have insufficient source coverage to compute even a partial CI. Those pages display "Insufficient data" rather than guess. The complete public replication package, including a frozen coverage list, is not yet available.
 
 **Partial-estimate upward bias.** Re-proportioning weights over the dimensions present (§7) can bias a partial score upward relative to what the country would score with full coverage, since the missing dimension is often the weakest one for a fragile or low-capacity state. The partial label identifies this limitation; no generic uncertainty band is presented as a correction.
 
 **Construct narrowing.** By design, the CI measures governing institutions only. If a reader wants to ask "is this country a good place to live?" — a different and broader question — the CI alone does not answer that. Read it together with [Civica Conditions](/civica-conditions).
 
-**PCA panel underpowered.** The PCA in §4 was run on n = {{state.civicaIndex.pca.panelSize}} countries from a single year ({{state.civicaIndex.pca.dataVintage}}). A historical panel is now frozen, but the preregistered longitudinal analysis has not been run. The current result does not establish that the same structure will hold across years or broader country coverage.
+**Level/change mismatch.** The deployed weights still come from the single-year PCA described in §4. The completed historical analysis finds a much weaker common structure in annual changes than in between-country levels. A strong pooled level factor therefore cannot establish that yearly composite movement tracks one coherent longitudinal construct.
 
 ## Section 13 · Citation {#citation}
 
@@ -163,4 +163,4 @@ Every score is open to dispute. Submit data-error corrections, methodology disag
 
 ### 13.3 · Replication
 
-A full replication package — codebook, processing logic, source references, and downloadable derived outputs — is in preparation, targeted for Q3 2026. Its landing page is at [/civica-index/replication](/civica-index/replication).
+The [replication status page](/civica-index/replication) lists the required artifacts and their current availability. The complete public package is not yet published; mixed source rights and pending external gates still limit what can be released.

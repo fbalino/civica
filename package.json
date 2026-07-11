@@ -85,6 +85,8 @@
     "validate:index-tournament-package": "tsx scripts/validate-index-tournament-package.ts",
     "generate:index-tournament-decision": "tsx scripts/generate-index-tournament-decision.ts",
     "validate:index-tournament-decision": "tsx scripts/validate-index-tournament-decision.ts",
+    "generate:index-disposition": "tsx scripts/generate-index-disposition.ts",
+    "validate:index-disposition": "tsx scripts/validate-index-disposition.ts",
     "validate:ci-tournament-panel:v3": "tsx scripts/validate-ci-tournament-panel-v3.ts",
     "validate:ci-tournament-panel:v3:live": "tsx scripts/validate-ci-tournament-panel-v3.ts --live",
     "validate:ci-tournament-panel:v2": "tsx scripts/validate-ci-tournament-panel-v2.ts",

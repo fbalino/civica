@@ -741,7 +741,7 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "index-methodology.pca-headline",
     "content/methodology-civica-index.md",
     "reader:methodology-civica-index",
-    "{{state.civicaIndex.dimensionCount}} governance dimensions are highly correlated",
+    "{{state.civicaIndex.dimensionCount}} dimensions are highly correlated",
     "registered site-state Civica Index PCA configuration",
   ),
   runtimeClaim(
@@ -771,13 +771,6 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "/civica-index",
     "Tied rank ${r.rank} (${r.tieCount} countries)",
     "live Beta competition-rank group returned by getCIRankings",
-  ),
-  runtimeClaim(
-    "index-methodology.pca-panel",
-    "content/methodology-civica-index.md",
-    "reader:methodology-civica-index",
-    "{{state.civicaIndex.pca.panelSize}} countries from a single year",
-    "registered site-state Civica Index PCA panel and data vintage",
   ),
   runtimeClaim(
     "pca-appendix.panel-summary",

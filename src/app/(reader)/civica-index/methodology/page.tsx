@@ -12,17 +12,19 @@ import {
 import { humanizeSectionLabel } from "@/lib/data/humanize-label";
 import { civicaIndex, disputeSla, pulse } from "@/lib/content/site-state";
 import { dimensionColorVar } from "@/lib/ci/dimension-colors";
+import { INDEX_DISPOSITION } from "@/lib/ci/index-disposition";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Civica Index Methodology — How Governance Is Scored",
+  title: "Civica Index Research Methodology and Disposition",
   description:
-    `The Civica Index research-beta methodology: ${civicaIndex.dimensionCount} governance dimensions, fixed-bound normalization, deterministic weighted point estimates, no published composite uncertainty band, neutral numeric presentation, and a separate Civica Conditions companion layer.${civicaIndex.status === "beta" ? " Beta — methodology in active development and not independently reviewed." : ""}`,
+    "The source-native Governance Evidence Dashboard is Civica's selected public comparison product. The composite remains versioned research and is not a recommended country ranking.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/methodology" },
 };
 
 const SECTIONS = [
+  { id: "disposition", num: 0, label: "Current disposition" },
   { id: "scale", num: 1, label: "Scale" },
   { id: "dimensions", num: 2, label: "Dimensions" },
   { id: "normalization", num: 3, label: "Normalization" },
@@ -136,24 +138,37 @@ export default async function MethodologyPage() {
       </div>
 
       <div className="editorial-warning">
-        <strong>Beta.</strong> The methodology described on this page
-        is in active development. The current single-year PCA is published but
-        underpowered; the planned longitudinal, factor-analysis, and
-        source-substitution tests are not complete. The provisional weights
-        are documented at{" "}
-        <Link href="/civica-index/methodology/pca-appendix">
-          /civica-index/methodology/pca-appendix
-        </Link>
-        . External academic review is still pending.
+        <strong>Research status.</strong> The confirmatory tournament has no
+        winner. The composite fails the original-measurement test, and its
+        current league-table presentation fails the misuse audit. Qualified
+        reader and external-review gates remain pending.
       </div>
 
       <p className="meth-abstract">
-        The Civica Index is a research-beta composite of four governance
-        dimensions. It is a secondary experiment, not a settled measure of a
-        country&rsquo;s overall governance quality. Current outputs include
-        explicit source inputs and sensitivity ranges, with known coverage and
-        validation gaps documented below.
+        {INDEX_DISPOSITION.publicSummary}
       </p>
+
+      <Reveal as="section" id="disposition" className="editorial-section">
+        <h2>
+          <span className="meth-num">Current disposition</span>Source-native
+          comparison is the public product
+        </h2>
+        <p>{INDEX_DISPOSITION.publicProduct.claim}</p>
+        <p>
+          The composite remains available for methods research and exact
+          reproduction. It cannot be presented as original measurement or a
+          recommended league table. Reconsideration requires the frozen reader
+          utility test, a presentation that passes the misuse gate, and renewed
+          reliability, coverage, rights, and reproduction checks.
+        </p>
+        <p>
+          <Link href={INDEX_DISPOSITION.publicProduct.route}>
+            Open the Governance Evidence Dashboard
+          </Link>
+          {" · "}
+          <Link href="/civica-index/replication">Review research evidence status</Link>
+        </p>
+      </Reveal>
 
       {/* Section 1 — Scale (markdown body). Slice ends at the
           next markdown anchor (normalization), since Section 2
