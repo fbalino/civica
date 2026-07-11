@@ -590,3 +590,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   separately from WGI Rule of Law and applies V-Dem-first precedence.
 - Candidate set, preregistration, and baselines advanced to v3 before outcome
   inspection; all earlier releases remain immutable. IDX-012 resumes.
+
+## 2026-07-11 — IDX-012 exact K1 candidate completed
+
+- K1 now runs independently on panel v3 with the exact primary/fallback inputs,
+  production weights, missingness, null uncertainty, and competition ranks.
+- It emits 3,659 hashed private outputs and exactly reproduces all 190 current
+  Beta-R5 composites. TypeScript and 688/688 tests pass. IDX-013 next.
