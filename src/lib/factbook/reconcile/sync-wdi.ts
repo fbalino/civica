@@ -352,7 +352,7 @@ export const WDI_INDICATORS: readonly WdiIndicatorConfig[] = [
   },
 ];
 
-interface WbDataPoint {
+export interface WbDataPoint {
   country: { id: string; value: string };
   /** ISO3 code for the country — sometimes empty for aggregates. */
   countryiso3code: string;
@@ -398,6 +398,17 @@ export interface WdiSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchIndicator?: (wbCode: string, startYear: number, endYear: number) => Promise<WbDataPoint[]>;
+  jurisdictions?: WdiJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface WdiJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -519,7 +530,7 @@ export async function syncWorldBankWdi(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -570,7 +581,7 @@ export async function syncWorldBankWdi(
 
     let rows: WbDataPoint[];
     try {
-      rows = await fetchIndicator(config.wbCode, startYear, endYear);
+      rows = await (options.fetchIndicator ?? fetchIndicator)(config.wbCode, startYear, endYear);
     } catch (err) {
       errors.push(
         `${config.wbCode} fetch failed: ${
@@ -753,7 +764,7 @@ export async function syncWorldBankWdi(
     );
   }
 
-  await markSourcesSynced("world_bank", {
+  await (options.markSynced ?? markSourcesSynced)("world_bank", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -772,7 +783,7 @@ export async function syncWorldBankWdi(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose

@@ -285,3 +285,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   the production build passed.
 - These adapters remain in progress until their source-shaped parser and
   two-run canonical-state fixtures land.
+
+## 2026-07-10 — DAT-012 factbook fixture tranche 1
+
+- Added bounded production seams and source-shaped repeatability fixtures for
+  World Bank WDI, IMF WEO, UN Data, and WHO GHO.
+- Each adapter now has executable proof for applied two-run canonical
+  convergence, stable zero-write dry runs, and upstream failures that cannot
+  stamp freshness.
+- Twelve focused tests, 491 full tests, and the production build passed.
+  Factbook fixture coverage is 4 of 18 external adapters.

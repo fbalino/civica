@@ -245,7 +245,7 @@ export const WHO_GHO_INDICATORS: readonly WhoGhoIndicatorConfig[] = [
  * One row as returned by the WHO GHO OData endpoint. Field names
  * are case-sensitive and match the upstream JSON exactly.
  */
-interface WhoGhoDataPoint {
+export interface WhoGhoDataPoint {
   Id: number;
   IndicatorCode: string;
   /** "COUNTRY" | "REGION" | "GLOBAL" | "UNSDGREGION" | etc. */
@@ -314,6 +314,17 @@ export interface WhoGhoSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchIndicator?: (config: WhoGhoIndicatorConfig) => Promise<WhoGhoDataPoint[]>;
+  jurisdictions?: WhoGhoJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface WhoGhoJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -450,7 +461,7 @@ export async function syncWhoGho(
   }
 
   // Build iso3 → jurisdictionId map once; reused across all indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -496,7 +507,7 @@ export async function syncWhoGho(
 
     let rows: WhoGhoDataPoint[];
     try {
-      rows = await fetchIndicator(config);
+      rows = await (options.fetchIndicator ?? fetchIndicator)(config);
     } catch (err) {
       errors.push(
         `${config.whoCode} fetch failed: ${
@@ -694,7 +705,7 @@ export async function syncWhoGho(
     );
   }
 
-  await markSourcesSynced("who_gho", {
+  await (options.markSynced ?? markSourcesSynced)("who_gho", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -713,7 +724,7 @@ export async function syncWhoGho(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose

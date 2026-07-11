@@ -301,6 +301,18 @@ export interface ImfWeoSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchCatalog?: typeof fetchIndicatorCatalog;
+  fetchIndicator?: typeof fetchIndicator;
+  jurisdictions?: ImfWeoJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface ImfWeoJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -472,7 +484,7 @@ export async function syncImfWeo(
   // proceeds.
   let vintageLabel = IMF_WEO_VINTAGE_FALLBACK;
   try {
-    const catalog = await fetchIndicatorCatalog();
+    const catalog = await (options.fetchCatalog ?? fetchIndicatorCatalog)();
     // Use the first target indicator's source to derive the vintage.
     // All WEO indicators share the same vintage string within a
     // release.
@@ -495,7 +507,7 @@ export async function syncImfWeo(
 
   // Build iso3 → jurisdictionId map once; reused across all
   // indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -543,7 +555,7 @@ export async function syncImfWeo(
 
     let rows: Record<string, Record<string, number>>;
     try {
-      rows = await fetchIndicator(config.weoCode);
+      rows = await (options.fetchIndicator ?? fetchIndicator)(config.weoCode);
     } catch (err) {
       errors.push(
         `${config.weoCode} fetch failed: ${
@@ -760,7 +772,7 @@ export async function syncImfWeo(
 
   // Stamp source freshness via the single sanctioned helper — only when
   // this run actually wrote rows (AGENTS.md provenance invariant).
-  await markSourcesSynced("imf_weo", {
+  await (options.markSynced ?? markSourcesSynced)("imf_weo", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -779,7 +791,7 @@ export async function syncImfWeo(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose

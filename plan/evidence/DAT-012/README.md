@@ -64,3 +64,19 @@ two-run canonical-state fixtures are still required before DAT-012 can count
 them as accepted.
 
 After this boundary wave, 479/479 tests and the full production build pass.
+
+## Factbook publisher-fixture tranche 1
+
+World Bank WDI, IMF WEO, UN Data, and WHO GHO now expose bounded production
+seams for source-shaped observations, jurisdiction catalogs, dispute handling,
+and freshness. Production defaults are unchanged; fixtures can execute the real
+normalization, envelope, snapshot, and country-fact code without network or a
+live database.
+
+For each of the four adapters, executable tests prove two applied runs converge
+on one semantic canonical fact, dry-run reports are stable with zero database
+writes, and an upstream failure is surfaced while freshness receives zero
+writable rows. Twelve focused tests pass. The other factbook publishers remain
+in progress.
+
+After this tranche, 491/491 tests and the full production build pass.

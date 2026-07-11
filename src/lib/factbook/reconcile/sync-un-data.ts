@@ -299,7 +299,7 @@ export const M49_TO_ISO3: Record<number, string> = {
  *   4. "Variant"                 (e.g. "Medium", "High", "Low", ...)
  *   5. "Value"                   (e.g. "232679.478")
  */
-interface UnDataRow {
+export interface UnDataRow {
   countryCode: number;
   countryName: string;
   year: number;
@@ -346,6 +346,17 @@ export interface UnDataSyncOptions {
   dryRun?: boolean;
   /** Optional progress callback for streaming logs. */
   onProgress?: (line: string) => void;
+  /** Deterministic fixture seams; production callers omit these. */
+  fetchIndicator?: (unVarId: number, timeId: number) => Promise<UnDataRow[]>;
+  jurisdictions?: UnDataJurisdiction[];
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface UnDataJurisdiction {
+  id: string;
+  slug: string;
+  iso3: string | null;
 }
 
 function freshCounters(
@@ -512,7 +523,7 @@ export async function syncUnData(
 
   // Build iso3 → jurisdictionId map once; reused across all
   // indicators.
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -558,7 +569,7 @@ export async function syncUnData(
 
     let rows: UnDataRow[];
     try {
-      rows = await fetchIndicatorYear(config.unVarId, UN_WPP_TIME_ID);
+      rows = await (options.fetchIndicator ?? fetchIndicatorYear)(config.unVarId, UN_WPP_TIME_ID);
     } catch (err) {
       errors.push(
         `UN vid ${config.unVarId} fetch failed: ${
@@ -753,7 +764,7 @@ export async function syncUnData(
     );
   }
 
-  await markSourcesSynced("un_data", {
+  await (options.markSynced ?? markSourcesSynced)("un_data", {
     rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
@@ -772,7 +783,7 @@ export async function syncUnData(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`,
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return; // too verbose
