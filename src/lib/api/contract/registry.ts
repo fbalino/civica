@@ -561,7 +561,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/countries/[slug]/export/route.ts",
     versioned: false,
     summary:
-      "Returns 503 while the former mixed-source country download is withheld for source/field rights closure. DAT-017/DAT-027 owns its rights-filtered replacement.",
+      "Returns 503 while the former mixed-source country download is withheld for source/field rights closure. DAT-027 owns its rights-filtered per-country replacement.",
     params: [
       {
         name: ":slug",

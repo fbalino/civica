@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-017_versioned_rights_filtered_atlas_export"
+    "current_task": "DAT-018_release_checksums_and_bill_of_materials"
   },
   "budget": {
     "mode": "subscription_only",
@@ -622,6 +622,9 @@
     "plan/evidence/DAT-016/README.md",
     "drizzle/migrations/0024_research_evidence_retention.sql",
     "data/RESEARCH-EVIDENCE-RETENTION.md",
+    "plan/evidence/DAT-017/README.md",
+    "data/releases/atlas-2026-07-11/manifest.v1.json",
+    "data/releases/atlas-2026-07-11/atlas-export.v1.json.gz",
     "data/release-quality-report.v1.json",
     "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json",
     "data/schema-data-dictionary.v1.json",
@@ -642,11 +645,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for DAT-016: retention, migration/preflight, data dictionary, Pulse runtime, source/adapter, release/version, claims/documentation, compilation, TypeScript, static generation, and route-generation gates succeeded with 614 tests.",
-    "tests": "614/614 tests passed. Seven DAT-016 fixtures cover protected-relation closure, append-only enforcement, actor/reason/time fields, cascade prevention, Pulse negative retention, both evaluation views, and the sole ephemeral deletion exemption. Master plan is 35/288 complete (12.2%).",
-    "public_claims": "No reader-facing empirical claim changed. The internal policy explicitly discloses that retention starts at migration 0024 and cannot reconstruct earlier deletions.",
-    "browser": "Not required for DAT-016 because no reader UI or rendered design-system behavior changed.",
-    "visual_review": "Not applicable; DAT-016 changed database retention, internal query surfaces, and operational documentation only."
+    "build": "npm run build passed for DAT-017: atlas-export, rights, derivation-version, API, claims/documentation, migration, source, compilation, TypeScript, static generation, and route-generation gates succeeded with 617 tests.",
+    "tests": "617/617 tests passed. Three DAT-017 fixtures cover deterministic ordering, blocked-source failure, and observed-zero preservation; the live validator reproduced the checked release byte-for-byte. Master plan is 36/288 complete (12.5%).",
+    "public_claims": "The API documentation now publishes one registered claim for the frozen Atlas source-observation release and keeps the legacy mixed-source per-country export visibly blocked for DAT-027.",
+    "browser": "Local API documentation rendered release ID, exclusions, SHA-256, codebook notice, and download link with zero console errors. The download returned HTTP 200 application/gzip and passed gzip integrity testing.",
+    "visual_review": "The download uses the canonical primary button and existing API-docs editorial components without new design-token drift."
   },
-  "updated_at": "2026-07-11T02:35:00Z"
+  "updated_at": "2026-07-11T03:10:33Z"
 }

@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 35
-- **Remaining:** 253
-- **Progress:** 12.2%
+- **Completed:** 36
+- **Remaining:** 252
+- **Progress:** 12.5%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -54,7 +54,7 @@ Source: `plan/03-data-provenance-and-reproducibility.md`
 - [x] **DAT-014** (P0) Add release data-quality invariants and anomaly reports. _Done when: one command checks identifier uniqueness, jurisdiction coverage, impossible ranges, unit/vintage consistency, orphan provenance, duplicate canonical facts, missing required fields, unexpected row deltas, and source-age thresholds; seeded anomalies fail with actionable output._
 - [x] **DAT-015** (P1) Define explicit missing, unknown, not-applicable, not-observed, disputed, and withheld states across DB/API/UI/export. _Done when: each state has distinct storage and rendering behavior, no zero/empty string substitutes for unknown, APIs preserve the distinction, and country/indicator fixtures cover all states._
 - [x] **DAT-016** (P1) Retain negative, rejected, superseded, and null evidence needed for audit and evaluation. _Done when: deletion/overwrite paths preserve tombstones or version history with reason/actor/time, rejected Pulse and reconciliation evidence remains queryable for false-positive/false-negative studies, and retention policy tests pass._
-- [ ] **DAT-017** (P0) Build a versioned bulk atlas export independent of restricted research-score products. _Done when: the release produces documented machine-readable tables for permitted atlas data, stable IDs, provenance/rights joins, codebook, schema version, generated-at/release date, and deterministic ordering; a reader can download it without scraping pages._
+- [x] **DAT-017** (P0) Build a versioned bulk atlas export independent of restricted research-score products. _Done when: the release produces documented machine-readable tables for permitted atlas data, stable IDs, provenance/rights joins, codebook, schema version, generated-at/release date, and deterministic ordering; a reader can download it without scraping pages._
 - [ ] **DAT-018** (P0) Generate deterministic release checksums and a bill of materials. _Done when: identical commit/input manifests produce byte-identical normalized exports or documented deterministic semantic hashes; the release includes file hashes, sizes, row counts, schemas, source vintages, code commit, and tool versions._
 - [ ] **DAT-019** (P0) Create a legally shareable clean-room reproduction fixture and runbook. _Done when: a new environment with only documented credentials/access and release inputs can build the database/export, run all validators, and match expected checksums/declared tolerances without private branches, local caches, or undocumented manual edits._
 - [ ] **DAT-020** (P1) Produce source-coverage dashboards for elections, constitutions, offices, people, parties, organizations, bills, indicators, and images. _Done when: each domain exposes freshness, country coverage, field completeness, source families, known gaps, and last successful run; thresholds power alerts and honest UI coverage notes._

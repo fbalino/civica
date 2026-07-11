@@ -198,6 +198,31 @@ export interface ProductRightsRecord {
 
 export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
   {
+    productId: "atlas-reference-export-v1",
+    routeOrArtifact: "/downloads/civica-atlas-2026-07-11.json.gz",
+    publicBulkExport: "allowed",
+    fields: [
+      {
+        fieldPattern: "tables.jurisdictions[]",
+        lineage: "civica-derived",
+        exportRule: "source-permission",
+      },
+      {
+        fieldPattern: "tables.facts[]",
+        lineage: "source-row",
+        exportRule: "source-permission",
+      },
+      {
+        fieldPattern: "tables.sources[]",
+        lineage: "civica-derived",
+        exportRule: "source-permission",
+      },
+    ],
+    reason:
+      "The frozen package contains Atlas reference observations only from sources with verified public bulk-export terms. It excludes Index, Pulse, restricted sources, images, and publisher payloads.",
+    requiresDerivationVersions: true,
+  },
+  {
     productId: "country-export-json-csv",
     routeOrArtifact: "/api/countries/{slug}/export?format=json|csv",
     publicBulkExport: "blocked",
@@ -224,7 +249,7 @@ export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
       },
     ],
     reason:
-      "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-017/DAT-027 will replace it with rights-filtered canonical-plus-alternates exports.",
+      "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; DAT-017 separately publishes a frozen Atlas source-observation package.",
     requiresDerivationVersions: true,
   },
   {
@@ -276,6 +301,28 @@ const CI_BETA_RELEASE_DERIVATION_VERSIONS = buildDerivationVersionEnvelope({
 });
 
 export const RELEASE_ARTIFACT_RIGHTS: readonly ReleaseArtifactRights[] = [
+  {
+    releaseId: "atlas-2026-07-11",
+    artifactPath: "data/releases/atlas-2026-07-11/atlas-export.v1.json.gz",
+    artifactKind: "data",
+    includedSources: ["cia_factbook", "wikidata", "world_bank"],
+    excludedSourcePayloads: [
+      "all raw publisher payloads",
+      "all sources without verified public bulk-export terms",
+      "Civica Index and Pulse outputs",
+      "images and constitution text",
+    ],
+    publicDistribution: "allowed",
+    governingTerms:
+      "Each fact row retains its source ID and joins to the embedded source-specific terms record. Download access does not replace those terms or grant a blanket license.",
+    derivationVersions: buildDerivationVersionEnvelope({
+      methodology: versioned("civica-atlas-export/v1"),
+      algorithm: versioned("atlas-export-generator/v1"),
+      prompt: notApplicable("The export is generated deterministically without a model prompt."),
+      taxonomy: versioned("jurisdiction-status/v1"),
+      sourceIds: ["cia_factbook", "wikidata", "world_bank"],
+    }),
+  },
   {
     releaseId: "ci-beta-2024-Q4",
     artifactPath: "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",

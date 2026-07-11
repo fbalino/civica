@@ -54,12 +54,27 @@ test("unknown products and pending sources fail closed", () => {
 });
 
 test("release artifacts name included and excluded publisher payloads", () => {
-  assert.equal(RELEASE_ARTIFACT_RIGHTS.length, 2);
-  for (const artifact of RELEASE_ARTIFACT_RIGHTS) {
+  assert.equal(RELEASE_ARTIFACT_RIGHTS.length, 3);
+  const metadataArtifacts = RELEASE_ARTIFACT_RIGHTS.filter(
+    (artifact) => artifact.artifactKind === "metadata-only",
+  );
+  assert.equal(metadataArtifacts.length, 2);
+  for (const artifact of metadataArtifacts) {
     assert.equal(artifact.artifactKind, "metadata-only");
     assert.equal(artifact.publicDistribution, "allowed");
     assert.deepEqual(artifact.includedSources, artifact.excludedSourcePayloads);
   }
+  const atlas = RELEASE_ARTIFACT_RIGHTS.find(
+    (artifact) => artifact.releaseId === "atlas-2026-07-11",
+  );
+  assert.equal(atlas?.artifactKind, "data");
+  assert.equal(atlas?.publicDistribution, "allowed");
+  assert.deepEqual(atlas?.includedSources, [
+    "cia_factbook",
+    "wikidata",
+    "world_bank",
+  ]);
+  assert.ok((atlas?.excludedSourcePayloads.length ?? 0) > 0);
 });
 
 test("machine-readable manifest contains source, product, field, and release levels", () => {

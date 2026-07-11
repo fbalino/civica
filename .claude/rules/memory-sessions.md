@@ -377,3 +377,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Seven focused fixtures, 614/614 tests, TypeScript, ESLint, live migration and
   query checks, documentation, claims, and the production build pass. DAT-017
   is next.
+
+## 2026-07-11 — DAT-017 frozen Atlas export completed
+
+- Published `atlas-2026-07-11`: 253 jurisdiction rows, 16,451 active fact
+  observations, and embedded rights records for CIA Factbook, Wikidata, and
+  World Bank in one deterministic gzip JSON package.
+- The package carries a field codebook, stable joins, value states, vintages,
+  source terms, ordering, dates, counts, and checked hashes. Index, Pulse,
+  pending sources, images, constitution text, and publisher payloads stay out.
+- Live regeneration matched the checked bytes; 617/617 tests, browser/download
+  checks, claims/docs, and the production build pass. DAT-018 is next.

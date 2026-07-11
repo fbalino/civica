@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "civica-atlas-export-manifest/v1",
+  "releaseId": "atlas-2026-07-11",
+  "releaseDate": "2026-07-11",
+  "sha256": "cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1",
+  "byteLength": 14600640,
+  "compressedSha256": "b704a564766cbda54d37be4c34211dc707af9aa98e9551b66a171d7b8789892b",
+  "compressedByteLength": 1206302,
+  "counts": {
+    "jurisdictions": 253,
+    "facts": 16451,
+    "sources": 3
+  },
+  "encoding": "gzip",
+  "publicDownload": "/downloads/civica-atlas-2026-07-11.json.gz"
+}

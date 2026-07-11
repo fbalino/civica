@@ -1025,9 +1025,9 @@ const countryExportJsonExample = zCountryExportBlocked.parse({
   code: "EXPORT_RIGHTS_BLOCKED",
   country: "france",
   reason:
-    "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-017/DAT-027 will replace it with rights-filtered canonical-plus-alternates exports.",
+    "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; DAT-017 separately publishes a frozen Atlas source-observation package.",
   rightsManifest: "/api/rights-manifest",
-  replacementGate: "DAT-017/DAT-027",
+  replacementGate: "DAT-027",
 });
 
 /* ────────────────────────────────────────────────────────────────
@@ -1063,7 +1063,7 @@ export function renderExample(id: ExampleId): string {
 
 /** Plain status text shown beside the blocked JSON response. */
 export function renderCountryExportCsvExample(): string {
-  return "CSV export is withheld until DAT-017/DAT-027 publishes a rights-filtered artifact.";
+  return "CSV export is withheld until DAT-027 publishes a rights-filtered per-country artifact.";
 }
 
 export { COUNTRY_EXPORT_CSV_HEADER };

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:migrations && npm run validate:migration-preflight && npm run validate:release-quality-report && npm run validate:data-value-states && npm run validate:research-evidence-retention && npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:raw-retention && npm run validate:rights-manifest && npm run validate:jurisdiction-status && npm run validate:fact-coverage && npm run validate:reconciliation-audit && npm run validate:source-precedence && npm run validate:data-dictionary && npm run validate:derivation-versions && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
+    "build": "npm run validate:migrations && npm run validate:migration-preflight && npm run validate:release-quality-report && npm run validate:data-value-states && npm run validate:research-evidence-retention && npm run validate:atlas-export && npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:raw-retention && npm run validate:rights-manifest && npm run validate:jurisdiction-status && npm run validate:fact-coverage && npm run validate:reconciliation-audit && npm run validate:source-precedence && npm run validate:data-dictionary && npm run validate:derivation-versions && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -46,6 +46,9 @@
     "validate:data-value-states:live": "tsx scripts/validate-data-value-states.ts --live",
     "validate:research-evidence-retention": "tsx scripts/validate-research-evidence-retention.ts",
     "validate:research-evidence-retention:live": "tsx scripts/validate-research-evidence-retention.ts --live",
+    "generate:atlas-export": "tsx scripts/generate-atlas-export.ts",
+    "validate:atlas-export": "tsx scripts/validate-atlas-export.ts",
+    "validate:atlas-export:live": "tsx scripts/validate-atlas-export.ts --live",
     "ingest:indicator-history": "tsx scripts/ingest-indicator-history.ts",
     "ingest:vparty": "tsx scripts/ingest-vparty-positions.ts --apply",
     "calculate:ci": "tsx scripts/calculate-ci-composite.ts",

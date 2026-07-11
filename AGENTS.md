@@ -133,6 +133,16 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
   evidence deleted before that point. Full policy:
   `data/RESEARCH-EVIDENCE-RETENTION.md`.
 
+## Atlas bulk export
+
+- DAT-017 publishes the frozen `civica-atlas-export/v1` package linked from
+  the API documentation. It contains permitted Atlas
+  reference observations only; Index, Pulse, restricted sources, images,
+  constitution text, and raw publisher payloads are excluded.
+- Every fact row joins to an embedded source-rights record. Regenerate with
+  `npm run generate:atlas-export`; verify checked hashes and a live deterministic
+  rebuild with `npm run validate:atlas-export:live`.
+
 ## Core environment variables
 The complete, authoritative contract (every var, required/optional, and why) is
 `.env.example` — read it rather than trusting a partial list here. Headline

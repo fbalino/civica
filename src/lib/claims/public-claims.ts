@@ -884,7 +884,7 @@ export const PUBLIC_CLAIMS = [
     surface: "exports",
     routeOrArtifact: "/api/countries/{slug}/export?format=csv|json",
     exactClaim:
-      "Country JSON and CSV downloads are withheld until DAT-017/DAT-027 replaces the mixed-source route with a rights-filtered canonical-plus-alternates export.",
+      "Country JSON and CSV downloads remain withheld until DAT-027 replaces the mixed-source route with a rights-filtered canonical-plus-alternates export.",
     tier: "retired-deprecated-output",
     evidenceSources: [
       "src/app/api/countries/[slug]/export/route.ts",
@@ -896,6 +896,26 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/api/countries/[slug]/export/route.ts",
       fragment: "Country data export is not published.",
+    },
+  },
+  {
+    id: "export.atlas-release",
+    surface: "exports",
+    routeOrArtifact: "/downloads/civica-atlas-2026-07-11.json.gz",
+    exactClaim:
+      "The frozen Atlas reference package contains permitted source observations with stable jurisdiction IDs, provenance, rights joins, a codebook, deterministic ordering, and no Index or Pulse outputs.",
+    tier: "institutional-posture",
+    evidenceSources: [
+      "data/releases/atlas-2026-07-11/manifest.v1.json",
+      "src/lib/rights/manifest.ts",
+      "scripts/validate-atlas-export.ts",
+    ],
+    implementationOwner: "Atlas exports and data governance",
+    methodologyVersion: "civica-atlas-export/v1",
+    gate: "G2",
+    source: {
+      path: "src/app/api-docs/page.tsx",
+      fragment: "Download Atlas JSON (gzip)",
     },
   },
   {

@@ -1069,6 +1069,6 @@ export const zCountryExportBlocked = z
     country: z.string(),
     reason: z.string(),
     rightsManifest: z.literal("/api/rights-manifest"),
-    replacementGate: z.literal("DAT-017/DAT-027"),
+    replacementGate: z.literal("DAT-027"),
   })
   .strict();

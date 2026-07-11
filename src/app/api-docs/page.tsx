@@ -258,9 +258,9 @@ export default function ApiDocsPage() {
         <p className="api-intro">
           The Civica API provides read-only access to government structure data
           for sovereign states. All <code>/api/v1/*</code> responses are JSON.
-          No authentication is required. The former mixed-source country
-          download is withheld while its replacement receives field-level rights
-          controls.
+          No authentication is required. A frozen, rights-filtered Atlas
+          reference package is available below. The former mixed-source
+          per-country download remains withheld.
         </p>
 
         <div className="api-info-card">
@@ -504,14 +504,40 @@ for country in resp.json()["data"]:
       <hr className="api-section-divider" />
 
       <section id="bulk-data" className="editorial-section">
+        {/* PUBLIC_CLAIM: export.atlas-release */}
         <h2>Bulk Data</h2>
 
         <p className="api-intro">
-          Country JSON and CSV downloads are withheld. The previous response
-          mixed cached fields, derived classifications, and source rows without
-          a license record for every field. DAT-017 and DAT-027 will replace it
-          with a versioned, rights-filtered export whose canonical and alternate
-          rows retain their source terms.
+          The frozen <code>atlas-2026-07-11</code> package provides stable
+          jurisdiction records and active source observations from CIA
+          Factbook, Wikidata, and World Bank. Every fact joins to an embedded
+          source-rights row. Index, Pulse, restricted sources, images,
+          constitution text, and raw publisher payloads are excluded.
+        </p>
+
+        <p>
+          <a
+            className="btn btn--primary"
+            href="/downloads/civica-atlas-2026-07-11.json.gz"
+            download
+          >
+            Download Atlas JSON (gzip) →
+          </a>
+        </p>
+
+        <p className="api-info-card__body">
+          Schema <code>civica-atlas-export/v1</code> · release date{" "}
+          <code>2026-07-11</code> · SHA-256{" "}
+          <code>cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1</code>.
+          The package contains its codebook, join keys, deterministic ordering,
+          table counts, and source-specific terms.
+        </p>
+
+        <p className="api-intro">
+          Per-country JSON and CSV downloads are still withheld. The previous
+          response mixed cached fields, derived classifications, and source
+          rows without a license record for every field. DAT-027 owns its
+          canonical-plus-alternates replacement.
         </p>
 
         <Banner variant="info">
@@ -535,12 +561,10 @@ for country in resp.json()["data"]:
         <CodeBlock>{renderCountryExportCsvExample()}</CodeBlock>
 
         <p className="api-info-card__body">
-          A single frozen, versioned dataset artifact — one download for the
-          entire atlas, with a persistent identifier for citation — is a planned
-          addition. There is no supported bulk-download workaround today. The
-          country-list API remains available for ordinary queries; it is not a
-          substitute for a rights-cleared research release. DAT-027 owns the
-          canonical-plus-alternates replacement.
+          The bulk package is a source-observation release, not a canonical
+          per-country export. The country-list API remains available for
+          ordinary queries. DAT-027 owns the canonical-plus-alternates
+          per-country replacement.
         </p>
       </section>
 

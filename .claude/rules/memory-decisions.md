@@ -715,3 +715,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Rate-limit counters are the sole deletion exemption. The contract starts at
   migration `0024`; do not imply that earlier deleted evidence was recovered.
   Durable record: APR-D049 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Atlas bulk export is a narrow frozen observation release
+
+- `civica-atlas-export/v1` contains stable jurisdiction records and permitted
+  active source observations from CIA Factbook, Wikidata, and World Bank.
+- Embed the field codebook and source-specific rights. Exclude Index, Pulse,
+  pending sources, images, constitution text, and publisher payloads.
+- Keep the legacy per-country mixed-source export blocked for DAT-027. Durable
+  record: APR-D050 in `plan/DECISIONS.md`.
