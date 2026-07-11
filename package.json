@@ -49,6 +49,8 @@
     "validate:k4-practice-inputs:live": "tsx scripts/validate-k4-practice-inputs.ts --live",
     "generate:k4-pairing-prototype": "tsx scripts/generate-k4-pairing-prototype.ts",
     "validate:k4-pairing-prototype": "tsx scripts/validate-k4-pairing-prototype.ts",
+    "generate:k5-relation-candidates": "tsx scripts/generate-k5-relation-candidates.ts",
+    "validate:k5-relation-candidates": "tsx scripts/validate-k5-relation-candidates.ts",
     "validate:ci-tournament-panel:v3": "tsx scripts/validate-ci-tournament-panel-v3.ts",
     "validate:ci-tournament-panel:v3:live": "tsx scripts/validate-ci-tournament-panel-v3.ts --live",
     "validate:ci-tournament-panel:v2": "tsx scripts/validate-ci-tournament-panel-v2.ts",

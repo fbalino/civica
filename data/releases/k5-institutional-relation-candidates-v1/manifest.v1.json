@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "k5-relation-candidate-manifest/v1",
+  "releaseId": "k5-institutional-relation-candidates-v1",
+  "candidateId": "K5",
+  "methodVersion": "k5-institutional-constraint-map/v1",
+  "contractSha256": "c3bb1e768823effe9df1de2e5f0d21e86e4ad20d86d6321b911c36f84848d121",
+  "source": {
+    "table": "constitution_topic_excerpts",
+    "upstream": "Constitute Project",
+    "rightsPosture": "private_internal_research_only_noncommercial_source",
+    "valuesIncluded": false
+  },
+  "candidateRows": 2138,
+  "jurisdictions": 181,
+  "byRelation": [
+    {
+      "relationType": "appoints_or_selects",
+      "candidates": 166
+    },
+    {
+      "relationType": "approves_or_vetoes_legislation",
+      "candidates": 206
+    },
+    {
+      "relationType": "constitutional_review",
+      "candidates": 222
+    },
+    {
+      "relationType": "dismisses_legislature",
+      "candidates": 141
+    },
+    {
+      "relationType": "emergency_power",
+      "candidates": 398
+    },
+    {
+      "relationType": "overrides_veto",
+      "candidates": 72
+    },
+    {
+      "relationType": "removes",
+      "candidates": 933
+    }
+  ],
+  "bySplit": [
+    {
+      "split": "development",
+      "candidates": 1488
+    },
+    {
+      "split": "validation",
+      "candidates": 383
+    },
+    {
+      "split": "final_holdout",
+      "candidates": 267
+    }
+  ],
+  "outputSha256": "007b297d145c5bf453e8b450bb9aeb9d8649d5de420abbd3d3c52db53d8c978e",
+  "heldoutLabelsInspected": false,
+  "validationStatus": "pending_double_blind_coding_external_expert_and_citation_audit",
+  "graphEdgesPublished": 0,
+  "prohibitedOutputs": [
+    "no weighted relation total",
+    "no country-quality score",
+    "no democracy inference",
+    "no claim that more constraints are better",
+    "no ranking or traffic-light summary"
+  ]
+}
