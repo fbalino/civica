@@ -183,12 +183,33 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.1-beta",
+    methodologyVersion: "pulse-v2.2-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/pulse-changelog/page.tsx",
       fragment:
         "An experimental ledger of published and review-queued governance-event classifications, filterable by country, dimension, and severity, with recorded source links and review state.",
+    },
+  },
+  {
+    id: "pulse.cluster-coverage-release",
+    surface: "pulse",
+    routeOrArtifact: "/api/v1/pulse/cluster-coverage",
+    exactClaim:
+      "A frozen descriptive report publishes stored Pulse cluster-size, source-ID, source-family, language, provisional-jurisdiction, and method-version distributions without treating them as validation evidence.",
+    tier: "derived-descriptive-metric",
+    evidenceSources: [
+      "src/lib/pulse/v2/cluster-coverage.generated.json",
+      "src/lib/pulse/v2/cluster-coverage.ts",
+      "scripts/generate-pulse-cluster-coverage.ts",
+      "scripts/validate-pulse-cluster-coverage.ts",
+    ],
+    implementationOwner: "Pulse event-ledger research lane",
+    methodologyVersion: "pulse-cluster-coverage/v1",
+    gate: "G3",
+    source: {
+      path: "src/app/api/v1/pulse/cluster-coverage/route.ts",
+      fragment: "PUBLIC_CLAIM: pulse.cluster-coverage-release",
     },
   },
   {
@@ -617,7 +638,7 @@ export const PUBLIC_CLAIMS = [
       "scripts/validate-pulse-runtime-method.ts",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.1-beta",
+    methodologyVersion: "pulse-v2.2-beta",
     gate: "G3",
     source: {
       // CLM-012: api-docs/page.tsx renders this route's description from
@@ -691,8 +712,7 @@ export const PUBLIC_CLAIMS = [
     gate: "G5",
     source: {
       path: "README.template.md",
-      fragment:
-        "The selected public comparison product presents V-Dem",
+      fragment: "The selected public comparison product presents V-Dem",
       mirrors: ["README.md"],
     },
   },
@@ -711,7 +731,7 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.1-beta",
+    methodologyVersion: "pulse-v2.2-beta",
     gate: "G3",
     source: {
       path: "README.template.md",
@@ -796,12 +816,11 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-pulse.md",
     ],
     implementationOwner: "Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.1-beta",
+    methodologyVersion: "pulse-v2.2-beta",
     gate: "G3",
     source: {
       path: "CITATION.cff",
-      fragment:
-        "the experimental Civica Pulse event ledger.",
+      fragment: "the experimental Civica Pulse event ledger.",
     },
   },
   {
@@ -894,7 +913,7 @@ export const PUBLIC_CLAIMS = [
       "src/lib/pulse/v2/runtime-contract.ts",
     ],
     implementationOwner: "SEO and Pulse event-ledger research lane",
-    methodologyVersion: "pulse-v2.1-beta",
+    methodologyVersion: "pulse-v2.2-beta",
     gate: "G3",
     source: {
       path: "src/app/(reader)/civica-index/methodology/pulse/page.tsx",
@@ -905,8 +924,7 @@ export const PUBLIC_CLAIMS = [
   {
     id: "methodology.pulse-ledger-charter",
     surface: "methodology",
-    routeOrArtifact:
-      "/civica-index/methodology/pulse#research-charter",
+    routeOrArtifact: "/civica-index/methodology/pulse#research-charter",
     exactClaim:
       "Pulse is being developed first as a versioned ledger of documented governance-relevant event records; it is not a complete, real-time, continuously observed, country-quality, or causal measure, and no-value is an allowed disposition.",
     tier: "experimental-heuristic",
@@ -979,8 +997,7 @@ export const PUBLIC_CLAIMS = [
     gate: "G5",
     source: {
       path: "src/app/embed/[slug]/route.ts",
-      fragment:
-        "This Civica Index embed has been retired.",
+      fragment: "This Civica Index embed has been retired.",
     },
   },
 ] as const satisfies readonly PublicClaim[];

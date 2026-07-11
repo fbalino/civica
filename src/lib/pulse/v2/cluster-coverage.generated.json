@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "pulse-cluster-coverage/v1",
+  "releaseId": "pulse-cluster-coverage-20260711T161017Z",
+  "releasedAt": "2026-07-11T16:10:17.246Z",
+  "observedThrough": "2026-07-11 08:02:49.912603",
+  "standing": "descriptive_not_validation",
+  "scope": "All retained raw Pulse reports assigned to a cluster at the release cut; distributions describe stored outputs across their recorded method versions.",
+  "totals": {
+    "rawReports": 1379,
+    "clusteredReports": 1379,
+    "unclusteredReports": 0,
+    "clusters": 1106,
+    "multiReportClusters": 95,
+    "multiSourceClusters": 1,
+    "multiSourceFamilyClusters": 1,
+    "multilingualClusters": 1,
+    "mixedProvisionalJurisdictionClusters": 0
+  },
+  "distributions": {
+    "clusterSize": [
+      {
+        "value": 1,
+        "clusters": 1011,
+        "share": 0.914105
+      },
+      {
+        "value": 2,
+        "clusters": 60,
+        "share": 0.05425
+      },
+      {
+        "value": 3,
+        "clusters": 13,
+        "share": 0.011754
+      },
+      {
+        "value": 4,
+        "clusters": 5,
+        "share": 0.004521
+      },
+      {
+        "value": 5,
+        "clusters": 5,
+        "share": 0.004521
+      },
+      {
+        "value": 6,
+        "clusters": 2,
+        "share": 0.001808
+      },
+      {
+        "value": 7,
+        "clusters": 2,
+        "share": 0.001808
+      },
+      {
+        "value": 8,
+        "clusters": 1,
+        "share": 0.000904
+      },
+      {
+        "value": 9,
+        "clusters": 2,
+        "share": 0.001808
+      },
+      {
+        "value": 12,
+        "clusters": 1,
+        "share": 0.000904
+      },
+      {
+        "value": 13,
+        "clusters": 1,
+        "share": 0.000904
+      },
+      {
+        "value": 14,
+        "clusters": 1,
+        "share": 0.000904
+      },
+      {
+        "value": 32,
+        "clusters": 1,
+        "share": 0.000904
+      },
+      {
+        "value": 41,
+        "clusters": 1,
+        "share": 0.000904
+      }
+    ],
+    "sourceIdsPerCluster": [
+      {
+        "value": 1,
+        "clusters": 1105,
+        "share": 0.999096
+      },
+      {
+        "value": 2,
+        "clusters": 1,
+        "share": 0.000904
+      }
+    ],
+    "sourceFamiliesPerCluster": [
+      {
+        "value": 1,
+        "clusters": 1105,
+        "share": 0.999096
+      },
+      {
+        "value": 2,
+        "clusters": 1,
+        "share": 0.000904
+      }
+    ],
+    "languagesPerCluster": [
+      {
+        "value": 1,
+        "clusters": 1105,
+        "share": 0.999096
+      },
+      {
+        "value": 2,
+        "clusters": 1,
+        "share": 0.000904
+      }
+    ],
+    "provisionalJurisdictionsPerCluster": [
+      {
+        "value": 0,
+        "clusters": 191,
+        "share": 0.172694
+      },
+      {
+        "value": 1,
+        "clusters": 915,
+        "share": 0.827306
+      }
+    ]
+  },
+  "methodVersions": [
+    {
+      "versionKey": "pulse-stage/sha256:458682c22ddb1ccd99b6e3ba78afa006f436d2816fd4ee6adcfbda15b4d38b9c",
+      "algorithmVersion": "legacy_unversioned",
+      "clusters": 915
+    },
+    {
+      "versionKey": "pulse-stage/sha256:8c5f53ef49be61eceb80e363b9f3482b1d49752e2b3a34cb1d8a2b4405316190",
+      "algorithmVersion": "pulse-cluster/normalized-global-union-find-v3+pulse-event-identity/multilingual-v1",
+      "clusters": 191
+    }
+  ],
+  "limitations": [
+    "This is a coverage and diversity description, not evidence that clusters are correct.",
+    "A distinct source-family identifier is recorded provenance, not proof of editorial independence; PUL-007 evaluates republication and common ownership.",
+    "Historical and current method identities are reported separately and must not be treated as one validated series.",
+    "Held-out overmerge, undermerge, and attribution accuracy belong to PUL-023."
+  ],
+  "reportHash": "e25240f6eb726c47ba08f53447c37bbfc094ebff60c426a5b186e74a04171844"
+}

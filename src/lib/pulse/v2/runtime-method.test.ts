@@ -21,7 +21,7 @@ const GENERATED_PATH = fileURLToPath(
 test("current contract states the non-negotiable publication boundaries", () => {
   const method = CURRENT_PULSE_RUNTIME_METHOD;
 
-  assert.equal(method.version, "pulse-v2.1-beta");
+  assert.equal(method.version, "pulse-v2.2-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
   assert.equal(method.mixed_legacy_unversioned, false);
@@ -42,12 +42,21 @@ test("current contract states the non-negotiable publication boundaries", () => 
     method.evaluation.currentProductionValidatedByExistingBacktest,
     false,
   );
+  assert.equal(method.clustering.countryPartitioned, false);
+  assert.equal(
+    method.clustering.identityNormalization.provisionalJurisdictionRole,
+    "diagnostic_not_partition",
+  );
+  assert.equal(
+    method.clustering.semantic.model,
+    "Xenova/paraphrase-multilingual-MiniLM-L12-v2",
+  );
 });
 
 test("only production-observed raw-event feeds are active", () => {
   assert.equal(
     CURRENT_PULSE_RUNTIME_METHOD.feeds.activeProduction.observedThrough,
-    "2026-07-09",
+    "2026-07-11",
   );
   assert.deepEqual(
     CURRENT_PULSE_RUNTIME_METHOD.feeds.activeProduction.sourceIds,
@@ -129,25 +138,22 @@ test("review gates encode the actual ensemble boolean logic", () => {
     policy.reviewGates.invalidConsensusCategoryPersistence,
     "normalize_to_none_unresolved",
   );
-  assert.deepEqual(
-    policy.reviewGates.verifierObjectionWithWeakConsensus,
-    {
-      verifierObjectionIncludes: [
-        "low_confidence",
-        "failed",
-        "verdict_revised",
-        "verdict_rejected",
-        "category_not_ok",
-        "severity_not_ok",
-        "subject_not_ok",
-        "not_event",
-      ],
-      weakConsensusRequiresNonUnanimous: true,
-      selfConfidenceAggregation: "maximum_among_winning_category_voters",
-      selfConfidenceBelow: 0.7,
-      degradedRunAlsoWeak: true,
-    },
-  );
+  assert.deepEqual(policy.reviewGates.verifierObjectionWithWeakConsensus, {
+    verifierObjectionIncludes: [
+      "low_confidence",
+      "failed",
+      "verdict_revised",
+      "verdict_rejected",
+      "category_not_ok",
+      "severity_not_ok",
+      "subject_not_ok",
+      "not_event",
+    ],
+    weakConsensusRequiresNonUnanimous: true,
+    selfConfidenceAggregation: "maximum_among_winning_category_voters",
+    selfConfidenceBelow: 0.7,
+    degradedRunAlsoWeak: true,
+  });
   assert.deepEqual(policy.states.autoPublished, {
     published: true,
     reviewStatus: "approved",
@@ -200,7 +206,9 @@ test("daily cadence includes corroboration and scoring in the score route", () =
 });
 
 test("pure builder normalizes set-like fields without mutating its input", () => {
-  const facts = structuredClone(CURRENT_PULSE_RUNTIME_FACTS) as PulseRuntimeFacts;
+  const facts = structuredClone(
+    CURRENT_PULSE_RUNTIME_FACTS,
+  ) as PulseRuntimeFacts;
   const reversed: PulseRuntimeFacts = {
     ...facts,
     connectors: [...facts.connectors].reverse(),
@@ -238,7 +246,7 @@ test("contract hash omits its own field and changes when contract content change
 
   const changed: PulseRuntimeMethodContract = {
     ...CURRENT_PULSE_RUNTIME_METHOD,
-    version: "pulse-v2.1-beta-test-change",
+    version: "pulse-v2.2-beta-test-change",
   };
   assert.notEqual(pulseContractHash(changed), snapshot.contractHash);
 });

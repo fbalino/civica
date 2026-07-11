@@ -42,20 +42,26 @@
     "timezone": "UTC"
   },
   "clustering": {
-    "countryPartitioned": true,
+    "countryPartitioned": false,
     "dateWindowHours": 48,
+    "identityNormalization": {
+      "provisionalJurisdictionRole": "diagnostic_not_partition",
+      "sharedAnchorRequired": true,
+      "version": "pulse-event-identity/multilingual-v1"
+    },
     "lexicalFallback": {
       "condition": "embedding_model_unavailable",
       "metric": "jaccard_token_similarity",
-      "threshold": 0.5
+      "threshold": 0.42
     },
     "semantic": {
       "metric": "cosine_similarity",
+      "model": "Xenova/paraphrase-multilingual-MiniLM-L12-v2",
       "threshold": 0.75
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "cf2281f9b7aa58cbf520e96c73e7573f6c70f8f8ea2e8d779288f4295171f553",
+  "contractHash": "e197ac2b107d7058c0cdc7af99f9980d4bf3429553914f1a7feba5ee05253a97",
   "evaluation": {
     "backtestMatchesCurrentProduction": false,
     "currentProductionValidatedByExistingBacktest": false,
@@ -84,7 +90,7 @@
   "feeds": {
     "activeDefinition": "A production-active feed is a source ID observed in raw_events by the stated evidence cut. A connector, configured source, or sync in another Civica pipeline does not qualify by itself.",
     "activeProduction": {
-      "observedThrough": "2026-07-09",
+      "observedThrough": "2026-07-11",
       "sourceIds": [
         "amnesty",
         "civicus_monitor",
@@ -401,7 +407,7 @@
       }
     }
   },
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "status": "experimental",
   "taxonomy": {
     "categoryCount": 61,
@@ -414,5 +420,5 @@
     ],
     "version": "v2.0"
   },
-  "version": "pulse-v2.1-beta"
+  "version": "pulse-v2.2-beta"
 }

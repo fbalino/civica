@@ -2,7 +2,7 @@
  * Phase 5.5 — sentence embeddings for the clustering pipeline.
  *
  * Wraps `@huggingface/transformers` (the Xenova fork's modern home)
- * with a lazy-init pipeline. The all-MiniLM-L6-v2 model produces
+ * with a lazy-init pipeline. The multilingual MiniLM model produces
  * 384-dim embeddings in ~50ms/record on CPU and is small enough
  * (~25MB) to ship in process.
  *
@@ -11,13 +11,14 @@
  * model itself only downloads/loads on first use.
  */
 
-const MODEL = "Xenova/all-MiniLM-L6-v2";
+export const PULSE_EMBEDDING_MODEL =
+  "Xenova/paraphrase-multilingual-MiniLM-L12-v2";
 const POOLING = "mean";
 const NORMALIZE = true;
 
 type Pipeline = (
   input: string | string[],
-  opts?: { pooling?: "mean" | "cls" | "none"; normalize?: boolean }
+  opts?: { pooling?: "mean" | "cls" | "none"; normalize?: boolean },
 ) => Promise<{ data: Float32Array | number[]; dims: number[] }>;
 
 let pipelineCache: Pipeline | null = null;
@@ -32,7 +33,10 @@ async function loadPipeline(): Promise<Pipeline> {
     // Cache models in node_modules-adjacent dir so subsequent runs
     // are instant. The default uses ~/.cache/huggingface; that's fine.
     env.allowRemoteModels = true;
-    const p = (await pipeline("feature-extraction", MODEL)) as unknown as Pipeline;
+    const p = (await pipeline(
+      "feature-extraction",
+      PULSE_EMBEDDING_MODEL,
+    )) as unknown as Pipeline;
     pipelineCache = p;
     return p;
   })();
@@ -74,7 +78,7 @@ export function cosineSimilarity(a: number[], b: number[]): number {
  * similarity, so the daily cron never dies on a missing native binary.
  */
 export async function tryEmbedBatch(
-  texts: string[]
+  texts: string[],
 ): Promise<number[][] | null> {
   try {
     return await embedBatch(texts);
@@ -82,16 +86,42 @@ export async function tryEmbedBatch(
     console.warn(
       `[embed] local embedding model unavailable (${
         (err as Error).message?.slice(0, 90) ?? String(err)
-      }); clustering will fall back to lexical similarity.`
+      }); clustering will fall back to lexical similarity.`,
     );
     return null;
   }
 }
 
 const LEXICAL_STOPWORDS = new Set([
-  "the", "and", "for", "that", "with", "from", "has", "have", "was", "were",
-  "are", "his", "her", "its", "their", "they", "this", "after", "over",
-  "into", "amid", "says", "said", "will", "who", "not", "but", "out", "new",
+  "the",
+  "and",
+  "for",
+  "that",
+  "with",
+  "from",
+  "has",
+  "have",
+  "was",
+  "were",
+  "are",
+  "his",
+  "her",
+  "its",
+  "their",
+  "they",
+  "this",
+  "after",
+  "over",
+  "into",
+  "amid",
+  "says",
+  "said",
+  "will",
+  "who",
+  "not",
+  "but",
+  "out",
+  "new",
 ]);
 
 /**

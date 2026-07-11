@@ -7,7 +7,7 @@ import { runClustering } from "@/lib/pulse/v2/cluster";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// First invocation downloads + loads the all-MiniLM-L6-v2 model (~25 MB).
+// First invocation downloads and loads the multilingual MiniLM model.
 // Subsequent calls reuse the cached pipeline; allow extra time for cold start.
 export const maxDuration = 300;
 
@@ -35,7 +35,7 @@ async function handler(request: Request) {
         step: "pulse.v2.cluster",
         error: err instanceof Error ? err.message : String(err),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -590,8 +590,11 @@ function validateClusteringAndScoring(
     cluster.includes("? (opts.embeddingResult ?? null)") &&
       cluster.includes(": await tryEmbedBatch(texts)") &&
       cluster.includes("const useEmbeddings = embeddings !== null") &&
-      cluster.includes(": lexicalSimilarity(texts[ia], texts[ib])"),
-    "Clustering must retain semantic embeddings with lexical fallback",
+      cluster.includes("compareEventIdentities(identities[ia], identities[ib])") &&
+      cluster.includes("semanticSimilarity >= CLUSTER_SIM_THRESHOLD") &&
+      cluster.includes("identity.tokenSimilarity >= LEXICAL_SIM_THRESHOLD") &&
+      snapshot.clustering.countryPartitioned === false,
+    "Clustering must retain multilingual semantic and normalized lexical paths without a country partition",
   );
 
   const score = relative("src/lib/pulse/v2/score.ts");

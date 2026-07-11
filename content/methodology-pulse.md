@@ -28,6 +28,7 @@ The current generated runtime contract is **{{ctx.methodologyVersion}}**. New ro
 Numeric deltas are available only through the versioned country-dimensions API. Active reader pages show the event ledger and do not render the dormant delta panel. A missing event is not converted into evidence of stability: the API returns an explicit non-observation rather than a scalar zero when no published event supports a dimension.
 
 <!-- PUBLIC_CLAIM: methodology.pulse-ledger-charter -->
+
 ## Research charter {#research-charter}
 
 **Charter version: pulse-ledger-charter/v1.** Pulse is being developed first as a versioned ledger of **documented governance-relevant event records**. One record asserts that an identifiable occurrence affecting a jurisdiction&rsquo;s domestic governing institutions took place at a stated event date, with retained source evidence and an explicit publication state. An article, source count, model vote, country-day, and numeric delta are not ledger units.
@@ -51,7 +52,7 @@ Changing the unit, admission boundary, source classes, scope, success gates, or 
 - Not a co-equal score alongside the CI. There is no single "Pulse number" that competes with the CI composite.
 - Not an established measurement. Treat numeric effects as experimental heuristics, not ground truth.
 - Not an attempt to outperform specialised sources. ACLED publishes specialist conflict-event data, while V-Dem publishes long-run democracy measures. The Pulse aggregates and scores; it does not claim original empirical measurement.
-- Not a foreign-policy tracker. Inter-state acts — sanctions, embargoes, diplomatic expulsions — are a *sender's* foreign-policy decision, not a change to the *target's* own domestic governance, so they are out of scope (descriptive context at most, never a delta). The Pulse scores a country's own domestic institutions; a sanction's downstream effects inside the target are scored only if they surface as domestic events (a crackdown, unrest). This matches how the established event datasets keep inter-state acts as a directed sender→target relation rather than a property of one country.
+- Not a foreign-policy tracker. Inter-state acts — sanctions, embargoes, diplomatic expulsions — are a _sender's_ foreign-policy decision, not a change to the _target's_ own domestic governance, so they are out of scope (descriptive context at most, never a delta). The Pulse scores a country's own domestic institutions; a sanction's downstream effects inside the target are scored only if they surface as domestic events (a crackdown, unrest). This matches how the established event datasets keep inter-state acts as a directed sender→target relation rather than a property of one country.
 - Not fully human-reviewed. Human review is mandatory for {{ctx.reviewTiersProse}}, deadlocks or no quorum, and weak/degraded majorities paired with a verifier objection: low confidence; a revised or rejected verdict; a negative category, severity, subject, or event check; or failed/unavailable verification. Other events may be auto-published. “Published” does not mean “human-reviewed.”
 
 ## Sources — specialist feeds first, news second {#sources}
@@ -83,12 +84,16 @@ An event seen only in news, without specialist corroboration, is scored at reduc
 The pipeline is scheduled once per day in UTC: {{ctx.scheduleProse}}. The score stage first recomputes heuristic corroboration weights and then writes dimensional deltas. These are separate cron jobs without a durable parent run ledger, so a schedule is not proof that every stage completed in sequence. Per-country panels expose the latest stored delta-computation time when available. The [Pulse changelog](/civica-index/pulse-changelog) shows the most recent event date in its current result set, not the last successful pipeline-run time.
 
 1. **Ingest.** Pull the trailing window of records from every active feed and write them to a staging table.
-2. **Cluster.** Attempt to embed each record with all-MiniLM-L6-v2 and group records within the ingest-assigned country and a ±48-hour window at cosine similarity ≥ 0.75. When the embedding runtime is unavailable, production falls back to lexical Jaccard similarity ≥ 0.5. This fallback is operational, not equivalent validation of the semantic method.
+2. **Cluster.** Normalize each report under `{{ctx.clusterIdentityVersion}}`, embed it with `{{ctx.clusterEmbeddingModel}}`, and compare it with other candidates inside a ±{{ctx.clusterWindowHours}}-hour window. The ingest-time country guess is diagnostic and does not partition the candidates. A pair must meet the semantic cosine threshold of {{ctx.clusterSemanticThreshold}} or the canonical-token Jaccard threshold of {{ctx.clusterLexicalThreshold}}, with a shared event-identity anchor guarding against generic same-day matches. When the embedding runtime is unavailable, production uses the canonical-token path alone. That fallback has not been shown to perform equivalently.
 3. **Classify.** The configured cross-vendor voters — {{ctx.classifyVotersProse}} — assign a taxonomy category and severity. A strict majority wins; a category deadlock or no quorum goes to review. Different vendors diversify error sources but do not make their errors statistically independent.
 4. **Verify and attribute.** {{ctx.verifierProse}} makes a separate adversarial call against the majority verdict. The same model also participates as one voter, so this is a separate call rather than an independent model family. Subject-country attribution is another pass, currently {{ctx.subjectAttributorProse}}, run after classification; if it fails, the ingest-time attribution remains. That attribution verdict is not yet persisted as a separately versioned audit row.
 5. **Weight.** Count distinct specialist and news source IDs, combine that diversity with the stored agreement label, and apply asymmetric and provisional press-context multipliers. The resulting “corroboration weight” is a hand-set heuristic in [0, 1], not a calibrated probability of correctness and not a publication minimum.
 6. **Review or publish.** {{ctx.reviewTiersProse}}, deadlocks/no quorum, and weak or degraded majorities paired with a verifier objection route to review. An objection includes low confidence, a revised or rejected verdict, a negative category/severity/subject/event check, or failed/unavailable verification. Other events may be auto-published. Queued and rejected events do not affect public deltas.
 7. **Score.** For published events in the trailing {{ctx.scoreWindowDays}}-day window, multiply severity by the heuristic weight, apply category-specific exponential decay, sum by country and dimension, clamp to [{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}], and write API-only experimental deltas.
+
+## Clustering coverage {#clustering-coverage}
+
+The frozen [cluster coverage report](/api/v1/pulse/cluster-coverage) publishes cluster-size, recorded source-ID, source-family, language, provisional-country, and method-version distributions for retained reports. It is a descriptive release rather than an accuracy result. Source-family diversity does not establish editorial independence, and the stored historical clusters should not be read as if the current method had produced all of them. Held-out overmerge and undermerge evaluation remains pending.
 
 ## Version identity {#version-identity}
 
@@ -118,13 +123,13 @@ The five dimensions remain Democratic Quality, Rule of Law, Rights & Freedoms, C
 
 Severity describes the documented reach and reversibility of a particular event facet. It is recorded separately from effect direction and from any experimental numeric delta.
 
-| Descriptor | Meaning |
-| --- | --- |
-| `not_assessed` | The occurrence is supported, but its institutional scope or intensity has not been assessed. |
-| `limited` | Localized, short-duration, narrowly targeted, or readily reversible. |
-| `material` | Substantial within an institution, jurisdiction, or affected population, without threatening the institutional order as a whole. |
-| `major` | National, prolonged, difficult to reverse, or consequential for a core institution. |
-| `critical` | Disrupts the constitutional or institutional order, affects a very large population, or has severe and difficult-to-reverse consequences. |
+| Descriptor     | Meaning                                                                                                                                   |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `not_assessed` | The occurrence is supported, but its institutional scope or intensity has not been assessed.                                              |
+| `limited`      | Localized, short-duration, narrowly targeted, or readily reversible.                                                                      |
+| `material`     | Substantial within an institution, jurisdiction, or affected population, without threatening the institutional order as a whole.          |
+| `major`        | National, prolonged, difficult to reverse, or consequential for a core institution.                                                       |
+| `critical`     | Disrupts the constitutional or institutional order, affects a very large population, or has severe and difficult-to-reverse consequences. |
 
 Effect direction is one of `expansive`, `restrictive`, `mixed`, `unclear`, or `not_assessed`. It refers only to the named construct. It is not an overall verdict on a policy, government, event, or country.
 
@@ -210,14 +215,14 @@ A lawful institutional act can qualify as an event without being coded as benefi
 
 Additional consequences are never inferred from the first event. Evidence of a coup alone does not establish media closure, martial law, electoral annulment, or detention. Each consequence needs its own source support.
 
-| Case | Treatment |
-| --- | --- |
-| A seizure of power, a separately documented dissolution of the elected legislature, and a separately documented media order | Assign `coup`, `constitutional_override_electoral`, and `media_shutdown` to three evidenced facets. |
-| A certified fair result accompanied by separately documented partisan violence | Assign `fair_election` and `electoral_violence`; the labels describe different facets. |
-| An opposition leader is convicted, but available evidence cannot establish prosecutorial independence | Keep `corruption_conviction` and `opposition_prosecution` as candidates; assign neither pending adjudication. |
-| A lawful disaster emergency has no documented institutional or rights effect | Mark non-qualifying; do not force an `emergency_declaration` label. |
-| One decree both declares an emergency and extends a mandate | Use the specific `term_extension` label for that facet, not both labels. |
-| A coup report contains no evidence of military jurisdiction over civilians | Assign `coup`; do not infer `martial_law`. |
+| Case                                                                                                                        | Treatment                                                                                                     |
+| --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| A seizure of power, a separately documented dissolution of the elected legislature, and a separately documented media order | Assign `coup`, `constitutional_override_electoral`, and `media_shutdown` to three evidenced facets.           |
+| A certified fair result accompanied by separately documented partisan violence                                              | Assign `fair_election` and `electoral_violence`; the labels describe different facets.                        |
+| An opposition leader is convicted, but available evidence cannot establish prosecutorial independence                       | Keep `corruption_conviction` and `opposition_prosecution` as candidates; assign neither pending adjudication. |
+| A lawful disaster emergency has no documented institutional or rights effect                                                | Mark non-qualifying; do not force an `emergency_declaration` label.                                           |
+| One decree both declares an emergency and extends a mandate                                                                 | Use the specific `term_extension` label for that facet, not both labels.                                      |
+| A coup report contains no evidence of military jurisdiction over civilians                                                  | Assign `coup`; do not infer `martial_law`.                                                                    |
 
 Changes are versioned. A new category needs a definition, dimension, source-framework rationale, example, counterexample, and compatibility review. Changes to category identity, dimension, compatibility, severity, or annotation states require a new major version and a migration map. Old annotations keep their recorded version.
 
@@ -283,22 +288,22 @@ This rule is an unvalidated attempt to reduce media-asymmetry effects. It does n
 
 Pulse Beta assigns event-type-specific half-lives instead of a single uniform decay constant. The production scorer nevertheless includes events only in a trailing {{ctx.scoreWindowDays}}-day window, so any longer half-life parameter is truncated when the event leaves that window.
 
-| Category | Half-life (days) |
-|---|---:|
-| Coup d'état | 365 |
-| State collapse | 730 |
-| Constitutional override / self-coup | 365 |
-| Judicial purge | 365 |
-| Free and fair election | 90 |
-| Flawed election | 180 |
-| Journalist arrest (individual) | 60 |
-| Media shutdown | 180 |
-| Protest crackdown (discrete) | 90 |
-| Systematic crackdown (pattern) | 180 |
-| Anti-corruption conviction | 120 |
-| Peace agreement (signed) | 90 |
-| Peace agreement (implemented) | 365 |
-| Armed conflict (active) | 180 |
+| Category                            | Half-life (days) |
+| ----------------------------------- | ---------------: |
+| Coup d'état                         |              365 |
+| State collapse                      |              730 |
+| Constitutional override / self-coup |              365 |
+| Judicial purge                      |              365 |
+| Free and fair election              |               90 |
+| Flawed election                     |              180 |
+| Journalist arrest (individual)      |               60 |
+| Media shutdown                      |              180 |
+| Protest crackdown (discrete)        |               90 |
+| Systematic crackdown (pattern)      |              180 |
+| Anti-corruption conviction          |              120 |
+| Peace agreement (signed)            |               90 |
+| Peace agreement (implemented)       |              365 |
+| Armed conflict (active)             |              180 |
 
 Decay is exponential: `impact = severity × confidence × exp(−ln2 × days / half_life)`.
 
@@ -320,7 +325,7 @@ Country pages flagged by the provisional press-context lookup surface this cavea
 
 - Coverage is uneven and currently leans heavily on GDELT plus three specialist feeds. Inactive and placeholder connectors do not contribute evidence. Sparse-coverage countries can have missed events; absence is not stability.
 - A single-source event can currently affect an experimental delta, and GDELT is counted as one source ID regardless of the underlying publisher. Source-family independence and republication detection are not implemented.
-- Clustering currently partitions on ingest-time country attribution and may use lexical fallback when semantic embeddings are unavailable. This can split reports of the same event, particularly across outlets or languages.
+- Current clustering compares normalized event identities without a country partition, but most retained historical clusters predate that method. The lexical-only fallback has not been evaluated as equivalent to the multilingual semantic path, and held-out overmerge and undermerge performance remains unknown.
 - The classifier is deliberately strict — the large majority of ingested news is commentary, business, or un-enacted announcements rather than discrete governance events, and is dropped. This keeps noise out of the scores, but a genuine event can occasionally be discarded; missing-event disputes are welcomed.
 - LLM classification is imperfect. Current provider-tagged runs preserve successful voter and verification outputs, while older classifier generations remain explicitly legacy-versioned. The API prevents the full ledger from presenting as a homogeneous current-method sample.
 - Positive events receive stronger heuristic discounts than negative events. This is an anti-gaming design choice under evaluation, not a requirement that they be independently verified before publication.

@@ -4,6 +4,7 @@ import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "@/lib/db/schema";
 import {
   classifyClusters,
+  selectProvisionalJurisdiction,
   type ClassifyOneResult,
   type ClusterToClassify,
 } from "./classify";
@@ -78,10 +79,20 @@ test("classification dry-run is stable and performs no writes", async () => {
 
 test("two classification fixture applications converge on one cluster record", async () => {
   const state = new Map<string, ClassifyOneResult>();
-  const write = async (_db: Db, input: ClusterToClassify, classified: ClassifyOneResult) => {
+  const write = async (
+    _db: Db,
+    input: ClusterToClassify,
+    classified: ClassifyOneResult,
+  ) => {
     state.set(input.clusterId, structuredClone(classified));
   };
-  const options = { clusters: [cluster], classify, resolveSubject, write, runRef };
+  const options = {
+    clusters: [cluster],
+    classify,
+    resolveSubject,
+    write,
+    runRef,
+  };
   await classifyClusters({} as Db, options);
   const first = structuredClone([...state.entries()]);
   await classifyClusters({} as Db, options);
@@ -118,5 +129,20 @@ test("strict mode surfaces classifier failures", async () => {
       runRef,
     }),
     /malformed model response/,
+  );
+});
+
+test("provisional jurisdiction selection is deterministic and majority-based", () => {
+  assert.equal(
+    selectProvisionalJurisdiction(["country-b", "country-a", "country-b"]),
+    "country-b",
+  );
+  assert.equal(
+    selectProvisionalJurisdiction(["country-b", "country-a"]),
+    "country-a",
+  );
+  assert.throws(
+    () => selectProvisionalJurisdiction([]),
+    /no provisional jurisdiction/,
   );
 });

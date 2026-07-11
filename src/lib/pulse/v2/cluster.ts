@@ -1,31 +1,28 @@
 /**
  * Phase 5.5 — clustering / de-duplication.
  *
- * Pulls unclustered `raw_events` rows, embeds title+body, groups
- * near-duplicate records into governance-event clusters per spec §2.4:
+ * Pulls unclustered `raw_events` rows, normalizes report identity, embeds
+ * title+body, and groups near-duplicate records into governance-event clusters:
  *
- *   - country must match (we don't cross-pollinate clusters across
- *     jurisdictions — events in different countries are different
- *     events even if textually similar)
  *   - event dates within ±48h of each other
- *   - cosine similarity above CLUSTER_SIM_THRESHOLD on the embeddings;
- *     when embeddings are unavailable, lexical Jaccard similarity is used
- *     with the separate LEXICAL_SIM_THRESHOLD fallback
+ *   - multilingual semantic or canonical-token similarity meets its threshold
+ *   - a shared identity anchor prevents generic same-day stories from merging
  *
- * Algorithm: per-country bucket, then union-find with greedy
- * pairwise similarity. O(N²) per bucket, which is fine — buckets
- * rarely exceed 10–30 events/day.
- *
- * Rows without a resolved jurisdictionId are left unclustered. They
- * stay in the staging table for human review or later auto-resolution.
+ * The ingest-time jurisdiction is diagnostic input, never a partition. Subject
+ * country is resolved later from the combined cluster evidence. The global
+ * union-find is O(N²) within a capped run and date-window pruning keeps it bounded.
  */
 
 import { createHash, randomUUID } from "node:crypto";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { rawEvents } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
-import { tryEmbedBatch, cosineSimilarity, lexicalSimilarity } from "./embed";
+import { tryEmbedBatch, cosineSimilarity } from "./embed";
+import {
+  compareEventIdentities,
+  normalizeEventIdentity,
+} from "./event-identity";
 import {
   createPulsePipelineRunRef,
   finishPulsePipelineRun,
@@ -36,7 +33,7 @@ import {
 // Jaccard threshold for the lexical fallback — a pair of stories sharing this
 // fraction of their significant tokens is treated as the same event. Higher
 // than the cosine threshold because token overlap is a coarser signal.
-const LEXICAL_SIM_THRESHOLD = 0.5;
+export const LEXICAL_SIM_THRESHOLD = 0.42;
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -49,27 +46,34 @@ export const CLUSTER_DATE_WINDOW_HOURS = 48;
 export interface ClusterRunSummary {
   runId: string;
   versionKey: string;
-  /** Rows considered (unclustered + jurisdiction-resolved) */
+  /** All unclustered rows considered, including unresolved jurisdictions. */
   candidates: number;
   /** Rows that got a cluster_id assigned */
   clustered: number;
   /** Distinct cluster ids written */
   clustersCreated: number;
-  /** Buckets that ran (one per country with ≥1 candidate) */
-  countryBuckets: number;
-  /** Rows with multi-source clusters (proves dedup) */
+  comparisonPairs: number;
+  /** Clusters with more than one source id. */
   multiSourceClusters: number;
+  /** Clusters with more than one independent source-family id. */
+  multiSourceFamilyClusters: number;
+  /** Clusters containing more than one declared evidence language. */
+  multilingualClusters: number;
+  /** Clusters whose members had different or missing provisional jurisdictions. */
+  crossJurisdictionClusters: number;
   dryRun: boolean;
   assignments: Array<{ clusterId: string; memberIds: string[] }>;
 }
 
 export interface CandidateRow {
   id: string;
-  jurisdictionId: string;
+  jurisdictionId: string | null;
   eventDate: string | null;
   title: string;
   body: string | null;
   sourceId: string;
+  sourceFamilyId: string;
+  language: string;
   ingestRunId: string;
 }
 
@@ -95,11 +99,21 @@ function deterministicFixtureClusterId(memberIds: readonly string[]): string {
 function validateCandidates(candidates: readonly CandidateRow[]): void {
   const ids = new Set<string>();
   for (const [index, candidate] of candidates.entries()) {
-    if (!candidate.id.trim() || !candidate.jurisdictionId.trim() || !candidate.title.trim() || !candidate.ingestRunId.trim()) {
-      throw new Error(`Invalid cluster candidate at index ${index}: id, jurisdictionId, title, and ingestRunId are required`);
+    if (
+      !candidate.id.trim() ||
+      !candidate.title.trim() ||
+      !candidate.sourceFamilyId.trim() ||
+      !candidate.language.trim() ||
+      !candidate.ingestRunId.trim()
+    ) {
+      throw new Error(
+        `Invalid cluster candidate at index ${index}: id, title, sourceFamilyId, language, and ingestRunId are required`,
+      );
     }
     if (ids.has(candidate.id)) {
-      throw new Error(`Invalid cluster fixture: duplicate candidate id ${candidate.id}`);
+      throw new Error(
+        `Invalid cluster fixture: duplicate candidate id ${candidate.id}`,
+      );
     }
     ids.add(candidate.id);
   }
@@ -115,27 +129,37 @@ export async function runClustering(
 ): Promise<ClusterRunSummary> {
   const limit = opts.limit ?? 1000;
 
-  // Pull candidates: unclustered, with a resolved jurisdiction id.
+  // Pull every unclustered candidate. A provisional country must never prevent
+  // two reports about the same event from meeting.
   const candidates: CandidateRow[] =
     opts.candidates ??
-    ((await db
-      .select({
-        id: rawEvents.id,
-        jurisdictionId: rawEvents.jurisdictionId,
-        eventDate: rawEvents.eventDate,
-        title: rawEvents.title,
-        body: rawEvents.body,
-        sourceId: rawEvents.sourceId,
-        ingestRunId: rawEvents.ingestRunId,
-      })
-      .from(rawEvents)
-      .where(
-        and(
-          isNull(rawEvents.clusterId),
-          sql`${rawEvents.jurisdictionId} IS NOT NULL`,
-        ),
-      )
-      .limit(limit)) as CandidateRow[]);
+    (
+      await db
+        .select({
+          id: rawEvents.id,
+          jurisdictionId: rawEvents.jurisdictionId,
+          eventDate: rawEvents.eventDate,
+          title: rawEvents.title,
+          body: rawEvents.body,
+          sourceId: rawEvents.sourceId,
+          evidenceLanguage: rawEvents.evidenceLanguage,
+          evidencePublisher: rawEvents.evidencePublisher,
+          ingestRunId: rawEvents.ingestRunId,
+        })
+        .from(rawEvents)
+        .where(isNull(rawEvents.clusterId))
+        .limit(limit)
+    ).map((row) => ({
+      id: row.id,
+      jurisdictionId: row.jurisdictionId,
+      eventDate: row.eventDate,
+      title: row.title,
+      body: row.body,
+      sourceId: row.sourceId,
+      sourceFamilyId: row.evidencePublisher.sourceFamilyId,
+      language: row.evidenceLanguage,
+      ingestRunId: row.ingestRunId,
+    }));
 
   validateCandidates(candidates);
   const run =
@@ -162,8 +186,11 @@ export async function runClustering(
       candidates: 0,
       clustered: 0,
       clustersCreated: 0,
-      countryBuckets: 0,
+      comparisonPairs: 0,
       multiSourceClusters: 0,
+      multiSourceFamilyClusters: 0,
+      multilingualClusters: 0,
+      crossJurisdictionClusters: 0,
       dryRun: opts.dryRun ?? false,
       assignments: [],
     };
@@ -171,10 +198,13 @@ export async function runClustering(
 
   // Batch-embed all candidates in one pass — much faster than per-row.
   const texts = candidates.map((c) =>
-    [c.title, c.body ?? ""].filter(Boolean).join(" — ").slice(0, 1500)
+    [c.title, c.body ?? ""].filter(Boolean).join(" — ").slice(0, 1500),
+  );
+  const identities = candidates.map((candidate) =>
+    normalizeEventIdentity(candidate.title, candidate.body),
   );
   console.log(
-    `[cluster] embedding ${candidates.length} candidates (this triggers model load on first run)…`
+    `[cluster] embedding ${candidates.length} candidates (this triggers model load on first run)…`,
   );
   // Semantic embeddings when the local model loads; null on serverless where
   // the ONNX native runtime is absent — then similarity is lexical (Jaccard).
@@ -184,103 +214,122 @@ export async function runClustering(
       : await tryEmbedBatch(texts);
   const useEmbeddings = embeddings !== null;
   console.log(
-    `[cluster] similarity mode: ${useEmbeddings ? "semantic embeddings" : "lexical (embedding model unavailable)"}`
+    `[cluster] similarity mode: ${useEmbeddings ? "semantic embeddings" : "lexical (embedding model unavailable)"}`,
   );
-
-  // Bucket by jurisdictionId
-  const buckets = new Map<string, number[]>(); // jurisdictionId → indexes
-  for (let i = 0; i < candidates.length; i++) {
-    const c = candidates[i];
-    const arr = buckets.get(c.jurisdictionId) ?? [];
-    arr.push(i);
-    buckets.set(c.jurisdictionId, arr);
-  }
 
   let clustered = 0;
   let clustersCreated = 0;
   let multiSourceClusters = 0;
+  let multiSourceFamilyClusters = 0;
+  let multilingualClusters = 0;
+  let crossJurisdictionClusters = 0;
+  let comparisonPairs = 0;
   const now = opts.now ?? new Date();
   const assignments: ClusterRunSummary["assignments"] = [];
 
-  for (const [jurisdictionId, indexes] of buckets) {
-    // Within a country, greedy union-find on (date proximity & embedding sim).
-    const parent = new Map<number, number>();
-    for (const i of indexes) parent.set(i, i);
-    const find = (i: number): number => {
-      let p = i;
-      while (parent.get(p)! !== p) p = parent.get(p)!;
-      // Path compression
-      let q = i;
-      while (parent.get(q)! !== q) {
-        const next = parent.get(q)!;
-        parent.set(q, p);
-        q = next;
-      }
-      return p;
-    };
-    const union = (i: number, j: number) => {
-      const ri = find(i);
-      const rj = find(j);
-      if (ri !== rj) parent.set(ri, rj);
-    };
+  // Global union-find: jurisdiction is deliberately not a bucket.
+  const indexes = candidates.map((_, index) => index);
+  const parent = new Map<number, number>();
+  for (const i of indexes) parent.set(i, i);
+  const find = (i: number): number => {
+    let p = i;
+    while (parent.get(p)! !== p) p = parent.get(p)!;
+    // Path compression
+    let q = i;
+    while (parent.get(q)! !== q) {
+      const next = parent.get(q)!;
+      parent.set(q, p);
+      q = next;
+    }
+    return p;
+  };
+  const union = (i: number, j: number) => {
+    const ri = find(i);
+    const rj = find(j);
+    if (ri !== rj) parent.set(ri, rj);
+  };
 
-    for (let a = 0; a < indexes.length; a++) {
-      for (let b = a + 1; b < indexes.length; b++) {
-        const ia = indexes[a];
-        const ib = indexes[b];
-        if (!withinDateWindow(candidates[ia].eventDate, candidates[ib].eventDate)) {
-          continue;
-        }
-        const sim = useEmbeddings
-          ? cosineSimilarity(embeddings![ia], embeddings![ib])
-          : lexicalSimilarity(texts[ia], texts[ib]);
-        const threshold = useEmbeddings
-          ? CLUSTER_SIM_THRESHOLD
-          : LEXICAL_SIM_THRESHOLD;
-        if (sim >= threshold) {
-          union(ia, ib);
-        }
+  for (let a = 0; a < indexes.length; a++) {
+    for (let b = a + 1; b < indexes.length; b++) {
+      const ia = indexes[a];
+      const ib = indexes[b];
+      if (
+        !withinDateWindow(candidates[ia].eventDate, candidates[ib].eventDate)
+      ) {
+        continue;
+      }
+      comparisonPairs++;
+      const identity = compareEventIdentities(identities[ia], identities[ib]);
+      const semanticSimilarity = useEmbeddings
+        ? cosineSimilarity(embeddings![ia], embeddings![ib])
+        : 0;
+      const similarityPass = useEmbeddings
+        ? semanticSimilarity >= CLUSTER_SIM_THRESHOLD ||
+          identity.tokenSimilarity >= LEXICAL_SIM_THRESHOLD
+        : identity.tokenSimilarity >= LEXICAL_SIM_THRESHOLD;
+      const sameProvisionalJurisdiction =
+        candidates[ia].jurisdictionId !== null &&
+        candidates[ia].jurisdictionId === candidates[ib].jurisdictionId;
+      const identityGuard =
+        identity.exactNormalizedMatch ||
+        identity.hasIdentityAnchor ||
+        (sameProvisionalJurisdiction && identity.tokenSimilarity >= 0.72);
+      if (similarityPass && identityGuard) {
+        union(ia, ib);
       }
     }
+  }
 
-    // Collect groups
-    const groups = new Map<number, number[]>();
-    for (const i of indexes) {
-      const r = find(i);
-      const arr = groups.get(r) ?? [];
-      arr.push(i);
-      groups.set(r, arr);
+  // Collect groups.
+  const groups = new Map<number, number[]>();
+  for (const i of indexes) {
+    const r = find(i);
+    const arr = groups.get(r) ?? [];
+    arr.push(i);
+    groups.set(r, arr);
+  }
+
+  // Assign cluster ids and write back
+  for (const [, members] of groups) {
+    const memberIds = members.map((idx) => candidates[idx].id).sort();
+    const clusterId =
+      opts.clusterIdFactory?.(memberIds) ??
+      (opts.dryRun ? deterministicFixtureClusterId(memberIds) : randomUUID());
+    assignments.push({ clusterId, memberIds });
+    const sourceIds = new Set(members.map((idx) => candidates[idx].sourceId));
+    if (sourceIds.size > 1) multiSourceClusters++;
+    const sourceFamilyIds = new Set(
+      members.map((idx) => candidates[idx].sourceFamilyId),
+    );
+    if (sourceFamilyIds.size > 1) multiSourceFamilyClusters++;
+    const languages = new Set(members.map((idx) => candidates[idx].language));
+    if (languages.size > 1) multilingualClusters++;
+    const provisionalJurisdictions = new Set(
+      members.map((idx) => candidates[idx].jurisdictionId ?? "unresolved"),
+    );
+    if (
+      provisionalJurisdictions.size > 1 ||
+      provisionalJurisdictions.has("unresolved")
+    ) {
+      crossJurisdictionClusters++;
     }
 
-    // Assign cluster ids and write back
-    for (const [, members] of groups) {
-      const memberIds = members.map((idx) => candidates[idx].id).sort();
-      const clusterId =
-        opts.clusterIdFactory?.(memberIds) ??
-        (opts.dryRun ? deterministicFixtureClusterId(memberIds) : randomUUID());
-      assignments.push({ clusterId, memberIds });
-      const sourceIds = new Set(members.map((idx) => candidates[idx].sourceId));
-      if (sourceIds.size > 1) multiSourceClusters++;
-
-      // Per-row update with the embedding + cluster_id stamped
-      for (const idx of members) {
-        if (!opts.dryRun) {
-          await db
-            .update(rawEvents)
-            .set({
-              embedding: useEmbeddings ? embeddings![idx] : null,
-              clusterId,
-              clusteredAt: now,
-              clusterRunId: run.id,
-            })
-            .where(eq(rawEvents.id, candidates[idx].id));
-        }
+    // Per-row update with the embedding + cluster_id stamped
+    for (const idx of members) {
+      if (!opts.dryRun) {
+        await db
+          .update(rawEvents)
+          .set({
+            embedding: useEmbeddings ? embeddings![idx] : null,
+            clusterId,
+            clusteredAt: now,
+            clusterRunId: run.id,
+          })
+          .where(eq(rawEvents.id, candidates[idx].id));
       }
-      clustered += members.length;
-      clustersCreated++;
     }
-
-    void jurisdictionId; // jurisdictionId loop var used implicitly via bucket
+    clustered += members.length;
+    clustersCreated++;
   }
 
   if (persistRun) {
@@ -291,6 +340,10 @@ export async function runClustering(
         clustered,
         clustersCreated,
         multiSourceClusters,
+        multiSourceFamilyClusters,
+        multilingualClusters,
+        crossJurisdictionClusters,
+        comparisonPairs,
       },
       failures: useEmbeddings
         ? []
@@ -309,17 +362,19 @@ export async function runClustering(
     candidates: candidates.length,
     clustered,
     clustersCreated,
-    countryBuckets: buckets.size,
+    comparisonPairs,
     multiSourceClusters,
+    multiSourceFamilyClusters,
+    multilingualClusters,
+    crossJurisdictionClusters,
     dryRun: opts.dryRun ?? false,
-    assignments: assignments.sort((left, right) => left.clusterId.localeCompare(right.clusterId)),
+    assignments: assignments.sort((left, right) =>
+      left.clusterId.localeCompare(right.clusterId),
+    ),
   };
 }
 
-function withinDateWindow(
-  a: string | null,
-  b: string | null
-): boolean {
+function withinDateWindow(a: string | null, b: string | null): boolean {
   // Missing dates → treat as same day (worst case: they're in the same
   // country and look textually similar; let the human reviewer split
   // them later if needed).

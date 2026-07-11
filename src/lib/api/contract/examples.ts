@@ -16,6 +16,7 @@
  */
 
 import { createPulseRuntimeMethodSnapshot } from "@/lib/pulse/v2/runtime-contract";
+import pulseClusterCoverage from "@/lib/pulse/v2/cluster-coverage.generated.json";
 import {
   STRUCTURAL_FAMILY_META,
   REGIME_TYPE_META,
@@ -32,6 +33,7 @@ import {
   zIndexRankingsResponse,
   zPeerGroupingsResponse,
   zPulseMethodologyResponse,
+  zPulseClusterCoverageResponse,
   zPulseDimensionsResponse,
   zPulseEventsResponse,
   zPulseChangelogResponse,
@@ -798,6 +800,10 @@ const pulseMethodologyExampleResponse = zPulseMethodologyResponse
     data: pulseSnapshot,
   });
 
+const pulseClusterCoverageExampleResponse = zPulseClusterCoverageResponse
+  .strict()
+  .parse({ data: pulseClusterCoverage });
+
 /** Every other Pulse endpoint's `meta.methodology` block, shared once
  *  here instead of copy-pasted per example. */
 function pulseMethodologyMetaExample() {
@@ -1319,6 +1325,7 @@ export const EXAMPLES = {
   indexRankings: indexRankingsExampleResponse,
   peerGroupings: peerGroupingsExampleResponse,
   pulseMethodology: pulseMethodologyExampleResponse,
+  pulseClusterCoverage: pulseClusterCoverageExampleResponse,
   pulseDimensions: pulseDimensionsExampleResponse,
   pulseEvents: pulseEventsExampleResponse,
   pulseChangelog: pulseChangelogExampleResponse,

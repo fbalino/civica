@@ -1276,6 +1276,64 @@ export const zPulseMethodologyResponse = z
   })
   .strict();
 
+const zPulseClusterDistributionRow = z
+  .object({
+    value: z.number().int().nonnegative(),
+    clusters: z.number().int().nonnegative(),
+    share: z.number().min(0).max(1),
+  })
+  .strict();
+
+export const zPulseClusterCoverageReport = z
+  .object({
+    schemaVersion: z.literal("pulse-cluster-coverage/v1"),
+    releaseId: z.string(),
+    releasedAt: z.string(),
+    observedThrough: z.string().nullable(),
+    standing: z.literal("descriptive_not_validation"),
+    scope: z.string(),
+    totals: z
+      .object({
+        rawReports: z.number().int().nonnegative(),
+        clusteredReports: z.number().int().nonnegative(),
+        unclusteredReports: z.number().int().nonnegative(),
+        clusters: z.number().int().nonnegative(),
+        multiReportClusters: z.number().int().nonnegative(),
+        multiSourceClusters: z.number().int().nonnegative(),
+        multiSourceFamilyClusters: z.number().int().nonnegative(),
+        multilingualClusters: z.number().int().nonnegative(),
+        mixedProvisionalJurisdictionClusters: z.number().int().nonnegative(),
+      })
+      .strict(),
+    distributions: z
+      .object({
+        clusterSize: z.array(zPulseClusterDistributionRow),
+        sourceIdsPerCluster: z.array(zPulseClusterDistributionRow),
+        sourceFamiliesPerCluster: z.array(zPulseClusterDistributionRow),
+        languagesPerCluster: z.array(zPulseClusterDistributionRow),
+        provisionalJurisdictionsPerCluster: z.array(
+          zPulseClusterDistributionRow,
+        ),
+      })
+      .strict(),
+    methodVersions: z.array(
+      z
+        .object({
+          versionKey: z.string(),
+          algorithmVersion: z.string(),
+          clusters: z.number().int().nonnegative(),
+        })
+        .strict(),
+    ),
+    limitations: z.array(z.string()),
+    reportHash: z.string().regex(/^[a-f0-9]{64}$/),
+  })
+  .strict();
+
+export const zPulseClusterCoverageResponse = z
+  .object({ data: zPulseClusterCoverageReport })
+  .strict();
+
 /* /api/countries/[slug]/export — rights-filtered research export. */
 const zDecisionTraceStep = z
   .object({

@@ -13,7 +13,12 @@ import {
   type VersionRef,
 } from "@/lib/research/derivation-version";
 import { PULSE_EVENT_ONTOLOGY_VERSION } from "./event-ontology";
-import { PULSE_REVIEW_SUMMARY_MODEL, PULSE_REVIEW_SUMMARY_PROVIDER } from "./summarize";
+import { PULSE_EMBEDDING_MODEL } from "./embed";
+import { PULSE_EVENT_IDENTITY_VERSION } from "./event-identity";
+import {
+  PULSE_REVIEW_SUMMARY_MODEL,
+  PULSE_REVIEW_SUMMARY_PROVIDER,
+} from "./summarize";
 import {
   CURRENT_PULSE_RUNTIME_METHOD,
   PULSE_RUNTIME_METHOD_VERSION,
@@ -83,9 +88,15 @@ const activeSourceIds = () =>
 
 function stageAlgorithm(stage: PulsePipelineStage): VersionRef {
   if (stage === "ingest") return versioned("pulse-ingest/connectors-v2.1");
-  if (stage === "cluster") return versioned("pulse-cluster/country-window-union-find-v2.1");
-  if (stage === "classify") return versioned(PULSE_CLASSIFICATION_ALGORITHM_VERSION);
-  if (stage === "corroborate") return versioned("pulse-corroboration/heuristic-v2.1");
+  if (stage === "cluster") {
+    return versioned(
+      `pulse-cluster/normalized-global-union-find-v3+${PULSE_EVENT_IDENTITY_VERSION}`,
+    );
+  }
+  if (stage === "classify")
+    return versioned(PULSE_CLASSIFICATION_ALGORITHM_VERSION);
+  if (stage === "corroborate")
+    return versioned("pulse-corroboration/heuristic-v2.1");
   if (stage === "review") return versioned("pulse-review/human-decision-v1");
   return versioned(PULSE_DELTA_ALGORITHM_VERSION);
 }
@@ -95,7 +106,9 @@ function stagePrompt(stage: PulsePipelineStage): VersionRef {
   if (stage === "review") {
     return versioned("pulse-review-contract/review-validation-v1");
   }
-  return notApplicable(`${stage} does not use a language-model decision prompt.`);
+  return notApplicable(
+    `${stage} does not use a language-model decision prompt.`,
+  );
 }
 
 function stageModels(stage: PulsePipelineStage): PulseModelVersionRef[] {
@@ -104,7 +117,7 @@ function stageModels(stage: PulsePipelineStage): PulseModelVersionRef[] {
       {
         role: "embedding",
         provider: "local_sentence_transformers",
-        model: "sentence-transformers/all-MiniLM-L6-v2",
+        model: PULSE_EMBEDDING_MODEL,
       },
     ];
   }
@@ -151,7 +164,8 @@ function canonicalizeEnvelope(
 
 export function pulseStageVersionErrors(value: unknown): string[] {
   const errors: string[] = [];
-  if (!value || typeof value !== "object") return ["stage envelope must be an object"];
+  if (!value || typeof value !== "object")
+    return ["stage envelope must be an object"];
   const envelope = value as Partial<PulseStageVersionEnvelope>;
   if (envelope.schemaVersion !== PULSE_STAGE_VERSION_SCHEMA) {
     errors.push(`schemaVersion must be ${PULSE_STAGE_VERSION_SCHEMA}`);
@@ -179,9 +193,11 @@ export function pulseStageVersionErrors(value: unknown): string[] {
       errors.push(`${axis} has no reason`);
     }
   }
-  if (!Array.isArray(envelope.sourceIds)) errors.push("sourceIds must be an array");
+  if (!Array.isArray(envelope.sourceIds))
+    errors.push("sourceIds must be an array");
   if (!Array.isArray(envelope.models)) errors.push("models must be an array");
-  if (!Array.isArray(envelope.upstreamRunIds)) errors.push("upstreamRunIds must be an array");
+  if (!Array.isArray(envelope.upstreamRunIds))
+    errors.push("upstreamRunIds must be an array");
   for (const model of envelope.models ?? []) {
     if (!model.role || !model.provider.trim() || !model.model.trim()) {
       errors.push("model references require role, provider, and model");
@@ -326,7 +342,9 @@ export function summarizePulseVersionSet(
       comparableAsSingleSeries: false,
     };
   }
-  const versionKeys = [...new Set(rows.map(({ versionKey }) => versionKey))].sort();
+  const versionKeys = [
+    ...new Set(rows.map(({ versionKey }) => versionKey)),
+  ].sort();
   const containsLegacy = rows.some(({ versions }) =>
     [
       versions.methodology,
@@ -337,9 +355,11 @@ export function summarizePulseVersionSet(
       versions.sourceBasket,
     ].some((ref) => ref.state === "legacy_unversioned"),
   );
-  const onlyLegacy = containsLegacy && rows.every(({ versions }) =>
-    versions.pipeline.state === "legacy_unversioned",
-  );
+  const onlyLegacy =
+    containsLegacy &&
+    rows.every(
+      ({ versions }) => versions.pipeline.state === "legacy_unversioned",
+    );
   return {
     state: onlyLegacy
       ? "legacy_only"

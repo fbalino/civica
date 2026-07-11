@@ -46,7 +46,10 @@ dotenvConfig({ path: ".env.local", override: true });
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { substitute, type SubstitutionContext } from "../src/lib/content/markdown/substitute";
+import {
+  substitute,
+  type SubstitutionContext,
+} from "../src/lib/content/markdown/substitute";
 import { findStatsMarkersWithoutFallback } from "../src/lib/claims/public-numeric-claims";
 
 // ─────────────────────────────────────────────────────────────────────
@@ -131,13 +134,16 @@ const CTX_ALLOWLIST: Record<string, readonly string[]> = {
     "reviewTiersProse",
     "weakConfidenceThreshold",
     "scheduleProse",
+    "clusterIdentityVersion",
+    "clusterEmbeddingModel",
+    "clusterWindowHours",
+    "clusterSemanticThreshold",
+    "clusterLexicalThreshold",
     "scoreWindowDays",
     "deltaLowerBound",
     "deltaUpperBound",
   ],
-  "content/methodology-peer-grouping.md": [
-    "reviewStatusLabel",
-  ],
+  "content/methodology-peer-grouping.md": ["reviewStatusLabel"],
   "content/methodology-civica-index.md": [
     "lastRevision",
     "pc1VariancePct",

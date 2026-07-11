@@ -1,0 +1,17 @@
+{
+  "id": "pulse-clustering-shared-api-contract",
+  "toVersion": "civica-index-api-contract-pulse-clustering-v1",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["content/methodology-pulse.md"],
+    "registry": ["src/lib/claims/public-claims.ts"],
+    "release_note": [
+      "plan/research/pulse-clustering-index-contract-release-note.md"
+    ],
+    "migration_plan": [
+      "plan/research/pulse-clustering-index-contract-migration.md"
+    ],
+    "golden_test": ["src/lib/pulse/v2/cluster-coverage.test.ts"],
+    "contract_test": ["src/lib/api/contract/examples.ts"]
+  }
+}

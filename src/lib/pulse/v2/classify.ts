@@ -178,10 +178,7 @@ export interface ClassifySummary {
   }>;
 }
 
-type ClassifierResult =
-  | ClassifyOneResult
-  | { category: "none" }
-  | null;
+type ClassifierResult = ClassifyOneResult | { category: "none" } | null;
 
 export interface ClassifyClustersOptions {
   limit?: number;
@@ -197,17 +194,35 @@ export interface ClassifyClustersOptions {
 function validateClusterFixtures(clusters: readonly ClusterToClassify[]): void {
   const ids = new Set<string>();
   for (const [index, cluster] of clusters.entries()) {
-    if (!cluster.clusterId.trim() || !cluster.jurisdictionId.trim() || !cluster.title.trim()) {
-      throw new Error(`Invalid classification cluster at index ${index}: clusterId, jurisdictionId, and title are required`);
+    if (
+      !cluster.clusterId.trim() ||
+      !cluster.jurisdictionId.trim() ||
+      !cluster.title.trim()
+    ) {
+      throw new Error(
+        `Invalid classification cluster at index ${index}: clusterId, jurisdictionId, and title are required`,
+      );
     }
-    if (!cluster.rawEventIds.length || cluster.rawEventIds.length !== cluster.attributions.length) {
-      throw new Error(`Invalid classification cluster ${cluster.clusterId}: raw-event attribution is incomplete`);
+    if (
+      !cluster.rawEventIds.length ||
+      cluster.rawEventIds.length !== cluster.attributions.length
+    ) {
+      throw new Error(
+        `Invalid classification cluster ${cluster.clusterId}: raw-event attribution is incomplete`,
+      );
     }
-    if (!cluster.clusterRunIds.length || cluster.clusterRunIds.some((id) => !id.trim())) {
-      throw new Error(`Invalid classification cluster ${cluster.clusterId}: cluster-run lineage is missing`);
+    if (
+      !cluster.clusterRunIds.length ||
+      cluster.clusterRunIds.some((id) => !id.trim())
+    ) {
+      throw new Error(
+        `Invalid classification cluster ${cluster.clusterId}: cluster-run lineage is missing`,
+      );
     }
     if (ids.has(cluster.clusterId)) {
-      throw new Error(`Invalid classification fixture: duplicate cluster id ${cluster.clusterId}`);
+      throw new Error(
+        `Invalid classification fixture: duplicate cluster id ${cluster.clusterId}`,
+      );
     }
     ids.add(cluster.clusterId);
   }
@@ -262,11 +277,16 @@ export async function classifyClusters(
       if ("category" in result && result.category === "none") {
         summary.noneCategory++;
         if (!opts.dryRun) {
-          await markClusterDisposition(db, cluster.clusterId, {
-            disposition: "non_governance",
-            reason: "classifier returned category none",
-            decision: result,
-          }, run.id);
+          await markClusterDisposition(
+            db,
+            cluster.clusterId,
+            {
+              disposition: "non_governance",
+              reason: "classifier returned category none",
+              decision: result,
+            },
+            run.id,
+          );
         }
         continue;
       }
@@ -280,7 +300,7 @@ export async function classifyClusters(
       const subject = await resolveSubject(
         db,
         ok.classified.headline,
-        ok.classified.description
+        ok.classified.description,
       );
       if (subject) ok.classified.jurisdictionId = subject.jurisdictionId;
       summary.planned.push({
@@ -300,7 +320,9 @@ export async function classifyClusters(
     }
   }
 
-  summary.planned.sort((left, right) => left.clusterId.localeCompare(right.clusterId));
+  summary.planned.sort((left, right) =>
+    left.clusterId.localeCompare(right.clusterId),
+  );
   if (persistRun) {
     await finishPulsePipelineRun(db, run.id, {
       status: summary.failed > 0 ? "partial" : "completed",
@@ -332,7 +354,7 @@ export interface ClassifyOneResult {
 }
 
 async function classifyOne(
-  cluster: ClusterToClassify
+  cluster: ClusterToClassify,
 ): Promise<ClassifyOneResult | { category: "none" } | null> {
   return IS_ENSEMBLE
     ? classifyOneEnsemble(cluster)
@@ -344,7 +366,7 @@ async function classifyOne(
  * when PULSE_CLASSIFY_ENSEMBLE names exactly one engine (or for A/B backtests).
  */
 async function classifyOneSingle(
-  cluster: ClusterToClassify
+  cluster: ClusterToClassify,
 ): Promise<ClassifyOneResult | { category: "none" } | null> {
   const userContent = buildUserContent(cluster);
 
@@ -356,19 +378,19 @@ async function classifyOneSingle(
   const cat = EVENT_CATEGORY_INDEX[first.category];
   if (!cat) {
     console.warn(
-      `[classify] cluster ${cluster.clusterId}: invalid category "${first.category}"`
+      `[classify] cluster ${cluster.clusterId}: invalid category "${first.category}"`,
     );
     return null;
   }
   if (!cat.allowedTiers.includes(first.severityTier)) {
     console.warn(
-      `[classify] cluster ${cluster.clusterId}: tier ${first.severityTier} not allowed for ${first.category}`
+      `[classify] cluster ${cluster.clusterId}: tier ${first.severityTier} not allowed for ${first.category}`,
     );
     return null;
   }
   const severityValue = clampSeverityToTier(
     first.severityValue,
-    first.severityTier
+    first.severityTier,
   );
 
   // Pass 2 — verify (refute). Independent re-read that tries to knock the
@@ -434,10 +456,7 @@ async function classifyOneSingle(
   // Auto-publish gate: every verifier objection and review-gated severity
   // tier routes to the human review queue. Single-engine mode has no
   // independent majority signal that can outweigh an objection.
-  const requiresReview = singleEngineRequiresReview(
-    first.severityTier,
-    verify,
-  );
+  const requiresReview = singleEngineRequiresReview(first.severityTier, verify);
 
   return {
     classified,
@@ -463,25 +482,24 @@ async function classifyOneSingle(
  * classifierRuns for audit.
  */
 async function classifyOneEnsemble(
-  cluster: ClusterToClassify
+  cluster: ClusterToClassify,
 ): Promise<ClassifyOneResult | { category: "none" } | null> {
   const userContent = buildUserContent(cluster);
 
   // --- Fan out one classify call per engine, in parallel ---
   const settled = await Promise.allSettled(
-    CLASSIFY_ENSEMBLE.map((cfg) => runClassify(cfg, userContent))
+    CLASSIFY_ENSEMBLE.map((cfg) => runClassify(cfg, userContent)),
   );
 
   const runs: EnsembleRun[] = [];
   const classifyRuns: ClassifierRun[] = [];
   settled.forEach((outcome, i) => {
     const cfg = CLASSIFY_ENSEMBLE[i];
-    const result =
-      outcome.status === "fulfilled" ? outcome.value : null;
+    const result = outcome.status === "fulfilled" ? outcome.value : null;
     if (outcome.status === "rejected") {
       console.error(
         `[classify] ensemble engine ${cfg.provider}/${cfg.model} rejected:`,
-        outcome.reason
+        outcome.reason,
       );
     }
     if (!result) return; // dropped voter (error or unparseable answer)
@@ -530,7 +548,7 @@ async function classifyOneEnsemble(
   const cat = EVENT_CATEGORY_INDEX[consensus.category];
   if (!cat) {
     console.warn(
-      `[classify] cluster ${cluster.clusterId}: consensus category "${consensus.category}" not in taxonomy → review`
+      `[classify] cluster ${cluster.clusterId}: consensus category "${consensus.category}" not in taxonomy → review`,
     );
     return buildEnsembleResult(
       cluster,
@@ -546,13 +564,13 @@ async function classifyOneEnsemble(
   // If the consensus tier isn't allowed for the category, snap to the nearest
   // allowed tier rather than dropping the whole (agreed-upon) event.
   const severityTier: SeverityTier = cat.allowedTiers.includes(
-    consensus.severityTier
+    consensus.severityTier,
   )
     ? consensus.severityTier
     : cat.allowedTiers[0];
   const severityValue = clampSeverityToTier(
     consensus.severityValue,
-    severityTier
+    severityTier,
   );
 
   // --- Verify pass (adversarial). Runs for 'all' and 'two_of_three'. ---
@@ -569,7 +587,12 @@ async function classifyOneEnsemble(
     cluster,
     { ...consensus, severityTier, severityValue },
     classifyRuns,
-    { verify, verifySkipped: false, forceReview: false, dimension: cat.dimension }
+    {
+      verify,
+      verifySkipped: false,
+      forceReview: false,
+      dimension: cat.dimension,
+    },
   );
 }
 
@@ -593,7 +616,7 @@ function buildEnsembleResult(
     verifySkipped: boolean;
     forceReview: boolean;
     dimension?: PulseDimension;
-  }
+  },
 ): ClassifyOneResult {
   const dimension: PulseDimension =
     opts.dimension ??
@@ -673,7 +696,7 @@ type EnsembleConsensusLike = {
 
 async function runClassify(
   config: ResolvedProviderConfig,
-  userContent: string
+  userContent: string,
 ): Promise<ClassifyResultLite | null> {
   let response;
   try {
@@ -686,14 +709,14 @@ async function runClassify(
   } catch (err) {
     console.error(
       `[classify] classify call failed (${config.provider}/${config.model}):`,
-      err
+      err,
     );
     return null;
   }
   const parsed = parseClassify(response.text);
   if (!parsed) {
     console.warn(
-      `[classify] classify parse failed (${config.provider}/${config.model}): ${response.text.slice(0, 100)}`
+      `[classify] classify parse failed (${config.provider}/${config.model}): ${response.text.slice(0, 100)}`,
     );
     return null;
   }
@@ -710,7 +733,7 @@ async function runVerify(
     severityTier: SeverityTier;
     severityValue: number;
     rationale: string;
-  }
+  },
 ): Promise<VerifyResultLite | null> {
   const verifyContent = `${userContent}
 
@@ -730,14 +753,14 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
   } catch (err) {
     console.error(
       `[classify] verify call failed (${config.provider}/${config.model}):`,
-      err
+      err,
     );
     return null;
   }
   const parsed = parseVerify(response.text);
   if (!parsed) {
     console.warn(
-      `[classify] verify parse failed: ${response.text.slice(0, 100)}`
+      `[classify] verify parse failed: ${response.text.slice(0, 100)}`,
     );
     return null;
   }
@@ -746,7 +769,7 @@ FIRST-PASS CLASSIFICATION TO VERIFY:
 
 function buildUserContent(cluster: ClusterToClassify): string {
   const sourcesLine = cluster.sourceIds.join(", ");
-  return `Country jurisdiction id: ${cluster.jurisdictionId}
+  return `Provisional ingest jurisdiction id (do not treat as subject-country evidence): ${cluster.jurisdictionId}
 Event date: ${cluster.eventDate}
 Sources: ${sourcesLine}
 
@@ -758,39 +781,57 @@ ${cluster.body}`;
 
 export async function loadUnclassifiedClusters(
   db: Db,
-  limit: number
+  limit: number,
 ): Promise<ClusterToClassify[]> {
-  // Find cluster ids in raw_events that don't yet have a pulse_events_v2
-  // row and have a resolved jurisdiction.
+  // Group only by event cluster. Members may carry different ingest-time
+  // jurisdictions; a deterministic provisional value supports classification,
+  // then the dedicated subject-country pass decides the event jurisdiction.
   const result = await db.execute(sql`
     SELECT
       r.cluster_id,
-      r.jurisdiction_id,
       MIN(COALESCE(r.event_date, CURRENT_DATE)) AS event_date,
-      ARRAY_AGG(r.id) AS raw_event_ids,
-      ARRAY_AGG(r.source_id) AS source_ids,
-      ARRAY_AGG(r.source_type) AS source_types,
-      ARRAY_AGG(r.source_url) AS source_urls,
+      ARRAY_REMOVE(ARRAY_AGG(r.jurisdiction_id ORDER BY r.id), NULL) AS jurisdiction_ids,
+      ARRAY_AGG(r.id ORDER BY r.id) AS raw_event_ids,
+      ARRAY_AGG(r.source_id ORDER BY r.id) AS source_ids,
+      ARRAY_AGG(r.source_type ORDER BY r.id) AS source_types,
+      ARRAY_AGG(r.source_url ORDER BY r.id) AS source_urls,
       ARRAY_AGG(DISTINCT r.cluster_run_id) AS cluster_run_ids,
-      (ARRAY_AGG(r.title))[1] AS first_title,
-      (ARRAY_AGG(COALESCE(r.body, ''))) AS bodies,
-      (ARRAY_AGG(r.title)) AS titles
+      (ARRAY_AGG(r.title ORDER BY r.id))[1] AS first_title,
+      ARRAY_AGG(COALESCE(r.body, '') ORDER BY r.id) AS bodies,
+      ARRAY_AGG(r.title ORDER BY r.id) AS titles
     FROM raw_events r
     WHERE r.cluster_id IS NOT NULL
-      AND r.jurisdiction_id IS NOT NULL
       AND r.classification_disposition = 'pending'
       AND NOT EXISTS (
         SELECT 1 FROM pulse_sources ps
         WHERE ps.raw_event_id = r.id
       )
-    GROUP BY r.cluster_id, r.jurisdiction_id
+    GROUP BY r.cluster_id
+    HAVING COUNT(r.jurisdiction_id) > 0
     LIMIT ${limit}
   `);
 
-  const rows = (result as unknown as {
-    rows?: Array<{
+  const rows =
+    (
+      result as unknown as {
+        rows?: Array<{
+          cluster_id: string;
+          jurisdiction_ids: string[];
+          event_date: string;
+          raw_event_ids: string[];
+          source_ids: string[];
+          source_types: string[];
+          source_urls: (string | null)[];
+          cluster_run_ids: string[];
+          first_title: string;
+          bodies: string[];
+          titles: string[];
+        }>;
+      }
+    ).rows ??
+    (result as unknown as Array<{
       cluster_id: string;
-      jurisdiction_id: string;
+      jurisdiction_ids: string[];
       event_date: string;
       raw_event_ids: string[];
       source_ids: string[];
@@ -800,20 +841,7 @@ export async function loadUnclassifiedClusters(
       first_title: string;
       bodies: string[];
       titles: string[];
-    }>;
-  }).rows ?? (result as unknown as Array<{
-    cluster_id: string;
-    jurisdiction_id: string;
-    event_date: string;
-    raw_event_ids: string[];
-    source_ids: string[];
-    source_types: string[];
-    source_urls: (string | null)[];
-    cluster_run_ids: string[];
-    first_title: string;
-    bodies: string[];
-    titles: string[];
-  }>);
+    }>);
 
   return rows.map((row) => {
     // Build a representative body by concatenating distinct titles +
@@ -836,7 +864,7 @@ export async function loadUnclassifiedClusters(
 
     return {
       clusterId: row.cluster_id,
-      jurisdictionId: row.jurisdiction_id,
+      jurisdictionId: selectProvisionalJurisdiction(row.jurisdiction_ids),
       eventDate: row.event_date,
       title: row.first_title,
       body: allText,
@@ -847,6 +875,25 @@ export async function loadUnclassifiedClusters(
       attributions,
     };
   });
+}
+
+/** Most frequent non-null ingest guess; lexical tie-break keeps replay stable. */
+export function selectProvisionalJurisdiction(
+  jurisdictionIds: readonly string[],
+): string {
+  const counts = new Map<string, number>();
+  for (const id of jurisdictionIds) {
+    if (id.trim()) counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  const selected = [...counts.entries()].sort(
+    ([leftId, leftCount], [rightId, rightCount]) =>
+      rightCount - leftCount || leftId.localeCompare(rightId),
+  )[0]?.[0];
+  if (!selected)
+    throw new Error(
+      "Cluster has no provisional jurisdiction for subject attribution",
+    );
+  return selected;
 }
 
 export async function writeEvent(
@@ -917,11 +964,16 @@ export async function writeEvent(
       .onConflictDoNothing();
   }
 
-  await markClusterDisposition(db, cluster.clusterId, {
-    disposition: "event",
-    reason: "classification admitted as a Pulse event",
-    decision: result.classified,
-  }, classificationRunId);
+  await markClusterDisposition(
+    db,
+    cluster.clusterId,
+    {
+      disposition: "event",
+      reason: "classification admitted as a Pulse event",
+      decision: result.classified,
+    },
+    classificationRunId,
+  );
 
   // NOTE: freshness is stamped ONLY at ingest time (upsert.ts), gated on
   // rows actually written. The classifier pass performs no upstream fetch,

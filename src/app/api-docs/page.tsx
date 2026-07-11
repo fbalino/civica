@@ -48,6 +48,7 @@ const SECTIONS: ReaderSidebarItem[] = [
   { id: "index-compare", label: "Index compare" },
   { id: "index-methodology", label: "Index methodology version" },
   { id: "pulse-methodology", label: "Pulse runtime method" },
+  { id: "pulse-cluster-coverage", label: "Pulse cluster coverage" },
   { id: "pulse-dimensions", label: "Pulse dimensions" },
   { id: "pulse-events", label: "Pulse country events" },
   { id: "pulse-changelog-v2", label: "Pulse changelog" },
@@ -236,6 +237,7 @@ export default function ApiDocsPage() {
   const indexCompareRoute = getRouteContract("index-compare");
   const indexMethodologyRoute = getRouteContract("index-methodology");
   const pulseMethodologyRoute = getRouteContract("pulse-methodology");
+  const pulseClusterCoverageRoute = getRouteContract("pulse-cluster-coverage");
   const pulseDimensionsRoute = getRouteContract("pulse-dimensions");
   const pulseEventsRoute = getRouteContract("pulse-events");
   const pulseChangelogRoute = getRouteContract("pulse-changelog-v2");
@@ -448,6 +450,16 @@ export default function ApiDocsPage() {
         />
 
         <EndpointSection
+          id="pulse-cluster-coverage"
+          routeId="pulse-cluster-coverage"
+          method="GET"
+          path={pulseClusterCoverageRoute.pathTemplate}
+          description={pulseClusterCoverageRoute.summary}
+          parameters={toDocParams(pulseClusterCoverageRoute.params)}
+          exampleResponse={docExample("pulseClusterCoverage")}
+        />
+
+        <EndpointSection
           id="pulse-dimensions"
           routeId="pulse-dimensions"
           method="GET"
@@ -512,8 +524,9 @@ for country in resp.json()["data"]:
           jurisdiction records and canonical facts from the immutable Q1
           snapshot, limited to CIA Factbook, Wikidata, and World Bank. Every
           fact carries its vintage label, cutoff, content hash, method, and an
-          embedded source-rights row. Index, Pulse, alternates, restricted sources, images,
-          constitution text, and raw publisher payloads are excluded.
+          embedded source-rights row. Index, Pulse, alternates, restricted
+          sources, images, constitution text, and raw publisher payloads are
+          excluded.
         </p>
 
         <p>
@@ -529,9 +542,11 @@ for country in resp.json()["data"]:
         <p className="api-info-card__body">
           Schema <code>civica-atlas-export/v3</code> · release date{" "}
           <code>2026-07-11</code> · SHA-256{" "}
-          <code>60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc</code>.
-          The package contains its codebook, join keys, deterministic ordering,
-          table counts, and source-specific terms. Its{" "}
+          <code>
+            60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc
+          </code>
+          . The package contains its codebook, join keys, deterministic
+          ordering, table counts, and source-specific terms. Its{" "}
           <a href="/downloads/civica-atlas-2026-07-11.manifest.json">
             release bill of materials
           </a>{" "}
@@ -568,8 +583,8 @@ for country in resp.json()["data"]:
 
         <p className="api-info-card__body">
           JSON and CSV use the same observation rows. The CSV
-          <code> record_class </code> column distinguishes canonical,
-          alternate, projection, and rejected evidence.
+          <code> record_class </code> column distinguishes canonical, alternate,
+          projection, and rejected evidence.
         </p>
       </section>
 

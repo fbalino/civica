@@ -58,7 +58,8 @@ export interface DeprecationContract {
   successor: string;
   headers: Record<string, string>;
   meta: { deprecations: readonly DeprecationEntryContract[] };
-  helperName: "withStructuralFamilyDeprecation" | "withIndexDispositionDeprecation";
+  helperName:
+    "withStructuralFamilyDeprecation" | "withIndexDispositionDeprecation";
   /** True when the ENTIRE route is deprecated (government-types);
    *  false when only a subset of its fields/filters are (countries,
    *  index/*). Drives whether api-docs renders a full "deprecated
@@ -137,7 +138,8 @@ export const API_ROUTES: RouteContract[] = [
         name: "as_of",
         in: "query",
         type: "string",
-        description: 'Required: "live" or a complete immutable Civica Atlas vintage label.',
+        description:
+          'Required: "live" or a complete immutable Civica Atlas vintage label.',
       },
       {
         name: "continent",
@@ -200,7 +202,8 @@ export const API_ROUTES: RouteContract[] = [
         name: "as_of",
         in: "query",
         type: "string",
-        description: 'Required: "live" or a complete immutable Civica Atlas vintage label.',
+        description:
+          'Required: "live" or a complete immutable Civica Atlas vintage label.',
       },
     ],
     cors: true,
@@ -247,7 +250,8 @@ export const API_ROUTES: RouteContract[] = [
         name: "release",
         in: "query",
         type: "string",
-        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
+        description:
+          'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
     ],
     cors: true,
@@ -277,7 +281,8 @@ export const API_ROUTES: RouteContract[] = [
         name: "release",
         in: "query",
         type: "string",
-        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
+        description:
+          'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
     ],
     cors: true,
@@ -308,7 +313,8 @@ export const API_ROUTES: RouteContract[] = [
         name: "release",
         in: "query",
         type: "string",
-        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
+        description:
+          'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
       {
         name: "taxonomy",
@@ -355,7 +361,8 @@ export const API_ROUTES: RouteContract[] = [
         name: "release",
         in: "query",
         type: "string",
-        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
+        description:
+          'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
     ],
     cors: true,
@@ -411,7 +418,8 @@ export const API_ROUTES: RouteContract[] = [
         name: "release",
         in: "query",
         type: "string",
-        description: 'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
+        description:
+          'Exact closed release id. Defaults to "ci-beta-r5-2024-Q4".',
       },
       {
         name: "sort",
@@ -494,6 +502,23 @@ export const API_ROUTES: RouteContract[] = [
     errorStatuses: [429, 500],
     deprecation: null,
     exampleId: "pulseMethodology",
+  },
+  {
+    id: "pulse-cluster-coverage",
+    docSectionId: "pulse-cluster-coverage",
+    method: "GET",
+    pathTemplate: "/api/v1/pulse/cluster-coverage",
+    filePath: "src/app/api/v1/pulse/cluster-coverage/route.ts",
+    versioned: true,
+    summary:
+      "Returns the frozen descriptive release of stored Pulse cluster-size, source, source-family, language, provisional-jurisdiction, and method-version distributions. It is not an accuracy result.",
+    params: [],
+    cors: true,
+    corsHeaders: CORS_HEADERS,
+    rateLimit: v1RateLimit,
+    errorStatuses: [429, 500],
+    deprecation: null,
+    exampleId: "pulseClusterCoverage",
   },
   {
     id: "pulse-dimensions",
@@ -630,7 +655,8 @@ export const API_ROUTES: RouteContract[] = [
         name: "as_of",
         in: "query",
         type: "string",
-        description: 'Required: "live" or a complete immutable Civica Atlas vintage label.',
+        description:
+          'Required: "live" or a complete immutable Civica Atlas vintage label.',
       },
     ],
     cors: false,

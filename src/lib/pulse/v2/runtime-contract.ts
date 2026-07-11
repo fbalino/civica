@@ -43,11 +43,13 @@ import {
   PULSE_REVIEW_SUMMARY_MODEL,
   PULSE_REVIEW_SUMMARY_PROVIDER,
 } from "./summarize";
+import { PULSE_EMBEDDING_MODEL } from "./embed";
+import { PULSE_EVENT_IDENTITY_VERSION } from "./event-identity";
 
-export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.0.0" as const;
-export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.1-beta" as const;
+export const PULSE_RUNTIME_CONTRACT_SCHEMA_VERSION = "1.1.0" as const;
+export const PULSE_RUNTIME_METHOD_VERSION = "pulse-v2.2-beta" as const;
 export const PULSE_TAXONOMY_VERSION = "v2.0" as const;
-export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-09" as const;
+export const PULSE_ACTIVE_FEEDS_OBSERVED_THROUGH = "2026-07-11" as const;
 
 export type PulseMethodStatus = "experimental";
 export type PulseSourceRole = "specialist" | "news";
@@ -100,6 +102,8 @@ export interface PulseRuntimeFacts {
   deltaBounds: Readonly<{ lower: number; upper: number }>;
   clustering: Readonly<{
     countryPartitioned: boolean;
+    identityVersion: string;
+    embeddingModel: string;
     dateWindowHours: number;
     semanticThreshold: number;
     lexicalThreshold: number;
@@ -212,9 +216,15 @@ export interface PulseRuntimeMethodContract {
   clustering: {
     strategy: "semantic_or_lexical_fallback";
     countryPartitioned: boolean;
+    identityNormalization: {
+      version: string;
+      provisionalJurisdictionRole: "diagnostic_not_partition";
+      sharedAnchorRequired: true;
+    };
     dateWindowHours: number;
     semantic: {
       metric: "cosine_similarity";
+      model: string;
       threshold: number;
     };
     lexicalFallback: {
@@ -459,9 +469,15 @@ export function buildPulseRuntimeMethod(
     clustering: {
       strategy: "semantic_or_lexical_fallback",
       countryPartitioned: facts.clustering.countryPartitioned,
+      identityNormalization: {
+        version: facts.clustering.identityVersion,
+        provisionalJurisdictionRole: "diagnostic_not_partition",
+        sharedAnchorRequired: true,
+      },
       dateWindowHours: facts.clustering.dateWindowHours,
       semantic: {
         metric: "cosine_similarity",
+        model: facts.clustering.embeddingModel,
         threshold: facts.clustering.semanticThreshold,
       },
       lexicalFallback: {
@@ -728,10 +744,12 @@ export const CURRENT_PULSE_RUNTIME_FACTS: PulseRuntimeFacts = {
   scoreWindowDays: SCORE_WINDOW_DAYS,
   deltaBounds: { lower: DELTA_LOWER_BOUND, upper: DELTA_UPPER_BOUND },
   clustering: {
-    countryPartitioned: true,
+    countryPartitioned: false,
+    identityVersion: PULSE_EVENT_IDENTITY_VERSION,
+    embeddingModel: PULSE_EMBEDDING_MODEL,
     dateWindowHours: 48,
     semanticThreshold: 0.75,
-    lexicalThreshold: 0.5,
+    lexicalThreshold: 0.42,
   },
 };
 

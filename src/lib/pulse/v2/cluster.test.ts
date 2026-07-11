@@ -2,10 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import type * as schema from "@/lib/db/schema";
-import {
-  runClustering,
-  type CandidateRow,
-} from "./cluster";
+import { runClustering, type CandidateRow } from "./cluster";
 import { createPulsePipelineRunRef } from "./pipeline-version";
 
 type Db = NeonHttpDatabase<typeof schema>;
@@ -18,6 +15,8 @@ const candidates: CandidateRow[] = [
     title: "Court removes election commissioner",
     body: "The national court removed the election commissioner",
     sourceId: "source-a",
+    sourceFamilyId: "publisher-a",
+    language: "en",
     ingestRunId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
   },
   {
@@ -27,6 +26,8 @@ const candidates: CandidateRow[] = [
     title: "Court removes election commissioner",
     body: "National court removed the election commissioner",
     sourceId: "source-b",
+    sourceFamilyId: "publisher-b",
+    language: "en",
     ingestRunId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
   },
 ];
@@ -113,4 +114,84 @@ test("an empty derived input is an explicit no-op", async () => {
   assert.equal(result.candidates, 0);
   assert.deepEqual(result.assignments, []);
   assert.equal(harness.writes(), 0);
+});
+
+test("normalized identity joins cross-family and cross-language reports despite conflicting provisional countries", async () => {
+  const fixture: CandidateRow[] = [
+    {
+      ...candidates[0],
+      id: "oaxaca-en",
+      jurisdictionId: "wrong-country-a",
+      title: "Mexico court annuls Oaxaca election",
+      body: null,
+      sourceId: "wire-en",
+      sourceFamilyId: "wire-family",
+      language: "en",
+    },
+    {
+      ...candidates[1],
+      id: "oaxaca-es",
+      jurisdictionId: "wrong-country-b",
+      title: "Tribunal de México anula elección Oaxaca",
+      body: null,
+      sourceId: "daily-es",
+      sourceFamilyId: "daily-family",
+      language: "es",
+    },
+  ];
+  const result = await runClustering(fakeDb().db, {
+    candidates: fixture,
+    embeddingResult: null,
+    dryRun: true,
+    runRef,
+  });
+  assert.equal(result.clustersCreated, 1);
+  assert.equal(result.multiSourceFamilyClusters, 1);
+  assert.equal(result.multilingualClusters, 1);
+  assert.equal(result.crossJurisdictionClusters, 1);
+  assert.deepEqual(result.assignments[0].memberIds, ["oaxaca-en", "oaxaca-es"]);
+});
+
+test("normalized identity keeps similar same-day events with conflicting anchors separate", async () => {
+  const fixture: CandidateRow[] = [
+    {
+      ...candidates[0],
+      id: "oaxaca",
+      title: "Mexico court annuls Oaxaca election",
+      body: null,
+    },
+    {
+      ...candidates[1],
+      id: "puebla",
+      jurisdictionId: "country-1",
+      title: "Mexico court annuls Puebla election",
+      body: null,
+    },
+  ];
+  const result = await runClustering(fakeDb().db, {
+    candidates: fixture,
+    embeddingResult: null,
+    dryRun: true,
+    runRef,
+  });
+  assert.equal(result.clustersCreated, 2);
+  assert.deepEqual(
+    result.assignments.map(({ memberIds }) => memberIds),
+    [["oaxaca"], ["puebla"]],
+  );
+});
+
+test("unresolved reports remain eligible for clustering", async () => {
+  const fixture = candidates.map((candidate) => ({
+    ...candidate,
+    jurisdictionId: null,
+  }));
+  const result = await runClustering(fakeDb().db, {
+    candidates: fixture,
+    embeddingResult: null,
+    dryRun: true,
+    runRef,
+  });
+  assert.equal(result.clustersCreated, 1);
+  assert.equal(result.crossJurisdictionClusters, 1);
 });
