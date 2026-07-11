@@ -198,6 +198,43 @@ function resultRows(result: unknown): Record<string, unknown>[] {
   >[];
 }
 
+/**
+ * Maps a database join to the public row. Every citation-defining field comes
+ * from the immutable snapshot aliases; mutable source-row fields are limited
+ * to descriptive metadata that the vintage schema did not yet copy.
+ */
+export function frozenSnapshotExportFact(row: Record<string, unknown>) {
+  return {
+    id: row.snapshot_id,
+    canonical_fact_id: row.canonical_fact_id,
+    jurisdiction_id: row.jurisdiction_id,
+    fact_key: row.fact_key,
+    fact_group: row.fact_group,
+    category: row.category,
+    source_id: row.snapshot_source_id,
+    source_url: row.source_url,
+    fact_value: row.snapshot_value_text,
+    fact_value_numeric: row.snapshot_value_numeric,
+    fact_unit: row.snapshot_value_unit,
+    fact_year: row.fact_year,
+    value_json: row.snapshot_value_json,
+    value_status: row.value_status,
+    value_status_reason: row.value_status_reason,
+    as_of: row.snapshot_as_of,
+    data_vintage_year: row.data_vintage_year,
+    retrieved_at: row.retrieved_at,
+    upstream_vintage_label: row.upstream_vintage_label,
+    methodology_version: row.snapshot_methodology_version,
+    value_type: row.value_type,
+    growth_methodology: row.growth_methodology,
+    vintage_label: row.vintage_label,
+    cut_at_timestamp: row.cut_at_timestamp,
+    content_hash: row.content_hash,
+    is_disputed_at_cut: row.is_disputed_at_cut,
+    supersedes_vintage_label: row.supersedes_vintage_label,
+  };
+}
+
 export async function loadAtlasExportInput(): Promise<AtlasExportInput> {
   const allowed = ATLAS_EXPORT_ALLOWED_SOURCE_IDS;
   const [jurisdictionResult, factResult] = await Promise.all([
@@ -209,13 +246,16 @@ export async function loadAtlasExportInput(): Promise<AtlasExportInput> {
       ORDER BY slug
     `),
     db.execute(sql`
-      SELECT v.id, v.canonical_fact_id, v.jurisdiction_id, v.fact_key,
-             cf.fact_group, cf.category, v.source_id, cf.source_url,
-             v.value_text AS fact_value, v.value_numeric AS fact_value_numeric,
-             v.value_unit AS fact_unit, cf.fact_year, v.value_json,
-             cf.value_status, cf.value_status_reason, v.as_of,
+      SELECT v.id AS snapshot_id, v.canonical_fact_id, v.jurisdiction_id, v.fact_key,
+             cf.fact_group, cf.category, v.source_id AS snapshot_source_id, cf.source_url,
+             v.value_text AS snapshot_value_text,
+             v.value_numeric AS snapshot_value_numeric,
+             v.value_unit AS snapshot_value_unit, cf.fact_year,
+             v.value_json AS snapshot_value_json,
+             cf.value_status, cf.value_status_reason, v.as_of AS snapshot_as_of,
              cf.data_vintage_year, cf.retrieved_at, cf.upstream_vintage_label,
-             v.methodology_version, cf.value_type, cf.growth_methodology,
+             v.methodology_version AS snapshot_methodology_version,
+             cf.value_type, cf.growth_methodology,
              v.vintage_label, v.cut_at_timestamp, v.content_hash,
              v.is_disputed_at_cut, v.supersedes_vintage_label
       FROM country_fact_vintages v
@@ -227,6 +267,6 @@ export async function loadAtlasExportInput(): Promise<AtlasExportInput> {
   ]);
   return {
     jurisdictions: resultRows(jurisdictionResult),
-    facts: resultRows(factResult),
+    facts: resultRows(factResult).map(frozenSnapshotExportFact),
   };
 }

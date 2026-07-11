@@ -50,7 +50,7 @@ if (JSON.stringify(codebook.codebook) !== JSON.stringify(original.codebook)) fai
 const rights = JSON.parse(readFileSync(join(dir, "rights-manifest.v1.json"), "utf8"));
 if (JSON.stringify(rights) !== JSON.stringify(buildRightsManifest())) fail("rights manifest drift");
 const inputs = JSON.parse(readFileSync(join(dir, "source-input-manifest.v1.json"), "utf8"));
-if (inputs.captureLevel !== "normalized-release-observations" || inputs.upstreamPublisherBytesRetained !== false) fail("input reconstruction boundary drift");
+if (inputs.captureLevel !== "immutable-civica-vintage-rows" || inputs.upstreamPublisherBytesRetained !== false) fail("input reconstruction boundary drift");
 if (inputs.inputs.length !== bom.sourceInputs.length) fail("source-input inventory drift");
 for (const source of bom.sourceInputs) {
   const input = inputs.inputs.find((row: { sourceId: string }) => row.sourceId === source.sourceId);
@@ -66,7 +66,7 @@ const cleanRoom = JSON.parse(readFileSync(join(dir, "clean-room-evidence.v1.json
 if (cleanRoom.fullReleaseSemanticSha256 !== bom.files[0].semanticSha256 || cleanRoom.credentialsRequired.length || cleanRoom.runtimeNetworkRequests !== 0) fail("clean-room evidence drift");
 const checklist = JSON.parse(readFileSync(join(dir, "G2-CHECKLIST.json"), "utf8"));
 if (checklist.result !== "pass" || checklist.checks.some((row: { status: string }) => row.status !== "pass") || !checklist.limitationBoundaryAccepted) fail("G2 checklist is not passing");
-for (const [file, phrase] of [["KNOWN-LIMITATIONS.md", "does not replay publisher ingestion"], ["REPRODUCE.md", "npm run reproduce:g2-atlas"], ["CHANGELOG.md", "16,451 permitted fact observations"]]) {
+for (const [file, phrase] of [["KNOWN-LIMITATIONS.md", "does not replay publisher ingestion"], ["REPRODUCE.md", "npm run reproduce:g2-atlas"], ["CHANGELOG.md", "frozen canonical fact rows"]]) {
   if (!readFileSync(join(dir, file), "utf8").includes(phrase)) fail(`${file} missing required release boundary`);
 }
 

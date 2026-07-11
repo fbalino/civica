@@ -29,7 +29,7 @@ const result = {
   rowCounts: rebuilt.counts,
   credentialsUsed: [],
   networkRequests: 0,
-  boundary: "normalized release reconstruction; not upstream publisher-byte replay",
+  boundary: "immutable canonical-snapshot reconstruction; not alternate-observation or upstream publisher-byte replay",
 };
 if (!result.pass) throw new Error("G2 Atlas reproduction differs from release BOM");
 console.log(JSON.stringify(result, null, 2));

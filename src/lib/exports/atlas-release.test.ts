@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { buildAtlasExport, buildAtlasReleaseBom, serializeAtlasExport, ATLAS_EXPORT_VINTAGE_LABEL } from "./atlas-release";
+import { buildAtlasExport, buildAtlasReleaseBom, serializeAtlasExport, ATLAS_EXPORT_VINTAGE_LABEL, frozenSnapshotExportFact } from "./atlas-release";
 
 const jurisdiction = { id: "j1", slug: "example", name: "Example" };
 const fact = (source_id: string, id = "f1") => ({ id, canonical_fact_id: `canonical-${id}`, jurisdiction_id: "j1", fact_key: "population", source_id, value_status: "observed", fact_value_numeric: 0, vintage_label: ATLAS_EXPORT_VINTAGE_LABEL, methodology_version: "v0.2-beta", content_hash: "a".repeat(64), cut_at_timestamp: "2026-05-05T22:54:22.775Z" });
@@ -48,9 +48,26 @@ test("release BOM is deterministic and complete", () => {
 test("the release loader selects frozen values, source, hash, and method instead of live values", () => {
   const source = readFileSync(new URL("./atlas-release.ts", import.meta.url), "utf8");
   assert.match(source, /FROM country_fact_vintages v/);
-  assert.match(source, /v\.value_text AS fact_value/);
-  assert.match(source, /v\.source_id/);
+  assert.match(source, /v\.value_text AS snapshot_value_text/);
+  assert.match(source, /v\.source_id AS snapshot_source_id/);
   assert.match(source, /v\.content_hash/);
   assert.match(source, /v\.methodology_version/);
   assert.doesNotMatch(source, /FROM country_facts\s+WHERE status = 'active'/);
+});
+
+test("a post-cut source-row change cannot replace frozen citation fields", () => {
+  const exported = frozenSnapshotExportFact({
+    snapshot_id: "v1", canonical_fact_id: "cf1", jurisdiction_id: "j1", fact_key: "population",
+    snapshot_source_id: "world_bank", snapshot_value_text: "100", snapshot_value_numeric: 100,
+    snapshot_value_unit: "people", snapshot_value_json: null, snapshot_as_of: "2024-01-01",
+    snapshot_methodology_version: "v0.2-beta", vintage_label: ATLAS_EXPORT_VINTAGE_LABEL,
+    cut_at_timestamp: "2026-05-05T22:54:22.775Z", content_hash: "a".repeat(64),
+    current_source_id: "wikidata", current_fact_value: "999", current_fact_value_numeric: 999,
+    current_methodology_version: "future-method",
+  });
+  assert.equal(exported.source_id, "world_bank");
+  assert.equal(exported.fact_value, "100");
+  assert.equal(exported.fact_value_numeric, 100);
+  assert.equal(exported.methodology_version, "v0.2-beta");
+  assert.equal(exported.content_hash, "a".repeat(64));
 });

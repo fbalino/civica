@@ -72,12 +72,12 @@ writeJson(join(BUNDLE_DIR, "rights-manifest.v1.json"), buildRightsManifest());
 
 const sourceById = new Map(release.tables.sources.map((row: { sourceId: string }) => [row.sourceId, row]));
 writeJson(join(BUNDLE_DIR, "source-input-manifest.v1.json"), {
-  schemaVersion: "atlas-release-observation-inputs/v1",
+  schemaVersion: "atlas-release-frozen-snapshot-inputs/v1",
   releaseId: RELEASE_ID,
-  captureLevel: "normalized-release-observations",
+  captureLevel: "immutable-civica-vintage-rows",
   upstreamPublisherBytesRetained: false,
   reconstructionBoundary:
-    "These records reproduce the frozen normalized Atlas export. They do not reconstruct upstream ingestion from publisher bytes that were not retained at release time.",
+    "These records reproduce the immutable as-published canonical snapshot. They do not reconstruct upstream ingestion from publisher bytes that were not retained at release time.",
   exportSourceCommit: bom.exportSourceCommit,
   inputs: bom.sourceInputs.map((input: Record<string, unknown>) => ({
     ...input,
@@ -96,7 +96,7 @@ const countsBy = (key: string) => Object.fromEntries(
 writeJson(join(BUNDLE_DIR, "coverage-report.v1.json"), {
   schemaVersion: "atlas-release-coverage/v1",
   releaseId: RELEASE_ID,
-  denominator: "released source-observation rows",
+  denominator: "released frozen canonical rows",
   rows: facts.length,
   jurisdictions: release.counts.jurisdictions,
   distinctJurisdictionsWithFacts: distinct("jurisdiction_id"),
@@ -105,7 +105,7 @@ writeJson(join(BUNDLE_DIR, "coverage-report.v1.json"), {
   bySource: countsBy("source_id"),
   byValueState: countsBy("value_status"),
   limitation:
-    "This is frozen-release observation coverage, not the live fact-key reconciliation report and not upstream source-capture completeness.",
+    "This is frozen canonical-release coverage, not live resolver coverage, alternate-observation coverage, or upstream source-capture completeness.",
 });
 
 const lockBytes = readFileSync("package-lock.json");
@@ -123,8 +123,8 @@ writeJson(join(BUNDLE_DIR, "environment.v1.json"), {
 writeJson(join(BUNDLE_DIR, "clean-room-evidence.v1.json"), {
   schemaVersion: "g2-clean-room-evidence/v1",
   releaseId: RELEASE_ID,
-  dat019FixtureSha256: "6813f95a781776d81b5235cc32b4c96d064fd0ccd9034e4fbe757b0e89125f0f",
-  dat019ExportSha256: "15a4fa61c5818d87941bc3a13de831548ad1e94c6fe626e4b00b573aae17c622",
+  dat019FixtureSha256: "78d1bf5d5fa335aa98f8424f9387cb45b1d5bbc1158dff9d8686a3bd4a6f8113",
+  dat019ExportSha256: "8ff633f5447f59b6771c7ae10b63b407df9af99aab632889967a073c6386e639",
   fullReleaseSemanticSha256: bom.files[0].semanticSha256,
   fullReleaseFileSha256: bom.files[0].fileSha256,
   credentialsRequired: [],
@@ -138,15 +138,15 @@ const citation = readFileSync("CITATION.cff", "utf8")
   .replace('url: "https://civicaatlas.org"', `version: "${RC_ID}"\ndate-released: 2026-07-11\nurl: "https://civicaatlas.org/downloads/civica-atlas-2026-07-11.json.gz"`);
 writeFileSync(join(BUNDLE_DIR, "CITATION.cff"), citation);
 
-writeFileSync(join(BUNDLE_DIR, "CHANGELOG.md"), `# ${RC_ID} changelog\n\n- Publishes the first rights-filtered frozen Atlas source-observation export.\n- Includes 253 jurisdiction identity/status rows and 16,451 permitted fact observations.\n- Adds a field codebook, source rights, observation-level input manifest, frozen coverage report, checksums, environment, citation draft, and clean-room verification.\n- Excludes Civica Index, Pulse, constitution text, images, restricted sources, and raw publisher payloads.\n`);
-writeFileSync(join(BUNDLE_DIR, "KNOWN-LIMITATIONS.md"), `# Known limitations\n\n- The package reproduces the normalized frozen Atlas export from its released observation rows; it does not replay publisher ingestion from unretained upstream bytes.\n- The release contains source observations, not one reconciled canonical value per fact key.\n- Only CIA Factbook, Wikidata, and World Bank rows whose public bulk-export posture was verified are included.\n- Country images, constitution text, Index scores, Pulse records, restricted sources, statements, disputes, and raw publisher payloads are excluded.\n- The clean-room result verifies deterministic export construction and package integrity; it is not an independent substantive validation of publisher accuracy.\n- DOI registration and external repository acceptance remain later governance work.\n`);
+writeFileSync(join(BUNDLE_DIR, "CHANGELOG.md"), `# ${RC_ID} changelog\n\n- Publishes the rights-filtered Atlas canonical selection from the immutable Q1 snapshot.\n- Includes ${release.counts.jurisdictions} jurisdiction identity/status rows and ${release.counts.facts} frozen canonical fact rows.\n- Carries the vintage label, cutoff, selected source row, content hash, and published method on every fact.\n- Excludes Civica Index, Pulse, alternate observations, constitution text, images, restricted sources, and raw publisher payloads.\n`);
+writeFileSync(join(BUNDLE_DIR, "KNOWN-LIMITATIONS.md"), `# Known limitations\n\n- The package reproduces the immutable Civica snapshot; it does not replay publisher ingestion from unretained upstream bytes.\n- Alternate observations are excluded pending the canonical-plus-alternates export owned by DAT-027.\n- Only canonical CIA Factbook, Wikidata, and World Bank rows whose public bulk-export posture was verified are included.\n- Metadata not copied into the vintage row remains joined from the selected source-observation row; DAT-025 owns the complete temporal-field separation.\n- Country images, constitution text, Index scores, Pulse records, restricted sources, statements, and raw publisher payloads are excluded.\n- The clean-room result verifies deterministic export construction and package integrity; it is not an independent substantive validation of publisher accuracy.\n- DOI registration and external repository acceptance remain later governance work.\n`);
 writeFileSync(join(BUNDLE_DIR, "REPRODUCE.md"), `# Reproduce the frozen Atlas candidate\n\nFrom a clean checkout of the repository:\n\n1. Install Node.js ${bom.tools.node} and run \`npm ci\`.\n2. Confirm no \`.env.local\`, \`.next\`, \`.turbo\`, or copied cache is present.\n3. Run \`npm run reproduce:g2-atlas\`.\n4. Run \`npm test\` and \`npm run build\`.\n\nThe reproduction command uses only checked release files. It requires no database, model credential, or runtime network request and must match both semantic and compressed release hashes.\n`);
 
 const inventory = [
   ["versioned-code.v1.json", "versioned-code"],
   ["atlas-export.v1.json.gz", "normalized-export"],
   ["release-bom.v1.json", "bill-of-materials"],
-  ["source-input-manifest.v1.json", "observation-input-manifest"],
+  ["source-input-manifest.v1.json", "frozen-snapshot-input-manifest"],
   ["rights-manifest.v1.json", "rights-manifest"],
   ["codebook.v1.json", "codebook"],
   ["coverage-report.v1.json", "coverage-report"],
@@ -164,7 +164,7 @@ writeJson(join(BUNDLE_DIR, "bundle-manifest.v1.json"), {
   status: "release-candidate",
   exportSourceCommit: bom.exportSourceCommit,
   components: inventory.map(([path, role]) => ({ path, role })),
-  scopeBoundary: "Atlas reference observations only; research-score products and unretained upstream publisher bytes are outside this candidate.",
+  scopeBoundary: "Immutable Atlas canonical snapshot rows only; alternates, research-score products, and unretained upstream publisher bytes are outside this candidate.",
 });
 writeJson(join(BUNDLE_DIR, "G2-CHECKLIST.json"), {
   schemaVersion: "civica-g2-checklist/v1",
