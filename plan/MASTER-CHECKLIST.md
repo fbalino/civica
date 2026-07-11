@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 59
-- **Remaining:** 229
-- **Progress:** 20.5%
+- **Completed:** 60
+- **Remaining:** 228
+- **Progress:** 20.8%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -83,7 +83,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-005** (P0) Correct score ties, rank semantics, and ranking uncertainty. _Done when: equal published scores receive an adopted competition/dense/equal-rank policy, deterministic tie fixtures pass, rank intervals or instability are shown when warranted, and ordinal ranks do not create distinctions unsupported by score precision._
 - [x] **IDX-006** (P0) Build and freeze the complete longitudinal research panel from native source observations. _Done when: country-year/period rows have source/vintage/unit/transform/uncertainty/missingness/revision flags, temporal breaks are documented, panel hashes are frozen, and a coverage report explains exclusions without freshest-value substitution._
 - [x] **IDX-007** (P0) Adopt a research charter defining what an original Civica measurement must contribute. _Done when: the charter specifies target users/decisions, unit/cadence, construct/nonclaims, expected causal or descriptive role, novelty criterion versus V-Dem/WGI/Freedom House/native dashboard, misuse risks, and falsification/retirement conditions._
-- [ ] **IDX-008** (P0) Convert Fable's design-space report and Codex audit into at least four materially distinct candidate specifications. _Done when: candidates include distinct constructs—not cosmetic weighting variants—and for each define inputs, transforms, missingness, uncertainty, versioning, normative choices, expected added value, public presentation, validation, and retirement rule; dashboard/no-score is included._
+- [x] **IDX-008** (P0) Convert Fable's design-space report and Codex audit into at least four materially distinct candidate specifications. _Done when: candidates include distinct constructs—not cosmetic weighting variants—and for each define inputs, transforms, missingness, uncertainty, versioning, normative choices, expected added value, public presentation, validation, and retirement rule; dashboard/no-score is included._
 - [ ] **IDX-009** (P0) Include provenance-native and institutional-structure alternatives, not only governance-quality composites. _Done when: at least one candidate uses Civica's source disagreement/coverage/reconciliation strength, at least one uses defensible institutional structure/constraint evidence, and each proves it is not a hidden country-quality grade or abandons the candidate._
 - [ ] **IDX-010** (P0) Preregister the candidate tournament before winner-selecting analyses. _Done when: protocol freezes panel split, candidates, simple baselines, metrics, subgroup/sensitivity tests, decision thresholds, multiplicity/exploration handling, missingness, exclusions, code commit, input hashes, and “no candidate wins” rule in a timestamped artifact._
 - [ ] **IDX-011** (P0) Define and implement simple baselines. _Done when: best single established indicator, transparent equal-weight aggregate where coherent, first common factor/latent baseline where coherent, and source-native dashboard/no-score baseline are reproducible and receive the same evaluation as Civica candidates._

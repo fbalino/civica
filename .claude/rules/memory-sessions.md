@@ -547,3 +547,11 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Candidates must add information and beat a relevant baseline on a locked user
   task; the dashboard/no-score baseline and no-winner outcome remain valid.
 - Machine contract, validator, and 674/674 tests pass. IDX-008 is next.
+
+## 2026-07-11 — IDX-008 candidate specifications completed
+
+- Defined six materially different tournament candidates, including the
+  source-native dashboard/no-score floor and the hardened current composite.
+- Every candidate now has a complete claim, data, transformation, uncertainty,
+  versioning, validation, presentation, and retirement contract.
+- Seeded duplicate-set validation and 677/677 tests pass. IDX-009 is next.
