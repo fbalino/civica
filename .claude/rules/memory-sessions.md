@@ -331,3 +331,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Final acceptance: 580/580 tests, TypeScript, targeted ESLint, freshness,
   production-adapter, source-input, raw-retention, derivation-version,
   claims/docs, and production build pass. DAT-012 is complete; DAT-013 is next.
+
+## 2026-07-10 — DAT-013 migration discipline completed
+
+- Registered all 36 migration/data-change artifacts: 25 SQL files and 11
+  operational scripts. The registry preserves the real 12-entry journal, two
+  sequence collisions, and later unjournaled files instead of inventing history.
+- Added a zero-write planner with live exact pre-change row counts, checked
+  36/36 preflight evidence, compensation and invariant policy, internal release
+  notes, a guarded disposable-local push path, and a refusing `db:push` command.
+- Eight focused fixtures, 588/588 tests, TypeScript, ESLint, documentation,
+  claims, and the full build pass. DAT-013 is complete; DAT-014 is next.

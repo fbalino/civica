@@ -1,0 +1,781 @@
+{
+  "generatedAt": "2026-07-11T01:03:00.315Z",
+  "plans": [
+    {
+      "id": "0000_smooth_kylun",
+      "artifact": "drizzle/migrations/0000_smooth_kylun.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "2b328d03dd59e4fe451641ec598d03ced73b67fc6191cd12d92f26e5764266a5",
+      "affectedRelations": [
+        "constitutions",
+        "country_factbook_sections",
+        "country_facts",
+        "elections",
+        "government_bodies",
+        "jurisdictions",
+        "legislature_parties",
+        "offices",
+        "persons",
+        "sources",
+        "statements",
+        "terms"
+      ],
+      "statementCount": 27,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0000_smooth_kylun-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0000_smooth_kylun must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "constitutions": 186,
+        "country_factbook_sections": 2889,
+        "country_facts": 25827,
+        "elections": 915,
+        "government_bodies": 483,
+        "jurisdictions": 253,
+        "legislature_parties": 1548,
+        "offices": 5305,
+        "persons": 4959,
+        "sources": 56,
+        "statements": 7891,
+        "terms": 5475
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0001_contact_submissions",
+      "artifact": "drizzle/migrations/0001_contact_submissions.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "cd6849a345728bd73c878cc743809121372ad513bb0233f9ab5324327984c79a",
+      "affectedRelations": [
+        "contact_submissions"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0001_contact_submissions-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0001_contact_submissions must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "contact_submissions": 1
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0002_pulse_events",
+      "artifact": "drizzle/migrations/0002_pulse_events.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "8079ffe68ce8e76ecd50435dae527df8a40743ab21e6f5d439d1f3a2da560cbf",
+      "affectedRelations": [
+        "pulse_events"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0002_pulse_events-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0002_pulse_events must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events": 462
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0002_purple_rachel_grey",
+      "artifact": "drizzle/migrations/0002_purple_rachel_grey.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_sequence_collision",
+      "sha256": "c062601c0e22ec40b45701af7ff1070f8c161f7e1339f8753535d9b740e25412",
+      "affectedRelations": [
+        "bill_summary_cache",
+        "contact_submissions",
+        "country_metrics",
+        "election_results",
+        "elections",
+        "government_bodies",
+        "metric_definitions",
+        "offices"
+      ],
+      "statementCount": 21,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0002_purple_rachel_grey-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0002_purple_rachel_grey must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "bill_summary_cache": 6141,
+        "contact_submissions": 1,
+        "country_metrics": 7449,
+        "election_results": 1351,
+        "elections": 915,
+        "government_bodies": 483,
+        "metric_definitions": 10,
+        "offices": 5305
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0003_international_organizations",
+      "artifact": "drizzle/migrations/0003_international_organizations.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_sequence_collision",
+      "sha256": "83ea10be45c1c2cac01d877b9e650dd058b45d4ce4120e55153c05a30e6ac2b1",
+      "affectedRelations": [
+        "organization_memberships",
+        "organizations"
+      ],
+      "statementCount": 11,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0003_international_organizations-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0003_international_organizations must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "organization_memberships": 1713,
+        "organizations": 19
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0003_soft_shinko_yamashiro",
+      "artifact": "drizzle/migrations/0003_soft_shinko_yamashiro.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "d804f3c3f067e24a2993b48563204ac5d498dff5d7a36710de7b3710d9c48dde",
+      "affectedRelations": [
+        "government_taxonomies"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0003_soft_shinko_yamashiro-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0003_soft_shinko_yamashiro must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "government_taxonomies": 249
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0004_gray_mojo",
+      "artifact": "drizzle/migrations/0004_gray_mojo.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "39705601d287c6ddf3cf5c8516c6434a63b75ae00f136473008ee532dec4b43a",
+      "affectedRelations": [
+        "bills"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0004_gray_mojo-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0004_gray_mojo must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "bills": 6811
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0005_wet_longshot",
+      "artifact": "drizzle/migrations/0005_wet_longshot.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "7f6be64d25a0aeec6752d34d859d33abb6db8d00c9fae94e7820eb8fa9e3b83f",
+      "affectedRelations": [
+        "advisory_board_members",
+        "correction_log"
+      ],
+      "statementCount": 3,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0005_wet_longshot-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0005_wet_longshot must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "advisory_board_members": 0,
+        "correction_log": 1
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0006_gigantic_quasimodo",
+      "artifact": "drizzle/migrations/0006_gigantic_quasimodo.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "35834a95e09b12d3117d10ae7879319fa7474dfa58d8adfd4a2f2957b5697e8f",
+      "affectedRelations": [
+        "ci_composite_scores"
+      ],
+      "statementCount": 5,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0006_gigantic_quasimodo-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0006_gigantic_quasimodo must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_composite_scores": 286
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0007_stiff_hobgoblin",
+      "artifact": "drizzle/migrations/0007_stiff_hobgoblin.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "91c31812803ff6c5c2dc4c22de528ee542aff9e46bc94fe03dbb443e20e8268f",
+      "affectedRelations": [
+        "civica_conditions_scores"
+      ],
+      "statementCount": 6,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0007_stiff_hobgoblin-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0007_stiff_hobgoblin must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "civica_conditions_scores": 331
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0008_violet_robin_chapel",
+      "artifact": "drizzle/migrations/0008_violet_robin_chapel.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "dc09bb9f32119cd7f73c5602db0083008bb1314fac5c42964f9849bb16e71ca5",
+      "affectedRelations": [
+        "pulse_corrections",
+        "pulse_dimensional_deltas",
+        "pulse_events_v2",
+        "pulse_sources",
+        "raw_events"
+      ],
+      "statementCount": 25,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0008_violet_robin_chapel-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0008_violet_robin_chapel must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_corrections": 0,
+        "pulse_dimensional_deltas": 325,
+        "pulse_events_v2": 384,
+        "pulse_sources": 529,
+        "raw_events": 1122
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0009_colossal_zaladane",
+      "artifact": "drizzle/migrations/0009_colossal_zaladane.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "8605fd52d787eb4e389bf6f8ada0dcefbf3770089266b8618938925bf59f6811",
+      "affectedRelations": [
+        "pulse_review_audit_log"
+      ],
+      "statementCount": 4,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0009_colossal_zaladane-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0009_colossal_zaladane must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_review_audit_log": 13
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0010_careless_dakota_north",
+      "artifact": "drizzle/migrations/0010_careless_dakota_north.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "87c7e466261189c3e25ce10ce2f846c24194c2708c0fa23383a49137f80089ea",
+      "affectedRelations": [
+        "backtest_cases",
+        "backtest_events",
+        "backtest_runs"
+      ],
+      "statementCount": 7,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0010_careless_dakota_north-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0010_careless_dakota_north must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "backtest_cases": 10,
+        "backtest_events": 59,
+        "backtest_runs": 52
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0011_tidy_mordo",
+      "artifact": "drizzle/migrations/0011_tidy_mordo.sql",
+      "kind": "schema",
+      "historyStatus": "journaled",
+      "sha256": "0cd6bb8befddc58c341bcdeec7d955fbb655f5fc8d84c48f472b548f47697496",
+      "affectedRelations": [
+        "pulse_events_v2"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0011_tidy_mordo-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0011_tidy_mordo must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0012_bug1_value_type",
+      "artifact": "drizzle/migrations/0012_bug1_value_type.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "ca6942842a96c974bcf01d90e17d6d8dd62da57ee921d2c67a49fe5ed00dd5a7",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 3,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0012_bug1_value_type-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0012_bug1_value_type must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25827
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0013_electoral_systems",
+      "artifact": "drizzle/migrations/0013_electoral_systems.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "3aff49bc77ec6a2d3168b0626d3625202564041042d0174e8e4004772ead9087",
+      "affectedRelations": [
+        "government_bodies"
+      ],
+      "statementCount": 2,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0013_electoral_systems-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0013_electoral_systems must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "government_bodies": 483
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0014_advisory_applications",
+      "artifact": "drizzle/migrations/0014_advisory_applications.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "38fe8a36b34e87e471289b7e82b2fa9d9cf6fbc7c37d3e8f6064a83424724ef4",
+      "affectedRelations": [
+        "advisory_applications"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0014_advisory_applications-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0014_advisory_applications must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "advisory_applications": 0
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0015_contact_messages_status",
+      "artifact": "drizzle/migrations/0015_contact_messages_status.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "49273715e61acf842cf9fefcda5877189cb80b458b9aace683bf147328a516dd",
+      "affectedRelations": [
+        "contact_submissions"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0015_contact_messages_status-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0015_contact_messages_status must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "contact_submissions": 1
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0016_indicator_history",
+      "artifact": "drizzle/migrations/0016_indicator_history.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "d1ac2490c5e780efb53e456ab3bffb25b87865631068cd9196356689135ef073",
+      "affectedRelations": [
+        "indicator_history",
+        "jurisdictions",
+        "sources"
+      ],
+      "statementCount": 10,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0016_indicator_history-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0016_indicator_history must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "indicator_history": 46215,
+        "jurisdictions": 253,
+        "sources": 56
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0017_party_positions",
+      "artifact": "drizzle/migrations/0017_party_positions.sql",
+      "kind": "schema",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "e50c060700e51f9f789e79354de11a8e7ed6c6b970ba59b2d0c5375f123669f2",
+      "affectedRelations": [
+        "legislature_parties",
+        "party_positions",
+        "sources"
+      ],
+      "statementCount": 12,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0017_party_positions-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0017_party_positions must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "legislature_parties": 1548,
+        "party_positions": 656,
+        "sources": 56
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0018_data_vintage_year",
+      "artifact": "drizzle/migrations/0018_data_vintage_year.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "d10031561687a54f856e5f2925539908c3d96c5a824dbe17de69f3411da4e22e",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0018_data_vintage_year-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0018_data_vintage_year must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25827
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0019_growth_methodology",
+      "artifact": "drizzle/migrations/0019_growth_methodology.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "296a269cb37bfc4032da59682ff3ff201d76329919eec88d9e835cec05361ac9",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 1,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0019_growth_methodology-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0019_growth_methodology must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25827
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0020_jurisdiction_status_taxonomy",
+      "artifact": "drizzle/migrations/0020_jurisdiction_status_taxonomy.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "7ce4e64cd22694f1d1390e07bf90217044288415dc8efe727b5b1299ba2f1f51",
+      "affectedRelations": [
+        "jurisdictions"
+      ],
+      "statementCount": 15,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0020_jurisdiction_status_taxonomy-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0020_jurisdiction_status_taxonomy must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0021_derivation_version_envelopes",
+      "artifact": "drizzle/migrations/0021_derivation_version_envelopes.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "1715f1beb9d4c26bb89078942aa1abd26ae00449012fb9cc6492d7cd29688c6c",
+      "affectedRelations": [
+        "ci_composite_scores",
+        "ci_dimension_scores",
+        "country_fact_vintages",
+        "government_taxonomies",
+        "pulse_dimensional_deltas",
+        "pulse_events_v2"
+      ],
+      "statementCount": 36,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0021_derivation_version_envelopes-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0021_derivation_version_envelopes must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "ci_composite_scores": 286,
+        "ci_dimension_scores": 1142,
+        "country_fact_vintages": 17506,
+        "government_taxonomies": 249,
+        "pulse_dimensional_deltas": 325,
+        "pulse_events_v2": 384
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "0022_pulse_event_idempotency",
+      "artifact": "drizzle/migrations/0022_pulse_event_idempotency.sql",
+      "kind": "mixed",
+      "historyStatus": "legacy_unjournaled",
+      "sha256": "5b920f980e48b9dfa1160859d4a8ed51fb7249325b78d275524cdba998786d23",
+      "affectedRelations": [
+        "pulse_events_v2",
+        "pulse_sources"
+      ],
+      "statementCount": 5,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named 0022_pulse_event_idempotency-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; 0022_pulse_event_idempotency must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "pulse_events_v2": 384,
+        "pulse_sources": 529
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-cia-vintage",
+      "artifact": "scripts/backfill-cia-vintage.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "511c281bfcc8f7953d75c7d5ed08ed6e49f570147f33ff0a5a2858b676ba7554",
+      "affectedRelations": [
+        "sources"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-cia-vintage-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-cia-vintage must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "sources": 56
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-election-results",
+      "artifact": "scripts/backfill-election-results.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "9921f9741eca756a5a159e5eaaa70c0b8f7a540422d8c3479660d24e35884c5e",
+      "affectedRelations": [
+        "election_results",
+        "elections",
+        "jurisdictions"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-election-results-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-election-results must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "election_results": 1351,
+        "elections": 915,
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-growth-methodology",
+      "artifact": "scripts/backfill-growth-methodology.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "4d9ddaad870dc96f5c44a4c9e8d3a84e3f3cf01c42a464486c100dbefdd19b13",
+      "affectedRelations": [
+        "sources"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-growth-methodology-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-growth-methodology must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "sources": 56
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-methodology-version",
+      "artifact": "scripts/backfill-methodology-version.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "42b4a35de3d1d22d49357d39c86698f25d722fd614704118e8a4d8dbf6036b60",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-methodology-version-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-methodology-version must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25827
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-territory-iso2",
+      "artifact": "scripts/backfill-territory-iso2.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "3853c9beef48bda239bde3ee45d1f9b92aecbfa00d2e57967338f69d76e3f641",
+      "affectedRelations": [
+        "jurisdictions"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-territory-iso2-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-territory-iso2 must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-backfill-upstream-vintage-labels",
+      "artifact": "scripts/backfill-upstream-vintage-labels.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "3dd754d3489d44884fae6ec44cc8d03cfede98eb916e79fd7fcd55f5c6fb2e89",
+      "affectedRelations": [
+        "country_facts"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-backfill-upstream-vintage-labels-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-backfill-upstream-vintage-labels must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25827
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-bridge-cia-legacy-to-canonical",
+      "artifact": "scripts/bridge-cia-legacy-to-canonical.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "df174fdad5b52df2252cc68a28367703f28564e9f63c9a42bf07a7a417a4529d",
+      "affectedRelations": [
+        "country_facts",
+        "jurisdictions",
+        "sources"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-bridge-cia-legacy-to-canonical-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-bridge-cia-legacy-to-canonical must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_facts": 25827,
+        "jurisdictions": 253,
+        "sources": 56
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-cleanup-bad-offices",
+      "artifact": "scripts/cleanup-bad-offices.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "2f1bc629b5592669e9a27cd439d99030c910eb998ed67ecd4e8b0c303ac73268",
+      "affectedRelations": [
+        "offices",
+        "persons",
+        "terms"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-cleanup-bad-offices-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-cleanup-bad-offices must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "offices": 5305,
+        "persons": 4959,
+        "terms": 5475
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-create-rate-limits-table",
+      "artifact": "scripts/create-rate-limits-table.ts",
+      "kind": "mixed",
+      "historyStatus": "operational_data_change",
+      "sha256": "b322c8656f77cef0123139596a0449c2286b6596686c0418613fa528cffe0c88",
+      "affectedRelations": [
+        "rate_limits"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-create-rate-limits-table-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-create-rate-limits-table must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "rate_limits": 13
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-reseed-bug3-corrupted",
+      "artifact": "scripts/reseed-bug3-corrupted.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "bb544183552844ebe0ca648790ac3b9a1033b9f29172d5987c98873d25c3c690",
+      "affectedRelations": [
+        "country_factbook_sections",
+        "country_facts",
+        "data_disputes",
+        "jurisdictions"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-reseed-bug3-corrupted-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-reseed-bug3-corrupted must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "country_factbook_sections": 2889,
+        "country_facts": 25827,
+        "data_disputes": 33,
+        "jurisdictions": 253
+      },
+      "writesPerformed": 0
+    },
+    {
+      "id": "data-restore-overdemoted-disputes",
+      "artifact": "scripts/restore-overdemoted-disputes.ts",
+      "kind": "data",
+      "historyStatus": "operational_data_change",
+      "sha256": "9de4ff1c02b00d2f851a7bf0a826dccafa07c0a5981ccda1c03451ce19ea4581",
+      "affectedRelations": [
+        "jurisdictions",
+        "sources"
+      ],
+      "statementCount": 0,
+      "destructiveStatementCount": 0,
+      "rollbackOrCompensation": "Restore the isolated pre-change backup or ship a reviewed forward compensation named data-restore-overdemoted-disputes-compensation; never reverse production DDL/data implicitly.",
+      "invariantPlan": "npm run validate:migrations verifies registry closure and artifact integrity; data-restore-overdemoted-disputes must also retain its task-specific schema/data validator before production apply.",
+      "releaseNote": "data/migrations/CHANGELOG.md",
+      "liveRowCounts": {
+        "jurisdictions": 253,
+        "sources": 56
+      },
+      "writesPerformed": 0
+    }
+  ]
+}

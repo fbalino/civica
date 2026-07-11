@@ -5,8 +5,8 @@
   will be overwritten on the next regeneration. Edit the template,
   then run:
       npm run regenerate:readme
-  Template SHA-256: b0ad9703e6feea761bed6f9981b58b0fc53d44e5c6df2ea02ba4db674e6db983
-  Generated body SHA-256: a8b499f87c2be396cd36f89118ac4e29fc5b8cdb742f9898be49fa34237d3c31
+  Template SHA-256: f3e04c50aedf4d5183ef052b05388491c658d5ad06cc961861613d0c9f4734a2
+  Generated body SHA-256: 43973dcdfda952daa3b2cc53a0722fe442999a7b6da0fecc5afdcc108fe008b0
   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 -->
 # Civica Atlas
@@ -179,7 +179,8 @@ Common npm scripts:
 
 ```bash
 npm run db:generate              # Drizzle schema migration
-npm run db:push                  # Push schema to Neon
+npm run db:plan -- --id=<id> --live  # Zero-write plan + pre-change row counts
+npm run db:push                  # Refuses; db:push is not production history
 npm run seed:sources             # Seed the sources table
 npm run seed:factbook            # Import the CIA Factbook archive
 npm run sync:factbook:wdi        # World Bank WDI sync

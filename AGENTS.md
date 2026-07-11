@@ -140,7 +140,10 @@ Canonical npm scripts (in `package.json`):
 - `npm run pulse:v2:all` — run Pulse v2 ingest → cluster → classify/verify/subject attribution → corroborate/score
 - `npm run pulse:v2:{ingest,cluster,classify,score}` — run one Pulse v2 stage
 - `npm run snapshot:pulse-runtime` / `npm run validate:pulse-runtime:live` — regenerate or validate the public runtime-method contract
-- `npm run db:generate` / `npm run db:push` — Drizzle migrations
+- `npm run db:generate` — generate a checked Drizzle forward artifact
+- `npm run db:plan -- --id=<migration-id> --live` — zero-write migration plan and pre-change row counts
+- `npm run db:push` — intentionally refuses; `db:push` is not production history
+- `CIVICA_ALLOW_DB_PUSH=local-only npm run db:push:local` — disposable non-production databases only
 
 ## Civica Index pipeline (manual today; cron target in the plan)
 1. `tsx scripts/ingest-ci-all.ts` — runs the four current Beta dimensions: V-Dem primary democratic quality, the disclosed WGI Voice & Accountability coverage fallback, WGI Rule of Law, Freedom House, and Transparency CPI. HDI/GPI are Conditions inputs, not Index dimensions.

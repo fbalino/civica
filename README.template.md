@@ -180,7 +180,8 @@ Common npm scripts:
 
 ```bash
 npm run db:generate              # Drizzle schema migration
-npm run db:push                  # Push schema to Neon
+npm run db:plan -- --id=<id> --live  # Zero-write plan + pre-change row counts
+npm run db:push                  # Refuses; db:push is not production history
 npm run seed:sources             # Seed the sources table
 npm run seed:factbook            # Import the CIA Factbook archive
 npm run sync:factbook:wdi        # World Bank WDI sync
