@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "civica-archive-file/v1",
+  "candidateId": "atlas-2026-07-11-g2-rc1",
+  "path": "atlas-2026-07-11-g2-rc1.zip",
+  "byteLength": 1215326,
+  "sha256": "2ff0f25fa8c69e1d2a7901aa45aa536df62ea7f7d58ed73717b61cdb5fe71372",
+  "entries": [
+    "g2-rc1/CHANGELOG.md",
+    "g2-rc1/CITATION.cff",
+    "g2-rc1/G2-CHECKLIST.json",
+    "g2-rc1/KNOWN-LIMITATIONS.md",
+    "g2-rc1/REPRODUCE.md",
+    "g2-rc1/SHA256SUMS",
+    "g2-rc1/atlas-export.v1.json.gz",
+    "g2-rc1/bundle-manifest.v1.json",
+    "g2-rc1/clean-room-evidence.v1.json",
+    "g2-rc1/codebook.v1.json",
+    "g2-rc1/coverage-report.v1.json",
+    "g2-rc1/environment.v1.json",
+    "g2-rc1/release-bom.v1.json",
+    "g2-rc1/rights-manifest.v1.json",
+    "g2-rc1/source-input-manifest.v1.json",
+    "g2-rc1/versioned-code.v1.json"
+  ]
+}

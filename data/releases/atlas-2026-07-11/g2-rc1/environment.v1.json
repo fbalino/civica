@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "civica-reproduction-environment/v1",
+  "releaseId": "atlas-2026-07-11",
+  "tools": {
+    "drizzleOrm": "^0.45.2",
+    "next": "16.2.7",
+    "node": "v25.4.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  },
+  "packageLockSha256": "d71b55dbb2a75caa0c1c7c63cb31382b80dd682f851bbb4495c6704b60d23927",
+  "requiredConfiguration": [],
+  "prohibitedForOfflineRebuild": [
+    "DATABASE_URL",
+    "model-provider credentials",
+    "private branches",
+    "local caches"
+  ],
+  "install": "npm ci",
+  "verify": "npm run reproduce:g2-atlas"
+}

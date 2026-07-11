@@ -425,3 +425,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   the frozen Atlas archive against its BOM. Verified restore time was 3.319s.
 - Recorded provider PITR/media gaps, deleted all temporary recovery material,
   and added a build validator. DAT-022 is next.
+
+## 2026-07-11 — DAT-022 G2 Atlas candidate completed
+
+- Packaged a deterministic 16-file Atlas G2 candidate and 1.21 MB archival ZIP
+  with versioned code, export, manifests, codebook, coverage, citation, and QA.
+- Clean-room reproduction matches the full semantic and file hashes with no
+  credentials or history; 622/622 tests and the production build pass.
+- The guarantee covers normalized released observations, not unretained raw
+  publisher bytes. DAT-023 is next.

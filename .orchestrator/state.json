@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-022_package_g2_atlas_release_candidate"
+    "current_task": "DAT-023_immutable_frozen_vintages"
   },
   "budget": {
     "mode": "subscription_only",
@@ -647,11 +647,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for DAT-021: backup/restore, release, provenance, claims/documentation, compilation, TypeScript, static generation, and route-generation gates succeeded.",
-    "tests": "Logical restore and named WAL PITR matched the 50-table schema, counts, and critical hashes; Atlas archive matched its BOM. Master plan is 40/288 complete (13.9%).",
+    "build": "A new credential/cache/history-free checkout passed strict G2 reproduction, every validator, and the production build for DAT-022.",
+    "tests": "622/622 tests passed. The deterministic 16-file G2 bundle and archival ZIP reproduce the full normalized release hashes. Master plan is 41/288 complete (14.2%).",
     "public_claims": "No new empirical claim was added. API documentation now links the checked BOM and states its concrete contents beside the registered Atlas release claim.",
     "browser": "Local API documentation rendered the BOM link and tool-version description with zero console errors. The manifest route returned HTTP 200 JSON, immutable caching, and an attachment filename.",
     "visual_review": "The BOM link composes the existing API-docs editorial typography; no new visual component or token was introduced."
   },
-  "updated_at": "2026-07-11T03:54:00Z"
+  "updated_at": "2026-07-11T04:10:00Z"
 }

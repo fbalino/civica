@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "civica-g2-atlas-bundle/v1",
+  "candidateId": "atlas-2026-07-11-g2-rc1",
+  "releaseId": "atlas-2026-07-11",
+  "status": "release-candidate",
+  "exportSourceCommit": "1dc2891d669ba4cc96ca817c98f3425a37272546",
+  "components": [
+    {
+      "path": "versioned-code.v1.json",
+      "role": "versioned-code"
+    },
+    {
+      "path": "atlas-export.v1.json.gz",
+      "role": "normalized-export"
+    },
+    {
+      "path": "release-bom.v1.json",
+      "role": "bill-of-materials"
+    },
+    {
+      "path": "source-input-manifest.v1.json",
+      "role": "observation-input-manifest"
+    },
+    {
+      "path": "rights-manifest.v1.json",
+      "role": "rights-manifest"
+    },
+    {
+      "path": "codebook.v1.json",
+      "role": "codebook"
+    },
+    {
+      "path": "coverage-report.v1.json",
+      "role": "coverage-report"
+    },
+    {
+      "path": "environment.v1.json",
+      "role": "environment"
+    },
+    {
+      "path": "clean-room-evidence.v1.json",
+      "role": "clean-room-evidence"
+    },
+    {
+      "path": "CITATION.cff",
+      "role": "citation-draft"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "role": "changelog"
+    },
+    {
+      "path": "KNOWN-LIMITATIONS.md",
+      "role": "known-limitations"
+    },
+    {
+      "path": "REPRODUCE.md",
+      "role": "reproduction-runbook"
+    }
+  ],
+  "scopeBoundary": "Atlas reference observations only; research-score products and unretained upstream publisher bytes are outside this candidate."
+}

@@ -1,0 +1,914 @@
+{
+  "schemaVersion": "rights-manifest/v1",
+  "generatedFrom": "checked-in-rights-contract",
+  "sources": [
+    {
+      "sourceId": "amnesty",
+      "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
+      "termsUrl": "https://www.amnesty.org/en/feed/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "blocked",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "bjornskov_rode",
+      "licenseId": "PUBLISHER-TERMS-PENDING:non-commercial",
+      "termsUrl": "https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "non-commercial-only",
+      "commercialUse": false,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "bundestag_dip",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://search.dip.bundestag.de/api/v1",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "camara_br",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://dadosabertos.camara.leg.br/api/v2",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "cia_factbook",
+      "licenseId": "US-PUBLIC-DOMAIN",
+      "termsUrl": "https://www.cia.gov/site-policies/",
+      "reviewStatus": "verified",
+      "reviewedAt": "2026-07-10",
+      "publicExport": "allowed",
+      "commercialUse": true,
+      "derivatives": true,
+      "attributionRequired": true,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Credit CIA as the source",
+        "Do not imply CIA endorsement",
+        "CIA marks and seal remain restricted"
+      ]
+    },
+    {
+      "sourceId": "cia_world_leaders",
+      "licenseId": "US-PUBLIC-DOMAIN",
+      "termsUrl": "https://www.cia.gov/site-policies/",
+      "reviewStatus": "verified",
+      "reviewedAt": "2026-07-10",
+      "publicExport": "allowed",
+      "commercialUse": true,
+      "derivatives": true,
+      "attributionRequired": true,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Credit CIA as the source",
+        "Do not imply CIA endorsement",
+        "CIA marks and seal remain restricted"
+      ]
+    },
+    {
+      "sourceId": "civicus_monitor",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-share-alike",
+      "termsUrl": "https://monitor.civicus.org/RSSFeed.xml",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "congress_gov",
+      "licenseId": "PUBLISHER-TERMS-PENDING:public-domain",
+      "termsUrl": "https://api.congress.gov/v3",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "constitute_project",
+      "licenseId": "PUBLISHER-TERMS-PENDING:non-commercial",
+      "termsUrl": "https://www.constituteproject.org/service/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "non-commercial-only",
+      "commercialUse": false,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "data_assemblee_fr",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://data.assemblee-nationale.fr",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "eurostat",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "fao_faostat",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://fenixservices.fao.org/faostat/api/v1/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "freedom_house",
+      "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
+      "termsUrl": "https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "blocked",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "gdelt",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://api.gdeltproject.org/api/v2/doc/doc",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "global_peace_index",
+      "licenseId": "PUBLISHER-TERMS-PENDING:non-commercial",
+      "termsUrl": "https://www.visionofhumanity.org/maps/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "non-commercial-only",
+      "commercialUse": false,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "hrw",
+      "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
+      "termsUrl": "https://www.hrw.org/rss/news",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "blocked",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "ibge_br",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://servicodados.ibge.gov.br/api/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "ilo_ilostat",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://rplumber.ilo.org/data/indicator/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "imf_weo",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://www.imf.org/en/Publications/WEO/weo-database",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "insee_fr",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://www.bdm.insee.fr/series/sdmx/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "international_idea",
+      "licenseId": "PUBLISHER-TERMS-PENDING:non-commercial",
+      "termsUrl": "https://www.idea.int/data-tools/export?type=region_only&themeId=293&world=all",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "non-commercial-only",
+      "commercialUse": false,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "ipu_parline",
+      "licenseId": "PUBLISHER-TERMS-PENDING:non-commercial",
+      "termsUrl": "https://api.data.ipu.org/v1",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "non-commercial-only",
+      "commercialUse": false,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "legisinfo_ca",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://www.parl.ca/legisinfo/en/bills/json",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "oecd_stat",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://sdmx.oecd.org/public/rest/v1/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "ons_uk",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://api.beta.ons.gov.uk/v1/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "senado_br",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://legis.senado.leg.br/dadosabertos",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "senat_fr",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://data.senat.fr",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "statcan_ca",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://www150.statcan.gc.ca/t1/wds/rest/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "stats_sa",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://www.statssa.gov.za/publications/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "transparency_intl",
+      "licenseId": "PUBLISHER-TERMS-PENDING:restricted-no-redistribution",
+      "termsUrl": "https://images.transparencycdn.org/images/CPI2024-Results-and-trends.xlsx",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "blocked",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "uk_parliament",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://bills-api.parliament.uk/api/v1",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "un_data",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://data.un.org/Handlers/DownloadHandler.ashx",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "undp_hdi",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "unesco_uis",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://api.uis.unesco.org/sdmx/data/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "us_census",
+      "licenseId": "PUBLISHER-TERMS-PENDING:public-domain",
+      "termsUrl": "https://api.census.gov/data/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "vdem",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v15_csv.zip",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "vparty",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-share-alike",
+      "termsUrl": "https://www.v-dem.net/data/v-party-dataset/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "who_gho",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://ghoapi.azureedge.net/api/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    },
+    {
+      "sourceId": "wikidata",
+      "licenseId": "CC0-1.0",
+      "termsUrl": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+      "reviewStatus": "verified",
+      "reviewedAt": "2026-07-10",
+      "publicExport": "allowed",
+      "commercialUse": true,
+      "derivatives": true,
+      "attributionRequired": false,
+      "shareAlikeRequired": false,
+      "restrictions": []
+    },
+    {
+      "sourceId": "world_bank",
+      "licenseId": "CC-BY-4.0",
+      "termsUrl": "https://datacatalog.worldbank.org/public-licenses",
+      "reviewStatus": "verified",
+      "reviewedAt": "2026-07-10",
+      "publicExport": "allowed",
+      "commercialUse": true,
+      "derivatives": true,
+      "attributionRequired": true,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Dataset-specific catalog terms override the default license",
+        "Indicate changes",
+        "Do not imply World Bank endorsement"
+      ]
+    },
+    {
+      "sourceId": "worldbank_economic",
+      "licenseId": "CC-BY-4.0",
+      "termsUrl": "https://datacatalog.worldbank.org/public-licenses",
+      "reviewStatus": "verified",
+      "reviewedAt": "2026-07-10",
+      "publicExport": "allowed",
+      "commercialUse": true,
+      "derivatives": true,
+      "attributionRequired": true,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Dataset-specific catalog terms override the default license",
+        "Indicate changes",
+        "Do not imply World Bank endorsement"
+      ]
+    },
+    {
+      "sourceId": "worldbank_wgi",
+      "licenseId": "CC-BY-4.0",
+      "termsUrl": "https://datacatalog.worldbank.org/public-licenses",
+      "reviewStatus": "verified",
+      "reviewedAt": "2026-07-10",
+      "publicExport": "allowed",
+      "commercialUse": true,
+      "derivatives": true,
+      "attributionRequired": true,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Dataset-specific catalog terms override the default license",
+        "Indicate changes",
+        "Do not imply World Bank endorsement"
+      ]
+    },
+    {
+      "sourceId": "wto_stats",
+      "licenseId": "PUBLISHER-TERMS-PENDING:open-with-attribution",
+      "termsUrl": "https://api.wto.org/timeseries/v1/",
+      "reviewStatus": "pending",
+      "reviewedAt": null,
+      "publicExport": "pending-review",
+      "commercialUse": null,
+      "derivatives": null,
+      "attributionRequired": null,
+      "shareAlikeRequired": false,
+      "restrictions": [
+        "Source-specific terms have not completed DAT-003 verification",
+        "Bulk export remains blocked until the terms record is verified"
+      ]
+    }
+  ],
+  "products": [
+    {
+      "productId": "atlas-reference-export-v1",
+      "routeOrArtifact": "/downloads/civica-atlas-2026-07-11.json.gz",
+      "publicBulkExport": "allowed",
+      "fields": [
+        {
+          "fieldPattern": "tables.jurisdictions[]",
+          "lineage": "civica-derived",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "tables.facts[]",
+          "lineage": "source-row",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "tables.sources[]",
+          "lineage": "civica-derived",
+          "exportRule": "source-permission"
+        }
+      ],
+      "reason": "The frozen package contains Atlas reference observations only from sources with verified public bulk-export terms. It excludes Index, Pulse, restricted sources, images, and publisher payloads.",
+      "requiresDerivationVersions": true
+    },
+    {
+      "productId": "country-export-json-csv",
+      "routeOrArtifact": "/api/countries/{slug}/export?format=json|csv",
+      "publicBulkExport": "blocked",
+      "fields": [
+        {
+          "fieldPattern": "facts[]",
+          "lineage": "source-row",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "provenance.*",
+          "lineage": "source-row",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "flat headline fields",
+          "lineage": "mixed-unresolved",
+          "exportRule": "blocked"
+        },
+        {
+          "fieldPattern": "government/index fields",
+          "lineage": "civica-derived",
+          "exportRule": "blocked"
+        }
+      ],
+      "reason": "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; DAT-017 separately publishes a frozen Atlas source-observation package.",
+      "requiresDerivationVersions": true
+    },
+    {
+      "productId": "index-bulk-release",
+      "routeOrArtifact": "future frozen Civica Index data package",
+      "publicBulkExport": "blocked",
+      "fields": [
+        {
+          "fieldPattern": "dimension inputs",
+          "lineage": "source-row",
+          "exportRule": "source-permission"
+        },
+        {
+          "fieldPattern": "composite scores",
+          "lineage": "civica-derived",
+          "exportRule": "blocked"
+        }
+      ],
+      "reason": "No standalone license has been selected for Civica-derived Index outputs, and two current inputs remain pending source-specific rights review.",
+      "requiresDerivationVersions": true
+    }
+  ],
+  "releaseArtifacts": [
+    {
+      "releaseId": "atlas-2026-07-11",
+      "artifactPath": "data/releases/atlas-2026-07-11/atlas-export.v1.json.gz",
+      "artifactKind": "data",
+      "includedSources": [
+        "cia_factbook",
+        "wikidata",
+        "world_bank"
+      ],
+      "excludedSourcePayloads": [
+        "all raw publisher payloads",
+        "all sources without verified public bulk-export terms",
+        "Civica Index and Pulse outputs",
+        "images and constitution text"
+      ],
+      "publicDistribution": "allowed",
+      "governingTerms": "Each fact row retains its source ID and joins to the embedded source-specific terms record. Download access does not replace those terms or grant a blanket license.",
+      "derivationVersions": {
+        "schemaVersion": "derivation-version-envelope/v1",
+        "methodology": {
+          "state": "versioned",
+          "id": "civica-atlas-export/v1"
+        },
+        "algorithm": {
+          "state": "versioned",
+          "id": "atlas-export-generator/v1"
+        },
+        "prompt": {
+          "state": "not_applicable",
+          "reason": "The export is generated deterministically without a model prompt."
+        },
+        "taxonomy": {
+          "state": "versioned",
+          "id": "jurisdiction-status/v1"
+        },
+        "sourceBasket": {
+          "state": "versioned",
+          "id": "source-basket/sha256:a7a7f2f79b19c250"
+        },
+        "sourceIds": [
+          "cia_factbook",
+          "wikidata",
+          "world_bank"
+        ]
+      }
+    },
+    {
+      "releaseId": "ci-beta-2024-Q4",
+      "artifactPath": "data/releases/ci-beta-2024-Q4/source-input-manifest.v1.json",
+      "artifactKind": "metadata-only",
+      "includedSources": [
+        "freedom_house",
+        "transparency_intl",
+        "vdem",
+        "worldbank_wgi"
+      ],
+      "excludedSourcePayloads": [
+        "freedom_house",
+        "transparency_intl",
+        "vdem",
+        "worldbank_wgi"
+      ],
+      "publicDistribution": "allowed",
+      "governingTerms": "The artifact contains Civica-authored provenance metadata and hashes only. It excludes all publisher files and observation rows.",
+      "derivationVersions": {
+        "schemaVersion": "derivation-version-envelope/v1",
+        "methodology": {
+          "state": "versioned",
+          "id": "ci-beta-2024-Q4/source-input-manifest-v1"
+        },
+        "algorithm": {
+          "state": "not_applicable",
+          "reason": "This release artifact contains captured-input metadata and hashes, not calculated scores."
+        },
+        "prompt": {
+          "state": "not_applicable",
+          "reason": "The release artifact is generated deterministically without a model prompt."
+        },
+        "taxonomy": {
+          "state": "not_applicable",
+          "reason": "The release artifact does not classify observations into a research taxonomy."
+        },
+        "sourceBasket": {
+          "state": "versioned",
+          "id": "source-basket/sha256:1ab35575dd1c4b53"
+        },
+        "sourceIds": [
+          "freedom_house",
+          "transparency_intl",
+          "vdem",
+          "worldbank_wgi"
+        ]
+      }
+    },
+    {
+      "releaseId": "ci-beta-2024-Q4",
+      "artifactPath": "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json",
+      "artifactKind": "metadata-only",
+      "includedSources": [
+        "freedom_house",
+        "transparency_intl",
+        "vdem",
+        "worldbank_wgi"
+      ],
+      "excludedSourcePayloads": [
+        "freedom_house",
+        "transparency_intl",
+        "vdem",
+        "worldbank_wgi"
+      ],
+      "publicDistribution": "allowed",
+      "governingTerms": "The artifact contains hashes, retrieval metadata, rights records, and reconstruction instructions only. It excludes all publisher files and observation rows.",
+      "derivationVersions": {
+        "schemaVersion": "derivation-version-envelope/v1",
+        "methodology": {
+          "state": "versioned",
+          "id": "ci-beta-2024-Q4/source-input-manifest-v1"
+        },
+        "algorithm": {
+          "state": "not_applicable",
+          "reason": "This release artifact contains captured-input metadata and hashes, not calculated scores."
+        },
+        "prompt": {
+          "state": "not_applicable",
+          "reason": "The release artifact is generated deterministically without a model prompt."
+        },
+        "taxonomy": {
+          "state": "not_applicable",
+          "reason": "The release artifact does not classify observations into a research taxonomy."
+        },
+        "sourceBasket": {
+          "state": "versioned",
+          "id": "source-basket/sha256:1ab35575dd1c4b53"
+        },
+        "sourceIds": [
+          "freedom_house",
+          "transparency_intl",
+          "vdem",
+          "worldbank_wgi"
+        ]
+      }
+    }
+  ]
+}

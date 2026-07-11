@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "civica-atlas-codebook/v1",
+  "releaseId": "atlas-2026-07-11",
+  "exportSchemaVersion": "civica-atlas-export/v1",
+  "codebook": {
+    "jurisdictions": "Stable Civica jurisdiction identity and sourced status classification.",
+    "facts": "Active source observations from verified bulk-export sources; rows are not presented as a canonical selection.",
+    "sources": "Source-specific license, terms, attribution, and restriction records for every emitted fact row.",
+    "joins": {
+      "facts.jurisdiction_id": "jurisdictions.id",
+      "facts.source_id": "sources.sourceId"
+    },
+    "ordering": {
+      "jurisdictions": "slug ascending",
+      "facts": "jurisdiction_id, fact_key, source_id, id ascending",
+      "sources": "sourceId ascending"
+    },
+    "columns": {
+      "jurisdictions": {
+        "id": "Stable Civica UUID.",
+        "slug": "Stable URL identifier.",
+        "name": "Display name.",
+        "type": "Closed jurisdiction-status/v1 class.",
+        "iso2": "ISO alpha-2 code when assigned.",
+        "iso3": "ISO alpha-3 code when assigned.",
+        "wikidata_qid": "Wikidata entity identifier when linked.",
+        "status_source_ids": "Source registry keys supporting the status classification.",
+        "status_reviewed_at": "Date Civica reviewed the status classification.",
+        "status_note": "Neutral scope and classification note.",
+        "administering_jurisdiction_iso3": "Administering jurisdiction ISO3 where applicable.",
+        "status_disputed": "Whether the territorial/status record is disputed."
+      },
+      "facts": {
+        "id": "Stable source-observation UUID.",
+        "jurisdiction_id": "Foreign key to jurisdictions.id.",
+        "fact_key": "Stable Civica fact identifier.",
+        "fact_group": "Reconciliation group A, B, or C.",
+        "category": "Reader-facing fact category.",
+        "source_id": "Foreign key to sources.sourceId.",
+        "source_url": "Direct upstream record URL when captured.",
+        "fact_value": "Source display value.",
+        "fact_value_numeric": "Numeric form when available; zero is observed, not missing.",
+        "fact_unit": "Unit attached to the value.",
+        "fact_year": "Year stated by the publisher.",
+        "value_json": "Structured value when scalar columns are insufficient.",
+        "value_status": "Closed data-value-state/v1 status.",
+        "value_status_reason": "Required explanation for non-observed states.",
+        "as_of": "Upstream observation/reference date.",
+        "data_vintage_year": "Underlying measurement year when different from the publisher stamp.",
+        "retrieved_at": "Civica retrieval timestamp.",
+        "upstream_vintage_label": "Publisher dataset/version label.",
+        "methodology_version": "Civica admission-method version.",
+        "value_type": "Measured or projected source value.",
+        "growth_methodology": "Growth-rate basis where applicable."
+      },
+      "sources": {
+        "sourceId": "Stable source identifier.",
+        "licenseId": "Source license or legal designation.",
+        "termsUrl": "Publisher terms URL.",
+        "reviewStatus": "Civica rights-review status.",
+        "reviewedAt": "Rights review date.",
+        "publicExport": "Bulk-export permission decision.",
+        "commercialUse": "Whether source terms allow commercial use.",
+        "derivatives": "Whether source terms allow derivatives.",
+        "attributionRequired": "Whether source terms require attribution.",
+        "shareAlikeRequired": "Whether share-alike applies.",
+        "restrictions": "Source-specific cautions and conditions."
+      }
+    }
+  }
+}

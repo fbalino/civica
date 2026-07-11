@@ -1,0 +1,36 @@
+# Machine-readable citation metadata (Citation File Format v1.2.0).
+# GitHub renders this as a "Cite this repository" button and Zenodo ingests
+# it on release. Spec: https://citation-file-format.github.io/
+#
+# The `license` key is intentionally omitted: Civica Atlas is a mixed-source
+# reference work with no single license. Public-domain and CC0 sources have
+# their own broad reuse posture; publisher-restricted datasets (IPU Parline,
+# Constitute Project, index feeds) remain governed by their upstream terms.
+# The code is publicly viewable, but no root LICENSE file currently grants an
+# open-source reuse license. See https://civicaatlas.org/licensing#reuse for
+# the current rights registry. Declaring one
+# SPDX license here would misrepresent that posture, so we omit it rather than
+# fabricate one.
+cff-version: 1.2.0
+message: "If you use Civica Atlas data or code, please cite it using the metadata below."
+title: "Civica Atlas: 2026-07-11 frozen Atlas release candidate"
+# PUBLIC_CLAIM: citation.atlas-positioning
+# PUBLIC_CLAIM: citation.index-estimate
+# PUBLIC_CLAIM: citation.pulse-signal
+# PUBLIC_CLAIM: citation.provenance-coverage
+abstract: "A provenance-first comparative reference to how every country is governed, combining source-linked country profiles with the explicitly experimental Civica Index and Civica Pulse research outputs."
+type: dataset
+authors:
+  - name: "Civica Atlas"
+    website: "https://civicaatlas.org"
+version: "atlas-2026-07-11-g2-rc1"
+date-released: 2026-07-11
+url: "https://civicaatlas.org/downloads/civica-atlas-2026-07-11.json.gz"
+repository-code: "https://github.com/fbalino/civica"
+keywords:
+  - governance
+  - political science
+  - world factbook
+  - civica index
+  - source-linked data
+  - comparative politics

@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "atlas-release-observation-inputs/v1",
+  "releaseId": "atlas-2026-07-11",
+  "captureLevel": "normalized-release-observations",
+  "upstreamPublisherBytesRetained": false,
+  "reconstructionBoundary": "These records reproduce the frozen normalized Atlas export. They do not reconstruct upstream ingestion from publisher bytes that were not retained at release time.",
+  "exportSourceCommit": "1dc2891d669ba4cc96ca817c98f3425a37272546",
+  "inputs": [
+    {
+      "sourceId": "cia_factbook",
+      "rowCount": 10699,
+      "upstreamVintageLabels": [
+        "CIA Factbook 2026-01-frozen"
+      ],
+      "observationYearMin": 1994,
+      "observationYearMax": 2026,
+      "retrievedThrough": "2026-05-04 19:06:52.469",
+      "semanticSha256": "f5373eafef11d1b1316c605d2db2679f350a0f5704f31e1c7c5b9f5bcfcda155",
+      "accessPath": "atlas-export.v1.json.gz",
+      "recordPath": "tables.facts[source_id=cia_factbook]",
+      "rights": {
+        "sourceId": "cia_factbook",
+        "licenseId": "US-PUBLIC-DOMAIN",
+        "termsUrl": "https://www.cia.gov/site-policies/",
+        "reviewStatus": "verified",
+        "reviewedAt": "2026-07-10",
+        "publicExport": "allowed",
+        "commercialUse": true,
+        "derivatives": true,
+        "attributionRequired": true,
+        "shareAlikeRequired": false,
+        "restrictions": [
+          "Credit CIA as the source",
+          "Do not imply CIA endorsement",
+          "CIA marks and seal remain restricted"
+        ]
+      }
+    },
+    {
+      "sourceId": "wikidata",
+      "rowCount": 1270,
+      "upstreamVintageLabels": [
+        "Wikidata 2026-05 snapshot"
+      ],
+      "observationYearMin": 1960,
+      "observationYearMax": 2026,
+      "retrievedThrough": "2026-07-01 06:08:18.725",
+      "semanticSha256": "2dc573eed08b308667720e033102130ceb11e5e725a2ff65fcd3cedb4499c2f1",
+      "accessPath": "atlas-export.v1.json.gz",
+      "recordPath": "tables.facts[source_id=wikidata]",
+      "rights": {
+        "sourceId": "wikidata",
+        "licenseId": "CC0-1.0",
+        "termsUrl": "https://www.wikidata.org/wiki/Wikidata:Licensing",
+        "reviewStatus": "verified",
+        "reviewedAt": "2026-07-10",
+        "publicExport": "allowed",
+        "commercialUse": true,
+        "derivatives": true,
+        "attributionRequired": false,
+        "shareAlikeRequired": false,
+        "restrictions": []
+      }
+    },
+    {
+      "sourceId": "world_bank",
+      "rowCount": 4482,
+      "upstreamVintageLabels": [
+        "WB Country Classifications FY2026",
+        "World Bank WDI 2026Q3"
+      ],
+      "observationYearMin": 2016,
+      "observationYearMax": 2026,
+      "retrievedThrough": "2026-07-02 08:02:36.643",
+      "semanticSha256": "3a960593604b0d563dfcdbe1cb6999fc64c370da4e9fdb0f87d0d20ac6e2e696",
+      "accessPath": "atlas-export.v1.json.gz",
+      "recordPath": "tables.facts[source_id=world_bank]",
+      "rights": {
+        "sourceId": "world_bank",
+        "licenseId": "CC-BY-4.0",
+        "termsUrl": "https://datacatalog.worldbank.org/public-licenses",
+        "reviewStatus": "verified",
+        "reviewedAt": "2026-07-10",
+        "publicExport": "allowed",
+        "commercialUse": true,
+        "derivatives": true,
+        "attributionRequired": true,
+        "shareAlikeRequired": false,
+        "restrictions": [
+          "Dataset-specific catalog terms override the default license",
+          "Indicate changes",
+          "Do not imply World Bank endorsement"
+        ]
+      }
+    }
+  ]
+}

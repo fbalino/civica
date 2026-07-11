@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "atlas-release-coverage/v1",
+  "releaseId": "atlas-2026-07-11",
+  "denominator": "released source-observation rows",
+  "rows": 16451,
+  "jurisdictions": 253,
+  "distinctJurisdictionsWithFacts": 253,
+  "distinctFactKeys": 58,
+  "sourceLinkedRows": 16451,
+  "bySource": {
+    "cia_factbook": 10699,
+    "wikidata": 1270,
+    "world_bank": 4482
+  },
+  "byValueState": {
+    "observed": 16451
+  },
+  "limitation": "This is frozen-release observation coverage, not the live fact-key reconciliation report and not upstream source-capture completeness."
+}

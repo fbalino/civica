@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 288
-- **Completed:** 40
-- **Remaining:** 248
-- **Progress:** 13.9%
+- **Completed:** 41
+- **Remaining:** 247
+- **Progress:** 14.2%
 - **Priority mix:** P0 179 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -59,7 +59,7 @@ Source: `plan/03-data-provenance-and-reproducibility.md`
 - [x] **DAT-019** (P0) Create a legally shareable clean-room reproduction fixture and runbook. _Done when: a new environment with only documented credentials/access and release inputs can build the database/export, run all validators, and match expected checksums/declared tolerances without private branches, local caches, or undocumented manual edits._
 - [x] **DAT-020** (P1) Produce source-coverage dashboards for elections, constitutions, offices, people, parties, organizations, bills, indicators, and images. _Done when: each domain exposes freshness, country coverage, field completeness, source families, known gaps, and last successful run; thresholds power alerts and honest UI coverage notes._
 - [x] **DAT-021** (P1) Verify backup, point-in-time recovery, and release-archive restoration without touching production. _Done when: an isolated restore drill recovers schema, data, source history, and release artifacts to a documented recovery point; checksums/invariants pass; time-to-recover and missing external assets are recorded in evidence and the manual queue._
-- [ ] **DAT-022** (P0) Package the G2 atlas release candidate. _Done when: versioned export, codebook, rights/source/input manifests, checksums, change log, known limitations, citation metadata draft, clean-room evidence, and archival deposit bundle exist at stable paths and the G2 checklist reports pass._
+- [x] **DAT-022** (P0) Package the G2 atlas release candidate. _Done when: versioned export, codebook, rights/source/input manifests, checksums, change log, known limitations, citation metadata draft, clean-room evidence, and archival deposit bundle exist at stable paths and the G2 checklist reports pass._
 - [ ] **DAT-023** (P0) Make frozen fact/data vintages immutable and internally version-consistent. _Done when: creating an existing release/vintage with different content fails instead of mutating rows, stored methodology/data version equals the published version for every row, identical reruns are no-ops verified by hashes, and corrections require a new superseding version._
 - [ ] **DAT-024** (P0) Make as-published exports read the actual frozen snapshot rather than current post-cut canonical values. _Done when: each frozen release export joins only snapshot/vintage rows valid at its cutoff, value/source/hash/version match the archived manifest, a post-cut update cannot appear under the old label, and regression fixtures prove the boundary._
 - [ ] **DAT-025** (P0) Separate observation/reference year, upstream dataset release/vintage, retrieval/ingestion time, and Civica publication version everywhere. _Done when: schema/manifests/API/UI distinguish all four dates, BR/CGV and comparable cross-sections display their real reference year instead of the ingestion/current year, and temporal-label fixtures fail on a seeded mislabel._

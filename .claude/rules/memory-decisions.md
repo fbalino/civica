@@ -758,3 +758,11 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Prove local WAL PITR at a named point and restore releases separately by BOM.
 - Keep provider retention/branch restore and external media in the manual queue.
   Durable record: APR-D054 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — G2 is an observation-release reconstruction boundary
+
+- Freeze the rights-cleared normalized source-observation rows and exact export
+  builder so the Atlas release can be reproduced offline and hash-verified.
+- Do not describe missing historical publisher bytes as captured raw inputs.
+- Keep DOI, Index/Pulse replication, upstream ingestion replay, and substantive
+  source validation outside this G2 Atlas candidate. Durable record: APR-D055.

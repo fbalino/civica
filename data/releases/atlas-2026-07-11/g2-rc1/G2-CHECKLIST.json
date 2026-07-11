@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "civica-g2-checklist/v1",
+  "candidateId": "atlas-2026-07-11-g2-rc1",
+  "checks": [
+    {
+      "id": "versioned-code",
+      "status": "pass"
+    },
+    {
+      "id": "normalized-export",
+      "status": "pass"
+    },
+    {
+      "id": "source-input-manifest",
+      "status": "pass"
+    },
+    {
+      "id": "codebook",
+      "status": "pass"
+    },
+    {
+      "id": "rights-manifest",
+      "status": "pass"
+    },
+    {
+      "id": "coverage-report",
+      "status": "pass"
+    },
+    {
+      "id": "checksums",
+      "status": "pass"
+    },
+    {
+      "id": "environment",
+      "status": "pass"
+    },
+    {
+      "id": "citation-draft",
+      "status": "pass"
+    },
+    {
+      "id": "changelog",
+      "status": "pass"
+    },
+    {
+      "id": "known-limitations",
+      "status": "pass"
+    },
+    {
+      "id": "clean-room-evidence",
+      "status": "pass"
+    },
+    {
+      "id": "archival-bundle",
+      "status": "pass"
+    }
+  ],
+  "result": "pass",
+  "limitationBoundaryAccepted": true
+}

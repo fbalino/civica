@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "g2-clean-room-evidence/v1",
+  "releaseId": "atlas-2026-07-11",
+  "dat019FixtureSha256": "6813f95a781776d81b5235cc32b4c96d064fd0ccd9034e4fbe757b0e89125f0f",
+  "dat019ExportSha256": "15a4fa61c5818d87941bc3a13de831548ad1e94c6fe626e4b00b573aae17c622",
+  "fullReleaseSemanticSha256": "cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1",
+  "fullReleaseFileSha256": "b704a564766cbda54d37be4c34211dc707af9aa98e9551b66a171d7b8789892b",
+  "credentialsRequired": [],
+  "runtimeNetworkRequests": 0,
+  "command": "npm run reproduce:g2-atlas",
+  "evidence": "plan/evidence/DAT-019/README.md"
+}
