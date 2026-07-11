@@ -55,6 +55,7 @@
     "validate:index-tournament-evaluation-suite": "tsx scripts/validate-tournament-evaluation-suite.ts",
     "generate:index-dimensionality": "tsx scripts/generate-index-dimensionality-analysis.ts",
     "validate:index-dimensionality": "tsx scripts/validate-index-dimensionality-analysis.ts",
+    "validate:index-validity-preregistration": "tsx scripts/validate-index-validity-preregistration.ts",
     "validate:ci-tournament-panel:v3": "tsx scripts/validate-ci-tournament-panel-v3.ts",
     "validate:ci-tournament-panel:v3:live": "tsx scripts/validate-ci-tournament-panel-v3.ts --live",
     "validate:ci-tournament-panel:v2": "tsx scripts/validate-ci-tournament-panel-v2.ts",
