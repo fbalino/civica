@@ -3,7 +3,7 @@
   "candidateId": "atlas-2026-07-11-g2-rc1",
   "releaseId": "atlas-2026-07-11",
   "status": "release-candidate",
-  "exportSourceCommit": "7d853d95e4416e0cb0cc4bbf1bd5134779d063ad",
+  "exportSourceCommit": "c415f8ae32ee0aafc9c0eb3813c88e7a4520ea84",
   "components": [
     {
       "path": "versioned-code.v1.json",

@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-025_temporal_field_separation"
+    "current_task": "DAT-026_authoritative_migration_path"
   },
   "budget": {
     "mode": "subscription_only",
@@ -630,6 +630,9 @@
     "plan/evidence/DAT-023/live-audit.json",
     "plan/evidence/DAT-024/README.md",
     "plan/evidence/DAT-024/live-boundary-audit.json",
+    "plan/evidence/DAT-025/README.md",
+    "plan/evidence/DAT-025/live-temporal-audit.json",
+    "drizzle/migrations/0026_temporal_metadata.sql",
     "drizzle/migrations/0025_immutable_frozen_vintages.sql",
     "src/app/downloads/civica-atlas-2026-07-11.manifest.json/route.ts",
     "data/release-quality-report.v1.json",
@@ -652,11 +655,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "Every validator, claims/documentation gate, TypeScript, and the production build passed for DAT-024.",
-    "tests": "628/628 tests passed. Live byte reproduction excluded 161 current post-cut differences. Master plan is 43/288 complete (14.9%).",
-    "public_claims": "The Atlas package claim now accurately describes 12,373 canonical rows from the named immutable Q1 snapshot and publishes its cutoff/hash/method boundary.",
-    "browser": "API docs rendered at desktop light and 390px dark; data and manifest downloads returned HTTP 200, immutable caching, and attachment names. A pre-existing country-search caret-style hydration warning repeated.",
-    "visual_review": "Revised bulk-data copy fits the existing editorial system at desktop and mobile; no new component or token was introduced."
+    "build": "Every migration, temporal, data, release, claims/documentation, TypeScript, and production-build gate passed for DAT-025.",
+    "tests": "631/631 tests passed. Live audit found 0 temporal mismatches and the seeded 2025 BR cross-section label fails. Master plan is 44/288 complete (15.3%).",
+    "public_claims": "BR/CGV now accurately publishes reference year 2022 and separately labels original v6.1, QoG Jan26, retrieval, and Civica publication versions.",
+    "browser": "The live peer-grouping API returned the four-field temporal object; the BR/CGV reader rendered reference year 2022 at desktop light and 390px dark with no request or console errors.",
+    "visual_review": "The corrected temporal note composes the existing editorial typography without a new component or token."
   },
-  "updated_at": "2026-07-11T06:35:00Z"
+  "updated_at": "2026-07-11T07:35:00Z"
 }

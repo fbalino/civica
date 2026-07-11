@@ -718,7 +718,7 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 
 ## 2026-07-11 — Atlas bulk export is a narrow frozen canonical release
 
-- `civica-atlas-export/v2` contains stable jurisdiction records and permitted
+- `civica-atlas-export/v3` contains stable jurisdiction records and permitted
   canonical rows from the named immutable Q1 vintage.
 - Embed the field codebook and source-specific rights. Exclude Index, Pulse,
   pending sources, images, constitution text, and publisher payloads.
@@ -783,3 +783,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Current source rows may temporarily supply only descriptive fields absent
   from the vintage schema; DAT-025 owns closing that residual ambiguity.
 - Keep alternates out until DAT-027. Durable record: APR-D057.
+
+## 2026-07-11 — Temporal provenance uses four clocks
+
+- Keep observation/reference year, upstream dataset release, retrieval time,
+  and Civica publication version in separate typed fields and labels.
+- BR/CGV QoG Jan26 cross-section reference year is 2022; v6.1, Jan26, the
+  2026 retrieval timestamp, and `2026_v1` describe different things.
+- Leave unavailable at-cut metadata null instead of borrowing post-cut state.
+  Durable record: APR-D058.

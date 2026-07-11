@@ -446,9 +446,19 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 
 ## 2026-07-11 — DAT-024 as-published export boundary completed
 
-- `civica-atlas-export/v2` emits 12,373 rights-cleared canonical facts from the
+- `civica-atlas-export/v3` emits 12,373 rights-cleared canonical facts from the
   immutable Q1 vintage with its label, cutoff, source-row ID, hash, and method.
 - 161 selected live source rows now differ from the cut; none can enter the old
   release. The release, BOM, G2 bundle, clean-room and recovery evidence agree.
 - 628/628 tests, live reconstruction, all gates, build, and browser/download
   checks pass. DAT-025 is next.
+
+## 2026-07-11 — DAT-025 temporal metadata completed
+
+- Added a four-clock contract across frozen Atlas rows/exports and BR/CGV:
+  observation year, upstream release, retrieval time, Civica publication.
+- Corrected 187 populated BR/CGV rows from false reference year 2025 to the
+  codebook's 2022; original v6.1, QoG Jan26, retrieval, and Civica version stay
+  separate. Honest historical nulls remain where only post-cut state exists.
+- 631/631 tests, live audit, release rebuild, all gates, build, API, and
+  desktop/mobile browser checks pass. DAT-026 is next.

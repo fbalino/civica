@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-07-11",
+  "contract": "temporal-metadata/v1",
+  "atlasVintage": {
+    "rows": 17506,
+    "observationReferenceYearPresent": 14588,
+    "upstreamDatasetReleasePresent": 13287,
+    "sourceRetrievedAtPresent": 13287,
+    "civicaPublicationVersionPresent": 17506,
+    "publicationVersionMismatches": 0,
+    "postCutRetrievalsRetained": 0
+  },
+  "bjornskovRodeCgv": {
+    "rows": 187,
+    "observationReferenceYear": 2022,
+    "sourceDatasetRelease": "Bjørnskov-Rode regime data v6.1",
+    "distributionRelease": "QoG Standard Jan26",
+    "retrievedAt": "2026-04-22T04:01:13.289Z",
+    "civicaPublicationVersion": "2026_v1",
+    "temporalMismatches": 0
+  },
+  "writesPerformedByAudit": 0
+}

@@ -4,7 +4,7 @@
   "captureLevel": "immutable-civica-vintage-rows",
   "upstreamPublisherBytesRetained": false,
   "reconstructionBoundary": "These records reproduce the immutable as-published canonical snapshot. They do not reconstruct upstream ingestion from publisher bytes that were not retained at release time.",
-  "exportSourceCommit": "7d853d95e4416e0cb0cc4bbf1bd5134779d063ad",
+  "exportSourceCommit": "c415f8ae32ee0aafc9c0eb3813c88e7a4520ea84",
   "inputs": [
     {
       "sourceId": "cia_factbook",
@@ -15,7 +15,7 @@
       "observationYearMin": 1994,
       "observationYearMax": 2026,
       "retrievedThrough": "2026-05-04 19:06:52.469",
-      "semanticSha256": "8f762c49e69b0d80ecbc172dfc917d843f0103fee84612db404c9f615e1c0c50",
+      "semanticSha256": "f762bad08b1377b09899859ddc6dd08c91853deae1a33188786a5730b1118ff8",
       "accessPath": "atlas-export.v1.json.gz",
       "recordPath": "tables.facts[source_id=cia_factbook]",
       "rights": {
@@ -39,13 +39,11 @@
     {
       "sourceId": "wikidata",
       "rowCount": 9,
-      "upstreamVintageLabels": [
-        "Wikidata 2026-05 snapshot"
-      ],
+      "upstreamVintageLabels": [],
       "observationYearMin": 2024,
       "observationYearMax": 2026,
-      "retrievedThrough": "2026-07-01 06:08:08.973",
-      "semanticSha256": "67d1a5018a3e48a2486ed262c897d56ce4109846a9a2770fa50bc0b3df72bcc3",
+      "retrievedThrough": null,
+      "semanticSha256": "5d9fd490f0bff5572b9711f85d35c2b172144006787ac230972c52c1a3485d2d",
       "accessPath": "atlas-export.v1.json.gz",
       "recordPath": "tables.facts[source_id=wikidata]",
       "rights": {
@@ -71,8 +69,8 @@
       ],
       "observationYearMin": 2016,
       "observationYearMax": 2026,
-      "retrievedThrough": "2026-07-02 08:02:36.643",
-      "semanticSha256": "2eafa0af41a5dd3dd72ab29ead2894c73b3ecec26aa4e5056651dcb9de61b7e2",
+      "retrievedThrough": "2026-05-04 18:49:56.233",
+      "semanticSha256": "13238b33399038193869288628cdd5190fc5a8f1583f7c6b67333aafef38c592",
       "accessPath": "atlas-export.v1.json.gz",
       "recordPath": "tables.facts[source_id=world_bank]",
       "rights": {

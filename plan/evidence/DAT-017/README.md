@@ -3,7 +3,7 @@
 ## Outcome
 
 DAT-017 is complete. Release `atlas-2026-07-11` is downloadable as a
-gzip-compressed `civica-atlas-export/v2` JSON package from the API documentation.
+gzip-compressed `civica-atlas-export/v3` JSON package from the API documentation.
 
 The release contains three machine-readable tables:
 
@@ -28,7 +28,7 @@ old per-country JSON/CSV route remains blocked until DAT-027.
 ## Verification
 
 - Uncompressed semantic SHA-256:
-  `8be96e97fef153736f98ce56c8ab59a697f6396c3f61d3b07b12ba7823904ba9`.
+  `60556198b2ee3805f93558db47b1e5620c4f8f5cf372d6f83ebb6265fdcfa9fc`.
 - The release manifest also records compressed hash, compressed/uncompressed
   sizes, row counts, release date, schema version, and download path.
 - `npm run validate:atlas-export:live` rebuilt the package from Neon and matched

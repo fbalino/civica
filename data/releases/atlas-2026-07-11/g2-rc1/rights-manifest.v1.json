@@ -789,7 +789,7 @@
         "schemaVersion": "derivation-version-envelope/v1",
         "methodology": {
           "state": "versioned",
-          "id": "civica-atlas-export/v2"
+          "id": "civica-atlas-export/v3"
         },
         "algorithm": {
           "state": "versioned",
