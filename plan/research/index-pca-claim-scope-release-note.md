@@ -8,3 +8,4 @@ Version: `civica-index-pca-scope-2026-07-v1`
 - Links the later frozen temporal analysis, which finds a strong common component across country levels and a much weaker one within countries and across annual changes.
 - Records that Administrative Capacity was absent from both analyses; no fifth-variable factor or rotation result exists.
 - Preserves the archived Beta weights and arithmetic without presenting them as validated or current product recommendations.
+
