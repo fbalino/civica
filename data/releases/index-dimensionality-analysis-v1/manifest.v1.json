@@ -1,0 +1,8 @@
+{
+  "schemaVersion": "civica-index-dimensionality-artifacts/v1",
+  "releaseId": "index-dimensionality-analysis-v1",
+  "resultSha256": "da3e54a515814e829287abb2600f52edd0eb02daf5920b1ebe2cc3aa63801e9f",
+  "tableSha256": "d5d2ec2279a4affd063cfe4caccf2c76f7f345b5bbd05a15975807485506b381",
+  "figureSha256": "7dafa5b35f0e99e105e349cf295a936f4b5dda51d8d149ca1e3f7d82ddb4de35",
+  "analysisSha256": "07b3b8b5513622fb3a7f3fabb8e8e811d0f55ae4f7a642f7f1681cfeb8ddf954"
+}
