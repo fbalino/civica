@@ -2,26 +2,27 @@ import { createHash } from "node:crypto";
 import { INDEX_CANDIDATE_SPECIFICATIONS, INDEX_CANDIDATE_SPEC_VERSION } from "./candidate-specifications";
 import { INDEX_RESEARCH_CHARTER_VERSION } from "./research-charter";
 
-export const INDEX_TOURNAMENT_PROTOCOL_VERSION = "civica-index-tournament-preregistration/v1";
-export const INDEX_TOURNAMENT_REGISTERED_AT = "2026-07-11T09:17:44Z";
+export const INDEX_TOURNAMENT_PROTOCOL_VERSION = "civica-index-tournament-preregistration/v2";
+export const INDEX_TOURNAMENT_REGISTERED_AT = "2026-07-11T09:31:50Z";
 
 export const INDEX_TOURNAMENT_PREREGISTRATION = {
   protocolVersion: INDEX_TOURNAMENT_PROTOCOL_VERSION,
   registeredAt: INDEX_TOURNAMENT_REGISTERED_AT,
   status: "locked_before_winner_selecting_analysis",
   frozenCode: {
-    registrationBaseCommit: "0c043072c136644be2f3bfde1e6f691c1ab19e1e",
-    panelCommit: "d24706b5204758fc56d768ce660f091220fc69c5",
+    registrationBaseCommit: "60012a66d1d5713c02c3e7355b4320113e221416",
+    panelCommit: "dcce033e56db7927d55743e05625aa539ded1544",
     charterCommit: "28edebdfea368c9f5938b8483b4fd1645a448ce9",
-    candidateSetCommit: "6ce344ba5e36cb45b780faf3bdd912b788224ef7",
+    candidateSetCommit: "60012a66d1d5713c02c3e7355b4320113e221416",
     charterVersion: INDEX_RESEARCH_CHARTER_VERSION,
     candidateSetVersion: INDEX_CANDIDATE_SPEC_VERSION,
   },
   frozenPanel: {
-    releaseId: "ci-research-panel-2000-2024-v1",
-    rowSha256: "ed6b5c358b08d2e9e5e13890a93337b585cbbfb5234f5dbd24c125332cc6a79f",
-    coverageSha256: "ebb6fbab9b2246578aa551cab85902ca0f9c4ddaeb2ef49e45e0f5c333868d26",
-    temporalBreaksSha256: "1dd19a9576b6dda9bf45f5058d2059ca88bd8080be48aab199949abaf99362f7",
+    releaseId: "ci-research-panel-2000-2024-v2",
+    supersedesReleaseId: "ci-research-panel-2000-2024-v1",
+    rowSha256: "0d232534be46fd3c4c18d7c9d278b41e258ec72c2f42b1d7fdc2796286aa7a37",
+    coverageSha256: "2e89d1bdcd1fed59031a64576917c506c31562e5c36a5591301f056841e99f40",
+    temporalBreaksSha256: "227b9c7ef58b6fba615378ceb7a755ee7a3b2892e27563dd366d78a85b59b237",
     expectedCells: 24250,
     rights: "private_internal_research_only_pending_source_terms",
   },
@@ -91,6 +92,12 @@ export const INDEX_TOURNAMENT_PREREGISTRATION = {
     simplicityTieBreak: "If candidates meet the same claimed use within the smallest meaningful-effect threshold, prefer the candidate with fewer transformations and lower reader burden; K0 wins an unresolved tie.",
   },
   amendmentPolicy: "Any change after registration creates a new protocol version and decision record before affected analysis. The original remains immutable. Results under an amended protocol are labeled exploratory unless a new untouched holdout exists.",
+  amendment: {
+    supersedesProtocol: "civica-index-tournament-preregistration/v1",
+    reason: "Correct the frozen Freedom House input from fh_total_score to the canonical K1 pr_cl_total series before any winner-selecting analysis.",
+    outcomeDataInspected: false,
+    unchanged: "Candidates, splits, baselines, gates, thresholds, subgroup and sensitivity plans, missingness, exclusions, multiplicity, and decision rules are unchanged.",
+  },
 } as const;
 
 export function geographicTournamentBucket(iso3: string): number {
