@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "ci-atomic-ingestion-audit/v1",
+  "task": "DAT-030",
+  "auditedAt": "2026-07-11",
+  "dryRun": { "adapters": 5, "stagedRows": 745, "databaseWrites": 0, "checksum": "9414401c2bcf097672af28bedcda924ad83ac29da5687d46188a76ea0a008f2c" },
+  "failedRun": { "id": "9086f019-3f17-4545-821c-1f9914de4265", "exitNonzero": true, "failedAdapters": 1, "notRunAdapters": 4, "visibleRowsBefore": 1142, "visibleRowsAfter": 1142, "visibleHashBefore": "da5142226dd2e37c4df5a31562de9aac", "visibleHashAfter": "da5142226dd2e37c4df5a31562de9aac", "scoreMutations": 0 },
+  "completedRun": {
+    "id": "000c7b15-afc9-4aad-ac47-3e117552f3a8",
+    "status": "completed",
+    "stagedRows": 745,
+    "checksum": "9414401c2bcf097672af28bedcda924ad83ac29da5687d46188a76ea0a008f2c",
+    "groups": { "vdemDemocraticQuality": 170, "wgiDemocraticFallback": 20, "wgiRuleOfLaw": 190, "freedomHouse": 190, "transparencyCpi": 175 },
+    "freshnessCommittedAtomically": true,
+    "terminalTimeMonotonic": true
+  },
+  "enforcement": { "statusCheck": true, "terminalShapeCheck": true, "retentionTrigger": true },
+  "migrationLedger": { "applied": 5, "expected": 5, "pendingAfterRerun": 0, "schemaFingerprint": "552dd17c582ebef7a30b001a37a2d46fc84a2bcc07b88824be9aaaded4538b86" },
+  "testsPassed": 644,
+  "buildPassed": true
+}

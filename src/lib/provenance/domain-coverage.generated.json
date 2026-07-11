@@ -1,6 +1,6 @@
 {
   "schemaVersion": "atlas-domain-coverage/v1",
-  "generatedAt": "2026-07-11T03:35:08.949Z",
+  "generatedAt": "2026-07-11T06:08:28.901Z",
   "scope": {
     "jurisdictionTaxonomy": "jurisdiction-status/v1",
     "eligibleClass": "sovereign_state",
@@ -397,29 +397,29 @@
       "id": "bills",
       "label": "Bills",
       "recordLabel": "bill records",
-      "recordCount": 6890,
+      "recordCount": 6942,
       "jurisdictionsCovered": 6,
       "completeness": [
         {
           "field": "url",
           "label": "Source URL",
-          "complete": 6890,
-          "total": 6890,
+          "complete": 6942,
+          "total": 6942,
           "percent": 100
         },
         {
           "field": "raw_status",
           "label": "Publisher status",
-          "complete": 5043,
-          "total": 6890,
-          "percent": 73.2
+          "complete": 5045,
+          "total": 6942,
+          "percent": 72.7
         },
         {
           "field": "introduced_date",
           "label": "Introduction date",
-          "complete": 536,
-          "total": 6890,
-          "percent": 7.8
+          "complete": 537,
+          "total": 6942,
+          "percent": 7.7
         }
       ],
       "sources": [
@@ -433,7 +433,7 @@
           "id": "camara_br",
           "label": "Câmara dos Deputados",
           "family": "camara_br",
-          "lastSuccessfulRun": "2026-07-10T04:30:30.152Z"
+          "lastSuccessfulRun": "2026-07-11T04:30:30.205Z"
         },
         {
           "id": "congress_gov",
@@ -445,25 +445,25 @@
           "id": "data_assemblee_fr",
           "label": "Assemblée Nationale",
           "family": "data_assemblee_fr",
-          "lastSuccessfulRun": "2026-07-10T05:30:36.353Z"
+          "lastSuccessfulRun": "2026-07-11T05:30:36.495Z"
         },
         {
           "id": "legisinfo_ca",
           "label": "Parliament of Canada (LEGISinfo)",
           "family": "legisinfo_ca",
-          "lastSuccessfulRun": "2026-07-10T04:01:39.122Z"
+          "lastSuccessfulRun": "2026-07-11T04:00:48.714Z"
         },
         {
           "id": "senado_br",
           "label": "Senado Federal",
           "family": "senado_br",
-          "lastSuccessfulRun": "2026-07-10T04:30:30.152Z"
+          "lastSuccessfulRun": "2026-07-11T04:30:30.205Z"
         },
         {
           "id": "senat_fr",
           "label": "Sénat (France)",
           "family": "senat_fr",
-          "lastSuccessfulRun": "2026-07-10T05:30:36.353Z"
+          "lastSuccessfulRun": "2026-07-11T05:30:36.495Z"
         },
         {
           "id": "uk_parliament",
@@ -472,7 +472,7 @@
           "lastSuccessfulRun": "2026-07-11T03:30:37.144Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-11T03:30:37.144Z",
+      "lastSuccessfulRun": "2026-07-11T05:30:36.495Z",
       "knownGaps": [
         "Production bill adapters currently cover six legislatures; summaries and vote fields are not consistently available from publishers."
       ],
@@ -492,12 +492,12 @@
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Publisher status is 73.2% complete; alert threshold is 80%."
+          "message": "Bills: Publisher status is 72.7% complete; alert threshold is 80%."
         },
         {
           "code": "field_completeness",
           "severity": "warning",
-          "message": "Bills: Introduction date is 7.8% complete; alert threshold is 80%."
+          "message": "Bills: Introduction date is 7.7% complete; alert threshold is 80%."
         }
       ],
       "status": "attention"
@@ -529,13 +529,13 @@
           "id": "freedom_house",
           "label": "Freedom House",
           "family": "freedom_house",
-          "lastSuccessfulRun": "2026-07-05T16:12:09.946Z"
+          "lastSuccessfulRun": "2026-07-11T06:04:23.248Z"
         },
         {
           "id": "transparency_intl",
           "label": "Transparency International CPI",
           "family": "transparency_intl",
-          "lastSuccessfulRun": "2026-07-05T16:12:13.425Z"
+          "lastSuccessfulRun": "2026-07-11T06:04:23.248Z"
         },
         {
           "id": "undp_hdi",
@@ -547,7 +547,7 @@
           "id": "vdem",
           "label": "V-Dem (Varieties of Democracy)",
           "family": "vdem",
-          "lastSuccessfulRun": "2026-07-05T16:11:56.756Z"
+          "lastSuccessfulRun": "2026-07-11T06:04:23.248Z"
         },
         {
           "id": "world_bank",
@@ -559,10 +559,10 @@
           "id": "worldbank_wgi",
           "label": "World Bank Worldwide Governance Indicators",
           "family": "worldbank_wgi",
-          "lastSuccessfulRun": "2026-07-05T17:22:55.195Z"
+          "lastSuccessfulRun": "2026-07-11T06:04:23.248Z"
         }
       ],
-      "lastSuccessfulRun": "2026-07-06T13:01:02.332Z",
+      "lastSuccessfulRun": "2026-07-11T06:04:23.248Z",
       "knownGaps": [
         "This combines Atlas country metrics and research indicator history; source vintages and product eligibility differ, and presence does not imply inclusion in the Civica Index."
       ],

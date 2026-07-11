@@ -6,7 +6,7 @@
 ## Scope
 
 Civica keeps the evidence needed to reproduce and challenge its factual and
-experimental outputs. The protected registry currently covers 29 relations:
+experimental outputs. The protected registry currently covers 30 relations:
 country facts and disputes, Index inputs and outputs, Pulse inputs and review
 records, elections, constitutions, legislatures, organizations, officeholders,
 provenance statements, corrections, and backtest records.

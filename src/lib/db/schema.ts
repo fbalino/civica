@@ -1127,6 +1127,38 @@ export const ciMethodologyVersions = pgTable("ci_methodology_versions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+/** One fail-closed orchestration record per multi-source Index refresh. The
+ * visible score tables change only in the transaction that marks this run
+ * completed; failed staging runs retain their adapter results and error. */
+export const ciIngestionRuns = pgTable(
+  "ci_ingestion_runs",
+  {
+    id: uuid("id").primaryKey(),
+    datasetYear: integer("dataset_year").notNull(),
+    quarter: text("quarter").notNull(),
+    methodologyVersion: text("methodology_version").notNull(),
+    releaseLabel: text("release_label").notNull(),
+    status: text("status").notNull().default("staging"),
+    requiredAdapters: jsonb("required_adapters").$type<string[]>().notNull(),
+    adapterResults: jsonb("adapter_results").notNull(),
+    stagedChecksum: text("staged_checksum"),
+    previousVisibleRelease: jsonb("previous_visible_release"),
+    errorMessage: text("error_message"),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => [
+    index("idx_ci_ingestion_runs_status_started").on(table.status, table.startedAt),
+    uniqueIndex("idx_ci_ingestion_runs_release_label").on(table.releaseLabel),
+    check("ci_ingestion_runs_status_closed", dsql`${table.status} IN ('staging', 'failed', 'completed')`),
+    check("ci_ingestion_runs_terminal_shape", dsql`
+      (${table.status} = 'staging' AND ${table.completedAt} IS NULL)
+      OR (${table.status} = 'failed' AND ${table.completedAt} IS NOT NULL AND ${table.errorMessage} IS NOT NULL)
+      OR (${table.status} = 'completed' AND ${table.completedAt} IS NOT NULL AND ${table.stagedChecksum} IS NOT NULL AND ${table.errorMessage} IS NULL)
+    `),
+  ],
+);
+
 export const ciSourceIngestions = pgTable(
   "ci_source_ingestions",
   {

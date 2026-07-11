@@ -828,3 +828,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   with reasons and source evidence, but cannot enter canonical resolution.
 - Scale words can modify only their attached quantity; ranged or multi-value
   percentage prose fails closed. Durable record: APR-D062.
+
+## 2026-07-11 — Index source baskets publish atomically
+
+- Full Index refreshes stage the closed five-adapter basket off-table, then
+  validate source set, coverage, version/period, identities, and checksum.
+- One transaction publishes scores, ingestion metadata, source freshness, and
+  the completed run manifest. Failed children leave visible scores untouched.
+- Dry runs create neither run rows nor freshness changes. Durable record:
+  APR-D063 in `plan/DECISIONS.md`.

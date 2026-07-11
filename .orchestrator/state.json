@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-030_atomic_ingestion_orchestration"
+    "current_task": "DAT-031_live_vs_frozen_api_selection"
   },
   "budget": {
     "mode": "subscription_only",
@@ -640,6 +640,8 @@
     "plan/evidence/DAT-028/live-statement-audit.json",
     "plan/evidence/DAT-029/README.md",
     "plan/evidence/DAT-029/live-numeric-audit.json",
+    "plan/evidence/DAT-030/README.md",
+    "plan/evidence/DAT-030/live-atomic-ingestion-audit.json",
     "drizzle/authoritative/0000_authoritative_baseline.sql",
     "data/authoritative-schema-fingerprint.v1.json",
     "drizzle/migrations/0026_temporal_metadata.sql",
@@ -665,11 +667,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "Every numeric, quality, migration, data, claims/documentation, TypeScript, and production-build gate passed for DAT-029.",
-    "tests": "641/641 tests passed. All five globally small edge fixtures remain active, North Korea's corrupt numeric candidate is retained as rejected evidence, and all nine release-quality families pass. Master plan is 48/288 complete (16.7%).",
-    "public_claims": "The live release-quality report now passes every invariant family with zero active numeric-envelope violations.",
-    "browser": "No reader-facing UI changed in DAT-029; canonical resolution now excludes the rejected North Korea numeric candidate.",
-    "visual_review": "No UI, design-system CSS, or component styling changed in DAT-029."
+    "build": "Every atomic-ingestion, migration, retention, data, claims/documentation, TypeScript, and production-build gate passed for DAT-030.",
+    "tests": "644/644 tests passed. Failed child adapters preserve the prior score release; the successful five-adapter basket publishes 745 rows with one checksum and manifest. Master plan is 49/288 complete (17.0%).",
+    "public_claims": "Index source ingestion now exposes either the prior complete basket or a fully validated replacement, never a partial refresh.",
+    "browser": "No reader-facing UI changed in DAT-030; live Index score APIs continue reading the atomically replaced score tables.",
+    "visual_review": "No UI, design-system CSS, or component styling changed in DAT-030."
   },
-  "updated_at": "2026-07-11T08:00:00Z"
+  "updated_at": "2026-07-11T09:15:00Z"
 }

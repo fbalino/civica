@@ -1,5 +1,7 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
+import { readFileSync } from "node:fs";
+import type { StagedCiAdapter } from "../src/lib/ci/atomic-ingestion";
 
 import { and, eq } from "drizzle-orm";
 import {
@@ -27,7 +29,7 @@ async function main() {
   );
   const quarter = yearToQuarter(datasetYear);
   const methodologyVersion = await getLatestMethodologyVersion(db);
-  const existingRows = await db
+  const existingRows = process.env.CI_VDEM_STAGE_FILE ? [] : await db
     .select({ iso3: jurisdictions.iso3 })
     .from(ciDimensionScores)
     .innerJoin(
@@ -41,9 +43,9 @@ async function main() {
         eq(ciDimensionScores.methodologyVersion, methodologyVersion),
       ),
     );
-  const alreadyCovered = new Set(
-    existingRows.flatMap((row) => (row.iso3 ? [row.iso3.toUpperCase()] : [])),
-  );
+  const alreadyCovered = new Set(process.env.CI_VDEM_STAGE_FILE
+    ? (JSON.parse(readFileSync(process.env.CI_VDEM_STAGE_FILE, "utf8")) as StagedCiAdapter).rows.map((row) => row.iso3)
+    : existingRows.flatMap((row) => (row.iso3 ? [row.iso3.toUpperCase()] : [])));
   const url =
     process.env.WGI_DATASET_XLSX_URL ?? CI_PRODUCTION_SOURCE_URLS.worldbankWgi;
   console.log(

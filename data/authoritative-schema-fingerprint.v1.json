@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T05:29:42.316Z",
-  "sha256": "647e8ed0a2d95e59e46ea7a53b5c8ac56acc6b078b1053fa19ac69dbde945e54",
+  "generatedAt": "2026-07-11T05:58:48.123Z",
+  "sha256": "552dd17c582ebef7a30b001a37a2d46fc84a2bcc07b88824be9aaaded4538b86",
   "schema": {
     "columns": [
       {
@@ -957,6 +957,123 @@
         "default": null,
         "nullable": "NO",
         "position": 12
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "int4",
+        "name": "dataset_year",
+        "type": "integer",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "quarter",
+        "type": "text",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "methodology_version",
+        "type": "text",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "text",
+        "name": "release_label",
+        "type": "text",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "ci_ingestion_runs",
+        "default": "'staging'::text",
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "jsonb",
+        "name": "required_adapters",
+        "type": "jsonb",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "jsonb",
+        "name": "adapter_results",
+        "type": "jsonb",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "text",
+        "name": "staged_checksum",
+        "type": "text",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "jsonb",
+        "name": "previous_visible_release",
+        "type": "jsonb",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 10
+      },
+      {
+        "udt": "text",
+        "name": "error_message",
+        "type": "text",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 11
+      },
+      {
+        "udt": "timestamp",
+        "name": "started_at",
+        "type": "timestamp without time zone",
+        "table": "ci_ingestion_runs",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 12
+      },
+      {
+        "udt": "timestamp",
+        "name": "completed_at",
+        "type": "timestamp without time zone",
+        "table": "ci_ingestion_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 13
       },
       {
         "udt": "text",
@@ -5607,6 +5724,21 @@
         "definition": "CREATE UNIQUE INDEX idx_ci_dimension_scores_unique ON public.ci_dimension_scores USING btree (jurisdiction_id, dimension, quarter, methodology_version)"
       },
       {
+        "name": "ci_ingestion_runs_pkey",
+        "table": "ci_ingestion_runs",
+        "definition": "CREATE UNIQUE INDEX ci_ingestion_runs_pkey ON public.ci_ingestion_runs USING btree (id)"
+      },
+      {
+        "name": "idx_ci_ingestion_runs_release_label",
+        "table": "ci_ingestion_runs",
+        "definition": "CREATE UNIQUE INDEX idx_ci_ingestion_runs_release_label ON public.ci_ingestion_runs USING btree (release_label)"
+      },
+      {
+        "name": "idx_ci_ingestion_runs_status_started",
+        "table": "ci_ingestion_runs",
+        "definition": "CREATE INDEX idx_ci_ingestion_runs_status_started ON public.ci_ingestion_runs USING btree (status, started_at)"
+      },
+      {
         "name": "ci_methodology_versions_pkey",
         "table": "ci_methodology_versions",
         "definition": "CREATE UNIQUE INDEX ci_methodology_versions_pkey ON public.ci_methodology_versions USING btree (id)"
@@ -6427,6 +6559,11 @@
       },
       {
         "name": "dat_016_retain_mutation",
+        "table": "ci_ingestion_runs",
+        "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON ci_ingestion_runs FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "dat_016_retain_mutation",
         "table": "civica_conditions_scores",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON civica_conditions_scores FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
@@ -6610,6 +6747,11 @@
       {
         "kind": "r",
         "name": "ci_dimension_scores",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "ci_ingestion_runs",
         "definition": null
       },
       {
@@ -6948,6 +7090,24 @@
         "type": "f",
         "table": "ci_dimension_scores",
         "definition": "FOREIGN KEY (source_id) REFERENCES sources(id)"
+      },
+      {
+        "name": "ci_ingestion_runs_pkey",
+        "type": "p",
+        "table": "ci_ingestion_runs",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "ci_ingestion_runs_status_closed",
+        "type": "c",
+        "table": "ci_ingestion_runs",
+        "definition": "CHECK (status = ANY (ARRAY['staging'::text, 'failed'::text, 'completed'::text]))"
+      },
+      {
+        "name": "ci_ingestion_runs_terminal_shape",
+        "type": "c",
+        "table": "ci_ingestion_runs",
+        "definition": "CHECK (status = 'staging'::text AND completed_at IS NULL OR status = 'failed'::text AND completed_at IS NOT NULL AND error_message IS NOT NULL OR status = 'completed'::text AND completed_at IS NOT NULL AND staged_checksum IS NOT NULL AND error_message IS NULL)"
       },
       {
         "name": "ci_methodology_versions_pkey",

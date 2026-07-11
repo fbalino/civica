@@ -12,6 +12,7 @@ export const RETAINED_EVIDENCE_RELATIONS = [
   "backtest_runs",
   "ci_composite_scores",
   "ci_dimension_scores",
+  "ci_ingestion_runs",
   "civica_conditions_scores",
   "constitutions",
   "constitution_topic_excerpts",
@@ -45,6 +46,7 @@ export type RetainedEvidenceRelation =
  * `rate_limits` is the sole exemption: it is ephemeral abuse-control state,
  * not source, interpretation, review, or evaluation evidence. */
 export const DESTRUCTIVE_WRITE_PATHS = [
+  { path: "scripts/ingest-ci-all.ts", relations: ["ci_dimension_scores"] },
   { path: "scripts/cleanup-bad-offices.ts", relations: ["government_bodies", "offices", "persons", "terms"] },
   { path: "scripts/reattribute-pulse-country.ts", relations: ["pulse_dimensional_deltas"] },
   { path: "scripts/seed-backtest-cases.ts", relations: ["backtest_events"] },

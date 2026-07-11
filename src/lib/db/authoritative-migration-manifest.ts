@@ -19,4 +19,16 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "76cca42a16ab01d41889922b72b15b7cd84e966145871b4a17a6070dd3b4c776",
     baseline: false,
   },
+  {
+    id: "0003_mixed_mockingbird",
+    path: "drizzle/authoritative/0003_mixed_mockingbird.sql",
+    sha256: "1d9741679ac592fe6ffdeb05e6d711a72b8ecd9520ed80969a2648ff37e15823",
+    baseline: false,
+  },
+  {
+    id: "0004_naive_dust",
+    path: "drizzle/authoritative/0004_naive_dust.sql",
+    sha256: "521113620700811c93b9acaf91c5766e0be302d9e8ecb6e9049e3fd8f11d235e",
+    baseline: false,
+  },
 ] as const;

@@ -13,7 +13,7 @@ const root = process.cwd();
 const migration = readFileSync(
   resolve(root, "drizzle/migrations/0024_research_evidence_retention.sql"),
   "utf8",
-);
+) + readFileSync(resolve(root, "drizzle/authoritative/0003_mixed_mockingbird.sql"), "utf8");
 const schema = readFileSync(resolve(root, "src/lib/db/schema.ts"), "utf8");
 const classify = readFileSync(
   resolve(root, "src/lib/pulse/v2/classify.ts"),
@@ -42,7 +42,7 @@ function sourceFiles(directory: string): string[] {
 }
 
 for (const relation of RETAINED_EVIDENCE_RELATIONS) {
-  if (!migration.includes(`'${relation}'`)) {
+  if (!migration.includes(`'${relation}'`) && !migration.includes(`ON ${relation}`)) {
     fail(`protected relation ${relation} is missing from the trigger registry`);
   }
 }

@@ -502,3 +502,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   prose, and pre-change audit state without inventing an alternate value.
 - Five microstate/territory edge fixtures stay active; the live quality report
   is green across all nine families. 641/641 tests and build pass. DAT-030 next.
+
+## 2026-07-11 — DAT-030 atomic Index ingestion completed
+
+- Five child adapters now stage off-table; the orchestrator validates the exact
+  source basket, shared version/period, coverage, identities, and checksum.
+- A seeded first-adapter failure exited nonzero, recorded failed/not-run states,
+  and left the prior 1,142-row score hash unchanged with zero score mutations.
+- A real run atomically published 745 rows and source timestamps under one
+  completed manifest/checksum. 644/644 tests and build pass. DAT-031 is next.

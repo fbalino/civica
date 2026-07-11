@@ -32,6 +32,7 @@
  *   });
  */
 import { eq, inArray } from "drizzle-orm";
+import type { NeonQueryFunctionInTransaction } from "@neondatabase/serverless";
 
 import { db } from "./index";
 import { sources } from "./schema";
@@ -116,4 +117,23 @@ export async function markSourcesSynced(
     .where(ids.length === 1 ? eq(sources.id, ids[0]) : inArray(sources.id, ids));
 
   return ids;
+}
+
+/** Build the sanctioned freshness statement for a Neon HTTP batch
+ * transaction. This keeps a multi-source publish and its freshness stamps in
+ * the same atomic commit while retaining this module as the sole writer. */
+export function sourceFreshnessTransactionQuery(
+  txn: NeonQueryFunctionInTransaction<false, false>,
+  sourceIds: string[],
+  rowsWritten: number,
+  at?: Date,
+) {
+  const ids = Array.from(new Set(sourceIds.map((id) => id.trim()).filter(Boolean)));
+  if (!Number.isSafeInteger(rowsWritten) || rowsWritten <= 0 || ids.length === 0) {
+    throw new RangeError("atomic source freshness requires positive rows and source ids");
+  }
+  if (at && !Number.isFinite(at.getTime())) throw new RangeError("atomic source freshness requires a valid timestamp");
+  return at
+    ? txn`UPDATE sources SET last_sync_at = ${at} WHERE id = ANY(${ids})`
+    : txn`UPDATE sources SET last_sync_at = NOW() WHERE id = ANY(${ids})`;
 }

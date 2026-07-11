@@ -1,4 +1,5 @@
 import { neon } from "@neondatabase/serverless";
+import { writeFileSync } from "node:fs";
 import { drizzle } from "drizzle-orm/neon-http";
 import { sql as dsql } from "drizzle-orm";
 import {
@@ -11,6 +12,7 @@ import { markSourcesSynced } from "../db/source-freshness";
 import { normalize, yearToQuarter } from "./normalize";
 import type { IngestionResult } from "./types";
 import { CI_INGEST_ALGORITHM_VERSION, ciVersionEnvelope } from "./versioning";
+import type { StagedCiAdapter, StagedCiRow } from "./atomic-ingestion";
 
 export function createDb() {
   const sqlClient = neon(process.env.DATABASE_URL!);
@@ -83,6 +85,39 @@ export async function runIngestion(
     }
     await (opts.markSynced ?? markSourcesSynced)(result.sourceId, { rowsWritten: ingested, dryRun: true });
     return { ingested, skipped };
+  }
+
+  const stageFile = process.env.CI_INGEST_STAGE_FILE;
+  if (stageFile) {
+    const rows: StagedCiRow[] = [];
+    let skipped = 0;
+    for (const record of result.records) {
+      const jurisdictionId = iso3Map.get(record.iso3.toUpperCase());
+      if (!jurisdictionId) { skipped++; continue; }
+      const normalizedScore = normalize(record.rawValue, result.globalMinObserved, result.globalMaxObserved, record.isInverted);
+      const versions = ciVersionEnvelope({ methodologyVersion, algorithmVersion: CI_INGEST_ALGORITHM_VERSION, sourceIds: [result.sourceId] });
+      rows.push({ jurisdictionId, iso3: record.iso3.toUpperCase(), normalizedScore, rawValue: record.rawValue, sourceId: result.sourceId, dimension: result.dimension, quarter, methodologyVersion, derivationVersionKey: versions.key, derivationVersions: versions.envelope });
+    }
+    if (rows.length === 0) throw new Error(`${result.sourceId}/${result.dimension}: staging produced zero matched rows`);
+    const stage: StagedCiAdapter = {
+      schemaVersion: "ci-atomic-stage/v1",
+      adapterKey: `${result.sourceId}:${result.dimension}`,
+      sourceId: result.sourceId,
+      dimension: result.dimension,
+      datasetYear: result.datasetYear,
+      quarter,
+      methodologyVersion,
+      nativeScaleMin: result.records[0]?.nativeMin ?? 0,
+      nativeScaleMax: result.records[0]?.nativeMax ?? 1,
+      isInverted: result.records[0]?.isInverted ?? false,
+      globalMinObserved: result.globalMinObserved,
+      globalMaxObserved: result.globalMaxObserved,
+      countriesCovered: rows.length,
+      skipped,
+      rows,
+    };
+    writeFileSync(stageFile, `${JSON.stringify(stage)}\n`, { flag: "wx" });
+    return { ingested: rows.length, skipped };
   }
 
   const [ingestion] = await db
