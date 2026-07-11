@@ -661,3 +661,9 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - `pulse-candidate-outcome/v1` retains six exclusion outcomes with complete decision context and append-only enforcement.
 - Ingestion duplicate attempts now persist individually; older aggregate duplicate counts remain unreconstructed.
 - A direct stable sampling view and rolled-back live fixture pass. PUL-014 is next.
+
+## 2026-07-11 — PUL-014 sampling preregistration completed
+
+- Frozen a 384-event census plus 482-valid-case negative and country-day probability frames before labels.
+- The frame balances geography, time, language, source type, regime, and retained media-evidence conditions with design weights.
+- Famous cases remain regression-only; executable population hash is frozen. PUL-015 is next.

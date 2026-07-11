@@ -1,0 +1,130 @@
+{
+  "schemaVersion": "pulse-evaluation-sampling-frame/v1",
+  "preregisteredAt": "2026-07-11",
+  "populationFreezeAt": "2026-07-11T16:45:00.899Z",
+  "period": {
+    "start": "2026-04-13",
+    "end": "2026-07-11",
+    "days": 90
+  },
+  "labelAccessAtFreeze": "none",
+  "unitSeparation": {
+    "retainedEventCandidate": "one distinct production cluster with a retained event row, regardless of publication or review outcome",
+    "systemNegative": "one retained exclusion outcome or unresolved raw candidate",
+    "countryDay": "one sovereign jurisdiction on one UTC calendar date",
+    "famousHistoricalCases": "regression_only_excluded_from_estimation"
+  },
+  "precision": {
+    "confidenceLevel": 0.95,
+    "anticipatedProportion": 0.5,
+    "absoluteHalfWidth": 0.05,
+    "simpleRandomRequired": 385,
+    "planningDesignEffect": 1.25,
+    "validRequiredPerProbabilityFrame": 482,
+    "anticipatedUnusableFraction": 0.1,
+    "initialDrawPerProbabilityFrame": 536,
+    "rule": "report design-based intervals; never replace observed design effect with the planning value"
+  },
+  "frames": [
+    {
+      "id": "retained_event_candidate_census",
+      "selection": "census",
+      "validTarget": 384,
+      "initialDraw": 384,
+      "primaryStratum": "event_month",
+      "populationRule": "all event rows created by the freeze time whose event date is inside the period, deduplicated by cluster",
+      "estimandRole": "finite-period event-candidate precision and error analysis"
+    },
+    {
+      "id": "system_negative_probability",
+      "selection": "stratified_probability",
+      "validTarget": 482,
+      "initialDraw": 536,
+      "primaryStratum": "candidate_state",
+      "populationRule": "retained exclusion outcomes whose candidate is outside the event census, plus raw candidates retrieved by the freeze time that have no event-source link",
+      "estimandRole": "false-negative, abstention, invalid-input, and deduplication error analysis"
+    },
+    {
+      "id": "country_day_retrieval_probability",
+      "selection": "stratified_probability",
+      "validTarget": 482,
+      "initialDraw": 536,
+      "primaryStratum": "continent_x_calendar_month",
+      "populationRule": "every sovereign-state jurisdiction crossed with every UTC date in the frozen period",
+      "estimandRole": "retrieval-miss, true-negative, and insufficient-observation analysis"
+    }
+  ],
+  "balancingMargins": {
+    "geography": [
+      "continent",
+      "jurisdiction"
+    ],
+    "time": [
+      "calendar_month",
+      "week"
+    ],
+    "language": [
+      "en",
+      "es",
+      "fr",
+      "ar",
+      "zh",
+      "ru",
+      "pt",
+      "de",
+      "id",
+      "it",
+      "other",
+      "und"
+    ],
+    "sourceType": [
+      "specialist",
+      "news",
+      "none"
+    ],
+    "regime": [
+      "parliamentary_democracy",
+      "semi_presidential_democracy",
+      "presidential_democracy",
+      "civilian_dictatorship",
+      "military_dictatorship",
+      "royal_dictatorship",
+      "unclassified"
+    ],
+    "mediaEvidenceEnvironment": [
+      "multi_family_5plus",
+      "observed_below_threshold",
+      "no_retained_documents",
+      "political_media_context_missing"
+    ],
+    "minimumValidPerReportableMarginWhenPopulationPermits": 30,
+    "crossingRule": "balance margins separately; do not require a sparse full cross-product"
+  },
+  "selection": {
+    "seed": "pulse-evaluation-sampling-frame/v1|2026-07-11",
+    "allocator": "bounded_minimum_plus_largest_remainder/v1",
+    "withinStratumOrder": "sha256(seed|frame|stratum|unit_id)",
+    "replacement": "next hash-ranked reserve in the same primary stratum",
+    "weight": "primary_stratum_population/primary_stratum_valid_sample",
+    "prohibited": [
+      "labels_or_model_correctness_in_selection",
+      "owner_approval_as_gold",
+      "famous_case_substitution",
+      "post_label_quota_changes",
+      "dropping_sampled_failures"
+    ]
+  },
+  "analysis": {
+    "benchmarkAccuracy": "conditioned_on_the_frozen_items",
+    "generalizedAccuracy": "requires design weights plus item/country clustering or a declared mixed model",
+    "variance": "Taylor linearization or replicate-weight equivalent",
+    "rareMargins": "report insufficient evidence when valid n is below 30",
+    "multiplicity": "headline overall metrics primary; subgroup results descriptive with intervals"
+  },
+  "sources": [
+    "https://pubmed.ncbi.nlm.nih.gov/8870764/",
+    "https://wwwn.cdc.gov/nchs/nhanes/tutorials/varianceestimation.aspx",
+    "https://wwwn.cdc.gov/nchs/nhanes/tutorials/weighting.aspx",
+    "https://doi.org/10.6028/NIST.AI.800-3"
+  ]
+}

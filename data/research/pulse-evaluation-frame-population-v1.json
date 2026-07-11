@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "pulse-evaluation-frame-population/v1",
+  "protocolVersion": "pulse-evaluation-sampling-frame/v1",
+  "populationFreezeAt": "2026-07-11T16:45:00.899Z",
+  "period": {
+    "start": "2026-04-13",
+    "end": "2026-07-11",
+    "days": 90
+  },
+  "counts": {
+    "retainedEventCandidateCensus": 384,
+    "retainedExclusionOutcomes": 0,
+    "unresolvedRawCandidates": 978,
+    "systemNegativePopulation": 978,
+    "sovereignJurisdictions": 194,
+    "countryDays": 17460
+  },
+  "balanceCoverage": {
+    "languages": 11,
+    "sourceTypes": 2,
+    "continents": 6,
+    "regimesIncludingUnclassified": 7,
+    "mediaEvidenceEnvironments": {
+      "multi_family_5plus": 5,
+      "no_retained_documents": 17076,
+      "observed_below_threshold": 379
+    },
+    "mediaEvidenceEnvironmentRule": "five_documents_and_two_source_families_else_observed_below_threshold_or_no_documents",
+    "politicalMediaContext": "missing_until_rights_cleared_sourced_context_exists"
+  },
+  "identityHashes": {
+    "acceptedEvents": "35cfe176952e616887ef7a4e946878d3c2266de83493865de08885dd60a0e8e7",
+    "systemNegatives": "443de2cc8e79e9d56e415028fb49d315ab066e8e4d223b230db7778656b2d220",
+    "countryDayCartesianFrame": "12237e228a521da32e6ac66fb9f39ff50878a437a83a1aabb951df3677272f7f"
+  },
+  "semanticSha256": "26e3f46b395dc968afeb4803b2eeb7c48aeb94f05f4f1a41c70a6d51eda01e92"
+}

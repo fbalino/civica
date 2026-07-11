@@ -905,3 +905,9 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - `pulse-candidate-outcome/v1` records duplicate, non-event, insufficient-evidence, invalid, refuted, and rejected outcomes with reason, actor, method, run, time, and evidence.
 - Evaluation samples use the direct stable-strata view; historical individual duplicates are never inferred from old counters.
 - Rows are append-only and decision-derived outcomes materialize transactionally. Durable record: APR-D121.
+
+## 2026-07-11 — Pulse evaluation uses three mutually exclusive frames
+
+- `pulse-evaluation-sampling-frame/v1` combines a frozen event-candidate census with weighted negative/unresolved and country-day probability samples.
+- Selection is label-blind, deterministic, margin-balanced, reserve-backed, and analyzed with design-aware uncertainty.
+- Famous historical cases never enter estimation. Durable record: APR-D122.
