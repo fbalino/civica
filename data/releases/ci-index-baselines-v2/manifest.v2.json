@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "civica-index-baseline-manifest/v2",
+  "releaseId": "ci-index-baselines-v2",
+  "methodVersion": "civica-index-baselines/v2",
+  "protocolVersion": "civica-index-tournament-preregistration/v2",
+  "panelReleaseId": "ci-research-panel-2000-2024-v2",
+  "inputSources": [
+    "vdem",
+    "worldbank_wgi",
+    "freedom_house",
+    "transparency_intl"
+  ],
+  "inputCells": 19400,
+  "observedInputRows": 14849,
+  "indicatorContractHash": "38eaf15fc0d730ae737a44022342a75ba15570c446574c209ee1c5830879023b",
+  "baselines": {
+    "B0": {
+      "rows": 4850,
+      "coverage": {
+        "development": 2193,
+        "validation": 1356,
+        "final_holdout": 1301
+      },
+      "outputSha256": "a03363d567759d90b18a34d75b9d0dfa30b3841269f367a1dd5379810aab215c",
+      "scale": [
+        "no_score_native_observations"
+      ]
+    },
+    "B1": {
+      "rows": 4298,
+      "coverage": {
+        "development": 1868,
+        "validation": 1238,
+        "final_holdout": 1192
+      },
+      "outputSha256": "5a57538da710d0ad13d5b2b51a85ce70a58b9524d7870aae0fdebfa2c13b589c",
+      "scale": [
+        "vdem_native_0_1"
+      ]
+    },
+    "B2": {
+      "rows": 2206,
+      "coverage": {
+        "development": 535,
+        "validation": 770,
+        "final_holdout": 901
+      },
+      "outputSha256": "bdbd8effcba8adf7925e378ae02120b560177bf9861a487ba155e40fd7961ed4",
+      "scale": [
+        "common_scale_0_100"
+      ]
+    },
+    "B3": {
+      "rows": 2206,
+      "coverage": {
+        "development": 535,
+        "validation": 770,
+        "final_holdout": 901
+      },
+      "outputSha256": "55a27327a72dc0fbc404726781b313285f53133a613b627f7ab4c1a1acc3c8b4",
+      "scale": [
+        "development_fitted_first_factor_z"
+      ]
+    }
+  },
+  "factorModel": {
+    "sourceOrder": [
+      "vdem",
+      "worldbank_wgi",
+      "freedom_house",
+      "transparency_intl"
+    ],
+    "fitRows": 535,
+    "iterations": 12,
+    "tolerance": 1e-12,
+    "modelSha256": "61a77bc209bb13b1964819f106d5afa188d042837ee7264d7667748e8b7fed07"
+  },
+  "valuesLocation": "private_reproducible_from_ci_research_panel_rows",
+  "publicValuesIncluded": false,
+  "rightsPosture": "private_internal_research_only_pending_source_terms"
+}

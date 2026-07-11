@@ -1,7 +1,7 @@
 import { CI_RESEARCH_PANEL_INDICATORS, researchPanelHash } from "./research-panel";
 import { geographicTournamentBucket, INDEX_TOURNAMENT_PREREGISTRATION } from "./tournament-preregistration";
 
-export const INDEX_BASELINE_IMPLEMENTATION_VERSION = "civica-index-baselines/v1";
+export const INDEX_BASELINE_IMPLEMENTATION_VERSION = "civica-index-baselines/v2";
 export const GOVERNANCE_BASELINE_SOURCES = ["vdem", "worldbank_wgi", "freedom_house", "transparency_intl"] as const;
 
 export interface BaselinePanelObservation {

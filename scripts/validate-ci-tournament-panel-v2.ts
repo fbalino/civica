@@ -1,7 +1,8 @@
 import { config } from "dotenv";
 import { readFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
-import { buildTournamentPanelV2, CI_TOURNAMENT_PANEL_RELEASE_ID } from "./generate-ci-tournament-panel-v2";
+import { CI_TOURNAMENT_PANEL_RELEASE_ID } from "../src/lib/ci/research-panel";
+import { buildTournamentPanelV2 } from "./generate-ci-tournament-panel-v2";
 
 config({ path: ".env.local" });
 const live = process.argv.includes("--live");

@@ -576,3 +576,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   development-fitted first-factor methods behind one split/output contract.
 - The live private panel exactly reproduces checked counts and hashes without
   publishing restricted values. TypeScript and 684/684 tests pass. IDX-012 next.
+
+## 2026-07-11 — IDX-038 Freedom House panel identity corrected
+
+- Panel v1 used Freedom House's 0–100 total score, not K1's 2–14 PR+CL
+  ratings input. Immutable v2 uses the exact hash-pinned publisher workbook.
+- Candidate set, preregistration, and baselines advanced to v2 before outcome
+  inspection; all v1 artifacts remain preserved. IDX-012 resumes next.

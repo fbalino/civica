@@ -1,5 +1,7 @@
 # IDX-011 evidence — executable tournament baselines
 
+Current release `civica-index-baselines/v2` reads corrected tournament panel v2. Baseline v1 remains preserved.
+
 ## Implemented baselines
 
 - B0 source-native dashboard/no score: 4,850 jurisdiction-year units, preserving explicit fully missing rows
@@ -11,7 +13,7 @@ The common interface records baseline ID, unit, ISO3, year, joint tournament spl
 
 ## Reproducibility and rights
 
-The checked release at `data/releases/ci-index-baselines-v1/` contains coverage and cryptographic output/model hashes, not source values or country outputs. The private panel supplies 19,400 four-source cells, of which 15,426 are observed. `npm run validate:index-tournament-baselines:live` recomputes B0–B3 and requires an exact byte-equivalent manifest.
+The checked release at `data/releases/ci-index-baselines-v2/` contains coverage and cryptographic output/model hashes, not source values or country outputs. The private panel supplies 19,400 four-source cells, of which 14,849 are observed. `npm run validate:index-tournament-baselines:live` recomputes B0–B3 and requires an exact byte-equivalent manifest.
 
 ## Verification
 

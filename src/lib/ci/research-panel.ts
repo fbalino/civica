@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { stableStringify } from "@/lib/data/frozen-vintage";
 
 export const CI_RESEARCH_PANEL_RELEASE_ID = "ci-research-panel-2000-2024-v1" as const;
+export const CI_TOURNAMENT_PANEL_RELEASE_ID = "ci-research-panel-2000-2024-v2" as const;
 export const CI_RESEARCH_PANEL_SCHEMA_VERSION = "ci-research-panel/v1" as const;
 export const CI_RESEARCH_PANEL_GENERATOR_VERSION = "ci-research-panel-generator/v1" as const;
 export const CI_RESEARCH_PANEL_START_YEAR = 2000 as const;

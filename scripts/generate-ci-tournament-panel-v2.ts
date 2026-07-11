@@ -4,13 +4,12 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { neon } from "@neondatabase/serverless";
 import { CI_PRODUCTION_SOURCE_URLS, parseFreedomHouse } from "../src/lib/ci/production-source-adapters";
 import { buildIso3ByCountryNameRows, fetchBuffer } from "../src/lib/ci/source-utils";
-import { CI_RESEARCH_PANEL_RELEASE_ID, researchPanelHash } from "../src/lib/ci/research-panel";
+import { CI_RESEARCH_PANEL_RELEASE_ID, CI_TOURNAMENT_PANEL_RELEASE_ID, researchPanelHash } from "../src/lib/ci/research-panel";
 
 config({ path: ".env.local" });
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
 const sql = neon(process.env.DATABASE_URL);
 const write = process.argv.includes("--write");
-export const CI_TOURNAMENT_PANEL_RELEASE_ID = "ci-research-panel-2000-2024-v2";
 const FH_SHA256 = "d6ac861af6e7dcea7e870e39ddbcd2925730a653c1466f8992a7d0005f53be88";
 
 interface BaseRow { jurisdictionId: string; iso3: string; name: string; periodYear: number; dimension: string; indicatorId: string; sourceId: string; sourceOwner: string; retrievalPath: string; value: number | null; valueStatus: string; missingReason: string | null; nativeUnit: string; nativeMin: number; nativeMax: number; isInverted: boolean; transformId: string; sourceVintage: string; sourceVintageStatus: string; artifactHash: string; uncertaintyStatus: string; uncertaintyLower: number | null; uncertaintyUpper: number | null; revisionStatus: string; seriesType: string }
