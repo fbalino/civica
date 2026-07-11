@@ -926,7 +926,7 @@ export const PUBLIC_CLAIMS = [
     surface: "exports",
     routeOrArtifact: "/downloads/civica-atlas-2026-07-11.json.gz",
     exactClaim:
-      "The frozen Atlas reference package contains permitted source observations with stable jurisdiction IDs, provenance, rights joins, a codebook, deterministic ordering, and no Index or Pulse outputs.",
+      "The frozen Atlas reference package contains rights-cleared canonical rows from its named immutable snapshot, with stable jurisdiction IDs, row hashes, provenance, rights joins, a codebook, deterministic ordering, and no Index or Pulse outputs.",
     tier: "institutional-posture",
     evidenceSources: [
       "data/releases/atlas-2026-07-11/manifest.v1.json",
@@ -934,7 +934,7 @@ export const PUBLIC_CLAIMS = [
       "scripts/validate-atlas-export.ts",
     ],
     implementationOwner: "Atlas exports and data governance",
-    methodologyVersion: "civica-atlas-export/v1",
+    methodologyVersion: "civica-atlas-export/v2",
     gate: "G2",
     source: {
       path: "src/app/api-docs/page.tsx",

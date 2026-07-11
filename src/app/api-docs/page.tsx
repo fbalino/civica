@@ -509,9 +509,10 @@ for country in resp.json()["data"]:
 
         <p className="api-intro">
           The frozen <code>atlas-2026-07-11</code> package provides stable
-          jurisdiction records and active source observations from CIA
-          Factbook, Wikidata, and World Bank. Every fact joins to an embedded
-          source-rights row. Index, Pulse, restricted sources, images,
+          jurisdiction records and canonical facts from the immutable Q1
+          snapshot, limited to CIA Factbook, Wikidata, and World Bank. Every
+          fact carries its vintage label, cutoff, content hash, method, and an
+          embedded source-rights row. Index, Pulse, alternates, restricted sources, images,
           constitution text, and raw publisher payloads are excluded.
         </p>
 
@@ -526,9 +527,9 @@ for country in resp.json()["data"]:
         </p>
 
         <p className="api-info-card__body">
-          Schema <code>civica-atlas-export/v1</code> · release date{" "}
+          Schema <code>civica-atlas-export/v2</code> · release date{" "}
           <code>2026-07-11</code> · SHA-256{" "}
-          <code>cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1</code>.
+          <code>8be96e97fef153736f98ce56c8ab59a697f6396c3f61d3b07b12ba7823904ba9</code>.
           The package contains its codebook, join keys, deterministic ordering,
           table counts, and source-specific terms. Its{" "}
           <a href="/downloads/civica-atlas-2026-07-11.manifest.json">
@@ -566,10 +567,9 @@ for country in resp.json()["data"]:
         <CodeBlock>{renderCountryExportCsvExample()}</CodeBlock>
 
         <p className="api-info-card__body">
-          The bulk package is a source-observation release, not a canonical
-          per-country export. The country-list API remains available for
-          ordinary queries. DAT-027 owns the canonical-plus-alternates
-          per-country replacement.
+          The bulk package contains the as-published canonical selection, not
+          current values or alternate observations. DAT-027 owns the richer
+          canonical-plus-alternates per-country replacement.
         </p>
       </section>
 

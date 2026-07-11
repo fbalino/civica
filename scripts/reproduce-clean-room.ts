@@ -23,7 +23,7 @@ const release = buildAtlasExport({ jurisdictions: fixture.jurisdictions, facts: 
 const serialized = serializeAtlasExport(release);
 const exportSemanticSha256 = createHash("sha256").update(serialized).digest("hex");
 
-if (fixture.schemaVersion !== "civica-clean-room-fixture/v1") throw new Error("Fixture schema drift");
+if (fixture.schemaVersion !== "civica-clean-room-fixture/v2") throw new Error("Fixture schema drift");
 if (fixtureSha256 !== expected.fixtureSha256) throw new Error(`Fixture hash mismatch: ${fixtureSha256}`);
 if (exportSemanticSha256 !== expected.exportSemanticSha256) throw new Error(`Export hash mismatch: ${exportSemanticSha256}`);
 if (JSON.stringify(release.counts) !== JSON.stringify(expected.rowCounts)) throw new Error("Row counts differ");

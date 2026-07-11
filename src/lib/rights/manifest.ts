@@ -249,7 +249,7 @@ export const PRODUCT_RIGHTS: readonly ProductRightsRecord[] = [
       },
     ],
     reason:
-      "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; DAT-017 separately publishes a frozen Atlas source-observation package.",
+      "The current mixed-source export cannot prove an allowed terms record for every emitted row and flat fallback field. DAT-027 will replace it with a rights-filtered canonical-plus-alternates export; the bulk Atlas package separately publishes rights-cleared canonical rows from an immutable snapshot.",
     requiresDerivationVersions: true,
   },
   {
@@ -316,7 +316,7 @@ export const RELEASE_ARTIFACT_RIGHTS: readonly ReleaseArtifactRights[] = [
     governingTerms:
       "Each fact row retains its source ID and joins to the embedded source-specific terms record. Download access does not replace those terms or grant a blanket license.",
     derivationVersions: buildDerivationVersionEnvelope({
-      methodology: versioned("civica-atlas-export/v1"),
+      methodology: versioned("civica-atlas-export/v2"),
       algorithm: versioned("atlas-export-generator/v1"),
       prompt: notApplicable("The export is generated deterministically without a model prompt."),
       taxonomy: versioned("jurisdiction-status/v1"),

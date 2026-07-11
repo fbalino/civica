@@ -2,10 +2,12 @@ import { createHash } from "node:crypto";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { SOURCE_RIGHTS } from "@/lib/rights/manifest";
+import { parseAtlasVintageLabel } from "@/lib/data/frozen-vintage";
 
-export const ATLAS_EXPORT_SCHEMA_VERSION = "civica-atlas-export/v1" as const;
+export const ATLAS_EXPORT_SCHEMA_VERSION = "civica-atlas-export/v2" as const;
 export const ATLAS_EXPORT_RELEASE_ID = "atlas-2026-07-11" as const;
 export const ATLAS_EXPORT_RELEASE_DATE = "2026-07-11" as const;
+export const ATLAS_EXPORT_VINTAGE_LABEL = "Civica Atlas Reconciled v0.2-beta — vintage 2026-Q1" as const;
 
 export const ATLAS_EXPORT_ALLOWED_SOURCE_IDS = SOURCE_RIGHTS.filter(
   (row) => row.reviewStatus === "verified" && row.publicExport === "allowed",
@@ -35,6 +37,19 @@ export function buildAtlasExport(input: AtlasExportInput) {
   const usedSourceIds = [
     ...new Set(facts.map((row) => String(row.source_id))),
   ].sort();
+  const identity = parseAtlasVintageLabel(ATLAS_EXPORT_VINTAGE_LABEL);
+  const invalidVintageRows = facts.filter((row) =>
+    row.vintage_label !== ATLAS_EXPORT_VINTAGE_LABEL ||
+    row.methodology_version !== identity.methodologyVersion ||
+    typeof row.content_hash !== "string" || !/^[a-f0-9]{64}$/.test(row.content_hash),
+  );
+  if (invalidVintageRows.length) {
+    throw new Error(`Atlas export contains ${invalidVintageRows.length} row(s) outside the frozen vintage/version/hash contract.`);
+  }
+  const cutTimes = [...new Set(facts.map((row) => String(row.cut_at_timestamp)))];
+  if (cutTimes.length !== 1 || cutTimes[0] === "null" || cutTimes[0] === "undefined") {
+    throw new Error(`Atlas export requires one frozen cutoff; found ${cutTimes.join(", ") || "none"}.`);
+  }
   const jurisdictionIds = new Set(jurisdictions.map((row) => String(row.id)));
   const orphanJurisdictionIds = [
     ...new Set(
@@ -62,16 +77,18 @@ export function buildAtlasExport(input: AtlasExportInput) {
     schemaVersion: ATLAS_EXPORT_SCHEMA_VERSION,
     releaseId: ATLAS_EXPORT_RELEASE_ID,
     releaseDate: ATLAS_EXPORT_RELEASE_DATE,
+    vintageLabel: ATLAS_EXPORT_VINTAGE_LABEL,
+    cutoffAt: cutTimes[0],
     generatedAt: `${ATLAS_EXPORT_RELEASE_DATE}T00:00:00.000Z`,
     scope:
-      "Permitted Atlas reference records only. Civica Index, Pulse, restricted source rows, images, and publisher payloads are excluded.",
+      "Frozen canonical Atlas reference records from the named Q1 snapshot only. Civica Index, Pulse, alternates, restricted source rows, images, and publisher payloads are excluded.",
     rightsManifest: "/api/rights-manifest",
     tables: { jurisdictions, facts, sources },
     codebook: {
       jurisdictions:
         "Stable Civica jurisdiction identity and sourced status classification.",
       facts:
-        "Active source observations from verified bulk-export sources; rows are not presented as a canonical selection.",
+        "As-published canonical selections copied from the immutable named vintage; current post-cut values and alternate observations are excluded.",
       sources:
         "Source-specific license, terms, attribution, and restriction records for every emitted fact row.",
       joins: {
@@ -91,9 +108,9 @@ export function buildAtlasExport(input: AtlasExportInput) {
           status_note: "Neutral scope and classification note.", administering_jurisdiction_iso3: "Administering jurisdiction ISO3 where applicable.", status_disputed: "Whether the territorial/status record is disputed.",
         },
         facts: {
-          id: "Stable source-observation UUID.", jurisdiction_id: "Foreign key to jurisdictions.id.", fact_key: "Stable Civica fact identifier.", fact_group: "Reconciliation group A, B, or C.", category: "Reader-facing fact category.",
+          id: "Stable frozen-vintage row UUID.", canonical_fact_id: "Source-observation row selected at the cutoff.", jurisdiction_id: "Foreign key to jurisdictions.id.", fact_key: "Stable Civica fact identifier.", fact_group: "Reconciliation group A, B, or C.", category: "Reader-facing fact category.",
           source_id: "Foreign key to sources.sourceId.", source_url: "Direct upstream record URL when captured.", fact_value: "Source display value.", fact_value_numeric: "Numeric form when available; zero is observed, not missing.", fact_unit: "Unit attached to the value.", fact_year: "Year stated by the publisher.", value_json: "Structured value when scalar columns are insufficient.",
-          value_status: "Closed data-value-state/v1 status.", value_status_reason: "Required explanation for non-observed states.", as_of: "Upstream observation/reference date.", data_vintage_year: "Underlying measurement year when different from the publisher stamp.", retrieved_at: "Civica retrieval timestamp.", upstream_vintage_label: "Publisher dataset/version label.", methodology_version: "Civica admission-method version.", value_type: "Measured or projected source value.", growth_methodology: "Growth-rate basis where applicable.",
+          value_status: "Closed data-value-state/v1 status.", value_status_reason: "Required explanation for non-observed states.", as_of: "Upstream observation/reference date.", data_vintage_year: "Underlying measurement year when different from the publisher stamp.", retrieved_at: "Civica retrieval timestamp.", upstream_vintage_label: "Publisher dataset/version label.", methodology_version: "Published Civica vintage-method version.", value_type: "Measured or projected source value.", growth_methodology: "Growth-rate basis where applicable.", vintage_label: "Immutable Civica citation handle.", cut_at_timestamp: "Shared publication cutoff for the vintage.", content_hash: "SHA-256 of the frozen value, source, date, and method recipe.", is_disputed_at_cut: "Whether the canonical selection was disputed when frozen.", supersedes_vintage_label: "Earlier release replaced by this version, when applicable.",
         },
         sources: {
           sourceId: "Stable source identifier.", licenseId: "Source license or legal designation.", termsUrl: "Publisher terms URL.", reviewStatus: "Civica rights-review status.", reviewedAt: "Rights review date.", publicExport: "Bulk-export permission decision.", commercialUse: "Whether source terms allow commercial use.", derivatives: "Whether source terms allow derivatives.", attributionRequired: "Whether source terms require attribution.", shareAlikeRequired: "Whether share-alike applies.", restrictions: "Source-specific cautions and conditions.",
@@ -192,15 +209,20 @@ export async function loadAtlasExportInput(): Promise<AtlasExportInput> {
       ORDER BY slug
     `),
     db.execute(sql`
-      SELECT id, jurisdiction_id, fact_key, fact_group, category,
-             source_id, source_url, fact_value, fact_value_numeric,
-             fact_unit, fact_year, value_json, value_status,
-             value_status_reason, as_of, data_vintage_year, retrieved_at,
-             upstream_vintage_label, methodology_version, value_type,
-             growth_methodology
-      FROM country_facts
-      WHERE status = 'active' AND source_id IN ${allowed}
-      ORDER BY jurisdiction_id, fact_key, source_id, id
+      SELECT v.id, v.canonical_fact_id, v.jurisdiction_id, v.fact_key,
+             cf.fact_group, cf.category, v.source_id, cf.source_url,
+             v.value_text AS fact_value, v.value_numeric AS fact_value_numeric,
+             v.value_unit AS fact_unit, cf.fact_year, v.value_json,
+             cf.value_status, cf.value_status_reason, v.as_of,
+             cf.data_vintage_year, cf.retrieved_at, cf.upstream_vintage_label,
+             v.methodology_version, cf.value_type, cf.growth_methodology,
+             v.vintage_label, v.cut_at_timestamp, v.content_hash,
+             v.is_disputed_at_cut, v.supersedes_vintage_label
+      FROM country_fact_vintages v
+      JOIN country_facts cf ON cf.id = v.canonical_fact_id
+      WHERE v.vintage_label = ${ATLAS_EXPORT_VINTAGE_LABEL}
+        AND v.source_id IN ${allowed}
+      ORDER BY v.jurisdiction_id, v.fact_key, v.source_id, v.id
     `),
   ]);
   return {
