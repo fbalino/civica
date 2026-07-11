@@ -59,7 +59,10 @@ import {
 } from "./shapes";
 import { COUNTRY_EXPORT_CSV_HEADER } from "./csv";
 import { CI_METHODOLOGY_META } from "@/lib/api/helpers";
-import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
+import { CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_RELEASE_ID } from "@/lib/ci/current-release";
+import { resolveCiRelease } from "@/lib/ci/release-selection";
+
+const currentCiSeries = resolveCiRelease(CURRENT_CI_RELEASE_ID).series;
 
 /* ────────────────────────────────────────────────────────────────
  * Shared fixture pieces
@@ -369,6 +372,7 @@ const indexCountryExampleResponse = zIndexCountryResponse.strict().parse({
   }),
   meta: {
     methodology: CI_METHODOLOGY_META,
+    series: currentCiSeries,
     deprecations: [
       {
         identifier: "structural_family",
@@ -412,6 +416,7 @@ const indexHistoryExampleResponse = zIndexHistoryResponse.strict().parse({
   ],
   meta: {
     methodology: CI_METHODOLOGY_META,
+    series: currentCiSeries,
   },
 });
 
@@ -435,7 +440,7 @@ const indexByGovernmentTypeExampleResponse = zIndexByGovernmentTypeResponse
         q3: 88.9,
       }),
     ],
-    meta: { quarter: "2026-Q1", taxonomy: "raw" },
+    meta: { quarter: "2026-Q1", taxonomy: "raw", series: currentCiSeries },
   });
 
 /* ────────────────────────────────────────────────────────────────
@@ -535,6 +540,7 @@ const indexCompareExampleResponse = zIndexCompareResponse.parse({
     quarter: null,
     count: 2,
     methodology: CI_METHODOLOGY_META,
+    series: currentCiSeries,
     deprecations: [
       {
         identifier: "structural_family",
@@ -577,6 +583,7 @@ const indexMethodologyExampleResponse = zIndexMethodologyResponse
     }),
     meta: {
       methodology: CI_METHODOLOGY_META,
+      series: currentCiSeries,
     },
   });
 
@@ -614,6 +621,7 @@ const indexRankingsExampleResponse = zIndexRankingsResponse.strict().parse({
     hasMore: true,
     quarter: "2026-Q1",
     taxonomy: "raw",
+    series: currentCiSeries,
   }),
 });
 

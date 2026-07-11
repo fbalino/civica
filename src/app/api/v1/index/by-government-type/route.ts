@@ -80,8 +80,8 @@ export async function GET(request: Request) {
       .sort((a, b) => b.avgScore - a.avgScore || a.governmentType.localeCompare(b.governmentType));
 
     const meta = isDeprecatedTaxonomy
-      ? { quarter: quarter ?? null, taxonomy, ...STRUCTURAL_FAMILY_DEPRECATION_META }
-      : { quarter: quarter ?? null, taxonomy };
+      ? { quarter: quarter ?? null, taxonomy, series: release.series, ...STRUCTURAL_FAMILY_DEPRECATION_META }
+      : { quarter: quarter ?? null, taxonomy, series: release.series };
 
     const response = apiResponse({ data, meta });
     return withIndexDispositionDeprecation(isDeprecatedTaxonomy ? withStructuralFamilyDeprecation(response) : response);

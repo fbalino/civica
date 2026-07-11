@@ -3,6 +3,7 @@ import { getCIMethodology } from "@/lib/db/queries";
 import { shapeIndexMethodologyData } from "@/lib/api/contract/shapes";
 import { retiredIndexApiResponse, withIndexDispositionDeprecation } from "@/lib/api/deprecation";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
+import { CI_RELEASE_CONTRACTS } from "@/lib/ci/release-selection";
 
 function publicMethodologyRecord<T extends { id: string; notes: string | null }>(
   row: T,
@@ -32,7 +33,10 @@ export async function GET(request: Request) {
 
     return withIndexDispositionDeprecation(apiResponse({
       data: shapeIndexMethodologyData(publicMethodologyRecord(methodology)),
-      meta: { methodology: CI_METHODOLOGY_META },
+      meta: {
+        methodology: CI_METHODOLOGY_META,
+        series: CI_RELEASE_CONTRACTS.find((release) => release.methodologyVersion === versionId)?.series ?? null,
+      },
     }));
   } catch (e) {
     console.error("API /v1/index/methodology error:", e);

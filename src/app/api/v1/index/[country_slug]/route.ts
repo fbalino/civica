@@ -147,6 +147,7 @@ export async function GET(
         }),
         meta: {
           methodology: CI_METHODOLOGY_META,
+          series: release.series,
           ...STRUCTURAL_FAMILY_DEPRECATION_META,
         },
       }),

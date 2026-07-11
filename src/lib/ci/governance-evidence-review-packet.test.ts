@@ -9,7 +9,8 @@ import {
 
 test("selected-product review packet closes every required section", () => {
   assert.deepEqual(governanceEvidenceReviewPacketErrors(), []);
-  assert.equal(REVIEW_PACKET_REQUIRED_SECTIONS.length, 13);
+  assert.equal(REVIEW_PACKET_REQUIRED_SECTIONS.length, 14);
+  assert.equal(GOVERNANCE_EVIDENCE_REVIEW_PACKET.seriesProvenance.seriesType, "harmonized_backcast");
   assert.equal(GOVERNANCE_EVIDENCE_REVIEW_PACKET.selectedProduct, "source_native_dashboard_only");
   assert.equal(GOVERNANCE_EVIDENCE_REVIEW_PACKET.codebook.length, 5);
   assert.equal(GOVERNANCE_EVIDENCE_REVIEW_PACKET.reviewerTerms.favorableConclusionRequired, false);

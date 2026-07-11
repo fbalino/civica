@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { GOVERNANCE_EVIDENCE_REVIEW_PACKET } from "./governance-evidence-review-packet";
 
 export const GOVERNANCE_EVIDENCE_REVIEW_PACKET_DIR =
-  "data/releases/governance-evidence-review-packet-2026-07-v1";
+  "data/releases/governance-evidence-review-packet-2026-07-v2";
 
 type InventoryRole =
   | "packet-document"
@@ -32,6 +32,7 @@ const CORE_EXTERNAL_ARTIFACTS: ReadonlyArray<{
   path: string;
 }> = [
   { artifactId: "selected-input-manifest", role: "selected-product-input", path: "data/releases/ci-k1-uncertainty-inputs-2024-v2/manifest.v1.json" },
+  { artifactId: "series-provenance-audit", role: "selected-product-input", path: "data/releases/ci-series-provenance-audit-2026-07-v1/manifest.v1.json" },
   { artifactId: "tournament-package-manifest", role: "tournament-package", path: TOURNAMENT_MANIFEST_PATH },
   { artifactId: "tournament-package-inventory", role: "tournament-package", path: "data/releases/index-tournament-results-package-v1/artifact-inventory.v1.csv" },
   { artifactId: "tournament-failure-ledger", role: "tournament-package", path: "data/releases/index-tournament-results-package-v1/error-ledger.v1.json" },
@@ -73,11 +74,11 @@ function canonicalize(value: unknown): unknown {
 
 export function renderReviewPacketReadme(): string {
   const packet = GOVERNANCE_EVIDENCE_REVIEW_PACKET;
-  return `# Governance Evidence external-review packet v1
+  return `# Governance Evidence external-review packet v2
 
 This is the versioned replication and review bundle for Civica's selected source-native public comparison product. It also carries the complete Index tournament inventory, decision, failures, misuse audit, and adopted disposition so a reviewer can assess the choice in context.
 
-The dashboard keeps five established publisher indicators on native scales. It does not emit a Civica composite, grade, rank, country-quality verdict, or claim of independent corroboration. The packet is ready for review; it is not an endorsement and does not imply that independent review has occurred.
+The dashboard keeps five established publisher indicators on native scales. The displayed 2024 observations are a harmonized backcast calculated in 2026. It does not emit a Civica composite, grade, rank, country-quality verdict, or claim of independent corroboration. The packet is ready for review; it is not an endorsement and does not imply that independent review has occurred.
 
 ## Exact workflow
 

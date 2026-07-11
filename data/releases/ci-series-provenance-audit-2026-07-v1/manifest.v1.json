@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "ci-series-provenance-audit/v1",
+  "releaseId": "ci-series-provenance-audit-2026-07-v1",
+  "capturedAt": "2026-07-11T13:47:32Z",
+  "source": "live Neon ci_composite_scores grouped by methodology_version and quarter",
+  "legacyCalculationTimezone": "America/Montevideo, inferred from the recorded execution environment because calculated_at is a PostgreSQL timestamp without time zone; UTC values below apply that disclosed conversion",
+  "classificationRule": "A historical reference period calculated later without a retained original publication cut is a harmonized_backcast, not an as_published_release.",
+  "availableSeriesTypes": [
+    "harmonized_backcast"
+  ],
+  "unavailableSeriesTypes": [
+    "as_published_release"
+  ],
+  "groups": [
+    { "methodologyVersion": "beta", "quarter": "2023-Q4", "calculatedAtMin": "2026-04-30T01:06:03.974Z", "calculatedAtMax": "2026-04-30T01:06:05.027Z", "rows": 47, "seriesType": "harmonized_backcast", "originalPublicationCutAt": null },
+    { "methodologyVersion": "beta", "quarter": "2024-Q4", "calculatedAtMin": "2026-05-02T08:29:14.400Z", "calculatedAtMax": "2026-05-02T08:29:19.153Z", "rows": 190, "seriesType": "harmonized_backcast", "originalPublicationCutAt": null },
+    { "methodologyVersion": "beta-r1", "quarter": "2024-Q4", "calculatedAtMin": "2026-07-11T10:37:50.347Z", "calculatedAtMax": "2026-07-11T10:38:16.956Z", "rows": 190, "seriesType": "harmonized_backcast", "originalPublicationCutAt": null },
+    { "methodologyVersion": "beta-r2", "quarter": "2024-Q4", "calculatedAtMin": "2026-07-11T10:41:30.252Z", "calculatedAtMax": "2026-07-11T10:41:56.905Z", "rows": 190, "seriesType": "harmonized_backcast", "originalPublicationCutAt": null },
+    { "methodologyVersion": "beta-r3", "quarter": "2024-Q4", "calculatedAtMin": "2026-07-11T10:48:54.880Z", "calculatedAtMax": "2026-07-11T10:49:21.451Z", "rows": 190, "seriesType": "harmonized_backcast", "originalPublicationCutAt": null },
+    { "methodologyVersion": "beta-r4", "quarter": "2024-Q4", "calculatedAtMin": "2026-07-11T11:25:59.923Z", "calculatedAtMax": "2026-07-11T11:26:26.793Z", "rows": 190, "seriesType": "harmonized_backcast", "originalPublicationCutAt": null },
+    { "methodologyVersion": "beta-r5", "quarter": "2024-Q4", "calculatedAtMin": "2026-07-11T11:37:56.850Z", "calculatedAtMax": "2026-07-11T11:38:23.634Z", "rows": 190, "seriesType": "harmonized_backcast", "originalPublicationCutAt": null },
+    { "methodologyVersion": "v1.0", "quarter": "2023-Q4", "calculatedAtMin": "2026-04-21T06:25:31.399Z", "calculatedAtMax": "2026-04-21T06:25:32.446Z", "rows": 49, "seriesType": "harmonized_backcast", "originalPublicationCutAt": null }
+  ],
+  "disposition": "No genuine historical as-published Civica Index release exists in the current database. The as_published_release query state is supported but intentionally empty."
+}

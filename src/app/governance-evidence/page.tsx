@@ -28,9 +28,9 @@ export default async function GovernanceEvidencePage({ searchParams }: { searchP
         <div className="editorial-section-header">
           <span className="editorial-eyebrow">Reference year {evidence.year}</span>
           <h2 id="evidence-country"><CountryFlag iso2={evidence.country.iso2} size={28} /> {evidence.country.name}</h2>
-          <p>Release <code>{evidence.releaseId}</code>. Values are exact publisher points; intervals appear only where the publisher supplies them.</p>
+          <p>Release <code>{evidence.releaseId}</code>. {evidence.series.citationLabel}. Original publication cut: {evidence.series.originalPublicationCutAt ?? "none retained; this is not an as-published historical release"}.</p>
         </div>
-        <Banner variant="info">These sources overlap in constructs and upstream evidence. Agreement is not independent corroboration, and the rows do not form a Civica country-quality score.</Banner>
+        <Banner variant="info">These sources overlap in constructs and upstream evidence. The current 2024 observations were assembled in 2026 from harmonized publisher series. They do not show what Civica or each publisher reported in 2024.</Banner>
         <GovernanceEvidenceTable countryName={evidence.country.name} rows={evidence.rows} />
       </section>
       <nav className="editorial-footer-nav"><Button href={`/api/governance-evidence/${evidence.country.slug}`} variant="secondary">Download rights-safe JSON</Button><Link href="/licensing#reuse">Rights and reuse</Link><Link href="/licensing#rights-manifest">Rights manifest</Link><Link href="/civica-index/methodology">Index research methodology</Link></nav>

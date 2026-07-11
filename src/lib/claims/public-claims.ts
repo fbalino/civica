@@ -223,7 +223,7 @@ export const PUBLIC_CLAIMS = [
     evidenceSources: [
       "src/lib/content/site-state.ts",
       "src/lib/content/replication-surface.ts",
-      "data/releases/governance-evidence-review-packet-2026-07-v1/manifest.v1.json",
+      "data/releases/governance-evidence-review-packet-2026-07-v2/manifest.v1.json",
       "plan/00-mission-and-operating-rules.md",
       "plan/MASTER-CHECKLIST.md",
     ],

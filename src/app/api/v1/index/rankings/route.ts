@@ -110,6 +110,7 @@ export async function GET(request: Request) {
             hasMore: false,
             quarter: null,
             taxonomy,
+            series: release.series,
           }),
         }),
       ));
@@ -229,6 +230,7 @@ export async function GET(request: Request) {
             hasMore: offset + limit < filtered.length,
             quarter,
             taxonomy,
+            series: release.series,
           }),
         }),
       ));
@@ -276,6 +278,7 @@ export async function GET(request: Request) {
           hasMore: offset + limit < total,
           quarter,
           taxonomy,
+          series: release.series,
         }),
       }),
     ));

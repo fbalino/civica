@@ -1,8 +1,24 @@
 import { K1_UNCERTAINTY_INPUTS } from "./k1-uncertainty-inputs";
 import { sourceRights } from "@/lib/rights/manifest";
+import { assertCiSeriesProvenance, type CiSeriesProvenance, type CiSeriesType } from "./series-provenance";
 
 export const GOVERNANCE_EVIDENCE_RELEASE_ID = K1_UNCERTAINTY_INPUTS.releaseId;
 export const GOVERNANCE_EVIDENCE_YEAR = K1_UNCERTAINTY_INPUTS.referenceYear;
+
+export const GOVERNANCE_EVIDENCE_SERIES: CiSeriesProvenance = assertCiSeriesProvenance({
+  releaseId: GOVERNANCE_EVIDENCE_RELEASE_ID,
+  seriesType: "harmonized_backcast",
+  observationPeriodStart: String(GOVERNANCE_EVIDENCE_YEAR),
+  observationPeriodEnd: String(GOVERNANCE_EVIDENCE_YEAR),
+  originalPublicationCutAt: null,
+  calculatedAt: "2026-07-11T11:04:46.000Z",
+  methodVersion: K1_UNCERTAINTY_INPUTS.schemaVersion,
+  citationLabel: `Governance Evidence Dashboard — ${GOVERNANCE_EVIDENCE_YEAR} reference observations; harmonized backcast calculated 2026; method ${K1_UNCERTAINTY_INPUTS.schemaVersion}`,
+});
+
+export const GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES = Object.freeze([
+  GOVERNANCE_EVIDENCE_SERIES.seriesType,
+] satisfies CiSeriesType[]);
 
 export const GOVERNANCE_EVIDENCE_INDICATORS = Object.freeze([
   { identity: "vdem:v2x_libdem", sourceId: "vdem", indicatorId: "v2x_libdem", label: "Liberal Democracy Index", construct: "Electoral democracy, liberal constraints, civil liberties, rule of law, and checks on executive power", direction: "Higher values indicate more liberal-democratic institutions under V-Dem's model", sourceUrl: K1_UNCERTAINTY_INPUTS.captures.vdem.url },
@@ -29,7 +45,7 @@ export type GovernanceEvidenceRow = {
   uncertaintyUpper: number | null;
   uncertaintyStatus: string;
   sourceVintage: string;
-  seriesType: string;
+  seriesType: CiSeriesType;
   artifactHash: string;
   sourceUrl: string;
   lastSyncAt: string | null;
@@ -65,7 +81,7 @@ export function formatUncertaintyStatus(status: string) {
   return UNCERTAINTY_STATUS_LABELS[status] ?? status.replaceAll("_", " ");
 }
 
-export function buildGovernanceEvidenceExport(evidence: { country: { slug: string }; year: number; releaseId: string; rows: GovernanceEvidenceRow[] }) {
+export function buildGovernanceEvidenceExport(evidence: { country: { slug: string }; year: number; releaseId: string; series: CiSeriesProvenance; availableSeriesTypes: readonly CiSeriesType[]; rows: GovernanceEvidenceRow[] }) {
   return {
     schemaVersion: "governance-evidence-export/v1",
     ...evidence,

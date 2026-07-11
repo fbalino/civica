@@ -18,6 +18,7 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/ci/production-source-adapters.ts", category: "input" },
   { path: "src/lib/ci/research-panel.ts", category: "input" },
   { path: "src/lib/ci/release-selection.ts", category: "input" },
+  { path: "src/lib/ci/series-provenance.ts", category: "input" },
   { path: "src/lib/ci/k1-uncertainty-inputs.ts", category: "input" },
   { path: "src/lib/ci/k4-practice-inputs.ts", category: "input" },
   { path: "src/lib/ci/history-adapters.ts", category: "input" },
@@ -27,6 +28,7 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/db/queries.ts", category: "input" },
   { path: "src/lib/db/queries-peer-grouping.ts", category: "input" },
   { path: "src/lib/db/queries-scores.ts", category: "input" },
+  { path: "src/lib/db/queries-governance-evidence.ts", category: "input" },
   { path: "src/lib/ci/normalize.ts", category: "transform" },
   { path: "src/lib/ci/normalize-v2.ts", category: "transform" },
   { path: "src/lib/ci/calculate.ts", category: "transform" },
@@ -73,6 +75,7 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/lib/ci/misuse-audit.ts", category: "presentation" },
   { path: "src/components/governance-evidence/GovernanceEvidenceTable.tsx", category: "presentation" },
   { path: "src/app/governance-evidence/page.tsx", category: "presentation" },
+  { path: "src/app/api/governance-evidence/[slug]/route.ts", category: "presentation" },
   { path: "src/app/(reader)/civica-index/page.tsx", category: "presentation" },
   { path: "src/app/(reader)/country/[slug]/civica-data/page.tsx", category: "presentation" },
   { path: "src/app/compare/page.tsx", category: "presentation" },
@@ -81,6 +84,9 @@ export const INDEX_PROTECTED_FILES: ReadonlyArray<{ path: string; category: Inde
   { path: "src/app/embed/[slug]/route.ts", category: "presentation" },
   { path: "src/lib/ci/quarantine-contract.ts", category: "presentation" },
   { path: "src/lib/api/contract/registry.ts", category: "presentation" },
+  { path: "src/lib/api/contract/schemas.ts", category: "presentation" },
+  { path: "src/lib/api/contract/shapes.ts", category: "presentation" },
+  { path: "src/lib/api/contract/examples.ts", category: "presentation" },
   { path: "src/app/api/v1/index/[country_slug]/route.ts", category: "presentation" },
   { path: "src/app/api/v1/index/[country_slug]/history/route.ts", category: "presentation" },
   { path: "src/app/api/v1/index/by-government-type/route.ts", category: "presentation" },
@@ -139,7 +145,7 @@ export type IndexChangeRegistry = {
 };
 
 const REQUIRED_VALIDATIONS: Record<IndexChangeCategory, readonly string[]> = {
-  input: ["validate:ci-current-release", "validate:ci-release-selection", "validate:ci-research-panel"],
+  input: ["validate:ci-current-release", "validate:ci-release-selection", "validate:ci-series-provenance", "validate:ci-research-panel"],
   transform: ["validate:index-research-archive"],
   weight_or_model: ["validate:index-research-archive"],
   missingness: ["validate:ci-missingness"],

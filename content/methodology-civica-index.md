@@ -121,14 +121,14 @@ The Pulse is currently a clearly labelled *Beta* experiment. Its classifications
 
 The archived Civica Index pipeline was designed for **quarterly** vintages aligned with source publication cycles. Mid-quarter source releases were staged for the next computation. Pulse is designed for scheduled event-ingestion runs, and its public ledger reflects the most recent completed computation rather than a live measure.
 
-The research design proposed two historical series:
+The version contract distinguishes two historical series:
 
-- **As-published vintages.** A quarterly snapshot would remain frozen under its original methodology version.
-- **Harmonized back-cast.** A separate series would recompute history under one method for longitudinal analysis.
+- **As-published release.** A frozen result must retain its actual publication cut, calculation time, and method. The reference period remains a separate field.
+- **Harmonized backcast.** A later computation applies a named method to historical reference periods. It has no original historical publication cut.
 
-Neither series was certified as complete and reproducible. The deprecated history API contains research-beta records, not a finished as-published or back-cast archive, and will stop serving composite data at the announced sunset.
+The stored 2023 and 2024 Index records were calculated in 2026. They are harmonized backcasts, including Beta-R3, Beta-R4, and Beta-R5; none is a Civica score published in 2023 or 2024. Civica currently has no genuine historical as-published Index series. Requests for that series return an explicit unavailable result instead of relabelling a backcast.
 
-Every preserved Beta read now names one closed release rather than asking for a methodology or “latest” quarter independently. The release contract binds the quarter, methodology, five permitted source-indicator identities, publisher artifact hashes, ingestion transform, composite algorithm, and display transform. When V-Dem and the disclosed WGI coverage fallback both exist, the contract selects V-Dem deterministically. Rows from another Beta revision can coexist in storage but cannot enter the requested release. Unknown sources, artifacts, transforms, and unregistered release coordinates fail closed.
+Every preserved Beta read now names one closed release rather than asking for a methodology or “latest” quarter independently. The release contract binds the quarter, methodology, five permitted source-indicator identities, publisher artifact hashes, ingestion transform, composite algorithm, display transform, `series_type`, calculation time, publication cut, and citation label. When V-Dem and the disclosed WGI coverage fallback both exist, the contract selects V-Dem deterministically. Rows from another Beta revision can coexist in storage but cannot enter the requested release. Unknown sources, artifacts, transforms, and unregistered release coordinates fail closed.
 
 ## Section 12 · Limitations {#limitations}
 

@@ -29,7 +29,7 @@ export async function GET(
     // silently omitted it.
     return withIndexDispositionDeprecation(apiResponse({
       data: history.map(shapeIndexHistoryItem),
-      meta: { methodology: CI_METHODOLOGY_META },
+      meta: { methodology: CI_METHODOLOGY_META, series: release.series },
     }));
   } catch (e) {
     console.error("API /v1/index/[country_slug]/history error:", e);

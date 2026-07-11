@@ -308,6 +308,19 @@ export const zCiMethodologyMeta = z
   })
   .strict();
 
+export const zCiSeriesProvenance = z
+  .object({
+    releaseId: z.string(),
+    seriesType: z.enum(["as_published_release", "harmonized_backcast"]),
+    observationPeriodStart: z.string(),
+    observationPeriodEnd: z.string(),
+    originalPublicationCutAt: z.string().nullable(),
+    calculatedAt: z.string(),
+    methodVersion: z.string(),
+    citationLabel: z.string(),
+  })
+  .strict();
+
 /** Mirrors `PULSE_METHODOLOGY_META` (src/lib/api/helpers.ts). */
 export const zPulseMethodologyMeta = z
   .object({
@@ -580,7 +593,7 @@ export const zIndexCountryResponse = z
   .object({
     data: zIndexCountryData,
     meta: z
-      .object({ methodology: zCiMethodologyMeta })
+      .object({ methodology: zCiMethodologyMeta, series: zCiSeriesProvenance })
       .extend(zDeprecationMeta.shape)
       .strict(),
   })
@@ -603,7 +616,7 @@ export const zIndexHistoryItem = z
 export const zIndexHistoryResponse = z
   .object({
     data: z.array(zIndexHistoryItem),
-    meta: z.object({ methodology: zCiMethodologyMeta }).strict(),
+    meta: z.object({ methodology: zCiMethodologyMeta, series: zCiSeriesProvenance }).strict(),
   })
   .strict();
 
@@ -629,6 +642,7 @@ export const zIndexByGovernmentTypeMetaBase = z
   .object({
     quarter: z.string().nullable(),
     taxonomy: z.string(),
+    series: zCiSeriesProvenance,
   })
   .strict();
 
@@ -673,6 +687,7 @@ export const zIndexCompareResponse = z
         quarter: z.string().nullable(),
         count: z.number(),
         methodology: zCiMethodologyMeta,
+        series: zCiSeriesProvenance,
       })
       .extend(zDeprecationMeta.shape)
       .strict(),
@@ -700,7 +715,7 @@ export const zIndexMethodologyData = z
 export const zIndexMethodologyResponse = z
   .object({
     data: zIndexMethodologyData,
-    meta: z.object({ methodology: zCiMethodologyMeta }).strict(),
+    meta: z.object({ methodology: zCiMethodologyMeta, series: zCiSeriesProvenance.nullable() }).strict(),
   })
   .strict();
 
@@ -754,6 +769,7 @@ export const zIndexRankingsMeta = zPaginationMeta
     quarter: z.string().nullable(),
     taxonomy: z.string(),
     methodology: zCiMethodologyMeta,
+    series: zCiSeriesProvenance,
   })
   .extend(zDeprecationMeta.shape)
   .strict();

@@ -100,6 +100,7 @@ export async function GET(request: Request) {
           quarter: quarter ?? null,
           count: results.length,
           methodology: CI_METHODOLOGY_META,
+          series: release.series,
           ...STRUCTURAL_FAMILY_DEPRECATION_META,
         },
       }),

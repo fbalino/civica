@@ -6,6 +6,7 @@ import {
   CURRENT_CI_VINTAGE_LABEL,
 } from "./current-release";
 import { normalizeV2 } from "./normalize-v2";
+import { assertCiSeriesProvenance, ciSeriesProvenanceErrors, type CiSeriesProvenance } from "./series-provenance";
 
 export type CiReleaseDimensionRule = {
   dimension: string;
@@ -23,6 +24,7 @@ export type CiReleaseContract = {
   inputTransformationVersion: string;
   compositeAlgorithmVersion: string;
   displayTransformVersion: string;
+  series: CiSeriesProvenance;
   dimensions: readonly CiReleaseDimensionRule[];
 };
 
@@ -41,7 +43,13 @@ const DIMENSION_RULES: readonly CiReleaseDimensionRule[] = [
   { dimension: "corruption_control", sourceId: "transparency_intl", indicatorId: "CPI_SCORE", priority: 1, artifactSha256: INPUT_HASHES.transparency_intl },
 ] as const;
 
-function betaRelease(releaseId: string, methodologyVersion: string, vintageLabel: string, compositeAlgorithmVersion: string): CiReleaseContract {
+function betaRelease(
+  releaseId: string,
+  methodologyVersion: string,
+  vintageLabel: string,
+  compositeAlgorithmVersion: string,
+  calculatedAt: string,
+): CiReleaseContract {
   return Object.freeze({
     releaseId,
     methodologyVersion,
@@ -50,14 +58,24 @@ function betaRelease(releaseId: string, methodologyVersion: string, vintageLabel
     inputTransformationVersion: CI_INGEST_ALGORITHM_VERSION,
     compositeAlgorithmVersion,
     displayTransformVersion: "ci-display/fixed-native-bounds-v1",
+    series: assertCiSeriesProvenance({
+      releaseId,
+      seriesType: "harmonized_backcast",
+      observationPeriodStart: "2024-Q4",
+      observationPeriodEnd: "2024-Q4",
+      originalPublicationCutAt: null,
+      calculatedAt,
+      methodVersion: compositeAlgorithmVersion,
+      citationLabel: `${vintageLabel} — 2024-Q4 reference inputs; harmonized backcast calculated 2026; method ${compositeAlgorithmVersion}`,
+    }),
     dimensions: DIMENSION_RULES,
   });
 }
 
 export const CI_RELEASE_CONTRACTS = Object.freeze([
-  betaRelease("ci-beta-r3-2024-Q4", "beta-r3", "Civica Index 2024 Q4 (Beta-R3)", "ci-composite/fixed-bounds-seeded-simulation-r3"),
-  betaRelease("ci-beta-r4-2024-Q4", "beta-r4", "Civica Index 2024 Q4 (Beta-R4)", "ci-composite/fixed-bounds-weighted-r4"),
-  betaRelease(CURRENT_CI_RELEASE_ID, CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_VINTAGE_LABEL, CI_BETA_COMPOSITE_ALGORITHM_VERSION),
+  betaRelease("ci-beta-r3-2024-Q4", "beta-r3", "Civica Index 2024 Q4 (Beta-R3)", "ci-composite/fixed-bounds-seeded-simulation-r3", "2026-07-11T10:49:21.451Z"),
+  betaRelease("ci-beta-r4-2024-Q4", "beta-r4", "Civica Index 2024 Q4 (Beta-R4)", "ci-composite/fixed-bounds-weighted-r4", "2026-07-11T11:26:26.793Z"),
+  betaRelease(CURRENT_CI_RELEASE_ID, CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_VINTAGE_LABEL, CI_BETA_COMPOSITE_ALGORITHM_VERSION, "2026-07-11T11:38:23.634Z"),
 ] as const);
 
 export function resolveCiRelease(releaseId: string = CURRENT_CI_RELEASE_ID): CiReleaseContract {
@@ -157,6 +175,7 @@ export function ciReleaseContractErrors(): string[] {
     if (coordinates.has(coordinate)) errors.push(`duplicate release coordinates ${coordinate}`);
     coordinates.add(coordinate);
     if (release.dimensions.length !== 5) errors.push(`${release.releaseId} must pin five source identities`);
+    for (const error of ciSeriesProvenanceErrors(release.series)) errors.push(`${release.releaseId}: ${error}`);
   }
   if (resolveCiRelease().quarter !== CURRENT_CI_QUARTER) errors.push("current release quarter drifted");
   return errors;

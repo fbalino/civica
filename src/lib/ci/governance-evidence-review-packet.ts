@@ -1,9 +1,9 @@
-import { GOVERNANCE_EVIDENCE_INDICATORS } from "./governance-evidence";
+import { GOVERNANCE_EVIDENCE_INDICATORS, GOVERNANCE_EVIDENCE_SERIES } from "./governance-evidence";
 import { INDEX_DISPOSITION } from "./index-disposition";
 
 export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
   schemaVersion: "governance-evidence-review-packet/v1",
-  releaseId: "governance-evidence-review-packet-2026-07-v1",
+  releaseId: "governance-evidence-review-packet-2026-07-v2",
   status: "ready_for_external_review_not_endorsed",
   selectedProduct: INDEX_DISPOSITION.selectedDisposition,
   productRoute: INDEX_DISPOSITION.publicProduct.route,
@@ -33,6 +33,8 @@ export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
       "src/app/governance-evidence/page.tsx",
       "src/app/api/governance-evidence/[slug]/route.ts",
       "scripts/validate-governance-evidence-dashboard.ts",
+      "src/lib/ci/series-provenance.ts",
+      "scripts/validate-ci-series-provenance.ts",
     ],
     environmentSource: "data/releases/index-tournament-results-package-v1/manifest.v1.json",
     packageLock: "package-lock.json",
@@ -47,6 +49,11 @@ export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
     aggregation: "none",
     missingness: "no imputation; missing remains explicit",
     export: "values survive only where the rights manifest permits public export",
+  },
+  seriesProvenance: {
+    ...GOVERNANCE_EVIDENCE_SERIES,
+    audit: "data/releases/ci-series-provenance-audit-2026-07-v1/manifest.v1.json",
+    historicalAsPublishedAvailability: "unavailable_no_genuine_release_retained",
   },
   uncertainty: {
     rule: "show publisher-supplied intervals exactly; otherwise state the published absence",
@@ -83,10 +90,11 @@ export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
     "Mixed publisher rights prevent one public bulk bundle of all values.",
     "No qualified-reader result or independent expert endorsement exists yet.",
     "Native scales reduce transformation risk but still require readers to understand different constructs and directions.",
+    "The displayed 2024 observations are a harmonized backcast calculated in 2026, not an as-published 2024 Civica release.",
   ],
   citation: {
     title: "Civica Atlas Governance Evidence Dashboard external-review packet",
-    version: "governance-evidence-review-packet-2026-07-v1",
+    version: "governance-evidence-review-packet-2026-07-v2",
     url: "https://civicaatlas.org/governance-evidence",
     accessVsReuse: "Citation does not grant permission to redistribute upstream data.",
   },
@@ -113,6 +121,7 @@ export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
     "Does the missingness presentation avoid treating scarce evidence as poor governance?",
     "Are the rights-filtered download and publisher-link approach adequate for scholarly verification?",
     "Does the no-winner evidence justify the adopted source-native disposition?",
+    "Does the series-provenance disclosure adequately separate the 2024 reference period from the 2026 calculation?",
     "Are K1's reconsideration criteria sufficient to prevent silent revival of the rejected league-table semantics?",
     "Which remaining evidence gap is most important before public academic outreach?",
   ],
@@ -135,6 +144,7 @@ export const GOVERNANCE_EVIDENCE_REVIEW_PACKET = Object.freeze({
 
 export const REVIEW_PACKET_REQUIRED_SECTIONS = [
   "construct", "frozenInputs", "implementation", "transformations",
+  "seriesProvenance",
   "uncertainty", "validation", "sensitivity", "subgroupResults",
   "knownLimitations", "citation", "reproduction", "tournamentReview",
   "reviewQuestions",
@@ -148,6 +158,7 @@ export function governanceEvidenceReviewPacketErrors(
   if (packet.frozenInputs.grid.cells !== 970) errors.push("frozen cell universe drifted");
   if (packet.validation.exactSourceFileCells.passed !== packet.validation.exactSourceFileCells.expected) errors.push("source-file fidelity is incomplete");
   if (packet.transformations.aggregation !== "none") errors.push("selected product gained an aggregation");
+  if (packet.seriesProvenance.seriesType !== "harmonized_backcast" || packet.seriesProvenance.originalPublicationCutAt !== null) errors.push("series provenance drifted");
   if (packet.uncertainty.calibratedCivicaInterval !== false) errors.push("unsupported Civica interval claim");
   if (packet.codebook.length !== 5) errors.push("codebook must contain five source-native indicators");
   if (packet.reviewQuestions.length < 8) errors.push("review questionnaire is not bounded and complete");

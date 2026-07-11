@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GOVERNANCE_EVIDENCE_INDICATORS, buildGovernanceEvidenceExport, formatNativeEvidenceValue, formatUncertaintyStatus, governanceEvidenceRights, type GovernanceEvidenceRow } from "./governance-evidence";
+import { GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES, GOVERNANCE_EVIDENCE_INDICATORS, GOVERNANCE_EVIDENCE_SERIES, buildGovernanceEvidenceExport, formatNativeEvidenceValue, formatUncertaintyStatus, governanceEvidenceRights, type GovernanceEvidenceRow } from "./governance-evidence";
 
 test("dashboard preserves five native publisher observations without a composite", () => {
   assert.equal(GOVERNANCE_EVIDENCE_INDICATORS.length, 5);
@@ -13,9 +13,9 @@ test("dashboard preserves five native publisher observations without a composite
 });
 
 test("rights-safe export retains allowed observations and withholds blocked values", () => {
-  const base = { sourceOwner: "Owner", indicatorId: "x", label: "X", construct: "X", direction: "Higher", valueStatus: "observed", missingReason: null, nativeUnit: "points", nativeMin: 0, nativeMax: 100, uncertaintyLower: 1, uncertaintyUpper: 2, uncertaintyStatus: "published", sourceVintage: "2024", seriesType: "release", artifactHash: "a".repeat(64), sourceUrl: "https://example.com", lastSyncAt: null, termsUrl: "https://example.com/terms" };
+  const base = { sourceOwner: "Owner", indicatorId: "x", label: "X", construct: "X", direction: "Higher", valueStatus: "observed", missingReason: null, nativeUnit: "points", nativeMin: 0, nativeMax: 100, uncertaintyLower: 1, uncertaintyUpper: 2, uncertaintyStatus: "published", sourceVintage: "2024", seriesType: "harmonized_backcast", artifactHash: "a".repeat(64), sourceUrl: "https://example.com", lastSyncAt: null, termsUrl: "https://example.com/terms" };
   const rows = [{ ...base, sourceId: "worldbank_wgi", value: 5, exportPermission: "allowed" }, { ...base, sourceId: "freedom_house", value: 6, exportPermission: "blocked" }] as GovernanceEvidenceRow[];
-  const output = buildGovernanceEvidenceExport({ country: { slug: "test" }, year: 2024, releaseId: "r", rows });
+  const output = buildGovernanceEvidenceExport({ country: { slug: "test" }, year: 2024, releaseId: "r", series: GOVERNANCE_EVIDENCE_SERIES, availableSeriesTypes: GOVERNANCE_EVIDENCE_AVAILABLE_SERIES_TYPES, rows });
   assert.equal(output.rows[0].value, 5);
   assert.equal(output.rows[1].value, null);
   assert.equal(output.rows[1].valueStatus, "withheld");

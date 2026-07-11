@@ -31,6 +31,7 @@ import {
   zIndexMethodologyData,
   zIndexRankingsItem,
   zIndexRankingsMeta,
+  zCiSeriesProvenance,
   zPeerGroupingsData,
   zPulseDimensionsData,
   zPulseEventsData,
@@ -221,6 +222,7 @@ export function shapeIndexRankingsMeta(input: {
   hasMore: boolean;
   quarter: string | null;
   taxonomy: string;
+  series: z.infer<typeof zCiSeriesProvenance>;
 }): z.infer<typeof zIndexRankingsMeta> {
   return zIndexRankingsMeta.parse({
     ...input,
