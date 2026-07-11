@@ -555,3 +555,10 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - Every candidate now has a complete claim, data, transformation, uncertainty,
   versioning, validation, presentation, and retirement contract.
 - Seeded duplicate-set validation and 677/677 tests pass. IDX-009 is next.
+
+## 2026-07-11 — IDX-009 alternative-family gate completed
+
+- Candidate validation now requires provenance-native disagreement or fact work
+  plus a separate sourced institutional-structure alternative.
+- Every qualifying candidate must explicitly reject hidden aggregation, ranking,
+  scoring, or country-quality inference. IDX-010 is next.

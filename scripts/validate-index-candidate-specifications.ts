@@ -1,6 +1,9 @@
-import { candidateSpecificationErrors, INDEX_CANDIDATE_SPECIFICATIONS, INDEX_CANDIDATE_SPEC_VERSION } from "../src/lib/ci/candidate-specifications";
+import { candidateAlternativeCoverageErrors, candidateSpecificationErrors, INDEX_CANDIDATE_SPECIFICATIONS, INDEX_CANDIDATE_SPEC_VERSION } from "../src/lib/ci/candidate-specifications";
 
-const errors = candidateSpecificationErrors(INDEX_CANDIDATE_SPECIFICATIONS);
+const errors = [
+  ...candidateSpecificationErrors(INDEX_CANDIDATE_SPECIFICATIONS),
+  ...candidateAlternativeCoverageErrors(INDEX_CANDIDATE_SPECIFICATIONS),
+];
 if (errors.length) {
   console.error(errors.map((error) => `FAIL — ${error}`).join("\n"));
   process.exit(1);

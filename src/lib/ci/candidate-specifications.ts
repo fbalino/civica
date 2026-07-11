@@ -177,3 +177,19 @@ export function candidateSpecificationErrors(candidates: readonly IndexCandidate
   }
   return errors;
 }
+
+export function candidateAlternativeCoverageErrors(candidates: readonly IndexCandidateSpecification[]): string[] {
+  const errors: string[] = [];
+  const provenanceNative = candidates.filter((candidate) => candidate.kind === "meta-measurement" || candidate.kind === "fact-ledger");
+  const institutionalStructure = candidates.filter((candidate) => candidate.kind === "institutional-structure");
+  if (provenanceNative.length === 0) errors.push("no provenance-native disagreement or fact alternative");
+  if (institutionalStructure.length === 0) errors.push("no institutional-structure alternative");
+  for (const candidate of [...provenanceNative, ...institutionalStructure]) {
+    if (candidate.hiddenCountryQualityGrade !== false) errors.push(`${candidate.id} permits a hidden country-quality grade`);
+    const boundary = [...candidate.nonclaims, candidate.publicPresentation, candidate.retirementRule].join(" ").toLowerCase();
+    if (!/(no |not |never |without |abandon ).*(quality|score|rank|aggregation|governance)/.test(boundary)) {
+      errors.push(`${candidate.id} lacks an explicit anti-quality-grade boundary`);
+    }
+  }
+  return errors;
+}
