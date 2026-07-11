@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 292
-- **Completed:** 79
-- **Remaining:** 213
-- **Progress:** 27.1%
+- **Completed:** 80
+- **Remaining:** 212
+- **Progress:** 27.4%
 - **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -98,7 +98,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-020** (P0) Measure source/ecosystem dependence and apparent novelty. _Done when: overlapping source families/experts/constructs are mapped, leave-one-source-family-out results are reported, established-indicator similarity is decomposed, and Civica does not claim independent corroboration from repackaged inputs._
 - [x] **IDX-021** (P0) Evaluate coverage, missingness, and subgroup fairness. _Done when: publication/uncertainty/performance is reported by region, income, regime/media environment, small/disputed entities, data-rich/poor groups, and source availability; candidates that systematically grade evidence scarcity as poor governance fail._
 - [ ] **IDX-022** (P1) Evaluate interpretability and decision usefulness with task-based reader protocols. _Done when: preregistered tasks compare candidates with the native dashboard for comprehension, uncertainty awareness, citation/source tracing, misuse, and time-to-answer; agent simulations remain provisional until qualified human testing at G5._
-- [ ] **IDX-023** (P0) Run an adversarial normative and misuse audit. _Done when: reviewers test arbitrary thresholds, regime/cultural assumptions, false precision, league-table incentives, media/policy misuse, historical revision, and harm to poorly observed countries; mitigations/retirement triggers are tied to concrete findings._
+- [x] **IDX-023** (P0) Run an adversarial normative and misuse audit. _Done when: reviewers test arbitrary thresholds, regime/cultural assumptions, false precision, league-table incentives, media/policy misuse, historical revision, and harm to poorly observed countries; mitigations/retirement triggers are tied to concrete findings._
 - [ ] **IDX-024** (P0) Produce one reproducible tournament results package. _Done when: frozen protocol/panel/code/environment/logs/seeds/results/tables/figures/error ledgers and every candidate/baseline output regenerate with one documented workflow; exploratory analyses are visibly separated from confirmatory results._
 - [ ] **IDX-025** (P0) Apply the preregistered winner/no-winner rules without post hoc preference. _Done when: a machine-readable decision table maps every threshold to pass/fail/insufficient evidence, robustness and simplicity penalties are applied as declared, and changing a threshold after results creates a separately labelled exploratory scenario._
 - [ ] **IDX-026** (P0) Publish the Index disposition resolution. _Done when: the resolution chooses source-native dashboard only, a nonordinal Civica research product, a secondary validated index, or retirement; records evidence/failed tests/minority arguments/limitations; removes unsupported alternatives from active claims; and states reconsideration criteria._
