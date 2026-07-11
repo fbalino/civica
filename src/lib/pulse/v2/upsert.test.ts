@@ -12,6 +12,7 @@ const fixture: RawEventInput = {
   title: "Fixture event",
   raw: { fixture: true },
 };
+const ingestRunId = "11111111-1111-4111-8111-111111111111";
 
 function fakeDb() {
   const state: RawEventInput[] = [];
@@ -42,9 +43,9 @@ function fakeDb() {
 
 test("the real Pulse upsert is idempotent and duplicate reruns do not stamp freshness", async () => {
   const harness = fakeDb();
-  const first = await upsertRawEvents(harness.db as never, [fixture]);
+  const first = await upsertRawEvents(harness.db as never, [fixture], ingestRunId);
   const afterFirst = structuredClone(harness.state);
-  const second = await upsertRawEvents(harness.db as never, [fixture]);
+  const second = await upsertRawEvents(harness.db as never, [fixture], ingestRunId);
   assert.deepEqual(harness.state, afterFirst);
   assert.equal(harness.state.length, 1);
   assert.deepEqual(first, {
@@ -62,7 +63,7 @@ test("the real Pulse upsert is idempotent and duplicate reruns do not stamp fres
 
 test("empty input is a no-op and cannot stamp freshness", async () => {
   const harness = fakeDb();
-  assert.deepEqual(await upsertRawEvents(harness.db as never, []), {
+  assert.deepEqual(await upsertRawEvents(harness.db as never, [], ingestRunId), {
     inserted: 0,
     skippedDuplicate: 0,
     sourcesStamped: [],
@@ -75,7 +76,7 @@ test("malformed rows fail before any database write or freshness update", async 
   const malformed = { ...fixture, externalId: null, sourceUrl: null };
   assert.match(rawEventInputErrors(malformed).join(" "), /idempotent ingestion/);
   await assert.rejects(
-    upsertRawEvents(harness.db as never, [malformed]),
+    upsertRawEvents(harness.db as never, [malformed], ingestRunId),
     /externalId or sourceUrl is required/,
   );
   assert.equal(harness.state.length, 0);

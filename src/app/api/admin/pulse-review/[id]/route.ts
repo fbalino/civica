@@ -31,6 +31,11 @@ import {
 import { getAdminSession } from "@/lib/admin/session";
 import { calculateDimensionalDeltas } from "@/lib/pulse/v2/score";
 import { validatePulseClassification } from "@/lib/pulse/v2/review-validation";
+import {
+  createPulsePipelineRunRef,
+  finishPulsePipelineRun,
+  startPulsePipelineRun,
+} from "@/lib/pulse/v2/pipeline-version";
 
 type Action = "approve" | "edit" | "reject";
 
@@ -167,6 +172,11 @@ export async function POST(
     reviewNotes: body.notes ?? existing.reviewNotes,
   };
 
+  const reviewRun = createPulsePipelineRunRef("review", {
+    upstreamRunIds: [existing.classificationRunId],
+  });
+  await startPulsePipelineRun(db, reviewRun);
+
   await db
     .update(pulseEventsV2)
     .set({
@@ -180,6 +190,7 @@ export async function POST(
       reviewerId: auth.reviewerId,
       reviewNotes: body.notes ?? existing.reviewNotes,
       updatedAt: new Date(),
+      publicationRunId: published ? reviewRun.id : null,
     })
     .where(eq(pulseEventsV2.id, id));
 
@@ -190,6 +201,17 @@ export async function POST(
     before,
     after,
     notes: body.notes ?? null,
+    runId: reviewRun.id,
+  });
+
+  await finishPulsePipelineRun(db, reviewRun.id, {
+    status: "completed",
+    counts: {
+      decisions: 1,
+      published: published ? 1 : 0,
+      rejected: body.action === "reject" ? 1 : 0,
+      edited: body.action === "edit" ? 1 : 0,
+    },
   });
 
   // Refresh dimensional deltas so the country page reflects this

@@ -8,6 +8,7 @@ import {
   type DimensionalDeltaPlan,
   type PublishedEvent,
 } from "./score";
+import { createPulsePipelineRunRef } from "./pipeline-version";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -22,7 +23,14 @@ const event: PublishedEvent = {
   eventDate: "2026-07-01",
   derivationVersions: legacyDerivationVersionEnvelope("fixture event"),
   sourceIds: ["source-1"],
+  publicationRunId: "33333333-3333-4333-8333-333333333333",
+  corroborationRunId: "55555555-5555-4555-8555-555555555555",
 };
+const runRef = createPulsePipelineRunRef("score", {
+  id: "44444444-4444-4444-8444-444444444444",
+  sourceIds: event.sourceIds,
+  upstreamRunIds: [event.publicationRunId, event.corroborationRunId],
+});
 
 const now = new Date("2026-07-10T00:00:00Z");
 
@@ -34,6 +42,7 @@ test("score dry-run is stable and performs zero writes", async () => {
     dryRun: true,
     now,
     write: async () => { writes++; },
+    runRef,
   };
   const first = await calculateDimensionalDeltas({} as Db, options);
   const second = await calculateDimensionalDeltas({} as Db, options);
@@ -48,7 +57,7 @@ test("two score applications converge on one row per country and dimension", asy
   const write = async (_db: Db, plan: DimensionalDeltaPlan) => {
     state.set(`${plan.jurisdictionId}:${plan.dimension}`, structuredClone(plan));
   };
-  const options = { events: [event], existingJurisdictionIds: [], now, write };
+  const options = { events: [event], existingJurisdictionIds: [], now, write, runRef };
   await calculateDimensionalDeltas({} as Db, options);
   const first = structuredClone([...state.entries()]);
   await calculateDimensionalDeltas({} as Db, options);
@@ -63,6 +72,7 @@ test("malformed score fixtures fail before writes", async () => {
       events: [event, event],
       existingJurisdictionIds: [],
       write: async () => { writes++; },
+      runRef,
     }),
     /duplicate score event id/,
   );
@@ -75,6 +85,7 @@ test("empty score input without prior state is an explicit no-op", async () => {
     existingJurisdictionIds: [],
     dryRun: true,
     now,
+    runRef,
   });
   assert.equal(result.eventsConsidered, 0);
   assert.deepEqual(result.planned, []);

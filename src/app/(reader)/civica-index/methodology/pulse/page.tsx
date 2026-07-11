@@ -38,6 +38,7 @@ const SECTIONS = [
   { id: "what-pulse-is-not", label: "What the Pulse is not" },
   { id: "sources", label: "Sources" },
   { id: "daily-pipeline", label: "Scheduled pipeline" },
+  { id: "version-identity", label: "Version identity" },
   { id: "event-categories", label: "Event ontology" },
   { id: "disambiguation", label: "Disambiguation" },
   { id: "cascade-model", label: "Cascade model" },

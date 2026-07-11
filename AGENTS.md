@@ -54,7 +54,7 @@ This version has breaking changes. Read `node_modules/next/dist/docs/` before wr
 <!-- END:nextjs-agent-rules -->
 
 ## Database
-- Schema: `src/lib/db/schema.ts` — **55 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
+- Schema: `src/lib/db/schema.ts` — **56 tables** across government structure, factbook, Civica Index scoring and research panels, Pulse, provenance, and organizations
 - Connection: `src/lib/db/index.ts` (lazy-initialized HTTP client)
 - Queries: `src/lib/db/queries.ts`
 - Drizzle config: `drizzle.config.ts` (reads `.env.local`)

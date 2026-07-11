@@ -4,7 +4,8 @@
  * This is deliberately a description of the scheduled production path, not
  * a claim that every historical row was produced by that path. The Pulse
  * ledger predates method-version columns and contains legacy classifier-run
- * shapes, so `mixed_legacy_unversioned` remains true until PUL-004 lands.
+ * shapes. PUL-004 attaches those rows to explicit legacy stage runs without
+ * pretending to know their historical method, prompt, model, or source basket.
  *
  * `buildPulseRuntimeMethod` is pure: all runtime facts arrive as input and
  * the result contains no dates derived from the clock, environment values,
@@ -115,7 +116,7 @@ export interface PulseRuntimeMethodContract {
     dimensions: PulseDimension[];
   };
   status: PulseMethodStatus;
-  mixed_legacy_unversioned: true;
+  mixed_legacy_unversioned: false;
   ledgerHistory: {
     currentRows: string;
     legacyRows: string;
@@ -274,7 +275,7 @@ export interface PulseRuntimeMethodContract {
     scalar: "none";
     dimensions: PulseDimension[];
     includedEvents: "published_only";
-    inputMethodCoverage: "mixed_legacy_unversioned";
+    inputMethodCoverage: "row_level_versioned_with_explicit_legacy";
     trailingWindowDays: number;
     boundsPerDimension: {
       lower: number;
@@ -347,14 +348,14 @@ export function buildPulseRuntimeMethod(
       dimensions: [...facts.dimensions],
     },
     status: facts.status,
-    mixed_legacy_unversioned: true,
+    mixed_legacy_unversioned: false,
     ledgerHistory: {
       currentRows:
-        "Current classifier runs record provider and model for each ensemble vote and verify pass.",
+        "Every new ingest, cluster, classification, corroboration, review/publication, and score row points to a content-addressed pipeline run with method, ontology, prompt, provider/model, source-basket, algorithm, and pipeline identity.",
       legacyRows:
-        "The stored ledger also contains older single-model, temperature-variant, and agent-generated rows without a row-level method version.",
+        "Older single-model, temperature-variant, and agent-generated rows point to fixed legacy stage runs whose version axes remain explicitly legacy_unversioned.",
       comparisonWarning:
-        "Do not treat the full historical ledger as a homogeneous sample of the current method.",
+        "API version-set metadata marks legacy or mixed results as not comparable as one method series.",
     },
     providers: {
       classify: {
@@ -502,7 +503,7 @@ export function buildPulseRuntimeMethod(
       scalar: "none",
       dimensions: [...facts.dimensions],
       includedEvents: "published_only",
-      inputMethodCoverage: "mixed_legacy_unversioned",
+      inputMethodCoverage: "row_level_versioned_with_explicit_legacy",
       trailingWindowDays: facts.scoreWindowDays,
       boundsPerDimension: {
         lower: facts.deltaBounds.lower,

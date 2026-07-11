@@ -34,6 +34,13 @@ completed research-panel releases and their rows.
 `0012_fix_panel_release_staging_delete` preserves deletion of an incomplete
 staging release while keeping completed releases immutable.
 
+`0013_real_bromley` adds immutable Pulse pipeline-run identities and binds
+ingest, cluster, classification, corroboration, review/publication, and score
+rows to their exact stage runs. Existing rows point to explicit fixed legacy
+runs; no historical method, prompt, model, ontology, or source basket is
+inferred. `0014_boring_tana_nile` adds the database check that binds each run's
+stored stage and schema to its content-addressed version key.
+
 ## Operational data changes
 
 data-backfill-cia-vintage · data-backfill-election-results ·

@@ -7,6 +7,7 @@ import {
   type ClassifyOneResult,
   type ClusterToClassify,
 } from "./classify";
+import { createPulsePipelineRunRef } from "./pipeline-version";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -19,6 +20,7 @@ const cluster: ClusterToClassify = {
   rawEventIds: ["raw-1"],
   sourceIds: ["gdelt"],
   sourceTypes: ["news"],
+  clusterRunIds: ["22222222-2222-4222-8222-222222222222"],
   attributions: [
     {
       sourceId: "gdelt",
@@ -48,6 +50,11 @@ const result: ClassifyOneResult = {
 
 const classify = async () => structuredClone(result);
 const resolveSubject = async () => null;
+const runRef = createPulsePipelineRunRef("classify", {
+  id: "33333333-3333-4333-8333-333333333333",
+  sourceIds: ["gdelt"],
+  upstreamRunIds: cluster.clusterRunIds,
+});
 
 test("classification dry-run is stable and performs no writes", async () => {
   let writes = 0;
@@ -60,6 +67,7 @@ test("classification dry-run is stable and performs no writes", async () => {
     resolveSubject,
     write,
     dryRun: true,
+    runRef,
   };
   const first = await classifyClusters({} as Db, options);
   const second = await classifyClusters({} as Db, options);
@@ -73,7 +81,7 @@ test("two classification fixture applications converge on one cluster record", a
   const write = async (_db: Db, input: ClusterToClassify, classified: ClassifyOneResult) => {
     state.set(input.clusterId, structuredClone(classified));
   };
-  const options = { clusters: [cluster], classify, resolveSubject, write };
+  const options = { clusters: [cluster], classify, resolveSubject, write, runRef };
   await classifyClusters({} as Db, options);
   const first = structuredClone([...state.entries()]);
   await classifyClusters({} as Db, options);
@@ -91,6 +99,7 @@ test("malformed classification fixtures fail before classification or writes", a
         return result;
       },
       resolveSubject,
+      runRef,
     }),
     /attribution is incomplete/,
   );
@@ -106,6 +115,7 @@ test("strict mode surfaces classifier failures", async () => {
       },
       resolveSubject,
       failOnError: true,
+      runRef,
     }),
     /malformed model response/,
   );

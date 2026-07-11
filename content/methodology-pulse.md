@@ -23,7 +23,7 @@
 
 The Civica Pulse is a model-assisted ledger designed to test whether documented events can add timely context between slower-moving source releases. It records governance-relevant event candidates, classifications, sources, publication origin, and review state. It also publishes **experimental per-dimension deltas**. Civica does not publish a merged Pulse score or Pulse ranking.
 
-The current generated runtime contract is **{{ctx.methodologyVersion}}**. It describes new classifications produced by the declared scheduled pipeline; it is not retroactively assigned to older unversioned ledger rows.
+The current generated runtime contract is **{{ctx.methodologyVersion}}**. New rows point to content-addressed stage runs that record the method, production ontology, prompt where applicable, provider and model set, source basket, algorithm, pipeline version, and upstream runs. Older rows point to fixed `legacy_unversioned` stage records; Civica does not retroactively assign the current method to them.
 
 Numeric deltas are available only through the versioned country-dimensions API. Active reader pages show the event ledger and do not render the dormant delta panel. A missing event is not converted into evidence of stability: the API returns an explicit non-observation rather than a scalar zero when no published event supports a dimension.
 
@@ -89,6 +89,14 @@ The pipeline is scheduled once per day in UTC: {{ctx.scheduleProse}}. The score 
 5. **Weight.** Count distinct specialist and news source IDs, combine that diversity with the stored agreement label, and apply asymmetric and provisional press-context multipliers. The resulting “corroboration weight” is a hand-set heuristic in [0, 1], not a calibrated probability of correctness and not a publication minimum.
 6. **Review or publish.** {{ctx.reviewTiersProse}}, deadlocks/no quorum, and weak or degraded majorities paired with a verifier objection route to review. An objection includes low confidence, a revised or rejected verdict, a negative category/severity/subject/event check, or failed/unavailable verification. Other events may be auto-published. Queued and rejected events do not affect public deltas.
 7. **Score.** For published events in the trailing {{ctx.scoreWindowDays}}-day window, multiply severity by the heuristic weight, apply category-specific exponential decay, sum by country and dimension, clamp to [{{ctx.deltaLowerBound}}, {{ctx.deltaUpperBound}}], and write API-only experimental deltas.
+
+## Version identity {#version-identity}
+
+Each attempted pipeline stage has an immutable run record. It names the stage, methodology, production ontology, pipeline and algorithm versions, prompt version or a reason no prompt applies, configured provider/model set, source basket, individual source IDs, and upstream run IDs. The run closes as completed, partial, or failed with outcome counts and retained component failures. Its version payload and content-derived key cannot be edited or deleted after insertion.
+
+Raw items point to the ingest run that created them. Cluster and classification links are write-once. Events identify their classification, latest corroboration, and current publication decision runs; a human review has its own append-only audit row. Stored dimensional outputs identify the score run that computed them. A later recomputation may replace a current-state pointer, but the referenced run record remains immutable. Append-only output history is a separate later requirement.
+
+Rows created before this contract point to fixed legacy stage records. Every unknown axis remains `legacy_unversioned`; the migration does not infer a modern method, ontology, prompt, provider, model, source basket, algorithm, or pipeline version. Event and delta APIs return exact row identities plus a version-set summary. A mixed or legacy result has `comparableAsSingleSeries: false` and cannot present as one continuous current-method series.
 
 ## Event ontology — {{ctx.ontologyVersion}} {#event-categories}
 
@@ -240,7 +248,7 @@ What this drives:
 - **Most raw news is dropped.** The classifier is deliberately strict about what qualifies as an event: opinion columns, partisan commentary, market and business stories, and un-enacted announcements are not governance events and are discarded rather than scored. Multiple configured models flagging the same item as a non-event is itself a strong drop signal.
 - **Corroboration is the primary weight on the events that do score** — see the next two sections. Source diversity and press-freedom context determine how heavily a published event moves the dimensional deltas.
 
-Current provider-tagged events store each successful voter result and rationale plus the verification result. The public ledger also contains older, unversioned classifier generations whose compatibility labels cannot be interpreted literally as three-voter counts. Until row-level method/version fields land, the ledger must not be treated as one homogeneous current-method series. Current dimensional deltas can include published rows from those older generations, so they are mixed-method experimental outputs rather than a current-ensemble validation sample. Every row remains challengeable through the [corrections process](#corrections).
+Current provider-tagged events store each successful voter result and rationale plus the verification result. The public ledger also contains older classifier generations whose compatibility labels cannot be interpreted literally as three-voter counts. Those rows now carry explicit legacy stage-run identities rather than guessed versions. Event and delta APIs return the exact run identity for each row and a version-set verdict; mixed or legacy results state that they are not comparable as one method series. Every row remains challengeable through the [corrections process](#corrections).
 
 ## Asymmetric scoring — anti-gaming {#asymmetric-scoring}
 
@@ -306,7 +314,7 @@ Country pages flagged by the provisional press-context lookup surface this cavea
 - A single-source event can currently affect an experimental delta, and GDELT is counted as one source ID regardless of the underlying publisher. Source-family independence and republication detection are not implemented.
 - Clustering currently partitions on ingest-time country attribution and may use lexical fallback when semantic embeddings are unavailable. This can split reports of the same event, particularly across outlets or languages.
 - The classifier is deliberately strict — the large majority of ingested news is commentary, business, or un-enacted announcements rather than discrete governance events, and is dropped. This keeps noise out of the scores, but a genuine event can occasionally be discarded; missing-event disputes are welcomed.
-- LLM classification is imperfect. Current provider-tagged runs preserve successful voter and verification outputs, but older rows use mixed, unversioned classifier generations. The full ledger is not a homogeneous current-method sample.
+- LLM classification is imperfect. Current provider-tagged runs preserve successful voter and verification outputs, while older classifier generations remain explicitly legacy-versioned. The API prevents the full ledger from presenting as a homogeneous current-method sample.
 - Positive events receive stronger heuristic discounts than negative events. This is an anti-gaming design choice under evaluation, not a requirement that they be independently verified before publication.
 - “Corroboration weight” is a heuristic, not a calibrated probability. The provisional press-context lookup is incomplete, applies a default to uncovered countries, and has not been validated as a bias correction.
 - Dimensional deltas are bounded and limited to a trailing {{ctx.scoreWindowDays}}-day window. Longer configured half-lives are truncated, and structural-overlap handling is not durable.

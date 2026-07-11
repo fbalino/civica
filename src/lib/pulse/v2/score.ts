@@ -25,10 +25,18 @@ import { PULSE_DIMENSIONS, type PulseDimension } from "./types";
 import { isPulseClassificationValid } from "./review-validation";
 import { pulseDeltaVersionEnvelope } from "./versioning";
 import type { DerivationVersionEnvelope } from "@/lib/research/derivation-version";
+import {
+  createPulsePipelineRunRef,
+  finishPulsePipelineRun,
+  startPulsePipelineRun,
+  type PulsePipelineRunRef,
+} from "./pipeline-version";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
 export interface ScoreSummary {
+  runId: string;
+  versionKey: string;
   eventsConsidered: number;
   countriesScored: number;
   dimensionRowsWritten: number;
@@ -49,6 +57,8 @@ export interface PublishedEvent {
   eventDate: string;
   derivationVersions: DerivationVersionEnvelope;
   sourceIds: string[];
+  publicationRunId: string;
+  corroborationRunId: string;
 }
 
 export interface DimensionalDeltaPlan {
@@ -58,6 +68,7 @@ export interface DimensionalDeltaPlan {
   contributingEventIds: string[];
   derivationVersionKey: string;
   derivationVersions: DerivationVersionEnvelope;
+  computationRunId: string;
 }
 
 export interface ScoreOptions {
@@ -66,6 +77,7 @@ export interface ScoreOptions {
   existingJurisdictionIds?: string[];
   write?: (db: Db, plan: DimensionalDeltaPlan) => Promise<void>;
   now?: Date;
+  runRef?: PulsePipelineRunRef;
 }
 
 export async function calculateDimensionalDeltas(
@@ -81,6 +93,21 @@ export async function calculateDimensionalDeltas(
 
   const events = options.events ?? await loadPublishedEvents(db, windowStart);
   validatePublishedEvents(events);
+  const run =
+    options.runRef ??
+    createPulsePipelineRunRef("score", {
+      sourceIds: events.length
+        ? events.flatMap(({ sourceIds }) => sourceIds)
+        : undefined,
+      upstreamRunIds: events.flatMap(
+        ({ publicationRunId, corroborationRunId }) => [
+          publicationRunId,
+          corroborationRunId,
+        ],
+      ),
+    });
+  const persistRun = !options.dryRun && !options.events && !options.runRef;
+  if (persistRun) await startPulsePipelineRun(db, run);
   const existingJurisdictionIds = options.existingJurisdictionIds ?? await loadExistingJurisdictionIds(db);
 
   // Bucket by (jurisdictionId, dimension)
@@ -152,6 +179,7 @@ export async function calculateDimensionalDeltas(
         contributingEventIds: eventIds,
         derivationVersionKey: versions.key,
         derivationVersions: versions.envelope,
+        computationRunId: run.id,
       };
       planned.push(plan);
       if (!options.dryRun) {
@@ -163,7 +191,21 @@ export async function calculateDimensionalDeltas(
     }
   }
 
+  if (persistRun) {
+    await finishPulsePipelineRun(db, run.id, {
+      status: "completed",
+      counts: {
+        eventsConsidered: events.length,
+        countriesScored: countriesSeen.size,
+        dimensionRowsWritten: written,
+        significantDeltas: significant,
+      },
+    });
+  }
+
   return {
+    runId: run.id,
+    versionKey: run.versionKey,
     eventsConsidered: events.length,
     countriesScored: countriesSeen.size,
     dimensionRowsWritten: written,
@@ -177,6 +219,8 @@ function validatePublishedEvents(events: PublishedEvent[]): void {
   const ids = new Set<string>();
   for (const event of events) {
     if (!event.id.trim() || !event.jurisdictionId.trim()) throw new Error("score fixture has a blank event or jurisdiction id");
+    if (!event.publicationRunId.trim()) throw new Error(`score fixture has no publication run: ${event.id}`);
+    if (!event.corroborationRunId.trim()) throw new Error(`score fixture has no corroboration run: ${event.id}`);
     if (!PULSE_DIMENSIONS.includes(event.dimension)) throw new Error(`score fixture has an invalid dimension: ${event.dimension}`);
     if (!Number.isFinite(event.severityValue) || !Number.isFinite(event.corroborationConfidence)) throw new Error(`score fixture has invalid numeric input: ${event.id}`);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(event.eventDate)) throw new Error(`score fixture has an invalid event date: ${event.id}`);
@@ -201,6 +245,7 @@ async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Da
       contributingEventIds: plan.contributingEventIds,
       derivationVersionKey: plan.derivationVersionKey,
       derivationVersions: plan.derivationVersions,
+      computationRunId: plan.computationRunId,
     })
     .onConflictDoUpdate({
       target: [pulseDimensionalDeltas.jurisdictionId, pulseDimensionalDeltas.dimension],
@@ -209,6 +254,7 @@ async function writeDimensionalDelta(db: Db, plan: DimensionalDeltaPlan, now: Da
         contributingEventIds: plan.contributingEventIds,
         derivationVersionKey: plan.derivationVersionKey,
         derivationVersions: plan.derivationVersions,
+        computationRunId: plan.computationRunId,
         lastComputedAt: now,
       },
     });
@@ -229,6 +275,8 @@ async function loadPublishedEvents(
       corroboration_confidence,
       event_date,
       derivation_versions,
+      publication_run_id,
+      corroboration_run_id,
       ARRAY(
         SELECT DISTINCT ps.source_id
         FROM pulse_sources ps
@@ -237,6 +285,8 @@ async function loadPublishedEvents(
       ) AS source_ids
     FROM pulse_events_v2
     WHERE published = true
+      AND publication_run_id IS NOT NULL
+      AND corroboration_run_id IS NOT NULL
       AND review_status IN ('approved', 'edited')
       AND category <> 'none'
       AND event_date >= ${sinceDate}
@@ -254,6 +304,8 @@ async function loadPublishedEvents(
       corroborationConfidence: Number(r.corroboration_confidence),
       eventDate: String(r.event_date),
       derivationVersions: r.derivation_versions as DerivationVersionEnvelope,
+      publicationRunId: String(r.publication_run_id),
+      corroborationRunId: String(r.corroboration_run_id),
       sourceIds: Array.isArray(r.source_ids) ? r.source_ids.map(String) : [],
     }))
     .filter((event) => isPulseClassificationValid(event));

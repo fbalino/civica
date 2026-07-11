@@ -24,13 +24,13 @@ test("current contract states the non-negotiable publication boundaries", () => 
   assert.equal(method.version, "pulse-v2.1-beta");
   assert.equal(method.taxonomy.version, "v2.0");
   assert.equal(method.status, "experimental");
-  assert.equal(method.mixed_legacy_unversioned, true);
+  assert.equal(method.mixed_legacy_unversioned, false);
   assert.equal(method.numericDeltas.publicStatus, "public_experimental");
   assert.equal(method.numericDeltas.shape, "per_dimension");
   assert.equal(method.numericDeltas.scalar, "none");
   assert.equal(
     method.numericDeltas.inputMethodCoverage,
-    "mixed_legacy_unversioned",
+    "row_level_versioned_with_explicit_legacy",
   );
   assert.deepEqual(method.numericDeltas.boundsPerDimension, {
     lower: -15,

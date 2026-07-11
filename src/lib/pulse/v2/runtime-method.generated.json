@@ -55,7 +55,7 @@
     },
     "strategy": "semantic_or_lexical_fallback"
   },
-  "contractHash": "967f7f5397952524e207a762cf2ccdc2976ee2c36d3c186beae075361bb9236f",
+  "contractHash": "5549ebfdad9257b6ce4e572390512c6c13fd17fe3200853f366e7f70d3007b78",
   "evaluation": {
     "backtestMatchesCurrentProduction": false,
     "currentProductionValidatedByExistingBacktest": false,
@@ -195,16 +195,16 @@
     ]
   },
   "ledgerHistory": {
-    "comparisonWarning": "Do not treat the full historical ledger as a homogeneous sample of the current method.",
-    "currentRows": "Current classifier runs record provider and model for each ensemble vote and verify pass.",
-    "legacyRows": "The stored ledger also contains older single-model, temperature-variant, and agent-generated rows without a row-level method version."
+    "comparisonWarning": "API version-set metadata marks legacy or mixed results as not comparable as one method series.",
+    "currentRows": "Every new ingest, cluster, classification, corroboration, review/publication, and score row points to a content-addressed pipeline run with method, ontology, prompt, provider/model, source-basket, algorithm, and pipeline identity.",
+    "legacyRows": "Older single-model, temperature-variant, and agent-generated rows point to fixed legacy stage runs whose version axes remain explicitly legacy_unversioned."
   },
   "methodology": {
     "currentContractScope": "New classifications produced by the declared scheduled Pulse v2 pipeline; not a retroactive description of every stored ledger row.",
     "id": "civica-pulse",
     "name": "Civica Pulse"
   },
-  "mixed_legacy_unversioned": true,
+  "mixed_legacy_unversioned": false,
   "numericDeltas": {
     "absorbedIntoIndexPolicy": "non_durable_zero_then_daily_recompute_can_restore",
     "boundsPerDimension": {
@@ -220,7 +220,7 @@
     ],
     "impactFormula": "severity_value * corroboration_confidence * exp(-ln(2) * days_since_event / category_half_life_days)",
     "includedEvents": "published_only",
-    "inputMethodCoverage": "mixed_legacy_unversioned",
+    "inputMethodCoverage": "row_level_versioned_with_explicit_legacy",
     "publicStatus": "public_experimental",
     "scalar": "none",
     "scoreStageOrder": [

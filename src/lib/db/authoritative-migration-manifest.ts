@@ -79,4 +79,16 @@ export const AUTHORITATIVE_MIGRATIONS: readonly AuthoritativeMigration[] = [
     sha256: "c7794c1ecfa66857310be13d66b545aaa3eaf12161902ec0c690b206c22f9c82",
     baseline: false,
   },
+  {
+    id: "0013_real_bromley",
+    path: "drizzle/authoritative/0013_real_bromley.sql",
+    sha256: "d7168cd2f97a94cc1255db81d4417e4f0f2893deee54641a6cae1774e70eade9",
+    baseline: false,
+  },
+  {
+    id: "0014_boring_tana_nile",
+    path: "drizzle/authoritative/0014_boring_tana_nile.sql",
+    sha256: "a508699b24d9a0730234af5d27e4df90bb25f9c750a0ea5ba3caa55ebee7fe63",
+    baseline: false,
+  },
 ] as const;

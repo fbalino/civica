@@ -76,6 +76,7 @@ export async function GET(request: Request) {
         limit,
         offset,
         hasMore: result.hasMore,
+        versionSet: result.versionSet,
       },
     });
   } catch (e) {

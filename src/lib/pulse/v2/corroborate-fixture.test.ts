@@ -8,6 +8,7 @@ import {
   type EventRow,
   type SourceCounts,
 } from "./corroborate";
+import { createPulsePipelineRunRef } from "./pipeline-version";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -19,12 +20,18 @@ const event: EventRow = {
   classifierAgreement: "all",
   category: "judicial_purge",
   pressPinned: null,
+  classificationRunId: "33333333-3333-4333-8333-333333333333",
 };
 
 const sourceCounts = new Map<string, SourceCounts>([[
   event.id,
   { specialist: new Set(["specialist-1"]), news: new Set(["news-1"]) },
 ]]);
+const runRef = createPulsePipelineRunRef("corroborate", {
+  id: "55555555-5555-4555-8555-555555555555",
+  sourceIds: ["specialist-1", "news-1"],
+  upstreamRunIds: [event.classificationRunId],
+});
 
 test("corroboration dry-run is stable and performs zero writes", async () => {
   let writes = 0;
@@ -33,6 +40,7 @@ test("corroboration dry-run is stable and performs zero writes", async () => {
     sourceCounts,
     dryRun: true,
     write: async () => { writes++; },
+    runRef,
   };
   const first = await corroborateEvents({} as Db, options);
   const second = await corroborateEvents({} as Db, options);
@@ -47,7 +55,7 @@ test("two corroboration applications converge on one canonical event", async () 
   const write = async (_db: Db, plan: CorroborationPlan) => {
     state.set(plan.eventId, structuredClone(plan));
   };
-  const options = { events: [event], sourceCounts, write };
+  const options = { events: [event], sourceCounts, write, runRef };
   await corroborateEvents({} as Db, options);
   const first = structuredClone([...state.entries()]);
   await corroborateEvents({} as Db, options);
@@ -62,6 +70,7 @@ test("malformed corroboration fixtures fail before writes", async () => {
       events: [event, event],
       sourceCounts,
       write: async () => { writes++; },
+      runRef,
     }),
     /duplicate corroboration event id/,
   );
@@ -73,6 +82,7 @@ test("empty corroboration input is an explicit no-op", async () => {
     events: [],
     sourceCounts: new Map(),
     dryRun: true,
+    runRef,
   });
   assert.equal(result.examined, 0);
   assert.deepEqual(result.planned, []);

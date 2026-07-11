@@ -2,12 +2,12 @@
   "version": "schema-data-dictionary/v1",
   "reviewedAt": "2026-07-10",
   "generatedFrom": "src/lib/db/schema.ts + src/lib/data-dictionary/registry.ts",
-  "schemaFingerprint": "c834223e5b8ba375671ff774ae7151e5c69c888170caa8a0e960b32036a419a8",
+  "schemaFingerprint": "2d373e7de492df38d0362d931d8ab899fb0cf1ddad72f4b901eb549b519f0cf0",
   "summary": {
-    "tables": 55,
-    "columns": 723,
+    "tables": 56,
+    "columns": 740,
     "publicAtlasTables": 18,
-    "researchBetaTables": 14,
+    "researchBetaTables": 15,
     "supportTables": 11,
     "internalTables": 10,
     "privateTables": 2,
@@ -16059,6 +16059,33 @@
       },
       "columns": [
         {
+          "name": "computation_run_id",
+          "propertyName": "computationRunId",
+          "definition": "Pulse score-stage run responsible for the stored computed output.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_dim_computation_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Daily after classification/corroboration and on rescore.",
+          "vintageSemantics": "created_at is scoring time; method_version fixes the scoring interpretation.",
+          "rights": "Civica-derived experimental metadata; linked evidence restrictions remain applicable.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "contributing_event_ids",
           "propertyName": "contributingEventIds",
           "definition": "Contributing event ids recorded for the event, Civica Index dimension, and scoring method version.",
@@ -16796,6 +16823,33 @@
           }
         },
         {
+          "name": "classification_run_id",
+          "propertyName": "classificationRunId",
+          "definition": "Immutable Pulse classification-stage run that produced or rejected this event candidate.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_v2_classification_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Daily pipeline with subsequent review/correction.",
+          "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
+          "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "classifier_agreement",
           "propertyName": "classifierAgreement",
           "definition": "Classifier agreement recorded for the deduplicated event cluster about one subject jurisdiction.",
@@ -16892,6 +16946,33 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Multi-provider classification, verification, subject attribution, and human review over raw_events.",
+          "cadence": "Daily pipeline with subsequent review/correction.",
+          "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
+          "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "corroboration_run_id",
+          "propertyName": "corroborationRunId",
+          "definition": "Latest versioned Pulse corroboration-stage run applied to this event.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_v2_corroboration_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily pipeline with subsequent review/correction.",
           "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
           "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
@@ -17184,6 +17265,33 @@
           }
         },
         {
+          "name": "publication_run_id",
+          "propertyName": "publicationRunId",
+          "definition": "Pulse classification or review run responsible for the event's current publication state.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_v2_publication_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Daily pipeline with subsequent review/correction.",
+          "vintageSemantics": "event/published times come from sources; pipeline timestamps and model versions describe processing.",
+          "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "published",
           "propertyName": "published",
           "definition": "Published recorded for the deduplicated event cluster about one subject jurisdiction.",
@@ -17358,6 +17466,253 @@
           "cadence": "Daily pipeline with subsequent review/correction.",
           "vintageSemantics": "Civica row-update time; not an observation or publisher vintage.",
           "rights": "Evidence rows inherit publisher rights; classifications are experimental Civica derivations.",
+          "deprecation": {
+            "status": "active"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pulse_pipeline_runs",
+      "exportName": "pulsePipelineRuns",
+      "definition": "Immutable version identity and terminal outcome for one Pulse pipeline-stage execution.",
+      "rowGrain": "One ingest, cluster, classification, corroboration, review, or score run.",
+      "releaseScope": "research_beta",
+      "sourceOrDerivation": "Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+      "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+      "vintageSemantics": "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+      "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+      "deprecation": {
+        "status": "active"
+      },
+      "columns": [
+        {
+          "name": "completed_at",
+          "propertyName": "completedAt",
+          "definition": "Timestamp when the operation completed.",
+          "sqlType": "timestamp",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "Completed at follows this table contract. started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "counts",
+          "propertyName": "counts",
+          "definition": "Structured terminal row and outcome counts recorded for the pipeline run.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "failures",
+          "propertyName": "failures",
+          "definition": "Structured component failures retained for the pipeline run.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "id",
+          "propertyName": "id",
+          "definition": "Stable row identifier.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "not applicable",
+          "key": {
+            "primary": true,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "stage",
+          "propertyName": "stage",
+          "definition": "Stage recorded for the ingest, cluster, classification, corroboration, review, or score run.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_pipeline_runs_stage_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "started_at",
+          "propertyName": "startedAt",
+          "definition": "Timestamp when the operation started.",
+          "sqlType": "timestamp",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": true,
+          "unit": "UTC timestamp (database type currently omits timezone)",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_pipeline_runs_stage_time"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Civica processing metadata. Substantive row origin: Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "Started at follows this table contract. started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "status",
+          "propertyName": "status",
+          "definition": "Current workflow or record status under this table's declared contract.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "version_key",
+          "propertyName": "versionKey",
+          "definition": "Content-addressed identifier for the immutable Pulse stage-version envelope.",
+          "sqlType": "text",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": null,
+            "indexGroups": [
+              "idx_pulse_pipeline_runs_version"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "versions",
+          "propertyName": "versions",
+          "definition": "Structured Pulse stage identity covering method, ontology, pipeline, algorithm, prompt, provider/model set, source basket, and upstream runs.",
+          "sqlType": "jsonb",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": false,
+            "foreignKey": null,
+            "indexGroups": [],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+          "cadence": "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+          "vintageSemantics": "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+          "rights": "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
           "deprecation": {
             "status": "active"
           }
@@ -17577,6 +17932,33 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Generated from automated or human review actions with before/after state.",
+          "cadence": "Event-driven on review action.",
+          "vintageSemantics": "created_at is review-action time; payloads preserve the state at that time.",
+          "rights": "Internal review metadata; embedded source evidence retains publisher rights.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "run_id",
+          "propertyName": "runId",
+          "definition": "Immutable Pulse pipeline-stage run linked to this audit action.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_pulse_review_audit_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Event-driven on review action.",
           "vintageSemantics": "created_at is review-action time; payloads preserve the state at that time.",
           "rights": "Internal review metadata; embedded source evidence retains publisher rights.",
@@ -18018,6 +18400,33 @@
           }
         },
         {
+          "name": "classification_run_id",
+          "propertyName": "classificationRunId",
+          "definition": "Immutable Pulse classification-stage run that produced or rejected this event candidate.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_raw_events_classification_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
           "name": "classified_at",
           "propertyName": "classifiedAt",
           "definition": "Classified at recorded for the fetched publisher item or deduplicated article candidate.",
@@ -18062,6 +18471,33 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Pulse source connector payload with content hash, canonical URL, and ingestion metadata.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "cluster_run_id",
+          "propertyName": "clusterRunId",
+          "definition": "Write-once Pulse cluster-stage run that assigned this raw item to a cluster.",
+          "sqlType": "uuid",
+          "nullable": true,
+          "nullableMeaning": "Null means no value is stored. This column has no data-availability companion; interpret absence only under its table/field contract.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_raw_events_cluster_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
           "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
@@ -18220,6 +18656,33 @@
             "uniqueGroups": []
           },
           "sourceOrDerivation": "Civica-generated database identifier.",
+          "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
+          "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
+          "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",
+          "deprecation": {
+            "status": "active"
+          }
+        },
+        {
+          "name": "ingest_run_id",
+          "propertyName": "ingestRunId",
+          "definition": "Immutable Pulse ingest-stage run that created this raw item.",
+          "sqlType": "uuid",
+          "nullable": false,
+          "nullableMeaning": "Not nullable; every stored row must supply this field or a database default.",
+          "hasDefault": false,
+          "unit": "not applicable",
+          "key": {
+            "primary": false,
+            "unique": false,
+            "indexed": true,
+            "foreignKey": "pulse_pipeline_runs.id",
+            "indexGroups": [
+              "idx_raw_events_ingest_run"
+            ],
+            "uniqueGroups": []
+          },
+          "sourceOrDerivation": "Relational identifier referencing pulse_pipeline_runs.id; substantive provenance follows this table's source contract.",
           "cadence": "Daily scheduled ingestion followed by retained classification/review disposition.",
           "vintageSemantics": "event_date is publisher/event time; retrieved_at is Civica retrieval; classified_at is the decision time.",
           "rights": "Publisher-specific; full text and excerpts may be non-redistributable and require release filtering.",

@@ -26,6 +26,12 @@ import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { rawEvents } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import { tryEmbedBatch, cosineSimilarity, lexicalSimilarity } from "./embed";
+import {
+  createPulsePipelineRunRef,
+  finishPulsePipelineRun,
+  startPulsePipelineRun,
+  type PulsePipelineRunRef,
+} from "./pipeline-version";
 
 // Jaccard threshold for the lexical fallback — a pair of stories sharing this
 // fraction of their significant tokens is treated as the same event. Higher
@@ -41,6 +47,8 @@ export const CLUSTER_SIM_THRESHOLD = 0.75;
 export const CLUSTER_DATE_WINDOW_HOURS = 48;
 
 export interface ClusterRunSummary {
+  runId: string;
+  versionKey: string;
   /** Rows considered (unclustered + jurisdiction-resolved) */
   candidates: number;
   /** Rows that got a cluster_id assigned */
@@ -62,6 +70,7 @@ export interface CandidateRow {
   title: string;
   body: string | null;
   sourceId: string;
+  ingestRunId: string;
 }
 
 export interface ClusterRunOptions {
@@ -73,6 +82,7 @@ export interface ClusterRunOptions {
   embeddingResult?: number[][] | null;
   now?: Date;
   clusterIdFactory?: (memberIds: readonly string[]) => string;
+  runRef?: PulsePipelineRunRef;
 }
 
 function deterministicFixtureClusterId(memberIds: readonly string[]): string {
@@ -85,8 +95,8 @@ function deterministicFixtureClusterId(memberIds: readonly string[]): string {
 function validateCandidates(candidates: readonly CandidateRow[]): void {
   const ids = new Set<string>();
   for (const [index, candidate] of candidates.entries()) {
-    if (!candidate.id.trim() || !candidate.jurisdictionId.trim() || !candidate.title.trim()) {
-      throw new Error(`Invalid cluster candidate at index ${index}: id, jurisdictionId, and title are required`);
+    if (!candidate.id.trim() || !candidate.jurisdictionId.trim() || !candidate.title.trim() || !candidate.ingestRunId.trim()) {
+      throw new Error(`Invalid cluster candidate at index ${index}: id, jurisdictionId, title, and ingestRunId are required`);
     }
     if (ids.has(candidate.id)) {
       throw new Error(`Invalid cluster fixture: duplicate candidate id ${candidate.id}`);
@@ -116,6 +126,7 @@ export async function runClustering(
         title: rawEvents.title,
         body: rawEvents.body,
         sourceId: rawEvents.sourceId,
+        ingestRunId: rawEvents.ingestRunId,
       })
       .from(rawEvents)
       .where(
@@ -127,9 +138,27 @@ export async function runClustering(
       .limit(limit)) as CandidateRow[]);
 
   validateCandidates(candidates);
+  const run =
+    opts.runRef ??
+    createPulsePipelineRunRef("cluster", {
+      sourceIds: candidates.length
+        ? candidates.map(({ sourceId }) => sourceId)
+        : undefined,
+      upstreamRunIds: candidates.map(({ ingestRunId }) => ingestRunId),
+    });
+  const persistRun = !opts.dryRun && !opts.candidates && !opts.runRef;
+  if (persistRun) await startPulsePipelineRun(db, run);
 
   if (candidates.length === 0) {
+    if (persistRun) {
+      await finishPulsePipelineRun(db, run.id, {
+        status: "completed",
+        counts: { candidates: 0, clustered: 0, clustersCreated: 0 },
+      });
+    }
     return {
+      runId: run.id,
+      versionKey: run.versionKey,
       candidates: 0,
       clustered: 0,
       clustersCreated: 0,
@@ -242,6 +271,7 @@ export async function runClustering(
               embedding: useEmbeddings ? embeddings![idx] : null,
               clusterId,
               clusteredAt: now,
+              clusterRunId: run.id,
             })
             .where(eq(rawEvents.id, candidates[idx].id));
         }
@@ -253,7 +283,29 @@ export async function runClustering(
     void jurisdictionId; // jurisdictionId loop var used implicitly via bucket
   }
 
+  if (persistRun) {
+    await finishPulsePipelineRun(db, run.id, {
+      status: useEmbeddings ? "completed" : "partial",
+      counts: {
+        candidates: candidates.length,
+        clustered,
+        clustersCreated,
+        multiSourceClusters,
+      },
+      failures: useEmbeddings
+        ? []
+        : [
+            {
+              component: "embedding",
+              message: "Embedding runtime unavailable; lexical fallback used.",
+            },
+          ],
+    });
+  }
+
   return {
+    runId: run.id,
+    versionKey: run.versionKey,
     candidates: candidates.length,
     clustered,
     clustersCreated,

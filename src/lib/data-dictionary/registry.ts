@@ -488,6 +488,16 @@ export const TABLE_POLICIES: Readonly<Record<string, TablePolicy>> = {
     rights: "Private personal/application data; excluded from public releases and exports.",
     deprecation: active,
   },
+  pulse_pipeline_runs: {
+    definition: "Immutable version identity and terminal outcome for one Pulse pipeline-stage execution.",
+    rowGrain: "One ingest, cluster, classification, corroboration, review, or score run.",
+    releaseScope: "research_beta",
+    sourceOrDerivation: "Content-addressed Civica pipeline metadata covering method, ontology, prompt, provider/model, source basket, algorithm, upstream runs, and pipeline version.",
+    cadence: "One row per attempted stage execution; the version payload is immutable and the status closes once.",
+    vintageSemantics: "started_at and completed_at are processing clocks; upstream event and source dates remain on linked rows.",
+    rights: "Civica-generated operational metadata; linked source evidence retains publisher-specific rights.",
+    deprecation: active,
+  },
   raw_events: {
     definition: "Deduplicated raw Pulse v2 inputs plus retained terminal classification dispositions.",
     rowGrain: "One fetched publisher item or deduplicated article candidate.",

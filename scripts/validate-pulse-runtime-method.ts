@@ -834,11 +834,11 @@ function validatePublicSurfaces(
   check(
     state,
     methodContent.includes("failed/unavailable verification") &&
-      methodContent.includes("mixed-method experimental outputs") &&
+      methodContent.includes("not comparable as one method series") &&
       methodContent.includes("failed provider") &&
       methodContent.includes("distinct recorded source IDs") &&
       methodContent.includes("does not detect state ownership or source-family relationships"),
-    "Pulse methodology must disclose failed verification, mixed-generation delta inputs, persistence limits, and source-ID semantics",
+    "Pulse methodology must disclose failed verification, explicit mixed/legacy version boundaries, persistence limits, and source-ID semantics",
   );
 }
 
@@ -900,12 +900,12 @@ async function main(): Promise<void> {
   check(
     state,
     snapshot.status === "experimental" &&
-      snapshot.mixed_legacy_unversioned === true &&
+      snapshot.mixed_legacy_unversioned === false &&
       snapshot.numericDeltas.publicStatus === "public_experimental" &&
       snapshot.numericDeltas.inputMethodCoverage ===
-        "mixed_legacy_unversioned" &&
+        "row_level_versioned_with_explicit_legacy" &&
       snapshot.numericDeltas.scalar === "none",
-    "Experimental status, mixed legacy history, public per-dimension deltas, and no scalar must remain explicit",
+    "Experimental status, explicit row-level legacy identity, public per-dimension deltas, and no scalar must remain explicit",
   );
 
   validateCadence(state, snapshot);

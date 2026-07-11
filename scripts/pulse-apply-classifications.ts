@@ -38,6 +38,12 @@ import {
 import { corroborateEvents } from "../src/lib/pulse/v2/corroborate";
 import { calculateDimensionalDeltas } from "../src/lib/pulse/v2/score";
 import type { ClassifierRun, ClassifiedEvent, SeverityTier } from "../src/lib/pulse/v2/types";
+import {
+  createPulsePipelineRunRef,
+  finishPulsePipelineRun,
+  startPulsePipelineRun,
+} from "../src/lib/pulse/v2/pipeline-version";
+import { versioned } from "../src/lib/research/derivation-version";
 
 interface Decision {
   clusterId: string;
@@ -64,6 +70,20 @@ async function main() {
   const clusters: ClusterToClassify[] = JSON.parse(await readFile(clustersPath, "utf8"));
   const decisions: Decision[] = JSON.parse(await readFile(decisionsPath, "utf8"));
   const byId = new Map(clusters.map((c) => [c.clusterId, c]));
+  const classificationRun = createPulsePipelineRunRef("classify", {
+    sourceIds: clusters.flatMap((cluster) => cluster.sourceIds),
+    upstreamRunIds: clusters.flatMap((cluster) => cluster.clusterRunIds),
+    models: [
+      {
+        role: "classify",
+        provider: "subscription_agent",
+        model: "claude-code-agent",
+      },
+    ],
+    prompt: versioned("pulse-subscription-agent-decision/v1"),
+    algorithm: versioned("pulse-classification/subscription-agent-apply-v1"),
+  });
+  await startPulsePipelineRun(db, classificationRun);
 
   const iso3Map = new Map<string, string>();
   for (const j of rows(
@@ -87,6 +107,7 @@ async function main() {
         classificationReason: reason,
         classificationDecision: decision,
         classifiedAt: new Date(),
+        classificationRunId: classificationRun.id,
       })
       .where(eq(rawEvents.clusterId, decision.clusterId));
   }
@@ -169,11 +190,24 @@ async function main() {
       // the human review queue (published=false) instead of scoring silently.
       autoPublished: !HUMAN_REVIEW_TIERS.has(d.severityTier) && conf !== "low",
     };
-    await writeEvent(db, cluster, ok);
+    await writeEvent(db, cluster, ok, classificationRun.id);
     written++;
   }
 
   console.log(`\nWrote ${written} event(s) · skipped ${skipped} (non-governance) · ${invalid} invalid.`);
+  await finishPulsePipelineRun(db, classificationRun.id, {
+    status: invalid > 0 ? "partial" : "completed",
+    counts: { decisions: decisions.length, written, skipped, invalid },
+    failures:
+      invalid > 0
+        ? [
+            {
+              component: "subscription_agent_decisions",
+              message: `${invalid} invalid or unmatched decision(s).`,
+            },
+          ]
+        : [],
+  });
   console.log("Re-running corroboration + scoring...");
   const corro = await corroborateEvents(db);
   const score = await calculateDimensionalDeltas(db);

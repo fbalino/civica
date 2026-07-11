@@ -55,8 +55,10 @@ export function rawEventInputErrors(row: RawEventInput): string[] {
  */
 export async function upsertRawEvents(
   db: Db,
-  rows: RawEventInput[]
+  rows: RawEventInput[],
+  ingestRunId: string,
 ): Promise<UpsertResult> {
+  if (!ingestRunId.trim()) throw new Error("ingestRunId is required");
   if (rows.length === 0) {
     return { inserted: 0, skippedDuplicate: 0, sourcesStamped: [] };
   }
@@ -120,6 +122,7 @@ export async function upsertRawEvents(
       title: row.title,
       body: row.body ?? null,
       raw: row.raw,
+      ingestRunId,
     });
     inserted++;
   }

@@ -1,0 +1,13 @@
+{
+  "id": "pulse-lineage-shared-api-contract",
+  "toVersion": "civica-index-api-contract-pulse-lineage-v1",
+  "categories": ["presentation"],
+  "evidence": {
+    "documentation": ["content/methodology-pulse.md"],
+    "registry": ["src/lib/pulse/v2/pipeline-version.ts"],
+    "release_note": ["plan/research/pulse-lineage-index-contract-release-note.md"],
+    "migration_plan": ["plan/research/pulse-lineage-index-contract-migration.md"],
+    "golden_test": ["src/lib/pulse/v2/pipeline-version.test.ts"],
+    "contract_test": ["src/lib/api/contract/examples.ts"]
+  }
+}

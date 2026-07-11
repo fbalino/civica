@@ -331,7 +331,10 @@ export const zPulseMethodologyMeta = z
       "https://civicaatlas.org/civica-index/methodology/pulse",
     ),
     runtime_snapshot: z.literal("/api/v1/pulse/methodology"),
-    method_version_coverage: z.enum(["mixed_legacy_unversioned", "current"]),
+    method_version_coverage: z.enum([
+      "mixed_legacy_unversioned",
+      "explicit_row_level_versions",
+    ]),
     presentation: z
       .object({
         format: z.string(),
@@ -845,6 +848,67 @@ export const zPeerGroupingsResponse = z
  * Pulse — shared building blocks
  * ──────────────────────────────────────────────────────────────── */
 
+const zPulseVersionRef = z.discriminatedUnion("state", [
+  z.object({ state: z.literal("versioned"), id: z.string() }).strict(),
+  z.object({ state: z.literal("not_applicable"), reason: z.string() }).strict(),
+  z.object({ state: z.literal("legacy_unversioned"), reason: z.string() }).strict(),
+]);
+
+const zPulseStageVersionEnvelope = z
+  .object({
+    schemaVersion: z.literal("pulse-stage-version-envelope/v1"),
+    stage: z.enum([
+      "ingest",
+      "cluster",
+      "classify",
+      "corroborate",
+      "review",
+      "score",
+    ]),
+    methodology: zPulseVersionRef,
+    ontology: zPulseVersionRef,
+    pipeline: zPulseVersionRef,
+    algorithm: zPulseVersionRef,
+    prompt: zPulseVersionRef,
+    sourceBasket: zPulseVersionRef,
+    sourceIds: z.array(z.string()),
+    models: z.array(
+      z
+        .object({
+          role: z.enum([
+            "connector",
+            "embedding",
+            "classify",
+            "verify",
+            "subject_attribution",
+            "review_summary",
+          ]),
+          provider: z.string(),
+          model: z.string(),
+        })
+        .strict(),
+    ),
+    upstreamRunIds: z.array(z.string()),
+  })
+  .strict();
+
+const zPulseRunIdentity = z
+  .object({
+    runId: z.string(),
+    versionKey: z.string(),
+    versions: zPulseStageVersionEnvelope,
+  })
+  .strict();
+
+const zPulseVersionSetSummary = z
+  .object({
+    state: z.enum(["single_version", "mixed_version", "legacy_only", "empty"]),
+    versionKeys: z.array(z.string()),
+    containsLegacy: z.boolean(),
+    comparableAsSingleSeries: z.boolean(),
+  })
+  .strict();
+
 export const zPulseDrivingEvent = z
   .object({
     id: z.string(),
@@ -873,6 +937,7 @@ export const zPulseDimensionRow = z
       .strict(),
     limitedSignal: z.boolean(),
     limitedReason: z.string().nullable(),
+    versionIdentity: zPulseRunIdentity.nullable(),
   })
   .strict();
 
@@ -901,6 +966,7 @@ export const zPulseDimensionsData = z
         defaultApplied: z.boolean(),
       })
       .strict(),
+    versionSet: zPulseVersionSetSummary,
   })
   .strict();
 
@@ -954,6 +1020,13 @@ export const zPulseCountryEvent = z
     headline: z.string(),
     description: z.string(),
     publicationOrigin: zPulsePublicationOrigin,
+    versionIdentity: z
+      .object({
+        classification: zPulseRunIdentity.nullable(),
+        publication: zPulseRunIdentity.nullable(),
+        corroboration: zPulseRunIdentity.nullable(),
+      })
+      .strict(),
     sources: z.array(zPulseEventSourceDetail),
   })
   .strict();
@@ -964,6 +1037,7 @@ export const zPulseEventsData = z
       .object({ id: z.string(), slug: z.string(), name: z.string() })
       .strict(),
     events: z.array(zPulseCountryEvent),
+    versionSet: zPulseVersionSetSummary,
   })
   .strict();
 
@@ -1015,6 +1089,13 @@ export const zPulseChangelogRow = z
     aiSummary: z.string().nullable(),
     sources: z.array(z.string()),
     sourceDetail: z.array(zPulseEventSourceDetail),
+    versionIdentity: z
+      .object({
+        classification: zPulseRunIdentity.nullable(),
+        publication: zPulseRunIdentity.nullable(),
+        corroboration: zPulseRunIdentity.nullable(),
+      })
+      .strict(),
   })
   .strict();
 
@@ -1027,6 +1108,7 @@ export const zPulseChangelogResponse = z
         limit: z.number(),
         offset: z.number(),
         hasMore: z.boolean(),
+        versionSet: zPulseVersionSetSummary,
       })
       .strict(),
   })
@@ -1062,7 +1144,7 @@ export const zPulseMethodologySnapshot = z
       })
       .strict(),
     status: z.literal("experimental"),
-    mixed_legacy_unversioned: z.literal(true),
+    mixed_legacy_unversioned: z.literal(false),
     ledgerHistory: z.unknown(),
     providers: z.unknown(),
     feeds: z.unknown(),

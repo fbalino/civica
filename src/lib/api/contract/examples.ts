@@ -757,7 +757,7 @@ function pulseMethodologyMetaExample() {
     reference:
       "https://civicaatlas.org/civica-index/methodology/pulse" as const,
     runtime_snapshot: "/api/v1/pulse/methodology" as const,
-    method_version_coverage: "mixed_legacy_unversioned" as const,
+    method_version_coverage: "explicit_row_level_versions" as const,
     presentation: {
       format: "per_dimension",
       public_status: "public_experimental",
@@ -771,6 +771,66 @@ function pulseMethodologyMetaExample() {
     },
   };
 }
+
+const pulseExampleVersionKey = `pulse-stage/sha256:${"a".repeat(64)}`;
+const pulseExampleRunId = "11111111-1111-4111-8111-111111111111";
+
+function pulseVersionIdentityExample(
+  stage: "classify" | "corroborate" | "score",
+  runId = pulseExampleRunId,
+) {
+  return {
+    runId,
+    versionKey: pulseExampleVersionKey,
+    versions: {
+      schemaVersion: "pulse-stage-version-envelope/v1" as const,
+      stage,
+      methodology: { state: "versioned" as const, id: pulseSnapshot.version },
+      ontology: {
+        state: "versioned" as const,
+        id: pulseSnapshot.taxonomy.version,
+      },
+      pipeline: {
+        state: "versioned" as const,
+        id: "pulse-pipeline/versioned-lineage-v1",
+      },
+      algorithm: {
+        state: "versioned" as const,
+        id: `pulse-${stage}/example-v1`,
+      },
+      prompt:
+        stage === "classify"
+          ? { state: "versioned" as const, id: "pulse-classifier-prompt/example" }
+          : {
+              state: "not_applicable" as const,
+              reason: `${stage} does not use a language-model decision prompt.`,
+            },
+      sourceBasket: {
+        state: "versioned" as const,
+        id: "source-basket/example",
+      },
+      sourceIds: ["gdelt"],
+      models:
+        stage === "classify"
+          ? [
+              {
+                role: "classify" as const,
+                provider: "deepseek",
+                model: "deepseek-v4-flash",
+              },
+            ]
+          : [],
+      upstreamRunIds: [],
+    },
+  };
+}
+
+const pulseExampleVersionSet = {
+  state: "single_version" as const,
+  versionKeys: [pulseExampleVersionKey],
+  containsLegacy: false,
+  comparableAsSingleSeries: true,
+};
 
 /* ────────────────────────────────────────────────────────────────
  * /api/v1/pulse/[country_slug]/dimensions
@@ -799,6 +859,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         },
         limitedSignal: false,
         limitedReason: null,
+        versionIdentity: null,
       },
       rule_of_law: {
         dimension: "rule_of_law",
@@ -823,6 +884,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         },
         limitedSignal: true,
         limitedReason: "Single event",
+        versionIdentity: pulseVersionIdentityExample("score"),
       },
       freedom_rights: {
         dimension: "freedom_rights",
@@ -838,6 +900,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         },
         limitedSignal: false,
         limitedReason: null,
+        versionIdentity: null,
       },
       corruption_control: {
         dimension: "corruption_control",
@@ -853,6 +916,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         },
         limitedSignal: false,
         limitedReason: null,
+        versionIdentity: null,
       },
       stability: {
         dimension: "stability",
@@ -868,6 +932,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
         },
         limitedSignal: false,
         limitedReason: null,
+        versionIdentity: null,
       },
     },
     lastComputedAt: "2026-07-09T09:00:29.000Z",
@@ -878,6 +943,7 @@ const pulseDimensionsExampleResponse = zPulseDimensionsResponse.strict().parse({
       directLookup: true,
       defaultApplied: false,
     },
+    versionSet: pulseExampleVersionSet,
   }),
   meta: {
     methodology: pulseMethodologyMetaExample(),
@@ -908,6 +974,11 @@ const pulseEventsExampleResponse = zPulseEventsResponse.strict().parse({
         description:
           "A high court decision curtails judicial review of executive decrees.",
         publicationOrigin: "auto",
+        versionIdentity: {
+          classification: pulseVersionIdentityExample("classify"),
+          publication: pulseVersionIdentityExample("classify"),
+          corroboration: pulseVersionIdentityExample("corroborate"),
+        },
         sources: [
           {
             sourceId: "gdelt",
@@ -918,6 +989,7 @@ const pulseEventsExampleResponse = zPulseEventsResponse.strict().parse({
         ],
       },
     ],
+    versionSet: pulseExampleVersionSet,
   }),
   meta: {
     methodology: pulseMethodologyMetaExample(),
@@ -970,6 +1042,11 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
           sourceUrl: null,
         },
       ],
+      versionIdentity: {
+        classification: pulseVersionIdentityExample("classify"),
+        publication: pulseVersionIdentityExample("classify"),
+        corroboration: pulseVersionIdentityExample("corroborate"),
+      },
     }),
   ],
   meta: {
@@ -977,6 +1054,7 @@ const pulseChangelogExampleResponse = zPulseChangelogResponse.strict().parse({
     limit: 50,
     offset: 0,
     hasMore: false,
+    versionSet: pulseExampleVersionSet,
   },
 });
 

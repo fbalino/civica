@@ -6,6 +6,7 @@ import {
   runClustering,
   type CandidateRow,
 } from "./cluster";
+import { createPulsePipelineRunRef } from "./pipeline-version";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
@@ -17,6 +18,7 @@ const candidates: CandidateRow[] = [
     title: "Court removes election commissioner",
     body: "The national court removed the election commissioner",
     sourceId: "source-a",
+    ingestRunId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
   },
   {
     id: "event-b",
@@ -25,6 +27,7 @@ const candidates: CandidateRow[] = [
     title: "Court removes election commissioner",
     body: "National court removed the election commissioner",
     sourceId: "source-b",
+    ingestRunId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
   },
 ];
 
@@ -46,6 +49,11 @@ function fakeDb() {
 }
 
 const fixedId = () => "11111111-1111-4111-8111-111111111111";
+const runRef = createPulsePipelineRunRef("cluster", {
+  id: "22222222-2222-4222-8222-222222222222",
+  sourceIds: ["source-a", "source-b"],
+  upstreamRunIds: ["aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"],
+});
 
 test("cluster dry-run is deterministic and performs zero writes", async () => {
   const harness = fakeDb();
@@ -54,6 +62,7 @@ test("cluster dry-run is deterministic and performs zero writes", async () => {
     embeddingResult: null,
     dryRun: true,
     now: new Date("2026-07-10T00:00:00Z"),
+    runRef,
   };
   const first = await runClustering(harness.db, options);
   const second = await runClustering(harness.db, options);
@@ -71,6 +80,7 @@ test("two fixture applications produce identical canonical cluster state", async
     embeddingResult: null,
     now: new Date("2026-07-10T00:00:00Z"),
     clusterIdFactory: fixedId,
+    runRef,
   };
   await runClustering(harness.db, options);
   const firstState = structuredClone([...harness.state.entries()]);
@@ -85,6 +95,7 @@ test("malformed duplicate fixture rows fail before writes", async () => {
     runClustering(harness.db, {
       candidates: [candidates[0], { ...candidates[1], id: candidates[0].id }],
       embeddingResult: null,
+      runRef,
     }),
     /duplicate candidate id/,
   );
@@ -97,6 +108,7 @@ test("an empty derived input is an explicit no-op", async () => {
     candidates: [],
     embeddingResult: null,
     dryRun: true,
+    runRef,
   });
   assert.equal(result.candidates, 0);
   assert.deepEqual(result.assignments, []);

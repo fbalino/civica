@@ -86,7 +86,7 @@ export const PULSE_METHODOLOGY_META = Object.freeze({
   runtime_snapshot: "/api/v1/pulse/methodology",
   method_version_coverage: CURRENT_PULSE_RUNTIME_METHOD.mixed_legacy_unversioned
     ? "mixed_legacy_unversioned"
-    : "current",
+    : "explicit_row_level_versions",
   presentation: Object.freeze({
     format: CURRENT_PULSE_RUNTIME_METHOD.numericDeltas.shape,
     public_status: CURRENT_PULSE_NUMERIC_PUBLICATION_POLICY.publicStatus,

@@ -6,12 +6,13 @@
  * endpoints and server-component consumers.
  */
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import {
   jurisdictions,
   pulseDimensionalDeltas,
   pulseEventsV2,
+  pulsePipelineRuns,
   pulseSources,
 } from "@/lib/db/schema";
 import { PULSE_DIMENSIONS, type PulseDimension } from "@/lib/pulse/v2/types";
@@ -24,6 +25,37 @@ import {
   publicationOriginFor,
   type PulsePublicationOrigin,
 } from "@/lib/pulse/v2/review-validation";
+import {
+  summarizePulseVersionSet,
+  type PulseStageVersionEnvelope,
+  type PulseVersionSetSummary,
+} from "@/lib/pulse/v2/pipeline-version";
+
+export interface PulseRunIdentity {
+  runId: string;
+  versionKey: string;
+  versions: PulseStageVersionEnvelope;
+}
+
+async function loadPulseRunMap(runIds: readonly string[]) {
+  const ids = [...new Set(runIds.filter(Boolean))];
+  const rows = ids.length
+    ? await db
+        .select({
+          id: pulsePipelineRuns.id,
+          versionKey: pulsePipelineRuns.versionKey,
+          versions: pulsePipelineRuns.versions,
+        })
+        .from(pulsePipelineRuns)
+        .where(inArray(pulsePipelineRuns.id, ids))
+    : [];
+  return new Map(
+    rows.map((row) => [
+      row.id,
+      { runId: row.id, versionKey: row.versionKey, versions: row.versions },
+    ]),
+  );
+}
 
 /** A row in the per-country dimensional-delta panel. */
 export interface DimensionRow {
@@ -67,6 +99,8 @@ export interface DimensionRow {
    * basis is adequate. "Single source" | "Single event" | "Low confidence".
    */
   limitedReason: string | null;
+  /** Exact immutable score-stage run behind this stored output. */
+  versionIdentity: PulseRunIdentity | null;
 }
 
 export interface PulseV2ForCountry {
@@ -83,6 +117,7 @@ export interface PulseV2ForCountry {
     directLookup: boolean;
     defaultApplied: boolean;
   };
+  versionSet: PulseVersionSetSummary;
 }
 
 /**
@@ -92,7 +127,7 @@ export interface PulseV2ForCountry {
  * returns `delta: null` so callers render non-observation rather than zero.
  */
 export async function getPulseV2ForCountry(
-  slug: string
+  slug: string,
 ): Promise<PulseV2ForCountry | null> {
   const lower = slug.toLowerCase();
 
@@ -111,7 +146,8 @@ export async function getPulseV2ForCountry(
   if (!jurisdiction) return null;
   const press = pressFreedomScore(jurisdiction.iso3);
   const directPressLookup = Boolean(
-    jurisdiction.iso3 && RSF_SCORES_2024[jurisdiction.iso3.toUpperCase()] != null,
+    jurisdiction.iso3 &&
+    RSF_SCORES_2024[jurisdiction.iso3.toUpperCase()] != null,
   );
 
   // Pull all stored dimension rows. Missing or not-yet-computed dimensions
@@ -120,6 +156,9 @@ export async function getPulseV2ForCountry(
     .select()
     .from(pulseDimensionalDeltas)
     .where(eq(pulseDimensionalDeltas.jurisdictionId, jurisdiction.id));
+  const computationRuns = await loadPulseRunMap(
+    deltaRows.map(({ computationRunId }) => computationRunId),
+  );
 
   // Pull driving events per dimension — only the same trailing 365-day
   // window used by the scoring pipeline. Older published rows remain in the
@@ -143,7 +182,7 @@ export async function getPulseV2ForCountry(
         sql`${pulseEventsV2.category} <> 'none'`,
         sql`${pulseEventsV2.eventDate} >= CURRENT_DATE - (${SCORE_WINDOW_DAYS} * INTERVAL '1 day')`,
         sql`${pulseEventsV2.eventDate} <= CURRENT_DATE`,
-      )
+      ),
     )
     .orderBy(desc(sql`ABS(${pulseEventsV2.severityValue})`));
 
@@ -172,10 +211,7 @@ export async function getPulseV2ForCountry(
   const sourceCountByEvent = new Map<string, number>();
   for (const e of eventRows) {
     confidenceByEvent.set(e.id, e.corroborationConfidence ?? 0);
-    sourceCountByEvent.set(
-      e.id,
-      new Set(sourceMap.get(e.id) ?? []).size
-    );
+    sourceCountByEvent.set(e.id, new Set(sourceMap.get(e.id) ?? []).size);
   }
 
   // Build the dimensions object — zero-fill any missing dimension
@@ -205,14 +241,14 @@ export async function getPulseV2ForCountry(
     // (or deflate) the basis.
     const contributingIds = deltaRow?.contributingEventIds ?? [];
     const publishedContributing = contributingIds.filter((id) =>
-      sourceCountByEvent.has(id)
+      sourceCountByEvent.has(id),
     );
     const nEvents = publishedContributing.length;
     const confidences = publishedContributing.map(
-      (id) => confidenceByEvent.get(id) ?? 0
+      (id) => confidenceByEvent.get(id) ?? 0,
     );
     const sourceCounts = publishedContributing.map(
-      (id) => sourceCountByEvent.get(id) ?? 0
+      (id) => sourceCountByEvent.get(id) ?? 0,
     );
     const maxConfidence = confidences.length ? Math.max(...confidences) : 0;
     const minSources = sourceCounts.length ? Math.min(...sourceCounts) : 0;
@@ -223,8 +259,7 @@ export async function getPulseV2ForCountry(
     // event, every event single-sourced, or low max confidence. Only a
     // delta that actually moved (|δ| ≥ 0.5) can read as a "limited" signal;
     // a flat dimension has its own treatment and needs no qualifier.
-    const moved =
-      nEvents > 0 && Math.abs(deltaRow?.deltaValue ?? 0) >= 0.5;
+    const moved = nEvents > 0 && Math.abs(deltaRow?.deltaValue ?? 0) >= 0.5;
     const limitedSignal =
       moved &&
       nEvents > 0 &&
@@ -252,6 +287,9 @@ export async function getPulseV2ForCountry(
       },
       limitedSignal,
       limitedReason,
+      versionIdentity: deltaRow
+        ? (computationRuns.get(deltaRow.computationRunId) ?? null)
+        : null,
     };
   }
 
@@ -266,6 +304,12 @@ export async function getPulseV2ForCountry(
       directLookup: directPressLookup,
       defaultApplied: !directPressLookup,
     },
+    versionSet: summarizePulseVersionSet(
+      [...computationRuns.values()].map(({ versionKey, versions }) => ({
+        versionKey,
+        versions,
+      })),
+    ),
   };
 }
 
@@ -301,12 +345,22 @@ export async function getPulseV2EventsForCountry(slug: string) {
       reviewStatus: pulseEventsV2.reviewStatus,
       headline: pulseEventsV2.headline,
       description: pulseEventsV2.description,
+      classificationRunId: pulseEventsV2.classificationRunId,
+      publicationRunId: pulseEventsV2.publicationRunId,
+      corroborationRunId: pulseEventsV2.corroborationRunId,
     })
     .from(pulseEventsV2)
     .where(eq(pulseEventsV2.jurisdictionId, jurisdiction.id))
     .orderBy(desc(pulseEventsV2.eventDate));
 
   const eventIds = events.map((e) => e.id);
+  const runMap = await loadPulseRunMap(
+    events.flatMap((event) => [
+      event.classificationRunId,
+      event.publicationRunId ?? "",
+      event.corroborationRunId ?? "",
+    ]),
+  );
   const sourceMap = new Map<
     string,
     Array<{
@@ -341,17 +395,40 @@ export async function getPulseV2EventsForCountry(slug: string) {
 
   return {
     jurisdiction,
-    events: events.map((e) => ({
-      ...e,
-      // A deadlocked ensemble is stored in the current non-null schema with
-      // category="none" and a compatibility dimension. Do not expose that
-      // placeholder as a substantive Stability classification.
-      dimension: e.category === "none" ? null : e.dimension,
-      severityTier: e.category === "none" ? null : e.severityTier,
-      severityValue: e.category === "none" ? null : e.severityValue,
-      publicationOrigin: publicationOriginFor(e),
-      sources: sourceMap.get(e.id) ?? [],
-    })),
+    events: events.map((e) => {
+      const {
+        classificationRunId,
+        publicationRunId,
+        corroborationRunId,
+        ...publicEvent
+      } = e;
+      return {
+        ...publicEvent,
+        // A deadlocked ensemble is stored in the current non-null schema with
+        // category="none" and a compatibility dimension. Do not expose that
+        // placeholder as a substantive Stability classification.
+        dimension: e.category === "none" ? null : e.dimension,
+        severityTier: e.category === "none" ? null : e.severityTier,
+        severityValue: e.category === "none" ? null : e.severityValue,
+        publicationOrigin: publicationOriginFor(e),
+        versionIdentity: {
+          classification: runMap.get(classificationRunId) ?? null,
+          publication: publicationRunId
+            ? (runMap.get(publicationRunId) ?? null)
+            : null,
+          corroboration: corroborationRunId
+            ? (runMap.get(corroborationRunId) ?? null)
+            : null,
+        },
+        sources: sourceMap.get(e.id) ?? [],
+      };
+    }),
+    versionSet: summarizePulseVersionSet(
+      events
+        .map(({ classificationRunId }) => runMap.get(classificationRunId))
+        .filter((row): row is PulseRunIdentity => Boolean(row))
+        .map(({ versionKey, versions }) => ({ versionKey, versions })),
+    ),
   };
 }
 
@@ -414,12 +491,21 @@ export interface PulseV2ChangelogRow {
   sources: string[];
   /** Full source attribution rows (name, type, url). */
   sourceDetail: PulseV2SourceDetail[];
+  versionIdentity: {
+    classification: PulseRunIdentity | null;
+    publication: PulseRunIdentity | null;
+    corroboration: PulseRunIdentity | null;
+  };
 }
 
 /** Paginated global changelog. Optional filters narrow the feed. */
 export async function getPulseV2Changelog(
-  filters: PulseV2ChangelogFilters = {}
-): Promise<{ rows: PulseV2ChangelogRow[]; hasMore: boolean }> {
+  filters: PulseV2ChangelogFilters = {},
+): Promise<{
+  rows: PulseV2ChangelogRow[];
+  hasMore: boolean;
+  versionSet: PulseVersionSetSummary;
+}> {
   const limit = Math.min(Math.max(filters.limit ?? 50, 1), 2500);
   const offset = Math.max(filters.offset ?? 0, 0);
 
@@ -443,7 +529,9 @@ export async function getPulseV2Changelog(
   }
   if (filters.withinDays && filters.withinDays > 0) {
     const days = Math.min(Math.floor(filters.withinDays), 3650);
-    wheres.push(sql`p.event_date >= CURRENT_DATE - (${days} * INTERVAL '1 day')`);
+    wheres.push(
+      sql`p.event_date >= CURRENT_DATE - (${days} * INTERVAL '1 day')`,
+    );
     wheres.push(sql`p.event_date <= CURRENT_DATE`);
   }
   if (filters.deltaEligibleOnly) {
@@ -456,9 +544,7 @@ export async function getPulseV2Changelog(
   }
 
   const whereClause =
-    wheres.length === 0
-      ? sql`TRUE`
-      : sql.join(wheres, sql` AND `);
+    wheres.length === 0 ? sql`TRUE` : sql.join(wheres, sql` AND `);
 
   const rowsResult = await db.execute(sql`
     SELECT
@@ -480,6 +566,9 @@ export async function getPulseV2Changelog(
       p.headline,
       p.description,
       p.ai_summary,
+      p.classification_run_id,
+      p.publication_run_id,
+      p.corroboration_run_id,
       ARRAY(
         SELECT DISTINCT ps.source_id
         FROM pulse_sources ps
@@ -509,6 +598,13 @@ export async function getPulseV2Changelog(
 
   const hasMore = raw.length > limit;
   const trimmed = hasMore ? raw.slice(0, limit) : raw;
+  const runMap = await loadPulseRunMap(
+    trimmed.flatMap((row) => [
+      String(row.classification_run_id ?? ""),
+      String(row.publication_run_id ?? ""),
+      String(row.corroboration_run_id ?? ""),
+    ]),
+  );
 
   const rows: PulseV2ChangelogRow[] = trimmed.map((r) => {
     const rawRuns = r.classifier_runs;
@@ -562,10 +658,8 @@ export async function getPulseV2Changelog(
       },
       category,
       dimension: category === "none" ? "unresolved" : String(r.dimension),
-      severityTier:
-        category === "none" ? null : String(r.severity_tier),
-      severityValue:
-        category === "none" ? null : Number(r.severity_value),
+      severityTier: category === "none" ? null : String(r.severity_tier),
+      severityValue: category === "none" ? null : Number(r.severity_value),
       classifierAgreement: String(r.classifier_agreement),
       classifierRuns: runs,
       corroborationConfidence: Number(r.corroboration_confidence),
@@ -583,8 +677,22 @@ export async function getPulseV2Changelog(
       aiSummary: r.ai_summary ? String(r.ai_summary) : null,
       sources: Array.isArray(r.source_ids) ? (r.source_ids as string[]) : [],
       sourceDetail,
+      versionIdentity: {
+        classification:
+          runMap.get(String(r.classification_run_id ?? "")) ?? null,
+        publication: runMap.get(String(r.publication_run_id ?? "")) ?? null,
+        corroboration: runMap.get(String(r.corroboration_run_id ?? "")) ?? null,
+      },
     };
   });
 
-  return { rows, hasMore };
+  return {
+    rows,
+    hasMore,
+    versionSet: summarizePulseVersionSet(
+      [...runMap.values()]
+        .filter(({ versions }) => versions.stage === "classify")
+        .map(({ versionKey, versions }) => ({ versionKey, versions })),
+    ),
+  };
 }

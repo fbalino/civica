@@ -25,6 +25,13 @@ import { fetchGdelt } from "./sources/gdelt";
 import { fetchReutersAp } from "./sources/reuters-ap";
 import type { RawEventInput } from "./types";
 import type { JurisdictionMap } from "./country-resolver";
+import { CURRENT_PULSE_RUNTIME_METHOD } from "./runtime-contract";
+import {
+  createPulsePipelineRunRef,
+  finishPulsePipelineRun,
+  startPulsePipelineRun,
+  type PulsePipelineRunRef,
+} from "./pipeline-version";
 
 export function createDb() {
   const sql = neon(process.env.DATABASE_URL!);
@@ -46,6 +53,8 @@ export interface ConnectorReport {
 }
 
 export interface IngestSummary {
+  runId: string;
+  versionKey: string;
   reports: ConnectorReport[];
   totalFetched: number;
   totalInserted: number;
@@ -71,7 +80,13 @@ export interface PulseIngestOptions {
   /** Fixture seam. Production callers omit this and use the live connectors. */
   jobs?: readonly PulseConnectorJob[];
   jurisdictionMap?: JurisdictionMap;
-  writeRows?: (db: Db, rows: RawEventInput[]) => Promise<UpsertResult>;
+  writeRows?: (
+    db: Db,
+    rows: RawEventInput[],
+    ingestRunId: string,
+  ) => Promise<UpsertResult>;
+  /** Fixture/replay seam. Production creates and persists a fresh run. */
+  runRef?: PulsePipelineRunRef;
   /** Fixture/diagnostic fail-closed controls; production preserves partial
    * connector availability unless the caller explicitly requests strictness. */
   failOnConnectorError?: boolean;
@@ -114,6 +129,13 @@ export async function ingestPulseV2(
   const map = options.jurisdictionMap ?? (await buildJurisdictionMap(db));
   const jobs = options.jobs ?? liveConnectorJobs(map);
   const writeRows = options.writeRows ?? upsertRawEvents;
+  const run =
+    options.runRef ??
+    createPulsePipelineRunRef("ingest", {
+      sourceIds: CURRENT_PULSE_RUNTIME_METHOD.feeds.activeProduction.sourceIds,
+    });
+  const persistRun = !options.dryRun && !options.jobs && !options.runRef;
+  if (persistRun) await startPulsePipelineRun(db, run);
   const reports: ConnectorReport[] = [];
 
   async function runOne(job: PulseConnectorJob) {
@@ -125,7 +147,7 @@ export async function ingestPulseV2(
         sourcesStamped: [],
       };
       if (result.rows.length && !options.dryRun) {
-        upsert = await writeRows(db, result.rows);
+        upsert = await writeRows(db, result.rows, run.id);
       }
       reports.push({
         source: job.source,
@@ -163,10 +185,37 @@ export async function ingestPulseV2(
   const totalWouldWrite = reports.reduce((a, report) => a + report.wouldWrite, 0);
 
   if ((options.requireNonEmpty ?? true) && totalFetched === 0) {
+    if (persistRun) {
+      await finishPulsePipelineRun(db, run.id, {
+        status: "failed",
+        counts: { fetched: 0, inserted: 0 },
+        failures: reports
+          .filter(({ error }) => error)
+          .map(({ source, error }) => ({ component: source, message: error! })),
+      });
+    }
     throw new Error("Pulse ingestion fixture/upstream returned no rows");
   }
 
+  if (persistRun) {
+    const failures = reports
+      .filter(({ error }) => error)
+      .map(({ source, error }) => ({ component: source, message: error! }));
+    await finishPulsePipelineRun(db, run.id, {
+      status: failures.length ? "partial" : "completed",
+      counts: {
+        fetched: totalFetched,
+        inserted: totalInserted,
+        skipped: totalSkipped,
+        unmatched: totalUnmatched,
+      },
+      failures,
+    });
+  }
+
   return {
+    runId: run.id,
+    versionKey: run.versionKey,
     reports,
     totalFetched,
     totalInserted,

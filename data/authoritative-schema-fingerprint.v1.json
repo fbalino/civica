@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T09:01:28.433Z",
-  "sha256": "3f1f49b235aee99b1861c589fe6cc2a760b1776f7544c53c079abf81eb1d8125",
+  "generatedAt": "2026-07-11T15:06:29.836Z",
+  "sha256": "d38f8953d5cfb721fe66770a280c986df8be9630cd65fd68f51d9bf2910f95e1",
   "schema": {
     "columns": [
       {
@@ -5459,6 +5459,15 @@
         "position": 8
       },
       {
+        "udt": "uuid",
+        "name": "computation_run_id",
+        "type": "uuid",
+        "table": "pulse_dimensional_deltas",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
+      },
+      {
         "udt": "text",
         "name": "evidence_kind",
         "type": "text",
@@ -5865,6 +5874,114 @@
       },
       {
         "udt": "uuid",
+        "name": "classification_run_id",
+        "type": "uuid",
+        "table": "pulse_events_v2",
+        "default": null,
+        "nullable": "NO",
+        "position": 25
+      },
+      {
+        "udt": "uuid",
+        "name": "publication_run_id",
+        "type": "uuid",
+        "table": "pulse_events_v2",
+        "default": null,
+        "nullable": "YES",
+        "position": 26
+      },
+      {
+        "udt": "uuid",
+        "name": "corroboration_run_id",
+        "type": "uuid",
+        "table": "pulse_events_v2",
+        "default": null,
+        "nullable": "YES",
+        "position": 27
+      },
+      {
+        "udt": "uuid",
+        "name": "id",
+        "type": "uuid",
+        "table": "pulse_pipeline_runs",
+        "default": "gen_random_uuid()",
+        "nullable": "NO",
+        "position": 1
+      },
+      {
+        "udt": "text",
+        "name": "stage",
+        "type": "text",
+        "table": "pulse_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 2
+      },
+      {
+        "udt": "text",
+        "name": "status",
+        "type": "text",
+        "table": "pulse_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 3
+      },
+      {
+        "udt": "text",
+        "name": "version_key",
+        "type": "text",
+        "table": "pulse_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 4
+      },
+      {
+        "udt": "jsonb",
+        "name": "versions",
+        "type": "jsonb",
+        "table": "pulse_pipeline_runs",
+        "default": null,
+        "nullable": "NO",
+        "position": 5
+      },
+      {
+        "udt": "jsonb",
+        "name": "counts",
+        "type": "jsonb",
+        "table": "pulse_pipeline_runs",
+        "default": "'{}'::jsonb",
+        "nullable": "NO",
+        "position": 6
+      },
+      {
+        "udt": "jsonb",
+        "name": "failures",
+        "type": "jsonb",
+        "table": "pulse_pipeline_runs",
+        "default": "'[]'::jsonb",
+        "nullable": "NO",
+        "position": 7
+      },
+      {
+        "udt": "timestamp",
+        "name": "started_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_pipeline_runs",
+        "default": "now()",
+        "nullable": "NO",
+        "position": 8
+      },
+      {
+        "udt": "timestamp",
+        "name": "completed_at",
+        "type": "timestamp without time zone",
+        "table": "pulse_pipeline_runs",
+        "default": null,
+        "nullable": "YES",
+        "position": 9
+      },
+      {
+        "udt": "uuid",
         "name": "id",
         "type": "uuid",
         "table": "pulse_review_audit_log",
@@ -5934,6 +6051,15 @@
         "default": "now()",
         "nullable": "NO",
         "position": 8
+      },
+      {
+        "udt": "uuid",
+        "name": "run_id",
+        "type": "uuid",
+        "table": "pulse_review_audit_log",
+        "default": null,
+        "nullable": "NO",
+        "position": 9
       },
       {
         "udt": "uuid",
@@ -6213,6 +6339,33 @@
         "default": null,
         "nullable": "YES",
         "position": 20
+      },
+      {
+        "udt": "uuid",
+        "name": "ingest_run_id",
+        "type": "uuid",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "NO",
+        "position": 21
+      },
+      {
+        "udt": "uuid",
+        "name": "cluster_run_id",
+        "type": "uuid",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 22
+      },
+      {
+        "udt": "uuid",
+        "name": "classification_run_id",
+        "type": "uuid",
+        "table": "raw_events",
+        "default": null,
+        "nullable": "YES",
+        "position": 23
       },
       {
         "udt": "text",
@@ -7189,6 +7342,11 @@
         "definition": "CREATE UNIQUE INDEX pulse_daily_scores_pkey ON public.pulse_daily_scores USING btree (id)"
       },
       {
+        "name": "idx_pulse_dim_computation_run",
+        "table": "pulse_dimensional_deltas",
+        "definition": "CREATE INDEX idx_pulse_dim_computation_run ON public.pulse_dimensional_deltas USING btree (computation_run_id)"
+      },
+      {
         "name": "idx_pulse_dim_derivation_version",
         "table": "pulse_dimensional_deltas",
         "definition": "CREATE INDEX idx_pulse_dim_derivation_version ON public.pulse_dimensional_deltas USING btree (derivation_version_key)"
@@ -7229,9 +7387,19 @@
         "definition": "CREATE UNIQUE INDEX pulse_events_pkey ON public.pulse_events USING btree (id)"
       },
       {
+        "name": "idx_pulse_v2_classification_run",
+        "table": "pulse_events_v2",
+        "definition": "CREATE INDEX idx_pulse_v2_classification_run ON public.pulse_events_v2 USING btree (classification_run_id)"
+      },
+      {
         "name": "idx_pulse_v2_cluster_unique",
         "table": "pulse_events_v2",
         "definition": "CREATE UNIQUE INDEX idx_pulse_v2_cluster_unique ON public.pulse_events_v2 USING btree (cluster_id)"
+      },
+      {
+        "name": "idx_pulse_v2_corroboration_run",
+        "table": "pulse_events_v2",
+        "definition": "CREATE INDEX idx_pulse_v2_corroboration_run ON public.pulse_events_v2 USING btree (corroboration_run_id)"
       },
       {
         "name": "idx_pulse_v2_derivation_version",
@@ -7249,6 +7417,11 @@
         "definition": "CREATE INDEX idx_pulse_v2_jurisdiction_date ON public.pulse_events_v2 USING btree (jurisdiction_id, event_date)"
       },
       {
+        "name": "idx_pulse_v2_publication_run",
+        "table": "pulse_events_v2",
+        "definition": "CREATE INDEX idx_pulse_v2_publication_run ON public.pulse_events_v2 USING btree (publication_run_id)"
+      },
+      {
         "name": "idx_pulse_v2_published",
         "table": "pulse_events_v2",
         "definition": "CREATE INDEX idx_pulse_v2_published ON public.pulse_events_v2 USING btree (published, review_status)"
@@ -7259,6 +7432,21 @@
         "definition": "CREATE UNIQUE INDEX pulse_events_v2_pkey ON public.pulse_events_v2 USING btree (id)"
       },
       {
+        "name": "idx_pulse_pipeline_runs_stage_time",
+        "table": "pulse_pipeline_runs",
+        "definition": "CREATE INDEX idx_pulse_pipeline_runs_stage_time ON public.pulse_pipeline_runs USING btree (stage, started_at)"
+      },
+      {
+        "name": "idx_pulse_pipeline_runs_version",
+        "table": "pulse_pipeline_runs",
+        "definition": "CREATE INDEX idx_pulse_pipeline_runs_version ON public.pulse_pipeline_runs USING btree (version_key)"
+      },
+      {
+        "name": "pulse_pipeline_runs_pkey",
+        "table": "pulse_pipeline_runs",
+        "definition": "CREATE UNIQUE INDEX pulse_pipeline_runs_pkey ON public.pulse_pipeline_runs USING btree (id)"
+      },
+      {
         "name": "idx_pulse_review_audit_event",
         "table": "pulse_review_audit_log",
         "definition": "CREATE INDEX idx_pulse_review_audit_event ON public.pulse_review_audit_log USING btree (event_id)"
@@ -7267,6 +7455,11 @@
         "name": "idx_pulse_review_audit_reviewer",
         "table": "pulse_review_audit_log",
         "definition": "CREATE INDEX idx_pulse_review_audit_reviewer ON public.pulse_review_audit_log USING btree (reviewer_id, created_at)"
+      },
+      {
+        "name": "idx_pulse_review_audit_run",
+        "table": "pulse_review_audit_log",
+        "definition": "CREATE INDEX idx_pulse_review_audit_run ON public.pulse_review_audit_log USING btree (run_id)"
       },
       {
         "name": "pulse_review_audit_log_pkey",
@@ -7304,14 +7497,29 @@
         "definition": "CREATE UNIQUE INDEX rate_limits_pkey ON public.rate_limits USING btree (key)"
       },
       {
+        "name": "idx_raw_events_classification_run",
+        "table": "raw_events",
+        "definition": "CREATE INDEX idx_raw_events_classification_run ON public.raw_events USING btree (classification_run_id)"
+      },
+      {
         "name": "idx_raw_events_cluster",
         "table": "raw_events",
         "definition": "CREATE INDEX idx_raw_events_cluster ON public.raw_events USING btree (cluster_id)"
       },
       {
+        "name": "idx_raw_events_cluster_run",
+        "table": "raw_events",
+        "definition": "CREATE INDEX idx_raw_events_cluster_run ON public.raw_events USING btree (cluster_run_id)"
+      },
+      {
         "name": "idx_raw_events_external",
         "table": "raw_events",
         "definition": "CREATE UNIQUE INDEX idx_raw_events_external ON public.raw_events USING btree (source_id, external_id) WHERE (external_id IS NOT NULL)"
+      },
+      {
+        "name": "idx_raw_events_ingest_run",
+        "table": "raw_events",
+        "definition": "CREATE INDEX idx_raw_events_ingest_run ON public.raw_events USING btree (ingest_run_id)"
       },
       {
         "name": "idx_raw_events_jurisdiction_date",
@@ -7594,6 +7802,21 @@
         "name": "pgp_sym_encrypt_bytea",
         "identity": "bytea, text, text",
         "definition": "CREATE OR REPLACE FUNCTION public.pgp_sym_encrypt_bytea(bytea, text, text)\n RETURNS bytea\n LANGUAGE c\n PARALLEL SAFE STRICT\nAS '$libdir/pgcrypto', $function$pgp_sym_encrypt_bytea$function$\n"
+      },
+      {
+        "name": "pul_004_guard_event_classification_lineage",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.pul_004_guard_event_classification_lineage()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n\tIF OLD.classification_run_id IS DISTINCT FROM NEW.classification_run_id THEN\n\t\tRAISE EXCEPTION 'Pulse event classification lineage is immutable';\n\tEND IF;\n\tRETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "pul_004_guard_pipeline_run",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.pul_004_guard_pipeline_run()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n\tIF TG_OP = 'DELETE' THEN\n\t\tRAISE EXCEPTION 'Pulse pipeline runs are retained evidence and cannot be deleted';\n\tEND IF;\n\tIF OLD.id IS DISTINCT FROM NEW.id\n\t\tOR OLD.stage IS DISTINCT FROM NEW.stage\n\t\tOR OLD.version_key IS DISTINCT FROM NEW.version_key\n\t\tOR OLD.versions IS DISTINCT FROM NEW.versions\n\t\tOR OLD.started_at IS DISTINCT FROM NEW.started_at THEN\n\t\tRAISE EXCEPTION 'Pulse pipeline version identity is immutable';\n\tEND IF;\n\tIF OLD.status <> 'running' THEN\n\t\tRAISE EXCEPTION 'Completed, failed, and legacy Pulse pipeline runs are immutable';\n\tEND IF;\n\tIF NEW.status NOT IN ('completed', 'partial', 'failed') OR NEW.completed_at IS NULL THEN\n\t\tRAISE EXCEPTION 'A running Pulse pipeline run may only close to a terminal status';\n\tEND IF;\n\tRETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "pul_004_guard_raw_lineage",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.pul_004_guard_raw_lineage()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nBEGIN\n\tIF OLD.ingest_run_id IS DISTINCT FROM NEW.ingest_run_id THEN\n\t\tRAISE EXCEPTION 'Raw-event ingest lineage is immutable';\n\tEND IF;\n\tIF OLD.cluster_run_id IS NOT NULL AND OLD.cluster_run_id IS DISTINCT FROM NEW.cluster_run_id THEN\n\t\tRAISE EXCEPTION 'Raw-event cluster lineage is write-once';\n\tEND IF;\n\tIF OLD.classification_run_id IS NOT NULL AND OLD.classification_run_id IS DISTINCT FROM NEW.classification_run_id THEN\n\t\tRAISE EXCEPTION 'Raw-event classification lineage is write-once';\n\tEND IF;\n\tRETURN NEW;\nEND;\n$function$\n"
       }
     ],
     "triggers": [
@@ -7768,6 +7991,16 @@
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_events_v2 FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
       },
       {
+        "name": "pul_004_event_classification_lineage_immutable",
+        "table": "pulse_events_v2",
+        "definition": "CREATE TRIGGER pul_004_event_classification_lineage_immutable BEFORE UPDATE ON pulse_events_v2 FOR EACH ROW EXECUTE FUNCTION pul_004_guard_event_classification_lineage()"
+      },
+      {
+        "name": "pul_004_pipeline_run_immutable",
+        "table": "pulse_pipeline_runs",
+        "definition": "CREATE TRIGGER pul_004_pipeline_run_immutable BEFORE DELETE OR UPDATE ON pulse_pipeline_runs FOR EACH ROW EXECUTE FUNCTION pul_004_guard_pipeline_run()"
+      },
+      {
         "name": "dat_016_retain_mutation",
         "table": "pulse_review_audit_log",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON pulse_review_audit_log FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
@@ -7781,6 +8014,11 @@
         "name": "dat_016_retain_mutation",
         "table": "raw_events",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON raw_events FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "pul_004_raw_lineage_write_once",
+        "table": "raw_events",
+        "definition": "CREATE TRIGGER pul_004_raw_lineage_write_once BEFORE UPDATE ON raw_events FOR EACH ROW EXECUTE FUNCTION pul_004_guard_raw_lineage()"
       },
       {
         "name": "research_evidence_history_append_only",
@@ -8042,6 +8280,11 @@
       {
         "kind": "r",
         "name": "pulse_events_v2",
+        "definition": null
+      },
+      {
+        "kind": "r",
+        "name": "pulse_pipeline_runs",
         "definition": null
       },
       {
@@ -8902,6 +9145,12 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "pulse_dimensional_deltas_computation_run_id_pulse_pipeline_runs",
+        "type": "f",
+        "table": "pulse_dimensional_deltas",
+        "definition": "FOREIGN KEY (computation_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
         "name": "pulse_dimensional_deltas_jurisdiction_id_jurisdictions_id_fk",
         "type": "f",
         "table": "pulse_dimensional_deltas",
@@ -8926,6 +9175,18 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "pulse_events_v2_classification_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "pulse_events_v2",
+        "definition": "FOREIGN KEY (classification_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_events_v2_corroboration_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "pulse_events_v2",
+        "definition": "FOREIGN KEY (corroboration_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
         "name": "pulse_events_v2_jurisdiction_id_jurisdictions_id_fk",
         "type": "f",
         "table": "pulse_events_v2",
@@ -8938,6 +9199,42 @@
         "definition": "PRIMARY KEY (id)"
       },
       {
+        "name": "pulse_events_v2_publication_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "pulse_events_v2",
+        "definition": "FOREIGN KEY (publication_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "pulse_pipeline_runs_completion_check",
+        "type": "c",
+        "table": "pulse_pipeline_runs",
+        "definition": "CHECK (status = 'running'::text AND completed_at IS NULL OR status <> 'running'::text AND completed_at IS NOT NULL)"
+      },
+      {
+        "name": "pulse_pipeline_runs_pkey",
+        "type": "p",
+        "table": "pulse_pipeline_runs",
+        "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_pipeline_runs_stage_check",
+        "type": "c",
+        "table": "pulse_pipeline_runs",
+        "definition": "CHECK (stage = ANY (ARRAY['ingest'::text, 'cluster'::text, 'classify'::text, 'corroborate'::text, 'review'::text, 'score'::text]))"
+      },
+      {
+        "name": "pulse_pipeline_runs_status_check",
+        "type": "c",
+        "table": "pulse_pipeline_runs",
+        "definition": "CHECK (status = ANY (ARRAY['running'::text, 'completed'::text, 'partial'::text, 'failed'::text, 'legacy'::text]))"
+      },
+      {
+        "name": "pulse_pipeline_runs_version_shape_check",
+        "type": "c",
+        "table": "pulse_pipeline_runs",
+        "definition": "CHECK ((versions ->> 'schemaVersion'::text) = 'pulse-stage-version-envelope/v1'::text AND (versions ->> 'stage'::text) = stage AND version_key ~ '^pulse-stage/sha256:[a-f0-9]{64}$'::text)"
+      },
+      {
         "name": "pulse_review_audit_log_event_id_pulse_events_v2_id_fk",
         "type": "f",
         "table": "pulse_review_audit_log",
@@ -8948,6 +9245,12 @@
         "type": "p",
         "table": "pulse_review_audit_log",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "pulse_review_audit_log_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "pulse_review_audit_log",
+        "definition": "FOREIGN KEY (run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
       },
       {
         "name": "pulse_sources_event_id_pulse_events_v2_id_fk",
@@ -8984,6 +9287,24 @@
         "type": "c",
         "table": "raw_events",
         "definition": "CHECK (classification_disposition = ANY (ARRAY['pending'::text, 'event'::text, 'non_governance'::text, 'invalid'::text]))"
+      },
+      {
+        "name": "raw_events_classification_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "raw_events",
+        "definition": "FOREIGN KEY (classification_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "raw_events_cluster_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "raw_events",
+        "definition": "FOREIGN KEY (cluster_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
+      },
+      {
+        "name": "raw_events_ingest_run_id_pulse_pipeline_runs_id_fk",
+        "type": "f",
+        "table": "raw_events",
+        "definition": "FOREIGN KEY (ingest_run_id) REFERENCES pulse_pipeline_runs(id) ON DELETE RESTRICT"
       },
       {
         "name": "raw_events_jurisdiction_id_jurisdictions_id_fk",

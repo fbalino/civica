@@ -7,6 +7,12 @@ import {
   type PulseConnectorJob,
 } from "./ingest";
 import type { UpsertResult } from "./upsert";
+import { createPulsePipelineRunRef } from "./pipeline-version";
+
+const runRef = createPulsePipelineRunRef("ingest", {
+  id: "11111111-1111-4111-8111-111111111111",
+  sourceIds: ["gdelt"],
+});
 
 const row: RawEventInput = {
   sourceId: "gdelt",
@@ -43,6 +49,7 @@ test("dry-run returns a stable diff and performs zero writes", async () => {
     jobs: jobs(),
     jurisdictionMap: new Map<string, string>(),
     writeRows,
+    runRef,
   };
   const first = await ingestPulseV2({} as Db, options);
   const second = await ingestPulseV2({} as Db, options);

@@ -1,0 +1,1 @@
+ALTER TABLE "pulse_pipeline_runs" ADD CONSTRAINT "pulse_pipeline_runs_version_shape_check" CHECK ("pulse_pipeline_runs"."versions"->>'schemaVersion' = 'pulse-stage-version-envelope/v1' AND "pulse_pipeline_runs"."versions"->>'stage' = "pulse_pipeline_runs"."stage" AND "pulse_pipeline_runs"."version_key" ~ '^pulse-stage/sha256:[a-f0-9]{64}$');

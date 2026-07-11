@@ -36,10 +36,18 @@ import {
   pressFreedomTier,
 } from "./press-freedom";
 import type { ClassifierAgreement, SeverityTier } from "./types";
+import {
+  createPulsePipelineRunRef,
+  finishPulsePipelineRun,
+  startPulsePipelineRun,
+  type PulsePipelineRunRef,
+} from "./pipeline-version";
 
 type Db = NeonHttpDatabase<typeof schema>;
 
 export interface CorroborateSummary {
+  runId: string;
+  versionKey: string;
   examined: number;
   updated: number;
   averageConfidence: number;
@@ -55,6 +63,7 @@ export interface EventRow {
   classifierAgreement: ClassifierAgreement;
   category: string;
   pressPinned: number | null;
+  classificationRunId: string;
 }
 
 export interface SourceCounts {
@@ -66,6 +75,7 @@ export interface CorroborationPlan {
   eventId: string;
   confidence: number;
   pressFreedomScore: number | null;
+  corroborationRunId: string;
 }
 
 export interface CorroborateOptions {
@@ -75,6 +85,7 @@ export interface CorroborateOptions {
   sourceCounts?: ReadonlyMap<string, SourceCounts>;
   write?: (db: Db, plan: CorroborationPlan) => Promise<void>;
   now?: Date;
+  runRef?: PulsePipelineRunRef;
 }
 
 export async function corroborateEvents(
@@ -83,15 +94,35 @@ export async function corroborateEvents(
 ): Promise<CorroborateSummary> {
   const events = opts.events ?? await loadEvents(db, opts);
   validateEvents(events);
+  const resolvedCounts = new Map<string, SourceCounts>();
+  for (const event of events) {
+    const fixtureCounts = opts.sourceCounts?.get(event.id);
+    if (opts.sourceCounts && !fixtureCounts) throw new Error(`missing source-count fixture for event: ${event.id}`);
+    resolvedCounts.set(
+      event.id,
+      fixtureCounts ?? (await loadSourceCounts(db, event.id)),
+    );
+  }
+  const run =
+    opts.runRef ??
+    createPulsePipelineRunRef("corroborate", {
+      sourceIds: events.length
+        ? [...resolvedCounts.values()].flatMap((counts) => [
+            ...counts.specialist,
+            ...counts.news,
+          ])
+        : undefined,
+      upstreamRunIds: events.map(({ classificationRunId }) => classificationRunId),
+    });
+  const persistRun = !opts.dryRun && !opts.events && !opts.runRef;
+  if (persistRun) await startPulsePipelineRun(db, run);
 
   let updated = 0;
   let totalConfidence = 0;
   const planned: CorroborationPlan[] = [];
 
   for (const event of events) {
-    const fixtureCounts = opts.sourceCounts?.get(event.id);
-    if (opts.sourceCounts && !fixtureCounts) throw new Error(`missing source-count fixture for event: ${event.id}`);
-    const counts = fixtureCounts ?? await loadSourceCounts(db, event.id);
+    const counts = resolvedCounts.get(event.id)!;
     const press = pressFreedomScore(event.iso3);
     const tier = pressFreedomTier(press);
 
@@ -121,7 +152,12 @@ export async function corroborateEvents(
 
     confidence = Math.max(0, Math.min(1, confidence));
     totalConfidence += confidence;
-    const plan = { eventId: event.id, confidence, pressFreedomScore: press };
+    const plan = {
+      eventId: event.id,
+      confidence,
+      pressFreedomScore: press,
+      corroborationRunId: run.id,
+    };
     planned.push(plan);
     if (!opts.dryRun) {
       if (opts.write) await opts.write(db, plan);
@@ -130,7 +166,16 @@ export async function corroborateEvents(
     }
   }
 
+  if (persistRun) {
+    await finishPulsePipelineRun(db, run.id, {
+      status: "completed",
+      counts: { examined: events.length, updated },
+    });
+  }
+
   return {
+    runId: run.id,
+    versionKey: run.versionKey,
     examined: events.length,
     updated,
     averageConfidence: events.length ? totalConfidence / events.length : 0,
@@ -143,6 +188,7 @@ function validateEvents(events: EventRow[]): void {
   const ids = new Set<string>();
   for (const event of events) {
     if (!event.id.trim() || !event.jurisdictionId.trim()) throw new Error("corroboration fixture has a blank event or jurisdiction id");
+    if (!event.classificationRunId.trim()) throw new Error(`corroboration fixture has no classification run: ${event.id}`);
     if (ids.has(event.id)) throw new Error(`duplicate corroboration event id: ${event.id}`);
     ids.add(event.id);
   }
@@ -155,6 +201,7 @@ async function writeCorroboration(db: Db, plan: CorroborationPlan, now: Date): P
       corroborationConfidence: plan.confidence,
       pressFreedomScoreAtClassification: plan.pressFreedomScore,
       updatedAt: now,
+      corroborationRunId: plan.corroborationRunId,
     })
     .where(eq(pulseEventsV2.id, plan.eventId));
 }
@@ -194,6 +241,7 @@ async function loadEvents(
       p.classifier_agreement,
       p.category,
       p.press_freedom_score_at_classification AS press_pinned
+      ,p.classification_run_id
     FROM pulse_events_v2 p
     JOIN jurisdictions j ON j.id = p.jurisdiction_id
     WHERE ${where}
@@ -207,6 +255,7 @@ async function loadEvents(
     classifierAgreement: r.classifier_agreement as ClassifierAgreement,
     category: String(r.category),
     pressPinned: r.press_pinned !== null ? Number(r.press_pinned) : null,
+    classificationRunId: String(r.classification_run_id),
   }));
 }
 

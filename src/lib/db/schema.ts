@@ -1,5 +1,6 @@
 import { sql as dsql } from "drizzle-orm";
 import type { DerivationVersionEnvelope } from "@/lib/research/derivation-version";
+import type { PulseStageVersionEnvelope } from "@/lib/pulse/v2/pipeline-version";
 import {
   pgTable,
   uuid,
@@ -1838,6 +1839,58 @@ export const advisoryApplications = pgTable("advisory_applications", {
 // --- Phase 5.5 — Pulse Beta foundation (dimensional deltas) ---
 
 /**
+ * Immutable identity for one execution of a Pulse pipeline stage. Status and
+ * outcome counts may close after the run, but the recorded method, ontology,
+ * prompt, provider/model, source-basket, algorithm, pipeline, and upstream-run
+ * identities cannot be changed after insertion (enforced by migration trigger).
+ */
+export const pulsePipelineRuns = pgTable(
+  "pulse_pipeline_runs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** ingest | cluster | classify | corroborate | review | score */
+    stage: text("stage").notNull(),
+    /** running | completed | partial | failed | legacy */
+    status: text("status").notNull(),
+    versionKey: text("version_key").notNull(),
+    versions: jsonb("versions").$type<PulseStageVersionEnvelope>().notNull(),
+    counts: jsonb("counts")
+      .$type<Record<string, number>>()
+      .notNull()
+      .default({}),
+    failures: jsonb("failures")
+      .$type<Array<{ component: string; message: string }>>()
+      .notNull()
+      .default([]),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    completedAt: timestamp("completed_at"),
+  },
+  (table) => [
+    index("idx_pulse_pipeline_runs_stage_time").on(
+      table.stage,
+      table.startedAt,
+    ),
+    index("idx_pulse_pipeline_runs_version").on(table.versionKey),
+    check(
+      "pulse_pipeline_runs_stage_check",
+      dsql`${table.stage} IN ('ingest','cluster','classify','corroborate','review','score')`,
+    ),
+    check(
+      "pulse_pipeline_runs_status_check",
+      dsql`${table.status} IN ('running','completed','partial','failed','legacy')`,
+    ),
+    check(
+      "pulse_pipeline_runs_completion_check",
+      dsql`(${table.status} = 'running' AND ${table.completedAt} IS NULL) OR (${table.status} <> 'running' AND ${table.completedAt} IS NOT NULL)`,
+    ),
+    check(
+      "pulse_pipeline_runs_version_shape_check",
+      dsql`${table.versions}->>'schemaVersion' = 'pulse-stage-version-envelope/v1' AND ${table.versions}->>'stage' = ${table.stage} AND ${table.versionKey} ~ '^pulse-stage/sha256:[a-f0-9]{64}$'`,
+    ),
+  ],
+);
+
+/**
  * Staging table for raw events ingested from specialist + news feeds.
  * One row per source-record. Drained by the clustering step which
  * groups near-duplicate records into governance-event clusters.
@@ -1883,6 +1936,18 @@ export const rawEvents = pgTable(
     classificationDecision: jsonb("classification_decision"),
     classifiedAt: timestamp("classified_at"),
     createdAt: timestamp("created_at").defaultNow(),
+    /** PUL-004 immutable stage-run lineage. */
+    ingestRunId: uuid("ingest_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    clusterRunId: uuid("cluster_run_id").references(
+      () => pulsePipelineRuns.id,
+      { onDelete: "restrict" },
+    ),
+    classificationRunId: uuid("classification_run_id").references(
+      () => pulsePipelineRuns.id,
+      { onDelete: "restrict" },
+    ),
   },
   (table) => [
     index("idx_raw_events_jurisdiction_date").on(
@@ -1891,6 +1956,9 @@ export const rawEvents = pgTable(
     ),
     index("idx_raw_events_unclustered").on(table.clusteredAt),
     index("idx_raw_events_cluster").on(table.clusterId),
+    index("idx_raw_events_ingest_run").on(table.ingestRunId),
+    index("idx_raw_events_cluster_run").on(table.clusterRunId),
+    index("idx_raw_events_classification_run").on(table.classificationRunId),
     uniqueIndex("idx_raw_events_external")
       .on(table.sourceId, table.externalId)
       .where(dsql`${table.externalId} IS NOT NULL`),
@@ -1946,6 +2014,19 @@ export const pulseEventsV2 = pgTable(
     derivationVersions: jsonb("derivation_versions")
       .$type<DerivationVersionEnvelope>()
       .notNull(),
+    classificationRunId: uuid("classification_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
+    /** Auto-publication points to the classification run; human decisions
+     * point to the review run. Null means the event is not public. */
+    publicationRunId: uuid("publication_run_id").references(
+      () => pulsePipelineRuns.id,
+      { onDelete: "restrict" },
+    ),
+    corroborationRunId: uuid("corroboration_run_id").references(
+      () => pulsePipelineRuns.id,
+      { onDelete: "restrict" },
+    ),
     humanReviewed: boolean("human_reviewed").notNull().default(false),
     reviewerId: text("reviewer_id"),
     reviewNotes: text("review_notes"),
@@ -1980,6 +2061,9 @@ export const pulseEventsV2 = pgTable(
     index("idx_pulse_v2_published").on(table.published, table.reviewStatus),
     index("idx_pulse_v2_dimension").on(table.dimension, table.eventDate),
     index("idx_pulse_v2_derivation_version").on(table.derivationVersionKey),
+    index("idx_pulse_v2_classification_run").on(table.classificationRunId),
+    index("idx_pulse_v2_publication_run").on(table.publicationRunId),
+    index("idx_pulse_v2_corroboration_run").on(table.corroborationRunId),
     uniqueIndex("idx_pulse_v2_cluster_unique").on(table.clusterId),
   ]
 );
@@ -2042,6 +2126,9 @@ export const pulseDimensionalDeltas = pgTable(
     derivationVersions: jsonb("derivation_versions")
       .$type<DerivationVersionEnvelope>()
       .notNull(),
+    computationRunId: uuid("computation_run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
     lastComputedAt: timestamp("last_computed_at").defaultNow().notNull(),
   },
   (table) => [
@@ -2051,6 +2138,7 @@ export const pulseDimensionalDeltas = pgTable(
     ),
     index("idx_pulse_dim_jurisdiction").on(table.jurisdictionId),
     index("idx_pulse_dim_derivation_version").on(table.derivationVersionKey),
+    index("idx_pulse_dim_computation_run").on(table.computationRunId),
   ]
 );
 
@@ -2079,6 +2167,9 @@ export const pulseReviewAuditLog = pgTable(
     /** Post-decision snapshot. For 'reject', after === before with
      *  review_status flipped. */
     after: jsonb("after").notNull(),
+    runId: uuid("run_id")
+      .references(() => pulsePipelineRuns.id, { onDelete: "restrict" })
+      .notNull(),
     notes: text("notes"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -2088,6 +2179,7 @@ export const pulseReviewAuditLog = pgTable(
       table.reviewerId,
       table.createdAt
     ),
+    index("idx_pulse_review_audit_run").on(table.runId),
   ]
 );
 

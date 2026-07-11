@@ -94,6 +94,12 @@ import {
   verifierObjects,
 } from "./publication-gate";
 import { pulseEventVersionEnvelope } from "./versioning";
+import {
+  createPulsePipelineRunRef,
+  finishPulsePipelineRun,
+  startPulsePipelineRun,
+  type PulsePipelineRunRef,
+} from "./pipeline-version";
 
 const SYSTEM_PROMPT = CLASSIFIER_SYSTEM_PROMPT;
 
@@ -142,6 +148,8 @@ export interface ClusterToClassify {
   /** distinct source ids contributing */
   sourceIds: string[];
   sourceTypes: string[];
+  /** Cluster-stage runs represented by this cluster's raw members. */
+  clusterRunIds: string[];
   /** distinct (sourceId, sourceUrl, sourceName, rawEventId) tuples for pulse_sources */
   attributions: Array<{
     sourceId: string;
@@ -153,6 +161,8 @@ export interface ClusterToClassify {
 }
 
 export interface ClassifySummary {
+  runId: string;
+  versionKey: string;
   clustersExamined: number;
   classified: number;
   publishedAuto: number;
@@ -180,6 +190,7 @@ export interface ClassifyClustersOptions {
   classify?: (cluster: ClusterToClassify) => Promise<ClassifierResult>;
   resolveSubject?: typeof resolveSubjectJurisdiction;
   write?: typeof writeEvent;
+  runRef?: PulsePipelineRunRef;
   failOnError?: boolean;
 }
 
@@ -191,6 +202,9 @@ function validateClusterFixtures(clusters: readonly ClusterToClassify[]): void {
     }
     if (!cluster.rawEventIds.length || cluster.rawEventIds.length !== cluster.attributions.length) {
       throw new Error(`Invalid classification cluster ${cluster.clusterId}: raw-event attribution is incomplete`);
+    }
+    if (!cluster.clusterRunIds.length || cluster.clusterRunIds.some((id) => !id.trim())) {
+      throw new Error(`Invalid classification cluster ${cluster.clusterId}: cluster-run lineage is missing`);
     }
     if (ids.has(cluster.clusterId)) {
       throw new Error(`Invalid classification fixture: duplicate cluster id ${cluster.clusterId}`);
@@ -214,8 +228,20 @@ export async function classifyClusters(
   const classify = opts.classify ?? classifyOne;
   const resolveSubject = opts.resolveSubject ?? resolveSubjectJurisdiction;
   const write = opts.write ?? writeEvent;
+  const run =
+    opts.runRef ??
+    createPulsePipelineRunRef("classify", {
+      sourceIds: clusters.length
+        ? clusters.flatMap(({ sourceIds }) => sourceIds)
+        : undefined,
+      upstreamRunIds: clusters.flatMap(({ clusterRunIds }) => clusterRunIds),
+    });
+  const persistRun = !opts.dryRun && !opts.clusters && !opts.runRef;
+  if (persistRun) await startPulsePipelineRun(db, run);
 
   const summary: ClassifySummary = {
+    runId: run.id,
+    versionKey: run.versionKey,
     clustersExamined: clusters.length,
     classified: 0,
     publishedAuto: 0,
@@ -240,7 +266,7 @@ export async function classifyClusters(
             disposition: "non_governance",
             reason: "classifier returned category none",
             decision: result,
-          });
+          }, run.id);
         }
         continue;
       }
@@ -263,7 +289,7 @@ export async function classifyClusters(
         category: ok.classified.category,
         autoPublished: ok.autoPublished,
       });
-      if (!opts.dryRun) await write(db, cluster, ok);
+      if (!opts.dryRun) await write(db, cluster, ok, run.id);
       summary.classified++;
       if (ok.autoPublished) summary.publishedAuto++;
       else summary.flaggedForReview++;
@@ -275,6 +301,28 @@ export async function classifyClusters(
   }
 
   summary.planned.sort((left, right) => left.clusterId.localeCompare(right.clusterId));
+  if (persistRun) {
+    await finishPulsePipelineRun(db, run.id, {
+      status: summary.failed > 0 ? "partial" : "completed",
+      counts: {
+        clustersExamined: summary.clustersExamined,
+        classified: summary.classified,
+        publishedAuto: summary.publishedAuto,
+        flaggedForReview: summary.flaggedForReview,
+        nonGovernance: summary.noneCategory,
+        failed: summary.failed,
+      },
+      failures:
+        summary.failed > 0
+          ? [
+              {
+                component: "classification",
+                message: `${summary.failed} cluster(s) failed classification or attribution.`,
+              },
+            ]
+          : [],
+    });
+  }
   return summary;
 }
 
@@ -723,6 +771,7 @@ export async function loadUnclassifiedClusters(
       ARRAY_AGG(r.source_id) AS source_ids,
       ARRAY_AGG(r.source_type) AS source_types,
       ARRAY_AGG(r.source_url) AS source_urls,
+      ARRAY_AGG(DISTINCT r.cluster_run_id) AS cluster_run_ids,
       (ARRAY_AGG(r.title))[1] AS first_title,
       (ARRAY_AGG(COALESCE(r.body, ''))) AS bodies,
       (ARRAY_AGG(r.title)) AS titles
@@ -747,6 +796,7 @@ export async function loadUnclassifiedClusters(
       source_ids: string[];
       source_types: string[];
       source_urls: (string | null)[];
+      cluster_run_ids: string[];
       first_title: string;
       bodies: string[];
       titles: string[];
@@ -759,6 +809,7 @@ export async function loadUnclassifiedClusters(
     source_ids: string[];
     source_types: string[];
     source_urls: (string | null)[];
+    cluster_run_ids: string[];
     first_title: string;
     bodies: string[];
     titles: string[];
@@ -792,6 +843,7 @@ export async function loadUnclassifiedClusters(
       rawEventIds: row.raw_event_ids,
       sourceIds: distinctSources,
       sourceTypes: distinctTypes,
+      clusterRunIds: row.cluster_run_ids,
       attributions,
     };
   });
@@ -800,7 +852,8 @@ export async function loadUnclassifiedClusters(
 export async function writeEvent(
   db: Db,
   cluster: ClusterToClassify,
-  result: ClassifyOneResult
+  result: ClassifyOneResult,
+  classificationRunId: string,
 ): Promise<void> {
   // Initial corroborationConfidence — provisional. Phase 5.7's
   // corroborate.ts can recompute. For now use a baseline based on
@@ -828,6 +881,8 @@ export async function writeEvent(
       classifierAgreement: result.classified.classifierAgreement,
       derivationVersionKey: versions.key,
       derivationVersions: versions.envelope,
+      classificationRunId,
+      publicationRunId: result.autoPublished ? classificationRunId : null,
       reviewStatus: result.autoPublished ? "approved" : "pending",
       published: result.autoPublished,
       headline: result.classified.headline,
@@ -866,7 +921,7 @@ export async function writeEvent(
     disposition: "event",
     reason: "classification admitted as a Pulse event",
     decision: result.classified,
-  });
+  }, classificationRunId);
 
   // NOTE: freshness is stamped ONLY at ingest time (upsert.ts), gated on
   // rows actually written. The classifier pass performs no upstream fetch,
@@ -882,6 +937,7 @@ export async function markClusterDisposition(
     reason: string;
     decision: unknown;
   },
+  classificationRunId: string,
 ): Promise<number> {
   const rows = await db
     .update(rawEvents)
@@ -890,6 +946,7 @@ export async function markClusterDisposition(
       classificationReason: input.reason,
       classificationDecision: input.decision,
       classifiedAt: new Date(),
+      classificationRunId,
     })
     .where(eq(rawEvents.clusterId, clusterId))
     .returning({ id: rawEvents.id });
