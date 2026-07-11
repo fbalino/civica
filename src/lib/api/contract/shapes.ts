@@ -100,7 +100,6 @@ export function shapeCountryDetailMeta(selection: AtlasSelectionMetadata): z.inf
       reference: FACTBOOK_RECONCILIATION_META.reference,
       ...selection,
     },
-    methodology: CI_METHODOLOGY_META,
     ...STRUCTURAL_FAMILY_DEPRECATION_META,
   });
 }

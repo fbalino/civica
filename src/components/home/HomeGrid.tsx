@@ -1,20 +1,15 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import Link from "next/link";
-import { getAllJurisdictions, getCIRankings } from "@/lib/db/queries";
+import { getAllJurisdictions } from "@/lib/db/queries";
 import {
   readCachedFieldFromRow,
   getCanonicalFactsForJurisdictions,
 } from "@/lib/factbook/reconcile/api";
 import { GlobalSearch } from "@/components/GlobalSearch";
-import { CountryFlag } from "@/components/CountryFlag";
 import { CountryCard, type CountryCardStat } from "@/components/home/CountryCard";
-import { Chip } from "@/components/editorial/Pill";
-import { civicaIndex } from "@/lib/content/site-state";
 import {
   Reveal,
-  Stagger,
-  StaggerItem,
   HeroReveal,
   HeroRevealItem,
 } from "@/components/motion/Reveal";
@@ -45,20 +40,7 @@ function SpotEngraving({
   );
 }
 
-/* A single Civica Index ranking row as returned by getCIRankings. */
-interface RankRow {
-  rank: number;
-  score: number;
-  name: string;
-  slug: string;
-  iso2: string | null;
-  iso3: string | null;
-  governmentType: string | null;
-  population: number | string | null;
-  flagUrl: string | null;
-  jurisdictionId: string;
-  governmentClassification: { regimeTypeLabel: string | null } | null;
-}
+type FeaturedCountryRow = Awaited<ReturnType<typeof getAllJurisdictions>>[number];
 
 /** Human-readable population (e.g. "123.3M", "1.41B"). Null-safe. */
 function formatPopulation(pop: number | string | null): string | null {
@@ -71,20 +53,17 @@ function formatPopulation(pop: number | string | null): string | null {
 }
 
 /** Government-type label: prefer the human regime label, else raw type. */
-function govLabel(row: RankRow): string | null {
+function govLabel(row: FeaturedCountryRow): string | null {
   return row.governmentClassification?.regimeTypeLabel ?? row.governmentType ?? null;
 }
 
 /** Build the (real-data-only) stat columns for a featured CountryCard. */
-function buildCardStats(row: RankRow): CountryCardStat[] {
+function buildCardStats(row: FeaturedCountryRow): CountryCardStat[] {
   const stats: CountryCardStat[] = [];
   const gov = govLabel(row);
   if (gov) stats.push({ label: "Government type", value: gov });
   const pop = formatPopulation(row.population);
   if (pop) stats.push({ label: "Population", value: pop });
-  if (Number.isFinite(row.score)) {
-    stats.push({ label: "Civica Index", value: String(Math.round(row.score)) });
-  }
   return stats;
 }
 
@@ -92,8 +71,10 @@ export async function HomeGrid() {
   // Country list for the hero search (graceful empty on DB error).
   let countries: { slug: string; name: string; iso2: string | null; capital: string | null }[] =
     [];
+  let allJurisdictions: Awaited<ReturnType<typeof getAllJurisdictions>> = [];
   try {
-    const all = await getAllJurisdictions();
+    allJurisdictions = await getAllJurisdictions();
+    const all = allJurisdictions;
     countries = all.map((c) => ({
       slug: c.slug,
       name: c.name,
@@ -102,25 +83,18 @@ export async function HomeGrid() {
     }));
   } catch {}
 
-  // Live Civica Index rankings — drives the featured cards + the Index table.
-  let rows: RankRow[] = [];
-  try {
-    const result = await getCIRankings(undefined, {});
-    rows = (
-      Array.isArray(result) ? result : ((result as { rows?: unknown[] }).rows ?? [])
-    ) as RankRow[];
-  } catch {}
-
-  // Featured cards: find Japan + Estonia in the rankings (by slug/iso3).
+  // Featured cards use the atlas jurisdiction spine, never a derived ranking.
   const findRow = (slug: string, iso3: string) =>
-    rows.find((r) => r.slug === slug || r.iso3?.toLowerCase() === iso3) ?? null;
+    allJurisdictions.find(
+      (r) => r.slug === slug || r.iso3?.toLowerCase() === iso3,
+    ) ?? null;
   const japan = findRow("japan", "jpn");
   const estonia = findRow("estonia", "est");
 
   // Resolve income-group chips for the featured cards (canonical fact layer).
   const featuredIds = [japan, estonia]
-    .filter((r): r is RankRow => r != null)
-    .map((r) => r.jurisdictionId);
+    .filter((r): r is FeaturedCountryRow => r != null)
+    .map((r) => r.id);
   const incomeByJur: Record<string, string | null> = {};
   if (featuredIds.length > 0) {
     try {
@@ -134,7 +108,6 @@ export async function HomeGrid() {
     } catch {}
   }
 
-  const top = rows.slice(0, 8);
   const catalogCount = countries.length || null;
   const japanDarkEngraving = countryDarkEngravingSrc("jpn");
   const estoniaDarkEngraving = countryDarkEngravingSrc("est");
@@ -170,18 +143,18 @@ export async function HomeGrid() {
                 <span className="home-stat-label">Countries &amp; territories</span>
               </div>
               <div className="home-stat">
-                <span className="home-stat-value">{civicaIndex.dimensionCount}</span>
-                <span className="home-stat-label">Index dimensions</span>
+                <span className="home-stat-mark" aria-hidden="true">◆</span>
+                <span className="home-stat-label">Source-native evidence</span>
               </div>
               <div className="home-stat home-stat--mark">
                 <span className="home-stat-mark" aria-hidden="true">
-                  &#9670;
+                  ◆
                 </span>
                 <span className="home-stat-label">Source links &amp; provenance</span>
               </div>
               <div className="home-stat home-stat--mark">
                 <span className="home-stat-mark" aria-hidden="true">
-                  &#9670;
+                  ◆
                 </span>
                 <span className="home-stat-label">Independent &amp; nonpartisan</span>
               </div>
@@ -216,7 +189,7 @@ export async function HomeGrid() {
             <CountryCard
               name={japan.name}
               iso2={japan.iso2}
-              incomeGroup={incomeByJur[japan.jurisdictionId] ?? null}
+              incomeGroup={incomeByJur[japan.id] ?? null}
               stats={buildCardStats(japan)}
               iso3="jpn"
               engravingDarkSrc={japanDarkEngraving}
@@ -257,7 +230,7 @@ export async function HomeGrid() {
             <CountryCard
               name={estonia.name}
               iso2={estonia.iso2}
-              incomeGroup={incomeByJur[estonia.jurisdictionId] ?? null}
+              incomeGroup={incomeByJur[estonia.id] ?? null}
               stats={buildCardStats(estonia)}
               iso3="est"
               engravingDarkSrc={estoniaDarkEngraving}
@@ -276,95 +249,35 @@ export async function HomeGrid() {
         </div>
       </Reveal>
 
-      {/* 03 — Civica Index */}
+      {/* 03 — Governance Evidence */}
       <Reveal as="section" className="home-feature">
         <div className="home-feature-num">03</div>
         <div className="home-feature-main">
-          <div className="home-eyebrow">Civica Index</div>
-          <h2 className="home-feature-title">Test comparative measures.</h2>
+          <div className="home-eyebrow">Governance Evidence</div>
+          <h2 className="home-feature-title">Compare what established sources report.</h2>
           {/* PUBLIC_CLAIM: home.secondary-research */}
           <p className="home-feature-desc">
-            The Civica Index and Pulse are secondary research experiments. Their
-            methods and outputs remain beta while Civica tests their validity,
-            sensitivity, and usefulness.
+            The dashboard presents governance observations on their original
+            scales, with source, vintage, and rights context. It does not average
+            them into a Civica country ranking.
           </p>
-          <Link href="/civica-index" className="btn btn--text">
-            <span>Explore the Index</span>
+          <Link href="/governance-evidence" className="btn btn--text">
+            <span>Explore Governance Evidence</span>
             <span className="btn__arrow" aria-hidden="true">
               &rarr;
             </span>
           </Link>
         </div>
         <div className="home-feature-visual-slot">
-          {top.length > 0 ? (
-            // PROVENANCE_COVERAGE: home.index-teaser
-            <div className="home-index">
-              <div className="home-index-head">
-                <h3 className="home-index-title">
-                  Civica Index <span>(Overall)</span>
-                </h3>
-                <Chip variant="sand">Beta</Chip>
-                <Link href="/civica-index" className="btn btn--text home-index-link">
-                  <span>View full Index</span>
-                  <span className="btn__arrow" aria-hidden="true">
-                    &rarr;
-                  </span>
-                </Link>
-                <p className="home-index-sub">
-                  Research-beta composite; methodology under active review.
-                </p>
-              </div>
-              <div className="home-index-table-wrap">
-                <table className="home-index-table">
-                  <thead>
-                    <tr>
-                      <th className="home-index-col-rank" scope="col">
-                        Rank
-                      </th>
-                      <th scope="col">Country</th>
-                      <th className="home-index-col-score" scope="col">
-                        Civica Index
-                      </th>
-                    </tr>
-                  </thead>
-                  <Stagger as="tbody" amount={0.1}>
-                    {top.map((r) => {
-                      return (
-                        <StaggerItem as="tr" key={r.slug}>
-                          <td className="home-index-col-rank">
-                            <span className="home-index-rank">{r.rank}</span>
-                          </td>
-                          <td>
-                            <Link
-                              href={`/country/${r.slug}/civica-data`}
-                              className="home-index-country"
-                            >
-                              <span className="home-index-flag" aria-hidden="true">
-                                <CountryFlag iso2={r.iso2} size={20} />
-                              </span>
-                              <span>{r.name}</span>
-                            </Link>
-                          </td>
-                          <td className="home-index-col-score">
-                            <span className="home-index-score">{Math.round(r.score)}</span>
-                          </td>
-                        </StaggerItem>
-                      );
-                    })}
-                  </Stagger>
-                </table>
-              </div>
+          {/* PROVENANCE_COVERAGE: home.evidence-teaser */}
+          <div className="home-feature-visual">
+            <div className="home-engraving">
+              <SpotEngraving
+                src="/engravings/spot-globe.webp"
+                darkSrc="/engravings/spot-globe-dark.webp"
+              />
             </div>
-          ) : (
-            <div className="home-feature-visual">
-              <div className="home-engraving">
-                <SpotEngraving
-                  src="/engravings/spot-globe.webp"
-                  darkSrc="/engravings/spot-globe-dark.webp"
-                />
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </Reveal>
     </div>

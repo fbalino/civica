@@ -162,7 +162,7 @@ async function main(): Promise<void> {
     });
   }
 
-  // Evidence fragments for the four classes currently counted complete.
+  // Evidence fragments for current classes counted complete.
   const rankingsPage = (await read("src/app/rankings/page.tsx")) ?? "";
   const rankingsMatrix = (await read("src/app/rankings/RankingsMatrix.tsx")) ?? "";
   if (!rankingsMatrix.includes("<SourceDot") || !rankingsPage.includes("/licensing#reuse")) {
@@ -174,20 +174,25 @@ async function main(): Promise<void> {
   }
   const embed = (await read("src/app/embed/[slug]/route.ts")) ?? "";
   for (const fragment of [
-    'name="civica:sources"',
-    "getNormalizationTableRows",
     'name="civica:rights"',
-    "quarterLabel",
-    "attributionHtml",
-    "Reuse: civicaatlas.org/licensing",
+    "status: 410",
+    'rel="successor-version"',
+    "/licensing#reuse",
   ]) {
     if (!embed.includes(fragment)) {
       problems.push({
         category: "complete-proof",
         file: "src/app/embed/[slug]/route.ts",
-        detail: `fixed embed completion requires ${fragment}`,
+        detail: `retired embed notice requires ${fragment}`,
       });
     }
+  }
+  if (embed.includes("getCICountryDetail") || embed.includes("ciScore")) {
+    problems.push({
+      category: "complete-proof",
+      file: "src/app/embed/[slug]/route.ts",
+      detail: "retired embed notice must not fetch or render composite values",
+    });
   }
 
   // Sweep rendered-source trees and the few public strings outside them.

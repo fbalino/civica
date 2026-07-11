@@ -136,15 +136,15 @@ export const RIGHTS_ARTIFACT_CLASSES: readonly RightsArtifactClassRow[] = [
   },
   {
     id: "hosted-embeds",
-    label: "Hosted widget embeds",
+    label: "Retired Index embeds",
     scope:
-      "The `/embed/[slug]` iframe widgets and the `/civica-index/widget` gallery that generates their snippets.",
+      "Legacy `/embed/[slug]` Civica Index iframes.",
     currentPermissionPosture:
-      "Embedding the hosted widget on a third-party page is permitted. That permission covers only the hosted display — it does not grant a separate license to the underlying data shown inside the widget.",
+      "The score widgets are retired and return an informational replacement notice without empirical values.",
     governingBasis:
-      "Civica's hosting terms for the iframe surface, distinct from the reuse terms of the data rendered inside it.",
+      "The selected Index disposition no longer publishes the composite as a public comparison product.",
     readerAction:
-      "Use the iframe as provided; do not scrape or republish the data rendered inside a widget as if the embed permission also covered that data.",
+      "Replace old iframe links with the source-native Governance Evidence Dashboard.",
   },
   {
     id: "code",
@@ -236,7 +236,7 @@ export const REQUIRED_RIGHTS_SURFACES: readonly RequiredRightsSurface[] = [
   {
     id: "metadata",
     label: "Structured Dataset metadata",
-    paths: ["src/lib/seo/jsonld.ts", "src/app/(reader)/civica-index/page.tsx"],
+    paths: ["src/lib/seo/jsonld.ts", "src/app/governance-evidence/page.tsx"],
   },
   {
     id: "downloads",
@@ -253,7 +253,6 @@ export const REQUIRED_RIGHTS_SURFACES: readonly RequiredRightsSurface[] = [
     label: "Embed route + widget gallery",
     paths: [
       "src/app/embed/[slug]/route.ts",
-      "src/app/(reader)/civica-index/widget/page.tsx",
     ],
     machineReadableOnlyPaths: ["src/app/embed/[slug]/route.ts"],
   },

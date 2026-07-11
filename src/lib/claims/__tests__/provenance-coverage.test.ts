@@ -10,8 +10,8 @@ import {
   validateProvenanceRendererSources,
 } from "../provenance-coverage";
 
-test("registry contains exactly the ten CLM-019 renderer contracts", () => {
-  assert.equal(PROVENANCE_RENDERER_CLASSES.length, 10);
+test("registry contains the current compact-surface renderer contracts", () => {
+  assert.equal(PROVENANCE_RENDERER_CLASSES.length, 6);
   assert.equal(
     new Set(PROVENANCE_RENDERER_CLASSES.map((row) => row.id)).size,
     PROVENANCE_RENDERER_CLASSES.length,
@@ -37,23 +37,21 @@ test("summary is derived from the registry and explicitly not dataset-wide", () 
   const complete = PROVENANCE_RENDERER_CLASSES.filter(
     hasCompleteCompactProvenance,
   );
-  assert.equal(PROVENANCE_COVERAGE_SUMMARY.total, 10);
+  assert.equal(PROVENANCE_COVERAGE_SUMMARY.total, 6);
   assert.equal(PROVENANCE_COVERAGE_SUMMARY.complete, complete.length);
-  assert.equal(PROVENANCE_COVERAGE_SUMMARY.percent, 40);
+  assert.equal(PROVENANCE_COVERAGE_SUMMARY.percent, 33);
   assert.equal(PROVENANCE_COVERAGE_SUMMARY.isDatasetWide, false);
   assert.equal(PROVENANCE_COVERAGE_SUMMARY.datasetWideOwner, "DAT-005");
 });
 
-test("the complete set is rankings plus the three fixed embed presets", () => {
+test("the complete set is rankings plus the retired embed notice", () => {
   assert.deepEqual(
     PROVENANCE_RENDERER_CLASSES.filter(hasCompleteCompactProvenance).map(
       (row) => row.id,
     ),
     [
       "rankings.metric-cell",
-      "embeds.small-index",
-      "embeds.medium-index",
-      "embeds.large-index",
+      "embeds.retired-index",
     ],
   );
 });
@@ -114,7 +112,7 @@ test("scanner permits explicit non-universality and bounded coverage", () => {
     "Civica does not claim that every value has inline provenance.",
     "Per-fact provenance appears where implemented.",
     "Supported ranking cells show source and freshness.",
-    "Four of ten registered compact renderer classes currently meet the contract.",
+    "Two of six registered compact renderer classes currently meet the contract.",
   ]) {
     assert.deepEqual(findUniversalProvenanceClaims(claim), [], claim);
   }

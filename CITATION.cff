@@ -18,7 +18,7 @@ title: "Civica Atlas"
 # PUBLIC_CLAIM: citation.index-estimate
 # PUBLIC_CLAIM: citation.pulse-signal
 # PUBLIC_CLAIM: citation.provenance-coverage
-abstract: "A provenance-first comparative reference to how every country is governed, combining source-linked country profiles with the explicitly experimental Civica Index and Civica Pulse research outputs."
+abstract: "A provenance-first comparative reference to how every country is governed, combining source-linked country profiles and source-native governance evidence with preserved Civica Index research and the experimental Civica Pulse event ledger."
 type: dataset
 authors:
   - name: "Civica Atlas"

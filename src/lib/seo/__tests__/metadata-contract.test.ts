@@ -627,11 +627,10 @@ test("classifyRouteStatus: pulse paths are a stricter subset of index paths", ()
   assert.equal(classifyRouteStatus("/about"), "none");
 });
 
-test("classifyRouteStatus: Index-facing also covers /rankings, /compare, and /country/:slug/civica-data", () => {
-  assert.equal(classifyRouteStatus("/rankings"), "index");
-  assert.equal(classifyRouteStatus("/compare"), "index");
-  assert.equal(classifyRouteStatus("/country/usa/civica-data"), "index");
-  // Other country tabs and unrelated near-matches are NOT index-facing.
+test("classifyRouteStatus: source-native public comparison surfaces are no longer Index-facing", () => {
+  assert.equal(classifyRouteStatus("/rankings"), "none");
+  assert.equal(classifyRouteStatus("/compare"), "none");
+  assert.equal(classifyRouteStatus("/country/usa/civica-data"), "none");
   assert.equal(classifyRouteStatus("/country/usa"), "none");
   assert.equal(classifyRouteStatus("/country/usa/constitution"), "none");
   assert.equal(classifyRouteStatus("/rankings-archive"), "none");
@@ -667,6 +666,10 @@ test("routeStatusSatisfied requires beta/research-experiment language on index-f
   );
   assert.equal(
     routeStatusSatisfied("/civica-index", metaTagsHtml({ ogDescription: "research-experiment status" })),
+    true,
+  );
+  assert.equal(
+    routeStatusSatisfied("/civica-index", metaTagsHtml({ description: "Preserved research and adopted disposition." })),
     true,
   );
   assert.equal(
@@ -710,7 +713,7 @@ test("routeStatusSatisfied ignores a status disclosure that only appears in body
   });
   assert.equal(routeStatusSatisfied("/civica-index", bodyOnlyBetaChip), false);
   assert.equal(routeStatusSatisfied("/civica-index/pulse-changelog", bodyOnlyBetaChip), false);
-  assert.equal(routeStatusSatisfied("/rankings", bodyOnlyBetaChip), false);
+  assert.equal(routeStatusSatisfied("/rankings", bodyOnlyBetaChip), true);
 });
 
 // ── Argument-less new Date() detection ──────────────────────────────────

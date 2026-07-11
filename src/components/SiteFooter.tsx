@@ -66,16 +66,15 @@ const FOOTER_COLUMNS: FooterColumn[] = [
     ],
   },
   {
-    title: "Civica Index",
+    title: "Governance Evidence",
     links: [
-      { label: "Overview", href: "/civica-index" },
-      { label: "Methodology", href: "/civica-index/methodology" },
+      { label: "Evidence Dashboard", href: "/governance-evidence" },
+      { label: "Research Status", href: "/civica-index" },
+      { label: "Index Methodology", href: "/civica-index/methodology" },
       { label: "The Pulse", href: "/civica-index/methodology/pulse" },
       { label: "Pulse Changelog", href: "/civica-index/pulse-changelog" },
-      { label: "Government Types", href: "/civica-index/government-types" },
       { label: "Replication", href: "/civica-index/replication" },
       { label: "Corrections", href: "/civica-index/corrections" },
-      { label: "Embed Widget", href: "/civica-index/widget" },
     ],
   },
   {

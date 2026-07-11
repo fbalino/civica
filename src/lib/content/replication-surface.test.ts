@@ -35,10 +35,10 @@ test("current replicationPackage state passes every invariant", () => {
   assert.deepEqual(validateReplicationPackage(replicationPackage), []);
 });
 
-test("no component is available and none has an href in the current state", () => {
+test("the current tournament package exposes only components that have stable links", () => {
+  assert.equal(replicationPackage.pageStatus, "tournament-package-available");
   for (const c of replicationPackage.components) {
-    assert.notEqual(c.status, "available", `${c.id} must not be available pre-G2`);
-    assert.equal(c.href, undefined, `${c.id} must not carry an href pre-G2`);
+    assert.equal(c.status === "available", Boolean(c.href), c.id);
   }
 });
 

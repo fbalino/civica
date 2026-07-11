@@ -299,12 +299,11 @@ export function deprecationMismatch(
   filePath: string,
   hasDeprecationContract: boolean,
   source: string,
+  helperName = "withStructuralFamilyDeprecation",
 ): string | null {
-  const usesDeprecationHelper = source.includes(
-    "withStructuralFamilyDeprecation",
-  );
+  const usesDeprecationHelper = source.includes(helperName);
   if (hasDeprecationContract && !usesDeprecationHelper) {
-    return `[deprecation] route "${routeId}" declares a deprecation contract but ${filePath} never calls withStructuralFamilyDeprecation`;
+    return `[deprecation] route "${routeId}" declares a deprecation contract but ${filePath} never calls ${helperName}`;
   }
   if (!hasDeprecationContract && usesDeprecationHelper) {
     return `[deprecation] route "${routeId}" has no deprecation contract in the registry, but ${filePath} calls withStructuralFamilyDeprecation — stripped deprecation headers or a missing registry entry`;
@@ -317,13 +316,11 @@ export function deprecationScopeMismatch(
   filePath: string,
   appliesWhen: "always" | "taxonomy-structural-regime",
   source: string,
+  helperName = "withStructuralFamilyDeprecation",
 ): string | null {
   if (appliesWhen === "always") {
-    if (
-      !/if\s*\(rateLimited\)\s*return\s+withStructuralFamilyDeprecation\(rateLimited\)/.test(
-        source,
-      )
-    ) {
+    const rateLimitPattern = new RegExp(`if\\s*\\(rateLimited\\)\\s*return\\s+${helperName}\\(rateLimited\\)`);
+    if (!rateLimitPattern.test(source)) {
       return `[deprecation] route "${routeId}" does not decorate its 429 rate-limit response in ${filePath}`;
     }
     return null;
@@ -346,6 +343,7 @@ async function checkDeprecationConsistency(report: Report): Promise<void> {
       route.filePath,
       route.deprecation !== null,
       source,
+      route.deprecation?.helperName,
     );
     if (mismatch) report.errors.push(mismatch);
     if (route.deprecation) {
@@ -354,6 +352,7 @@ async function checkDeprecationConsistency(report: Report): Promise<void> {
         route.filePath,
         route.deprecation.appliesWhen,
         source,
+        route.deprecation.helperName,
       );
       if (scopeMismatch) report.errors.push(scopeMismatch);
     }

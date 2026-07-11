@@ -30,7 +30,7 @@
 
 ## Section 1 · Scale {#scale}
 
-Every Civica Index score is an integer between 0 and 100. Higher means stronger governance institutions. Every published score is accompanied by:
+The preserved Beta method produces an integer between 0 and 100. Higher values represent stronger governance institutions under that model. These values are retained as research records and are not Civica's current public comparison product. Each retained record includes:
 
 - **No composite uncertainty band.** The current release retains no usable per-country uncertainty field and has no cross-source covariance model. It therefore publishes the deterministic weighted point estimate without lower or upper bounds.
 - **A neutral numeric position** — the estimate is plotted on a 0–100 line without a letter grade or qualitative country verdict. See §6.
@@ -39,7 +39,7 @@ Every Civica Index score is an integer between 0 and 100. Higher means stronger 
 
 Scores are integers, not decimals. The underlying data is not precise enough to support fractional digits, and pretending otherwise misleads readers.
 
-Ranks order those published integer estimates using **competition ranking**. Countries with the same published score share the same rank; the next rank skips the positions occupied by the tie. Jurisdiction identity stabilizes display order inside a tied group but does not break the tie. A rank is therefore an ordering of rounded estimates, not evidence that adjacent countries are meaningfully different. Because the current release has no valid score-uncertainty model, it does not publish rank intervals or claim that rank instability has been estimated.
+The archived pipeline ordered integer estimates using **competition ranking**. Countries with the same published score shared the same rank; the next rank skipped the positions occupied by the tie. Jurisdiction identity stabilized display order inside a tied group but did not break the tie. The rank was only an ordering of rounded estimates. It was not evidence that adjacent countries were meaningfully different. The research record has no valid score-uncertainty model, does not publish rank intervals, and does not claim estimated rank stability.
 
 ## Section 3 · Normalization {#normalization}
 
@@ -105,9 +105,9 @@ The contrast between CI and Conditions is itself informative. A country can have
 
 ## Section 9 · Government type {#gov-type}
 
-Government type is descriptive metadata, not a scoring signal. It does not enter the CI calculation in any form. Constitutional monarchies are not awarded points for being constitutional monarchies; presidential republics are not penalized for being presidential republics. The score measures governance quality directly, regardless of the constitutional shell that produces it.
+Government type is descriptive metadata, not a scoring signal. It does not enter the archived CI calculation. Constitutional monarchies received no bonus for being constitutional monarchies, and presidential republics received no penalty for being presidential republics.
 
-Empirical observation about how governance scores vary by government type is published as a separate analysis at [/civica-index/government-types](/civica-index/government-types) — average CI per type, distribution spread, twenty-year trajectories. The data is presented as observation, never as ranking.
+The former government-type score explorer has been removed from public navigation because it depended on the superseded composite. Source-native governance observations remain available in the [Governance Evidence Dashboard](/governance-evidence); descriptive regime classifications remain available in country profiles and the Atlas.
 
 How Civica chooses peer sets for ranking comparisons — different lenses for material, governance, and descriptive comparisons — is documented in the [peer-grouping methodology](/civica-index/methodology/peer-grouping).
 
@@ -119,20 +119,20 @@ The Pulse is currently a clearly labelled *Beta* experiment. Its classifications
 
 ## Section 11 · Update frequency & vintages {#vintages}
 
-The Civica Index is designed for **quarterly** vintages aligned with source publication cycles. Mid-quarter source releases are staged for the next published computation. Pulse is designed for scheduled event-ingestion runs, but the public ledger always reflects the most recent completed computation rather than a live or continuous measure.
+The archived Civica Index pipeline was designed for **quarterly** vintages aligned with source publication cycles. Mid-quarter source releases were staged for the next computation. Pulse is designed for scheduled event-ingestion runs, and its public ledger reflects the most recent completed computation rather than a live measure.
 
-The research design distinguishes two historical series:
+The research design proposed two historical series:
 
-- **As-published vintages.** Every quarterly snapshot is preserved permanently. Cited values like "Civica Index 2026 Q3" resolve to that frozen value forever, regardless of how the methodology evolves afterward.
-- **Harmonized back-cast.** Every country's historical CI is recomputed annually under the current methodology and published as a separate time series — for researchers who want apples-to-apples comparisons across years. Always clearly labelled as back-cast.
+- **As-published vintages.** A quarterly snapshot would remain frozen under its original methodology version.
+- **Harmonized back-cast.** A separate series would recompute history under one method for longitudinal analysis.
 
-The current public API does not yet certify both series as separately complete and reproducible. Until that versioning gate passes, readers should treat current history responses as research-beta records rather than a finished as-published/back-cast archive. See §13 for citation guidance.
+Neither series was certified as complete and reproducible. The deprecated history API contains research-beta records, not a finished as-published or back-cast archive, and will stop serving composite data at the announced sunset.
 
 ## Section 12 · Limitations {#limitations}
 
 **Source lag.** The CI is only as current as its slowest-updating source. Some upstream indices publish 12–18 months behind real-world developments. Pulse is a separate experiment testing whether an event ledger can add timely context; its incremental value has not yet been established.
 
-**Coverage gaps.** Some countries have insufficient source coverage to compute even a partial CI. Those pages display "Insufficient data" rather than guess. The complete public replication package, including a frozen coverage list, is not yet available.
+**Coverage gaps.** Some countries lacked enough source coverage to compute even a partial CI. The public country pages now show source-native evidence instead of filling those gaps with a composite.
 
 **Partial-estimate upward bias.** Re-proportioning weights over the dimensions present (§7) can bias a partial score upward relative to what the country would score with full coverage, since the missing dimension is often the weakest one for a fragile or low-capacity state. The partial label identifies this limitation; no generic uncertainty band is presented as a correction.
 
@@ -142,25 +142,24 @@ The current public API does not yet certify both series as separately complete a
 
 ## Section 13 · Citation {#citation}
 
-For published vintages, cite by year and quarter. While the Index is in Beta, include the "Beta" suffix:
+Do not cite the current website as publishing an endorsed Civica country score or ranking. To discuss the preserved Beta method, cite the methodology and identify the versioned research artifact:
 
 ```
-Civica Index 2026 Q3 (Beta). Civica Atlas. https://civicaatlas.org/civica-index
-For a specific country:
-  Civica Index for [Country], 2026 Q3 (Beta). Civica Atlas.
-    https://civicaatlas.org/civica-index/[country-slug]
+Civica Atlas. Civica Index research methodology and disposition,
+version civica-index-disposition-2026-07-v1.
+https://civicaatlas.org/civica-index/methodology
 ```
 
-Once the Beta exits and the Index stabilizes, the "Beta" suffix drops; the year-quarter remains the canonical citation handle.
+If a future candidate passes the preregistered validation gates, it will receive a new methodology version and its own citation instructions. The archived Beta values do not inherit that standing.
 
 ### 13.1 · API access
 
-The full, generated endpoint list — Civica Index rankings/compare/history/methodology and the Pulse endpoints — lives at [/api-docs](/api-docs), with a live parameter table and a schema-validated example response for each. Every CI API response includes a CI-specific `meta.methodology` block describing the methodology revision date and Beta status. Pulse endpoints carry a separate Pulse runtime-method block, marked `experimental` (not Beta), because their version, output shape, and experimental status differ from the Index.
+The generated endpoint list lives at [/api-docs](/api-docs). Legacy Civica Index score, ranking, comparison, history, and methodology endpoints are marked deprecated, name the [Governance Evidence Dashboard](/governance-evidence) as their successor, and return `410 Gone` after the announced sunset. Pulse endpoints remain separate and carry their own experimental runtime-method contract.
 
 ### 13.2 · Disputes & corrections
 
-Every score is open to dispute. Submit data-error corrections, methodology disagreements, or Pulse event misclassifications at [/civica-index/corrections](/civica-index/corrections). Best-effort targets are {{state.disputeSla.initialResponseDays}} calendar days for initial review and {{state.disputeSla.fullDispositionDays}} calendar days for full disposition. Public submissions can be followed in the corrections log; privacy-requested submissions are omitted. The governing rules are in the [corrections and versioning policy](/policies#corrections).
+Submit source-data errors, methodology disagreements, or Pulse event misclassifications at [/civica-index/corrections](/civica-index/corrections). Best-effort targets are {{state.disputeSla.initialResponseDays}} calendar days for initial review and {{state.disputeSla.fullDispositionDays}} calendar days for full disposition. Public submissions can be followed in the corrections log; privacy-requested submissions are omitted. The governing rules are in the [corrections and versioning policy](/policies#corrections).
 
 ### 13.3 · Replication
 
-The [replication status page](/civica-index/replication) lists the required artifacts and their current availability. The complete public package is not yet published; mixed source rights and pending external gates still limit what can be released.
+The [replication status page](/civica-index/replication) records the available artifacts and remaining rights constraints. The frozen tournament package preserves code, manifests, diagnostics, and decision outputs in the repository; restricted source observations are not republished where upstream terms do not permit it.

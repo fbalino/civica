@@ -69,13 +69,13 @@ const EXPLORE_SECTIONS: { label: string; items: NavItem[] }[] =
     })),
   }));
 
-/** Everything that is NOT a browse surface: the Index/Methodology hubs and
+/** Everything that is NOT a browse surface: evidence/methodology hubs and
  * the two editorial links. */
 const PRIMARY: NavItem[] = [
   {
-    href: "/civica-index",
-    label: "Index",
-    descriptor: "Civica Index (beta)",
+    href: "/governance-evidence",
+    label: "Governance Evidence",
+    descriptor: "Source-native comparison",
     glyph: "◈",
     children: INDEX_NAV_ITEMS,
   },

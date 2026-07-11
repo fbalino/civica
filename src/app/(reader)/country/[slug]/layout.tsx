@@ -3,10 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { existsSync } from "fs";
 import { join } from "path";
-import {
-  getJurisdictionBySlug,
-  getCICountryDetail,
-} from "@/lib/db/queries";
+import { getJurisdictionBySlug } from "@/lib/db/queries";
 import { reconciliation } from "@/lib/content/site-state";
 import {
   darkEngravingCaption,
@@ -89,21 +86,13 @@ export default async function CountryLayout({
   const jurisdiction = await getJurisdictionBySlug(slug).catch(() => null);
   if (!jurisdiction) notFound();
 
-  const [ciDetail, headerFacts] = await Promise.all([
-    getCICountryDetail(slug).catch(() => null),
-    // Resolver batch for the two masthead pills (Pop + GDP).
-    getCanonicalFactsForJurisdiction(jurisdiction.id, [
-      "population_total",
-      "gdp_ppp_usd_billions",
-    ]).catch(
-      () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>
-    ),
-  ]);
-
-  const ciScore =
-    ciDetail?.composite?.score != null
-      ? Number(ciDetail.composite.score)
-      : null;
+  // Resolver batch for the two masthead pills (Pop + GDP).
+  const headerFacts = await getCanonicalFactsForJurisdiction(jurisdiction.id, [
+    "population_total",
+    "gdp_ppp_usd_billions",
+  ]).catch(
+    () => ({}) as Record<string, import("@/lib/factbook/reconcile/types").ResolverOutput>,
+  );
 
   const govLabel =
     formatGovernmentType(
@@ -214,7 +203,6 @@ export default async function CountryLayout({
         }
         populationResolver={headerFacts["population_total"] ?? null}
         gdpResolver={headerFacts["gdp_ppp_usd_billions"] ?? null}
-        ciScore={ciScore}
         mapImages={mapImages}
         photos={photos}
         bounds={bounds}

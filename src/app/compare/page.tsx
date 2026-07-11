@@ -7,14 +7,13 @@ import {
   getGovernmentStructure,
   getLegislatureComposition,
   getElectionsByJurisdiction,
-  compareCICountries,
-  getCICountryHistory,
   getInternationalMembershipsBySlugs,
 } from "@/lib/db/queries";
 import { CompareCountrySelector, type SelectedCountryCard } from "./CompareCountrySelector";
 import { CompareSectionNav } from "./CompareSectionNav";
 import { CompareOverview, formatNumber } from "@/components/compare/CompareOverview";
-import { CompareCivicaIndex } from "@/components/compare/CompareCivicaIndex";
+import { GovernanceEvidenceTable } from "@/components/governance-evidence/GovernanceEvidenceTable";
+import { Banner } from "@/components/editorial/Banner";
 import { CompareChambers } from "@/components/compare/CompareChambers";
 import { CompareElections } from "@/components/compare/CompareElections";
 import { CompareInternational } from "@/components/compare/CompareInternational";
@@ -22,7 +21,7 @@ import { withOg } from "@/lib/og";
 import { getCanonicalFactsForJurisdictions } from "@/lib/factbook/reconcile/api";
 import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { PageHero } from "@/components/PageHero";
-import { civicaIndex } from "@/lib/content/site-state";
+import { getGovernanceEvidence } from "@/lib/db/queries-governance-evidence";
 
 export const revalidate = 3600;
 
@@ -86,12 +85,12 @@ export async function generateMetadata({
   return {
     title,
     description:
-      "Compare any two or three countries side by side: factbook overview, research-beta Civica Index scores, parliamentary chambers, recent elections, and international memberships.",
+      "Compare any two or three countries side by side: source-native governance evidence, factbook overview, parliamentary chambers, recent elections, and international memberships.",
     alternates: { canonical },
     openGraph: withOg({
       title: `${title} · Civica Atlas`,
       description:
-        "Compare the governance, research-beta scoring, chambers, elections, and global memberships of any two or three countries side by side.",
+        "Compare source-native governance evidence, chambers, elections, and global memberships for any two or three countries.",
       url: canonical,
     }),
   };
@@ -127,8 +126,7 @@ export default async function ComparePage({
   const ids = selectedJurisdictions.map((j) => j.id);
 
   // Phase 2 — fetch ALL section data in parallel
-  let compareCI: Awaited<ReturnType<typeof compareCICountries>> = [];
-  let histories: Array<Awaited<ReturnType<typeof getCICountryHistory>>> = [];
+  let governanceEvidence: Array<Awaited<ReturnType<typeof getGovernanceEvidence>>> = [];
   let govStructures: Array<Awaited<ReturnType<typeof getGovernmentStructure>>> = [];
   let chambersArr: Array<Awaited<ReturnType<typeof getLegislatureComposition>>> = [];
   let electionsArr: Array<Awaited<ReturnType<typeof getElectionsByJurisdiction>>> = [];
@@ -137,15 +135,13 @@ export default async function ComparePage({
   if (validSlugs.length > 0) {
     try {
       [
-        compareCI,
-        histories,
+        governanceEvidence,
         govStructures,
         chambersArr,
         electionsArr,
         memberships,
       ] = await Promise.all([
-        compareCICountries(validSlugs),
-        Promise.all(validSlugs.map((s) => getCICountryHistory(s))),
+        Promise.all(validSlugs.map((slug) => getGovernanceEvidence(slug))),
         Promise.all(ids.map((id) => getGovernmentStructure(id))),
         Promise.all(ids.map((id) => getLegislatureComposition(id))),
         Promise.all(ids.map((id) => getElectionsByJurisdiction(id))),
@@ -155,11 +151,6 @@ export default async function ComparePage({
       console.error("[/compare] section data fetch failed:", err);
     }
   }
-
-  // Re-order CI result to match user-entered slug order
-  const orderedCI = validSlugs
-    .map((slug) => compareCI.find((c) => c.jurisdiction.slug === slug))
-    .filter(Boolean) as typeof compareCI;
 
   // Phase F.4 — multi-country resolver fetch. Pulls every in-scope
   // reconciled fact-key for every selected country in a single batch
@@ -191,27 +182,25 @@ export default async function ComparePage({
     null;
 
   const selectedCards: Array<SelectedCountryCard | null> = [0, 1, 2].map((i) => {
-    const ciRow = orderedCI[i];
-    if (!ciRow) return null;
+    const jurisdiction = selectedJurisdictions[i];
+    if (!jurisdiction) return null;
     // Phase 3e (structural_family removal) — prefer the pretty-printed
     // BR/CGV regime type label from the taxonomy layer (e.g.
     // "Parliamentary democracy", "Civilian dictatorship") over the raw
     // DB `government_type` factbook string. The legacy
     // `structuralFamilyLabel` was retired with the heuristic taxonomy
     // per the 2026-05-02 peer-grouping resolution.
-    const classification = ciRow.jurisdiction.governmentClassification;
+    const classification = jurisdiction.governmentClassification;
     const prettyGov =
       classification?.regimeTypeLabel ??
-      govShort(ciRow.jurisdiction.governmentType);
-    const popN = resolvedPopulation(ciRow.jurisdiction);
+      govShort(jurisdiction.governmentType);
+    const popN = resolvedPopulation(jurisdiction);
     return {
-      slug: ciRow.jurisdiction.slug,
-      name: ciRow.jurisdiction.name,
-      iso2: ciRow.jurisdiction.iso2 ?? null,
-      score: ciRow.composite?.score != null ? Number(ciRow.composite.score) : null,
-      rank: ciRow.composite?.rank ?? null,
+      slug: jurisdiction.slug,
+      name: jurisdiction.name,
+      iso2: jurisdiction.iso2 ?? null,
       governmentType: prettyGov,
-      continent: ciRow.jurisdiction.continent ?? null,
+      continent: jurisdiction.continent ?? null,
       populationLabel: popN != null && popN > 0 ? formatNumber(popN) : null,
     };
   });
@@ -273,7 +262,7 @@ export default async function ComparePage({
         }
         description={
           <>
-            Overview, Civica Index, chambers, elections, and international
+            Overview, source-native governance evidence, chambers, elections, and international
             memberships &mdash; any two or three countries in one view.
           </>
         }
@@ -297,8 +286,8 @@ export default async function ComparePage({
         <div className="compare-empty">
           <p className="compare-empty-title">Choose two or three countries above to begin comparing.</p>
           <p className="compare-empty-sub">
-            You&apos;ll see an overview, Civica Index scoring with a shared
-            timeline, parliamentary chambers side-by-side, recent elections,
+            You&apos;ll see an overview, source-native governance evidence,
+            parliamentary chambers side-by-side, recent elections,
             and international memberships.
           </p>
         </div>
@@ -322,16 +311,19 @@ export default async function ComparePage({
             <CompareOverview countries={overviewCountries} />
           </section>
 
-          <section id="civica-index" className="compare-section">
-            <div className="compare-section-eyebrow">II · CIVICA INDEX</div>
-            <h2 className="compare-section-heading">How well are they governed?</h2>
-            <CompareCivicaIndex
-              ordered={orderedCI}
-              histories={validSlugs.map((s) =>
-                histories[validSlugs.indexOf(s)] ?? []
-              )}
-              seriesColors={SERIES_VARS}
-            />
+          <section id="governance-evidence" className="compare-section">
+            <div className="compare-section-eyebrow">II · GOVERNANCE EVIDENCE</div>
+            <h2 className="compare-section-heading">What established sources report.</h2>
+            <Banner variant="info">
+              Each source keeps its native scale. Civica does not average the
+              rows or turn them into a country-quality ranking.
+            </Banner>
+            {governanceEvidence.flatMap((evidence) => evidence ? [
+              <div key={evidence.country.slug} className="editorial-section">
+                <h3>{evidence.country.name}</h3>
+                <GovernanceEvidenceTable countryName={evidence.country.name} rows={evidence.rows} />
+              </div>
+            ] : [])}
           </section>
 
           <section id="chambers" className="compare-section">
@@ -361,9 +353,9 @@ export default async function ComparePage({
                 {c.name} profile →
               </Link>
             ))}
-            <Link href="/civica-index/methodology">Methodology →</Link>
+            <Link href="/governance-evidence">Governance Evidence →</Link>
             <span className="compare-footer-meta">
-              Civica Index{civicaIndex.status === "beta" ? " (Beta)" : ""} · weighted composite of governance dimensions
+              Source-native observations · no Civica country-quality composite
             </span>
           </footer>
         </>

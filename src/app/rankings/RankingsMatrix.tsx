@@ -45,17 +45,6 @@ const formatArea = (n: number) => `${Math.round(n).toLocaleString()}`;
 const formatYears = (n: number) => n.toFixed(1);
 const formatDecimal2 = (n: number) => n.toFixed(2);
 const formatPercent = (n: number) => `${n.toFixed(1)}%`;
-const formatScore = (n: number) => n.toFixed(1);
-
-// Governance dimensions + composite are normalized 0-100 (beta Civica Index).
-const GOVERNANCE_COLUMNS: MetricColumn[] = [
-  { id: "civica_index", label: "Civica Index", unit: "0–100", format: formatScore },
-  { id: "democratic_quality", label: "Democracy", unit: "0–100", format: formatScore },
-  { id: "freedom_rights", label: "Freedom & Rights", unit: "0–100", format: formatScore },
-  { id: "rule_of_law", label: "Rule of Law", unit: "0–100", format: formatScore },
-  { id: "corruption_control", label: "Corruption Control", unit: "0–100", format: formatScore },
-];
-
 const MATERIAL_COLUMNS: MetricColumn[] = [
   { id: "population", label: "Population", unit: "people", format: formatPopulation },
   { id: "gdp_ppp", label: "GDP (PPP)", unit: "USD", format: formatGdp },
@@ -67,7 +56,7 @@ const MATERIAL_COLUMNS: MetricColumn[] = [
   { id: "median_age", label: "Median Age", unit: "years", format: formatYears },
 ];
 
-const METRIC_COLUMNS: MetricColumn[] = [...GOVERNANCE_COLUMNS, ...MATERIAL_COLUMNS];
+const METRIC_COLUMNS: MetricColumn[] = MATERIAL_COLUMNS;
 
 export function RankingsMatrix({ rows }: { rows: RankingCountryRow[] }) {
   const columns: SortableColumn<RankingCountryRow>[] = [
@@ -93,18 +82,9 @@ export function RankingsMatrix({ rows }: { rows: RankingCountryRow[] }) {
       render: (row) => {
         const cell = row.metrics[metric.id];
         if (!cell) return null;
-        const isCivicaIndex = metric.id === "civica_index";
         return (
           <span className="sortable-data-table__value">
-            <span
-              style={
-                isCivicaIndex
-                  ? { color: "var(--color-text-primary)", fontWeight: "var(--font-weight-semibold)" }
-                  : undefined
-              }
-            >
-              {metric.format(cell.value)}
-            </span>
+            <span>{metric.format(cell.value)}</span>
             <SourceDot source={cell.source} retrievedAt={cell.retrievedAt} />
           </span>
         );
@@ -118,7 +98,7 @@ export function RankingsMatrix({ rows }: { rows: RankingCountryRow[] }) {
         columns={columns}
         rows={rows}
         getRowKey={(row) => row.slug}
-        initialSort={{ columnId: "civica_index", direction: "desc" }}
+        initialSort={{ columnId: "population", direction: "desc" }}
         caption={`${rows.length} jurisdictions · click a column header to re-sort`}
       />
     </div>

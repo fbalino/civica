@@ -27,7 +27,7 @@ export const REDIRECTS: CivicaRedirect[] = [
   },
   {
     source: "/index",
-    destination: "/civica-index",
+    destination: "/governance-evidence",
     permanent: true,
   },
   // Country-slug shortcut: /index/:slug would otherwise double-hop
@@ -40,7 +40,7 @@ export const REDIRECTS: CivicaRedirect[] = [
   {
     source:
       "/index/:slug((?!methodology|government-types|widget|pulse-changelog|corrections|replication|changelog).+)",
-    destination: "/country/:slug/civica-data",
+    destination: "/governance-evidence?country=:slug",
     permanent: true,
   },
   {
@@ -142,7 +142,7 @@ export const REDIRECTS: CivicaRedirect[] = [
   },
   {
     source: "/countries/:slug/democracy",
-    destination: "/country/:slug/civica-data#rankings",
+    destination: "/country/:slug/civica-data#governance-evidence",
     permanent: true,
   },
   {

@@ -7,6 +7,8 @@ import {
 } from "@/lib/government-taxonomy";
 import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
+  retiredIndexApiResponse,
+  withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { shapeIndexByGovernmentTypeItem } from "@/lib/api/contract/shapes";
@@ -33,11 +35,9 @@ export async function GET(request: Request) {
   const isDeprecatedTaxonomy = taxonomy === "structural" || taxonomy === "regime";
 
   const rateLimited = withRateLimit(request);
-  if (rateLimited) {
-    return isDeprecatedTaxonomy
-      ? withStructuralFamilyDeprecation(rateLimited)
-      : rateLimited;
-  }
+  if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const retired = retiredIndexApiResponse();
+  if (retired) return retired;
 
   try {
     const rows = await getCIByGovernmentTypeDots(quarter);
@@ -81,16 +81,16 @@ export async function GET(request: Request) {
       : { quarter: quarter ?? null, taxonomy };
 
     const response = apiResponse({ data, meta });
-    return isDeprecatedTaxonomy ? withStructuralFamilyDeprecation(response) : response;
+    return withIndexDispositionDeprecation(isDeprecatedTaxonomy ? withStructuralFamilyDeprecation(response) : response);
   } catch (e) {
     console.error("API /v1/index/by-government-type error:", e);
     const response = apiError("Internal server error", 500);
-    return isDeprecatedTaxonomy
+    return withIndexDispositionDeprecation(isDeprecatedTaxonomy
       ? withStructuralFamilyDeprecation(response)
-      : response;
+      : response);
   }
 }
 
 export async function OPTIONS() {
-  return corsOptions();
+  return withIndexDispositionDeprecation(corsOptions());
 }

@@ -52,10 +52,9 @@ export function CivicaDataSections({
   // `defaultId`; a `#hash` is client-only (never reaches the server), so read
   // it here too. An EXPLICIT target — a real `#hash` OR a server-resolved
   // `?section=` (`defaultId` differs from the first section only when the URL
-  // carried one) — always scrolls, first section included: the masthead links
-  // to `/country/{slug}/civica-data#civica-index`, and Civica Index is the
-  // first section but sits below a tall hero, so that link must still land on
-  // it. Only a plain load with no explicit target skips the scroll.
+  // carried one) — always scrolls, first section included. Governance Evidence
+  // is the first section but sits below a tall hero, so a direct hash must
+  // still land on it. Only a plain load with no explicit target skips scroll.
   useEffect(() => {
     const hash = window.location.hash.replace(/^#/, "");
     const explicitTarget = ids.includes(hash)

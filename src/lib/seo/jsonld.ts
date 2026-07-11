@@ -204,8 +204,8 @@ export interface DatasetInput {
 }
 
 /**
- * Dataset node for the Civica Index. Creator is the Organization; the
- * distribution points at the documented public JSON API.
+ * Dataset node for a Civica data product. Creator is the Organization; an
+ * optional distribution points at a documented machine-readable artifact.
  *
  * `isAccessibleForFree: true` means no-charge ACCESS only — it is not a
  * reuse grant. `conditionsOfAccess` carries the canonical access-vs-reuse

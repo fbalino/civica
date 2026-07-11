@@ -86,15 +86,15 @@ const SECTIONS: MethodologySection[] = [
   },
   {
     id: "scoring",
-    heading: "Composite scoring — the Civica Index",
+    heading: "Preserved scoring research — the Civica Index",
     intro:
-      `The Civica Index is a secondary research-beta 0–100 composite across ${civicaIndex.dimensionCount} governance dimensions. It has not completed independent review; its construction, weights, and interpretation remain subject to validation.`,
+      "The former Civica composite is preserved as versioned research. The source-native Governance Evidence Dashboard is the selected public comparison product; no Civica country ranking is recommended.",
     entries: [
       {
         href: "/civica-index/methodology",
         title: "Civica Index methodology",
         blurb:
-          `The research-beta composite specification — ${civicaIndex.dimensionCount} governance dimensions, indicator basket, sources, frozen reference periods, deterministic weighting, and the current no-band uncertainty posture.`,
+          `The archived ${civicaIndex.dimensionCount}-dimension specification, frozen tournament evidence, limitations, and adopted public disposition.`,
         beta: true,
       },
       {

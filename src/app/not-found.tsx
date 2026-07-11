@@ -9,7 +9,7 @@ import "./not-found.css";
 export const metadata: Metadata = {
   title: "Page Not Found — 404",
   description:
-    "This address isn't in the Civica atlas. Search for a country or head to the Civica Index, World Atlas, Elections, Compare, or The Record.",
+    "This address isn't in the Civica atlas. Search for a country or head to Governance Evidence, World Atlas, Elections, Compare, or The Record.",
   robots: { index: false, follow: false },
 };
 
@@ -24,9 +24,9 @@ const DESTINATIONS: ReadonlyArray<{
     description: "Government structures and source-linked country profiles.",
   },
   {
-    href: "/civica-index",
-    label: "Civica Index",
-    description: "An experimental research index of governance dimensions.",
+    href: "/governance-evidence",
+    label: "Governance Evidence",
+    description: "Source-native governance indicators with provenance.",
   },
   {
     href: "/atlas",

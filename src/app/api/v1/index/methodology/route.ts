@@ -1,6 +1,7 @@
 import { apiResponse, apiError, corsOptions, withRateLimit, CI_METHODOLOGY_META } from "@/lib/api/helpers";
 import { getCIMethodology } from "@/lib/db/queries";
 import { shapeIndexMethodologyData } from "@/lib/api/contract/shapes";
+import { retiredIndexApiResponse, withIndexDispositionDeprecation } from "@/lib/api/deprecation";
 
 function publicMethodologyRecord<T extends { id: string; notes: string | null }>(
   row: T,
@@ -16,26 +17,28 @@ function publicMethodologyRecord<T extends { id: string; notes: string | null }>
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return rateLimited;
+  if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const retired = retiredIndexApiResponse();
+  if (retired) return retired;
 
   try {
     const url = new URL(request.url);
     const versionId = url.searchParams.get("version") ?? undefined;
     const methodology = await getCIMethodology(versionId);
     if (!methodology) {
-      return apiError("Methodology not found", 404);
+      return withIndexDispositionDeprecation(apiError("Methodology not found", 404));
     }
 
-    return apiResponse({
+    return withIndexDispositionDeprecation(apiResponse({
       data: shapeIndexMethodologyData(publicMethodologyRecord(methodology)),
       meta: { methodology: CI_METHODOLOGY_META },
-    });
+    }));
   } catch (e) {
     console.error("API /v1/index/methodology error:", e);
-    return apiError("Internal server error", 500);
+    return withIndexDispositionDeprecation(apiError("Internal server error", 500));
   }
 }
 
 export async function OPTIONS() {
-  return corsOptions();
+  return withIndexDispositionDeprecation(corsOptions());
 }

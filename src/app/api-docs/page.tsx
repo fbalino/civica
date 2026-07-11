@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   title: "Public API — Sovereign-State Governance Data",
   // PUBLIC_CLAIM: api.coverage-and-products
   description:
-    "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, Civica Index scores, and political-system classifications.",
+    "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, source provenance, and political-system classifications.",
   alternates: { canonical: "https://civicaatlas.org/api-docs" },
   openGraph: withOg({
     title: "Public API — Sovereign-State Governance Data · Civica Atlas",

@@ -1,7 +1,6 @@
 import { apiResponse, apiError, corsOptions, withRateLimit } from "@/lib/api/helpers";
 import { db } from "@/lib/db";
 import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
-import { getCICountryDetail } from "@/lib/db/queries";
 import {
   jurisdictions,
   governmentBodies,
@@ -20,7 +19,6 @@ import {
   type ApiDataValueStatus,
 } from "@/lib/factbook/reconcile/api";
 import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
-import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { shapeCountryDetail, shapeCountryDetailMeta } from "@/lib/api/contract/shapes";
 import type { zCountryDetail } from "@/lib/api/contract/schemas";
 import type { z } from "zod";
@@ -132,17 +130,6 @@ export async function GET(
       .from(constitutions)
       .where(eq(constitutions.jurisdictionId, country.id))
       .limit(1);
-
-    // Phase E — include Civica Index composite + dimensions + Pulse
-    // latest in the JSON download so a researcher pulling
-    // /api/v1/countries/<slug> gets a comprehensive snapshot.
-    let ciDetail: Awaited<ReturnType<typeof getCICountryDetail>> = null;
-    try {
-      ciDetail = await getCICountryDetail(country.slug);
-    } catch {
-      /* CI tables may be missing in fresh dev DBs — keep the response
-       * useful even when the score subsystem isn't available. */
-    }
 
     // Phase F.4 — resolver-direct fetch for every reconciled fact.
     // One batch query covers all 11 in-scope fact-keys.
@@ -311,31 +298,6 @@ export async function GET(
         flagUrl: country.flagUrl,
         constitution: constitutionResults[0] ?? null,
         government: branches,
-        civicaIndex: ciDetail
-          ? {
-              quarter: ciDetail.composite?.quarter ?? null,
-              composite: ciDetail.composite
-                ? {
-                    score: ciDetail.composite.score,
-                    rank: ciDetail.composite.rank,
-                    totalRanked: ciDetail.composite.totalRanked,
-                    isPartial: ciDetail.composite.isPartial,
-                  }
-                : null,
-              dimensions: ciDetail.dimensions.map((d) => ({
-                dimension: d.dimension,
-                // v2 fixed-bound display score so this snapshot matches
-                // the country page + /api/v1/index; the stored
-                // normalized_score is the legacy v1 value and doesn't
-                // reconcile with the v2 headline.
-                normalizedScore:
-                  displayDimensionScore(d.rawValue, d.sourceId) ??
-                  d.normalizedScore,
-                rawValue: d.rawValue,
-                valueStatus: "observed",
-              })),
-            }
-          : null,
         // ── Phase F.4 — provenance block keyed by flat field ──
         provenance,
         valueStatus,

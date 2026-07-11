@@ -407,6 +407,7 @@ export const advisoryBoard = {
  *  frozen, checksummed, independently-reproducible bundle. */
 export const REPLICATION_PAGE_STATUSES = [
   "unpublished-pre-g2",
+  "tournament-package-available",
   "published",
 ] as const;
 export type ReplicationPageStatus = (typeof REPLICATION_PAGE_STATUSES)[number];
@@ -452,64 +453,74 @@ export interface ReplicationPackageState {
  *  external-review packet), GOV-021 (DOI/archive registration), and
  *  QA-020 (machine-readable readiness reports) per
  *  `plan/MASTER-CHECKLIST.md`. */
+const INDEX_TOURNAMENT_PACKAGE_URL =
+  "https://github.com/fbalino/civica/tree/main/data/releases/index-tournament-results-package-v1";
+
 export const replicationPackage: ReplicationPackageState = {
-  pageStatus: "unpublished-pre-g2",
+  pageStatus: "tournament-package-available",
   components: [
     {
       id: "versioned-code",
       label: "Versioned code",
-      status: "in-progress",
-      owner: "DAT-022",
+      status: "available",
+      owner: "IDX-024",
       whatRemains:
-        "Tag and publish the exact commit the frozen G2 release runs from — today the pipeline runs from an unpinned working branch.",
+        "The tournament package preserves the exact code inventory and hashes; an archival tag remains a later release-governance step.",
+      href: INDEX_TOURNAMENT_PACKAGE_URL,
     },
     {
       id: "data-input-manifest",
       label: "Data / input manifest",
-      status: "planned",
-      owner: "DAT-022",
+      status: "available",
+      owner: "IDX-024",
       whatRemains:
-        "Enumerate every frozen input dataset, vintage, and license needed to rerun the pipeline from scratch.",
+        "Restricted source observations remain private where upstream rights prevent redistribution.",
+      href: INDEX_TOURNAMENT_PACKAGE_URL,
     },
     {
       id: "codebook",
       label: "Codebook",
-      status: "planned",
-      owner: "DAT-022 / IDX-028",
+      status: "available",
+      owner: "IDX-024 / IDX-028",
       whatRemains:
-        "Publish the single reference table of every variable, source, and formula, with native-scale definitions and normalization bounds.",
+        "External reviewers must still assess whether the definitions support the claimed constructs.",
+      href: INDEX_TOURNAMENT_PACKAGE_URL,
     },
     {
       id: "checksums",
       label: "Checksums",
-      status: "planned",
-      owner: "DAT-022",
+      status: "available",
+      owner: "IDX-024",
       whatRemains:
-        "Generate and publish checksums for the frozen release bundle so a rebuild can be verified byte-for-byte.",
+        "No checksum work remains for the frozen tournament package.",
+      href: INDEX_TOURNAMENT_PACKAGE_URL,
     },
     {
       id: "environment",
       label: "Environment",
-      status: "planned",
-      owner: "DAT-022",
+      status: "available",
+      owner: "IDX-024",
       whatRemains:
-        "Document the exact runtime, dependency versions, and configuration needed to reproduce a run in a clean environment.",
+        "A future candidate would require a new environment lock rather than reusing this one silently.",
+      href: INDEX_TOURNAMENT_PACKAGE_URL,
     },
     {
       id: "reproduction-commands",
       label: "Reproduction commands",
-      status: "in-progress",
-      owner: "DAT-022",
+      status: "available",
+      owner: "IDX-024",
       whatRemains:
-        "Finish testing the exact command sequence end to end from a clean checkout before publishing it.",
+        "The checked command reproduces the package; external execution remains an independent-review gate.",
+      href: INDEX_TOURNAMENT_PACKAGE_URL,
     },
     {
       id: "expected-outputs",
       label: "Expected outputs",
-      status: "planned",
-      owner: "DAT-022 / IDX-028",
+      status: "available",
+      owner: "IDX-024 / IDX-028",
       whatRemains:
-        "Publish the reference output set a correct rerun should produce, so reviewers can diff their own results against it.",
+        "No expected-output work remains for this frozen package.",
+      href: INDEX_TOURNAMENT_PACKAGE_URL,
     },
     {
       id: "doi-archive",
@@ -522,10 +533,10 @@ export const replicationPackage: ReplicationPackageState = {
     {
       id: "clean-room-evidence",
       label: "Clean-room evidence",
-      status: "planned",
-      owner: "DAT-022 / QA-020",
+      status: "in-progress",
+      owner: "IDX-024 / QA-020",
       whatRemains:
-        "Run and document an independent clean-room rebuild that verifies the published package actually reproduces the release.",
+        "An external party has not yet repeated the rebuild independently.",
     },
   ] as const,
 } as const;

@@ -24,7 +24,7 @@ Civica Atlas is a provenance-first comparative reference to how every country is
 
 ## What this is
 
-Civica Atlas brings country profiles, political institutions, constitutions, elections, and source-linked facts into one browsable reference. The atlas is the primary product. The Civica Index and Civica Pulse are secondary research experiments and remain beta while their constructs, methods, sensitivity, usefulness, and failure modes are tested.
+Civica Atlas brings country profiles, political institutions, constitutions, elections, and source-linked facts into one browsable reference. The atlas is the primary product. The Governance Evidence Dashboard compares established indicators on their native scales. The Civica Index composite is preserved research rather than a recommended ranking; Civica Pulse remains an experimental event ledger.
 
 The near-term goal is to preserve and extend the comparative-reference role of the CIA World Factbook, which was sunset on 4 February 2026. Civica aims to publish a transparent reference layer that researchers, journalists, NGOs, students, and the public can inspect, correct, and cite with its stated limitations.
 
@@ -34,10 +34,10 @@ The near-term goal is to preserve and extend the comparative-reference role of t
 
 Country dossiers cover geography, demographics, government, economy, energy, communications, transport, environment, military, and transnational issues. Facts retain upstream source, vintage, and rights context; multi-source reconciliation and alternate-source panels appear where the current resolver has coverage.
 
-### Civica Index — secondary research beta
+### Governance Evidence — source-native comparison
 
 <!-- PUBLIC_CLAIM: readme.index-estimate -->
-A research-beta 0–100 composite across {{ctx.civicaIndexDimensionCountWord}} governance dimensions: {{ctx.civicaIndexDimensionLabelsProse}}. It uses V-Dem, World Bank Worldwide Governance Indicators, Freedom House, Transparency International CPI, and supporting inputs. The current release publishes no composite uncertainty band because its adapters retain no usable source-specific uncertainty model. The Index is currently {{ctx.civicaIndexStatusUpper}} and has not completed external methodological review; its construction, weights, and interpretation remain subject to validation.
+The selected public comparison product presents V-Dem, World Bank Worldwide Governance Indicators, Freedom House, and Transparency International observations without averaging them into a Civica score or rank. Each row keeps its source-native scale, vintage, coverage, and rights context. The former {{ctx.civicaIndexDimensionCountWord}}-dimension composite, its code, and its frozen validation results remain versioned research because the tournament found no original measurement contribution and insufficient evidence for a recommended country ranking.
 
 ### Civica Pulse — experimental event ledger
 
@@ -60,7 +60,7 @@ Civica's pipeline is built on opposite premises:
 
 - **Versioned methodology.** Load-bearing research and reconciliation decisions are documented with citations and revision history. Documentation improves auditability but is not evidence of independent review or validity.
 
-- **Honest beta posture.** Novel Civica-asserted methodologies (the Civica Index composite, the Pulse classifier, the reconciliation rules) ship with a BETA pill until external academic review. Civica-cited external methodologies (V-Dem Regimes of the World, World Bank classifications, Bjørnskov-Rode regime taxonomy) inherit the source's standing without a beta marker.
+- **Explicit research standing.** Civica Pulse and reconciliation rules remain visibly experimental or beta until their validation gates are met. The archived Civica Index composite is labelled preserved research, while source-native external methodologies retain the standing stated by their publishers.
 
 ## Current state
 
@@ -77,7 +77,7 @@ This is a pre-launch project. Honest snapshot:
 | External methodology review | {{ctx.externalReviewStatusProse}} |
 | Public launch | Pre-launch; URLs are live but no inbound traffic yet |
 
-The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Civica Index methodology is currently in {{ctx.civicaIndexStatusUpper}}, scored under the v2-Beta {{ctx.civicaIndexDimensionCountWord}}-dimension composite (PCA-derived weights, see `/civica-index/methodology/pca-appendix`). Stabilization depends on longitudinal and factor analysis, retained source-specific uncertainty, dependence and calibration work, and external academic review; no launch date is claimed.
+The reconciliation v1 milestone (full Tier-1 + first NSO wave + methodology page rewrite) is in active execution. The Index candidate tournament is complete: the source-native Governance Evidence Dashboard is the selected public product, and the v2-Beta composite is preserved as research. A future composite would require a new candidate, preregistered validation, retained uncertainty, calibration evidence, and external review.
 
 For live source and fact-layer totals, see `/country/methodology/reconciliation` — those values are read directly from the database rather than maintained as inline prose. Page values may briefly differ from this generated README as new vintages land.
 
@@ -118,7 +118,7 @@ Public methodology pages (in approximate read order):
 | **How we approach data** (intro, plain English) | `/methodology/approach` |
 | **Methodology hub** (index of every methodology page) | `/methodology` |
 | Reconciliation — multi-source resolver, dispute rules, provenance | `/country/methodology/reconciliation` |
-| Civica Index — composite scoring, dimensions, weights | `/civica-index/methodology` |
+| Civica Index — archived composite method and disposition | `/civica-index/methodology` |
 | Civica Index — PCA appendix (the math) | `/civica-index/methodology/pca-appendix` |
 | Civica Pulse — event classification + experimental effects | `/civica-index/methodology/pulse` |
 | Civica Pulse — archived diagnostic smoke test | `/civica-index/methodology/pulse/backtest` |

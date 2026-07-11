@@ -242,10 +242,10 @@ export default async function AboutPage() {
               }}
             >
               <Link
-                href="/civica-index"
+                href="/governance-evidence"
                 style={{ color: "inherit", textDecoration: "none" }}
               >
-                Civica Index
+                Governance Evidence
               </Link>
             </h3>
             <p
@@ -257,19 +257,11 @@ export default async function AboutPage() {
                 margin: 0,
               }}
             >
-              A secondary research-beta composite (0&ndash;100) computed across{" "}
-              {civicaIndex.dimensionCount} governance
-              dimensions:{" "}
-              {civicaIndex.dimensions.map((d) => d.label.toLowerCase()).join(", ")}.
-              Material outcomes (human development, peace &amp; security,
-              economic stability) live on the separate Civica Conditions
-              companion layer at <Link href="/civica-conditions">/civica-conditions</Link>.
-              PCA-derived weights and frozen reference periods. The current
-              release publishes no composite uncertainty band because its
-              adapters retain no usable source-specific uncertainty model.
-              {civicaIndex.status === "beta"
-                ? " Currently in BETA pending external review."
-                : ""}
+              A source-native dashboard for comparing established governance
+              indicators without averaging them into a Civica country score or
+              rank. The former composite is preserved as versioned research;
+              material outcomes remain on the separate{" "}
+              <Link href="/civica-conditions">Civica Conditions</Link> layer.
             </p>
           </div>
 

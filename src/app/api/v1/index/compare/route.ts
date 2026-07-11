@@ -4,13 +4,17 @@ import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
+  retiredIndexApiResponse,
+  withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { shapeIndexCompareResult } from "@/lib/api/contract/shapes";
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
+  if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const retired = retiredIndexApiResponse();
+  if (retired) return retired;
 
   try {
     const url = new URL(request.url);
@@ -18,10 +22,10 @@ export async function GET(request: Request) {
     const quarter = url.searchParams.get("quarter") ?? undefined;
 
     if (slugsParam.length === 0) {
-      return apiError("At least one `slug` query parameter is required", 400);
+      return withIndexDispositionDeprecation(apiError("At least one `slug` query parameter is required", 400));
     }
     if (slugsParam.length > 10) {
-      return apiError("Maximum 10 countries per comparison", 400);
+      return withIndexDispositionDeprecation(apiError("Maximum 10 countries per comparison", 400));
     }
 
     const slugs = slugsParam.map((s) => s.toLowerCase());
@@ -35,13 +39,11 @@ export async function GET(request: Request) {
     // v1 route curates its fields; mirror /api/v1/index/[country_slug].
     //
     // Emit each per-dimension `normalizedScore` on the SAME v2 fixed-bound
-    // scale as the headline composite, so this endpoint reconciles with the
-    // /compare page, /api/v1/index/[slug], and the embed card (all of which
-    // route rawValue/sourceId through displayDimensionScore). The stored
+    // scale as the archived headline composite, so this sunset endpoint
+    // reconciles with /api/v1/index/[slug]. The stored
     // `normalized_score` column is the legacy v1 observed-min-max value and
     // does NOT sum to the v2 headline; fall back to it only when raw value /
-    // source is missing. Mirrors src/app/api/v1/index/[country_slug]/route.ts
-    // and src/components/compare/CompareCivicaIndex.tsx.
+    // source is missing. Mirrors src/app/api/v1/index/[country_slug]/route.ts.
     const results = rows.map((row) =>
       shapeIndexCompareResult({
         jurisdiction: {
@@ -89,7 +91,7 @@ export async function GET(request: Request) {
     // `structuralFamily` / `structuralSubtype` fields — attach the same
     // sunset signal the other structural surfaces use (rankings, countries,
     // index/[slug]).
-    return withStructuralFamilyDeprecation(
+    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
       apiResponse({
         data: results,
         meta: {
@@ -99,13 +101,13 @@ export async function GET(request: Request) {
           ...STRUCTURAL_FAMILY_DEPRECATION_META,
         },
       }),
-    );
+    ));
   } catch (e) {
     console.error("API /v1/index/compare error:", e);
-    return withStructuralFamilyDeprecation(apiError("Internal server error", 500));
+    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Internal server error", 500)));
   }
 }
 
 export async function OPTIONS() {
-  return corsOptions();
+  return withIndexDispositionDeprecation(corsOptions());
 }

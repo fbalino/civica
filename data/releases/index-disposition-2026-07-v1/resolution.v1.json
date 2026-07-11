@@ -2,7 +2,7 @@
   "schemaVersion": "civica-index-disposition/v1",
   "releaseId": "civica-index-disposition-2026-07-v1",
   "selectedDisposition": "source_native_dashboard_only",
-  "status": "adopted_pending_full_surface_migration",
+  "status": "adopted_public_surface_migration_complete",
   "publicProduct": {
     "name": "Governance Evidence Dashboard",
     "route": "/governance-evidence",
@@ -58,5 +58,5 @@
     "nonordinalCandidateAsPublicProduct": "not_selected_pending_external_validation"
   },
   "publicSummary": "Civica's selected public comparison product is the source-native Governance Evidence Dashboard. The composite is preserved as versioned research, but it is not an original Civica measurement or a recommended country ranking. A narrower derivative use may be reconsidered only after the qualified-reader and misuse gates pass.",
-  "resolutionSha256": "6b6ff6aaa328aa955b40a3fdddee251da9f982b8b7f00e3de4343c493929adb0"
+  "resolutionSha256": "2de6b1bfb4ab62657db7b17e5c9d99e4d0c8a14df986c3a846b7d2c92566b96e"
 }

@@ -5,7 +5,7 @@ export type IndexNavItem = {
 };
 
 /**
- * Flat list of Index-related sub-pages shown in the "Index" dropdown.
+ * Flat list of governance-evidence and related research pages.
  *
  * Methodology pages are NOT listed here — they live under the
  * top-level /methodology nav link (the methodology hub at
@@ -19,12 +19,7 @@ export type IndexNavItem = {
  */
 export const INDEX_NAV_ITEMS: IndexNavItem[] = [
   { href: "/governance-evidence", label: "Evidence Dashboard", descriptor: "Source-native observations" },
-  { href: "/civica-index", label: "Overview", descriptor: "Research-beta home" },
-  {
-    href: "/civica-index/government-types",
-    label: "Government Types",
-    descriptor: "Taxonomy",
-  },
+  { href: "/civica-index", label: "Research Status", descriptor: "Disposition and evidence" },
   {
     href: "/civica-index/pulse-changelog",
     label: "Pulse Changelog",
@@ -35,7 +30,6 @@ export const INDEX_NAV_ITEMS: IndexNavItem[] = [
     label: "Replication",
     descriptor: "Replication status",
   },
-  { href: "/civica-index/widget", label: "Widgets", descriptor: "Embeds" },
   {
     href: "/civica-index/corrections",
     label: "Corrections",

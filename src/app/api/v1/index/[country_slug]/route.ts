@@ -8,6 +8,8 @@ import {
 import { displayDimensionScore } from "@/lib/ci/normalize-v2";
 import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
+  retiredIndexApiResponse,
+  withIndexDispositionDeprecation,
   withStructuralFamilyDeprecation,
 } from "@/lib/api/deprecation";
 import { and, eq, sql, desc } from "drizzle-orm";
@@ -26,7 +28,9 @@ export async function GET(
   { params }: { params: Promise<{ country_slug: string }> }
 ) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
+  if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const retired = retiredIndexApiResponse();
+  if (retired) return retired;
 
   try {
     const { country_slug } = await params;
@@ -36,7 +40,7 @@ export async function GET(
 
     const jurisdiction = await getJurisdictionBySlug(slug);
     if (!jurisdiction) {
-      return withStructuralFamilyDeprecation(apiError("Country not found", 404));
+      return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Country not found", 404)));
     }
 
     // Fetch the latest score under the requested methodology. Falling
@@ -69,12 +73,12 @@ export async function GET(
 
     const composite = latestScore[0];
     if (!composite) {
-      return withStructuralFamilyDeprecation(
+      return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
         apiError(
           `No CI data available for this country under methodology "${methodologyVersion}".`,
           404,
         ),
-      );
+      ));
     }
 
     const dimensionRows = await db
@@ -113,7 +117,7 @@ export async function GET(
     // headers + `meta.deprecations` block every sibling structural
     // surface uses (rankings, countries) so consumers get one
     // consistent sunset signal.
-    return withStructuralFamilyDeprecation(
+    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
       apiResponse({
         data: shapeIndexCountryData({
           slug: jurisdiction.slug,
@@ -138,13 +142,13 @@ export async function GET(
           ...STRUCTURAL_FAMILY_DEPRECATION_META,
         },
       }),
-    );
+    ));
   } catch (e) {
     console.error("API /v1/index/[country_slug] error:", e);
-    return withStructuralFamilyDeprecation(apiError("Internal server error", 500));
+    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Internal server error", 500)));
   }
 }
 
 export async function OPTIONS() {
-  return corsOptions();
+  return withIndexDispositionDeprecation(corsOptions());
 }

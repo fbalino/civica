@@ -150,21 +150,13 @@ test("required-surface coverage fails on a silent or missing point-of-use surfac
     ...sources,
     "src/app/embed/[slug]/route.ts":
       '<meta name="civica:rights" content="https://civicaatlas.org/licensing#reuse">',
-    "src/app/(reader)/civica-index/widget/page.tsx":
-      "widget gallery with no visible rights link",
   };
   const embedIssues = validateRequiredRightsSurfaceSources(embedMetaOnly);
   assert.equal(
     embedIssues.some((issue) => issue.path === "src/app/embed/[slug]/route.ts"),
     false,
   );
-  assert.ok(
-    embedIssues.some(
-      (issue) =>
-        issue.ruleId === "missing-pointer" &&
-        issue.path === "src/app/(reader)/civica-index/widget/page.tsx",
-    ),
-  );
+  assert.equal(embedIssues.length, 0);
 });
 
 // ── hasRightsPointer / hasMachineReadableRightsPointer ──────────────────

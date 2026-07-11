@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 
+// PUBLIC_CLAIM: index.public-disposition
 export const INDEX_DISPOSITION = Object.freeze({
   schemaVersion: "civica-index-disposition/v1",
   releaseId: "civica-index-disposition-2026-07-v1",
   selectedDisposition: "source_native_dashboard_only",
-  status: "adopted_pending_full_surface_migration",
+  status: "adopted_public_surface_migration_complete",
   publicProduct: {
     name: "Governance Evidence Dashboard",
     route: "/governance-evidence",

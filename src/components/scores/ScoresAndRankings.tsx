@@ -14,7 +14,7 @@
  *   - Provenance via `<SourceDot>` per row.
  *   - Trend arrows + tier-colored text via `--color-success` /
  *     `--color-danger` / `--color-text-40`.
- *   - Civica Index gets `--hero` styling because it's our own score.
+ *   - Source-native publisher measures use one neutral row treatment.
  *
  * The atlas tab passes pre-fetched rows in (it lives behind a client
  * boundary) — pass `rows` directly. The factbook section calls without
@@ -109,7 +109,6 @@ export function ScoresAndRankingsView({
       </div>
 
       {rows.map((row) => {
-        const isHero = row.id === "civica-index";
         const arrow = row.trend ? ARROW_BY_TREND[row.trend] : null;
         const trendClass = row.trend
           ? `scores-rankings__trend scores-rankings__trend--${row.trend}`
@@ -124,7 +123,7 @@ export function ScoresAndRankingsView({
         return (
           <div
             key={row.id}
-            className={`scores-rankings__row${isHero ? " scores-rankings__row--hero" : ""}`}
+            className="scores-rankings__row"
             role="row"
           >
             <span className="scores-rankings__label">{row.label}</span>

@@ -33,8 +33,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/country", changeFrequency: "weekly", priority: 0.9 },
   { path: "/parties", changeFrequency: "weekly", priority: 0.8 },
   { path: "/compare", changeFrequency: "monthly", priority: 0.6 },
-  { path: "/civica-index", changeFrequency: "weekly", priority: 0.95 },
-  { path: "/civica-index/government-types", changeFrequency: "monthly", priority: 0.7 },
+  { path: "/civica-index", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/methodology", changeFrequency: "monthly", priority: 0.7 },
   { path: "/civica-index/methodology/pca-appendix", changeFrequency: "monthly", priority: 0.5 },
   { path: "/civica-index/methodology/peer-grouping", changeFrequency: "monthly", priority: 0.6 },
@@ -43,7 +42,6 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/civica-index/pulse-changelog", changeFrequency: "monthly", priority: 0.7 },
   { path: "/civica-index/corrections", changeFrequency: "monthly", priority: 0.4 },
   { path: "/civica-index/replication", changeFrequency: "monthly", priority: 0.5 },
-  { path: "/civica-index/widget", changeFrequency: "monthly", priority: 0.4 },
   { path: "/methodology", changeFrequency: "monthly", priority: 0.7 },
   { path: "/policies", changeFrequency: "monthly", priority: 0.5 },
   { path: "/methodology/approach", changeFrequency: "monthly", priority: 0.6 },
@@ -56,7 +54,7 @@ const PUBLIC_STATIC_ROUTES: StaticRoute[] = [
   { path: "/elections", changeFrequency: "weekly", priority: 0.7 },
   { path: "/elections/systems", changeFrequency: "monthly", priority: 0.6 },
   { path: "/civica-conditions", changeFrequency: "weekly", priority: 0.7 },
-  { path: "/governance-evidence", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/governance-evidence", changeFrequency: "weekly", priority: 0.95 },
   { path: "/rankings", changeFrequency: "weekly", priority: 0.7 },
   { path: "/blog", changeFrequency: "weekly", priority: 0.7 },
   { path: "/about", changeFrequency: "monthly", priority: 0.4 },
@@ -103,7 +101,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // /country/[slug] is the single canonical per-country reader (Factbook ·
   // Civica Data · Constitution tabs). The legacy /factbook/[slug],
-  // /countries/[slug], and /civica-index/[slug] surfaces 308-redirect here.
+  // /countries/[slug], and legacy /civica-index/[slug] surfaces redirect here.
   // Each tab is a distinct indexable URL, so all three emit one entry per
   // country, sharing the same stored jurisdiction timestamp.
   const countryPages: MetadataRoute.Sitemap = countries.flatMap((country) => {

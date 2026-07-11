@@ -167,20 +167,20 @@ export function NavLinks() {
 
       <div className="nav-dropdown">
         <Link
-          href="/civica-index"
+          href="/governance-evidence"
           className={`tab-nav nav-dropdown-trigger ${
             indexActive ? "tab-nav--active" : ""
           }`}
           style={{ textDecoration: "none" }}
         >
-          Index · Beta
+          Governance Evidence
           <ChevronDown
             className="nav-dropdown-chevron"
             aria-hidden="true"
             focusable="false"
           />
         </Link>
-        <div className="nav-dropdown-menu" aria-label="Research-beta Index sections">
+        <div className="nav-dropdown-menu" aria-label="Governance evidence and research sections">
           {INDEX_NAV_ITEMS.map((item) => (
             <Link
               key={item.href}

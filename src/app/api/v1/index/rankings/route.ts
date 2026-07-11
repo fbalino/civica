@@ -4,7 +4,7 @@ import { buildGovernmentClassificationMap } from "@/lib/db/government-taxonomy";
 import { jurisdictions, ciCompositeScores } from "@/lib/db/schema";
 import { eq, sql, desc, asc } from "drizzle-orm";
 import type { GovernmentTaxonomyLens } from "@/lib/government-taxonomy";
-import { withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
+import { retiredIndexApiResponse, withIndexDispositionDeprecation, withStructuralFamilyDeprecation } from "@/lib/api/deprecation";
 import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import { parsePublishedCiCompleteness } from "@/lib/ci/missingness-policy";
 import {
@@ -51,17 +51,19 @@ function buildPeerLensCondition(
 
 export async function GET(request: Request) {
   const rateLimited = withRateLimit(request);
-  if (rateLimited) return withStructuralFamilyDeprecation(rateLimited);
+  if (rateLimited) return withIndexDispositionDeprecation(rateLimited);
+  const retired = retiredIndexApiResponse();
+  if (retired) return retired;
 
   try {
     const url = new URL(request.url);
     const quarterParam = url.searchParams.get("quarter");
     const sort = url.searchParams.get("sort") ?? "ci";
     if (sort !== "ci") {
-      return apiError(
+      return withIndexDispositionDeprecation(apiError(
         "Unsupported sort. Civica Pulse is published only as named per-dimension experimental deltas, not as a scalar score or ranking.",
         400,
-      );
+      ));
     }
     const continent = url.searchParams.get("continent");
     const governmentType = url.searchParams.get("government_type");
@@ -105,7 +107,7 @@ export async function GET(request: Request) {
       // CLM-012 fix: this early-return branch previously omitted
       // `taxonomy` from meta, unlike the two branches below — every
       // /v1/index/rankings response now carries it consistently.
-      return withStructuralFamilyDeprecation(
+      return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
         apiResponse({
           data: [],
           meta: shapeIndexRankingsMeta({
@@ -117,7 +119,7 @@ export async function GET(request: Request) {
             taxonomy,
           }),
         }),
-      );
+      ));
     }
 
     const conditions = [
@@ -224,7 +226,7 @@ export async function GET(request: Request) {
             : false;
         });
 
-      return withStructuralFamilyDeprecation(
+      return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
         apiResponse({
           data: filtered.slice(offset, offset + limit).map(shapeIndexRankingsItem),
           meta: shapeIndexRankingsMeta({
@@ -236,7 +238,7 @@ export async function GET(request: Request) {
             taxonomy,
           }),
         }),
-      );
+      ));
     }
 
     const [rows, countResult] = await Promise.all([
@@ -263,7 +265,7 @@ export async function GET(request: Request) {
       })),
     );
 
-    return withStructuralFamilyDeprecation(
+    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(
       apiResponse({
         data: rows.map(({ jurisdictionId, ...row }) => {
           const completeness = parsePublishedCiCompleteness(row);
@@ -283,13 +285,13 @@ export async function GET(request: Request) {
           taxonomy,
         }),
       }),
-    );
+    ));
   } catch (e) {
     console.error("API /v1/index/rankings error:", e);
-    return withStructuralFamilyDeprecation(apiError("Internal server error", 500));
+    return withIndexDispositionDeprecation(withStructuralFamilyDeprecation(apiError("Internal server error", 500)));
   }
 }
 
 export async function OPTIONS() {
-  return corsOptions();
+  return withIndexDispositionDeprecation(corsOptions());
 }

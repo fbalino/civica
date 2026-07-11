@@ -14,10 +14,7 @@ import {
   organizations,
   organizationMemberships,
   elections,
-  ciCompositeScores,
 } from "@/lib/db/schema";
-import { getLatestAvailableQuarter } from "@/lib/db/queries";
-import { CURRENT_CI_METHODOLOGY_VERSION } from "@/lib/ci/current-release";
 import { formatGovernmentDisplay } from "@/lib/text/clean";
 import { resolvePartyColor } from "@/lib/data/party-colors";
 import { readCachedFieldFromRow } from "@/lib/factbook/reconcile/api";
@@ -793,21 +790,17 @@ async function _loadAtlasData(): Promise<{
 /**
  * Per-country data-layer values for the /atlas map choropleth switcher.
  * Keyed by lower-case iso3 (the atlas `Country.id`), so the client can look
- * up a country's regime type, income group, and Civica Index score without
+ * up a country's regime type and income group without
  * any client-side DB access.
  *
  * Mirrors the query shape of `getAlmanacFilterFacts` (queries.ts):
  *   - regime / income come from the canonical fact layer (`status='active'`
  *     rows of `vdem_row` / `world_bank_income_group`), preserving the
  *     human-readable upstream strings ("Liberal Democracy", "High income").
- *   - the Civica Index composite is pinned to the current release constant at
- *     its latest available quarter (AGENTS.md CI read invariant), so the
- *     tier coloring reconciles with the rest of the site.
  */
 export interface AtlasLayerValues {
   regimeType: string | null;
   incomeGroup: string | null;
-  ciScore: number | null;
 }
 
 export const loadAtlasLayerData = cache(_loadAtlasLayerData);
@@ -824,14 +817,14 @@ async function _loadAtlasLayerData(): Promise<Record<string, AtlasLayerValues>> 
   const ensure = (iso3: string) => {
     let entry = out[iso3];
     if (!entry) {
-      entry = { regimeType: null, incomeGroup: null, ciScore: null };
+      entry = { regimeType: null, incomeGroup: null };
       out[iso3] = entry;
     }
     return entry;
   };
 
   // Every Atlas jurisdiction exists independently of optional research layers.
-  // Missing Index, regime, or income observations remain explicit nulls.
+  // Missing regime or income observations remain explicit nulls.
   for (const jurisdiction of juris) ensure(jurisdiction.iso3!.toLowerCase());
 
   const factRows = await db
@@ -856,26 +849,6 @@ async function _loadAtlasLayerData(): Promise<Record<string, AtlasLayerValues>> 
     if (row.factKey === "vdem_row") entry.regimeType = row.factValue;
     else if (row.factKey === "world_bank_income_group")
       entry.incomeGroup = row.factValue;
-  }
-
-  const quarter = await getLatestAvailableQuarter(CURRENT_CI_METHODOLOGY_VERSION);
-  const scoreRows = await db
-    .select({
-      jurisdictionId: ciCompositeScores.jurisdictionId,
-      score: ciCompositeScores.score,
-    })
-    .from(ciCompositeScores)
-    .where(
-      and(
-        eq(ciCompositeScores.quarter, quarter),
-        eq(ciCompositeScores.methodologyVersion, CURRENT_CI_METHODOLOGY_VERSION)
-      )
-    );
-
-  for (const row of scoreRows) {
-    const iso3 = iso3ById.get(row.jurisdictionId);
-    if (!iso3) continue;
-    ensure(iso3).ciScore = row.score;
   }
 
   return out;

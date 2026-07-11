@@ -107,22 +107,22 @@ export const PUBLIC_CLAIMS = [
   {
     id: "home.secondary-research",
     surface: "home",
-    routeOrArtifact: "/ — Civica Index feature",
+    routeOrArtifact: "/ — Governance Evidence feature",
     exactClaim:
-      "The Civica Index and Pulse are secondary research experiments whose methods and outputs remain beta while validity, sensitivity, and usefulness are tested.",
+      "The Governance Evidence Dashboard presents source-native observations without averaging them into a Civica country ranking.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/components/home/HomeGrid.tsx",
       "plan/DECISIONS.md",
       "plan/MASTER-CHECKLIST.md",
     ],
-    implementationOwner: "Atlas editorial and research methods",
-    methodologyVersion: "atlas-positioning-v1",
-    gate: "G1",
+    implementationOwner: "Atlas editorial and governance evidence",
+    methodologyVersion: "governance-evidence/v1",
+    gate: "G5",
     source: {
       path: "src/components/home/HomeGrid.tsx",
       fragment:
-        "The Civica Index and Pulse are secondary research experiments.",
+        "The dashboard presents governance observations on their original scales",
     },
   },
   {
@@ -147,25 +147,25 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
-    id: "index.composite-estimate",
+    id: "index.public-disposition",
     surface: "index",
     routeOrArtifact: "/civica-index",
     exactClaim:
-      "The Civica Index is a research-beta composite across {dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band; it has not completed independent review.",
-    tier: "research-beta-estimate",
+      "Civica's selected public comparison product is the source-native Governance Evidence Dashboard; the composite is preserved as versioned research but is not an original Civica measurement or a recommended country ranking.",
+    tier: "institutional-posture",
     evidenceSources: [
-      "src/lib/ci/calculate-v2.ts",
-      "src/lib/ci/dimensions-v2.ts",
-      "src/lib/content/site-state.ts",
+      "src/lib/ci/index-disposition.ts",
+      "data/releases/index-disposition-2026-07-v1/resolution.v1.json",
       "content/methodology-civica-index.md",
     ],
     implementationOwner: "Civica Index research lane",
-    methodologyVersion: "civica-index-v2-beta",
-    gate: "G3",
+    methodologyVersion: "civica-index-disposition-2026-07-v1",
+    gate: "G5",
     source: {
-      path: "src/app/(reader)/civica-index/page.tsx",
+      path: "src/lib/ci/index-disposition.ts",
       fragment:
-        "A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band. Not independently reviewed.",
+        "Civica's selected public comparison product is the source-native Governance Evidence Dashboard.",
+      mirrors: ["src/app/(reader)/civica-index/page.tsx"],
     },
   },
   {
@@ -218,7 +218,7 @@ export const PUBLIC_CLAIMS = [
     surface: "methodology",
     routeOrArtifact: "/civica-index/replication",
     exactClaim:
-      "No replication package is currently published. The components below are individually marked with their build status.",
+      "The repository contains a reproducible tournament package, with restricted observations withheld where publisher rights do not permit redistribution and external review still pending.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/lib/content/site-state.ts",
@@ -227,13 +227,13 @@ export const PUBLIC_CLAIMS = [
       "plan/MASTER-CHECKLIST.md",
     ],
     implementationOwner:
-      "Civica Index research lane and release packaging (DAT-022)",
-    methodologyVersion: "replication-status-v1",
-    gate: "G1",
+      "Civica Index research lane and tournament packaging (IDX-024)",
+    methodologyVersion: "replication-status-v2",
+    gate: "G5",
     source: {
       path: "src/app/(reader)/civica-index/replication/page.tsx",
       fragment:
-        "No replication package is currently published. The components below are individually marked with their build status.",
+        "The repository contains a reproducible tournament package.",
     },
   },
   {
@@ -586,7 +586,7 @@ export const PUBLIC_CLAIMS = [
     surface: "api-docs",
     routeOrArtifact: "/api-docs",
     exactClaim:
-      "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, Civica Index scores, and political-system classifications.",
+      "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, source provenance, and political-system classifications.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/app/api-docs/page.tsx",
@@ -599,7 +599,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "src/app/api-docs/page.tsx",
       fragment:
-        "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, Civica Index scores, and political-system classifications.",
+        "Documentation for the Civica public REST API: sovereign-state government structure, country metadata, source provenance, and political-system classifications.",
     },
   },
   {
@@ -675,10 +675,10 @@ export const PUBLIC_CLAIMS = [
   {
     id: "readme.index-estimate",
     surface: "readme",
-    routeOrArtifact: "README.md — Civica Index section",
+    routeOrArtifact: "README.md — Governance Evidence section",
     exactClaim:
-      "The Civica Index is a research-beta 0–100 composite with no published composite uncertainty band because the current release retains no usable source-specific uncertainty model; its construction, weights, and interpretation remain subject to validation.",
-    tier: "research-beta-estimate",
+      "Governance Evidence is the selected source-native public comparison product; the former Civica composite and its frozen validation results remain versioned research rather than a recommended ranking.",
+    tier: "institutional-posture",
     evidenceSources: [
       "README.template.md",
       "src/lib/content/site-state.ts",
@@ -686,12 +686,12 @@ export const PUBLIC_CLAIMS = [
       "content/methodology-civica-index.md",
     ],
     implementationOwner: "Civica Index research lane",
-    methodologyVersion: "civica-index-v2-beta",
-    gate: "G3",
+    methodologyVersion: "civica-index-disposition-2026-07-v1",
+    gate: "G5",
     source: {
       path: "README.template.md",
       fragment:
-        "A research-beta 0–100 composite across {{ctx.civicaIndexDimensionCountWord}} governance dimensions",
+        "The selected public comparison product presents V-Dem",
       mirrors: ["README.md"],
     },
   },
@@ -766,20 +766,20 @@ export const PUBLIC_CLAIMS = [
     surface: "citation",
     routeOrArtifact: "CITATION.cff — abstract",
     exactClaim:
-      "The Civica Index is an explicitly experimental research output.",
-    tier: "research-beta-estimate",
+      "The Civica Index is preserved research rather than a current public comparison product.",
+    tier: "institutional-posture",
     evidenceSources: [
       "CITATION.cff",
       "src/lib/ci/calculate-v2.ts",
       "content/methodology-civica-index.md",
     ],
     implementationOwner: "Civica Index research lane",
-    methodologyVersion: "civica-index-v2-beta",
-    gate: "G3",
+    methodologyVersion: "civica-index-disposition-2026-07-v1",
+    gate: "G5",
     source: {
       path: "CITATION.cff",
       fragment:
-        "the explicitly experimental Civica Index and Civica Pulse research outputs.",
+        "preserved Civica Index research and the experimental Civica Pulse event ledger.",
     },
   },
   {
@@ -800,7 +800,7 @@ export const PUBLIC_CLAIMS = [
     source: {
       path: "CITATION.cff",
       fragment:
-        "the explicitly experimental Civica Index and Civica Pulse research outputs.",
+        "the experimental Civica Pulse event ledger.",
     },
   },
   {
@@ -861,24 +861,23 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
-    id: "metadata.index-dataset",
+    id: "metadata.index-disposition",
     surface: "metadata",
-    routeOrArtifact: "/civica-index — JSON-LD Dataset description",
+    routeOrArtifact: "/civica-index — research status metadata",
     exactClaim:
-      "A research-beta composite across {dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band. The methodology has not completed independent review.",
-    tier: "research-beta-estimate",
+      "The source-native Governance Evidence Dashboard is Civica's selected public comparison product. The composite remains versioned research and is not a recommended country ranking.",
+    tier: "institutional-posture",
     evidenceSources: [
       "src/app/(reader)/civica-index/page.tsx",
-      "src/lib/seo/jsonld.ts",
-      "src/lib/content/site-state.ts",
+      "src/lib/ci/index-disposition.ts",
     ],
     implementationOwner: "SEO and Civica Index research lane",
-    methodologyVersion: "civica-index-v2-beta",
-    gate: "G3",
+    methodologyVersion: "civica-index-disposition-2026-07-v1",
+    gate: "G5",
     source: {
       path: "src/app/(reader)/civica-index/page.tsx",
       fragment:
-        "A research-beta composite across ${civicaIndex.dimensionCount} governance dimensions, with fixed-bound normalization and no published composite uncertainty band. The methodology has not completed independent review.",
+        "The source-native Governance Evidence Dashboard is Civica's selected public comparison product.",
     },
   },
   {
@@ -942,65 +941,23 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
-    id: "embed.reconciled-attribution",
+    id: "embeds.retired-index",
     surface: "embeds",
     routeOrArtifact: "/embed/{slug}",
     exactClaim:
-      "Source: {canonical source list} · Civica Atlas reconciled {reconciliationVersion}.",
-    tier: "reconciled-fact",
-    evidenceSources: [
-      "src/app/embed/[slug]/route.ts",
-      "src/lib/factbook/reconcile/api.ts",
-    ],
-    implementationOwner: "Embeds and atlas reconciliation",
-    methodologyVersion: "reconciliation-v0.2-beta",
-    gate: "G2",
-    source: {
-      path: "src/app/embed/[slug]/route.ts",
-      fragment:
-        "Source: ${esc(attributionLabel)} · Civica Atlas reconciled ${esc(FACTBOOK_RECONCILIATION_META.version)}",
-    },
-  },
-  {
-    id: "embeds.reuse-rights",
-    surface: "embeds",
-    routeOrArtifact: "/embed/{slug} and /civica-index/widget",
-    exactClaim:
-      "Embedding the hosted widget is permitted, but that permission covers only the hosted display and does not grant a separate license to the underlying data.",
+      "Legacy Civica Index embeds are retired and return no score, rank, or dimension value; Governance Evidence is the successor public product.",
     tier: "institutional-posture",
     evidenceSources: [
-      "src/lib/claims/reuse-rights.ts",
       "src/app/embed/[slug]/route.ts",
-      "src/app/(reader)/civica-index/widget/page.tsx",
+      "src/lib/ci/index-disposition.ts",
     ],
-    implementationOwner: "Embeds and licensing",
-    methodologyVersion: "interim-rights-registry-v1",
-    gate: "G2",
-    source: {
-      path: "src/app/(reader)/civica-index/widget/page.tsx",
-      fragment:
-        "Embedding the hosted widget on a third-party page is permitted, but",
-      mirrors: ["src/app/embed/[slug]/route.ts"],
-    },
-  },
-  {
-    id: "embed.index-score",
-    surface: "embeds",
-    routeOrArtifact: "/embed/{slug}",
-    exactClaim:
-      "Civica Index {countryScore}/100 · research beta · {quarter}; rank may be shown where space permits.",
-    tier: "research-beta-estimate",
-    evidenceSources: [
-      "src/app/embed/[slug]/route.ts",
-      "src/lib/ci/calculate-v2.ts",
-      "src/lib/ci/dimensions-v2.ts",
-    ],
-    implementationOwner: "Embeds and Civica Index research lane",
-    methodologyVersion: "civica-index-v2-beta",
-    gate: "G3",
+    implementationOwner: "Governance evidence and API stewardship",
+    methodologyVersion: "civica-index-disposition-2026-07-v1",
+    gate: "G5",
     source: {
       path: "src/app/embed/[slug]/route.ts",
-      fragment: '<div class="brand">Civica Index <span',
+      fragment:
+        "This Civica Index embed has been retired.",
     },
   },
 ] as const satisfies readonly PublicClaim[];

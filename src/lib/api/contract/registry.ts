@@ -19,6 +19,10 @@ import {
   STRUCTURAL_FAMILY_DEPRECATION_META,
   STRUCTURAL_FAMILY_SUNSET_DATE_ISO,
   PEER_GROUPINGS_SUCCESSOR_HREF,
+  INDEX_COMPOSITE_DEPRECATION_HEADERS,
+  INDEX_COMPOSITE_DEPRECATION_META,
+  INDEX_COMPOSITE_SUNSET_DATE_ISO,
+  INDEX_DISPOSITION_SUCCESSOR_HREF,
 } from "@/lib/api/deprecation";
 import {
   RATE_LIMIT_MAX,
@@ -39,14 +43,22 @@ export interface RateLimitContract {
   scope: "per-ip";
 }
 
+export interface DeprecationEntryContract {
+  identifier: string;
+  kind: string;
+  sunset: string;
+  successor: string;
+  replacedBy: readonly string[];
+  reason: string;
+}
+
 export interface DeprecationContract {
-  /** Always the structural_family retirement today — a second
-   *  deprecation would add a discriminated union here. */
-  reason: "structural_family";
-  sunsetIso: typeof STRUCTURAL_FAMILY_SUNSET_DATE_ISO;
-  successor: typeof PEER_GROUPINGS_SUCCESSOR_HREF;
-  headers: typeof STRUCTURAL_FAMILY_DEPRECATION_HEADERS;
-  meta: typeof STRUCTURAL_FAMILY_DEPRECATION_META;
+  reason: "structural_family" | "index_public_disposition";
+  sunsetIso: string;
+  successor: string;
+  headers: Record<string, string>;
+  meta: { deprecations: readonly DeprecationEntryContract[] };
+  helperName: "withStructuralFamilyDeprecation" | "withIndexDispositionDeprecation";
   /** True when the ENTIRE route is deprecated (government-types);
    *  false when only a subset of its fields/filters are (countries,
    *  index/*). Drives whether api-docs renders a full "deprecated
@@ -88,8 +100,20 @@ const structuralFamilyDeprecation = (
   successor: PEER_GROUPINGS_SUCCESSOR_HREF,
   headers: STRUCTURAL_FAMILY_DEPRECATION_HEADERS,
   meta: STRUCTURAL_FAMILY_DEPRECATION_META,
+  helperName: "withStructuralFamilyDeprecation",
   wholeRoute,
   appliesWhen,
+});
+
+const indexDispositionDeprecation = (): DeprecationContract => ({
+  reason: "index_public_disposition",
+  sunsetIso: INDEX_COMPOSITE_SUNSET_DATE_ISO,
+  successor: INDEX_DISPOSITION_SUCCESSOR_HREF,
+  headers: INDEX_COMPOSITE_DEPRECATION_HEADERS,
+  meta: INDEX_COMPOSITE_DEPRECATION_META,
+  helperName: "withIndexDispositionDeprecation",
+  wholeRoute: true,
+  appliesWhen: "always",
 });
 
 const v1RateLimit: RateLimitContract = {
@@ -211,7 +235,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/[country_slug]/route.ts",
     versioned: true,
     summary:
-      "Latest research-beta Civica Index deterministic point estimate, rank, completeness fields, and available dimension rows for one country. No composite uncertainty band or categorical country grades.",
+      "DEPRECATED — preserved research endpoint for the former public composite. The source-native Governance Evidence Dashboard is the selected public product.",
     params: [
       {
         name: ":country_slug",
@@ -230,7 +254,7 @@ export const API_ROUTES: RouteContract[] = [
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
     errorStatuses: [404, 429, 500],
-    deprecation: structuralFamilyDeprecation(false),
+    deprecation: indexDispositionDeprecation(),
     exampleId: "indexCountry",
   },
   {
@@ -241,7 +265,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/[country_slug]/history/route.ts",
     versioned: true,
     summary:
-      "Quarter-by-quarter research-beta Civica Index composite history for one country: quarter, score, rank, totalRanked, isPartial.",
+      "DEPRECATED — preserved quarterly composite research history; not a selected public measurement product.",
     params: [
       {
         name: ":country_slug",
@@ -254,7 +278,7 @@ export const API_ROUTES: RouteContract[] = [
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
     errorStatuses: [404, 429, 500],
-    deprecation: null,
+    deprecation: indexDispositionDeprecation(),
     exampleId: "indexHistory",
   },
   {
@@ -265,7 +289,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/by-government-type/route.ts",
     versioned: true,
     summary:
-      "Research-beta Civica Index score distribution (count, avg/min/max/median, quartiles) grouped by government-type bucket, for the requested or latest quarter.",
+      "DEPRECATED — preserved composite-by-government-type research analysis; source-native comparison is the selected public product.",
     params: [
       {
         name: "quarter",
@@ -288,10 +312,7 @@ export const API_ROUTES: RouteContract[] = [
     errorStatuses: [429, 500],
     // Field-level deprecation only applies when ?taxonomy=structural|regime
     // is requested — see zIndexByGovernmentTypeResponse's meta union.
-    deprecation: structuralFamilyDeprecation(
-      false,
-      "taxonomy-structural-regime",
-    ),
+    deprecation: indexDispositionDeprecation(),
     exampleId: "indexByGovernmentType",
   },
   {
@@ -302,7 +323,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/compare/route.ts",
     versioned: true,
     summary:
-      "Compares up to 10 countries on the research-beta Civica Index for a given quarter.",
+      "DEPRECATED — preserved composite comparison endpoint. Use the source-native Governance Evidence Dashboard.",
     params: [
       {
         name: "slug",
@@ -323,7 +344,7 @@ export const API_ROUTES: RouteContract[] = [
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
     errorStatuses: [400, 429, 500],
-    deprecation: structuralFamilyDeprecation(false),
+    deprecation: indexDispositionDeprecation(),
     exampleId: "indexCompare",
   },
   {
@@ -334,7 +355,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/methodology/route.ts",
     versioned: true,
     summary:
-      "Published research-beta Civica Index methodology version record (weights, notes, publish date). Defaults to the latest version.",
+      "DEPRECATED — preserved composite methodology record. The current disposition and research evidence are published on the methodology page.",
     params: [
       {
         name: "version",
@@ -348,7 +369,7 @@ export const API_ROUTES: RouteContract[] = [
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
     errorStatuses: [404, 429, 500],
-    deprecation: null,
+    deprecation: indexDispositionDeprecation(),
     exampleId: "indexMethodology",
   },
   {
@@ -359,7 +380,7 @@ export const API_ROUTES: RouteContract[] = [
     filePath: "src/app/api/v1/index/rankings/route.ts",
     versioned: true,
     summary:
-      "Research-beta Civica Index rankings for the latest available quarter, or a requested quarter. Pulse is not available as a scalar ranking.",
+      "DEPRECATED — preserved composite ranking endpoint. Civica no longer recommends a public country league table.",
     params: [
       {
         name: "quarter",
@@ -418,7 +439,7 @@ export const API_ROUTES: RouteContract[] = [
     corsHeaders: CORS_HEADERS,
     rateLimit: v1RateLimit,
     errorStatuses: [400, 429, 500],
-    deprecation: structuralFamilyDeprecation(false),
+    deprecation: indexDispositionDeprecation(),
     exampleId: "indexRankings",
   },
   {

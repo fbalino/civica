@@ -6,7 +6,6 @@ import { EditorialPage } from "@/components/editorial/EditorialPage";
 import { MethodologyLayout } from "@/components/editorial/MethodologyLayout";
 import { SectionHeader } from "@/components/editorial/SectionHeader";
 import { CiteAccordion } from "@/components/cite/CiteAccordion";
-import { getSiteStats, type SiteStats } from "@/lib/content/site-stats";
 import { civicaIndex, replicationPackage } from "@/lib/content/site-state";
 import type { ReplicationComponentStatus } from "@/lib/content/site-state";
 
@@ -15,7 +14,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = {
   title: "Civica Index Replication Status",
   description:
-    "Status surface for the research-beta Civica Index replication package: no package is currently published, and every required component is listed with its individual build status and owner.",
+    "Status surface for the frozen Civica Index tournament package, its reproducible artifacts, rights limits, and remaining independent-review gates.",
   alternates: { canonical: "https://civicaatlas.org/civica-index/replication" },
 };
 
@@ -26,6 +25,7 @@ const SECTIONS = [
 
 const PAGE_STATUS_LABEL: Record<typeof replicationPackage.pageStatus, string> = {
   "unpublished-pre-g2": "Not published",
+  "tournament-package-available": "Tournament package available",
   published: "Published",
 };
 
@@ -34,6 +34,7 @@ const PAGE_STATUS_VARIANT: Record<
   "sand" | "sage"
 > = {
   "unpublished-pre-g2": "sand",
+  "tournament-package-available": "sage",
   published: "sage",
 };
 
@@ -54,15 +55,7 @@ const COMPONENT_STATUS_VARIANT: Record<
   deferred: "sand",
 };
 
-export default async function ReplicationPage() {
-  let stats: SiteStats | null = null;
-  try {
-    stats = await getSiteStats();
-  } catch {
-    stats = null;
-  }
-  const scoredJurisdictions = stats?.currentScoredJurisdictions ?? null;
-
+export default function ReplicationPage() {
   return (
     <MethodologyLayout items={SECTIONS}>
       <EditorialPage>
@@ -80,25 +73,24 @@ export default async function ReplicationPage() {
           >
             {PAGE_STATUS_LABEL[replicationPackage.pageStatus]}
           </Chip>{" "}
-          Tracking what still has to exist before a Civica Index score can be
-          independently reproduced from source.
+          Tracking what the frozen research package contains and what still
+          requires independent review.
         </p>
 
         <p>
-          The broader atlas release package is a G2 milestone in the master
-          plan: a clean environment reproducing the frozen release, checksums,
-          a coverage report, a codebook, a rights manifest, and citation
-          metadata. That complete bundle does not yet exist. Whether the
-          current Index is reproduced, redesigned, or retired is decided by
-          the later G3 validation tournament and its IDX-028 replication
-          packet. This page tracks the shared release components without
-          implying either milestone has passed.
+          The confirmatory tournament package freezes the candidate code,
+          manifests, environment, seeds, logs, diagnostics, expected outputs,
+          and decision tables. It reproduced successfully under the checked
+          command. This does not make the composite valid or recommended: the
+          tournament selected source-native comparison and left external
+          review gates unresolved.
         </p>
 
         {/* PUBLIC_CLAIM: replication.package-status */}
-        <Banner variant="warn">
-          No replication package is currently published. The components
-          below are individually marked with their build status.
+        <Banner variant="info">
+          The repository contains a reproducible tournament package. Exact
+          source observations are not redistributed where publisher rights do
+          not permit it, and no external reviewer has endorsed the method.
         </Banner>
 
         <section id="component-status" className="editorial-section">
@@ -140,16 +132,6 @@ export default async function ReplicationPage() {
             </table>
           </div>
 
-          <p>
-            For live-site context only — not a released replication output —
-            the Civica Index currently scores{" "}
-            {scoredJurisdictions !== null
-              ? `the ${scoredJurisdictions} jurisdictions with a current Beta score`
-              : "jurisdictions with a current Beta score"}
-            . That running count is not a codebook, checksum, or reproducible
-            bundle; it exists only to show the current scope the replication
-            package will eventually need to cover.
-          </p>
         </section>
 
         <section id="cite" className="editorial-section">

@@ -450,31 +450,6 @@ const zGovernmentBody = z
   })
   .strict();
 
-export const zCountryDetailCivicaIndex = z
-  .object({
-    quarter: z.string().nullable(),
-    composite: z
-      .object({
-        score: z.number(),
-        rank: z.number().nullable(),
-        totalRanked: z.number().nullable(),
-        isPartial: z.boolean(),
-      })
-      .strict()
-      .nullable(),
-    dimensions: z.array(
-      z
-        .object({
-          dimension: z.string(),
-          normalizedScore: z.number().nullable(),
-          rawValue: z.number().nullable(),
-          valueStatus: zDataValueStatus,
-        })
-        .strict(),
-    ),
-  })
-  .strict();
-
 export const zCountryDetail = z
   .object({
     slug: z.string(),
@@ -506,7 +481,6 @@ export const zCountryDetail = z
       .strict()
       .nullable(),
     government: z.record(z.string(), z.array(zGovernmentBody)),
-    civicaIndex: zCountryDetailCivicaIndex.nullable(),
     provenance: z.record(z.string(), zApiProvenanceEntry),
     valueStatus: z.record(z.string(), zApiDataValueStatus),
   })
@@ -515,7 +489,6 @@ export const zCountryDetail = z
 export const zCountryDetailMeta = z
   .object({
     reconciliation: zFactbookReconciliationMeta,
-    methodology: zCiMethodologyMeta,
   })
   .extend(zDeprecationMeta.shape)
   .strict();

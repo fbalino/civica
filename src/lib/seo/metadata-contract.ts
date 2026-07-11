@@ -417,22 +417,15 @@ export type RouteStatusClass = "pulse" | "index" | "none";
 // they're a subset of /civica-index and carry their own, stricter language.
 const PULSE_FACING_PATTERN = /^\/civica-index\/(pulse-changelog|methodology\/pulse)(\/|$)/;
 const INDEX_FACING_PATTERN = /^\/civica-index(\/|$)/;
-// Index-facing surfaces beyond the /civica-index namespace itself: the
-// rankings leaderboard, the country-comparison tool (query string is not
-// part of `pathname`, so `/compare?c=a&c=b` classifies the same as
-// `/compare`), and each country's Civica Data tab.
-const INDEX_FACING_EXTRA_PATTERN =
-  /^\/(rankings|compare)(\/|$)|^\/country\/[^/]+\/civica-data(\/|$)/;
-
 export function classifyRouteStatus(pathname: string): RouteStatusClass {
   if (PULSE_FACING_PATTERN.test(pathname)) return "pulse";
-  if (INDEX_FACING_PATTERN.test(pathname) || INDEX_FACING_EXTRA_PATTERN.test(pathname)) {
+  if (INDEX_FACING_PATTERN.test(pathname)) {
     return "index";
   }
   return "none";
 }
 
-const INDEX_STATUS_RE = /\b(beta|research-experiment|research experiment)\b/i;
+const INDEX_STATUS_RE = /\b(beta|research-experiment|research experiment|preserved research|research status|deprecated)\b/i;
 const PULSE_STATUS_RE = /\b(experimental|archived-diagnostic|archived diagnostic)\b/i;
 
 /**

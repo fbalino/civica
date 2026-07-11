@@ -25,6 +25,7 @@ export type ProvenanceSurfaceId = (typeof PROVENANCE_SURFACE_IDS)[number];
 export type ProvenanceLinkage =
   | "point-of-use"
   | "machine-readable"
+  | "not-applicable"
   | "partial"
   | "downstream-only"
   | "absent";
@@ -44,6 +45,7 @@ export interface ProvenanceRendererClass {
 const COMPLETE_LINKAGE = new Set<ProvenanceLinkage>([
   "point-of-use",
   "machine-readable",
+  "not-applicable",
 ]);
 
 export function hasCompleteCompactProvenance(
@@ -81,17 +83,6 @@ export const PROVENANCE_RENDERER_CLASSES: readonly ProvenanceRendererClass[] = [
     ],
     exception:
       "government, population, income, and Index summaries link onward but have no inline source/date/rights mapping",
-  },
-  {
-    id: "home.index-teaser",
-    surface: "home",
-    label: "Homepage Index teaser",
-    source: "downstream-only",
-    vintage: "downstream-only",
-    rights: "downstream-only",
-    implementationPaths: ["src/components/home/HomeGrid.tsx"],
-    exception:
-      "rank and score rows link to country research pages but do not carry their own source, vintage, or rights control",
   },
   {
     id: "atlas.choropleth-layer",
@@ -135,48 +126,14 @@ export const PROVENANCE_RENDERER_CLASSES: readonly ProvenanceRendererClass[] = [
     exception: null,
   },
   {
-    id: "embeds.small-index",
+    id: "embeds.retired-index",
     surface: "embeds",
-    label: "Small Index embed",
-    source: "machine-readable",
-    vintage: "point-of-use",
-    rights: "machine-readable",
-    implementationPaths: ["src/app/embed/[slug]/route.ts"],
-    exception: null,
-  },
-  {
-    id: "embeds.medium-index",
-    surface: "embeds",
-    label: "Medium Index embed",
-    source: "machine-readable",
-    vintage: "point-of-use",
+    label: "Retired Index embed notice",
+    source: "not-applicable",
+    vintage: "not-applicable",
     rights: "point-of-use",
     implementationPaths: ["src/app/embed/[slug]/route.ts"],
     exception: null,
-  },
-  {
-    id: "embeds.large-index",
-    surface: "embeds",
-    label: "Large Index embed",
-    source: "machine-readable",
-    vintage: "point-of-use",
-    rights: "point-of-use",
-    implementationPaths: ["src/app/embed/[slug]/route.ts"],
-    exception: null,
-  },
-  {
-    id: "embeds.custom-facts",
-    surface: "embeds",
-    label: "Custom embed selected facts",
-    source: "partial",
-    vintage: "partial",
-    rights: "point-of-use",
-    implementationPaths: [
-      "src/app/embed/[slug]/route.ts",
-      "src/app/(reader)/civica-index/widget/page.tsx",
-    ],
-    exception:
-      "the card aggregates source names and rights but does not map each selected fact to its own source and vintage",
   },
 ];
 

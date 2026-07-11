@@ -654,13 +654,6 @@ function exemptClaim(
 
 export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = [
   runtimeClaim(
-    "readme.index-dimensions",
-    "README.template.md",
-    "README",
-    "{{ctx.civicaIndexDimensionCountWord}} governance dimensions",
-    "regenerate-readme ctx derived from site-state.civicaIndex.dimensionCount",
-  ),
-  runtimeClaim(
     "readme.reconciliation-summary",
     "README.template.md",
     "README",
@@ -766,13 +759,6 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "checked current-release uncertainty audit exposed through site-state.civicaIndex.uncertainty",
   ),
   runtimeClaim(
-    "index-leaderboard.tie-tooltip",
-    "src/app/(reader)/civica-index/page.tsx",
-    "/civica-index",
-    "Tied rank ${r.rank} (${r.tieCount} countries)",
-    "live Beta competition-rank group returned by getCIRankings",
-  ),
-  runtimeClaim(
     "pca-appendix.panel-summary",
     "content/methodology-pca-appendix.md",
     "reader:methodology-pca-appendix",
@@ -871,20 +857,6 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "site-state.civicaIndex.pca.panelSize and lastRunDate",
   ),
   runtimeClaim(
-    "index-page.dimensions",
-    "src/app/(reader)/civica-index/page.tsx",
-    "/civica-index",
-    "${civicaIndex.dimensionCount} governance dimensions",
-    "site-state.civicaIndex.dimensionCount",
-  ),
-  runtimeClaim(
-    "replication.current-score-coverage",
-    "src/app/(reader)/civica-index/replication/page.tsx",
-    "/civica-index/replication",
-    "the ${scoredJurisdictions} jurisdictions with a current Beta score",
-    "getSiteStats().currentScoredJurisdictions with a count-free outage fallback",
-  ),
-  runtimeClaim(
     "reconciliation.metadata-source-roster",
     "src/app/(reader)/country/methodology/reconciliation/page.tsx",
     "/country/methodology/reconciliation",
@@ -904,20 +876,6 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "/country/methodology/reconciliation",
     "${stats.totalFacts.toLocaleString()} rows across ${stats.distinctFactKeys} fact-keys and ${stats.activeSources} active sources",
     "getSiteStats live database counters with count-free outage fallback",
-  ),
-  runtimeClaim(
-    "methodology-hub.index-dimensions",
-    "src/app/(reader)/methodology/page.tsx",
-    "/methodology",
-    "${civicaIndex.dimensionCount} governance dimensions",
-    "site-state.civicaIndex.dimensionCount",
-  ),
-  runtimeClaim(
-    "about.index-dimensions",
-    "src/app/about/page.tsx",
-    "/about",
-    "{civicaIndex.dimensionCount} governance dimensions",
-    "site-state.civicaIndex.dimensionCount",
   ),
   runtimeClaim(
     "about.source-roster-count",
@@ -967,13 +925,6 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "/api-docs",
     'Illustrative Example Response: {"data":{"world_bank_region"',
     "EndpointSection visibly labels every generated example response illustrative",
-  ),
-  exemptClaim(
-    "api-docs.compare-limit",
-    "src/lib/api/contract/registry.ts",
-    "/api-docs",
-    "Compares up to 10 countries",
-    "documented endpoint request limit, not a coverage claim",
   ),
   runtimeClaim(
     "rankings.live-row-count",
@@ -1065,12 +1016,5 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "component:home/HomeGrid",
     '{catalogCount ?? "—"} Countries &amp; territories',
     "runtime getAllJurisdictions catalog length with nonnumeric fallback",
-  ),
-  runtimeClaim(
-    "home.index-dimensions",
-    "src/components/home/HomeGrid.tsx",
-    "component:home/HomeGrid",
-    "{civicaIndex.dimensionCount} Index dimensions",
-    "site-state.civicaIndex.dimensionCount",
   ),
 ];

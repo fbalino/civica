@@ -246,19 +246,8 @@ const RANKING_FACT_KEYS: Record<string, string> = {
   median_age: "median_age",
 };
 
-/** ci_dimension_scores dimensions surfaced as columns (normalized 0-100),
- *  keyed by column id. */
-const RANKING_CI_DIMENSIONS: Record<string, string> = {
-  democratic_quality: "democratic_quality",
-  freedom_rights: "freedom_rights",
-  rule_of_law: "rule_of_law",
-  corruption_control: "corruption_control",
-};
-
 export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
   const factKeys = Object.values(RANKING_FACT_KEYS);
-  const dimensions = Object.values(RANKING_CI_DIMENSIONS);
-  const quarter = await getLatestAvailableQuarter(CURRENT_CI_METHODOLOGY_VERSION);
 
   const byId = new Map<string, RankingCountryRow & { id: string }>();
   const ensure = (
@@ -278,9 +267,6 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
   // Reverse maps: fact_key/dimension -> column id.
   const factKeyToColumn = new Map(
     Object.entries(RANKING_FACT_KEYS).map(([col, key]) => [key, col]),
-  );
-  const dimensionToColumn = new Map(
-    Object.entries(RANKING_CI_DIMENSIONS).map(([col, dim]) => [dim, col]),
   );
 
   // ── country_facts (canonical row per (jurisdiction, fact_key)) ──
@@ -336,91 +322,6 @@ export async function getRankingsMatrix(): Promise<RankingCountryRow[]> {
       source: r.source_id,
       retrievedAt: toIso(r.retrieved_at),
     };
-  }
-
-  // ── Civica Index composite (beta, latest quarter) ──
-  const compositeResult = await db.execute(sql`
-    SELECT
-      j.id AS jurisdiction_id, j.slug, j.name, j.iso2,
-      cs.score, cs.calculated_at
-    FROM ci_composite_scores cs
-    JOIN jurisdictions j
-      ON j.id = cs.jurisdiction_id
-      AND j.type = 'sovereign_state' AND LOWER(j.name) <> 'none'
-    WHERE cs.quarter = ${quarter} AND cs.methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}
-  `);
-  const compositeRows = (
-    Array.isArray(compositeResult)
-      ? compositeResult
-      : ((compositeResult as { rows?: unknown[] }).rows ?? [])
-  ) as Array<{
-    jurisdiction_id: string;
-    slug: string;
-    name: string;
-    iso2: string | null;
-    score: number | string | null;
-    calculated_at: string | Date | null;
-  }>;
-
-  for (const r of compositeRows) {
-    const value = Number(r.score);
-    if (!Number.isFinite(value)) continue;
-    const row = ensure(r.jurisdiction_id, r.slug, r.name, r.iso2);
-    row.metrics.civica_index = {
-      value,
-      source: "civica_curated",
-      retrievedAt: toIso(r.calculated_at),
-    };
-  }
-
-  // ── Civica Index dimension scores (beta, latest quarter) ──
-  // Selects the jurisdiction identity (slug/name/iso2) so a country that has
-  // dimension scores but no composite and no ranking country_facts still SEEDS
-  // its own row (via ensure) instead of being silently dropped. Today every CI
-  // country also has a composite, so this is defensive, not corrective.
-  //
-  // Reads raw_value + source_id and normalizes via displayDimensionScore()
-  // (the same v2 fixed-bound transform the headline composite uses) rather
-  // than the stored normalized_score column, which is the legacy v1
-  // observed-min-max value and does not reconcile with the Beta headline —
-  // see src/lib/ci/normalize-v2.ts.
-  const dimensionResult = await db.execute(sql`
-    SELECT
-      ds.jurisdiction_id, j.slug, j.name, j.iso2,
-      ds.dimension, ds.raw_value,
-      ds.source_id, ds.created_at
-    FROM ci_dimension_scores ds
-    JOIN jurisdictions j
-      ON j.id = ds.jurisdiction_id
-      AND j.type = 'sovereign_state' AND LOWER(j.name) <> 'none'
-    WHERE ds.quarter = ${quarter}
-      AND ds.methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}
-      AND ds.dimension IN ${dimensions}
-  `);
-  const dimensionRows = (
-    Array.isArray(dimensionResult)
-      ? dimensionResult
-      : ((dimensionResult as { rows?: unknown[] }).rows ?? [])
-  ) as Array<{
-    jurisdiction_id: string;
-    slug: string;
-    name: string;
-    iso2: string | null;
-    dimension: string;
-    raw_value: number | string | null;
-    source_id: string;
-    created_at: string | Date | null;
-  }>;
-
-  for (const r of dimensionRows) {
-    const column = dimensionToColumn.get(r.dimension);
-    if (!column) continue;
-    const cell = rankingDimensionCell(r.raw_value, r.source_id, r.created_at);
-    if (cell === null) continue;
-    // Seed the row if this country wasn't introduced by facts/composite, so a
-    // dimension-only country is never silently dropped from the matrix.
-    const row = ensure(r.jurisdiction_id, r.slug, r.name, r.iso2);
-    row.metrics[column] = cell;
   }
 
   return [...byId.values()].map(({ id: _id, ...row }) => row);

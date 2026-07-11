@@ -294,18 +294,6 @@ const countryDetailExampleResponse = zCountryDetailResponse.strict().parse({
         },
       ],
     },
-    civicaIndex: {
-      quarter: "2026-Q1",
-      composite: { score: 83.2, rank: 18, totalRanked: 167, isPartial: false },
-      dimensions: [
-        {
-          dimension: "democratic_quality",
-          normalizedScore: 82.4,
-          rawValue: 0.824,
-          valueStatus: "observed",
-        },
-      ],
-    },
     provenance: {
       population: exampleProvenanceEntry,
     },

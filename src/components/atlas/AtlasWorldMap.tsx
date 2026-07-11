@@ -31,7 +31,7 @@ import {
  * Choropleth layer switcher (Wave 6)
  *
  * The map colors every country by one of four CATEGORICAL data layers —
- * government type, neutral Civica Index score bins, V-Dem regime, or World Bank income
+ * government type, V-Dem regime, or World Bank income
  * group. The active `layer` is controlled by the parent (URL `?layer=`);
  * all color-token + legend + tooltip logic lives in
  * `src/lib/atlas/map-layers.ts` so it stays in one documented place.

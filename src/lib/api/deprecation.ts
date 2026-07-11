@@ -21,7 +21,7 @@
  * draft-ietf-httpapi-deprecation-header.
  */
 
-import type { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 /**
  * Sunset date in HTTP-date format (RFC 5322). 23:59:59 UTC on
@@ -108,4 +108,54 @@ export function withStructuralFamilyDeprecation(
     res.headers.set(k, v);
   }
   return res;
+}
+
+/** Terminal public-composite transition selected by the July 2026 Index
+ * disposition. Research artifacts remain preserved, but versioned Index score,
+ * rank, comparison, history, and methodology endpoints leave the public API. */
+export const INDEX_COMPOSITE_SUNSET_DATE =
+  "Fri, 31 Jul 2026 23:59:59 GMT" as const;
+export const INDEX_COMPOSITE_SUNSET_DATE_ISO = "2026-07-31" as const;
+export const INDEX_DISPOSITION_SUCCESSOR_HREF = "/governance-evidence" as const;
+export const INDEX_COMPOSITE_DEPRECATION_HEADERS: Record<string, string> = {
+  Deprecation: "true",
+  Sunset: INDEX_COMPOSITE_SUNSET_DATE,
+  Link: `<${INDEX_DISPOSITION_SUCCESSOR_HREF}>; rel="successor-version"`,
+};
+export const INDEX_COMPOSITE_DEPRECATION_META = Object.freeze({
+  deprecations: [
+    Object.freeze({
+      identifier: "civica_index_composite_public_api",
+      kind: "endpoint-family",
+      sunset: INDEX_COMPOSITE_SUNSET_DATE_ISO,
+      successor: INDEX_DISPOSITION_SUCCESSOR_HREF,
+      replacedBy: ["source-native Governance Evidence Dashboard"],
+      reason:
+        "The adopted disposition selects source-native comparison as the public product. Composite code and frozen results remain preserved research.",
+    }),
+  ],
+});
+
+export function withIndexDispositionDeprecation(res: NextResponse): NextResponse {
+  for (const [key, value] of Object.entries(INDEX_COMPOSITE_DEPRECATION_HEADERS)) {
+    res.headers.set(key, value);
+  }
+  return res;
+}
+
+/** Return a terminal response once the announced public-composite window ends. */
+export function retiredIndexApiResponse(
+  now: Date = new Date(),
+): NextResponse | null {
+  if (now.getTime() <= Date.parse(INDEX_COMPOSITE_SUNSET_DATE)) return null;
+  return withIndexDispositionDeprecation(
+    NextResponse.json(
+      {
+        error: "The public Civica Index composite API has been retired.",
+        successor: INDEX_DISPOSITION_SUCCESSOR_HREF,
+        disposition: "source_native_dashboard_only",
+      },
+      { status: 410 },
+    ),
+  );
 }

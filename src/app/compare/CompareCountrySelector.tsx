@@ -15,8 +15,6 @@ export interface SelectedCountryCard {
   slug: string;
   name: string;
   iso2: string | null;
-  score: number | null;
-  rank: number | null;
   governmentType: string | null;
   continent: string | null;
   populationLabel: string | null;
@@ -58,20 +56,6 @@ function CountryPicker({
         <div className="ci-compare-picker-name">
           <CountryFlag iso2={selectedCountry.iso2} size={20} />
           <span>{selectedCountry.name}</span>
-        </div>
-        <div className="ci-compare-picker-score">
-          {selectedCard?.score !== null && selectedCard?.score !== undefined ? (
-            <>
-              <span className="ci-compare-picker-score-val" style={{ color: seriesColor }}>
-                {selectedCard.score.toFixed(1)}
-              </span>
-              <span className="ci-compare-picker-score-label">
-                CI{selectedCard.rank ? ` · rank ${selectedCard.rank}` : ""}
-              </span>
-            </>
-          ) : (
-            <span className="ci-compare-picker-score-label">No CI score</span>
-          )}
         </div>
         <div className="ci-compare-picker-meta">{meta || "Profile data pending"}</div>
         <button

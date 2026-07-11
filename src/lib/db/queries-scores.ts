@@ -3,12 +3,11 @@
  *
  * Pulls the canonical governance / democracy / freedom score rows for a
  * single country, in display order:
- *   1. Civica Index (composite, 0-100)
- *   2. V-Dem Liberal Democracy (native 0-1 + global rank from CI dimension)
- *   3. Freedom House status (Free / Partly Free / Not Free + score)
- *   4. RSF Press Freedom (ingested dimension history)
- *   5. UNDP HDI (0-1, with rank)
- *   6. Transparency CPI (0-100, with rank)
+ *   1. V-Dem Liberal Democracy (native 0-1 + source-series rank)
+ *   2. Freedom House status (Free / Partly Free / Not Free + score)
+ *   3. RSF Press Freedom (ingested dimension history)
+ *   4. UNDP HDI (0-1, with rank)
+ *   5. Transparency CPI (0-100, with rank)
  *
  * Trend = current value vs the oldest comparable value we have, capped at
  * "4y trend" — when ≥ 4 years of history exist we compare to the value
@@ -449,14 +448,12 @@ export async function getScoresForJurisdiction(
 
   // Run all data fetches in parallel — none depend on each other.
   const [
-    civicaIndex,
     vdem,
     freedomHouse,
     hdi,
     cpi,
     rsf,
   ] = await Promise.all([
-    buildCivicaIndexRow(jur.id).catch(() => null),
     buildVDemRow(jur.id).catch(() => null),
     buildFreedomHouseRow(jur.id).catch(() => null),
     buildMetricRow({
@@ -482,7 +479,6 @@ export async function getScoresForJurisdiction(
 
   // Display order is the same as the brief — most important first.
   const ordered: Array<ScoreRow | null> = [
-    civicaIndex,
     vdem,
     freedomHouse,
     rsf,

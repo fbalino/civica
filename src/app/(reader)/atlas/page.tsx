@@ -10,7 +10,7 @@ export async function generateMetadata() {
   return {
     title: "World Atlas — Interactive Map of Every Government",
     description:
-      "An interactive world map of every government. Pan, zoom, and click any country to open its factbook entry, Civica Index score, and governance data.",
+      "An interactive world map of every government. Pan, zoom, and click any country to open its factbook entry and source-linked governance data.",
     alternates: { canonical: "https://civicaatlas.org/atlas" },
     openGraph: withOg({
       title: "World Atlas — Interactive Map of Every Government · Civica Atlas",

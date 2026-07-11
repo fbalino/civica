@@ -10,14 +10,14 @@ import { Banner } from "@/components/editorial/Banner";
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: "Country Rankings — Democracy, Freedom & Governance",
+  title: "Country Rankings — Population, Development & Reference Facts",
   description:
-    "Sort countries across governance and development metrics — the research-beta Civica Index, democracy, freedom, rule of law, corruption control, GDP, population, HDI, life expectancy and more. Sourced from the Civica Index, Wikidata, the World Bank, and the archived CIA World Factbook.",
+    "Sort countries across source-reported population, GDP, area, human development, life expectancy, literacy, and age measures, with source and freshness context.",
   alternates: { canonical: "https://civicaatlas.org/rankings" },
   openGraph: withOg({
-    title: "Country Rankings — Democracy, Freedom & Governance · Civica Atlas",
+    title: "Country Rankings — Population, Development & Reference Facts · Civica Atlas",
     description:
-      "Sort countries across the research-beta Civica Index, democracy, freedom, rule of law, GDP, population, HDI and more.",
+      "Sort countries across population, GDP, area, human development, life expectancy, literacy, and age measures.",
     url: "https://civicaatlas.org/rankings",
   }),
 };
@@ -36,16 +36,16 @@ export default async function RankingsPage() {
       <PageHero
         eyebrow="Rankings"
         titleId="rankings-hero-title"
-        title="Countries ranked across governance and development metrics."
+        title="Countries ordered by source-reported reference measures."
         description={
           <>
             Sort{" "}
             {rows.length > 0
               ? `${rows.length} jurisdictions`
               : "available jurisdictions"}{" "}
-            by the Civica Index and its governance dimensions &mdash;
-            democracy, freedom, rule of law, corruption control &mdash;
-            alongside population, GDP, area, HDI, life expectancy and literacy.
+            by population, GDP, area, HDI, life expectancy, literacy, and
+            median age. Governance assessments remain separate on the{" "}
+            <Link href="/governance-evidence">Governance Evidence Dashboard</Link>.
             Metric cells carry source and freshness indicators; reuse terms
             remain source-specific.
           </>
