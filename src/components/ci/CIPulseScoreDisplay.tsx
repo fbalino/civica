@@ -23,6 +23,7 @@ export interface CIScoreData {
   scoreUpper: number | null;
   completenessFlag: "full" | "partial" | "insufficient" | string | null;
   rank: number | null;
+  tieCount: number | null;
   totalRanked: number | null;
   quarter: string;
   isPartial: boolean;
@@ -293,7 +294,7 @@ export function CIScoreDisplay({
   const ciFooter = ciScore
     ? [
         ciScore.rank && ciScore.totalRanked
-          ? `Rank ${ciScore.rank} of ${ciScore.totalRanked}.`
+          ? `${(ciScore.tieCount ?? 1) > 1 ? "Shared rank" : "Rank"} ${ciScore.rank} of ${ciScore.totalRanked}.`
           : null,
         `Composite of ${dimCount} governance dimensions.`,
         ciScore.completenessFlag === "partial"

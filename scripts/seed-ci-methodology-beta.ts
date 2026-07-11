@@ -33,7 +33,7 @@ async function main() {
       notes:
         `Research beta ${CURRENT_CI_METHODOLOGY_VERSION} — 4 governance dimensions, fixed-bound normalization, ` +
         "deterministic weighted point estimates with no generic uncertainty band, neutral numeric presentation, " +
-        "versioned three-of-four missing-data rules. Weights provisional " +
+        "versioned three-of-four missing-data rules, and competition ranking on the published integer score. Weights provisional " +
         "until PCA / factor analysis (Phase 5.3) confirms structure. " +
         "HDI and Stability moved out to Civica Conditions companion layer.",
     })
@@ -44,7 +44,7 @@ async function main() {
         notes:
           `Research beta ${CURRENT_CI_METHODOLOGY_VERSION} — 4 governance dimensions, fixed-bound normalization, ` +
           "deterministic weighted point estimates with no generic uncertainty band, neutral numeric presentation, " +
-          "versioned three-of-four missing-data rules. Weights provisional " +
+          "versioned three-of-four missing-data rules, and competition ranking on the published integer score. Weights provisional " +
           "until PCA / factor analysis (Phase 5.3) confirms structure. " +
           "HDI and Stability moved out to Civica Conditions companion layer.",
       },

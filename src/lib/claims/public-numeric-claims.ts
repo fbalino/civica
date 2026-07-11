@@ -763,7 +763,14 @@ export const PUBLIC_NUMERIC_CLAIMS: readonly PublicNumericClaimRegistration[] = 
     "content/methodology-civica-index.md",
     "reader:methodology-civica-index",
     "usable uncertainty coverage is {{state.civicaIndex.uncertainty.usableReleasedUncertaintyRows}} of {{state.civicaIndex.uncertainty.releasedDimensionRows}} rows",
-    "checked Beta-R4 uncertainty audit exposed through site-state.civicaIndex.uncertainty",
+    "checked current-release uncertainty audit exposed through site-state.civicaIndex.uncertainty",
+  ),
+  runtimeClaim(
+    "index-leaderboard.tie-tooltip",
+    "src/app/(reader)/civica-index/page.tsx",
+    "/civica-index",
+    "Tied rank ${r.rank} (${r.tieCount} countries)",
+    "live Beta competition-rank group returned by getCIRankings",
   ),
   runtimeClaim(
     "index-methodology.pca-panel",

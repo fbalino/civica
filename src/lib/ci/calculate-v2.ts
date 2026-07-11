@@ -30,6 +30,7 @@ import {
   assessCiCompleteness,
   type CiCompletenessFlag,
 } from "./missingness-policy";
+import { competitionRankPublishedScores } from "./rank-policy";
 
 export const BETA_VERSION = CURRENT_CI_METHODOLOGY_VERSION;
 
@@ -221,13 +222,13 @@ export async function calculateCompositeV2(
     results.push(result);
   }
 
-  // Rank within the Beta result set. Tie-break on jurisdictionId
-  // ascending so equal-score countries get stable, reproducible ranks
-  // across recomputes (a raw score sort alone reshuffles ties each run).
-  results.sort(
-    (a, b) =>
-      b.scoreInteger - a.scoreInteger ||
-      a.jurisdictionId.localeCompare(b.jurisdictionId),
+  // Competition ranking is defined on the published integer estimate. The
+  // jurisdiction ID only stabilizes display order inside a tie; it never
+  // creates an ordinal distinction between equal published scores.
+  const rankedResults = competitionRankPublishedScores(
+    results,
+    (row) => row.scoreInteger,
+    (row) => row.jurisdictionId,
   );
   const totalRanked = results.length;
   const existingRows = vintageLabel ? await db
@@ -269,8 +270,8 @@ export async function calculateCompositeV2(
   );
   let unchanged = 0;
 
-  for (let i = 0; i < results.length; i++) {
-    const r = results[i];
+  for (const ranked of rankedResults) {
+    const r = ranked.row;
     const sourceIds = [...new Set([...(byJurisdiction.get(r.jurisdictionId)?.values() ?? [])].map((row) => row.sourceId))];
     const versions = ciVersionEnvelope({
       methodologyVersion,
@@ -286,7 +287,7 @@ export async function calculateCompositeV2(
         completenessFlag: r.completeness,
         vintageLabel,
         supersedesVintageLabel: opts.supersedesVintageLabel ?? null,
-        rank: i + 1,
+        rank: ranked.rank,
         totalRanked,
         isPartial: r.completeness === "partial",
         dimensionsAvailable: r.dimensionsAvailable,
@@ -338,7 +339,7 @@ export async function calculateCompositeV2(
           vintageLabel,
           supersedesVintageLabel: null,
           contentHash: null,
-          rank: i + 1,
+          rank: ranked.rank,
           totalRanked,
           isPartial: r.completeness === "partial",
           dimensionsAvailable: r.dimensionsAvailable,

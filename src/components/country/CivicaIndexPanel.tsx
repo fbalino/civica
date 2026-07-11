@@ -571,6 +571,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
             | "insufficient"
             | null) ?? null,
         rank: composite.rank ?? null,
+        tieCount: composite.tieCount ?? null,
         totalRanked: composite.totalRanked ?? null,
         quarter: composite.quarter,
         isPartial: Boolean(composite.isPartial),
@@ -653,7 +654,7 @@ export async function CivicaIndexPanel({ slug, quarter }: CivicaIndexPanelProps)
     composite?.rank && composite?.totalRanked
       ? {
           label: "Global",
-          value: `#${composite.rank} of ${composite.totalRanked}`,
+          value: `${(composite.tieCount ?? 1) > 1 ? "Tied " : ""}#${composite.rank} of ${composite.totalRanked}`,
         }
       : null,
     regionalRank && jurisdiction.continent

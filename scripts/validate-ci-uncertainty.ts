@@ -10,7 +10,7 @@ const normalization = readFileSync("src/lib/ci/normalize-v2.ts", "utf8");
 const methodology = readFileSync("content/methodology-civica-index.md", "utf8");
 const api = readFileSync("src/lib/api/helpers.ts", "utf8");
 const audit = JSON.parse(
-  readFileSync("data/releases/ci-beta-r4-2024-Q4/uncertainty-audit.v1.json", "utf8"),
+  readFileSync("data/releases/ci-beta-r5-2024-Q4/uncertainty-audit.v1.json", "utf8"),
 ) as Record<string, unknown>;
 
 assert.equal(CURRENT_CI_UNCERTAINTY_POLICY.methodologyVersion, CURRENT_CI_METHODOLOGY_VERSION);
@@ -47,7 +47,7 @@ async function validateLive(): Promise<void> {
       count(*) FILTER (WHERE score_lower IS NOT NULL)::int AS lower_count,
       count(*) FILTER (WHERE score_upper IS NOT NULL)::int AS upper_count,
       count(*) FILTER (
-        WHERE derivation_versions->'algorithm'->>'id' <> 'ci-composite/fixed-bounds-weighted-v3'
+        WHERE derivation_versions->'algorithm'->>'id' <> 'ci-composite/fixed-bounds-weighted-v4'
       )::int AS wrong_algorithm
     FROM ci_composite_scores
     WHERE methodology_version = ${CURRENT_CI_METHODOLOGY_VERSION}

@@ -5,6 +5,7 @@ import { computeOne } from "./calculate-v2";
 import { CURRENT_CI_METHODOLOGY_VERSION, CURRENT_CI_QUARTER, CURRENT_CI_VINTAGE_LABEL } from "./current-release";
 import type { IngestionResult } from "./types";
 import { indicatorIdFor } from "@/lib/indicators/lineage";
+import { competitionRankPublishedScores } from "./rank-policy";
 
 export interface CiSpineRow { id: string; name: string; iso3: string }
 export interface ReproducedDimensionRow { jurisdictionId: string; iso3: string; dimension: string; indicatorId: string; sourceId: string; rawValue: number; normalizedScore: number; quarter: string; methodologyVersion: string }
@@ -52,10 +53,10 @@ export function reproduceCurrentCiRelease(spine: readonly CiSpineRow[], inputs: 
     const result = computeOne(ordered);
     if (result) computed.push(Object.assign(result, { iso3: ordered[0].iso3 }));
   }
-  computed.sort((a, b) => b!.scoreInteger - a!.scoreInteger || a!.jurisdictionId.localeCompare(b!.jurisdictionId));
-  const composites: ReproducedCompositeRow[] = computed.map((row, index) => ({
+  const ranked = competitionRankPublishedScores(computed, (row) => row!.scoreInteger, (row) => row!.jurisdictionId);
+  const composites: ReproducedCompositeRow[] = ranked.map(({ row, rank }) => ({
     jurisdictionId: row!.jurisdictionId, iso3: row!.iso3, score: row!.scoreInteger, scoreLower: row!.scoreLower,
-    scoreUpper: row!.scoreUpper, completenessFlag: row!.completeness, rank: index + 1, totalRanked: computed.length,
+    scoreUpper: row!.scoreUpper, completenessFlag: row!.completeness, rank, totalRanked: computed.length,
     isPartial: row!.completeness === "partial", dimensionsAvailable: row!.dimensionsAvailable,
     missingDimensions: [...row!.missingDimensions], quarter: CURRENT_CI_QUARTER,
     methodologyVersion: CURRENT_CI_METHODOLOGY_VERSION, vintageLabel: CURRENT_CI_VINTAGE_LABEL,

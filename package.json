@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:authoritative-migrations && npm run validate:migrations && npm run validate:migration-preflight && npm run validate:statement-provenance && npm run validate:numeric-quarantine && npm run validate:ci-atomic-ingestion && npm run validate:ci-current-release && npm run validate:ci-missingness && npm run validate:ci-uncertainty && npm run validate:fact-read-selection && npm run validate:candidate-vintages && npm run validate:frozen-vintages && npm run validate:temporal-metadata && npm run validate:release-quality-report && npm run validate:data-value-states && npm run validate:research-evidence-retention && npm run validate:release-bom && npm run validate:clean-room && npm run validate:backup-restore && npm run validate:g2-atlas && npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:raw-retention && npm run validate:rights-manifest && npm run validate:jurisdiction-status && npm run validate:fact-coverage && npm run validate:source-coverage && npm run validate:reconciliation-audit && npm run validate:source-precedence && npm run validate:data-dictionary && npm run validate:derivation-versions && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
+    "build": "npm run validate:authoritative-migrations && npm run validate:migrations && npm run validate:migration-preflight && npm run validate:statement-provenance && npm run validate:numeric-quarantine && npm run validate:ci-atomic-ingestion && npm run validate:ci-current-release && npm run validate:ci-missingness && npm run validate:ci-uncertainty && npm run validate:ci-ranking && npm run validate:fact-read-selection && npm run validate:candidate-vintages && npm run validate:frozen-vintages && npm run validate:temporal-metadata && npm run validate:release-quality-report && npm run validate:data-value-states && npm run validate:research-evidence-retention && npm run validate:release-bom && npm run validate:clean-room && npm run validate:backup-restore && npm run validate:g2-atlas && npm run validate:sync-freshness && npm run validate:production-adapters && npm run validate:source-input-manifest && npm run validate:raw-retention && npm run validate:rights-manifest && npm run validate:jurisdiction-status && npm run validate:fact-coverage && npm run validate:source-coverage && npm run validate:reconciliation-audit && npm run validate:source-precedence && npm run validate:data-dictionary && npm run validate:derivation-versions && npm run validate:replication-surface && npm run validate:editorial-illustrations && npm run validate:claims-docs && next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
@@ -39,6 +39,8 @@
     "validate:ci-missingness:live": "tsx scripts/validate-ci-missingness.ts --live",
     "validate:ci-uncertainty": "tsx scripts/validate-ci-uncertainty.ts",
     "validate:ci-uncertainty:live": "tsx scripts/validate-ci-uncertainty.ts --live",
+    "validate:ci-ranking": "tsx scripts/validate-ci-ranking.ts",
+    "validate:ci-ranking:live": "tsx scripts/validate-ci-ranking.ts --live",
     "generate:source-input-manifest": "tsx scripts/generate-source-input-manifest.ts",
     "generate:fact-coverage": "tsx scripts/generate-fact-coverage-report.ts",
     "generate:source-coverage": "tsx scripts/generate-domain-coverage.ts",

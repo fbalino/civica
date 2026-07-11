@@ -1170,6 +1170,11 @@ export async function getCIRankings(
       cs.completeness_flag    AS "completenessFlag",
       cs.vintage_label        AS "vintageLabel",
       cs.rank,
+      (SELECT COUNT(*)::int
+       FROM ci_composite_scores tied
+       WHERE tied.quarter = cs.quarter
+         AND tied.methodology_version = cs.methodology_version
+         AND tied.score = cs.score) AS "tieCount",
       cs.total_ranked         AS "totalRanked",
       cs.is_partial           AS "isPartial",
       cs.dimensions_available AS "dimensionsAvailable",
@@ -1197,7 +1202,7 @@ export async function getCIRankings(
       ${wbRegionFilter}
       ${wbIncomeFilter}
       ${cgvFilter}
-    ORDER BY cs.rank ASC
+    ORDER BY cs.rank ASC, j.id ASC
   `);
   const rows = Array.isArray(result)
     ? result
@@ -1253,6 +1258,12 @@ export async function getCICountryDetail(
       completenessFlag: ciCompositeScores.completenessFlag,
       vintageLabel: ciCompositeScores.vintageLabel,
       rank: ciCompositeScores.rank,
+      tieCount: sql<number>`(
+        SELECT COUNT(*)::int FROM ci_composite_scores tied
+        WHERE tied.quarter = ${ciCompositeScores.quarter}
+          AND tied.methodology_version = ${ciCompositeScores.methodologyVersion}
+          AND tied.score = ${ciCompositeScores.score}
+      )`,
       totalRanked: ciCompositeScores.totalRanked,
       isPartial: ciCompositeScores.isPartial,
       dimensionsAvailable: ciCompositeScores.dimensionsAvailable,

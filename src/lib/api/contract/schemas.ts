@@ -287,6 +287,16 @@ export const zCiMethodologyMeta = z
         ),
       })
       .strict(),
+    ranking: z
+      .object({
+        policy_id: z.literal("ci-rank/competition-rounded-score-v1"),
+        ranked_quantity: z.literal("published_integer_composite"),
+        tie_method: z.literal("competition"),
+        tie_breaker: z.literal("none_for_published_rank"),
+        display_order_within_tie: z.literal("jurisdiction_id_ascending_nonordinal"),
+        rank_uncertainty: z.literal("not_estimable_without_valid_score_uncertainty"),
+      })
+      .strict(),
     presentation: z
       .object({
         format: z.literal("numeric_position"),

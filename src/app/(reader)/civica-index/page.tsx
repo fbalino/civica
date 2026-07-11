@@ -137,6 +137,7 @@ interface CIRankingRow {
   completenessFlag: string | null;
   vintageLabel: string | null;
   rank: number;
+  tieCount: number;
   totalRanked: number;
   isPartial: boolean;
   dimensionsAvailable: number;
@@ -413,8 +414,10 @@ export default async function CivicaIndexPage({
                       <div
                         className="ci-lb-rank"
                         role="cell"
+                        aria-label={r.tieCount > 1 ? `Tied rank ${r.rank}` : `Rank ${r.rank}`}
+                        title={r.tieCount > 1 ? `Tied rank ${r.rank} (${r.tieCount} countries)` : `Rank ${r.rank}`}
                       >
-                        {String(r.rank).padStart(2, "0")}
+                        {r.tieCount > 1 ? "T" : ""}{String(r.rank).padStart(2, "0")}
                       </div>
 
                       <div className="ci-lb-country" role="cell">

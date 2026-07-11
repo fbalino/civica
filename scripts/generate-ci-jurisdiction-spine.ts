@@ -17,7 +17,7 @@ async function main() {
     sha256: createHash("sha256").update(canonical).digest("hex"),
     rows,
   };
-  const path = "data/releases/ci-beta-r4-2024-Q4/jurisdiction-spine.v1.json";
+  const path = "data/releases/ci-beta-r5-2024-Q4/jurisdiction-spine.v1.json";
   writeFileSync(path, `${JSON.stringify(artifact, null, 2)}\n`);
   console.log(`Wrote ${path}: ${rows.length} rows, ${artifact.sha256}`);
 }

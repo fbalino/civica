@@ -39,6 +39,8 @@ Every Civica Index score is an integer between 0 and 100. Higher means stronger 
 
 Scores are integers, not decimals. The underlying data is not precise enough to support fractional digits, and pretending otherwise misleads readers.
 
+Ranks order those published integer estimates using **competition ranking**. Countries with the same published score share the same rank; the next rank skips the positions occupied by the tie. Jurisdiction identity stabilizes display order inside a tied group but does not break the tie. A rank is therefore an ordering of rounded estimates, not evidence that adjacent countries are meaningfully different. Because the current release has no valid score-uncertainty model, it does not publish rank intervals or claim that rank instability has been estimated.
+
 ## Section 3 · Normalization {#normalization}
 
 Every source uses a different native scale. Civica normalizes them to 0–100 using **fixed theoretical bounds** rather than observed minimums and maximums, so scores remain comparable across years and aren't shifted by changes elsewhere in the dataset. The current implementation uses the explicit source paths below. A source outside this table is skipped rather than receiving an invented transform:

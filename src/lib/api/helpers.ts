@@ -3,6 +3,7 @@ import { civicaIndex } from "@/lib/content/site-state";
 import { CURRENT_PULSE_RUNTIME_METHOD } from "@/lib/pulse/v2/runtime-contract";
 import { checkInMemoryRateLimit, getRequestIp } from "@/lib/api/rate-limit";
 import { CURRENT_CI_UNCERTAINTY_POLICY } from "@/lib/ci/uncertainty-policy";
+import { CURRENT_CI_RANK_POLICY } from "@/lib/ci/rank-policy";
 
 // CLM-012: exported so contract/registry.ts documents the real header
 // values instead of retyping them.
@@ -57,6 +58,14 @@ export const CI_METHODOLOGY_META = Object.freeze({
     released_dimension_rows:
       CURRENT_CI_UNCERTAINTY_POLICY.releasedDimensionRows,
     disposition: CURRENT_CI_UNCERTAINTY_POLICY.disposition,
+  }),
+  ranking: Object.freeze({
+    policy_id: CURRENT_CI_RANK_POLICY.id,
+    ranked_quantity: CURRENT_CI_RANK_POLICY.rankedQuantity,
+    tie_method: CURRENT_CI_RANK_POLICY.tieMethod,
+    tie_breaker: CURRENT_CI_RANK_POLICY.tieBreaker,
+    display_order_within_tie: CURRENT_CI_RANK_POLICY.displayOrderWithinTie,
+    rank_uncertainty: CURRENT_CI_RANK_POLICY.rankUncertainty,
   }),
   presentation: Object.freeze({
     format: "numeric_position",
