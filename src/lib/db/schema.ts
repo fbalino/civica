@@ -13,6 +13,7 @@ import {
   uniqueIndex,
   index,
   foreignKey,
+  check,
 } from "drizzle-orm/pg-core";
 
 export const jurisdictions = pgTable("jurisdictions", {
@@ -884,23 +885,38 @@ export const researchEvidenceHistory = pgTable(
   ],
 );
 
-export const statements = pgTable("statements", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  subjectTable: text("subject_table").notNull(),
-  subjectId: uuid("subject_id").notNull(),
-  predicate: text("predicate").notNull(),
-  objectValue: text("object_value"),
-  objectEntityId: uuid("object_entity_id"),
-  sourceId: text("source_id").notNull(),
-  sourceUrl: text("source_url"),
-  sourceLicense: text("source_license"),
-  retrievedAt: timestamp("retrieved_at").notNull(),
-  sourceHash: text("source_hash"),
-  validFrom: date("valid_from"),
-  validTo: date("valid_to"),
-  confidence: real("confidence").default(1.0),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+export const statements = pgTable(
+  "statements",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    subjectTable: text("subject_table").notNull(),
+    subjectId: uuid("subject_id").notNull(),
+    predicate: text("predicate").notNull(),
+    objectValue: text("object_value"),
+    objectEntityId: uuid("object_entity_id"),
+    sourceId: text("source_id").notNull(),
+    sourceUrl: text("source_url"),
+    sourceLicense: text("source_license"),
+    retrievedAt: timestamp("retrieved_at").notNull(),
+    sourceHash: text("source_hash"),
+    validFrom: date("valid_from"),
+    validTo: date("valid_to"),
+    confidence: real("confidence").default(1.0),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_statements_subject_predicate_source").on(
+      table.subjectTable,
+      table.subjectId,
+      table.predicate,
+      table.sourceId,
+    ),
+    check(
+      "statements_subject_table_closed",
+      dsql`${table.subjectTable} IN ('constitutions', 'elections', 'government_bodies', 'jurisdictions', 'terms')`,
+    ),
+  ],
+);
 
 export const sources = pgTable("sources", {
   id: text("id").primaryKey(),

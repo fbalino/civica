@@ -1,7 +1,7 @@
 {
   "schemaVersion": "authoritative-schema-fingerprint/v1",
-  "generatedAt": "2026-07-11T05:04:54.116Z",
-  "sha256": "92914965fc631e39e059fde8c7d9d4daaeb7cb24b8c025f19a28db60af9b6bee",
+  "generatedAt": "2026-07-11T05:29:42.316Z",
+  "sha256": "647e8ed0a2d95e59e46ea7a53b5c8ac56acc6b078b1053fa19ac69dbde945e54",
   "schema": {
     "columns": [
       {
@@ -6167,6 +6167,11 @@
         "definition": "CREATE UNIQUE INDEX sources_pkey ON public.sources USING btree (id)"
       },
       {
+        "name": "idx_statements_subject_predicate_source",
+        "table": "statements",
+        "definition": "CREATE UNIQUE INDEX idx_statements_subject_predicate_source ON public.statements USING btree (subject_table, subject_id, predicate, source_id)"
+      },
+      {
         "name": "statements_pkey",
         "table": "statements",
         "definition": "CREATE UNIQUE INDEX statements_pkey ON public.statements USING btree (id)"
@@ -6207,6 +6212,11 @@
         "name": "civica_validate_frozen_vintage_insert",
         "identity": "",
         "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_frozen_vintage_insert()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  parsed text[];\n  published_period text;\n  prior_label text;\nBEGIN\n  IF TG_TABLE_NAME = 'country_fact_vintages' THEN\n    parsed := regexp_match(NEW.vintage_label, '^Civica Atlas Reconciled (v[^[:space:]]+) — vintage ([0-9]{4}-Q[1-4])$');\n    IF parsed IS NULL OR NEW.methodology_version <> parsed[1] THEN\n      RAISE EXCEPTION 'Atlas vintage label and methodology_version disagree';\n    END IF;\n    published_period := parsed[2];\n    SELECT vintage_label INTO prior_label FROM country_fact_vintages\n      WHERE vintage_label <> NEW.vintage_label\n        AND vintage_label LIKE '%vintage ' || published_period LIMIT 1;\n    IF prior_label IS NOT NULL AND NEW.supersedes_vintage_label IS NULL THEN\n      RAISE EXCEPTION 'corrected Atlas vintage must name supersedes_vintage_label';\n    END IF;\n  ELSE\n    IF NEW.vintage_label IS NULL THEN RETURN NEW; END IF;\n    parsed := regexp_match(NEW.vintage_label, '^Civica Index ([0-9]{4}) Q([1-4]) \\(([^)]+)\\)$');\n    IF parsed IS NULL OR NEW.quarter <> parsed[1] || '-Q' || parsed[2]\n       OR lower(NEW.methodology_version) <> lower(parsed[3]) THEN\n      RAISE EXCEPTION 'Civica Index vintage label, quarter, and methodology_version disagree';\n    END IF;\n    SELECT vintage_label INTO prior_label FROM ci_composite_scores\n      WHERE quarter = NEW.quarter AND vintage_label IS NOT NULL\n        AND vintage_label <> NEW.vintage_label LIMIT 1;\n    IF prior_label IS NOT NULL AND NEW.supersedes_vintage_label IS NULL THEN\n      RAISE EXCEPTION 'corrected Civica Index vintage must name supersedes_vintage_label';\n    END IF;\n  END IF;\n\n  IF NEW.supersedes_vintage_label IS NOT NULL AND NOT EXISTS (\n    SELECT 1 FROM (\n      SELECT vintage_label FROM country_fact_vintages WHERE TG_TABLE_NAME = 'country_fact_vintages'\n      UNION ALL\n      SELECT vintage_label FROM ci_composite_scores WHERE TG_TABLE_NAME = 'ci_composite_scores'\n    ) prior WHERE prior.vintage_label = NEW.supersedes_vintage_label\n  ) THEN\n    RAISE EXCEPTION 'supersedes_vintage_label does not identify an existing frozen vintage';\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
+      },
+      {
+        "name": "civica_validate_statement_subject",
+        "identity": "",
+        "definition": "CREATE OR REPLACE FUNCTION public.civica_validate_statement_subject()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nDECLARE\n  subject_exists boolean;\nBEGIN\n  CASE NEW.subject_table\n    WHEN 'constitutions' THEN SELECT EXISTS(SELECT 1 FROM constitutions x WHERE x.id = NEW.subject_id) INTO subject_exists;\n    WHEN 'elections' THEN SELECT EXISTS(SELECT 1 FROM elections x WHERE x.id = NEW.subject_id) INTO subject_exists;\n    WHEN 'government_bodies' THEN SELECT EXISTS(SELECT 1 FROM government_bodies x WHERE x.id = NEW.subject_id) INTO subject_exists;\n    WHEN 'jurisdictions' THEN SELECT EXISTS(SELECT 1 FROM jurisdictions x WHERE x.id = NEW.subject_id) INTO subject_exists;\n    WHEN 'terms' THEN SELECT EXISTS(SELECT 1 FROM terms x WHERE x.id = NEW.subject_id) INTO subject_exists;\n    ELSE RAISE EXCEPTION 'Unsupported statement subject table: %', NEW.subject_table;\n  END CASE;\n  IF NOT subject_exists THEN\n    RAISE EXCEPTION 'Statement subject does not exist: %.%', NEW.subject_table, NEW.subject_id;\n  END IF;\n  RETURN NEW;\nEND;\n$function$\n"
       },
       {
         "name": "crypt",
@@ -6544,6 +6554,11 @@
         "name": "dat_016_retain_mutation",
         "table": "statements",
         "definition": "CREATE TRIGGER dat_016_retain_mutation BEFORE DELETE OR UPDATE ON statements FOR EACH ROW EXECUTE FUNCTION civica_capture_research_evidence_history()"
+      },
+      {
+        "name": "dat_028_validate_statement_subject",
+        "table": "statements",
+        "definition": "CREATE TRIGGER dat_028_validate_statement_subject BEFORE INSERT OR UPDATE OF subject_table, subject_id ON statements FOR EACH ROW EXECUTE FUNCTION civica_validate_statement_subject()"
       },
       {
         "name": "dat_016_retain_mutation",
@@ -7581,6 +7596,12 @@
         "type": "p",
         "table": "statements",
         "definition": "PRIMARY KEY (id)"
+      },
+      {
+        "name": "statements_subject_table_closed",
+        "type": "c",
+        "table": "statements",
+        "definition": "CHECK (subject_table = ANY (ARRAY['constitutions'::text, 'elections'::text, 'government_bodies'::text, 'jurisdictions'::text, 'terms'::text]))"
       },
       {
         "name": "terms_office_id_offices_id_fk",

@@ -810,3 +810,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   canonical is restricted, withhold the fact rather than promote an alternate.
 - Every emitted row retains source, license, temporal, status, method, decision,
   and dispute metadata. Durable record: APR-D060 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Statement provenance uses typed, source-specific identities
+
+- The closed subject registry is constitutions, elections, government bodies,
+  jurisdictions, and terms; unsupported subject types fail closed.
+- Officeholder and cabinet statements attach to terms. Aggregate legislature
+  composition statements attach to their government body.
+- Statement uniqueness includes source ID, and both application producers and
+  database enforcement use the same identity. Durable record: APR-D061.

@@ -56,6 +56,8 @@ test("CIA cabinet fixture applications create no duplicate canonical rows", asyn
   assert.equal(state.rows.get(persons)?.length, 1);
   assert.equal(state.rows.get(terms)?.length, 1);
   assert.equal(state.rows.get(statements)?.length, 1);
+  assert.equal(state.rows.get(statements)?.[0].subjectTable, "terms");
+  assert.equal(state.rows.get(statements)?.[0].subjectId, state.rows.get(terms)?.[0].id);
 });
 
 test("CIA cabinet dry-run is stable and performs zero writes", async () => {

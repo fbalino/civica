@@ -21,8 +21,8 @@ import { RELEASE_QUALITY_POLICY } from "../src/lib/data-quality/release-quality-
 const SUBJECT_TABLES = [
   "constitutions",
   "elections",
+  "government_bodies",
   "jurisdictions",
-  "legislature_parties",
   "terms",
 ] as const;
 
@@ -105,8 +105,8 @@ async function collectSnapshot(): Promise<ReleaseQualitySnapshot> {
     sql`SELECT id, constitute_project_id AS "constituteProjectId" FROM constitutions ORDER BY id`,
     sql`SELECT 'constitutions' AS table_name, id FROM constitutions
         UNION ALL SELECT 'elections', id FROM elections
+        UNION ALL SELECT 'government_bodies', id FROM government_bodies
         UNION ALL SELECT 'jurisdictions', id FROM jurisdictions
-        UNION ALL SELECT 'legislature_parties', id FROM legislature_parties
         UNION ALL SELECT 'terms', id FROM terms
         ORDER BY table_name, id`,
     sql`SELECT 'jurisdictions' AS table_name, count(*)::int AS count FROM jurisdictions

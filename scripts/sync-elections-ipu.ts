@@ -555,7 +555,8 @@ async function main() {
           and(
             eq(statements.subjectTable, "elections"),
             eq(statements.subjectId, estRowId),
-            eq(statements.predicate, "civica_estimated_next_election")
+            eq(statements.predicate, "civica_estimated_next_election"),
+            eq(statements.sourceId, SOURCE_ID),
           )
         )
         .limit(1);

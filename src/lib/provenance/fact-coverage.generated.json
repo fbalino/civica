@@ -1,6 +1,6 @@
 {
   "schemaVersion": "fact-provenance-coverage/v1",
-  "generatedAt": "2026-07-10T21:45:39.133Z",
+  "generatedAt": "2026-07-11T05:31:41.563Z",
   "staleness": {
     "liveRowThresholdDays": 180,
     "frozenSourcesExcluded": true,
@@ -27,10 +27,10 @@
     "distinctFactKeys": 88
   },
   "statements": {
-    "total": 7875,
-    "sourceLinked": 7875,
+    "total": 6768,
+    "sourceLinked": 6768,
     "unlinked": 0,
-    "distinctGroups": 6745,
+    "distinctGroups": 6759,
     "bySubjectTable": [
       {
         "subjectTable": "constitutions",
@@ -43,19 +43,19 @@
         "sourceLinked": 1236
       },
       {
-        "subjectTable": "jurisdictions",
-        "total": 1270,
-        "sourceLinked": 1270
+        "subjectTable": "government_bodies",
+        "total": 250,
+        "sourceLinked": 250
       },
       {
-        "subjectTable": "legislature_parties",
-        "total": 351,
-        "sourceLinked": 351
+        "subjectTable": "jurisdictions",
+        "total": 249,
+        "sourceLinked": 249
       },
       {
         "subjectTable": "terms",
-        "total": 4998,
-        "sourceLinked": 4998
+        "total": 5013,
+        "sourceLinked": 5013
       }
     ]
   },

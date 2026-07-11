@@ -345,7 +345,7 @@ async function upsertTerm(
   officeId: string,
   personId: string,
   startDate: string | null
-) {
+): Promise<string> {
   // 1. If a term already exists for this (officeId, personId, startDate),
   //    just make sure it's marked current. Without this guard, every sync
   //    run was inserting a fresh duplicate row — that's how Nigeria ended
@@ -374,7 +374,7 @@ async function upsertTerm(
         .set({ isCurrent: true })
         .where(eq(terms.id, existing[0].id));
     }
-    return;
+    return existing[0].id;
   }
 
   await db
@@ -384,17 +384,15 @@ async function upsertTerm(
       sql`${terms.officeId} = ${officeId} AND ${terms.isCurrent} = true`
     );
 
-  await db.insert(terms).values({
-    officeId,
-    personId,
-    startDate,
-    isCurrent: true,
-  });
+  const inserted = await db.insert(terms).values({
+    officeId, personId, startDate, isCurrent: true,
+  }).returning({ id: terms.id });
+  return inserted[0].id;
 }
 
 async function upsertStatement(
   db: OfficeholderSyncDb,
-  personId: string,
+  termId: string,
   predicate: string,
   objectValue: string,
   stateQid: string
@@ -405,7 +403,7 @@ async function upsertStatement(
     .select({ id: statements.id })
     .from(statements)
     .where(
-      sql`${statements.subjectTable} = ${"terms"} AND ${statements.subjectId} = ${personId} AND ${statements.predicate} = ${predicate}`
+      sql`${statements.subjectTable} = ${"terms"} AND ${statements.subjectId} = ${termId} AND ${statements.predicate} = ${predicate} AND ${statements.sourceId} = ${"wikidata"}`
     )
     .limit(1);
 
@@ -425,7 +423,7 @@ async function upsertStatement(
 
   await db.insert(statements).values({
     subjectTable: "terms",
-    subjectId: personId,
+    subjectId: termId,
     predicate,
     objectValue,
     sourceId: "wikidata",
@@ -1225,8 +1223,8 @@ export async function syncFactbookOfficeholders(
         "Head of State",
         "head_of_state"
       );
-      await upsertTerm(db, officeId, personId, hosStart);
-      await upsertStatement(db, personId, "head_of_state", hosName, stateQid);
+      const termId = await upsertTerm(db, officeId, personId, hosStart);
+      await upsertStatement(db, termId, "head_of_state", hosName, stateQid);
     }
 
     // Head of Government
@@ -1242,8 +1240,8 @@ export async function syncFactbookOfficeholders(
         "Head of Government",
         "head_of_government"
       );
-      await upsertTerm(db, officeId, personId, hogStart);
-      await upsertStatement(db, personId, "head_of_government", hogName, stateQid);
+      const termId = await upsertTerm(db, officeId, personId, hogStart);
+      await upsertStatement(db, termId, "head_of_government", hogName, stateQid);
     }
 
     synced++;

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "release-data-quality/v1",
-  "generatedAt": "2026-07-11T01:30:48.774Z",
+  "generatedAt": "2026-07-11T05:32:22.591Z",
   "status": "fail",
   "policy": {
     "sourceMaxAgeDays": 180,
@@ -15,7 +15,7 @@
     "jurisdictions": 253,
     "legislature_parties": 1548,
     "sources": 56,
-    "statements": 7891,
+    "statements": 6768,
     "terms": 5475
   },
   "checks": [
@@ -41,8 +41,8 @@
     },
     {
       "category": "orphan_provenance",
-      "status": "fail",
-      "issueCount": 3
+      "status": "pass",
+      "issueCount": 0
     },
     {
       "category": "duplicate_canonical",
@@ -75,36 +75,6 @@
       "observed": 2010000000000,
       "expected": "0..100",
       "remediation": "Reject or correct country_facts row f853cbae-795b-4426-b2e2-fa2c002ccc3d; do not widen the envelope without methodology review."
-    },
-    {
-      "checkId": "statement.subject_fk",
-      "category": "orphan_provenance",
-      "severity": "error",
-      "entity": "jurisdictions",
-      "detail": "29 statements point to missing jurisdictions subjects; sample statement IDs: 0212e7f6-31d5-4351-a92b-f2f588dcfd74, 045ec890-9e75-453a-b1d4-0bb08efabf66, 0619832e-52a1-4554-8c84-9a7e2874f633, 357099cb-4f28-4a93-8948-4bf768b8e1d6, 3bd54fbb-3b57-45b7-b98b-3106ff69767b.",
-      "observed": 29,
-      "expected": 0,
-      "remediation": "Relink or remove orphaned jurisdictions statement provenance before release."
-    },
-    {
-      "checkId": "statement.subject_fk",
-      "category": "orphan_provenance",
-      "severity": "error",
-      "entity": "legislature_parties",
-      "detail": "351 statements point to missing legislature_parties subjects; sample statement IDs: 6a0bc049-91a8-4616-bde9-585d8c6e6b29, d6a0600b-b2b3-4358-ba63-d0c14afe74fd, 51b64be6-978c-4e8c-811b-190406819bc2, cae3c178-4095-49fe-99ef-85ff4228a76b, f27c0d9e-9ecb-4b9b-a1a9-68a27791298a.",
-      "observed": 351,
-      "expected": 0,
-      "remediation": "Relink or remove orphaned legislature_parties statement provenance before release."
-    },
-    {
-      "checkId": "statement.subject_fk",
-      "category": "orphan_provenance",
-      "severity": "error",
-      "entity": "terms",
-      "detail": "5014 statements point to missing terms subjects; sample statement IDs: 23f798e4-345e-4e79-a6ea-da701791606b, 7bf81a26-ce09-4a75-b6e8-381cb117a824, 39f531b8-0c93-41a1-bf43-48a7cdc570b3, 5b7c60f1-77ca-4849-a0e0-1610ae05691c, 81c866f2-35b8-43f5-93b3-821868032bb7.",
-      "observed": 5014,
-      "expected": 0,
-      "remediation": "Relink or remove orphaned terms statement provenance before release."
     }
   ]
 }

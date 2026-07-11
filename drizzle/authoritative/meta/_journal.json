@@ -8,6 +8,13 @@
       "when": 1783746322756,
       "tag": "0000_authoritative_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783747696005,
+      "tag": "0001_aspiring_bloodaxe",
+      "breakpoints": true
     }
   ]
 }

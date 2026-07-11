@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "statement-provenance-audit/v1",
+  "task": "DAT-028",
+  "auditedAt": "2026-07-11",
+  "before": { "statementCount": 7891, "wrongOrOrphanSubjectCount": 5394, "duplicateIdentityGroups": 352, "excessDuplicateRows": 1121 },
+  "after": {
+    "statementCount": 6768,
+    "unresolvedSubjects": 0,
+    "duplicateIdentityGroups": 0,
+    "sourceLinkedStatements": 6768,
+    "subjectCounts": { "constitutions": 20, "elections": 1236, "government_bodies": 250, "jurisdictions": 249, "terms": 5013 }
+  },
+  "retainedHistory": { "updates": 5365, "deletes": 1123 },
+  "migration": {
+    "id": "0001_aspiring_bloodaxe",
+    "sha256": "113c545226364b362f78480f3a9a83cee52605e39b37eeb3e27ae651d520e4d0",
+    "ledgerApplied": 2,
+    "ledgerExpected": 2,
+    "pendingAfterRerun": 0,
+    "writesAfterRerun": 0,
+    "schemaFingerprint": "647e8ed0a2d95e59e46ea7a53b5c8ac56acc6b078b1053fa19ac69dbde945e54"
+  },
+  "freshDatabaseProbes": { "orphanInsertRejected": true, "duplicateInsertRejected": true },
+  "producerInventoryCount": 7,
+  "testsPassed": 636,
+  "buildPassed": true
+}

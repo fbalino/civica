@@ -349,7 +349,8 @@ async function main() {
         and(
           eq(statements.subjectTable, "elections"),
           eq(statements.subjectId, e.id),
-          eq(statements.predicate, "idea_voter_turnout")
+          eq(statements.predicate, "idea_voter_turnout"),
+          eq(statements.sourceId, SOURCE_ID),
         )
       )
       .limit(1);

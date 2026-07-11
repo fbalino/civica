@@ -482,3 +482,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   prove all four classes and population semantic parity.
 - 636/636 tests, browser/API checks, all gates, and the production build pass.
   DAT-028 is next.
+
+## 2026-07-11 — DAT-028 statement provenance repair completed
+
+- Repaired person-as-term, body-as-party, orphan, and duplicate statement rows;
+  all 6,768 live subjects now resolve and duplicate identity groups are zero.
+- Closed the subject registry and added database subject validation plus
+  source-specific uniqueness; all seven producers use the matching identity.
+- The repair remains auditable through 5,365 update and 1,123 delete history
+  rows. 636/636 tests, fresh/live migration proof, and the build pass.
+  DAT-029 is next.

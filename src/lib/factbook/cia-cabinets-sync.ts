@@ -1333,7 +1333,7 @@ async function upsertCabinetTerm(
   officeId: string,
   personId: string,
   startDate: string | null,
-): Promise<void> {
+): Promise<string> {
   const existing = await db
     .select({ id: terms.id, isCurrent: terms.isCurrent })
     .from(terms)
@@ -1355,7 +1355,7 @@ async function upsertCabinetTerm(
         .set({ isCurrent: true })
         .where(eq(terms.id, existing[0].id));
     }
-    return;
+    return existing[0].id;
   }
 
   await db
@@ -1363,24 +1363,22 @@ async function upsertCabinetTerm(
     .set({ isCurrent: false })
     .where(sql`${terms.officeId} = ${officeId} AND ${terms.isCurrent} = true`);
 
-  await db.insert(terms).values({
-    officeId,
-    personId,
-    startDate,
-    isCurrent: true,
-  });
+  const inserted = await db.insert(terms).values({
+    officeId, personId, startDate, isCurrent: true,
+  }).returning({ id: terms.id });
+  return inserted[0].id;
 }
 
 /**
  * Provenance row for a cabinet term. Mirrors
  * `officeholders-sync.upsertStatement` (subject_table='terms', subject_id is
- * the person id — the established convention there), but sourced to
+ * the term id), but sourced to
  * `cia_world_leaders` (public domain) with the per-country page URL. Idempotent
  * on (subject_table, subject_id, predicate).
  */
 async function upsertCabinetStatement(
   db: CabinetSyncDb,
-  personId: string,
+  termId: string,
   predicate: string,
   objectValue: string,
   sourceUrl: string,
@@ -1389,7 +1387,7 @@ async function upsertCabinetStatement(
     .select({ id: statements.id })
     .from(statements)
     .where(
-      sql`${statements.subjectTable} = ${"terms"} AND ${statements.subjectId} = ${personId} AND ${statements.predicate} = ${predicate}`,
+      sql`${statements.subjectTable} = ${"terms"} AND ${statements.subjectId} = ${termId} AND ${statements.predicate} = ${predicate} AND ${statements.sourceId} = ${CIA_WORLD_LEADERS_SOURCE_ID}`,
     )
     .limit(1);
 
@@ -1409,7 +1407,7 @@ async function upsertCabinetStatement(
 
   await db.insert(statements).values({
     subjectTable: "terms",
-    subjectId: personId,
+    subjectId: termId,
     predicate,
     objectValue,
     sourceId: CIA_WORLD_LEADERS_SOURCE_ID,
@@ -1617,7 +1615,7 @@ export async function syncCiaCabinets(
         else if (pos.personPath === "qid") summary.personsQidCreated++;
         else summary.personsIdlessCreated++;
 
-        await withDbRetry(
+        const termId = await withDbRetry(
           () => upsertCabinetTerm(db, officeId, personId, startDate),
           { log, label: `upsertTerm(${country.slug})` },
         );
@@ -1627,7 +1625,7 @@ export async function syncCiaCabinets(
           () =>
             upsertCabinetStatement(
               db,
-              personId,
+              termId,
               "cabinet_member",
               pos.title,
               sourceUrl,
@@ -1759,7 +1757,7 @@ export interface BackfillQidsSummary {
  *
  * "cia-sourced" = a person who is the subject of a `cabinet_member` statement
  * sourced to `cia_world_leaders` (the convention `upsertCabinetStatement`
- * writes: `subject_table='terms'`, `subject_id = <person id>`). Ordered by
+ * writes: `subject_table='terms'`, `subject_id = <term id>`). Ordered by
  * `persons.id` so paging is stable across resumable runs. `limit=0` counts
  * only (returns []).
  */
@@ -1771,11 +1769,12 @@ async function selectIdlessCiaPersons(
   return db
     .selectDistinct({ id: persons.id, name: persons.name })
     .from(persons)
+    .innerJoin(terms, eq(terms.personId, persons.id))
     .innerJoin(
       statements,
       and(
         eq(statements.subjectTable, "terms"),
-        eq(statements.subjectId, persons.id),
+        eq(statements.subjectId, terms.id),
         eq(statements.predicate, "cabinet_member"),
         eq(statements.sourceId, CIA_WORLD_LEADERS_SOURCE_ID),
       ),
@@ -1790,11 +1789,12 @@ async function countIdlessCiaPersons(db: CabinetSyncDb): Promise<number> {
   const rows = await db
     .select({ id: persons.id })
     .from(persons)
+    .innerJoin(terms, eq(terms.personId, persons.id))
     .innerJoin(
       statements,
       and(
         eq(statements.subjectTable, "terms"),
-        eq(statements.subjectId, persons.id),
+        eq(statements.subjectId, terms.id),
         eq(statements.predicate, "cabinet_member"),
         eq(statements.sourceId, CIA_WORLD_LEADERS_SOURCE_ID),
       ),
