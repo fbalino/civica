@@ -22,6 +22,7 @@ import {
   syncVdemRow,
   syncMonarchyAndGovernmentForm,
 } from "@/lib/factbook/reconcile/sync-classifications";
+import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,9 +36,26 @@ async function handler(request: Request) {
   const startedAt = new Date().toISOString();
 
   try {
-    const wb = await syncWorldBankClassifications(db);
-    const vdem = await syncVdemRow(db);
-    const monarchy = await syncMonarchyAndGovernmentForm(db);
+    const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
+    const wb = await syncWorldBankClassifications(db, { dryRun });
+    const vdem = await syncVdemRow(db, { dryRun });
+    const monarchy = await syncMonarchyAndGovernmentForm(db, { dryRun });
+
+    assertExternalSyncSucceeded("factbook.classifications.world-bank", {
+      totalWritten: wb.regionRowsWritten + wb.incomeRowsWritten,
+      errors: wb.errors,
+      dryRun,
+    });
+    assertExternalSyncSucceeded("factbook.classifications.vdem", {
+      totalWritten: vdem.rowsWritten,
+      errors: vdem.errors,
+      dryRun,
+    });
+    assertExternalSyncSucceeded("factbook.classifications.monarchy", {
+      totalWritten: monarchy.monarchyRowsWritten + monarchy.formDescriptionRowsWritten,
+      errors: monarchy.errors,
+      dryRun,
+    });
 
     const totalErrors = [
       ...wb.errors,

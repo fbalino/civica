@@ -754,7 +754,7 @@ export async function syncUnData(
   }
 
   await markSourcesSynced("un_data", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

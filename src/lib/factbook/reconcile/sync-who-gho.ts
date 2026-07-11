@@ -695,7 +695,7 @@ export async function syncWhoGho(
   }
 
   await markSourcesSynced("who_gho", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

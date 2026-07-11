@@ -842,7 +842,7 @@ export async function syncIloIlostat(
   }
 
   await markSourcesSynced("ilo_ilostat", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

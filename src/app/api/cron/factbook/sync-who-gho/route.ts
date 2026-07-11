@@ -15,6 +15,7 @@ import { NextResponse } from "next/server";
 import { requireCronAuth } from "@/lib/api/cron-auth";
 import { db } from "@/lib/db";
 import { syncWhoGho } from "@/lib/factbook/reconcile/sync-who-gho";
+import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,11 +29,13 @@ async function handler(request: Request) {
 
   try {
     const summary = await syncWhoGho(db, {
+      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
       // Cron always runs a full pass over all WHO GHO indicators.
       onProgress: (line) => {
         if (line.startsWith("!")) console.error(line);
       },
     });
+    assertExternalSyncSucceeded("factbook.who-gho", summary);
 
     return NextResponse.json({
       ok: true,

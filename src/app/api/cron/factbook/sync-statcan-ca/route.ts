@@ -35,6 +35,7 @@ import { NextResponse } from "next/server";
 import { requireCronAuth } from "@/lib/api/cron-auth";
 import { db } from "@/lib/db";
 import { syncStatCanCa } from "@/lib/factbook/reconcile/sync-statcan-ca";
+import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -48,11 +49,13 @@ async function handler(request: Request) {
 
   try {
     const summary = await syncStatCanCa(db, {
+      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
       // Cron always runs a full pass over all StatCan indicators in scope.
       onProgress: (line) => {
         if (line.startsWith("!")) console.error(line);
       },
     });
+    assertExternalSyncSucceeded("factbook.statcan-ca", summary);
 
     return NextResponse.json({
       ok: true,

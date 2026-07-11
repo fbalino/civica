@@ -333,7 +333,7 @@ export async function syncWorldBankClassifications(
   }
 
   await markSourcesSynced("world_bank", {
-    rowsWritten: regionWritten + incomeWritten,
+    rowsWritten: errors.length === 0 ? regionWritten + incomeWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });
@@ -659,7 +659,7 @@ export async function syncVdemRow(
   }
 
   await markSourcesSynced("vdem", {
-    rowsWritten: written,
+    rowsWritten: errors.length === 0 ? written : 0,
     dryRun: options.dryRun,
     executor: db,
   });
@@ -1000,7 +1000,7 @@ export async function syncMonarchyAndGovernmentForm(
   }
 
   await markSourcesSynced("cia_factbook", {
-    rowsWritten: monarchyWritten + formWritten,
+    rowsWritten: errors.length === 0 ? monarchyWritten + formWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

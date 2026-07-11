@@ -799,7 +799,7 @@ export async function syncUnescoUis(
   // Freshness stamp routed through the sole sanctioned helper, which
   // stamps `last_sync_at` only when the run actually wrote rows.
   await markSourcesSynced("unesco_uis", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

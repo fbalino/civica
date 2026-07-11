@@ -1002,7 +1002,7 @@ export async function syncWtoStats(
   }
 
   await markSourcesSynced("wto_stats", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

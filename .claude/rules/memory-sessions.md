@@ -274,3 +274,14 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   parsers twice.
 - Seven focused tests, 476 full tests, and the production build passed.
   DAT-012 remains open for the remaining adapter families.
+
+## 2026-07-10 — DAT-012 factbook external boundary wave
+
+- Wired all 18 external factbook crons to dry-run and fail-closed outcome
+  handling. Error-bearing or zero-row summaries now fail monitoring instead of
+  returning a misleading successful response.
+- Prevented every external factbook adapter from advancing source freshness
+  after any partial error. Three boundary/contract tests, 479 full tests, and
+  the production build passed.
+- These adapters remain in progress until their source-shaped parser and
+  two-run canonical-state fixtures land.

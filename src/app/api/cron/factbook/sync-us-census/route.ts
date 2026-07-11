@@ -28,6 +28,7 @@ import { NextResponse } from "next/server";
 import { requireCronAuth } from "@/lib/api/cron-auth";
 import { db } from "@/lib/db";
 import { syncUsCensus } from "@/lib/factbook/reconcile/sync-us-census";
+import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,11 +42,13 @@ async function handler(request: Request) {
 
   try {
     const summary = await syncUsCensus(db, {
+      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
       // Cron always runs a full pass over all US Census indicators in scope.
       onProgress: (line) => {
         if (line.startsWith("!")) console.error(line);
       },
     });
+    assertExternalSyncSucceeded("factbook.us-census", summary);
 
     return NextResponse.json({
       ok: true,

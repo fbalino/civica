@@ -883,7 +883,7 @@ export async function syncOnsUk(
   }
 
   await markSourcesSynced(ONS_SOURCE_ID, {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

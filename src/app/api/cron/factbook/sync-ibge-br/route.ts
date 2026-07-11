@@ -40,6 +40,7 @@ import { NextResponse } from "next/server";
 import { requireCronAuth } from "@/lib/api/cron-auth";
 import { db } from "@/lib/db";
 import { syncIbgeBr } from "@/lib/factbook/reconcile/sync-ibge-br";
+import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,11 +54,13 @@ async function handler(request: Request) {
 
   try {
     const summary = await syncIbgeBr(db, {
+      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
       // Cron always runs a full pass over all IBGE indicators in scope.
       onProgress: (line) => {
         if (line.startsWith("!")) console.error(line);
       },
     });
+    assertExternalSyncSucceeded("factbook.ibge-br", summary);
 
     return NextResponse.json({
       ok: true,

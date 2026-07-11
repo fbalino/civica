@@ -24,6 +24,7 @@ import { NextResponse } from "next/server";
 import { requireCronAuth } from "@/lib/api/cron-auth";
 import { db } from "@/lib/db";
 import { syncUndpHdi } from "@/lib/factbook/reconcile/sync-undp-hdi";
+import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -37,11 +38,13 @@ async function handler(request: Request) {
 
   try {
     const summary = await syncUndpHdi(db, {
+      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
       // Cron always runs a full pass over all UNDP HDI indicators.
       onProgress: (line) => {
         if (line.startsWith("!")) console.error(line);
       },
     });
+    assertExternalSyncSucceeded("factbook.undp-hdi", summary);
 
     return NextResponse.json({
       ok: true,

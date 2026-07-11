@@ -34,10 +34,8 @@
  *
  * **Failure-mode behavior (Q5 user override):** ANY extraction
  * failure → graceful no-op, NEVER a hallucinated row. Skipped
- * indicators surface in `summary.errors[]`; the cron returns 200
- * OK with the partial summary so Vercel doesn't classify the run
- * as failed (operator inspects the response body). Catastrophic
- * failure (e.g. ANTHROPIC_API_KEY_RECONCILIATION unset) returns 500.
+ * indicators surface in `summary.errors[]`; the cron fails loudly so
+ * monitoring cannot mistake a partial extraction for a fresh successful run.
  *
  * Methodology: ~/civica/plan/phase-f-methodology-v0.1.md §2 / §3.3
  * Plan:        ~/civica/plan/reconciliation-v1-master-plan.md § R.19
@@ -47,6 +45,7 @@ import { NextResponse } from "next/server";
 import { requireCronAuth } from "@/lib/api/cron-auth";
 import { db } from "@/lib/db";
 import { syncStatsSa } from "@/lib/factbook/reconcile/sync-stats-sa";
+import { assertExternalSyncSucceeded } from "@/lib/data/external-sync-outcome";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -60,6 +59,7 @@ async function handler(request: Request) {
 
   try {
     const summary = await syncStatsSa(db, {
+      dryRun: new URL(request.url).searchParams.get("dryRun") === "1",
       // Cron always runs a full pass over all Stats SA indicators
       // in scope.
       onProgress: (line) => {
@@ -68,6 +68,7 @@ async function handler(request: Request) {
         }
       },
     });
+    assertExternalSyncSucceeded("factbook.stats-sa", summary);
 
     return NextResponse.json({
       ok: true,

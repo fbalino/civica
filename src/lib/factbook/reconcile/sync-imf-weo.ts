@@ -761,7 +761,7 @@ export async function syncImfWeo(
   // Stamp source freshness via the single sanctioned helper — only when
   // this run actually wrote rows (AGENTS.md provenance invariant).
   await markSourcesSynced("imf_weo", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

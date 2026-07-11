@@ -851,7 +851,7 @@ export async function syncStatCanCa(
   }
 
   await markSourcesSynced("statcan_ca", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

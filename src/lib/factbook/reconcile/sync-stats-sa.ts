@@ -1529,7 +1529,7 @@ export async function syncStatsSa(
   }
 
   await markSourcesSynced(STATS_SA_SOURCE_ID, {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

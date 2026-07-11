@@ -738,7 +738,7 @@ export async function syncUndpHdi(
   }
 
   await markSourcesSynced("undp_hdi", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

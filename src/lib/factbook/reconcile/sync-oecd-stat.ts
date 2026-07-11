@@ -927,7 +927,7 @@ export async function syncOecdStat(
   }
 
   await markSourcesSynced("oecd_stat", {
-    rowsWritten: totalWritten,
+    rowsWritten: errors.length === 0 ? totalWritten : 0,
     dryRun: options.dryRun,
     executor: db,
   });

@@ -50,3 +50,17 @@ Canada, Germany, Brazil, and France adapters; the shared runner/writer fixtures
 cover dry-run, malformed, duplicate, empty, and two-run convergence behavior.
 
 After this wave, 476/476 tests and the full production build pass.
+
+## Factbook external-sync boundary wave
+
+All 18 external factbook cron adapters now expose `?dryRun=1` and share a
+fail-closed outcome rule: any reported adapter error or zero usable rows makes
+the cron fail instead of returning a misleading successful response. Their
+freshness calls receive zero writable rows whenever any adapter error occurred,
+so a partial or upstream-changed run cannot advance `sources.last_sync_at`.
+
+This boundary wave does not complete the 18 adapters. Source-shaped parser and
+two-run canonical-state fixtures are still required before DAT-012 can count
+them as accepted.
+
+After this boundary wave, 479/479 tests and the full production build pass.
