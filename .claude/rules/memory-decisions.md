@@ -724,3 +724,12 @@ must NOT be auto-applied just because a U.S. executive order changed them.
   pending sources, images, constitution text, and publisher payloads.
 - Keep the legacy per-country mixed-source export blocked for DAT-027. Durable
   record: APR-D050 in `plan/DECISIONS.md`.
+
+## 2026-07-11 — Releases carry semantic checksums and a complete BOM
+
+- `civica-release-bom/v1` records normalized semantic hashes separately from
+  compressed file hashes, with sizes, counts, schemas, source commit, tools,
+  and per-source vintage and semantic-input records.
+- Live validation must reproduce both the normalized data and BOM. Serve the
+  checked manifest beside the immutable download. Durable record: APR-D051 in
+  `plan/DECISIONS.md`.

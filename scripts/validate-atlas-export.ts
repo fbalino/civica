@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { config } from "dotenv";
-import { ATLAS_EXPORT_RELEASE_ID, ATLAS_EXPORT_SCHEMA_VERSION, atlasExportSha256, buildAtlasExport, loadAtlasExportInput, serializeAtlasExport } from "../src/lib/exports/atlas-release";
+import { ATLAS_EXPORT_RELEASE_ID, ATLAS_EXPORT_SCHEMA_VERSION, atlasExportSha256, buildAtlasExport, buildAtlasReleaseBom, loadAtlasExportInput, serializeAtlasExport } from "../src/lib/exports/atlas-release";
 import { evaluatePublicExport } from "../src/lib/rights/manifest";
 
 config({ path: ".env.local", override: true });
@@ -17,12 +17,17 @@ const fail = (message: string): never => { throw new Error(`DAT-017 atlas export
 
 if (release.schemaVersion !== ATLAS_EXPORT_SCHEMA_VERSION) fail("schema version drift");
 if (release.releaseId !== ATLAS_EXPORT_RELEASE_ID) fail("release id drift");
-if (manifest.sha256 !== atlasExportSha256(serialized)) fail("content hash mismatch");
-if (manifest.byteLength !== Buffer.byteLength(serialized)) fail("byte length mismatch");
-if (manifest.compressedSha256 !== createHash("sha256").update(compressed).digest("hex")) fail("compressed hash mismatch");
-if (manifest.compressedByteLength !== compressed.byteLength) fail("compressed byte length mismatch");
-if (!apiDocs.includes(manifest.sha256) || !apiDocs.includes(manifest.publicDownload)) fail("API docs do not match the checked release");
-if (JSON.stringify(manifest.counts) !== JSON.stringify(release.counts)) fail("count mismatch");
+const file = manifest.files?.[0];
+if (manifest.schemaVersion !== "civica-release-bom/v1") fail("BOM schema drift");
+if (file?.semanticSha256 !== atlasExportSha256(serialized)) fail("content hash mismatch");
+if (file?.uncompressedByteLength !== Buffer.byteLength(serialized)) fail("byte length mismatch");
+if (file?.fileSha256 !== createHash("sha256").update(compressed).digest("hex")) fail("compressed hash mismatch");
+if (file?.fileByteLength !== compressed.byteLength) fail("compressed byte length mismatch");
+if (!apiDocs.includes(file.semanticSha256) || !apiDocs.includes(manifest.publicDownload) || !apiDocs.includes("civica-atlas-2026-07-11.manifest.json")) fail("API docs do not match the checked release");
+if (JSON.stringify(manifest.rowCounts) !== JSON.stringify(release.counts)) fail("count mismatch");
+if (!/^[0-9a-f]{40}$/.test(manifest.exportSourceCommit)) fail("source commit is missing");
+for (const key of ["node", "next", "drizzleOrm", "typescript", "tsx"]) if (!manifest.tools?.[key]) fail(`tool version missing: ${key}`);
+if (!Array.isArray(manifest.sourceInputs) || manifest.sourceInputs.length !== release.counts.sources) fail("source-input BOM incomplete");
 if (release.tables.jurisdictions.length !== release.counts.jurisdictions || release.tables.facts.length !== release.counts.facts || release.tables.sources.length !== release.counts.sources) fail("table counts drift");
 const jurisdictionIds = new Set(release.tables.jurisdictions.map((row) => String(row.id)));
 const sourceIds = new Set(release.tables.sources.map((row) => row.sourceId));
@@ -40,13 +45,16 @@ if (!decision.allowed) fail(decision.reason);
 if (serializeAtlasExport(release) !== serialized) fail("non-canonical serialization");
 async function main() {
   if (process.argv.includes("--live")) {
-    const rebuilt = serializeAtlasExport(buildAtlasExport(await loadAtlasExportInput()));
+    const rebuiltRelease = buildAtlasExport(await loadAtlasExportInput());
+    const rebuilt = serializeAtlasExport(rebuiltRelease);
     if (rebuilt !== serialized) fail("live rebuild differs from frozen release");
+    const rebuiltBom = buildAtlasReleaseBom({ release: rebuiltRelease, serialized: rebuilt, compressed, codeCommit: manifest.exportSourceCommit, tools: manifest.tools });
+    if (`${JSON.stringify(rebuiltBom, null, 2)}\n` !== `${JSON.stringify(manifest, null, 2)}\n`) fail("live BOM rebuild differs from checked manifest");
   }
   console.log("=== DAT-017 atlas export ===\n");
   console.log(`Release: ${release.releaseId}`);
   console.log(`Rows: ${release.counts.jurisdictions} jurisdictions, ${release.counts.facts} facts, ${release.counts.sources} sources`);
-  console.log(`SHA-256: ${manifest.sha256}`);
+console.log(`SHA-256: ${file.semanticSha256}`);
   console.log("\nPASS — package, rights joins, codebook, ordering, counts, and hashes agree.");
 }
 

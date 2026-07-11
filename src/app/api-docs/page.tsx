@@ -530,7 +530,12 @@ for country in resp.json()["data"]:
           <code>2026-07-11</code> · SHA-256{" "}
           <code>cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1</code>.
           The package contains its codebook, join keys, deterministic ordering,
-          table counts, and source-specific terms.
+          table counts, and source-specific terms. Its{" "}
+          <a href="/downloads/civica-atlas-2026-07-11.manifest.json">
+            release bill of materials
+          </a>{" "}
+          records file hashes and sizes, source vintages and semantic hashes,
+          schema contracts, the export source commit, and tool versions.
         </p>
 
         <p className="api-intro">

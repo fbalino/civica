@@ -7,7 +7,7 @@
     "goal": "Make Civica Atlas the trusted provenance-first comparative reference to how every country is governed, while validating or redesigning the Civica Index and rebuilding Pulse as an academically defensible experimental event system before human review and outreach.",
     "status": "active",
     "phase": "phase_0_truthful_beta",
-    "current_task": "DAT-018_release_checksums_and_bill_of_materials"
+    "current_task": "DAT-019_clean_room_reproduction_fixture_and_runbook"
   },
   "budget": {
     "mode": "subscription_only",
@@ -625,6 +625,8 @@
     "plan/evidence/DAT-017/README.md",
     "data/releases/atlas-2026-07-11/manifest.v1.json",
     "data/releases/atlas-2026-07-11/atlas-export.v1.json.gz",
+    "plan/evidence/DAT-018/README.md",
+    "src/app/downloads/civica-atlas-2026-07-11.manifest.json/route.ts",
     "data/release-quality-report.v1.json",
     "data/releases/ci-beta-2024-Q4/raw-input-retention-manifest.v1.json",
     "data/schema-data-dictionary.v1.json",
@@ -645,11 +647,11 @@
   ],
   "verification": {
     "git_status": "Academic-readiness work is isolated on codex/civica-academic-readiness; pre-existing user untracked plan artifacts remain untouched.",
-    "build": "npm run build passed for DAT-017: atlas-export, rights, derivation-version, API, claims/documentation, migration, source, compilation, TypeScript, static generation, and route-generation gates succeeded with 617 tests.",
-    "tests": "617/617 tests passed. Three DAT-017 fixtures cover deterministic ordering, blocked-source failure, and observed-zero preservation; the live validator reproduced the checked release byte-for-byte. Master plan is 36/288 complete (12.5%).",
-    "public_claims": "The API documentation now publishes one registered claim for the frozen Atlas source-observation release and keeps the legacy mixed-source per-country export visibly blocked for DAT-027.",
-    "browser": "Local API documentation rendered release ID, exclusions, SHA-256, codebook notice, and download link with zero console errors. The download returned HTTP 200 application/gzip and passed gzip integrity testing.",
-    "visual_review": "The download uses the canonical primary button and existing API-docs editorial components without new design-token drift."
+    "build": "npm run build passed for DAT-018: release-BOM, Atlas export, rights/version, claims/documentation, migration, source, compilation, TypeScript, static generation, and route-generation gates succeeded with 618 tests.",
+    "tests": "618/618 tests passed. The BOM fixture proves deterministic construction and completeness; the live validator reproduced the normalized export and checked BOM exactly. Master plan is 37/288 complete (12.8%).",
+    "public_claims": "No new empirical claim was added. API documentation now links the checked BOM and states its concrete contents beside the registered Atlas release claim.",
+    "browser": "Local API documentation rendered the BOM link and tool-version description with zero console errors. The manifest route returned HTTP 200 JSON, immutable caching, and an attachment filename.",
+    "visual_review": "The BOM link composes the existing API-docs editorial typography; no new visual component or token was introduced."
   },
-  "updated_at": "2026-07-11T03:10:33Z"
+  "updated_at": "2026-07-11T03:20:29Z"
 }

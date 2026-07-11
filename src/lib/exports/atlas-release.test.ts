@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildAtlasExport, serializeAtlasExport } from "./atlas-release";
+import { buildAtlasExport, buildAtlasReleaseBom, serializeAtlasExport } from "./atlas-release";
 
 const jurisdiction = { id: "j1", slug: "example", name: "Example" };
 const fact = (source_id: string, id = "f1") => ({ id, jurisdiction_id: "j1", fact_key: "population", source_id, value_status: "observed", fact_value_numeric: 0 });
@@ -20,4 +20,16 @@ test("zero remains an observed exported value", () => {
   const release = buildAtlasExport({ jurisdictions: [jurisdiction], facts: [fact("world_bank")] });
   assert.equal(release.tables.facts[0].fact_value_numeric, 0);
   assert.equal(release.tables.facts[0].value_status, "observed");
+});
+
+test("release BOM is deterministic and complete", () => {
+  const release = buildAtlasExport({ jurisdictions: [jurisdiction], facts: [fact("wikidata")] });
+  const serialized = serializeAtlasExport(release);
+  const input = { release, serialized, compressed: new TextEncoder().encode(serialized), codeCommit: "a".repeat(40), tools: { node: "v1", next: "1", drizzleOrm: "1", typescript: "1", tsx: "1" } };
+  const first = buildAtlasReleaseBom(input);
+  const second = buildAtlasReleaseBom(input);
+  assert.deepEqual(first, second);
+  assert.equal(first.files[0].semanticSha256.length, 64);
+  assert.equal(first.sourceInputs[0].rowCount, 1);
+  assert.equal(first.exportSourceCommit, "a".repeat(40));
 });

@@ -103,6 +103,62 @@ export function atlasExportSha256(serialized: string) {
   return createHash("sha256").update(serialized).digest("hex");
 }
 
+export function buildAtlasReleaseBom(input: {
+  release: ReturnType<typeof buildAtlasExport>;
+  serialized: string;
+  compressed: Uint8Array;
+  codeCommit: string;
+  tools: Record<string, string>;
+}) {
+  const { release, serialized, compressed } = input;
+  const sourceInputs = release.tables.sources.map((source) => {
+    const rows = release.tables.facts.filter(
+      (fact) => fact.source_id === source.sourceId,
+    );
+    const labels = [...new Set(rows.map((row) => row.upstream_vintage_label).filter(Boolean).map(String))].sort();
+    const years = rows.flatMap((row) => [row.data_vintage_year, row.fact_year]).filter((value): value is number => typeof value === "number");
+    const retrieved = rows.map((row) => String(row.retrieved_at)).sort();
+    return {
+      sourceId: source.sourceId,
+      rowCount: rows.length,
+      upstreamVintageLabels: labels,
+      observationYearMin: years.length ? Math.min(...years) : null,
+      observationYearMax: years.length ? Math.max(...years) : null,
+      retrievedThrough: retrieved.at(-1) ?? null,
+      semanticSha256: createHash("sha256")
+        .update(JSON.stringify(rows))
+        .digest("hex"),
+    };
+  });
+  return {
+    schemaVersion: "civica-release-bom/v1",
+    releaseId: release.releaseId,
+    releaseDate: release.releaseDate,
+    exportSourceCommit: input.codeCommit,
+    schemas: {
+      export: release.schemaVersion,
+      rights: "rights-manifest/v1",
+      jurisdictionStatus: "jurisdiction-status/v1",
+      dataValueState: "data-value-state/v1",
+    },
+    tools: Object.fromEntries(Object.entries(input.tools).sort(([a], [b]) => a.localeCompare(b))),
+    files: [
+      {
+        role: "normalized-export",
+        path: "atlas-export.v1.json.gz",
+        encoding: "gzip",
+        semanticSha256: atlasExportSha256(serialized),
+        uncompressedByteLength: Buffer.byteLength(serialized),
+        fileSha256: createHash("sha256").update(compressed).digest("hex"),
+        fileByteLength: compressed.byteLength,
+      },
+    ],
+    rowCounts: release.counts,
+    sourceInputs,
+    publicDownload: `/downloads/civica-${release.releaseId}.json.gz`,
+  };
+}
+
 function resultRows(result: unknown): Record<string, unknown>[] {
   return (Array.isArray(result)
     ? result

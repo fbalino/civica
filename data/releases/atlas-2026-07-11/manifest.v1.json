@@ -1,16 +1,72 @@
 {
-  "schemaVersion": "civica-atlas-export-manifest/v1",
+  "schemaVersion": "civica-release-bom/v1",
   "releaseId": "atlas-2026-07-11",
   "releaseDate": "2026-07-11",
-  "sha256": "cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1",
-  "byteLength": 14600640,
-  "compressedSha256": "b704a564766cbda54d37be4c34211dc707af9aa98e9551b66a171d7b8789892b",
-  "compressedByteLength": 1206302,
-  "counts": {
+  "exportSourceCommit": "1dc2891d669ba4cc96ca817c98f3425a37272546",
+  "schemas": {
+    "export": "civica-atlas-export/v1",
+    "rights": "rights-manifest/v1",
+    "jurisdictionStatus": "jurisdiction-status/v1",
+    "dataValueState": "data-value-state/v1"
+  },
+  "tools": {
+    "drizzleOrm": "^0.45.2",
+    "next": "16.2.7",
+    "node": "v25.4.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  },
+  "files": [
+    {
+      "role": "normalized-export",
+      "path": "atlas-export.v1.json.gz",
+      "encoding": "gzip",
+      "semanticSha256": "cd9937fc74d007af1818cb84dae9250b1816354059c1080ec031d4d829098ce1",
+      "uncompressedByteLength": 14600640,
+      "fileSha256": "b704a564766cbda54d37be4c34211dc707af9aa98e9551b66a171d7b8789892b",
+      "fileByteLength": 1206302
+    }
+  ],
+  "rowCounts": {
     "jurisdictions": 253,
     "facts": 16451,
     "sources": 3
   },
-  "encoding": "gzip",
+  "sourceInputs": [
+    {
+      "sourceId": "cia_factbook",
+      "rowCount": 10699,
+      "upstreamVintageLabels": [
+        "CIA Factbook 2026-01-frozen"
+      ],
+      "observationYearMin": 1994,
+      "observationYearMax": 2026,
+      "retrievedThrough": "2026-05-04 19:06:52.469",
+      "semanticSha256": "f5373eafef11d1b1316c605d2db2679f350a0f5704f31e1c7c5b9f5bcfcda155"
+    },
+    {
+      "sourceId": "wikidata",
+      "rowCount": 1270,
+      "upstreamVintageLabels": [
+        "Wikidata 2026-05 snapshot"
+      ],
+      "observationYearMin": 1960,
+      "observationYearMax": 2026,
+      "retrievedThrough": "2026-07-01 06:08:18.725",
+      "semanticSha256": "2dc573eed08b308667720e033102130ceb11e5e725a2ff65fcd3cedb4499c2f1"
+    },
+    {
+      "sourceId": "world_bank",
+      "rowCount": 4482,
+      "upstreamVintageLabels": [
+        "WB Country Classifications FY2026",
+        "World Bank WDI 2026Q3"
+      ],
+      "observationYearMin": 2016,
+      "observationYearMax": 2026,
+      "retrievedThrough": "2026-07-02 08:02:36.643",
+      "semanticSha256": "3a960593604b0d563dfcdbe1cb6999fc64c370da4e9fdb0f87d0d20ac6e2e696"
+    }
+  ],
   "publicDownload": "/downloads/civica-atlas-2026-07-11.json.gz"
 }

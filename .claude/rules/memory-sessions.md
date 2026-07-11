@@ -388,3 +388,13 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   pending sources, images, constitution text, and publisher payloads stay out.
 - Live regeneration matched the checked bytes; 617/617 tests, browser/download
   checks, claims/docs, and the production build pass. DAT-018 is next.
+
+## 2026-07-11 — DAT-018 release BOM completed
+
+- Expanded the Atlas manifest to `civica-release-bom/v1`: semantic and gzip
+  hashes/sizes, row counts, four schemas, export source commit, five tool
+  versions, and per-source vintage/retrieval/semantic-hash records.
+- Added a public immutable manifest download beside the data archive. Live
+  reconstruction reproduces the normalized export and BOM exactly.
+- Four focused fixtures, 618/618 tests, TypeScript, ESLint, browser/HTTP checks,
+  claims/docs, and the production build pass. DAT-019 is next.
