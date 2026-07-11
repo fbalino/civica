@@ -1,0 +1,404 @@
+{
+  "schemaVersion": "civica-index-sensitivity-result/v1",
+  "releaseId": "index-sensitivity-analysis-v1",
+  "panelReleaseId": "ci-research-panel-2000-2024-v3",
+  "uncertaintyReleaseId": "ci-k1-uncertainty-inputs-2024-v2",
+  "referenceYear": 2024,
+  "base": {
+    "coverage": 193,
+    "hash": "bc69a95639ed12d08bc85e2da8dc077148848bd88f049bc942bd3ab3a60f4466"
+  },
+  "comparisons": [
+    {
+      "id": "equal_weights",
+      "category": "weights",
+      "note": "equal weights",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 0.9997545492953538,
+      "rankSpearman": 0.9997545492953538,
+      "medianAbsoluteRankShift": 1,
+      "p95AbsoluteRankShift": 3,
+      "maxAbsoluteRankShift": 5,
+      "topDecileJaccard": 0.9047619047619048,
+      "comparisonSha256": "8d8429c67122ce58a8517db262f2591f2d0db2f5209380c2cf516d32f27b70cb"
+    },
+    {
+      "id": "full_panel_pca_weights",
+      "category": "weights",
+      "note": "squared pooled PC1 loadings",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 0.9997950447604785,
+      "rankSpearman": 0.9997950447604785,
+      "medianAbsoluteRankShift": 1,
+      "p95AbsoluteRankShift": 3,
+      "maxAbsoluteRankShift": 4,
+      "topDecileJaccard": 0.9047619047619048,
+      "comparisonSha256": "8e352b8e502704e53fce842b080b80e3f78644770207e7ad8ee666fe1d39a55a"
+    },
+    {
+      "id": "drop_democratic_quality",
+      "category": "indicator_inclusion",
+      "note": "leave out democratic_quality",
+      "common": 177,
+      "coverage": 177,
+      "scoreSpearman": 0.9926782056935414,
+      "rankSpearman": 0.9926782056935414,
+      "medianAbsoluteRankShift": 14,
+      "p95AbsoluteRankShift": 25.19999999999999,
+      "maxAbsoluteRankShift": 38,
+      "topDecileJaccard": 1,
+      "comparisonSha256": "3407e5b0e2055d10a194df3fc57354db28ae70ba4514f278b4949bfd1883afce"
+    },
+    {
+      "id": "drop_rule_of_law",
+      "category": "indicator_inclusion",
+      "note": "leave out rule_of_law",
+      "common": 177,
+      "coverage": 177,
+      "scoreSpearman": 0.9951917067587509,
+      "rankSpearman": 0.9951917067587509,
+      "medianAbsoluteRankShift": 14,
+      "p95AbsoluteRankShift": 23,
+      "maxAbsoluteRankShift": 26,
+      "topDecileJaccard": 0.8947368421052632,
+      "comparisonSha256": "87ca996b5bba90dacce5ad7112f0590f30bf570602be35f9cf5b2099f950ca33"
+    },
+    {
+      "id": "drop_freedom_rights",
+      "category": "indicator_inclusion",
+      "note": "leave out freedom_rights",
+      "common": 177,
+      "coverage": 177,
+      "scoreSpearman": 0.9859116945673853,
+      "rankSpearman": 0.9859116945673853,
+      "medianAbsoluteRankShift": 13,
+      "p95AbsoluteRankShift": 33.19999999999999,
+      "maxAbsoluteRankShift": 51,
+      "topDecileJaccard": 1,
+      "comparisonSha256": "36236ffebdb13eee97bfc670b1772c537e9626e59281f9e09cae2ae336fc35ed"
+    },
+    {
+      "id": "drop_corruption_control",
+      "category": "indicator_inclusion",
+      "note": "leave out corruption_control",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 0.995153351400263,
+      "rankSpearman": 0.995153351400263,
+      "medianAbsoluteRankShift": 3,
+      "p95AbsoluteRankShift": 10.399999999999977,
+      "maxAbsoluteRankShift": 22,
+      "topDecileJaccard": 0.8181818181818182,
+      "comparisonSha256": "8bdd2349607b7a9d0bced39a0ad45f7189a0a9090ba24ba645f3fa7a6f4d5559"
+    },
+    {
+      "id": "wgi_va_for_all",
+      "category": "source_substitution",
+      "note": "substitute WGI Voice for V-Dem whenever WGI is observed",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 0.9968374897656009,
+      "rankSpearman": 0.9968374897656009,
+      "medianAbsoluteRankShift": 2,
+      "p95AbsoluteRankShift": 11,
+      "maxAbsoluteRankShift": 17,
+      "topDecileJaccard": 0.9047619047619048,
+      "comparisonSha256": "b4a9a57339ec15f02d3c6443b915588c829f9ab83fde4bf04008b7fd8e049e38"
+    },
+    {
+      "id": "exact_publisher_points",
+      "category": "source_substitution",
+      "note": "replace republisher points with exact publisher points where captured",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 0.9997295117193287,
+      "rankSpearman": 0.9997295117193287,
+      "medianAbsoluteRankShift": 0,
+      "p95AbsoluteRankShift": 3,
+      "maxAbsoluteRankShift": 6,
+      "topDecileJaccard": 1,
+      "comparisonSha256": "f602d7b74f830eab2a3be70fa455f6df1588eb7cd9bd6924f3d29ddaed2ece68"
+    },
+    {
+      "id": "within_year_percentiles",
+      "category": "normalization",
+      "note": "within-year average-rank percentile normalization",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 0.9940512566259251,
+      "rankSpearman": 0.9940512566259251,
+      "medianAbsoluteRankShift": 3,
+      "p95AbsoluteRankShift": 14,
+      "maxAbsoluteRankShift": 22,
+      "topDecileJaccard": 0.8181818181818182,
+      "comparisonSha256": "343c5b48e668162f9afa3699cb03654f6c969e4e75be8e3efb103c60427cac34"
+    },
+    {
+      "id": "median_aggregation",
+      "category": "aggregation",
+      "note": "unweighted median of four normalized inputs",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 0.9933115826572271,
+      "rankSpearman": 0.9933115826572271,
+      "medianAbsoluteRankShift": 3,
+      "p95AbsoluteRankShift": 14,
+      "maxAbsoluteRankShift": 18,
+      "topDecileJaccard": 0.8181818181818182,
+      "comparisonSha256": "7f5acc181ac861db93c3b0ef838bd6d935dbe542ee6f24544a7d2b3bcbd464d5"
+    },
+    {
+      "id": "winsor_5_95",
+      "category": "outliers",
+      "note": "within-year 5th/95th percentile winsorization",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 0.9997783399404865,
+      "rankSpearman": 0.9997783399404865,
+      "medianAbsoluteRankShift": 0,
+      "p95AbsoluteRankShift": 3,
+      "maxAbsoluteRankShift": 8,
+      "topDecileJaccard": 1,
+      "comparisonSha256": "e397ad9459481dd50c416ef131bb4f44c59a5a4ff80c58247063f4cb68dde05a"
+    },
+    {
+      "id": "complete_case_only",
+      "category": "missingness",
+      "note": "withhold every partial profile",
+      "common": 177,
+      "coverage": 177,
+      "scoreSpearman": 0.9999999999999999,
+      "rankSpearman": 0.9999999999999999,
+      "medianAbsoluteRankShift": 15,
+      "p95AbsoluteRankShift": 16,
+      "maxAbsoluteRankShift": 16,
+      "topDecileJaccard": 1,
+      "comparisonSha256": "19e6d515857a328f79f0f0bb4a3efbd5fa9afb446ee0269f3e288e5ae601ad4a"
+    },
+    {
+      "id": "mandatory_two_allowed",
+      "category": "missingness",
+      "note": "permit mandatory two-dimension estimates; no imputation",
+      "common": 193,
+      "coverage": 193,
+      "scoreSpearman": 1.0000000000000002,
+      "rankSpearman": 1.0000000000000002,
+      "medianAbsoluteRankShift": 0,
+      "p95AbsoluteRankShift": 0,
+      "maxAbsoluteRankShift": 0,
+      "topDecileJaccard": 1,
+      "comparisonSha256": "6f535772b3ddc805c1fe322d017ab29d280663986ab4d46ca35f1627ccb811e0"
+    },
+    {
+      "id": "median_imputation",
+      "category": "imputation",
+      "note": "exploratory within-year median imputation; prohibited for production",
+      "common": 193,
+      "coverage": 194,
+      "scoreSpearman": 0.9958904475554452,
+      "rankSpearman": 0.9958904475554452,
+      "medianAbsoluteRankShift": 1,
+      "p95AbsoluteRankShift": 15,
+      "maxAbsoluteRankShift": 20,
+      "topDecileJaccard": 0.7391304347826086,
+      "comparisonSha256": "f518ae883a108778de63dbfc7c249b7e08e9b808b5db14ff91f0b0c8a4b62c5c"
+    }
+  ],
+  "uncertainty": {
+    "eligibleCountries": 177,
+    "scenarios": [
+      {
+        "id": "lower",
+        "interpretation": "perfect same-direction bound stress",
+        "common": 177,
+        "coverage": 177,
+        "scoreSpearman": 0.9993408431702907,
+        "rankSpearman": 0.9993408431702907,
+        "medianAbsoluteRankShift": 1,
+        "p95AbsoluteRankShift": 4,
+        "maxAbsoluteRankShift": 11,
+        "topDecileJaccard": 0.8947368421052632,
+        "comparisonSha256": "98c9b00a7a35ca298489afd74f3c843941be383439d78175a9fb8c64f2c35f34"
+      },
+      {
+        "id": "upper",
+        "interpretation": "perfect same-direction bound stress",
+        "common": 177,
+        "coverage": 177,
+        "scoreSpearman": 0.9992461551106558,
+        "rankSpearman": 0.9992461551106558,
+        "medianAbsoluteRankShift": 1,
+        "p95AbsoluteRankShift": 4.199999999999989,
+        "maxAbsoluteRankShift": 9,
+        "topDecileJaccard": 1,
+        "comparisonSha256": "fa892bc648b1c281581a194523ab58229008900ea3f88c46379fe47b93622a4c"
+      },
+      {
+        "id": "alternating",
+        "interpretation": "counter-direction dependence stress",
+        "common": 177,
+        "coverage": 177,
+        "scoreSpearman": 0.9995464912382169,
+        "rankSpearman": 0.9995464912382169,
+        "medianAbsoluteRankShift": 1,
+        "p95AbsoluteRankShift": 3,
+        "maxAbsoluteRankShift": 7,
+        "topDecileJaccard": 1,
+        "comparisonSha256": "78a7f61157156d6e848a1a4714bef4554451a092de378526b3836372b61f4faf"
+      }
+    ],
+    "freedomHouseTreatment": "point held fixed because no per-country probability distribution is published",
+    "covarianceInterpretation": "bound stress under same-direction and counter-direction dependence; not a calibrated probability interval"
+  },
+  "vintage": {
+    "vdemV14V15": {
+      "comparableScores": 3088,
+      "medianAbsoluteK1Shift": 0,
+      "p95AbsoluteK1Shift": 1,
+      "maxAbsoluteK1Shift": 2,
+      "nonzeroShifts": 526,
+      "shiftsAboveThreePoints": 0,
+      "largestShifts": [
+        {
+          "iso3": "AFG",
+          "year": 2006,
+          "oldScore": 21,
+          "revisedScore": 23,
+          "absoluteShift": 2
+        },
+        {
+          "iso3": "AFG",
+          "year": 2007,
+          "oldScore": 21,
+          "revisedScore": 23,
+          "absoluteShift": 2
+        },
+        {
+          "iso3": "AFG",
+          "year": 2008,
+          "oldScore": 21,
+          "revisedScore": 22,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2009,
+          "oldScore": 19,
+          "revisedScore": 20,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2010,
+          "oldScore": 16,
+          "revisedScore": 17,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2011,
+          "oldScore": 16,
+          "revisedScore": 17,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2012,
+          "oldScore": 14,
+          "revisedScore": 15,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2013,
+          "oldScore": 15,
+          "revisedScore": 16,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2015,
+          "oldScore": 16,
+          "revisedScore": 17,
+          "absoluteShift": 1
+        },
+        {
+          "iso3": "AFG",
+          "year": 2016,
+          "oldScore": 17,
+          "revisedScore": 18,
+          "absoluteShift": 1
+        }
+      ],
+      "shiftSha256": "c149f2d3e6f2fdac2c8014424eff3957b49e7e64bff3fb48d38efe7125c15ee4"
+    },
+    "qogLabelEditions": {
+      "jan24VsJan26": {
+        "commonStart": 1946,
+        "commonEnd": 2023,
+        "a": 219,
+        "b": 258,
+        "intersection": 219,
+        "union": 258,
+        "jaccard": 0.8488372093023255,
+        "bEventsAfterCommonEnd": 6
+      },
+      "jan25VsJan26": {
+        "commonStart": 1946,
+        "commonEnd": 2024,
+        "a": 260,
+        "b": 260,
+        "intersection": 259,
+        "union": 261,
+        "jaccard": 0.9923371647509579,
+        "bEventsAfterCommonEnd": 4
+      }
+    }
+  },
+  "temporalAndGeographic": {
+    "source": "index-oos-validation-v1",
+    "note": "frozen joint folds evaluated separately; no post-result fold changes"
+  },
+  "dominantChoices": [
+    {
+      "id": "drop_freedom_rights",
+      "category": "indicator_inclusion",
+      "rankSpearman": 0.9859116945673853,
+      "p95AbsoluteRankShift": 33.19999999999999,
+      "coverage": 177
+    },
+    {
+      "id": "drop_democratic_quality",
+      "category": "indicator_inclusion",
+      "rankSpearman": 0.9926782056935414,
+      "p95AbsoluteRankShift": 25.19999999999999,
+      "coverage": 177
+    },
+    {
+      "id": "median_aggregation",
+      "category": "aggregation",
+      "rankSpearman": 0.9933115826572271,
+      "p95AbsoluteRankShift": 14,
+      "coverage": 193
+    },
+    {
+      "id": "within_year_percentiles",
+      "category": "normalization",
+      "rankSpearman": 0.9940512566259251,
+      "p95AbsoluteRankShift": 14,
+      "coverage": 193
+    },
+    {
+      "id": "drop_corruption_control",
+      "category": "indicator_inclusion",
+      "rankSpearman": 0.995153351400263,
+      "p95AbsoluteRankShift": 10.399999999999977,
+      "coverage": 193
+    }
+  ],
+  "noImputation": true,
+  "noConfidenceIntervalClaim": true,
+  "resultSha256": "49576076eaf6920594d4c51290fb0164b8ab8e82abec5e4a7b05ab313aa8b7c6"
+}

@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 292
-- **Completed:** 76
-- **Remaining:** 216
-- **Progress:** 26%
+- **Completed:** 77
+- **Remaining:** 215
+- **Progress:** 26.4%
 - **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -94,7 +94,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-016** (P0) Test incremental information beyond established indicators and simple dashboards. _Done when: held-out prediction/explanation or justified decision-utility tests compare nested baselines, effect sizes/uncertainty are reported, and a candidate fails if added complexity produces less than the preregistered meaningful gain._
 - [x] **IDX-017** (P0) Test longitudinal sensitivity and responsiveness without rewarding noise. _Done when: candidates are evaluated on known/independently coded changes, lead/lag, revision sensitivity, autocorrelation, stability under quiet periods, and source-update artifacts; level accuracy cannot substitute for change validity._
 - [x] **IDX-018** (P0) Run temporal and geographic out-of-sample validation. _Done when: held-out years and countries/regions remain untouched until final evaluation, all candidates/baselines use identical splits, uncertainty and subgroup sample limits are reported, and results reproduce from the preregistration artifact._
-- [ ] **IDX-019** (P0) Run full sensitivity and uncertainty analysis. _Done when: indicator inclusion, source substitution, vintages, normalization, weights/model parameters, aggregation, missingness/imputation, uncertainty/covariance, outliers, and country coverage are varied; rank/decision stability and dominant choices are published._
+- [x] **IDX-019** (P0) Run full sensitivity and uncertainty analysis. _Done when: indicator inclusion, source substitution, vintages, normalization, weights/model parameters, aggregation, missingness/imputation, uncertainty/covariance, outliers, and country coverage are varied; rank/decision stability and dominant choices are published._
 - [ ] **IDX-020** (P0) Measure source/ecosystem dependence and apparent novelty. _Done when: overlapping source families/experts/constructs are mapped, leave-one-source-family-out results are reported, established-indicator similarity is decomposed, and Civica does not claim independent corroboration from repackaged inputs._
 - [ ] **IDX-021** (P0) Evaluate coverage, missingness, and subgroup fairness. _Done when: publication/uncertainty/performance is reported by region, income, regime/media environment, small/disputed entities, data-rich/poor groups, and source availability; candidates that systematically grade evidence scarcity as poor governance fail._
 - [ ] **IDX-022** (P1) Evaluate interpretability and decision usefulness with task-based reader protocols. _Done when: preregistered tasks compare candidates with the native dashboard for comprehension, uncertainty awareness, citation/source tracing, misuse, and time-to-answer; agent simulations remain provisional until qualified human testing at G5._
