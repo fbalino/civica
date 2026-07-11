@@ -48,7 +48,6 @@ import {
 import {
   snapshotDispute,
   writeDisputeAuditLog,
-  type DisputeSnapshot,
 } from "@/lib/factbook/reconcile/dispute-audit-log";
 import { getCanonicalFactsForJurisdiction } from "@/lib/factbook/reconcile/api";
 
@@ -146,9 +145,12 @@ export interface AutoResolveOptions {
   limit?: number;
   /** Progress logger; cron uses this to surface to Vercel logs. */
   onProgress?: (line: string) => void;
+  readDisputes?: () => Promise<OpenDisputeRow[]>;
+  resolveFacts?: typeof getCanonicalFactsForJurisdiction;
+  writeAudit?: typeof writeDisputeAuditLog;
 }
 
-interface OpenDisputeRow {
+export interface OpenDisputeRow {
   id: string;
   jurisdictionId: string;
   factKey: string;
@@ -186,7 +188,7 @@ export async function autoResolveStaleDisputes(
   const limitClause = options.limit
     ? sql`LIMIT ${Math.max(1, options.limit)}`
     : sql``;
-  const rowsResult = await db.execute(sql`
+  const rowsResult = options.readDisputes ? null : await db.execute(sql`
     SELECT
       d.id,
       d.jurisdiction_id,
@@ -207,10 +209,10 @@ export async function autoResolveStaleDisputes(
     ORDER BY d.created_at ASC
     ${limitClause}
   `);
-  const raw = ((rowsResult as unknown as { rows?: unknown[] }).rows ??
-    rowsResult) as Array<Record<string, unknown>>;
+  const raw = rowsResult === null ? [] : (((rowsResult as unknown as { rows?: unknown[] }).rows ??
+    rowsResult) as Array<Record<string, unknown>>);
 
-  const disputes: OpenDisputeRow[] = raw.map((r) => ({
+  const disputes: OpenDisputeRow[] = options.readDisputes ? await options.readDisputes() : raw.map((r) => ({
     id: String(r.id),
     jurisdictionId: String(r.jurisdiction_id),
     factKey: String(r.fact_key),
@@ -250,7 +252,7 @@ export async function autoResolveStaleDisputes(
       ReturnType<typeof getCanonicalFactsForJurisdiction>
     >;
     try {
-      resolverOutputs = await getCanonicalFactsForJurisdiction(
+      resolverOutputs = await (options.resolveFacts ?? getCanonicalFactsForJurisdiction)(
         jurisdictionId,
         factKeys,
       );
@@ -270,6 +272,7 @@ export async function autoResolveStaleDisputes(
       try {
         const outcome = await processOneDispute(db, d, resolverOutputs[d.factKey], {
           dryRun: options.dryRun ?? false,
+          writeAudit: options.writeAudit ?? writeDisputeAuditLog,
         });
         if (outcome.outcome === "still_proposed") summary.stillProposed++;
         else if (outcome.outcome === "auto_resolved") summary.autoResolved++;
@@ -299,6 +302,7 @@ export async function autoResolveStaleDisputes(
 
 interface ProcessOneOptions {
   dryRun: boolean;
+  writeAudit: typeof writeDisputeAuditLog;
 }
 
 /**
@@ -363,15 +367,6 @@ async function closeStale(
 
   const beforeSnap = snapshotDispute(before);
   const now = new Date();
-  const afterSnap: DisputeSnapshot = {
-    id: before.id,
-    status: AUTO_RESOLVE_STATUS,
-    reviewerId: AUTO_RESOLVE_REVIEWER_ID,
-    reviewerNotes: before.reviewerNotes,
-    resolvedAt: now.toISOString(),
-    resolutionAction: "auto_resolve_stale",
-  };
-
   if (opts.dryRun) {
     return {
       disputeId: dispute.id,
@@ -401,7 +396,7 @@ async function closeStale(
     .limit(1);
   const after = afterRows[0] ?? before;
 
-  await writeDisputeAuditLog({
+  await opts.writeAudit({
     dispute: after,
     action: "auto_resolve_stale",
     actorId: AUTO_RESOLVE_REVIEWER_ID,

@@ -41,6 +41,7 @@ async function handler(request: Request) {
   if (unauthorized) return unauthorized;
 
   const startedAt = new Date().toISOString();
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
   try {
     // Deterministic, sorted full list → stable per-day shard membership.
@@ -72,7 +73,12 @@ async function handler(request: Request) {
       onProgress: (line) => {
         if (line.startsWith("!")) console.error(line);
       },
+      dryRun,
     });
+
+    if (summary.skipped.length > 0 || summary.totalRowsWritten === 0) {
+      return NextResponse.json({ ok: false, step: "factbook.cia-cabinets.sync", dryRun, errors: summary.skipped.length ? summary.skipped : [{ reason: "No cabinet rows produced" }] }, { status: 502 });
+    }
 
     return NextResponse.json({
       ok: true,
@@ -97,6 +103,7 @@ async function handler(request: Request) {
       statementsWritten: summary.statementsWritten,
       totalRowsWritten: summary.totalRowsWritten,
       freshnessStamped: summary.freshnessStamped,
+      dryRun,
     });
   } catch (err) {
     console.error("[cron factbook.cia-cabinets.sync] failed:", err);

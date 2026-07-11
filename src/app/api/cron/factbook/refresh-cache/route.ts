@@ -26,13 +26,19 @@ async function handler(request: Request) {
   if (unauthorized) return unauthorized;
 
   const startedAt = new Date().toISOString();
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
   try {
     const summary = await refreshJurisdictionCache(db, {
       onProgress: (line) => {
         if (line.startsWith("!")) console.error(line);
       },
+      dryRun,
     });
+
+    if (summary.errors.length > 0 || summary.jurisdictionsRefreshed === 0) {
+      return NextResponse.json({ ok: false, step: "factbook.refresh-cache", dryRun, errors: summary.errors.length ? summary.errors : ["No jurisdictions refreshed"] }, { status: 500 });
+    }
 
     return NextResponse.json({
       ok: true,
@@ -43,6 +49,7 @@ async function handler(request: Request) {
       jurisdictionsRefreshed: summary.jurisdictionsRefreshed,
       fieldsWritten: summary.fieldsWritten,
       errorCount: summary.errors.length,
+      dryRun,
     });
   } catch (err) {
     console.error("[cron factbook.refresh-cache] failed:", err);

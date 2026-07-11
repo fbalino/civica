@@ -244,6 +244,9 @@ export interface CabinetSyncOptions {
   slugs?: string[];
   /** Crawl-delay override (ms) between country fetches. Defaults to 10s. */
   crawlDelayMs?: number;
+  dryRun?: boolean;
+  plan?: CabinetPlan;
+  markSynced?: typeof markSourcesSynced;
 }
 
 // ─── Position category classification ────────────────────────────────────────
@@ -1464,6 +1467,7 @@ export interface CiaCabinetSyncSummary {
   statementsWritten: number;
   totalRowsWritten: number;
   freshnessStamped: boolean;
+  dryRun: boolean;
 }
 
 /**
@@ -1489,7 +1493,7 @@ export async function syncCiaCabinets(
   log(`=== CIA World Leaders Cabinet Sync (APPLY) ===`);
   log(`Crawling ${slugs.length} CIA candidate pages …`);
 
-  const plan = await computeCabinetPlan({
+  const plan = options.plan ?? await computeCabinetPlan({
     db,
     slugs,
     crawlDelayMs: options.crawlDelayMs,
@@ -1516,7 +1520,39 @@ export async function syncCiaCabinets(
     statementsWritten: 0,
     totalRowsWritten: 0,
     freshnessStamped: false,
+    dryRun: options.dryRun ?? false,
   };
+
+  if (options.dryRun) {
+    for (const country of plan.countries) {
+      if (!country.jurisdictionMatched || country.parseFailed) continue;
+      let appliedAny = false;
+      for (const pos of country.positions) {
+        if (pos.category === "diplomatic") {
+          summary.diplomaticSkipped++;
+          continue;
+        }
+        if (!INGEST_CATEGORIES.has(pos.category)) continue;
+        summary.officesWritten++;
+        appliedAny = true;
+        if (!pos.rawName || !pos.personPath) {
+          summary.vacantOffices++;
+          continue;
+        }
+        summary.termsWritten++;
+        summary.statementsWritten++;
+        if (pos.personPath === "existing") summary.personsExisting++;
+        else if (pos.personPath === "qid") summary.personsQidCreated++;
+        else summary.personsIdlessCreated++;
+      }
+      if (appliedAny) summary.countriesApplied++;
+    }
+    summary.totalRowsWritten = summary.officesWritten + summary.termsWritten + summary.statementsWritten;
+    const finishedAtMs = Date.now();
+    summary.finishedAt = new Date(finishedAtMs).toISOString();
+    summary.durationMs = finishedAtMs - startedAtMs;
+    return summary;
+  }
 
   log(`=== Applying — persisting offices / persons / terms / statements ===`);
   for (const country of plan.countries) {
@@ -1622,8 +1658,8 @@ export async function syncCiaCabinets(
   summary.totalRowsWritten =
     summary.officesWritten + summary.termsWritten + summary.statementsWritten;
 
-  const stamped = await markSourcesSynced(CIA_WORLD_LEADERS_SOURCE_ID, {
-    rowsWritten: summary.totalRowsWritten,
+  const stamped = await (options.markSynced ?? markSourcesSynced)(CIA_WORLD_LEADERS_SOURCE_ID, {
+    rowsWritten: summary.skipped.length === 0 ? summary.totalRowsWritten : 0,
     executor: db,
   });
   summary.freshnessStamped = stamped.length > 0;

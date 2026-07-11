@@ -306,3 +306,15 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
 - The full suite passes 533/533, source-freshness validation passes, and the
   production build passes. DAT-012 remains open for other factbook jobs and
   manual Atlas/Index/Conditions entrypoints.
+
+## 2026-07-10 — DAT-012 remaining factbook-job completion
+
+- Added repeatability fixtures and cron dry-run support for Wikidata facts,
+  Wikidata officeholders, CIA World Leaders cabinets, cache refresh, quarterly
+  vintage snapshots, and stale-dispute auto-resolution.
+- Applied reruns converge without duplicate canonical facts, organization
+  spine rows, people, terms, statements, offices, vintages, or audit actions;
+  publisher failures cannot advance freshness.
+- The read-only reconciliation verifier retains its 24-case suite. All 25
+  scheduled factbook jobs are now covered; 551/551 full tests and the
+  production build pass. DAT-012 remains open for ten manual pipelines.

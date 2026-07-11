@@ -53,6 +53,12 @@ export interface OfficeholderSyncOptions {
   db?: OfficeholderSyncDb;
   /** Progress sink. Lines starting with `!` are warnings. Defaults to no-op. */
   onProgress?: (line: string) => void;
+  dryRun?: boolean;
+  bindings?: Awaited<ReturnType<typeof sparqlQuery>>;
+  findJurisdictionId?: typeof findJurisdiction;
+  enrichmentPlan?: EnrichmentPlan;
+  enrichPersons?: typeof enrichPersonPortraits;
+  markSynced?: typeof markSourcesSynced;
 }
 
 export interface OfficeholderSyncSummary {
@@ -81,6 +87,7 @@ export interface OfficeholderSyncSummary {
   totalRowsWritten: number;
   /** Whether `sources.last_sync_at` was stamped this run. */
   freshnessStamped: boolean;
+  dryRun: boolean;
 }
 
 // Generic office names we are allowed to overwrite with a real P39 title. A
@@ -1151,7 +1158,7 @@ export async function syncFactbookOfficeholders(
   log("=== Wikidata Officeholder Sync ===");
   log("Querying Wikidata SPARQL endpoint...");
 
-  const bindings = await sparqlQuery(QUERY);
+  const bindings = options.bindings ?? await sparqlQuery(QUERY);
   log(`Got ${bindings.length} results`);
 
   let synced = 0;
@@ -1168,7 +1175,7 @@ export async function syncFactbookOfficeholders(
     const iso3 = binding.iso3?.value ?? null;
     const shortName = binding.shortName?.value ?? null;
 
-    const jurisdictionId = await findJurisdiction(
+    const jurisdictionId = await (options.findJurisdictionId ?? findJurisdiction)(
       db,
       iso2,
       stateQid,
@@ -1180,6 +1187,11 @@ export async function syncFactbookOfficeholders(
       if (binding.headOfState?.value || binding.headOfGov?.value) {
         log(`! Skipped ${stateName} (${stateQid}) — no DB match, has leadership data`);
       }
+      continue;
+    }
+
+    if (options.dryRun) {
+      synced++;
       continue;
     }
 
@@ -1244,7 +1256,7 @@ export async function syncFactbookOfficeholders(
 
   // Resolve any remaining QID-as-name persons via Wikidata entity API
   let qidNamesResolved = 0;
-  const allPersons = await db
+  const allPersons = options.dryRun ? [] : await db
     .select({ id: persons.id, name: persons.name, wikidataQid: persons.wikidataQid })
     .from(persons);
   const qidPersons = allPersons.filter((p) => /^Q\d+$/.test(p.name));
@@ -1267,11 +1279,15 @@ export async function syncFactbookOfficeholders(
   // Reuses the exact same computeEnrichmentPlan() the dry run reports on, so
   // what was approved in the dry-run preview is exactly what gets written.
   log("=== Applying government-title + party enrichment ===");
-  const plan = await computeEnrichmentPlan(db, log);
+  const plan = options.enrichmentPlan ?? await computeEnrichmentPlan(db, log);
   reportEnrichmentPlan(plan, log);
 
   let titlesWritten = 0;
   for (const t of plan.titles) {
+    if (options.dryRun) {
+      titlesWritten++;
+      continue;
+    }
     await db.update(offices).set({ name: t.newName }).where(eq(offices.id, t.officeId));
     titlesWritten++;
   }
@@ -1279,6 +1295,10 @@ export async function syncFactbookOfficeholders(
   let partiesWritten = 0;
   for (const p of plan.parties) {
     if (!p.termId) continue;
+    if (options.dryRun) {
+      partiesWritten++;
+      continue;
+    }
     await db
       .update(terms)
       .set({ partyName: p.party, partyColor: p.color })
@@ -1294,6 +1314,10 @@ export async function syncFactbookOfficeholders(
   let portraitsWritten = 0;
   for (const p of plan.portraits) {
     if (p.unchanged) continue;
+    if (options.dryRun) {
+      portraitsWritten++;
+      continue;
+    }
     await db
       .update(persons)
       .set({ photoUrl: p.file, photoLicense: p.license, photoCredit: p.credit })
@@ -1304,6 +1328,10 @@ export async function syncFactbookOfficeholders(
   let birthdatesWritten = 0;
   for (const b of plan.birthdates) {
     if (b.unchanged) continue;
+    if (options.dryRun) {
+      birthdatesWritten++;
+      continue;
+    }
     await db
       .update(persons)
       .set({ dateOfBirth: b.dob })
@@ -1330,7 +1358,7 @@ export async function syncFactbookOfficeholders(
   let personPortraitsWritten = 0;
   let personBirthdatesWritten = 0;
   try {
-    const personPass = await enrichPersonPortraits({
+    const personPass = options.dryRun ? null : await (options.enrichPersons ?? enrichPersonPortraits)({
       db,
       // The delta pass owns its own freshness stamp normally, but here the
       // officeholder sync stamps once at the end, so run it as a non-stamping
@@ -1339,10 +1367,10 @@ export async function syncFactbookOfficeholders(
         if (line.startsWith("!")) log(line);
       },
     });
-    personPortraitsWritten = personPass.portraitsWritten;
-    personBirthdatesWritten = personPass.birthdatesWritten;
+    personPortraitsWritten = personPass?.portraitsWritten ?? 0;
+    personBirthdatesWritten = personPass?.birthdatesWritten ?? 0;
     log(
-      `Person-portrait backfill: ${personPortraitsWritten} portraits, ${personBirthdatesWritten} birthdates (${personPass.candidates} candidates scanned)`,
+        `Person-portrait backfill: ${personPortraitsWritten} portraits, ${personBirthdatesWritten} birthdates (${personPass?.candidates ?? 0} candidates scanned)`,
     );
   } catch (err) {
     log(
@@ -1363,8 +1391,9 @@ export async function syncFactbookOfficeholders(
     birthdatesWritten +
     personPortraitsWritten +
     personBirthdatesWritten;
-  const stamped = await markSourcesSynced("wikidata", {
+  const stamped = await (options.markSynced ?? markSourcesSynced)("wikidata", {
     rowsWritten: totalRowsWritten,
+    dryRun: options.dryRun,
     executor: db,
   });
 
@@ -1389,5 +1418,6 @@ export async function syncFactbookOfficeholders(
     personBirthdatesWritten,
     totalRowsWritten,
     freshnessStamped: stamped.length > 0,
+    dryRun: options.dryRun ?? false,
   };
 }

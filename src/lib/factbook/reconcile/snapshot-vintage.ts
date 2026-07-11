@@ -229,6 +229,16 @@ export interface SnapshotOptions {
   /** Per-row progress callback (`!`-prefixed lines indicate
    *  warnings / errors). Defaults to silent. */
   onProgress?: (line: string) => void;
+  pairs?: SnapshotPair[];
+  disputedKeys?: Set<string>;
+  readRows?: (pair: SnapshotPair) => Promise<FactRowDb[]>;
+}
+
+export interface SnapshotPair {
+  jurisdictionId: string;
+  factKey: string;
+  slug: string;
+  name: string;
 }
 
 export interface SnapshotSummary {
@@ -415,7 +425,7 @@ export async function snapshotCurrentVintage(
   }
 
   // 1. Walk every (jurisdiction, fact_key) pair in country_facts.
-  const pairs = await dbInstance
+  const pairs = options.pairs ?? await dbInstance
     .select({
       jurisdictionId: countryFacts.jurisdictionId,
       factKey: countryFacts.factKey,
@@ -443,7 +453,7 @@ export async function snapshotCurrentVintage(
 
   // 2. Pre-fetch the disputed-keys set so we don't 1+N the dispute
   //    table for every pair.
-  const disputedKeys = await readDisputedKeys(dbInstance, jurisdictionFilterId);
+  const disputedKeys = options.disputedKeys ?? await readDisputedKeys(dbInstance, jurisdictionFilterId);
 
   const summary: SnapshotSummary = {
     vintageLabel,
@@ -465,13 +475,15 @@ export async function snapshotCurrentVintage(
 
     try {
       // 3. Pull all rows for this pair, resolve, snapshot the winner.
-      const rowsRaw = (await dbInstance
-        .select()
-        .from(countryFacts)
-        .where(
-          sql`${countryFacts.jurisdictionId} = ${pair.jurisdictionId}
-            AND ${countryFacts.factKey} = ${pair.factKey}`,
-        )) as unknown as FactRowDb[];
+      const rowsRaw = options.readRows
+        ? await options.readRows(pair)
+        : (await dbInstance
+            .select()
+            .from(countryFacts)
+            .where(
+              sql`${countryFacts.jurisdictionId} = ${pair.jurisdictionId}
+                AND ${countryFacts.factKey} = ${pair.factKey}`,
+            )) as unknown as FactRowDb[];
 
       const rows = rowsRaw.map(dbRowToFactRow);
       const result = resolveFromRows(rows, factKeyDef);

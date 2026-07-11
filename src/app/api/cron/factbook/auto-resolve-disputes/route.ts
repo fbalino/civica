@@ -47,6 +47,10 @@ async function handler(request: Request) {
       },
     });
 
+    if (summary.errors.length > 0) {
+      return NextResponse.json({ ok: false, step: "factbook.auto-resolve-disputes", dryRun, errors: summary.errors }, { status: 500 });
+    }
+
     return NextResponse.json({
       ok: true,
       step: "factbook.auto-resolve-disputes",

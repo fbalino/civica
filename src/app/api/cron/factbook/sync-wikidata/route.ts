@@ -25,6 +25,7 @@ async function handler(request: Request) {
   if (unauthorized) return unauthorized;
 
   const startedAt = new Date().toISOString();
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
   try {
     const summary = await syncFactbookWikidata(db, {
@@ -35,7 +36,17 @@ async function handler(request: Request) {
         // log buffer. The summary at the end has counters.
         if (line.startsWith("!")) console.error(line);
       },
+      dryRun,
     });
+
+    if (summary.errors.length > 0 || summary.totalAdmitted === 0) {
+      return NextResponse.json({
+        ok: false,
+        step: "factbook.wikidata.sync",
+        dryRun,
+        errors: summary.errors.length > 0 ? summary.errors : ["No admissible Wikidata facts returned"],
+      }, { status: 502 });
+    }
 
     return NextResponse.json({
       ok: true,
@@ -46,6 +57,7 @@ async function handler(request: Request) {
       jurisdictionsProcessed: summary.jurisdictionsProcessed,
       totalAdmitted: summary.totalAdmitted,
       perFact: summary.factCountersByKey,
+      dryRun,
     });
   } catch (err) {
     console.error("[cron factbook.wikidata.sync] failed:", err);

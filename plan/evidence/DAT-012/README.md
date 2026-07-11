@@ -95,5 +95,20 @@ canonical convergence after two applications, stable zero-write dry runs, and
 failure behavior that cannot advance source freshness. The full unit suite is
 533/533, the source-freshness validator passes, and the production build passes.
 
-DAT-012 remains open for the three other external factbook jobs, four derived
-factbook jobs, and the ten manual Atlas/Index/Conditions entrypoints.
+## Remaining factbook-job completion
+
+The Wikidata fact reconciler, Wikidata officeholder spine, and CIA World
+Leaders cabinet sync now expose bounded fixtures and cron-level dry runs. The
+cache refresh, quarterly vintage snapshot, and stale-dispute resolver have the
+same contract. Their applied fixtures prove reruns converge without duplicate
+facts, people, terms, statements, offices, bodies, vintages, cache state, or
+audit actions. Partial publisher failures cannot advance source freshness.
+
+The reconciliation verifier is read-only; its existing 24-case executable
+suite covers comparator, phase-softening, aggregate, and end-to-end verdict
+behavior. This closes all 25 scheduled factbook jobs: 21 external and four
+derived.
+
+Across this wave, 18 new focused checks pass. The full unit suite is 551/551,
+the freshness/type/lint gates pass, and the production build passes. DAT-012
+remains open for the ten manual Atlas/Index/Conditions entrypoints.

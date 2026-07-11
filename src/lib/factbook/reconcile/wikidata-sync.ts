@@ -48,6 +48,17 @@ export interface WikidataSyncOptions {
   limitJurisdictions?: number;
   /** Optional callback for streaming progress lines. */
   onProgress?: (line: string) => void;
+  jurisdictions?: WikidataJurisdiction[];
+  getClaims?: typeof getClaimsForEntity;
+  persistDisputes?: typeof persistProposedDisputes;
+  markSynced?: typeof markSourcesSynced;
+}
+
+export interface WikidataJurisdiction {
+  id: string;
+  slug: string;
+  name: string;
+  wikidataQid: string | null;
 }
 
 export interface PerFactCounters {
@@ -79,6 +90,7 @@ export interface WikidataSyncSummary {
    *  written to `data_disputes` after the sync completes. Null on
    *  dry runs. */
   disputes: PersistDisputeSummary | null;
+  errors: string[];
   dryRun: boolean;
 }
 
@@ -299,8 +311,9 @@ export async function syncFactbookWikidata(
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
+  const errors: string[] = [];
 
-  const allJurisdictions = await db
+  const allJurisdictions = options.jurisdictions ?? await db
     .select({
       id: jurisdictions.id,
       slug: jurisdictions.slug,
@@ -344,14 +357,14 @@ export async function syncFactbookWikidata(
 
       let groupedClaims: GroupedClaim[] = [];
       try {
-        const rows = await getClaimsForEntity(j.wikidataQid, config.pid);
+        const rows = await (options.getClaims ?? getClaimsForEntity)(j.wikidataQid, config.pid);
         groupedClaims = groupClaimsByStatement(rows);
       } catch (err) {
-        log(
-          `! ${j.slug} ${config.factKey}: SPARQL failure — ${
-            err instanceof Error ? err.message : String(err)
-          }`
-        );
+        const message = `${j.slug} ${config.factKey}: SPARQL failure — ${
+          err instanceof Error ? err.message : String(err)
+        }`;
+        errors.push(message);
+        log(`! ${message}`);
         continue;
       }
 
@@ -508,8 +521,8 @@ export async function syncFactbookWikidata(
     }
   }
 
-  await markSourcesSynced("wikidata", {
-    rowsWritten: touchedPairs.size,
+  await (options.markSynced ?? markSourcesSynced)("wikidata", {
+    rowsWritten: errors.length === 0 ? touchedPairs.size : 0,
     dryRun: options.dryRun,
     executor: db,
   });
@@ -526,7 +539,7 @@ export async function syncFactbookWikidata(
       `→ persisting resolver-proposed disputes across ${touched.length} (jurisdiction, fact-key) pairs…`
     );
     try {
-      disputes = await persistProposedDisputes(db, touched, {
+      disputes = await (options.persistDisputes ?? persistProposedDisputes)(db, touched, {
         dryRun: options.dryRun,
         onProgress: (line) => {
           if (line.startsWith("[DRY]")) return;
@@ -534,11 +547,11 @@ export async function syncFactbookWikidata(
         },
       });
     } catch (err) {
-      log(
-        `! dispute persistence failed: ${
-          err instanceof Error ? err.message : err
-        }`
-      );
+      const message = `dispute persistence failed: ${
+        err instanceof Error ? err.message : err
+      }`;
+      errors.push(message);
+      log(`! ${message}`);
     }
   }
 
@@ -558,6 +571,7 @@ export async function syncFactbookWikidata(
     factCountersByKey,
     totalAdmitted,
     disputes,
+    errors,
     dryRun: options.dryRun ?? false,
   };
 }

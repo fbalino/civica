@@ -62,6 +62,12 @@ export interface CacheRefreshSummary {
   jurisdictionsRefreshed: number;
   fieldsWritten: number;
   errors: string[];
+  dryRun: boolean;
+}
+
+export interface CacheJurisdiction {
+  id: string;
+  slug: string;
 }
 
 /**
@@ -82,20 +88,23 @@ export async function refreshJurisdictionCache(
   options: {
     jurisdictionId?: string;
     onProgress?: (line: string) => void;
+    dryRun?: boolean;
+    jurisdictions?: CacheJurisdiction[];
+    resolveFacts?: typeof getCanonicalFactsForJurisdiction;
   } = {}
 ): Promise<CacheRefreshSummary> {
   const startedAtMs = Date.now();
   const startedAt = new Date(startedAtMs).toISOString();
   const log = options.onProgress ?? (() => {});
 
-  const jurisdictionRows = options.jurisdictionId
+  const jurisdictionRows = options.jurisdictions ?? (options.jurisdictionId
     ? await db
         .select({ id: jurisdictions.id, slug: jurisdictions.slug })
         .from(jurisdictions)
         .where(eq(jurisdictions.id, options.jurisdictionId))
     : await db
         .select({ id: jurisdictions.id, slug: jurisdictions.slug })
-        .from(jurisdictions);
+        .from(jurisdictions));
 
   log(
     `${jurisdictionRows.length} jurisdiction(s) to refresh; ${ALL_FACT_KEYS.length} cached fact-keys.`
@@ -107,7 +116,7 @@ export async function refreshJurisdictionCache(
 
   for (const j of jurisdictionRows) {
     try {
-      const resolved = await getCanonicalFactsForJurisdiction(
+      const resolved = await (options.resolveFacts ?? getCanonicalFactsForJurisdiction)(
         j.id,
         ALL_FACT_KEYS
       );
@@ -176,10 +185,12 @@ export async function refreshJurisdictionCache(
         if (update.democracyIndex !== null) fieldsWritten++;
       }
 
-      await db
-        .update(jurisdictions)
-        .set(update)
-        .where(eq(jurisdictions.id, j.id));
+      if (!options.dryRun) {
+        await db
+          .update(jurisdictions)
+          .set(update)
+          .where(eq(jurisdictions.id, j.id));
+      }
 
       jurisdictionsRefreshed++;
     } catch (err) {
@@ -197,6 +208,7 @@ export async function refreshJurisdictionCache(
     jurisdictionsRefreshed,
     fieldsWritten,
     errors,
+    dryRun: options.dryRun ?? false,
   };
 }
 

@@ -71,6 +71,10 @@ async function handler(request: Request) {
       },
     });
 
+    if (summary.errors.length > 0 || summary.snapshotted === 0) {
+      return NextResponse.json({ ok: false, step: "factbook.snapshot-vintage", dryRun, errors: summary.errors.length ? summary.errors : [{ error: "No canonical facts snapshotted" }] }, { status: 500 });
+    }
+
     return NextResponse.json({
       ok: true,
       step: "factbook.snapshot-vintage",

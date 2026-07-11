@@ -26,6 +26,7 @@ async function handler(request: Request) {
   if (unauthorized) return unauthorized;
 
   const startedAt = new Date().toISOString();
+  const dryRun = new URL(request.url).searchParams.get("dryRun") === "1";
 
   try {
     const summary = await syncFactbookOfficeholders({
@@ -35,7 +36,12 @@ async function handler(request: Request) {
       onProgress: (line) => {
         if (line.startsWith("!")) console.error(line);
       },
+      dryRun,
     });
+
+    if (summary.totalRowsWritten === 0) {
+      return NextResponse.json({ ok: false, step: "factbook.officeholders.sync", dryRun, error: "No officeholder rows produced" }, { status: 502 });
+    }
 
     return NextResponse.json({
       ok: true,
@@ -54,6 +60,7 @@ async function handler(request: Request) {
       personBirthdatesWritten: summary.personBirthdatesWritten,
       totalRowsWritten: summary.totalRowsWritten,
       freshnessStamped: summary.freshnessStamped,
+      dryRun,
     });
   } catch (err) {
     console.error("[cron factbook.officeholders.sync] failed:", err);
