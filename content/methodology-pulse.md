@@ -27,6 +27,25 @@ The current generated runtime contract is **{{ctx.methodologyVersion}}**. It des
 
 Numeric deltas are available only through the versioned country-dimensions API. Active reader pages show the event ledger and do not render the dormant delta panel. A missing event is not converted into evidence of stability: the API returns an explicit non-observation rather than a scalar zero when no published event supports a dimension.
 
+<!-- PUBLIC_CLAIM: methodology.pulse-ledger-charter -->
+## Research charter {#research-charter}
+
+**Charter version: pulse-ledger-charter/v1.** Pulse is being developed first as a versioned ledger of **documented governance-relevant event records**. One record asserts that an identifiable occurrence affecting a jurisdiction&rsquo;s domestic governing institutions took place at a stated event date, with retained source evidence and an explicit publication state. An article, source count, model vote, country-day, and numeric delta are not ledger units.
+
+The intended users are researchers, journalists, civic educators, reviewers, and data users who preserve event-level evidence and uncertainty. The ledger is not approved for automated eligibility, sanctions, lending, migration, employment, or security decisions; country grades, rankings, or risk scores; or as a substitute for specialist datasets.
+
+An event is in scope only when it concerns a domestic institutional occurrence covered by the versioned ontology, has a bounded event date, retains at least one source identity, carries explicit subject evidence, and can be separated from commentary, prediction, source failure, and duplication. Lawful or normatively ambiguous events can be recorded descriptively. Their inclusion does not declare them beneficial or harmful.
+
+Opinion, rhetoric, forecasts, polling movement, general conditions without an institutional occurrence, foreign-policy acts without a separately evidenced domestic event, unsupported rumors, and duplicate or republished accounts are excluded as ledger events. No qualifying event observed and low observation are different states.
+
+Eligible evidence classes are specialist monitors, attributable official institutional documents, and established news reporting subject to source-family and republication controls. The current operating basket is the generated runtime contract; connector code alone does not make a feed active. Geographic coverage is limited to Civica jurisdictions with recorded subject-attribution evidence. At charter adoption, the retained provisional history began on 2026-04-13, but that is only the earliest stored event in the adoption snapshot, not the beginning of complete observation. Language and temporal coverage are release properties.
+
+The ledger is not complete, exhaustive, real-time, continuously observed, a country-quality measure, or a causal estimate. Publication does not establish full human review, independent corroboration, calibrated confidence, or academic validation. Media restrictions, connectivity, feed outages, query design, paywalls, language support, publisher cadence, and source concentration all constrain observability.
+
+Success requires complete evidence and version history; representative preregistered evaluation of retrieval, clustering, attribution, labels, severity, abstention, and publication; subgroup and source-bias gates; qualified-reader evidence tracing; and retained prospective and adverse results. Publication is suspended when rights, evidence identity, attribution, correction history, or the distinction between low observation and no qualifying event cannot be maintained. The ledger is retired or redesigned when preregistered safety or performance gates fail without a bounded repair that passes a new evaluation. Numeric effects can be retired independently. No-value is a valid result.
+
+Changing the unit, admission boundary, source classes, scope, success gates, or retirement rules requires a new charter version and migration note. The adopted resolution is preserved at [`plan/research/pulse-ledger-research-charter-v1.md`](https://github.com/fbalino/civica/blob/main/plan/research/pulse-ledger-research-charter-v1.md).
+
 ## What the Pulse is not {#what-pulse-is-not}
 
 - Not a co-equal score alongside the CI. There is no single "Pulse number" that competes with the CI composite.

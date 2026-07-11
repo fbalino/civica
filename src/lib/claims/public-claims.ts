@@ -903,6 +903,28 @@ export const PUBLIC_CLAIMS = [
     },
   },
   {
+    id: "methodology.pulse-ledger-charter",
+    surface: "methodology",
+    routeOrArtifact:
+      "/civica-index/methodology/pulse#research-charter",
+    exactClaim:
+      "Pulse is being developed first as a versioned ledger of documented governance-relevant event records; it is not a complete, real-time, continuously observed, country-quality, or causal measure, and no-value is an allowed disposition.",
+    tier: "experimental-heuristic",
+    evidenceSources: [
+      "src/lib/pulse/v2/research-charter.ts",
+      "plan/research/pulse-ledger-research-charter-v1.md",
+      "scripts/validate-pulse-ledger-charter.ts",
+    ],
+    implementationOwner: "Pulse event-ledger research lane",
+    methodologyVersion: "pulse-ledger-charter/v1",
+    gate: "G3",
+    source: {
+      path: "content/methodology-pulse.md",
+      fragment:
+        "Pulse is being developed first as a versioned ledger of **documented governance-relevant event records**.",
+    },
+  },
+  {
     id: "export.provenance-coverage",
     surface: "exports",
     routeOrArtifact: "/api/countries/{slug}/export?format=csv|json",

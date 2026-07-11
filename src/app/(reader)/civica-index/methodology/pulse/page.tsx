@@ -33,6 +33,7 @@ export const metadata: Metadata = {
 
 const SECTIONS = [
   { id: "what-pulse-is", label: "What the Pulse is" },
+  { id: "research-charter", label: "Research charter" },
   { id: "what-pulse-is-not", label: "What the Pulse is not" },
   { id: "sources", label: "Sources" },
   { id: "daily-pipeline", label: "Scheduled pipeline" },

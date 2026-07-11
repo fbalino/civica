@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 292
-- **Completed:** 92
-- **Remaining:** 200
-- **Progress:** 31.5%
+- **Completed:** 93
+- **Remaining:** 199
+- **Progress:** 31.8%
 - **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -123,7 +123,7 @@ Source: `plan/04-civica-index-research-program.md`
 Source: `plan/05-pulse-event-ledger-and-validation.md`
 
 - [x] **PUL-001** (P0) Freeze or clearly subordinate public numeric Pulse deltas while validation is incomplete. _Done when: UI/API/metadata/export/prose either omit the deltas or label them an experimental heuristic with methodology version and limitations; no page calls them validated daily governance change; snapshot tests cover both policies._
-- [ ] **PUL-002** (P0) Adopt a Pulse ledger research charter with a bounded construct. _Done when: a citable resolution defines the unit as documented governance-relevant events, target users, inclusion/exclusion rules, non-claims, source universe, geographic/temporal scope, observability limitations, and success/retirement criteria._
+- [x] **PUL-002** (P0) Adopt a Pulse ledger research charter with a bounded construct. _Done when: a citable resolution defines the unit as documented governance-relevant events, target users, inclusion/exclusion rules, non-claims, source universe, geographic/temporal scope, observability limitations, and success/retirement criteria._
 - [ ] **PUL-003** (P0) Replace the single-label-only codebook with a versioned multi-label event ontology. _Done when: ontology version, categories, dimensions, severity descriptors, mutually compatible labels, ambiguous/legitimate-event guidance, examples/counterexamples, and change policy are published; fixtures cover known multi-dimensional and normatively ambiguous cases._
 - [ ] **PUL-004** (P0) Add immutable methodology, ontology, prompt, model/provider, source-basket, and pipeline versions to Pulse rows. _Done when: every raw item, cluster, classification run, review, published event, and computed output identifies all applicable versions; mixed-version queries cannot masquerade as one continuous series._
 - [ ] **PUL-005** (P0) Preserve legally compliant source snapshots and evidence identity for every ledger item. _Done when: each event traces to URL/source family/publisher/retrieval time/content hash or permitted snapshot, language, jurisdiction attribution evidence, and licensing posture; link rot cannot erase the audit trail._
