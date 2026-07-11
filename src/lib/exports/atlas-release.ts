@@ -35,6 +35,19 @@ export function buildAtlasExport(input: AtlasExportInput) {
   const usedSourceIds = [
     ...new Set(facts.map((row) => String(row.source_id))),
   ].sort();
+  const jurisdictionIds = new Set(jurisdictions.map((row) => String(row.id)));
+  const orphanJurisdictionIds = [
+    ...new Set(
+      facts
+        .map((row) => String(row.jurisdiction_id))
+        .filter((id) => !jurisdictionIds.has(id)),
+    ),
+  ].sort();
+  if (orphanJurisdictionIds.length) {
+    throw new Error(
+      `Atlas export contains facts for missing jurisdictions: ${orphanJurisdictionIds.join(", ")}`,
+    );
+  }
   const blocked = usedSourceIds.filter(
     (sourceId) => !ATLAS_EXPORT_ALLOWED_SOURCE_IDS.includes(sourceId),
   );

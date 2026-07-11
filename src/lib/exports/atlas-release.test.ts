@@ -16,6 +16,16 @@ test("a pending source fails closed", () => {
   assert.throws(() => buildAtlasExport({ jurisdictions: [jurisdiction], facts: [fact("vdem")] }), /blocked sources: vdem/);
 });
 
+test("a fact for a missing jurisdiction fails closed", () => {
+  assert.throws(
+    () => buildAtlasExport({
+      jurisdictions: [jurisdiction],
+      facts: [{ ...fact("wikidata"), jurisdiction_id: "missing-jurisdiction" }],
+    }),
+    /facts for missing jurisdictions: missing-jurisdiction/,
+  );
+});
+
 test("zero remains an observed exported value", () => {
   const release = buildAtlasExport({ jurisdictions: [jurisdiction], facts: [fact("world_bank")] });
   assert.equal(release.tables.facts[0].fact_value_numeric, 0);

@@ -1,0 +1,7 @@
+{
+  "schemaVersion": "civica-clean-room-expected/v1",
+  "fixtureSha256": "6813f95a781776d81b5235cc32b4c96d064fd0ccd9034e4fbe757b0e89125f0f",
+  "exportSemanticSha256": "15a4fa61c5818d87941bc3a13de831548ad1e94c6fe626e4b00b573aae17c622",
+  "rowCounts": { "jurisdictions": 3, "facts": 3, "sources": 3 },
+  "tolerance": "exact bytes after canonical JSON serialization"
+}

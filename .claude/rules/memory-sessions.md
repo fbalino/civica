@@ -398,3 +398,12 @@ lives in git (`git log`) and `~/civica/plan/*` — NOT here. Do not add changelo
   reconstruction reproduces the normalized export and BOM exactly.
 - Four focused fixtures, 618/618 tests, TypeScript, ESLint, browser/HTTP checks,
   claims/docs, and the production build pass. DAT-019 is next.
+
+## 2026-07-11 — DAT-019 clean-room reproduction completed
+
+- Added a public three-jurisdiction fixture covering permitted CIA Factbook,
+  Wikidata, and World Bank observations through the production export builder.
+- Exact fixture/export hashes, rights, row counts, and relational joins fail
+  closed. The runbook explicitly does not claim full uncaptured-input replay.
+- A credential- and cache-free temporary checkout passed strict reproduction,
+  619/619 tests, every validator, and the production build. DAT-020 is next.

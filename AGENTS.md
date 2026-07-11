@@ -142,6 +142,9 @@ All sources tracked in `sources` table. Every fact ideally has statement-level p
 - Every fact row joins to an embedded source-rights record. Regenerate with
   `npm run generate:atlas-export`; verify checked hashes and a live deterministic
   rebuild with `npm run validate:atlas-export:live`.
+- DAT-019's legally shareable clean-room fixture and fresh-checkout procedure
+  live in `data/CLEAN-ROOM-REPRODUCTION.md`. `npm run validate:clean-room` is
+  credential-free and must remain part of the production build.
 
 ## Core environment variables
 The complete, authoritative contract (every var, required/optional, and why) is

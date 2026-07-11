@@ -733,3 +733,11 @@ must NOT be auto-applied just because a U.S. executive order changed them.
 - Live validation must reproduce both the normalized data and BOM. Serve the
   checked manifest beside the immutable download. Durable record: APR-D051 in
   `plan/DECISIONS.md`.
+
+## 2026-07-11 — Clean-room proof stays narrower than uncaptured source replay
+
+- Use a legally shareable miniature fixture to prove the production export,
+  rights, join, checksum, validator, and build paths in a fresh environment.
+- Require exact bytes and no database/model credentials or runtime network.
+- Do not describe it as full Atlas reconstruction while historical source
+  inputs remain uncaptured. Durable record: APR-D052 in `plan/DECISIONS.md`.
