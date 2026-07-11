@@ -1,0 +1,156 @@
+{
+  "schemaVersion": "civica-index-incremental-information-result/v1",
+  "releaseId": "index-incremental-information-v1",
+  "protocolVersion": "civica-index-incremental-information/v1",
+  "panelReleaseId": "ci-research-panel-2000-2024-v3",
+  "samples": {
+    "development": 535,
+    "finalHoldout": 901,
+    "jurisdictions": 172
+  },
+  "models": [
+    {
+      "id": "B1",
+      "fit": {
+        "intercept": 13.675513045858672,
+        "slope": 79.56569594496408
+      },
+      "metrics": {
+        "n": 901,
+        "r2": 0.9285257148998861,
+        "rmse": 6.384967113883319,
+        "mae": 5.1696887969822685
+      },
+      "intervals": {
+        "iterations": 2000,
+        "r2": {
+          "lower95": 0.9065575762714541,
+          "upper95": 0.9430515991661219
+        },
+        "rmse": {
+          "lower95": 5.764745556299504,
+          "upper95": 7.03409498627559
+        },
+        "mae": {
+          "lower95": 4.633519778315807,
+          "upper95": 5.744919061895437
+        },
+        "bootstrapSha256": "9c2aa25aed2987add6d3860167ddf39433aa45d49b729f6ab135ddfa3e1e4a12"
+      },
+      "predictionSha256": "a48a383ac60c9980b2fbd055de542283b3e210cc04fd4e07baa8573f3daf4549",
+      "deltaR2VsB1": 0
+    },
+    {
+      "id": "B2",
+      "fit": {
+        "intercept": -0.09055617601466537,
+        "slope": 0.9960174248832281
+      },
+      "metrics": {
+        "n": 901,
+        "r2": 0.9997697706132576,
+        "rmse": 0.3623799268666353,
+        "mae": 0.2955421838853066
+      },
+      "intervals": {
+        "iterations": 2000,
+        "r2": {
+          "lower95": 0.9997035238785448,
+          "upper95": 0.9998113551870061
+        },
+        "rmse": {
+          "lower95": 0.34228114296168105,
+          "upper95": 0.3846333215420365
+        },
+        "mae": {
+          "lower95": 0.27942799667302215,
+          "upper95": 0.31381691733702155
+        },
+        "bootstrapSha256": "3dc7327e2be30aa3516812910e18fde0d7356e14176e2bea867597bb66c41e30"
+      },
+      "predictionSha256": "8a32c02ab085a2d9d8b4facc524f155f68e7453bcaab99c607e16fcbc3751c7b",
+      "deltaR2VsB1": 0.07124405571337145
+    },
+    {
+      "id": "B3",
+      "fit": {
+        "intercept": 49.28843784066357,
+        "slope": 12.198253296632226
+      },
+      "metrics": {
+        "n": 901,
+        "r2": 0.9946641679624771,
+        "rmse": 1.744555658662569,
+        "mae": 1.363174312313786
+      },
+      "intervals": {
+        "iterations": 2000,
+        "r2": {
+          "lower95": 0.9926277707854353,
+          "upper95": 0.9960949966486302
+        },
+        "rmse": {
+          "lower95": 1.5284223102821948,
+          "upper95": 1.9646673265980736
+        },
+        "mae": {
+          "lower95": 1.2078503817707957,
+          "upper95": 1.5293204544480938
+        },
+        "bootstrapSha256": "38da2618ad68cd870d4236ebed60056ea5eabbabc203380e4ff3debf99730936"
+      },
+      "predictionSha256": "61d014ecbd25bd25372e450b0d63e83dd87046a9c52982ae9e5be7d826ceb33f",
+      "deltaR2VsB1": 0.06613845306259103
+    },
+    {
+      "id": "P1",
+      "fit": {
+        "coefficients": [
+          0.031815288319442914,
+          0.2685114545071901,
+          0.25369309778103166,
+          0.23250081111351636,
+          0.24422971779397118
+        ]
+      },
+      "metrics": {
+        "n": 901,
+        "r2": 0.999847164869575,
+        "rmse": 0.29525370129479583,
+        "mae": 0.254885326366938
+      },
+      "intervals": {
+        "iterations": 2000,
+        "r2": {
+          "lower95": 0.9998091745762511,
+          "upper95": 0.9998725944206361
+        },
+        "rmse": {
+          "lower95": 0.28531060859228996,
+          "upper95": 0.3047244770502897
+        },
+        "mae": {
+          "lower95": 0.24474090959861217,
+          "upper95": 0.2653528647388908
+        },
+        "bootstrapSha256": "1f95d05f48409d9ac9b6e8cc74416241ed0e5650755019a949ace1eaa5b09664"
+      },
+      "predictionSha256": "991ab754fd7bf956682beffb4be69154f9f30ebd30ad6906709243a4e513eb84",
+      "deltaR2VsB1": 0.07132144996968892
+    }
+  ],
+  "originality": {
+    "threshold": 0.9,
+    "publicInputModelR2": 0.999847164869575,
+    "passes": false
+  },
+  "decisionUtility": "not_tested_requires_preregistered_human_tasks",
+  "otherCandidates": {
+    "K2": "incremental expert AUC versus B4 pending external labels",
+    "K3": "B5 structured-data comparison pending historical transfer benchmark",
+    "K4": "B5 comparison pending blinded fair-pair labels",
+    "K5": "B5 comparison pending adjudicated relation benchmark"
+  },
+  "noGovernanceOutcomePredicted": true,
+  "resultSha256": "d723adf25baf589ec4c53bbab7ef85fcb0429f5fddd36edebff73f42ce7b48fb"
+}
