@@ -35,8 +35,8 @@ test("current replicationPackage state passes every invariant", () => {
   assert.deepEqual(validateReplicationPackage(replicationPackage), []);
 });
 
-test("the current tournament package exposes only components that have stable links", () => {
-  assert.equal(replicationPackage.pageStatus, "tournament-package-available");
+test("the current review packet exposes only components that have stable links", () => {
+  assert.equal(replicationPackage.pageStatus, "review-packet-available");
   for (const c of replicationPackage.components) {
     assert.equal(c.status === "available", Boolean(c.href), c.id);
   }

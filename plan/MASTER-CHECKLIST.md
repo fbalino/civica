@@ -3,9 +3,9 @@
 **Single source of execution truth.** Task text is mirrored from the numbered area files and must be checked in both places. Run `node plan/tools/validate-master-plan.mjs` after every task/checklist edit.
 
 - **Total tasks:** 292
-- **Completed:** 85
-- **Remaining:** 207
-- **Progress:** 29.1%
+- **Completed:** 86
+- **Remaining:** 206
+- **Progress:** 29.5%
 - **Priority mix:** P0 183 · P1 104 · P2 5
 
 Work in dependency/gate order defined in `00-mission-and-operating-rules.md`, not simply top to bottom. A checked box without evidence under `plan/evidence/<ID>/` and a matching `PROGRESS.md` line is invalid.
@@ -103,7 +103,7 @@ Source: `plan/04-civica-index-research-program.md`
 - [x] **IDX-025** (P0) Apply the preregistered winner/no-winner rules without post hoc preference. _Done when: a machine-readable decision table maps every threshold to pass/fail/insufficient evidence, robustness and simplicity penalties are applied as declared, and changing a threshold after results creates a separately labelled exploratory scenario._
 - [x] **IDX-026** (P0) Publish the Index disposition resolution. _Done when: the resolution chooses source-native dashboard only, a nonordinal Civica research product, a secondary validated index, or retirement; records evidence/failed tests/minority arguments/limitations; removes unsupported alternatives from active claims; and states reconsideration criteria._
 - [x] **IDX-027** (P0) Implement the selected disposition without preserving incompatible legacy semantics. _Done when: schema/data/API/UI/routes/metadata/exports/methodology/caches/charts/embeds are versioned or migrated, old endpoints/fields have deprecation/sunset behavior, no A–F grade remains, and browser/API/data tests match IDX-026 exactly._
-- [ ] **IDX-028** (P0) Publish the selected product's replication package and external-review packet. _Done when: construct, frozen inputs, code, environment, codebook, transformations, uncertainty, validation, sensitivity, subgroup results, known limitations, citation/version, and exact reproduction command are complete and GOV-014 can consume the bundle unchanged._
+- [x] **IDX-028** (P0) Publish the selected product's replication package and external-review packet. _Done when: construct, frozen inputs, code, environment, codebook, transformations, uncertainty, validation, sensitivity, subgroup results, known limitations, citation/version, and exact reproduction command are complete and GOV-014 can consume the bundle unchanged._
 - [ ] **IDX-029** (P1) Preserve failed candidates and null results as research artifacts where rights allow. _Done when: failed thresholds, code, outputs, and reasons remain archived/versioned without remaining live as recommended products, preventing future agents from silently reviving a rejected method._
 - [ ] **IDX-030** (P0) Gate all future Index changes through versioned methodology and regression tests. _Done when: any input/transform/weight/model/missingness/uncertainty/band/presentation change requires a new version, updated docs/registry/release notes, rerun declared validations, migration plan, and passing golden/contract tests._
 - [x] **IDX-031** (P0) Build the Governance Evidence Dashboard as the no-composite floor product. _Done when: established sources render on native scales with named ownership, vintage, definitions, direction, published upstream uncertainty or explicit absence, missingness, downloadable observations, and no Civica grade/average; source-file fidelity is 100% on release fixtures._

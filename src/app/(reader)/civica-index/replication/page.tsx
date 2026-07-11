@@ -26,6 +26,7 @@ const SECTIONS = [
 const PAGE_STATUS_LABEL: Record<typeof replicationPackage.pageStatus, string> = {
   "unpublished-pre-g2": "Not published",
   "tournament-package-available": "Tournament package available",
+  "review-packet-available": "Review packet available",
   published: "Published",
 };
 
@@ -35,6 +36,7 @@ const PAGE_STATUS_VARIANT: Record<
 > = {
   "unpublished-pre-g2": "sand",
   "tournament-package-available": "sage",
+  "review-packet-available": "sage",
   published: "sage",
 };
 
@@ -73,24 +75,24 @@ export default function ReplicationPage() {
           >
             {PAGE_STATUS_LABEL[replicationPackage.pageStatus]}
           </Chip>{" "}
-          Tracking what the frozen research package contains and what still
-          requires independent review.
+          Tracking what the frozen selected-product review packet contains and
+          what still requires independent review.
         </p>
 
         <p>
-          The confirmatory tournament package freezes the candidate code,
-          manifests, environment, seeds, logs, diagnostics, expected outputs,
-          and decision tables. It reproduced successfully under the checked
-          command. This does not make the composite valid or recommended: the
-          tournament selected source-native comparison and left external
-          review gates unresolved.
+          The selected-product packet freezes the source-native construct,
+          inputs, code, environment, codebook, transformations, uncertainty,
+          validation, sensitivity, subgroup results, limitations, citation,
+          reviewer questions, and the complete tournament record. It
+          reproduces under one checked command. External review remains open.
         </p>
 
         {/* PUBLIC_CLAIM: replication.package-status */}
         <Banner variant="info">
-          The repository contains a reproducible tournament package. Exact
-          source observations are not redistributed where publisher rights do
-          not permit it, and no external reviewer has endorsed the method.
+          The repository contains a reproducible Governance Evidence review
+          packet. Exact source observations are not redistributed where
+          publisher rights do not permit it, and no external reviewer has
+          endorsed the selected product or the rejected composite candidates.
         </Banner>
 
         <section id="component-status" className="editorial-section">

@@ -218,22 +218,23 @@ export const PUBLIC_CLAIMS = [
     surface: "methodology",
     routeOrArtifact: "/civica-index/replication",
     exactClaim:
-      "The repository contains a reproducible tournament package, with restricted observations withheld where publisher rights do not permit redistribution and external review still pending.",
+      "The repository contains a reproducible Governance Evidence review packet, with restricted observations withheld where publisher rights do not permit redistribution and external review still pending.",
     tier: "institutional-posture",
     evidenceSources: [
       "src/lib/content/site-state.ts",
       "src/lib/content/replication-surface.ts",
+      "data/releases/governance-evidence-review-packet-2026-07-v1/manifest.v1.json",
       "plan/00-mission-and-operating-rules.md",
       "plan/MASTER-CHECKLIST.md",
     ],
     implementationOwner:
-      "Civica Index research lane and tournament packaging (IDX-024)",
-    methodologyVersion: "replication-status-v2",
+      "Civica Index research lane and review packaging (IDX-028)",
+    methodologyVersion: "replication-status-v3",
     gate: "G5",
     source: {
       path: "src/app/(reader)/civica-index/replication/page.tsx",
       fragment:
-        "The repository contains a reproducible tournament package.",
+        "The repository contains a reproducible Governance Evidence review packet.",
     },
   },
   {

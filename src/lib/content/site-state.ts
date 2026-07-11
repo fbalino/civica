@@ -408,6 +408,7 @@ export const advisoryBoard = {
 export const REPLICATION_PAGE_STATUSES = [
   "unpublished-pre-g2",
   "tournament-package-available",
+  "review-packet-available",
   "published",
 ] as const;
 export type ReplicationPageStatus = (typeof REPLICATION_PAGE_STATUSES)[number];
@@ -453,74 +454,74 @@ export interface ReplicationPackageState {
  *  external-review packet), GOV-021 (DOI/archive registration), and
  *  QA-020 (machine-readable readiness reports) per
  *  `plan/MASTER-CHECKLIST.md`. */
-const INDEX_TOURNAMENT_PACKAGE_URL =
-  "https://github.com/fbalino/civica/tree/main/data/releases/index-tournament-results-package-v1";
+const GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL =
+  "https://github.com/fbalino/civica/tree/main/data/releases/governance-evidence-review-packet-2026-07-v1";
 
 export const replicationPackage: ReplicationPackageState = {
-  pageStatus: "tournament-package-available",
+  pageStatus: "review-packet-available",
   components: [
     {
       id: "versioned-code",
       label: "Versioned code",
       status: "available",
-      owner: "IDX-024",
+      owner: "IDX-028",
       whatRemains:
-        "The tournament package preserves the exact code inventory and hashes; an archival tag remains a later release-governance step.",
-      href: INDEX_TOURNAMENT_PACKAGE_URL,
+        "The review packet preserves the selected product and tournament code inventories and hashes; an archival tag remains a later release-governance step.",
+      href: GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL,
     },
     {
       id: "data-input-manifest",
       label: "Data / input manifest",
       status: "available",
-      owner: "IDX-024",
+      owner: "IDX-028",
       whatRemains:
         "Restricted source observations remain private where upstream rights prevent redistribution.",
-      href: INDEX_TOURNAMENT_PACKAGE_URL,
+      href: GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL,
     },
     {
       id: "codebook",
       label: "Codebook",
       status: "available",
-      owner: "IDX-024 / IDX-028",
+      owner: "IDX-028",
       whatRemains:
         "External reviewers must still assess whether the definitions support the claimed constructs.",
-      href: INDEX_TOURNAMENT_PACKAGE_URL,
+      href: GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL,
     },
     {
       id: "checksums",
       label: "Checksums",
       status: "available",
-      owner: "IDX-024",
+      owner: "IDX-028",
       whatRemains:
-        "No checksum work remains for the frozen tournament package.",
-      href: INDEX_TOURNAMENT_PACKAGE_URL,
+        "No checksum work remains for this frozen review packet.",
+      href: GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL,
     },
     {
       id: "environment",
       label: "Environment",
       status: "available",
-      owner: "IDX-024",
+      owner: "IDX-028",
       whatRemains:
         "A future candidate would require a new environment lock rather than reusing this one silently.",
-      href: INDEX_TOURNAMENT_PACKAGE_URL,
+      href: GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL,
     },
     {
       id: "reproduction-commands",
       label: "Reproduction commands",
       status: "available",
-      owner: "IDX-024",
+      owner: "IDX-028",
       whatRemains:
-        "The checked command reproduces the package; external execution remains an independent-review gate.",
-      href: INDEX_TOURNAMENT_PACKAGE_URL,
+        "The checked command reproduces the packet; execution by an independent reviewer remains open.",
+      href: GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL,
     },
     {
       id: "expected-outputs",
       label: "Expected outputs",
       status: "available",
-      owner: "IDX-024 / IDX-028",
+      owner: "IDX-028",
       whatRemains:
-        "No expected-output work remains for this frozen package.",
-      href: INDEX_TOURNAMENT_PACKAGE_URL,
+        "No expected-output work remains for this frozen review packet.",
+      href: GOVERNANCE_EVIDENCE_REVIEW_PACKET_URL,
     },
     {
       id: "doi-archive",

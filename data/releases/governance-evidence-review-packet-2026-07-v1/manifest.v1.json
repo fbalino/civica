@@ -1,0 +1,507 @@
+{
+  "schemaVersion": "governance-evidence-review-packet/v1",
+  "releaseId": "governance-evidence-review-packet-2026-07-v1",
+  "status": "ready_for_external_review_not_endorsed",
+  "selectedProduct": "source_native_dashboard_only",
+  "productRoute": "/governance-evidence",
+  "construct": {
+    "question": "What do the selected established governance sources report for this country in the frozen reference year?",
+    "unit": "one country × publisher indicator × reference year observation",
+    "role": "comparative reference display",
+    "nonclaims": [
+      "No original Civica governance measurement",
+      "No composite, grade, rank, country-quality verdict, or causal estimate",
+      "Agreement between rows is not independent corroboration",
+      "Absence of an observation is not evidence of weak governance"
+    ]
+  },
+  "frozenInputs": {
+    "releaseId": "ci-k1-uncertainty-inputs-2024-v2",
+    "referenceYear": 2024,
+    "grid": {
+      "jurisdictions": 194,
+      "indicators": 5,
+      "cells": 970
+    },
+    "valuesLocation": "private_neon_ci_research_panel_rows",
+    "redistribution": "rights-filtered; blocked values remain at publisher URLs"
+  },
+  "implementation": {
+    "code": [
+      "src/lib/ci/governance-evidence.ts",
+      "src/lib/db/queries-governance-evidence.ts",
+      "src/components/governance-evidence/GovernanceEvidenceTable.tsx",
+      "src/app/governance-evidence/page.tsx",
+      "src/app/api/governance-evidence/[slug]/route.ts",
+      "scripts/validate-governance-evidence-dashboard.ts"
+    ],
+    "environmentSource": "data/releases/index-tournament-results-package-v1/manifest.v1.json",
+    "packageLock": "package-lock.json"
+  },
+  "transformations": {
+    "empiricalValues": "none; publisher values remain on native scales",
+    "displayOnly": "decimal formatting follows native scale span",
+    "aggregation": "none",
+    "missingness": "no imputation; missing remains explicit",
+    "export": "values survive only where the rights manifest permits public export"
+  },
+  "uncertainty": {
+    "rule": "show publisher-supplied intervals exactly; otherwise state the published absence",
+    "covariance": "not estimated and not required because no composite is calculated",
+    "calibratedCivicaInterval": false
+  },
+  "validation": {
+    "exactSourceFileCells": {
+      "passed": 970,
+      "expected": 970
+    },
+    "rightsSafeExportFixture": "passed",
+    "noCompositeContract": "passed",
+    "qualifiedReaderProtocol": "pending_human_responses",
+    "independentReview": "pending"
+  },
+  "sensitivity": {
+    "modelParameters": "not applicable: the selected product has no model, weights, or thresholds",
+    "materialChoices": [
+      "publisher and indicator inclusion",
+      "source edition and reference year",
+      "ordering and explanatory copy",
+      "rights-driven visibility in downloads"
+    ],
+    "relatedCompositeAnalysis": "data/releases/index-sensitivity-analysis-v1/result.v1.json"
+  },
+  "subgroupResults": {
+    "scorePerformance": "not applicable: the selected product emits no score or prediction",
+    "coverageOwner": "data/releases/index-subgroup-fairness-v1/result.v1.json",
+    "limitation": "coverage differences remain visible; no subgroup accuracy claim is possible without an external truth criterion"
+  },
+  "knownLimitations": [
+    "The selected five rows are overlapping governance assessments, not independent evidence streams.",
+    "Indicator inclusion is an editorial choice and does not exhaust the governance literature.",
+    "Publisher vintages and country coverage differ.",
+    "Freedom House publishes no per-country probability distribution for the displayed combined rating.",
+    "Mixed publisher rights prevent one public bulk bundle of all values.",
+    "No qualified-reader result or independent expert endorsement exists yet.",
+    "Native scales reduce transformation risk but still require readers to understand different constructs and directions."
+  ],
+  "citation": {
+    "title": "Civica Atlas Governance Evidence Dashboard external-review packet",
+    "version": "governance-evidence-review-packet-2026-07-v1",
+    "url": "https://civicaatlas.org/governance-evidence",
+    "accessVsReuse": "Citation does not grant permission to redistribute upstream data."
+  },
+  "reproduction": {
+    "command": "npm run reproduce:governance-evidence-review-packet",
+    "validationCommand": "npm run validate:governance-evidence-review-packet",
+    "expected": "The generated manifest, inventory, codebook, questions, citation, and checksums match byte-for-byte; dashboard fixtures pass 970/970 cells."
+  },
+  "tournamentReview": {
+    "package": "data/releases/index-tournament-results-package-v1/manifest.v1.json",
+    "preregistration": "plan/research/index-tournament-preregistration-v3.md",
+    "decisionTable": "data/releases/index-tournament-confirmatory-decision-v1/decision.v1.json",
+    "disposition": "data/releases/index-disposition-2026-07-v1/resolution.v1.json",
+    "misuseAudit": "data/releases/index-misuse-audit-v1/result.v1.json",
+    "failedAndPendingLedger": "data/releases/index-tournament-results-package-v1/error-ledger.v1.json",
+    "interpretation": "No candidate won. K1 failed originality, K2 failed stability, and fourteen human or expert thresholds remain insufficient."
+  },
+  "reviewQuestions": [
+    "Is the stated source-native construct narrow enough to match what the dashboard actually displays?",
+    "Are any selected indicators inappropriate, redundant, or missing for the stated comparative-reference role?",
+    "Does the native-scale presentation prevent false comparability, or does it need stronger visual or prose separation?",
+    "Are publisher uncertainty and explicit uncertainty absence represented accurately and proportionately?",
+    "Are source overlap and dependence disclosed clearly enough to prevent a corroboration claim?",
+    "Does the missingness presentation avoid treating scarce evidence as poor governance?",
+    "Are the rights-filtered download and publisher-link approach adequate for scholarly verification?",
+    "Does the no-winner evidence justify the adopted source-native disposition?",
+    "Are K1's reconsideration criteria sufficient to prevent silent revival of the rejected league-table semantics?",
+    "Which remaining evidence gap is most important before public academic outreach?"
+  ],
+  "reviewerTerms": {
+    "conflictDisclosureRequired": true,
+    "favorableConclusionRequired": false,
+    "publicEndorsementImplied": false,
+    "requestedOutput": "bounded written review answering the exact questions, with severity and evidence references for each concern"
+  },
+  "codebook": [
+    {
+      "identity": "vdem:v2x_libdem",
+      "sourceId": "vdem",
+      "indicatorId": "v2x_libdem",
+      "label": "Liberal Democracy Index",
+      "construct": "Electoral democracy, liberal constraints, civil liberties, rule of law, and checks on executive power",
+      "direction": "Higher values indicate more liberal-democratic institutions under V-Dem's model",
+      "sourceUrl": "https://www.v-dem.net/media/datasets/V-Dem-CY-Core-v15_csv.zip"
+    },
+    {
+      "identity": "worldbank_wgi:va.est",
+      "sourceId": "worldbank_wgi",
+      "indicatorId": "va.est",
+      "label": "Voice and Accountability",
+      "construct": "Participation in selecting government, expression, association, and free media",
+      "direction": "Higher estimates indicate stronger voice and accountability under WGI",
+      "sourceUrl": "https://www.worldbank.org/content/dam/sites/govindicators/doc/wgidataset_with_sourcedata-2025.xlsx"
+    },
+    {
+      "identity": "worldbank_wgi:rl.est",
+      "sourceId": "worldbank_wgi",
+      "indicatorId": "rl.est",
+      "label": "Rule of Law",
+      "construct": "Confidence in and adherence to rules, including contract enforcement, property rights, police, courts, crime, and violence",
+      "direction": "Higher estimates indicate stronger rule of law under WGI",
+      "sourceUrl": "https://www.worldbank.org/content/dam/sites/govindicators/doc/wgidataset_with_sourcedata-2025.xlsx"
+    },
+    {
+      "identity": "freedom_house:pr_cl_total",
+      "sourceId": "freedom_house",
+      "indicatorId": "pr_cl_total",
+      "label": "Freedom in the World combined rating",
+      "construct": "Political rights and civil liberties ratings under Freedom House's methodology",
+      "direction": "Lower combined ratings indicate greater political rights and civil liberties; 2 is the freest endpoint and 14 the least free",
+      "sourceUrl": "https://freedomhouse.org/sites/default/files/2024-02/Aggregate_Category_and_Subcategory_Scores_FIW_2003-2024.xlsx"
+    },
+    {
+      "identity": "transparency_intl:score",
+      "sourceId": "transparency_intl",
+      "indicatorId": "score",
+      "label": "Corruption Perceptions Index",
+      "construct": "Perceived public-sector corruption according to expert and business sources",
+      "direction": "Higher scores indicate lower perceived public-sector corruption",
+      "sourceUrl": "https://images.transparencycdn.org/images/CPI2024-Results-and-trends.xlsx"
+    }
+  ],
+  "environment": {
+    "node": "v25.4.0",
+    "npm": "11.7.0",
+    "platform": "darwin",
+    "platformRelease": "25.5.0",
+    "arch": "arm64",
+    "packageLockSha256": "d71b55dbb2a75caa0c1c7c63cb31382b80dd682f851bbb4495c6704b60d23927"
+  },
+  "tournamentReleaseId": "civica-index-tournament-results-v1",
+  "tournamentWinnerSelected": false,
+  "inventory": [
+    {
+      "artifactId": "tournament-baselines",
+      "role": "tournament-artifact",
+      "bytes": 2302,
+      "sha256": "b33e849ec082e8042a90b274aabdb4b694342d2aa5ce44ad1a9317b4ea129cce",
+      "path": "data/releases/ci-index-baselines-v3/manifest.v3.json"
+    },
+    {
+      "artifactId": "selected-input-manifest",
+      "role": "selected-product-input",
+      "bytes": 3002,
+      "sha256": "15e2fa5ec8fa00bbdfcf10fe93ae9d49d79c666dce9418dd7fc15e10bce9fb99",
+      "path": "data/releases/ci-k1-uncertainty-inputs-2024-v2/manifest.v1.json"
+    },
+    {
+      "artifactId": "tournament-panel-coverage",
+      "role": "tournament-artifact",
+      "bytes": 721,
+      "sha256": "3134aa8aa70c102dd3421ae396fbb6777d646fb02630588cdc1cadddb3ef9a94",
+      "path": "data/releases/ci-research-panel-2000-2024-v3/coverage.v3.json"
+    },
+    {
+      "artifactId": "tournament-panel-manifest",
+      "role": "tournament-artifact",
+      "bytes": 2236,
+      "sha256": "f9f83964c34693cc17944e418818f0092c2a03f158f32e5e3adddfa50bfe0c84",
+      "path": "data/releases/ci-research-panel-2000-2024-v3/manifest.v3.json"
+    },
+    {
+      "artifactId": "packet-citation",
+      "role": "packet-document",
+      "bytes": 601,
+      "sha256": "c015cbe357f54ffa6e705410549105f1988e419cc35694f32ceb9a70c1ccae13",
+      "path": "data/releases/governance-evidence-review-packet-2026-07-v1/CITATION.cff"
+    },
+    {
+      "artifactId": "selected-product-codebook",
+      "role": "packet-document",
+      "bytes": 1800,
+      "sha256": "ea3bcc481d715b15ed4e3c0a081503d81a2d362e089ff675f47d147c423b6747",
+      "path": "data/releases/governance-evidence-review-packet-2026-07-v1/codebook.v1.csv"
+    },
+    {
+      "artifactId": "packet-readme",
+      "role": "packet-document",
+      "bytes": 990,
+      "sha256": "1a02968a1beff9494eab8805b4742449a476ea40ff44004bb1a44f8c21f2872b",
+      "path": "data/releases/governance-evidence-review-packet-2026-07-v1/README.md"
+    },
+    {
+      "artifactId": "reproduction-guide",
+      "role": "packet-document",
+      "bytes": 726,
+      "sha256": "546710b7fcd1650088fb3a739fa3c77a6ab107380a7ed939993c78bf9408bce1",
+      "path": "data/releases/governance-evidence-review-packet-2026-07-v1/reproduction.md"
+    },
+    {
+      "artifactId": "review-questionnaire",
+      "role": "packet-document",
+      "bytes": 1498,
+      "sha256": "ad7843f2b9dc90832bea3f5ed0192792f2b3261c18e4f86dec617b02b96d6290",
+      "path": "data/releases/governance-evidence-review-packet-2026-07-v1/review-questionnaire.md"
+    },
+    {
+      "artifactId": "tournament-dimensionality-figure",
+      "role": "tournament-artifact",
+      "bytes": 1699,
+      "sha256": "7dafa5b35f0e99e105e349cf295a936f4b5dda51d8d149ca1e3f7d82ddb4de35",
+      "path": "data/releases/index-dimensionality-analysis-v1/pc1-level-comparison.v1.svg"
+    },
+    {
+      "artifactId": "tournament-dimensionality",
+      "role": "tournament-artifact",
+      "bytes": 36589,
+      "sha256": "da3e54a515814e829287abb2600f52edd0eb02daf5920b1ebe2cc3aa63801e9f",
+      "path": "data/releases/index-dimensionality-analysis-v1/result.v1.json"
+    },
+    {
+      "artifactId": "tournament-dimensionality-table",
+      "role": "tournament-artifact",
+      "bytes": 3512,
+      "sha256": "d5d2ec2279a4affd063cfe4caccf2c76f7f345b5bbd05a15975807485506b381",
+      "path": "data/releases/index-dimensionality-analysis-v1/table.v1.csv"
+    },
+    {
+      "artifactId": "adopted-disposition",
+      "role": "disposition",
+      "bytes": 3879,
+      "sha256": "0d554163511751801a6d357b1bbc8344e50564c6481c8fcb4468bd8a73ca1b2b",
+      "path": "data/releases/index-disposition-2026-07-v1/resolution.v1.json"
+    },
+    {
+      "artifactId": "tournament-longitudinal",
+      "role": "tournament-artifact",
+      "bytes": 4941,
+      "sha256": "fbca344ee15d3039010732a00a820c7e76b0726c8a812f9dc2419d88250423fd",
+      "path": "data/releases/index-longitudinal-analysis-v1/result.v1.json"
+    },
+    {
+      "artifactId": "tournament-misuse-audit",
+      "role": "tournament-artifact",
+      "bytes": 6722,
+      "sha256": "983e9b38f283b3b9503dbb70946fc70f9a2105f322f92c67be6387737d403e83",
+      "path": "data/releases/index-misuse-audit-v1/result.v1.json"
+    },
+    {
+      "artifactId": "tournament-out-of-sample",
+      "role": "tournament-artifact",
+      "bytes": 4681,
+      "sha256": "279d8379df018d59345b747375e62b1d5787dbeef6c43b7800e2ffb58c8623af",
+      "path": "data/releases/index-oos-validation-v1/result.v1.json"
+    },
+    {
+      "artifactId": "tournament-sensitivity",
+      "role": "tournament-artifact",
+      "bytes": 13052,
+      "sha256": "5d6676552e34e12bd3b75ab7f514ac508557e692c6fa7582bbcd08911f5b4f39",
+      "path": "data/releases/index-sensitivity-analysis-v1/result.v1.json"
+    },
+    {
+      "artifactId": "tournament-source-dependence",
+      "role": "tournament-artifact",
+      "bytes": 9061,
+      "sha256": "b34ff36c5e82f4b50fa71eb3f349ef0224848a3fb1141aef9e4fb86e64ffa14f",
+      "path": "data/releases/index-source-dependence-v1/result.v1.json"
+    },
+    {
+      "artifactId": "tournament-subgroup-fairness",
+      "role": "tournament-artifact",
+      "bytes": 14679,
+      "sha256": "1108c521d1fa6131fc379c6f3b60132eae5a77e0c97c33582b09694643e18a30",
+      "path": "data/releases/index-subgroup-fairness-v1/result.v1.json"
+    },
+    {
+      "artifactId": "confirmatory-decision",
+      "role": "disposition",
+      "bytes": 8963,
+      "sha256": "8e6f124ccff8ba897b18d3ad1c1ac1e39b215f103b82bb6dca561aa6d84fdae2",
+      "path": "data/releases/index-tournament-confirmatory-decision-v1/decision.v1.json"
+    },
+    {
+      "artifactId": "tournament-evaluation-suite",
+      "role": "tournament-artifact",
+      "bytes": 7005,
+      "sha256": "e52bf0dc6c3a12489f19098a2842113b54c6c61c93488d177129d8a22868c09e",
+      "path": "data/releases/index-tournament-evaluation-suite-v1/manifest.v1.json"
+    },
+    {
+      "artifactId": "tournament-package-inventory",
+      "role": "tournament-package",
+      "bytes": 3948,
+      "sha256": "5b9c66eeef9a38fd874c125c5afca6d31ca884cd80053878302d3b3c66bc2408",
+      "path": "data/releases/index-tournament-results-package-v1/artifact-inventory.v1.csv"
+    },
+    {
+      "artifactId": "tournament-failure-ledger",
+      "role": "tournament-package",
+      "bytes": 2489,
+      "sha256": "0c05913b949bb92feb56cf3c593bfe6fa54d9a4c3fe182391f622450d5882a86",
+      "path": "data/releases/index-tournament-results-package-v1/error-ledger.v1.json"
+    },
+    {
+      "artifactId": "tournament-package-manifest",
+      "role": "tournament-package",
+      "bytes": 25758,
+      "sha256": "f8f59eefba7fd65de84de2c6b8b04cfe42cee2cab39e12712a6f6dbef86c0b45",
+      "path": "data/releases/index-tournament-results-package-v1/manifest.v1.json"
+    },
+    {
+      "artifactId": "tournament-validity",
+      "role": "tournament-artifact",
+      "bytes": 4629,
+      "sha256": "4ecc0c9a985d4eee07911136ec031d511d288fd0b0d961ed4aef358951ba4e9e",
+      "path": "data/releases/index-validity-analysis-v1/result.v1.json"
+    },
+    {
+      "artifactId": "tournament-k1",
+      "role": "tournament-artifact",
+      "bytes": 3343,
+      "sha256": "0e6c24d58dc59710deebe47fadbeb4c12e2879440cfad9137628653cfa994e5b",
+      "path": "data/releases/k1-current-composite-tournament-v1/manifest.v1.json"
+    },
+    {
+      "artifactId": "tournament-k2",
+      "role": "tournament-artifact",
+      "bytes": 1287,
+      "sha256": "3b355c2491a31321b9bfd2c92ea501991110f295271d32b3fdc486dd7b623e35",
+      "path": "data/releases/k2-concordance-prototype-v1/manifest.v1.json"
+    },
+    {
+      "artifactId": "tournament-k3",
+      "role": "tournament-artifact",
+      "bytes": 1061,
+      "sha256": "a630c639941b009d56fc84674d31ac32baca52cbced631b3d623d2a79c65519d",
+      "path": "data/releases/k3-power-transfer-ledger-prototype-v1/manifest.v1.json"
+    },
+    {
+      "artifactId": "tournament-k4",
+      "role": "tournament-artifact",
+      "bytes": 1110,
+      "sha256": "9ac2e28a6ae8061cd31e1d0dd70148069e803a33bbc3e9597917f5ed44da3bb0",
+      "path": "data/releases/k4-constitution-practice-pairings-2024-v1/manifest.v1.json"
+    },
+    {
+      "artifactId": "tournament-k5",
+      "role": "tournament-artifact",
+      "bytes": 1804,
+      "sha256": "f45cbe8a1c612a0583080fb5dfcacc36974698e158572df1543f2bdf216481cb",
+      "path": "data/releases/k5-institutional-relation-candidates-v1/manifest.v1.json"
+    },
+    {
+      "artifactId": "package-lock",
+      "role": "environment",
+      "bytes": 406742,
+      "sha256": "d71b55dbb2a75caa0c1c7c63cb31382b80dd682f851bbb4495c6704b60d23927",
+      "path": "package-lock.json"
+    },
+    {
+      "artifactId": "package-json",
+      "role": "environment",
+      "bytes": 22856,
+      "sha256": "0b368e1f833f3b315ed53feac38bb924049a09c14c9e3f904a59d3cf956f34a8",
+      "path": "package.json"
+    },
+    {
+      "artifactId": "public-surface-migration",
+      "role": "disposition",
+      "bytes": 3243,
+      "sha256": "f38c0ca56fc5917cd81045406dd2486da126a97e481d04aa929c41723160c639",
+      "path": "plan/evidence/IDX-027/README.md"
+    },
+    {
+      "artifactId": "tournament-k0",
+      "role": "tournament-artifact",
+      "bytes": 1849,
+      "sha256": "6bd51fcef1c3729aedc07b5dbcfc9c40161b03223b3e023e52e74c2fb8eee251",
+      "path": "plan/evidence/IDX-031/README.md"
+    },
+    {
+      "artifactId": "tournament-preregistered-protocol",
+      "role": "tournament-artifact",
+      "bytes": 793,
+      "sha256": "3a831c23cbc3a01d3b292da429f4d662c10e8225afd341222b4633e2c894f31a",
+      "path": "plan/research/index-tournament-preregistration-v3.md"
+    },
+    {
+      "artifactId": "review-packet-generator",
+      "role": "selected-product-code",
+      "bytes": 1342,
+      "sha256": "0710c85056a2119cf6e5c9cb4e824615795c5ae451ddbf61fef8a913800abd15",
+      "path": "scripts/generate-governance-evidence-review-packet.ts"
+    },
+    {
+      "artifactId": "selected-product-code-6",
+      "role": "selected-product-code",
+      "bytes": 2344,
+      "sha256": "32502cecb1d274d64fd7f96ffea37dfd9a3fd8457d0ee4842dce089a69e7d609",
+      "path": "scripts/validate-governance-evidence-dashboard.ts"
+    },
+    {
+      "artifactId": "review-packet-validator",
+      "role": "selected-product-code",
+      "bytes": 2434,
+      "sha256": "3629fe4a6185bdaf447c22807c7e51da8047d35204da37a371f9717126dbbada",
+      "path": "scripts/validate-governance-evidence-review-packet.ts"
+    },
+    {
+      "artifactId": "selected-product-code-5",
+      "role": "selected-product-code",
+      "bytes": 702,
+      "sha256": "fdc6080697163204e06f9c971f00169c69ffbc6367e88473584108f7eb4c1108",
+      "path": "src/app/api/governance-evidence/[slug]/route.ts"
+    },
+    {
+      "artifactId": "selected-product-code-4",
+      "role": "selected-product-code",
+      "bytes": 3153,
+      "sha256": "328ad2c07ea485a42452f15e624b23087d67fe19785b8ea9e65f1d5b28a60446",
+      "path": "src/app/governance-evidence/page.tsx"
+    },
+    {
+      "artifactId": "selected-product-code-3",
+      "role": "selected-product-code",
+      "bytes": 2074,
+      "sha256": "c57b3223f18980c4c1c1b6d6d5942ef4d5b4a365e4f5834aa01de427b19c20db",
+      "path": "src/components/governance-evidence/GovernanceEvidenceTable.tsx"
+    },
+    {
+      "artifactId": "review-packet-builder",
+      "role": "selected-product-code",
+      "bytes": 10097,
+      "sha256": "e35587f696e6b1d2c497f51e650ccfff6c5165b2aa70115368c88ce17338ad1f",
+      "path": "src/lib/ci/governance-evidence-review-package.ts"
+    },
+    {
+      "artifactId": "review-packet-contract",
+      "role": "selected-product-code",
+      "bytes": 8882,
+      "sha256": "fd8b049cec2c6f002a6f7906e836a289df94a1a25eca8ed677e7da828f41d585",
+      "path": "src/lib/ci/governance-evidence-review-packet.ts"
+    },
+    {
+      "artifactId": "selected-product-code-1",
+      "role": "selected-product-code",
+      "bytes": 4644,
+      "sha256": "5174855f9b5ed486cdf17b2bb1327a57c56a342f4bf70d2f043ea759e2acdf7a",
+      "path": "src/lib/ci/governance-evidence.ts"
+    },
+    {
+      "artifactId": "selected-product-code-2",
+      "role": "selected-product-code",
+      "bytes": 2991,
+      "sha256": "3d9e0d1cee7fee6e9ff46581e3491600c15216cf00307ae8aa02d9c72db62853",
+      "path": "src/lib/db/queries-governance-evidence.ts"
+    },
+    {
+      "artifactId": "rights-manifest-code",
+      "role": "rights",
+      "bytes": 12228,
+      "sha256": "3114b8b433cedc9f4008c907da6e2713fa5b4efbbac9df1ee714f64dd8be2878",
+      "path": "src/lib/rights/manifest.ts"
+    }
+  ],
+  "bundleSemanticSha256": "067310d6227ecea53d6b4b1d60faf6ba7f7d177582c01579b360d62ea7310317"
+}
